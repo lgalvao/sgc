@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
@@ -35,6 +36,8 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Unidade unidadeSuperior;
     private Subprocesso subprocesso1;
@@ -150,5 +153,35 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movs2 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s2.getCodigo());
         assertThat(movs2).isNotEmpty();
         assertThat(movs2.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(2L);
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_ACEITO)
+                .filter(n -> n.getUsuarioDestinoTitulo() == null)
+                .toList();
+        assertThat(notificacoes).hasSize(3);
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
+            assertThat(notificacao.getDestinatario()).isEqualTo("sedesenv@tre-pe.jus.br");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos submetido para análise - SEDESENV");
+            assertThat(notificacao.getCorpoHtml()).contains("foi aceito e submetido para análise pela unidade superior imediata");
+            assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+        });
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDIA");
+            assertThat(notificacao.getDestinatario()).isEqualTo("sedia@tre-pe.jus.br");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos submetido para análise - SEDIA");
+        });
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
+            assertThat(notificacao.getDestinatario()).isEqualTo("cosis@tre-pe.jus.br");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastros de atividades e conhecimentos submetidos para análise");
+            assertThat(notificacao.getCorpoHtml()).contains("SEDESENV, SEDIA");
+        });
+
+        aguardarEmail(3);
+        assertThat(algumEmailPara("sedesenv@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailPara("sedia@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailPara("cosis@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Cadastros de atividades e conhecimentos submetidos para análise")).isTrue();
     }
 }

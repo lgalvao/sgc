@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
@@ -37,6 +39,10 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private AlertaRepo alertaRepo;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Unidade unidade1;
     private Unidade unidade2;
@@ -144,7 +150,9 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
-        assertThat(movs1.getFirst().getDescricao()).contains("homologado");
+        assertThat(movs1.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_CADASTRO_HOMOLOGADO);
+        assertThat(movs1.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
+        assertThat(movs1.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
 
         // Verify subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
@@ -152,7 +160,54 @@ class CDU23IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs2 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s2.getCodigo());
         assertThat(movs2).isNotEmpty();
-        assertThat(movs2.getFirst().getDescricao()).contains("homologado");
+        assertThat(movs2.getFirst().getDescricao()).isEqualTo(Mensagens.HIST_CADASTRO_HOMOLOGADO);
+        assertThat(movs2.getFirst().getUnidadeOrigem().getSigla()).isEqualTo("ADMIN");
+        assertThat(movs2.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
+
+        List<Alerta> alertas = alertaRepo.findByProcessoCodigo(processo.getCodigo());
+        assertThat(alertas).anyMatch(alerta ->
+                alerta.getUnidadeDestino() != null
+                        && Objects.equals(alerta.getUnidadeDestino().getCodigo(), unidade1.getCodigo())
+                        && Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(unidade1.getSigla()).equals(alerta.getDescricao())
+                        && "ADMIN".equals(alerta.getUnidadeOrigem().getSigla())
+        );
+        assertThat(alertas).anyMatch(alerta ->
+                alerta.getUnidadeDestino() != null
+                        && Objects.equals(alerta.getUnidadeDestino().getCodigo(), unidade2.getCodigo())
+                        && Mensagens.ALERTA_CADASTRO_HOMOLOGADO.formatted(unidade2.getSigla()).equals(alerta.getDescricao())
+                        && "ADMIN".equals(alerta.getUnidadeOrigem().getSigla())
+        );
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_HOMOLOGADO)
+                .toList();
+        assertThat(notificacoes).hasSize(2);
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo(unidade1.getSigla());
+            assertThat(notificacao.getDestinatario()).isEqualTo("unid-homolog-1@tre-pe.jus.br");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades homologado");
+            assertThat(notificacao.getCorpoHtml())
+                    .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidade1.getSigla()))
+                    .contains("O cadastro de atividades e conhecimentos da sua unidade foi homologado no processo")
+                    .contains(processo.getDescricao())
+                    .contains("Acompanhe o processo no Sistema de Gestão de Competências");
+            assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+        });
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo(unidade2.getSigla());
+            assertThat(notificacao.getDestinatario()).isEqualTo("unid-homolog-2@tre-pe.jus.br");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades homologado");
+            assertThat(notificacao.getCorpoHtml())
+                    .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidade2.getSigla()))
+                    .contains(processo.getDescricao());
+            assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+        });
+
+        aguardarEmail(2);
+        assertThat(algumEmailPara("unid-homolog-1@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailPara("unid-homolog-2@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Cadastro de atividades homologado")).isTrue();
+        assertThat(algumEmailContem("foi homologado no processo")).isTrue();
     }
 
     @Test

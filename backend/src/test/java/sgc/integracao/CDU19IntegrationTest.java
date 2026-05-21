@@ -28,6 +28,8 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private AlertaRepo alertaRepo;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -107,6 +109,26 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
 
             assertThat(alertas).hasSize(1);
+
+            List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                    .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_SUGESTOES_APRESENTADAS)
+                    .filter(n -> n.getUsuarioDestinoTitulo() == null)
+                    .toList();
+            assertThat(notificacoes).hasSize(1);
+
+            NotificacaoEmail notificacao = notificacoes.getFirst();
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(notificacao.getDestinatario())
+                    .isEqualTo("%s@tre-pe.jus.br".formatted(unidadeSuperior.getSigla().toLowerCase(Locale.ROOT)));
+            assertThat(notificacao.getAssunto())
+                    .isEqualTo("SGC: Sugestões apresentadas para o mapa de competências da %s".formatted(unidade.getSigla()));
+            assertThat(notificacao.getCorpoHtml())
+                    .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidadeSuperior.getSigla()))
+                    .contains("A unidade <strong>%s</strong> apresentou sugestões para o mapa de".formatted(unidade.getSigla()))
+                    .contains("competências elaborado no processo")
+                    .contains("Processo para CDU-19")
+                    .contains("A análise dessas sugestões já pode ser realizada no Sistema de Gestão de Competências");
+            assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
         }
     }
 
@@ -146,6 +168,25 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     .contains("Validação do mapa de competências da unidade " + unidade.getSigla() + " aguardando análise");
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla())
                     .isEqualTo(unidadeSuperior.getSigla());
+
+            List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                    .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDADO)
+                    .filter(n -> n.getUsuarioDestinoTitulo() == null)
+                    .toList();
+            assertThat(notificacoes).hasSize(1);
+
+            NotificacaoEmail notificacao = notificacoes.getFirst();
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo(unidadeSuperior.getSigla());
+            assertThat(notificacao.getDestinatario())
+                    .isEqualTo("%s@tre-pe.jus.br".formatted(unidadeSuperior.getSigla().toLowerCase(Locale.ROOT)));
+            assertThat(notificacao.getAssunto())
+                    .isEqualTo("SGC: Validação do mapa de competências da %s submetida para análise".formatted(unidade.getSigla()));
+            assertThat(notificacao.getCorpoHtml())
+                    .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidadeSuperior.getSigla()))
+                    .contains("A unidade <strong>%s</strong> validou o mapa de competências".formatted(unidade.getSigla()))
+                    .contains("Processo para CDU-19")
+                    .contains("A análise dessa validação já pode ser realizada no Sistema de Gestão de Competências");
+            assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
         }
     }
 }

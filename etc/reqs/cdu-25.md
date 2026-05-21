@@ -55,7 +55,19 @@
     - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-   8.4. Envia notificação por e-mail para a unidade superior, com o modelo a seguir:
+   8.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, com o modelo a seguir:
+
+    ```text
+    Assunto: SGC: Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+
+    A validação do mapa de competências da sua unidade no processo [DESCRIÇÃO_PROCESSO] foi aceita e submetida para análise pela unidade superior imediata.
+
+    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
+
+   8.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e envia, para cada unidade superior imediata que tenha ao menos uma subordinada direta selecionada, uma única notificação consolidada por e-mail, com o modelo a seguir:
 
     ```text
     Assunto: SGC: Validação de mapas de competências submetida para análise
@@ -66,5 +78,7 @@
 
     As análises já podem ser realizadas no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
+
+   8.6. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
 
 9. O sistema mostra mensagem de confirmação: "Mapas aceitos em bloco" e redireciona para o Painel.

@@ -20,6 +20,7 @@ public record RegistrarWorkflowCommand(
         Unidade unidadeDestinoTransicao,
         Usuario usuario,
         @Nullable String motivoAnalise,
-        @Nullable String observacoes
+        @Nullable String observacoes,
+        @Nullable Boolean notificarSuperior
 ) {
 }

@@ -46,6 +46,8 @@ class CadastroFluxoServiceTest {
     private AlertaFacade alertaService;
     @Mock
     private SubprocessoTransicaoService transicaoService;
+    @Mock
+    private SubprocessoNotificacaoService notificacaoService;
 
     @InjectMocks
     private CadastroFluxoService service;

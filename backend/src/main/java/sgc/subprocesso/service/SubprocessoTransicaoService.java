@@ -6,6 +6,7 @@ import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
+import sgc.alerta.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
@@ -58,6 +59,7 @@ public class SubprocessoTransicaoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final UsuarioFacade usuarioFacade;
     private final MapaManutencaoService mapaManutencaoService;
+    private final AlertaFacade alertaFacade;
 
     private static @Nullable String normalizarTexto(@Nullable String texto) {
         if (!StringUtils.hasText(texto)) {
@@ -69,6 +71,19 @@ public class SubprocessoTransicaoService {
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
         persistirTransicao(cmd);
         registrarComunicacoesTransicao(cmd);
+    }
+
+    public void registrarTransicaoSemEmail(RegistrarTransicaoCommand cmd) {
+        persistirTransicao(cmd);
+        if (cmd.tipo().geraAlerta()) {
+            notificacaoService.registrarAlertaTransicao(NotificacaoCommand.builder()
+                    .subprocesso(cmd.sp())
+                    .tipoTransicao(cmd.tipo())
+                    .unidadeOrigem(cmd.origem())
+                    .unidadeDestino(cmd.destino())
+                    .observacoes(cmd.observacoes())
+                    .build());
+        }
     }
 
     private void persistirTransicao(RegistrarTransicaoCommand cmd) {
@@ -93,6 +108,7 @@ public class SubprocessoTransicaoService {
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .observacoes(cmd.observacoes())
+                .notificarSuperior(cmd.notificarSuperior())
                 .build());
     }
 
@@ -111,6 +127,29 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(cmd.novaSituacao());
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(cmd.tipoTransicao())
+                .origem(cmd.unidadeOrigemTransicao())
+                .destino(cmd.unidadeDestinoTransicao())
+                .usuario(usuario)
+                .observacoes(cmd.observacoes())
+                .build());
+    }
+
+    public void registrarAnaliseSemEmail(RegistrarWorkflowCommand cmd) {
+        Subprocesso sp = cmd.sp();
+        Usuario usuario = cmd.usuario();
+
+        CriarAnaliseRequest request = CriarAnaliseRequest.builder()
+                .observacoes(cmd.observacoes())
+                .acao(cmd.tipoAcaoAnalise())
+                .motivo(cmd.motivoAnalise())
+                .build();
+
+        criarAnalise(sp, request, cmd.tipoAnalise());
+        sp.setSituacao(cmd.novaSituacao());
+
+        registrarTransicaoSemEmail(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(cmd.tipoTransicao())
                 .origem(cmd.unidadeOrigemTransicao())
@@ -145,20 +184,27 @@ public class SubprocessoTransicaoService {
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> subprocessoCodigos, DisponibilizarMapaRequest request) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        subprocessoCodigos.forEach(codSubprocesso -> executarDisponibilizacaoMapa(codSubprocesso, request, usuario));
+        List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
+        subprocessos.forEach(subprocesso -> executarDisponibilizacaoMapa(subprocesso, request, usuario, false));
+        notificacaoService.notificarDisponibilizacaoMapaEmBloco(subprocessos);
     }
 
     @Transactional
     public void disponibilizarMapaEmBloco(List<Subprocesso> subprocessos, DisponibilizarMapaRequest request, Usuario usuario) {
-        subprocessos.forEach(subprocesso -> executarDisponibilizacaoMapa(subprocesso, request, usuario));
+        subprocessos.forEach(subprocesso -> executarDisponibilizacaoMapa(subprocesso, request, usuario, false));
+        notificacaoService.notificarDisponibilizacaoMapaEmBloco(subprocessos);
     }
 
     private void executarDisponibilizacaoMapa(Long codSubprocesso, DisponibilizarMapaRequest request, Usuario usuario) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        executarDisponibilizacaoMapa(sp, request, usuario);
+        executarDisponibilizacaoMapa(sp, request, usuario, true);
     }
 
     private void executarDisponibilizacaoMapa(Subprocesso sp, DisponibilizarMapaRequest request, Usuario usuario) {
+        executarDisponibilizacaoMapa(sp, request, usuario, true);
+    }
+
+    private void executarDisponibilizacaoMapa(Subprocesso sp, DisponibilizarMapaRequest request, Usuario usuario, boolean enviarEmails) {
         Long codSubprocesso = sp.getCodigo();
         log.info("Disponibilizando mapa do subprocesso {}", codSubprocesso);
 
@@ -195,7 +241,15 @@ public class SubprocessoTransicaoService {
         sp.setDataLimiteEtapa2(request.dataLimite().atStartOfDay());
         sp.setDataFimEtapa1(LocalDateTime.now());
 
-        registrarTransicaoDoAdminParaUnidade(sp, TipoTransicao.MAPA_DISPONIBILIZADO, usuario, normalizarTexto(observacoes));
+        registrarTransicao(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(TipoTransicao.MAPA_DISPONIBILIZADO)
+                .origem(obterUnidadeAdmin())
+                .destino(sp.getUnidade())
+                .usuario(usuario)
+                .observacoes(normalizarTexto(observacoes))
+                .notificarSuperior(enviarEmails ? null : Boolean.FALSE)
+                .build());
     }
 
     private @Nullable LocalDate obterDataFimEtapaAnterior(Subprocesso sp) {
@@ -314,10 +368,15 @@ public class SubprocessoTransicaoService {
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarAceiteValidacao(sp, null, usuario));
+        subprocessos.forEach(sp -> executarAceiteValidacao(sp, null, usuario, false));
+        notificacaoService.notificarAceiteValidacaoEmBloco(subprocessos);
     }
 
     private void executarAceiteValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
+        executarAceiteValidacao(sp, observacoes, usuario, true);
+    }
+
+    private void executarAceiteValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario, boolean enviarEmails) {
         validarLocalizacaoEscrita(sp, usuario);
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_COM_SUGESTOES,
@@ -326,12 +385,17 @@ public class SubprocessoTransicaoService {
                 REVISAO_MAPA_VALIDADO);
 
         SituacaoSubprocesso novaSituacao = sp.getSituacao();
-        registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand.aceiteValidacao(
+        RegistrarWorkflowInternoCommand cmd = RegistrarWorkflowInternoCommand.aceiteValidacao(
                 sp,
                 novaSituacao,
                 usuario,
                 normalizarTexto(observacoes)
-        ));
+        );
+        if (enviarEmails) {
+            registrarWorkflowParaSuperiorAtual(cmd, true);
+        } else {
+            registrarWorkflowParaSuperiorAtualSemEmail(cmd);
+        }
 
         log.info("Validação aceita para mapa do SP {}", sp.getCodigo());
     }
@@ -346,10 +410,14 @@ public class SubprocessoTransicaoService {
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarHomologacaoValidacao(sp, null, usuario));
+        subprocessos.forEach(sp -> executarHomologacaoValidacao(sp, null, usuario, true));
     }
 
     private void executarHomologacaoValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
+        executarHomologacaoValidacao(sp, observacoes, usuario, false);
+    }
+
+    private void executarHomologacaoValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario, boolean notificarUnidade) {
         log.info("Homologando validação do mapa do subprocesso {}", sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_VALIDADO,
@@ -358,6 +426,15 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_HOMOLOGADO, sp, "homologação de validação"));
 
         registrarTransicaoDentroDoAdmin(sp, TipoTransicao.MAPA_HOMOLOGADO, usuario, normalizarTexto(observacoes));
+        if (notificarUnidade) {
+            alertaFacade.criarAlertaTransicao(
+                    sp.getProcesso(),
+                    Mensagens.ALERTA_MAPA_HOMOLOGADO.formatted(sp.getUnidade().getSigla()),
+                    obterUnidadeAdmin(),
+                    sp.getUnidade()
+            );
+            notificacaoService.notificarHomologacaoMapa(sp);
+        }
     }
 
     private void registrarTransicaoParaSuperiorDaUnidade(
@@ -381,6 +458,10 @@ public class SubprocessoTransicaoService {
     }
 
     private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd) {
+        registrarWorkflowParaSuperiorAtual(cmd, true);
+    }
+
+    private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd, boolean notificarSuperior) {
         Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(cmd.sp());
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
 
@@ -396,10 +477,32 @@ public class SubprocessoTransicaoService {
                 .observacoes(cmd.observacoes());
 
         if (unidadeDestino != null) {
-            registrarWorkflowComDestino(builder.unidadeDestino(unidadeDestino).build());
+            registrarWorkflowComDestino(builder.unidadeDestino(unidadeDestino).build(), notificarSuperior);
         } else if (cmd.usuario().getPerfilAtivo() == Perfil.ADMIN) {
             // ADMIN na raiz: registra transição interna para si mesmo para mudar a situação
-            registrarWorkflowComDestino(builder.unidadeDestino(unidadeAtual).build());
+            registrarWorkflowComDestino(builder.unidadeDestino(unidadeAtual).build(), notificarSuperior);
+        }
+    }
+
+    private void registrarWorkflowParaSuperiorAtualSemEmail(RegistrarWorkflowInternoCommand cmd) {
+        Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(cmd.sp());
+        Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
+
+        RegistrarWorkflowInternoCommand.RegistrarWorkflowInternoCommandBuilder builder = RegistrarWorkflowInternoCommand.builder()
+                .sp(cmd.sp())
+                .novaSituacao(cmd.novaSituacao())
+                .tipoTransicao(cmd.tipoTransicao())
+                .tipoAnalise(cmd.tipoAnalise())
+                .tipoAcaoAnalise(cmd.tipoAcaoAnalise())
+                .unidadeAnalise(unidadeAtual)
+                .usuario(cmd.usuario())
+                .motivoAnalise(cmd.motivoAnalise())
+                .observacoes(cmd.observacoes());
+
+        if (unidadeDestino != null) {
+            registrarWorkflowComDestinoSemEmail(builder.unidadeDestino(unidadeDestino).build());
+        } else if (cmd.usuario().getPerfilAtivo() == Perfil.ADMIN) {
+            registrarWorkflowComDestinoSemEmail(builder.unidadeDestino(unidadeAtual).build());
         }
     }
 
@@ -411,9 +514,32 @@ public class SubprocessoTransicaoService {
     }
 
     private void registrarWorkflowComDestino(RegistrarWorkflowInternoCommand cmd) {
+        registrarWorkflowComDestino(cmd, true);
+    }
+
+    private void registrarWorkflowComDestino(RegistrarWorkflowInternoCommand cmd, boolean notificarSuperior) {
         Unidade unidadeAnalise = Objects.requireNonNull(cmd.unidadeAnalise(), "Unidade de analise obrigatoria");
         Unidade unidadeDestino = Objects.requireNonNull(cmd.unidadeDestino(), "Unidade de destino obrigatoria");
         registrarAnalise(RegistrarWorkflowCommand.builder()
+                .sp(cmd.sp())
+                .novaSituacao(cmd.novaSituacao())
+                .tipoTransicao(cmd.tipoTransicao())
+                .tipoAnalise(cmd.tipoAnalise())
+                .tipoAcaoAnalise(cmd.tipoAcaoAnalise())
+                .unidadeAnalise(unidadeAnalise)
+                .unidadeOrigemTransicao(unidadeAnalise)
+                .unidadeDestinoTransicao(unidadeDestino)
+                .usuario(cmd.usuario())
+                .motivoAnalise(cmd.motivoAnalise())
+                .observacoes(cmd.observacoes())
+                .notificarSuperior(notificarSuperior ? null : Boolean.FALSE)
+                .build());
+    }
+
+    private void registrarWorkflowComDestinoSemEmail(RegistrarWorkflowInternoCommand cmd) {
+        Unidade unidadeAnalise = Objects.requireNonNull(cmd.unidadeAnalise(), "Unidade de analise obrigatoria");
+        Unidade unidadeDestino = Objects.requireNonNull(cmd.unidadeDestino(), "Unidade de destino obrigatoria");
+        registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
                 .sp(cmd.sp())
                 .novaSituacao(cmd.novaSituacao())
                 .tipoTransicao(cmd.tipoTransicao())
@@ -441,6 +567,7 @@ public class SubprocessoTransicaoService {
                 .destino(sp.getUnidade())
                 .usuario(usuario)
                 .observacoes(observacoes)
+                .notificarSuperior(null)
                 .build());
     }
 
@@ -458,6 +585,7 @@ public class SubprocessoTransicaoService {
                 .destino(admin)
                 .usuario(usuario)
                 .observacoes(observacoes)
+                .notificarSuperior(null)
                 .build());
     }
 

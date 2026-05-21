@@ -32,6 +32,11 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private static final String API_URL = "/api/subprocessos/{codigo}/disponibilizar-mapa";
     private static final String OBS_LITERAL = "Obs";
     private static final String ADMIN_LITERAL = "ADMIN";
+    private static final String SQL_ATUALIZAR_UNIDADE_SUPERIOR = """
+            UPDATE SGC.VW_UNIDADE
+            SET unidade_superior_codigo = ?
+            WHERE codigo = ?
+            """;
 
     @Autowired
     private CompetenciaRepo competenciaRepo;
@@ -45,8 +50,11 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private UsuarioRepo usuarioRepo;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Unidade unidade;
+    private Unidade unidadeSuperior;
     private Subprocesso subprocesso;
     private Mapa mapa;
 
@@ -62,9 +70,22 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
         unidade.setSigla("U17");
         unidade = unidadeRepo.save(unidade);
 
+        unidadeSuperior = UnidadeFixture.unidadePadrao();
+        unidadeSuperior.setCodigo(null);
+        unidadeSuperior.setNome("Unidade superior CDU-17");
+        unidadeSuperior.setSigla("U17SUP");
+        unidadeSuperior.setTipo(TipoUnidade.INTERMEDIARIA);
+        unidadeSuperior = unidadeRepo.save(unidadeSuperior);
+
         // Add responsabilidade to prevent 404 during email notification
         jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
                 unidade.getCodigo(), "111111111111", "00000", "TITULAR", LocalDateTime.now());
+        jdbcTemplate.update("INSERT INTO SGC.VW_RESPONSABILIDADE (unidade_codigo, usuario_titulo, usuario_matricula, tipo, data_inicio) VALUES (?, ?, ?, ?, ?)",
+                unidadeSuperior.getCodigo(), "222222222222", "00001", "TITULAR", LocalDateTime.now());
+        jdbcTemplate.update(SQL_ATUALIZAR_UNIDADE_SUPERIOR, unidadeSuperior.getCodigo(), unidade.getCodigo());
+
+        unidade = unidadeRepo.findById(unidade.getCodigo()).orElseThrow();
+        unidadeSuperior = unidadeRepo.findById(unidadeSuperior.getCodigo()).orElseThrow();
 
         // Criar processo via Fixture
         Processo processo = ProcessoFixture.processoPadrao();
@@ -166,6 +187,44 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
             List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
+
+            List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                    .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_DISPONIBILIZADO)
+                    .filter(n -> n.getUsuarioDestinoTitulo() == null)
+                    .toList();
+            assertThat(notificacoes).hasSizeGreaterThanOrEqualTo(2);
+
+            NotificacaoEmail notificacaoUnidade = notificacoes.stream()
+                    .filter(n -> unidade.getSigla().equals(n.getUnidadeDestinoSigla()))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(notificacaoUnidade.getDestinatario()).isEqualTo("u17@tre-pe.jus.br");
+            assertThat(notificacaoUnidade.getAssunto()).isEqualTo("SGC: Mapa de competências disponibilizado");
+            assertThat(notificacaoUnidade.getCorpoHtml())
+                    .contains("Prezado(a) responsável pela <strong>U17</strong>")
+                    .contains("O mapa de competências de sua unidade foi disponibilizado no contexto do processo")
+                    .contains(subprocesso.getProcesso().getDescricao())
+                    .contains("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências");
+            assertThat(notificacaoUnidade.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+
+            NotificacaoEmail notificacaoSuperior = notificacoes.stream()
+                    .filter(n -> unidadeSuperior.getSigla().equals(n.getUnidadeDestinoSigla()))
+                    .findFirst()
+                    .orElseThrow();
+            assertThat(notificacaoSuperior.getDestinatario()).isEqualTo("u17sup@tre-pe.jus.br");
+            assertThat(notificacaoSuperior.getAssunto()).isEqualTo("SGC: Mapa de competências disponibilizado - U17");
+            assertThat(notificacaoSuperior.getCorpoHtml())
+                    .contains("Prezado(a) responsável pela <strong>U17SUP</strong>")
+                    .contains("O mapa de competências da <strong>U17</strong> foi disponibilizado no")
+                    .contains("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências");
+            assertThat(notificacaoSuperior.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+
+            aguardarEmail(2);
+            assertThat(algumEmailPara(notificacaoUnidade.getDestinatario())).isTrue();
+            assertThat(algumEmailPara(notificacaoSuperior.getDestinatario())).isTrue();
+            assertThat(algumEmailComAssunto("[SGC-TEST] Mapa de competências disponibilizado")).isTrue();
+            assertThat(algumEmailComAssunto("[SGC-TEST] Mapa de competências disponibilizado - U17")).isTrue();
+            assertThat(algumEmailContem("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências")).isTrue();
 
             List<Analise> analisesRestantes = analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());
             assertThat(analisesRestantes).hasSize(1);

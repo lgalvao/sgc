@@ -37,6 +37,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Subprocesso subprocesso;
     private Unidade unidade;
@@ -150,6 +152,28 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(alertasDevolucao.getFirst().getUnidadeDestino().getSigla())
                 .isEqualTo(subprocesso.getUnidade().getSigla());
 
+        List<NotificacaoEmail> notificacoesDevolucao = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_DEVOLVIDA)
+                .filter(n -> n.getUsuarioDestinoTitulo() == null)
+                .toList();
+        assertThat(notificacoesDevolucao).isNotEmpty();
+
+        NotificacaoEmail notificacaoDevolucao = notificacoesDevolucao.stream()
+                .filter(n -> unidade.getSigla().equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(notificacaoDevolucao.getDestinatario())
+                .isEqualTo("%s@tre-pe.jus.br".formatted(unidade.getSigla().toLowerCase(Locale.ROOT)));
+        assertThat(notificacaoDevolucao.getAssunto())
+                .isEqualTo("SGC: Validação do mapa da %s devolvida para ajustes".formatted(unidade.getSigla()));
+        assertThat(notificacaoDevolucao.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidade.getSigla()))
+                .contains("foi devolvida para ajustes")
+                .contains("Processo de Teste")
+                .contains("Justificativa da devolução")
+                .contains("Acompanhe o processo no Sistema de Gestão de Competências");
+        assertThat(notificacaoDevolucao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+
         // Unidade inferior valida o mapa novamente (CHEFE of unit 9)
         mockMvc.perform(post("/api/subprocessos/{codigo}/validar-mapa", subprocesso.getCodigo())
                         .with(user(usuarioChefe))
@@ -196,6 +220,29 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         assertThat(alertaDeAceite.getDescricao())
                 .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");
+
+        List<NotificacaoEmail> notificacoesAceite = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_ACEITA)
+                .filter(n -> n.getUsuarioDestinoTitulo() == null)
+                .toList();
+        assertThat(notificacoesAceite).isNotEmpty();
+
+        NotificacaoEmail notificacaoAceite = notificacoesAceite.stream()
+                .filter(n -> unidadeSuperiorSuperior.getSigla().equals(n.getUnidadeDestinoSigla()))
+                .findFirst()
+                .orElseThrow();
+        assertThat(notificacaoAceite.getDestinatario())
+                .isEqualTo("%s@tre-pe.jus.br".formatted(unidadeSuperiorSuperior.getSigla().toLowerCase(Locale.ROOT)));
+        assertThat(notificacaoAceite.getAssunto())
+                .isEqualTo("SGC: Validação do mapa de competências da %s submetida para análise".formatted(unidade.getSigla()));
+        assertThat(notificacaoAceite.getCorpoHtml())
+                .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidadeSuperiorSuperior.getSigla()))
+                .contains("A validação do mapa de competências da <strong>%s</strong>".formatted(unidade.getSigla()))
+                .contains("foi submetida para análise por essa")
+                .contains("unidade")
+                .contains("Processo de Teste")
+                .contains("A análise já pode ser realizada no Sistema de Gestão de Competências");
+        assertThat(notificacaoAceite.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
     }
 
     @Test

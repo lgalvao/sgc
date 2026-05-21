@@ -57,7 +57,19 @@
     - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-   8.4. Envia notificação por e-mail para a unidade superior, seguindo este modelo:
+   8.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, seguindo este modelo:
+
+    ```text
+    Assunto: SGC: Cadastro de atividades e conhecimentos submetido para análise - [SIGLA_UNIDADE_SUBPROCESSO]
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+
+    O cadastro de atividades e conhecimentos da sua unidade no processo [DESCRIÇÃO_PROCESSO] foi aceito e submetido para análise pela unidade superior imediata.
+
+    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
+
+   8.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e, para cada unidade superior imediata que tenha ao menos uma subordinada direta selecionada, envia uma única notificação consolidada por e-mail, seguindo este modelo:
 
     ```text
     Assunto: SGC: Cadastros de atividades e conhecimentos submetidos para análise
@@ -68,5 +80,7 @@
 
     As análises já podem ser realizadas no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
+
+   8.6. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
 
 9. O sistema redireciona para `Painel` e mostra a mensagem "Cadastros aceitos em bloco".

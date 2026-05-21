@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.*;
 import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
@@ -37,6 +38,8 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     private Subprocesso subprocesso1;
     private Subprocesso subprocesso2;
@@ -140,6 +143,31 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         // Check subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s2.getCodigo())).isNotEmpty();
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_ACEITA)
+                .filter(n -> n.getUsuarioDestinoTitulo() == null)
+                .toList();
+        assertThat(notificacoes).hasSize(3);
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação do mapa de competências da SEDESENV submetida para análise");
+            assertThat(notificacao.getCorpoHtml()).contains("foi aceita e submetida para análise pela unidade superior imediata");
+        });
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDIA");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação do mapa de competências da SEDIA submetida para análise");
+        });
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação de mapas de competências submetida para análise");
+            assertThat(notificacao.getCorpoHtml()).contains("SEDESENV, SEDIA");
+        });
+
+        aguardarEmail(3);
+        assertThat(algumEmailPara("sedesenv@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailPara("sedia@tre-pe.jus.br")).isTrue();
+        assertThat(algumEmailPara("cosis@tre-pe.jus.br")).isTrue();
     }
 
     @Test

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
+    <th:block th:fragment="cabecalho">
+        <h1>Cadastro de atividades homologado</h1>
+    </th:block>
+    <th:block th:fragment="conteudo">
+        <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}">UNIDADE</strong>,</p>
+
+        <p>
+            O cadastro de atividades e conhecimentos da sua unidade foi homologado no processo
+            <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+        </p>
+
+        <p>
+            Acompanhe o processo no Sistema de Gestão de Competências:
+            <a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>.
+        </p>
+    </th:block>
+</th:block>
+</body>
+</html>

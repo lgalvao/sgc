@@ -194,6 +194,7 @@ public final class Mensagens {
     public static final String ALERTA_CADASTRO_HOMOLOGADO = "Cadastro da unidade %s homologado";
     public static final String ALERTA_REVISAO_HOMOLOGADA = "Revisão do cadastro da unidade %s homologada";
     public static final String ALERTA_MAPA_VALIDACAO_ACEITA = "Validação do mapa da unidade %s submetida para análise";
+    public static final String ALERTA_MAPA_HOMOLOGADO = "Mapa de competências da unidade %s homologado";
     public static final String ALERTA_PROCESSO_INICIADO = "Início do processo";
 
     // ── Notificações e E-mails ───────────────────────────────────────────────

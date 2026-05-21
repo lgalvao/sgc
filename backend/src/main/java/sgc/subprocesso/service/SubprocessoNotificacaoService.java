@@ -43,6 +43,10 @@ public class SubprocessoNotificacaoService {
         }
     }
 
+    public void registrarAlertaTransicao(NotificacaoCommand cmd) {
+        executarAlertaSemInterromperEmail(() -> criarAlertaTransicao(cmd), "transicao", cmd.subprocesso().getCodigo());
+    }
+
     private void criarAlertaTransicao(NotificacaoCommand cmd) {
         Subprocesso subprocesso = cmd.subprocesso();
         String sigla = subprocesso.getUnidade().getSigla();
@@ -55,7 +59,7 @@ public class SubprocessoNotificacaoService {
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
         criarNotificacaoDireta(cmd, variaveis);
 
-        if (tipoTransicao.notificacaoSuperior()) {
+        if (tipoTransicao.notificacaoSuperior() && !Boolean.FALSE.equals(cmd.notificarSuperior())) {
             criarNotificacaoSuperior(cmd, variaveis);
         }
     }
@@ -93,6 +97,37 @@ public class SubprocessoNotificacaoService {
                 .corpoHtml(corpo)
                 .chaveIdempotencia(chave)
                 .build());
+    }
+
+    public void notificarHomologacaoCadastro(Subprocesso sp) {
+        criarNotificacaoHomologacao(sp, TipoTransicao.CADASTRO_HOMOLOGADO, TipoNotificacao.CADASTRO_HOMOLOGADO, "cadastro-homologado");
+    }
+
+    public void notificarHomologacaoMapa(Subprocesso sp) {
+        criarNotificacaoHomologacao(sp, TipoTransicao.MAPA_HOMOLOGADO, TipoNotificacao.MAPA_HOMOLOGADO, "mapa-homologado");
+    }
+
+    public void notificarAceiteCadastroEmBloco(List<Subprocesso> subprocessos) {
+        if (subprocessos.isEmpty()) {
+            return;
+        }
+        subprocessos.forEach(this::criarNotificacaoDiretaAceiteCadastroBloco);
+        agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaAceiteCadastroBloco);
+    }
+
+    public void notificarDisponibilizacaoMapaEmBloco(List<Subprocesso> subprocessos) {
+        if (subprocessos.isEmpty()) {
+            return;
+        }
+        agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaDisponibilizacaoMapaBloco);
+    }
+
+    public void notificarAceiteValidacaoEmBloco(List<Subprocesso> subprocessos) {
+        if (subprocessos.isEmpty()) {
+            return;
+        }
+        subprocessos.forEach(this::criarNotificacaoDiretaAceiteValidacaoBloco);
+        agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaAceiteValidacaoBloco);
     }
 
     private void criarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {
@@ -148,9 +183,13 @@ public class SubprocessoNotificacaoService {
     }
 
     private void criarNotificacao(NotificacaoCommand cmd, EmailGerado email) {
+        criarNotificacao(cmd, email, TipoNotificacao.valueOf(cmd.tipoTransicao().name()));
+    }
+
+    private void criarNotificacao(NotificacaoCommand cmd, EmailGerado email, TipoNotificacao tipoNotificacao) {
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(cmd.subprocesso())
-                .tipoNotificacao(TipoNotificacao.valueOf(cmd.tipoTransicao().name()))
+                .tipoNotificacao(tipoNotificacao)
                 .unidadeDestinoSigla(email.unidadeSigla())
                 .usuarioDestinoTitulo(email.usuarioTitulo())
                 .destinatario(email.destinatario())
@@ -158,6 +197,155 @@ public class SubprocessoNotificacaoService {
                 .corpoHtml(email.corpo())
                 .chaveIdempotencia(chaveIdempotencia(cmd, email))
                 .build());
+    }
+
+    private void criarNotificacaoComChave(
+            NotificacaoCommand cmd,
+            EmailGerado email,
+            TipoNotificacao tipoNotificacao,
+            String sufixoChave
+    ) {
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(cmd.subprocesso())
+                .tipoNotificacao(tipoNotificacao)
+                .unidadeDestinoSigla(email.unidadeSigla())
+                .usuarioDestinoTitulo(email.usuarioTitulo())
+                .destinatario(email.destinatario())
+                .assunto(email.assunto())
+                .corpoHtml(email.corpo())
+                .chaveIdempotencia(chaveIdempotenciaComSufixo(cmd, email, sufixoChave))
+                .build());
+    }
+
+    private void criarNotificacaoHomologacao(
+            Subprocesso sp,
+            TipoTransicao tipoTransicao,
+            TipoNotificacao tipoNotificacao,
+            String template
+    ) {
+        Unidade admin = unidadeService.buscarAdmin();
+        Unidade unidadeDestino = sp.getUnidade();
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(sp)
+                .tipoTransicao(tipoTransicao)
+                .unidadeOrigem(admin)
+                .unidadeDestino(unidadeDestino)
+                .build();
+        Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
+        String assunto = criarAssunto(tipoTransicao, sp, false);
+        String corpo = processarTemplate(template, variaveis);
+        String emailUnidade = getEmailUnidade(unidadeDestino);
+
+        EmailGerado emailDireto = new EmailGerado(
+                emailUnidade,
+                assunto,
+                corpo,
+                OrigemNotificacao.DIRETO,
+                unidadeDestino.getSigla(),
+                null
+        );
+        criarNotificacao(cmd, emailDireto, tipoNotificacao);
+        notificarResponsavelPessoal(cmd, unidadeDestino, emailDireto);
+    }
+
+    private void criarNotificacaoDiretaAceiteCadastroBloco(Subprocesso sp) {
+        Unidade unidade = sp.getUnidade();
+        Unidade admin = unidadeService.buscarAdmin();
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(sp)
+                .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
+                .unidadeOrigem(admin)
+                .unidadeDestino(unidade)
+                .build();
+        Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
+        String assunto = "SGC: Cadastro de atividades e conhecimentos submetido para análise - %s".formatted(unidade.getSigla());
+        String corpo = processarTemplate("cadastro-aceito-bloco-unidade", variaveis);
+        EmailGerado email = new EmailGerado(getEmailUnidade(unidade), assunto, corpo, OrigemNotificacao.DIRETO, unidade.getSigla(), null);
+        criarNotificacaoComChave(cmd, email, TipoNotificacao.CADASTRO_ACEITO, "bloco-direto");
+        notificarResponsavelPessoal(cmd, unidade, email);
+    }
+
+    private void criarNotificacaoConsolidadaAceiteCadastroBloco(Unidade superior, List<Subprocesso> subprocessos) {
+        Subprocesso base = subprocessos.getFirst();
+        Unidade admin = unidadeService.buscarAdmin();
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(base)
+                .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
+                .unidadeOrigem(admin)
+                .unidadeDestino(superior)
+                .build();
+        Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
+        String assunto = "SGC: Cadastros de atividades e conhecimentos submetidos para análise";
+        String corpo = processarTemplate("cadastro-aceito-bloco-superior", variaveis);
+        EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
+        criarNotificacaoComChave(cmd, email, TipoNotificacao.CADASTRO_ACEITO, "bloco-superior");
+    }
+
+    private void criarNotificacaoDiretaDisponibilizacaoMapaBloco(Subprocesso sp) {
+        Unidade admin = unidadeService.buscarAdmin();
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(sp)
+                .tipoTransicao(TipoTransicao.MAPA_DISPONIBILIZADO)
+                .unidadeOrigem(admin)
+                .unidadeDestino(sp.getUnidade())
+                .observacoes("Disponibilização em bloco")
+                .build();
+        Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
+        String assunto = criarAssunto(TipoTransicao.MAPA_DISPONIBILIZADO, sp, false);
+        String corpo = processarTemplate("mapa-disponibilizado", variaveis);
+        EmailGerado email = new EmailGerado(getEmailUnidade(sp.getUnidade()), assunto, corpo, OrigemNotificacao.DIRETO, sp.getUnidade().getSigla(), null);
+        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_DISPONIBILIZADO, "bloco-direto");
+        notificarResponsavelPessoal(cmd, sp.getUnidade(), email);
+    }
+
+    private void criarNotificacaoConsolidadaDisponibilizacaoMapaBloco(Unidade superior, List<Subprocesso> subprocessos) {
+        Subprocesso base = subprocessos.getFirst();
+        Unidade admin = unidadeService.buscarAdmin();
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(base)
+                .tipoTransicao(TipoTransicao.MAPA_DISPONIBILIZADO)
+                .unidadeOrigem(admin)
+                .unidadeDestino(superior)
+                .observacoes("Disponibilização em bloco")
+                .build();
+        Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
+        String assunto = "SGC: Mapas de competências disponibilizados";
+        String corpo = processarTemplate("mapa-disponibilizado-bloco-superior", variaveis);
+        EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
+        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_DISPONIBILIZADO, "bloco-superior");
+    }
+
+    private void criarNotificacaoDiretaAceiteValidacaoBloco(Subprocesso sp) {
+        Unidade unidade = sp.getUnidade();
+        Unidade admin = unidadeService.buscarAdmin();
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(sp)
+                .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
+                .unidadeOrigem(admin)
+                .unidadeDestino(unidade)
+                .build();
+        Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
+        String assunto = "SGC: Validação do mapa de competências da %s submetida para análise".formatted(unidade.getSigla());
+        String corpo = processarTemplate("validacao-mapa-aceita-bloco-unidade", variaveis);
+        EmailGerado email = new EmailGerado(getEmailUnidade(unidade), assunto, corpo, OrigemNotificacao.DIRETO, unidade.getSigla(), null);
+        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-direto");
+        notificarResponsavelPessoal(cmd, unidade, email);
+    }
+
+    private void criarNotificacaoConsolidadaAceiteValidacaoBloco(Unidade superior, List<Subprocesso> subprocessos) {
+        Subprocesso base = subprocessos.getFirst();
+        Unidade admin = unidadeService.buscarAdmin();
+        NotificacaoCommand cmd = NotificacaoCommand.builder()
+                .subprocesso(base)
+                .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
+                .unidadeOrigem(admin)
+                .unidadeDestino(superior)
+                .build();
+        Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
+        String assunto = "SGC: Validação de mapas de competências submetida para análise";
+        String corpo = processarTemplate("validacao-mapa-aceita-bloco-superior", variaveis);
+        EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
+        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-superior");
     }
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {
@@ -168,6 +356,10 @@ public class SubprocessoNotificacaoService {
                 destinatario,
                 email.origem().name()
         );
+    }
+
+    private String chaveIdempotenciaComSufixo(NotificacaoCommand cmd, EmailGerado email, String sufixo) {
+        return "%s:%s".formatted(chaveIdempotencia(cmd, email), sufixo);
     }
 
     private Map<String, Object> criarVariaveisTemplateDireto(NotificacaoCommand cmd) {
@@ -185,6 +377,8 @@ public class SubprocessoNotificacaoService {
         Unidade unidadeDestino = cmd.unidadeDestino();
         variaveis.put("siglaUnidadeDestino", unidadeDestino.getSigla());
         variaveis.put("nomeUnidadeDestino", unidadeDestino.getNome());
+        variaveis.put("siglaUnidadeSuperior", unidadeDestino.getSigla());
+        variaveis.put("nomeUnidadeSuperior", unidadeDestino.getNome());
 
         Processo processo = subprocesso.getProcesso();
         variaveis.put("nomeProcesso", processo.getDescricao());
@@ -208,12 +402,56 @@ public class SubprocessoNotificacaoService {
         return variaveis;
     }
 
+    private Map<String, Object> criarVariaveisConsolidacao(Unidade superior, List<Subprocesso> subprocessos) {
+        Map<String, Object> variaveis = new HashMap<>();
+        Subprocesso base = subprocessos.getFirst();
+        variaveis.put("siglaUnidadeSuperior", superior.getSigla());
+        variaveis.put("nomeProcesso", base.getProcesso().getDescricao());
+        variaveis.put("siglasUnidades", subprocessos.stream()
+                .map(sp -> sp.getUnidade().getSigla())
+                .distinct()
+                .sorted()
+                .toList());
+        if (base.getDataLimiteEtapa2() != null) {
+            variaveis.put("dataLimiteValidacao", base.getDataLimiteEtapa2().format(DATE_FORMATTER));
+        }
+        return variaveis;
+    }
+
+    private Map<Unidade, List<Subprocesso>> agruparPorSuperiorImediata(List<Subprocesso> subprocessos) {
+        Map<Long, Unidade> superiores = new LinkedHashMap<>();
+        Map<Long, List<Subprocesso>> agrupado = new LinkedHashMap<>();
+        for (Subprocesso sp : subprocessos) {
+            Unidade superior = sp.getUnidade().getUnidadeSuperior();
+            if (superior == null) {
+                continue;
+            }
+            superiores.putIfAbsent(superior.getCodigo(), superior);
+            agrupado.computeIfAbsent(superior.getCodigo(), ignored -> new ArrayList<>()).add(sp);
+        }
+
+        Map<Unidade, List<Subprocesso>> resultado = new LinkedHashMap<>();
+        agrupado.forEach((codigo, lista) -> resultado.put(superiores.get(codigo), lista));
+        return resultado;
+    }
+
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp, boolean paraSuperior) {
         String base = switch (tipo) {
             case CADASTRO_ACEITO -> "Cadastro de atividades e conhecimentos submetido para análise";
             case CADASTRO_DEVOLVIDO -> "Cadastro de atividades e conhecimentos devolvido para ajustes";
+            case CADASTRO_HOMOLOGADO -> "Cadastro de atividades homologado";
             case CADASTRO_DISPONIBILIZADO -> "Cadastro de atividades e conhecimentos disponibilizado";
             case CADASTRO_REABERTO -> "Reabertura de cadastro de atividades";
+            case MAPA_HOMOLOGADO -> "Mapa de competências homologado";
+            case MAPA_DISPONIBILIZADO -> "Mapa de competências disponibilizado";
+            case MAPA_SUGESTOES_APRESENTADAS -> "Sugestões apresentadas para o mapa de competências da %s"
+                    .formatted(sp.getUnidade().getSigla());
+            case MAPA_VALIDADO -> "Validação do mapa de competências da %s submetida para análise"
+                    .formatted(sp.getUnidade().getSigla());
+            case MAPA_VALIDACAO_DEVOLVIDA -> "Validação do mapa da %s devolvida para ajustes"
+                    .formatted(sp.getUnidade().getSigla());
+            case MAPA_VALIDACAO_ACEITA -> "Validação do mapa de competências da %s submetida para análise"
+                    .formatted(sp.getUnidade().getSigla());
             case REVISAO_CADASTRO_ACEITA -> "Revisão do cadastro de atividades e conhecimentos submetida para análise";
             case REVISAO_CADASTRO_DEVOLVIDA -> "Revisão do cadastro de atividades e conhecimentos devolvida para ajustes";
             case REVISAO_CADASTRO_DISPONIBILIZADA -> "Revisão do cadastro de atividades e conhecimentos disponibilizada";

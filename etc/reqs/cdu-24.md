@@ -55,7 +55,7 @@
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Disponibilização do mapa de competências'
 
-   9.4. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
+   9.4. O sistema notifica individualmente a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
 
    ```text
    Assunto: SGC: Mapa de competências disponibilizado
@@ -77,8 +77,7 @@
 
    9.6. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
-   9.7. O sistema agrupa as unidades selecionadas com suas unidades superiores em todos os níveis da hierarquia,
-   notificando estas unidades superiores, com e-mail no modelo abaixo:
+   9.7. O sistema agrupa as unidades selecionadas por unidade superior imediata, notificando cada uma dessas unidades superiores com um único e-mail consolidado, no modelo abaixo:
 
    ```text
    Assunto: SGC: Mapas de competências disponibilizados
@@ -89,5 +88,7 @@
 
    A validação destes mapas já pode ser realizada no Sistema de Gestão de Competências (URL_SISTEMA). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
    ```
+
+   9.8. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
 
 10. O sistema redireciona para o `Painel` e mostra a mensagem de confirmação "Mapas disponibilizados em bloco".

@@ -15,6 +15,7 @@ public record RegistrarTransicaoCommand(
         Unidade origem,
         Unidade destino,
         Usuario usuario,
-        @Nullable String observacoes
+        @Nullable String observacoes,
+        @Nullable Boolean notificarSuperior
 ) {
 }

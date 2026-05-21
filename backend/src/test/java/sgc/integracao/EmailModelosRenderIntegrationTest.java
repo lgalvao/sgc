@@ -386,6 +386,120 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Deve renderizar cadastro homologado conforme CDU-23")
+    void deveRenderizarCadastroHomologado() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Processo cadastro 2026");
+
+        String html = templateEngine.process("cadastro-homologado", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("O cadastro de atividades e conhecimentos da sua unidade foi homologado no processo")
+                .contains("Processo cadastro 2026")
+                .contains("Acompanhe o processo no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar mapa homologado conforme CDU-26")
+    void deveRenderizarMapaHomologado() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Processo mapa 2026");
+
+        String html = templateEngine.process("mapa-homologado", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("O mapa de competências da sua unidade foi homologado no processo")
+                .contains("Processo mapa 2026")
+                .contains("Acompanhe o processo no Sistema de Gestão de Competências")
+                .contains("https://sgc.tre-pe.jus.br");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar aceite de cadastro em bloco para unidade conforme CDU-22")
+    void deveRenderizarAceiteCadastroBlocoUnidade() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Processo cadastro bloco 2026");
+
+        String html = templateEngine.process("cadastro-aceito-bloco-unidade", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("foi aceito e submetido para análise pela unidade superior imediata")
+                .contains("Processo cadastro bloco 2026");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar aceite de cadastro em bloco consolidado conforme CDU-22")
+    void deveRenderizarAceiteCadastroBlocoSuperior() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("nomeProcesso", "Processo cadastro bloco 2026");
+        context.setVariable("siglasUnidades", List.of("SESEL", "SEDESENV"));
+
+        String html = templateEngine.process("cadastro-aceito-bloco-superior", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("SESEL, SEDESENV")
+                .contains("foram submetidos para análise por essa unidade");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar disponibilização de mapa em bloco consolidada conforme CDU-24")
+    void deveRenderizarMapaDisponibilizadoBlocoSuperior() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("nomeProcesso", "Processo mapa bloco 2026");
+        context.setVariable("siglasUnidades", List.of("SESEL", "SEDESENV"));
+        context.setVariable("dataLimiteValidacao", "30/04/2026");
+
+        String html = templateEngine.process("mapa-disponibilizado-bloco-superior", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("SESEL, SEDESENV")
+                .contains("Processo mapa bloco 2026")
+                .contains("30/04/2026");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar aceite de validação em bloco para unidade conforme CDU-25")
+    void deveRenderizarAceiteValidacaoBlocoUnidade() {
+        Context context = new Context();
+        context.setVariable("siglaUnidade", "SESEL");
+        context.setVariable("nomeProcesso", "Processo validacao bloco 2026");
+
+        String html = templateEngine.process("validacao-mapa-aceita-bloco-unidade", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
+                .contains("foi aceita e submetida para análise pela unidade superior imediata")
+                .contains("Processo validacao bloco 2026");
+    }
+
+    @Test
+    @DisplayName("Deve renderizar aceite de validação em bloco consolidado conforme CDU-25")
+    void deveRenderizarAceiteValidacaoBlocoSuperior() {
+        Context context = new Context();
+        context.setVariable("siglaUnidadeSuperior", "COSIS");
+        context.setVariable("nomeProcesso", "Processo validacao bloco 2026");
+        context.setVariable("siglasUnidades", List.of("SESEL", "SEDESENV"));
+
+        String html = templateEngine.process("validacao-mapa-aceita-bloco-superior", context);
+
+        assertThat(html)
+                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
+                .contains("SESEL, SEDESENV")
+                .contains("foi submetida para análise por essa unidade");
+    }
+
+    @Test
     @DisplayName("Deve renderizar cadastro reaberto conforme CDU-32")
     void deveRenderizarCadastroReaberto() {
         Context context = new Context();

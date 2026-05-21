@@ -42,6 +42,7 @@ public class CadastroFluxoService {
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final AlertaFacade alertaService;
     private final SubprocessoTransicaoService transicaoService;
+    private final SubprocessoNotificacaoService notificacaoService;
 
     private static @Nullable String normalizarTexto(@Nullable String texto) {
         if (texto == null || texto.isBlank()) {
@@ -115,7 +116,8 @@ public class CadastroFluxoService {
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarAceite(sp, usuario, "Avaliação em bloco"));
+        subprocessos.forEach(sp -> executarAceite(sp, usuario, "Avaliação em bloco", false));
+        notificacaoService.notificarAceiteCadastroEmBloco(subprocessos);
     }
 
     public void homologar(Long codSubprocesso, @Nullable String observacoes) {
@@ -127,7 +129,7 @@ public class CadastroFluxoService {
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco"));
+        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco", true));
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {
@@ -190,6 +192,10 @@ public class CadastroFluxoService {
     }
 
     private void executarAceite(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
+        executarAceite(sp, usuario, observacoes, true);
+    }
+
+    private void executarAceite(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean enviarEmails) {
         FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         log.info("Aceitando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
@@ -198,7 +204,7 @@ public class CadastroFluxoService {
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
         if (unidadeDestino != null) {
             String obs = normalizarTexto(observacoes);
-            transicaoService.registrarAnalise(RegistrarWorkflowCommand.builder()
+            RegistrarWorkflowCommand cmd = RegistrarWorkflowCommand.builder()
                     .sp(sp)
                     .novaSituacao(contexto.situacaoDisponibilizada())
                     .tipoTransicao(contexto.transicaoAceite())
@@ -210,11 +216,21 @@ public class CadastroFluxoService {
                     .usuario(usuario)
                     .motivoAnalise(null)
                     .observacoes(obs)
-                    .build());
+                    .notificarSuperior(enviarEmails ? null : Boolean.FALSE)
+                    .build();
+            if (enviarEmails) {
+                transicaoService.registrarAnalise(cmd);
+            } else {
+                transicaoService.registrarAnaliseSemEmail(cmd);
+            }
         }
     }
 
     private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
+        executarHomologacao(sp, usuario, observacoes, false);
+    }
+
+    private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes, boolean notificarUnidade) {
         FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         log.info("Homologando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
@@ -232,6 +248,9 @@ public class CadastroFluxoService {
                 .build());
 
         executarEfeitosDerivadosHomologacaoCadastro(sp);
+        if (notificarUnidade) {
+            notificacaoService.notificarHomologacaoCadastro(sp);
+        }
     }
 
     private void executarEfeitosDerivadosHomologacaoCadastro(Subprocesso sp) {

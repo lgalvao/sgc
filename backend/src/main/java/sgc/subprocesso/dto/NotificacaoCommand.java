@@ -11,6 +11,7 @@ public record NotificacaoCommand(
         TipoTransicao tipoTransicao,
         Unidade unidadeOrigem,
         Unidade unidadeDestino,
-        @Nullable String observacoes
+        @Nullable String observacoes,
+        @Nullable Boolean notificarSuperior
 ) {
 }
