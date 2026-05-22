@@ -47,14 +47,6 @@ public class ProcessoController {
         return ResponseEntity.created(uri).body(ProcessoResumoDto.fromEntity(criado));
     }
 
-    @GetMapping("/status-unidades")
-    @Operation(summary = "Retorna unidades desabilitadas por tipo e processo")
-    public ResponseEntity<Map<String, List<Long>>> obterStatusUnidades(
-            @RequestParam String tipo, @RequestParam(required = false) Long codProcesso) {
-        List<Long> unidadesDesabilitadas = processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.valueOf(tipo));
-        return ResponseEntity.ok(Map.of("unidadesDesabilitadas", unidadesDesabilitadas));
-    }
-
     @GetMapping("/{codigo}")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codigo)")
     public ResponseEntity<ProcessoResumoDto> obterPorCodigo(@PathVariable Long codigo) {
@@ -98,7 +90,7 @@ public class ProcessoController {
 
     @SuppressWarnings("UnusedReturnValue")
     @GetMapping("/{codigo}/unidades-importacao")
-    @PreAuthorize("hasRole('CHEFE')")
+    @PreAuthorize("hasAnyRole('CHEFE', 'ADMIN')")
     @Operation(summary = "Lista todas as unidades participantes de um processo finalizado para importação")
     public ResponseEntity<List<ProcessoDetalheDto.UnidadeParticipanteDto>> listarUnidadesParaImportacao(
             @PathVariable Long codigo) {

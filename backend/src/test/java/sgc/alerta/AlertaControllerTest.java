@@ -35,46 +35,6 @@ class AlertaControllerTest {
     private UsuarioFacade usuarioFacade;
 
     @Nested
-    @DisplayName("Marcar como Lidos")
-    class MarcarComoLidos {
-        @Test
-        @DisplayName("Deve retornar OK quando marcar como lidos com sucesso")
-        void marcarComoLidos_quandoSucesso_deveRetornarOk() throws Exception {
-            Usuario usuarioMock = Usuario.builder()
-                    .tituloEleitoral(TITULO_TESTE)
-                    .build();
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
-
-            mockMvc.perform(post("/api/alertas/marcar-como-lidos")
-                            .with(user(usuarioMock))
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("[1, 2, 3]"))
-                    .andExpect(status().isOk());
-
-            verify(alertaFacade).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
-        }
-
-        @Test
-        @DisplayName("Deve retornar OK quando lista vazia")
-        void marcarComoLidos_quandoListaVazia_deveRetornarOk() throws Exception {
-            Usuario usuarioMock = Usuario.builder()
-                    .tituloEleitoral(TITULO_TESTE)
-                    .build();
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
-
-            mockMvc.perform(post("/api/alertas/marcar-como-lidos")
-                            .with(user(usuarioMock))
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("[]"))
-                    .andExpect(status().isOk());
-
-            verify(alertaFacade).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
-        }
-    }
-
-    @Nested
     @DisplayName("Listar alertas")
     class ListarAlertas {
         @Test

@@ -14,9 +14,11 @@ import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
+import sgc.seguranca.config.*;
 import sgc.seguranca.dto.*;
 import tools.jackson.databind.*;
 
+import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -51,6 +53,10 @@ class LoginControllerTest {
 
     @MockitoBean
     private GerenciadorJwt gerenciadorJwt;
+    @MockitoBean
+    private ListaNegraJwt listaNegraJwt;
+    @MockitoBean
+    private JwtProperties jwtProperties;
 
     @BeforeEach
     void setUp() {
@@ -208,7 +214,8 @@ class LoginControllerTest {
 
         when(loginFacade.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
         when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
-        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
+        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth"))
+                .thenReturn(Optional.of(new GerenciadorJwt.JwtPreAuthClaims("123", "preauth-1", Instant.now().plusSeconds(60))));
 
         mockMvc.perform(post("/api/usuarios/entrar")
                         .with(csrf())
@@ -274,14 +281,21 @@ class LoginControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/usuarios/logout - Deve limpar cookies de autenticação")
+    @DisplayName("POST /api/usuarios/logout - Deve limpar cookies de autenticação e revogar JWT válido")
     @WithMockUser
-    void logout_DeveLimparCookiesAutenticacao() throws Exception {
+    void logout_DeveLimparCookiesAutenticacaoERevogarJwt() throws Exception {
+        Instant expiracao = Instant.now().plusSeconds(300);
+        when(gerenciadorJwt.validarToken("token-jwt"))
+                .thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", Perfil.ADMIN, 1L, "jti-logout", expiracao)));
+
         mockMvc.perform(post("/api/usuarios/logout")
-                        .with(csrf()))
+                        .with(csrf())
+                        .cookie(new Cookie("jwtToken", "token-jwt")))
                 .andExpect(status().isNoContent())
                 .andExpect(cookie().maxAge("jwtToken", 0))
                 .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));
+
+        verify(listaNegraJwt).revogar("jti-logout", expiracao);
     }
 
     @Test
@@ -299,7 +313,8 @@ class LoginControllerTest {
 
         when(loginFacade.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
         when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
-        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth")).thenReturn(Optional.of("123"));
+        when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth"))
+                .thenReturn(Optional.of(new GerenciadorJwt.JwtPreAuthClaims("123", "preauth-2", Instant.now().plusSeconds(60))));
 
         mockMvc.perform(post("/api/usuarios/entrar")
                         .with(csrf())

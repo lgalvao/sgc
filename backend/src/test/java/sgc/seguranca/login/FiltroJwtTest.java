@@ -27,6 +27,8 @@ class FiltroJwtTest {
     @Mock
     private UsuarioFacade usuarioService;
     @Mock
+    private ListaNegraJwt listaNegraJwt;
+    @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
@@ -57,7 +59,7 @@ class FiltroJwtTest {
         String token = "valid-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
 
-        GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("12345", Perfil.SERVIDOR, 10L);
+        GerenciadorJwt.JwtClaims claims = new GerenciadorJwt.JwtClaims("12345", Perfil.SERVIDOR, 10L, "jti-1", java.time.Instant.now().plusSeconds(60));
         when(jwtService.validarToken(token)).thenReturn(Optional.of(claims));
 
         when(usuarioService.carregarUsuarioSemAtribuicoesParaAutenticacao("12345")).thenReturn(null);
@@ -68,11 +70,11 @@ class FiltroJwtTest {
     }
 
     @Test
-    @DisplayName("Deve ignorar endpoint de eventos SSE")
-    void deveIgnorarEndpointEventos() {
+    @DisplayName("Deve processar autenticação no endpoint de eventos SSE")
+    void deveProcessarEndpointEventos() {
         when(request.getRequestURI()).thenReturn("/api/eventos");
 
-        assertThat(filtro.shouldNotFilter(request)).isTrue();
+        assertThat(filtro.shouldNotFilter(request)).isFalse();
         verifyNoInteractions(jwtService, usuarioService);
     }
 
@@ -130,10 +132,30 @@ class FiltroJwtTest {
         // Caso valor.length <= 4
         String token = "short-token";
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", Perfil.SERVIDOR, 10L)));
+        when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", Perfil.SERVIDOR, 10L, "jti-2", java.time.Instant.now().plusSeconds(60))));
         when(usuarioService.carregarUsuarioSemAtribuicoesParaAutenticacao("123")).thenReturn(null);
 
         filtro.doFilterInternal(request, response, filterChain);
+        verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    @DisplayName("Deve ignorar JWT revogado")
+    void deveIgnorarJwtRevogado() throws ServletException, IOException {
+        String token = "revogado-token";
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
+        when(jwtService.validarToken(token)).thenReturn(Optional.of(new GerenciadorJwt.JwtClaims(
+                "12345",
+                Perfil.SERVIDOR,
+                10L,
+                "jti-revogado",
+                java.time.Instant.now().plusSeconds(60)
+        )));
+        when(listaNegraJwt.estaRevogado("jti-revogado")).thenReturn(true);
+
+        filtro.doFilterInternal(request, response, filterChain);
+
+        verify(usuarioService, never()).carregarUsuarioSemAtribuicoesParaAutenticacao(anyString());
         verify(filterChain).doFilter(request, response);
     }
 

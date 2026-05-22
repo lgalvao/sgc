@@ -14,8 +14,11 @@ import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.*;
+import sgc.seguranca.config.*;
 import sgc.seguranca.dto.*;
 
+import java.time.*;
+import java.time.temporal.*;
 import java.util.*;
 
 /**
@@ -31,6 +34,8 @@ public class LoginController {
     private final UsuarioFacade usuarioFacade;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
+    private final ListaNegraJwt listaNegraJwt;
+    private final JwtProperties jwtProperties;
 
     @Value("${aplicacao.cookies.secure:false}")
     private boolean cookieSecure;
@@ -128,7 +133,10 @@ public class LoginController {
 
     @PostMapping("/logout")
     @Operation(summary = "Encerra a sessão e remove os cookies de autenticação")
-    public ResponseEntity<Void> logout(HttpServletResponse httpResponse) {
+    public ResponseEntity<Void> logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        extrairTokenCookie(httpRequest, "jwtToken")
+                .flatMap(gerenciadorJwt::validarToken)
+                .ifPresent(claims -> listaNegraJwt.revogar(claims.jti(), obterExpiracaoLogout(claims)));
         limparCookieJwt(httpResponse);
         limparCookiePreAuth(httpResponse);
         return ResponseEntity.noContent().build();
@@ -184,25 +192,31 @@ public class LoginController {
     }
 
     private String extrairTituloPreAuth(HttpServletRequest request) {
-        String token = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("SGC_PRE_AUTH".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
+        String token = extrairTokenCookie(request, "SGC_PRE_AUTH")
+                .orElseThrow(() -> new ErroAutenticacao("Sessão expirada ou inválida. Faça login novamente."));
+
+        return gerenciadorJwt.validarTokenPreAuth(token)
+                .map(GerenciadorJwt.JwtPreAuthClaims::tituloEleitoral)
+                .orElseThrow(() -> new ErroAutenticacao("Sessão inválida. Faça login novamente."));
+    }
+
+    private Optional<String> extrairTokenCookie(HttpServletRequest request, String nomeCookie) {
+        if (request.getCookies() == null) {
+            return Optional.empty();
+        }
+        for (Cookie cookie : request.getCookies()) {
+            if (nomeCookie.equals(cookie.getName())) {
+                return Optional.ofNullable(cookie.getValue());
             }
         }
+        return Optional.empty();
+    }
 
-        if (token == null) {
-            throw new ErroAutenticacao("Sessão expirada ou inválida. Faça login novamente.");
+    private Instant obterExpiracaoLogout(GerenciadorJwt.JwtClaims claims) {
+        if (claims.expiracao() != null) {
+            return claims.expiracao();
         }
-
-        Optional<String> sujeito = gerenciadorJwt.validarTokenPreAuth(token);
-        if (sujeito.isEmpty()) {
-            throw new ErroAutenticacao("Sessão inválida. Faça login novamente.");
-        }
-        return sujeito.get();
+        return Instant.now().plus(jwtProperties.expiracaoMinutos(), ChronoUnit.MINUTES);
     }
 
     @SuppressWarnings("ConstantConditions")

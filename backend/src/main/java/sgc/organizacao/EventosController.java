@@ -2,6 +2,7 @@ package sgc.organizacao;
 
 import lombok.*;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 import sgc.organizacao.service.*;
@@ -21,6 +22,7 @@ public class EventosController {
     private final RegistroSseEmitter registroSseEmitter;
 
     @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public SseEmitter assinar() {
         return registroSseEmitter.registrar();
     }

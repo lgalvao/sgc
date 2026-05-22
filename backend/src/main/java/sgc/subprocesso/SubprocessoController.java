@@ -307,12 +307,6 @@ public class SubprocessoController {
         return consultaService.verificarImpactos(codSubprocesso);
     }
 
-    @GetMapping("/{codSubprocesso}/mapa")
-    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
-    public MapaCompletoDto obterMapa(@PathVariable Long codSubprocesso) {
-        return consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
-    }
-
     @PostMapping("/{codSubprocesso}/disponibilizar-mapa")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DISPONIBILIZAR_MAPA')")
     @Operation(summary = "Disponibiliza o mapa para validação")
@@ -328,16 +322,6 @@ public class SubprocessoController {
     @Operation(summary = "Obtém o mapa formatado para visualização")
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(@PathVariable Long codSubprocesso) {
         return consultaService.mapaParaVisualizacao(codSubprocesso);
-    }
-
-    @PostMapping("/{codSubprocesso}/mapa")
-    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'EDITAR_MAPA')")
-    @Operation(summary = "Salva as alterações do mapa")
-    public MapaCompletoDto salvarMapa(
-            @PathVariable Long codSubprocesso,
-            @Valid @RequestBody SalvarMapaRequest request) {
-        subprocessoService.salvarMapa(codSubprocesso, request);
-        return consultaService.mapaCompletoDtoPorSubprocesso(codSubprocesso);
     }
 
     @GetMapping("/{codSubprocesso}/mapa-completo")

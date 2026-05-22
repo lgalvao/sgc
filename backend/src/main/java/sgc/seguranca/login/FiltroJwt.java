@@ -23,12 +23,12 @@ import java.util.*;
 public class FiltroJwt extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
     private final UsuarioFacade usuarioService;
+    private final ListaNegraJwt listaNegraJwt;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return "/api/eventos".equals(uri)
-                || "/api/usuarios/login".equals(uri)
+        return "/api/usuarios/login".equals(uri)
                 || "/api/usuarios/entrar".equals(uri)
                 || "/api/usuarios/logout".equals(uri)
                 || uri.startsWith("/e2e/");
@@ -64,6 +64,11 @@ public class FiltroJwt extends OncePerRequestFilter {
         if (jwtToken != null) {
 
             gerenciadorJwt.validarToken(jwtToken).ifPresent(claims -> {
+                if (listaNegraJwt.estaRevogado(claims.jti())) {
+                    log.debug("JWT revogado ignorado: {}", claims.jti());
+                    return;
+                }
+
                 Usuario usuario = usuarioService.carregarUsuarioSemAtribuicoesParaAutenticacao(claims.tituloEleitoral());
 
                 if (usuario != null) {
