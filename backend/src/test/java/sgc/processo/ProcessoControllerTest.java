@@ -472,15 +472,31 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser(roles = "ADMIN")
-        @DisplayName("obterStatusUnidades deve retornar unidades desabilitadas")
-        void deveObterStatusUnidades() throws Exception {
-            when(processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO)).thenReturn(List.of(1L, 2L));
+        @DisplayName("listarUnidadesParaImportacao deve permitir ADMIN")
+        void devePermitirAdminListarUnidadesParaImportacao() throws Exception {
+            Processo processo = Processo.builder()
+                    .codigo(1L)
+                    .situacao(SituacaoProcesso.FINALIZADO)
+                    .build();
 
-            mockMvc.perform(get("/api/processos/status-unidades")
-                            .param("tipo", "MAPEAMENTO"))
+            Unidade unidade = criarUnidadeParticipante();
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
+
+            Subprocesso sub = Subprocesso.builder()
+                    .codigo(100L)
+                    .processo(processo)
+                    .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO)
+                    .unidade(unidade)
+                    .dataLimiteEtapa1(LocalDateTime.now())
+                    .build();
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sub));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sub.getCodigo(), unidade));
+
+            mockMvc.perform(get("/api/processos/1/unidades-importacao"))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.unidadesDesabilitadas").isArray())
-                    .andExpect(jsonPath("$.unidadesDesabilitadas[0]").value(1L));
+                    .andExpect(jsonPath("$[0].codUnidade").value(10L));
         }
 
         @Test

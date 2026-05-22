@@ -56,6 +56,7 @@ public class GerenciadorJwt {
         Instant expiration = now.plus(jwtProperties.expiracaoMinutos(), ChronoUnit.MINUTES);
 
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(tituloEleitoral)
                 .claim("perfil", perfil.name())
                 .claim("unidade", unidadeCodigo)
@@ -67,26 +68,22 @@ public class GerenciadorJwt {
 
     public Optional<JwtClaims> validarToken(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-
+            Claims claims = extrairClaims(token);
             String tituloEleitoral = claims.getSubject();
             String perfilStr = claims.get("perfil", String.class);
             Long unidadeCodigo = claims.get("unidade", Long.class);
+            String jti = claims.getId();
+            Date expiracao = claims.getExpiration();
 
             @SuppressWarnings("ConstantConditions")
-            boolean incompleto = tituloEleitoral == null || perfilStr == null || unidadeCodigo == null;
+            boolean incompleto = tituloEleitoral == null || perfilStr == null || unidadeCodigo == null || jti == null || expiracao == null;
             if (incompleto) {
                 log.warn("JWT com claims obrigatórios ausentes");
                 return Optional.empty();
             }
 
             Perfil perfil = Perfil.valueOf(perfilStr);
-            return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo));
-
+            return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo, jti, expiracao.toInstant()));
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Falha na validação do JWT: {}", e.getMessage());
             return Optional.empty();
@@ -101,6 +98,7 @@ public class GerenciadorJwt {
         Instant expiration = now.plus(5, ChronoUnit.MINUTES);
 
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(tituloEleitoral)
                 .claim("type", "PRE_AUTH")
                 .issuedAt(Date.from(now))
@@ -109,27 +107,41 @@ public class GerenciadorJwt {
                 .compact();
     }
 
-    public Optional<String> validarTokenPreAuth(String token) {
+    public Optional<JwtPreAuthClaims> validarTokenPreAuth(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+            Claims claims = extrairClaims(token);
 
             if (!"PRE_AUTH".equals(claims.get("type"))) {
                 log.warn("Tentativa de uso de token inválido para pré-autenticação");
                 return Optional.empty();
             }
 
-            return Optional.ofNullable(claims.getSubject());
+            String tituloEleitoral = claims.getSubject();
+            String jti = claims.getId();
+            Date expiracao = claims.getExpiration();
+            if (tituloEleitoral == null || jti == null || expiracao == null) {
+                log.warn("Token pré-auth com claims obrigatórios ausentes");
+                return Optional.empty();
+            }
 
+            return Optional.of(new JwtPreAuthClaims(tituloEleitoral, jti, expiracao.toInstant()));
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Falha na validação do token pré-auth: {}", e.getMessage());
             return Optional.empty();
         }
     }
 
-    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
+    private Claims extrairClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo, String jti, Instant expiracao) {
+    }
+
+    public record JwtPreAuthClaims(String tituloEleitoral, String jti, Instant expiracao) {
     }
 }

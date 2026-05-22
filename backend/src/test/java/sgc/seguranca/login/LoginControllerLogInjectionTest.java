@@ -44,6 +44,10 @@ class LoginControllerLogInjectionTest {
 
     @MockitoBean
     private GerenciadorJwt gerenciadorJwt;
+    @MockitoBean
+    private ListaNegraJwt listaNegraJwt;
+    @MockitoBean
+    private sgc.seguranca.config.JwtProperties jwtProperties;
 
     @BeforeEach
     void setUp() {

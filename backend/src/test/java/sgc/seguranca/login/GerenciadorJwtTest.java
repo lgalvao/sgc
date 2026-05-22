@@ -95,6 +95,8 @@ class GerenciadorJwtTest {
         assertThat(result.get().tituloEleitoral()).isEqualTo("123");
         assertThat(result.get().perfil()).isEqualTo(Perfil.ADMIN);
         assertThat(result.get().unidadeCodigo()).isEqualTo(1L);
+        assertThat(result.get().jti()).isNotBlank();
+        assertThat(result.get().expiracao()).isAfter(java.time.Instant.now().minusSeconds(1));
     }
 
     @Test
@@ -128,8 +130,10 @@ class GerenciadorJwtTest {
 
         String token = Jwts.builder()
                 .subject(null) // subject nulo
+                .id("jti-null-subject")
                 .claim("perfil", Perfil.SERVIDOR.name())
                 .claim("unidade", 10L)
+                .expiration(new Date(System.currentTimeMillis() + 60_000))
                 .signWith(Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
                 .compact();
 
@@ -143,8 +147,10 @@ class GerenciadorJwtTest {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
 
         String token = Jwts.builder()
+                .id("jti-sem-perfil")
                 .subject("123")
                 .claim("unidade", 1L)
+                .expiration(new Date(System.currentTimeMillis() + 60_000))
                 // Missing perfil
                 .signWith(Keys
                         .hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
@@ -160,8 +166,10 @@ class GerenciadorJwtTest {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
 
         String token = Jwts.builder()
+                .id("jti-sem-unidade")
                 .subject("123")
                 .claim("perfil", Perfil.ADMIN.name())
+                .expiration(new Date(System.currentTimeMillis() + 60_000))
                 // Missing unidade
                 .signWith(Keys
                         .hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
@@ -188,9 +196,12 @@ class GerenciadorJwtTest {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
 
         String token = gerenciador.gerarTokenPreAuth("123");
-        Optional<String> result = gerenciador.validarTokenPreAuth(token);
+        Optional<GerenciadorJwt.JwtPreAuthClaims> result = gerenciador.validarTokenPreAuth(token);
 
-        assertThat(result).isPresent().contains("123");
+        assertThat(result).isPresent();
+        assertThat(result.get().tituloEleitoral()).isEqualTo("123");
+        assertThat(result.get().jti()).isNotBlank();
+        assertThat(result.get().expiracao()).isAfter(java.time.Instant.now().minusSeconds(1));
     }
 
     @Test
@@ -201,7 +212,7 @@ class GerenciadorJwtTest {
 
         // Token normal usado como pré-auth
         String token = gerenciador.gerarToken("123", Perfil.ADMIN, 1L);
-        Optional<String> result = gerenciador.validarTokenPreAuth(token);
+        Optional<GerenciadorJwt.JwtPreAuthClaims> result = gerenciador.validarTokenPreAuth(token);
 
         assertThat(result).isEmpty();
     }
@@ -210,7 +221,7 @@ class GerenciadorJwtTest {
     @DisplayName("Deve retornar empty para token pré-auth inválido")
     void preAuthInvalid() {
         when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
-        Optional<String> result = gerenciador.validarTokenPreAuth("invalid.token");
+        Optional<GerenciadorJwt.JwtPreAuthClaims> result = gerenciador.validarTokenPreAuth("invalid.token");
         assertThat(result).isEmpty();
     }
 

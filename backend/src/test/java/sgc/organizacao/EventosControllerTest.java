@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.annotation.method.configuration.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(EventosController.class)
 @Import(ConfigSeguranca.class)
+@EnableMethodSecurity
 class EventosControllerTest {
 
     @Autowired
@@ -39,4 +41,5 @@ class EventosControllerTest {
 
         verify(registroSseEmitter).registrar();
     }
+
 }

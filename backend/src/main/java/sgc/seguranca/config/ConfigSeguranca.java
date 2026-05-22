@@ -32,8 +32,8 @@ import java.io.*;
 public class ConfigSeguranca {
 
     @Bean
-    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade) {
-        return new FiltroJwt(gerenciadorJwt, usuarioFacade);
+    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade, ListaNegraJwt listaNegraJwt) {
+        return new FiltroJwt(gerenciadorJwt, usuarioFacade, listaNegraJwt);
     }
 
     @Bean
@@ -66,12 +66,10 @@ public class ConfigSeguranca {
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    FiltroJwt filtroJwt,
                                                    FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
-        http.authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/api/usuarios/login",
-                                "/api/usuarios/entrar",
-                                "/api/usuarios/logout",
-                                "/api/eventos")
-                        .permitAll()
+        http.authorizeHttpRequests(auth ->         auth.requestMatchers(
+                "/api/usuarios/login",
+                "/api/usuarios/entrar",
+                "/api/usuarios/logout")                        .permitAll()
                         .requestMatchers("/actuator/**")
                         .hasRole("ADMIN")
                         .requestMatchers("/api/**")
