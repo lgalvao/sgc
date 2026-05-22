@@ -759,8 +759,9 @@ class RelatorioFacadeTest {
         assertThat(resultado.getFirst().codigo()).isEqualTo(10L);
         assertThat(resultado.getFirst().sigla()).isEqualTo("SEC");
         assertThat(resultado.getFirst().filhas()).hasSize(1);
-        assertThat(resultado.getFirst().filhas().getFirst().codigo()).isNotNull();
         assertThat(resultado.getFirst().filhas().getFirst().sigla()).isEqualTo("ZONAS ELEITORAIS");
+        assertThat(resultado.getFirst().filhas().getFirst().filhas()).hasSize(1);
+        assertThat(resultado.getFirst().filhas().getFirst().filhas().getFirst().codigo()).isEqualTo(11L);
     }
 
     @Test
