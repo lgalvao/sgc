@@ -28,7 +28,6 @@
     "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck && npm run cruft:check"
   },
   "dependencies": {
-    "@tiptap/extension-underline": "^3.23.1",
     "@tiptap/starter-kit": "^3.23.1",
     "@tiptap/vue-3": "^3.23.1",
     "axios": "1.16.1",
