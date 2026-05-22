@@ -108,15 +108,6 @@ export async function verificarNotificacaoAdmin(page: Page, criterios: Criterios
         });
     }
 
-    function localizarItem(notificacoes: NotificacaoAdminApi[]): NotificacaoAdminApi | undefined {
-        return notificacoes.find(item =>
-            correspondeTexto(normalizarAssuntoVisivel(item.assunto), criterios.assunto)
-            && correspondeDestinatario(item, criterios.destinatario)
-            && correspondeTipo(item, criterios.tipo)
-            && correspondeTexto(item.situacao, criterios.situacao)
-        );
-    }
-
     let itemEncontrado: NotificacaoAdminApi | undefined;
     try {
         const botaoAtualizar = page.getByTestId('btn-notificacoes-atualizar');
@@ -126,7 +117,7 @@ export async function verificarNotificacaoAdmin(page: Page, criterios: Criterios
                 page.waitForResponse(response => urlListagem.test(response.url()) && response.ok()),
                 botaoAtualizar.click()
             ]);
-            itemEncontrado = localizarItem(await listarNotificacoesApi());
+            itemEncontrado = localizarNotificacaoAdmin(await listarNotificacoesApi(), criterios);
             return itemEncontrado ? 1 : 0;
         }, {
             message: `Notificação não encontrada para assunto ${String(criterios.assunto)}`,
@@ -159,4 +150,27 @@ export async function verificarNotificacaoAdmin(page: Page, criterios: Criterios
     await expect(iframe.locator('body')).toContainText(criterios.trechoCorpo);
     await page.getByTestId('btn-fechar-preview-email').click();
     await expect(modal).toBeHidden();
+}
+
+export async function verificarAusenciaNotificacaoAdmin(page: Page, criterios: CriteriosNotificacaoAdmin): Promise<void> {
+    await abrirNotificacoesAdmin(page);
+    const notificacoes = await page.evaluate(async () => {
+        const resposta = await fetch('/api/admin/notificacoes/listar?limite=50', {credentials: 'include'});
+        if (!resposta.ok) {
+            throw new Error(`HTTP ${resposta.status}`);
+        }
+        return await resposta.json();
+    }) as NotificacaoAdminApi[];
+
+    const item = localizarNotificacaoAdmin(notificacoes, criterios);
+    expect(item, `Notificação inesperada encontrada para assunto ${String(criterios.assunto)}`).toBeUndefined();
+}
+
+function localizarNotificacaoAdmin(notificacoes: NotificacaoAdminApi[], criterios: CriteriosNotificacaoAdmin): NotificacaoAdminApi | undefined {
+    return notificacoes.find(item =>
+        correspondeTexto(normalizarAssuntoVisivel(item.assunto), criterios.assunto)
+        && correspondeDestinatario(item, criterios.destinatario)
+        && correspondeTipo(item, criterios.tipo)
+        && correspondeTexto(item.situacao, criterios.situacao)
+    );
 }

@@ -2,12 +2,14 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoMapaHomologadoFixture, validarProcessoFixture} from './fixtures/index.js';
 import {navegarParaSubprocesso, obterAcaoCabecalhoSubprocesso, verificarToast} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 /**
  * CDU-32 - Reabrir cadastro
  */
 test.describe.serial('CDU-32 - Reabrir cadastro', () => {
     const UNIDADE_1 = 'SECAO_221';
+    const JUSTIFICATIVA = 'Necessário ajustar informações do cadastro';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-32 ${timestamp}`;
@@ -44,7 +46,7 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await (await obterAcaoCabecalhoSubprocesso(page, 'btn-reabrir-cadastro')).click();
         await page.getByTestId('btn-confirmar-reabrir').click();
         await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeVisible();
-        await page.getByTestId('inp-justificativa-reabrir').fill('Justificativa de teste');
+        await page.getByTestId('inp-justificativa-reabrir').fill(JUSTIFICATIVA);
         await expect(page.getByTestId('txt-reabertura-pendencia-justificativa')).toBeHidden();
 
         // Cenario 5: Confirmar reabertura
@@ -61,6 +63,19 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}/);
         await expect(linhaMovimentacao).toContainText('ADMIN');
         await expect(linhaMovimentacao).toContainText(UNIDADE_1);
+
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_1,
+            assunto: `Reabertura de cadastro de atividades - ${UNIDADE_1}`,
+            tipo: 'Cadastro reaberto',
+            trechoCorpo: JUSTIFICATIVA
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: `Reabertura de cadastro de atividades - ${UNIDADE_1}`,
+            tipo: 'Cadastro reaberto',
+            trechoCorpo: JUSTIFICATIVA
+        });
     });
 
     test('Cenário complementar: unidade alvo visualiza alerta de reabertura de cadastro no painel', async ({

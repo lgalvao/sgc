@@ -4,6 +4,7 @@ import {acessarSubprocessoAdmin} from './helpers/helpers-analise.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {obterAcaoCabecalhoSubprocesso, verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 /**
  * CDU-33 - Reabrir revisão de cadastro
@@ -99,6 +100,19 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(linhaMovimentacao).toContainText(/\d{2}\/\d{2}\/\d{4}/);
         await expect(linhaMovimentacao).toContainText('ADMIN');
         await expect(linhaMovimentacao).toContainText(UNIDADE_ALVO);
+
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_ALVO,
+            assunto: `Reabertura de revisão de cadastro - ${UNIDADE_ALVO}`,
+            tipo: 'Revisão de cadastro reaberta',
+            trechoCorpo: textoJustificativa
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_21',
+            assunto: `Reabertura de revisão de cadastro - ${UNIDADE_ALVO}`,
+            tipo: 'Revisão de cadastro reaberta',
+            trechoCorpo: textoJustificativa
+        });
     });
 
     test('Cenário complementar: unidade alvo visualiza alerta de reabertura de revisão no painel', async ({

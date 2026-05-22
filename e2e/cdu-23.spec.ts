@@ -9,6 +9,7 @@ import {
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {verificarAusenciaNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
@@ -106,6 +107,11 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
         await expect(btnHomologar).toBeDisabled();
         await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();
+
+        await verificarAusenciaNotificacaoAdmin(page, {
+            assunto: `Cadastro homologado`,
+            tipo: 'Cadastro homologado'
+        });
     });
 
     test('Cenario 3: Homologação em bloco registra movimentação e alerta com data/hora', async ({
@@ -133,6 +139,13 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
             .filter({hasText: /homologado/i})
             .first();
         await expect(linhaAlerta).not.toBeVisible();
+
+        await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
+        const tabelaAlertasSuperior = page.getByTestId('tbl-alertas');
+        const linhaAlertaSuperior = tabelaAlertasSuperior.locator('tr', {hasText: descProcesso})
+            .filter({hasText: /homologado/i})
+            .first();
+        await expect(linhaAlertaSuperior).not.toBeVisible();
     });
 });
 
