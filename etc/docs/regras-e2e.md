@@ -19,8 +19,13 @@ Nunca será porque um elemento não teve tempo de carregar ou renderizar. Então
 Esse sistema está rodando localmente, com um banco H2 em memória. Tudo é rápido. Se um elemento nao aparece, é por
 alguns dos motivos indicados acima.
 
-Ao rodar os testes e2e, tanto o frontend como o backend serão construídos e executados, e os logs de ambos serão
-mostrados durante os testes. Então nao se preocupe em rodar o backend ou frontend separadamente.
+Ao rodar os testes e2e, tanto o frontend como o backend serão construídos e executados automaticamente. Não é preciso
+subi-los separadamente.
+
+O `e2e/lifecycle.js` agora opera em modo mais enxuto:
+
+- o console fica focado no resumo do Playwright e em erros relevantes;
+- os logs detalhados de backend/frontend continuam sendo gravados em `e2e/server.log`.
 
 Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela no momento da falha -- nao deixe de ler
 esses arquivos.
@@ -29,13 +34,25 @@ esses arquivos.
 
 - **NUNCA rode apenas um cenário isolado se o teste for serial**: Muitos testes usam `test.describe.serial()`, o que
   significa que os cenários dependem da execução sequencial dos anteriores. Rodar um cenário isolado causará falhas.
+- **Prefira sempre `chromium` ao depurar**: Salvo necessidade explícita de outro navegador, use `--project=chromium`
+  para ganhar tempo e reduzir ruído.
 - **Procure sempre redirecionar a saída para um arquivo**: Use `> resultado.txt 2>&1` ao rodar testes E2E para capturar
-  toda a saída (stdout e stderr) em um arquivo de texto. Isso porque os testes repassam todos os logs de backend e
-  frontend -- e isso vai poluir muito seu contexto!
-- **Use grep ou euivalente para analisar resultados**: Após redirecionar para arquivo, use `grep` para filtrar e
-  analisar partes específicas da saída, como erros, logs do backend, ou mensagens específicas.
+  toda a saída (stdout e stderr) em um arquivo de texto.
+- **Nunca leia o arquivo de saída inteiro**: Comece por `tail -n 40 resultado.txt`. Se falhar, leia apenas o trecho
+  estritamente necessário com `rg`, `grep` ou `sed -n`.
+- **Use grep ou equivalente para analisar resultados**: Após redirecionar para arquivo, filtre só erros, falhas ou o
+  nome do cenário. Evite carregar logs completos no contexto.
+- **Use `e2e/server.log` só cirurgicamente**: Se precisar ver detalhe de backend/frontend, leia apenas o trecho
+  relacionado ao erro. O arquivo pode ser grande.
 - **Não misture variáveis ao depurar**: Se o objetivo é corrigir semântica de um arquivo legado ou `serial`, rode com
   `--workers=1` primeiro. Valide o paralelismo só depois que o arquivo estiver verde isoladamente.
+
+Exemplo de execução recomendada:
+
+```bash
+npx playwright test --project=chromium e2e/cdu-28.spec.ts > /tmp/sgc-e2e-cdu28.log 2>&1
+tail -n 40 /tmp/sgc-e2e-cdu28.log
+```
 
 ## Fixtures e preparação de estado (State-Jumping)
 
@@ -72,8 +89,18 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 | `helpers-atividades.ts` | Atividades, conhecimentos e impactos (`adicionarAtividade`, `adicionarConhecimento`, `editarAtividade`, `removerAtividade`, `disponibilizarCadastro`, `abrirModalImpacto`, `verificarBotaoImpactoAusenteEdicao`, `verificarBotaoImpactoAusenteDireto`)                                                                                                                                                                                      |
 | `helpers-mapas.ts`      | Competências e mapas (`navegarParaMapa`, `criarCompetencia`, `editarCompetencia`, `excluirCompetenciaConfirmando`, `disponibilizarMapa`)                                                                                                                                                                                                                                                                                                    |
 | `helpers-analise.ts`    | Análise de cadastro — navegação (`acessarSubprocessoGestor`, `acessarSubprocessoChefeDireto`, `acessarSubprocessoAdmin`), aceite (`aceitarCadastroMapeamento`, `aceitarRevisao`), devolução (`devolverCadastroMapeamento`, `devolverRevisao`, `cancelarDevolucao`), homologação (`homologarCadastroMapeamento`, `homologarCadastroRevisaoComImpacto`, `cancelarHomologacao`), histórico (`abrirHistoricoAnalise`, `fecharHistoricoAnalise`) |
+| `helpers-notificacoes-admin.ts` | Verificação de notificações pela view administrativa (`abrirNotificacoesAdmin`, `verificarNotificacaoAdmin`) |
 
 **IMPORTANTE**: Sempre use os helpers centralizados ao invés de definir funções locais nos arquivos de teste.
+
+### Contrato de notificações por E2E
+
+- **Quando o requisito especificar e-mail, prefira validar pela view admin de notificações**.
+- **E2E deve confirmar o contrato do requisito, não apenas repetir a integração**.
+- **Use a API admin apenas como apoio de localização**, nunca como substituta da validação visual final da linha/modal na
+  própria tela.
+- **Ao voltar da view admin, reancore o fluxo explicitamente**: se o helper terminar em `/administracao/notificacoes`,
+  o teste deve navegar de volta para a tela do caso de uso antes de continuar.
 
 ### Estratégias de Espera
 
@@ -100,6 +127,9 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 - **Não mantenha texto legado em asserções**:
     - Depois de refatorações de notificação, frases como “Cadastro aceito” ou “Mapa disponibilizado” podem deixar de ser
       estáveis mesmo com a funcionalidade correta.
+- **Não use E2E para adivinhar contrato de e-mail**:
+    - Se assunto/corpo ainda estiverem ambíguos, revise primeiro o CDU e os templates/serviços de backend.
+    - Use E2E para confirmar um contrato já conhecido.
 
 ## Robustez de Seletores e Ambiguidade
 
@@ -185,6 +215,14 @@ workarounds. Exemplos:
   problema pode ser no frontend, não no teste.
 - Se um modal ainda está aberto, verifique se a ação anterior realmente completou. O problema pode ser que o teste não
   esperou a ação terminar.
+
+### Ordem prática de depuração
+
+1. Rode só o arquivo necessário, preferencialmente em `chromium`, com saída redirecionada.
+2. Leia apenas o final do arquivo de saída.
+3. Se houver falha, leia `error-context.md`.
+4. Se ainda faltar contexto, use `rg` ou `sed -n` no log de saída e, por último, em `e2e/server.log`.
+5. Se o problema envolver e-mail, confirme pela view admin de notificações antes de alterar backend ou requisito.
 
 ### Datas e Localização
 
