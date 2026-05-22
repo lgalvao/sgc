@@ -186,7 +186,7 @@ public class ResponsavelUnidadeService {
 
     private void criarNotificacoesAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao, Usuario usuario) {
         String siglaUnidade = atribuicao.getUnidade().getSigla();
-        String assunto = "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(siglaUnidade);
+        String assunto = AssuntosNotificacao.atribuicaoPerfilChefe(siglaUnidade);
         criarAlertaSemInterromperNotificacao(usuario, siglaUnidade);
 
         String corpoHtml = emailModelosService.criarEmailAtribuicaoTemporaria(

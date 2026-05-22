@@ -283,9 +283,7 @@ public class SubprocessoNotificacaoService {
                 .unidadeDestino(superior)
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
-        String assunto = revisao
-                ? "SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise"
-                : "SGC: Cadastros de atividades e conhecimentos submetidos para análise";
+        String assunto = AssuntosNotificacao.cadastroAceitoBloco(revisao);
         String corpo = processarTemplate(
                 revisao ? "revisao-cadastro-aceita-bloco-superior" : "cadastro-aceito-bloco-superior",
                 variaveis
@@ -305,7 +303,7 @@ public class SubprocessoNotificacaoService {
                 .observacoes("Disponibilização em bloco")
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
-        String assunto = "SGC: Mapas de competências disponibilizados";
+        String assunto = AssuntosNotificacao.disponibilizacaoMapaBloco();
         String corpo = processarTemplate("mapa-disponibilizado-bloco-superior", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
         criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_DISPONIBILIZADO, "bloco-superior");
@@ -321,7 +319,7 @@ public class SubprocessoNotificacaoService {
                 .unidadeDestino(unidade)
                 .build();
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
-        String assunto = "SGC: Validação do mapa de competências da %s submetida para análise".formatted(unidade.getSigla());
+        String assunto = AssuntosNotificacao.aceiteValidacaoBlocoDireto(unidade.getSigla());
         String corpo = processarTemplate("validacao-mapa-aceita-bloco-unidade", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(unidade), assunto, corpo, OrigemNotificacao.DIRETO, unidade.getSigla(), null);
         criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-direto");
@@ -338,7 +336,7 @@ public class SubprocessoNotificacaoService {
                 .unidadeDestino(superior)
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
-        String assunto = "SGC: Validação de mapas de competências submetida para análise";
+        String assunto = AssuntosNotificacao.aceiteValidacaoBlocoSuperior();
         String corpo = processarTemplate("validacao-mapa-aceita-bloco-superior", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
         criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-superior");
@@ -432,41 +430,7 @@ public class SubprocessoNotificacaoService {
     }
 
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp, boolean paraSuperior) {
-        String base = switch (tipo) {
-            case CADASTRO_ACEITO -> "Cadastro de atividades e conhecimentos da %s submetido para análise"
-                    .formatted(sp.getUnidade().getSigla());
-            case CADASTRO_DEVOLVIDO -> "Cadastro de atividades e conhecimentos da %s devolvido para ajustes"
-                    .formatted(sp.getUnidade().getSigla());
-            case CADASTRO_HOMOLOGADO -> "Cadastro de atividades homologado";
-            case CADASTRO_DISPONIBILIZADO -> "Cadastro de atividades e conhecimentos disponibilizado";
-            case CADASTRO_REABERTO -> "Reabertura de cadastro de atividades";
-            case MAPA_HOMOLOGADO -> "Mapa de competências homologado";
-            case MAPA_DISPONIBILIZADO -> "Mapa de competências disponibilizado";
-            case MAPA_SUGESTOES_APRESENTADAS -> "Sugestões apresentadas para o mapa de competências da %s"
-                    .formatted(sp.getUnidade().getSigla());
-            case MAPA_VALIDADO -> "Validação do mapa de competências da %s submetida para análise"
-                    .formatted(sp.getUnidade().getSigla());
-            case MAPA_VALIDACAO_DEVOLVIDA -> "Validação do mapa da %s devolvida para ajustes"
-                    .formatted(sp.getUnidade().getSigla());
-            case MAPA_VALIDACAO_ACEITA -> "Validação do mapa de competências da %s submetida para análise"
-                    .formatted(sp.getUnidade().getSigla());
-            case REVISAO_CADASTRO_ACEITA -> "Revisão do cadastro de atividades e conhecimentos da %s submetido para análise"
-                    .formatted(sp.getUnidade().getSigla());
-            case REVISAO_CADASTRO_DEVOLVIDA -> "Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes"
-                    .formatted(sp.getUnidade().getSigla());
-            case REVISAO_CADASTRO_DISPONIBILIZADA -> "Revisão do cadastro de atividades e conhecimentos disponibilizada: %s"
-                    .formatted(sp.getUnidade().getSigla());
-            case REVISAO_CADASTRO_REABERTA -> "Reabertura de revisão de cadastro";
-            default -> tipo.getDescMovimentacao();
-        };
-        boolean incluirSigla = paraSuperior
-                || tipo == TipoTransicao.CADASTRO_DISPONIBILIZADO
-                || tipo == TipoTransicao.CADASTRO_REABERTO
-                || tipo == TipoTransicao.REVISAO_CADASTRO_REABERTA;
-
-        return incluirSigla
-                ? "SGC: %s - %s".formatted(base, sp.getUnidade().getSigla())
-                : "SGC: %s".formatted(base);
+        return AssuntosNotificacao.subprocesso(tipo, sp.getUnidade().getSigla(), paraSuperior);
     }
 
     private String processarTemplate(String templateName, Map<String, Object> variables) {

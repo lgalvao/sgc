@@ -406,7 +406,7 @@ public class ProcessoService {
 
         criarAlertaLembretePrazo(processo, unidade, dataLimiteText);
 
-        String assunto = "SGC: Lembrete de prazo - " + processo.getDescricao();
+        String assunto = emailModelosService.criarAssuntoLembretePrazo(processo.getDescricao());
         String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
                 .formatted(codProcesso, unidadeCodigo, LocalDate.now());
         enfileirarNotificacaoUnidade(
@@ -1264,7 +1264,7 @@ public class ProcessoService {
         enfileirarNotificacaoUnidade(
                 unidade,
                 TipoNotificacao.PROCESSO_FINALIZADO,
-                "SGC: Finalização do processo " + processo.getDescricao(),
+                emailModelosService.criarAssuntoProcessoFinalizado(processo.getDescricao()),
                 corpo,
                 chaveFinalizacaoProcesso(processo, unidade, true),
                 null
@@ -1280,7 +1280,7 @@ public class ProcessoService {
         enfileirarNotificacaoUnidade(
                 unidade,
                 TipoNotificacao.PROCESSO_FINALIZADO,
-                "SGC: Finalização do processo " + processo.getDescricao() + " em unidades subordinadas",
+                emailModelosService.criarAssuntoProcessoFinalizadoUnidadesSubordinadas(processo.getDescricao()),
                 corpo,
                 chaveFinalizacaoProcesso(processo, unidade, false),
                 null

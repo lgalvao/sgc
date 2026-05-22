@@ -463,6 +463,8 @@ class ProcessoServiceTest {
             when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
             when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SECAO", "Mapeamento 2026"))
                     .thenReturn("<html>finalizado</html>");
+            when(emailModelosService.criarAssuntoProcessoFinalizado("Mapeamento 2026"))
+                    .thenReturn("SGC: Finalização do processo Mapeamento 2026");
             when(validacaoService.validarSubprocessosParaFinalizacao(id))
                     .thenReturn(ResultadoValidacao.ofValido());
 
@@ -1348,6 +1350,7 @@ class ProcessoServiceTest {
             when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
             when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
             when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
+            when(emailModelosService.criarAssuntoLembretePrazo("Processo teste")).thenReturn("SGC: Lembrete de prazo - Processo teste");
             when(servicoAlertas.criarAlertaAdmin(eq(p), eq(u), anyString())).thenReturn(alerta);
 
             processoService.enviarLembrete(codProcesso, codUnidade);
@@ -2466,4 +2469,3 @@ class ProcessoServiceTest {
     }
 }
 }
-

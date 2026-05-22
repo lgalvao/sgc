@@ -8,7 +8,6 @@ import org.thymeleaf.spring6.*;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
-
 /**
  * Cria templates HTML para diferentes tipos de e-mail.
  */
@@ -16,9 +15,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class EmailModelosService {
     private static final DateTimeFormatter FORMATADOR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    private static final String TITULO_PROCESSO_FINALIZACAO_SGC = "Finalização do processo ";
-    private static final String TITULO_LEMBRETE_PRAZO = "SGC: Lembrete de prazo - ";
 
     private static final String VAR_TITULO = "titulo";
     private static final String VAR_NOME_PROCESSO = "nomeProcesso";
@@ -54,10 +50,19 @@ public class EmailModelosService {
     }
 
     public String criarAssuntoInicioProcesso(String tipoProcesso, boolean participante) {
-        String descricaoTipoProcesso = descricaoTipoProcessoInicio(tipoProcesso);
-        return participante
-                ? "SGC: Início de processo de %s".formatted(descricaoTipoProcesso)
-                : "SGC: Início de processo de %s em unidades subordinadas".formatted(descricaoTipoProcesso);
+        return AssuntosNotificacao.inicioProcesso(tipoProcesso, participante);
+    }
+
+    public String criarAssuntoProcessoFinalizado(String nomeProcesso) {
+        return AssuntosNotificacao.processoFinalizado(nomeProcesso);
+    }
+
+    public String criarAssuntoProcessoFinalizadoUnidadesSubordinadas(String nomeProcesso) {
+        return AssuntosNotificacao.processoFinalizadoUnidadesSubordinadas(nomeProcesso);
+    }
+
+    public String criarAssuntoLembretePrazo(String nomeProcesso) {
+        return AssuntosNotificacao.lembretePrazo(nomeProcesso);
     }
 
     /**
@@ -65,8 +70,7 @@ public class EmailModelosService {
      */
     public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso) {
         Context context = new Context();
-        context.setVariable(
-                VAR_TITULO, "%s%s".formatted(TITULO_PROCESSO_FINALIZACAO_SGC, nomeProcesso));
+        context.setVariable(VAR_TITULO, criarAssuntoProcessoFinalizado(nomeProcesso));
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
 
@@ -81,7 +85,7 @@ public class EmailModelosService {
             String siglaUnidade, String nomeProcesso, List<String> siglasUnidadesSubordinadas) {
 
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "%s%s em unidades subordinadas".formatted(TITULO_PROCESSO_FINALIZACAO_SGC, nomeProcesso));
+        ctx.setVariable(VAR_TITULO, criarAssuntoProcessoFinalizadoUnidadesSubordinadas(nomeProcesso));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         ctx.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);
@@ -94,7 +98,7 @@ public class EmailModelosService {
      */
     public String criarEmailLembretePrazo(String siglaUnidade, String nomeProcesso, LocalDateTime dataLimite) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, TITULO_LEMBRETE_PRAZO + nomeProcesso);
+        ctx.setVariable(VAR_TITULO, criarAssuntoLembretePrazo(nomeProcesso));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         ctx.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
@@ -113,15 +117,6 @@ public class EmailModelosService {
         ctx.setVariable("urlSistema", cmd.urlSistema());
 
         return templateEngine.process("atribuicao-temporaria", ctx);
-    }
-
-    private String descricaoTipoProcessoInicio(String tipoProcesso) {
-        return switch (tipoProcesso) {
-            case "MAPEAMENTO" -> "mapeamento de competências";
-            case "REVISAO" -> "revisão do mapa de competências";
-            case "DIAGNOSTICO" -> "diagnóstico";
-            default -> tipoProcesso.toLowerCase(Locale.ROOT);
-        };
     }
 
     public record EmailAtribuicaoTemporariaCommand(

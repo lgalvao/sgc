@@ -173,7 +173,7 @@ class EmailModelosServiceTest {
 
             assertThat(templateNameCaptor.getValue()).isEqualTo("processo-finalizado-por-unidade");
             Context context = contextCaptor.getValue();
-            assertThat(context.getVariable("titulo")).isEqualTo("Finalização do processo " + nomeProcesso);
+            assertThat(context.getVariable("titulo")).isEqualTo("SGC: Finalização do processo " + nomeProcesso);
             assertThat(context.getVariable("siglaUnidade")).isEqualTo(siglaUnidade);
             assertThat(context.getVariable("nomeProcesso")).isEqualTo(nomeProcesso);
         }
@@ -192,7 +192,7 @@ class EmailModelosServiceTest {
             assertThat(templateNameCaptor.getValue()).isEqualTo("processo-finalizado-unidades-subordinadas");
             Context context = contextCaptor.getValue();
             assertThat(context.getVariable("titulo"))
-                    .isEqualTo("Finalização do processo " + nomeProcesso + " em unidades subordinadas");
+                    .isEqualTo("SGC: Finalização do processo " + nomeProcesso + " em unidades subordinadas");
             assertThat(context.getVariable("siglaUnidade")).isEqualTo(siglaUnidade);
             assertThat(context.getVariable("nomeProcesso")).isEqualTo(nomeProcesso);
             assertThat(context.getVariable("siglasUnidadesSubordinadas")).isEqualTo(siglas);

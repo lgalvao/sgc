@@ -1,0 +1,237 @@
+#!/usr/bin/env node
+
+import fs from 'node:fs';
+import path from 'node:path';
+
+const raiz = process.cwd();
+const arquivos = [
+    path.join(raiz, 'backend/src/main/java/sgc/subprocesso/service/SubprocessoNotificacaoService.java'),
+    path.join(raiz, 'backend/src/main/java/sgc/comum/Mensagens.java'),
+    path.join(raiz, 'backend/src/main/java/sgc/alerta/AssuntosNotificacao.java'),
+    path.join(raiz, 'backend/src/main/java/sgc/alerta/EmailModelosService.java'),
+    path.join(raiz, 'backend/src/main/java/sgc/processo/service/ProcessoService.java'),
+    path.join(raiz, 'backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java'),
+    ...listarArquivos(path.join(raiz, 'backend/src/test/java/sgc/integracao'), /(CDU\d+IntegrationTest\.java|EmailModelosRenderIntegrationTest\.java)$/),
+    ...listarArquivos(path.join(raiz, 'e2e'), /cdu-\d+\.spec\.ts$/),
+    ...listarArquivos(path.join(raiz, 'etc/reqs'), /^cdu-\d+\.md$/)
+].filter(caminho => !caminho.includes(`${path.sep}etc${path.sep}reqs${path.sep}diagnostico${path.sep}`));
+
+const entradas = arquivos.flatMap(extrairEntradasArquivo);
+const grupos = agruparPorFamilia(entradas);
+const suspeitas = grupos.filter(temSuspeita);
+
+if (process.argv.includes('--json')) {
+    console.log(JSON.stringify((process.argv.includes('--suspeitas') ? suspeitas : grupos), null, 2));
+    process.exit(0);
+}
+
+const filtroFamilia = argumentoOpcional('--familia');
+const saida = (process.argv.includes('--suspeitas') ? suspeitas : grupos)
+    .filter(grupo => !filtroFamilia || grupo.familia.includes(normalizar(filtroFamilia)));
+
+console.log(`familias: ${grupos.length}`);
+console.log(`suspeitas: ${suspeitas.length}`);
+
+for (const grupo of saida) {
+    console.log(`\n${grupo.titulo}`);
+    console.log(`  familia: ${grupo.familia}`);
+    console.log(`  resumo: ${grupo.resumo}`);
+    console.log(`  origens: ${grupo.origens.join('; ')}`);
+    if (grupo.variantes.length > 1) {
+        console.log(`  variantes: ${grupo.variantes.map(variant => `"${variant}"`).join(' | ')}`);
+    } else {
+        console.log(`  variante: "${grupo.variantes[0]}"`);
+    }
+    if (grupo.suspeitas.length > 0) {
+        console.log(`  suspeitas: ${grupo.suspeitas.join('; ')}`);
+    }
+}
+
+function listarArquivos(diretorio, padraoNome) {
+    if (!fs.existsSync(diretorio)) return [];
+    return fs.readdirSync(diretorio, {withFileTypes: true})
+        .flatMap(entrada => {
+            const caminho = path.join(diretorio, entrada.name);
+            if (entrada.isDirectory()) {
+                return listarArquivos(caminho, padraoNome);
+            }
+            return padraoNome.test(entrada.name) ? [caminho] : [];
+        });
+}
+
+function extrairEntradasArquivo(caminho) {
+    const texto = fs.readFileSync(caminho, 'utf8');
+    const relativas = path.relative(raiz, caminho);
+    const linhas = texto.split('\n');
+    const entradas = [];
+
+    linhas.forEach((linha, indice) => {
+        const numeroLinha = indice + 1;
+        const textoRequisito = extrairAssuntoRequisito(linha);
+        if (textoRequisito) {
+            entradas.push(criarEntrada(relativas, numeroLinha, 'requisito', 'assunto', textoRequisito));
+        }
+
+        if (relativas.endsWith('Mensagens.java')) {
+            const constante = extrairConstanteMensagens(linha);
+            if (constante) {
+                entradas.push(criarEntrada(relativas, numeroLinha, 'producao', constante.tipo, constante.valor, constante.nome));
+            }
+        }
+
+        for (const literal of extrairLiteraisLinha(linha)) {
+            if (!pareceComunicacao(literal)) continue;
+            entradas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), 'literal', literal));
+        }
+    });
+
+    return deduplicarEntradasMesmaLinha(entradas);
+}
+
+function extrairAssuntoRequisito(linha) {
+    const match = linha.match(/^\s*Assunto:\s*(.+)$/);
+    return match?.[1]?.trim() || null;
+}
+
+function extrairConstanteMensagens(linha) {
+    const match = linha.match(/public static final String\s+((?:ALERTA|HIST|ASSUNTO)_[A-Z0-9_]+)\s*=\s*"([^"]+)"/);
+    if (!match) return null;
+    const nome = match[1];
+    const valor = match[2].trim();
+    const tipo = nome.startsWith('ALERTA_') ? 'alerta' : nome.startsWith('HIST_') ? 'historico' : 'assunto';
+    return {nome, valor, tipo};
+}
+
+function extrairLiteraisLinha(linha) {
+    const literais = [
+        ...linha.matchAll(/"([^"\n]{6,})"/g),
+        ...linha.matchAll(/`([^`\n]{6,})`/g)
+    ].map(match => match[1].trim());
+    return literais.filter(Boolean);
+}
+
+function pareceComunicacao(valor) {
+    if (valor.length < 12) return false;
+    if (/^[A-Z0-9_ -]+$/.test(valor) && !valor.includes('SGC:')) return false;
+    return /(SGC:|cadastro.+(analise|ajustes|reabert|homolog|disponibil)|revis[aã]o.+(analise|ajustes|reabert|disponibil)|mapa.+(analise|ajustes|homolog|disponibil|sugest|valida)|lembrete de prazo|finaliza[cç][aã]o do processo|in[ií]cio de processo|atribui[cç][aã]o de perfil|submetid[oa] para an[aá]lise|devolvid[oa] para ajustes|reabert[oa] para ajustes)/i.test(valor);
+}
+
+function criarEntrada(arquivo, linha, origem, tipo, valor, chave = null) {
+    return {
+        arquivo,
+        linha,
+        origem,
+        tipo,
+        valor,
+        chave,
+        familia: normalizarFamilia(valor)
+    };
+}
+
+function deduplicarEntradasMesmaLinha(entradas) {
+    const vistos = new Set();
+    return entradas.filter(entrada => {
+        const chave = `${entrada.arquivo}:${entrada.linha}:${entrada.tipo}:${entrada.valor}`;
+        if (vistos.has(chave)) return false;
+        vistos.add(chave);
+        return true;
+    });
+}
+
+function agruparPorFamilia(entradas) {
+    const mapa = new Map();
+    for (const entrada of entradas) {
+        if (!entrada.familia) continue;
+        if (!mapa.has(entrada.familia)) {
+            mapa.set(entrada.familia, []);
+        }
+        mapa.get(entrada.familia).push(entrada);
+    }
+
+    return [...mapa.entries()]
+        .map(([familia, itens]) => resumirGrupo(familia, itens))
+        .sort((a, b) => b.suspeitas.length - a.suspeitas.length || a.titulo.localeCompare(b.titulo, 'pt-BR'));
+}
+
+function resumirGrupo(familia, itens) {
+    const variantes = [...new Set(itens.map(item => item.valor))].sort();
+    const arquivosProducao = new Set(itens.filter(item => item.origem === 'producao').map(item => item.arquivo));
+    const arquivosTeste = new Set(itens.filter(item => item.origem === 'teste').map(item => item.arquivo));
+    const arquivosRequisito = new Set(itens.filter(item => item.origem === 'requisito').map(item => item.arquivo));
+    const tipos = [...new Set(itens.map(item => item.tipo))].sort();
+    const suspeitas = [];
+
+    if (variantes.length > 1 && arquivosProducao.size > 1) {
+        suspeitas.push('variantes em producao');
+    }
+    if (arquivosProducao.size > 1) {
+        suspeitas.push('duplicada em multiplos arquivos de producao');
+    }
+    if (arquivosProducao.size > 0 && arquivosRequisito.size === 0 && tipos.includes('assunto')) {
+        suspeitas.push('assunto sem lastro explicito em requisito');
+    }
+    if (arquivosProducao.size > 0 && arquivosTeste.size === 0 && (tipos.includes('assunto') || tipos.includes('alerta'))) {
+        suspeitas.push('sem cobertura textual em teste');
+    }
+    if (arquivosRequisito.size > 0 && arquivosProducao.size === 0 && tipos.includes('assunto')) {
+        suspeitas.push('assunto so em requisito');
+    }
+
+    const amostra = itens[0];
+    const titulo = amostra.chave ?? variantes[0];
+    const resumo = `producao=${arquivosProducao.size} teste=${arquivosTeste.size} requisito=${arquivosRequisito.size} tipos=${tipos.join(',')}`;
+    const origens = itens
+        .slice()
+        .sort((a, b) => a.arquivo.localeCompare(b.arquivo, 'pt-BR') || a.linha - b.linha)
+        .map(item => `${item.origem}:${item.arquivo}:${item.linha}`);
+
+    return {
+        titulo,
+        familia,
+        resumo,
+        variantes,
+        origens,
+        suspeitas
+    };
+}
+
+function temSuspeita(grupo) {
+    const temRelevanciaForaTeste = grupo.origens.some(origem => !origem.startsWith('teste:'));
+    return grupo.suspeitas.length > 0 && temRelevanciaForaTeste;
+}
+
+function normalizarFamilia(valor) {
+    return normalizar(
+        valor
+            .replace(/^Assunto:\s*/i, '')
+            .replace(/^SGC:\s*/i, '')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/%[sd]/g, '<var>')
+            .replace(/\[[A-Z0-9_]+\]/g, '<var>')
+            .replace(/\$\{[^}]+\}/g, '<var>')
+            .replace(/\b\d{2}\/\d{2}\/\d{4}\b/g, '<data>')
+            .replace(/\b\d+\b/g, '<num>')
+    );
+}
+
+function normalizar(valor) {
+    return valor
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function tipoOrigem(relativo) {
+    if (relativo.startsWith('backend/src/main/java/')) return 'producao';
+    if (relativo.startsWith('backend/src/test/java/') || relativo.startsWith('e2e/')) return 'teste';
+    if (relativo.startsWith('etc/reqs/')) return 'requisito';
+    return 'outro';
+}
+
+function argumentoOpcional(flag) {
+    const indice = process.argv.indexOf(flag);
+    if (indice === -1) return null;
+    return process.argv[indice + 1] ?? null;
+}
