@@ -286,4 +286,38 @@ class NotificacaoServiceTest {
 
         assertThat(notificacao.getUltimoErro()).hasSize(2000);
     }
+
+    @Test
+    @DisplayName("listarResumoSubprocessosAtivos deve mapear consultas do repositório")
+    void listarResumoSubprocessosAtivosDeveMapearConsultasDoRepositorio() {
+        LocalDateTime ultimaNotificacao = LocalDateTime.of(2026, 4, 20, 10, 0);
+        when(notificacaoEmailRepo.resumirPorSubprocessosDeProcessosAtivos()).thenReturn(List.of(
+                new sgc.alerta.dto.NotificacaoSubprocessoResumoQuery(
+                        10L,
+                        20L,
+                        "Processo ativo",
+                        "U1",
+                        sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO,
+                        3,
+                        1,
+                        0,
+                        2,
+                        0,
+                        0,
+                        ultimaNotificacao,
+                        ultimaNotificacao.plusDays(1),
+                        2,
+                        null
+                )
+        ));
+
+        var resultado = service.listarResumoSubprocessosAtivos();
+
+        assertThat(resultado).singleElement().satisfies(resumo -> {
+            assertThat(resumo.subprocessoCodigo()).isEqualTo(10L);
+            assertThat(resumo.processoDescricao()).isEqualTo("Processo ativo");
+            assertThat(resumo.statusGeral().name()).isEqualTo("PENDENTE");
+            assertThat(resumo.podeReenviar()).isFalse();
+        });
+    }
 }

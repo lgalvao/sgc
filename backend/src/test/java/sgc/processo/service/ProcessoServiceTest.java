@@ -2310,6 +2310,160 @@ class ProcessoServiceTest {
         List<SubprocessoElegivelDto> resultado2 = processoService.listarSubprocessosElegiveis(codProcesso);
         assertThat(resultado2).isEmpty();
     }
+
+    @Test
+    @DisplayName("executarAcaoEmBloco deve negar acesso quando o usuário não possuir permissão")
+    void executarAcaoEmBloco_DeveNegarAcessoQuandoUsuarioNaoPossuirPermissao() {
+        Long codProcesso = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.ACEITAR);
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(100L);
+        subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        subprocesso.setUnidade(unidade);
+        Usuario usuario = new Usuario();
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, List.of(10L))).thenReturn(List.of(subprocesso));
+        when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), eq(ACEITAR_MAPA))).thenReturn(false);
+
+        assertThatThrownBy(() -> processoService.executarAcaoEmBloco(codProcesso, req))
+                .isInstanceOf(ErroAcessoNegado.class)
+                .hasMessageContaining("não possui permissão");
+    }
+
+    @Test
+    @DisplayName("iniciar deve manter o primeiro subprocesso quando houver duplicidade por unidade nas notificações")
+    void iniciarDeveManterOPrimeiroSubprocessoQuandoHouverDuplicidadePorUnidadeNasNotificacoes() {
+        Long codigoProcesso = 104L;
+        Processo processo = new Processo();
+        processo.setCodigo(codigoProcesso);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.REVISAO);
+        processo.setDescricao("Processo com duplicidade");
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+        Unidade unidade = criarUnidadeValida(10L);
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Subprocesso primeiro = new Subprocesso();
+        primeiro.setCodigo(501L);
+        primeiro.setProcesso(processo);
+        primeiro.setUnidade(unidade);
+
+        Subprocesso duplicado = new Subprocesso();
+        duplicado.setCodigo(502L);
+        duplicado.setProcesso(processo);
+        duplicado.setUnidade(unidade);
+
+        when(repo.buscar(Processo.class, codigoProcesso)).thenReturn(processo);
+        when(unidadeService.buscarAdmin()).thenReturn(criarUnidadeValida(999L));
+        when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+        when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L));
+        when(unidadeService.buscarMapasPorUnidades(List.of(10L))).thenReturn(List.of(
+                UnidadeMapa.builder().unidadeCodigo(10L).build()
+        ));
+        when(consultaService.listarEntidadesPorProcesso(codigoProcesso)).thenReturn(List.of(primeiro, duplicado));
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
+                .thenReturn("<html>inicio</html>");
+        mockarResponsaveisEfetivos();
+
+        processoService.iniciar(codigoProcesso, List.of(10L));
+
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                cmd.subprocesso() != null && Objects.equals(cmd.subprocesso().getCodigo(), 501L)
+        ));
+    }
+
+    @Test
+    @DisplayName("finalizar deve manter o primeiro mapa quando houver subprocessos duplicados por unidade")
+    void finalizarDeveManterOPrimeiroMapaQuandoHouverSubprocessosDuplicadosPorUnidade() {
+        Long codigoProcesso = 204L;
+        Processo processo = new Processo();
+        processo.setCodigo(codigoProcesso);
+        processo.setDescricao("Processo duplicado");
+        processo.setSituacao(EM_ANDAMENTO);
+        processo.setTipo(MAPEAMENTO);
+
+        Unidade unidade = criarUnidadeValida(20L);
+        unidade.setSigla("DUP");
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Subprocesso primeiro = new Subprocesso();
+        primeiro.setCodigo(5000L);
+        primeiro.setUnidade(unidade);
+        Subprocesso duplicado = new Subprocesso();
+        duplicado.setCodigo(5001L);
+        duplicado.setUnidade(unidade);
+
+        Mapa primeiroMapa = new Mapa();
+        primeiroMapa.setSubprocesso(primeiro);
+        Mapa segundoMapa = new Mapa();
+        segundoMapa.setSubprocesso(duplicado);
+
+        when(repo.buscar(Processo.class, codigoProcesso)).thenReturn(processo);
+        when(validacaoService.validarSubprocessosParaFinalizacao(codigoProcesso)).thenReturn(ResultadoValidacao.ofValido());
+        when(consultaService.listarEntidadesPorProcesso(codigoProcesso)).thenReturn(List.of(primeiro, duplicado));
+        when(mapaManutencaoService.buscarMapasPorSubprocessos(List.of(5000L, 5001L))).thenReturn(List.of(primeiroMapa, segundoMapa));
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidade));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of());
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString())).thenReturn("<html>finalizado</html>");
+
+        processoService.finalizar(codigoProcesso);
+
+        verify(unidadeService).definirMapasVigentesEmBloco(Map.of(20L, primeiroMapa));
+    }
+
+    @Test
+    @DisplayName("finalizar deve carregar unidades consolidadas ausentes antes de notificar")
+    void finalizarDeveCarregarUnidadesConsolidadasAusentesAntesDeNotificar() {
+        Long codigoProcesso = 205L;
+        Processo processo = new Processo();
+        processo.setCodigo(codigoProcesso);
+        processo.setDescricao("Processo consolidado");
+        processo.setSituacao(EM_ANDAMENTO);
+        processo.setTipo(MAPEAMENTO);
+
+        Unidade unidadeSuperior = criarUnidadeValida(30L);
+        unidadeSuperior.setTipo(TipoUnidade.INTERMEDIARIA);
+        unidadeSuperior.setSigla("SUP");
+        Unidade unidadeOperacional = criarUnidadeValida(31L);
+        unidadeOperacional.setSigla("OPER");
+        processo.adicionarParticipantes(Set.of(unidadeOperacional));
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(3100L);
+        subprocesso.setUnidade(unidadeOperacional);
+        Mapa mapa = new Mapa();
+        mapa.setSubprocesso(subprocesso);
+
+        when(repo.buscar(Processo.class, codigoProcesso)).thenReturn(processo);
+        when(validacaoService.validarSubprocessosParaFinalizacao(codigoProcesso)).thenReturn(ResultadoValidacao.ofValido());
+        when(consultaService.listarEntidadesPorProcesso(codigoProcesso)).thenReturn(List.of(subprocesso));
+        when(mapaManutencaoService.buscarMapasPorSubprocessos(List.of(3100L))).thenReturn(List.of(mapa));
+        when(unidadeService.buscarPorCodigos(anyList())).thenAnswer(invocation -> {
+            List<Long> codigos = invocation.getArgument(0);
+            if (codigos.size() == 1 && codigos.contains(31L)) {
+                return List.of(unidadeOperacional);
+            }
+            if (codigos.size() == 1 && codigos.contains(30L)) {
+                return List.of(unidadeSuperior);
+            }
+            return List.of();
+        });
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(31L)).thenReturn(List.of(30L));
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString())).thenReturn("<html>direto</html>");
+        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(eq("SUP"), eq("Processo consolidado"), eq(List.of("OPER"))))
+                .thenReturn("<html>consolidado</html>");
+
+        processoService.finalizar(codigoProcesso);
+
+        verify(unidadeService, atLeastOnce()).buscarPorCodigos(argThat(codigos -> codigos.size() == 1 && codigos.contains(30L)));
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "SUP".equals(cmd.unidadeDestinoSigla()) && "<html>consolidado</html>".equals(cmd.corpoHtml())
+        ));
+    }
 }
 }
 

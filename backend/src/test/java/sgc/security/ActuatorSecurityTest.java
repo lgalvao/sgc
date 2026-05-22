@@ -12,6 +12,7 @@ import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
 import sgc.seguranca.login.*;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -93,5 +94,19 @@ class ActuatorSecurityTest {
         mockMvc.perform(get("/actuator/health")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Deve materializar token CSRF quando ele estiver disponível na requisição")
+    void deveMaterializarTokenCsrfQuandoEleEstiverDisponivelNaRequisicao() throws Exception {
+        String token = gerenciadorJwt.gerarToken("123456789", Perfil.ADMIN, 1L);
+        var csrfToken = org.mockito.Mockito.mock(org.springframework.security.web.csrf.CsrfToken.class);
+        org.mockito.Mockito.when(csrfToken.getToken()).thenReturn("csrf-token");
+
+        mockMvc.perform(get("/actuator/health")
+                        .with(csrf())
+                        .requestAttr(org.springframework.security.web.csrf.CsrfToken.class.getName(), csrfToken)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
     }
 }

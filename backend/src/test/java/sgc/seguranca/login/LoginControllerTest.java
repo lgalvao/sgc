@@ -32,6 +32,9 @@ class LoginControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private LoginController loginController;
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
 
@@ -361,6 +364,57 @@ class LoginControllerTest {
                 .andExpect(status().isOk());
 
         verify(limitadorTentativasLogin, never()).verificar(any());
+    }
+
+    @Test
+    @DisplayName("login direto deve ignorar limitador quando o request não informar IP")
+    void loginDiretoDeveIgnorarLimitadorQuandoORequestNaoInformarIp() {
+        AutenticarRequest req = criarRequestPadrao();
+        UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        Usuario usuario = new Usuario();
+        usuario.setNome("Admin user");
+        usuario.setTituloEleitoral("123");
+
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
+        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(httpRequest.getRemoteAddr()).thenReturn(null);
+
+        var resposta = loginController.login(req, httpRequest, httpResponse);
+
+        assertThat(resposta.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(resposta.getBody()).isNotNull();
+        assertThat(resposta.getBody().autenticado()).isTrue();
+        verify(limitadorTentativasLogin, never()).verificar(any());
+    }
+
+    @Test
+    @DisplayName("login direto deve exigir seleção quando houver múltiplos perfis")
+    void loginDiretoDeveExigirSelecaoQuandoHouverMultiplosPerfis() {
+        AutenticarRequest req = criarRequestPadrao();
+        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE,
+                UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build());
+        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR,
+                UnidadeResumoDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build());
+
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(primeiro, segundo));
+        when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
+
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(httpRequest.getRemoteAddr()).thenReturn("10.0.0.1");
+
+        var resposta = loginController.login(req, httpRequest, httpResponse);
+
+        assertThat(resposta.getBody()).isNotNull();
+        assertThat(resposta.getBody().requerSelecaoPerfil()).isTrue();
+        verify(limitadorTentativasLogin).verificar("10.0.0.1");
     }
 
     @Nested

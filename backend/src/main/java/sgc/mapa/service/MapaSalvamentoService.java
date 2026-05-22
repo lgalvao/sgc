@@ -151,9 +151,6 @@ public class MapaSalvamentoService {
             for (Long codAtividade : dto.atividadesCodigos()) {
                 validarAtividadePertenceAoMapa(codAtividade, contexto.codigosAtividadesDoMapa, contexto.codMapa);
                 Set<Competencia> competencias = mapAtividadeCompetencias.get(codAtividade);
-                if (competencias == null) {
-                    throw new IllegalStateException("Atividade %d sem estrutura de associação preparada".formatted(codAtividade));
-                }
                 competencias.add(competencia);
             }
         }

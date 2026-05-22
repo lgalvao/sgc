@@ -482,4 +482,154 @@ class SubprocessoNotificacaoServiceTest {
         }).isInstanceOf(IllegalStateException.class)
           .hasMessageContaining("Template ausente para contexto vazio");
     }
+
+    @Test
+    @DisplayName("não deve gerar notificações em bloco quando a lista estiver vazia")
+    void naoDeveGerarNotificacoesEmBlocoQuandoAListaEstiverVazia() {
+        service.notificarAceiteCadastroEmBloco(List.of());
+        service.notificarDisponibilizacaoMapaEmBloco(List.of());
+        service.notificarAceiteValidacaoEmBloco(List.of());
+
+        verifyNoInteractions(notificacaoService, templateEngine, unidadeService, usuarioService, responsavelService);
+    }
+
+    @Test
+    @DisplayName("deve criar assunto de revisão de cadastro reaberta com a sigla da unidade")
+    void deveCriarAssuntoDeRevisaoDeCadastroReabertaComASiglaDaUnidade() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade admin = criarUnidade(1L, "ADMIN", "Administracao");
+        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+
+        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(unidade.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+        when(unidadeHierarquiaService.buscarCodigoPai(unidade.getCodigo())).thenReturn(null);
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.REVISAO_CADASTRO_REABERTA)
+                .unidadeOrigem(admin)
+                .unidadeDestino(unidade)
+                .build());
+
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().assunto()).isEqualTo("SGC: Reabertura de revisão de cadastro - ORIG");
+    }
+
+    @Test
+    @DisplayName("notificarHomologacaoMapa deve usar o assunto padrão do tipo de transição")
+    void notificarHomologacaoMapaDeveUsarOAssuntoPadraoDoTipoDeTransicao() {
+        when(templateEngine.process(eq("mapa-homologado"), any(IContext.class))).thenReturn("<html>homologado</html>");
+
+        Unidade admin = criarUnidade(1L, "ADMIN", "Administracao");
+        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(unidade.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+
+        service.notificarHomologacaoMapa(subprocesso);
+
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().assunto()).isEqualTo("SGC: Mapa de competências homologado");
+    }
+
+    @Test
+    @DisplayName("criarAssunto deve retornar texto específico para cadastro homologado")
+    void criarAssuntoDeveRetornarTextoEspecificoParaCadastroHomologado() throws Exception {
+        java.lang.reflect.Method metodo = SubprocessoNotificacaoService.class
+                .getDeclaredMethod("criarAssunto", TipoTransicao.class, Subprocesso.class, boolean.class);
+        metodo.setAccessible(true);
+
+        String assunto = (String) metodo.invoke(
+                service,
+                TipoTransicao.CADASTRO_HOMOLOGADO,
+                criarSubprocesso(criarUnidade(10L, "ORIG", "Origem"), criarProcesso()),
+                false
+        );
+
+        assertThat(assunto).isEqualTo("SGC: Cadastro de atividades homologado");
+    }
+
+    @Test
+    @DisplayName("não deve notificar superior quando o comando desabilitar explicitamente essa notificação")
+    void naoDeveNotificarSuperiorQuandoOComandoDesabilitarExplicitamenteEssaNotificacao() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade origem = criarUnidade(10L, "ORIG", "Origem");
+        Unidade destino = criarUnidade(20L, "DEST", "Destino");
+        destino.setUnidadeSuperior(criarUnidade(30L, "SUP", "Superior"));
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(destino.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .notificarSuperior(Boolean.FALSE)
+                .build());
+
+        verify(notificacaoService, times(1)).enfileirar(any());
+        verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
+    }
+
+    @Test
+    @DisplayName("notificarAceiteCadastroEmBloco deve ignorar subprocessos sem superior imediato")
+    void notificarAceiteCadastroEmBlocoDeveIgnorarSubprocessosSemSuperiorImediato() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
+        unidade.setUnidadeSuperior(null);
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+
+        when(unidadeService.buscarAdmin()).thenReturn(criarUnidade(1L, "ADMIN", "Administracao"));
+        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(unidade.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+
+        service.notificarAceiteCadastroEmBloco(List.of(subprocesso));
+
+        verify(notificacaoService, times(1)).enfileirar(any());
+    }
+
+    @Test
+    @DisplayName("criarAssunto deve usar fallback para tipos não mapeados explicitamente")
+    void criarAssuntoDeveUsarFallbackParaTiposNaoMapeadosExplicitamente() throws Exception {
+        java.lang.reflect.Method metodo = SubprocessoNotificacaoService.class
+                .getDeclaredMethod("criarAssunto", TipoTransicao.class, Subprocesso.class, boolean.class);
+        metodo.setAccessible(true);
+
+        String assunto = (String) metodo.invoke(
+                service,
+                TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA,
+                criarSubprocesso(criarUnidade(10L, "ORIG", "Origem"), criarProcesso()),
+                false
+        );
+
+        assertThat(assunto).isEqualTo("SGC: " + TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA.getDescMovimentacao());
+    }
 }

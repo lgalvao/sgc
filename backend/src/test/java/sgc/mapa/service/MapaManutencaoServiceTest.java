@@ -198,4 +198,14 @@ class MapaManutencaoServiceTest {
         assertThat(mapaSalvo.getSugestoes()).isNull();
         assertThat(mapaSalvo.getDataHoraHomologado()).isNull();
     }
+
+    @Test
+    void mapaComCompetenciasEAtividadesSubprocesso_ok() {
+        Mapa mapa = new Mapa();
+        when(mapaRepo.buscarComCompetenciasEAtividadesPorSubprocesso(1L)).thenReturn(Optional.of(mapa));
+
+        Mapa resultado = mapaService.mapaComCompetenciasEAtividadesSubprocesso(1L);
+
+        assertThat(resultado).isSameAs(mapa);
+    }
 }

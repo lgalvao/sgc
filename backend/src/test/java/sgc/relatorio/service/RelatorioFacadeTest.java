@@ -537,6 +537,19 @@ class RelatorioFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve cobrir erro ao gerar relatório de unidades sem mapas vigentes")
+    void deveCobrirErroAoGerarRelatorioDeUnidadesSemMapasVigentes() throws Exception {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of());
+        doThrow(new DocumentException("Simulado")).when(pdfFactory).createWriter(any(), any());
+
+        OutputStream out = new ByteArrayOutputStream();
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Erro ao gerar PDF");
+    }
+
+    @Test
     @DisplayName("Deve obter relatório do mapa vigente da unidade a partir do vínculo vigente")
     void deveObterRelatorioMapaVigenteDaUnidade() {
         mockContextoAdmin();
@@ -960,6 +973,62 @@ class RelatorioFacadeTest {
         relatorioService.gerarRelatorioAndamento(1L, out);
 
         verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve gerar relatório de andamento com responsável substituto")
+    void deveGerarRelatorioAndamentoComResponsavelSubstituto() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo Teste");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSigla("U1");
+        unidade.setNome("Unidade 1");
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(100L);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setDataLimiteEtapa1(java.time.LocalDateTime.now());
+
+        when(processoService.buscarPorCodigo(1L)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of(
+                1L, UnidadeResponsavelDto.builder().titularNome("Carlos").substitutoNome("Ana").build()
+        ));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, unidade));
+
+        List<RelatorioAndamentoDto> relatorio = relatorioService.obterRelatorioAndamento(1L);
+        relatorioService.gerarRelatorioAndamento(1L, new ByteArrayOutputStream());
+
+        assertThat(relatorio.getFirst().titular()).isEqualTo("Carlos");
+        assertThat(relatorio.getFirst().responsavel()).isEqualTo("Ana (Substituição)");
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve comparar segmentos considerando quantidade diferente de partes")
+    void deveCompararSegmentosConsiderandoQuantidadeDiferenteDePartes() throws Exception {
+        java.lang.reflect.Method metodo = RelatorioFacade.class.getDeclaredMethod("compararSegmentosTexto", String.class, String.class);
+        metodo.setAccessible(true);
+
+        int comparacao = (int) metodo.invoke(relatorioService, "A1B", "A1");
+
+        assertThat(comparacao).isPositive();
+    }
+
+    @Test
+    @DisplayName("Deve formatar situação ignorando partes em branco")
+    void deveFormatarSituacaoIgnorandoPartesEmBranco() throws Exception {
+        java.lang.reflect.Method metodo = RelatorioFacade.class.getDeclaredMethod("formatarSituacaoPdf", String.class);
+        metodo.setAccessible(true);
+
+        String situacao = (String) metodo.invoke(relatorioService, "MAPA__COM__SUGESTOES");
+
+        assertThat(situacao).isEqualTo("Mapa Com Sugestoes");
     }
 }
 

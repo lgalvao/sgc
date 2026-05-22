@@ -471,6 +471,21 @@ class SubprocessoServiceTest {
                         .isInstanceOf(IllegalStateException.class)
                         .hasMessageContaining("Subprocesso 1 sem mapa associado");
             }
+
+            @Test
+            @DisplayName("removerCompetencia deve lancar IllegalStateException se o mapa associado nao possuir codigo")
+            void removerCompetencia_DeveLancarErroQuandoMapaAssociadoNaoPossuirCodigo() {
+                Subprocesso sp = new Subprocesso();
+                sp.setCodigo(1L);
+                sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+                sp.setMapa(new Mapa());
+
+                when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+
+                assertThatThrownBy(() -> service.removerCompetencia(1L, 10L))
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessageContaining("Subprocesso 1 com mapa sem código associado");
+            }
         }
 
         @Nested

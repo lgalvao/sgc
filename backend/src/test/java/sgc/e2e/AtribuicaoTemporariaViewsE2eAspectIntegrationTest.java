@@ -187,6 +187,109 @@ class AtribuicaoTemporariaViewsE2eAspectIntegrationTest {
         assertThat(perfisChefeTemporario).isZero();
     }
 
+    @Test
+    @DisplayName("Deve sincronizar perfil GESTOR quando a unidade for intermediária")
+    void deveSincronizarPerfilGestorQuandoAUnidadeForIntermediaria() {
+        prepararMassaMinima();
+        jdbcTemplate.update("UPDATE sgc.vw_unidade SET tipo = 'INTERMEDIARIA' WHERE codigo = ?", 3L);
+
+        responsavelUnidadeService.criarAtribuicaoTemporaria(
+                3L,
+                new CriarAtribuicaoRequest(
+                        "232323",
+                        LocalDate.now(),
+                        LocalDate.now().plusDays(10),
+                        "Cobertura de férias"
+                )
+        );
+
+        Integer perfisGestor = jdbcTemplate.queryForObject(
+                """
+                        SELECT COUNT(*)
+                        FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil = 'GESTOR'
+                        """,
+                Integer.class,
+                "232323",
+                3L
+        );
+        Integer perfisChefe = jdbcTemplate.queryForObject(
+                """
+                        SELECT COUNT(*)
+                        FROM sgc.vw_usuario_perfil_unidade
+                        WHERE usuario_titulo = ?
+                          AND unidade_codigo = ?
+                          AND perfil = 'CHEFE'
+                        """,
+                Integer.class,
+                "232323",
+                3L
+        );
+
+        assertThat(perfisGestor).isEqualTo(1);
+        assertThat(perfisChefe).isZero();
+    }
+
+    @Test
+    @DisplayName("Deve lançar IllegalStateException quando valor obrigatório vier nulo")
+    void deveLancarIllegalStateExceptionQuandoValorObrigatorioVierNulo() throws Exception {
+        JdbcTemplate jdbcTemplateMock = org.mockito.Mockito.mock(JdbcTemplate.class);
+        org.mockito.Mockito.when(jdbcTemplateMock.queryForObject("SELECT valor", String.class, 3L)).thenReturn(null);
+        AtribuicaoTemporariaViewsE2eAspect aspect = new AtribuicaoTemporariaViewsE2eAspect(jdbcTemplateMock);
+        java.lang.reflect.Method metodo = AtribuicaoTemporariaViewsE2eAspect.class
+                .getDeclaredMethod("buscarValorObrigatorio", String.class, Object[].class);
+        metodo.setAccessible(true);
+
+        assertThatThrownBy(() -> {
+            try {
+                metodo.invoke(aspect, "SELECT valor", (Object) new Object[]{3L});
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw e.getCause();
+            }
+        }).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Fixture E2E não encontrou valor obrigatório");
+    }
+
+    @Test
+    @DisplayName("Não deve remover perfis antigos quando o título anterior for nulo")
+    void naoDeveRemoverPerfisAntigosQuandoOTituloAnteriorForNulo() throws Exception {
+        JdbcTemplate jdbcTemplateMock = org.mockito.Mockito.mock(JdbcTemplate.class);
+        AtribuicaoTemporariaViewsE2eAspect aspect = new AtribuicaoTemporariaViewsE2eAspect(jdbcTemplateMock);
+        java.lang.reflect.Method metodo = AtribuicaoTemporariaViewsE2eAspect.class
+                .getDeclaredMethod("removerPerfisDeResponsabilidadeAnteriores", String.class, String.class, Long.class);
+        metodo.setAccessible(true);
+
+        metodo.invoke(aspect, null, "232323", 3L);
+
+        org.mockito.Mockito.verifyNoInteractions(jdbcTemplateMock);
+    }
+
+    @Test
+    @DisplayName("Não deve remover perfis do responsável anterior quando ele já for o titular")
+    void naoDeveRemoverPerfisDoResponsavelAnteriorQuandoEleJaForOTitular() throws Exception {
+        JdbcTemplate jdbcTemplateMock = org.mockito.Mockito.mock(JdbcTemplate.class);
+        org.mockito.Mockito.when(jdbcTemplateMock.queryForObject("SELECT titulo_titular FROM sgc.vw_unidade WHERE codigo = ?", String.class, 3L))
+                .thenReturn("555555");
+        org.mockito.Mockito.when(jdbcTemplateMock.queryForObject("SELECT matricula_titular FROM sgc.vw_unidade WHERE codigo = ?", String.class, 3L))
+                .thenReturn("00555555");
+        org.mockito.Mockito.when(jdbcTemplateMock.queryForObject("SELECT tipo FROM sgc.vw_unidade WHERE codigo = ?", String.class, 3L))
+                .thenReturn("OPERACIONAL");
+        AtribuicaoTemporariaViewsE2eAspect aspect = new AtribuicaoTemporariaViewsE2eAspect(jdbcTemplateMock);
+        java.lang.reflect.Method metodo = AtribuicaoTemporariaViewsE2eAspect.class
+                .getDeclaredMethod("restaurarResponsabilidadeTitular", Long.class, String.class);
+        metodo.setAccessible(true);
+
+        metodo.invoke(aspect, 3L, "555555");
+
+        org.mockito.Mockito.verify(jdbcTemplateMock, org.mockito.Mockito.times(1)).update(
+                org.mockito.ArgumentMatchers.contains("DELETE FROM sgc.vw_usuario_perfil_unidade"),
+                org.mockito.ArgumentMatchers.eq("555555"),
+                org.mockito.ArgumentMatchers.eq(3L)
+        );
+    }
+
     private void prepararMassaMinima() {
         jdbcTemplate.update("""
                 MERGE INTO sgc.vw_unidade

@@ -200,10 +200,6 @@ public class SubprocessoTransicaoService {
         executarDisponibilizacaoMapa(sp, request, usuario, true);
     }
 
-    private void executarDisponibilizacaoMapa(Subprocesso sp, DisponibilizarMapaRequest request, Usuario usuario) {
-        executarDisponibilizacaoMapa(sp, request, usuario, true);
-    }
-
     private void executarDisponibilizacaoMapa(Subprocesso sp, DisponibilizarMapaRequest request, Usuario usuario, boolean enviarEmails) {
         Long codSubprocesso = sp.getCodigo();
         log.info("Disponibilizando mapa do subprocesso {}", codSubprocesso);
@@ -392,7 +388,7 @@ public class SubprocessoTransicaoService {
                 normalizarTexto(observacoes)
         );
         if (enviarEmails) {
-            registrarWorkflowParaSuperiorAtual(cmd, true);
+            registrarWorkflowParaSuperiorAtual(cmd);
         } else {
             registrarWorkflowParaSuperiorAtualSemEmail(cmd);
         }
@@ -458,10 +454,6 @@ public class SubprocessoTransicaoService {
     }
 
     private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd) {
-        registrarWorkflowParaSuperiorAtual(cmd, true);
-    }
-
-    private void registrarWorkflowParaSuperiorAtual(RegistrarWorkflowInternoCommand cmd, boolean notificarSuperior) {
         Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(cmd.sp());
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
 
@@ -477,10 +469,10 @@ public class SubprocessoTransicaoService {
                 .observacoes(cmd.observacoes());
 
         if (unidadeDestino != null) {
-            registrarWorkflowComDestino(builder.unidadeDestino(unidadeDestino).build(), notificarSuperior);
+            registrarWorkflowComDestino(builder.unidadeDestino(unidadeDestino).build());
         } else if (cmd.usuario().getPerfilAtivo() == Perfil.ADMIN) {
             // ADMIN na raiz: registra transição interna para si mesmo para mudar a situação
-            registrarWorkflowComDestino(builder.unidadeDestino(unidadeAtual).build(), notificarSuperior);
+            registrarWorkflowComDestino(builder.unidadeDestino(unidadeAtual).build());
         }
     }
 
@@ -514,10 +506,6 @@ public class SubprocessoTransicaoService {
     }
 
     private void registrarWorkflowComDestino(RegistrarWorkflowInternoCommand cmd) {
-        registrarWorkflowComDestino(cmd, true);
-    }
-
-    private void registrarWorkflowComDestino(RegistrarWorkflowInternoCommand cmd, boolean notificarSuperior) {
         Unidade unidadeAnalise = Objects.requireNonNull(cmd.unidadeAnalise(), "Unidade de analise obrigatoria");
         Unidade unidadeDestino = Objects.requireNonNull(cmd.unidadeDestino(), "Unidade de destino obrigatoria");
         registrarAnalise(RegistrarWorkflowCommand.builder()
@@ -532,7 +520,7 @@ public class SubprocessoTransicaoService {
                 .usuario(cmd.usuario())
                 .motivoAnalise(cmd.motivoAnalise())
                 .observacoes(cmd.observacoes())
-                .notificarSuperior(notificarSuperior ? null : Boolean.FALSE)
+                .notificarSuperior(null)
                 .build());
     }
 
@@ -551,23 +539,6 @@ public class SubprocessoTransicaoService {
                 .usuario(cmd.usuario())
                 .motivoAnalise(cmd.motivoAnalise())
                 .observacoes(cmd.observacoes())
-                .build());
-    }
-
-    private void registrarTransicaoDoAdminParaUnidade(
-            Subprocesso sp,
-            TipoTransicao tipoTransicao,
-            Usuario usuario,
-            @Nullable String observacoes
-    ) {
-        registrarTransicao(RegistrarTransicaoCommand.builder()
-                .sp(sp)
-                .tipo(tipoTransicao)
-                .origem(obterUnidadeAdmin())
-                .destino(sp.getUnidade())
-                .usuario(usuario)
-                .observacoes(observacoes)
-                .notificarSuperior(null)
                 .build());
     }
 
