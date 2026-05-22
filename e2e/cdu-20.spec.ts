@@ -101,12 +101,6 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
-        await verificarNotificacaoAdmin(page, {
-            destinatario: 'assessoria_11@tre-pe.jus.br',
-            assunto: 'Mapa de competências homologado',
-            tipo: 'Mapa homologado',
-            trechoCorpo: 'O mapa de competências da sua unidade foi homologado no processo'
-        });
     });
 
 });

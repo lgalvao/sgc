@@ -24,6 +24,7 @@ const TEMPO_MINIMO_JAVA_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_TEMPO
 const TEMPO_MINIMO_HTTP_MS = Number.parseInt(process.env.SGC_MONITORAMENTO_TEMPO_MINIMO_HTTP_MS || '100', 10);
 const NIVEL_LOG_MONITORAMENTO = (process.env.SGC_MONITORAMENTO_NIVEL_LOG || 'INFO').toUpperCase();
 const SILENT_LOGS = process.env.SGC_SILENT_LIFECYCLE === 'true';
+const LOGS_RESUMIDOS_CONSOLE = process.env.SGC_LIFECYCLE_LOGS_RESUMIDOS !== 'false';
 const ANSI_RESET = '\u001b[0m';
 const ANSI_AMARELO = '\u001b[33m';
 
@@ -35,32 +36,32 @@ let backendPortSelecionado = BACKEND_BASE_PORT;
 // Criar/limpar arquivo de log ao iniciar
 const LOG_FILE = path.resolve(__dirname, 'server.log');
 
+function anexarAoArquivoLog(nivel, msg) {
+    try {
+        fs.appendFileSync(LOG_FILE, `[${nivel}] ${msg}\n`);
+    } catch {
+        // Ignorar erro de escrita em arquivo
+    }
+}
+
 // Local lightweight logger for this lifecycle script.
 // Writes to console and appends to LOG_FILE.
 const lifecycleLogger = {
     info: (msg) => {
         try {
-            if (!SILENT_LOGS) console.log(msg);
+            if (!SILENT_LOGS && !LOGS_RESUMIDOS_CONSOLE) console.log(msg);
         } catch {
             // Ignorar erro de log
         }
-        try {
-            fs.appendFileSync(LOG_FILE, `[INFO] ${msg}\n`);
-        } catch {
-            // Ignorar erro de escrita em arquivo
-        }
+        anexarAoArquivoLog('INFO', msg);
     },
     warn: (msg) => {
         try {
-            if (!SILENT_LOGS) console.warn(msg);
+            if (!SILENT_LOGS && !LOGS_RESUMIDOS_CONSOLE) console.warn(msg);
         } catch {
             // Ignorar erro de log
         }
-        try {
-            fs.appendFileSync(LOG_FILE, `[WARN] ${msg}\n`);
-        } catch {
-            // Ignorar erro de escrita em arquivo
-        }
+        anexarAoArquivoLog('WARN', msg);
     },
     error: (msg) => {
         try {
@@ -68,11 +69,7 @@ const lifecycleLogger = {
         } catch {
             // Ignorar erro de log
         }
-        try {
-            fs.appendFileSync(LOG_FILE, `[ERROR] ${msg}\n`);
-        } catch {
-            // Ignorar erro de escrita em arquivo
-        }
+        anexarAoArquivoLog('ERROR', msg);
     }
 };
 
@@ -158,6 +155,21 @@ function colorirLinha(line) {
     return line;
 }
 
+const PADROES_LINHA_ERRO = [
+    /^ERROR\b/,
+    /^WARN\b/,
+    /\bException\b/,
+    /\bError\b/,
+    /\bFailed\b/,
+    /\bCaused by:\b/,
+    /\bCannot\b/,
+    /\bUnable\b/
+];
+
+function ehLinhaDeErro(line) {
+    return PADROES_LINHA_ERRO.some(pattern => pattern.test(line));
+}
+
 function formatarLinha(prefix, line) {
     const trimmed = line.trim();
     if (!trimmed) {
@@ -182,6 +194,10 @@ function log(prefix, data) {
         if (trimmed && !shouldFilterLog(line)) {
             const linhaFormatada = formatarLinha(prefix, line);
             if (linhaFormatada) {
+                if (LOGS_RESUMIDOS_CONSOLE && !ehLinhaDeErro(linhaFormatada)) {
+                    anexarAoArquivoLog('INFO', linhaFormatada);
+                    return;
+                }
                 lifecycleLogger.info(linhaFormatada);
             }
         }

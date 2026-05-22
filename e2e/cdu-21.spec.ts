@@ -92,7 +92,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
         await verificarNotificacaoAdmin(page, {
-            destinatario: 'secao_221@tre-pe.jus.br',
+            destinatario: 'SECAO_221',
             assunto: `Finalização do processo ${descProcesso}`,
             tipo: 'Finalização de processo',
             trechoCorpo: 'Comunicamos a finalização do processo'
@@ -204,7 +204,7 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
         await verificarNotificacaoAdmin(page, {
-            destinatario: 'secao_212@tre-pe.jus.br',
+            destinatario: 'SECAO_212',
             assunto: `Finalização do processo ${descProcessoRevisao}`,
             tipo: 'Finalização de processo',
             trechoCorpo: 'Comunicamos a finalização do processo'

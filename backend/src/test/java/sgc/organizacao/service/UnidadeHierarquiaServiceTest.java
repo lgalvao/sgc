@@ -395,6 +395,7 @@ class UnidadeHierarquiaServiceTest {
 
         @Test
         @DisplayName("montarHierarquia deve ignorar DTOs ausentes no mapa de unidades")
+        @SuppressWarnings("unchecked")
         void montarHierarquia_DeveIgnorarDtosAusentesNoMapa() throws Exception {
             List<UnidadeHierarquiaLeitura> unidadesMutantes = new ArrayList<UnidadeHierarquiaLeitura>() {
                 private int iteracoes = 0;
