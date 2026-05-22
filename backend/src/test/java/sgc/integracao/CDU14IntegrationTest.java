@@ -5,6 +5,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
@@ -203,7 +204,13 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
+            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
+            assertThat(alertas).hasSize(6);
+            assertThat(alertas).anySatisfy(alerta -> {
+                assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidadeChefe.getSigla());
+                assertThat(alerta.getDescricao())
+                        .isEqualTo(Mensagens.ALERTA_REVISAO_DEVOLVIDA.formatted(unidadeChefe.getSigla()));
+            });
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
             List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
@@ -247,7 +254,12 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Subprocesso sp = subprocessoRepo.findById(subprocessoId).orElseThrow();
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
-            assertThat(alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo())).hasSize(6);
+            List<Alerta> alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
+            assertThat(alertas).hasSize(6);
+            assertThat(alertas.stream()
+                    .map(Alerta::getDescricao)
+                    .toList())
+                    .contains(Mensagens.ALERTA_REVISAO_ACEITA.formatted(unidadeChefe.getSigla()));
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
             // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite

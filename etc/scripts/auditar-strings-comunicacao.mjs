@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const raiz = process.cwd();
+const mapaMensagens = carregarMapaMensagens(path.join(raiz, 'backend/src/main/java/sgc/comum/Mensagens.java'));
+const mapaTextosAlerta = carregarMapaTextosAlerta(path.join(raiz, 'frontend/src/constants/textos.ts'));
 const arquivos = [
     path.join(raiz, 'backend/src/main/java/sgc/subprocesso/service/SubprocessoNotificacaoService.java'),
     path.join(raiz, 'backend/src/main/java/sgc/comum/Mensagens.java'),
@@ -16,7 +18,10 @@ const arquivos = [
     ...listarArquivos(path.join(raiz, 'etc/reqs'), /^cdu-\d+\.md$/)
 ].filter(caminho => !caminho.includes(`${path.sep}etc${path.sep}reqs${path.sep}diagnostico${path.sep}`));
 
-const entradas = arquivos.flatMap(extrairEntradasArquivo);
+const entradas = [
+    ...arquivos.flatMap(extrairEntradasArquivo),
+    ...criarEntradasSinteticasAssuntosCatalogo()
+];
 const grupos = agruparPorFamilia(entradas);
 const suspeitas = grupos.filter(temSuspeita);
 
@@ -79,6 +84,18 @@ function extrairEntradasArquivo(caminho) {
             }
         }
 
+        for (const nomeConstante of extrairReferenciasMensagens(linha)) {
+            const constante = mapaMensagens.get(nomeConstante);
+            if (!constante) continue;
+            entradas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), constante.tipo, constante.valor, nomeConstante));
+        }
+
+        for (const nomeConstante of extrairReferenciasTextosAlerta(linha)) {
+            const valor = mapaTextosAlerta.get(nomeConstante);
+            if (!valor) continue;
+            entradas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), 'alerta', valor, `TEXTOS.alerta.${nomeConstante}`));
+        }
+
         for (const literal of extrairLiteraisLinha(linha)) {
             if (!pareceComunicacao(literal)) continue;
             entradas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), 'literal', literal));
@@ -100,6 +117,14 @@ function extrairConstanteMensagens(linha) {
     const valor = match[2].trim();
     const tipo = nome.startsWith('ALERTA_') ? 'alerta' : nome.startsWith('HIST_') ? 'historico' : 'assunto';
     return {nome, valor, tipo};
+}
+
+function extrairReferenciasMensagens(linha) {
+    return [...linha.matchAll(/Mensagens\.((?:ALERTA|HIST|ASSUNTO)_[A-Z0-9_]+)/g)].map(match => match[1]);
+}
+
+function extrairReferenciasTextosAlerta(linha) {
+    return [...linha.matchAll(/TEXTOS\.alerta\.([A-Z0-9_]+)/g)].map(match => match[1]);
 }
 
 function extrairLiteraisLinha(linha) {
@@ -207,8 +232,9 @@ function normalizarFamilia(valor) {
             .replace(/^SGC:\s*/i, '')
             .replace(/<[^>]+>/g, ' ')
             .replace(/%[sd]/g, '<var>')
-            .replace(/\[[A-Z0-9_]+\]/g, '<var>')
+            .replace(/\[[^\]]+\]/g, '<var>')
             .replace(/\$\{[^}]+\}/g, '<var>')
+            .replace(/\b[A-ZÁÉÍÓÚÇ][A-ZÁÉÍÓÚÇ0-9_-]{1,}\b/g, '<var>')
             .replace(/\b\d{2}\/\d{2}\/\d{4}\b/g, '<data>')
             .replace(/\b\d+\b/g, '<num>')
     );
@@ -234,4 +260,74 @@ function argumentoOpcional(flag) {
     const indice = process.argv.indexOf(flag);
     if (indice === -1) return null;
     return process.argv[indice + 1] ?? null;
+}
+
+function criarEntradasSinteticasAssuntosCatalogo() {
+    const arquivo = 'backend/src/main/java/sgc/alerta/AssuntosNotificacao.java';
+    const entradas = [];
+    const assuntos = [
+        'SGC: Início de processo de mapeamento de competências',
+        'SGC: Início de processo de mapeamento de competências em unidades subordinadas',
+        'SGC: Início de processo de revisão do mapa de competências',
+        'SGC: Início de processo de revisão do mapa de competências em unidades subordinadas',
+        'SGC: Finalização do processo %s',
+        'SGC: Finalização do processo %s em unidades subordinadas',
+        'SGC: Lembrete de prazo - %s',
+        'SGC: Data limite alterada',
+        'SGC: Atribuição de perfil CHEFE na unidade %s',
+        'SGC: Cadastro de atividades e conhecimentos da %s submetido para análise',
+        'SGC: Cadastro de atividades e conhecimentos da %s devolvido para ajustes',
+        'SGC: Cadastro de atividades e conhecimentos disponibilizado - %s',
+        'SGC: Reabertura de cadastro de atividades - %s',
+        'SGC: Mapa de competências homologado',
+        'SGC: Mapa de competências disponibilizado',
+        'SGC: Mapa de competências disponibilizado - %s',
+        'SGC: Sugestões apresentadas para o mapa de competências da %s',
+        'SGC: Validação do mapa de competências da %s submetida para análise',
+        'SGC: Validação do mapa da %s devolvida para ajustes',
+        'SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise',
+        'SGC: Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes',
+        'SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: %s',
+        'SGC: Reabertura de revisão de cadastro - %s',
+        'SGC: Cadastros de atividades e conhecimentos submetidos para análise',
+        'SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise',
+        'SGC: Mapas de competências disponibilizados',
+        'SGC: Validação de mapas de competências submetida para análise'
+    ];
+
+    assuntos.forEach((assunto, indice) => {
+        entradas.push(criarEntrada(arquivo, indice + 1, 'producao', 'assunto', assunto, 'CATALOGO_ASSUNTO'));
+    });
+    return entradas;
+}
+
+function carregarMapaMensagens(caminho) {
+    const mapa = new Map();
+    if (!fs.existsSync(caminho)) return mapa;
+    const texto = fs.readFileSync(caminho, 'utf8');
+    for (const linha of texto.split('\n')) {
+        const constante = extrairConstanteMensagens(linha);
+        if (constante) mapa.set(constante.nome, constante);
+    }
+    return mapa;
+}
+
+function carregarMapaTextosAlerta(caminho) {
+    const mapa = new Map();
+    if (!fs.existsSync(caminho)) return mapa;
+    const texto = fs.readFileSync(caminho, 'utf8');
+    const bloco = texto.match(/alerta:\s*\{([\s\S]*?)\n\s*},\n\s*[a-zA-Z]/);
+    if (!bloco) return mapa;
+    for (const linha of bloco[1].split('\n')) {
+        const func = linha.match(/^\s*([A-Z0-9_]+):\s*\([^)]*\)\s*=>\s*`([^`]+)`/);
+        if (func) {
+            mapa.set(func[1], func[2]);
+            continue;
+        }
+        const literal = linha.match(/^\s*([A-Z0-9_]+):\s*"([^"]+)"/);
+        if (literal) {
+            mapa.set(literal[1], literal[2]);
+        }
+    }
+    return mapa;
 }

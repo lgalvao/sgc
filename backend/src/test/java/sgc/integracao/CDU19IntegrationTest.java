@@ -109,6 +109,10 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
 
             assertThat(alertas).hasSize(1);
+            assertThat(alertas.getFirst().getDescricao())
+                    .isEqualTo(Mensagens.ALERTA_MAPA_SUGESTOES.formatted(unidade.getSigla()));
+            assertThat(alertas.getFirst().getUnidadeDestino().getSigla())
+                    .isEqualTo(unidadeSuperior.getSigla());
 
             List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
                     .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_SUGESTOES_APRESENTADAS)
@@ -165,7 +169,7 @@ class CDU19IntegrationTest extends BaseIntegrationTest {
                     alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
             assertThat(alertas.getFirst().getDescricao())
-                    .contains("Validação do mapa de competências da unidade " + unidade.getSigla() + " aguardando análise");
+                    .isEqualTo(Mensagens.ALERTA_MAPA_VALIDACAO_PENDENTE.formatted(unidade.getSigla()));
             assertThat(alertas.getFirst().getUnidadeDestino().getSigla())
                     .isEqualTo(unidadeSuperior.getSigla());
 

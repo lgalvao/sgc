@@ -187,6 +187,9 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
 
             List<Alerta> alertas = alertaRepo.findByProcessoCodigo(subprocesso.getProcesso().getCodigo());
             assertThat(alertas).hasSize(1);
+            assertThat(alertas.getFirst().getDescricao())
+                    .isEqualTo(Mensagens.ALERTA_MAPA_DISPONIBILIZADO.formatted(unidade.getSigla()));
+            assertThat(alertas.getFirst().getUnidadeDestino().getSigla()).isEqualTo(unidade.getSigla());
 
             List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
                     .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_DISPONIBILIZADO)

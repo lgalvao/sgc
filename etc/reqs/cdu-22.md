@@ -60,7 +60,7 @@
    8.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, seguindo este modelo:
 
     ```text
-    Assunto: SGC: Cadastro de atividades e conhecimentos submetido para análise - [SIGLA_UNIDADE_SUBPROCESSO]
+    Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
 

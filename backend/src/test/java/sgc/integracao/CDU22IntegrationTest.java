@@ -38,6 +38,8 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     private EntityManager entityManager;
     @Autowired
     private NotificacaoEmailRepo notificacaoEmailRepo;
+    @Autowired
+    private AlertaRepo alertaRepo;
 
     private Unidade unidadeSuperior;
     private Subprocesso subprocesso1;
@@ -153,6 +155,14 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movs2 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s2.getCodigo());
         assertThat(movs2).isNotEmpty();
         assertThat(movs2.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(2L);
+
+        List<Alerta> alertas = alertaRepo.findByProcessoCodigo(processo.getCodigo());
+        assertThat(alertas).anySatisfy(alerta -> {
+            assertThat(alerta.getDescricao()).isEqualTo(Mensagens.ALERTA_CADASTRO_ACEITO.formatted("SEDESENV"));
+        });
+        assertThat(alertas).anySatisfy(alerta -> {
+            assertThat(alerta.getDescricao()).isEqualTo(Mensagens.ALERTA_CADASTRO_ACEITO.formatted("SEDIA"));
+        });
 
         List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_ACEITO)

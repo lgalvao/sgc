@@ -77,7 +77,8 @@ public class SubprocessoNotificacaoService {
         );
 
         Map<String, Object> variaveis = new HashMap<>();
-        variaveis.put("titulo", sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA);
+        String assunto = AssuntosNotificacao.dataLimiteAlterada();
+        variaveis.put("titulo", assunto);
         variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());
         variaveis.put("novaData", novaDataFormatada);
@@ -93,7 +94,7 @@ public class SubprocessoNotificacaoService {
                 .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
                 .unidadeDestinoSigla(sp.getUnidade().getSigla())
                 .destinatario(emailDestino)
-                .assunto(sgc.comum.Mensagens.ASSUNTO_DATA_LIMITE_ALTERADA)
+                .assunto(assunto)
                 .corpoHtml(corpo)
                 .chaveIdempotencia(chave)
                 .build());

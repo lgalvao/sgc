@@ -219,7 +219,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         () -> new AssertionError("Alerta de aceite para unidade superior não encontrado"));
 
         assertThat(alertaDeAceite.getDescricao())
-                .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");
+                .isEqualTo(Mensagens.ALERTA_MAPA_VALIDACAO_ACEITA.formatted(unidade.getSigla()));
 
         List<NotificacaoEmail> notificacoesAceite = notificacaoEmailRepo.findAll().stream()
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_ACEITA)
@@ -275,7 +275,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                         .findFirst()
                         .orElseThrow();
         assertThat(alerta.getDescricao())
-                .contains("Validação do mapa da unidade " + unidade.getSigla() + " submetida para análise");
+                .isEqualTo(Mensagens.ALERTA_MAPA_VALIDACAO_ACEITA.formatted(unidade.getSigla()));
     }
 
     @Test
