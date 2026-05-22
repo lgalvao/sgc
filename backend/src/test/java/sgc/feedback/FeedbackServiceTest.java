@@ -533,6 +533,28 @@ class FeedbackServiceTest {
     }
 
     @Test
+    @DisplayName("deve ignorar screenshot quando falhar a gravação no diretório configurado")
+    void deveIgnorarScreenshotQuandoFalharAGravacaoNoDiretorioConfigurado() throws IOException {
+        configurarUsuarioMock();
+        Path arquivoNoLugarDoDiretorio = Path.of("backend", "build", "feedback-screenshot-arquivo-" + UUID.randomUUID() + ".bin");
+        Files.createDirectories(arquivoNoLugarDoDiretorio.getParent());
+        Files.writeString(arquivoNoLugarDoDiretorio, "arquivo");
+        propriedades = new FeedbackPropriedades(arquivoNoLugarDoDiretorio.toString(), 5_242_880L);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota com screenshot", null);
+        var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
+        when(repo.save(any())).thenReturn(FeedbackRegistro.builder().codigo(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
+
+        try {
+            service.registrar(payload, screenshot);
+        } finally {
+            Files.deleteIfExists(arquivoNoLugarDoDiretorio);
+        }
+
+        verify(repo).save(argThat(r -> r.getCaminhoScreenshot() == null));
+    }
+
+    @Test
     @DisplayName("deve usar caminho padrão quando screenshotDir for nulo na resolução de caminho")
     void deveUsarCaminhosPadraoQuandoScreenshotDirForNuloNaResolucao() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);

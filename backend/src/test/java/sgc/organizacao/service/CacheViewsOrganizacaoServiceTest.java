@@ -229,4 +229,48 @@ class CacheViewsOrganizacaoServiceTest {
 
         assertThat(result).isEmpty();
     }
+
+    @Test
+    @DisplayName("listarTodosPerfisUnidade deve manter primeiros usuários e unidades quando houver duplicidades")
+    void listarTodosPerfisUnidade_DeveManterPrimeirosUsuariosEUnidadesQuandoHouverDuplicidades() {
+        UsuarioConsultaLeitura primeiroUsuario = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("dup")
+                .unidadeCompetenciaCodigo(10L)
+                .build();
+        UsuarioConsultaLeitura segundoUsuario = UsuarioConsultaLeitura.builder()
+                .tituloEleitoral("dup")
+                .unidadeCompetenciaCodigo(20L)
+                .build();
+        when(usuarioRepo.listarTodasConsultas()).thenReturn(List.of(primeiroUsuario, segundoUsuario));
+
+        UnidadeHierarquiaLeitura primeiraUnidade = UnidadeHierarquiaLeitura.builder()
+                .codigo(10L)
+                .nome("Primeira unidade")
+                .sigla("PRI")
+                .tipo(TipoUnidade.OPERACIONAL)
+                .tituloTitular("dup")
+                .situacao(SituacaoUnidade.ATIVA)
+                .build();
+        UnidadeHierarquiaLeitura unidadeDuplicada = UnidadeHierarquiaLeitura.builder()
+                .codigo(10L)
+                .nome("Segunda unidade")
+                .sigla("SEG")
+                .tipo(TipoUnidade.INTEROPERACIONAL)
+                .situacao(SituacaoUnidade.INATIVA)
+                .build();
+        when(unidadeRepo.listarEstruturasAtivas()).thenReturn(List.of(primeiraUnidade, unidadeDuplicada));
+
+        when(responsabilidadeRepo.listarTodasLeituras()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(10L, "dup")
+        ));
+        when(administradorRepo.findAll()).thenReturn(List.of());
+        when(selfProvider.getIfAvailable(org.mockito.ArgumentMatchers.any())).thenReturn(cacheService);
+        when(environment.acceptsProfiles(Profiles.of("test"))).thenReturn(false);
+
+        List<UsuarioPerfilLeitura> result = cacheService.listarTodosPerfisUnidade();
+
+        assertThat(result).contains(
+                new UsuarioPerfilLeitura("dup", 10L, Perfil.CHEFE)
+        );
+    }
 }

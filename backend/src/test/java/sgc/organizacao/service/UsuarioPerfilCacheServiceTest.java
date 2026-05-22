@@ -90,4 +90,24 @@ class UsuarioPerfilCacheServiceTest {
 
         assertThat(perfis).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve manter a primeira unidade quando o cache retornar codigos duplicados")
+    void deveManterAPrimeiraUnidadeQuandoOCacheRetornarCodigosDuplicados() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                new UnidadeHierarquiaLeitura(1L, "Primeira unidade", "PRI", null, TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA, null),
+                new UnidadeHierarquiaLeitura(1L, "Segunda unidade", "SEG", null, TipoUnidade.INTERMEDIARIA, SituacaoUnidade.INATIVA, null)
+        ));
+        when(usuarioPerfilRepo.findByUsuarioTitulo("222")).thenReturn(List.of(
+                new UsuarioPerfil("222", 1L, Perfil.CHEFE)
+        ));
+
+        List<UsuarioPerfilAutorizacaoLeitura> perfis = usuarioPerfilCacheService.buscarAutorizacoesPerfil("222");
+
+        assertThat(perfis).singleElement().satisfies(perfil -> {
+            assertThat(perfil.unidadeNome()).isEqualTo("Primeira unidade");
+            assertThat(perfil.unidadeSigla()).isEqualTo("PRI");
+            assertThat(perfil.unidadeTipo()).isEqualTo(TipoUnidade.OPERACIONAL);
+        });
+    }
 }

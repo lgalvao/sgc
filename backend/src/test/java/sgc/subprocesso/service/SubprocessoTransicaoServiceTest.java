@@ -624,4 +624,97 @@ class SubprocessoTransicaoServiceTest {
             assertThat(sp.getDataFimEtapa2()).isNotNull();
         }
     }
+
+    @Test
+    @DisplayName("devolverValidacao deve validar apenas situações com sugestões para ADMIN")
+    void devolverValidacaoDeveValidarApenasSituacoesComSugestoesParaAdmin() {
+        Unidade unidadeSubprocesso = criarUnidade(1L, "U1", "Unidade 1");
+        Unidade unidadeAnalise = criarUnidade(10L, "U10", "Unidade 10");
+        Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_COM_SUGESTOES, unidadeSubprocesso);
+        sp.setDataFimEtapa2(LocalDateTime.now());
+
+        Movimentacao movimentacao = new Movimentacao();
+        movimentacao.setUnidadeDestino(unidadeAnalise);
+        movimentacao.setUnidadeOrigem(unidadeSubprocesso);
+
+        Usuario usuario = criarUsuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
+        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
+        when(hierarquiaService.isSubordinada(unidadeSubprocesso, unidadeAnalise)).thenReturn(true);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(analiseRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.devolverValidacao(1L, "Ajustar");
+
+        verify(validacaoService).validarSituacaoPermitida(sp,
+                MAPEAMENTO_MAPA_COM_SUGESTOES,
+                REVISAO_MAPA_COM_SUGESTOES);
+    }
+
+    @Test
+    @DisplayName("devolverValidacao deve lançar erro quando o histórico não indicar unidade de devolução")
+    void devolverValidacaoDeveLancarErroQuandoOHistoricoNaoIndicarUnidadeDeDevolucao() {
+        Unidade unidadeSubprocesso = criarUnidade(1L, "U1", "Unidade 1");
+        Unidade unidadeAnalise = criarUnidade(10L, "U10", "Unidade 10");
+        Unidade outraUnidade = criarUnidade(20L, "U20", "Unidade 20");
+        Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidadeSubprocesso);
+
+        Movimentacao movimentacao = new Movimentacao();
+        movimentacao.setUnidadeDestino(outraUnidade);
+        movimentacao.setUnidadeOrigem(outraUnidade);
+
+        Usuario usuario = criarUsuario();
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
+        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+
+        assertThatThrownBy(() -> service.devolverValidacao(1L, "Justificativa"))
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                .hasMessageContaining("Historico de movimentacoes inconsistente");
+    }
+
+    @Test
+    @DisplayName("registrarTransicaoSemEmail não deve criar alerta quando o tipo não gerar alerta")
+    void registrarTransicaoSemEmailNaoDeveCriarAlertaQuandoOTipoNaoGerarAlerta() {
+        Unidade origem = criarUnidade(10L, "ORIG", "Origem");
+        Unidade destino = criarUnidade(20L, "DEST", "Destino");
+        Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, origem);
+        Usuario usuario = criarUsuario();
+
+        service.registrarTransicaoSemEmail(RegistrarTransicaoCommand.builder()
+                .sp(subprocesso)
+                .tipo(CADASTRO_HOMOLOGADO)
+                .origem(origem)
+                .destino(destino)
+                .usuario(usuario)
+                .build());
+
+        verify(notificacaoService, never()).registrarAlertaTransicao(any());
+    }
+
+    @Test
+    @DisplayName("aceitarValidacaoEmBloco não deve registrar workflow sem e-mail quando não houver superior e o usuário não for ADMIN")
+    void aceitarValidacaoEmBlocoNaoDeveRegistrarWorkflowSemEmailQuandoNaoHouverSuperiorEUsuarioNaoForAdmin() {
+        Unidade unidade = criarUnidade(10L, "U10", "Unidade 10");
+        Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
+        Usuario usuario = criarUsuario();
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(1L))).thenReturn(List.of(subprocesso));
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(null);
+
+        service.aceitarValidacaoEmBloco(List.of(1L));
+
+        verify(analiseRepo, never()).save(any());
+    }
 }

@@ -280,6 +280,24 @@ class E2eControllerTest {
     }
 
     @Test
+    @DisplayName("Deve criar processo de revisão fixture com descrição padrão quando a descrição vier em branco")
+    void deveCriarProcessoRevisaoFixtureComDescricaoPadraoQuandoDescricaoVierEmBranco() {
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "   ", "SIGLA", false, 10);
+
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
+        Processo proc = new Processo();
+        proc.setCodigo(100L);
+        when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
+
+        controller.criarProcessoRevisao(req);
+
+        ArgumentCaptor<CriarProcessoRequest> requestCaptor = ArgumentCaptor.forClass(CriarProcessoRequest.class);
+        verify(processoService).criar(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().descricao()).startsWith("Processo fixture E2E REVISAO ");
+    }
+
+    @Test
     @DisplayName("Deve criar processo de mapeamento fixture e iniciar")
     void deveCriarProcessoMapeamentoFixtureIniciado() {
 

@@ -277,23 +277,6 @@ public class SubprocessoNotificacaoService {
         criarNotificacaoComChave(cmd, email, TipoNotificacao.CADASTRO_ACEITO, "bloco-superior");
     }
 
-    private void criarNotificacaoDiretaDisponibilizacaoMapaBloco(Subprocesso sp) {
-        Unidade admin = unidadeService.buscarAdmin();
-        NotificacaoCommand cmd = NotificacaoCommand.builder()
-                .subprocesso(sp)
-                .tipoTransicao(TipoTransicao.MAPA_DISPONIBILIZADO)
-                .unidadeOrigem(admin)
-                .unidadeDestino(sp.getUnidade())
-                .observacoes("Disponibilização em bloco")
-                .build();
-        Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
-        String assunto = criarAssunto(TipoTransicao.MAPA_DISPONIBILIZADO, sp, false);
-        String corpo = processarTemplate("mapa-disponibilizado", variaveis);
-        EmailGerado email = new EmailGerado(getEmailUnidade(sp.getUnidade()), assunto, corpo, OrigemNotificacao.DIRETO, sp.getUnidade().getSigla(), null);
-        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_DISPONIBILIZADO, "bloco-direto");
-        notificarResponsavelPessoal(cmd, sp.getUnidade(), email);
-    }
-
     private void criarNotificacaoConsolidadaDisponibilizacaoMapaBloco(Unidade superior, List<Subprocesso> subprocessos) {
         Subprocesso base = subprocessos.getFirst();
         Unidade admin = unidadeService.buscarAdmin();
