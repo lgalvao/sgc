@@ -5,6 +5,7 @@ import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-process
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 /**
  * CDU-24 - Disponibilizar mapas de competências em bloco
@@ -129,6 +130,18 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.disponibilizar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO).first()).toBeVisible();
         await expect(page).toHaveURL(/\/painel/);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_1,
+            assunto: 'Mapa de competências disponibilizado',
+            tipo: 'Mapa disponibilizado',
+            trechoCorpo: `O mapa de competências de sua unidade foi disponibilizado no contexto do processo ${descProcesso}.`
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: 'Mapas de competências disponibilizados',
+            tipo: 'Mapa disponibilizado',
+            trechoCorpo: UNIDADE_1
+        });
     });
 
     test('Cenario 4: Disponibilização em bloco registra movimentação e alerta com data/hora', async ({

@@ -5,6 +5,7 @@ import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-process
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 /**
  * CDU-25 - Aceitar validação de mapas de competências em bloco
@@ -95,6 +96,20 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
         await expect(modal).toBeVisible();
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO)).toBeVisible();
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_1,
+            assunto: `Validação do mapa de competências da ${UNIDADE_1} submetida para análise`,
+            tipo: 'Validação do mapa aceita',
+            trechoCorpo: `A validação do mapa de competências da sua unidade no processo ${descIsolada} foi aceita e submetida para análise pela unidade superior imediata.`
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_21',
+            assunto: 'Validação de mapas de competências submetida para análise',
+            tipo: 'Validação do mapa aceita',
+            trechoCorpo: UNIDADE_1
+        });
 
         await loginComPerfil(
             page,

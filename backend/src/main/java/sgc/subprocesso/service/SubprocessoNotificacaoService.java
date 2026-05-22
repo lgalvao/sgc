@@ -247,34 +247,51 @@ public class SubprocessoNotificacaoService {
     private void criarNotificacaoDiretaAceiteCadastroBloco(Subprocesso sp) {
         Unidade unidade = sp.getUnidade();
         Unidade admin = unidadeService.buscarAdmin();
+        TipoTransicao tipoTransicao = sp.getProcesso().getTipo() == TipoProcesso.REVISAO
+                ? TipoTransicao.REVISAO_CADASTRO_ACEITA
+                : TipoTransicao.CADASTRO_ACEITO;
+        TipoNotificacao tipoNotificacao = sp.getProcesso().getTipo() == TipoProcesso.REVISAO
+                ? TipoNotificacao.REVISAO_CADASTRO_ACEITA
+                : TipoNotificacao.CADASTRO_ACEITO;
+        String template = sp.getProcesso().getTipo() == TipoProcesso.REVISAO
+                ? "revisao-cadastro-aceita-bloco-unidade"
+                : "cadastro-aceito-bloco-unidade";
         NotificacaoCommand cmd = NotificacaoCommand.builder()
                 .subprocesso(sp)
-                .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
+                .tipoTransicao(tipoTransicao)
                 .unidadeOrigem(admin)
                 .unidadeDestino(unidade)
                 .build();
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
-        String assunto = criarAssunto(TipoTransicao.CADASTRO_ACEITO, sp, false);
-        String corpo = processarTemplate("cadastro-aceito-bloco-unidade", variaveis);
+        String assunto = criarAssunto(tipoTransicao, sp, false);
+        String corpo = processarTemplate(template, variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(unidade), assunto, corpo, OrigemNotificacao.DIRETO, unidade.getSigla(), null);
-        criarNotificacaoComChave(cmd, email, TipoNotificacao.CADASTRO_ACEITO, "bloco-direto");
+        criarNotificacaoComChave(cmd, email, tipoNotificacao, "bloco-direto");
         notificarResponsavelPessoal(cmd, unidade, email);
     }
 
     private void criarNotificacaoConsolidadaAceiteCadastroBloco(Unidade superior, List<Subprocesso> subprocessos) {
         Subprocesso base = subprocessos.getFirst();
         Unidade admin = unidadeService.buscarAdmin();
+        boolean revisao = base.getProcesso().getTipo() == TipoProcesso.REVISAO;
+        TipoTransicao tipoTransicao = revisao ? TipoTransicao.REVISAO_CADASTRO_ACEITA : TipoTransicao.CADASTRO_ACEITO;
+        TipoNotificacao tipoNotificacao = revisao ? TipoNotificacao.REVISAO_CADASTRO_ACEITA : TipoNotificacao.CADASTRO_ACEITO;
         NotificacaoCommand cmd = NotificacaoCommand.builder()
                 .subprocesso(base)
-                .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
+                .tipoTransicao(tipoTransicao)
                 .unidadeOrigem(admin)
                 .unidadeDestino(superior)
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
-        String assunto = "SGC: Cadastros de atividades e conhecimentos submetidos para análise";
-        String corpo = processarTemplate("cadastro-aceito-bloco-superior", variaveis);
+        String assunto = revisao
+                ? "SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise"
+                : "SGC: Cadastros de atividades e conhecimentos submetidos para análise";
+        String corpo = processarTemplate(
+                revisao ? "revisao-cadastro-aceita-bloco-superior" : "cadastro-aceito-bloco-superior",
+                variaveis
+        );
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
-        criarNotificacaoComChave(cmd, email, TipoNotificacao.CADASTRO_ACEITO, "bloco-superior");
+        criarNotificacaoComChave(cmd, email, tipoNotificacao, "bloco-superior");
     }
 
     private void criarNotificacaoConsolidadaDisponibilizacaoMapaBloco(Unidade superior, List<Subprocesso> subprocessos) {

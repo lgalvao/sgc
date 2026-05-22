@@ -8,6 +8,7 @@ import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-process
 import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 /**
  * CDU-22 - Aceitar cadastros em bloco
@@ -147,6 +148,20 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
         await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
 
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_1,
+            assunto: `Cadastro de atividades e conhecimentos da ${UNIDADE_1} submetido para análise`,
+            tipo: 'Cadastro aceito',
+            trechoCorpo: `O cadastro de atividades e conhecimentos da sua unidade no processo ${descIsolada} foi aceito e submetido para análise pela unidade superior imediata.`
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: 'Cadastros de atividades e conhecimentos submetidos para análise',
+            tipo: 'Cadastro aceito',
+            trechoCorpo: UNIDADE_1
+        });
+
         // Verificar movimentação no subprocesso
         await page.goto(`/processo/${processoIsolado.codigo}`);
         await navegarParaSubprocesso(page, UNIDADE_1);
@@ -204,5 +219,19 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
 
         await expect(page).toHaveURL(/\/painel/);
         await expect(page.getByText(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO).first()).toBeVisible();
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_REVISAO,
+            assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_REVISAO} submetido para análise`,
+            tipo: 'Revisão de cadastro aceita',
+            trechoCorpo: `A revisão do cadastro de atividades e conhecimentos da sua unidade no processo ${descProcessoRevisao} foi aceita e submetida para análise pela unidade superior imediata.`
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: 'Revisões de cadastro de atividades e conhecimentos submetidas para análise',
+            tipo: 'Revisão de cadastro aceita',
+            trechoCorpo: UNIDADE_REVISAO
+        });
     });
 });
