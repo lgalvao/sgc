@@ -11,6 +11,7 @@ import {
     obterAcaoCabecalhoSubprocesso,
     verificarPaginaPainel
 } from './helpers/helpers-navegacao.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão', () => {
@@ -90,6 +91,12 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
 
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'secao_221@tre-pe.jus.br',
+            assunto: `Finalização do processo ${descProcesso}`,
+            tipo: 'Finalização de processo',
+            trechoCorpo: 'Comunicamos a finalização do processo'
+        });
 
         // Verificar que processo não aparece mais no painel ativo (foi finalizado)
         // (Processo finalizado não aparece na lista de processos ativos)
@@ -196,6 +203,12 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
 
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'secao_212@tre-pe.jus.br',
+            assunto: `Finalização do processo ${descProcessoRevisao}`,
+            tipo: 'Finalização de processo',
+            trechoCorpo: 'Comunicamos a finalização do processo'
+        });
     });
 
     test('Cenario 2: Verificar ausência de botões em processo de revisão finalizado', async ({

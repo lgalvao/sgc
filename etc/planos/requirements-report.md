@@ -22,14 +22,25 @@ O backlog abaixo mantém somente o que ainda está pendente.
 
 ### 1.1 Tratar a lacuna sistêmica de cobertura de comunicações nos testes
 
-Há indícios concretos de que vários `CDUs` com envio de e-mail ainda têm testes de integração insuficientes para fechar
-o contrato de comunicação. O padrão da lacuna recorrente é:
+Depois das rodadas mais recentes, a lacuna sistêmica remanescente ficou concentrada principalmente em observabilidade de
+comunicação nos testes E2E. Na integração backend, os principais fluxos não ligados a Diagnóstico já têm boa cobertura
+de `assunto`, `corpo`, destinatários e fila/outbox.
 
-- validação de transição/estado sem validação de `assunto`, `corpo` e notificação enfileirada;
-- ausência de diferenciação explícita entre destinatários/papéis quando o requisito prevê múltiplos envios;
-- cobertura E2E frequentemente limitada ao fluxo principal, sem observar comunicação visível quando ela existe.
+O padrão residual recorrente é:
+
+- cobertura E2E limitada ao fluxo principal, sem observar a comunicação gerada;
+- falta de um mecanismo reutilizável para inspecionar envio de e-mails sem acoplar os cenários ao SMTP de teste;
+- oportunidade de validar essas comunicações pela própria view administrativa de notificações.
 
 Já existe um apoio inicial para triagem em [auditar-cobertura-notificacoes.mjs](/Users/leonardo/sgc/etc/scripts/auditar-cobertura-notificacoes.mjs:1).
+
+CDUs fora de Diagnóstico que ainda aparecem com essa lacuna residual de E2E:
+
+- `CDU-13`
+- `CDU-14`
+- `CDU-20`
+- `CDU-21`
+- `CDU-28`
 
 ---
 

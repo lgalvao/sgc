@@ -19,6 +19,7 @@ import {
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
@@ -100,6 +101,12 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await verificarPaginaPainel(page);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'assessoria_11@tre-pe.jus.br',
+            assunto: 'Mapa de competências homologado',
+            tipo: 'Mapa homologado',
+            trechoCorpo: 'O mapa de competências da sua unidade foi homologado no processo'
+        });
     });
 
 });
