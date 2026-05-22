@@ -204,4 +204,32 @@ class RelatorioControllerTest {
         verify(relatorioFacade).gerarRelatorioUnidadesSemMapasVigentes(any());
     }
 
+    @Test
+    @DisplayName("GET /api/relatorios/unidades-sem-mapas-vigentes - Deve retornar relatório em JSON")
+    @WithMockUser(roles = "ADMIN")
+    void deveObterRelatorioUnidadesSemMapasVigentes() throws Exception {
+        RelatorioUnidadeSemMapaVigenteDto unidadeFilha = new RelatorioUnidadeSemMapaVigenteDto(
+                12L,
+                "ZE 1",
+                "Zona Eleitoral 1",
+                "ZONA_ELEITORAL",
+                List.of()
+        );
+        RelatorioUnidadeSemMapaVigenteDto unidadePai = new RelatorioUnidadeSemMapaVigenteDto(
+                11L,
+                "SEC",
+                "Secretaria X",
+                "SECRETARIA",
+                List.of(unidadeFilha)
+        );
+        when(relatorioFacade.obterRelatorioUnidadesSemMapasVigentes()).thenReturn(List.of(unidadePai));
+
+        mockMvc.perform(get("/api/relatorios/unidades-sem-mapas-vigentes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].codigo").value(11))
+                .andExpect(jsonPath("$[0].sigla").value("SEC"))
+                .andExpect(jsonPath("$[0].filhas[0].codigo").value(12))
+                .andExpect(jsonPath("$[0].filhas[0].sigla").value("ZE 1"));
+    }
+
 }

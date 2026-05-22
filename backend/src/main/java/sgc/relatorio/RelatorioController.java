@@ -95,6 +95,13 @@ public class RelatorioController {
         relatorioService.gerarRelatorioUnidadesSemMapasVigentes(response.getOutputStream());
     }
 
+    @GetMapping("/unidades-sem-mapas-vigentes")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Gera a visualização em JSON das unidades sem mapa vigente")
+    public ResponseEntity<List<RelatorioUnidadeSemMapaVigenteDto>> obterRelatorioUnidadesSemMapasVigentes() {
+        return ResponseEntity.ok(relatorioService.obterRelatorioUnidadesSemMapasVigentes());
+    }
+
     private String nomeArquivoRelatorioAndamento() {
         return "sgc-rel-andamento-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
     }

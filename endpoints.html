@@ -147,7 +147,7 @@
   <div class="sidebar-group"><div class="sidebar-group-header"><a href="#sec-analise" style="color:inherit;">🔍 Análise Geral</a></div></div>
 
   <div style="padding:16px;margin-top:16px;border-top:1px solid var(--border);">
-    <div style="font-size:11px;color:var(--text-dim);">Gerado em 2026-05-20</div>
+    <div style="font-size:11px;color:var(--text-dim);">Gerado em 2026-05-22</div>
   </div>
 </nav>
 
@@ -360,7 +360,7 @@
     <div class="section"><div class="section-label">Body (JSON)</div><pre>[1, 2, 3, 42]</pre></div>
     <div class="section"><div class="section-label">Uso no frontend</div><code>painelService.marcarAlertasLidos()</code> — fire-and-forget.</div>
     <div class="section"><div class="section-label">Análise</div>
-      <div class="notice notice-warn">⚠️ Duplicação: <code>AlertaController</code> também tem <code>POST /api/alertas/marcar-como-lidos</code> com o mesmo propósito. Dois endpoints distintos para a mesma operação. Deve-se consolidar em um único.</div>
+      <div class="notice notice-ok">✅ Endpoint consolidado para marcação em lote de alertas lidos no painel.</div>
     </div>
   </div>
 </div>
@@ -552,10 +552,10 @@
   </div>
   <div class="endpoint-body">
     <div class="section"><div class="section-label">Finalidade</div><p>Lista todas as unidades que participaram de um processo finalizado, com o código do seu subprocesso. Permite ao chefe navegar para o subprocesso correto para importar atividades.</p></div>
-    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-CHEFE">CHEFE</span></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-CHEFE">CHEFE</span> ou <span class="auth-badge auth-ADMIN">ADMIN</span></div>
     <div class="section"><div class="section-label">Uso no frontend</div><code>processoService.buscarUnidadesParaImportacao()</code></div>
     <div class="section"><div class="section-label">Análise</div>
-      <div class="notice notice-warn">⚠️ A restrição de acesso a somente <code>CHEFE</code> é questionável — ADMIN e GESTOR também deveriam poder visualizar? Verificar se há um caso de uso legítimo que justifique a restrição.</div>
+      <div class="notice notice-warn">⚠️ O endpoint permite <code>CHEFE</code> e <code>ADMIN</code>, mas <code>GESTOR</code> permanece bloqueado. Validar se essa restrição atende ao caso de uso.</div>
     </div>
   </div>
 </div>
@@ -571,23 +571,7 @@
     <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados</span></div>
     <div class="section"><div class="section-label">Query Params</div><table><tr><th>Param</th><th>Obrigatório</th><th>Descrição</th></tr><tr><td><code>tipo</code></td><td>Sim</td><td>MAPEAMENTO, REVISAO ou DIAGNOSTICO</td></tr></table></div>
     <div class="section"><div class="section-label">Análise</div>
-      <div class="notice notice-warn">⚠️ Existe também <code>GET /status-unidades?tipo=</code> com lógica similar. Possível duplicação. O endpoint <code>/status-unidades</code> retorna <code>{"unidadesDesabilitadas": [...]}</code> — mesmo dado, formato diferente. Consolidar em um só.</div>
-    </div>
-  </div>
-</div>
-
-<div class="endpoint-card">
-  <div class="endpoint-header">
-    <span class="method method-GET">GET</span>
-    <span class="endpoint-path">/api/processos/status-unidades</span>
-    <span class="endpoint-title">Status de unidades por tipo (duplicado)</span>
-  </div>
-  <div class="endpoint-body">
-    <div class="section"><div class="section-label">Finalidade</div><p>Mesmo propósito que <code>/unidades-bloqueadas</code>. Retorna <code>{"unidadesDesabilitadas": [...ids]}</code>.</p></div>
-    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados</span></div>
-    <div class="section"><div class="section-label">Query Params</div><code>tipo</code> (obrigatório) + <code>codProcesso</code> (opcional, não utilizado na implementação atual)</div>
-    <div class="section"><div class="section-label">Análise</div>
-      <div class="notice notice-danger">🔴 DUPLICAÇÃO IDENTIFICADA: Este endpoint faz o mesmo que <code>/unidades-bloqueadas</code>. O parâmetro <code>codProcesso</code> é aceito mas ignorado no service. Deve ser removido ou unificado.</div>
+      <div class="notice notice-ok">✅ Endpoint canônico para unidades bloqueadas por tipo de processo.</div>
     </div>
   </div>
 </div>
@@ -784,8 +768,8 @@
   <tr><td><code>POST /{id}/analises-validacao</code></td><td>DEVOLVER_MAPA</td><td>Cria análise de validação</td></tr>
 </table>
 
-<div class="notice notice-warn">
-  <strong>⚠️ Atenção — duplicação de endpoints de mapa:</strong> Existem tanto <code>GET/POST /{id}/mapa</code> quanto <code>GET/POST /{id}/mapa-completo</code> com implementações idênticas no backend (ambos chamam <code>mapaCompletoDtoPorSubprocesso</code>). Deve-se consolidar em um único endpoint.
+<div class="notice notice-ok">
+  ✅ Operações de mapa estão padronizadas em <code>/{id}/mapa-completo</code> (edição/consulta) e <code>/{id}/mapa-visualizacao</code> (visualização).
 </div>
 
 <div class="endpoint-card" style="margin-top:16px;">
@@ -936,14 +920,15 @@
   <tr><td><code>GET /mapas/subprocessos/{id}/exportar</code></td><td>GET</td><td>VISUALIZAR_SUBPROCESSO</td><td>Mapa atual de um subprocesso (PDF)</td></tr>
   <tr><td><code>GET /mapas-vigentes/unidades/{id}</code></td><td>GET</td><td>ADMIN, GESTOR, CHEFE</td><td>Mapa vigente de uma unidade (JSON)</td></tr>
   <tr><td><code>GET /mapas-vigentes/unidades/{id}/exportar</code></td><td>GET</td><td>ADMIN, GESTOR, CHEFE</td><td>Mapa vigente de uma unidade (PDF)</td></tr>
+  <tr><td><code>GET /unidades-sem-mapas-vigentes</code></td><td>GET</td><td>ADMIN</td><td>Relatório de unidades sem mapa vigente (JSON)</td></tr>
   <tr><td><code>GET /unidades-sem-mapas-vigentes/exportar</code></td><td>GET</td><td>ADMIN</td><td>Relatório de unidades sem mapa vigente (PDF)</td></tr>
 </table>
 
 <div class="notice notice-info" style="margin-top:16px;">
   💡 O padrão JSON + PDF para cada relatório é bem desenhado — permite visualização in-app antes de exportar. O frontend usa a versão JSON para renderizar o relatório na tela e a versão <code>/exportar</code> para download.
 </div>
-<div class="notice notice-warn" style="margin-top:8px;">
-  ⚠️ Não há endpoint JSON para <code>/unidades-sem-mapas-vigentes</code> — apenas o PDF. Considerar adicionar a versão JSON para permitir visualização na interface.
+<div class="notice notice-ok" style="margin-top:8px;">
+  ✅ O relatório de <code>/unidades-sem-mapas-vigentes</code> agora segue o mesmo padrão dos demais: versão JSON para visualização e versão <code>/exportar</code> para download.
 </div>
 
 <!-- =========================================
@@ -956,11 +941,10 @@
   <tr><th>Endpoint</th><th>Método</th><th>Acesso</th><th>Descrição</th></tr>
   <tr><td><code>GET /</code></td><td>GET</td><td>Todos autenticados</td><td>Lista todos os alertas do usuário (contexto do JWT)</td></tr>
   <tr><td><code>GET /nao-lidos</code></td><td>GET</td><td>Todos autenticados</td><td>Lista apenas alertas não lidos</td></tr>
-  <tr><td><code>POST /marcar-como-lidos</code></td><td>POST</td><td>Todos autenticados</td><td>Marca lista de alertas como lidos</td></tr>
 </table>
 
-<div class="notice notice-danger" style="margin-top:16px;">
-  🔴 <strong>Duplicação:</strong> <code>POST /alertas/marcar-como-lidos</code> e <code>POST /painel/alertas/marcar-lidos</code> têm o mesmo propósito. O frontend usa ativamente apenas o de <code>/painel</code>. O endpoint de <code>/alertas</code> parece legado. Remover ou consolidar.
+<div class="notice notice-ok" style="margin-top:16px;">
+  ✅ A marcação de alertas como lidos está consolidada no endpoint <code>POST /painel/alertas/marcar-lidos</code>.
 </div>
 
 <!-- =========================================
@@ -1023,10 +1007,10 @@
   </div>
   <div class="endpoint-body">
     <div class="section"><div class="section-label">Finalidade</div><p>Endpoint Server-Sent Events. Clientes Vue se conectam e ficam aguardando eventos. Atualmente apenas o evento <code>org-cache-refreshed</code> é transmitido, mas a arquitetura suporta novos eventos.</p></div>
-    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados (sem @PreAuthorize explícito — verificar)</span></div>
+    <div class="section"><div class="section-label">Acesso</div><span class="auth-badge auth-ALL">Todos autenticados (com <code>@PreAuthorize("isAuthenticated()")</code>)</span></div>
     <div class="section"><div class="section-label">Uso no frontend</div>Store Pinia usa <code>EventSource</code> para ouvir e disparar <code>recarregarDadosOrganizacionais()</code> quando recebe o evento.</div>
     <div class="section"><div class="section-label">Análise</div>
-      <div class="notice notice-warn">⚠️ O endpoint não tem <code>@PreAuthorize</code> explícito. Verificar se o filtro JWT está cobrindo este endpoint ou se é necessário adicionar a anotação.</div>
+      <div class="notice notice-ok">✅ Proteção explícita aplicada com <code>@PreAuthorize("isAuthenticated()")</code>.</div>
       <div class="notice notice-info">💡 Potencial de expansão: alertas em tempo real, notificações de mudança de status de subprocesso, etc.</div>
     </div>
   </div>
@@ -1086,6 +1070,7 @@
   <li>✅ Permissões granulares via <code>SgcPermissionEvaluator</code> — separação clara de concerns</li>
   <li>✅ SSE para invalidação de cache em tempo real é elegante e sem polling</li>
   <li>✅ Sanitização de inputs (HTML escape, log injection) em pontos corretos</li>
+  <li>✅ Relatórios seguem padrão JSON + PDF também para <code>/unidades-sem-mapas-vigentes</code></li>
 </ul>
 
 <h3>Problemas e melhorias identificadas</h3>
@@ -1093,69 +1078,27 @@
   <tr><th>#</th><th>Severidade</th><th>Endpoint(s)</th><th>Problema</th><th>Recomendação</th></tr>
   <tr>
     <td>1</td>
-    <td><span class="tag tag-danger">Alta</span></td>
-    <td><code>/processos/unidades-bloqueadas</code><br><code>/processos/status-unidades</code></td>
-    <td>Duplicação exata: dois endpoints retornam os mesmos dados (IDs de unidades bloqueadas por tipo)</td>
-    <td>Remover <code>/status-unidades</code> (ou o inverso). O parâmetro <code>codProcesso</code> de status-unidades é aceito mas ignorado.</td>
+    <td><span class="tag tag-warn">Média</span></td>
+    <td><code>/processos/{id}/unidades-importacao</code></td>
+    <td>Restrito a CHEFE e ADMIN; GESTOR permanece bloqueado</td>
+    <td>Revisar se GESTOR deve ter acesso conforme regra de negócio e casos de uso.</td>
   </tr>
   <tr>
     <td>2</td>
-    <td><span class="tag tag-danger">Alta</span></td>
-    <td><code>/alertas/marcar-como-lidos</code><br><code>/painel/alertas/marcar-lidos</code></td>
-    <td>Duplicação de funcionalidade de marcação de alertas como lidos</td>
-    <td>Manter apenas <code>/painel/alertas/marcar-lidos</code> (é o que o frontend usa). Remover o de <code>/alertas</code> ou deprecated.</td>
-  </tr>
-  <tr>
-    <td>3</td>
-    <td><span class="tag tag-warn">Média</span></td>
-    <td><code>/subprocessos/{id}/mapa</code><br><code>/subprocessos/{id}/mapa-completo</code></td>
-    <td>GET e POST para ambos têm implementação idêntica no backend</td>
-    <td>Consolidar em <code>/mapa-completo</code> apenas e remover <code>/mapa</code>.</td>
-  </tr>
-  <tr>
-    <td>4</td>
-    <td><span class="tag tag-warn">Média</span></td>
-    <td><code>/api/eventos</code></td>
-    <td>Sem <code>@PreAuthorize</code> explícito no controller SSE</td>
-    <td>Adicionar <code>@PreAuthorize("isAuthenticated()")</code> para garantir proteção explícita.</td>
-  </tr>
-  <tr>
-    <td>5</td>
-    <td><span class="tag tag-warn">Média</span></td>
-    <td><code>/usuarios/logout</code></td>
-    <td>JWT não é invalidado server-side — token válido por 24h após logout</td>
-    <td>Implementar blacklist de JWTs revogados (Redis) ou reduzir vida do token + refresh token.</td>
-  </tr>
-  <tr>
-    <td>6</td>
-    <td><span class="tag tag-warn">Média</span></td>
-    <td><code>/processos/{id}/unidades-importacao</code></td>
-    <td>Restrito somente a CHEFE; ADMIN e GESTOR são bloqueados</td>
-    <td>Revisar regra de acesso — parece um esquecimento. ADMIN pelo menos deveria ter acesso.</td>
-  </tr>
-  <tr>
-    <td>7</td>
-    <td><span class="tag tag-warn">Média</span></td>
-    <td><code>/relatorios/unidades-sem-mapas-vigentes/exportar</code></td>
-    <td>Apenas versão PDF, sem versão JSON para visualização in-app</td>
-    <td>Adicionar <code>GET /relatorios/unidades-sem-mapas-vigentes</code> retornando JSON, consistente com os outros relatórios.</td>
-  </tr>
-  <tr>
-    <td>8</td>
     <td><span class="tag tag-info">Baixa</span></td>
     <td><code>/mapas</code></td>
     <td>Sem paginação, pode retornar volume grande</td>
     <td>Adicionar paginação ou pelo menos filtros básicos.</td>
   </tr>
   <tr>
-    <td>9</td>
+    <td>3</td>
     <td><span class="tag tag-info">Baixa</span></td>
     <td><code>/processos/finalizados</code><br><code>/processos/para-importacao</code></td>
     <td>Dois endpoints similares, diferem apenas por filtro de elegibilidade de importação</td>
     <td>Considerar unificar com parâmetro <code>?elegívelImportacao=true</code> — mas a separação atual tem clareza de intenção.</td>
   </tr>
   <tr>
-    <td>10</td>
+    <td>4</td>
     <td><span class="tag tag-info">Baixa</span></td>
     <td><code>/unidades/{id}/mapa-vigente</code></td>
     <td>Retorna apenas booleano quando <code>/mapa-vigente/referencia</code> já contém essa informação</td>
@@ -1177,7 +1120,7 @@
 <div style="margin-top:48px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
   <div style="font-size:13px;color:var(--text-muted);">
     <strong style="color:var(--text);">SGC — Sistema de Gestão de Competências</strong><br>
-    Documento gerado em 2026-05-20 a partir da análise dos controllers Spring Boot e dos serviços frontend Vue 3.<br>
+    Documento gerado em 2026-05-22 a partir da análise dos controllers Spring Boot e dos serviços frontend Vue 3.<br>
     Controllers analisados: <code>AlertaController</code>, <code>AtividadeController</code>, <code>CacheAdminController</code>, <code>ConfiguracaoController</code>, <code>E2eController</code>, <code>EventosController</code>, <code>FeedbackController</code>, <code>LoginController</code>, <code>MapaController</code>, <code>NotificacaoAdminController</code>, <code>NotificacaoController</code>, <code>PainelController</code>, <code>ProcessoController</code>, <code>ProcessoExclusaoController</code>, <code>RelatorioController</code>, <code>SubprocessoController</code>, <code>UnidadeController</code>, <code>UsuarioController</code>.
   </div>
 </div>
