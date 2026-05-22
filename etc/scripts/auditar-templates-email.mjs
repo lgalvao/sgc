@@ -8,14 +8,10 @@ const dirTemplates = path.join(raiz, 'backend/src/main/resources/templates/email
 const arquivoSubprocesso = path.join(raiz, 'backend/src/main/java/sgc/subprocesso/service/SubprocessoNotificacaoService.java');
 const arquivoTipoTransicao = path.join(raiz, 'backend/src/main/java/sgc/subprocesso/model/TipoTransicao.java');
 const arquivoEmailModelos = path.join(raiz, 'backend/src/main/java/sgc/alerta/EmailModelosService.java');
-const arquivoProcesso = path.join(raiz, 'backend/src/main/java/sgc/processo/service/ProcessoService.java');
-const arquivoAtribuicao = path.join(raiz, 'backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java');
 
 const textoSubprocesso = lerArquivo(arquivoSubprocesso);
 const textoTipoTransicao = lerArquivo(arquivoTipoTransicao);
 const textoEmailModelos = lerArquivo(arquivoEmailModelos);
-const textoProcesso = lerArquivo(arquivoProcesso);
-const textoAtribuicao = lerArquivo(arquivoAtribuicao);
 
 const variaveisDiretas = extrairVariaveisPut(textoSubprocesso, 'criarVariaveisTemplateDireto', [
     'siglaUnidade',
