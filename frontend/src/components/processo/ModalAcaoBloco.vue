@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ModalPadrao
       :id="id"
       v-model="mostrar"
@@ -91,6 +91,7 @@ const props = defineProps<{
   unidadesPreSelecionadas: number[];
   mostrarDataLimite?: boolean;
   mostrarSituacao?: boolean;
+  permitirVazio?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -117,6 +118,7 @@ const mensagemErroDataLimite = computed(() => {
 });
 
 const mensagemErroSelecao = computed(() => {
+  if (props.permitirVazio) return "";
   return deveExibirErro(selecionadosLocal.value.length === 0) ? "Selecione ao menos uma unidade." : "";
 });
 
@@ -186,7 +188,7 @@ const todosSelecionados = computed({
 });
 
 const isFormularioValido = computed(() => {
-  const selecaoValida = selecionadosLocal.value.length > 0;
+  const selecaoValida = props.permitirVazio || selecionadosLocal.value.length > 0;
   if (!props.mostrarDataLimite) return selecaoValida;
   return selecaoValida && !!dataLimite.value && !erroLocalDataLimite.value;
 });

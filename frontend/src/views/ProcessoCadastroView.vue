@@ -93,6 +93,7 @@
         id="modal-unidades-com-equipe-propria"
         ref="modalUnidadesComEquipePropriaRef"
         :mostrar-situacao="false"
+        :permitir-vazio="true"
         :rotulo-botao="TEXTOS.comum.BOTAO_INICIAR"
         :texto="textoModalUnidadesComEquipePropria"
         :titulo="tituloModalUnidadesComEquipePropria"
