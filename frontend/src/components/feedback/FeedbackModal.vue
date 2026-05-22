@@ -218,6 +218,7 @@ function submeter() {
 .feedback-modal__textarea {
   flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
 }
 
 .feedback-modal__principal :deep(.form-label),

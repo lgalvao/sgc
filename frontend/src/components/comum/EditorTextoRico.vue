@@ -194,7 +194,7 @@ function sincronizarPorDom(event: Event) {
             :editor="editor"
             :aria-label="rotulo"
             :aria-invalid="erroComprimento ? 'true' : 'false'"
-            :class="classesEditor"
+            :class="['editor-texto-rico__editor', classesEditor]"
             :style="{ '--editor-minimo-altura': minimoAltura }"
             @input.capture="sincronizarPorDom"
         />
@@ -244,6 +244,7 @@ function sincronizarPorDom(event: Event) {
 }
 
 .editor-texto-rico :deep(.editor-texto-rico__conteudo) {
+    flex: 1 1 auto;
     min-height: var(--editor-minimo-altura);
     border: 0;
     border-radius: 0;
@@ -251,6 +252,8 @@ function sincronizarPorDom(event: Event) {
     line-height: 1.6;
     overflow-y: auto;
     background: var(--bs-body-bg);
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .editor-texto-rico :deep(.editor-texto-rico__conteudo:focus) {
@@ -274,15 +277,23 @@ function sincronizarPorDom(event: Event) {
   margin-bottom: 0;
 }
 
+.editor-texto-rico__editor {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .editor-texto-rico__rodape {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  align-items: flex-start;
-  padding: 0.55rem 0.85rem 0.7rem;
+  align-items: center;
+  padding: 0.1rem 0.85rem 0.2rem;
   border-top: 1px solid var(--bs-border-color-translucent);
   background: var(--bs-body-bg);
   font-size: 0.875rem;
+  line-height: 1;
 }
 
 .editor-texto-rico__rodape--erro .editor-texto-rico__contador {
