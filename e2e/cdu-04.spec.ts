@@ -14,6 +14,7 @@ import {
     verificarToast
 } from './helpers/helpers-navegacao.js';
 import {loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe('CDU-04 - Iniciar processo', () => {
@@ -127,5 +128,12 @@ test.describe('CDU-04 - Iniciar processo', () => {
             .filter({hasText: 'Início do processo em unidade(s) subordinada(s)'})
         ).toBeVisible();
         await contextoGestorSec1.close();
+
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'SECRETARIA_1',
+            assunto: 'Início de processo de mapeamento de competências',
+            tipo: 'Início do processo',
+            trechoCorpo: new RegExp(`Comunicamos o início do processo\\s+${descricao}\\s+para a sua unidade`, 'i')
+        });
     });
 });

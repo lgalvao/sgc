@@ -18,6 +18,7 @@ import {
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor
 } from './helpers/helpers-analise.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -89,6 +90,14 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
         await abrirAcaoPrincipalMapa(page);
         await page.getByTestId('btn-aceite-mapa-confirmar').click();
         await expect(page).toHaveURL(/\/painel/);
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'ADMIN',
+            assunto: `Validação do mapa de competências da ${UNIDADE_ALVO} submetida para análise`,
+            tipo: 'Validação do mapa aceita',
+            trechoCorpo: 'foi submetida para análise por essa'
+        });
     });
 
     test('Cenario 2: ADMIN homologa final', async ({_resetAutomatico, page}) => {
@@ -228,6 +237,14 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
 
         await verificarPaginaPainel(page);
         await expect(page.getByText(TEXTOS.sucesso.DEVOLUCAO_REALIZADA).first()).toBeVisible();
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_ALVO,
+            assunto: `Validação do mapa da ${UNIDADE_ALVO} devolvida para ajustes`,
+            tipo: 'Validação do mapa devolvida',
+            trechoCorpo: new RegExp(`A validação do mapa de competências da\\s+${UNIDADE_ALVO}[\\s\\S]*foi devolvida para ajustes`, 'i')
+        });
 
         await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);
         await acessarSubprocessoChefeDireto(page, processo.descricao, UNIDADE_ALVO);

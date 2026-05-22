@@ -20,6 +20,7 @@ import {
     verificarPaginaPainel,
     verificarToast,
 } from './helpers/helpers-navegacao.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecimentos', () => {
@@ -97,6 +98,14 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
         await acessarSubprocessoGestor(page, descricaoProcesso, UNIDADE_ALVO);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Cadastro disponibilizado/i);
         await expect(page.getByTestId('tbl-movimentacoes')).toContainText(TEXTOS.movimentacao.CADASTRO_DISPONIBILIZADO);
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: `Cadastro de atividades e conhecimentos disponibilizado - ${UNIDADE_ALVO}`,
+            tipo: 'Cadastro disponibilizado',
+            trechoCorpo: new RegExp(`A unidade\\s+${UNIDADE_ALVO}\\s+disponibilizou o cadastro de atividades e`, 'i')
+        });
     });
 
     test('Cenario 3: Devolucao e Historico de Analise', async ({_resetAutomatico, page}) => {

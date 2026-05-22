@@ -204,7 +204,9 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
         await expect(modal).toBeVisible();
     }
 
-    const btnConfirmar = page.getByTestId('btn-confirmar-disponibilizacao');
+    await expect(modal).toBeVisible();
+    const btnConfirmar = modal.getByTestId('btn-confirmar-disponibilizacao');
+    await expect(btnConfirmar).toBeVisible();
     await expect(btnConfirmar).toBeEnabled();
     await btnConfirmar.click();
     await verificarToast(page, /disponibilizada?|Disponibilizado/i);

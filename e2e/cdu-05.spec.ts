@@ -28,6 +28,7 @@ import {
     disponibilizarMapa,
     navegarParaMapa,
 } from './helpers/helpers-mapas.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 
@@ -298,6 +299,20 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(tabelaAlertasGestor.locator('tr', {hasText: descProcRevisao})
             .filter({hasText: 'Início do processo em unidade(s) subordinada(s)'})
         ).toBeVisible();
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_ALVO,
+            assunto: 'Início de processo de revisão do mapa de competências',
+            tipo: 'Início do processo',
+            trechoCorpo: new RegExp(`Comunicamos o início do processo\\s+${descProcRevisao}\\s+para a sua unidade`, 'i')
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'SECRETARIA_2',
+            assunto: 'Início de processo de revisão do mapa de competências em unidades subordinadas',
+            tipo: 'Início do processo',
+            trechoCorpo: new RegExp(`${UNIDADE_ALVO}[\\s\\S]*já podem iniciar a revisão do cadastro de atividades e conhecimentos`, 'i')
+        });
     });
 
     test('Fase 2.2: CHEFE acessa o cadastro editavel da Revisão pelo card do subprocesso', async ({

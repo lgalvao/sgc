@@ -15,8 +15,9 @@ function lerSeExistir(caminho) {
 }
 
 function listarCdusComEmail() {
-    return fs.readdirSync(dirRequisitos)
-        .filter(nome => /^cdu-\d+\.md$/.test(nome))
+    return fs.readdirSync(dirRequisitos, {withFileTypes: true})
+        .filter(entrada => entrada.isFile() && /^cdu-\d+\.md$/.test(entrada.name))
+        .map(entrada => entrada.name)
         .sort((a, b) => a.localeCompare(b, 'pt-BR', {numeric: true}))
         .map(nome => {
             const caminho = path.join(dirRequisitos, nome);
