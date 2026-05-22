@@ -86,6 +86,13 @@ public class RelatorioController {
         relatorioService.gerarRelatorioMapaVigenteUnidade(codUnidade, response.getOutputStream());
     }
 
+    @GetMapping("/unidades-sem-mapas-vigentes")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Retorna códigos de unidades sem mapa vigente")
+    public ResponseEntity<List<Long>> obterUnidadesSemMapasVigentes() {
+        return ResponseEntity.ok(relatorioService.obterCodigosUnidadesSemMapasVigentes());
+    }
+
     @GetMapping("/unidades-sem-mapas-vigentes/exportar")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Gera relatório de unidades sem mapa vigente")

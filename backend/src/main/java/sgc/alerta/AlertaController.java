@@ -36,15 +36,4 @@ public class AlertaController {
 
         return ResponseEntity.ok(alertas.stream().map(AlertaDto::fromEntity).toList());
     }
-
-    @PostMapping("/marcar-como-lidos")
-    @Operation(summary = "Marca múltiplos alertas como lidos")
-    public ResponseEntity<Map<String, String>> marcarComoLidos(@RequestBody List<Long> codigos) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        alertaFacade.marcarComoLidos(contextoUsuario, codigos);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Alertas marcados como lidos.");
-        return ResponseEntity.ok(response);
-    }
 }

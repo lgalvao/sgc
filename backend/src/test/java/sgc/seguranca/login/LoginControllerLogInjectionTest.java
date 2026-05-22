@@ -45,6 +45,9 @@ class LoginControllerLogInjectionTest {
     @MockitoBean
     private GerenciadorJwt gerenciadorJwt;
 
+    @MockitoBean
+    private BlacklistJwt blacklistJwt;
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();

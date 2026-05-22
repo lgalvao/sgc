@@ -43,8 +43,8 @@ public class E2eSecurityConfig {
     }
 
     @Bean
-    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade) {
-        return new FiltroJwt(gerenciadorJwt, usuarioFacade);
+    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade, BlacklistJwt blacklistJwt) {
+        return new FiltroJwt(gerenciadorJwt, usuarioFacade, blacklistJwt);
     }
 
     @Bean
@@ -69,7 +69,6 @@ public class E2eSecurityConfig {
                                 "/api/usuarios/login",
                                 "/api/usuarios/entrar",
                                 "/api/usuarios/logout",
-                                "/api/eventos",
                                 "/actuator/**",
                                 "/e2e/**")
                         .permitAll()

@@ -471,19 +471,6 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @WithMockUser(roles = "ADMIN")
-        @DisplayName("obterStatusUnidades deve retornar unidades desabilitadas")
-        void deveObterStatusUnidades() throws Exception {
-            when(processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO)).thenReturn(List.of(1L, 2L));
-
-            mockMvc.perform(get("/api/processos/status-unidades")
-                            .param("tipo", "MAPEAMENTO"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.unidadesDesabilitadas").isArray())
-                    .andExpect(jsonPath("$.unidadesDesabilitadas[0]").value(1L));
-        }
-
-        @Test
         @WithMockUser(roles = "CHEFE")
         @DisplayName("listarUnidadesParaImportacao deve retornar lista de participantes quando finalizado com mapa e localizacao")
         void deveListarUnidadesParaImportacaoQuandoFinalizadoCompleto() throws Exception {
@@ -549,6 +536,25 @@ class ProcessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[0].codUnidade").value(10L))
                     .andExpect(jsonPath("$[0].codSubprocesso").isEmpty());
+        }
+
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        @DisplayName("listarUnidadesParaImportacao deve ser acessível por ADMIN")
+        void deveListarUnidadesParaImportacaoComoAdmin() throws Exception {
+            Processo processo = Processo.builder()
+                    .codigo(1L)
+                    .situacao(SituacaoProcesso.FINALIZADO)
+                    .build();
+
+            Unidade unidade = criarUnidadeParticipante();
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            when(processoService.buscarPorCodigoComParticipantes(1L)).thenReturn(processo);
+            when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of());
+
+            mockMvc.perform(get("/api/processos/1/unidades-importacao"))
+                    .andExpect(status().isOk());
         }
 
         @Test

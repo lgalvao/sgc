@@ -185,6 +185,11 @@ public class RelatorioFacade {
     }
 
     @Transactional(readOnly = true)
+    public List<Long> obterCodigosUnidadesSemMapasVigentes() {
+        return unidadeService.buscarCodigosUnidadesSemMapaVigente();
+    }
+
+    @Transactional(readOnly = true)
     public void gerarRelatorioUnidadesSemMapasVigentes(OutputStream outputStream) {
         Set<Long> codigosSemMapaVigente = new HashSet<>(unidadeService.buscarCodigosUnidadesSemMapaVigente());
         List<UnidadeDto> arvoreCompleta = unidadeHierarquiaService.buscarArvoreHierarquica();

@@ -2,6 +2,7 @@ package sgc.organizacao;
 
 import lombok.*;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 import sgc.organizacao.service.*;
@@ -16,6 +17,7 @@ import sgc.organizacao.service.*;
 @RestController
 @RequestMapping("/api/eventos")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class EventosController {
 
     private final RegistroSseEmitter registroSseEmitter;

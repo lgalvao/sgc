@@ -189,6 +189,20 @@ class RelatorioControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/relatorios/unidades-sem-mapas-vigentes - Deve retornar lista de códigos")
+    @WithMockUser(roles = "ADMIN")
+    void deveObterCodigosUnidadesSemMapasVigentes() throws Exception {
+        when(relatorioFacade.obterCodigosUnidadesSemMapasVigentes()).thenReturn(List.of(1L, 2L, 3L));
+
+        mockMvc.perform(get("/api/relatorios/unidades-sem-mapas-vigentes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(1L))
+                .andExpect(jsonPath("$[1]").value(2L));
+
+        verify(relatorioFacade).obterCodigosUnidadesSemMapasVigentes();
+    }
+
+    @Test
     @DisplayName("GET /api/relatorios/unidades-sem-mapas-vigentes/exportar - Deve gerar PDF")
     @WithMockUser(roles = "ADMIN")
     void deveGerarRelatorioUnidadesSemMapasVigentesPdf() throws Exception {

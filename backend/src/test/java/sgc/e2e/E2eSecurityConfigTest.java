@@ -21,10 +21,10 @@ class E2eSecurityConfigTest {
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("deve permitir assinar eventos SSE sem autenticação")
+    @DisplayName("deve bloquear eventos SSE sem autenticação")
     void devePermitirAssinarEventosSemAutenticacao() throws Exception {
         mockMvc.perform(get("/api/eventos")
                         .accept(MediaType.TEXT_EVENT_STREAM_VALUE))
-                .andExpect(status().isOk());
+                .andExpect(status().isUnauthorized());
     }
 }

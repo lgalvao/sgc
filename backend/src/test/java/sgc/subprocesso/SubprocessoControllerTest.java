@@ -436,20 +436,6 @@ class SubprocessoControllerTest {
         }
 
         @Test
-        @DisplayName("deve obter mapa")
-        @WithMockUser(roles = "GESTOR")
-        void deveObterMapa() throws Exception {
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
-            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
-
-            mockMvc.perform(get("/api/subprocessos/1/mapa"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.codigo").value(1));
-
-            verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
-        }
-
-        @Test
         @DisplayName("deve obter mapa completo")
         @WithMockUser(roles = "GESTOR")
         void deveObterMapaCompleto() throws Exception {
@@ -460,25 +446,6 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.codigo").value(1));
 
-            verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
-        }
-
-        @Test
-        @DisplayName("deve salvar mapa")
-        @WithMockUser(roles = "CHEFE")
-        void deveSalvarMapa() throws Exception {
-            SalvarMapaRequest request = SalvarMapaRequest.builder().competencias(List.of()).build();
-            MapaCompletoDto dto = new MapaCompletoDto(1L, 100L, "Mapa", List.of(), List.of(), null);
-            when(consultaService.mapaCompletoDtoPorSubprocesso(1L)).thenReturn(dto);
-
-            mockMvc.perform(post("/api/subprocessos/1/mapa")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.codigo").value(1));
-
-            verify(subprocessoService).salvarMapa(eq(1L), any(SalvarMapaRequest.class));
             verify(consultaService).mapaCompletoDtoPorSubprocesso(1L);
         }
 

@@ -225,18 +225,6 @@ class UnidadeControllerTest {
     }
 
     @Test
-    @DisplayName("Deve verificar mapa vigente e retornar boolean")
-    @WithMockUser
-    void deveVerificarMapaVigente() throws Exception {
-
-        when(unidadeService.temMapaVigente(1L)).thenReturn(true);
-
-        mockMvc.perform(get("/api/unidades/1/mapa-vigente"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.temMapaVigente").value(true));
-    }
-
-    @Test
     @DisplayName("Deve retornar referência do mapa vigente quando existente")
     @WithMockUser
     void deveRetornarReferenciaMapaVigente() throws Exception {

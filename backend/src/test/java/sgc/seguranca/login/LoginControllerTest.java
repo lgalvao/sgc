@@ -52,6 +52,9 @@ class LoginControllerTest {
     @MockitoBean
     private GerenciadorJwt gerenciadorJwt;
 
+    @MockitoBean
+    private BlacklistJwt blacklistJwt;
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
@@ -282,6 +285,21 @@ class LoginControllerTest {
                 .andExpect(status().isNoContent())
                 .andExpect(cookie().maxAge("jwtToken", 0))
                 .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/logout - Deve revogar token JWT quando presente no cookie")
+    @WithMockUser
+    void logout_DeveRevogarTokenJwt() throws Exception {
+        var claims = new GerenciadorJwt.JwtClaims("12345678901", Perfil.ADMIN, 1L, "jti-teste", java.time.Instant.now().plusSeconds(3600));
+        when(gerenciadorJwt.validarToken("token-valido")).thenReturn(java.util.Optional.of(claims));
+
+        mockMvc.perform(post("/api/usuarios/logout")
+                        .with(csrf())
+                        .cookie(new jakarta.servlet.http.Cookie("jwtToken", "token-valido")))
+                .andExpect(status().isNoContent());
+
+        verify(blacklistJwt).revogar("jti-teste", claims.expiracao());
     }
 
     @Test

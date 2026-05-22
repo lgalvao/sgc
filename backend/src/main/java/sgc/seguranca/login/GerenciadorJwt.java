@@ -56,6 +56,7 @@ public class GerenciadorJwt {
         Instant expiration = now.plus(jwtProperties.expiracaoMinutos(), ChronoUnit.MINUTES);
 
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .subject(tituloEleitoral)
                 .claim("perfil", perfil.name())
                 .claim("unidade", unidadeCodigo)
@@ -76,6 +77,10 @@ public class GerenciadorJwt {
             String tituloEleitoral = claims.getSubject();
             String perfilStr = claims.get("perfil", String.class);
             Long unidadeCodigo = claims.get("unidade", Long.class);
+            String jti = claims.getId();
+            Instant expiracao = claims.getExpiration() != null
+                    ? claims.getExpiration().toInstant()
+                    : Instant.now();
 
             @SuppressWarnings("ConstantConditions")
             boolean incompleto = tituloEleitoral == null || perfilStr == null || unidadeCodigo == null;
@@ -85,7 +90,7 @@ public class GerenciadorJwt {
             }
 
             Perfil perfil = Perfil.valueOf(perfilStr);
-            return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo));
+            return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo, jti, expiracao));
 
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Falha na validação do JWT: {}", e.getMessage());
@@ -130,6 +135,6 @@ public class GerenciadorJwt {
         }
     }
 
-    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo) {
+    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo, String jti, Instant expiracao) {
     }
 }

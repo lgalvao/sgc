@@ -108,12 +108,6 @@ public class UnidadeController {
         return ResponseEntity.ok(arvore);
     }
 
-    @GetMapping("/{codUnidade}/mapa-vigente")
-    public ResponseEntity<Map<String, Boolean>> temMapaVigente(@PathVariable Long codUnidade) {
-        boolean temMapaVigente = unidadeService.temMapaVigente(codUnidade);
-        return ResponseEntity.ok(Map.of("temMapaVigente", temMapaVigente));
-    }
-
     @GetMapping("/{codUnidade}/mapa-vigente/referencia")
     public ResponseEntity<MapaVigenteReferenciaDto> buscarReferenciaMapaVigente(@PathVariable Long codUnidade) {
         return unidadeService.buscarReferenciaMapaVigente(codUnidade)

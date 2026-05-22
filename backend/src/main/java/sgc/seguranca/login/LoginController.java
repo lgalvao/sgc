@@ -31,6 +31,7 @@ public class LoginController {
     private final UsuarioFacade usuarioFacade;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
+    private final BlacklistJwt blacklistJwt;
 
     @Value("${aplicacao.cookies.secure:false}")
     private boolean cookieSecure;
@@ -128,7 +129,19 @@ public class LoginController {
 
     @PostMapping("/logout")
     @Operation(summary = "Encerra a sessão e remove os cookies de autenticação")
-    public ResponseEntity<Void> logout(HttpServletResponse httpResponse) {
+    public ResponseEntity<Void> logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        if (httpRequest.getCookies() != null) {
+            for (Cookie cookie : httpRequest.getCookies()) {
+                if ("jwtToken".equals(cookie.getName()) && cookie.getValue() != null && !cookie.getValue().isBlank()) {
+                    gerenciadorJwt.validarToken(cookie.getValue()).ifPresent(claims -> {
+                        if (claims.jti() != null) {
+                            blacklistJwt.revogar(claims.jti(), claims.expiracao());
+                        }
+                    });
+                    break;
+                }
+            }
+        }
         limparCookieJwt(httpResponse);
         limparCookiePreAuth(httpResponse);
         return ResponseEntity.noContent().build();

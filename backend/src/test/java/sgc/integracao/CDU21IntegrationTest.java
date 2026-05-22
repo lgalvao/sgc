@@ -121,10 +121,6 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         assertThat(unidadeMapa.getMapaVigente()).isNotNull();
         assertThat(unidadeMapa.getMapaVigente().getCodigo()).isEqualTo(subprocesso.getMapa().getCodigo());
 
-        mockMvc.perform(get("/api/unidades/{codUnidade}/mapa-vigente", unidade.getCodigo()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.temMapaVigente").value(true));
-
         mockMvc.perform(get("/api/unidades/{codUnidade}/mapa-vigente/referencia", unidade.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codProcesso").value(processo.getCodigo()))
