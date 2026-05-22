@@ -213,7 +213,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo(unidadeChefe.getSigla());
                 assertThat(notificacao.getDestinatario()).isEqualTo("%s@tre-pe.jus.br".formatted(unidadeChefe.getSigla().toLowerCase(Locale.ROOT)));
                 assertThat(notificacao.getAssunto())
-                        .isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos devolvida para ajustes - %s"
+                        .isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes"
                                 .formatted(unidadeChefe.getSigla()));
                 assertThat(notificacao.getCorpoHtml())
                         .contains("foi devolvida para ajustes")
@@ -259,7 +259,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                     .toList();
             assertThat(notificacoes).anySatisfy(notificacao -> {
                 assertThat(notificacao.getAssunto())
-                        .isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos submetida para análise - %s"
+                        .isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos da %s submetido para análise"
                                 .formatted(unidadeChefe.getSigla()));
                 assertThat(notificacao.getCorpoHtml())
                         .contains("foi submetida para análise por essa unidade")

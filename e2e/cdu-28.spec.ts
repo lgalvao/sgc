@@ -1,10 +1,12 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {loginComPerfil} from './helpers/helpers-auth.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const SIGLA_UNIDADE = 'ASSESSORIA_11';
 const TITULO_USUARIO_ALVO = '232323';
 const NOME_USUARIO_ALVO = 'Bon Jovi';
+const EMAIL_USUARIO_ALVO = 'bon.jovi@tre-pe.jus.br';
 const PERFIL_TEMPORARIO = 'CHEFE - ASSESSORIA_11';
 const SIGLAS_SUBARVORE_SECRETARIA_1 = [
     'ASSESSORIA_11',
@@ -203,7 +205,20 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
                                                                                                    page
                                                                                                }) => {
         await criarAtribuicaoVigente(page);
-        await page.getByTestId('btn-cancelar-atribuicao').click();
+        await verificarNotificacaoAdmin(page, {
+            destinatario: EMAIL_USUARIO_ALVO,
+            assunto: `Atribuição de perfil CHEFE na unidade ${SIGLA_UNIDADE}`,
+            tipo: 'Atribuição temporária',
+            trechoCorpo: `Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade ${SIGLA_UNIDADE}.`
+        });
+        await page.getByTestId('nav-link-painel').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
+        await page.getByRole('link', {name: /Unidades/i}).click();
+        await expect(page).toHaveURL(/\/unidades/);
+        await expect(page.getByRole('heading', {name: TEXTOS.unidades.TITULO})).toBeVisible();
+        await page.getByTestId('btn-unidades-expandir-todas').click();
+        await expect(page.getByTestId('tbl-tree')).toBeVisible();
+        await acessarUnidadeAlvo(page);
         await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Editar atribuição');
         await expect(page.getByText(/Atrib\. temporária/)).toBeVisible();
 

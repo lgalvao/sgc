@@ -198,7 +198,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve renderizar cadastro aceito conforme CDU-13")
     void deveRenderizarCadastroAceito() {
         Context context = new Context();
-        context.setVariable("siglaUnidadeOrigem", "SESEL");
+        context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("siglaUnidadeDestino", "COSIS");
         context.setVariable("nomeProcesso", "Processo aceite 2026");
 
@@ -236,7 +236,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve renderizar revisão de cadastro devolvida conforme CDU-14")
     void deveRenderizarDevolucaoRevisaoCadastro() {
         Context context = new Context();
-        context.setVariable("siglaUnidadeOrigem", "SESEL");
+        context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("siglaUnidadeDestino", "SESEL");
         context.setVariable("nomeProcesso", "Processo revisao 2026");
         context.setVariable("observacoes", "Favor ajustar o cadastro revisado.");
@@ -256,7 +256,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Deve renderizar aceite de revisão de cadastro conforme CDU-14")
     void deveRenderizarAceiteRevisaoCadastro() {
         Context context = new Context();
-        context.setVariable("siglaUnidadeOrigem", "SESEL");
+        context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("siglaUnidadeDestino", "COSIS");
         context.setVariable("nomeProcesso", "Processo revisao 2026");
 

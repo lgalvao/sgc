@@ -162,14 +162,14 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         assertThat(notificacoes).anySatisfy(notificacao -> {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
             assertThat(notificacao.getDestinatario()).isEqualTo("sedesenv@tre-pe.jus.br");
-            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos submetido para análise - SEDESENV");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos da SEDESENV submetido para análise");
             assertThat(notificacao.getCorpoHtml()).contains("foi aceito e submetido para análise pela unidade superior imediata");
             assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
         });
         assertThat(notificacoes).anySatisfy(notificacao -> {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDIA");
             assertThat(notificacao.getDestinatario()).isEqualTo("sedia@tre-pe.jus.br");
-            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos submetido para análise - SEDIA");
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos da SEDIA submetido para análise");
         });
         assertThat(notificacoes).anySatisfy(notificacao -> {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");

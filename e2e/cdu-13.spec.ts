@@ -17,6 +17,7 @@ import {
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 async function validarCabecalhosHistorico(modal: ReturnType<typeof abrirHistoricoAnalise> extends Promise<infer T> ? T : never) {
     await expect(modal.getByTestId('header-historico-dataHora')).toBeVisible();
@@ -68,6 +69,16 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
 
         await navegarParaCadastro(page);
         await devolverCadastroMapeamento(page, 'Corrigir conforme Secretaria');
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_ALVO,
+            assunto: `Cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} devolvido para ajustes`,
+            tipo: 'Cadastro devolvido para ajustes',
+            trechoCorpo: `O cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+        });
+        await page.getByTestId('nav-link-painel').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
 
         await login(page, USUARIOS.CHEFE_SECAO_211.titulo, USUARIOS.CHEFE_SECAO_211.senha);
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
@@ -123,6 +134,14 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
         await aceitarCadastroMapeamento(page, 'Ok final 2');
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'ADMIN',
+            assunto: `Cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} submetido para análise`,
+            tipo: 'Cadastro aceito',
+            trechoCorpo: `O cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+        });
+        await page.getByTestId('nav-link-painel').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaCadastro(page);

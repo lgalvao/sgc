@@ -199,7 +199,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV-TEST");
         assertThat(notificacao.getDestinatario()).isEqualTo("sedesenv-test@tre-pe.jus.br");
         assertThat(notificacao.getAssunto())
-                .isEqualTo("SGC: Cadastro de atividades e conhecimentos devolvido para ajustes - SEDESENV-TEST");
+                .isEqualTo("SGC: Cadastro de atividades e conhecimentos da SEDESENV-TEST devolvido para ajustes");
         assertThat(notificacao.getCorpoHtml())
                 .contains("Prezado(a) responsável pela <strong>SEDESENV-TEST</strong>")
                 .contains("foi devolvido para ajustes")
@@ -271,7 +271,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .orElseThrow();
         assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("ADMIN");
         assertThat(notificacao.getAssunto())
-                .isEqualTo("SGC: Cadastro de atividades e conhecimentos submetido para análise - SEDESENV-TEST");
+                .isEqualTo("SGC: Cadastro de atividades e conhecimentos da SEDESENV-TEST submetido para análise");
         assertThat(notificacao.getCorpoHtml())
                 .contains("foi submetido para análise por essa unidade")
                 .contains("Processo de Teste CDU-13");

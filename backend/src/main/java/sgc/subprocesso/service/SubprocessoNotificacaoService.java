@@ -254,7 +254,7 @@ public class SubprocessoNotificacaoService {
                 .unidadeDestino(unidade)
                 .build();
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
-        String assunto = "SGC: Cadastro de atividades e conhecimentos submetido para análise - %s".formatted(unidade.getSigla());
+        String assunto = criarAssunto(TipoTransicao.CADASTRO_ACEITO, sp, false);
         String corpo = processarTemplate("cadastro-aceito-bloco-unidade", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(unidade), assunto, corpo, OrigemNotificacao.DIRETO, unidade.getSigla(), null);
         criarNotificacaoComChave(cmd, email, TipoNotificacao.CADASTRO_ACEITO, "bloco-direto");
@@ -433,8 +433,10 @@ public class SubprocessoNotificacaoService {
 
     private String criarAssunto(TipoTransicao tipo, Subprocesso sp, boolean paraSuperior) {
         String base = switch (tipo) {
-            case CADASTRO_ACEITO -> "Cadastro de atividades e conhecimentos submetido para análise";
-            case CADASTRO_DEVOLVIDO -> "Cadastro de atividades e conhecimentos devolvido para ajustes";
+            case CADASTRO_ACEITO -> "Cadastro de atividades e conhecimentos da %s submetido para análise"
+                    .formatted(sp.getUnidade().getSigla());
+            case CADASTRO_DEVOLVIDO -> "Cadastro de atividades e conhecimentos da %s devolvido para ajustes"
+                    .formatted(sp.getUnidade().getSigla());
             case CADASTRO_HOMOLOGADO -> "Cadastro de atividades homologado";
             case CADASTRO_DISPONIBILIZADO -> "Cadastro de atividades e conhecimentos disponibilizado";
             case CADASTRO_REABERTO -> "Reabertura de cadastro de atividades";
@@ -448,19 +450,17 @@ public class SubprocessoNotificacaoService {
                     .formatted(sp.getUnidade().getSigla());
             case MAPA_VALIDACAO_ACEITA -> "Validação do mapa de competências da %s submetida para análise"
                     .formatted(sp.getUnidade().getSigla());
-            case REVISAO_CADASTRO_ACEITA -> "Revisão do cadastro de atividades e conhecimentos submetida para análise";
-            case REVISAO_CADASTRO_DEVOLVIDA -> "Revisão do cadastro de atividades e conhecimentos devolvida para ajustes";
+            case REVISAO_CADASTRO_ACEITA -> "Revisão do cadastro de atividades e conhecimentos da %s submetido para análise"
+                    .formatted(sp.getUnidade().getSigla());
+            case REVISAO_CADASTRO_DEVOLVIDA -> "Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes"
+                    .formatted(sp.getUnidade().getSigla());
             case REVISAO_CADASTRO_DISPONIBILIZADA -> "Revisão do cadastro de atividades e conhecimentos disponibilizada";
             case REVISAO_CADASTRO_REABERTA -> "Reabertura de revisão de cadastro";
             default -> tipo.getDescMovimentacao();
         };
         boolean incluirSigla = paraSuperior
-                || tipo == TipoTransicao.CADASTRO_ACEITO
-                || tipo == TipoTransicao.CADASTRO_DEVOLVIDO
                 || tipo == TipoTransicao.CADASTRO_DISPONIBILIZADO
                 || tipo == TipoTransicao.CADASTRO_REABERTO
-                || tipo == TipoTransicao.REVISAO_CADASTRO_ACEITA
-                || tipo == TipoTransicao.REVISAO_CADASTRO_DEVOLVIDA
                 || tipo == TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA
                 || tipo == TipoTransicao.REVISAO_CADASTRO_REABERTA;
 

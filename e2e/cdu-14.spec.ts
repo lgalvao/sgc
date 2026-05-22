@@ -21,6 +21,7 @@ import {
 import {navegarParaSubprocesso, verificarPaginaPainel, verificarToast} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 async function validarCabecalhosHistorico(modal: ReturnType<typeof abrirHistoricoAnalise> extends Promise<infer T> ? T : never) {
     await expect(modal.getByTestId('header-historico-dataHora')).toBeVisible();
@@ -81,6 +82,16 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await fecharModalImpacto(page);
         await devolverRevisao(page, 'Favor revisar as competências associadas');
 
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_ALVO,
+            assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} devolvida para ajustes`,
+            tipo: 'Revisão de cadastro devolvida',
+            trechoCorpo: `A revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+        });
+        await page.getByTestId('nav-link-painel').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
+
         // Preparacao 6: CHEFE vê devolução, ajusta e redisponibiliza
         await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
         await acessarSubprocessoChefeDireto(page, descProcesso, UNIDADE_ALVO);
@@ -115,6 +126,14 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
         await aceitarRevisao(page, 'Revisão aprovada conforme análise');
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'SECRETARIA_2',
+            assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} submetido para análise`,
+            tipo: 'Revisão de cadastro aceita',
+            trechoCorpo: `A revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+        });
+        await page.getByTestId('nav-link-painel').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, UNIDADE_ALVO);
         await navegarParaCadastro(page);
