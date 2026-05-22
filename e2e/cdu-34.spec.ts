@@ -6,6 +6,7 @@ import {
     verificarPaginaPainel
 } from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 /**
@@ -82,6 +83,14 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
         await expect(await obterAcaoCabecalhoSubprocesso(page, 'btn-enviar-lembrete')).toBeVisible();
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(situacaoAntes);
         await expect(page.getByTestId('subprocesso-header__txt-localizacao')).toHaveText(localizacaoAntes);
+
+        const prazo = (await page.getByTestId('subprocesso-header__txt-prazo').innerText()).trim();
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_1,
+            assunto: `Lembrete de prazo - ${descProcesso}`,
+            tipo: 'Lembrete de prazo',
+            trechoCorpo: `Este é um lembrete de que o prazo para a conclusão da etapa atual do processo ${descProcesso} encerra em ${prazo}.`
+        });
     });
 
     test('Cenario complementar: unidade de destino visualiza alerta de lembrete no painel', async ({

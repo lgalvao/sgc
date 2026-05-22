@@ -12,6 +12,7 @@ import {acessarSubprocessoGestor} from './helpers/helpers-analise.js';
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 test.describe.serial('CDU-19 - Validar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_221';
@@ -60,6 +61,14 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
         await page.getByTestId('btn-validar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: `Validação do mapa de competências da ${UNIDADE_ALVO} submetida para análise`,
+            tipo: 'Mapa validado',
+            trechoCorpo: `A unidade ${UNIDADE_ALVO} validou o mapa de competências elaborado no processo ${descProcesso}.`
+        });
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa validado/i);
 
@@ -115,6 +124,14 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
         await page.getByTestId('btn-sugestoes-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: `Sugestões apresentadas para o mapa de competências da ${UNIDADE_ALVO}`,
+            tipo: 'Sugestões apresentadas para o mapa',
+            trechoCorpo: `A unidade ${UNIDADE_ALVO} apresentou sugestões para o mapa de competências elaborado no processo ${descProcesso}.`
+        });
+        await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarDetalhesProcesso(page, descProcesso);
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa com sugestões/i);
     });

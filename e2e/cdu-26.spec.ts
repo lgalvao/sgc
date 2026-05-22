@@ -3,6 +3,7 @@ import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtur
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {loginComPerfil} from './helpers/helpers-auth.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 /**
  * CDU-26 - Homologar validação de mapas de competências em bloco
@@ -115,6 +116,12 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
         await page.waitForURL(/\/painel/);
         await expect(page.getByTestId('tbl-processos')).toBeVisible();
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_1,
+            assunto: 'Mapa de competências homologado',
+            tipo: 'Mapa homologado',
+            trechoCorpo: `O mapa de competências da sua unidade foi homologado no processo ${descProcesso}.`
+        });
     });
 
     test('Cenario 5: Homologação em bloco registra movimentação com data/hora e origem/destino ADMIN', async ({

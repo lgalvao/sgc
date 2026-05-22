@@ -4,9 +4,11 @@ import {abrirAcaoMapa, criarCompetencia, navegarParaMapa} from './helpers/helper
 import {navegarParaSubprocesso, verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
-test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
+    test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
+    const UNIDADE_SUPERIOR_IMEDIATA = 'COORD_21';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-17 ${timestamp}`;
@@ -95,6 +97,20 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
         await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
 
         await verificarPaginaPainel(page);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_ALVO,
+            assunto: 'Mapa de competências disponibilizado',
+            tipo: 'Mapa disponibilizado',
+            trechoCorpo: `O mapa de competências de sua unidade foi disponibilizado no contexto do processo ${descProcesso}.`
+        });
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_SUPERIOR_IMEDIATA,
+            assunto: `Mapa de competências disponibilizado - ${UNIDADE_ALVO}`,
+            tipo: 'Mapa disponibilizado',
+            trechoCorpo: `O mapa de competências da ${UNIDADE_ALVO} foi disponibilizado no contexto do processo ${descProcesso}.`
+        });
+        await page.getByTestId('nav-link-painel').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
         await acessarDetalhesProcesso(page, descProcesso);
         await navegarParaSubprocesso(page, 'SECAO_211');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Mapa disponibilizado/i);

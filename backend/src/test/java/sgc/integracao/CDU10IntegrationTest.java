@@ -234,7 +234,7 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         NotificacaoEmail notificacao = notificacoes.getFirst();
         assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
         assertThat(notificacao.getDestinatario()).isEqualTo("cosis@tre-pe.jus.br");
-        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada - SESEL");
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: SESEL");
         assertThat(notificacao.getCorpoHtml())
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("A unidade <strong>SESEL</strong> concluiu a revisão e")

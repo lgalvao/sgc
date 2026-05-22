@@ -17,6 +17,7 @@ import {
 } from './helpers/helpers-analise.js';
 import {limparNotificacoes, verificarPaginaPainel,} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 async function verificarPaginaSubprocesso(page: Page, unidade: string) {
     await expect(page).toHaveURL(new RegExp(String.raw`/processo/\d+/${unidade}(?:/)?(?:\?.*)?$`));
@@ -195,6 +196,14 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
 
         await expect(page.getByText(/disponibilizada?|Disponibilizado/i).first()).toBeVisible();
         await verificarPaginaPainel(page);
+
+        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'COORD_22',
+            assunto: `Revisão do cadastro de atividades e conhecimentos disponibilizada: ${UNIDADE_ALVO}`,
+            tipo: 'Revisão de cadastro disponibilizada',
+            trechoCorpo: `A unidade ${UNIDADE_ALVO} concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo ${descProcessoRevisao}.`
+        });
 
         // Verificar alerta para o gestor superior
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);

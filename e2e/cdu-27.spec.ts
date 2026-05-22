@@ -9,6 +9,7 @@ import {
 import {adicionarAtividade, navegarParaCadastro} from './helpers/helpers-atividades.js';
 import {acessarSubprocessoChefeDireto} from './helpers/helpers-analise.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 
@@ -151,6 +152,15 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
 
         // Verificar se a página atualizou o prazo
         await expect(page.getByTestId('subprocesso-header__txt-prazo')).toContainText(`${d}/${m}/${y}`);
+
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE_1,
+            assunto: 'Data limite alterada',
+            tipo: 'Alteração da data limite',
+            trechoCorpo: `A data limite da etapa atual no processo ${descProcesso} foi alterada para ${d}/${m}/${y}.`
+        });
+        await page.getByTestId('nav-link-painel').click();
+        await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
 
         // Validar alerta criado para a unidade destino
         await fazerLogout(page);

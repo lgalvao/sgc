@@ -454,14 +454,14 @@ public class SubprocessoNotificacaoService {
                     .formatted(sp.getUnidade().getSigla());
             case REVISAO_CADASTRO_DEVOLVIDA -> "Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes"
                     .formatted(sp.getUnidade().getSigla());
-            case REVISAO_CADASTRO_DISPONIBILIZADA -> "Revisão do cadastro de atividades e conhecimentos disponibilizada";
+            case REVISAO_CADASTRO_DISPONIBILIZADA -> "Revisão do cadastro de atividades e conhecimentos disponibilizada: %s"
+                    .formatted(sp.getUnidade().getSigla());
             case REVISAO_CADASTRO_REABERTA -> "Reabertura de revisão de cadastro";
             default -> tipo.getDescMovimentacao();
         };
         boolean incluirSigla = paraSuperior
                 || tipo == TipoTransicao.CADASTRO_DISPONIBILIZADO
                 || tipo == TipoTransicao.CADASTRO_REABERTO
-                || tipo == TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA
                 || tipo == TipoTransicao.REVISAO_CADASTRO_REABERTA;
 
         return incluirSigla
