@@ -186,14 +186,7 @@ public class RelatorioFacade {
 
     @Transactional(readOnly = true)
     public void gerarRelatorioUnidadesSemMapasVigentes(OutputStream outputStream) {
-        Set<Long> codigosSemMapaVigente = new HashSet<>(unidadeService.buscarCodigosUnidadesSemMapaVigente());
-        List<UnidadeDto> arvoreCompleta = unidadeHierarquiaService.buscarArvoreHierarquica();
-        List<UnidadeRelatorioSemMapa> unidadesExibidas = filtrarUnidadesExibidas(arvoreCompleta);
-        List<UnidadeRelatorioSemMapa> arvoreFiltrada = filtrarArvoreSemMapaVigente(
-                unidadesExibidas,
-                codigosSemMapaVigente
-        );
-        List<UnidadeRelatorioSemMapa> cardsRelatorio = organizarArvoreUnidades(arvoreFiltrada, "raiz");
+        ResultadoUnidadesSemMapaVigente resultado = obterResultadoUnidadesSemMapasVigentes();
 
         try (Document document = pdfFactory.createDocument()) {
             pdfFactory.createWriter(document, outputStream);
@@ -204,20 +197,27 @@ public class RelatorioFacade {
                     "Todas as unidades",
                     LocalDateTime.now(),
                     null,
-                    codigosSemMapaVigente.size()
+                    resultado.codigosSemMapaVigente().size()
             ));
 
-            if (codigosSemMapaVigente.isEmpty()) {
+            if (resultado.codigosSemMapaVigente().isEmpty()) {
                 document.add(criarParagrafo("Não há unidades sem mapa vigente.", FONTE_TEXTO, 0f));
                 return;
             }
 
-            for (UnidadeRelatorioSemMapa card : cardsRelatorio) {
+            for (UnidadeRelatorioSemMapa card : resultado.arvoreOrganizada()) {
                 adicionarSecaoUnidadesSemMapa(document, card);
             }
         } catch (DocumentException | IOException e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<RelatorioUnidadeSemMapaVigenteDto> obterRelatorioUnidadesSemMapasVigentes() {
+        return obterResultadoUnidadesSemMapasVigentes().arvoreOrganizada().stream()
+                .map(this::criarRelatorioUnidadeSemMapaVigenteDto)
+                .toList();
     }
 
     private Map<Long, UnidadeResponsavelDto> buscarResponsaveisPorUnidade(List<Subprocesso> subprocessos) {
@@ -725,6 +725,28 @@ public class RelatorioFacade {
         return resultado;
     }
 
+    private ResultadoUnidadesSemMapaVigente obterResultadoUnidadesSemMapasVigentes() {
+        Set<Long> codigosSemMapaVigente = new HashSet<>(unidadeService.buscarCodigosUnidadesSemMapaVigente());
+        List<UnidadeDto> arvoreCompleta = unidadeHierarquiaService.buscarArvoreHierarquica();
+        List<UnidadeRelatorioSemMapa> unidadesExibidas = filtrarUnidadesExibidas(arvoreCompleta);
+        List<UnidadeRelatorioSemMapa> arvoreFiltrada = filtrarArvoreSemMapaVigente(
+                unidadesExibidas,
+                codigosSemMapaVigente
+        );
+        List<UnidadeRelatorioSemMapa> arvoreOrganizada = organizarArvoreUnidades(arvoreFiltrada, "raiz");
+        return new ResultadoUnidadesSemMapaVigente(codigosSemMapaVigente, arvoreOrganizada);
+    }
+
+    private RelatorioUnidadeSemMapaVigenteDto criarRelatorioUnidadeSemMapaVigenteDto(UnidadeRelatorioSemMapa unidade) {
+        return new RelatorioUnidadeSemMapaVigenteDto(
+                unidade.codigo(),
+                unidade.sigla(),
+                unidade.nome(),
+                unidade.tipo(),
+                unidade.filhas().stream().map(this::criarRelatorioUnidadeSemMapaVigenteDto).toList()
+        );
+    }
+
     private void ordenarAlfabeticamente(List<UnidadeRelatorioSemMapa> unidades) {
         unidades.sort((a, b) -> compararTextoPtBr(obterTextoOrdenacao(a), obterTextoOrdenacao(b)));
     }
@@ -882,5 +904,11 @@ public class RelatorioFacade {
         UnidadeRelatorioSemMapa comFilhas(List<UnidadeRelatorioSemMapa> filhas) {
             return new UnidadeRelatorioSemMapa(codigo, sigla, nome, tipo, filhas);
         }
+    }
+
+    private record ResultadoUnidadesSemMapaVigente(
+            Set<Long> codigosSemMapaVigente,
+            List<UnidadeRelatorioSemMapa> arvoreOrganizada
+    ) {
     }
 }

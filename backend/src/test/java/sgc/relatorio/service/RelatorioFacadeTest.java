@@ -729,6 +729,41 @@ class RelatorioFacadeTest {
     }
 
     @Test
+    @DisplayName("Deve obter relatório em JSON de unidades sem mapas vigentes")
+    void deveObterRelatorioUnidadesSemMapasVigentes() {
+        UnidadeDto raiz = new UnidadeDto();
+        raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
+        raiz.setNome("Unidade Raiz");
+
+        UnidadeDto secretaria = new UnidadeDto();
+        secretaria.setCodigo(10L);
+        secretaria.setSigla("SEC");
+        secretaria.setNome("SECRETARIA X");
+        secretaria.setTipo("SECRETARIA");
+
+        UnidadeDto zonaEleitoral = new UnidadeDto();
+        zonaEleitoral.setCodigo(11L);
+        zonaEleitoral.setSigla("ZE 1");
+        zonaEleitoral.setNome("ZONA ELEITORAL 1");
+        zonaEleitoral.setTipo("ZONA ELEITORAL");
+        secretaria.setSubunidades(List.of(zonaEleitoral));
+        raiz.setSubunidades(List.of(secretaria));
+
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(11L));
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(raiz));
+
+        List<RelatorioUnidadeSemMapaVigenteDto> resultado = relatorioService.obterRelatorioUnidadesSemMapasVigentes();
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getFirst().codigo()).isEqualTo(10L);
+        assertThat(resultado.getFirst().sigla()).isEqualTo("SEC");
+        assertThat(resultado.getFirst().filhas()).hasSize(1);
+        assertThat(resultado.getFirst().filhas().getFirst().codigo()).isNotNull();
+        assertThat(resultado.getFirst().filhas().getFirst().sigla()).isEqualTo("ZONAS ELEITORAIS");
+    }
+
+    @Test
     @DisplayName("Deve gerar relatório de unidades sem mapas vigentes com ordenações e agrupamentos complexos")
     void deveGerarRelatorioUnidadesSemMapasVigentesComOrdenacoesEAgrupamentosComplexos() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
@@ -1031,4 +1066,3 @@ class RelatorioFacadeTest {
         assertThat(situacao).isEqualTo("Mapa Com Sugestoes");
     }
 }
-
