@@ -120,13 +120,6 @@ public enum TipoTransicao {
             null,
             null,
             null
-    ),
-
-    PROCESSO_INICIADO(
-            Mensagens.HIST_PROCESSO_INICIADO,
-            Mensagens.ALERTA_PROCESSO_INICIADO,
-            "processo-iniciado",
-            null
     );
 
     private final String descMovimentacao;

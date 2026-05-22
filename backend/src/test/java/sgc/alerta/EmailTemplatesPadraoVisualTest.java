@@ -107,7 +107,7 @@ class EmailTemplatesPadraoVisualTest {
     @Test
     @DisplayName("somente templates explicitamente permitidos podem usar highlight-box")
     void somenteTemplatesPermitidosPodemUsarHighlightBox() throws IOException {
-        Set<String> templatesPermitidos = Set.of("processo-iniciado.html");
+        Set<String> templatesPermitidos = Set.of();
 
         List<Path> templates = listarTemplates()
                 .filter(path -> !path.getFileName().toString().equals("_layout.html"))

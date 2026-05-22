@@ -76,7 +76,7 @@ class SubprocessoNotificacaoServiceTest {
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
-                .tipoTransicao(TipoTransicao.PROCESSO_INICIADO)
+                .tipoTransicao(TipoTransicao.CADASTRO_DISPONIBILIZADO)
                 .unidadeOrigem(origem)
                 .unidadeDestino(destino)
                 .observacoes("Observacao importante")
@@ -84,7 +84,7 @@ class SubprocessoNotificacaoServiceTest {
 
         verify(alertaService).criarAlertaTransicao(
                 eq(processo),
-                eq(TipoTransicao.PROCESSO_INICIADO.formatarAlerta("ORIG")),
+                eq(TipoTransicao.CADASTRO_DISPONIBILIZADO.formatarAlerta("ORIG")),
                 eq(origem),
                 eq(destino));
         verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
@@ -95,12 +95,12 @@ class SubprocessoNotificacaoServiceTest {
                 .allSatisfy(cmd -> {
                     assertThat(cmd.assunto()).startsWith("SGC: ");
                     assertThat(cmd.corpoHtml()).isEqualTo("<html>corpo</html>");
-                    assertThat(cmd.tipoNotificacao()).isEqualTo(TipoNotificacao.PROCESSO_INICIADO);
-                    assertThat(cmd.chaveIdempotencia()).contains("transicao:PROCESSO_INICIADO");
+                    assertThat(cmd.tipoNotificacao()).isEqualTo(TipoNotificacao.CADASTRO_DISPONIBILIZADO);
+                    assertThat(cmd.chaveIdempotencia()).contains("transicao:CADASTRO_DISPONIBILIZADO");
                 });
         verify(templateEngine).process(templateCaptor.capture(), contextCaptor.capture());
 
-        assertThat(templateCaptor.getValue()).isEqualTo("processo-iniciado");
+        assertThat(templateCaptor.getValue()).isEqualTo("cadastro-disponibilizado");
         IContext contexto = contextCaptor.getValue();
         assertThat(contexto.getVariable("siglaUnidade")).isEqualTo("ORIG");
         assertThat(contexto.getVariable("siglaUnidadeDestino")).isEqualTo("DEST");
@@ -247,7 +247,7 @@ class SubprocessoNotificacaoServiceTest {
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
-                .tipoTransicao(TipoTransicao.PROCESSO_INICIADO)
+                .tipoTransicao(TipoTransicao.CADASTRO_DISPONIBILIZADO)
                 .unidadeOrigem(origem)
                 .unidadeDestino(destino)
                 .build());
@@ -277,7 +277,7 @@ class SubprocessoNotificacaoServiceTest {
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
-                .tipoTransicao(TipoTransicao.PROCESSO_INICIADO)
+                .tipoTransicao(TipoTransicao.CADASTRO_DISPONIBILIZADO)
                 .unidadeOrigem(origem)
                 .unidadeDestino(destino)
                 .build());
