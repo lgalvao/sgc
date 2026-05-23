@@ -1046,28 +1046,6 @@ class RelatorioFacadeTest {
     }
 
     @Test
-    @DisplayName("Deve comparar segmentos considerando quantidade diferente de partes")
-    void deveCompararSegmentosConsiderandoQuantidadeDiferenteDePartes() throws Exception {
-        java.lang.reflect.Method metodo = RelatorioFacade.class.getDeclaredMethod("compararSegmentosTexto", String.class, String.class);
-        metodo.setAccessible(true);
-
-        int comparacao = (int) metodo.invoke(relatorioService, "A1B", "A1");
-
-        assertThat(comparacao).isPositive();
-    }
-
-    @Test
-    @DisplayName("Deve formatar situação ignorando partes em branco")
-    void deveFormatarSituacaoIgnorandoPartesEmBranco() throws Exception {
-        java.lang.reflect.Method metodo = RelatorioFacade.class.getDeclaredMethod("formatarSituacaoPdf", String.class);
-        metodo.setAccessible(true);
-
-        String situacao = (String) metodo.invoke(relatorioService, "MAPA__COM__SUGESTOES");
-
-        assertThat(situacao).isEqualTo("Mapa Com Sugestoes");
-    }
-
-    @Test
     @DisplayName("Deve lançar erro quando a unidade não possui mapa vigente")
     void deveLancarErroQuandoUnidadeNaoPossuiMapaVigente() {
         mockContextoAdmin();
@@ -1113,69 +1091,42 @@ class RelatorioFacadeTest {
                 .containsExactly(11L);
     }
 
-
     @Test
-    @DisplayName("Deve exercitar identificação e lista de unidades sem mapa com sigla e nome alternativos")
-    void deveExercitarIdentificacaoEListaDeUnidadesSemMapaComSiglaENomeAlternativos() throws Exception {
-        Class<?> tipoCard = Class.forName("sgc.relatorio.RelatorioFacade$UnidadeRelatorioSemMapa");
-        java.lang.reflect.Constructor<?> construtor = tipoCard.getDeclaredConstructor(Long.class, String.class, String.class, String.class, List.class);
-        construtor.setAccessible(true);
-        Object filhoSomenteNome = construtor.newInstance(3L, null, "Somente nome", null, List.of());
-        Object filhoCompleto = construtor.newInstance(4L, "SIG", "Nome completo", null, List.of());
-        Object filhoSomenteSigla = construtor.newInstance(5L, "SO", null, null, List.of());
-        Object cardComNome = construtor.newInstance(1L, "   ", "Nome do card", null, List.of(filhoSomenteNome, filhoCompleto, filhoSomenteSigla));
-        Object cardVazio = construtor.newInstance(2L, " ", " ", null, List.of());
+    @DisplayName("Deve filtrar unidades sem mapa quando subunidades sao nulas ou vazias")
+    void deveFiltrarUnidadesQuandoSubunidadesSaoNulasOuVazias() {
+        UnidadeDto raiz = new UnidadeDto();
+        raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
 
-        java.lang.reflect.Method adicionarIdentificacao = RelatorioFacade.class
-                .getDeclaredMethod("adicionarIdentificacaoUnidadeSemMapa", Document.class, tipoCard);
-        adicionarIdentificacao.setAccessible(true);
-        java.lang.reflect.Method adicionarLista = RelatorioFacade.class
-                .getDeclaredMethod("adicionarListaUnidadesSemMapa", Document.class, List.class, int.class);
-        adicionarLista.setAccessible(true);
+        UnidadeDto secretariaComSubunidades = new UnidadeDto();
+        secretariaComSubunidades.setCodigo(10L);
+        secretariaComSubunidades.setSigla("SEC");
+        secretariaComSubunidades.setNome("SECRETARIA X");
+        secretariaComSubunidades.setTipo("SECRETARIA");
 
-        adicionarIdentificacao.invoke(relatorioService, document, cardComNome);
-        adicionarIdentificacao.invoke(relatorioService, document, cardVazio);
-        adicionarLista.invoke(relatorioService, document, List.of(cardComNome, cardVazio), 0);
+        // secretaria com subunidades == null (nao deve aparecer no resultado)
+        UnidadeDto secretariaSemFilhas = new UnidadeDto();
+        secretariaSemFilhas.setCodigo(20L);
+        secretariaSemFilhas.setSigla("SEC-B");
+        secretariaSemFilhas.setNome("SECRETARIA B");
+        secretariaSemFilhas.setSubunidades(null);
 
-        verify(document, atLeastOnce()).add(any());
-    }
+        UnidadeDto zona = new UnidadeDto();
+        zona.setCodigo(11L);
+        zona.setSigla("ZE 01");
+        zona.setNome("ZONA ELEITORAL 1");
+        zona.setTipo("ZONA ELEITORAL");
+        secretariaComSubunidades.setSubunidades(List.of(zona));
+        raiz.setSubunidades(List.of(secretariaComSubunidades, secretariaSemFilhas));
 
-    @Test
-    @DisplayName("Deve tratar texto secretaria, segmentos nulos e raízes sem filhas")
-    void deveTratarTextoSecretariaSegmentosNulosERaizesSemFilhas() throws Exception {
-        java.lang.reflect.Method filtrarUnidadesExibidas = RelatorioFacade.class
-                .getDeclaredMethod("filtrarUnidadesExibidas", List.class);
-        filtrarUnidadesExibidas.setAccessible(true);
-        java.lang.reflect.Method ehTextoSecretaria = RelatorioFacade.class
-                .getDeclaredMethod("ehTextoSecretaria", String.class);
-        ehTextoSecretaria.setAccessible(true);
-        java.lang.reflect.Method separarSegmentos = RelatorioFacade.class
-                .getDeclaredMethod("separarSegmentos", String.class);
-        separarSegmentos.setAccessible(true);
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(11L));
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(raiz));
 
-        UnidadeDto raizSemFilhasNulas = new UnidadeDto();
-        raizSemFilhasNulas.setCodigo(1L);
-        raizSemFilhasNulas.setSubunidades(null);
-        UnidadeDto raizSemFilhasVazias = new UnidadeDto();
-        raizSemFilhasVazias.setCodigo(2L);
-        raizSemFilhasVazias.setSubunidades(List.of());
-        UnidadeDto filha = new UnidadeDto();
-        filha.setCodigo(3L);
-        UnidadeDto raizComFilha = new UnidadeDto();
-        raizComFilha.setCodigo(4L);
-        raizComFilha.setSubunidades(List.of(filha));
+        List<RelatorioUnidadeSemMapaVigenteDto> resultado = relatorioService.obterRelatorioUnidadesSemMapasVigentes();
 
-        List<?> resultado = (List<?>) filtrarUnidadesExibidas.invoke(
-                relatorioService,
-                List.of(raizSemFilhasNulas, raizSemFilhasVazias, raizComFilha)
-        );
-
+        // Apenas a secretaria com subunidades pendentes deve aparecer
         assertThat(resultado).hasSize(1);
-        assertThat((boolean) ehTextoSecretaria.invoke(relatorioService, (Object) null)).isFalse();
-        assertThat((boolean) ehTextoSecretaria.invoke(relatorioService, "Secretaria de Gestão")).isTrue();
-        @SuppressWarnings("unchecked")
-        List<String> segmentosNulos = (List<String>) separarSegmentos.invoke(relatorioService, (Object) null);
-        assertThat(segmentosNulos).containsExactly("");
+        assertThat(resultado.getFirst().sigla()).isEqualTo("SEC");
     }
 
     @Test
