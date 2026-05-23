@@ -24,8 +24,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("Testes de Integração - ProcessoService")
 class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
+    // Unidade 8 está em processo EM_ANDAMENTO no data.sql — usar apenas onde não se precisar iniciar processo
     private static final Long CODIGO_UNIDADE_MAPEAMENTO = 8L;
     private static final Long CODIGO_UNIDADE_SEM_MAPA = 15L;
+    // Unidades livres (sem processo ativo), com mapa vigente para REVISAO/DIAGNOSTICO
+    private static final Long CODIGO_UNIDADE_LIVRE_MAPA = 9L;   // SEDIA — mapa vigente 1002
+    private static final Long CODIGO_UNIDADE_LIVRE_MAPA2 = 10L; // SESEL — mapa vigente 1003
+    private static final Long CODIGO_UNIDADE_CHEFE = 102L;      // SUB-UNIT — chefe=111111111111, mapa vigente 1004
 
     @Autowired
     private ProcessoService service;
@@ -247,9 +252,9 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo elegíveis")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA))
                     .build());
-            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA));
 
             List<SubprocessoElegivelDto> resultado = service.listarSubprocessosElegiveis(processo.getCodigo());
 
@@ -258,15 +263,15 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
 
         @Test
         @DisplayName("Deve listar subprocessos elegíveis como CHEFE")
-        @WithMockChefe
+        @WithMockChefe("333333333333")
         void deveListarSubprocessosElegiveisComoChefe() {
             Processo processo = service.criar(CriarProcessoRequest.builder()
                     .descricao("Processo elegíveis chefe")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA))
                     .build());
-            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA));
 
             List<SubprocessoElegivelDto> resultado = service.listarSubprocessosElegiveis(processo.getCodigo());
 
@@ -295,10 +300,10 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo REVISAO inicio")
                     .tipo(TipoProcesso.REVISAO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA))
                     .build());
 
-            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA));
 
             Processo iniciado = processoRepo.findById(processo.getCodigo()).orElseThrow();
             assertThat(iniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
@@ -313,10 +318,10 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo DIAGNOSTICO inicio")
                     .tipo(TipoProcesso.DIAGNOSTICO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA2))
                     .build());
 
-            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA2));
 
             Processo iniciado = processoRepo.findById(processo.getCodigo()).orElseThrow();
             assertThat(iniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
@@ -335,11 +340,11 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .descricao("Processo já iniciado")
                     .tipo(TipoProcesso.MAPEAMENTO)
                     .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
-                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA))
                     .build());
-            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA));
 
-            assertThatThrownBy(() -> service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO)))
+            assertThatThrownBy(() -> service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA)))
                     .isInstanceOf(ErroValidacao.class);
         }
     }
@@ -377,6 +382,62 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
 
             assertThatThrownBy(() -> service.apagar(p.getCodigo()))
                     .isInstanceOf(ErroValidacao.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("Acesso e Detalhes")
+    class AcessoDetalhesTests {
+
+        @Test
+        @DisplayName("Deve acessar detalhes do processo como CHEFE da unidade participante (checarAcesso)")
+        @WithMockChefe("333333333333")
+        void deveAcessarDetalhesComoChefeDaUnidade() throws Exception {
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo acesso chefe")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA))
+                    .build());
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA));
+
+            mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.codigo").value(processo.getCodigo()));
+        }
+
+        @Test
+        @DisplayName("Deve acessar contexto completo (incluirElegiveis=true) como GESTOR")
+        @WithMockGestor("666666666666")
+        void deveAcessarContextoCompletoComoGestor() throws Exception {
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo contexto gestor")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA))
+                    .build());
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA));
+
+            mockMvc.perform(get("/api/processos/{codigo}/contexto-completo", processo.getCodigo()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.codigo").value(processo.getCodigo()));
+        }
+
+        @Test
+        @DisplayName("Deve negar acesso ao CHEFE sem subprocesso no processo")
+        @WithMockChefe("333333333333")
+        void deveDenegarAcessoAoChefeForaDoProcesso() throws Exception {
+            // Processo com unit 10 — CHEFE de unit 9 não tem acesso
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo sem acesso")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_LIVRE_MAPA2))
+                    .build());
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_LIVRE_MAPA2));
+
+            mockMvc.perform(get("/api/processos/{codigo}/detalhes", processo.getCodigo()))
+                    .andExpect(status().isForbidden());
         }
     }
 }
