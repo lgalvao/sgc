@@ -8,7 +8,7 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_ATIVIDADES} from "@/constants/textos-atividades";
 import {TEXTOS_SUCESSO_SUBPROCESSO} from "@/constants/textos-subprocesso";
-import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
+import type {HomologarCadastroRequest} from "@/types/tipos";
 import type {RouteLocationRaw} from "vue-router";
 
 interface WorkflowOptions {
@@ -33,6 +33,14 @@ interface OpcoesMensagemSucesso {
 interface OpcoesHomologacao extends OpcoesMensagemSucesso {
     redirecionarParaPainel?: boolean;
     redirecionarPara?: RouteLocationRaw;
+}
+
+type AcaoSemPayload = (codigoSubprocesso: number) => Promise<unknown>;
+type AcaoComPayload<T> = (codigoSubprocesso: number, payload: T) => Promise<unknown>;
+
+interface DependenciasFluxoSubprocesso {
+    executarAcaoWorkflow: (acao: () => Promise<unknown>, options?: WorkflowOptions) => Promise<boolean>;
+    executarComTratamentoDeErros: ReturnType<typeof useErrorHandler>["executarComTratamentoDeErros"];
 }
 
 function invalidarPainelEMapa(codigoSubprocesso: number) {
@@ -118,6 +126,41 @@ async function executarPosAcao(
     }
 }
 
+function criarAcaoPainel(
+    deps: DependenciasFluxoSubprocesso,
+    mensagemSucesso: string,
+    acao: AcaoSemPayload,
+) {
+    return (codigoSubprocesso: number) =>
+        deps.executarAcaoWorkflow(
+            () => acao(codigoSubprocesso),
+            workflowPainel(codigoSubprocesso, mensagemSucesso));
+}
+
+function criarAcaoRecarga(
+    deps: DependenciasFluxoSubprocesso,
+    tipo: "cadastro" | "edicao",
+    acao: AcaoSemPayload,
+) {
+    return (codigoSubprocesso: number) =>
+        deps.executarAcaoWorkflow(
+            () => acao(codigoSubprocesso),
+            workflowRecargaContexto(codigoSubprocesso, tipo),
+        );
+}
+
+function criarAcaoPainelComPayload<T>(
+    deps: DependenciasFluxoSubprocesso,
+    obterMensagemSucesso: (options?: OpcoesMensagemSucesso) => string,
+    acao: AcaoComPayload<T>,
+) {
+    return (codigoSubprocesso: number, payload: T, options?: OpcoesMensagemSucesso) =>
+        deps.executarAcaoWorkflow(
+            () => acao(codigoSubprocesso, payload),
+            workflowPainel(codigoSubprocesso, obterMensagemSucesso(options)),
+        );
+}
+
 export function useFluxoSubprocesso() {
     const {ultimoErro, limparErro, executarComTratamentoDeErros} = useErrorHandler();
     const subprocessoStore = useSubprocessoStore();
@@ -141,64 +184,53 @@ export function useFluxoSubprocesso() {
         }
     }
 
+    const dependenciasFluxo = {
+        executarAcaoWorkflow,
+        executarComTratamentoDeErros,
+    };
+    const disponibilizarCadastro = criarAcaoPainel(
+        dependenciasFluxo,
+        TEXTOS_SUCESSO_ATIVIDADES.CADASTRO_ATIVIDADES_DISPONIBILIZADO,
+        cadastroService.disponibilizarCadastro,
+    );
+    const disponibilizarRevisaoCadastro = criarAcaoPainel(
+        dependenciasFluxo,
+        TEXTOS_SUCESSO_ATIVIDADES.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA,
+        cadastroService.disponibilizarRevisaoCadastro,
+    );
+    const iniciarRevisaoCadastro = criarAcaoRecarga(
+        dependenciasFluxo,
+        "cadastro",
+        cadastroService.iniciarRevisaoCadastro,
+    );
+    const cancelarInicioRevisaoCadastro = criarAcaoRecarga(
+        dependenciasFluxo,
+        "cadastro",
+        cadastroService.cancelarInicioRevisaoCadastro,
+    );
+    const devolverCadastro = criarAcaoPainelComPayload(
+        dependenciasFluxo,
+        () => TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA,
+        cadastroService.devolverCadastro,
+    );
+    const devolverRevisaoCadastro = criarAcaoPainelComPayload(
+        dependenciasFluxo,
+        () => TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA,
+        cadastroService.devolverRevisaoCadastro,
+    );
+    const aceitarCadastro = criarAcaoPainelComPayload(
+        dependenciasFluxo,
+        (options) => options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
+        cadastroService.aceitarCadastro,
+    );
+    const aceitarRevisaoCadastro = criarAcaoPainelComPayload(
+        dependenciasFluxo,
+        (options) => options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
+        cadastroService.aceitarRevisaoCadastro,
+    );
+
     async function validarCadastro(codigoSubprocesso: number) {
         return executarComTratamentoDeErros(async () => subprocessoService.validarCadastro(codigoSubprocesso));
-    }
-
-    async function disponibilizarCadastro(codigoSubprocesso: number) {
-        return executarAcaoWorkflow(
-            () => cadastroService.disponibilizarCadastro(codigoSubprocesso),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.CADASTRO_ATIVIDADES_DISPONIBILIZADO)
-        );
-    }
-
-    async function disponibilizarRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcaoWorkflow(
-            () => cadastroService.disponibilizarRevisaoCadastro(codigoSubprocesso),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA)
-        );
-    }
-
-    async function iniciarRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcaoWorkflow(
-            () => cadastroService.iniciarRevisaoCadastro(codigoSubprocesso),
-            workflowRecargaContexto(codigoSubprocesso, "cadastro")
-        );
-    }
-
-    async function cancelarInicioRevisaoCadastro(codigoSubprocesso: number) {
-        return executarAcaoWorkflow(
-            () => cadastroService.cancelarInicioRevisaoCadastro(codigoSubprocesso),
-            workflowRecargaContexto(codigoSubprocesso, "cadastro")
-        );
-    }
-
-    async function devolverCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {
-        return executarAcaoWorkflow(
-            () => cadastroService.devolverCadastro(codigoSubprocesso, req),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA)
-        );
-    }
-
-    async function devolverRevisaoCadastro(codigoSubprocesso: number, req: DevolverCadastroRequest) {
-        return executarAcaoWorkflow(
-            () => cadastroService.devolverRevisaoCadastro(codigoSubprocesso, req),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA)
-        );
-    }
-
-    async function aceitarCadastro(codigoSubprocesso: number, req: AceitarCadastroRequest, options?: OpcoesMensagemSucesso) {
-        return executarAcaoWorkflow(
-            () => cadastroService.aceitarCadastro(codigoSubprocesso, req),
-            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO)
-        );
-    }
-
-    async function aceitarRevisaoCadastro(codigoSubprocesso: number, req: AceitarCadastroRequest, options?: OpcoesMensagemSucesso) {
-        return executarAcaoWorkflow(
-            () => cadastroService.aceitarRevisaoCadastro(codigoSubprocesso, req),
-            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO)
-        );
     }
 
     async function homologarCadastro(codigoSubprocesso: number, req: HomologarCadastroRequest, options?: OpcoesHomologacao) {

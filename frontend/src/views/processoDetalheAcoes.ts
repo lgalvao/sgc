@@ -32,6 +32,66 @@ interface DadosAcaoBloco {
     dataLimite?: string;
 }
 
+interface DependenciasAcaoBloco {
+    processo: Ref<Processo | null>;
+    acaoBlocoAtual: Ref<AcaoBlocoProcesso | null>;
+    processandoAcaoBloco: Ref<boolean>;
+    modalBlocoRef: Ref<ModalAcaoBlocoRef | null>;
+    invalidarCachesProcesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesProcesso"];
+    invalidarCachesSubprocesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesSubprocesso"];
+    toastStore: ReturnType<typeof useToastStore>;
+    router: ReturnType<typeof useRouter>;
+    notify: Dependencias["notify"];
+    carregarContextoCompleto: Dependencias["carregarContextoCompleto"];
+    registrarErro: Dependencias["registrarErro"];
+}
+
+function finalizarEstadoAcaoBloco(deps: DependenciasAcaoBloco) {
+    deps.processandoAcaoBloco.value = false;
+    deps.modalBlocoRef.value?.setProcessando(false);
+}
+
+function validarEstadoAcaoBloco(deps: DependenciasAcaoBloco): Processo | null {
+    if (!deps.processo.value) {
+        deps.modalBlocoRef.value?.setErro("Detalhes do processo não carregados.");
+        finalizarEstadoAcaoBloco(deps);
+        return null;
+    }
+
+    if (!deps.acaoBlocoAtual.value) {
+        deps.modalBlocoRef.value?.setErro(TEXTOS.processo.ERRO_ACAO_BLOCO);
+        finalizarEstadoAcaoBloco(deps);
+        return null;
+    }
+
+    return deps.processo.value;
+}
+
+async function concluirAcaoBlocoSemRedirecionamento(deps: DependenciasAcaoBloco, mensagemSucesso: string) {
+    deps.notify(mensagemSucesso, "success");
+    deps.invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: true});
+    await deps.carregarContextoCompleto();
+}
+
+async function concluirAcaoBlocoComRedirecionamento(deps: DependenciasAcaoBloco, mensagemSucesso: string) {
+    deps.toastStore.setPending(mensagemSucesso);
+    deps.invalidarCachesProcesso();
+    deps.processo.value = null;
+    await deps.router.push("/painel");
+}
+
+async function concluirAcaoBloco(deps: DependenciasAcaoBloco) {
+    deps.modalBlocoRef.value?.fechar();
+
+    const {mensagemSucesso, redirecionarPainel} = deps.acaoBlocoAtual.value as AcaoBlocoProcesso;
+    if (redirecionarPainel) {
+        await concluirAcaoBlocoComRedirecionamento(deps, mensagemSucesso);
+        return;
+    }
+
+    await concluirAcaoBlocoSemRedirecionamento(deps, mensagemSucesso);
+}
+
 export function useProcessoAcoes({
                                      codProcesso,
                                      processo,
@@ -71,52 +131,19 @@ export function useProcessoAcoes({
         acaoBlocoAtual.value = acao;
         modalBlocoRef.value?.abrir();
     }
-
-    function finalizarEstadoAcaoBloco() {
-        processandoAcaoBloco.value = false;
-        modalBlocoRef.value?.setProcessando(false);
-    }
-
-    function validarEstadoAcaoBloco(): Processo | null {
-        if (!processo.value) {
-            modalBlocoRef.value?.setErro("Detalhes do processo não carregados.");
-            finalizarEstadoAcaoBloco();
-            return null;
-        }
-
-        if (!acaoBlocoAtual.value) {
-            modalBlocoRef.value?.setErro(TEXTOS.processo.ERRO_ACAO_BLOCO);
-            finalizarEstadoAcaoBloco();
-            return null;
-        }
-
-        return processo.value;
-    }
-
-    async function concluirAcaoBlocoSemRedirecionamento(mensagemSucesso: string) {
-        notify(mensagemSucesso, "success");
-        invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: true});
-        await carregarContextoCompleto();
-    }
-
-    async function concluirAcaoBlocoComRedirecionamento(mensagemSucesso: string) {
-        toastStore.setPending(mensagemSucesso);
-        invalidarCachesProcesso();
-        processo.value = null;
-        await router.push("/painel");
-    }
-
-    async function concluirAcaoBloco() {
-        modalBlocoRef.value?.fechar();
-
-        const {mensagemSucesso, redirecionarPainel} = acaoBlocoAtual.value as AcaoBlocoProcesso;
-        if (redirecionarPainel) {
-            await concluirAcaoBlocoComRedirecionamento(mensagemSucesso);
-            return;
-        }
-
-        await concluirAcaoBlocoSemRedirecionamento(mensagemSucesso);
-    }
+    const dependenciasAcaoBloco = {
+        processo,
+        acaoBlocoAtual,
+        processandoAcaoBloco,
+        modalBlocoRef,
+        invalidarCachesProcesso,
+        invalidarCachesSubprocesso,
+        toastStore,
+        router,
+        notify,
+        carregarContextoCompleto,
+        registrarErro,
+    };
 
     async function confirmarFinalizacao() {
         if (loadingFinalizacao.value) {
@@ -145,7 +172,7 @@ export function useProcessoAcoes({
             processandoAcaoBloco.value = true;
             modalBlocoRef.value?.setProcessando(true);
 
-            const processoAtual = validarEstadoAcaoBloco();
+            const processoAtual = validarEstadoAcaoBloco(dependenciasAcaoBloco);
             if (!processoAtual) {
                 return;
             }
@@ -156,11 +183,11 @@ export function useProcessoAcoes({
                 dataLimite: dados.dataLimite,
             });
 
-            await concluirAcaoBloco();
+            await concluirAcaoBloco(dependenciasAcaoBloco);
         } catch (erro) {
             modalBlocoRef.value?.setErro(registrarErro(erro) || TEXTOS.processo.ERRO_ACAO_BLOCO);
         } finally {
-            finalizarEstadoAcaoBloco();
+            finalizarEstadoAcaoBloco(dependenciasAcaoBloco);
         }
     }
 
