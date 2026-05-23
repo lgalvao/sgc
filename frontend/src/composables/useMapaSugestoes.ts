@@ -2,6 +2,7 @@ import {ref, type Ref} from "vue";
 import {apresentarSugestoes, obterSugestoesMapa} from "@/services/subprocessoService";
 import logger from "@/utils/logger";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
 import type {VarianteAlerta} from "@/composables/useNotification";
 
 interface UseMapaSugestoesOptions {
@@ -112,7 +113,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
             loadingSugestoesEnvio.value = true;
             const sucesso = await executarOperacaoSugestoes(async () => {
                 await apresentarSugestoes(codigoSubprocesso.value!, {sugestoes: sugestoes.value});
-                await concluirAcaoPainel(TEXTOS.sucesso.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
+                await concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
             }, TEXTOS.mapa.ERRO_SUGESTOES);
             if (!sucesso) {
                 return;

@@ -1,6 +1,7 @@
 import {computed, type ComputedRef} from 'vue';
 import type {PermissoesSubprocesso} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
+import {TEXTOS_SUCESSO_SUBPROCESSO} from '@/constants/textos-subprocesso';
 import type {AcaoPrincipalCadastro} from './tipos';
 
 export function usarAcessoCadastro(
@@ -29,7 +30,7 @@ export function usarAcessoCadastro(
                 textoModal: TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO,
                 rotuloBotao: TEXTOS.atividades.BOTAO_HOMOLOGAR,
                 rotuloConfirmacao: TEXTOS.comum.BOTAO_HOMOLOGAR,
-                mensagemSucesso: TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA,
+                mensagemSucesso: TEXTOS_SUCESSO_SUBPROCESSO.HOMOLOGACAO_EFETIVADA,
                 redirecionarParaPainel: false,
             };
         }
@@ -47,7 +48,7 @@ export function usarAcessoCadastro(
                     : TEXTOS.atividades.MODAL_VALIDAR_TEXTO,
                 rotuloBotao: TEXTOS.comum.BOTAO_REGISTRAR_ACEITE,
                 rotuloConfirmacao: TEXTOS.comum.BOTAO_REGISTRAR_ACEITE,
-                mensagemSucesso: TEXTOS.sucesso.ACEITE_REGISTRADO,
+                mensagemSucesso: TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
             };
         }

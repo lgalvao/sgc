@@ -39,7 +39,7 @@
                   data-testid="btn-exportar-mapa-vigente-csv"
                   @click="exportarMapaVigenteCsv"
               >
-                {{ TEXTOS.relatorios.BOTAO_CSV }}
+                {{ TEXTOS_RELATORIOS.BOTAO_CSV }}
               </BDropdownItemButton>
             </BDropdown>
             <BButton
@@ -113,6 +113,7 @@ import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {logger,formatarDataBR} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useNotification} from "@/composables/useNotification";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil} from "@/types/comum";
@@ -228,7 +229,7 @@ async function exportarMapaVigentePdf() {
   try {
     await relatoriosService.downloadRelatorioMapaVigenteUnidadePdf(props.codUnidade);
   } catch {
-    notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
+    notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
   } finally {
     loadingExportacaoPdf.value = false;
   }
@@ -243,7 +244,7 @@ async function exportarMapaVigenteCsv() {
   try {
     await relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv(props.codUnidade);
   } catch {
-    notify(TEXTOS.relatorios.ERRO_EXPORTAR_CSV, "danger");
+    notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
   } finally {
     loadingExportacaoCsv.value = false;
   }

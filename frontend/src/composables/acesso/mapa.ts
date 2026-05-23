@@ -1,6 +1,7 @@
 import {computed, type ComputedRef} from 'vue';
 import type {PermissoesSubprocesso} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
+import {TEXTOS_SUCESSO_SUBPROCESSO} from '@/constants/textos-subprocesso';
 import type {AcaoPrincipalMapa} from './tipos';
 
 export function usarAcessoMapa(
@@ -34,7 +35,7 @@ export function usarAcessoMapa(
                 mostrar: true,
                 habilitar: permissoes.value.podeAceitarMapa && permissoes.value.habilitarAceitarMapa,
                 rotuloBotao: TEXTOS.mapa.LABEL_REGISTRAR_ACEITE,
-                mensagemSucesso: TEXTOS.sucesso.ACEITE_REGISTRADO,
+                mensagemSucesso: TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
             };
         }
 

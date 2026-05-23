@@ -76,7 +76,7 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {buscarCodigosUnidadesSemMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
 import {relatoriosService} from "@/services/relatoriosService";
-import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useNotification} from "@/composables/useNotification";
 import UnidadesSemMapaArvore from "@/components/relatorios/UnidadesSemMapaArvore.vue";
 import type {Unidade} from "@/types/tipos";
@@ -174,7 +174,7 @@ async function carregarUnidadesSemMapaVigente() {
     const unidadesExibidas = filtrarUnidadesExibidas(arvore);
 
     unidadesSemMapaVigenteArvore.value = filtrarArvoreSemMapaVigente(unidadesExibidas, codigosSemMapaVigenteSet);
-  }).catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
+  }).catch(() => notify(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"))
       .finally(() => { carregando.value = false; });
 }
 
@@ -186,7 +186,7 @@ async function visualizarRelatorio() {
 async function exportarPdf() {
   carregando.value = true;
   await relatoriosService.downloadRelatorioUnidadesSemMapasVigentesPdf()
-      .catch(() => notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger"))
+      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger"))
       .finally(() => { carregando.value = false; });
 }
 </script>

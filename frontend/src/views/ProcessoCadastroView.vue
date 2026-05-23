@@ -123,6 +123,7 @@ import {useDiagnosticoOrganizacionalAlert} from "@/composables/useDiagnosticoOrg
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useNotification} from "@/composables/useNotification";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_SUCESSO_PROCESSO} from "@/constants/textos-processo";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 
 import {useToastStore} from "@/stores/toast";
@@ -335,11 +336,11 @@ async function salvarProcesso() {
     if (processoEditando.value) {
       const request = construirAtualizarRequest(processoEditando.value.codigo);
       await processoService.atualizarProcesso(processoEditando.value.codigo, request);
-      toastStore.setPending(TEXTOS.sucesso.PROCESSO_ALTERADO);
+      toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_ALTERADO);
     } else {
       const request = construirCriarRequest();
       await processoService.criarProcesso(request);
-      toastStore.setPending(TEXTOS.sucesso.PROCESSO_CRIADO);
+      toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_CRIADO);
     }
     invalidarCachesProcesso();
     await router.push("/painel");
@@ -398,7 +399,7 @@ async function iniciarProcessoComSelecaoDireta(codigosDiretos: number[]) {
   try {
     if (!tipo.value) throw new Error("Tipo não definido");
     await processoService.iniciarProcesso(codigoProcesso, tipo.value, codigosDiretos);
-    toastStore.setPending(TEXTOS.sucesso.PROCESSO_INICIADO);
+    toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
     invalidarCachesProcesso();
     await router.push("/painel");
     mostrarModalConfirmacao.value = false;
@@ -430,7 +431,7 @@ async function confirmarRemocao() {
   const descRemovida = processoEditando.value.descricao;
   try {
     await processoService.excluirProcesso(processoEditando.value.codigo);
-    toastStore.setPending(TEXTOS.sucesso.PROCESSO_REMOVIDO(descRemovida));
+    toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_REMOVIDO(descRemovida));
     invalidarCachesProcesso();
     await router.push("/painel");
     limparCampos();

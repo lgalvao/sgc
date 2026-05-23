@@ -4,6 +4,7 @@ import {BButton, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import type {Unidade} from "@/types/tipos";
 
 interface Props {
@@ -132,7 +133,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
               data-testid="btn-mapa-exportar-csv"
               @click="$emit('exportar-csv')"
           >
-            {{ TEXTOS.relatorios.BOTAO_CSV }}
+                {{ TEXTOS_RELATORIOS.BOTAO_CSV }}
           </BDropdownItemButton>
         </BDropdown>
 

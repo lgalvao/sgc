@@ -188,6 +188,7 @@ import {normalizarErro} from "@/utils/apiError";
 import type {Analise, MapaCompleto,} from "@/types/tipos";
 import {Perfil} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {relatoriosService} from "@/services/relatoriosService";
 
 const props = defineProps<{ codProcesso: number | string; sigla: string; codSubprocesso?: number }>();
@@ -368,7 +369,7 @@ async function exportarMapaAtualPdf() {
         relatoriosService.downloadRelatorioMapaAtualPdf(codSubprocessoAtual)
     );
   } catch {
-    notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
+    notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
   } finally {
     loadingExportacaoPdf.value = false;
   }
@@ -381,7 +382,7 @@ async function exportarMapaAtualCsv() {
         relatoriosService.downloadRelatorioMapaAtualCsv(codSubprocessoAtual)
     );
   } catch {
-    notify(TEXTOS.relatorios.ERRO_EXPORTAR_CSV, "danger");
+    notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
   } finally {
     loadingExportacaoCsv.value = false;
   }

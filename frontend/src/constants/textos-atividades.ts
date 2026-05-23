@@ -1,0 +1,60 @@
+export const TEXTOS_ATIVIDADES = {
+    TITULO: "Atividades e conhecimentos",
+    CHECKBOX_DISPONIBILIZACAO_SEM_MUDANCAS: "Disponibilização sem mudanças",
+    BOTAO_IMPACTO: "Impacto no mapa",
+    BOTAO_HISTORICO: "Histórico",
+    BOTAO_IMPORTAR: "Importar",
+    BOTAO_DISPONIBILIZAR: "Disponibilizar",
+    BOTAO_DISPONIBILIZANDO: "Validando...",
+    EMPTY_TITLE: "Lista de atividades",
+    EMPTY_DESCRIPTION: "Não há atividades cadastradas. Use o campo acima para adicionar uma atividade ou importe de outro processo.",
+    MODAL_REMOVER_ATIVIDADE_TITULO: "Remover atividade",
+    MODAL_REMOVER_ATIVIDADE_TEXTO: "Confirma a remoção desta atividade e todos os conhecimentos associados?",
+    MODAL_REMOVER_CONHECIMENTO_TITULO: "Remover conhecimento",
+    MODAL_REMOVER_CONHECIMENTO_TEXTO: "Confirma a remoção deste conhecimento?",
+    ERRO_ADICIONAR: "Não foi possível adicionar atividade.",
+    ERRO_REMOVER: "Não foi possível remover o item.",
+    ERRO_SALVAR_ATIVIDADE: "Falha ao salvar edição da atividade.",
+    ERRO_ADICIONAR_CONHECIMENTO: "Falha ao adicionar conhecimento.",
+    ERRO_ATUALIZAR_CONHECIMENTO: "Falha ao atualizar conhecimento.",
+    ERRO_CADASTRO_INCOMPLETO: "Cadastro incompleto. Deve haver pelo menos uma atividade e todas devem ter conhecimentos associados.",
+    ERRO_REVISAO_SEM_ALTERACAO: "Não foram identificadas alterações no cadastro para disponibilizar. Se não houver mudanças, marque a opção 'Disponibilização sem mudanças'.",
+    SUCESSO_IMPORTACAO: "Atividades importadas",
+    AVISO_IMPORTACAO_DUPLICATAS: "Uma ou mais atividades selecionadas já existem no cadastro e não foram importadas.",
+    MODAL_DISPONIBILIZAR_TITULO: "Disponibilização do cadastro",
+    MODAL_DISPONIBILIZAR_REVISAO_TITULO: "Disponibilização da revisão do cadastro",
+    MODAL_DISPONIBILIZAR_TEXTO: "Confirma a disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades superiores.",
+    MODAL_DISPONIBILIZAR_REVISAO_TEXTO: "Confirma a disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades superiores.",
+    BOTAO_HISTORICO_ANALISE: "Histórico de análise",
+    MODAL_VALIDAR_TITULO: "Aceite do cadastro",
+    MODAL_ACEITE_REVISAO_TITULO: "Aceite da revisão do cadastro",
+    MODAL_HOMOLOGAR_TITULO: "Homologação do cadastro",
+    MODAL_VALIDAR_TEXTO: "Confirma o aceite do cadastro de atividades?",
+    MODAL_ACEITE_REVISAO_TEXTO: "Confirma o aceite da revisão do cadastro de atividades?",
+    MODAL_HOMOLOGAR_TEXTO: "Confirma a homologação do cadastro?",
+    MODAL_DEVOLVER_TITULO: "Devolução do cadastro",
+    MODAL_DEVOLVER_REVISAO_TITULO: "Devolução da revisão do cadastro",
+    MODAL_DEVOLVER_TEXTO: "Confirma a devolução do cadastro para ajustes?",
+    MODAL_DEVOLVER_REVISAO_TEXTO: "Confirma a devolução da revisão do cadastro para ajustes?",
+    ERRO_DEVOLUCAO_JUSTIFICATIVA: "A justificativa é obrigatória para a devolução.",
+    MODAL_IMPORTAR_TITULO: "Importação de atividades",
+    BOTAO_DEVOLVER: "Devolver para ajustes",
+    BOTAO_HOMOLOGAR: "Homologar",
+    importacao: {
+        NENHUM_PROCESSO: "Nenhum processo disponível para importação.",
+        NENHUMA_ATIVIDADE: "Nenhuma atividade encontrada para esta unidade/processo.",
+        SELECIONE_ATIVIDADE: "Selecione ao menos uma atividade para importar.",
+        BOTAO_SELECIONAR_TODAS: "Todas",
+        BOTAO_LIMPAR_SELECAO: "Limpar"
+    }
+} as const;
+
+export const TEXTOS_SUCESSO_ATIVIDADES = {
+    CADASTRO_ATIVIDADES_DISPONIBILIZADO: "Cadastro de atividades disponibilizado",
+    REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA: "Revisão do cadastro de atividades disponibilizada",
+} as const;
+
+export const TEXTOS_ALERTA_ATIVIDADES = {
+    SUCESSO_REVISAO_DISPONIBILIZADA: (unidade: string) => `Revisão do cadastro da unidade ${unidade} disponibilizada para análise`,
+    REVISAO_DEVOLVIDA: (unidade: string) => `Revisão do cadastro da unidade ${unidade} devolvida para ajustes`,
+} as const;

@@ -3,7 +3,7 @@
     <CarregamentoPagina v-if="carregando && relatorioAndamento.length === 0"/>
 
     <template v-else>
-      <PageHeader :title="TEXTOS.relatorios.ANDAMENTO_PROCESSO">
+      <PageHeader :title="TEXTOS_RELATORIOS.ANDAMENTO_PROCESSO">
         <template #actions>
           <BButton to="/relatorios" variant="outline-secondary">
             <i class="bi bi-arrow-left me-1"/> Voltar
@@ -38,7 +38,7 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
-import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import * as painelService from "@/services/painelService";
 import type {ProcessoResumo} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
@@ -74,7 +74,7 @@ const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(ite
 }));
 
 const opcoesProcessos = computed(() => [
-  {value: null, text: TEXTOS.relatorios.SELECIONE},
+  {value: null, text: TEXTOS_RELATORIOS.SELECIONE},
   ...processosDisponiveis.value.map(p => ({value: p.codigo, text: p.descricao}))
 ]);
 
@@ -91,7 +91,7 @@ async function gerarRelatorio() {
   if (!codProcessoSelecionado.value) return;
   carregando.value = true;
   await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value)
-      .catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
+      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"))
       .finally(() => { carregando.value = false; });
 }
 
@@ -99,7 +99,7 @@ async function exportarPdf() {
   if (!codProcessoSelecionado.value) return;
   carregando.value = true;
   await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value)
-      .catch(() => notify(TEXTOS.relatorios.ERRO_EXPORTAR, "danger"))
+      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger"))
       .finally(() => { carregando.value = false; });
 }
 

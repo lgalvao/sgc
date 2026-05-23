@@ -50,7 +50,7 @@ import RelatorioMapasFiltros from "@/components/relatorios/RelatorioMapasFiltros
 import RelatorioMapaVigenteCard from "@/components/relatorios/RelatorioMapaVigenteCard.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {usePerfilStore} from "@/stores/perfil";
-import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {Perfil, type Unidade} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
 import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
@@ -138,7 +138,7 @@ async function exportarPdf() {
   if (!temUnidadesSelecionadas.value) return;
   carregando.value = true;
   await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value)
-      .catch(() => notify(TEXTOS.relatorios.ERRO_GERAR, "danger"))
+      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_GERAR, "danger"))
       .finally(() => { carregando.value = false; });
 }
 
@@ -146,7 +146,7 @@ async function gerarRelatorio() {
   if (!temUnidadesSelecionadas.value) return;
   carregando.value = true;
   await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value)
-      .catch(() => notify(TEXTOS.relatorios.ERRO_BUSCA, "danger"))
+      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"))
       .finally(() => { carregando.value = false; });
 }
 

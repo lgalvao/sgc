@@ -6,6 +6,8 @@ import {useToastStore} from "@/stores/toast";
 import {useRouter} from "vue-router";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_SUCESSO_ATIVIDADES} from "@/constants/textos-atividades";
+import {TEXTOS_SUCESSO_SUBPROCESSO} from "@/constants/textos-subprocesso";
 import type {AceitarCadastroRequest, DevolverCadastroRequest, HomologarCadastroRequest,} from "@/types/tipos";
 
 interface WorkflowOptions {
@@ -81,7 +83,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.disponibilizarCadastro(codigoSubprocesso),
             {
-                mensagemSucesso: TEXTOS.sucesso.CADASTRO_ATIVIDADES_DISPONIBILIZADO,
+                mensagemSucesso: TEXTOS_SUCESSO_ATIVIDADES.CADASTRO_ATIVIDADES_DISPONIBILIZADO,
                 redirecionarParaPainel: true,
                 invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
@@ -92,7 +94,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.disponibilizarRevisaoCadastro(codigoSubprocesso),
             {
-                mensagemSucesso: TEXTOS.sucesso.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA,
+                mensagemSucesso: TEXTOS_SUCESSO_ATIVIDADES.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA,
                 redirecionarParaPainel: true,
                 invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
@@ -121,7 +123,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.devolverCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: TEXTOS.sucesso.DEVOLUCAO_REALIZADA,
+                mensagemSucesso: TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA,
                 redirecionarParaPainel: true,
                 invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
@@ -132,7 +134,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.devolverRevisaoCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: TEXTOS.sucesso.DEVOLUCAO_REALIZADA,
+                mensagemSucesso: TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA,
                 redirecionarParaPainel: true,
                 invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
@@ -145,7 +147,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.aceitarCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.ACEITE_REGISTRADO,
+                mensagemSucesso: options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
                 invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
@@ -158,7 +160,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.aceitarRevisaoCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.ACEITE_REGISTRADO,
+                mensagemSucesso: options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
                 redirecionarParaPainel: true,
                 invalidarCaches: {incluirPainel: true, incluirMapas: true, codigoSubprocessoMapa: codigoSubprocesso}
             }
@@ -174,7 +176,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.homologarCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA,
+                mensagemSucesso: options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.HOMOLOGACAO_EFETIVADA,
                 redirecionarParaPainel,
                 redirecionarPara: options?.redirecionarPara,
                 invalidarCaches: redirecionarParaPainel
@@ -193,7 +195,7 @@ export function useFluxoSubprocesso() {
         return executarAcaoWorkflow(
             () => cadastroService.homologarRevisaoCadastro(codigoSubprocesso, req),
             {
-                mensagemSucesso: options?.mensagemSucesso || TEXTOS.sucesso.HOMOLOGACAO_EFETIVADA,
+                mensagemSucesso: options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.HOMOLOGACAO_EFETIVADA,
                 redirecionarParaPainel,
                 redirecionarPara: options?.redirecionarPara,
                 invalidarCaches: redirecionarParaPainel

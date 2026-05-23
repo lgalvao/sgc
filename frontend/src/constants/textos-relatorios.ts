@@ -1,0 +1,16 @@
+export const TEXTOS_RELATORIOS = {
+    TITULO: "Relatórios",
+    ANDAMENTO_PROCESSO: "Andamento de processo",
+    LABEL_SELECIONE_PROCESSO: "Processo",
+    LABEL_SELECIONE_UNIDADE: "Unidade",
+    BOTAO_GERAR: "Gerar",
+    BOTAO_PDF: "Gerar",
+    BOTAO_CSV: "CSV",
+    BOTAO_GERAR_PDF: "Gerar",
+    SELECIONE: "Selecione...",
+    TODAS_UNIDADES: "Todas",
+    ERRO_BUSCA: "Erro ao buscar relatório",
+    ERRO_EXPORTAR: "Erro ao exportar PDF",
+    ERRO_EXPORTAR_CSV: "Erro ao exportar CSV",
+    ERRO_GERAR: "Erro ao gerar PDF",
+} as const;

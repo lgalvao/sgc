@@ -6,6 +6,7 @@ import {useToastStore} from "@/stores/toast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_SUCESSO_PROCESSO} from "@/constants/textos-processo";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import * as processoService from "@/services/processo";
 import {obterIdBotaoAcaoProcesso, obterTestIdBotaoAcaoProcesso} from "@/components/processo/processoAcoes";
@@ -75,7 +76,7 @@ export function useProcessoAcoes({
         try {
             limparErro();
             await processoService.finalizarProcesso(codProcesso);
-            toastStore.setPending(TEXTOS.sucesso.PROCESSO_FINALIZADO);
+            toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
             invalidarCachesProcesso();
             processo.value = null;
             historicoStore.invalidar();

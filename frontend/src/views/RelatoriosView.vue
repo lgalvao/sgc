@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.relatorios.TITULO"/>
+    <PageHeader :title="TEXTOS_RELATORIOS.TITULO"/>
 
     <BRow>
       <BCol class="mb-4" md="4">
@@ -16,7 +16,7 @@
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
               <i aria-hidden="true" class="bi bi-bar-chart-steps text-primary flex-shrink-0 mt-1"></i>
-              <span class="lh-sm">{{ TEXTOS.relatorios.ANDAMENTO_PROCESSO }}</span>
+              <span class="lh-sm">{{ TEXTOS_RELATORIOS.ANDAMENTO_PROCESSO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
               Situação das unidades participantes em um processo ativo
@@ -77,7 +77,7 @@ import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
-import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil} from "@/types/tipos";
 

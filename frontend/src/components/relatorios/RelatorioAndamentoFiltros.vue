@@ -3,7 +3,7 @@
     <div class="d-flex flex-column gap-3">
       <BFormGroup label-for="select-processo">
         <template #label>
-          {{ TEXTOS.relatorios.LABEL_SELECIONE_PROCESSO }}
+          {{ TEXTOS_RELATORIOS.LABEL_SELECIONE_PROCESSO }}
         </template>
         <BFormSelect
             id="select-processo"
@@ -41,7 +41,7 @@
 
 <script lang="ts" setup>
 import {BButton, BCard, BFormGroup, BFormSelect, BSpinner} from "bootstrap-vue-next";
-import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 
 interface OpcaoProcesso {
   value: number | null;

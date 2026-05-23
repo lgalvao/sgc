@@ -1,6 +1,8 @@
 import type {ComputedRef, Ref} from "vue";
 import type {Analise} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
+import {TEXTOS_SUCESSO_SUBPROCESSO} from "@/constants/textos-subprocesso";
 import type {VarianteAlerta} from "@/composables/useNotification";
 import logger from "@/utils/logger";
 
@@ -93,7 +95,7 @@ export function useMapaAnaliseFluxo({
         if (!codigo) return;
         await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_VALIDAR, async () => {
             await validarMapa(codigo);
-            await concluirAcaoPainel(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
+            await concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
         });
     }
 
@@ -120,7 +122,7 @@ export function useMapaAnaliseFluxo({
         if (!codigo) return;
         await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_DEVOLVER, async () => {
             await devolverMapa(codigo, {justificativa: observacaoDevolucao.value});
-            await concluirAcaoPainel(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
+            await concluirAcaoPainel(TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
         });
     }
 
