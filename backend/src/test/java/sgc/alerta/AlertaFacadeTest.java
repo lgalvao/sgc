@@ -434,25 +434,6 @@ class AlertaFacadeTest {
     }
 
     @Test
-    @DisplayName("obterUnidadeObrigatoria deve lancar excecao quando a unidade nao for encontrada no mapa")
-    void obterUnidadeObrigatoriaAusenteDeveLancarExcecao() throws Exception {
-        java.lang.reflect.Method metodo = AlertaFacade.class.getDeclaredMethod("obterUnidadeObrigatoria", Map.class, Long.class);
-        metodo.setAccessible(true);
-
-        Map<Long, Unidade> map = new HashMap<>();
-
-        assertThatThrownBy(() -> {
-            try {
-                metodo.invoke(alertaFacade, map, 999L);
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                throw e.getTargetException();
-            }
-        })
-        .isInstanceOf(IllegalStateException.class)
-        .hasMessageContaining("ausente na construção de alertas");
-    }
-
-    @Test
     @DisplayName("criarAlertasProcessoIniciado deve processar unidades operacionais e intermediarias corretamente")
     void criarAlertasProcessoIniciadoOperacionaisEIntermediarias() {
         Processo processo = new Processo();

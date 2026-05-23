@@ -13,6 +13,7 @@ import sgc.subprocesso.model.*;
 
 import java.time.*;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -178,5 +179,83 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/mapa-completo", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.atividades").isArray());
+    }
+
+    @Test
+    @DisplayName("CHEFE deve listar atividades para importação de subprocesso finalizado")
+    @WithMockChefe
+    void listarAtividadesParaImportacao_chefe_sucesso() throws Exception {
+        Processo processoFinalizado = ProcessoFixture.processoPadrao();
+        processoFinalizado.setCodigo(null);
+        processoFinalizado.setDescricao("Processo finalizado para importação");
+        processoFinalizado.setSituacao(SituacaoProcesso.FINALIZADO);
+        processoFinalizado.setDataFinalizacao(LocalDateTime.now().minusDays(1));
+        processoFinalizado.adicionarParticipantes(java.util.Set.of(unidade102));
+        processoFinalizado = processoRepo.save(processoFinalizado);
+
+        Subprocesso subprocessoFinalizado = SubprocessoFixture.novoSubprocesso(processoFinalizado, unidade102);
+        subprocessoFinalizado.setCodigo(null);
+        subprocessoFinalizado.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+        subprocessoFinalizado = subprocessoRepo.save(subprocessoFinalizado);
+
+        Mapa mapaFinalizado = new Mapa();
+        mapaFinalizado.setSubprocesso(subprocessoFinalizado);
+        mapaFinalizado = mapaRepo.save(mapaFinalizado);
+
+        subprocessoFinalizado.setMapa(mapaFinalizado);
+        subprocessoFinalizado = subprocessoRepo.saveAndFlush(subprocessoFinalizado);
+
+        Atividade atividade = AtividadeFixture.atividadePadrao(mapaFinalizado);
+        atividade.setDescricao("Atividade pronta para importação");
+        atividadeRepo.saveAndFlush(atividade);
+        registrarMovimentacaoInicial(subprocessoFinalizado);
+
+        String corpo = mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/atividades-importacao", subprocessoFinalizado.getCodigo()))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(corpo).contains("Atividade pronta para importação");
+    }
+
+    @Test
+    @DisplayName("CHEFE deve obter sugestões do subprocesso")
+    @WithMockChefe
+    void obterSugestoes_chefe_sucesso() throws Exception {
+        mapa.setSugestoes("Sugestão de integração do subprocesso");
+        mapaRepo.saveAndFlush(mapa);
+
+        String corpo = mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/sugestoes", subprocesso.getCodigo()))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(objectMapper.readTree(corpo).get("sugestoes").stringValue()).isEqualTo("Sugestão de integração do subprocesso");
+    }
+
+    @Test
+    @DisplayName("CHEFE deve obter histórico de validação")
+    @WithMockChefe
+    void obterHistoricoValidacao_chefe_sucesso() throws Exception {
+        entityManager.persist(Analise.builder()
+                .tipo(TipoAnalise.VALIDACAO)
+                .subprocesso(subprocesso)
+                .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
+                .dataHora(LocalDateTime.now())
+                .unidadeCodigo(unidade102.getCodigo())
+                .usuarioTitulo("111111111111")
+                .observacoes("Validação concluída")
+                .build());
+        entityManager.flush();
+
+        String corpo = mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/historico-validacao", subprocesso.getCodigo()))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(corpo).contains("Validação concluída", "ACEITE_MAPEAMENTO");
     }
 }
