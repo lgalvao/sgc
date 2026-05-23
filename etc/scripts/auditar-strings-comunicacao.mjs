@@ -14,6 +14,7 @@ const arquivos = [
     path.join(raiz, 'backend/src/main/java/sgc/processo/service/ProcessoService.java'),
     path.join(raiz, 'backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java'),
     ...listarArquivos(path.join(raiz, 'backend/src/test/java/sgc/integracao'), /(CDU\d+IntegrationTest\.java|EmailModelosRenderIntegrationTest\.java)$/),
+    path.join(raiz, 'backend/src/test/java/sgc/alerta/notificacao/EmailModelosServiceTest.java'),
     ...listarArquivos(path.join(raiz, 'e2e'), /cdu-\d+\.spec\.ts$/),
     ...listarArquivos(path.join(raiz, 'etc/reqs'), /^cdu-\d+\.md$/)
 ].filter(caminho => !caminho.includes(`${path.sep}etc${path.sep}reqs${path.sep}diagnostico${path.sep}`));
@@ -130,6 +131,7 @@ function extrairReferenciasTextosAlerta(linha) {
 function extrairLiteraisLinha(linha) {
     const literais = [
         ...linha.matchAll(/"([^"\n]{6,})"/g),
+        ...linha.matchAll(/'([^'\n]{6,})'/g),
         ...linha.matchAll(/`([^`\n]{6,})`/g)
     ].map(match => match[1].trim());
     return literais.filter(Boolean);
@@ -138,7 +140,7 @@ function extrairLiteraisLinha(linha) {
 function pareceComunicacao(valor) {
     if (valor.length < 12) return false;
     if (/^[A-Z0-9_ -]+$/.test(valor) && !valor.includes('SGC:')) return false;
-    return /(SGC:|cadastro.+(analise|ajustes|reabert|homolog|disponibil)|revis[aã]o.+(analise|ajustes|reabert|disponibil)|mapa.+(analise|ajustes|homolog|disponibil|sugest|valida)|lembrete de prazo|finaliza[cç][aã]o do processo|in[ií]cio de processo|atribui[cç][aã]o de perfil|submetid[oa] para an[aá]lise|devolvid[oa] para ajustes|reabert[oa] para ajustes)/i.test(valor);
+    return /(SGC:|cadastro.+(analise|ajustes|reabert|homolog|disponibil)|revis(?:[aã]o|[õo]es).+(analise|ajustes|reabert|disponibil)|mapa.+(analise|ajustes|homolog|disponibil|sugest|valida)|lembrete de prazo|finaliza[cç][aã]o do processo|in[ií]cio de processo|atribui[cç][aã]o de perfil|submetid[oa]s? para an[aá]lise|devolvid[oa]s? para ajustes|reabert[oa]s? para ajustes)/i.test(valor);
 }
 
 function criarEntrada(arquivo, linha, origem, tipo, valor, chave = null) {

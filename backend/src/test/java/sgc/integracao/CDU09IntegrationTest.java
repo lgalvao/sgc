@@ -1,7 +1,6 @@
 package sgc.integracao;
 
 import jakarta.persistence.*;
-import org.awaitility.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
@@ -120,12 +119,14 @@ class CDU09IntegrationTest extends BaseIntegrationTest {
         aguardarEmail(1);
 
         final Long processoCodigo = spEtapa3.getProcesso().getCodigo();
-        Awaitility.await()
-                .atMost(Duration.ofSeconds(5))
-                .untilAsserted(() -> {
-                    var alertas = alertaRepo.findByProcessoCodigo(processoCodigo);
-                    assertThat(alertas.stream().anyMatch(a -> a.getUnidadeDestino() != null && a.getUnidadeDestino().getCodigo() == 6L)).isTrue();
-                });
+        entityManager.flush();
+        entityManager.clear();
+        var alertas = alertaRepo.findByProcessoCodigo(processoCodigo);
+        assertThat(alertas).anySatisfy(alerta -> {
+            assertThat(alerta.getUnidadeDestino()).isNotNull();
+            assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(6L);
+            assertThat(alerta.getDescricao()).isEqualTo(Mensagens.ALERTA_CADASTRO_DISPONIBILIZADO.formatted("SEDESENV"));
+        });
 
         List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_DISPONIBILIZADO)

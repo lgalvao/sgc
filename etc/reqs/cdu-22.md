@@ -52,14 +52,16 @@
    8.3. Registra internamente um alerta:
 
     - `Data/hora`: [Data/hora atual]
-    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+    - `Descrição`: para processos de mapeamento, "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+    - `Descrição`: para processos de revisão, "Revisão do cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
     - `Processo`: [DESCRIÇÃO_PROCESSO]
     - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-   8.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, seguindo este modelo:
+   8.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, seguindo o modelo correspondente ao tipo do processo:
 
     ```text
+    Para processos de mapeamento:
     Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
@@ -67,16 +69,35 @@
     O cadastro de atividades e conhecimentos da sua unidade no processo [DESCRIÇÃO_PROCESSO] foi aceito e submetido para análise pela unidade superior imediata.
 
     Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+
+    Para processos de revisão:
+    Assunto: SGC: Revisão do cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+
+    A revisão do cadastro de atividades e conhecimentos da sua unidade no processo [DESCRIÇÃO_PROCESSO] foi aceita e submetida para análise pela unidade superior imediata.
+
+    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-   8.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e, para cada unidade superior imediata que tenha ao menos uma subordinada direta selecionada, envia uma única notificação consolidada por e-mail, seguindo este modelo:
+   8.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e, para cada unidade superior imediata que tenha ao menos uma subordinada direta selecionada, envia uma única notificação consolidada por e-mail, seguindo o modelo correspondente ao tipo do processo:
 
     ```text
+    Para processos de mapeamento:
     Assunto: SGC: Cadastros de atividades e conhecimentos submetidos para análise
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
 
     Os cadastros de atividades e conhecimentos das unidades [LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS] no processo [DESCRIÇÃO_PROCESSO] foram submetidos para análise por essa unidade.
+
+    As análises já podem ser realizadas no Sistema de Gestão de Competências ([URL_SISTEMA]).
+
+    Para processos de revisão:
+    Assunto: SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+
+    As revisões de cadastro de atividades e conhecimentos das unidades [LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS] no processo [DESCRIÇÃO_PROCESSO] foram submetidas para análise por essa unidade.
 
     As análises já podem ser realizadas no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
