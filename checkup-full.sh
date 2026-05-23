@@ -45,8 +45,7 @@ fi
 
 invoke_passo 'Atualizar branch local' git pull
 invoke_passo 'npm install' npm install --prefix etc/scripts --silent && npm install --silent && npm install --prefix frontend --silent 
-invoke_passo 'npm update' npm update --prefix etc/scripts --silent && npm update --silent && npm update --prefix frontend --silent 
-invoke_passo 'Lint raiz' npm run lint 
+invoke_passo 'Lint raiz' npm run lint
 invoke_passo 'Typecheck raiz' npm run typecheck
 invoke_passo 'Testes scripts' npm --prefix etc/scripts run test
 invoke_passo 'Testes frontend' npm --prefix frontend run test

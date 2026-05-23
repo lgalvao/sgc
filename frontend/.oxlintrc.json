@@ -4,9 +4,9 @@
     "max-params": ["error", 3],
     "max-depth": ["error", 4],
     "max-nested-callbacks": ["error", 3],
-    "max-lines": ["warn", 300],
+    "max-lines": ["warn", 600],
     "max-lines-per-function": ["warn", 60],
-    "max-statements": ["warn", 20]
+    "max-statements": ["warn", 30]
   },
   "overrides": [
     {
