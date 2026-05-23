@@ -35,6 +35,7 @@ graph TD
 | Caminho | Papel |
 |---|---|
 | `sgc.js` | roteador principal da CLI |
+| `*.mjs` (raiz) | auditorias transversais de comunicação, templates e notificações |
 | `lib/` | infraestrutura compartilhada, execução, paths, saída e utilidades |
 | `backend/` | comandos de cobertura, testes e higiene Java |
 | `frontend/` | comandos de cobertura, mensagens, validações, test ids e cruft |
@@ -52,6 +53,7 @@ graph TD
 ```bash
 node etc/scripts/sgc.js backend cobertura auditoria
 node etc/scripts/sgc.js backend cobertura jornada
+node etc/scripts/sgc.js backend cobertura cruzada
 node etc/scripts/sgc.js backend testes analisar
 node etc/scripts/sgc.js backend testes priorizar
 node etc/scripts/sgc.js backend testes gerar-stub
@@ -72,6 +74,7 @@ node etc/scripts/sgc.js frontend cruft validar
 node etc/scripts/sgc.js frontend views validacoes-auditar
 node etc/scripts/sgc.js frontend test-ids listar
 node etc/scripts/sgc.js frontend test-ids listar-duplicados
+node etc/scripts/sgc.js frontend test-ids duplicados
 node etc/scripts/sgc.js frontend telas capturar
 node etc/scripts/sgc.js frontend a11y auditar
 node etc/scripts/sgc.js frontend a11y crawler
@@ -90,6 +93,14 @@ node etc/scripts/sgc.js codigo nomes auditar-consistencia
 
 ```bash
 node etc/scripts/sgc.js e2e limpar
+```
+
+### Comunicação
+
+```bash
+node etc/scripts/sgc.js comunicacao cobertura-notificacoes
+node etc/scripts/sgc.js comunicacao strings
+node etc/scripts/sgc.js comunicacao templates-email
 ```
 
 ### QA

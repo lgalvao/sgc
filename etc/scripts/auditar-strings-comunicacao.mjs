@@ -68,41 +68,41 @@ function extrairEntradasArquivo(caminho) {
     const texto = fs.readFileSync(caminho, 'utf8');
     const relativas = path.relative(raiz, caminho);
     const linhas = texto.split('\n');
-    const entradas = [];
+    const entradasExtraidas = [];
 
     linhas.forEach((linha, indice) => {
         const numeroLinha = indice + 1;
         const textoRequisito = extrairAssuntoRequisito(linha);
         if (textoRequisito) {
-            entradas.push(criarEntrada(relativas, numeroLinha, 'requisito', 'assunto', textoRequisito));
+            entradasExtraidas.push(criarEntrada(relativas, numeroLinha, 'requisito', 'assunto', textoRequisito));
         }
 
         if (relativas.endsWith('Mensagens.java')) {
             const constante = extrairConstanteMensagens(linha);
             if (constante) {
-                entradas.push(criarEntrada(relativas, numeroLinha, 'producao', constante.tipo, constante.valor, constante.nome));
+                entradasExtraidas.push(criarEntrada(relativas, numeroLinha, 'producao', constante.tipo, constante.valor, constante.nome));
             }
         }
 
         for (const nomeConstante of extrairReferenciasMensagens(linha)) {
             const constante = mapaMensagens.get(nomeConstante);
             if (!constante) continue;
-            entradas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), constante.tipo, constante.valor, nomeConstante));
+            entradasExtraidas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), constante.tipo, constante.valor, nomeConstante));
         }
 
         for (const nomeConstante of extrairReferenciasTextosAlerta(linha)) {
             const valor = mapaTextosAlerta.get(nomeConstante);
             if (!valor) continue;
-            entradas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), 'alerta', valor, `TEXTOS.alerta.${nomeConstante}`));
+            entradasExtraidas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), 'alerta', valor, `TEXTOS.alerta.${nomeConstante}`));
         }
 
         for (const literal of extrairLiteraisLinha(linha)) {
             if (!pareceComunicacao(literal)) continue;
-            entradas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), 'literal', literal));
+            entradasExtraidas.push(criarEntrada(relativas, numeroLinha, tipoOrigem(relativas), 'literal', literal));
         }
     });
 
-    return deduplicarEntradasMesmaLinha(entradas);
+    return deduplicarEntradasMesmaLinha(entradasExtraidas);
 }
 
 function extrairAssuntoRequisito(linha) {
@@ -153,9 +153,9 @@ function criarEntrada(arquivo, linha, origem, tipo, valor, chave = null) {
     };
 }
 
-function deduplicarEntradasMesmaLinha(entradas) {
+function deduplicarEntradasMesmaLinha(listaEntradas) {
     const vistos = new Set();
-    return entradas.filter(entrada => {
+    return listaEntradas.filter(entrada => {
         const chave = `${entrada.arquivo}:${entrada.linha}:${entrada.tipo}:${entrada.valor}`;
         if (vistos.has(chave)) return false;
         vistos.add(chave);
@@ -163,9 +163,9 @@ function deduplicarEntradasMesmaLinha(entradas) {
     });
 }
 
-function agruparPorFamilia(entradas) {
+function agruparPorFamilia(listaEntradas) {
     const mapa = new Map();
-    for (const entrada of entradas) {
+    for (const entrada of listaEntradas) {
         if (!entrada.familia) continue;
         if (!mapa.has(entrada.familia)) {
             mapa.set(entrada.familia, []);
@@ -184,22 +184,22 @@ function resumirGrupo(familia, itens) {
     const arquivosTeste = new Set(itens.filter(item => item.origem === 'teste').map(item => item.arquivo));
     const arquivosRequisito = new Set(itens.filter(item => item.origem === 'requisito').map(item => item.arquivo));
     const tipos = [...new Set(itens.map(item => item.tipo))].sort();
-    const suspeitas = [];
+    const listaSuspeitas = [];
 
     if (variantes.length > 1 && arquivosProducao.size > 1) {
-        suspeitas.push('variantes em producao');
+        listaSuspeitas.push('variantes em producao');
     }
     if (arquivosProducao.size > 1) {
-        suspeitas.push('duplicada em multiplos arquivos de producao');
+        listaSuspeitas.push('duplicada em multiplos arquivos de producao');
     }
     if (arquivosProducao.size > 0 && arquivosRequisito.size === 0 && tipos.includes('assunto')) {
-        suspeitas.push('assunto sem lastro explicito em requisito');
+        listaSuspeitas.push('assunto sem lastro explicito in requisito');
     }
     if (arquivosProducao.size > 0 && arquivosTeste.size === 0 && (tipos.includes('assunto') || tipos.includes('alerta'))) {
-        suspeitas.push('sem cobertura textual em teste');
+        listaSuspeitas.push('sem cobertura textual em teste');
     }
     if (arquivosRequisito.size > 0 && arquivosProducao.size === 0 && tipos.includes('assunto')) {
-        suspeitas.push('assunto so em requisito');
+        listaSuspeitas.push('assunto so em requisito');
     }
 
     const amostra = itens[0];
@@ -216,7 +216,7 @@ function resumirGrupo(familia, itens) {
         resumo,
         variantes,
         origens,
-        suspeitas
+        suspeitas: listaSuspeitas
     };
 }
 
@@ -264,7 +264,7 @@ function argumentoOpcional(flag) {
 
 function criarEntradasSinteticasAssuntosCatalogo() {
     const arquivo = 'backend/src/main/java/sgc/alerta/AssuntosNotificacao.java';
-    const entradas = [];
+    const entradasSinteticas = [];
     const assuntos = [
         'SGC: Início de processo de mapeamento de competências',
         'SGC: Início de processo de mapeamento de competências em unidades subordinadas',
@@ -296,9 +296,9 @@ function criarEntradasSinteticasAssuntosCatalogo() {
     ];
 
     assuntos.forEach((assunto, indice) => {
-        entradas.push(criarEntrada(arquivo, indice + 1, 'producao', 'assunto', assunto, 'CATALOGO_ASSUNTO'));
+        entradasSinteticas.push(criarEntrada(arquivo, indice + 1, 'producao', 'assunto', assunto, 'CATALOGO_ASSUNTO'));
     });
-    return entradas;
+    return entradasSinteticas;
 }
 
 function carregarMapaMensagens(caminho) {

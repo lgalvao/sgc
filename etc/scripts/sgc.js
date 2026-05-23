@@ -35,6 +35,7 @@ const backend = program.command("backend").description("Ferramentas do backend."
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
 criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "etc/scripts/backend/cobertura-auditoria.js");
 criarComandoScript(backendCobertura, "jornada", "Executa a jornada consolidada de cobertura do backend.", "etc/scripts/backend/cobertura-jornada.js");
+criarComandoScript(backendCobertura, "cruzada", "Auditoria de cobertura cruzada e independente (Backend).", "etc/scripts/backend/cobertura-cruzada.js");
 
 const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
 criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "etc/scripts/backend/testes-analisar.js");
@@ -68,6 +69,7 @@ criarComandoScript(frontendViews, "auditar-validacoes", "Alias legado para 'vali
 const frontendTestIds = frontend.command("test-ids").description("Ferramentas para atributos data-test.");
 criarComandoScript(frontendTestIds, "listar", "Lista data-test do frontend.", "etc/scripts/frontend/test-ids-listar.js");
 criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplicados.", "etc/scripts/frontend/test-ids-listar-duplicados.js");
+criarComandoScript(frontendTestIds, "duplicados", "Alias legado para 'listar-duplicados'.", "etc/scripts/legado/frontend/test-ids-duplicados.js");
 
 const frontendTelas = frontend.command("telas").description("Ferramentas de captura e apoio visual.");
 criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "etc/scripts/frontend/telas-capturar.js");
@@ -87,6 +89,11 @@ criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e ca
 
 const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
 criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");
+
+const comunicacao = program.command("comunicacao").description("Ferramentas de auditoria de comunicacao, templates e notificacoes.");
+criarComandoScript(comunicacao, "cobertura-notificacoes", "Audita a cobertura de testes de notificacoes e modelos de email.", "etc/scripts/auditar-cobertura-notificacoes.mjs");
+criarComandoScript(comunicacao, "strings", "Audita consistência de mensagens de comunicação entre backend e frontend.", "etc/scripts/auditar-strings-comunicacao.mjs");
+criarComandoScript(comunicacao, "templates-email", "Audita consistência de variáveis nos templates de email HTML do backend.", "etc/scripts/auditar-templates-email.mjs");
 
 const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
 const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");

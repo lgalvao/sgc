@@ -669,4 +669,50 @@ describe("CLI raiz do toolkit", () => {
         expect(await fs.pathExists(DIRETORIO_SCRIPTS_BACKEND_LEGADO)).toBe(false);
         expect(await fs.pathExists(DIRETORIO_SCRIPTS_FRONTEND_LEGADO)).toBe(false);
     });
+
+    test("exibe ajuda do comando de cobertura cruzada do backend", async () => {
+        const resultado = await executarSgc(["backend", "cobertura", "cruzada", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Auditoria de cobertura cruzada e independente (Backend).");
+    });
+
+    test("exibe ajuda do alias de test-ids duplicados do frontend", async () => {
+        const resultado = await executarSgc(["frontend", "test-ids", "duplicados", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Alias legado para 'listar-duplicados'.");
+    });
+
+    test("exibe ajuda dos novos comandos de comunicacao", async () => {
+        const resultado = await executarSgc(["comunicacao", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("cobertura-notificacoes");
+        expect(resultado.stdout).toContain("strings");
+        expect(resultado.stdout).toContain("templates-email");
+    });
+
+    test("exibe ajuda do comando de auditar-null do java", async () => {
+        const resultado = await executarSgc(["backend", "java", "auditar-null", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Audita verificacoes de null no backend");
+    });
+
+    test("projeto doctor identifica corretamente a ausência de arquivos essenciais e falha com código 1", async () => {
+        const diretorioVazio = await mkdtemp(path.join(os.tmpdir(), "sgc-doctor-vazio-"));
+
+        // Executamos o doctor passando o diretório temporário vazio como base
+        const resultado = await executarSgc(["projeto", "doctor", "--json", "--base", diretorioVazio]);
+
+        // Como arquivos essenciais como gradlew e package.json estão ausentes, deve retornar código de erro 1
+        expect(resultado.exitCode).toBe(1);
+
+        const dados = JSON.parse(resultado.stdout);
+        expect(dados.statusGeral).toBe("falha");
+        expect(dados.totais.falha).toBeGreaterThan(0);
+
+        // Verifica se um dos arquivos obrigatórios ausentes foi reportado como falha
+        const falhaGradlew = dados.verificacoes.find((v) => v.nome === "gradlew");
+        expect(falhaGradlew).toBeDefined();
+        expect(falhaGradlew.status).toBe("falha");
+        expect(falhaGradlew.detalhe).toContain("gradlew ausente");
+    });
 });
