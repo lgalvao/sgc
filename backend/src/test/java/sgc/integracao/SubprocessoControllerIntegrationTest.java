@@ -44,6 +44,7 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
         processo = ProcessoFixture.processoEmAndamento();
         processo.setCodigo(null);
         processo.setDescricao("Processo SubprocessoController Test");
+        processo.adicionarParticipantes(java.util.Set.of(unidade102));
         processo = processoRepo.save(processo);
 
         // Cria subprocesso na unidade 102
@@ -80,8 +81,8 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void obterPorCodigo_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{codSubprocesso}", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigo").value(subprocesso.getCodigo()))
-                .andExpect(jsonPath("$.unidadeSigla").value("U102"));
+                .andExpect(jsonPath("$.subprocesso.codigo").value(subprocesso.getCodigo()))
+                .andExpect(jsonPath("$.subprocesso.unidadeSigla").value("SUB-UNIT"));
     }
 
     @Test
@@ -100,7 +101,7 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void buscarPorProcessoEUnidade_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/buscar")
                         .param("codProcesso", processo.getCodigo().toString())
-                        .param("siglaUnidade", "U102"))
+                        .param("siglaUnidade", "SUB-UNIT"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codigo").value(subprocesso.getCodigo()));
     }
@@ -111,7 +112,7 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void obterContextoEdicao_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/contexto-edicao", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigoSubprocesso").value(subprocesso.getCodigo()));
+                .andExpect(jsonPath("$.subprocesso.codigo").value(subprocesso.getCodigo()));
     }
 
     @Test
@@ -120,7 +121,7 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void obterContextoCadastroAtividades_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/contexto-cadastro-atividades", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigoSubprocesso").value(subprocesso.getCodigo()));
+                .andExpect(jsonPath("$.detalhes.subprocesso.codigo").value(subprocesso.getCodigo()));
     }
 
     @Test
@@ -129,9 +130,9 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void obterContextoEdicaoPorProcessoEUnidade_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")
                         .param("codProcesso", processo.getCodigo().toString())
-                        .param("siglaUnidade", "U102"))
+                        .param("siglaUnidade", "SUB-UNIT"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigoSubprocesso").value(subprocesso.getCodigo()));
+                .andExpect(jsonPath("$.subprocesso.codigo").value(subprocesso.getCodigo()));
     }
 
     @Test
@@ -140,9 +141,9 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void obterContextoCadastroPorProcessoEUnidade_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/contexto-cadastro-atividades/buscar")
                         .param("codProcesso", processo.getCodigo().toString())
-                        .param("siglaUnidade", "U102"))
+                        .param("siglaUnidade", "SUB-UNIT"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.codigoSubprocesso").value(subprocesso.getCodigo()));
+                .andExpect(jsonPath("$.detalhes.subprocesso.codigo").value(subprocesso.getCodigo()));
     }
 
     @Test
@@ -151,7 +152,7 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void validarCadastro_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/validar-cadastro", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.atividadesSemConhecimento").isArray());
+                .andExpect(jsonPath("$.valido").isBoolean());
     }
 
     @Test
@@ -169,7 +170,7 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     void obterMapaParaVisualizacao_chefe_sucesso() throws Exception {
         mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/mapa-visualizacao", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.siglaUnidade").value("U102"));
+                .andExpect(jsonPath("$.unidade.sigla").value("SUB-UNIT"));
     }
 
     @Test
