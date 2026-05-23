@@ -167,4 +167,25 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
         assertThat(atualizado.getDataFinalizacao()).isNotNull();
     }
+
+    @Test
+    @DisplayName("Deve finalizar processo DIAGNOSTICO sem tornar mapas vigentes")
+    void deveFinalizarProcessoDiagnostico() throws Exception {
+        processo.setTipo(TipoProcesso.DIAGNOSTICO);
+        processoRepo.save(processo);
+
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocessoRepo.save(subprocesso);
+
+        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Processo atualizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
+        assertThat(atualizado.getDataFinalizacao()).isNotNull();
+        // DIAGNOSTICO não torna mapas vigentes
+        assertThat(unidadeMapaRepo.findById(unidade.getCodigo())).isEmpty();
+    }
 }

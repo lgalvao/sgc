@@ -378,16 +378,42 @@ class CadastroFluxoServiceTest {
 
         assertThatThrownBy(() -> service.homologar(100L, "Obs"))
                 .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
-    }    @Test
-    @DisplayName("normalizarTexto deve tratar strings corretamente")
-    void normalizarTextoDeveTratarStringsCorretamente() throws Exception {
-        java.lang.reflect.Method metodo = CadastroFluxoService.class.getDeclaredMethod("normalizarTexto", String.class);
-        metodo.setAccessible(true);
+    }
 
-        assertThat(metodo.invoke(null, (Object) null)).isNull();
-        assertThat(metodo.invoke(null, "")).isNull();
-        assertThat(metodo.invoke(null, "    ")).isNull();
-        assertThat(metodo.invoke(null, "  texto com espaco  ")).isEqualTo("texto com espaco");
+    @Test
+    @DisplayName("homologar deve normalizar observações em branco para nulo")
+    void homologarDeveNormalizarObservacoesEmBrancoParaNulo() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setMapa(new sgc.mapa.model.Mapa());
+        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
+        sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+        service.homologar(100L, "   ");
+
+        verify(transicaoService).registrarTransicao(argThat(cmd -> cmd.observacoes() == null));
+    }
+
+    @Test
+    @DisplayName("homologar deve remover espaços excedentes das observações")
+    void homologarDeveRemoverEspacosExcedentesDasObservacoes() {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setMapa(new sgc.mapa.model.Mapa());
+        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
+        sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
+
+        when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
+
+        service.homologar(100L, "  texto com espaco  ");
+
+        verify(transicaoService).registrarTransicao(argThat(cmd -> "texto com espaco".equals(cmd.observacoes())));
     }
 
     @Test

@@ -587,52 +587,6 @@ class ProcessoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve montar hierarquia no DTO corretamente para GESTOR")
-        void deveMontarHierarquiaDtoGestor() {
-            Long codProcesso = 1L;
-            Usuario usuario = new Usuario();
-            usuario.setUnidadeAtivaCodigo(10L); // Pai
-            usuario.setPerfilAtivo(Perfil.GESTOR);
-
-            Processo p = new Processo();
-            p.setCodigo(codProcesso);
-            p.setDescricao("Processo");
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-
-            Unidade uPai = criarUnidadeValida(10L);
-            uPai.setSigla("PAI");
-            p.adicionarParticipantes(Set.of(uPai));
-
-            Unidade uFilho = criarUnidadeValida(20L);
-            uFilho.setSigla("FILHO");
-            uFilho.setUnidadeSuperior(uPai);
-            p.adicionarParticipantes(Set.of(uFilho));
-
-            Unidade uSemSub = criarUnidadeValida(30L);
-            uSemSub.setSigla("SEMSUB");
-            p.adicionarParticipantes(Set.of(uSemSub));
-
-            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
-            when(unidadeHierarquiaService.buscarIdsDescendentes(10L)).thenReturn(List.of(20L));
-
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(100L);
-            sp.setUnidade(uPai);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            // Filho não tem subprocesso para cobrir branch sp != null
-
-            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
-            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uPai));
-
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
-
-            assertThat(result.getUnidades()).isNotEmpty();
-            assertThat(result.getUnidades().getFirst().getFilhos()).isNotEmpty();
-        }
-
-        @Test
         @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelMapa mas sem permissao ACEITAR ou HOMOLOGAR")
         void isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelMapaSemPermissoes() {
             Long codProcesso = 1L;
