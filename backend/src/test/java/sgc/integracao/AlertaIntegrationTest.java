@@ -1,6 +1,6 @@
 package sgc.integracao;
 
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
@@ -10,8 +10,8 @@ import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
