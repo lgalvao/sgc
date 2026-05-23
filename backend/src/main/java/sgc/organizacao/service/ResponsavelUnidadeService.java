@@ -2,6 +2,7 @@ package sgc.organizacao.service;
 
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
@@ -249,12 +250,18 @@ public class ResponsavelUnidadeService {
     /**
      * Busca o responsável atual de uma unidade (com atribuições carregadas).
      *
-     * @throws ErroEntidadeNaoEncontrada se a unidade ou responsável não for encontrado
+     * @throws ErroEntidadeNaoEncontrada se a unidade não for encontrada
      */
     @Transactional(readOnly = true)
-    public Usuario buscarResponsavelAtual(String siglaUnidade) {
+    public @Nullable Usuario buscarResponsavelAtual(String siglaUnidade) {
         Long unidadeCodigo = buscarCodigoUnidadePorSigla(siglaUnidade);
-        ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
+        Optional<ResponsabilidadeUnidadeLeitura> responsabilidadeOpt = responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(unidadeCodigo);
+
+        if (responsabilidadeOpt.isEmpty()) {
+            return null;
+        }
+
+        ResponsabilidadeUnidadeLeitura responsabilidade = responsabilidadeOpt.get();
         return usuarioRepo.findById(responsabilidade.usuarioTitulo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
     }
@@ -263,17 +270,26 @@ public class ResponsavelUnidadeService {
      * Busca o responsável atual de uma unidade com detalhes da responsabilidade.
      */
     @Transactional(readOnly = true)
-    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
-        Long unidadeCodigo = buscarCodigoUnidadePorSigla(siglaUnidade);
-        return buscarResponsabilidadeDetalhadaAtual(unidadeCodigo);
+    public @Nullable ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
+        Optional<Long> unidadeCodigoOpt = unidadeRepo.buscarCodigoAtivoPorSigla(siglaUnidade);
+        if (unidadeCodigoOpt.isEmpty()) {
+            return null;
+        }
+        return buscarResponsabilidadeDetalhadaAtual(unidadeCodigoOpt.get());
     }
 
     /**
      * Busca o responsável atual de uma unidade com detalhes da responsabilidade.
      */
     @Transactional(readOnly = true)
-    public ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long unidadeCodigo) {
-        ResponsabilidadeUnidadeLeitura responsabilidade = buscarResponsabilidadeDetalhada(unidadeCodigo);
+    public @Nullable ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long unidadeCodigo) {
+        Optional<ResponsabilidadeUnidadeLeitura> responsabilidadeOpt = responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(unidadeCodigo);
+
+        if (responsabilidadeOpt.isEmpty()) {
+            return null;
+        }
+
+        ResponsabilidadeUnidadeLeitura responsabilidade = responsabilidadeOpt.get();
         Usuario usuario = usuarioRepo.findById(responsabilidade.usuarioTitulo())
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
 

@@ -80,7 +80,7 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/subprocessos/{codSubprocesso}", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.subprocesso.codigo").value(subprocesso.getCodigo()))
-                .andExpect(jsonPath("$.subprocesso.unidadeSigla").value("SUB-UNIT"));
+                .andExpect(jsonPath("$.subprocesso.unidade.sigla").value("SUB-UNIT"));
     }
 
     @Test
