@@ -1,5 +1,26 @@
 import {isValid, parse, parseISO} from "date-fns";
 
+type ValorComCampoValue = {
+    value: unknown;
+};
+
+function ehValorComCampoValue(valor: unknown): valor is ValorComCampoValue {
+    return typeof valor === "object" && valor !== null && !Array.isArray(valor) && "value" in valor;
+}
+
+function normalizarData(data: Date): Date | null {
+    return isValid(data) ? data : null;
+}
+
+function analisarDataTimestamp(timestamp: number): Date | null {
+    return normalizarData(new Date(timestamp));
+}
+
+function analisarDataArray(valor: unknown[]): Date | null {
+    const [ano, mes, dia, hora = 0, minuto = 0, segundo = 0] = valor;
+    return normalizarData(new Date(Number(ano), Number(mes) - 1, Number(dia), Number(hora), Number(minuto), Number(segundo)));
+}
+
 function analisarStringData(s: string): Date | null {
     const trimmed = s.trim();
     if (!trimmed) return null;
@@ -27,18 +48,14 @@ export function analisarData(entrada: unknown): Date | null {
         return null;
     }
 
-    // Suporte para objetos de contexto do BTable (bootstrap-vue-next)
-    const valor = (typeof entrada === 'object' && !Array.isArray(entrada) && entrada !== null && 'value' in entrada)
-        ? (entrada as { value: unknown }).value
-        : entrada;
+    const valor = ehValorComCampoValue(entrada) ? entrada.value : entrada;
 
     if (valor instanceof Date) {
-        return isValid(valor) ? valor : null;
+        return normalizarData(valor);
     }
 
     if (typeof valor === "number") {
-        const d = new Date(valor);
-        return isValid(d) ? d : null;
+        return analisarDataTimestamp(valor);
     }
 
     if (typeof valor === "string") {
@@ -46,10 +63,7 @@ export function analisarData(entrada: unknown): Date | null {
     }
 
     if (Array.isArray(valor)) {
-        const [ano, mes, dia, hora = 0, minuto = 0, segundo = 0] = valor;
-        // Mês no JS é 0-indexed
-        const d = new Date(ano, mes - 1, dia, hora, minuto, segundo);
-        return isValid(d) ? d : null;
+        return analisarDataArray(valor);
     }
 
     return null;

@@ -6,15 +6,18 @@ const backendBasePort = Number.parseInt(process.env.E2E_BACKEND_BASE_PORT || "10
 const workerCount = Number.parseInt(process.env.E2E_WORKER_COUNT || "1", 10);
 
 function extrairWorker(req: { headers?: Record<string, string | string[] | undefined> }): number | null {
-    const header = req.headers?.["x-e2e-worker"];
-    const workerHeader = Array.isArray(header) ? header[0] : header;
-    const cookieHeader = Array.isArray(req.headers?.cookie) ? req.headers?.cookie[0] : req.headers?.cookie;
+    const workerHeader = extrairPrimeiroCabecalho(req.headers?.["x-e2e-worker"]);
+    const cookieHeader = extrairPrimeiroCabecalho(req.headers?.cookie);
     const cookieMatch = cookieHeader?.match(/(?:^|;\s*)e2e_worker=(\d+)/);
     const workerCookie = cookieMatch?.[1];
     const workerRaw = workerHeader ?? workerCookie;
     const workerIndex = Number.parseInt(String(workerRaw ?? ""), 10);
     if (!Number.isFinite(workerIndex) || workerIndex < 0) return null;
     return workerIndex;
+}
+
+function extrairPrimeiroCabecalho(valor?: string | string[]): string | undefined {
+    return Array.isArray(valor) ? valor[0] : valor;
 }
 
 function construirProxyPorWorker() {
