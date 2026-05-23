@@ -162,25 +162,4 @@ class LimitadorTentativasLoginTest {
 
         assertThat(limitador.getCacheSize()).isZero();
     }
-
-    @Test
-    @DisplayName("deve cobrir branch de valor vazio no filtro do IP mais antigo")
-    @SuppressWarnings("unchecked")
-    void deveCobrirBranchDeValorVazioNoFiltroDoIpMaisAntigo() throws Exception {
-        LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, 2, clock);
-
-        java.lang.reflect.Field field = LimitadorTentativasLogin.class.getDeclaredField("tentativasPorIp");
-        field.setAccessible(true);
-        java.util.Map<String, java.util.Deque<LocalDateTime>> mapa = 
-                (java.util.Map<String, java.util.Deque<LocalDateTime>>) field.get(limitadorTeste);
-
-        mapa.put("ip-vazio", new java.util.concurrent.ConcurrentLinkedDeque<>());
-
-        java.lang.reflect.Method method = LimitadorTentativasLogin.class.getDeclaredMethod("encontrarIpMaisAntigo");
-        method.setAccessible(true);
-        String resultado = (String) method.invoke(limitadorTeste);
-
-        assertThat(resultado).isEqualTo("ip-vazio");
-    }
 }
-

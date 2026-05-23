@@ -189,9 +189,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private boolean deveEncaminharParaFrontend(String caminho) {
-        return !caminho.isBlank()
-                && !caminho.contains(".")
-                && PREFIXOS_FRONTEND_EXCLUIDOS.stream().noneMatch(caminho::startsWith);
+        if (caminho.isBlank()) {
+            return false;
+        }
+        String caminhoNormalizado = caminho.startsWith("/") ? caminho : "/" + caminho;
+        return !caminho.contains(".")
+                && PREFIXOS_FRONTEND_EXCLUIDOS.stream().noneMatch(caminhoNormalizado::startsWith);
     }
 
     private boolean encaminharIndexHtml(ServletWebRequest servletWebRequest) {
