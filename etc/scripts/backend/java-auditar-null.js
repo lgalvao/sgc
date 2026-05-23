@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable max-depth */
+ 
 import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";

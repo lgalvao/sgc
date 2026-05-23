@@ -144,7 +144,7 @@ function indexarTestes(backendTest) {
     return {indicePorNome, indicePorPacote};
 }
 
-/* eslint-disable max-params */
+ 
 function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
     const candidatos = SUFIXOS_TESTE.map(sufixo => `${nomeClasse}${sufixo}${EXTENSAO_JAVA}`);
     const encontradosMesmoPacote = [];

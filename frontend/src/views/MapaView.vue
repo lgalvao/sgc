@@ -389,7 +389,12 @@ async function exportarMapaAtualCsv() {
 
 const contextoEdicaoAtual = computed(() => subprocessoStore.contextoEdicao);
 const sincronizarMapaStore = (mapaAtualizado: MapaCompleto | null | undefined) =>
-    sincronizarMapaContexto(mapaAtualizado, codigoSubprocesso.value, mapasStore.definirMapaCompleto, contextoEdicaoAtual);
+    sincronizarMapaContexto({
+        mapaAtualizado,
+        codigoSubprocesso: codigoSubprocesso.value,
+        definirMapaCompleto: mapasStore.definirMapaCompleto,
+        mapaContextoAtual: contextoEdicaoAtual,
+    });
 
 onMounted(async () => {
   const sucesso = await carregarContextoInicial();

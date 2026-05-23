@@ -56,7 +56,7 @@ async function listarTemplatesEmail() {
         .map(nome => nome.replace(/\.html$/, ''));
 }
 
-/* eslint-disable max-params */
+ 
 function resumirCobertura(cdu, renderTemplates, templatesEmail, analisarTemplates) {
     const numero = cdu.numero.padStart(2, '0');
     const arquivoIntegracao = path.join(dirIntegracao, `CDU${numero}IntegrationTest.java`);

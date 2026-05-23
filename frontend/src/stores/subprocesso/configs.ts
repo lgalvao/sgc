@@ -8,16 +8,27 @@ import {
 } from "@/services/subprocessoService";
 import type {ConfiguracaoContexto} from "./tipos";
 
-export function criarConfigs(
-    contextoEdicao: Ref<ContextoEdicaoSubprocesso | null>,
-    contextoEdicaoInvalido: Ref<boolean>,
-    codigosEdicaoPorProcessoUnidade: Map<string, number>,
-    registrarContextoEdicao: (c: ContextoEdicaoSubprocesso) => void,
-    contextoCadastro: Ref<ContextoCadastroAtividadesSubprocesso | null>,
-    contextoCadastroInvalido: Ref<boolean>,
-    codigosCadastroPorProcessoUnidade: Map<string, number>,
-    registrarContextoCadastro: (c: ContextoCadastroAtividadesSubprocesso) => void,
-) {
+export type CriarConfigsParams = {
+    contextoEdicao: Ref<ContextoEdicaoSubprocesso | null>;
+    contextoEdicaoInvalido: Ref<boolean>;
+    codigosEdicaoPorProcessoUnidade: Map<string, number>;
+    registrarContextoEdicao: (c: ContextoEdicaoSubprocesso) => void;
+    contextoCadastro: Ref<ContextoCadastroAtividadesSubprocesso | null>;
+    contextoCadastroInvalido: Ref<boolean>;
+    codigosCadastroPorProcessoUnidade: Map<string, number>;
+    registrarContextoCadastro: (c: ContextoCadastroAtividadesSubprocesso) => void;
+};
+
+export function criarConfigs({
+    contextoEdicao,
+    contextoEdicaoInvalido,
+    codigosEdicaoPorProcessoUnidade,
+    registrarContextoEdicao,
+    contextoCadastro,
+    contextoCadastroInvalido,
+    codigosCadastroPorProcessoUnidade,
+    registrarContextoCadastro,
+}: CriarConfigsParams) {
     const configEdicao: ConfiguracaoContexto<ContextoEdicaoSubprocesso> = {
         tipoCodigo: "EDICAO_CODIGO",
         tipoProcessoUnidade: "EDICAO_PROCESSO_UNIDADE",

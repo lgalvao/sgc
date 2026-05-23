@@ -137,7 +137,7 @@ function pareceComunicacao(valor) {
     return /(SGC:|cadastro.+(analise|ajustes|reabert|homolog|disponibil)|revis(?:[aã]o|[õo]es).+(analise|ajustes|reabert|disponibil)|mapa.+(analise|ajustes|homolog|disponibil|sugest|valida)|lembrete de prazo|finaliza[cç][aã]o do processo|in[ií]cio de processo|atribui[cç][aã]o de perfil|submetid[oa]s? para an[aá]lise|devolvid[oa]s? para ajustes|reabert[oa]s? para ajustes)/i.test(valor);
 }
 
-/* eslint-disable max-params */
+ 
 function criarEntrada(arquivo, linha, origem, tipo, valor, chave = null) {
     return {
         arquivo,

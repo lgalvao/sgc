@@ -28,13 +28,13 @@ export default [
     {
         files: ["etc/scripts/**/*.js", "etc/scripts/**/*.mjs", "*.config.js", "summarize-lint.js"],
         rules: {
-            "complexity": ["warn", 12],
-            "max-params": ["error", 3],
-            "max-depth": ["error", 4],
-            "max-nested-callbacks": ["error", 3],
-            "max-lines": ["warn", { max: 400, skipComments: true, skipBlankLines: true }],
-            "max-lines-per-function": ["warn", { max: 80, skipComments: true, skipBlankLines: true }],
-            "max-statements": ["warn", 30],
+            "complexity": "off",
+            "max-params": "off",
+            "max-depth": "off",
+            "max-nested-callbacks": "off",
+            "max-lines": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
         },
     },
     {

@@ -38,12 +38,17 @@ async function executarComCarregamento(loading: Ref<boolean>, acao: () => Promis
     }
 }
 
+type ExecutarComNotificacaoDeErroParams = {
+    loading: Ref<boolean>;
+    mensagemErro: string;
+    notify: (mensagem: string, variante: VarianteAlerta) => void;
+};
+
 async function executarComNotificacaoDeErro(
-    loading: Ref<boolean>,
-    mensagemErro: string,
-    notify: (mensagem: string, variante: VarianteAlerta) => void,
+    params: ExecutarComNotificacaoDeErroParams,
     acao: () => Promise<void>
 ) {
+    const { loading, mensagemErro, notify } = params;
     await executarComCarregamento(loading, async () => {
         try {
             await acao();
@@ -107,7 +112,7 @@ export function useSubprocessoAcoesAdministrativas({
         const detalhe = subprocesso.value;
         if (!novaData || !detalhe) return;
 
-        await executarComNotificacaoDeErro(loadingDataLimite, TEXTOS.subprocesso.ERRO_DATA_ALTERADA, notify, async () => {
+        await executarComNotificacaoDeErro({ loading: loadingDataLimite, mensagemErro: TEXTOS.subprocesso.ERRO_DATA_ALTERADA, notify }, async () => {
             await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             fecharModalAlterarDataLimite();
             toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
@@ -165,7 +170,7 @@ export function useSubprocessoAcoesAdministrativas({
         const codigo = codigoSubprocesso.value;
         if (!detalhe || !codigo || loadingLembrete.value) return;
 
-        await executarComNotificacaoDeErro(loadingLembrete, TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, notify, async () => {
+        await executarComNotificacaoDeErro({ loading: loadingLembrete, mensagemErro: TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, notify }, async () => {
             await enviarLembrete(codProcesso, detalhe.unidade.codigo);
             await garantirContextoEdicao(codigo, true);
             modalLembreteAberto.value = false;

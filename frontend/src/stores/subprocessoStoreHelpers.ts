@@ -14,12 +14,19 @@ export type AtualizacaoStatusLocal = {
     permissoes?: PermissoesSubprocesso;
 };
 
-export function registrarContexto<T extends ContextoSubprocesso>(
-    contextoRef: Ref<T | null>,
-    contextoInvalidoRef: Ref<boolean>,
-    contexto: T,
-    limparErroIntegracao: () => void,
-): void {
+export type RegistrarContextoParams<T extends ContextoSubprocesso> = {
+    contextoRef: Ref<T | null>;
+    contextoInvalidoRef: Ref<boolean>;
+    contexto: T;
+    limparErroIntegracao: () => void;
+};
+
+export function registrarContexto<T extends ContextoSubprocesso>({
+    contextoRef,
+    contextoInvalidoRef,
+    contexto,
+    limparErroIntegracao,
+}: RegistrarContextoParams<T>): void {
     contextoRef.value = contexto;
     contextoInvalidoRef.value = false;
     limparErroIntegracao();

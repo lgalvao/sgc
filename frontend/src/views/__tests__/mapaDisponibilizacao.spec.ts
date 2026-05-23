@@ -96,7 +96,12 @@ describe('mapaDisponibilizacao.ts', () => {
         const mapaContextoAtual = ref({detalhes: {codigo: 123}, mapa: {} as any})
         const novoMapa = {codigo: 1, competencias: []} as any
 
-        sincronizarMapaContexto(novoMapa, 123, definirMapaCompleto, mapaContextoAtual)
+        sincronizarMapaContexto({
+            mapaAtualizado: novoMapa,
+            codigoSubprocesso: 123,
+            definirMapaCompleto,
+            mapaContextoAtual,
+        })
 
         expect(definirMapaCompleto).toHaveBeenCalledWith(123, novoMapa)
         expect(mapaContextoAtual.value.mapa).toEqual(novoMapa)

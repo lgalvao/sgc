@@ -16,6 +16,13 @@ type DependenciasMapaDisponibilizacao = {
     aplicarErroNormalizado: (error: ReturnType<typeof normalizarErro> | null) => void;
 };
 
+export interface SincronizarMapaContextoParams {
+    mapaAtualizado: MapaCompleto | null | undefined;
+    codigoSubprocesso: number | null;
+    definirMapaCompleto: (codigo: number, mapa: MapaCompleto) => void;
+    mapaContextoAtual: Ref<{ detalhes: { codigo: number }; mapa: MapaCompleto } | null>;
+}
+
 export function useMapaDisponibilizacao({
                                             competencias,
                                             existeCompetenciaSemAtividade,
@@ -84,12 +91,12 @@ export function useMapaDisponibilizacao({
         });
     }
 
-    function sincronizarMapaContexto(
-        mapaAtualizado: MapaCompleto | null | undefined,
-        codigoSubprocesso: number | null,
-        definirMapaCompleto: (codigo: number, mapa: MapaCompleto) => void,
-        mapaContextoAtual: Ref<{ detalhes: { codigo: number }; mapa: MapaCompleto } | null>,
-    ) {
+    function sincronizarMapaContexto({
+        mapaAtualizado,
+        codigoSubprocesso,
+        definirMapaCompleto,
+        mapaContextoAtual,
+    }: SincronizarMapaContextoParams) {
         if (!mapaAtualizado || !codigoSubprocesso) return;
         definirMapaCompleto(codigoSubprocesso, mapaAtualizado);
         if (mapaContextoAtual.value?.detalhes.codigo === codigoSubprocesso) {

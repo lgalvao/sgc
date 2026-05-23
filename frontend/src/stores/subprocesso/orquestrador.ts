@@ -41,9 +41,12 @@ export function usarOrquestradorContexto(
     async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso>(
         codProcesso: number,
         siglaUnidade: string,
-        limparAntes: boolean,
-        config: ConfiguracaoContexto<T>,
+        opcoes: {
+            limparAntes: boolean;
+            config: ConfiguracaoContexto<T>;
+        },
     ): Promise<{ codigo: number; contexto: T } | null> {
+        const { limparAntes, config } = opcoes;
         if (limparAntes) limparContextoAtual();
         const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
         const codigoMapeado = config.codigosPorProcessoUnidade.get(chaveProcessoUnidade);
