@@ -8,6 +8,30 @@ import type {FeedbackTipo, MetadadosFeedback, PayloadFeedback} from '@/types/fee
 
 const TIMEOUT_CAPTURA_MS = 5_000
 
+function criarTimeoutCaptura(): Promise<never> {
+    return new Promise((_, rejeitar) =>
+        setTimeout(() => rejeitar(new Error('Timeout de captura de tela')), TIMEOUT_CAPTURA_MS)
+    )
+}
+
+async function capturarCanvasPagina() {
+    return Promise.race([
+        html2canvas(document.body, {
+            useCORS: true,
+            allowTaint: false,
+            logging: false,
+            scale: window.devicePixelRatio,
+        }),
+        criarTimeoutCaptura(),
+    ])
+}
+
+async function converterCanvasParaBlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
+    return new Promise((resolver) => {
+        canvas.toBlob((blob: Blob | null) => resolver(blob), 'image/webp', 0.85)
+    })
+}
+
 /**
  * Composable para captura de tela, montagem de metadados e envio de feedback UAT.
  *
@@ -21,21 +45,8 @@ export function useFeedback() {
 
     async function capturarTela(): Promise<void> {
         try {
-            const canvas = await Promise.race([
-                html2canvas(document.body, {
-                    useCORS: true,
-                    allowTaint: false,
-                    logging: false,
-                    scale: window.devicePixelRatio,
-                }),
-                new Promise<never>((_, rejeitar) =>
-                    setTimeout(() => rejeitar(new Error('Timeout de captura de tela')), TIMEOUT_CAPTURA_MS)
-                ),
-            ])
-
-            captura.value = await new Promise<Blob | null>((resolver) => {
-                canvas.toBlob((blob: Blob | null) => resolver(blob), 'image/webp', 0.85)
-            })
+            const canvas = await capturarCanvasPagina()
+            captura.value = await converterCanvasParaBlob(canvas)
         } catch (erro) {
             logger.error('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
             captura.value = null

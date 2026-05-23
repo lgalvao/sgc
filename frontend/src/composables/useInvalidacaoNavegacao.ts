@@ -4,6 +4,13 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
 import {useUnidadeStore} from "@/stores/unidade";
 
+interface OpcoesInvalidacaoSubprocesso {
+    incluirPainel?: boolean;
+    incluirProcesso?: boolean;
+    incluirMapas?: boolean;
+    codigoSubprocessoMapa?: number;
+}
+
 /**
  * Ponto central de invalidação dos caches de navegação da SPA.
  *
@@ -64,28 +71,31 @@ export function useInvalidacaoNavegacao() {
         unidadeStore.invalidar();
     }
 
-    function invalidarCachesSubprocesso(opcoes?: {
-        incluirPainel?: boolean;
-        incluirProcesso?: boolean;
-        incluirMapas?: boolean;
-        codigoSubprocessoMapa?: number;
-    }): void {
-        if (opcoes?.incluirPainel ?? false) {
+    function invalidarMapas(opcoes?: OpcoesInvalidacaoSubprocesso) {
+        if (!(opcoes?.incluirMapas ?? false)) {
+            return;
+        }
+
+        const codigoSubprocessoMapa = opcoes?.codigoSubprocessoMapa;
+        if (typeof codigoSubprocessoMapa === "number") {
+            mapasStore.invalidar(codigoSubprocessoMapa);
+            return;
+        }
+
+        mapasStore.invalidar();
+    }
+
+    function invalidarCachesSubprocesso(opcoes?: OpcoesInvalidacaoSubprocesso): void {
+        if (opcoes?.incluirPainel) {
             painelStore.invalidar();
         }
-        if (opcoes?.incluirProcesso ?? false) {
+        if (opcoes?.incluirProcesso) {
             processoStore.invalidar();
         }
         subprocessoStore.invalidar();
         // Mapas são pesados e nem toda ação de subprocesso altera esse domínio.
         // Mantemos opt-in explícito para evitar recarregamentos desnecessários.
-        if (opcoes?.incluirMapas ?? false) {
-            if (typeof opcoes?.codigoSubprocessoMapa === "number") {
-                mapasStore.invalidar(opcoes.codigoSubprocessoMapa);
-            } else {
-                mapasStore.invalidar();
-            }
-        }
+        invalidarMapas(opcoes);
     }
 
     return {
