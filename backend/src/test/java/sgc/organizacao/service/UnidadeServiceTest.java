@@ -237,7 +237,6 @@ class UnidadeServiceTest {
         verifyNoInteractions(unidadeMapaRepo, cacheOrganizacaoService);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     @DisplayName("definirMapasVigentesEmBloco - Salva os mapas vigentes informados em bloco e invalida cache")
     void definirMapasVigentesEmBloco_SalvaEmBloco() {

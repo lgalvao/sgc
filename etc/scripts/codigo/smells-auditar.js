@@ -138,6 +138,7 @@ function contarOcorrencias(conteudo, regex) {
     return correspondencias ? correspondencias.length : 0;
 }
 
+/* eslint-disable max-params */
 function somarCategoriaPorArquivo(resumoArquivo, categoria, quantidade, peso) {
     if (!resumoArquivo.categorias[categoria]) {
         resumoArquivo.categorias[categoria] = 0;

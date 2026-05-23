@@ -1,9 +1,13 @@
 /* eslint-disable */
 import fs from "fs";
 import path from "path";
+import { globby } from "globby";
 
-const searchDir = path.join(import.meta.dirname, '../../../frontend/src');
-const extensions = ['.vue'];
+const argBaseIdx = process.argv.indexOf('--base');
+const searchDir = argBaseIdx >= 0 && process.argv[argBaseIdx + 1]
+    ? path.resolve(process.argv[argBaseIdx + 1])
+    : path.join(import.meta.dirname, '../../../frontend/src');
+
 const idsCompartilhadosPermitidos = new Set([
     'subprocesso-header__txt-header-unidade',
 ]);
@@ -11,51 +15,41 @@ const idsCompartilhadosPermitidos = new Set([
 // Suporta: data-testid="valor", :data-testid="'valor'", data-testid='valor'
 const regex = /(^|[\s<])(:?)(data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/gm;
 
-function scanDirectory(directory) {
-    let results = [];
-    const files = fs.readdirSync(directory);
-
-    for (const file of files) {
-        const absolutePath = path.join(directory, file);
-        const stat = fs.statSync(absolutePath);
-
-        if (stat.isDirectory()) {
-            results = results.concat(scanDirectory(absolutePath));
-        } else if (extensions.includes(path.extname(absolutePath))) {
-            const content = fs.readFileSync(absolutePath, 'utf-8');
-            let match;
-            while ((match = regex.exec(content)) !== null) {
-                const attrName = match[3];
-                let value = match[5] || match[6] || '';
-
-                // Se for um binding dinâmico (começa com :), só aceitamos literal estático.
-                // Ex: :data-testid="'meu-id'" -> meu-id
-                // Ex: :data-testid="dataTestid" -> ignorado, pois o valor real vem por prop/estado
-                const isDynamic = match[2] === ':';
-                if (isDynamic) {
-                    const literalMatch = value.match(/^['"]([^'"]+)['"]$/);
-                    if (literalMatch) {
-                        value = literalMatch[1];
-                    } else {
-                        continue;
-                    }
-                }
-
-                results.push({
-                    file: path.relative(import.meta.dirname, absolutePath),
-                    attribute: (isDynamic ? ':' : '') + attrName,
-                    value: value
-                });
-            }
-        }
-    }
-    return results;
-}
-
 console.log(`Buscando por test-ids em: ${searchDir}\n`);
 
 try {
-    const findings = scanDirectory(searchDir);
+    const padraoVue = path.join(searchDir, '**/*.vue').replace(/\\/g, '/');
+    const files = await globby(padraoVue, { absolute: true });
+
+    const findings = [];
+    for (const file of files) {
+        const content = fs.readFileSync(file, 'utf-8');
+        let match;
+        regex.lastIndex = 0;
+        while ((match = regex.exec(content)) !== null) {
+            const attrName = match[3];
+            let value = match[5] || match[6] || '';
+
+            // Se for um binding dinâmico (começa com :), só aceitamos literal estático.
+            // Ex: :data-testid="'meu-id'" -> meu-id
+            // Ex: :data-testid="dataTestid" -> ignorado, pois o valor real vem por prop/estado
+            const isDynamic = match[2] === ':';
+            if (isDynamic) {
+                const literalMatch = value.match(/^['"]([^'"]+)['"]$/);
+                if (literalMatch) {
+                    value = literalMatch[1];
+                } else {
+                    continue;
+                }
+            }
+
+            findings.push({
+                file: path.relative(import.meta.dirname, file),
+                attribute: (isDynamic ? ':' : '') + attrName,
+                value: value
+            });
+        }
+    }
 
     if (findings.length === 0) {
         console.log('Nenhum test-id encontrado.');

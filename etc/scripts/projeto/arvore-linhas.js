@@ -81,6 +81,7 @@ function printNode(node, prefix, connector) {
     process.stdout.write(`${nameLine}\n`);
 }
 
+/* eslint-disable max-params */
 function printTree(node, options, prefix = '', isLast = true, isRoot = true, currentDepth = 0) {
     const {maxDepth, minLines} = options;
 

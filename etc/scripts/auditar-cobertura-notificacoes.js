@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { globby } from 'globby';
 
 const raiz = process.cwd();
 const dirRequisitos = path.join(raiz, 'etc/reqs');
@@ -14,28 +15,31 @@ function lerSeExistir(caminho) {
     return fs.existsSync(caminho) ? fs.readFileSync(caminho, 'utf8') : '';
 }
 
-function listarCdusComEmail() {
-    return fs.readdirSync(dirRequisitos, {withFileTypes: true})
-        .filter(entrada => entrada.isFile() && /^cdu-\d+\.md$/.test(entrada.name))
-        .map(entrada => entrada.name)
-        .sort((a, b) => a.localeCompare(b, 'pt-BR', {numeric: true}))
-        .map(nome => {
-            const caminho = path.join(dirRequisitos, nome);
-            const texto = fs.readFileSync(caminho, 'utf8');
-            const assuntos = [...texto.matchAll(/^\s*Assunto:\s*(.+)$/gm)].map(match => match[1].trim());
-            const mencionaEmail = assuntos.length > 0
-                || /envia(?:r)? notifica(?:ç|c)(?:ões|ao) por e-?mail/i.test(texto)
-                || /envia(?:r)? e-?mails?/i.test(texto);
-            return {
-                numero: nome.match(/\d+/)?.[0] ?? '?',
-                nome,
-                caminho,
-                texto,
-                assuntos,
-                mencionaEmail
-            };
-        })
-        .filter(cdu => cdu.mencionaEmail);
+async function listarCdusComEmail() {
+    const arquivos = await globby(path.join(dirRequisitos, 'cdu-*.md').replace(/\\/g, '/'), { absolute: true });
+    const cdus = [];
+    
+    for (const caminho of arquivos) {
+        const nome = path.basename(caminho);
+        const texto = fs.readFileSync(caminho, 'utf8');
+        const assuntos = [...texto.matchAll(/^\s*Assunto:\s*(.+)$/gm)].map(match => match[1].trim());
+        const mencionaEmail = assuntos.length > 0
+            || /envia(?:r)? notifica(?:ç|c)(?:ões|ao) por e-?mail/i.test(texto)
+            || /envia(?:r)? e-?mails?/i.test(texto);
+        
+        cdus.push({
+            numero: nome.match(/\d+/)?.[0] ?? '?',
+            nome,
+            caminho,
+            texto,
+            assuntos,
+            mencionaEmail
+        });
+    }
+
+    return cdus
+        .filter(cdu => cdu.mencionaEmail)
+        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', {numeric: true}));
 }
 
 function detectarTemplates(renderTexto) {
@@ -44,12 +48,15 @@ function detectarTemplates(renderTexto) {
     );
 }
 
-function listarTemplatesEmail() {
-    return fs.readdirSync(dirTemplates)
-        .filter(nome => nome.endsWith('.html') && nome !== '_layout.html')
+async function listarTemplatesEmail() {
+    const arquivos = await globby(path.join(dirTemplates, '*.html').replace(/\\/g, '/'), { absolute: true });
+    return arquivos
+        .map(caminho => path.basename(caminho))
+        .filter(nome => nome !== '_layout.html')
         .map(nome => nome.replace(/\.html$/, ''));
 }
 
+/* eslint-disable max-params */
 function resumirCobertura(cdu, renderTemplates, templatesEmail, analisarTemplates) {
     const numero = cdu.numero.padStart(2, '0');
     const arquivoIntegracao = path.join(dirIntegracao, `CDU${numero}IntegrationTest.java`);
@@ -106,9 +113,10 @@ function resumirCobertura(cdu, renderTemplates, templatesEmail, analisarTemplate
 
 const renderTexto = lerSeExistir(arquivoRender);
 const renderTemplates = detectarTemplates(renderTexto);
-const templatesEmail = listarTemplatesEmail();
+const templatesEmail = await listarTemplatesEmail();
 const analisarTemplates = process.argv.includes('--templates');
-const resultados = listarCdusComEmail().map(cdu => resumirCobertura(cdu, renderTemplates, templatesEmail, analisarTemplates));
+const cdusComEmail = await listarCdusComEmail();
+const resultados = cdusComEmail.map(cdu => resumirCobertura(cdu, renderTemplates, templatesEmail, analisarTemplates));
 
 const somenteComLacuna = process.argv.includes('--lacunas');
 const saida = somenteComLacuna ? resultados.filter(item => item.lacunas.length > 0) : resultados;

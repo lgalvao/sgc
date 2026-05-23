@@ -65,6 +65,7 @@ function checkCollision(simpleName, fqn, newImportsToAdd) {
     return [...newImportsToAdd].some(item => item.split('.').pop() === simpleName && item !== fqn);
 }
 
+/* eslint-disable max-params */
 function determineReplacement(match, currentPackage, existingImports, newImportsToAdd) {
     if (match[1]) {
         return {replacement: match[1], changed: false};

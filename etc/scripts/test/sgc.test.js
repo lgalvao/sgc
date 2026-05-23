@@ -715,4 +715,63 @@ describe("CLI raiz do toolkit", () => {
         expect(falhaGradlew.status).toBe("falha");
         expect(falhaGradlew.detalhe).toContain("gradlew ausente");
     });
+
+    test("lista com sucesso test-ids do frontend em recorte controlado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-listar-"));
+        
+        // Criar arquivos .vue de teste com test-ids
+        await fs.outputFile(
+            path.join(diretorioBase, "ComponenteA.vue"),
+            `<template><button data-test-codigo="btn-salvar">Salvar</button></template>`
+        );
+        await fs.outputFile(
+            path.join(diretorioBase, "ComponenteB.vue"),
+            `<template><input data-testid="input-nome" /></template>`
+        );
+
+        const resultado = await executarSgc(["frontend", "test-ids", "listar", "--base", diretorioBase]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("ComponenteA.vue");
+        expect(resultado.stdout).toContain("btn-salvar");
+        expect(resultado.stdout).toContain("ComponenteB.vue");
+        expect(resultado.stdout).toContain("input-nome");
+    });
+
+    test("detecta corretamente test-ids duplicados e falha com codigo 1", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-duplicados-"));
+        
+        // Criar dois arquivos com o mesmo test-id
+        await fs.outputFile(
+            path.join(diretorioBase, "ComponenteX.vue"),
+            `<template><button data-testid="btn-acao">Ação X</button></template>`
+        );
+        await fs.outputFile(
+            path.join(diretorioBase, "ComponenteY.vue"),
+            `<template><div data-testid="btn-acao">Ação Y</div></template>`
+        );
+
+        const resultado = await executarSgc(["frontend", "test-ids", "listar-duplicados", "--base", diretorioBase]);
+
+        // O script deve falhar com exitCode 1 quando encontra duplicados
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stdout).toContain("Test-ids duplicados encontrados");
+        expect(resultado.stdout).toContain("btn-acao");
+        expect(resultado.stdout).toContain("ComponenteX.vue");
+        expect(resultado.stdout).toContain("ComponenteY.vue");
+    });
+
+    test("passa com sucesso se nao houver test-ids duplicados", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-unicos-"));
+        
+        await fs.outputFile(
+            path.join(diretorioBase, "ComponenteUnico.vue"),
+            `<template><button data-testid="btn-unico">Ação Única</button></template>`
+        );
+
+        const resultado = await executarSgc(["frontend", "test-ids", "listar-duplicados", "--base", diretorioBase]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Nenhum test-id duplicado encontrado.");
+    });
 });

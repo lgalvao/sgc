@@ -8,7 +8,6 @@ import org.springframework.security.test.context.support.*;
 import org.springframework.test.web.servlet.result.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
-import sgc.comum.*;
 import sgc.fixture.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.model.*;

@@ -10,7 +10,7 @@ import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 export default [
     // 1. Ignores globais
     {
-        ignores: ["dist/", "node_modules/", "*.config.js", "coverage/"],
+        ignores: ["dist/", "node_modules/", "*.config.js", "coverage/", "src/types/**/*.d.ts", "**/*.d.ts"],
     },
     // 2. Configuração base para todos os arquivos
     {
@@ -47,20 +47,37 @@ export default [
                 },
             ],
             "no-console": ["error", {allow: ["error"]}],
+
+            // Regras de Qualidade de Engenharia de Software
+            "complexity": ["warn", 10],
+            "max-params": ["error", 3], // Limite de 3 parâmetros estrito (Regra de Negócio SGC)
+            "max-depth": ["error", 4],
+            "max-nested-callbacks": ["error", 3],
+            "max-lines": ["warn", { max: 300, skipComments: true, skipBlankLines: true }],
+            "max-lines-per-function": ["warn", { max: 60, skipComments: true, skipBlankLines: true }],
+            "max-statements": ["warn", 20],
         },
     },
-    // 5. Overrides para Testes e Stories (Desabilita 'any' e 'no-console')
+    // 5. Overrides para Testes, Stories e Tipagens (Desabilita regras estritas de complexidade/any)
     {
         files: [
             "**/__tests__/**",
             "**/*.test.ts",
             "**/*.spec.ts",
             "**/*.stories.ts",
-            "**/test-utils/**"
+            "**/test-utils/**",
+            "**/*.d.ts"
         ],
         rules: {
             "no-console": "off",
             "@typescript-eslint/no-explicit-any": "off",
+            "complexity": "off",
+            "max-params": "off",
+            "max-depth": "off",
+            "max-nested-callbacks": "off",
+            "max-lines": "off",
+            "max-lines-per-function": "off",
+            "max-statements": "off",
         },
     },
     // 6. Configuração específica para Vue
@@ -78,6 +95,7 @@ export default [
             },
         },
         rules: {
+            "max-depth": ["error", 5],
             "vue/multi-word-component-names": "off",
             "no-useless-assignment": "off",
             "vuejs-accessibility/label-has-for": [

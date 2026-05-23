@@ -11,6 +11,7 @@ import {executarSetup} from "./projeto/setup.js";
 import {executarSnapshotQa} from "./qa/snapshot-coletar.js";
 import {executarResumoQa} from "./qa/resumo.js";
 
+/* eslint-disable max-params */
 function criarComandoScript(pai, nome, descricao, relativo) {
     pai
         .command(nome)
@@ -91,9 +92,9 @@ const e2e = program.command("e2e").description("Ferramentas auxiliares de testes
 criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");
 
 const comunicacao = program.command("comunicacao").description("Ferramentas de auditoria de comunicacao, templates e notificacoes.");
-criarComandoScript(comunicacao, "cobertura-notificacoes", "Audita a cobertura de testes de notificacoes e modelos de email.", "etc/scripts/auditar-cobertura-notificacoes.mjs");
-criarComandoScript(comunicacao, "strings", "Audita consistência de mensagens de comunicação entre backend e frontend.", "etc/scripts/auditar-strings-comunicacao.mjs");
-criarComandoScript(comunicacao, "templates-email", "Audita consistência de variáveis nos templates de email HTML do backend.", "etc/scripts/auditar-templates-email.mjs");
+criarComandoScript(comunicacao, "cobertura-notificacoes", "Audita a cobertura de testes de notificacoes e modelos de email.", "etc/scripts/auditar-cobertura-notificacoes.js");
+criarComandoScript(comunicacao, "strings", "Audita consistência de mensagens de comunicação entre backend e frontend.", "etc/scripts/auditar-strings-comunicacao.js");
+criarComandoScript(comunicacao, "templates-email", "Audita consistência de variáveis nos templates de email HTML do backend.", "etc/scripts/auditar-templates-email.js");
 
 const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
 const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");

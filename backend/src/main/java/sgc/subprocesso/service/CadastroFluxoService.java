@@ -17,7 +17,6 @@ import sgc.subprocesso.model.*;
 import java.time.*;
 import java.util.*;
 
-import static sgc.processo.model.TipoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA;

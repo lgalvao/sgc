@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import path from "node:path";
+import { resolverNaRaiz } from "../lib/caminhos.js";
 
 const novaVersao = process.argv[2];
 if (!novaVersao) {
@@ -8,10 +8,8 @@ if (!novaVersao) {
     process.exit(1);
 }
 
-const raiz = process.cwd();
-
 // 1. Sincronizar gradle.properties
-const caminhoGradle = path.join(raiz, "gradle.properties");
+const caminhoGradle = resolverNaRaiz("gradle.properties");
 if (fs.existsSync(caminhoGradle)) {
     let conteudo = fs.readFileSync(caminhoGradle, "utf-8");
     conteudo = conteudo.replace(/^version=.*$/m, `version=${novaVersao}`);
@@ -19,8 +17,8 @@ if (fs.existsSync(caminhoGradle)) {
     console.log(`[v] gradle.properties atualizado para ${novaVersao}`);
 }
 
-// 2. Sincronizar frontend/package.json (via fs para evitar dependência de path de executável)
-const caminhoFront = path.join(raiz, "frontend", "package.json");
+// 2. Sincronizar frontend/package.json
+const caminhoFront = resolverNaRaiz("frontend/package.json");
 if (fs.existsSync(caminhoFront)) {
     const pkg = JSON.parse(fs.readFileSync(caminhoFront, "utf-8"));
     pkg.version = novaVersao;

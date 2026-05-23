@@ -3,8 +3,6 @@ package sgc.organizacao.model;
 import org.springframework.data.repository.query.*;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.*;
-import sgc.mapa.model.*;
-
 import java.util.*;
 
 @Repository

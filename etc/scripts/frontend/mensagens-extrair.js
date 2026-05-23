@@ -13,6 +13,7 @@
 
 'use strict';
 
+/* eslint-disable max-depth */
 import fs from "node:fs";
 import path from "node:path";
 

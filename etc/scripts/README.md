@@ -35,7 +35,7 @@ graph TD
 | Caminho | Papel |
 |---|---|
 | `sgc.js` | roteador principal da CLI |
-| `*.mjs` (raiz) | auditorias transversais de comunicação, templates e notificações |
+| `*.js` (raiz) | auditorias transversais de comunicação, templates e notificações |
 | `lib/` | infraestrutura compartilhada, execução, paths, saída e utilidades |
 | `backend/` | comandos de cobertura, testes e higiene Java |
 | `frontend/` | comandos de cobertura, mensagens, validações, test ids e cruft |
