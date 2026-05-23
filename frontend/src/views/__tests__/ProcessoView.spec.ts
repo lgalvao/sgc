@@ -7,6 +7,7 @@ import {useToastStore} from "@/stores/toast";
 import {nextTick, ref} from "vue";
 import {Perfil, SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_SUCESSO_PROCESSO} from "@/constants/textos-processo";
 import * as processoService from "@/services/processo";
 
 // Mocks
@@ -170,7 +171,7 @@ function criarAcoesBloco(elegiveis: any[]) {
             titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
             texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
             rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
-            mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+            mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.CADASTROS_ACEITOS_EM_BLOCO,
             redirecionarPainel: true,
         }),
         criarAcao({
@@ -181,7 +182,7 @@ function criarAcoesBloco(elegiveis: any[]) {
             titulo: TEXTOS.acaoBloco.aceitar.TITULO_VALIDACAO,
             texto: TEXTOS.acaoBloco.aceitar.TEXTO_VALIDACAO,
             rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
-            mensagemSucesso: TEXTOS.sucesso.MAPAS_ACEITOS_EM_BLOCO,
+            mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.MAPAS_ACEITOS_EM_BLOCO,
             redirecionarPainel: true,
         }),
         criarAcao({
@@ -192,7 +193,7 @@ function criarAcoesBloco(elegiveis: any[]) {
             titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
             texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
             rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
-            mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+            mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.CADASTROS_HOMOLOGADOS_EM_BLOCO,
             redirecionarPainel: false,
         }),
         criarAcao({
@@ -203,7 +204,7 @@ function criarAcoesBloco(elegiveis: any[]) {
             titulo: TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
             texto: TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
             rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
-            mensagemSucesso: TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
+            mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.MAPAS_HOMOLOGADOS_EM_BLOCO,
             redirecionarPainel: true,
         }),
         criarAcao({
@@ -214,7 +215,7 @@ function criarAcoesBloco(elegiveis: any[]) {
             titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
             texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
             rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
-            mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+            mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
             redirecionarPainel: true,
             requerDataLimite: true,
         }),
@@ -555,7 +556,7 @@ describe("Processo.vue", () => {
             acao: 'ACEITAR',
             dataLimite: undefined,
         });
-        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO);
+        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.CADASTROS_ACEITOS_EM_BLOCO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -625,7 +626,7 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).acaoBlocoAtual.titulo).toBe(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO);
         expect((wrapper.vm).acaoBlocoAtual.texto).toBe(TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO);
         expect((wrapper.vm).acaoBlocoAtual.rotuloBotao).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
-        expect((wrapper.vm).acaoBlocoAtual.mensagemSucesso).toBe(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
+        expect((wrapper.vm).acaoBlocoAtual.mensagemSucesso).toBe(TEXTOS_SUCESSO_PROCESSO.CADASTROS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [101]});
@@ -633,7 +634,7 @@ describe("Processo.vue", () => {
 
         expect(toastStore.setPending).not.toHaveBeenCalled();
         expect(mocks.push).not.toHaveBeenCalledWith("/painel");
-        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
+        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain(TEXTOS_SUCESSO_PROCESSO.CADASTROS_HOMOLOGADOS_EM_BLOCO);
     });
 
     it("deve usar textos de CDU-26 quando houver apenas validacao elegível para homologacao", async () => {
@@ -659,11 +660,11 @@ describe("Processo.vue", () => {
         expect((wrapper.vm).acaoBlocoAtual.titulo).toBe(TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO);
         expect((wrapper.vm).acaoBlocoAtual.texto).toBe(TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO);
         expect((wrapper.vm).acaoBlocoAtual.rotuloBotao).toBe(TEXTOS.acaoBloco.homologar.BOTAO);
-        expect((wrapper.vm).acaoBlocoAtual.mensagemSucesso).toBe(TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO);
+        expect((wrapper.vm).acaoBlocoAtual.mensagemSucesso).toBe(TEXTOS_SUCESSO_PROCESSO.MAPAS_HOMOLOGADOS_EM_BLOCO);
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [103]});
-        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO);
+        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.MAPAS_HOMOLOGADOS_EM_BLOCO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -754,7 +755,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
                         texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
                         rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.CADASTROS_ACEITOS_EM_BLOCO,
                         unidades: [mockElegiveis[0]],
                     },
                     {
@@ -768,7 +769,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
                         texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
                         rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.CADASTROS_HOMOLOGADOS_EM_BLOCO,
                         unidades: [mockElegiveis[0]],
                     },
                     {
@@ -782,7 +783,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
                         texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
                         rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
                         unidades: [],
                     },
                 ],
@@ -822,7 +823,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.aceitar.TITULO_CADASTRO,
                         texto: TEXTOS.acaoBloco.aceitar.TEXTO_CADASTRO,
                         rotuloBotao: TEXTOS.acaoBloco.aceitar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_ACEITOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.CADASTROS_ACEITOS_EM_BLOCO,
                         unidades: [],
                     },
                     {
@@ -836,7 +837,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.homologar.TITULO_VALIDACAO,
                         texto: TEXTOS.acaoBloco.homologar.TEXTO_VALIDACAO,
                         rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.MAPAS_HOMOLOGADOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.MAPAS_HOMOLOGADOS_EM_BLOCO,
                         unidades: [mockElegiveis[1]],
                     },
                     {
@@ -850,7 +851,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
                         texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
                         rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
                         unidades: [mockElegiveis[2]],
                     },
                 ],
@@ -990,7 +991,7 @@ describe("Processo.vue", () => {
         await (wrapper.vm).confirmarFinalizacao();
 
         expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
-        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS.sucesso.PROCESSO_FINALIZADO);
+        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -1092,7 +1093,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.homologar.TITULO_CADASTRO,
                         texto: TEXTOS.acaoBloco.homologar.TEXTO_CADASTRO,
                         rotuloBotao: TEXTOS.acaoBloco.homologar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.CADASTROS_HOMOLOGADOS_EM_BLOCO,
                         unidades: []
                     },
                     {
@@ -1106,7 +1107,7 @@ describe("Processo.vue", () => {
                         titulo: TEXTOS.acaoBloco.disponibilizar.TITULO,
                         texto: TEXTOS.acaoBloco.disponibilizar.TEXTO,
                         rotuloBotao: TEXTOS.acaoBloco.disponibilizar.BOTAO,
-                        mensagemSucesso: TEXTOS.sucesso.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
+                        mensagemSucesso: TEXTOS_SUCESSO_PROCESSO.MAPAS_DISPONIBILIZADOS_EM_BLOCO,
                         unidades: []
                     }
                 ]

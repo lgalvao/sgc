@@ -3,7 +3,7 @@ import {flushPromises, mount} from "@vue/test-utils";
 import RelatorioUnidadesSemMapasVigentesView from "@/views/RelatorioUnidadesSemMapasVigentesView.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
 import * as unidadeService from "@/services/unidadeService";
-import {TEXTOS} from "@/constants/textos";
+import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 
 const mocks = vi.hoisted(() => ({
     notify: vi.fn(),
@@ -121,7 +121,7 @@ describe("RelatorioUnidadesSemMapasVigentesView.vue", () => {
         await ctx.wrapper.find("[data-testid='btn-visualizar-unidades-sem-mapa']").trigger("click");
         await flushPromises();
 
-        expect(mocks.notify).toHaveBeenCalledWith(TEXTOS.relatorios.ERRO_BUSCA, "danger");
+        expect(mocks.notify).toHaveBeenCalledWith(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger");
     });
 
     it("deve disparar exportação de PDF", async () => {

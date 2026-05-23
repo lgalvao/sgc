@@ -2,6 +2,8 @@ import {describe, expect, it, vi} from 'vitest'
 import {computed, ref} from 'vue'
 import {useMapaAnaliseFluxo} from '../mapaAnaliseFluxo'
 import {TEXTOS} from "@/constants/textos"
+import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa"
+import {TEXTOS_SUCESSO_SUBPROCESSO} from "@/constants/textos-subprocesso"
 
 describe('mapaAnaliseFluxo.ts', () => {
     const criarDependencias = () => ({
@@ -42,7 +44,7 @@ describe('mapaAnaliseFluxo.ts', () => {
         const {confirmarValidacao} = useMapaAnaliseFluxo(deps)
         await confirmarValidacao()
         expect(deps.validarMapa).toHaveBeenCalledWith(123)
-        expect(deps.concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS.sucesso.MAPA_VALIDADO_SUBMETIDO, expect.any(Function))
+        expect(deps.concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS_SUCESSO_MAPA.MAPA_VALIDADO_SUBMETIDO, expect.any(Function))
     })
 
     it('deve notificar erro ao confirmar validação falha', async () => {
@@ -100,7 +102,7 @@ describe('mapaAnaliseFluxo.ts', () => {
             const {handleConfirmarDevolucao} = useMapaAnaliseFluxo(deps)
             await handleConfirmarDevolucao()
             expect(deps.devolverMapa).toHaveBeenCalledWith(123, {justificativa: 'justificativa'})
-            expect(deps.concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS.sucesso.DEVOLUCAO_REALIZADA, expect.any(Function))
+            expect(deps.concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA, expect.any(Function))
         })
 
         it('deve notificar erro se devolução falhar', async () => {

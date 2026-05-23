@@ -2,6 +2,7 @@ import {describe, expect, it, vi} from 'vitest'
 import {ref} from 'vue'
 import {useMapaDisponibilizacao} from '../mapaDisponibilizacao'
 import {TEXTOS} from "@/constants/textos"
+import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa"
 
 describe('mapaDisponibilizacao.ts', () => {
     const criarDependencias = () => ({
@@ -75,7 +76,7 @@ describe('mapaDisponibilizacao.ts', () => {
         await promise
 
         expect(deps.disponibilizarMapaFluxo).toHaveBeenCalledWith(123, request)
-        expect(deps.concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS.sucesso.MAPA_DISPONIBILIZADO, expect.any(Function))
+        expect(deps.concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS_SUCESSO_MAPA.MAPA_DISPONIBILIZADO, expect.any(Function))
         expect(loadingDisponibilizacao.value).toBe(false)
     })
 

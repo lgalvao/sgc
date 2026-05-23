@@ -3,7 +3,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {ref} from 'vue';
 import RelatorioAndamentoView from '@/views/RelatorioAndamentoView.vue';
 import * as painelService from '@/services/painelService';
-import {TEXTOS} from '@/constants/textos';
+import {TEXTOS_RELATORIOS} from '@/constants/textos-relatorios';
 
 const buscarRelatorioAndamento = vi.fn().mockResolvedValue(undefined);
 const exportarAndamentoPdf = vi.fn().mockResolvedValue(undefined);
@@ -121,7 +121,7 @@ describe('RelatorioAndamentoView', () => {
         // cover error: mock rejeita, view deve notificar
         buscarRelatorioAndamento.mockRejectedValueOnce(new Error("Erro"));
         await vm.gerarRelatorio();
-        expect(notify).toHaveBeenCalledWith(TEXTOS.relatorios.ERRO_BUSCA, "danger");
+        expect(notify).toHaveBeenCalledWith(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger");
     });
 
     it('cobre exportarPdf com e sem erro', async () => {
@@ -141,7 +141,7 @@ describe('RelatorioAndamentoView', () => {
         // cover error: mock rejeita, view deve notificar
         exportarAndamentoPdf.mockRejectedValueOnce(new Error("Erro"));
         await vm.exportarPdf();
-        expect(notify).toHaveBeenCalledWith(TEXTOS.relatorios.ERRO_EXPORTAR, "danger");
+        expect(notify).toHaveBeenCalledWith(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
     });
 
     it('encerra o carregamento quando gerar relatório falha', async () => {
