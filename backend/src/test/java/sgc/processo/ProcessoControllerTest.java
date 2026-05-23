@@ -433,7 +433,7 @@ class ProcessoControllerTest {
             when(processoService.listarParaImportacao())
                     .thenReturn(List.of(criarProcessoResumoValido("Teste", SituacaoProcesso.FINALIZADO)));
 
-            mockMvc.perform(get("/api/processos/para-importacao"))
+            mockMvc.perform(get("/api/processos/finalizados").param("elegivelImportacao", "true"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$[0].codigo").value(1L));

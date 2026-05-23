@@ -50,7 +50,7 @@ class MapaControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("Deve retornar lista de mapas")
     void deveRetornarListaDeMapas() throws Exception {
         Subprocesso subprocesso = new Subprocesso();
@@ -60,11 +60,12 @@ class MapaControllerTest {
         mapa.setSubprocesso(subprocesso);
         mapa.setCodigo(1L);
 
-        when(mapaManutencaoService.mapas()).thenReturn(List.of(mapa));
+        org.springframework.data.domain.Page<Mapa> page = new org.springframework.data.domain.PageImpl<>(List.of(mapa));
+        when(mapaManutencaoService.mapas(any(org.springframework.data.domain.Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get(API_MAPAS))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].codigo").value(1L));
+                .andExpect(jsonPath("$.content[0].codigo").value(1L));
     }
 
     @Test

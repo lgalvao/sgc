@@ -12,7 +12,6 @@ import sgc.mapa.dto.*;
 import sgc.mapa.service.*;
 
 import java.net.*;
-import java.util.*;
 
 /**
  * Controlador REST para gerenciar Mapas.
@@ -30,11 +29,10 @@ public class MapaController {
      */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
-    @Operation(summary = "Lista todos os mapas")
-    public List<MapaResumoDto> listar() {
-        return mapaManutencaoService.mapas().stream()
-                .map(MapaResumoDto::fromEntity)
-                .toList();
+    @Operation(summary = "Lista todos os mapas de forma paginada")
+    public org.springframework.data.domain.Page<MapaResumoDto> listar(org.springframework.data.domain.Pageable pageable) {
+        return mapaManutencaoService.mapas(pageable)
+                .map(MapaResumoDto::fromEntity);
     }
 
     /**

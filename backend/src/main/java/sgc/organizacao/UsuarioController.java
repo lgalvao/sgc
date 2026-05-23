@@ -23,6 +23,7 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
 
     @GetMapping("/{titulo}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public ResponseEntity<UsuarioConsultaDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
         return usuarioService.buscarConsultaPorTitulo(titulo)
                 .map(UsuarioConsultaDto::fromLeitura)

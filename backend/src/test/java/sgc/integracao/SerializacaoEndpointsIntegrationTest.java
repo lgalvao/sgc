@@ -265,8 +265,8 @@ class SerializacaoEndpointsIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/mapas")
                         .header("Authorization", "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].codigo", hasItem(subprocesso.getMapa().getCodigo().intValue())))
-                .andExpect(jsonPath("$[*].subprocessoCodigo", hasItem(subprocesso.getCodigo().intValue())));
+                .andExpect(jsonPath("$.content[*].codigo", hasItem(subprocesso.getMapa().getCodigo().intValue())))
+                .andExpect(jsonPath("$.content[*].subprocessoCodigo", hasItem(subprocesso.getCodigo().intValue())));
     }
 
     @Test

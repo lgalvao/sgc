@@ -298,7 +298,7 @@ async function preencherFormularioImportacao(page: Page, processoOrigemDescricao
 
 export async function selecionarAtividadesParaImportacao(page: Page, processoOrigemDescricao: string, unidadeOrigemSigla: string, atividadesDescricoes: string[]) {
     await Promise.all([
-        page.waitForResponse(r => r.url().includes('/para-importacao')),
+        page.waitForResponse(r => r.url().includes('/finalizados')),
         abrirModalImportacao(page)
     ]);
     await preencherFormularioImportacao(page, processoOrigemDescricao, unidadeOrigemSigla, atividadesDescricoes);
@@ -366,7 +366,7 @@ export async function verificarOpcoesImportacao(
     page: Page,
     opcoesEsperadas: Array<{ processo: string; unidades: string[] }>
 ) {
-    const respostaProcessos = page.waitForResponse(r => r.url().includes('/para-importacao'));
+    const respostaProcessos = page.waitForResponse(r => r.url().includes('/finalizados'));
     await abrirModalImportacao(page);
     await respostaProcessos;
     await realizarVerificacaoOpcoesImportacao(page, opcoesEsperadas);

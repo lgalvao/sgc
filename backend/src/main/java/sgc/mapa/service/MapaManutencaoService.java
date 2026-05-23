@@ -92,6 +92,10 @@ public class MapaManutencaoService {
         return mapaRepo.findAll();
     }
 
+    public org.springframework.data.domain.Page<Mapa> mapas(org.springframework.data.domain.Pageable pageable) {
+        return mapaRepo.findAll(pageable);
+    }
+
     public List<Mapa> buscarMapasPorSubprocessos(Collection<Long> codigosSubprocessos) {
         if (codigosSubprocessos.isEmpty()) {
             return List.of();
