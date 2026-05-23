@@ -14,9 +14,12 @@ interface UseMapaSugestoesOptions {
     resetarValidacao: () => void;
 }
 
+function limparTexto(destino: Ref<string>) {
+    destino.value = "";
+}
+
 export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     const {
-        codigoSubprocesso,
         notify,
         concluirAcaoPainel,
         validarSubmissao,
@@ -30,6 +33,10 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     const loadingSugestoesEnvio = ref(false);
     const mostrarModalSugestoes = ref(false);
     const mostrarModalVerSugestoes = ref(false);
+
+    function obterCodigoSubprocesso(): number | null {
+        return options.codigoSubprocesso.value;
+    }
 
     async function executarOperacaoSugestoes(
         operacao: () => Promise<void>,
@@ -45,11 +52,25 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         }
     }
 
-    async function sincronizarSugestoesMapa(): Promise<string> {
-        if (!codigoSubprocesso.value) {
+    async function buscarSugestoesMapa(): Promise<string> {
+        const codigo = obterCodigoSubprocesso();
+        if (!codigo) {
             return "";
         }
-        return await obterSugestoesMapa(codigoSubprocesso.value);
+
+        return obterSugestoesMapa(codigo);
+    }
+
+    async function preencherSugestoes(destino: Ref<string>) {
+        const sucesso = await executarOperacaoSugestoes(async () => {
+            destino.value = await buscarSugestoesMapa();
+        }, TEXTOS.mapa.ERRO_SUGESTOES);
+
+        if (!sucesso) {
+            limparTexto(destino);
+        }
+
+        return sucesso;
     }
 
     async function verSugestoes() {
@@ -57,15 +78,12 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
             return;
         }
 
-        sugestoesVisualizacao.value = "";
+        limparTexto(sugestoesVisualizacao);
         loadingSugestoesVisualizacao.value = true;
 
         try {
-            const sucesso = await executarOperacaoSugestoes(async () => {
-                sugestoesVisualizacao.value = await sincronizarSugestoesMapa();
-            }, TEXTOS.mapa.ERRO_SUGESTOES);
+            const sucesso = await preencherSugestoes(sugestoesVisualizacao);
             if (!sucesso) {
-                sugestoesVisualizacao.value = "";
                 return;
             }
             mostrarModalVerSugestoes.value = true;
@@ -76,28 +94,18 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
 
     function fecharModalVerSugestoes() {
         mostrarModalVerSugestoes.value = false;
-        sugestoesVisualizacao.value = "";
-    }
-
-    async function carregarSugestoesParaEdicao() {
-        const sucesso = await executarOperacaoSugestoes(async () => {
-            sugestoes.value = await sincronizarSugestoesMapa();
-        }, TEXTOS.mapa.ERRO_SUGESTOES);
-
-        if (!sucesso) {
-            sugestoes.value = "";
-        }
+        limparTexto(sugestoesVisualizacao);
     }
 
     function abrirModalSugestoes() {
         resetarValidacao();
         mostrarModalSugestoes.value = true;
-        void carregarSugestoesParaEdicao();
+        void preencherSugestoes(sugestoes);
     }
 
     function fecharModalSugestoes() {
         mostrarModalSugestoes.value = false;
-        sugestoes.value = "";
+        limparTexto(sugestoes);
         resetarValidacao();
     }
 
@@ -107,12 +115,15 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
             return;
         }
 
-        if (!codigoSubprocesso.value) return;
+        const codigo = obterCodigoSubprocesso();
+        if (!codigo) {
+            return;
+        }
 
         try {
             loadingSugestoesEnvio.value = true;
             const sucesso = await executarOperacaoSugestoes(async () => {
-                await apresentarSugestoes(codigoSubprocesso.value!, {sugestoes: sugestoes.value});
+                await apresentarSugestoes(codigo, {sugestoes: sugestoes.value});
                 await concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
             }, TEXTOS.mapa.ERRO_SUGESTOES);
             if (!sucesso) {
@@ -135,7 +146,5 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
         abrirModalSugestoes,
         fecharModalSugestoes,
         confirmarSugestoes,
-        sincronizarSugestoesMapa,
-        carregarSugestoesParaEdicao
     };
 }
