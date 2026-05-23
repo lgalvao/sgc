@@ -262,6 +262,22 @@ tasks.jacocoTestReport {
     }
 }
 
+tasks.register<JacocoReport>("jacocoIntegrationTestReport") {
+    group = "verification"
+    description = "Gera o relatório de cobertura do Jacoco exclusivamente para os testes de integração."
+    dependsOn(tasks.named("integrationTest"))
+
+    executionData.setFrom(fileTree(layout.buildDirectory).include("jacoco/integrationTest.exec"))
+    classDirectories.setFrom(files(sourceSets["main"].output.classesDirs))
+    sourceDirectories.setFrom(files(sourceSets["main"].allSource.srcDirs))
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/integrationTest/html"))
+    }
+}
+
 spotbugs {
     toolVersion.set(libs.versions.spotbugs.get())
     ignoreFailures.set(false)
