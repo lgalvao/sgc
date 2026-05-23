@@ -1066,4 +1066,147 @@ class RelatorioFacadeTest {
 
         assertThat(situacao).isEqualTo("Mapa Com Sugestoes");
     }
+
+    @Test
+    @DisplayName("Deve lançar erro quando a unidade não possui mapa vigente")
+    void deveLancarErroQuandoUnidadeNaoPossuiMapaVigente() {
+        mockContextoAdmin();
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
+        when(unidadeService.buscarMapaVigente(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> relatorioService.obterRelatorioMapaVigenteUnidade(1L))
+                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("MapaVigente");
+    }
+
+    @Test
+    @DisplayName("Deve agrupar unidades com sigla ZE como zonas eleitorais")
+    void deveAgruparUnidadesComSiglaZeComoZonasEleitorais() {
+        UnidadeDto raiz = new UnidadeDto();
+        raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
+
+        UnidadeDto secretaria = new UnidadeDto();
+        secretaria.setCodigo(10L);
+        secretaria.setSigla("SEC");
+        secretaria.setNome("SECRETARIA X");
+        secretaria.setTipo("SECRETARIA");
+
+        UnidadeDto zonaPorSigla = new UnidadeDto();
+        zonaPorSigla.setCodigo(11L);
+        zonaPorSigla.setSigla("ZE");
+        zonaPorSigla.setNome("Cartório 11");
+        zonaPorSigla.setTipo(null);
+        secretaria.setSubunidades(List.of(zonaPorSigla));
+        raiz.setSubunidades(List.of(secretaria));
+
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(11L));
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(raiz));
+
+        List<RelatorioUnidadeSemMapaVigenteDto> resultado = relatorioService.obterRelatorioUnidadesSemMapasVigentes();
+
+        assertThat(resultado.getFirst().filhas()).hasSize(1);
+        assertThat(resultado.getFirst().filhas().getFirst().sigla()).isEqualTo("ZONAS ELEITORAIS");
+        assertThat(resultado.getFirst().filhas().getFirst().filhas()).extracting(RelatorioUnidadeSemMapaVigenteDto::codigo)
+                .containsExactly(11L);
+    }
+
+
+    @Test
+    @DisplayName("Deve exercitar identificação e lista de unidades sem mapa com sigla e nome alternativos")
+    void deveExercitarIdentificacaoEListaDeUnidadesSemMapaComSiglaENomeAlternativos() throws Exception {
+        Class<?> tipoCard = Class.forName("sgc.relatorio.RelatorioFacade$UnidadeRelatorioSemMapa");
+        java.lang.reflect.Constructor<?> construtor = tipoCard.getDeclaredConstructor(Long.class, String.class, String.class, String.class, List.class);
+        construtor.setAccessible(true);
+        Object filhoSomenteNome = construtor.newInstance(3L, null, "Somente nome", null, List.of());
+        Object filhoCompleto = construtor.newInstance(4L, "SIG", "Nome completo", null, List.of());
+        Object filhoSomenteSigla = construtor.newInstance(5L, "SO", null, null, List.of());
+        Object cardComNome = construtor.newInstance(1L, "   ", "Nome do card", null, List.of(filhoSomenteNome, filhoCompleto, filhoSomenteSigla));
+        Object cardVazio = construtor.newInstance(2L, " ", " ", null, List.of());
+
+        java.lang.reflect.Method adicionarIdentificacao = RelatorioFacade.class
+                .getDeclaredMethod("adicionarIdentificacaoUnidadeSemMapa", Document.class, tipoCard);
+        adicionarIdentificacao.setAccessible(true);
+        java.lang.reflect.Method adicionarLista = RelatorioFacade.class
+                .getDeclaredMethod("adicionarListaUnidadesSemMapa", Document.class, List.class, int.class);
+        adicionarLista.setAccessible(true);
+
+        adicionarIdentificacao.invoke(relatorioService, document, cardComNome);
+        adicionarIdentificacao.invoke(relatorioService, document, cardVazio);
+        adicionarLista.invoke(relatorioService, document, List.of(cardComNome, cardVazio), 0);
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve tratar texto secretaria, segmentos nulos e raízes sem filhas")
+    void deveTratarTextoSecretariaSegmentosNulosERaizesSemFilhas() throws Exception {
+        java.lang.reflect.Method filtrarUnidadesExibidas = RelatorioFacade.class
+                .getDeclaredMethod("filtrarUnidadesExibidas", List.class);
+        filtrarUnidadesExibidas.setAccessible(true);
+        java.lang.reflect.Method ehTextoSecretaria = RelatorioFacade.class
+                .getDeclaredMethod("ehTextoSecretaria", String.class);
+        ehTextoSecretaria.setAccessible(true);
+        java.lang.reflect.Method separarSegmentos = RelatorioFacade.class
+                .getDeclaredMethod("separarSegmentos", String.class);
+        separarSegmentos.setAccessible(true);
+
+        UnidadeDto raizSemFilhasNulas = new UnidadeDto();
+        raizSemFilhasNulas.setCodigo(1L);
+        raizSemFilhasNulas.setSubunidades(null);
+        UnidadeDto raizSemFilhasVazias = new UnidadeDto();
+        raizSemFilhasVazias.setCodigo(2L);
+        raizSemFilhasVazias.setSubunidades(List.of());
+        UnidadeDto filha = new UnidadeDto();
+        filha.setCodigo(3L);
+        UnidadeDto raizComFilha = new UnidadeDto();
+        raizComFilha.setCodigo(4L);
+        raizComFilha.setSubunidades(List.of(filha));
+
+        List<?> resultado = (List<?>) filtrarUnidadesExibidas.invoke(
+                relatorioService,
+                List.of(raizSemFilhasNulas, raizSemFilhasVazias, raizComFilha)
+        );
+
+        assertThat(resultado).hasSize(1);
+        assertThat((boolean) ehTextoSecretaria.invoke(relatorioService, (Object) null)).isFalse();
+        assertThat((boolean) ehTextoSecretaria.invoke(relatorioService, "Secretaria de Gestão")).isTrue();
+        @SuppressWarnings("unchecked")
+        List<String> segmentosNulos = (List<String>) separarSegmentos.invoke(relatorioService, (Object) null);
+        assertThat(segmentosNulos).containsExactly("");
+    }
+
+    @Test
+    @DisplayName("Deve gerar relatório de andamento sem marcar prazo ajustado quando datas são iguais")
+    void deveGerarRelatorioAndamentoSemMarcarPrazoAjustadoQuandoDatasSaoIguais() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo processo = new Processo();
+        processo.setDescricao("Processo Teste");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(1L);
+        unidade.setSigla("U1");
+        unidade.setNome("Unidade 1");
+
+        java.time.LocalDateTime data = java.time.LocalDateTime.now();
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(100L);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        subprocesso.setDataLimiteEtapa1(data);
+        subprocesso.setDataLimiteEtapa2(data);
+
+        when(processoService.buscarPorCodigo(1L)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(subprocesso));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, unidade));
+
+        relatorioService.gerarRelatorioAndamento(1L, new ByteArrayOutputStream());
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
 }

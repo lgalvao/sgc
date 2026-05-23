@@ -2467,5 +2467,219 @@ class ProcessoServiceTest {
                 "SUP".equals(cmd.unidadeDestinoSigla()) && "<html>consolidado</html>".equals(cmd.corpoHtml())
         ));
     }
+
+    @Test
+    @DisplayName("buscarPorCodigoComParticipantes deve lançar erro quando processo não existe")
+    void buscarPorCodigoComParticipantesDeveLancarErroQuandoProcessoNaoExiste() {
+        when(processoRepo.buscarPorCodigoComParticipantes(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> processoService.buscarPorCodigoComParticipantes(99L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Processo");
+    }
+
+    @Test
+    @DisplayName("enviarLembrete para unidade ADMIN deve enviar cópia quando usuário não possui unidade de lotação")
+    void enviarLembreteAdminSemUnidadeLotacao() {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setDescricao("Processo Teste");
+        processo.setDataLimite(LocalDateTime.of(2026, 6, 30, 0, 0));
+
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
+        UnidadeProcesso participanteAdmin = new UnidadeProcesso();
+        participanteAdmin.setUnidadeCodigo(1L);
+        participanteAdmin.setSigla("ADMIN");
+        processo.setParticipantes(new ArrayList<>(List.of(participanteAdmin)));
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("TITULO_SEM_LOTACAO");
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setEmail("admin.sem.lotacao@tre-pe.jus.br");
+        usuario.setUnidadeLotacao(null);
+
+        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(processo));
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioService.buscarUsuarioComUnidadeLotacao("TITULO_SEM_LOTACAO")).thenReturn(usuario);
+
+        processoService.enviarLembrete(1L, 1L);
+
+        verify(notificacaoService, times(2)).enfileirar(any());
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                "admin.sem.lotacao@tre-pe.jus.br".equals(cmd.destinatario())
+                        && cmd.chaveIdempotencia().endsWith(":copia-admin")
+        ));
+    }
+
 }
+
+    @Test
+    @DisplayName("finalizar deve lançar erro quando processo não está em andamento")
+    void finalizarDeveLancarErroQuandoProcessoNaoEstaEmAndamento() {
+        Processo processo = new Processo();
+        processo.setCodigo(77L);
+        processo.setSituacao(CRIADO);
+        when(repo.buscar(Processo.class, 77L)).thenReturn(processo);
+
+        assertThatThrownBy(() -> processoService.finalizar(77L))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining(Mensagens.SITUACAO_INVALIDA);
+    }
+
+    @Test
+    @DisplayName("efetivarInicioSubprocessos deve delegar conforme o tipo do processo")
+    void efetivarInicioSubprocessosDeveDelegarConformeOTipoDoProcesso() throws Exception {
+        java.lang.reflect.Method metodo = ProcessoService.class
+                .getDeclaredMethod("efetivarInicioSubprocessos", ProcessoService.InicioSubprocessosContexto.class);
+        metodo.setAccessible(true);
+
+        Processo processo = new Processo();
+        Unidade unidade = criarUnidadeValida(10L);
+        Unidade admin = criarUnidadeValida(99L);
+        UnidadeMapa unidadeMapa = new UnidadeMapa();
+        unidadeMapa.setUnidadeCodigo(10L);
+
+        metodo.invoke(processoService, new ProcessoService.InicioSubprocessosContexto(
+                processo, MAPEAMENTO, List.of(10L), Set.of(unidade), List.of(), admin));
+        verify(subprocessoService).criarParaMapeamento(any());
+
+        reset(subprocessoService);
+        metodo.invoke(processoService, new ProcessoService.InicioSubprocessosContexto(
+                processo, REVISAO, List.of(10L), Set.of(unidade), List.of(unidadeMapa), admin));
+        verify(subprocessoService).criarParaRevisao(any());
+
+        reset(subprocessoService);
+        metodo.invoke(processoService, new ProcessoService.InicioSubprocessosContexto(
+                processo, DIAGNOSTICO, List.of(10L), Set.of(unidade), List.of(unidadeMapa), admin));
+        verify(subprocessoService).criarParaDiagnostico(any());
+    }
+
+    @Test
+    @DisplayName("obterDetalhesCompleto deve desabilitar ações em bloco para processo finalizado com revisão homologada")
+    void obterDetalhesCompletoDeveDesabilitarAcoesEmBlocoParaProcessoFinalizadoComRevisaoHomologada() {
+        Long codigoProcesso = 88L;
+        Processo processo = new Processo();
+        processo.setCodigo(codigoProcesso);
+        processo.setSituacao(FINALIZADO);
+        processo.setTipo(REVISAO);
+
+        Unidade unidade = criarUnidadeValida(10L);
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(100L);
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacaoForcada(REVISAO_CADASTRO_HOMOLOGADA);
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now());
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Processo.class, codigoProcesso)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(codigoProcesso)).thenReturn(List.of(subprocesso));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, unidade));
+        when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
+
+        ProcessoDetalheDto resultado = processoService.obterDetalhesCompleto(codigoProcesso, true);
+
+        assertThat(resultado.getAcoesBloco())
+                .filteredOn(acao -> "disponibilizar-mapa".equals(acao.getCodigo()))
+                .singleElement()
+                .satisfies(acao -> {
+                    assertThat(acao.isMostrar()).isTrue();
+                    assertThat(acao.isHabilitar()).isFalse();
+                });
+    }
+
+    @Test
+    @DisplayName("carregarUnidadesPorCodigo deve manter a primeira unidade quando houver duplicadas")
+    void carregarUnidadesPorCodigoDeveManterAPrimeiraUnidadeQuandoHouverDuplicadas() throws Exception {
+        java.lang.reflect.Method metodo = ProcessoService.class
+                .getDeclaredMethod("carregarUnidadesPorCodigo", List.class);
+        metodo.setAccessible(true);
+
+        Unidade primeira = criarUnidadeValida(1L);
+        Unidade duplicada = criarUnidadeValida(1L);
+        duplicada.setNome("Duplicada");
+        when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(primeira, duplicada));
+
+        @SuppressWarnings("unchecked")
+        Map<Long, Unidade> resultado = (Map<Long, Unidade>) metodo.invoke(processoService, List.of(1L));
+
+        assertThat(resultado).containsOnlyKeys(1L);
+        assertThat(resultado.get(1L)).isSameAs(primeira);
+    }
+
+    @Test
+    @DisplayName("criarNotificacoesInicioProcesso deve classificar unidades raiz e interoperacionais")
+    void criarNotificacoesInicioProcessoDeveClassificarUnidadesRaizEInteroperacionais() throws Exception {
+        java.lang.reflect.Method metodo = ProcessoService.class
+                .getDeclaredMethod("criarNotificacoesInicioProcesso", Processo.class, List.class);
+        metodo.setAccessible(true);
+
+        Processo processo = new Processo();
+        processo.setCodigo(90L);
+        processo.setDescricao("Processo notificações");
+        processo.setTipo(MAPEAMENTO);
+        processo.setDataLimite(LocalDateTime.now().plusDays(10));
+
+        Unidade unidadeRaiz = criarUnidadeValida(1L);
+        unidadeRaiz.setTipo(TipoUnidade.RAIZ);
+        unidadeRaiz.setSigla("RAIZ");
+        Unidade unidadeInterop = criarUnidadeValida(2L);
+        unidadeInterop.setTipo(TipoUnidade.INTEROPERACIONAL);
+        unidadeInterop.setSigla("INT");
+        Unidade unidadeOperacional = criarUnidadeValida(3L);
+        unidadeOperacional.setTipo(TipoUnidade.OPERACIONAL);
+        unidadeOperacional.setSigla("OPER");
+        Unidade unidadeIntermediaria = criarUnidadeValida(4L);
+        unidadeIntermediaria.setTipo(TipoUnidade.INTERMEDIARIA);
+        unidadeIntermediaria.setSigla("INTER");
+
+        Subprocesso subprocessoRaiz = new Subprocesso();
+        subprocessoRaiz.setCodigo(1001L);
+        subprocessoRaiz.setUnidade(unidadeRaiz);
+        Subprocesso subprocessoInterop = new Subprocesso();
+        subprocessoInterop.setCodigo(1002L);
+        subprocessoInterop.setUnidade(unidadeInterop);
+        Subprocesso subprocessoOperacional = new Subprocesso();
+        subprocessoOperacional.setCodigo(1003L);
+        subprocessoOperacional.setUnidade(unidadeOperacional);
+        Subprocesso subprocessoIntermediaria = new Subprocesso();
+        subprocessoIntermediaria.setCodigo(1004L);
+        subprocessoIntermediaria.setUnidade(unidadeIntermediaria);
+
+        when(consultaService.listarEntidadesPorProcesso(90L)).thenReturn(List.of(
+                subprocessoRaiz, subprocessoInterop, subprocessoOperacional, subprocessoIntermediaria));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(1L)).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(2L)).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(3L)).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(4L)).thenReturn(List.of());
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
+                .thenReturn("<html>inicio</html>");
+        when(emailModelosService.criarAssuntoInicioProcesso(anyString(), anyBoolean())).thenReturn("Assunto");
+
+        metodo.invoke(processoService, processo, List.of(unidadeRaiz, unidadeInterop, unidadeOperacional, unidadeIntermediaria));
+
+        verify(notificacaoService, atLeast(2)).enfileirar(any());
+    }
+
+    @Test
+    @DisplayName("isSituacaoCadastro deve reconhecer revisão de cadastro homologada")
+    void isSituacaoCadastroDeveReconhecerRevisaoDeCadastroHomologada() throws Exception {
+        java.lang.reflect.Method metodo = ProcessoService.class
+                .getDeclaredMethod("isSituacaoCadastro", SituacaoSubprocesso.class);
+        metodo.setAccessible(true);
+
+        assertThat((boolean) metodo.invoke(processoService, REVISAO_CADASTRO_HOMOLOGADA)).isTrue();
+        assertThat((boolean) metodo.invoke(processoService, MAPEAMENTO_MAPA_CRIADO)).isFalse();
+    }
+
 }

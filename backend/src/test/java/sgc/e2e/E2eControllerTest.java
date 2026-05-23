@@ -854,4 +854,241 @@ class E2eControllerTest {
             verify(statementMock).execute("SET REFERENTIAL_INTEGRITY TRUE");
         }
     }
+
+    @Test
+    @DisplayName("Deve falhar ao validar ambiente E2E quando o produto é H2, mas a URL não é jdbc:h2")
+    void validarAmbienteE2eComProdutoH2MasUrlInvalida() throws Exception {
+        JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
+        DataSource dataSource = mock(DataSource.class);
+        Connection conexao = mock(Connection.class);
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        when(jdbcTemplateMock.getDataSource()).thenReturn(dataSource);
+        when(dataSource.getConnection()).thenReturn(conexao);
+        when(conexao.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("H2");
+        when(metaData.getURL()).thenReturn("jdbc:postgresql://localhost/sgc");
+
+        E2eController controllerComMocks = new E2eController(
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
+
+        assertThatThrownBy(controllerComMocks::validarAmbienteE2e)
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("requer H2 em memória");
+    }
+
+
+    @Test
+    @DisplayName("Deve falhar ao validar ambiente E2E quando a URL JDBC estiver nula")
+    void validarAmbienteE2eComUrlJdbcNula() throws Exception {
+        JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
+        DataSource dataSource = mock(DataSource.class);
+        Connection conexao = mock(Connection.class);
+        DatabaseMetaData metaData = mock(DatabaseMetaData.class);
+        when(jdbcTemplateMock.getDataSource()).thenReturn(dataSource);
+        when(dataSource.getConnection()).thenReturn(conexao);
+        when(conexao.getMetaData()).thenReturn(metaData);
+        when(metaData.getDatabaseProductName()).thenReturn("H2");
+        when(metaData.getURL()).thenReturn(null);
+
+        E2eController controllerComMocks = new E2eController(
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
+
+        assertThatThrownBy(controllerComMocks::validarAmbienteE2e)
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("requer H2 em memória");
+    }
+
+    @Test
+    @DisplayName("criarProcessoRevisaoComMapaHomologado deve usar a descrição informada")
+    void criarProcessoRevisaoComMapaHomologadoDeveUsarDescricaoInformada() {
+        JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
+        E2eController controllerComMocks = new E2eController(
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("SIGLA");
+        unidade.setNome("Unidade SIGLA");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
+        admin.setNome("Administrador");
+        admin.setTipo(TipoUnidade.RAIZ);
+        admin.setSituacao(SituacaoUnidade.ATIVA);
+
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(processoRepo.saveAndFlush(any(Processo.class))).thenAnswer(invocacao -> {
+            Processo processo = invocacao.getArgument(0);
+            processo.setCodigo(100L);
+            return processo;
+        });
+        when(subprocessoRepo.saveAndFlush(any(Subprocesso.class))).thenAnswer(invocacao -> {
+            Subprocesso subprocesso = invocacao.getArgument(0);
+            subprocesso.setCodigo(200L);
+            return subprocesso;
+        });
+        when(mapaRepo.saveAndFlush(any(Mapa.class))).thenAnswer(invocacao -> {
+            Mapa mapa = invocacao.getArgument(0);
+            mapa.setCodigo(300L);
+            return mapa;
+        });
+        when(jdbcTemplateMock.update(anyString(), any(), any(), any(), any(), any(), any())).thenReturn(1);
+        Processo processoRecarregado = Processo.builder().codigo(100L).descricao("Descrição customizada").build();
+        when(processoService.buscarPorCodigo(100L)).thenReturn(processoRecarregado);
+
+        Processo resultado = controllerComMocks.criarProcessoRevisaoComMapaHomologado(
+                new E2eController.ProcessoFixtureRequest("Descrição customizada", "SIGLA", false, 30));
+
+        assertThat(resultado.getDescricao()).isEqualTo("Descrição customizada");
+        verify(processoRepo).saveAndFlush(argThat(processo -> "Descrição customizada".equals(processo.getDescricao())));
+    }
+
+    @Test
+    @DisplayName("criarProcessoRevisaoComCadastroDisponibilizado deve falhar quando não encontra subprocesso base")
+    void criarProcessoRevisaoComCadastroDisponibilizadoDeveFalharQuandoNaoEncontraSubprocessoBase() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("SIGLA");
+        Unidade superior = new Unidade();
+        superior.setCodigo(5L);
+        unidade.setUnidadeSuperior(superior);
+
+        Processo processo = Processo.builder().codigo(100L).build();
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+        when(processoService.criar(any())).thenReturn(processo);
+        when(processoService.buscarPorCodigo(100L)).thenReturn(processo);
+        doNothing().when(processoService).iniciar(100L, List.of(10L));
+        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> controller.criarProcessoRevisaoComCadastroDisponibilizado(
+                new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, null)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("criarProcessoRevisaoComMapaHomologado deve usar dias limite e descrição padrão quando ausentes")
+    void criarProcessoRevisaoComMapaHomologadoDeveUsarDiasLimiteEDescricaoPadraoQuandoAusentes() {
+        JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
+        E2eController controllerComMocks = new E2eController(
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("SIGLA");
+        unidade.setNome("Unidade SIGLA");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
+        admin.setNome("Administrador");
+        admin.setTipo(TipoUnidade.RAIZ);
+        admin.setSituacao(SituacaoUnidade.ATIVA);
+
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(processoRepo.saveAndFlush(any(Processo.class))).thenAnswer(invocacao -> {
+            Processo processo = invocacao.getArgument(0);
+            processo.setCodigo(101L);
+            return processo;
+        });
+        when(subprocessoRepo.saveAndFlush(any(Subprocesso.class))).thenAnswer(invocacao -> {
+            Subprocesso subprocesso = invocacao.getArgument(0);
+            subprocesso.setCodigo(201L);
+            return subprocesso;
+        });
+        when(mapaRepo.saveAndFlush(any(Mapa.class))).thenAnswer(invocacao -> {
+            Mapa mapa = invocacao.getArgument(0);
+            mapa.setCodigo(301L);
+            return mapa;
+        });
+        when(jdbcTemplateMock.update(anyString(), any(), any(), any(), any(), any(), any())).thenReturn(1);
+        Processo processoRecarregado = Processo.builder().codigo(101L).descricao("Processo padrão").build();
+        when(processoService.buscarPorCodigo(101L)).thenReturn(processoRecarregado);
+
+        controllerComMocks.criarProcessoRevisaoComMapaHomologado(
+                new E2eController.ProcessoFixtureRequest("   ", "SIGLA", false, null));
+
+        verify(processoRepo).saveAndFlush(argThat(processo ->
+                processo.getDescricao().startsWith("Processo fixture E2E REVISAO ")
+                        && processo.getDataLimite().toLocalDate().isEqual(java.time.LocalDate.now().plusDays(30))
+        ));
+    }
+
+
+    @Test
+    @DisplayName("criarProcessoRevisaoComMapaHomologado deve usar descrição padrão quando a descrição for nula")
+    void criarProcessoRevisaoComMapaHomologadoDeveUsarDescricaoPadraoQuandoDescricaoForNula() {
+        JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
+        E2eController controllerComMocks = new E2eController(
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, subprocessoRepo, mapaRepo, unidadeService, resourceLoader, cacheManager);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("SIGLA");
+        unidade.setNome("Unidade SIGLA");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        Unidade admin = new Unidade();
+        admin.setCodigo(1L);
+        admin.setSigla("ADMIN");
+        admin.setNome("Administrador");
+        admin.setTipo(TipoUnidade.RAIZ);
+        admin.setSituacao(SituacaoUnidade.ATIVA);
+
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(processoRepo.saveAndFlush(any(Processo.class))).thenAnswer(invocacao -> {
+            Processo processo = invocacao.getArgument(0);
+            processo.setCodigo(102L);
+            return processo;
+        });
+        when(subprocessoRepo.saveAndFlush(any(Subprocesso.class))).thenAnswer(invocacao -> {
+            Subprocesso subprocesso = invocacao.getArgument(0);
+            subprocesso.setCodigo(202L);
+            return subprocesso;
+        });
+        when(mapaRepo.saveAndFlush(any(Mapa.class))).thenAnswer(invocacao -> {
+            Mapa mapa = invocacao.getArgument(0);
+            mapa.setCodigo(302L);
+            return mapa;
+        });
+        when(jdbcTemplateMock.update(anyString(), any(), any(), any(), any(), any(), any())).thenReturn(1);
+        when(processoService.buscarPorCodigo(102L)).thenReturn(Processo.builder().codigo(102L).build());
+
+        controllerComMocks.criarProcessoRevisaoComMapaHomologado(
+                new E2eController.ProcessoFixtureRequest(null, "SIGLA", false, 30));
+
+        verify(processoRepo).saveAndFlush(argThat(processo ->
+                processo.getDescricao().startsWith("Processo fixture E2E REVISAO ")
+        ));
+    }
+
+    @Test
+    @DisplayName("criarProcessoRevisaoComCadastroHomologado deve usar dias limite padrão quando ausentes")
+    void criarProcessoRevisaoComCadastroHomologadoDeveUsarDiasLimitePadraoQuandoAusentes() {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("SIGLA");
+        Unidade superior = new Unidade();
+        superior.setCodigo(5L);
+        unidade.setUnidadeSuperior(superior);
+
+        Processo processo = Processo.builder().codigo(100L).build();
+        when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
+        when(processoService.criar(any())).thenReturn(processo);
+        when(processoService.buscarPorCodigo(100L)).thenReturn(processo);
+        doNothing().when(processoService).iniciar(100L, List.of(10L));
+        when(subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(100L, 10L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> controller.criarProcessoRevisaoComCadastroHomologado(
+                new E2eController.ProcessoFixtureRequest("Desc", "SIGLA", true, null)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
 }

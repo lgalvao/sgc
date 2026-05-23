@@ -471,4 +471,37 @@ class LoginControllerTest {
                 .senha("senha")
                 .build();
     }
+
+    @Test
+    @DisplayName("login direto deve lançar erro de configuração quando usuário autenticado não possui perfis")
+    void loginDiretoDeveLancarErroDeConfiguracaoQuandoUsuarioNaoPossuiPerfis() {
+        AutenticarRequest req = criarRequestPadrao();
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(httpRequest.getRemoteAddr()).thenReturn("10.0.0.1");
+        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
+
+        assertThatThrownBy(() -> loginController.login(req, httpRequest, httpResponse))
+                .isInstanceOf(ErroConfiguracao.class)
+                .hasMessageContaining("sem perfil no SGC");
+    }
+
+    @Test
+    @DisplayName("POST /api/usuarios/logout - Deve usar expiração padrão quando o JWT não informar expiração")
+    @WithMockUser
+    void logout_DeveUsarExpiracaoPadraoQuandoJwtNaoInformarExpiracao() throws Exception {
+        when(gerenciadorJwt.validarToken("token-jwt"))
+                .thenReturn(Optional.of(new GerenciadorJwt.JwtClaims("123", Perfil.ADMIN, 1L, "jti-x", null)));
+        when(jwtProperties.expiracaoMinutos()).thenReturn(15);
+
+        mockMvc.perform(post("/api/usuarios/logout")
+                        .with(csrf())
+                        .cookie(new Cookie("jwtToken", "token-jwt")))
+                .andExpect(status().isNoContent());
+
+        verify(listaNegraJwt).revogar(eq("jti-x"), argThat(expiracao ->
+                expiracao != null && expiracao.isAfter(Instant.now().plusSeconds(600))));
+    }
+
 }

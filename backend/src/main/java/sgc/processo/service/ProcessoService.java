@@ -317,11 +317,13 @@ public class ProcessoService {
         if (unidadeCodigos.isEmpty()) throw new ErroValidacao(Mensagens.SELECIONE_AO_MENOS_UMA_UNIDADE);
         validarSelecaoBloco(unidadeCodigos, subprocessos);
 
-        if (command instanceof DisponibilizarMapaEmBlocoCommand disponibilizacao) {
-            executarDisponibilizacaoMapaEmBloco(disponibilizacao, usuario, subprocessos);
-        } else if (command instanceof ProcessarAnaliseEmBlocoCommand analise) {
-            validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
-            processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
+        switch (command) {
+            case DisponibilizarMapaEmBlocoCommand disponibilizacao ->
+                    executarDisponibilizacaoMapaEmBloco(disponibilizacao, usuario, subprocessos);
+            case ProcessarAnaliseEmBlocoCommand analise -> {
+                validarPermissaoAnaliseEmBloco(usuario, subprocessos, analise);
+                processarAcoesBlocoAceiteHomologacao(analise, subprocessos);
+            }
         }
     }
 
@@ -563,11 +565,15 @@ public class ProcessoService {
     }
 
     private void efetivarInicioSubprocessos(InicioSubprocessosContexto contexto) {
-        switch (contexto.tipo()) {
-            case MAPEAMENTO -> iniciarSubprocessosMapeamento(contexto);
-            case REVISAO -> iniciarSubprocessosRevisao(contexto);
-            case DIAGNOSTICO -> iniciarSubprocessosDiagnostico(contexto);
+        if (contexto.tipo() == MAPEAMENTO) {
+            iniciarSubprocessosMapeamento(contexto);
+            return;
         }
+        if (contexto.tipo() == REVISAO) {
+            iniciarSubprocessosRevisao(contexto);
+            return;
+        }
+        iniciarSubprocessosDiagnostico(contexto);
     }
 
 

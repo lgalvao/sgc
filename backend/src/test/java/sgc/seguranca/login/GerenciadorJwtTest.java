@@ -225,4 +225,94 @@ class GerenciadorJwtTest {
         assertThat(result).isEmpty();
     }
 
+
+    @Test
+    @DisplayName("Deve retornar empty para token sem jti")
+    void validateMissingJti() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = Jwts.builder()
+                .subject("123")
+                .claim("perfil", Perfil.ADMIN.name())
+                .claim("unidade", 1L)
+                .expiration(new Date(System.currentTimeMillis() + 60_000))
+                .signWith(Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve retornar empty para token sem expiração")
+    void validateMissingExpiracao() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = Jwts.builder()
+                .id("jti-sem-expiracao")
+                .subject("123")
+                .claim("perfil", Perfil.ADMIN.name())
+                .claim("unidade", 1L)
+                .signWith(Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtClaims> result = gerenciador.validarToken(token);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve retornar empty para token pré-auth sem título eleitoral")
+    void preAuthMissingSubject() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = Jwts.builder()
+                .id("some-jti")
+                .subject(null)
+                .claim("type", "PRE_AUTH")
+                .expiration(new Date(System.currentTimeMillis() + 60_000))
+                .signWith(Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtPreAuthClaims> result = gerenciador.validarTokenPreAuth(token);
+
+        assertThat(result).isEmpty();
+    }
+
+
+    @Test
+    @DisplayName("Deve retornar empty para token pré-auth sem jti")
+    void preAuthMissingJti() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = Jwts.builder()
+                .subject("123")
+                .claim("type", "PRE_AUTH")
+                .expiration(new Date(System.currentTimeMillis() + 60_000))
+                .signWith(Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtPreAuthClaims> result = gerenciador.validarTokenPreAuth(token);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve retornar empty para token pré-auth sem expiração")
+    void preAuthMissingExpiracao() {
+        when(jwtProperties.secret()).thenReturn(SECURE_SECRET);
+
+        String token = Jwts.builder()
+                .id("preauth-sem-expiracao")
+                .subject("123")
+                .claim("type", "PRE_AUTH")
+                .signWith(Keys.hmacShaKeyFor(SECURE_SECRET.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        Optional<GerenciadorJwt.JwtPreAuthClaims> result = gerenciador.validarTokenPreAuth(token);
+
+        assertThat(result).isEmpty();
+    }
+
 }

@@ -96,7 +96,7 @@ public class LoginController {
 
         return ResponseEntity.ok(FluxoLoginResponse.builder()
                 .autenticado(true)
-                .requerSelecaoPerfil(perfis.size() > 1)
+                .requerSelecaoPerfil(true)
                 .perfisUnidades(perfis)
                 .sessao(null)
                 .build());
