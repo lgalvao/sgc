@@ -632,4 +632,43 @@ class SubprocessoNotificacaoServiceTest {
 
         assertThat(assunto).isEqualTo("SGC: " + TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA.getDescMovimentacao());
     }
+
+    @Test
+    @DisplayName("notificarAceiteCadastroEmBloco deve usar templates e assuntos de revisão")
+    void notificarAceiteCadastroEmBlocoDeveUsarTemplatesEAssuntosDeRevisao() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade superior = criarUnidade(20L, "SUP", "Superior");
+        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
+        unidade.setUnidadeSuperior(superior);
+        Processo processo = criarProcesso();
+        processo.setTipo(TipoProcesso.REVISAO);
+        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
+
+        when(unidadeService.buscarAdmin()).thenReturn(criarUnidade(1L, "ADMIN", "Administracao"));
+        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
+                .thenReturn(UnidadeResponsavelDto.builder()
+                        .unidadeCodigo(unidade.getCodigo())
+                        .titularTitulo("titular")
+                        .titularNome("Titular")
+                        .build());
+
+        service.notificarAceiteCadastroEmBloco(List.of(subprocesso));
+
+        verify(templateEngine, times(2)).process(templateCaptor.capture(), any(IContext.class));
+        assertThat(templateCaptor.getAllValues())
+                .containsExactly("revisao-cadastro-aceita-bloco-unidade", "revisao-cadastro-aceita-bloco-superior");
+
+        verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getAllValues())
+                .extracting(EnfileirarNotificacaoCommand::tipoNotificacao)
+                .containsOnly(TipoNotificacao.REVISAO_CADASTRO_ACEITA);
+        assertThat(notificacaoEmailCaptor.getAllValues())
+                .extracting(EnfileirarNotificacaoCommand::assunto)
+                .containsExactly(
+                        "SGC: Revisão do cadastro de atividades e conhecimentos da ORIG submetido para análise",
+                        "SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise"
+                );
+    }
+
 }

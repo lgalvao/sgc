@@ -333,4 +333,29 @@ class AtribuicaoTemporariaViewsE2eAspectIntegrationTest {
                   AND perfil IN ('CHEFE', 'GESTOR')
                 """);
     }
+
+    @Test
+    @DisplayName("Não deve remover perfis do responsável anterior quando o título anterior for nulo em restaurar")
+    void restaurarResponsabilidadeTitularComTituloAnteriorNulo() throws Exception {
+        JdbcTemplate jdbcTemplateMock = org.mockito.Mockito.mock(JdbcTemplate.class);
+        org.mockito.Mockito.when(jdbcTemplateMock.queryForObject("SELECT titulo_titular FROM sgc.vw_unidade WHERE codigo = ?", String.class, 3L))
+                .thenReturn("333333");
+        org.mockito.Mockito.when(jdbcTemplateMock.queryForObject("SELECT matricula_titular FROM sgc.vw_unidade WHERE codigo = ?", String.class, 3L))
+                .thenReturn("00333333");
+        org.mockito.Mockito.when(jdbcTemplateMock.queryForObject("SELECT tipo FROM sgc.vw_unidade WHERE codigo = ?", String.class, 3L))
+                .thenReturn("OPERACIONAL");
+        AtribuicaoTemporariaViewsE2eAspect aspect = new AtribuicaoTemporariaViewsE2eAspect(jdbcTemplateMock);
+        java.lang.reflect.Method metodo = AtribuicaoTemporariaViewsE2eAspect.class
+                .getDeclaredMethod("restaurarResponsabilidadeTitular", Long.class, String.class);
+        metodo.setAccessible(true);
+
+        metodo.invoke(aspect, 3L, null);
+
+        org.mockito.Mockito.verify(jdbcTemplateMock, org.mockito.Mockito.never()).update(
+                org.mockito.ArgumentMatchers.contains("DELETE FROM sgc.vw_usuario_perfil_unidade"),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any()
+        );
+    }
+
 }

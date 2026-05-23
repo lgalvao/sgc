@@ -208,7 +208,7 @@ public class RelatorioFacade {
             for (UnidadeRelatorioSemMapa card : resultado.arvoreOrganizada()) {
                 adicionarSecaoUnidadesSemMapa(document, card);
             }
-        } catch (DocumentException | IOException e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
         }
     }
@@ -616,9 +616,9 @@ public class RelatorioFacade {
 
             if (temSigla) {
                 item.add(new Chunk(sigla, FONTE_TEXTO_NEGRITO));
-            }
-            if (temSigla && temNome) {
-                item.add(new Chunk(" - ", FONTE_TEXTO_SUAVE));
+                if (temNome) {
+                    item.add(new Chunk(" - ", FONTE_TEXTO_SUAVE));
+                }
             }
             if (temNome) {
                 item.add(new Chunk(nome, FONTE_TEXTO_CORPO));

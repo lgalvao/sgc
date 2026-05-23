@@ -55,13 +55,13 @@ public class SubprocessoNotificacaoService {
     }
 
     private void criarNotificacoesTransicao(NotificacaoCommand cmd) {
-        TipoTransicao tipoTransicao = cmd.tipoTransicao();
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
         criarNotificacaoDireta(cmd, variaveis);
 
-        if (tipoTransicao.notificacaoSuperior() && !Boolean.FALSE.equals(cmd.notificarSuperior())) {
-            criarNotificacaoSuperior(cmd, variaveis);
+        if (Boolean.FALSE.equals(cmd.notificarSuperior())) {
+            return;
         }
+        criarNotificacaoSuperior(cmd, variaveis);
     }
 
     public String getEmailUnidade(Unidade unidade) {
@@ -160,10 +160,20 @@ public class SubprocessoNotificacaoService {
     }
 
     private void criarNotificacaoSuperior(NotificacaoCommand cmd, Map<String, Object> variaveisBase) {
+        String templateEmailSuperior = cmd.tipoTransicao().getTemplateEmailSuperior();
+        if (templateEmailSuperior == null || templateEmailSuperior.isBlank()) {
+            return;
+        }
+
         String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), true);
         Long codigoUnidade = cmd.subprocesso().getUnidade().getCodigo();
         Long codigoSuperior = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
-        if (codigoSuperior == null || Objects.equals(codigoSuperior, cmd.unidadeDestino().getCodigo())) return;
+        if (codigoSuperior == null) {
+            return;
+        }
+        if (Objects.equals(codigoSuperior, cmd.unidadeDestino().getCodigo())) {
+            return;
+        }
 
         UnidadeResumoLeitura superior = unidadeService.buscarResumosPorCodigos(List.of(codigoSuperior)).stream()
                 .findFirst()
@@ -172,7 +182,6 @@ public class SubprocessoNotificacaoService {
 
         Map<String, Object> variaveis = new HashMap<>(variaveisBase);
         variaveis.put("siglaUnidadeSuperior", superior.sigla());
-        String templateEmailSuperior = obterTemplateObrigatorio(cmd.tipoTransicao().getTemplateEmailSuperior(), "e-mail superior");
         String corpo = processarTemplate(templateEmailSuperior, variaveis);
         String emailSuperior = "%s@tre-pe.jus.br".formatted(superior.sigla().toLowerCase());
 
