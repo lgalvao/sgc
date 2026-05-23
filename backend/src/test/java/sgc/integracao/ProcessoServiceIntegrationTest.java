@@ -2,16 +2,25 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.*;
 import sgc.comum.erros.*;
+import sgc.fixture.*;
 import sgc.integracao.mocks.*;
+import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
 import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("Testes de Integração - ProcessoService")
 class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
@@ -194,6 +203,144 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
             assertThat(subprocessoRepo.listarPorProcessoComUnidade(processo.getCodigo()).stream()
                     .map(subprocesso -> subprocesso.getUnidade().getCodigo())
                     .toList()).containsExactlyInAnyOrder(2L, 9L);
+        }
+    }
+
+    @Nested
+    @DisplayName("Consultas de Processo")
+    class ConsultaTests {
+
+        @Test
+        @DisplayName("Deve listar processos ativos")
+        @WithMockAdmin
+        void deveListarAtivos() throws Exception {
+            mockMvc.perform(get("/api/processos/ativos"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray());
+        }
+
+        @Test
+        @DisplayName("Deve listar unidades bloqueadas por tipo MAPEAMENTO")
+        @WithMockAdmin
+        void deveListarUnidadesBloqueadasPorTipoMapeamento() throws Exception {
+            mockMvc.perform(get("/api/processos/unidades-bloqueadas")
+                            .param("tipo", "MAPEAMENTO"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray());
+        }
+
+        @Test
+        @DisplayName("Deve listar unidades bloqueadas por tipo REVISAO")
+        @WithMockAdmin
+        void deveListarUnidadesBloqueadasPorTipoRevisao() throws Exception {
+            mockMvc.perform(get("/api/processos/unidades-bloqueadas")
+                            .param("tipo", "REVISAO"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isArray());
+        }
+
+        @Test
+        @DisplayName("Deve listar subprocessos elegíveis como ADMIN")
+        @WithMockAdmin
+        void deveListarSubprocessosElegiveisComoAdmin() {
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo elegíveis")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .build());
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+
+            List<SubprocessoElegivelDto> resultado = service.listarSubprocessosElegiveis(processo.getCodigo());
+
+            assertThat(resultado).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve listar subprocessos elegíveis como CHEFE")
+        @WithMockChefe
+        void deveListarSubprocessosElegiveisComoChefe() {
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo elegíveis chefe")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .build());
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+
+            List<SubprocessoElegivelDto> resultado = service.listarSubprocessosElegiveis(processo.getCodigo());
+
+            assertThat(resultado).isNotNull();
+        }
+
+        @Test
+        @DisplayName("Deve buscar IDs de unidades com processos ativos excluindo processo específico")
+        @WithMockAdmin
+        void deveBuscarIdsUnidadesComProcessosAtivos() {
+            Set<Long> ids = service.buscarIdsUnidadesComProcessosAtivos(-1L);
+
+            assertThat(ids).isNotNull();
+        }
+    }
+
+    @Nested
+    @DisplayName("Início de Processo — tipos distintos")
+    class InicioTiposTests {
+
+        @Test
+        @DisplayName("Deve iniciar processo REVISAO exercitando branches específicos de REVISAO/DIAGNOSTICO")
+        @WithMockAdmin
+        void deveIniciarProcessoRevisao() {
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo REVISAO inicio")
+                    .tipo(TipoProcesso.REVISAO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .build());
+
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+
+            Processo iniciado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+            assertThat(iniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+            assertThat(iniciado.getTipo()).isEqualTo(TipoProcesso.REVISAO);
+        }
+
+        @Test
+        @DisplayName("Deve iniciar processo DIAGNOSTICO exercitando branches específicos de DIAGNOSTICO")
+        @WithMockAdmin
+        void deveIniciarProcessoDiagnostico() {
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo DIAGNOSTICO inicio")
+                    .tipo(TipoProcesso.DIAGNOSTICO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .build());
+
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+
+            Processo iniciado = processoRepo.findById(processo.getCodigo()).orElseThrow();
+            assertThat(iniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
+            assertThat(iniciado.getTipo()).isEqualTo(TipoProcesso.DIAGNOSTICO);
+
+            List<Subprocesso> subs = subprocessoRepo.listarPorProcessoComUnidade(processo.getCodigo());
+            assertThat(subs).isNotEmpty();
+            assertThat(subs.getFirst().getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao tentar iniciar processo já em andamento")
+        @WithMockAdmin
+        void deveLancarErroAoIniciarProcessoJaEmAndamento() {
+            Processo processo = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo já iniciado")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(LocalDateTime.now().plusDays(30))
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .build());
+            service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO));
+
+            assertThatThrownBy(() -> service.iniciar(processo.getCodigo(), List.of(CODIGO_UNIDADE_MAPEAMENTO)))
+                    .isInstanceOf(ErroValidacao.class);
         }
     }
 
