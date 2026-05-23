@@ -1,7 +1,7 @@
 /* eslint-disable */
 import fs from "fs";
 import path from "path";
-import { globby } from "globby";
+import {globby} from "globby";
 
 const argBaseIdx = process.argv.indexOf('--base');
 const searchDir = argBaseIdx >= 0 && process.argv[argBaseIdx + 1]

@@ -16,7 +16,7 @@ import sgc.comum.model.*;
 import sgc.configuracoes.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
-import sgc.mapa.service.MapaManutencaoService;
+import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;

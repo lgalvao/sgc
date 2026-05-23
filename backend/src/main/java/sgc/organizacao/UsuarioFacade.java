@@ -10,7 +10,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
-import sgc.comum.util.MascaraUtil;
+import sgc.comum.util.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;

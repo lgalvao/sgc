@@ -1,9 +1,9 @@
+import type {Ref} from "vue";
 import {getCurrentInstance, onActivated, onMounted, ref} from "vue";
 import type {ContextoEdicaoSubprocesso, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
 import logger from "@/utils/logger";
-import type {Ref} from "vue";
 
 interface MapaOrquestracaoProps {
     codProcesso: number | string;

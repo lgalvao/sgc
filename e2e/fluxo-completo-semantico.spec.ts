@@ -21,12 +21,12 @@ import {
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {
+    abrirHistoricoAnalise,
     aceitarCadastroMapeamento,
     aceitarRevisao,
     acessarSubprocessoAdmin,
     acessarSubprocessoChefeDireto,
     acessarSubprocessoGestor,
-    abrirHistoricoAnalise,
     devolverCadastroMapeamento,
     fecharHistoricoAnalise,
     homologarCadastroMapeamento

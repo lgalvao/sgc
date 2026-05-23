@@ -1,4 +1,4 @@
-import {computed, ref, watch, type Ref} from "vue";
+import {computed, ref, type Ref, watch} from "vue";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";

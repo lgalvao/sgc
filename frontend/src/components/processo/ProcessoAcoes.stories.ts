@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import ProcessoAcoes from './ProcessoAcoes.vue';
-import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 import type {Processo} from '@/types/tipos';
+import {SituacaoProcesso, TipoProcesso} from '@/types/tipos';
 
 const meta: Meta<typeof ProcessoAcoes> = {
     title: 'Processo/ProcessoAcoes',

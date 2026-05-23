@@ -11,7 +11,7 @@ import {executarSetup} from "./projeto/setup.js";
 import {executarSnapshotQa} from "./qa/snapshot-coletar.js";
 import {executarResumoQa} from "./qa/resumo.js";
 
- 
+
 function criarComandoScript(pai, nome, descricao, relativo) {
     pai
         .command(nome)

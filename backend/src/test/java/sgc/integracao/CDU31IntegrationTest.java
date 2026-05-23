@@ -5,8 +5,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.*;
-import sgc.integracao.mocks.*;
 import sgc.configuracoes.model.*;
+import sgc.integracao.mocks.*;
 import tools.jackson.databind.*;
 
 import java.util.*;

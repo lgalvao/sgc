@@ -2,7 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { globby } from 'globby';
+import {globby} from 'globby';
 
 const raiz = process.cwd();
 const dirRequisitos = path.join(raiz, 'etc/reqs');

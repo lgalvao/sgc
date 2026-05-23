@@ -5,7 +5,13 @@ import {TEXTOS_ERRO_GERAL} from "./textos-erro-geral.js";
 import {TEXTOS_LOGIN} from "./textos-login.js";
 import {TEXTOS_MAPA, TEXTOS_MAPA_VISUALIZACAO, TEXTOS_SUCESSO_MAPA} from "./textos-mapa.js";
 import {TEXTOS_PAINEL} from "./textos-painel.js";
-import {TEXTOS_ACAO_BLOCO, TEXTOS_HISTORICO, TEXTOS_PROCESSO, TEXTOS_SUCESSO_PROCESSO, TEXTOS_TABELA_PROCESSOS} from "./textos-processo.js";
+import {
+    TEXTOS_ACAO_BLOCO,
+    TEXTOS_HISTORICO,
+    TEXTOS_PROCESSO,
+    TEXTOS_SUCESSO_PROCESSO,
+    TEXTOS_TABELA_PROCESSOS
+} from "./textos-processo.js";
 import {TEXTOS_MOVIMENTACAO, TEXTOS_SUBPROCESSO, TEXTOS_SUCESSO_SUBPROCESSO} from "./textos-subprocesso.js";
 import {TEXTOS_TREE_TABLE, TEXTOS_UNIDADE, TEXTOS_UNIDADES} from "./textos-unidades.js";
 

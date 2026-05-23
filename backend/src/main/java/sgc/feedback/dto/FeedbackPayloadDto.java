@@ -2,7 +2,7 @@ package sgc.feedback.dto;
 
 import jakarta.validation.constraints.*;
 import org.jspecify.annotations.*;
-import sgc.comum.Mensagens;
+import sgc.comum.*;
 import sgc.feedback.*;
 import sgc.seguranca.sanitizacao.*;
 import tools.jackson.databind.*;

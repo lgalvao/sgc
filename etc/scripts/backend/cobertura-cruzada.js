@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import pc from "picocolors";
-import { resolverNaRaiz } from "../lib/caminhos.js";
-import { deveExcluirClasse } from "../lib/dominios/cobertura-java.js";
-import { parseStringPromise } from "xml2js";
+import {resolverNaRaiz} from "../lib/caminhos.js";
+import {deveExcluirClasse} from "../lib/dominios/cobertura-java.js";
+import {parseStringPromise} from "xml2js";
 
 async function main() {
     try {

@@ -195,11 +195,11 @@ import {useUnidadeStore} from "@/stores/unidade";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/date";
 import {
+  type AtribuicaoTemporaria,
   atualizarAtribuicaoTemporaria,
   buscarAtribuicoesTemporariasPorUnidade,
   criarAtribuicaoTemporaria,
-  removerAtribuicaoTemporaria,
-  type AtribuicaoTemporaria
+  removerAtribuicaoTemporaria
 } from "@/services/atribuicaoTemporariaService";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import {useOrganizacaoStore} from "@/stores/organizacao";

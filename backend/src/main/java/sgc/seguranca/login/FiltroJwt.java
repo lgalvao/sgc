@@ -7,8 +7,8 @@ import lombok.extern.slf4j.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.context.*;
 import org.springframework.web.filter.*;
-import sgc.organizacao.*;
 import sgc.comum.util.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 
 import java.io.*;

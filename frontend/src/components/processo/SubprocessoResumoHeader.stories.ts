@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import SubprocessoResumoHeader from './SubprocessoResumoHeader.vue';
+import type {ResponsavelDto, SubprocessoDetalhe} from '@/types/tipos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
-import type {SubprocessoDetalhe, ResponsavelDto} from '@/types/tipos';
 
 const meta: Meta<typeof SubprocessoResumoHeader> = {
     title: 'Processo/SubprocessoResumoHeader',

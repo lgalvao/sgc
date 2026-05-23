@@ -176,7 +176,13 @@ import {TEXTOS} from "@/constants/textos";
 import {type FeedbackAdmin, listarFeedbacksAdmin, obterUrlScreenshot} from "@/services/feedbackAdminService";
 import {formatarDataHoraBR} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
-import {formatarMetadados, formatarTipo, obterIconeTipo, obterVarianteTipo, resumirNota} from "@/views/feedbacksAdminApresentacao";
+import {
+  formatarMetadados,
+  formatarTipo,
+  obterIconeTipo,
+  obterVarianteTipo,
+  resumirNota
+} from "@/views/feedbacksAdminApresentacao";
 
 const feedbacks = ref<FeedbackAdmin[]>([]);
 const carregando = ref(true);

@@ -1,4 +1,3 @@
- 
 import fs from "node:fs/promises";
 import {parseStringPromise} from "xml2js";
 import {resolverNaRaiz} from "../caminhos.js";

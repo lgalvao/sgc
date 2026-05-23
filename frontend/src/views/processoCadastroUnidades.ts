@@ -1,6 +1,5 @@
 import {coletarCodigosElegiveis} from "@/components/unidade/arvoreSelecaoHelpers";
-import type {Unidade} from "@/types/tipos";
-import type {UnidadeSelecao} from "@/types/tipos";
+import type {Unidade, UnidadeSelecao} from "@/types/tipos";
 
 export function filtrarSelecionadasPorElegibilidade(
     selecionadas: number[],

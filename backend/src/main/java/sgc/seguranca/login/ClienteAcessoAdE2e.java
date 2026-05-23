@@ -5,7 +5,6 @@ import org.jspecify.annotations.*;
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
-
 import sgc.comum.util.*;
 
 /**

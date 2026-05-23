@@ -1,7 +1,6 @@
 package sgc.comum.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * Utilitário para mascaramento de dados sensíveis em logs.

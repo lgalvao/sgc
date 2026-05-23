@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.openpdf.text.*;
+import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -16,7 +17,6 @@ import sgc.processo.service.*;
 import sgc.relatorio.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
-import sgc.comum.erros.ErroAcessoNegado;
 
 import java.io.*;
 import java.util.*;

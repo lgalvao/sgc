@@ -7,7 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.model.*;
-import sgc.comum.util.MascaraUtil;
+import sgc.comum.util.*;
 import sgc.configuracoes.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;

@@ -110,7 +110,7 @@ import UnidadeContatoInfo from "@/components/unidade/UnidadeContatoInfo.vue";
 import {useUnidadeStore} from "@/stores/unidade";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
-import {logger,formatarDataBR} from "@/utils";
+import {formatarDataBR, logger} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";

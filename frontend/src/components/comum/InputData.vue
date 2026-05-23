@@ -29,9 +29,8 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import {BFormInput, BInputGroup, BInputGroupText} from "bootstrap-vue-next";
-import {ref} from "vue";
 
 defineProps<{
   modelValue: string;

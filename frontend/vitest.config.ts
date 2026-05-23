@@ -1,6 +1,7 @@
 import vue from "@vitejs/plugin-vue";
-import type { Plugin } from "vite";
-import { defineConfig } from "vitest/config";
+import type {Plugin} from "vite";
+import {defineConfig} from "vitest/config";
+
 export default defineConfig({
   plugins: [vue() as Plugin],
   resolve: {

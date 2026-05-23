@@ -3,13 +3,13 @@ import * as subprocessoService from "@/services/subprocessoService";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useToastStore} from "@/stores/toast";
+import type {RouteLocationRaw} from "vue-router";
 import {useRouter} from "vue-router";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_ATIVIDADES} from "@/constants/textos-atividades";
 import {TEXTOS_SUCESSO_SUBPROCESSO} from "@/constants/textos-subprocesso";
 import type {HomologarCadastroRequest} from "@/types/tipos";
-import type {RouteLocationRaw} from "vue-router";
 
 interface WorkflowOptions {
     mensagemSucesso?: string;

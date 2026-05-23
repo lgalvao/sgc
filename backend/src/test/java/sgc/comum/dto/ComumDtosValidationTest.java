@@ -3,7 +3,7 @@ package sgc.comum.dto;
 import jakarta.validation.*;
 import org.junit.jupiter.api.*;
 import sgc.comum.ComumDtos.*;
-import sgc.comum.Mensagens;
+import sgc.comum.*;
 
 import java.time.*;
 import java.util.*;

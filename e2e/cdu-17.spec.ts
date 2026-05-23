@@ -6,7 +6,7 @@ import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
-    test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
+test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
     const UNIDADE_SUPERIOR_IMEDIATA = 'COORD_21';
 

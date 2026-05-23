@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { resolverNaRaiz } from "../lib/caminhos.js";
+import {resolverNaRaiz} from "../lib/caminhos.js";
 
 const novaVersao = process.argv[2];
 if (!novaVersao) {

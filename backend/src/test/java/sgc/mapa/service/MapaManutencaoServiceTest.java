@@ -8,7 +8,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
 import java.util.*;
