@@ -12,6 +12,82 @@ interface CadastroOrquestracaoProps {
     codSubprocesso?: number;
 }
 
+interface EstadoCadastroOrquestracao {
+    atividades: Ref<Atividade[]>;
+    carregandoInicial: Ref<boolean>;
+    codigoSubprocesso: Ref<number | null>;
+    atividadesSnapshotInicial: Ref<string | null>;
+    unidade: Ref<Unidade | null>;
+    codMapa: Ref<number | null>;
+    carregamentoInicialConcluido: Ref<boolean>;
+}
+
+interface DependenciasCadastroOrquestracao {
+    subprocessoStore: ReturnType<typeof useSubprocessoStore>;
+    mapasStore: ReturnType<typeof useMapasStore>;
+    invalidarCachesSubprocesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesSubprocesso"];
+}
+
+function aplicarEstadoContexto(
+    estado: EstadoCadastroOrquestracao,
+    deps: DependenciasCadastroOrquestracao,
+    response: RespostaLocalCadastro,
+) {
+    estado.atividades.value = response.atividadesAtualizadas;
+    deps.subprocessoStore.atualizarStatusLocal({
+        ...response.subprocesso,
+        permissoes: response.permissoes
+    });
+    deps.mapasStore.invalidar(response.subprocesso.codigo);
+    deps.subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
+}
+
+function processarRespostaLocal(
+    estado: EstadoCadastroOrquestracao,
+    deps: DependenciasCadastroOrquestracao,
+    response: RespostaLocalCadastro,
+) {
+    aplicarEstadoContexto(estado, deps, response);
+    deps.invalidarCachesSubprocesso({incluirPainel: true});
+}
+
+function sincronizarEstadoInicialContexto(
+    estado: EstadoCadastroOrquestracao,
+    deps: DependenciasCadastroOrquestracao,
+    data: ContextoCadastroAtividadesSubprocesso,
+) {
+    aplicarEstadoContexto(estado, deps, {
+        subprocesso: {
+            codigo: data.detalhes.codigo,
+            situacao: data.detalhes.situacao,
+        },
+        permissoes: data.detalhes.permissoes,
+        atividadesAtualizadas: data.atividadesDisponiveis,
+    });
+
+    estado.atividadesSnapshotInicial.value = data.assinaturaCadastroReferencia ?? calcularAssinaturaCadastro(data.atividadesDisponiveis);
+    estado.unidade.value = data.unidade;
+    estado.codMapa.value = data.mapa.codigo;
+}
+
+function erroIntegracaoFoiCancelado(subprocessoStore: ReturnType<typeof useSubprocessoStore>): boolean {
+    return subprocessoStore.erroIntegracaoContexto?.codigo === "REQUEST_CANCELADA";
+}
+
+async function buscarContextoInicial(
+    props: CadastroOrquestracaoProps,
+    subprocessoStore: ReturnType<typeof useSubprocessoStore>,
+    limparAntes = false,
+) {
+    return typeof props.codSubprocesso === "number"
+        ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, limparAntes)
+        : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
+            Number(props.codProcesso),
+            props.sigla,
+            limparAntes,
+        );
+}
+
 export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
@@ -23,78 +99,31 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
     const unidade = ref<Unidade | null>(null);
     const codMapa = ref<number | null>(null);
     const carregamentoInicialConcluido = ref(false);
-
-    /**
-     * Aplica o payload de um contexto de cadastro ao estado local e invalida
-     * os caches de subprocesso e mapas dependentes.
-     *
-     * Esta função é usada tanto na carga inicial quanto após mutações.
-     * NÃO invalida o painelStore — use processarRespostaLocal para mutações
-     * que devem reflectir no painel ao retornar.
-     */
-    function aplicarEstadoContexto(response: RespostaLocalCadastro) {
-        atividades.value = response.atividadesAtualizadas;
-        subprocessoStore.atualizarStatusLocal({
-            ...response.subprocesso,
-            permissoes: response.permissoes
-        });
-        mapasStore.invalidar(response.subprocesso.codigo);
-        subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
-    }
-
-    /**
-     * Processa a resposta de uma mutação de cadastro (adicionar, remover,
-     * importar atividades). Aplica o novo estado local e invalida o painel
-     * para que ao retornar o usuário veja os dados atualizados.
-     */
-    function processarRespostaLocal(response: RespostaLocalCadastro) {
-        aplicarEstadoContexto(response);
-        invalidarCachesSubprocesso({incluirPainel: true});
-    }
-
-    /**
-     * Sincroniza o estado inicial do contexto de cadastro após a carga do
-     * backend. Não invalida o painel — é uma operação de leitura, não mutação.
-     */
-    function sincronizarEstadoInicialContexto(data: ContextoCadastroAtividadesSubprocesso) {
-        aplicarEstadoContexto({
-            subprocesso: {
-                codigo: data.detalhes.codigo,
-                situacao: data.detalhes.situacao,
-            },
-            permissoes: data.detalhes.permissoes,
-            atividadesAtualizadas: data.atividadesDisponiveis,
-        });
-
-        atividadesSnapshotInicial.value = data.assinaturaCadastroReferencia ?? calcularAssinaturaCadastro(data.atividadesDisponiveis);
-        unidade.value = data.unidade;
-        codMapa.value = data.mapa.codigo;
-    }
-
-    function erroIntegracaoFoiCancelado(): boolean {
-        return subprocessoStore.erroIntegracaoContexto?.codigo === "REQUEST_CANCELADA";
-    }
-
-    async function buscarContextoInicial(limparAntes = false) {
-        return typeof props.codSubprocesso === "number"
-            ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, limparAntes)
-            : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
-                Number(props.codProcesso),
-                props.sigla,
-                limparAntes,
-            );
-    }
+    const estado = {
+        atividades,
+        carregandoInicial,
+        codigoSubprocesso,
+        atividadesSnapshotInicial,
+        unidade,
+        codMapa,
+        carregamentoInicialConcluido,
+    };
+    const dependencias = {
+        subprocessoStore,
+        mapasStore,
+        invalidarCachesSubprocesso,
+    };
 
     async function carregarContextoInicial() {
         try {
-            let data = await buscarContextoInicial(false);
+            let data = await buscarContextoInicial(props, subprocessoStore, false);
 
-            if (!data && erroIntegracaoFoiCancelado()) {
-                data = await buscarContextoInicial(true);
+            if (!data && erroIntegracaoFoiCancelado(subprocessoStore)) {
+                data = await buscarContextoInicial(props, subprocessoStore, true);
             }
 
             if (!data) {
-                if (erroIntegracaoFoiCancelado()) {
+                if (erroIntegracaoFoiCancelado(subprocessoStore)) {
                     return false;
                 }
                 logger.error("ERRO: Subprocesso não encontrado!");
@@ -102,7 +131,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
             }
 
             codigoSubprocesso.value = data.detalhes.codigo;
-            sincronizarEstadoInicialContexto(data);
+            sincronizarEstadoInicialContexto(estado, dependencias, data);
             return true;
         } finally {
             carregandoInicial.value = false;
@@ -135,7 +164,8 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         unidade,
         codMapa,
         carregarContextoInicial,
-        processarRespostaLocal,
-        sincronizarEstadoInicialContexto
+        processarRespostaLocal: (response: RespostaLocalCadastro) => processarRespostaLocal(estado, dependencias, response),
+        sincronizarEstadoInicialContexto: (data: ContextoCadastroAtividadesSubprocesso) =>
+            sincronizarEstadoInicialContexto(estado, dependencias, data),
     };
 }

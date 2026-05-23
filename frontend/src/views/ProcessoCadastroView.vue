@@ -356,6 +356,48 @@ function abrirModalConfirmacao() {
   mostrarModalConfirmacao.value = true;
 }
 
+function prepararInicioProcesso() {
+  limparErros();
+  isStarting.value = true;
+  modalUnidadesComEquipePropriaRef.value?.setErro(null);
+  modalUnidadesComEquipePropriaRef.value?.setProcessando(true);
+}
+
+function finalizarInicioProcesso() {
+  modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
+  isStarting.value = false;
+}
+
+function fecharModaisInicioProcesso() {
+  mostrarModalConfirmacao.value = false;
+  modalUnidadesComEquipePropriaRef.value?.fechar();
+}
+
+async function garantirCodigoProcessoParaInicio(): Promise<number | null> {
+  if (processoEditando.value?.codigo) {
+    return processoEditando.value.codigo;
+  }
+
+  try {
+    const request = construirCriarRequest();
+    const novoProcesso = await processoService.criarProcesso(request);
+    return novoProcesso.codigo;
+  } catch (error) {
+    mostrarModalConfirmacao.value = false;
+    modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
+    handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
+    isStarting.value = false;
+    return null;
+  }
+}
+
+async function concluirInicioProcessoComSucesso() {
+  toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
+  invalidarCachesProcesso();
+  await router.push("/painel");
+  fecharModaisInicioProcesso();
+}
+
 async function confirmarIniciarProcesso() {
   if (unidadesComEquipePropriaSelecionadas.value.length > 0) {
     mostrarModalConfirmacao.value = false;
@@ -376,41 +418,22 @@ async function confirmarSelecaoUnidadesComEquipePropria(dados: { ids: number[] }
 }
 
 async function iniciarProcessoComSelecaoDireta(codigosDiretos: number[]) {
-  limparErros();
-  isStarting.value = true;
-  modalUnidadesComEquipePropriaRef.value?.setErro(null);
-  modalUnidadesComEquipePropriaRef.value?.setProcessando(true);
-  let codigoProcesso = processoEditando.value?.codigo;
+  prepararInicioProcesso();
 
+  const codigoProcesso = await garantirCodigoProcessoParaInicio();
   if (!codigoProcesso) {
-    try {
-      const request = construirCriarRequest();
-      const novoProcesso = await processoService.criarProcesso(request);
-      codigoProcesso = novoProcesso.codigo;
-    } catch (error) {
-      mostrarModalConfirmacao.value = false;
-      modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
-      handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
-      isStarting.value = false;
-      return;
-    }
+    return;
   }
 
   try {
     if (!tipo.value) throw new Error("Tipo não definido");
     await processoService.iniciarProcesso(codigoProcesso, tipo.value, codigosDiretos);
-    toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
-    invalidarCachesProcesso();
-    await router.push("/painel");
-    mostrarModalConfirmacao.value = false;
-    modalUnidadesComEquipePropriaRef.value?.fechar();
+    await concluirInicioProcessoComSucesso();
   } catch (error) {
-    mostrarModalConfirmacao.value = false;
-    modalUnidadesComEquipePropriaRef.value?.fechar();
+    fecharModaisInicioProcesso();
     handleApiErrors(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
   } finally {
-    modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
-    isStarting.value = false;
+    finalizarInicioProcesso();
   }
 }
 
