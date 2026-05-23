@@ -458,29 +458,16 @@ class SubprocessoNotificacaoServiceTest {
 
     @Test
     @DisplayName("obterTemplateObrigatorio deve lancar IllegalStateException quando template for nulo ou em branco")
-    void obterTemplateObrigatorio_DeveLancarErroQuandoNuloOuEmBranco() throws Exception {
-        java.lang.reflect.Method metodo = SubprocessoNotificacaoService.class.getDeclaredMethod("obterTemplateObrigatorio", String.class, String.class);
-        metodo.setAccessible(true);
-
+    void obterTemplateObrigatorio_DeveLancarErroQuandoNuloOuEmBranco() {
         // Caso 1: Nulo
-        assertThatThrownBy(() -> {
-            try {
-                metodo.invoke(service, null, "contexto nulo");
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                throw e.getCause();
-            }
-        }).isInstanceOf(IllegalStateException.class)
-          .hasMessageContaining("Template ausente para contexto nulo");
+        assertThatThrownBy(() -> service.obterTemplateObrigatorio(null, "contexto nulo"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Template ausente para contexto nulo");
 
         // Caso 2: Em branco
-        assertThatThrownBy(() -> {
-            try {
-                metodo.invoke(service, "   ", "contexto vazio");
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                throw e.getCause();
-            }
-        }).isInstanceOf(IllegalStateException.class)
-          .hasMessageContaining("Template ausente para contexto vazio");
+        assertThatThrownBy(() -> service.obterTemplateObrigatorio("   ", "contexto vazio"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Template ausente para contexto vazio");
     }
 
     @Test
@@ -548,13 +535,8 @@ class SubprocessoNotificacaoServiceTest {
 
     @Test
     @DisplayName("criarAssunto deve retornar texto específico para cadastro homologado")
-    void criarAssuntoDeveRetornarTextoEspecificoParaCadastroHomologado() throws Exception {
-        java.lang.reflect.Method metodo = SubprocessoNotificacaoService.class
-                .getDeclaredMethod("criarAssunto", TipoTransicao.class, Subprocesso.class, boolean.class);
-        metodo.setAccessible(true);
-
-        String assunto = (String) metodo.invoke(
-                service,
+    void criarAssuntoDeveRetornarTextoEspecificoParaCadastroHomologado() {
+        String assunto = service.criarAssunto(
                 TipoTransicao.CADASTRO_HOMOLOGADO,
                 criarSubprocesso(criarUnidade(10L, "ORIG", "Origem"), criarProcesso()),
                 false
@@ -618,13 +600,8 @@ class SubprocessoNotificacaoServiceTest {
 
     @Test
     @DisplayName("criarAssunto deve usar fallback para tipos não mapeados explicitamente")
-    void criarAssuntoDeveUsarFallbackParaTiposNaoMapeadosExplicitamente() throws Exception {
-        java.lang.reflect.Method metodo = SubprocessoNotificacaoService.class
-                .getDeclaredMethod("criarAssunto", TipoTransicao.class, Subprocesso.class, boolean.class);
-        metodo.setAccessible(true);
-
-        String assunto = (String) metodo.invoke(
-                service,
+    void criarAssuntoDeveUsarFallbackParaTiposNaoMapeadosExplicitamente() {
+        String assunto = service.criarAssunto(
                 TipoTransicao.REVISAO_CADASTRO_HOMOLOGADA,
                 criarSubprocesso(criarUnidade(10L, "ORIG", "Origem"), criarProcesso()),
                 false

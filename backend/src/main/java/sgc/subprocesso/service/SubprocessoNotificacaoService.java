@@ -439,7 +439,7 @@ public class SubprocessoNotificacaoService {
         return resultado;
     }
 
-    private String criarAssunto(TipoTransicao tipo, Subprocesso sp, boolean paraSuperior) {
+    String criarAssunto(TipoTransicao tipo, Subprocesso sp, boolean paraSuperior) {
         return AssuntosNotificacao.subprocesso(tipo, sp.getUnidade().getSigla(), paraSuperior);
     }
 
@@ -449,7 +449,7 @@ public class SubprocessoNotificacaoService {
         return templateEngine.process(templateName, context);
     }
 
-    private String obterTemplateObrigatorio(@Nullable String template, String contexto) {
+    String obterTemplateObrigatorio(@Nullable String template, String contexto) {
         if (template == null || template.isBlank()) {
             throw new IllegalStateException("Template ausente para %s".formatted(contexto));
         }
