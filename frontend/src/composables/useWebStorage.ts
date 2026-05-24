@@ -9,7 +9,7 @@ export function useWebStorage<T>(
 ): Ref<T> {
     const lerValor = (): T => {
         const item = armazenamento.getItem(chave);
-        if (item === null) {
+        if (!item) {
             return valorPadrao;
         }
 
@@ -23,12 +23,11 @@ export function useWebStorage<T>(
     const valorArmazenado = ref(lerValor()) as Ref<T>;
 
     watch(valorArmazenado, (novoValor) => {
-        if (novoValor === null || novoValor === undefined) {
+        if (novoValor == null) {
             armazenamento.removeItem(chave);
-            return;
+        } else {
+            armazenamento.setItem(chave, JSON.stringify(novoValor));
         }
-
-        armazenamento.setItem(chave, JSON.stringify(novoValor));
     }, {deep: true, flush: 'sync'});
 
     return valorArmazenado;

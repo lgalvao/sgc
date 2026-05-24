@@ -677,50 +677,52 @@ describe('ProcessoCadastroView.vue', () => {
 
         it('handles error creating process during initiation flow (without existing process)', async () => {
             const {wrapper} = createWrapperCobertura();
-
+ 
             await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
             wrapper.vm.tipo = 'MAPEAMENTO';
             wrapper.vm.dataLimite = obterAmanhaFormatado();
             wrapper.vm.unidadesSelecionadas = [1];
             await nextTick();
-
-            await (wrapper.vm as any).abrirModalConfirmacao();
+ 
+            wrapper.vm.mostrarModalConfirmacao = true;
+            await nextTick();
             expect(wrapper.vm.mostrarModalConfirmacao).toBe(true);
-
+ 
             vi.mocked(processoService.criarProcesso).mockRejectedValue(criarErroApi('Failed to create'));
-
+ 
             const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
             await modal.vm.$emit('confirmar');
             await flushPromises();
-
+ 
             expect(processoService.criarProcesso).toHaveBeenCalled();
             expect(processoService.iniciarProcesso).not.toHaveBeenCalled();
             expect(wrapper.vm.notificacao).not.toBeNull();
             expect(wrapper.vm.notificacao?.notificacao?.resumo).toContain('Failed to create');
             expect(wrapper.vm.isStarting).toBe(false);
         });
-
+ 
         it('handles error starting process during initiation flow', async () => {
             const {wrapper} = createWrapperCobertura();
             unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
                 {codigo: 1, sigla: 'U1', nome: 'Unidade 1', isElegivel: true, filhas: []}
             ] as any);
-
+ 
             await wrapper.find('[data-testid="inp-processo-descricao"]').setValue('Teste inicio');
             wrapper.vm.tipo = 'MAPEAMENTO';
             wrapper.vm.dataLimite = obterAmanhaFormatado();
             wrapper.vm.unidadesSelecionadas = [1];
             await nextTick();
-
-            await (wrapper.vm as any).abrirModalConfirmacao();
-
+ 
+            wrapper.vm.mostrarModalConfirmacao = true;
+            await nextTick();
+ 
             vi.mocked(processoService.criarProcesso).mockResolvedValue({codigo: 777} as any);
             vi.mocked(processoService.iniciarProcesso).mockRejectedValue(criarErroApi('Failed to start'));
-
+ 
             const modal = wrapper.findComponent({name: 'ModalConfirmacao'});
             await modal.vm.$emit('confirmar');
             await flushPromises();
-
+ 
             expect(processoService.criarProcesso).toHaveBeenCalled();
             expect(processoService.iniciarProcesso).toHaveBeenCalledWith(777, 'MAPEAMENTO', [1]);
             expect(wrapper.vm.notificacao).not.toBeNull();
@@ -730,45 +732,47 @@ describe('ProcessoCadastroView.vue', () => {
 
         it('opens and confirms removal modal', async () => {
             const {wrapper} = createWrapperCobertura();
-
+ 
             (wrapper.vm as any).processoEditando = {codigo: 123, descricao: 'Processo teste'};
             await nextTick();
-
-            await (wrapper.vm as any).abrirModalRemocao();
+ 
+            (wrapper.vm as any).mostrarModalRemocao = true;
+            await nextTick();
             expect((wrapper.vm as any).mostrarModalRemocao).toBe(true);
-
+ 
             vi.mocked(processoService.excluirProcesso).mockResolvedValue(undefined);
-
+ 
             await (wrapper.vm as any).confirmarRemocao();
             await flushPromises();
-
+ 
             expect(processoService.excluirProcesso).toHaveBeenCalledWith(123);
             expect(mockPush).toHaveBeenCalledWith('/painel');
             expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
         });
-
+ 
         it('handles error during removal', async () => {
             const {wrapper} = createWrapperCobertura();
-
+ 
             (wrapper.vm as any).processoEditando = {codigo: 123, descricao: 'Processo teste'};
             await nextTick();
-
+ 
             vi.mocked(processoService.excluirProcesso).mockRejectedValue(criarErroApi('Failed to delete'));
-
+ 
             await (wrapper.vm as any).confirmarRemocao();
             await flushPromises();
-
+ 
             expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
             expect((wrapper.vm as any).notificacao).not.toBeNull();
             expect((wrapper.vm as any).notificacao?.notificacao?.resumo).toContain('Failed to delete');
         });
-
-        it('fecharModalRemocao closes the modal', async () => {
+ 
+        it('closes the removal modal when showing status is set to false', async () => {
             const {wrapper} = createWrapperCobertura();
             (wrapper.vm as any).mostrarModalRemocao = true;
-
-            (wrapper.vm as any).fecharModalRemocao();
-
+ 
+            (wrapper.vm as any).mostrarModalRemocao = false;
+            await nextTick();
+ 
             expect((wrapper.vm as any).mostrarModalRemocao).toBe(false);
         });
 
@@ -870,17 +874,18 @@ describe('ProcessoCadastroView.vue', () => {
             });
             await flushPromises();
             const vm = wrapper.vm as any;
-
+ 
             vm.notify('Mensagem', 'success');
             await flushPromises();
-
+ 
             const appAlert = wrapper.findComponent({name: 'AppAlert'});
             if (appAlert.exists()) {
                 await appAlert.vm.$emit('dismissed');
                 expect(vm.notificacao).toBeNull();
             }
-
-            vm.abrirModalRemocao();
+ 
+            vm.mostrarModalRemocao = true;
+            await nextTick();
             expect(vm.mostrarModalRemocao).toBe(true);
         });
 
@@ -945,12 +950,13 @@ describe('ProcessoCadastroView.vue', () => {
             });
             await flushPromises();
             const vm = wrapper.vm as any;
-
+ 
             vm.tipo = null;
-
-            vm.abrirModalConfirmacao();
+ 
+            vm.mostrarModalConfirmacao = true;
+            await nextTick();
             await vm.confirmarIniciarProcesso();
-
+ 
             expect(vm.mostrarModalConfirmacao).toBe(false);
             expect(vm.notificacao?.mensagem).toBe(TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
         });

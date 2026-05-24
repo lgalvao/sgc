@@ -2,44 +2,6 @@
  * Utilitários para manipulação de estruturas de árvore hierárquicas.
  */
 
-/**
- * Achata uma estrutura de árvore hierárquica em uma lista plana.
- *
- * @example
- * // Com subordinadas (unidades)
- * const arvore = [
- *   { codigo: 1, subordinadas: [{ codigo: 2 }] },
- *   { codigo: 3 }
- * ];
- * const plano = flattenTree(arvore, 'subordinadas');
- * // Resultado: [{ codigo: 1, ... }, { codigo: 2 }, { codigo: 3 }]
- *
- * @example
- * // Com filhos (processos)
- * const arvore = [
- *   { codigo: 1, filhos: [{ codigo: 2 }] },
- *   { codigo: 3 }
- * ];
- * const plano = flattenTree(arvore, 'filhos');
- * // Resultado: [{ codigo: 1, ... }, { codigo: 2 }, { codigo: 3 }]
- */
-export function flattenTree<T extends Record<string, unknown>>(
-    items: T[],
-    childrenKey: string = 'subordinadas'
-): T[] {
-    const result: T[] = [];
-
-    for (const item of items) {
-        result.push(item);
-
-        if (item[childrenKey] && Array.isArray(item[childrenKey])) {
-            result.push(...flattenTree(item[childrenKey], childrenKey));
-        }
-    }
-
-    return result;
-}
-
 type IdentificadorGrupo = number | string;
 
 interface ConfiguracaoOrganizacaoArvore<T extends object> {
@@ -80,7 +42,7 @@ function obterTextoOrdenacao<T extends object>(item: T, config: ConfiguracaoOrga
     return config.obterSigla(item) ?? config.obterRotulo(item) ?? "";
 }
 
-export function ehZonaEleitoralPorMetadados(item: {
+function ehZonaEleitoralPorMetadados(item: {
     tipo?: string;
     sigla?: string;
     nome?: string;
@@ -90,7 +52,7 @@ export function ehZonaEleitoralPorMetadados(item: {
         || ehTextoZonaEleitoral(item.nome);
 }
 
-export function ehSecretariaPorMetadados(item: {
+function ehSecretariaPorMetadados(item: {
     nome?: string;
 }): boolean {
     return ehTextoSecretaria(item.nome);

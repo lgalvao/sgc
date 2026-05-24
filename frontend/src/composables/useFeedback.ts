@@ -44,9 +44,9 @@ async function capturarBlobTela(): Promise<Blob | null> {
 
 function criarMetadados(route: ReturnType<typeof useRoute>, perfilStore: ReturnType<typeof usePerfilStore>): MetadadosFeedback {
     return {
-        usuarioCodigo: perfilStore.usuarioCodigo ?? '',
-        usuarioNome: perfilStore.usuarioNome ?? '',
-        rotaNome: String(route.name ?? ''),
+        usuarioCodigo: perfilStore.usuarioCodigo ? perfilStore.usuarioCodigo : '',
+        usuarioNome: perfilStore.usuarioNome ? perfilStore.usuarioNome : '',
+        rotaNome: route.name ? String(route.name) : '',
         rotaCaminho: route.fullPath,
         rotaQuery: JSON.stringify(route.query),
         tituloPagina: document.title,

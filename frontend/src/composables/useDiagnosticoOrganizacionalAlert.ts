@@ -8,83 +8,35 @@ export interface UnidadeSemResponsavel {
     sigla: string;
 }
 
-type EstadoDiagnosticoOrganizacionalAlert = ReturnType<typeof criarEstado>;
-type DependenciasDiagnosticoOrganizacionalAlert = {
-    unidades: Ref<Unidade[]>;
-    mostrarDiagnosticoOrganizacional: Ref<boolean>;
-    gruposDiagnostico: Ref<Array<{tipo: string; ocorrencias: string[]}>>;
-};
-
-function criarEstado() {
-    return {
-        unidadesReferencia: ref<Unidade[]>([]),
-        carregandoUnidadesReferencia: ref(false),
-        unidadesReferenciaCarregadas: ref(false),
-        alertaDiagnosticoDispensado: ref(false),
-    };
-}
-
-function listarSiglasUnidadesSemResponsavel(ocorrencias: string[]): string[] {
-    return ocorrencias
-        .map(extrairSiglaUnidade)
-        .filter((sigla): sigla is string => Boolean(sigla));
-}
-
-function encontrarGrupoUnidadeSemResponsavel(grupos: Array<{tipo: string; ocorrencias: string[]}>) {
-    return grupos.find((item) => item.tipo === "Unidade sem responsável") ?? null;
-}
-
-function carregarUnidadesReferenciaSeNecessario(
-    estado: EstadoDiagnosticoOrganizacionalAlert,
-    dependencias: DependenciasDiagnosticoOrganizacionalAlert,
-) {
-    watch(
-        [() => dependencias.mostrarDiagnosticoOrganizacional.value, dependencias.gruposDiagnostico, dependencias.unidades],
-        async () => {
-            if (!dependencias.mostrarDiagnosticoOrganizacional.value || estado.unidadesReferenciaCarregadas.value || estado.carregandoUnidadesReferencia.value) {
-                return;
-            }
-
-            const grupo = encontrarGrupoUnidadeSemResponsavel(dependencias.gruposDiagnostico.value);
-            if (!grupo) {
-                return;
-            }
-
-            const existemLinksPendentes = listarSiglasUnidadesSemResponsavel(grupo.ocorrencias)
-                .some((sigla) => buscarCodigoUnidadePorSigla(dependencias.unidades.value, sigla) === null);
-            if (!existemLinksPendentes) {
-                return;
-            }
-
-            estado.carregandoUnidadesReferencia.value = true;
-            try {
-                estado.unidadesReferencia.value = await buscarTodasUnidades();
-                estado.unidadesReferenciaCarregadas.value = true;
-            } finally {
-                estado.carregandoUnidadesReferencia.value = false;
-            }
-        },
-        {immediate: true},
-    );
-}
-
 export function useDiagnosticoOrganizacionalAlert(
     unidades: Ref<Unidade[]>,
     mostrarDiagnosticoOrganizacional: Ref<boolean>,
 ) {
     const organizacaoStore = useOrganizacaoStore();
-    const estado = criarEstado();
+    
+    // Estado local reativo do composable
+    const unidadesReferencia = ref<Unidade[]>([]);
+    const carregandoUnidadesReferencia = ref(false);
+    const unidadesReferenciaCarregadas = ref(false);
+    const alertaDiagnosticoDispensado = ref(false);
+
     const carregandoDiagnosticoOrganizacional = computed(() => organizacaoStore.carregando);
     const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
     const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
     const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
+    
     const resumoDiagnostico = computed(() =>
         erroDiagnosticoOrganizacional.value
-        ?? diagnosticoOrganizacional.value?.resumo
-        ?? ""
+        || diagnosticoOrganizacional.value?.resumo
+        || ""
     );
+
+    const encontrarGrupoUnidadeSemResponsavel = () => {
+        return gruposDiagnostico.value.find((item) => item.tipo === "Unidade sem responsável");
+    };
+
     const unidadesSemResponsavel = computed(() => {
-        const grupo = encontrarGrupoUnidadeSemResponsavel(gruposDiagnostico.value);
+        const grupo = encontrarGrupoUnidadeSemResponsavel();
         if (!grupo) {
             return [];
         }
@@ -92,9 +44,10 @@ export function useDiagnosticoOrganizacionalAlert(
             .map((sigla) => ({
                 sigla,
                 codigo: buscarCodigoUnidadePorSigla(unidades.value, sigla)
-                    ?? buscarCodigoUnidadePorSigla(estado.unidadesReferencia.value, sigla),
+                    || buscarCodigoUnidadePorSigla(unidadesReferencia.value, sigla),
             }));
     });
+
     const exibirAlertaDiagnostico = computed(() =>
         mostrarDiagnosticoOrganizacional.value
         && (
@@ -102,9 +55,10 @@ export function useDiagnosticoOrganizacionalAlert(
             || !!erroDiagnosticoOrganizacional.value
             || diagnosticoOrganizacional.value?.possuiViolacoes === true
         )
-        && !estado.alertaDiagnosticoDispensado.value
+        && !alertaDiagnosticoDispensado.value
     );
 
+    // Watcher para garantir o diagnóstico organizacional da loja Pinia
     watch(
         () => mostrarDiagnosticoOrganizacional.value,
         async (deveExibir) => {
@@ -112,7 +66,38 @@ export function useDiagnosticoOrganizacionalAlert(
         },
         {immediate: true},
     );
-    carregarUnidadesReferenciaSeNecessario(estado, {unidades, mostrarDiagnosticoOrganizacional, gruposDiagnostico});
+
+    // Watcher para carregar as unidades de referência de forma reativa sob demanda
+    watch(
+        [() => mostrarDiagnosticoOrganizacional.value, gruposDiagnostico, unidades],
+        async () => {
+            if (!mostrarDiagnosticoOrganizacional.value || unidadesReferenciaCarregadas.value || carregandoUnidadesReferencia.value) {
+                return;
+            }
+
+            const grupo = encontrarGrupoUnidadeSemResponsavel();
+            if (!grupo) {
+                return;
+            }
+
+            const siglas = listarSiglasUnidadesSemResponsavel(grupo.ocorrencias);
+            const existemLinksPendentes = siglas.some(
+                (sigla) => !buscarCodigoUnidadePorSigla(unidades.value, sigla)
+            );
+            if (!existemLinksPendentes) {
+                return;
+            }
+
+            carregandoUnidadesReferencia.value = true;
+            try {
+                unidadesReferencia.value = await buscarTodasUnidades();
+                unidadesReferenciaCarregadas.value = true;
+            } finally {
+                carregandoUnidadesReferencia.value = false;
+            }
+        },
+        {immediate: true},
+    );
 
     return {
         carregandoDiagnosticoOrganizacional,
@@ -123,9 +108,9 @@ export function useDiagnosticoOrganizacionalAlert(
         unidadesSemResponsavel,
         exibirAlertaDiagnostico,
         dispensarAlertaDiagnostico: () => {
-            estado.alertaDiagnosticoDispensado.value = true;
+            alertaDiagnosticoDispensado.value = true;
         },
-        alertaDiagnosticoDispensado: estado.alertaDiagnosticoDispensado,
+        alertaDiagnosticoDispensado,
     };
 }
 
@@ -133,9 +118,14 @@ function extrairSiglaUnidade(ocorrencia: string): string | null {
     if (!ocorrencia) {
         return null;
     }
-
     const correspondencia = new RegExp(/^sigla=([^,]+?)(?:,\s|$)/).exec(ocorrencia);
     return correspondencia?.[1]?.trim() || null;
+}
+
+function listarSiglasUnidadesSemResponsavel(ocorrencias: string[]): string[] {
+    return ocorrencias
+        .map(extrairSiglaUnidade)
+        .filter((sigla): sigla is string => Boolean(sigla));
 }
 
 function buscarCodigoUnidadePorSigla(unidadesOrigem: Unidade[], sigla: string): number | null {
@@ -144,11 +134,10 @@ function buscarCodigoUnidadePorSigla(unidadesOrigem: Unidade[], sigla: string): 
             return unidade.codigo;
         }
 
-        const codigoFilha = buscarCodigoUnidadePorSigla(unidade.filhas ?? [], sigla);
-        if (codigoFilha !== null) {
+        const codigoFilha = buscarCodigoUnidadePorSigla(unidade.filhas || [], sigla);
+        if (codigoFilha) {
             return codigoFilha;
         }
     }
-
     return null;
 }

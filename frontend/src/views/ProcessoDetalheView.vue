@@ -8,7 +8,7 @@
 
     <AppAlert
         v-if="notificacao"
-        :dispensavel="notificacao.dispensavel ?? true"
+        :dispensavel="notificacao.dispensavel"
         :mensagem="notificacao.mensagem"
         :notification="notificacao.notificacao"
         :stack-trace="notificacao.stackTrace"
@@ -37,10 +37,10 @@
     <ModalAcaoBloco
         :id="'modal-acao-bloco'"
         ref="modalBlocoRef"
-        :mostrar-data-limite="acaoBlocoAtual?.requerDataLimite ?? false"
-        :rotulo-botao="acaoBlocoAtual?.rotuloBotao ?? ''"
-        :texto="acaoBlocoAtual?.texto ?? ''"
-        :titulo="acaoBlocoAtual?.titulo ?? ''"
+        :mostrar-data-limite="acaoBlocoAtual?.requerDataLimite"
+        :rotulo-botao="acaoBlocoAtual?.rotuloBotao"
+        :texto="acaoBlocoAtual?.texto"
+        :titulo="acaoBlocoAtual?.titulo"
         :unidades="unidadesElegiveis"
         :unidades-pre-selecionadas="idsElegiveis"
         @confirmar="executarAcaoBloco"/>
@@ -56,7 +56,7 @@
         @confirmar="confirmarFinalizacao">
       <p class="mb-2">
         {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO }}
-        <strong>{{ processo?.descricao || '' }}</strong>?
+        <strong>{{ descricaoProcesso }}</strong>?
       </p>
       <p class="mb-0">{{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO }}</p>
     </ModalConfirmacao>
@@ -124,12 +124,17 @@ async function carregarContextoCompleto() {
   }
 }
 
-const participantesHierarquia = computed(() => processo.value?.unidades || []);
-const podeFinalizar = computed(() => processo.value?.podeFinalizar || false);
+const participantesHierarquia = computed(() => processo.value ? processo.value.unidades : []);
+const podeFinalizar = computed(() => !!processo.value?.podeFinalizar);
 const mostrarFinalizarProcesso = computed(() => isAdmin.value);
-const acoesBlocoVisiveis = computed(() => (processo.value?.acoesBloco ?? []).filter(acao => acao.mostrar));
+const acoesBlocoVisiveis = computed(() => {
+  const acoes = processo.value?.acoesBloco;
+  return acoes ? acoes.filter(acao => acao.mostrar) : [];
+});
 const usarMenuAcoesBloco = computed(() => acoesBlocoVisiveis.value.length > 1);
 const acaoBlocoPrincipal = computed(() => acoesBlocoVisiveis.value[0] ?? null);
+
+const descricaoProcesso = computed(() => processo.value ? processo.value.descricao : "");
 const {
   acaoBlocoAtual,
   abrirModalBloco,

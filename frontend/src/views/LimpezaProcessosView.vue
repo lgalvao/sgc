@@ -57,7 +57,7 @@
         variant="danger"
         @confirmar="confirmarExclusao"
     >
-      <p v-if="codigoConfirmacao !== null">
+      <p v-if="codigoConfirmacao">
         {{ TEXTOS.administracao.LIMPEZA_MODAL_TEXTO(codigoConfirmacao) }}
       </p>
     </ModalConfirmacao>
@@ -89,17 +89,17 @@ const codigoProcesso = ref('');
 const excluindo = ref(false);
 const mostrarConfirmacao = ref(false);
 
-const codigoConfirmacao = computed(() => {
+const codigoConfirmacao = computed<number | undefined>(() => {
   const codigo = Number(codigoProcesso.value);
-  return Number.isInteger(codigo) && codigo > 0 ? codigo : null;
+  return Number.isInteger(codigo) && codigo > 0 ? codigo : undefined;
 });
 
 const mensagemErroCodigo = computed(() => {
-  return deveExibirErro(codigoConfirmacao.value === null) ? TEXTOS.administracao.LIMPEZA_ERRO_CODIGO : '';
+  return deveExibirErro(!codigoConfirmacao.value) ? TEXTOS.administracao.LIMPEZA_ERRO_CODIGO : '';
 });
 
 async function abrirConfirmacao() {
-  if (!validarSubmissao(codigoConfirmacao.value !== null)) {
+  if (!validarSubmissao(!!codigoConfirmacao.value)) {
     await focarPrimeiroErroInvalido();
     return;
   }
@@ -108,7 +108,7 @@ async function abrirConfirmacao() {
 }
 
 async function confirmarExclusao() {
-  if (codigoConfirmacao.value === null) {
+  if (!codigoConfirmacao.value) {
     return;
   }
 

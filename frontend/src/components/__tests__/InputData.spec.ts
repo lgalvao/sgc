@@ -2,7 +2,6 @@ import {mount} from "@vue/test-utils";
 import {afterEach, describe, expect, it, vi} from "vitest";
 import InputData from "@/components/comum/InputData.vue";
 import {logger, obterHojeFormatado} from "@/utils";
-import {flattenTree} from "@/utils/treeUtils";
 
 const BFormInputStub = {
     template: `
@@ -165,7 +164,5 @@ describe("InputData.vue", () => {
     it("deve manter os reexports do barrel de utils disponíveis", () => {
         expect(typeof logger.info).toBe("function");
         expect(obterHojeFormatado()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-        expect(flattenTree([{codigo: 1, subordinadas: [{codigo: 2}]}]).map((item: { codigo: number }) => item.codigo))
-            .toEqual([1, 2]);
     });
 });
