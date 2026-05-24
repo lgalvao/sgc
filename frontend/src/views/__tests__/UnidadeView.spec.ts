@@ -376,4 +376,67 @@ describe('UnidadeView.vue', () => {
         expect(wrapper.text()).not.toContain('Responsável');
         wrapper.unmount();
     });
+
+    it('exportarMapaVigentePdf lida com erro', async () => {
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'CHEFE',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: false},
+            },
+        });
+        await flushPromises();
+
+        mockObterReferenciaMapaVigente.mockResolvedValueOnce(mockMapaVigente);
+        downloadRelatorioMapaVigenteUnidadePdf.mockRejectedValueOnce(new Error('Erro PDF'));
+
+        const vm = wrapper.vm as any;
+        vm.mapaVigente = mockMapaVigente;
+
+        await vm.exportarMapaVigentePdf();
+        expect(downloadRelatorioMapaVigenteUnidadePdf).toHaveBeenCalledWith(1);
+        expect(vm.loadingExportacaoPdf).toBe(false);
+    });
+
+    it('calcula corretamente as propriedades computadas de responsabilidade e titular', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // Caso Substituição com data
+        vm.unidade = {
+            ...mockUnidadeData,
+            tipoResponsabilidade: 'SUBSTITUTO',
+            dataFimResponsabilidade: '2026-12-31T23:59:59'
+        };
+        expect(vm.descricaoResponsabilidade).toContain('Substituição');
+        expect(vm.descricaoResponsabilidade).toContain('31/12/2026');
+
+        // Caso Atribuição Temporária sem data
+        vm.unidade = {
+            ...mockUnidadeData,
+            tipoResponsabilidade: 'ATRIBUICAO_TEMPORARIA',
+            dataFimResponsabilidade: null
+        };
+        expect(vm.descricaoResponsabilidade).toBe('Atrib. temporária');
+
+        // Caso Responsável não é Titular
+        vm.unidade = {
+            ...mockUnidadeData,
+            titular: {tituloEleitoral: '123'},
+            responsavel: {tituloEleitoral: '456'}
+        };
+        expect(vm.responsavelEhTitular).toBe(false);
+        expect(vm.titularExibivel).toBe(true);
+        expect(vm.labelContatoPrincipal).toContain('Responsável');
+
+        // Caso Responsável É Titular
+        vm.unidade = {
+            ...mockUnidadeData,
+            titular: {tituloEleitoral: '123'},
+            responsavel: {tituloEleitoral: '123'}
+        };
+        expect(vm.responsavelEhTitular).toBe(true);
+        expect(vm.titularExibivel).toBe(false);
+        expect(vm.labelContatoPrincipal).toContain('Titular');
+    });
 });

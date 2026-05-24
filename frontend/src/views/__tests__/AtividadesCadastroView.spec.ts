@@ -12,6 +12,8 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/acesso';
+import * as useNotificationModule from '@/composables/useNotification';
+import {useNotification} from '@/composables/useNotification';
 import {TEXTOS} from "@/constants/textos";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
@@ -32,6 +34,22 @@ vi.mock("@/utils/logger", () => ({
         info: vi.fn(),
         debug: vi.fn(),
     }
+}));
+
+const notificacaoMock = ref(null);
+const notifyMock = vi.fn((mensagem, variante, dispensavel) => {
+    notificacaoMock.value = {mensagem, variante, dispensavel};
+});
+const clearMock = vi.fn(() => {
+    notificacaoMock.value = null;
+});
+
+vi.mock("@/composables/useNotification", () => ({
+    useNotification: vi.fn(() => ({
+        notify: notifyMock,
+        clear: clearMock,
+        notificacao: notificacaoMock
+    }))
 }));
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -892,6 +910,24 @@ describe("CadastroView.vue", () => {
                 conhecimentos: [{codigo: 2, descricao: "Conhecimento importado"}]
             }
         ]);
+    });
+
+    it("handleImportAtividades exibe aviso quando resultado tem aviso", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+
+        const resultadoComAviso = {
+            aviso: "Duplicatas encontradas",
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: criarContextoEdicao().detalhes.permissoes,
+            atividadesAtualizadas: []
+        };
+
+        await vm.handleImportAtividades(resultadoComAviso);
+
+        const notifyMock = vi.mocked(useNotificationModule.useNotification()).notify;
+        expect(notifyMock).toHaveBeenCalledWith(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
     });
 
     it("deve gerenciar interações com formulários de atividades, modais de importação e alertas de erro", async () => {
