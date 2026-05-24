@@ -1,43 +1,34 @@
 import {computed, ref, watch} from "vue";
+import type {Ref} from "vue";
 import type {Unidade} from "@/types/tipos";
-import {coletarCodigosElegiveis, getTodasSubunidades, mapearHierarquia} from "./arvoreSelecaoHelpers";
+import {
+    coletarCodigosElegiveis,
+    ehAgrupadorVisual,
+    getTodasSubunidades,
+    mapearHierarquia,
+    ordenarCodigos
+} from "./arvoreSelecaoHelpers";
 
-export function useArvoreSelecao(props: {
+type PropsArvoreSelecao = {
     unidades: Unidade[];
     modelValue: number[];
     modoSelecao: boolean;
     mostrarSuperioresNaoElegiveisComoIndeterminados: boolean;
-}, emit: (e: "update:modelValue", value: number[]) => void) {
-    const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+};
 
-    // Mapas para acesso rápido (Pai e Unidade)
-    const maps = computed(() => mapearHierarquia(props.unidades));
-
-    const parentMap = computed(() => maps.value.parentMap);
-
-    function filtrarSelecaoPorElegibilidade(selecao: number[]): number[] {
+function criarFiltradorSelecao(props: PropsArvoreSelecao) {
+    return (selecao: number[]): number[] => {
         const codigosElegiveis = coletarCodigosElegiveis(props.unidades);
         return selecao.filter(codigo => codigosElegiveis.has(codigo));
-    }
+    };
+}
 
-    function isChecked(codigo: number): boolean {
-        if (!props.modoSelecao) return false;
-        return unidadesSelecionadasLocal.value.includes(codigo);
-    }
-
-    function isHabilitado(unidade: Unidade): boolean {
-        if (!props.modoSelecao) return false;
-        if (unidade.isElegivel) return true;
-        if (!unidade.filhas || unidade.filhas.length === 0) return false;
-        return unidade.filhas.some(filha => isHabilitado(filha));
-    }
-
-    function calcularEstadoSelecao(
+function criarCalculadorEstadoSelecao(props: PropsArvoreSelecao) {
+    const calcularEstadoSelecao = (
         unidade: Unidade,
         selectionSet: ReadonlySet<number>
-    ): boolean | "indeterminate" {
+    ): boolean | "indeterminate" => {
         const selfSelected = selectionSet.has(unidade.codigo);
-
         if (!unidade.filhas || unidade.filhas.length === 0) {
             return selfSelected;
         }
@@ -46,77 +37,74 @@ export function useArvoreSelecao(props: {
         const todasFilhasMarcadas = estadosFilhas.every(estado => estado === true);
         const algumaFilhaSelecionada = estadosFilhas.some(estado => estado !== false);
 
-        if (props.mostrarSuperioresNaoElegiveisComoIndeterminados &&
-            !unidade.isElegivel &&
-            algumaFilhaSelecionada) {
+        if (props.mostrarSuperioresNaoElegiveisComoIndeterminados && !unidade.isElegivel && algumaFilhaSelecionada) {
             return "indeterminate";
         }
-
-        if (todasFilhasMarcadas) {
-            return true;
-        }
-
-        if (!algumaFilhaSelecionada) {
-            return selfSelected;
-        }
-
+        if (todasFilhasMarcadas) return true;
+        if (!algumaFilhaSelecionada) return selfSelected;
         return "indeterminate";
-    }
+    };
 
-    function getEstadoSelecao(unidade: Unidade): boolean | "indeterminate" {
-        if (!props.modoSelecao) return false;
-        return calcularEstadoSelecao(unidade, new Set(unidadesSelecionadasLocal.value));
-    }
+    return calcularEstadoSelecao;
+}
 
-    function updateAncestors(node: Unidade, selectionSet: Set<number>) {
+function sincronizarSelecaoLocal(novoValor: number[], unidadesSelecionadasLocal: Ref<number[]>, filtrarSelecaoPorElegibilidade: (selecao: number[]) => number[]) {
+    const novoValorFiltrado = filtrarSelecaoPorElegibilidade(novoValor);
+    if (JSON.stringify(ordenarCodigos(novoValorFiltrado)) !== JSON.stringify(ordenarCodigos(unidadesSelecionadasLocal.value))) {
+        unidadesSelecionadasLocal.value = [...novoValorFiltrado];
+    }
+}
+
+function criarAtualizadorAncestrais(
+    parentMap: Ref<Map<number, Unidade>>,
+    calcularEstadoSelecao: (unidade: Unidade, selectionSet: ReadonlySet<number>) => boolean | "indeterminate"
+) {
+    return (node: Unidade, selectionSet: Set<number>) => {
         let current = node;
         while (true) {
             const parent = parentMap.value.get(current.codigo);
             if (!parent) break;
 
-            const children = parent.filhas || [];
-            const allChildrenSelected = children.every(child => calcularEstadoSelecao(child, selectionSet) === true);
-
-            if (allChildrenSelected) {
-                if (parent.isElegivel) {
-                    selectionSet.add(parent.codigo);
-                }
+            const allChildrenSelected = (parent.filhas || []).every(child => calcularEstadoSelecao(child, selectionSet) === true);
+            if (allChildrenSelected && parent.isElegivel) {
+                selectionSet.add(parent.codigo);
             } else {
                 selectionSet.delete(parent.codigo);
             }
             current = parent;
         }
-    }
+    };
+}
 
-    function toggle(unidade: Unidade, checked: boolean) {
+function criarAlternadorSelecao(props: PropsArvoreSelecao, unidadesSelecionadasLocal: Ref<number[]>, updateAncestors: (node: Unidade, selectionSet: Set<number>) => void) {
+    return (unidade: Unidade, checked: boolean) => {
         if (!props.modoSelecao) return;
 
         const newSelection = new Set(unidadesSelecionadasLocal.value);
-        const unitsToToggle = [unidade, ...getTodasSubunidades(unidade)];
-
-        if (checked) {
-            unitsToToggle.forEach(u => {
-                if (u.isElegivel) {
-                    newSelection.add(u.codigo);
+        [unidade, ...getTodasSubunidades(unidade)].forEach((unidadeAtual) => {
+            if (checked) {
+                if (unidadeAtual.isElegivel) {
+                    newSelection.add(unidadeAtual.codigo);
                 }
-            });
-        } else {
-            unitsToToggle.forEach(u => newSelection.delete(u.codigo));
-        }
+                return;
+            }
+            newSelection.delete(unidadeAtual.codigo);
+        });
 
-        const unidadeVisual = unidade as Unidade & { agrupadorVisual?: boolean };
-        if (unidadeVisual.agrupadorVisual) {
+        if (ehAgrupadorVisual(unidade)) {
             (unidade.filhas ?? []).forEach(filha => updateAncestors(filha, newSelection));
         } else {
             updateAncestors(unidade, newSelection);
         }
         unidadesSelecionadasLocal.value = Array.from(newSelection);
-    }
+    };
+}
 
-    function selecionarTodas(unidadesParaSelecionar: Unidade[]) {
+function criarSelecionadorTotal(props: PropsArvoreSelecao, unidadesSelecionadasLocal: Ref<number[]>) {
+    return (unidadesParaSelecionar: Unidade[]) => {
         if (!props.modoSelecao) return;
-        const newSelection = new Set<number>(unidadesSelecionadasLocal.value);
 
+        const newSelection = new Set<number>(unidadesSelecionadasLocal.value);
         const traverse = (nodes: Unidade[]) => {
             nodes.forEach(node => {
                 if (node.isElegivel) {
@@ -130,34 +118,51 @@ export function useArvoreSelecao(props: {
 
         traverse(unidadesParaSelecionar);
         unidadesSelecionadasLocal.value = Array.from(newSelection);
-    }
+    };
+}
 
-    function deselecionarTodas() {
-        if (!props.modoSelecao) return;
-        unidadesSelecionadasLocal.value = [];
-    }
+function isHabilitadoParaSelecao(modoSelecao: boolean, unidade: Unidade): boolean {
+    if (!modoSelecao) return false;
+    if (unidade.isElegivel) return true;
+    return (unidade.filhas ?? []).some(filha => isHabilitadoParaSelecao(modoSelecao, filha));
+}
 
+function configurarWatchers(args: {
+    props: PropsArvoreSelecao;
+    unidadesSelecionadasLocal: Ref<number[]>;
+    filtrarSelecaoPorElegibilidade: (selecao: number[]) => number[];
+    emit: (e: "update:modelValue", value: number[]) => void;
+}) {
     watch(
-        () => props.modelValue,
-        (novoValor) => {
-            const novoValorFiltrado = filtrarSelecaoPorElegibilidade(novoValor);
-            const sortedNew = [...novoValorFiltrado].sort((a, b) => a - b);
-            const sortedLocal = [...unidadesSelecionadasLocal.value].sort((a, b) => a - b);
-
-            if (JSON.stringify(sortedNew) !== JSON.stringify(sortedLocal)) {
-                unidadesSelecionadasLocal.value = [...novoValorFiltrado];
-            }
-        },
+        () => args.props.modelValue,
+        (novoValor) => sincronizarSelecaoLocal(novoValor, args.unidadesSelecionadasLocal, args.filtrarSelecaoPorElegibilidade),
         {deep: true}
     );
 
-    watch(
-        unidadesSelecionadasLocal,
-        (newValue) => {
-            emit("update:modelValue", newValue);
-        },
-        {deep: true}
-    );
+    watch(() => args.unidadesSelecionadasLocal.value, (newValue) => args.emit("update:modelValue", newValue), {deep: true});
+}
+
+export function useArvoreSelecao(props: PropsArvoreSelecao, emit: (e: "update:modelValue", value: number[]) => void) {
+    const unidadesSelecionadasLocal = ref<number[]>([...props.modelValue]);
+    const maps = computed(() => mapearHierarquia(props.unidades));
+    const parentMap = computed(() => maps.value.parentMap);
+    const filtrarSelecaoPorElegibilidade = criarFiltradorSelecao(props);
+    const calcularEstadoSelecao = criarCalculadorEstadoSelecao(props);
+    const updateAncestors = criarAtualizadorAncestrais(parentMap, calcularEstadoSelecao);
+    const toggle = criarAlternadorSelecao(props, unidadesSelecionadasLocal, updateAncestors);
+    const isChecked = (codigo: number) => props.modoSelecao && unidadesSelecionadasLocal.value.includes(codigo);
+    const isHabilitado = (unidade: Unidade) => isHabilitadoParaSelecao(props.modoSelecao, unidade);
+    const getEstadoSelecao = (unidade: Unidade) => props.modoSelecao
+        ? calcularEstadoSelecao(unidade, new Set(unidadesSelecionadasLocal.value))
+        : false;
+    const selecionarTodas = criarSelecionadorTotal(props, unidadesSelecionadasLocal);
+    const deselecionarTodas = () => {
+        if (props.modoSelecao) {
+            unidadesSelecionadasLocal.value = [];
+        }
+    };
+
+    configurarWatchers({props, unidadesSelecionadasLocal, filtrarSelecaoPorElegibilidade, emit});
 
     return {
         unidadesSelecionadasLocal,
