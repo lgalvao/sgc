@@ -28,175 +28,154 @@ type DependenciasSubprocessoAcoesAdministrativas = {
     garantirContextoEdicao: (codigoSubprocesso: number, limpar: boolean) => Promise<unknown>;
 };
 
-
-async function executarComCarregamento(loading: Ref<boolean>, acao: () => Promise<void>) {
-    loading.value = true;
-    try {
-        await acao();
-    } finally {
-        loading.value = false;
-    }
-}
-
-type ExecutarComNotificacaoDeErroParams = {
-    loading: Ref<boolean>;
-    mensagemErro: string;
-    notify: (mensagem: string, variante: VarianteAlerta) => void;
-};
-
-async function executarComNotificacaoDeErro(
-    params: ExecutarComNotificacaoDeErroParams,
-    acao: () => Promise<void>
-) {
-    const { loading, mensagemErro, notify } = params;
-    await executarComCarregamento(loading, async () => {
-        try {
-            await acao();
-        } catch (error) {
-            logger.error(mensagemErro, error);
-            notify(mensagemErro, "danger");
-        }
-    });
-}
-
-export function useSubprocessoAcoesAdministrativas({
-                                                       subprocesso,
-                                                       codigoSubprocesso,
-                                                       codProcesso,
-                                                       habilitarAlterarDataLimite,
-                                                       deveExibirErro,
-                                                       resetarValidacao,
-                                                       validarSubmissao,
-                                                       focarPrimeiroErroInvalido,
-                                                       notify,
-                                                       atualizarSubprocessoAtual,
-                                                       exibirToastPendente,
-                                                       alterarDataLimiteSubprocesso,
-                                                       reabrirCadastro,
-                                                       reabrirRevisaoCadastro,
-                                                       enviarLembrete,
-                                                       garantirContextoEdicao,
-                                                   }: DependenciasSubprocessoAcoesAdministrativas) {
-    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
-    const toastStore = useToastStore();
-    const estadoModais = reactive({
+function criarEstado() {
+    const modais = reactive({
         modalLembreteAberto: false,
         mostrarModalAlterarDataLimite: false,
         mostrarModalReabrir: false,
     });
-    const {modalLembreteAberto, mostrarModalAlterarDataLimite, mostrarModalReabrir} = toRefs(estadoModais);
-
-    const tipoReabertura = ref<TipoReabertura>("cadastro");
-    const justificativaReabertura = ref("");
-    const loadingDataLimite = ref(false);
-    const loadingReabertura = ref(false);
-    const loadingLembrete = ref(false);
-    const mensagemErroJustificativa = computed(() =>
-        deveExibirErro(!justificativaReabertura.value.trim()) ? "Informe a justificativa para reabrir." : "",
-    );
-
-
-    function abrirModalAlterarDataLimite() {
-        if (habilitarAlterarDataLimite.value) {
-            mostrarModalAlterarDataLimite.value = true;
-            return;
-        }
-        notify(TEXTOS.subprocesso.ERRO_SEM_PERMISSAO_DATA, "danger");
-    }
-
-    function fecharModalAlterarDataLimite() {
-        mostrarModalAlterarDataLimite.value = false;
-    }
-
-    async function confirmarAlteracaoDataLimite(novaData: string) {
-        const detalhe = subprocesso.value;
-        if (!novaData || !detalhe) return;
-
-        await executarComNotificacaoDeErro({ loading: loadingDataLimite, mensagemErro: TEXTOS.subprocesso.ERRO_DATA_ALTERADA, notify }, async () => {
-            await alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
-            fecharModalAlterarDataLimite();
-            toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
-            // ProcessoResumo.dataLimite é exibido no painel — invalida para refletir a mudança
-            invalidarCachesSubprocesso({incluirPainel: true});
-            await atualizarSubprocessoAtual();
-        });
-    }
-
-    function abrirModalReabrirCadastro() {
-        resetarValidacao();
-        tipoReabertura.value = "cadastro";
-        justificativaReabertura.value = "";
-        mostrarModalReabrir.value = true;
-    }
-
-    function abrirModalReabrirRevisao() {
-        resetarValidacao();
-        tipoReabertura.value = "revisao";
-        justificativaReabertura.value = "";
-        mostrarModalReabrir.value = true;
-    }
-
-    function fecharModalReabrir() {
-        mostrarModalReabrir.value = false;
-        justificativaReabertura.value = "";
-    }
-
-    async function confirmarReabertura() {
-        if (!validarSubmissao(!!justificativaReabertura.value.trim())) {
-            void focarPrimeiroErroInvalido();
-            return;
-        }
-
-        const codigo = codigoSubprocesso.value;
-        if (!codigo) return;
-
-        await executarComCarregamento(loadingReabertura, async () => {
-            const fn = tipoReabertura.value === "revisao" ? reabrirRevisaoCadastro : reabrirCadastro;
-            const sucesso = await fn(codigo, justificativaReabertura.value);
-            if (sucesso) {
-                fecharModalReabrir();
-                exibirToastPendente();
-            }
-        });
-    }
-
-    function confirmarEnviarLembrete() {
-        if (!subprocesso.value) return;
-        modalLembreteAberto.value = true;
-    }
-
-    async function enviarLembreteConfirmado() {
-        const detalhe = subprocesso.value;
-        const codigo = codigoSubprocesso.value;
-        if (!detalhe || !codigo || loadingLembrete.value) return;
-
-        await executarComNotificacaoDeErro({ loading: loadingLembrete, mensagemErro: TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, notify }, async () => {
-            await enviarLembrete(codProcesso, detalhe.unidade.codigo);
-            await garantirContextoEdicao(codigo, true);
-            modalLembreteAberto.value = false;
-            toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
-            exibirToastPendente();
-        });
-    }
 
     return {
-        tipoReabertura,
-        justificativaReabertura,
-        modalLembreteAberto,
-        mostrarModalAlterarDataLimite,
-        mostrarModalReabrir,
-        loadingDataLimite,
-        loadingReabertura,
-        loadingLembrete,
-        mensagemErroJustificativa,
-        abrirModalAlterarDataLimite,
-        fecharModalAlterarDataLimite,
-        confirmarAlteracaoDataLimite,
-        abrirModalReabrirCadastro,
-        abrirModalReabrirRevisao,
-        fecharModalReabrir,
-        confirmarReabertura,
-        confirmarEnviarLembrete,
-        enviarLembreteConfirmado,
+        ...toRefs(modais),
+        tipoReabertura: ref<TipoReabertura>("cadastro"),
+        justificativaReabertura: ref(""),
+        loadingDataLimite: ref(false),
+        loadingReabertura: ref(false),
+        loadingLembrete: ref(false),
+    };
+}
+
+function abrirReabertura(estado: ReturnType<typeof criarEstado>, resetarValidacao: () => void, tipo: TipoReabertura) {
+    resetarValidacao();
+    estado.tipoReabertura.value = tipo;
+    estado.justificativaReabertura.value = "";
+    estado.mostrarModalReabrir.value = true;
+}
+
+async function alterarDataLimite(args: {
+    dependencias: DependenciasSubprocessoAcoesAdministrativas;
+    estado: ReturnType<typeof criarEstado>;
+    invalidarCachesSubprocesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesSubprocesso"];
+    toastStore: ReturnType<typeof useToastStore>;
+    novaData: string;
+}) {
+    const {dependencias, estado, invalidarCachesSubprocesso, toastStore, novaData} = args;
+    const detalhe = dependencias.subprocesso.value;
+    if (!novaData || !detalhe) {
+        return;
+    }
+
+    estado.loadingDataLimite.value = true;
+    try {
+        await dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
+        estado.mostrarModalAlterarDataLimite.value = false;
+        toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
+        invalidarCachesSubprocesso({incluirPainel: true});
+        await dependencias.atualizarSubprocessoAtual();
+    } catch (error) {
+        logger.error(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, error);
+        dependencias.notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, "danger");
+    } finally {
+        estado.loadingDataLimite.value = false;
+    }
+}
+
+async function confirmarReabertura(
+    dependencias: DependenciasSubprocessoAcoesAdministrativas,
+    estado: ReturnType<typeof criarEstado>
+) {
+    const justificativa = estado.justificativaReabertura.value.trim();
+    if (!dependencias.validarSubmissao(Boolean(justificativa))) {
+        void dependencias.focarPrimeiroErroInvalido();
+        return;
+    }
+
+    estado.loadingReabertura.value = true;
+    try {
+        const reabrir = estado.tipoReabertura.value === "revisao"
+            ? dependencias.reabrirRevisaoCadastro
+            : dependencias.reabrirCadastro;
+        const sucesso = await reabrir(dependencias.codigoSubprocesso.value!, justificativa);
+        if (!sucesso) {
+            return;
+        }
+
+        estado.mostrarModalReabrir.value = false;
+        estado.justificativaReabertura.value = "";
+        dependencias.exibirToastPendente();
+    } finally {
+        estado.loadingReabertura.value = false;
+    }
+}
+
+async function enviarLembrete(
+    dependencias: DependenciasSubprocessoAcoesAdministrativas,
+    estado: ReturnType<typeof criarEstado>,
+    toastStore: ReturnType<typeof useToastStore>
+) {
+    const detalhe = dependencias.subprocesso.value;
+    if (!detalhe || estado.loadingLembrete.value) {
+        return;
+    }
+
+    estado.loadingLembrete.value = true;
+    try {
+        await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
+        await dependencias.garantirContextoEdicao(dependencias.codigoSubprocesso.value!, true);
+        estado.modalLembreteAberto.value = false;
+        toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
+        dependencias.exibirToastPendente();
+    } catch (error) {
+        logger.error(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, error);
+        dependencias.notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, "danger");
+    } finally {
+        estado.loadingLembrete.value = false;
+    }
+}
+
+export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSubprocessoAcoesAdministrativas) {
+    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+    const toastStore = useToastStore();
+    const estado = criarEstado();
+
+    return {
+        tipoReabertura: estado.tipoReabertura,
+        justificativaReabertura: estado.justificativaReabertura,
+        modalLembreteAberto: estado.modalLembreteAberto,
+        mostrarModalAlterarDataLimite: estado.mostrarModalAlterarDataLimite,
+        mostrarModalReabrir: estado.mostrarModalReabrir,
+        loadingDataLimite: estado.loadingDataLimite,
+        loadingReabertura: estado.loadingReabertura,
+        loadingLembrete: estado.loadingLembrete,
+        mensagemErroJustificativa: computed(() =>
+            dependencias.deveExibirErro(!estado.justificativaReabertura.value.trim())
+                ? "Informe a justificativa para reabrir."
+                : ""
+        ),
+        abrirModalAlterarDataLimite: () => {
+            if (!dependencias.habilitarAlterarDataLimite.value) {
+                dependencias.notify(TEXTOS.subprocesso.ERRO_SEM_PERMISSAO_DATA, "danger");
+                return;
+            }
+            estado.mostrarModalAlterarDataLimite.value = true;
+        },
+        fecharModalAlterarDataLimite: () => {
+            estado.mostrarModalAlterarDataLimite.value = false;
+        },
+        confirmarAlteracaoDataLimite: (novaData: string) =>
+            alterarDataLimite({dependencias, estado, invalidarCachesSubprocesso, toastStore, novaData}),
+        abrirModalReabrirCadastro: () => abrirReabertura(estado, dependencias.resetarValidacao, "cadastro"),
+        abrirModalReabrirRevisao: () => abrirReabertura(estado, dependencias.resetarValidacao, "revisao"),
+        fecharModalReabrir: () => {
+            estado.mostrarModalReabrir.value = false;
+            estado.justificativaReabertura.value = "";
+        },
+        confirmarReabertura: () => confirmarReabertura(dependencias, estado),
+        confirmarEnviarLembrete: () => {
+            if (dependencias.subprocesso.value) {
+                estado.modalLembreteAberto.value = true;
+            }
+        },
+        enviarLembreteConfirmado: () => enviarLembrete(dependencias, estado, toastStore),
     };
 }

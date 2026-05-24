@@ -274,7 +274,7 @@ watch(novaAtividade, (valorAtual, valorAnterior) => {
 
 watch(assinaturaCadastroAtual, (valorAtual, valorAnterior) => {
   if (valorAtual !== valorAnterior && (errosValidacao.value.length > 0 || erroGlobal.value)) {
-    limparErrosValidacaoCadastro();
+    limparErrosValidacao();
   }
 });
 
@@ -361,7 +361,7 @@ const {
   errosValidacao,
   loadingValidacao,
   loadingDisponibilizacao,
-  limparErrosValidacaoCadastro,
+  limparErrosValidacao,
   disponibilizarCadastro,
   confirmarDisponibilizacao,
   obterErroParaAtividade,
@@ -373,7 +373,6 @@ const {
   houveAlteracaoCadastro,
   disponibilizacaoSemMudancas,
   mostrarModalConfirmacao,
-  nextTick,
   scrollParaPrimeiroErro,
   validarCadastro: fluxoSubprocesso.validarCadastro,
   disponibilizarCadastroFluxo: fluxoSubprocesso.disponibilizarCadastro,
