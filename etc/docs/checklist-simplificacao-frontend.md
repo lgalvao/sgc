@@ -44,6 +44,7 @@ O objetivo é reduzir complexidade acidental sem quebrar contrato, esconder regr
 - Não há alias, compatibilidades ou nomes duplicados sem necessidade real.
 - Se um helper precisa de muitos parâmetros, isso é sinal de fronteira ruim ou abstração artificial.
 - Quando várias ações compartilham muitas dependências locais, prefira um contexto local explícito a passar parâmetros soltos demais.
+- Se um helper privado ultrapassa 3 parâmetros, reagrupe em contexto ou opções semânticas em vez de manter assinatura posicional longa.
 
 ## 5. Critérios de corte
 

@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-24T15:16:59.463Z",
+  "geradoEm": "2026-05-24T15:20:07.447Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -1546,6 +1546,32 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/stores/subprocesso/orquestrador.ts",
+      "camada": "store",
+      "categoriaArquivo": "producao",
+      "linhas": 122,
+      "imports": 5,
+      "exports": 1,
+      "exportsRuntime": [
+        "usarOrquestradorContexto"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 2,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 4,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/utils/apiError/normalizer.ts",
       "camada": "utils",
       "categoriaArquivo": "producao",
@@ -1596,32 +1622,6 @@
         "castsDuplos": 0,
         "storageDireto": 0,
         "exportsSuspeitos": 1
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 4,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/stores/subprocesso/orquestrador.ts",
-      "camada": "store",
-      "categoriaArquivo": "producao",
-      "linhas": 76,
-      "imports": 4,
-      "exports": 1,
-      "exportsRuntime": [
-        "usarOrquestradorContexto"
-      ],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 2,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
       },
       "limites": {
         "target": null,
@@ -2308,7 +2308,7 @@
       "arquivo": "frontend/src/stores/processo.ts",
       "camada": "store",
       "categoriaArquivo": "producao",
-      "linhas": 94,
+      "linhas": 106,
       "imports": 7,
       "exports": 1,
       "exportsRuntime": [

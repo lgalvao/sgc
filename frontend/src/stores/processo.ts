@@ -1,10 +1,66 @@
 import {defineStore} from "pinia";
-import {ref} from "vue";
+import {ref, type Ref} from "vue";
 import type {Processo} from "@/types/tipos";
 import {buscarContextoCompleto as serviceBuscarContextoCompleto} from "@/services/processo";
 import {logger} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
 import {isErroCanceladoHttp} from "@/axios-setup";
+
+type EstadoProcesso = {
+    contextoCompleto: Ref<Processo | null>;
+    codProcessoCarregado: Ref<number | null>;
+    contextoInvalido: Ref<boolean>;
+    carregamentosEmAndamento: Map<number, Promise<Processo>>;
+};
+
+function criarEstado(): EstadoProcesso {
+    return {
+        contextoCompleto: ref<Processo | null>(null),
+        codProcessoCarregado: ref<number | null>(null),
+        contextoInvalido: ref(false),
+        carregamentosEmAndamento: new Map<number, Promise<Processo>>(),
+    };
+}
+
+function registrarContextoCarregado(estado: EstadoProcesso, codProcesso: number, data: Processo) {
+    estado.contextoCompleto.value = data;
+    estado.codProcessoCarregado.value = codProcesso;
+    estado.contextoInvalido.value = false;
+}
+
+function dadosValidos(estado: EstadoProcesso, codProcesso: number): boolean {
+    return estado.contextoCompleto.value?.codigo === codProcesso
+        && estado.codProcessoCarregado.value === codProcesso
+        && !estado.contextoInvalido.value;
+}
+
+async function garantirContextoCompleto(estado: EstadoProcesso, codProcesso: number): Promise<Processo | null> {
+    if (dadosValidos(estado, codProcesso)) {
+        return estado.contextoCompleto.value;
+    }
+
+    const carregamentoExistente = estado.carregamentosEmAndamento.get(codProcesso);
+    if (carregamentoExistente) {
+        return carregamentoExistente;
+    }
+
+    const promessaCarregamento = serviceBuscarContextoCompleto(codProcesso);
+    estado.carregamentosEmAndamento.set(codProcesso, promessaCarregamento);
+    try {
+        const data = await promessaCarregamento;
+        registrarContextoCarregado(estado, codProcesso, data);
+        return data;
+    } catch (erro) {
+        const erroNormalizado = normalizarErro(erro);
+        if (isErroCanceladoHttp(erro) || erroNormalizado.codigo === "REQUEST_CANCELADA") {
+            return null;
+        }
+        logger.error(`Erro ao buscar contexto completo do processo ${codProcesso}:`, erro);
+        throw erro;
+    } finally {
+        estado.carregamentosEmAndamento.delete(codProcesso);
+    }
+}
 
 /**
  * Dedupe de sessão para contexto completo de processo.
@@ -19,75 +75,31 @@ import {isErroCanceladoHttp} from "@/axios-setup";
  * recargas repetidas ao reativar a view sem perder previsibilidade.
  */
 export const useProcessoStore = defineStore("processo", () => {
-    const contextoCompleto = ref<Processo | null>(null);
-    const codProcessoCarregado = ref<number | null>(null);
-    const contextoInvalido = ref(false);
-    const carregamentosEmAndamento = new Map<number, Promise<Processo>>();
+    const estado = criarEstado();
 
     function limparContextoAtual(): void {
-        contextoCompleto.value = null;
-        codProcessoCarregado.value = null;
-        contextoInvalido.value = false;
+        estado.contextoCompleto.value = null;
+        estado.codProcessoCarregado.value = null;
+        estado.contextoInvalido.value = false;
     }
 
-    /** Invalida o cache — deve ser chamado após qualquer ação de workflow que altera o processo. */
     function invalidar(): void {
-        contextoInvalido.value = true;
-        carregamentosEmAndamento.clear();
+        estado.contextoInvalido.value = true;
+        estado.carregamentosEmAndamento.clear();
     }
 
     function resetar(): void {
-        carregamentosEmAndamento.clear();
+        estado.carregamentosEmAndamento.clear();
         limparContextoAtual();
     }
 
-    function dadosValidos(codProcesso: number): boolean {
-        return contextoCompleto.value?.codigo === codProcesso
-            && codProcessoCarregado.value === codProcesso
-            && !contextoInvalido.value;
-    }
-
-    /**
-     * Retorna o contexto completo do processo, usando deduplicação de requisições concorrentes.
-     * @returns o contexto ou null em caso de erro
-     */
-    async function garantirContextoCompleto(codProcesso: number): Promise<Processo | null> {
-        if (dadosValidos(codProcesso)) {
-            return contextoCompleto.value;
-        }
-
-        const carregamentoExistente = carregamentosEmAndamento.get(codProcesso);
-        if (carregamentoExistente) {
-            return carregamentoExistente;
-        }
-
-        try {
-            const promessaCarregamento = serviceBuscarContextoCompleto(codProcesso);
-            carregamentosEmAndamento.set(codProcesso, promessaCarregamento);
-            const data = await promessaCarregamento;
-            contextoCompleto.value = data;
-            codProcessoCarregado.value = codProcesso;
-            contextoInvalido.value = false;
-            return data;
-        } catch (err) {
-            const erroNormalizado = normalizarErro(err);
-            if (isErroCanceladoHttp(err) || erroNormalizado.codigo === "REQUEST_CANCELADA") {
-                return null;
-            }
-            logger.error(`Erro ao buscar contexto completo do processo ${codProcesso}:`, err);
-            throw err; // relança para que a view possa exibir erro inline
-        } finally {
-            carregamentosEmAndamento.delete(codProcesso);
-        }
-    }
-
     return {
-        contextoCompleto,
-        codProcessoCarregado,
+        contextoCompleto: estado.contextoCompleto,
+        codProcessoCarregado: estado.codProcessoCarregado,
         limparContextoAtual,
         invalidar,
         resetar,
-        dadosValidos,
-        garantirContextoCompleto,
+        dadosValidos: (codProcesso: number) => dadosValidos(estado, codProcesso),
+        garantirContextoCompleto: (codProcesso: number) => garantirContextoCompleto(estado, codProcesso),
     };
 });

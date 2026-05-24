@@ -1,6 +1,6 @@
 # Auditoria de cruft do frontend
 
-Gerado em: 2026-05-24T15:16:59.463Z
+Gerado em: 2026-05-24T15:20:07.447Z
 Score total: 495 (critico)
 
 ## Resumo
