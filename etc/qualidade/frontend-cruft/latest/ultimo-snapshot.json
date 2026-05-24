@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-24T15:20:07.447Z",
+  "geradoEm": "2026-05-24T15:22:09.725Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -228,7 +228,7 @@
     {
       "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
       "camada": "composable",
-      "linhas": 134,
+      "linhas": 155,
       "score": 13,
       "contagens": {
         "anyExplicito": 0,
@@ -630,7 +630,7 @@
       "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 134,
+      "linhas": 155,
       "imports": 4,
       "exports": 1,
       "exportsRuntime": [
