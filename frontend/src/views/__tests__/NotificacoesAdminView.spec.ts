@@ -266,4 +266,29 @@ describe('NotificacoesAdminView', () => {
         const item2 = {destinatario: 'a@a.com', usuarioDestinoTitulo: 'TITULO'};
         expect(formatarDestinatario(item2)).toBe('a@a.com');
     });
+
+    it('formata data com hifen para valores invalidos', () => {
+        const wrapper = mountComponent();
+        const vm = wrapper.vm as any;
+        expect(vm.formatarDataOuHifen(null)).toBe('-');
+        expect(vm.formatarDataOuHifen('')).toBe('-');
+        expect(vm.formatarDataOuHifen('data-invalida')).toBe('-');
+    });
+
+    it('limpa html para preview removendo scripts e handlers', () => {
+        const wrapper = mountComponent();
+        const vm = wrapper.vm as any;
+        const sujo = '<p>Olá</p><script>alert(1)</script><div onclick="alert(2)"></div>';
+        const limpo = vm.limparHtmlPreview(sujo);
+        expect(limpo).not.toContain('<script>');
+        expect(limpo).not.toContain('onclick');
+        expect(limpo).toContain('<p>Olá</p>');
+    });
+
+    it('montarPreviewHtml lida com corpo vazio', () => {
+        const wrapper = mountComponent();
+        const vm = wrapper.vm as any;
+        const html = vm.montarPreviewHtml('');
+        expect(html).toContain('Conteúdo indisponível');
+    });
 });

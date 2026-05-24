@@ -89,6 +89,11 @@ vi.mock('@/services/relatoriosService', () => ({
         downloadRelatorioMapaVigenteUnidadeCsv,
     },
 }));
+vi.mock('@/utils/apiError', () => ({
+    normalizarErro: vi.fn((e) => ({
+        mensagem: e?.response?.data?.message || e?.message || 'Erro padrão'
+    })),
+}));
 
 const TreeTableStub = {
     template: '<div data-testid="tree-table"></div>',
@@ -438,5 +443,111 @@ describe('UnidadeView.vue', () => {
         expect(vm.responsavelEhTitular).toBe(true);
         expect(vm.titularExibivel).toBe(false);
         expect(vm.labelContatoPrincipal).toContain('Titular');
+    });
+
+    it('exportarMapaVigenteCsv lida com erro', async () => {
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'CHEFE',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: false},
+            },
+        });
+        await flushPromises();
+
+        downloadRelatorioMapaVigenteUnidadeCsv.mockRejectedValueOnce(new Error('Erro CSV'));
+
+        const vm = wrapper.vm as any;
+        vm.mapaVigente = mockMapaVigente;
+
+        await vm.exportarMapaVigenteCsv();
+        expect(downloadRelatorioMapaVigenteUnidadeCsv).toHaveBeenCalledWith(1);
+        expect(vm.loadingExportacaoCsv).toBe(false);
+    });
+
+    it('carregarDados evita re-entrada', async () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        // Account for initial call during mount
+        await flushPromises();
+        mockObterUnidade.mockClear();
+        
+        let resolve1!: (val: any) => void;
+        mockObterUnidade.mockReturnValueOnce(new Promise(r => resolve1 = r));
+        
+        const p1 = vm.carregarDados(true); // forcar=true to bypass some checks
+        const p2 = vm.carregarDados(true);
+        
+        resolve1(mockUnidadeData);
+        await p1;
+        await p2;
+        
+        // Should only have been called once despite two calls to vm.carregarDados()
+        expect(mockObterUnidade).toHaveBeenCalledTimes(1); 
+    });
+
+    it('possuiDadosLocaisValidos retorna falso quando dados divergem do cache', () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        vm.unidade = { codigo: 1 };
+        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1 });
+        mockUnidadeStore.cacheMapasVigentes.set(1, { codigo: 100 });
+        
+        // Case: unidade.value !== unidadeEmCache
+        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1, diff: true });
+        expect(vm.possuiDadosLocaisValidos()).toBe(false);
+
+        // Case: mapaVigente.value !== mapaVigenteEmCache
+        vm.unidade = mockUnidadeStore.cacheUnidades.get(1);
+        vm.mapaVigente = { codigo: 100 };
+        mockUnidadeStore.cacheMapasVigentes.set(1, { codigo: 100, diff: true });
+        expect(vm.possuiDadosLocaisValidos()).toBe(false);
+    });
+
+    it('reaplicarDadosDoCache retorna falso quando cache incompleto', () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        mockUnidadeStore.cacheUnidades.delete(1);
+        expect(vm.reaplicarDadosDoCache()).toBe(false);
+        
+        mockUnidadeStore.cacheUnidades.set(1, {});
+        mockUnidadeStore.cacheMapasVigentes.delete(1);
+        expect(vm.reaplicarDadosDoCache()).toBe(false);
+    });
+
+    it('deveExibirCarregamento depende de forcar e cache', () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        mockUnidadeStore.cacheUnidades.set(1, {});
+        expect(vm.deveExibirCarregamento(false)).toBe(false);
+        expect(vm.deveExibirCarregamento(true)).toBe(true);
+        
+        mockUnidadeStore.cacheUnidades.delete(1);
+        expect(vm.deveExibirCarregamento(false)).toBe(true);
+    });
+
+    it('carregarDados lida com erro e define ultimoErro', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        mockObterUnidade.mockRejectedValueOnce({ response: { data: { message: 'Erro Customizado' } } });
+        await vm.carregarDados(true);
+        
+        expect(vm.ultimoErro).toBe('Erro Customizado');
+    });
+
+    it('formatarDadosParaArvore lida com itens sem filhas', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        
+        const input = [{ codigo: 1, nome: 'N', sigla: 'S', filhas: null }];
+        const output = vm.formatarDadosParaArvore(input);
+        
+        expect(output[0].children).toBeUndefined();
     });
 });

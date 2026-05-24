@@ -645,5 +645,49 @@ describe('SubprocessoView.vue', () => {
 
         expect(wrapper.find('[data-testid="empty-state-movimentacoes"]').exists()).toBe(true);
     });
+
+    it('exibe erro de integração sem detalhes', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        subprocessoStoreMock.contextoEdicao = null;
+        subprocessoStoreMock.erroIntegracaoContexto = {
+            mensagem: 'Erro de Banco',
+        } as any;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.text()).toContain('Erro de Banco');
+        expect(wrapper.text()).not.toContain('Detalhes:');
+    });
+
+    it('formata data simples', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        expect(vm.formatDataSimples('2026-01-01')).toBe('01/01/2026');
+        expect(vm.formatDataSimples(null)).toBe('');
+    });
+
+    it('reabre revisão com erro na API', async () => {
+        const {wrapper} = mountComponent();
+        await flushPromises();
+        fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(false);
+
+        await wrapper.find('[data-testid="btn-reabrir-revisao"]').trigger('click');
+        await definirJustificativaReabertura(wrapper, 'Justificativa');
+        const btn = wrapper.find('[data-testid="btn-confirmar-reabrir"]');
+        await btn.trigger('click');
+        await flushPromises();
+
+        expect(fluxoSubprocessoMock.reabrirRevisaoCadastro).toHaveBeenCalled();
+    });
+
+    it('deve lidar com subprocesso sem tipoProcesso', async () => {
+        const {wrapper} = mountComponent({
+            tipoProcesso: undefined as any,
+        });
+        await flushPromises();
+        const cards = wrapper.findComponent(SubprocessoCardsStub);
+        expect(cards.props('tipoProcesso')).toBe(TipoProcesso.MAPEAMENTO);
+    });
 });
 

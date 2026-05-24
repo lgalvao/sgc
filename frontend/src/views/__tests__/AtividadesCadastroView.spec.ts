@@ -1111,4 +1111,66 @@ describe("CadastroView.vue", () => {
         expect(vm.erroGlobal).toBe("Erro de validação");
         expect(wrapper.find('[data-testid="btn-dismiss-alert"]').exists()).toBe(true);
     });
+
+    it("deve gerenciar interações com formulários de atividades, modais de importação e alertas de erro extras", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // handleAdicionarAtividade branches
+        await vm.handleAdicionarAtividade();
+        expect(mockAtividadeForm.adicionarAtividade).toHaveBeenCalled();
+
+        // scrollParaPrimeiroErro branches
+        vm.errosValidacao = [{atividadeCodigo: 1, mensagem: 'erro'}];
+        const div = document.createElement('div');
+        div.scrollIntoView = vi.fn();
+        vm.setAtividadeRef(1, div);
+        vm.scrollParaPrimeiroErro();
+        expect(div.scrollIntoView).toHaveBeenCalled();
+
+        // handleImportAtividades branches (success case without warning)
+        await vm.handleImportAtividades({
+            aviso: null, 
+            atividadesAtualizadas: [], 
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
+        });
+        expect(notifyMock).toHaveBeenCalledWith(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
+    });
+
+    it("deve calcular assinatura e ordenar atividades corretamente", async () => {
+        const wrapper = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        vm.atividades = [
+            {codigo: 1, descricao: 'B'},
+            {codigo: 2, descricao: 'A'},
+            {codigo: null, descricao: 'C'}
+        ];
+
+        expect(vm.atividadesOrdenadas[0].codigo).toBe(2);
+        expect(vm.atividadesOrdenadas[1].codigo).toBe(1);
+        expect(vm.atividadesOrdenadas[2].codigo).toBe(null);
+        
+        expect(vm.houveAlteracaoCadastro).toBe(true);
+    });
+
+    it("deve esconder edicao para chefe quando nao habilitado", async () => {
+        const wrapper = createWrapper({}, {
+            podeEditarCadastro: ref(true),
+            habilitarEditarCadastro: ref(false)
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        const {usePerfilStore} = await import("@/stores/perfil");
+        const perfilStore = usePerfilStore();
+        perfilStore.perfilSelecionado = Perfil.CHEFE;
+
+        expect(vm.podeEditarCadastro).toBe(true);
+        expect(vm.habilitarEditarCadastro).toBe(false);
+        expect(vm.esconderEdicaoCadastroParaChefe).toBe(true);
+        expect(vm.mostrarControlesEdicaoCadastro).toBe(false);
+    });
 });
