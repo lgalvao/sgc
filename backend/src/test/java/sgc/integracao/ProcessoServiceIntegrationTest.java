@@ -24,8 +24,6 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
     // Unidades livres (sem processo ativo), com mapa vigente para REVISAO/DIAGNOSTICO
     private static final Long CODIGO_UNIDADE_LIVRE_MAPA = 9L;   // SEDIA — mapa vigente 1002
     private static final Long CODIGO_UNIDADE_LIVRE_MAPA2 = 10L; // SESEL — mapa vigente 1003
-    private static final Long CODIGO_UNIDADE_CHEFE = 102L;      // SUB-UNIT — chefe=111111111111, mapa vigente 1004
-
     @Autowired
     private ProcessoService service;
 
