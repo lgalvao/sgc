@@ -36,7 +36,7 @@ vi.mock("@/utils/logger", () => ({
     }
 }));
 
-const notificacaoMock = ref(null);
+const notificacaoMock = ref<any>(null);
 const notifyMock = vi.fn((mensagem, variante, dispensavel) => {
     notificacaoMock.value = {mensagem, variante, dispensavel};
 });

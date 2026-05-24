@@ -77,7 +77,7 @@ describe('HistoricoAnaliseModal.vue', () => {
 
     it('renders historico correctly and handles branches', async () => {
         const wrapper = mount(HistoricoAnaliseModal, {
-            props: {mostrar: true, historico: historicoMock, loading: false},
+            props: {mostrar: true, historico: historicoMock as any, loading: false},
             global: {stubs}
         });
 
