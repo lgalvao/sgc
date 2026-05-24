@@ -9,12 +9,14 @@ import * as useCadastroAnaliseFluxoModule from "../cadastroAnaliseFluxo";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {createMemoryHistory, createRouter} from "vue-router";
 import * as useNotificationModule from "@/composables/useNotification";
+import * as useCadastroOrquestracaoModule from "@/composables/useCadastroOrquestracao";
 
 vi.mock("@/composables/useCadastroAtividadesMutacoes");
 vi.mock("../cadastroDisponibilizacao");
 vi.mock("../cadastroAnaliseFluxo");
 vi.mock("@/composables/useFluxoSubprocesso");
 vi.mock("@/composables/useNotification");
+vi.mock("@/composables/useCadastroOrquestracao");
 
 const router = createRouter({
   history: createMemoryHistory(),
@@ -72,6 +74,16 @@ const mockFluxo = {
   podeEditarCadastro: ref(true)
 };
 
+const mockOrquestracao = {
+    carregandoInicial: ref(false),
+    codigoSubprocesso: ref(123),
+    atividadesSnapshotInicial: ref(""),
+    unidade: ref({sigla: "U", nome: "Unidade"}),
+    codMapa: ref(100),
+    carregarContextoInicial: vi.fn(),
+    processarRespostaLocal: vi.fn()
+};
+
 const mockNotify = vi.fn();
 const mockClear = vi.fn();
 
@@ -81,6 +93,7 @@ describe("CadastroView Coverage", () => {
       vi.mocked(useCadastroAtividadesMutacoesModule.useCadastroAtividadesMutacoes).mockReturnValue(mockMutacoes as any);
       vi.mocked(useCadastroDisponibilizacaoModule.useCadastroDisponibilizacao).mockReturnValue(mockDisponibilizacao as any);
       vi.mocked(useCadastroAnaliseFluxoModule.useCadastroAnaliseFluxo).mockReturnValue(mockAnaliseFluxo as any);
+      vi.mocked(useCadastroOrquestracaoModule.useCadastroOrquestracao).mockReturnValue(mockOrquestracao as any);
       vi.mocked(useNotificationModule.useNotification).mockReturnValue({
           notify: mockNotify,
           clear: mockClear,
@@ -103,7 +116,10 @@ describe("CadastroView Coverage", () => {
       });
       
       await flushPromises();
-      const resultadoComAviso = { aviso: "Duplicatas" } as any;
+      const resultadoComAviso = { 
+          aviso: "Duplicatas",
+          subprocesso: { codigo: 123 }
+      } as any;
       await (wrapper.vm as any).handleImportAtividades(resultadoComAviso);
       expect(mockClear).toHaveBeenCalled();
       expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'warning');
