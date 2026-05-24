@@ -49,7 +49,7 @@
               data-testid="btn-processo-remover-rodape"
               icon="trash"
               variant="outline-danger"
-              @click="abrirModalRemocao"
+              @click="mostrarModalRemocao = true"
           />
 
           <LoadingButton
@@ -71,7 +71,7 @@
               data-testid="btn-processo-iniciar-rodape"
               icon="play-fill"
               variant="danger"
-              @click="abrirModalConfirmacao"
+              @click="mostrarModalConfirmacao = true"
           />
         </div>
       </BForm>
@@ -304,7 +304,7 @@ function handleApiErrors(error: unknown, title: string, defaultMsg: string) {
   clear();
 
   const erroNormalizado = normalizarErro(error);
-  const usarErroEstruturado = ehErroAxios(error) || (erroNormalizado.erros?.length ?? 0) > 0;
+  const usarErroEstruturado = ehErroAxios(error) || !!erroNormalizado.erros?.length;
 
   if (usarErroEstruturado) {
     aplicarErroNormalizado(erroNormalizado);
@@ -352,50 +352,13 @@ async function salvarProcesso() {
   }
 }
 
-function abrirModalConfirmacao() {
-  mostrarModalConfirmacao.value = true;
-}
-
-function prepararInicioProcesso() {
-  limparErros();
-  isStarting.value = true;
-  modalUnidadesComEquipePropriaRef.value?.setErro(null);
-  modalUnidadesComEquipePropriaRef.value?.setProcessando(true);
-}
-
-function finalizarInicioProcesso() {
-  modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
-  isStarting.value = false;
-}
-
-function fecharModaisInicioProcesso() {
-  mostrarModalConfirmacao.value = false;
-  modalUnidadesComEquipePropriaRef.value?.fechar();
-}
-
-async function garantirCodigoProcessoParaInicio(): Promise<number | null> {
+async function garantirCodigoProcessoParaInicio(): Promise<number> {
   if (processoEditando.value?.codigo) {
     return processoEditando.value.codigo;
   }
-
-  try {
-    const request = construirCriarRequest();
-    const novoProcesso = await processoService.criarProcesso(request);
-    return novoProcesso.codigo;
-  } catch (error) {
-    mostrarModalConfirmacao.value = false;
-    modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
-    handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
-    isStarting.value = false;
-    return null;
-  }
-}
-
-async function concluirInicioProcessoComSucesso() {
-  toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
-  invalidarCachesProcesso();
-  await router.push("/painel");
-  fecharModaisInicioProcesso();
+  const request = construirCriarRequest();
+  const novoProcesso = await processoService.criarProcesso(request);
+  return novoProcesso.codigo;
 }
 
 async function confirmarIniciarProcesso() {
@@ -418,36 +381,44 @@ async function confirmarSelecaoUnidadesComEquipePropria(dados: { ids: number[] }
 }
 
 async function iniciarProcessoComSelecaoDireta(codigosDiretos: number[]) {
-  prepararInicioProcesso();
-
-  const codigoProcesso = await garantirCodigoProcessoParaInicio();
-  if (!codigoProcesso) {
-    return;
-  }
+  limparErros();
+  isStarting.value = true;
+  modalUnidadesComEquipePropriaRef.value?.setErro(null);
+  modalUnidadesComEquipePropriaRef.value?.setProcessando(true);
 
   try {
+    let codigoProcesso: number;
+    try {
+      codigoProcesso = await garantirCodigoProcessoParaInicio();
+    } catch (error) {
+      mostrarModalConfirmacao.value = false;
+      modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
+      handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
+      return;
+    }
+
     if (!tipo.value) throw new Error("Tipo não definido");
     await processoService.iniciarProcesso(codigoProcesso, tipo.value, codigosDiretos);
-    await concluirInicioProcessoComSucesso();
+    
+    toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
+    invalidarCachesProcesso();
+    await router.push("/painel");
+    
+    mostrarModalConfirmacao.value = false;
+    modalUnidadesComEquipePropriaRef.value?.fechar();
   } catch (error) {
-    fecharModaisInicioProcesso();
+    mostrarModalConfirmacao.value = false;
+    modalUnidadesComEquipePropriaRef.value?.fechar();
     handleApiErrors(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
   } finally {
-    finalizarInicioProcesso();
+    modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
+    isStarting.value = false;
   }
-}
-
-function abrirModalRemocao() {
-  mostrarModalRemocao.value = true;
-}
-
-function fecharModalRemocao() {
-  mostrarModalRemocao.value = false;
 }
 
 async function confirmarRemocao() {
   if (!processoEditando.value) {
-    fecharModalRemocao();
+    mostrarModalRemocao.value = false;
     return;
   }
   isRemoving.value = true;
@@ -458,9 +429,9 @@ async function confirmarRemocao() {
     invalidarCachesProcesso();
     await router.push("/painel");
     limparCampos();
-    fecharModalRemocao();
+    mostrarModalRemocao.value = false;
   } catch (error) {
-    fecharModalRemocao();
+    mostrarModalRemocao.value = false;
     handleApiErrors(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
   } finally {
     isRemoving.value = false;
