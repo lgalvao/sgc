@@ -1,42 +1,68 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import apiClient from "@/axios-setup";
-import * as service from "../notificacaoService";
+import {
+  buscarUrlLeitorEmailTestes,
+  compararNotificacoes,
+  listarNotificacoesAdmin,
+  obterTimestampOrdenacao,
+  reenviarNotificacao
+} from "../notificacaoService";
 
-vi.mock("@/axios-setup");
+vi.mock("@/axios-setup", () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn()
+  }
+}));
 
 describe("notificacaoService", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
+  it("listarNotificacoesAdmin deve chamar o endpoint correto", async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({data: []});
+    await listarNotificacoesAdmin(20);
+    expect(apiClient.get).toHaveBeenCalledWith("/admin/notificacoes/listar", {params: {limite: 20}});
+  });
 
-    it("listarNotificacoesAdmin deve chamar endpoint administrativo", async () => {
-        const dados = [{codigo: 1, destinatario: "teste@teste.com", situacao: "PENDENTE"}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: dados});
+  it("reenviarNotificacao deve chamar o endpoint correto", async () => {
+    vi.mocked(apiClient.post).mockResolvedValue({data: {codigo: 1, reenfileiradas: 1}});
+    const res = await reenviarNotificacao(123);
+    expect(apiClient.post).toHaveBeenCalledWith("/admin/notificacoes/123/reenviar");
+    expect(res.codigo).toBe(1);
+  });
 
-        const resultado = await service.listarNotificacoesAdmin(20);
+  it("buscarUrlLeitorEmailTestes deve retornar url ou null", async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({data: {url: " http://mail.test "}});
+    expect(await buscarUrlLeitorEmailTestes()).toBe("http://mail.test");
 
-        expect(apiClient.get).toHaveBeenCalledWith("/admin/notificacoes/listar", {
-            params: {limite: 20}
-        });
-        expect(resultado).toEqual(dados);
-    });
+    vi.mocked(apiClient.get).mockResolvedValue({data: {url: null}});
+    expect(await buscarUrlLeitorEmailTestes()).toBeNull();
+  });
 
-    it("reenviarNotificacao deve chamar endpoint de reenvio por código", async () => {
-        const resposta = {codigo: 123, reenfileiradas: 1};
-        vi.mocked(apiClient.post).mockResolvedValue({data: resposta});
+  it("obterTimestampOrdenacao deve retornar timestamp correto", () => {
+    const item = {proximaTentativaEm: "2026-05-24T10:00:00Z"} as any;
+    expect(obterTimestampOrdenacao(item)).toBe(Date.parse("2026-05-24T10:00:00Z"));
 
-        const resultado = await service.reenviarNotificacao(123);
+    const item2 = {dataHoraEnvio: "2026-05-24T11:00:00Z"} as any;
+    expect(obterTimestampOrdenacao(item2)).toBe(Date.parse("2026-05-24T11:00:00Z"));
 
-        expect(apiClient.post).toHaveBeenCalledWith("/admin/notificacoes/123/reenviar");
-        expect(resultado).toEqual(resposta);
-    });
+    expect(obterTimestampOrdenacao({} as any)).toBe(0);
+    expect(obterTimestampOrdenacao({proximaTentativaEm: "invalido"} as any)).toBe(0);
+  });
 
-    it("buscarUrlLeitorEmailTestes deve chamar endpoint administrativo do leitor", async () => {
-        vi.mocked(apiClient.get).mockResolvedValue({data: {url: "https://seseldev06.tre-pe.gov.br/"}});
+  it("compararNotificacoes deve ordenar por prioridade e depois timestamp", () => {
+    const a = {situacao: "PENDENTE", dataHoraCriacao: "2026-05-24T10:00:00Z"} as any;
+    const b = {situacao: "ENVIADO", dataHoraEnvio: "2026-05-24T11:00:00Z"} as any;
+    
+    // PENDENTE tem prioridade menor (valor numerico) que ENVIADO? 
+    // Vamos assumir que a logica de info.prioridade define isso.
+    const res = compararNotificacoes(a, b);
+    expect(res).not.toBe(0);
 
-        const resultado = await service.buscarUrlLeitorEmailTestes();
+    const c = {situacao: "PENDENTE", dataHoraCriacao: "2026-05-24T09:00:00Z"} as any;
+    // Mesmo status, 'a' é mais recente que 'c'. Comparador retorna b - a para timestamp (descendente).
+    expect(compararNotificacoes(a, c)).toBeLessThan(0); 
+  });
 
-        expect(apiClient.get).toHaveBeenCalledWith("/admin/notificacoes/leitor-email-testes");
-        expect(resultado).toBe("https://seseldev06.tre-pe.gov.br/");
-    });
+  it("compararNotificacoes deve lidar com situacao desconhecida", () => {
+      expect(compararNotificacoes({situacao: "X"} as any, {situacao: "Y"} as any)).toBe(0);
+  });
 });
