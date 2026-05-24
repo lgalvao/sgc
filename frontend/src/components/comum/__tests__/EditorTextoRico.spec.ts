@@ -130,28 +130,30 @@ describe('EditorTextoRico.vue', () => {
         expect(invalidoEmits![invalidoEmits!.length - 1]).toEqual([true]);
         expect(mockEditorInstance.commands.setContent).toHaveBeenCalled();
     });
-
-    it('onUpdate handles reducing content when over limit', async () => {
-        const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '1234567', maximoCaracteres: 5 }
-        });
-        await flushPromises();
-        
-        // Initial call from watch happens here
-        expect(mockEditorInstance.commands.setContent).toHaveBeenCalled();
-        mockEditorInstance.commands.setContent.mockClear();
-        
-        mockEditorInstance.isEmpty = false;
-        mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p>123456</p>');
-        
-        const onUpdate = vi.mocked(Editor).mock.calls[0][0].onUpdate;
-        onUpdate({ editor: mockEditorInstance });
-        
-        expect(wrapper.emitted('update:invalido')).toBeDefined();
-        // Should not trigger setContent loop when reducing, even if still over limit
-        expect(wrapper.emitted('update:modelValue')![0]).toEqual(['123456']);
+it('onUpdate handles reducing content when over limit', async () => {
+    const wrapper = mount(EditorTextoRico, {
+        props: { modelValue: '<p>1234567</p>', maximoCaracteres: 5 }
     });
+    await flushPromises();
 
+    // Initial call from watch happens here
+    expect(mockEditorInstance.commands.setContent).toHaveBeenCalled();
+
+    mockEditorInstance.isEmpty = false;
+    mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p>123456</p>');
+
+    const onUpdate = vi.mocked(Editor).mock.calls[0][0].onUpdate;
+
+    // Clear here to be absolutely sure we only track calls from onUpdate
+    mockEditorInstance.commands.setContent.mockClear();
+
+    onUpdate({ editor: mockEditorInstance });
+
+    expect(wrapper.emitted('update:invalido')).toBeDefined();
+    // Should not trigger setContent loop when reducing, even if still over limit
+    expect(mockEditorInstance.commands.setContent).not.toHaveBeenCalled();
+    expect(wrapper.emitted('update:modelValue')![0]).toEqual(['<p>123456</p>']);
+});
     it('watch modelValue ignores same content', async () => {
         const wrapper = mount(EditorTextoRico, {
             props: { modelValue: '<p>test</p>' }
