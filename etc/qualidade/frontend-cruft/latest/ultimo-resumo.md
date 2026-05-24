@@ -1,7 +1,7 @@
 # Auditoria de cruft do frontend
 
-Gerado em: 2026-05-24T14:04:41.530Z
-Score total: 489 (critico)
+Gerado em: 2026-05-24T15:12:52.773Z
+Score total: 497 (critico)
 
 ## Resumo
 
@@ -9,8 +9,8 @@ Score total: 489 (critico)
 - Arquivos de teste/story: 200
 - any explicito em producao: 0
 - checks de null em producao: 29
-- fallbacks defensivos em producao: 73
-- blocos catch em producao: 55
+- fallbacks defensivos em producao: 75
+- blocos catch em producao: 56
 - casts duplos em producao: 2
 - acessos diretos a storage em producao: 3
 - exports suspeitos em producao: 14
@@ -33,14 +33,14 @@ Score total: 489 (critico)
 | frontend/src/utils/textoFormatado.ts | utils | 37 | 14 | fallbacksDefensivos: 2, exportsSuspeitos: 2 |
 | frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts | composable | 134 | 13 | checksNull: 2, fallbacksDefensivos: 3 |
 | frontend/src/services/processo/mapeadores.ts | service | 38 | 13 | fallbacksDefensivos: 3, exportsSuspeitos: 1 |
-| frontend/src/views/CadastroView.vue | view | 454 | 12 | fallbacksDefensivos: 4 |
+| frontend/src/views/CadastroView.vue | view | 453 | 12 | fallbacksDefensivos: 4 |
 | frontend/src/views/UnidadeView.vue | view | 361 | 12 | fallbacksDefensivos: 2, catchBlocks: 3 |
 | frontend/src/composables/useFeedback.ts | composable | 110 | 11 | fallbacksDefensivos: 3, catchBlocks: 1 |
 | frontend/src/views/RelatorioUnidadesSemMapasVigentesView.vue | view | 235 | 11 | checksNull: 1, fallbacksDefensivos: 3 |
 | frontend/src/views/LimpezaProcessosView.vue | view | 128 | 10 | checksNull: 4, catchBlocks: 1 |
 | frontend/src/views/MapaView.vue | view | 502 | 10 | fallbacksDefensivos: 2, catchBlocks: 2 |
+| frontend/src/views/processoDetalheAcoes.ts | view | 173 | 10 | fallbacksDefensivos: 2, catchBlocks: 2 |
 | frontend/src/components/processo/SubprocessoResumoHeader.vue | component | 173 | 9 | fallbacksDefensivos: 3 |
+| frontend/src/components/unidade/useArvoreSelecao.ts | component | 178 | 9 | fallbacksDefensivos: 3 |
 | frontend/src/utils/formatters.ts | utils | 79 | 9 | fallbacksDefensivos: 3 |
 | frontend/src/views/feedbacksAdminApresentacao.ts | view | 165 | 9 | fallbacksDefensivos: 1, catchBlocks: 3 |
-| frontend/src/components/comum/ModalConfirmacao.vue | component | 144 | 8 | castsDuplos: 1 |
-| frontend/src/utils/statusHelpers.ts | utils | 64 | 8 | exportsSuspeitos: 2 |
