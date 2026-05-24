@@ -41,6 +41,7 @@ O objetivo é reduzir complexidade acidental sem quebrar contrato, esconder regr
 - A API pública do composable/view é coerente com a modelagem interna.
 - Não há alias, compatibilidades ou nomes duplicados sem necessidade real.
 - Se um helper precisa de muitos parâmetros, isso é sinal de fronteira ruim ou abstração artificial.
+- Quando várias ações compartilham muitas dependências locais, prefira um contexto local explícito a passar parâmetros soltos demais.
 
 ## 5. Critérios de corte
 

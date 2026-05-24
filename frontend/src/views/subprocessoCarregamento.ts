@@ -18,92 +18,112 @@ type DependenciasSubprocessoCarregamento = {
     exibirToastPendente: () => void;
 };
 
-export function useSubprocessoCarregamento({
-                                               codProcesso,
-                                               siglaUnidade,
-                                               codSubprocesso,
-                                                erroIntegracaoContexto,
-                                                garantirContextoEdicao,
-                                                garantirContextoEdicaoPorProcessoEUnidade,
-                                                dadosEdicaoValidos,
-                                                exibirToastPendente,
-                                            }: DependenciasSubprocessoCarregamento) {
+type EstadoSubprocessoCarregamento = ReturnType<typeof criarEstado>;
+
+function criarEstado() {
     const codigoSubprocesso = ref<number | null>(null);
     const erroNaoEncontrado = ref(false);
     const carregamentoInicialConcluido = ref(false);
+
+    return {codigoSubprocesso, erroNaoEncontrado, carregamentoInicialConcluido};
+}
+
+function criarCarregador(dependencias: DependenciasSubprocessoCarregamento, estado: EstadoSubprocessoCarregamento) {
     let carregamentoEmAndamento: Promise<void> | null = null;
+
+    async function resolverCodigoSubprocesso(limpar: boolean) {
+        if (typeof dependencias.codSubprocesso === "number") {
+            const contextoDireto = await dependencias.garantirContextoEdicao(dependencias.codSubprocesso, limpar);
+            if (contextoDireto) {
+                estado.codigoSubprocesso.value = contextoDireto.detalhes.codigo;
+                estado.erroNaoEncontrado.value = false;
+                return;
+            }
+        }
+
+        const contexto = await dependencias.garantirContextoEdicaoPorProcessoEUnidade(
+            dependencias.codProcesso,
+            dependencias.siglaUnidade,
+            limpar,
+        );
+        if (contexto) {
+            estado.codigoSubprocesso.value = contexto.codigo;
+            estado.erroNaoEncontrado.value = false;
+            return;
+        }
+
+        estado.codigoSubprocesso.value = null;
+        estado.erroNaoEncontrado.value = !dependencias.erroIntegracaoContexto.value;
+    }
 
     async function carregarSubprocesso(limpar = false) {
         if (!limpar && carregamentoEmAndamento) {
             await carregamentoEmAndamento;
             return;
         }
-        const tarefaCarregamento = (async () => {
-        const resultadoDireto = typeof codSubprocesso === "number"
-            ? await garantirContextoEdicao(codSubprocesso, limpar)
-            : null;
 
-        if (resultadoDireto) {
-            codigoSubprocesso.value = resultadoDireto.detalhes.codigo;
-            erroNaoEncontrado.value = false;
-            return;
-        }
-
-        const resultado = await garantirContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade, limpar);
-        if (!resultado) {
-            codigoSubprocesso.value = null;
-            erroNaoEncontrado.value = !erroIntegracaoContexto.value;
-            return;
-        }
-
-        codigoSubprocesso.value = resultado.codigo;
-        erroNaoEncontrado.value = false;
-        })();
-
-        carregamentoEmAndamento = tarefaCarregamento;
+        const tarefa = resolverCodigoSubprocesso(limpar);
+        carregamentoEmAndamento = tarefa;
         try {
-            await tarefaCarregamento;
+            await tarefa;
         } finally {
-            if (carregamentoEmAndamento === tarefaCarregamento) {
+            if (carregamentoEmAndamento === tarefa) {
                 carregamentoEmAndamento = null;
             }
         }
     }
 
-    async function atualizarSubprocessoAtual() {
-        const codigo = codigoSubprocesso.value;
-        if (!codigo) return;
+    return {carregarSubprocesso};
+}
 
-        await garantirContextoEdicao(codigo, true);
-        exibirToastPendente();
-    }
-
+function registrarRecargas(
+    dependencias: DependenciasSubprocessoCarregamento,
+    estado: EstadoSubprocessoCarregamento,
+    carregarSubprocesso: (limpar?: boolean) => Promise<void>
+) {
     onMounted(async () => {
-        exibirToastPendente();
+        dependencias.exibirToastPendente();
         await carregarSubprocesso(false);
-        carregamentoInicialConcluido.value = true;
+        estado.carregamentoInicialConcluido.value = true;
     });
 
     watch(
-        () => [codProcesso, siglaUnidade, codSubprocesso],
+        () => [dependencias.codProcesso, dependencias.siglaUnidade, dependencias.codSubprocesso],
         async () => {
             await carregarSubprocesso(false);
         },
     );
 
     onActivated(async () => {
-        exibirToastPendente();
-        if (!carregamentoInicialConcluido.value) return;
-        const codigoAtual = codigoSubprocesso.value;
-        if (typeof codigoAtual === "number" && dadosEdicaoValidos(codigoAtual)) {
+        dependencias.exibirToastPendente();
+        if (!estado.carregamentoInicialConcluido.value) {
+            return;
+        }
+        if (typeof estado.codigoSubprocesso.value === "number" && dependencias.dadosEdicaoValidos(estado.codigoSubprocesso.value)) {
             return;
         }
         await carregarSubprocesso(false);
     });
+}
+
+export function useSubprocessoCarregamento(dependencias: DependenciasSubprocessoCarregamento) {
+    const estado = criarEstado();
+    const {carregarSubprocesso} = criarCarregador(dependencias, estado);
+
+    async function atualizarSubprocessoAtual() {
+        if (typeof estado.codigoSubprocesso.value !== "number") {
+            return;
+        }
+
+        await dependencias.garantirContextoEdicao(estado.codigoSubprocesso.value, true);
+        dependencias.exibirToastPendente();
+    }
+
+    registrarRecargas(dependencias, estado, carregarSubprocesso);
 
     return {
-        codigoSubprocesso,
-        erroNaoEncontrado,
+        codigoSubprocesso: estado.codigoSubprocesso,
+        erroNaoEncontrado: estado.erroNaoEncontrado,
         carregarSubprocesso,
         atualizarSubprocessoAtual,
     };

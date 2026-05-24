@@ -5,6 +5,8 @@ import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
 import logger from "@/utils/logger";
 import {normalizarErro} from "@/utils/apiError";
 
+const {mapa: TEXTOS_MAPA} = TEXTOS;
+
 type DependenciasMapaDisponibilizacao = {
     competencias: ComputedRef<Competencia[]>;
     existeCompetenciaSemAtividade: ComputedRef<boolean>;
@@ -24,97 +26,109 @@ export interface SincronizarMapaContextoParams {
     mapaContextoAtual: Ref<{ detalhes: { codigo: number }; mapa: MapaCompleto } | null>;
 }
 
-export function useMapaDisponibilizacao({
-                                            competencias,
-                                            existeCompetenciaSemAtividade,
-                                            atividadesSemCompetencia,
-                                            mostrarModalDisponibilizar,
-                                            limparErros,
-                                            executarComSubprocesso,
-                                            disponibilizarMapaFluxo,
-                                            concluirAcaoPainel,
-                                            aplicarErroNormalizado,
-                                        }: DependenciasMapaDisponibilizacao) {
-    const notificacaoDisponibilizacao = ref("");
-    const erroValidacaoMapa = ref("");
-    const erroValidacaoMapaTick = ref(0);
-    const loadingDisponibilizacao = ref(false);
+type EstadoMapaDisponibilizacao = ReturnType<typeof criarEstado>;
 
-    const podeConfirmarDisponibilizacao = computed(() =>
-        competencias.value.length > 0 && !existeCompetenciaSemAtividade.value && atividadesSemCompetencia.value.length === 0,
-    );
+type ResultadoChecklistDisponibilizacao =
+    | {tipo: "pode-disponibilizar"}
+    | {tipo: "erro-validacao"; mensagem: string};
 
-    function limparErroMapa(erroMapa?: Ref<string | null>) {
-        erroValidacaoMapa.value = "";
-        erroValidacaoMapaTick.value += 1;
-        if (erroMapa) {
-            erroMapa.value = null;
+function criarEstado() {
+    return {
+        notificacaoDisponibilizacao: ref(""),
+        erroValidacaoMapa: ref(""),
+        erroValidacaoMapaTick: ref(0),
+        loadingDisponibilizacao: ref(false),
+    };
+}
+
+function limparErroValidacaoMapa(estado: EstadoMapaDisponibilizacao, erroMapa?: Ref<string | null>) {
+    estado.erroValidacaoMapa.value = "";
+    estado.erroValidacaoMapaTick.value += 1;
+    if (erroMapa) {
+        erroMapa.value = null;
+    }
+}
+
+function validarChecklistDisponibilizacao(dependencias: DependenciasMapaDisponibilizacao): ResultadoChecklistDisponibilizacao {
+    if (dependencias.competencias.value.length === 0) {
+        return {tipo: "erro-validacao", mensagem: TEXTOS_MAPA.ERRO_MAPA_SEM_COMPETENCIAS};
+    }
+    if (dependencias.existeCompetenciaSemAtividade.value) {
+        return {tipo: "erro-validacao", mensagem: TEXTOS_MAPA.ERRO_COMPETENCIA_SEM_ATIVIDADE};
+    }
+    if (dependencias.atividadesSemCompetencia.value.length > 0) {
+        return {tipo: "erro-validacao", mensagem: TEXTOS_MAPA.ERRO_ATIVIDADES_SEM_COMPETENCIA};
+    }
+    return {tipo: "pode-disponibilizar"};
+}
+
+async function disponibilizarMapa(
+    dependencias: DependenciasMapaDisponibilizacao,
+    estado: EstadoMapaDisponibilizacao,
+    request: DisponibilizarMapaRequest
+) {
+    if (estado.loadingDisponibilizacao.value) {
+        return;
+    }
+
+    await dependencias.executarComSubprocesso(async (codigoSubprocesso) => {
+        estado.loadingDisponibilizacao.value = true;
+        try {
+            await dependencias.disponibilizarMapaFluxo(codigoSubprocesso, request);
+            await dependencias.concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_DISPONIBILIZADO, () => {
+                dependencias.mostrarModalDisponibilizar.value = false;
+                estado.notificacaoDisponibilizacao.value = "";
+                dependencias.limparErros();
+            });
+        } catch (error) {
+            logger.error(error);
+            dependencias.aplicarErroNormalizado(normalizarErro(error));
+        } finally {
+            estado.loadingDisponibilizacao.value = false;
         }
-    }
+    });
+}
 
-    function obterMensagemErroChecklistDisponibilizacao() {
-        if (competencias.value.length === 0) return TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS;
-        if (existeCompetenciaSemAtividade.value) return TEXTOS.mapa.ERRO_COMPETENCIA_SEM_ATIVIDADE;
-        if (atividadesSemCompetencia.value.length > 0) return TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA;
-        return "";
-    }
-
-    function abrirModalDisponibilizar() {
-        erroValidacaoMapa.value = "";
-        if (!podeConfirmarDisponibilizacao.value) {
-            erroValidacaoMapa.value = obterMensagemErroChecklistDisponibilizacao();
-            erroValidacaoMapaTick.value += 1;
-            return;
-        }
-        mostrarModalDisponibilizar.value = true;
-        limparErros();
-    }
-
-    function fecharModalDisponibilizar() {
-        mostrarModalDisponibilizar.value = false;
-        notificacaoDisponibilizacao.value = "";
-        limparErros();
-    }
-
-    async function disponibilizarMapa(request: DisponibilizarMapaRequest) {
-        if (loadingDisponibilizacao.value) return;
-        await executarComSubprocesso(async (codigoSubprocesso) => {
-            loadingDisponibilizacao.value = true;
-            try {
-                await disponibilizarMapaFluxo(codigoSubprocesso, request);
-                await concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_DISPONIBILIZADO, fecharModalDisponibilizar);
-            } catch (error) {
-                logger.error(error);
-                aplicarErroNormalizado(normalizarErro(error) as ReturnType<typeof normalizarErro>);
-            } finally {
-                loadingDisponibilizacao.value = false;
-            }
-        });
-    }
-
-    function sincronizarMapaContexto({
-        mapaAtualizado,
-        codigoSubprocesso,
-        definirMapaCompleto,
-        mapaContextoAtual,
-    }: SincronizarMapaContextoParams) {
-        if (!mapaAtualizado || !codigoSubprocesso) return;
-        definirMapaCompleto(codigoSubprocesso, mapaAtualizado);
-        if (mapaContextoAtual.value?.detalhes.codigo === codigoSubprocesso) {
-            mapaContextoAtual.value.mapa = mapaAtualizado;
-        }
-    }
+export function useMapaDisponibilizacao(dependencias: DependenciasMapaDisponibilizacao) {
+    const estado = criarEstado();
 
     return {
-        podeConfirmarDisponibilizacao,
-        erroValidacaoMapa,
-        erroValidacaoMapaTick,
-        loadingDisponibilizacao,
-        notificacaoDisponibilizacao,
-        abrirModalDisponibilizar,
-        fecharModalDisponibilizar,
-        disponibilizarMapa,
-        limparErroMapa,
-        sincronizarMapaContexto,
+        podeConfirmarDisponibilizacao: computed(() => validarChecklistDisponibilizacao(dependencias).tipo === "pode-disponibilizar"),
+        erroValidacaoMapa: estado.erroValidacaoMapa,
+        erroValidacaoMapaTick: estado.erroValidacaoMapaTick,
+        loadingDisponibilizacao: estado.loadingDisponibilizacao,
+        notificacaoDisponibilizacao: estado.notificacaoDisponibilizacao,
+        abrirModalDisponibilizar: () => {
+            estado.erroValidacaoMapa.value = "";
+            const checklist = validarChecklistDisponibilizacao(dependencias);
+            if (checklist.tipo === "erro-validacao") {
+                estado.erroValidacaoMapa.value = checklist.mensagem;
+                estado.erroValidacaoMapaTick.value += 1;
+                return;
+            }
+            dependencias.mostrarModalDisponibilizar.value = true;
+            dependencias.limparErros();
+        },
+        fecharModalDisponibilizar: () => {
+            dependencias.mostrarModalDisponibilizar.value = false;
+            estado.notificacaoDisponibilizacao.value = "";
+            dependencias.limparErros();
+        },
+        disponibilizarMapa: (request: DisponibilizarMapaRequest) => disponibilizarMapa(dependencias, estado, request),
+        limparErroMapa: (erroMapa?: Ref<string | null>) => limparErroValidacaoMapa(estado, erroMapa),
+        sincronizarMapaContexto: ({
+            mapaAtualizado,
+            codigoSubprocesso,
+            definirMapaCompleto,
+            mapaContextoAtual,
+        }: SincronizarMapaContextoParams) => {
+            if (!mapaAtualizado || !codigoSubprocesso) {
+                return;
+            }
+            definirMapaCompleto(codigoSubprocesso, mapaAtualizado);
+            if (mapaContextoAtual.value?.detalhes.codigo === codigoSubprocesso) {
+                mapaContextoAtual.value.mapa = mapaAtualizado;
+            }
+        },
     };
 }
