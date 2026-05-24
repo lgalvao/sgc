@@ -579,7 +579,7 @@ describe('UnidadeView.vue', () => {
         // CASE: possuiDadosLocaisValidos -> returns early
         vm.carregamentoInicialConcluido = true;
         // Mock data to satisfy possuiDadosLocaisValidos
-        vm.unidade = { codigo: 1 };
+        vm.unidade = { codigo: 1, sigla: 'TEST', nome: 'Test' };
         vm.mapaVigente = { id: 100 };
         mockUnidadeStore.cacheUnidades.set(1, vm.unidade);
         mockUnidadeStore.cacheMapasVigentes.set(1, vm.mapaVigente);
@@ -591,9 +591,9 @@ describe('UnidadeView.vue', () => {
 
         // CASE: reaplicarDadosDoCache -> returns early
         // Make possuiDadosLocaisValidos false (by changing unit)
-        vm.unidade = { codigo: 99 }; 
+        vm.unidade = { codigo: 99, sigla: 'OTHER', nome: 'Other' }; 
         // But make reaplicarDadosDoCache true (satisfy its condition)
-        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1 });
+        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1, sigla: 'TEST', nome: 'Test' });
         mockUnidadeStore.cacheMapasVigentes.set(1, { id: 100 });
         
         mockObterUnidade.mockClear();
