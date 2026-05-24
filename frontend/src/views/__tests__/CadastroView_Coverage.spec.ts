@@ -1,21 +1,20 @@
 import {createTestingPinia} from "@pinia/testing";
 import {flushPromises, mount} from "@vue/test-utils";
 import {describe, expect, it, vi} from "vitest";
-import {ref, defineComponent} from "vue";
+import {ref} from "vue";
 import CadastroView from "../CadastroView.vue";
 import * as useCadastroAtividadesMutacoesModule from "@/composables/useCadastroAtividadesMutacoes";
 import * as useCadastroDisponibilizacaoModule from "../cadastroDisponibilizacao";
 import * as useCadastroAnaliseFluxoModule from "../cadastroAnaliseFluxo";
 import * as useFluxoSubprocessoModule from "@/composables/useFluxoSubprocesso";
 import {createMemoryHistory, createRouter} from "vue-router";
+import * as useNotificationModule from "@/composables/useNotification";
 
 vi.mock("@/composables/useCadastroAtividadesMutacoes");
 vi.mock("../cadastroDisponibilizacao");
 vi.mock("../cadastroAnaliseFluxo");
 vi.mock("@/composables/useFluxoSubprocesso");
-vi.mock("@/composables/useNotification", () => ({
-  useNotification: () => ({ notify: vi.fn() })
-}));
+vi.mock("@/composables/useNotification");
 
 const router = createRouter({
   history: createMemoryHistory(),
@@ -73,30 +72,21 @@ const mockFluxo = {
   podeEditarCadastro: ref(true)
 };
 
-const focusSpy = vi.fn();
-const CadAtividadeFormStub = defineComponent({
-  name: "CadAtividadeForm",
-  template: "<div></div>",
-  setup() {
-    return {
-      inputRef: {
-        $el: {
-          focus: focusSpy
-        }
-      }
-    };
-  }
-});
+const mockNotify = vi.fn();
+const mockClear = vi.fn();
 
 describe("CadastroView Coverage", () => {
-  it("handleAdicionarAtividade foca no input após adicionar", async () => {
+  it("handleImportAtividades exibe aviso quando resultado tem aviso", async () => {
       vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue(mockFluxo as any);
       vi.mocked(useCadastroAtividadesMutacoesModule.useCadastroAtividadesMutacoes).mockReturnValue(mockMutacoes as any);
       vi.mocked(useCadastroDisponibilizacaoModule.useCadastroDisponibilizacao).mockReturnValue(mockDisponibilizacao as any);
       vi.mocked(useCadastroAnaliseFluxoModule.useCadastroAnaliseFluxo).mockReturnValue(mockAnaliseFluxo as any);
+      vi.mocked(useNotificationModule.useNotification).mockReturnValue({
+          notify: mockNotify,
+          clear: mockClear,
+          notificacao: ref(null)
+      } as any);
 
-      mockMutacoes.adicionarAtividade.mockResolvedValue(true);
-      
       const wrapper = mount(CadastroView, {
           props: {codProcesso: 1, sigla: "U"},
           global: {
@@ -104,7 +94,7 @@ describe("CadastroView Coverage", () => {
               stubs: {
                   LayoutPadrao: {template: "<div><slot/></div>"},
                   CadastroAcoesHeader: true,
-                  CadAtividadeForm: CadAtividadeFormStub,
+                  CadAtividadeForm: true,
                   EmptyState: true,
                   CadastroFluxoModais: true,
                   AtividadeItem: true
@@ -113,7 +103,9 @@ describe("CadastroView Coverage", () => {
       });
       
       await flushPromises();
-      await (wrapper.vm as any).handleAdicionarAtividade();
-      expect(focusSpy).toHaveBeenCalled();
+      const resultadoComAviso = { aviso: "Duplicatas" } as any;
+      await (wrapper.vm as any).handleImportAtividades(resultadoComAviso);
+      expect(mockClear).toHaveBeenCalled();
+      expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'warning');
   });
 });
