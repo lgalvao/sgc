@@ -1,0 +1,612 @@
+package sgc.processo.service;
+
+import org.junit.jupiter.api.*;
+import org.springframework.data.domain.*;
+import sgc.comum.erros.*;
+import sgc.fixture.*;
+import sgc.organizacao.model.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.SubprocessoValidacaoService.*;
+
+import java.time.*;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static sgc.processo.model.SituacaoProcesso.*;
+import static sgc.processo.model.TipoProcesso.*;
+import static sgc.seguranca.AcaoPermissao.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+
+@DisplayName("ProcessoService Consulta Test suite")
+class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
+
+    @Nested
+    @DisplayName("Detalhes e Elegibilidade")
+    class DetalhesEElegibilidade {
+        @Test
+        @DisplayName("Deve obter detalhes completos do processo")
+        void deveObterDetalhesCompletos() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setDescricao("Processo");
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+            Unidade u = criarUnidadeValida(10L);
+            p.adicionarParticipantes(Set.of(u));
+
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(permissionEvaluator.verificarPermissao(usuario, p, AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(u);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ResultadoValidacao.ofValido());
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getCodigo()).isEqualTo(codProcesso);
+            assertThat(result.getUnidades()).isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve listar subprocessos elegíveis para ação em bloco")
+        void deveListarSubprocessosElegiveis() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.CHEFE);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso s1 = new Subprocesso();
+            s1.setCodigo(101L);
+            s1.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade u1 = new Unidade();
+            u1.setCodigo(10L);
+            s1.setUnidade(u1);
+
+            Subprocesso s2 = new Subprocesso();
+            s2.setCodigo(102L);
+            s2.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            Unidade u2 = new Unidade();
+            u2.setCodigo(20L);
+            s2.setUnidade(u2);
+
+            Subprocesso s3 = new Subprocesso();
+            s3.setCodigo(103L);
+            s3.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO); // Não elegível
+            Unidade u3 = new Unidade();
+            u3.setCodigo(30L);
+            s3.setUnidade(u3);
+
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
+                    s1.getCodigo(), u1,
+                    s2.getCodigo(), u1
+            ));
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s1, AcaoPermissao.ACEITAR_CADASTRO)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s1, AcaoPermissao.HOMOLOGAR_CADASTRO)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s2, AcaoPermissao.ACEITAR_MAPA)).thenReturn(true);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, s2, AcaoPermissao.HOMOLOGAR_MAPA)).thenReturn(false);
+
+            List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
+
+            assertThat(result).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("Deve montar hierarquia no DTO corretamente para GESTOR")
+        void deveMontarHierarquiaDtoGestor() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L); // Pai
+            usuario.setPerfilAtivo(Perfil.GESTOR);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setDescricao("Processo");
+            p.setTipo(TipoProcesso.MAPEAMENTO);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+            Unidade uPai = criarUnidadeValida(10L);
+            uPai.setSigla("PAI");
+            p.adicionarParticipantes(Set.of(uPai));
+
+            Unidade uFilho = criarUnidadeValida(20L);
+            uFilho.setSigla("FILHO");
+            uFilho.setUnidadeSuperior(uPai);
+            p.adicionarParticipantes(Set.of(uFilho));
+
+            Unidade uSemSub = criarUnidadeValida(30L);
+            uSemSub.setSigla("SEMSUB");
+            p.adicionarParticipantes(Set.of(uSemSub));
+
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(unidadeHierarquiaService.buscarIdsDescendentes(10L)).thenReturn(List.of(20L));
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(uPai);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            // Filho não tem subprocesso para cobrir branch sp != null
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uPai));
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
+
+            assertThat(result.getUnidades()).isNotEmpty();
+            assertThat(result.getUnidades().getFirst().getFilhos()).isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelMapa mas sem permissao ACEITAR ou HOMOLOGAR")
+        void isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelMapaSemPermissoes() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            sp.setUnidade(new Unidade());
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, HOMOLOGAR_MAPA)).thenReturn(false);
+
+            List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        @DisplayName("isElegivelParaAcaoEmBloco deve retornar false quando elegivelDisponibilizacao mas sem permissao DISPONIBILIZAR_MAPA")
+        void isElegivelParaAcaoEmBloco_DeveRetornarFalseQuandoElegivelDisponibilizacaoSemPermissao() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+            sp.setUnidade(new Unidade());
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, DISPONIBILIZAR_MAPA)).thenReturn(false);
+
+            List<SubprocessoElegivelDto> result = processoService.listarSubprocessosElegiveis(codProcesso);
+            assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Consultas e Detalhes")
+    class Consultas {
+        @Test
+        @DisplayName("Deve listar para importacao")
+        void deveListarParaImportacao() {
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO)).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarParaImportacao();
+            assertThat(res).containsExactly(p);
+            verify(processoRepo).listarPorSituacaoComParticipantes(SituacaoProcesso.FINALIZADO);
+        }
+
+        @Test
+        @DisplayName("Deve listar ativos para ADMIN")
+        void deveListarAtivosParaAdmin() {
+            Usuario admin = new Usuario();
+            admin.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacao(SituacaoProcesso.EM_ANDAMENTO)).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarAtivos();
+            assertThat(res).containsExactly(p);
+            verify(processoRepo).listarPorSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            verify(processoRepo, never()).listarPorSituacaoEUnidadeCodigos(any(), any());
+        }
+
+        @Test
+        @DisplayName("Deve listar ativos para usuario normal")
+        void deveListarAtivosParaUsuarioNormal() {
+            Usuario gestor = new Usuario();
+            gestor.setPerfilAtivo(Perfil.GESTOR);
+            Unidade u = new Unidade();
+            u.setCodigo(1L);
+            gestor.setUnidadeAtivaCodigo(1L);
+            when(usuarioService.usuarioAutenticado()).thenReturn(gestor);
+            when(unidadeHierarquiaService.buscarIdsDescendentes(1L)).thenReturn(List.of());
+
+            Processo p = new Processo();
+            when(processoRepo.listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.EM_ANDAMENTO), anyList())).thenReturn(List.of(p));
+
+            List<Processo> res = processoService.listarAtivos();
+            assertThat(res).containsExactly(p);
+            verify(processoRepo).listarPorSituacaoEUnidadeCodigos(eq(SituacaoProcesso.EM_ANDAMENTO), anyList());
+            verify(processoRepo, never()).listarPorSituacao(any());
+        }
+
+        @Test
+        @DisplayName("Deve listar iniciados por participantes")
+        void deveListarIniciadosPorParticipantes() {
+            Pageable pageable = Pageable.unpaged();
+            Processo p = new Processo();
+            p.setCodigo(5L);
+            when(processoRepo.listarCodigosPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), eq(pageable)))
+                    .thenReturn(new PageImpl<>(List.of(5L), pageable, 1));
+            when(processoRepo.listarPorCodigosComParticipantes(List.of(5L))).thenReturn(List.of(p));
+
+            Page<Processo> res = processoService.listarIniciadosPorParticipantes(List.of(1L), pageable);
+            assertThat(res.getContent()).containsExactly(p);
+            verify(processoRepo).listarCodigosPorParticipantesESituacaoDiferente(List.of(1L), SituacaoProcesso.CRIADO, pageable);
+        }
+
+        @Test
+        @DisplayName("Deve listar iniciados por subprocessos")
+        void deveListarIniciadosPorSubprocessos() {
+            Pageable pageable = Pageable.unpaged();
+            Processo p = new Processo();
+            p.setCodigo(10L);
+            when(configuracaoService.buscarDiasInativacaoProcesso()).thenReturn(10);
+            when(processoRepo.listarCodigosAtivosPorSubprocessos(eq(List.of(1L)), eq(SituacaoProcesso.CRIADO), eq(SituacaoProcesso.FINALIZADO), any(), eq(pageable)))
+                    .thenReturn(new PageImpl<>(List.of(10L), pageable, 1));
+            when(processoRepo.listarPorCodigosComParticipantes(List.of(10L))).thenReturn(List.of(p));
+
+            Page<Processo> res = processoService.listarIniciadosPorSubprocessos(List.of(1L), pageable);
+
+            assertThat(res.getContent()).containsExactly(p);
+            verify(processoRepo).listarCodigosAtivosPorSubprocessos(eq(List.of(1L)), eq(SituacaoProcesso.CRIADO), eq(SituacaoProcesso.FINALIZADO), any(), eq(pageable));
+        }
+
+        @Test
+        @DisplayName("Deve listar unidades bloqueadas por tipo")
+        void deveListarUnidadesBloqueadasPorTipo() {
+            when(processoRepo.listarUnidadesBloqueadasPorSituacaoETipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO))
+                    .thenReturn(List.of(1L, 2L));
+
+            List<Long> res = processoService.listarUnidadesBloqueadasPorTipo(TipoProcesso.MAPEAMENTO);
+            assertThat(res).containsExactly(1L, 2L);
+            verify(processoRepo).listarUnidadesBloqueadasPorSituacaoETipo(SituacaoProcesso.EM_ANDAMENTO, TipoProcesso.MAPEAMENTO);
+        }
+
+        @Test
+        @DisplayName("Deve buscar entidade por ID")
+        void deveBuscarEntidadePorId() {
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+
+            Processo res = processoService.buscarPorCodigo(id);
+            assertThat(res).isEqualTo(processo);
+        }
+
+        @Test
+        @DisplayName("Deve obter processo por ID (Optional)")
+        void deveobterPorCodigoOptional() {
+            Long id = 100L;
+            Processo processo = ProcessoFixture.processoPadrao();
+            when(processoRepo.buscarPorCodigoComParticipantes(id)).thenReturn(Optional.of(processo));
+
+            Optional<Processo> res = processoService.buscarOpt(id);
+            assertThat(res).isPresent();
+        }
+
+        @Test
+        @DisplayName("Deve listar todos com paginação")
+        void deveListarTodosPaginado() {
+            Pageable pageable = Pageable.unpaged();
+            when(configuracaoService.buscarDiasInativacaoProcesso()).thenReturn(10);
+            when(processoRepo.listarCodigosAtivos(eq(SituacaoProcesso.FINALIZADO), any(), eq(pageable))).thenReturn(Page.empty());
+
+            var res = processoService.listarTodos(pageable);
+            assertThat(res).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Gaps de Data Limite no DTO")
+    class DataLimiteGaps {
+        @Test
+        @DisplayName("obterDetalhesCompleto deve lançar IllegalStateException quando etapa 2 existe sem etapa 1")
+        void etapa2SemEtapa1() {
+            Long cod = 1L;
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setNome("Unidade 10");
+            uni.setSigla("U10");
+            sp.setUnidade(uni);
+            sp.setDataLimiteEtapa2(java.time.LocalDateTime.now());
+
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            assertThatThrownBy(() -> processoService.obterDetalhesCompleto(cod, true))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("sem data limite da etapa 1");
+        }
+
+        @Test
+        @DisplayName("obterDetalhesCompleto deve priorizar dataLimite2 quando etapa 1 é posterior à etapa 2")
+        void etapa1PosteriorEtapa2() {
+            Long cod = 1L;
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setNome("Unidade 10");
+            uni.setSigla("U10");
+            sp.setUnidade(uni);
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            sp.setDataLimiteEtapa1(now.plusDays(2));
+            sp.setDataLimiteEtapa2(now.plusDays(1));
+
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
+            assertThat(res.getElegiveis()).isNotEmpty();
+            assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(sp.getDataLimiteEtapa2());
+        }
+
+        @Test
+        @DisplayName("obterDetalhesCompleto deve retornar dataLimite2 quando válida via elegíveis")
+        void etapa2Valida() {
+            Long cod = 1L;
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setNome("Unidade 10");
+            uni.setSigla("U10");
+            sp.setUnidade(uni);
+            java.time.LocalDateTime d1 = java.time.LocalDateTime.now().plusDays(1);
+            java.time.LocalDateTime d2 = java.time.LocalDateTime.now().plusDays(2);
+            sp.setDataLimiteEtapa1(d1);
+            sp.setDataLimiteEtapa2(d2);
+
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
+            assertThat(res.getElegiveis()).isNotEmpty();
+            assertThat(res.getElegiveis().getFirst().getUltimaDataLimite()).isEqualTo(d2);
+        }
+
+        @Test
+        @DisplayName("obterDetalhesCompleto deve tratar subprocesso sem mapa")
+        void subprocessoSemMapa() {
+            Long cod = 1L;
+            Processo p = new Processo();
+            p.setCodigo(cod);
+            p.setTipo(MAPEAMENTO);
+            Usuario u = new Usuario();
+            u.setPerfilAtivo(Perfil.ADMIN);
+            u.setUnidadeAtivaCodigo(10L);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            Unidade uni = new Unidade();
+            uni.setCodigo(10L);
+            uni.setSigla("U10");
+            uni.setNome("Unidade 10");
+            uni.setTipo(TipoUnidade.OPERACIONAL);
+            uni.setSituacao(SituacaoUnidade.ATIVA);
+            sp.setUnidade(uni);
+            sp.setDataLimiteEtapa1(java.time.LocalDateTime.now());
+            sp.setMapa(null);
+
+            p.adicionarParticipantes(Set.of(uni));
+
+            when(repo.buscar(Processo.class, cod)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+            when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class))).thenReturn(true);
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(u);
+            ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, false);
+            assertThat(res.getUnidades()).hasSize(1);
+            assertThat(res.getUnidades().getFirst().getMapaCodigo()).isNull();
+        }
+    }
+
+    @Test
+    @DisplayName("obterDetalhesCompleto deve reutilizar subprocessos ja carregados ao listar elegiveis")
+    void deveReutilizarSubprocessosAoListarElegiveisNoContextoCompleto() {
+        Long cod = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(cod);
+        processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setSigla("U10");
+        unidade.setNome("Unidade 10");
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        unidade.setSituacao(SituacaoUnidade.ATIVA);
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(100L);
+        subprocesso.setUnidade(unidade);
+        subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(1));
+
+        when(repo.buscar(Processo.class, cod)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(subprocesso));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(subprocesso.getCodigo(), unidade));
+        when(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)).thenReturn(false);
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        ProcessoDetalheDto resultado = processoService.obterDetalhesCompleto(cod, true);
+
+        assertThat(resultado.getElegiveis()).hasSize(1);
+        verify(consultaService, times(1)).listarEntidadesPorProcesso(cod);
+        verify(localizacaoSubprocessoService, times(1)).obterLocalizacoesAtuais(anyCollection());
+        verify(permissionEvaluator, never()).verificarPermissaoSilenciosa(eq(usuario), any(Subprocesso.class), any(AcaoPermissao.class));
+    }
+
+    @Test
+    @DisplayName("listarIniciadosPorParticipantes - deve retornar pagina normal")
+    void listarIniciadosPorParticipantes_Sucesso() {
+        when(processoRepo.listarCodigosPorParticipantesESituacaoDiferente(anyList(), eq(SituacaoProcesso.CRIADO), any()))
+                .thenReturn(new PageImpl<>(List.of(1L)));
+        Processo p = new Processo();
+        p.setCodigo(1L);
+        when(processoRepo.listarPorCodigosComParticipantes(anyList())).thenReturn(List.of(p));
+
+        Page<Processo> result = processoService.listarIniciadosPorParticipantes(List.of(10L), PageRequest.of(0, 10));
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("obterDetalhesCompleto deve lançar erro quando participante tiver nome vazio")
+    void obterDetalhesCompletoDeveLancarErroQuandoParticipanteTiverNomeVazio() {
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setTipo(MAPEAMENTO);
+
+        Unidade unidade = criarUnidadeValida(10L);
+        unidade.setNome(" ");
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Snapshot inconsistente");
+    }
+
+    @Test
+    @DisplayName("obterDetalhesCompleto deve lançar erro quando participante tiver sigla vazia")
+    void obterDetalhesCompletoDeveLancarErroQuandoParticipanteTiverSiglaVazia() {
+        Long codProcesso = 1L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setTipo(MAPEAMENTO);
+
+        Unidade unidade = criarUnidadeValida(10L);
+        unidade.setSigla("");
+        processo.adicionarParticipantes(Set.of(unidade));
+
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
+
+        assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Snapshot inconsistente");
+    }
+
+    @Test
+    @DisplayName("buscarPorCodigoComParticipantes deve lançar erro quando processo não existe")
+    void buscarPorCodigoComParticipantesDeveLancarErroQuandoProcessoNaoExiste() {
+        when(processoRepo.buscarPorCodigoComParticipantes(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> processoService.buscarPorCodigoComParticipantes(99L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("Processo");
+    }
+
+    @Test
+    @DisplayName("podeDisponibilizarEmBloco deve exercitar todas as combinações de situações de subprocesso")
+    void podeDisponibilizarEmBloco_DeveExercitarTodasAsCombinacoesDeSituacoes() {
+        Long codProcesso = 1L;
+        
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(unidade);
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), any())).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(sp.getCodigo(), unidade));
+        when(permissionEvaluator.verificarPermissaoSilenciosa(any(), any(), any())).thenReturn(true);
+
+        List<SubprocessoElegivelDto> resultado = processoService.listarSubprocessosElegiveis(codProcesso);
+        assertThat(resultado).isNotEmpty();
+
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        List<SubprocessoElegivelDto> resultado2 = processoService.listarSubprocessosElegiveis(codProcesso);
+        assertThat(resultado2).isEmpty();
+    }
+}

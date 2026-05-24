@@ -2,23 +2,17 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.*;
 import sgc.comum.erros.*;
-import sgc.fixture.*;
 import sgc.integracao.mocks.*;
-import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
-import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -178,6 +172,29 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
                     .build();
 
             assertThatThrownBy(() -> service.atualizar(p.getCodigo(), request))
+                    .isInstanceOf(ErroValidacao.class);
+        }
+
+        @Test
+        @DisplayName("Deve lançar erro ao atualizar processo para REVISAO com unidades sem mapa")
+        void deveLancarErroAoAtualizarComUnidadeSemMapa() {
+            LocalDateTime dataLimite = LocalDateTime.now().plusDays(30);
+            Processo criado = service.criar(CriarProcessoRequest.builder()
+                    .descricao("Processo Original")
+                    .tipo(TipoProcesso.MAPEAMENTO)
+                    .dataLimiteEtapa1(dataLimite)
+                    .unidades(List.of(CODIGO_UNIDADE_MAPEAMENTO))
+                    .build());
+
+            AtualizarProcessoRequest request = AtualizarProcessoRequest.builder()
+                    .codigo(criado.getCodigo())
+                    .descricao("Atualizada")
+                    .tipo(TipoProcesso.REVISAO)
+                    .dataLimiteEtapa1(dataLimite)
+                    .unidades(List.of(CODIGO_UNIDADE_SEM_MAPA))
+                    .build();
+
+            assertThatThrownBy(() -> service.atualizar(criado.getCodigo(), request))
                     .isInstanceOf(ErroValidacao.class);
         }
     }

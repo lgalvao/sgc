@@ -8,6 +8,7 @@ springDoc = "3.0.2"
 jacoco = "0.8.14"
 spotbugs = "4.9.8"
 spotbugsPlugin = "6.4.8"
+pitest = "1.19.0"
 openRewrite = "7.18.0"
 
 # Security & Core Overrides
@@ -94,5 +95,6 @@ swagger-request-validator = { module = "com.atlassian.oai:swagger-request-valida
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }
 spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugsPlugin" }
+pitest = { id = "info.solidsoft.pitest", version.ref = "pitest" }
 open-rewrite = { id = "org.openrewrite.rewrite", version.ref = "openRewrite" }
 node = { id = "com.github.node-gradle.node", version = "7.1.0" }

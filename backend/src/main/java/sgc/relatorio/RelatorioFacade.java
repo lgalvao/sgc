@@ -785,7 +785,7 @@ public class RelatorioFacade {
             List<UnidadeRelatorioSemMapa> zonasEleitorais
     ) {
         return new UnidadeRelatorioSemMapa(
-                Math.abs(identificadorGrupo.hashCode()) + 1L,
+                (identificadorGrupo.hashCode() & 0x7fffffff) + 1L,
                 TITULO_GRUPO_ZONAS_ELEITORAIS,
                 TITULO_GRUPO_ZONAS_ELEITORAIS,
                 "AGRUPADOR_VISUAL",

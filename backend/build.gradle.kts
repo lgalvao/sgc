@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.spotbugs)
+    alias(libs.plugins.pitest)
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -298,4 +299,15 @@ tasks.register("qualityCheckFast") {
     group = "quality"
     description = "Runs fast backend quality checks (tests, coverage)"
     dependsOn("test", "jacocoTestCoverageVerification")
+}
+
+pitest {
+    junit5PluginVersion.set("1.2.1")
+    targetClasses.set(listOf("sgc.*.service.*"))
+    targetTests.set(listOf("sgc.*"))
+    threads.set(Runtime.getRuntime().availableProcessors())
+    outputFormats.set(listOf("HTML", "XML"))
+    timestampedReports.set(false)
+    mutationThreshold.set(0)
+    coverageThreshold.set(0)
 }
