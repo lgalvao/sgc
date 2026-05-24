@@ -1,7 +1,7 @@
 # Auditoria de cruft do frontend
 
-Gerado em: 2026-05-24T15:12:52.773Z
-Score total: 497 (critico)
+Gerado em: 2026-05-24T15:15:22.666Z
+Score total: 495 (critico)
 
 ## Resumo
 
@@ -10,7 +10,7 @@ Score total: 497 (critico)
 - any explicito em producao: 0
 - checks de null em producao: 29
 - fallbacks defensivos em producao: 75
-- blocos catch em producao: 56
+- blocos catch em producao: 55
 - casts duplos em producao: 2
 - acessos diretos a storage em producao: 3
 - exports suspeitos em producao: 14

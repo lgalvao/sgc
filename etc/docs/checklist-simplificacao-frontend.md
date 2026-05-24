@@ -30,6 +30,7 @@ O objetivo é reduzir complexidade acidental sem quebrar contrato, esconder regr
 - Não há fallback para estados impossíveis pelo contrato atual.
 - O frontend não inventa mensagem de erro para esconder violação de contrato interno.
 - O arquivo não recompõe heurísticas locais quando o contrato já deveria vir explícito de outra borda.
+- `try/catch` só permanece quando existe tratamento local real; não apenas log, fallback ou conversão silenciosa de erro.
 - A simplificação não muda permissões, visibilidade ou habilitação sem confronto com os requisitos vigentes.
 - Se o comportamento depende de situação do subprocesso, a situação esperada está explícita no código.
 
@@ -64,6 +65,7 @@ O objetivo é reduzir complexidade acidental sem quebrar contrato, esconder regr
 - Funções demais para coordenar erro, loading, modal e `nextTick`.
 - Muitos retornos especiais com significado implícito.
 - Defensividade para estados que nunca deveriam acontecer.
+- `try/catch` que apenas registra log e devolve valor neutro.
 - Funções com nomes longos só para compensar estrutura confusa.
 - Helpers privados com “cara de infraestrutura compartilhável”, mas que só existem para reduzir linhas.
 - Wrappers genéricos como “executar com loading/erro/toast” que escondem fluxo importante.

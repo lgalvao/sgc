@@ -3,7 +3,6 @@ import {getCurrentInstance, onActivated, onMounted, ref} from "vue";
 import type {ContextoEdicaoSubprocesso, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
-import logger from "@/utils/logger";
 
 interface MapaOrquestracaoProps {
     codProcesso: number | string;
@@ -21,6 +20,15 @@ interface EstadoMapaOrquestracao {
 interface DependenciasMapaOrquestracao {
     subprocessoStore: ReturnType<typeof useSubprocessoStore>;
     mapasStore: ReturnType<typeof useMapasStore>;
+}
+
+function criarEstado() {
+    return {
+        carregandoInicial: ref(true),
+        codigoSubprocesso: ref<number | null>(null),
+        unidade: ref<Unidade | null>(null),
+        carregamentoInicialConcluido: ref(false),
+    };
 }
 
 function sincronizarEstadoInicialContexto(
@@ -48,65 +56,55 @@ async function buscarContextoEdicao(
     return resultado?.contexto ?? null;
 }
 
-export function useMapaOrquestracao(
-    props: MapaOrquestracaoProps
+function registrarRecargas(
+    estado: EstadoMapaOrquestracao,
+    dependencias: DependenciasMapaOrquestracao,
+    carregarContextoInicial: () => Promise<boolean>,
 ) {
-    const subprocessoStore = useSubprocessoStore();
-    const mapasStore = useMapasStore();
+    onMounted(() => {
+        estado.carregamentoInicialConcluido.value = true;
+    });
 
-    const carregandoInicial = ref(true);
-    const codigoSubprocesso = ref<number | null>(null);
-    const unidade = ref<Unidade | null>(null);
-    const carregamentoInicialConcluido = ref(false);
-    const estado = {carregandoInicial, codigoSubprocesso, unidade, carregamentoInicialConcluido};
-    const dependencias = {subprocessoStore, mapasStore};
-
-    async function carregarContextoInicial() {
-        try {
-            const contexto = await buscarContextoEdicao(props, subprocessoStore);
-
-            if (!contexto) {
-                logger.error("Falha grave ao resolver subprocesso para o mapa.");
-                return false;
-            }
-
-            codigoSubprocesso.value = contexto.detalhes.codigo;
-            sincronizarEstadoInicialContexto(estado, dependencias, contexto);
-
-            return true;
-        } catch (e) {
-            logger.error("Erro ao carregar contexto inicial do mapa", e);
-            return false;
-        } finally {
-            carregandoInicial.value = false;
+    onActivated(async () => {
+        if (!estado.carregamentoInicialConcluido.value) {
+            return;
         }
+        const codigo = estado.codigoSubprocesso.value;
+        if (typeof codigo === "number"
+            && dependencias.subprocessoStore.dadosEdicaoValidos(codigo)
+            && dependencias.mapasStore.dadosMapaValidos(codigo)) {
+            return;
+        }
+        await carregarContextoInicial();
+    });
+}
+
+export function useMapaOrquestracao(props: MapaOrquestracaoProps) {
+    const estado = criarEstado();
+    const dependencias = {
+        subprocessoStore: useSubprocessoStore(),
+        mapasStore: useMapasStore(),
+    };
+    async function carregarContextoInicial() {
+        const contexto = await buscarContextoEdicao(props, dependencias.subprocessoStore);
+        if (!contexto) {
+            estado.carregandoInicial.value = false;
+            return false;
+        }
+        estado.codigoSubprocesso.value = contexto.detalhes.codigo;
+        sincronizarEstadoInicialContexto(estado, dependencias, contexto);
+        estado.carregandoInicial.value = false;
+        return true;
     }
 
     if (getCurrentInstance()) {
-        onMounted(() => {
-            carregamentoInicialConcluido.value = true;
-        });
-
-        onActivated(async () => {
-            if (!carregamentoInicialConcluido.value) {
-                return;
-            }
-
-            const codigo = codigoSubprocesso.value;
-            if (typeof codigo === "number"
-                && subprocessoStore.dadosEdicaoValidos(codigo)
-                && mapasStore.dadosMapaValidos(codigo)) {
-                return;
-            }
-
-            await carregarContextoInicial();
-        });
+        registrarRecargas(estado, dependencias, carregarContextoInicial);
     }
 
     return {
-        carregandoInicial,
-        codigoSubprocesso,
-        unidade,
+        carregandoInicial: estado.carregandoInicial,
+        codigoSubprocesso: estado.codigoSubprocesso,
+        unidade: estado.unidade,
         carregarContextoInicial,
         sincronizarEstadoInicialContexto: (data: ContextoEdicaoSubprocesso) =>
             sincronizarEstadoInicialContexto(estado, dependencias, data),
