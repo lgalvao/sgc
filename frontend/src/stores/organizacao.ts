@@ -4,6 +4,26 @@ import type {DiagnosticoOrganizacional} from "@/types/tipos";
 import {buscarDiagnosticoOrganizacional} from "@/services/unidadeService";
 import {logger} from "@/utils";
 
+function limparCarregamento(
+    carregando: {value: boolean},
+    carregado: {value: boolean},
+    definirCarregamentoEmAndamento: (carregamento: Promise<void> | null) => void,
+) {
+    carregando.value = false;
+    carregado.value = true;
+    definirCarregamentoEmAndamento(null);
+}
+
+function registrarErroDiagnostico(
+    diagnostico: {value: DiagnosticoOrganizacional | null},
+    erroDiagnostico: {value: string | null},
+    erro: unknown,
+) {
+    diagnostico.value = null;
+    erroDiagnostico.value = "Não foi possível verificar as pendências organizacionais.";
+    logger.error("Erro ao carregar diagnóstico organizacional:", erro);
+}
+
 /**
  * Cache de sessão para o diagnóstico organizacional.
  * O diagnóstico é configuração administrativa — não muda durante a sessão ativa.
@@ -16,9 +36,7 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
     const carregando = ref(false);
     let carregamentoEmAndamento: Promise<void> | null = null;
 
-    function dadosValidos(): boolean {
-        return carregado.value;
-    }
+    const dadosValidos = (): boolean => carregado.value;
 
     /**
      * Carrega o diagnóstico organizacional somente se ainda estiver válido nesta sessão.
@@ -46,14 +64,12 @@ export const useOrganizacaoStore = defineStore("organizacao", () => {
         try {
             diagnostico.value = await buscarDiagnosticoOrganizacional();
             erroDiagnostico.value = null;
-        } catch (err) {
-            diagnostico.value = null;
-            erroDiagnostico.value = "Não foi possível verificar as pendências organizacionais.";
-            logger.error("Erro ao carregar diagnóstico organizacional:", err);
+        } catch (erro) {
+            registrarErroDiagnostico(diagnostico, erroDiagnostico, erro);
         } finally {
-            carregando.value = false;
-            carregado.value = true;
-            carregamentoEmAndamento = null;
+            limparCarregamento(carregando, carregado, (carregamento) => {
+                carregamentoEmAndamento = carregamento;
+            });
         }
     }
 

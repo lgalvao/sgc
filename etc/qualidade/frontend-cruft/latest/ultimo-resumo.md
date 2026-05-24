@@ -1,6 +1,6 @@
 # Auditoria de cruft do frontend
 
-Gerado em: 2026-05-24T15:15:22.666Z
+Gerado em: 2026-05-24T15:16:59.463Z
 Score total: 495 (critico)
 
 ## Resumo
@@ -35,7 +35,7 @@ Score total: 495 (critico)
 | frontend/src/services/processo/mapeadores.ts | service | 38 | 13 | fallbacksDefensivos: 3, exportsSuspeitos: 1 |
 | frontend/src/views/CadastroView.vue | view | 453 | 12 | fallbacksDefensivos: 4 |
 | frontend/src/views/UnidadeView.vue | view | 361 | 12 | fallbacksDefensivos: 2, catchBlocks: 3 |
-| frontend/src/composables/useFeedback.ts | composable | 110 | 11 | fallbacksDefensivos: 3, catchBlocks: 1 |
+| frontend/src/composables/useFeedback.ts | composable | 116 | 11 | fallbacksDefensivos: 3, catchBlocks: 1 |
 | frontend/src/views/RelatorioUnidadesSemMapasVigentesView.vue | view | 235 | 11 | checksNull: 1, fallbacksDefensivos: 3 |
 | frontend/src/views/LimpezaProcessosView.vue | view | 128 | 10 | checksNull: 4, catchBlocks: 1 |
 | frontend/src/views/MapaView.vue | view | 502 | 10 | fallbacksDefensivos: 2, catchBlocks: 2 |

@@ -28,6 +28,7 @@ O objetivo é reduzir complexidade acidental sem quebrar contrato, esconder regr
 ## 3. Contrato e defensividade
 
 - Não há fallback para estados impossíveis pelo contrato atual.
+- Degradação opcional só é aceitável quando o requisito permite explicitamente perder um complemento não crítico sem comprometer o fluxo principal.
 - O frontend não inventa mensagem de erro para esconder violação de contrato interno.
 - O arquivo não recompõe heurísticas locais quando o contrato já deveria vir explícito de outra borda.
 - `try/catch` só permanece quando existe tratamento local real; não apenas log, fallback ou conversão silenciosa de erro.

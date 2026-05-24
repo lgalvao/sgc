@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-24T15:15:22.666Z",
+  "geradoEm": "2026-05-24T15:16:59.463Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -292,7 +292,7 @@
     {
       "arquivo": "frontend/src/composables/useFeedback.ts",
       "camada": "composable",
-      "linhas": 110,
+      "linhas": 116,
       "score": 11,
       "contagens": {
         "anyExplicito": 0,
@@ -755,7 +755,7 @@
       "arquivo": "frontend/src/composables/useFeedback.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 110,
+      "linhas": 116,
       "imports": 7,
       "exports": 1,
       "exportsRuntime": [
@@ -2331,13 +2331,15 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/components/feedback/FeedbackWidget.vue",
-      "camada": "component",
+      "arquivo": "frontend/src/stores/organizacao.ts",
+      "camada": "store",
       "categoriaArquivo": "producao",
-      "linhas": 80,
-      "imports": 6,
-      "exports": 0,
-      "exportsRuntime": [],
+      "linhas": 91,
+      "imports": 5,
+      "exports": 1,
+      "exportsRuntime": [
+        "useOrganizacaoStore"
+      ],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
@@ -2355,15 +2357,13 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/stores/organizacao.ts",
-      "camada": "store",
+      "arquivo": "frontend/src/components/feedback/FeedbackWidget.vue",
+      "camada": "component",
       "categoriaArquivo": "producao",
-      "linhas": 75,
-      "imports": 5,
-      "exports": 1,
-      "exportsRuntime": [
-        "useOrganizacaoStore"
-      ],
+      "linhas": 80,
+      "imports": 6,
+      "exports": 0,
+      "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
