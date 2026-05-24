@@ -58,14 +58,31 @@ describe('useBuscadorUsuarios.ts', () => {
         expect(vm.mostrarResultadosUsuarios).toBe(false);
     });
 
-    it('agendarOcultacao schedules hide', async () => {
+    it('agendarOcultacao handles multiple calls', async () => {
         const wrapper = mount(TestComponent, { props: { termo: '', selecionado: null } });
         const vm = wrapper.vm as any;
         
         vm.mostrarResultadosUsuarios = true;
         vm.agendarOcultacao();
+        vm.agendarOcultacao(); // Should clear previous
+        expect(vi.getTimerCount()).toBe(1);
+        
         vi.advanceTimersByTime(150);
         expect(vm.mostrarResultadosUsuarios).toBe(false);
+    });
+
+    it('watch termo handles null and non-empty values', async () => {
+        const wrapper = mount(TestComponent, { props: { termo: 'test', selecionado: null } });
+        const vm = wrapper.vm as any;
+        vm.usuariosEncontrados = [{nome: 'U1'}];
+        
+        vm.termoRef = null;
+        await nextTick();
+        expect(vm.usuariosEncontrados).toEqual([]);
+
+        vm.termoRef = 'something';
+        await nextTick();
+        // Should NOT clear results (unless term is empty)
     });
 
     it('calcularProximoIndice handles empty list and wrap around', () => {

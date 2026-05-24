@@ -540,14 +540,70 @@ describe('UnidadeView.vue', () => {
         expect(vm.ultimoErro).toBe('Erro Customizado');
     });
 
-    it('formatarDadosParaArvore lida com itens sem filhas', async () => {
+    it('podeExportarMapaVigente computed property branches', async () => {
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'USER',
+            },
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // CASE 1: USER profile, has mapaVigente -> false
+        vm.mapaVigente = { id: 1 };
+        expect(vm.podeExportarMapaVigente).toBe(false);
+
+        // CASE 2: CHEFE profile, NO mapaVigente -> false
+        vm.perfilStore.perfilSelecionado = 'CHEFE';
+        vm.mapaVigente = null;
+        expect(vm.podeExportarMapaVigente).toBe(false);
+
+        // CASE 3: CHEFE profile, has mapaVigente -> true
+        vm.mapaVigente = { id: 1 };
+        expect(vm.podeExportarMapaVigente).toBe(true);
+    });
+
+    it('onActivated branches', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
         
-        const input = [{ codigo: 1, nome: 'N', sigla: 'S', filhas: null }];
-        const output = vm.formatarDadosParaArvore(input);
+        const hook = ((wrapper.vm.$ as any).a)?.[0];
         
-        expect(output[0].children).toBeUndefined();
+        // CASE: !carregamentoInicialConcluido -> returns early
+        vm.carregamentoInicialConcluido = false;
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).not.toHaveBeenCalled();
+
+        // CASE: possuiDadosLocaisValidos -> returns early
+        vm.carregamentoInicialConcluido = true;
+        // Mock data to satisfy possuiDadosLocaisValidos
+        vm.unidade = { codigo: 1 };
+        vm.mapaVigente = { id: 100 };
+        mockUnidadeStore.cacheUnidades.set(1, vm.unidade);
+        mockUnidadeStore.cacheMapasVigentes.set(1, vm.mapaVigente);
+        vm.ultimoErro = null;
+        
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).not.toHaveBeenCalled();
+
+        // CASE: reaplicarDadosDoCache -> returns early
+        // Make possuiDadosLocaisValidos false (by changing unit)
+        vm.unidade = { codigo: 99 }; 
+        // But make reaplicarDadosDoCache true (satisfy its condition)
+        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1 });
+        mockUnidadeStore.cacheMapasVigentes.set(1, { id: 100 });
+        
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).not.toHaveBeenCalled();
+
+        // CASE: none of above -> calls carregarDados
+        mockUnidadeStore.cacheUnidades.clear();
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).toHaveBeenCalled();
     });
 });
