@@ -39,7 +39,10 @@ function compararTextoPtBr(a: string, b: string): number {
 }
 
 function obterTextoOrdenacao<T extends object>(item: T, config: ConfiguracaoOrganizacaoArvore<T>): string {
-    return config.obterSigla(item) ?? config.obterRotulo(item) ?? "";
+    const sigla = config.obterSigla(item);
+    if (sigla !== undefined && sigla !== null) return sigla;
+    const rotulo = config.obterRotulo(item);
+    return rotulo !== undefined && rotulo !== null ? rotulo : "";
 }
 
 function ehZonaEleitoralPorMetadados(item: {
@@ -68,14 +71,16 @@ export function organizarArvoreUnidades<T extends object>(
     const demais: T[] = [];
 
     for (const item of items) {
+        const filhosBrutos = config.obterFilhos(item);
         const filhos = organizarArvoreUnidades(
-            config.obterFilhos(item) ?? [],
+            filhosBrutos ? filhosBrutos : [],
             config.criarIdentificadorGrupoFilhos(item),
             config
         );
 
         const itemNormalizado = config.clonarComFilhos(item, filhos);
-        const nome = config.obterRotulo(itemNormalizado) ?? "";
+        const rotuloObtido = config.obterRotulo(itemNormalizado);
+        const nome = rotuloObtido ? rotuloObtido : "";
 
         if (ehZonaEleitoralPorMetadados({
             tipo: config.obterTipo(itemNormalizado),

@@ -52,7 +52,7 @@ export function setRouter(router: Router) {
 }
 
 function isMonitoramentoSolicitadoPorSessao(): boolean {
-    return isBrowser && window.sessionStorage.getItem(CHAVE_MONITORAMENTO_SESSAO) === 'true';
+    return isBrowser && window.sessionStorage[CHAVE_MONITORAMENTO_SESSAO] === 'true';
 }
 
 function isMonitoramentoSolicitadoPorUrl(): boolean {
@@ -122,7 +122,7 @@ export function finalizarTransicaoSessao() {
 }
 
 export function isErroCanceladoHttp(error: unknown): boolean {
-    if (typeof error !== "object" || error === null) {
+    if (typeof error !== "object" || !error) {
         return false;
     }
 
@@ -155,8 +155,8 @@ function calcularDuracao(inicioMs?: number): number {
 }
 
 function registrarConclusaoResposta(response: AxiosResponse) {
-    const config = (response.config || {}) as ConfiguracaoMonitorada;
-    const metadados = config.metadadosMonitoramento;
+    const config = response.config as ConfiguracaoMonitorada;
+    const metadados = config?.metadadosMonitoramento;
     limparControleCancelamento(config);
 
     if (!metadados?.monitoramentoAtivo) {

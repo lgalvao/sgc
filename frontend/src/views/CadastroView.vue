@@ -53,7 +53,7 @@
 
       <AppAlert
           v-if="notificacao"
-          :dispensavel="notificacao.dispensavel ?? true"
+          :dispensavel="notificacao.dispensavel"
           :mensagem="notificacao.mensagem"
           :variante="notificacao.variante"
           @dismissed="clear()"
@@ -101,7 +101,7 @@
           :dados-remocao="dadosRemocao"
           :erro-fluxo="erroFluxoCadastro"
           :historico-analises="historicoAnalises"
-          :impactos="impactos ?? null"
+          :impactos="impactos"
           :is-revisao="isRevisao"
           :loading-analise-cadastro="loadingAnaliseCadastro"
           :loading-devolucao-analise="loadingDevolucaoAnalise"
@@ -382,11 +382,13 @@ const {
 const erroGlobalFormatado = computed(() =>
     erroGlobal.value ? {mensagem: erroGlobal.value} : null
 );
-const erroCampoObservacaoDevolucao = computed(() =>
-    fluxoSubprocesso.ultimoErro.value?.erros?.find((erro) =>
-        ["justificativa", "texto", "observacoes"].includes(erro.campo ?? "")
-    )?.mensagem ?? ""
-);
+const erroCampoObservacaoDevolucao = computed(() => {
+  const erros = fluxoSubprocesso.ultimoErro.value?.erros;
+  if (!erros) return "";
+  return erros.find((erro) =>
+      ["justificativa", "texto", "observacoes"].includes(erro.campo || "")
+  )?.mensagem || "";
+});
 const erroFluxoCadastro = computed(() =>
     fluxoSubprocesso.ultimoErro.value?.tipo === "validacao"
         ? undefined

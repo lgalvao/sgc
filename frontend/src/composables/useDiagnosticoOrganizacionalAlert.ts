@@ -23,13 +23,17 @@ export function useDiagnosticoOrganizacionalAlert(
     const carregandoDiagnosticoOrganizacional = computed(() => organizacaoStore.carregando);
     const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
     const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
-    const gruposDiagnostico = computed(() => diagnosticoOrganizacional.value?.grupos ?? []);
+    const gruposDiagnostico = computed(() => {
+        const grupos = diagnosticoOrganizacional.value?.grupos;
+        return grupos ? grupos : [];
+    });
     
-    const resumoDiagnostico = computed(() =>
-        erroDiagnosticoOrganizacional.value
-        || diagnosticoOrganizacional.value?.resumo
-        || ""
-    );
+    const resumoDiagnostico = computed(() => {
+        const erro = erroDiagnosticoOrganizacional.value;
+        if (erro) return erro;
+        const resumo = diagnosticoOrganizacional.value?.resumo;
+        return resumo ? resumo : "";
+    });
 
     const encontrarGrupoUnidadeSemResponsavel = () => {
         return gruposDiagnostico.value.find((item) => item.tipo === "Unidade sem responsável");
@@ -128,13 +132,16 @@ function listarSiglasUnidadesSemResponsavel(ocorrencias: string[]): string[] {
         .filter((sigla): sigla is string => Boolean(sigla));
 }
 
-function buscarCodigoUnidadePorSigla(unidadesOrigem: Unidade[], sigla: string): number | null {
+function buscarCodigoUnidadePorSigla(unidadesOrigem: Unidade[] | undefined | null, sigla: string): number | null {
+    if (!unidadesOrigem) {
+        return null;
+    }
     for (const unidade of unidadesOrigem) {
         if (unidade.sigla === sigla) {
             return unidade.codigo;
         }
 
-        const codigoFilha = buscarCodigoUnidadePorSigla(unidade.filhas || [], sigla);
+        const codigoFilha = buscarCodigoUnidadePorSigla(unidade.filhas, sigla);
         if (codigoFilha) {
             return codigoFilha;
         }

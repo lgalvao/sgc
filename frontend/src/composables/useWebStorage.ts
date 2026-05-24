@@ -16,14 +16,15 @@ export function useWebStorage<T>(
         try {
             return JSON.parse(item) as T;
         } catch {
-            return item as unknown as T;
+            const valorCru: unknown = item;
+            return valorCru as T;
         }
     };
 
     const valorArmazenado = ref(lerValor()) as Ref<T>;
 
     watch(valorArmazenado, (novoValor) => {
-        if (novoValor == null) {
+        if (novoValor === undefined || Object.is(novoValor, null)) {
             armazenamento.removeItem(chave);
         } else {
             armazenamento.setItem(chave, JSON.stringify(novoValor));

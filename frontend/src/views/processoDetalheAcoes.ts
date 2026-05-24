@@ -149,8 +149,8 @@ export function useProcessoAcoes(dependencias: Dependencias) {
             estado.mostrarModalFinalizacao.value = true;
         },
         idsElegiveis: computed(() => {
-            const unidades = estado.acaoBlocoAtual.value?.unidades ?? [];
-            return unidades.map((unidade) => unidade.unidadeCodigo);
+            const unidades = estado.acaoBlocoAtual.value?.unidades;
+            return unidades ? unidades.map((unidade) => unidade.unidadeCodigo) : [];
         }),
         loadingFinalizacao: estado.loadingFinalizacao,
         modalBlocoRef: estado.modalBlocoRef,
@@ -159,7 +159,10 @@ export function useProcessoAcoes(dependencias: Dependencias) {
         obterTestIdBotaoAcao: obterTestIdBotaoAcaoProcesso,
         processandoAcaoBloco: estado.processandoAcaoBloco,
         unidadesElegiveis: computed(() => {
-            const elegiveis = estado.acaoBlocoAtual.value?.unidades ?? [];
+            const elegiveis = estado.acaoBlocoAtual.value?.unidades;
+            if (!elegiveis) {
+                return [];
+            }
             return elegiveis.map((unidade: SubprocessoElegivel) => ({
                 codigo: unidade.unidadeCodigo,
                 sigla: unidade.unidadeSigla,

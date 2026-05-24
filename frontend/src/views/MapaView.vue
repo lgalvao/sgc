@@ -104,7 +104,7 @@
           :field-errors="fieldErrors"
           :historico-analise="historicoAnalise"
           :homologacao="acaoPrincipalMapa?.codigo === 'HOMOLOGAR'"
-          :impactos="impactos ?? null"
+          :impactos="impactos"
           :loading-competencia="loadingCompetencia"
           :loading-disponibilizacao="loadingDisponibilizacao"
           :loading-exclusao="loadingExclusao"
@@ -185,6 +185,7 @@ import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
 import {useMapaAnaliseFluxo} from "@/views/mapaAnaliseFluxo";
 import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
 import {normalizarErro} from "@/utils/apiError";
+import {logger} from "@/utils";
 import type {Analise, MapaCompleto,} from "@/types/tipos";
 import {Perfil} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -233,8 +234,8 @@ const esconderEdicaoMapaParaAdmin = computed(() =>
 );
 const modoSomenteLeitura = computed(() => !podeEditarMapa.value || esconderEdicaoMapaParaAdmin.value);
 const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?.mostrar));
-const habilitarAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.habilitar ?? false);
-const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);
+const habilitarAcaoPrincipalMapa = computed(() => !!acaoPrincipalMapa.value?.habilitar);
+const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao || TEXTOS.mapa.LABEL_HOMOLOGAR);
 
 const {
   carregandoInicial,
@@ -368,7 +369,8 @@ async function exportarMapaAtualPdf() {
     await executarComSubprocesso((codSubprocessoAtual) =>
         relatoriosService.downloadRelatorioMapaAtualPdf(codSubprocessoAtual)
     );
-  } catch {
+  } catch (error) {
+    logger.error("Erro ao exportar PDF do mapa atual:", error);
     notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
   } finally {
     loadingExportacaoPdf.value = false;
@@ -381,7 +383,8 @@ async function exportarMapaAtualCsv() {
     await executarComSubprocesso((codSubprocessoAtual) =>
         relatoriosService.downloadRelatorioMapaAtualCsv(codSubprocessoAtual)
     );
-  } catch {
+  } catch (error) {
+    logger.error("Erro ao exportar CSV do mapa atual:", error);
     notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
   } finally {
     loadingExportacaoCsv.value = false;

@@ -5,7 +5,7 @@
         :model-value="true"
         dismissible
         variant="danger"
-        @dismissed="limparErro()"
+        @dismissed="ultimoErro = null"
     >
       {{ ultimoErro }}
     </BAlert>
@@ -138,10 +138,6 @@ const loadingExportacaoPdf = ref(false);
 const loadingExportacaoCsv = ref(false);
 let carregamentoEmAndamento: Promise<void> | null = null;
 
-function limparErro() {
-  ultimoErro.value = null;
-}
-
 function possuiDadosLocaisValidos(): boolean {
   const unidadeEmCache = unidadeStore.cacheUnidades.get(props.codUnidade);
   const mapaVigenteEmCache = unidadeStore.cacheMapasVigentes.get(props.codUnidade);
@@ -159,9 +155,9 @@ function reaplicarDadosDoCache(): boolean {
     return false;
   }
 
-  unidade.value = unidadeStore.cacheUnidades.get(props.codUnidade) ?? null;
+  unidade.value = unidadeStore.cacheUnidades.get(props.codUnidade) || null;
   definirUnidadeAtual(unidade.value);
-  mapaVigente.value = unidadeStore.cacheMapasVigentes.get(props.codUnidade) ?? null;
+  mapaVigente.value = unidadeStore.cacheMapasVigentes.get(props.codUnidade) || null;
   carregandoPagina.value = false;
   return true;
 }
@@ -176,7 +172,7 @@ async function carregarDados(forcar = false) {
     return;
   }
 
-  limparErro();
+  ultimoErro.value = null;
 
   const tarefaCarregamento = (async () => {
     if (deveExibirCarregamento(forcar)) {
@@ -228,7 +224,8 @@ async function exportarMapaVigentePdf() {
   loadingExportacaoPdf.value = true;
   try {
     await relatoriosService.downloadRelatorioMapaVigenteUnidadePdf(props.codUnidade);
-  } catch {
+  } catch (error) {
+    logger.error("Falha ao exportar PDF do mapa vigente:", error);
     notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
   } finally {
     loadingExportacaoPdf.value = false;
@@ -243,7 +240,8 @@ async function exportarMapaVigenteCsv() {
   loadingExportacaoCsv.value = true;
   try {
     await relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv(props.codUnidade);
-  } catch {
+  } catch (error) {
+    logger.error("Falha ao exportar CSV do mapa vigente:", error);
     notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
   } finally {
     loadingExportacaoCsv.value = false;
@@ -347,7 +345,7 @@ interface UnidadeFormatada {
 
 function formatarDadosParaArvore(dados: Unidade[]): UnidadeFormatada[] {
   return dados.map((item) => {
-    const children = formatarDadosParaArvore(item.filhas ?? []);
+    const children = formatarDadosParaArvore(item.filhas || []);
     return {
       codigo: item.codigo,
       nome: item.nome,
