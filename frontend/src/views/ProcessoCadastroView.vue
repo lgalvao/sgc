@@ -235,6 +235,9 @@ async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codProcess
     unidades.value = unidadesSemSemEquipe;
     sincronizarUnidadesSelecionadasElegiveis(unidadesSemSemEquipe);
   } catch (error) {
+    if (isErroCanceladoHttp(error)) {
+      return;
+    }
     logger.error("Erro ao buscar unidades:", error);
     notify(TEXTOS.processo.cadastro.ERRO_CARREGAR_UNIDADES, 'danger');
   } finally {
