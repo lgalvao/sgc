@@ -209,10 +209,12 @@ export async function navegarParaSubprocesso(
     const padraoUnidade = new RegExp(String.raw`^${siglaUnidade}\b`, 'i');
     const tabelaArvore = page.getByTestId('tbl-tree');
     if (await tabelaArvore.count() > 0 && await tabelaArvore.isVisible()) {
-        const celula = tabelaArvore.getByRole('cell', {name: padraoUnidade}).first();
-        await expect(celula).toBeVisible();
-        await celula.click();
-        await expect(page).toHaveURL(urlSubprocesso);
+        const linhaArvore = tabelaArvore.getByRole('row', {name: padraoUnidade}).first();
+        await expect(linhaArvore).toBeVisible();
+        await Promise.all([
+            page.waitForURL(urlSubprocesso),
+            linhaArvore.click()
+        ]);
         return;
     }
 
@@ -220,16 +222,19 @@ export async function navegarParaSubprocesso(
     if (await tabelaProcessos.count() > 0 && await tabelaProcessos.isVisible()) {
         const linhaProcesso = tabelaProcessos.locator('tr').filter({hasText: padraoUnidade}).first();
         await expect(linhaProcesso).toBeVisible();
-        await linhaProcesso.click();
-        await expect(page).toHaveURL(urlSubprocesso);
+        await Promise.all([
+            page.waitForURL(urlSubprocesso),
+            linhaProcesso.click()
+        ]);
         return;
     }
 
     const linhaGenerica = page.locator('main table tr').filter({hasText: padraoUnidade}).first();
     await expect(linhaGenerica).toBeVisible();
-    await linhaGenerica.click();
-
-    await expect(page).toHaveURL(urlSubprocesso);
+    await Promise.all([
+        page.waitForURL(urlSubprocesso),
+        linhaGenerica.click()
+    ]);
 }
 
 export async function obterAcaoCabecalhoSubprocesso(page: Page, testIdAcao: string) {
