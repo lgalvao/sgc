@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DIRETORIO_SCRIPT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$DIRETORIO_SCRIPT"
+
 NOME_SISTEMA="sgc"
 CONTAINER_CLI="${CONTAINER_CLI:-docker}"
 REGISTRY="${REGISTRY:-registry.tre-pe.gov.br/sesel}"
