@@ -752,7 +752,7 @@ create index if not exists idx_notif_email_fila on sgc.notificacao_email (situac
 create index if not exists idx_notif_email_subproc_sit on sgc.notificacao_email (subprocesso_codigo, situacao);
 create index if not exists idx_notif_email_usuario on sgc.notificacao_email (usuario_destino_titulo);
 
--- Feedback UAT (perfil hom)
+-- Feedback (perfil hom)
 create table if not exists sgc.FEEDBACK
 (
     id                 uuid                       not null,

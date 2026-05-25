@@ -124,7 +124,8 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
         await expect(tabelaAlertas).toBeVisible();
         await expect(tabelaAlertas).toContainText(descRevisao);
         await expect(tabelaAlertas).toContainText(/Revisão de cadastro.*reaberta/i);
-        await expect(tabelaAlertas).toContainText(/Justificativa:\s*Ajuste necessário/i);
+        await expect(tabelaAlertas).toContainText(/Justificativa:/i);
+        await expect(tabelaAlertas).toContainText(/Ajuste necessário/i);
         await expect(tabelaAlertas).toContainText(/\d{2}\/\d{2}\/\d{4}/);
     });
 

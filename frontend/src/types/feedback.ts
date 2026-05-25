@@ -1,5 +1,5 @@
 /**
- * Tipos utilizados pelo widget de feedback UAT.
+ * Tipos utilizados pelo widget de feedback.
  *
  * Este módulo é carregado apenas em builds com VITE_FEEDBACK_WIDGET=true
  * e é excluído pelo tree-shaker em builds de produção.

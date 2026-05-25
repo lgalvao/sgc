@@ -33,7 +33,7 @@ async function converterCanvasParaBlob(canvas: HTMLCanvasElement): Promise<Blob 
 }
 
 /**
- * Composable para captura de tela, montagem de metadados e envio de feedback UAT.
+ * Composable para captura de tela, montagem de metadados e envio de feedback.
  *
  * Disponível apenas em builds com VITE_FEEDBACK_WIDGET=true.
  */

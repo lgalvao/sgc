@@ -16,7 +16,7 @@ import tools.jackson.databind.*;
 import java.util.*;
 
 /**
- * Endpoint de feedback disponível apenas no perfil {@code hom} (UAT).
+ * Endpoint de feedback disponível apenas no perfil {@code hom}.
  *
  * <p>Com {@code spring.profiles.active=prod} este bean não é instanciado
  * e o endpoint retorna 404 para qualquer sonda.
