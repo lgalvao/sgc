@@ -26,6 +26,8 @@ services:
     image: docker.io/axllent/mailpit:v1.27
     container_name: sgc-mailpit
     restart: unless-stopped
+    env_file:
+      - .env.hom
     ports:
       - "${MAILPIT_WEB_PORT:-8580}:8025"
     environment:
