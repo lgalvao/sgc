@@ -466,7 +466,7 @@ public class SubprocessoController {
         if (request == null || request.texto() == null) {
             return null;
         }
-        return UtilSanitizacao.sanitizar(request.texto());
+        return UtilSanitizacao.sanitizarFormatado(request.texto());
     }
 
     private void verificarPermissaoVisualizacao(Subprocesso subprocesso) {
@@ -535,7 +535,7 @@ public class SubprocessoController {
 
     private String sanitizar(@Nullable String texto) {
         return Optional.ofNullable(texto)
-                .map(UtilSanitizacao::sanitizar)
+                .map(UtilSanitizacao::sanitizarFormatado)
                 .orElse("");
     }
 

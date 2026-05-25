@@ -348,6 +348,29 @@ async function criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
     return processo.codigo;
 }
 
+async function criarProcessoMapeamentoComMapaValidadoPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-mapeamento-com-mapa-validado', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de mapa validado: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
 async function criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
     request: APIRequestContext,
     cleanup: ReturnType<typeof useProcessoCleanup>,
@@ -1030,53 +1053,20 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('05 - Mapa de Competências', () => {
-        test('Captura fluxo de mapa de competências', async ({page}) => {
+        test('Captura análise de cadastro antes do mapa', async ({page, request}) => {
             test.setTimeout(30000);
-            const descricao = `Proc mapa ${Date.now()}`;
+            const descricao = `Proc mapa cadastro ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
-
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
-            await criarProcesso(page, {
+            const codProcesso = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
+                request,
+                cleanup,
                 descricao,
-                tipo: 'MAPEAMENTO',
-                diasLimite: 30,
-                unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_1', 'COORD_12']
-            });
-
-            const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
-            await linhaProcesso.click();
-            const codProcesso = await extrairProcessoCodigo(page);
-            registrarProcessoParaCleanup(cleanup, codProcesso);
-
-            await iniciarProcessoPeloCadastro(page, {
-                descricao,
-                tipo: 'MAPEAMENTO'
-            });
-
-            await login(page,
-                USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
-
-            await acessarSubprocessoChefeDireto(page, descricao, 'SECAO_121');
-            await navegarParaCadastro(page);
-
-            await adicionarAtividade(page, 'Desenvolvimento web');
-            await adicionarConhecimento(page, 'Desenvolvimento web', 'Vue.js');
-            await adicionarConhecimento(page, 'Desenvolvimento web', 'TypeScript');
-
-            await adicionarAtividade(page, 'Desenvolvimento backend');
-            await adicionarConhecimento(page, 'Desenvolvimento backend', 'Java');
-            await adicionarConhecimento(page, 'Desenvolvimento backend', 'Spring Boot');
-
-            // Disponibilizar (como chefe)
-            await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-            await page.getByTestId('btn-confirmar-disponibilizacao').click();
-            await verificarPaginaPainel(page);
+                UNIDADE_ALVO
+            );
 
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
-
-            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${UNIDADE_ALVO}(?:\?.*)?$`));
             await navegarParaCadastro(page);
             await capturarTela(page, 'processo', 'cadastro-analise-gestor-coordenadoria', {
                 fullPage: true,
@@ -1089,31 +1079,32 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await verificarPaginaPainel(page);
 
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
-            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${UNIDADE_ALVO}(?:\?.*)?$`));
             await navegarParaCadastro(page);
             await capturarTela(page, 'processo', 'cadastro-analise-gestor-secretaria', {
                 fullPage: true,
                 tags: ['cadastro', 'analise', 'somente-leitura'],
                 extra: {perfil: 'GESTOR_SEC', acao: 'aceite-cadastro-2'}
             });
-            await (await abrirAcaoCadastroPrincipal(page)).click();
-            await page.getByTestId('inp-aceite-cadastro-obs').fill('Ok. Para homologação do ADMIN.');
-            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
-            await verificarPaginaPainel(page);
+        });
+
+        test('Captura edição inicial do mapa de competências', async ({page, request}) => {
+            test.setTimeout(30000);
+            const descricao = `Proc mapa ${Date.now()}`;
+            const UNIDADE_ALVO = 'SECAO_121';
+            const codProcesso = await criarProcessoMapeamentoComCadastroHomologadoPorFixture(
+                request,
+                cleanup,
+                descricao,
+                UNIDADE_ALVO
+            );
 
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
-            // Navegar para o subprocesso (admin vê tabela de unidades)
-            await acessarSubprocessoAdmin(page, descricao, UNIDADE_ALVO);
-
-            // Entrar no cadastro de atividades (visualização)
-            await navegarParaCadastro(page);
-
-            await (await abrirAcaoCadastroPrincipal(page)).click();
-            await page.getByTestId('btn-aceite-cadastro-confirmar').click();
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${UNIDADE_ALVO}(?:\?.*)?$`));
 
             // Agora o Mapa deve estar habilitado para edição pelo Admin
-            // Navegar para mapa
             await navegarParaMapa(page);
             await capturarTela(page, 'mapa', 'mapa-vazio', {
                 fullPage: true,
@@ -1132,10 +1123,31 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, 'mapa', 'modal-criar-competencia-preenchida', {
                 extra: {competencia: competenciaDesc}
             });
+        });
 
+        test('Captura criação e disponibilização do mapa de competências', async ({page, request}) => {
+            test.setTimeout(30000);
+            const descricao = `Proc mapa criacao ${Date.now()}`;
+            const UNIDADE_ALVO = 'SECAO_121';
+            const codProcesso = await criarProcessoMapeamentoComCadastroHomologadoPorFixture(
+                request,
+                cleanup,
+                descricao,
+                UNIDADE_ALVO
+            );
+
+            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${UNIDADE_ALVO}(?:\?.*)?$`));
+            await navegarParaMapa(page);
+
+            await abrirModalCriarCompetencia(page);
             const modal = page.getByTestId('mdl-criar-competencia');
-            await modal.locator('label').filter({hasText: 'Desenvolvimento web'}).click();
-            await modal.locator('label').filter({hasText: 'Desenvolvimento backend'}).click();
+            await expect(modal).toBeVisible();
+            const competenciaDesc = 'Desenvolvimento de Software';
+            await page.getByTestId('inp-criar-competencia-descricao').fill(competenciaDesc);
+
+            await modal.getByTestId('btn-competencia-selecionar-todas-atividades').click();
             await capturarTela(page, 'mapa', 'modal-criar-competencia-atividades-selecionadas', {
                 tags: ['selecao', 'atividades']
             });
@@ -1157,19 +1169,26 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
             await (await MapaHelpers.abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
-            await expect(page.getByRole('dialog')).toBeVisible();
+            await expect(page.getByTestId('mdl-disponibilizar-mapa')).toBeVisible();
             await capturarTela(page, 'mapa', 'modal-disponibilizar-mapa', {
                 tags: ['modal', 'disponibilizar-mapa']
             });
+        });
 
-            const dataLimite = new Date();
-            dataLimite.setDate(dataLimite.getDate() + 30);
-            await page.getByTestId('inp-disponibilizar-mapa-data').fill(dataLimite.toISOString().split('T')[0]);
-            await page.getByTestId('btn-disponibilizar-mapa-confirmar').click();
-            await verificarPaginaPainel(page);
+        test('Captura mapa disponibilizado e validação do chefe', async ({page, request}) => {
+            test.setTimeout(30000);
+            const descricao = `Proc mapa disponibilizado ${Date.now()}`;
+            const UNIDADE_ALVO = 'SECAO_121';
+            const codProcesso = await criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(
+                request,
+                cleanup,
+                descricao,
+                UNIDADE_ALVO
+            );
 
             await login(page, USUARIOS.CHEFE_SECAO_121.titulo, USUARIOS.CHEFE_SECAO_121.senha);
-            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${UNIDADE_ALVO}(?:\?.*)?$`));
             await navegarParaMapa(page);
             await capturarTela(page, 'mapa', 'mapa-disponibilizado', {
                 fullPage: true,
@@ -1181,9 +1200,22 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByRole('dialog')).toContainText('Confirma a validação do mapa de competências?');
             await page.getByTestId('btn-validar-mapa-confirmar').click();
             await verificarPaginaPainel(page);
+        });
+
+        test('Captura análise de mapa por gestores', async ({page, request}) => {
+            test.setTimeout(30000);
+            const descricao = `Proc mapa analise ${Date.now()}`;
+            const UNIDADE_ALVO = 'SECAO_121';
+            const codProcesso = await criarProcessoMapeamentoComMapaValidadoPorFixture(
+                request,
+                cleanup,
+                descricao,
+                UNIDADE_ALVO
+            );
 
             await login(page, USUARIOS.GESTOR_COORD_12.titulo, USUARIOS.GESTOR_COORD_12.senha);
-            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${UNIDADE_ALVO}(?:\?.*)?$`));
             await navegarParaMapa(page);
             await capturarTela(page, 'mapa', 'analise-gestor-coordenadoria', {
                 fullPage: true,
@@ -1197,7 +1229,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await verificarPaginaPainel(page);
 
             await loginComPerfil(page, USUARIOS.GESTOR_SECRETARIA_1.titulo, USUARIOS.GESTOR_SECRETARIA_1.senha, USUARIOS.GESTOR_SECRETARIA_1.perfil);
-            await acessarSubprocessoGestor(page, descricao, UNIDADE_ALVO);
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codProcesso}/${UNIDADE_ALVO}(?:\?.*)?$`));
             await navegarParaMapa(page);
             await capturarTela(page, 'mapa', 'analise-gestor-secretaria', {
                 fullPage: true,
