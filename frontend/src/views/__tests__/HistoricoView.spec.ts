@@ -1,8 +1,10 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
-import {createTestingPinia} from '@pinia/testing';
+import {PiniaColada} from '@pinia/colada';
+import {createPinia} from 'pinia';
 import HistoricoView from '../HistoricoView.vue';
 import {useRouter} from 'vue-router';
+import {usePerfilStore} from '@/stores/perfil';
 import * as processoService from '@/services/processo';
 import * as configuracaoService from '@/services/configuracaoService';
 
@@ -54,14 +56,17 @@ describe('HistoricoView.vue', () => {
     });
 
     const createWrapper = (initialState?: Record<string, unknown>) => {
+        const pinia = createPinia();
+        const perfilStore = usePerfilStore(pinia);
+        if (initialState?.perfil && typeof initialState.perfil === 'object') {
+            perfilStore.$patch(initialState.perfil as Record<string, unknown>);
+        }
+
         return mount(HistoricoView, {
             global: {
                 plugins: [
-                    createTestingPinia({
-                        createSpy: vi.fn,
-                        initialState,
-                        stubActions: false,
-                    })
+                    pinia,
+                    [PiniaColada, {}],
                 ],
                 stubs: {
                     LayoutPadrao: LayoutPadraoStub,

@@ -3,7 +3,24 @@ import {mount, flushPromises} from '@vue/test-utils';
 import {Editor} from '@tiptap/vue-3';
 import EditorTextoRico from '../EditorTextoRico.vue';
 
-const mockEditorInstance = {
+type MockEditor = {
+    destroy: ReturnType<typeof vi.fn>;
+    isActive: ReturnType<typeof vi.fn>;
+    getHTML: ReturnType<typeof vi.fn>;
+    isEmpty: boolean;
+    commands: {
+        setContent: ReturnType<typeof vi.fn>;
+    };
+    chain: ReturnType<typeof vi.fn>;
+    setEditable: ReturnType<typeof vi.fn>;
+    on: ReturnType<typeof vi.fn>;
+};
+
+type EditorOptionsMock = {
+    onUpdate?: (payload: { editor: MockEditor }) => void;
+};
+
+const mockEditorInstance: MockEditor = {
     destroy: vi.fn(),
     isActive: vi.fn().mockReturnValue(false),
     getHTML: vi.fn().mockReturnValue('<p>initial</p>'),
@@ -22,6 +39,14 @@ const mockEditorInstance = {
     setEditable: vi.fn(),
     on: vi.fn(),
 };
+
+function obterOnUpdateMock() {
+    const primeiraChamada = vi.mocked(Editor).mock.calls[0];
+    expect(primeiraChamada).toBeDefined();
+    const opcoes = primeiraChamada?.[0] as EditorOptionsMock | undefined;
+    expect(opcoes?.onUpdate).toBeDefined();
+    return opcoes!.onUpdate!;
+}
 
 vi.mock('@tiptap/vue-3', async () => {
     const actual = await vi.importActual('@tiptap/vue-3') as any;
@@ -116,7 +141,7 @@ describe('EditorTextoRico.vue', () => {
         // Trigger onUpdate (simulated) for empty
         mockEditorInstance.isEmpty = true;
         mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p></p>');
-        const onUpdate = vi.mocked(Editor).mock.calls[0][0].onUpdate;
+        const onUpdate = obterOnUpdateMock();
         onUpdate({ editor: mockEditorInstance });
         expect(wrapper.emitted('update:modelValue')![0]).toEqual(['']);
 
@@ -142,7 +167,7 @@ it('onUpdate handles reducing content when over limit', async () => {
     mockEditorInstance.isEmpty = false;
     mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p>123456</p>');
 
-    const onUpdate = vi.mocked(Editor).mock.calls[0][0].onUpdate;
+    const onUpdate = obterOnUpdateMock();
 
     // Clear here to be absolutely sure we only track calls from onUpdate
     mockEditorInstance.commands.setContent.mockClear();

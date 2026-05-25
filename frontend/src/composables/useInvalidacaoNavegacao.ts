@@ -1,3 +1,6 @@
+import {useQueryCache} from "@pinia/colada";
+import {CHAVE_QUERY_PAINEL} from "@/composables/usePainelQuery";
+import {CHAVE_QUERY_PROCESSO} from "@/composables/useProcessoQuery";
 import {usePainelStore} from "@/stores/painel";
 import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
@@ -53,6 +56,7 @@ interface OpcoesInvalidacaoSubprocesso {
  * nunca para stores de outras telas (painel, processo).
  */
 export function useInvalidacaoNavegacao() {
+    const queryCache = useQueryCache();
     const painelStore = usePainelStore();
     const processoStore = useProcessoStore();
     const subprocessoStore = useSubprocessoStore();
@@ -65,6 +69,8 @@ export function useInvalidacaoNavegacao() {
 
     function invalidarCachesProcesso(): void {
         painelStore.invalidar();
+        void queryCache.invalidateQueries({key: CHAVE_QUERY_PAINEL});
+        void queryCache.invalidateQueries({key: CHAVE_QUERY_PROCESSO});
         processoStore.invalidar();
         subprocessoStore.invalidar();
         mapasStore.invalidar();
@@ -88,8 +94,10 @@ export function useInvalidacaoNavegacao() {
     function invalidarCachesSubprocesso(opcoes?: OpcoesInvalidacaoSubprocesso): void {
         if (opcoes?.incluirPainel) {
             painelStore.invalidar();
+            void queryCache.invalidateQueries({key: CHAVE_QUERY_PAINEL});
         }
         if (opcoes?.incluirProcesso) {
+            void queryCache.invalidateQueries({key: CHAVE_QUERY_PROCESSO});
             processoStore.invalidar();
         }
         subprocessoStore.invalidar();

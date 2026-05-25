@@ -28,18 +28,18 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
-import {useHistoricoStore} from '@/stores/historico';
 import {usePerfilStore} from '@/stores/perfil';
 import {useConfiguracoes} from '@/composables/useConfiguracoes';
+import {useHistoricoQuery} from '@/composables/useHistoricoQuery';
 import {TEXTOS} from '@/constants/textos';
 import type {ProcessoResumo} from "@/types/tipos";
 
 const router = useRouter();
-const historicoStore = useHistoricoStore();
 const perfilStore = usePerfilStore();
 const {carregarConfiguracoes, obterDiasInativacaoProcesso} = useConfiguracoes();
+const historicoQuery = useHistoricoQuery();
 
-const loading = computed(() => historicoStore.carregando);
+const loading = computed(() => historicoQuery.isPending.value || historicoQuery.isLoading.value);
 const podeCarregarConfiguracoes = computed(() => perfilStore.permissoesSessao?.mostrarMenuConfiguracoes === true);
 
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
@@ -48,7 +48,7 @@ const asc = ref(false);
 const diasInativacao = computed(() => obterDiasInativacaoProcesso());
 
 const processosOrdenados = computed(() => {
-  const lista = [...historicoStore.processos];
+  const lista = [...(historicoQuery.data.value ?? [])];
   const campo = criterio.value;
   const direcao = asc.value ? 1 : -1;
 
@@ -89,7 +89,7 @@ let montadoUmaVez = false;
 async function carregarDadosTela(deveRecarregarHistorico: boolean) {
   const promessas = [];
   if (deveRecarregarHistorico) {
-    promessas.push(historicoStore.garantirDados());
+    promessas.push(montadoUmaVez ? historicoQuery.refresh(true) : historicoQuery.refetch(true));
   }
   if (podeCarregarConfiguracoes.value) {
     promessas.push(carregarConfiguracoes());
@@ -103,12 +103,12 @@ async function carregarDadosTela(deveRecarregarHistorico: boolean) {
 }
 
 onMounted(async () => {
-  montadoUmaVez = true;
   await carregarDadosTela(true);
+  montadoUmaVez = true;
 });
 
 onActivated(async () => {
   if (!montadoUmaVez) return;
-  await carregarDadosTela(!historicoStore.dadosValidos());
+  await carregarDadosTela(true);
 });
 </script>

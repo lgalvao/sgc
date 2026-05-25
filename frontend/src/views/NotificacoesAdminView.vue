@@ -155,12 +155,11 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import NotificacaoTabela from "@/components/administracao/NotificacaoTabela.vue";
+import {useNotificacoesAdminQuery} from "@/composables/useNotificacoesAdminQuery";
 import {TEXTOS} from "@/constants/textos";
 import {TIPOS_NOTIFICACAO_LABELS} from "@/constants/notificacoes";
 import {
   buscarUrlLeitorEmailTestes,
-  compararNotificacoes,
-  listarNotificacoesAdmin,
   type Notificacao,
   obterStatusNotificacao,
   reenviarNotificacao,
@@ -171,10 +170,8 @@ import {normalizarErro} from "@/utils/apiError";
 import {useNotification} from "@/composables/useNotification";
 
 const {notificacao, notify, clear} = useNotification();
+const notificacoesQuery = useNotificacoesAdminQuery();
 
-const itens = ref<Notificacao[]>([]);
-const carregando = ref(true);
-const erro = ref<string | null>(null);
 const itemSelecionado = ref<Notificacao | null>(null);
 const itemParaPreview = ref<Notificacao | null>(null);
 const itemParaDetalhes = ref<Notificacao | null>(null);
@@ -184,7 +181,9 @@ const mostrarDetalhes = ref(false);
 const reenviando = ref(false);
 const urlLeitorEmailTestes = ref<string>();
 
-const itensOrdenados = computed(() => [...itens.value].sort(compararNotificacoes));
+const carregando = computed(() => notificacoesQuery.isPending.value || notificacoesQuery.isLoading.value);
+const erro = computed(() => notificacoesQuery.error.value?.message || null);
+const itensOrdenados = notificacoesQuery.itensOrdenados;
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
 
 function formatarDataOuHifen(valor?: string | null): string {
@@ -236,14 +235,10 @@ function limparHtmlPreview(html: string): string {
 }
 
 async function carregar() {
-  carregando.value = true;
-  erro.value = null;
   try {
-    itens.value = await listarNotificacoesAdmin();
+    await notificacoesQuery.refetch(true);
   } catch (error) {
-    erro.value = normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR;
-  } finally {
-    carregando.value = false;
+    notify(normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR, "danger");
   }
 }
 
@@ -287,7 +282,7 @@ async function reenviar() {
 }
 
 onMounted(() => {
-  void carregar();
+  void notificacoesQuery.refetch();
   void carregarUrlLeitorEmailTestes();
 });
 </script>

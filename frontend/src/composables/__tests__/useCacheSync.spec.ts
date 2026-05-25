@@ -9,6 +9,14 @@ import {useMapasStore} from '@/stores/mapas';
 import {createPinia, setActivePinia} from 'pinia';
 import {logger} from '@/utils';
 
+const invalidateQueriesMock = vi.fn();
+
+vi.mock('@pinia/colada', () => ({
+    useQueryCache: () => ({
+        invalidateQueries: invalidateQueriesMock,
+    }),
+}));
+
 // Global to hold the last created instance
 let lastInstance: EventSourceMock | null = null;
 const instanciasCriadas: EventSourceMock[] = [];
@@ -79,6 +87,7 @@ describe('useCacheSync', () => {
         vi.spyOn(subprocessoStore, 'invalidar');
         vi.spyOn(mapasStore, 'invalidar');
         vi.spyOn(logger, 'warn').mockImplementation(() => logger);
+        invalidateQueriesMock.mockReset();
     });
 
     afterEach(() => {
@@ -101,6 +110,7 @@ describe('useCacheSync', () => {
         expect(unidadeStore.invalidar).toHaveBeenCalled();
         expect(organizacaoStore.invalidar).toHaveBeenCalled();
         expect(painelStore.invalidar).toHaveBeenCalled();
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['painel']});
         expect(processoStore.invalidar).not.toHaveBeenCalled();
         expect(subprocessoStore.invalidar).not.toHaveBeenCalled();
         expect(mapasStore.invalidar).not.toHaveBeenCalled();

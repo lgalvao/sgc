@@ -1,3 +1,5 @@
+import {useQueryCache} from "@pinia/colada";
+import {CHAVE_QUERY_PAINEL} from "@/composables/usePainelQuery";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useOrganizacaoStore} from "@/stores/organizacao";
 import {usePainelStore} from "@/stores/painel";
@@ -15,10 +17,12 @@ const EVENTO_CACHE_ATUALIZADO = "org-cache-refreshed";
  * Deve ser chamado uma vez em App.vue após a autenticação do usuário.
  */
 export function useCacheSync() {
+    const queryCache = useQueryCache();
     const invalidarCachesOrganizacionais = () => {
         useUnidadeStore().invalidar();
         useOrganizacaoStore().invalidar();
         usePainelStore().invalidar();
+        void queryCache.invalidateQueries({key: CHAVE_QUERY_PAINEL});
     };
     let encerradoManualmente = false;
     let source: EventSource | null = null;

@@ -1,7 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
+import {PiniaColada} from '@pinia/colada';
 import NotificacoesAdminView from '../NotificacoesAdminView.vue';
-import {createTestingPinia} from '@pinia/testing';
+import {createPinia} from 'pinia';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {buscarUrlLeitorEmailTestes, listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
 import {formatarDestinatario} from "@/utils/notificacaoFormatters";
@@ -45,9 +46,10 @@ describe('NotificacoesAdminView', () => {
     });
 
     const mountComponent = () => {
+        const pinia = createPinia();
         return mount(NotificacoesAdminView, {
             global: {
-                plugins: [createTestingPinia({createSpy: vi.fn}), router],
+                plugins: [pinia, [PiniaColada, {}], router],
                 stubs: {
                     LayoutPadrao: {template: '<div><slot/></div>'},
                     CarregamentoPagina: {template: '<div data-testid="pagina-carregando"></div>'},

@@ -1,11 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
+import {PiniaColada} from '@pinia/colada';
 import PainelView from '../PainelView.vue';
-import {createTestingPinia} from '@pinia/testing';
+import {createPinia} from 'pinia';
 import {useToastStore} from '@/stores/toast';
-import {usePainelStore} from '@/stores/painel';
 import * as painelService from '@/services/painelService';
 import {createMemoryHistory, createRouter} from 'vue-router';
+import {usePerfilStore} from '@/stores/perfil';
 
 vi.mock('@/services/painelService', () => ({
     obterBootstrap: vi.fn(),
@@ -36,7 +37,7 @@ vi.mock('bootstrap-vue-next', async (importOriginal) => {
     };
 });
 
-function createMountOptions(initialStateOverrides = {}) {
+function createMountOptions(initialStateOverrides = {}): any {
     const permissoesAdmin = {
         mostrarCriarProcesso: true,
         mostrarArvoreCompletaUnidades: true,
@@ -46,22 +47,25 @@ function createMountOptions(initialStateOverrides = {}) {
         mostrarMenuAdministradores: true,
         mostrarCriarAtribuicaoTemporaria: true,
     };
+    const pinia = createPinia();
+    const perfilStore = usePerfilStore(pinia);
+    perfilStore.$patch({
+        perfilSelecionado: 'ADMIN',
+        unidadeSelecionada: 1,
+        usuarioCodigo: 'U123',
+        permissoesSessao: {
+            ...permissoesAdmin,
+            ...(initialStateOverrides as any).permissoesSessao,
+        },
+        ...(initialStateOverrides as any),
+    });
     return {
+        pinia,
         global: {
             plugins: [
                 router,
-                createTestingPinia({
-                    initialState: {
-                        perfil: {
-                            perfilSelecionado: 'ADMIN',
-                            unidadeSelecionada: 1,
-                            usuarioCodigo: 'U123',
-                            permissoesSessao: permissoesAdmin,
-                            ...initialStateOverrides
-                        }
-                    },
-                    stubActions: false,
-                }),
+                pinia,
+                [PiniaColada, {}] as const,
             ],
             stubs: {
                 LayoutPadrao: {template: '<div><slot></slot></div>'},
@@ -97,8 +101,7 @@ describe('PainelView', () => {
 
     it('deve carregar os dados e exibir toast pendente no onMounted', async () => {
         const options = createMountOptions();
-        const pinia = options.global.plugins[1] as any;
-        const toastStore = useToastStore(pinia);
+        const toastStore = useToastStore(options.pinia);
         toastStore.consumePending = vi.fn().mockReturnValue({body: 'Sucesso'});
 
         mount(PainelView, options);
@@ -192,18 +195,18 @@ describe('PainelView', () => {
     });
 
     it('cobre ordenacao computed localmente', async () => {
-        const options = createMountOptions();
-        const wrapper = mount(PainelView, options);
+        vi.mocked(painelService.obterBootstrap).mockResolvedValueOnce({
+            processos: [
+                {codigo: 1, descricao: 'B'},
+                {codigo: 2, descricao: 'A'},
+                {codigo: 3, descricao: 'B'},
+                {codigo: 4},
+            ],
+            alertas: [],
+        } as any);
+
+        const wrapper = mount(PainelView, createMountOptions());
         await flushPromises();
-
-        const painelStore = (wrapper.vm as any).painelStore;
-
-        painelStore.processos = [
-            {codigo: 1, descricao: 'B'},
-            {codigo: 2, descricao: 'A'},
-            {codigo: 3, descricao: 'B'},
-            {codigo: 4}, // undefined descricao
-        ];
 
         const vm = wrapper.vm as any;
         vm.criterio = 'descricao';
@@ -220,11 +223,6 @@ describe('PainelView', () => {
 
     it('cobre onActivated e comportamento de cache', async () => {
         const options = createMountOptions();
-
-        // Mock dadosValidos BEFORE mounting so onActivated doesn't trigger a second call
-        const pinia = options.global.plugins[1] as any;
-        const painelStore = usePainelStore(pinia);
-        painelStore.dadosValidos = vi.fn().mockReturnValue(true);
 
         const KeepAliveWrapper = {
             template: `<keep-alive><PainelView v-if="show" /></keep-alive>`,
@@ -243,8 +241,9 @@ describe('PainelView', () => {
         vm.show = false;
         await flushPromises();
 
-        // Activate - cache is INVALID
-        painelStore.dadosValidos = vi.fn().mockReturnValue(false);
+        // Activate - cache INVALIDADO
+        const queryCache = (options.pinia as any)._s.get('_pc_query');
+        await queryCache.invalidateQueries({key: ['painel']});
         vm.show = true;
         await flushPromises();
         expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
@@ -253,8 +252,7 @@ describe('PainelView', () => {
         vm.show = false;
         await flushPromises();
 
-        // Activate - cache is VALID
-        painelStore.dadosValidos = vi.fn().mockReturnValue(true);
+        // Activate - cache VÁLIDO
         vm.show = true;
         await flushPromises();
         expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); // Should not increase

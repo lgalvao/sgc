@@ -74,9 +74,9 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import ProcessoAcoes from "@/components/processo/ProcessoAcoes.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useNotification} from "@/composables/useNotification";
+import {useProcessoQuery} from "@/composables/useProcessoQuery";
 import {useProcessoAcoes} from "@/views/processoDetalheAcoes";
 import {usePerfil} from "@/composables/usePerfil";
-import {useProcessoStore} from "@/stores/processo";
 import type {Processo} from "@/types/tipos";
 import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
@@ -91,8 +91,8 @@ const route = useRoute();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
 const {isAdmin} = usePerfil();
-const processoStore = useProcessoStore();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
+const processoQuery = useProcessoQuery(codProcesso);
 const processo = ref<Processo | null>(null);
 const ultimoErro = ref<ErroNormalizado | null>(null);
 const carregamentoInicialConcluido = ref(false);
@@ -111,7 +111,10 @@ async function carregarContextoCompleto() {
   const snapshotAnterior = processo.value;
 
   try {
-    const data = await processoStore.garantirContextoCompleto(codProcesso);
+    const resultado = carregamentoInicialConcluido.value
+        ? await processoQuery.refresh(true)
+        : await processoQuery.refetch(true);
+    const data = resultado.data;
     if (data) {
       processo.value = data;
     }
@@ -182,9 +185,6 @@ onMounted(async () => {
 
 onActivated(async () => {
   if (!codProcesso || !carregamentoInicialConcluido.value) {
-    return;
-  }
-  if (processoStore.dadosValidos(codProcesso)) {
     return;
   }
   await carregarContextoCompleto();

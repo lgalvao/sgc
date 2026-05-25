@@ -1,7 +1,8 @@
 import {computed, ref, type Ref} from "vue";
+import {useQueryCache} from "@pinia/colada";
 import {useRouter} from "vue-router";
 import type {VarianteAlerta} from "@/composables/useNotification";
-import {useHistoricoStore} from "@/stores/historico";
+import {CHAVE_QUERY_HISTORICO} from "@/composables/useHistoricoQuery";
 import {useToastStore} from "@/stores/toast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {AcaoBlocoProcesso, Processo, SubprocessoElegivel} from "@/types/tipos";
@@ -38,8 +39,8 @@ type ContextoProcessoAcoes = {
     dependencias: Dependencias;
     estado: EstadoProcessoAcoes;
     router: ReturnType<typeof useRouter>;
+    queryCache: ReturnType<typeof useQueryCache>;
     toastStore: ReturnType<typeof useToastStore>;
-    historicoStore: ReturnType<typeof useHistoricoStore>;
     invalidarCachesProcesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesProcesso"];
     invalidarCachesSubprocesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesSubprocesso"];
 };
@@ -66,7 +67,7 @@ async function confirmarFinalizacao(contexto: ContextoProcessoAcoes) {
         contexto.toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
         contexto.invalidarCachesProcesso();
         contexto.dependencias.processo.value = null;
-        contexto.historicoStore.invalidar();
+        await contexto.queryCache.invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true});
         await contexto.router.push("/painel");
     } catch (error) {
         contexto.dependencias.notify(contexto.dependencias.registrarErro(error) || TEXTOS.processo.ERRO_PADRAO, "danger");
@@ -123,16 +124,16 @@ async function executarAcaoBloco(contexto: ContextoProcessoAcoes, dados: DadosAc
 
 export function useProcessoAcoes(dependencias: Dependencias) {
     const router = useRouter();
+    const queryCache = useQueryCache();
     const toastStore = useToastStore();
-    const historicoStore = useHistoricoStore();
     const {invalidarCachesProcesso, invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
     const estado = criarEstado();
     const contexto = {
         dependencias,
         estado,
         router,
+        queryCache,
         toastStore,
-        historicoStore,
         invalidarCachesProcesso,
         invalidarCachesSubprocesso,
     };
