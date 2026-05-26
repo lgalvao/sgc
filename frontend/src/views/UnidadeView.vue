@@ -107,7 +107,6 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import UnidadeContatoInfo from "@/components/unidade/UnidadeContatoInfo.vue";
-import {useUnidadeStore} from "@/stores/unidade";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {formatarDataBR, logger} from "@/utils";
@@ -118,6 +117,7 @@ import {useNotification} from "@/composables/useNotification";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil} from "@/types/comum";
 import {relatoriosService} from "@/services/relatoriosService";
+import {useUnidade} from "@/composables/useUnidadeQuery";
 
 
 const props = defineProps<{ codUnidade: number }>();
@@ -126,55 +126,24 @@ const router = useRouter();
 const {mostrarCriarAtribuicaoTemporaria} = usePerfil();
 const {notify} = useNotification();
 const {definirUnidadeAtual} = useUnidadeAtual();
-const unidadeStore = useUnidadeStore();
 const perfilStore = usePerfilStore();
 
-const unidade = ref<Unidade | null>(null);
-const mapaVigente = ref<MapaVigenteReferencia | null>(null);
-const ultimoErro = ref<string | null>(null);
-const carregandoPagina = ref(true);
+const {
+  unidade,
+  mapaVigente,
+  carregando: carregandoPagina,
+  erro: ultimoErro,
+  carregar: carregarDados,
+  recarregar: recarregarDados,
+} = useUnidade(() => props.codUnidade);
+
 const carregamentoInicialConcluido = ref(false);
 const loadingExportacaoPdf = ref(false);
 const loadingExportacaoCsv = ref(false);
-let carregamentoEmAndamento: Promise<void> | null = null;
 
-async function carregarDados() {
-  if (carregamentoEmAndamento) {
-    await carregamentoEmAndamento;
-    return;
-  }
-
-  ultimoErro.value = null;
-
-  const tarefaCarregamento = (async () => {
-    if (!unidadeStore.possuiDadosTelaUnidade(props.codUnidade)) {
-      carregandoPagina.value = true;
-      unidade.value = null;
-      mapaVigente.value = null;
-    }
-
-    try {
-      const dadosTela = await unidadeStore.obterDadosTelaUnidade(props.codUnidade);
-      unidade.value = dadosTela.unidade;
-      definirUnidadeAtual(unidade.value);
-      mapaVigente.value = dadosTela.mapaVigente;
-    } catch (error: unknown) {
-      ultimoErro.value = normalizarErro(error).mensagem || TEXTOS.unidade.ERRO_CARREGAR;
-      logger.error("Erro ao carregar dados da unidade:", error);
-    } finally {
-      carregandoPagina.value = false;
-    }
-  })();
-
-  carregamentoEmAndamento = tarefaCarregamento;
-  try {
-    await tarefaCarregamento;
-  } finally {
-    if (carregamentoEmAndamento === tarefaCarregamento) {
-      carregamentoEmAndamento = null;
-    }
-  }
-}
+watch(unidade, (novaUnidade) => {
+  definirUnidadeAtual(novaUnidade);
+}, { immediate: true });
 
 function irParaCriarAtribuicao() {
   router.push({path: `/unidade/${props.codUnidade}/atribuicao`});
@@ -220,19 +189,9 @@ onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  try {
-    ultimoErro.value = null;
-    const dadosTela = await unidadeStore.recarregarDadosTelaUnidade(props.codUnidade);
-    unidade.value = dadosTela.unidade;
-    definirUnidadeAtual(unidade.value);
-    mapaVigente.value = dadosTela.mapaVigente;
-    carregandoPagina.value = false;
-  } catch (error: unknown) {
-    ultimoErro.value = normalizarErro(error).mensagem || TEXTOS.unidade.ERRO_CARREGAR;
-    logger.error("Erro ao recarregar dados da unidade:", error);
-    carregandoPagina.value = false;
-  }
+  await recarregarDados();
 });
+
 watch(
     () => props.codUnidade,
     async () => {

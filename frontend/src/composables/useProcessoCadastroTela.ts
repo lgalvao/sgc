@@ -12,7 +12,7 @@ import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_PROCESSO} from "@/constants/textos-processo";
 import * as processoService from "@/services/processo";
 import {useToastStore} from "@/stores/toast";
-import {useUnidadeStore} from "@/stores/unidade";
+import {useArvoreElegibilidadeQuery} from "@/composables/useUnidadeQuery";
 import {Processo, TipoProcesso, type Unidade} from "@/types/tipos";
 import {logger} from "@/utils";
 import {deveNotificarGlobalmente, ehErroAxios, extrairErrosGenericos, normalizarErro} from "@/utils/apiError";
@@ -134,7 +134,6 @@ function criarFluxoCarga({
     route,
     router,
     notify,
-    unidadeStore,
     unidades,
     isLoadingData,
     isLoadingUnidades,
@@ -147,7 +146,6 @@ function criarFluxoCarga({
     route: ReturnType<typeof useRoute>;
     router: ReturnType<typeof useRouter>;
     notify: (mensagem: string, variante?: VarianteAlerta, dispensavel?: boolean) => void;
-    unidadeStore: ReturnType<typeof useUnidadeStore>;
     unidades: Ref<Unidade[]>;
     isLoadingData: Ref<boolean>;
     isLoadingUnidades: Ref<boolean>;
@@ -155,6 +153,10 @@ function criarFluxoCarga({
     inicializando: Ref<boolean>;
     carregamentoInicialConcluido: Ref<boolean>;
 }) {
+    const tipoRef = ref<string | null>(null);
+    const codigoRef = ref<number | undefined>(undefined);
+    const query = useArvoreElegibilidadeQuery(tipoRef, codigoRef);
+
     function sincronizarUnidadesSelecionadasElegiveis(unidadesArvore: Unidade[]) {
         const selecionadasFiltradas = filtrarSelecionadasPorElegibilidade(
             formulario.unidadesSelecionadas.value,
@@ -168,8 +170,11 @@ function criarFluxoCarga({
 
     async function buscarUnidadesParaProcesso(tipoProcesso: TipoProcesso, codigoProcesso?: number) {
         isLoadingUnidades.value = true;
+        tipoRef.value = tipoProcesso;
+        codigoRef.value = codigoProcesso;
         try {
-            const unidadesMapeadas = await unidadeStore.garantirArvoreElegibilidade(tipoProcesso, codigoProcesso);
+            const resultado = await query.refetch();
+            const unidadesMapeadas = resultado.data ?? [];
             const unidadesSemSemEquipe = removerUnidadesSemEquipe(unidadesMapeadas);
             unidades.value = unidadesSemSemEquipe;
             sincronizarUnidadesSelecionadasElegiveis(unidadesSemSemEquipe);
@@ -392,7 +397,6 @@ export function useProcessoCadastroTela({formFieldsRef, modalUnidadesComEquipePr
     const route = useRoute();
     const router = useRouter();
     const toastStore = useToastStore();
-    const unidadeStore = useUnidadeStore();
     const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
     const {notificacao, notify, notifyStructured, clear} = useNotification();
     const {mostrarDiagnosticoOrganizacional} = usePerfil();
@@ -414,13 +418,12 @@ export function useProcessoCadastroTela({formFieldsRef, modalUnidadesComEquipePr
         notify,
         notifyStructured
     });
-    const {buscarUnidadesParaProcesso} = criarFluxoCarga({
+        const {buscarUnidadesParaProcesso} = criarFluxoCarga({
         formulario,
         formFieldsRef,
         route,
         router,
         notify,
-        unidadeStore,
         unidades: tela.unidades,
         isLoadingData: tela.isLoadingData,
         isLoadingUnidades: tela.isLoadingUnidades,

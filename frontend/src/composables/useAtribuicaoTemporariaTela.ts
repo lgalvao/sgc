@@ -13,11 +13,11 @@ import {
     removerAtribuicaoTemporaria
 } from "@/services/atribuicaoTemporariaService";
 import {useOrganizacaoStore} from "@/stores/organizacao";
-import {useUnidadeStore} from "@/stores/unidade";
 import type {Unidade} from "@/types/tipos";
 import {obterHojeFormatado} from "@/utils/date";
 import {logger} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
+import {useUnidadeQuery} from "@/composables/useUnidadeQuery";
 
 interface EstadoCampos {
     usuarioSelecionado: Ref<string | null>;
@@ -143,7 +143,7 @@ function criarFluxoCarga({
     erroUsuario,
     resetarValidacao,
     unidade,
-    unidadeStore
+    unidadeQuery
 }: {
     atribuicaoVigente: Ref<AtribuicaoTemporaria | null>;
     atribuicoes: Ref<AtribuicaoTemporaria[]>;
@@ -155,14 +155,14 @@ function criarFluxoCarga({
     erroUsuario: Ref<string>;
     resetarValidacao: () => void;
     unidade: Ref<Unidade | null>;
-    unidadeStore: ReturnType<typeof useUnidadeStore>;
+    unidadeQuery: ReturnType<typeof useUnidadeQuery>;
 }) {
     async function carregarDados() {
         carregandoInicial.value = true;
         erroUsuario.value = "";
 
         try {
-            unidade.value = await unidadeStore.recarregarUnidade(codigoUnidade);
+            unidade.value = (await unidadeQuery.refresh(true)).data;
             atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
             preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
         } catch (error) {
@@ -206,7 +206,7 @@ function criarFluxoMutacao({
     organizacaoStore,
     resetarValidacao,
     unidade,
-    unidadeStore,
+    unidadeQuery,
     validarSubmissao,
     focarPrimeiroErroInvalido
 }: {
@@ -225,12 +225,12 @@ function criarFluxoMutacao({
     organizacaoStore: ReturnType<typeof useOrganizacaoStore>;
     resetarValidacao: () => void;
     unidade: Ref<Unidade | null>;
-    unidadeStore: ReturnType<typeof useUnidadeStore>;
+    unidadeQuery: ReturnType<typeof useUnidadeQuery>;
     validarSubmissao: (valido: boolean) => boolean;
     focarPrimeiroErroInvalido: () => Promise<void>;
 }) {
     async function atualizarCachesPosMutacao() {
-        unidade.value = await unidadeStore.recarregarUnidade(codigoUnidade);
+        unidade.value = (await unidadeQuery.refresh(true)).data;
         atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
         preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
     }
@@ -312,7 +312,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
     const router = useRouter();
     const {notificacao, notify, clear} = useNotification();
     const {mostrarDiagnosticoOrganizacional} = usePerfil();
-    const unidadeStore = useUnidadeStore();
+    const unidadeQuery = useUnidadeQuery(codigoUnidade);
     const organizacaoStore = useOrganizacaoStore();
     const campos = criarEstadoCampos();
     const unidade = ref<Unidade | null>(null);
@@ -346,7 +346,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         erroUsuario,
         resetarValidacao,
         unidade,
-        unidadeStore
+        unidadeQuery
     });
     const {removerAtribuicao, salvarAtribuicao} = criarFluxoMutacao({
         atribuicaoVigente,
@@ -364,7 +364,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         organizacaoStore,
         resetarValidacao,
         unidade,
-        unidadeStore,
+        unidadeQuery,
         validarSubmissao,
         focarPrimeiroErroInvalido
     });

@@ -8,7 +8,6 @@ import {TEXTOS} from "@/constants/textos";
 import * as processoService from '@/services/processo';
 import {obterAmanhaFormatado} from "@/utils/date";
 import {useSubprocessoStore} from '@/stores/subprocesso';
-import {useUnidadeStore} from '@/stores/unidade';
 import {useProcessoForm} from '@/composables/useProcessoForm';
 import {logger} from '@/utils';
 
@@ -42,9 +41,20 @@ const unidadeStoreMock = {
     invalidar: vi.fn(),
 };
 
-vi.mock('@/stores/unidade', () => ({
-    useUnidadeStore: () => unidadeStoreMock,
-}));
+const useUnidadeStore = (pinia?: any) => unidadeStoreMock;
+
+vi.mock('@/composables/useUnidadeQuery', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/composables/useUnidadeQuery')>();
+    return {
+        ...actual,
+        useArvoreElegibilidadeQuery: (tipoRef: any, codigoRef: any) => ({
+            refetch: async () => {
+                const data = await unidadeStoreMock.garantirArvoreElegibilidade(tipoRef.value, codigoRef.value);
+                return { data };
+            }
+        }),
+    };
+});
 
 const {mockPush, mockRoute} = vi.hoisted(() => {
     return {

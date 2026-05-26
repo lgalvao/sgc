@@ -1,19 +1,15 @@
-import {useMapasStore} from "@/stores/mapas";
+import {useCacheMapa} from "@/composables/useMapaQuery";
 
 export function useEstadoMapaNavegacao() {
-    const mapasStore = useMapasStore();
+    const cacheMapa = useCacheMapa();
 
     function atualizarEstadoMapa(codigoSubprocesso?: number): void {
-        if (typeof codigoSubprocesso === "number") {
-            mapasStore.marcarMapaParaAtualizacao(codigoSubprocesso);
-            return;
-        }
-
-        mapasStore.invalidar();
+        cacheMapa.invalidarMapa(codigoSubprocesso);
     }
 
     function resetarEstadoMapa(): void {
-        mapasStore.resetar();
+        cacheMapa.invalidarMapa();
+        cacheMapa.invalidarImpacto();
     }
 
     return {

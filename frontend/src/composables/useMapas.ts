@@ -1,33 +1,31 @@
-import {storeToRefs} from "pinia";
-import {computed, type MaybeRefOrGetter, type Ref, toValue} from "vue";
+import {computed, type MaybeRefOrGetter, ref, type Ref, toValue} from "vue";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
-import {useMapasStore} from "@/stores/mapas";
+import {useCacheMapa, useImpactoMapaQuery, useMapaQuery} from "@/composables/useMapaQuery";
 
 export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | undefined>) {
-    const mapasStore = useMapasStore();
-    const {mapaCompleto: mapaCompletoGlobal, impactoMapa: impactoMapaGlobal} = storeToRefs(mapasStore);
+    const codigoSubprocessoInterno = ref<number | null>(codigoSubprocesso === undefined ? null : null);
+    const codigoConsulta = computed(() =>
+        codigoSubprocesso === undefined ? codigoSubprocessoInterno.value : (toValue(codigoSubprocesso) ?? null)
+    );
+    const mapaQuery = useMapaQuery(codigoConsulta);
+    const impactoQuery = useImpactoMapaQuery(codigoConsulta);
+    const cacheMapa = useCacheMapa();
     const {carregando, erro, executar} = useAsyncAction();
-    const mapaCompleto = codigoSubprocesso === undefined
-        ? mapaCompletoGlobal
-        : computed(() => {
-            const codigoAtual = toValue(codigoSubprocesso);
-            return typeof codigoAtual === "number"
-                ? mapasStore.obterMapa(codigoAtual)
-                : null;
-        });
-    const impactoMapa = codigoSubprocesso === undefined
-        ? impactoMapaGlobal
-        : computed(() => {
-            const codigoAtual = toValue(codigoSubprocesso);
-            return typeof codigoAtual === "number"
-                ? mapasStore.obterImpacto(codigoAtual)
-                : null;
-        });
+    const mapaCompleto = computed(() => mapaQuery.data.value ?? null);
+    const impactoMapa = computed(() => impactoQuery.data.value ?? null);
 
     async function carregarMapa(codSubprocesso: number) {
         await executar(async () => {
-            await mapasStore.carregarMapa(codSubprocesso);
+            if (codigoSubprocesso === undefined) {
+                codigoSubprocessoInterno.value = codSubprocesso;
+            }
+            const codigoAtual = codigoConsulta.value;
+            if (codigoAtual === codSubprocesso && (mapaQuery.status.value === "success" || mapaQuery.status.value === "error")) {
+                await mapaQuery.refresh(true);
+                return;
+            }
+            await mapaQuery.refetch(true);
         }, "Erro ao carregar mapa completo.", {relancarErro: false});
     }
 
@@ -37,7 +35,15 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         }
 
         await executar(async () => {
-            await mapasStore.carregarImpacto(codSubprocesso);
+            if (codigoSubprocesso === undefined) {
+                codigoSubprocessoInterno.value = codSubprocesso;
+            }
+            const codigoAtual = codigoConsulta.value;
+            if (codigoAtual === codSubprocesso && (impactoQuery.status.value === "success" || impactoQuery.status.value === "error")) {
+                await impactoQuery.refresh(true);
+                return;
+            }
+            await impactoQuery.refetch(true);
         }, "Erro ao verificar impactos.", {relancarErro: false});
     }
 
@@ -46,11 +52,14 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         impactoMapa: impactoMapa as Ref<ImpactoMapa | null>,
         carregando,
         erro,
-        sincronizarMapa: mapasStore.sincronizarMapa,
-        sincronizarImpacto: mapasStore.sincronizarImpacto,
-        invalidar: mapasStore.invalidar,
-        invalidarImpacto: mapasStore.invalidarImpacto,
-        resetar: mapasStore.resetar,
+        sincronizarMapa: cacheMapa.sincronizarMapa,
+        sincronizarImpacto: cacheMapa.sincronizarImpacto,
+        invalidar: cacheMapa.invalidarMapa,
+        invalidarImpacto: cacheMapa.invalidarImpacto,
+        resetar: () => {
+            cacheMapa.invalidarMapa();
+            cacheMapa.invalidarImpacto();
+        },
         carregarMapa,
         carregarImpacto,
     };

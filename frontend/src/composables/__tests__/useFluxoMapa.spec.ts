@@ -1,23 +1,27 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useFluxoMapa} from "../useFluxoMapa";
 import * as subprocessoService from "@/services/subprocessoService";
-import {useMapasStore} from "@/stores/mapas";
+import {useCacheMapa} from "@/composables/useMapaQuery";
 
-vi.mock("@/services/subprocessoService", () => ({
-    salvarMapaCompleto: vi.fn(),
-    salvarMapaAjuste: vi.fn(),
-    disponibilizarMapa: vi.fn(),
-    adicionarCompetencia: vi.fn(),
-    atualizarCompetencia: vi.fn(),
-    removerCompetencia: vi.fn(),
-    validarMapa: vi.fn(),
-    aceitarValidacao: vi.fn(),
-    homologarValidacao: vi.fn(),
-    devolverValidacao: vi.fn(),
-}));
+vi.mock("@/services/subprocessoService", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("@/services/subprocessoService")>();
+    return {
+        ...actual,
+        salvarMapaCompleto: vi.fn(),
+        salvarMapaAjuste: vi.fn(),
+        disponibilizarMapa: vi.fn(),
+        adicionarCompetencia: vi.fn(),
+        atualizarCompetencia: vi.fn(),
+        removerCompetencia: vi.fn(),
+        validarMapa: vi.fn(),
+        aceitarValidacao: vi.fn(),
+        homologarValidacao: vi.fn(),
+        devolverValidacao: vi.fn(),
+    };
+});
 
-vi.mock("@/stores/mapas", () => ({
-    useMapasStore: vi.fn(() => ({
+vi.mock("@/composables/useMapaQuery", () => ({
+    useCacheMapa: vi.fn(() => ({
         obterMapa: vi.fn().mockReturnValue(null)
     }))
 }));
@@ -137,7 +141,7 @@ describe("useFluxoMapa", () => {
                     }
                 ]
             };
-            vi.mocked(useMapasStore).mockReturnValue({
+            vi.mocked(useCacheMapa).mockReturnValue({
                 obterMapa: vi.fn().mockReturnValue(mockMapa)
             } as any);
 
@@ -151,7 +155,7 @@ describe("useFluxoMapa", () => {
         });
 
         it("deve lançar erro se competencia não for encontrada", async () => {
-            vi.mocked(useMapasStore).mockReturnValue({
+            vi.mocked(useCacheMapa).mockReturnValue({
                 obterMapa: vi.fn().mockReturnValue({competencias: []})
             } as any);
 

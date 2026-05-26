@@ -1,10 +1,10 @@
 import {getCurrentInstance, onActivated, onMounted, ref, type Ref} from "vue";
 import type {Atividade, ContextoCadastroAtividadesSubprocesso, RespostaLocalCadastro, Unidade} from "@/types/tipos";
-import {useMapasStore} from "@/stores/mapas";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import logger from "@/utils/logger";
+import {useCacheMapa} from "@/composables/useMapaQuery";
 
 interface CadastroOrquestracaoProps {
     codProcesso: number | string;
@@ -42,7 +42,7 @@ async function recarregarContextoInicial(
 
 export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
-    const mapasStore = useMapasStore();
+    const cacheMapa = useCacheMapa();
     const {atualizarFluxoSubprocessoEPainel} = useInvalidacaoNavegacao();
 
     const carregandoInicial = ref(true);
@@ -58,7 +58,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
             ...response.subprocesso,
             permissoes: response.permissoes
         });
-        mapasStore.marcarMapaParaAtualizacao(response.subprocesso.codigo);
+        cacheMapa.invalidarMapa(response.subprocesso.codigo);
         subprocessoStore.marcarContextoEdicaoParaAtualizacao(response.subprocesso.codigo);
     }
 

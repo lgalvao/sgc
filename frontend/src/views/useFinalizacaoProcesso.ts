@@ -11,7 +11,6 @@ import type {DependenciasProcessoAcoes} from "@/views/processoDetalheTipos";
 
 export function useFinalizacaoProcesso(dependencias: DependenciasProcessoAcoes) {
     const router = useRouter();
-    const queryCache = useQueryCache();
     const toastStore = useToastStore();
     const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
     const loadingFinalizacao = ref(false);
@@ -29,7 +28,7 @@ export function useFinalizacaoProcesso(dependencias: DependenciasProcessoAcoes) 
             toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
             atualizarFluxoProcesso();
             dependencias.processo.value = null;
-            await queryCache.invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true});
+            await useQueryCache().invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true});
             await router.push("/painel");
         } catch (error) {
             dependencias.notify(dependencias.registrarErro(error) || TEXTOS.processo.ERRO_PADRAO, "danger");

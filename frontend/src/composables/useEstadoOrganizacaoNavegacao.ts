@@ -1,22 +1,28 @@
 import {useOrganizacaoStore} from "@/stores/organizacao";
-import {useUnidadeStore} from "@/stores/unidade";
+import {useInvalidacaoUnidade} from "@/composables/useUnidadeQuery";
 
 export function useEstadoOrganizacaoNavegacao() {
-    const unidadeStore = useUnidadeStore();
     const organizacaoStore = useOrganizacaoStore();
+    const {invalidarDadosTelaUnidade, invalidarUnidade, invalidarArvoreElegibilidade} = useInvalidacaoUnidade();
 
     function atualizarEstadoOrganizacional(): void {
-        unidadeStore.invalidar();
         organizacaoStore.invalidar();
+        invalidarUnidade();
+        invalidarDadosTelaUnidade();
+        invalidarArvoreElegibilidade();
     }
 
     function atualizarEstadoUnidade(): void {
-        unidadeStore.invalidar();
+        invalidarUnidade();
+        invalidarDadosTelaUnidade();
+        invalidarArvoreElegibilidade();
     }
 
     function resetarEstadoOrganizacional(): void {
-        unidadeStore.resetar();
         organizacaoStore.resetar();
+        invalidarUnidade();
+        invalidarDadosTelaUnidade();
+        invalidarArvoreElegibilidade();
     }
 
     return {

@@ -13,7 +13,6 @@ import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.v
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/acesso';
 import * as useNotificationModule from '@/composables/useNotification';
-import {useNotification} from '@/composables/useNotification';
 import {TEXTOS} from "@/constants/textos";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
@@ -52,7 +51,31 @@ vi.mock("@/composables/useNotification", () => ({
     }))
 }));
 
-const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
+const mockMapaCompleto = ref<any>(null);
+const mockImpactoMapa = ref<any>(null);
+const mockErroMapas = ref<any>(null);
+
+const {pushMock} = vi.hoisted(() => ({
+    pushMock: vi.fn()
+}));
+
+vi.mock("@/composables/useMapas", () => ({
+    useMapas: vi.fn(() => ({
+        mapaCompleto: mockMapaCompleto,
+        impactoMapa: mockImpactoMapa,
+        carregando: { value: false },
+        erro: mockErroMapas,
+        carregarMapa: vi.fn(),
+        carregarImpacto: vi.fn(async (cod: number) => {
+            await subprocessoService.verificarImpactosMapa(cod);
+        }),
+        sincronizarMapa: vi.fn(),
+        sincronizarImpacto: vi.fn(),
+        invalidar: vi.fn(),
+        invalidarImpacto: vi.fn(),
+        resetar: vi.fn(),
+    }))
+}));
 
 type AtividadeMinima = {
     codigo: number;
@@ -409,6 +432,9 @@ function createWrapper(customState = {}, accessOverrides = {}) {
 describe("CadastroView.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockMapaCompleto.value = null;
+        mockImpactoMapa.value = null;
+        mockErroMapas.value = null;
         estadoContextoCadastro.value = null;
         subprocessosMock.subprocessoDetalhe = {
             codigo: 123,

@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {createTestingPinia} from '@pinia/testing';
-import {useMapas} from '@/composables/useMapas';
+import {ref} from 'vue';
 import MapaView from '@/views/MapaView.vue';
 import * as useFluxoMapaModule from '@/composables/useFluxoMapa';
 import * as subprocessoService from '@/services/subprocessoService';
@@ -23,6 +23,41 @@ type MapaViewVm = {
     exportarMapaAtualPdf: () => Promise<void>;
     exportarMapaAtualCsv: () => Promise<void>;
 };
+
+// Ref controlável que simula codigoSubprocesso exposto por useMapaOrquestracao
+const codigoSubprocessoRef = ref<number | null>(null);
+vi.mock('@/composables/useMapaOrquestracao', () => ({
+    useMapaOrquestracao: () => ({
+        carregandoInicial: ref(false),
+        codigoSubprocesso: codigoSubprocessoRef,
+        unidade: ref(null),
+        carregarContextoInicial: vi.fn().mockResolvedValue(true),
+        sincronizarEstadoInicialContexto: vi.fn(),
+    }),
+}));
+
+// Estado controlável do useMapas para testes de componente
+// (evita dependência de contexto de injeção Vue/PiniaColada)
+const mapasMockState = {
+    mapaCompleto: ref<any>(null),
+    impactoMapa: ref<any>(null),
+    carregando: ref(false),
+    erro: ref<string | null>(null),
+    carregarImpacto: vi.fn(async (codigo: number) => {
+        await subprocessoService.verificarImpactosMapa(codigo);
+    }),
+    carregarMapa: vi.fn(),
+    sincronizarMapa: vi.fn(),
+    sincronizarImpacto: vi.fn(),
+    invalidar: vi.fn(),
+    invalidarImpacto: vi.fn(),
+    resetar: vi.fn(),
+};
+vi.mock('@/composables/useMapas', () => ({
+    useMapas: () => mapasMockState,
+}));
+// Re-exporta useMapas para uso nos testes que chamam diretamente
+const useMapas = () => mapasMockState;
 
 vi.mock('@/composables/useFluxoMapa', () => ({useFluxoMapa: vi.fn()}));
 vi.mock('@/services/subprocessoService', () => ({
@@ -89,6 +124,14 @@ describe('MapaView', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        codigoSubprocessoRef.value = null;
+        mapasMockState.mapaCompleto.value = null;
+        mapasMockState.impactoMapa.value = null;
+        mapasMockState.carregando.value = false;
+        mapasMockState.erro.value = null;
+        mapasMockState.carregarImpacto.mockImplementation(async (codigo: number) => {
+            await subprocessoService.verificarImpactosMapa(codigo);
+        });
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = null;
         subprocessoStoreMock.obterContextoEdicao.mockResolvedValue(null);
@@ -179,6 +222,9 @@ describe('MapaView', () => {
             }
         });
 
+        // Define codigoSubprocesso antes de montar para que o ref seja reativo desde o início
+        codigoSubprocessoRef.value = 456;
+
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
@@ -192,7 +238,6 @@ describe('MapaView', () => {
 
         vi.mocked(subprocessoService.verificarImpactosMapa).mockResolvedValue({} as any);
         const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.codigoSubprocesso = 456;
 
         await vm.abrirModalImpacto();
         await new Promise(r => setTimeout(r, 0));
@@ -205,14 +250,14 @@ describe('MapaView', () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             stubActions: false,
-            initialState: {
-                mapas: {
-                    mapaCompleto: {
-                        competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}]
-                    }
-                }
-            }
         });
+
+        // Define o estado do mapa diretamente no mock
+        codigoSubprocessoRef.value = 456;
+        mapasMockState.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}],
+            atividades: [],
+        };
 
         const wrapper = mount(MapaView, {
             global: {
@@ -224,14 +269,9 @@ describe('MapaView', () => {
                 sigla: "TESTE"
             }
         });
-        const mapas = useMapas();
-        const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.codigoSubprocesso = 456;
-        mapas.sincronizarMapa(456, {
-            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}]
-        } as unknown as NonNullable<typeof mapas.mapaCompleto.value>);
 
         const fluxoMapa = useFluxoMapaModule.useFluxoMapa();
+        const vm = wrapper.vm as unknown as MapaViewVm;
 
         await vm.removerAtividadeAssociada(1, 10);
 
@@ -242,14 +282,14 @@ describe('MapaView', () => {
         const pinia = createTestingPinia({
             createSpy: vi.fn,
             stubActions: false,
-            initialState: {
-                mapas: {
-                    mapaCompleto: {
-                        competencias: [{codigo: 1, descricao: 'Comp 1', atividades: []}]
-                    }
-                }
-            }
         });
+
+        // Define o estado do mapa diretamente no mock
+        codigoSubprocessoRef.value = 456;
+        mapasMockState.mapaCompleto.value = {
+            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: []}],
+            atividades: [],
+        };
 
         const wrapper = mount(MapaView, {
             global: {
@@ -262,15 +302,9 @@ describe('MapaView', () => {
             }
         });
 
-        const mapas = useMapas();
-        const vm = wrapper.vm as unknown as MapaViewVm;
-        vm.codigoSubprocesso = 456;
-        mapas.sincronizarMapa(456, {
-            competencias: [{codigo: 1, descricao: 'Comp 1', atividades: []}]
-        } as unknown as NonNullable<typeof mapas.mapaCompleto.value>);
-
         await wrapper.vm.$nextTick();
 
+        const vm = wrapper.vm as unknown as MapaViewVm;
         expect(vm.existeCompetenciaSemAtividade).toBe(true);
     });
 

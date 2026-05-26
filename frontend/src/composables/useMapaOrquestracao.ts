@@ -1,7 +1,7 @@
 import {getCurrentInstance, onActivated, onMounted, ref} from "vue";
 import type {ContextoEdicaoSubprocesso, Unidade} from "@/types/tipos";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useMapasStore} from "@/stores/mapas";
+import {useCacheMapa} from "@/composables/useMapaQuery";
 
 interface MapaOrquestracaoProps {
     codProcesso: number | string;
@@ -36,11 +36,11 @@ async function buscarContextoEdicao(
 export function useMapaOrquestracao(props: MapaOrquestracaoProps) {
     const {carregandoInicial, codigoSubprocesso, unidade, carregamentoInicialConcluido} = criarEstado();
     const subprocessoStore = useSubprocessoStore();
-    const mapasStore = useMapasStore();
+    const cacheMapa = useCacheMapa();
 
     function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
         unidade.value = data.unidade;
-        mapasStore.sincronizarMapa(data.detalhes.codigo, data.mapa);
+        cacheMapa.sincronizarMapa(data.detalhes.codigo, data.mapa);
     }
 
     async function carregarContextoInicial() {

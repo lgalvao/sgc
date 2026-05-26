@@ -17,8 +17,8 @@ const storeMock = {
     erroIntegracaoContexto: null as {codigo?: string} | null,
 };
 
-const mapasStoreMock = {
-    marcarMapaParaAtualizacao: vi.fn(),
+const cacheMapaMock = {
+    invalidarMapa: vi.fn(),
 };
 
 const atualizarFluxoSubprocessoEPainelMock = vi.fn();
@@ -27,8 +27,8 @@ vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => storeMock
 }));
 
-vi.mock("@/stores/mapas", () => ({
-    useMapasStore: () => mapasStoreMock
+vi.mock("@/composables/useMapaQuery", () => ({
+    useCacheMapa: () => cacheMapaMock
 }));
 
 vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
@@ -106,7 +106,7 @@ describe("useCadastroOrquestracao", () => {
         });
 
         expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
-        expect(mapasStoreMock.marcarMapaParaAtualizacao).toHaveBeenCalledWith(123);
+        expect(cacheMapaMock.invalidarMapa).toHaveBeenCalledWith(123);
         expect(storeMock.marcarContextoEdicaoParaAtualizacao).toHaveBeenCalledWith(123);
         expect(atualizarFluxoSubprocessoEPainelMock).toHaveBeenCalled();
     });

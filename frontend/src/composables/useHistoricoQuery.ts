@@ -14,9 +14,7 @@ export function useHistoricoQuery() {
 }
 
 export function useInvalidacaoHistorico() {
-    const queryCache = useQueryCache();
-
     return {
-        invalidarHistorico: () => queryCache.invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true}),
+        invalidarHistorico: () => useQueryCache().invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true}),
     };
 }

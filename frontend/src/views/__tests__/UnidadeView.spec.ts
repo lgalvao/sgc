@@ -4,7 +4,7 @@ import UnidadeView from '@/views/UnidadeView.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {BAlert} from 'bootstrap-vue-next';
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import {nextTick, ref} from "vue";
+import {nextTick, ref, computed, watch} from "vue";
 
 const {
     mockPush,
@@ -12,7 +12,7 @@ const {
     mockMapaVigente,
     mockObterUnidade,
     mockObterReferenciaMapaVigente,
-    mockUnidadeStore,
+    unidadeQueryMock,
     notify,
     downloadRelatorioMapaVigenteUnidadePdf,
     downloadRelatorioMapaVigenteUnidadeCsv
@@ -53,16 +53,11 @@ const {
         mockMapaVigente: {codProcesso: 99, codSubprocesso: 77},
         mockObterUnidade: vi.fn(),
         mockObterReferenciaMapaVigente: vi.fn(),
-        mockUnidadeStore: {
-            cacheUnidades: new Map<number, unknown>(),
-            cacheMapasVigentes: new Map<number, unknown>(),
-            possuiDadosTelaUnidade: vi.fn(),
-            obterDadosTelaUnidade: vi.fn(),
-            recarregarDadosTelaUnidade: vi.fn(),
-            obterUnidade: vi.fn(),
-            recarregarUnidade: vi.fn(),
-            obterReferenciaMapaVigente: vi.fn(),
-            recarregarReferenciaMapaVigente: vi.fn(),
+        unidadeQueryMock: {
+            data: {value: null as any},
+            status: {value: "pending"},
+            refetch: vi.fn(),
+            refresh: vi.fn(),
         },
         notify: vi.fn(),
         downloadRelatorioMapaVigenteUnidadePdf: vi.fn(),
@@ -80,9 +75,125 @@ vi.mock('vue-router', async (importOriginal) => {
     };
 });
 
-vi.mock('@/stores/unidade', () => {
+vi.mock('@/composables/useUnidadeQuery', () => {
+    let errorMsgStr: string | null = null;
+
+    const initialDataVal = unidadeQueryMock.data.value;
+    const initialStatusVal = unidadeQueryMock.status.value;
+
+    let dataRefObj: any = null;
+    let statusRefObj: any = null;
+
+    const getDataRef = () => {
+        if (!dataRefObj) {
+            dataRefObj = ref(initialDataVal);
+        }
+        return dataRefObj;
+    };
+
+    const getStatusRef = () => {
+        if (!statusRefObj) {
+            statusRefObj = ref(initialStatusVal);
+        }
+        return statusRefObj;
+    };
+
+    Object.defineProperty(unidadeQueryMock.data, 'value', {
+        get() { return getDataRef().value; },
+        set(val) { getDataRef().value = val; }
+    });
+
+    Object.defineProperty(unidadeQueryMock.status, 'value', {
+        get() { return getStatusRef().value; },
+        set(val) { getStatusRef().value = val; }
+    });
+
+    const useUnidade = () => {
+        const errorMsg = ref<string | null>(errorMsgStr);
+        const unidade = ref<any>(getDataRef().value?.unidade ?? null);
+        const mapaVigente = ref<any>(getDataRef().value?.mapaVigente ?? null);
+        const carregando = computed(() => {
+            return getStatusRef().value === "pending";
+        });
+        const erro = computed(() => {
+            return errorMsg.value;
+        });
+
+        watch(() => getDataRef().value, (newData: any) => {
+            unidade.value = newData?.unidade ?? null;
+            mapaVigente.value = newData?.mapaVigente ?? null;
+        }, { immediate: true });
+
+        let promessaCarregamento: Promise<void> | null = null;
+        let promessaRecarregamento: Promise<void> | null = null;
+
+        const normalizar = (e: any) => ({
+            mensagem: e?.response?.data?.message || e?.message || 'Erro padrão'
+        });
+
+        const carregar = async () => {
+            if (promessaCarregamento) {
+                return promessaCarregamento;
+            }
+            errorMsgStr = null;
+            errorMsg.value = null;
+            promessaCarregamento = (async () => {
+                try {
+                    const res = await unidadeQueryMock.refetch(true);
+                    if (res && 'data' in res) {
+                        getDataRef().value = res.data;
+                    }
+                } catch (e: any) {
+                    const normalized = normalizar(e);
+                    errorMsgStr = normalized.mensagem;
+                    errorMsg.value = errorMsgStr;
+                } finally {
+                    promessaCarregamento = null;
+                }
+            })();
+            return promessaCarregamento;
+        };
+
+        const recarregar = async () => {
+            if (promessaRecarregamento) {
+                return promessaRecarregamento;
+            }
+            errorMsgStr = null;
+            errorMsg.value = null;
+            promessaRecarregamento = (async () => {
+                try {
+                    const res = await unidadeQueryMock.refresh(true);
+                    if (res && 'data' in res) {
+                        getDataRef().value = res.data;
+                    }
+                } catch (e: any) {
+                    const normalized = normalizar(e);
+                    errorMsgStr = normalized.mensagem;
+                    errorMsg.value = errorMsgStr;
+                } finally {
+                    promessaRecarregamento = null;
+                }
+            })();
+            return promessaRecarregamento;
+        };
+
+        return {
+            unidade,
+            mapaVigente,
+            carregando,
+            erro,
+            carregar,
+            recarregar,
+        };
+    };
+
     return {
-        useUnidadeStore: () => mockUnidadeStore,
+        useUnidade,
+        useDadosTelaUnidadeQuery: () => unidadeQueryMock,
+        useInvalidacaoUnidade: () => ({
+            invalidarUnidade: vi.fn(),
+            invalidarDadosTelaUnidade: vi.fn(),
+        }),
     };
 });
 vi.mock('@/composables/useNotification', () => ({
@@ -111,25 +222,38 @@ describe('UnidadeView.vue', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockUnidadeStore.cacheUnidades.clear();
-        mockUnidadeStore.cacheMapasVigentes.clear();
-        mockUnidadeStore.possuiDadosTelaUnidade.mockImplementation((codigo: number) =>
-            mockUnidadeStore.cacheUnidades.has(codigo) && mockUnidadeStore.cacheMapasVigentes.has(codigo)
-        );
-        mockUnidadeStore.obterDadosTelaUnidade.mockImplementation(async (codigo: number) => ({
-            unidade: await mockObterUnidade(codigo),
-            mapaVigente: await mockObterReferenciaMapaVigente(codigo),
-        }));
-        mockUnidadeStore.recarregarDadosTelaUnidade.mockImplementation(async (codigo: number) => ({
-            unidade: await mockObterUnidade(codigo),
-            mapaVigente: await mockObterReferenciaMapaVigente(codigo),
-        }));
-        mockUnidadeStore.obterUnidade = mockObterUnidade;
-        mockUnidadeStore.recarregarUnidade = mockObterUnidade;
-        mockUnidadeStore.obterReferenciaMapaVigente = mockObterReferenciaMapaVigente;
-        mockUnidadeStore.recarregarReferenciaMapaVigente = mockObterReferenciaMapaVigente;
         mockObterUnidade.mockResolvedValue(mockUnidadeData);
         mockObterReferenciaMapaVigente.mockResolvedValue(null);
+        unidadeQueryMock.data.value = null;
+        unidadeQueryMock.status.value = "pending";
+        unidadeQueryMock.refetch.mockImplementation(async () => {
+            try {
+                const data = {
+                    unidade: await mockObterUnidade(1),
+                    mapaVigente: await mockObterReferenciaMapaVigente(1),
+                };
+                unidadeQueryMock.data.value = data;
+                unidadeQueryMock.status.value = "success";
+                return {data};
+            } catch (e) {
+                unidadeQueryMock.status.value = "error";
+                throw e;
+            }
+        });
+        unidadeQueryMock.refresh.mockImplementation(async () => {
+            try {
+                const data = {
+                    unidade: await mockObterUnidade(1),
+                    mapaVigente: await mockObterReferenciaMapaVigente(1),
+                };
+                unidadeQueryMock.data.value = data;
+                unidadeQueryMock.status.value = "success";
+                return {data};
+            } catch (e) {
+                unidadeQueryMock.status.value = "error";
+                throw e;
+            }
+        });
         downloadRelatorioMapaVigenteUnidadePdf.mockResolvedValue(undefined);
         downloadRelatorioMapaVigenteUnidadeCsv.mockResolvedValue(undefined);
     });
@@ -371,9 +495,11 @@ describe('UnidadeView.vue', () => {
         };
 
         mockObterUnidade.mockResolvedValueOnce(unidadeComAtribuicao);
-        mockUnidadeStore.recarregarDadosTelaUnidade.mockResolvedValueOnce({
-            unidade: unidadeSemAtribuicao,
-            mapaVigente: null,
+        unidadeQueryMock.refresh.mockResolvedValueOnce({
+            data: {
+                unidade: unidadeSemAtribuicao,
+                mapaVigente: null,
+            },
         });
 
         const manterMontado = ref(true);
@@ -393,7 +519,7 @@ describe('UnidadeView.vue', () => {
         await flushPromises();
 
         expect(mockObterUnidade).toHaveBeenCalledTimes(1);
-        expect(mockUnidadeStore.recarregarDadosTelaUnidade).toHaveBeenCalledWith(1);
+        expect(unidadeQueryMock.refresh).toHaveBeenCalled();
         expect(wrapper.find('[data-testid="unidade-view__btn-atribuicao-texto"]').text()).toBe('Criar atribuição');
         expect(wrapper.text()).toContain('Titular');
         expect(wrapper.text()).not.toContain('Responsável');
@@ -553,8 +679,8 @@ describe('UnidadeView.vue', () => {
 
         // CASE: carregamento inicial concluído -> recarrega via store
         vm.carregamentoInicialConcluido = true;
-        mockUnidadeStore.recarregarDadosTelaUnidade.mockClear();
+        unidadeQueryMock.refresh.mockClear();
         await hook.call(vm);
-        expect(mockUnidadeStore.recarregarDadosTelaUnidade).toHaveBeenCalledWith(1);
+        expect(unidadeQueryMock.refresh).toHaveBeenCalled();
     });
 });

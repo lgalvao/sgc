@@ -9,7 +9,7 @@ const subprocessoStoreMock = {
     dadosEdicaoValidos: vi.fn(),
 };
 
-const mapasStoreMock = {
+const cacheMapaMock = {
     sincronizarMapa: vi.fn(),
 };
 
@@ -17,8 +17,8 @@ vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => subprocessoStoreMock,
 }));
 
-vi.mock("@/stores/mapas", () => ({
-    useMapasStore: () => mapasStoreMock,
+vi.mock("@/composables/useMapaQuery", () => ({
+    useCacheMapa: () => cacheMapaMock,
 }));
 
 describe("useMapaOrquestracao", () => {
@@ -55,7 +55,7 @@ describe("useMapaOrquestracao", () => {
         expect(sucesso).toBe(true);
         expect(codigoSubprocesso.value).toBe(123);
         expect(unidade.value).toEqual(expect.objectContaining({sigla: "TEST"}));
-        expect(mapasStoreMock.sincronizarMapa).toHaveBeenCalledWith(123, expect.objectContaining({codigo: 77}));
+        expect(cacheMapaMock.sincronizarMapa).toHaveBeenCalledWith(123, expect.objectContaining({codigo: 77}));
         expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST");
         expect(carregandoInicial.value).toBe(false);
     });
@@ -90,7 +90,7 @@ describe("useMapaOrquestracao", () => {
         const sucesso = await carregarContextoInicial();
 
         expect(sucesso).toBe(false);
-        expect(mapasStoreMock.sincronizarMapa).not.toHaveBeenCalled();
+        expect(cacheMapaMock.sincronizarMapa).not.toHaveBeenCalled();
         expect(carregandoInicial.value).toBe(false);
     });
 

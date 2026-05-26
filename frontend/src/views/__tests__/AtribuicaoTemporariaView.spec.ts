@@ -13,7 +13,7 @@ const {
     mockAtualizarAtribuicao,
     mockRemoverAtribuicao,
     mockRecarregarDiagnostico,
-    mockUnidadeStore,
+    unidadeQueryMock,
 } = vi.hoisted(() => {
     const unidade = {
         codigo: 1,
@@ -35,10 +35,8 @@ const {
         mockAtualizarAtribuicao: vi.fn().mockResolvedValue(undefined),
         mockRemoverAtribuicao: vi.fn().mockResolvedValue(undefined),
         mockRecarregarDiagnostico: vi.fn().mockResolvedValue(undefined),
-        mockUnidadeStore: {
-            cacheUnidades: new Map<number, unknown>(),
-            obterUnidade: vi.fn().mockResolvedValue(unidade),
-            recarregarUnidade: vi.fn().mockResolvedValue(unidade),
+        unidadeQueryMock: {
+            refresh: vi.fn(),
         },
     };
 });
@@ -49,8 +47,8 @@ vi.mock("vue-router", () => ({
     }),
 }));
 
-vi.mock("@/stores/unidade", () => ({
-    useUnidadeStore: () => mockUnidadeStore,
+vi.mock("@/composables/useUnidadeQuery", () => ({
+    useUnidadeQuery: () => unidadeQueryMock,
 }));
 
 vi.mock("@/stores/organizacao", () => ({
@@ -85,10 +83,7 @@ describe("AtribuicaoTemporariaView", () => {
         vi.useFakeTimers();
         vi.setSystemTime(new Date("2026-05-13T12:00:00"));
         vi.clearAllMocks();
-        mockUnidadeStore.cacheUnidades.clear();
-        mockUnidadeStore.obterUnidade = mockObterUnidade;
-        mockUnidadeStore.recarregarUnidade = mockObterUnidade;
-        mockObterUnidade.mockResolvedValue({
+        const unidade = {
             codigo: 1,
             sigla: "TESTE",
             nome: "Unidade de Teste",
@@ -96,7 +91,9 @@ describe("AtribuicaoTemporariaView", () => {
             titular: null,
             responsavel: null,
             filhas: [],
-        });
+        };
+        mockObterUnidade.mockResolvedValue(unidade);
+        unidadeQueryMock.refresh.mockImplementation(async () => ({data: await mockObterUnidade(1)}));
         mockBuscarAtribuicoes.mockResolvedValue([]);
     });
 

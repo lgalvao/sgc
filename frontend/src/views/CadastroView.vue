@@ -184,15 +184,14 @@ const props = defineProps<{
 
 const atividades = ref<Atividade[]>([]);
 
-const {
-  carregandoInicial,
-  codigoSubprocesso,
-  atividadesSnapshotInicial,
-  unidade,
-  codMapa,
-  carregarContextoInicial,
-  processarRespostaLocal
-} = useCadastroOrquestracao(props, atividades);
+const orquestracao = useCadastroOrquestracao(props, atividades);
+const carregandoInicial = orquestracao.carregandoInicial;
+const codigoSubprocesso = orquestracao.codigoSubprocesso;
+const atividadesSnapshotInicial = orquestracao.atividadesSnapshotInicial;
+const unidade = orquestracao.unidade;
+const codMapa = orquestracao.codMapa;
+const carregarContextoInicial = orquestracao.carregarContextoInicial;
+const processarRespostaLocal = orquestracao.processarRespostaLocal;
 
 const subprocessoStore = useSubprocessoStore();
 const perfilStore = usePerfilStore();

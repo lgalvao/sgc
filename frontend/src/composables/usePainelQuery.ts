@@ -25,9 +25,7 @@ export function usePainelQuery() {
 }
 
 export function useInvalidacaoPainel() {
-    const queryCache = useQueryCache();
-
     return {
-        invalidarPainel: () => queryCache.invalidateQueries({key: CHAVE_QUERY_PAINEL}),
+        invalidarPainel: () => useQueryCache().invalidateQueries({key: CHAVE_QUERY_PAINEL}),
     };
 }

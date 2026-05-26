@@ -1,14 +1,15 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {useCacheSync} from '../useCacheSync';
-import {useUnidadeStore} from '@/stores/unidade';
+
 import {useOrganizacaoStore} from '@/stores/organizacao';
 import {usePainelStore} from '@/stores/painel';
 import {useSubprocessoStore} from '@/stores/subprocesso';
-import {useMapasStore} from '@/stores/mapas';
 import {logger} from '@/utils';
 import {criarPiniaDeTeste} from '@/test-utils/storeTestHelpers';
 
 const invalidateQueriesMock = vi.fn();
+const setQueryDataMock = vi.fn();
+const getQueryDataMock = vi.fn();
 
 vi.mock('@pinia/colada', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@pinia/colada')>();
@@ -16,7 +17,9 @@ vi.mock('@pinia/colada', async (importOriginal) => {
         ...actual,
         useQueryCache: () => ({
             ...actual.useQueryCache(),
+            getQueryData: getQueryDataMock,
             invalidateQueries: invalidateQueriesMock,
+            setQueryData: setQueryDataMock,
         }),
     };
 });
@@ -66,29 +69,25 @@ class EventSourceMock {
 vi.stubGlobal('EventSource', EventSourceMock);
 
 describe('useCacheSync', () => {
-    let unidadeStore: any;
     let organizacaoStore: any;
     let painelStore: any;
     let subprocessoStore: any;
-    let mapasStore: any;
 
     beforeEach(() => {
         criarPiniaDeTeste();
-        unidadeStore = useUnidadeStore();
         organizacaoStore = useOrganizacaoStore();
         painelStore = usePainelStore();
         subprocessoStore = useSubprocessoStore();
-        mapasStore = useMapasStore();
         lastInstance = null;
         instanciasCriadas.length = 0;
         vi.clearAllMocks();
-        vi.spyOn(unidadeStore, 'invalidar');
         vi.spyOn(organizacaoStore, 'invalidar');
         vi.spyOn(painelStore, 'invalidar');
         vi.spyOn(subprocessoStore, 'invalidar');
-        vi.spyOn(mapasStore, 'invalidar');
         vi.spyOn(logger, 'warn').mockImplementation(() => logger);
         invalidateQueriesMock.mockReset();
+        setQueryDataMock.mockReset();
+        getQueryDataMock.mockReset();
     });
 
     afterEach(() => {
@@ -108,24 +107,14 @@ describe('useCacheSync', () => {
 
         lastInstance?.emit('org-cache-refreshed', {});
 
-        expect(unidadeStore.invalidar).toHaveBeenCalled();
         expect(organizacaoStore.invalidar).toHaveBeenCalled();
         expect(painelStore.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['painel']});
         expect(subprocessoStore.invalidar).not.toHaveBeenCalled();
-        expect(mapasStore.invalidar).not.toHaveBeenCalled();
     });
 
     it('deve preservar caches críticos e limpar marcações locais do painel ao invalidar por SSE organizacional', () => {
         subprocessoStore.contextoEdicao = {detalhes: {codigo: 200, situacao: 'MAPA'}} as any;
-        mapasStore.sincronizarMapa(200, {
-            codigo: 1,
-            subprocessoCodigo: 200,
-            observacoes: 'Mapa vivo',
-            competencias: [],
-            atividades: [],
-            situacao: 'EM_ANDAMENTO',
-        } as any);
         painelStore.registrarLeitura([2]);
 
         fechamentosPendentes.push(useCacheSync());
@@ -135,11 +124,6 @@ describe('useCacheSync', () => {
         expect(subprocessoStore.contextoEdicao).toEqual(expect.objectContaining({
             detalhes: expect.objectContaining({codigo: 200}),
         }));
-        expect(mapasStore.obterMapa(200)).toEqual(expect.objectContaining({
-            subprocessoCodigo: 200,
-            observacoes: 'Mapa vivo',
-        }));
-        expect(mapasStore.mapaDisponivel(200)).toBe(true);
     });
 
     it('não deve fechar a conexão em caso de erro transitório durante reconexão', () => {

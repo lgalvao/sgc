@@ -18,9 +18,7 @@ export function useProcessoQuery(codigoProcesso: number) {
 }
 
 export function useInvalidacaoProcesso() {
-    const queryCache = useQueryCache();
-
     return {
-        invalidarProcesso: () => queryCache.invalidateQueries({key: CHAVE_QUERY_PROCESSO}),
+        invalidarProcesso: () => useQueryCache().invalidateQueries({key: CHAVE_QUERY_PROCESSO}),
     };
 }
