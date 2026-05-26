@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-26T00:22:07.512Z",
+  "geradoEm": "2026-05-26T00:27:22.863Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -30,7 +30,7 @@
     },
     "testes": {
       "anyExplicito": 573,
-      "checksNull": 1,
+      "checksNull": 2,
       "fallbacksDefensivos": 6,
       "catchBlocks": 0,
       "castsDuplos": 87,
@@ -2010,7 +2010,7 @@
       "arquivo": "frontend/src/composables/useMapaCompetenciasMutacoes.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 164,
+      "linhas": 155,
       "imports": 5,
       "exports": 1,
       "exportsRuntime": [
@@ -2036,37 +2036,11 @@
       "arquivo": "frontend/src/views/mapaAnaliseFluxo.ts",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 159,
+      "linhas": 152,
       "imports": 7,
       "exports": 1,
       "exportsRuntime": [
         "useMapaAnaliseFluxo"
-      ],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 1,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 2,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
-      "camada": "composable",
-      "categoriaArquivo": "producao",
-      "linhas": 151,
-      "imports": 6,
-      "exports": 1,
-      "exportsRuntime": [
-        "useMapaSugestoes"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2119,6 +2093,32 @@
       "exports": 1,
       "exportsRuntime": [
         "useCadastroAtividadesMutacoes"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 1,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 2,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
+      "camada": "composable",
+      "categoriaArquivo": "producao",
+      "linhas": 137,
+      "imports": 6,
+      "exports": 1,
+      "exportsRuntime": [
+        "useMapaSugestoes"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -3511,6 +3511,30 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/composables/__tests__/useMapaCompetenciasMutacoes.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 213,
+      "imports": 3,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 13,
+        "checksNull": 1,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/composables/__tests__/useFluxoSubprocesso.spec.ts",
       "camada": "composable",
       "categoriaArquivo": "teste",
@@ -3564,30 +3588,6 @@
       "categoriaArquivo": "teste",
       "linhas": 208,
       "imports": 9,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 13,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/__tests__/useMapaCompetenciasMutacoes.spec.ts",
-      "camada": "composable",
-      "categoriaArquivo": "teste",
-      "linhas": 206,
-      "imports": 3,
       "exports": 0,
       "exportsRuntime": [],
       "contagens": {

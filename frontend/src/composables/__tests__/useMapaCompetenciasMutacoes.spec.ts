@@ -4,6 +4,12 @@ import {useMapaCompetenciasMutacoes} from "../useMapaCompetenciasMutacoes";
 
 describe("useMapaCompetenciasMutacoes", () => {
     const codigoSubprocesso = ref<number | null>(null);
+    const obterCodigoSubprocessoObrigatorio = vi.fn(() => {
+        if (codigoSubprocesso.value === null) {
+            throw new Error("Invariante violada: codigoSubprocesso não carregado");
+        }
+        return codigoSubprocesso.value;
+    });
     const competencias = computed(() => []);
     const fluxoMapa = {
         adicionarCompetencia: vi.fn(),
@@ -17,7 +23,7 @@ describe("useMapaCompetenciasMutacoes", () => {
     const sincronizarMapa = vi.fn();
 
     const setup = () => useMapaCompetenciasMutacoes({
-        codigoSubprocesso,
+        obterCodigoSubprocessoObrigatorio,
         competencias: competencias as any,
         fluxoMapa,
         notify,
@@ -41,11 +47,12 @@ describe("useMapaCompetenciasMutacoes", () => {
         expect(limparErros).toHaveBeenCalled();
     });
 
-    it("deve ignorar abertura quando nao ha subprocesso", async () => {
+    it("deve falhar com invariante quando nao ha subprocesso", async () => {
         codigoSubprocesso.value = null;
         const {adicionarCompetenciaEFecharModal} = setup();
 
-        await adicionarCompetenciaEFecharModal({descricao: "Nova", atividadesSelecionadas: [1]});
+        await expect(adicionarCompetenciaEFecharModal({descricao: "Nova", atividadesSelecionadas: [1]}))
+            .rejects.toThrow("Invariante violada: codigoSubprocesso não carregado");
 
         expect(fluxoMapa.adicionarCompetencia).not.toHaveBeenCalled();
         expect(fluxoMapa.atualizarCompetencia).not.toHaveBeenCalled();
@@ -86,7 +93,16 @@ describe("useMapaCompetenciasMutacoes", () => {
     });
 
     it("deve remover atividade associada", async () => {
-        const {removerAtividadeAssociada} = setup();
+        const localCompetencias = ref([{codigo: 50, descricao: "C", atividades: [{codigo: 10}]}] as any);
+        const {removerAtividadeAssociada} = useMapaCompetenciasMutacoes({
+            obterCodigoSubprocessoObrigatorio,
+            competencias: localCompetencias as any,
+            fluxoMapa,
+            notify,
+            limparErros,
+            aplicarErroNormalizado,
+            sincronizarMapa,
+        });
         fluxoMapa.removerAtividadeDaCompetencia.mockResolvedValue({} as any);
 
         await removerAtividadeAssociada(50, 10);
@@ -127,7 +143,7 @@ describe("useMapaCompetenciasMutacoes", () => {
             mostrarModalExcluirCompetencia,
             competenciaParaExcluir
         } = useMapaCompetenciasMutacoes({
-            codigoSubprocesso,
+            obterCodigoSubprocessoObrigatorio,
             competencias: localCompetencias as any,
             fluxoMapa,
             notify,
@@ -149,7 +165,7 @@ describe("useMapaCompetenciasMutacoes", () => {
             confirmarExclusaoCompetencia,
             mostrarModalExcluirCompetencia
         } = useMapaCompetenciasMutacoes({
-            codigoSubprocesso,
+            obterCodigoSubprocessoObrigatorio,
             competencias: localCompetencias as any,
             fluxoMapa,
             notify,
@@ -178,7 +194,7 @@ describe("useMapaCompetenciasMutacoes", () => {
     it("deve lidar com erro ao confirmar exclusão", async () => {
         const localCompetencias = ref([{codigo: 50, descricao: "C"}] as any);
         const {excluirCompetencia, confirmarExclusaoCompetencia} = useMapaCompetenciasMutacoes({
-            codigoSubprocesso,
+            obterCodigoSubprocessoObrigatorio,
             competencias: localCompetencias as any,
             fluxoMapa,
             notify,
@@ -195,7 +211,16 @@ describe("useMapaCompetenciasMutacoes", () => {
     });
 
     it("deve lidar com erro ao remover atividade associada", async () => {
-        const {removerAtividadeAssociada} = setup();
+        const localCompetencias = ref([{codigo: 50, descricao: "C", atividades: [{codigo: 10}]}] as any);
+        const {removerAtividadeAssociada} = useMapaCompetenciasMutacoes({
+            obterCodigoSubprocessoObrigatorio,
+            competencias: localCompetencias as any,
+            fluxoMapa,
+            notify,
+            limparErros,
+            aplicarErroNormalizado,
+            sincronizarMapa,
+        });
         fluxoMapa.removerAtividadeDaCompetencia.mockRejectedValue(new Error("Erro de remoção"));
 
         await removerAtividadeAssociada(50, 10);

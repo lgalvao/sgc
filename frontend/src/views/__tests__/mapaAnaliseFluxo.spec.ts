@@ -7,7 +7,7 @@ import {TEXTOS_SUCESSO_SUBPROCESSO} from "@/constants/textos-subprocesso"
 
 describe('mapaAnaliseFluxo.ts', () => {
     const criarDependencias = () => ({
-        codigoSubprocesso: ref<number | null>(123),
+        obterCodigoSubprocessoObrigatorio: vi.fn(() => 123),
         acaoPrincipalMapa: computed(() => ({
             codigo: 'ACEITAR' as const,
             mensagemSucesso: 'Sucesso Aceitar'

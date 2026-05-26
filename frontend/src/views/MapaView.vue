@@ -290,7 +290,7 @@ const {
   abrirModalSugestoes,
   confirmarSugestoes,
 } = useMapaSugestoes({
-  codigoSubprocesso,
+  obterCodigoSubprocessoObrigatorio,
   notify,
   concluirAcaoPainel,
   validarSubmissao,
@@ -335,7 +335,7 @@ const {
   fecharModalHistorico,
   verHistorico,
 } = useMapaAnaliseFluxo({
-  codigoSubprocesso,
+  obterCodigoSubprocessoObrigatorio,
   acaoPrincipalMapa,
   mostrarModalAceitar,
   mostrarModalValidar,
@@ -459,7 +459,7 @@ const {
   confirmarExclusaoCompetencia,
   removerAtividadeAssociada,
 } = useMapaCompetenciasMutacoes({
-  codigoSubprocesso,
+  obterCodigoSubprocessoObrigatorio,
   competencias,
   fluxoMapa,
   notify,

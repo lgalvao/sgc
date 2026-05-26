@@ -6,7 +6,7 @@ import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
 import type {VarianteAlerta} from "@/composables/useNotification";
 
 interface UseMapaSugestoesOptions {
-    codigoSubprocesso: Ref<number | null>;
+    obterCodigoSubprocessoObrigatorio: () => number;
     notify: (message: string, variant?: VarianteAlerta) => void;
     concluirAcaoPainel: (mensagem: string, fecharModal: () => void) => Promise<void>;
     validarSubmissao: (val: boolean) => boolean;
@@ -34,10 +34,6 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     const mostrarModalSugestoes = ref(false);
     const mostrarModalVerSugestoes = ref(false);
 
-    function obterCodigoSubprocesso(): number | null {
-        return options.codigoSubprocesso.value;
-    }
-
     async function executarOperacaoSugestoes(
         operacao: () => Promise<void>,
         mensagemErro: string
@@ -53,12 +49,7 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
     }
 
     async function buscarSugestoesMapa(): Promise<string> {
-        const codigo = obterCodigoSubprocesso();
-        if (!codigo) {
-            return "";
-        }
-
-        return obterSugestoesMapa(codigo);
+        return obterSugestoesMapa(options.obterCodigoSubprocessoObrigatorio());
     }
 
     async function preencherSugestoes(destino: Ref<string>) {
@@ -115,15 +106,10 @@ export function useMapaSugestoes(options: UseMapaSugestoesOptions) {
             return;
         }
 
-        const codigo = obterCodigoSubprocesso();
-        if (!codigo) {
-            return;
-        }
-
         try {
             loadingSugestoesEnvio.value = true;
             const sucesso = await executarOperacaoSugestoes(async () => {
-                await apresentarSugestoes(codigo, {sugestoes: sugestoes.value});
+                await apresentarSugestoes(options.obterCodigoSubprocessoObrigatorio(), {sugestoes: sugestoes.value});
                 await concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_SUBMETIDO_COM_SUGESTOES, fecharModalSugestoes);
             }, TEXTOS.mapa.ERRO_SUGESTOES);
             if (!sucesso) {

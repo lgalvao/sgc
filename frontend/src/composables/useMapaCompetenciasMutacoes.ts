@@ -1,4 +1,4 @@
-import {type ComputedRef, ref, type Ref} from "vue";
+import {type ComputedRef, ref} from "vue";
 import type {Competencia, MapaCompleto, SalvarCompetenciaRequest} from "@/types/tipos";
 import type {ErroNormalizado} from "@/utils/apiError";
 import {normalizarErro} from "@/utils/apiError";
@@ -15,7 +15,7 @@ interface FluxoMapaCompetencias {
 }
 
 interface UseMapaCompetenciasMutacoesParams {
-    codigoSubprocesso: Ref<number | null>;
+    obterCodigoSubprocessoObrigatorio: () => number;
     competencias: ComputedRef<Competencia[]>;
     fluxoMapa: FluxoMapaCompetencias;
     notify: (mensagem: string, variante: "danger" | "warning" | "success" | "info") => void;
@@ -25,7 +25,7 @@ interface UseMapaCompetenciasMutacoesParams {
 }
 
 export function useMapaCompetenciasMutacoes({
-                                                codigoSubprocesso,
+                                                obterCodigoSubprocessoObrigatorio,
                                                 competencias,
                                                 fluxoMapa,
                                                 notify,
@@ -39,12 +39,6 @@ export function useMapaCompetenciasMutacoes({
     const competenciaParaExcluir = ref<Competencia | null>(null);
     const loadingCompetencia = ref(false);
     const loadingExclusao = ref(false);
-
-    async function executarComSubprocesso(callback: (codigoSubprocesso: number) => Promise<void>) {
-        const codigo = codigoSubprocesso.value;
-        if (!codigo) return;
-        await callback(codigo);
-    }
 
     async function executarOperacaoCompetencia(
         operacao: () => Promise<void>,
@@ -84,26 +78,25 @@ export function useMapaCompetenciasMutacoes({
     async function adicionarCompetenciaEFecharModal(dados: { descricao: string; atividadesSelecionadas: number[] }) {
         if (loadingCompetencia.value) return;
 
-        await executarComSubprocesso(async (codigo) => {
-            const request: SalvarCompetenciaRequest = {
-                descricao: dados.descricao,
-                atividadesCodigos: dados.atividadesSelecionadas,
-            };
+        const codigo = obterCodigoSubprocessoObrigatorio();
+        const request: SalvarCompetenciaRequest = {
+            descricao: dados.descricao,
+            atividadesCodigos: dados.atividadesSelecionadas,
+        };
 
-            loadingCompetencia.value = true;
-            try {
-                await executarOperacaoCompetencia(async () => {
-                    if (competenciaSendoEditada.value) {
-                        sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigo, competenciaSendoEditada.value.codigo, request));
-                    } else {
-                        sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigo, request));
-                    }
-                    fecharModalCriarNovaCompetencia();
-                }, tratarErros);
-            } finally {
-                loadingCompetencia.value = false;
-            }
-        });
+        loadingCompetencia.value = true;
+        try {
+            await executarOperacaoCompetencia(async () => {
+                if (competenciaSendoEditada.value) {
+                    sincronizarMapa(await fluxoMapa.atualizarCompetencia(codigo, competenciaSendoEditada.value.codigo, request));
+                } else {
+                    sincronizarMapa(await fluxoMapa.adicionarCompetencia(codigo, request));
+                }
+                fecharModalCriarNovaCompetencia();
+            }, tratarErros);
+        } finally {
+            loadingCompetencia.value = false;
+        }
     }
 
     function excluirCompetencia(codigo: number) {
@@ -117,25 +110,28 @@ export function useMapaCompetenciasMutacoes({
     async function confirmarExclusaoCompetencia() {
         if (!competenciaParaExcluir.value) return;
 
-        await executarComSubprocesso(async (codigo) => {
-            loadingExclusao.value = true;
-            try {
-                await executarOperacaoCompetencia(async () => {
-                    sincronizarMapa(await fluxoMapa.removerCompetencia(codigo, competenciaParaExcluir.value!.codigo));
-                    mostrarModalExcluirCompetencia.value = false;
-                }, (error) => notify(normalizarErro(error).mensagem, "danger"));
-            } finally {
-                loadingExclusao.value = false;
-            }
-        });
+        const codigo = obterCodigoSubprocessoObrigatorio();
+        loadingExclusao.value = true;
+        try {
+            await executarOperacaoCompetencia(async () => {
+                sincronizarMapa(await fluxoMapa.removerCompetencia(codigo, competenciaParaExcluir.value!.codigo));
+                mostrarModalExcluirCompetencia.value = false;
+            }, (error) => notify(normalizarErro(error).mensagem, "danger"));
+        } finally {
+            loadingExclusao.value = false;
+        }
     }
 
     async function removerAtividadeAssociada(codigoCompetencia: number, codigoAtividade: number) {
-        await executarComSubprocesso(async (codigo) => {
-            await executarOperacaoCompetencia(async () => {
-                sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigo, codigoCompetencia, codigoAtividade));
-            }, (error) => notify(normalizarErro(error).mensagem, "danger"));
-        });
+        const competencia = competencias.value.find((item) => item.codigo === codigoCompetencia);
+        if (!competencia) {
+            return;
+        }
+
+        const codigo = obterCodigoSubprocessoObrigatorio();
+        await executarOperacaoCompetencia(async () => {
+            sincronizarMapa(await fluxoMapa.removerAtividadeDaCompetencia(codigo, codigoCompetencia, codigoAtividade));
+        }, (error) => notify(normalizarErro(error).mensagem, "danger"));
     }
 
     function fecharModalExcluirCompetencia() {

@@ -12,7 +12,7 @@ type AcaoPrincipalMapa = {
 };
 
 type DependenciasMapaAnaliseFluxo = {
-    codigoSubprocesso: Ref<number | null>;
+    obterCodigoSubprocessoObrigatorio: () => number;
     acaoPrincipalMapa: ComputedRef<AcaoPrincipalMapa | null>;
     mostrarModalAceitar: Ref<boolean>;
     mostrarModalValidar: Ref<boolean>;
@@ -33,7 +33,7 @@ type DependenciasMapaAnaliseFluxo = {
 };
 
 export function useMapaAnaliseFluxo({
-                                        codigoSubprocesso,
+                                        obterCodigoSubprocessoObrigatorio,
                                         acaoPrincipalMapa,
                                         mostrarModalAceitar,
                                         mostrarModalValidar,
@@ -91,18 +91,16 @@ export function useMapaAnaliseFluxo({
     }
 
     async function confirmarValidacao() {
-        const codigo = codigoSubprocesso.value;
-        if (!codigo) return;
         await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_VALIDAR, async () => {
-            await validarMapa(codigo);
+            await validarMapa(obterCodigoSubprocessoObrigatorio());
             await concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_VALIDADO_SUBMETIDO, fecharModalValidar);
         });
     }
 
     async function confirmarAceitacao(observacao = "") {
-        const codigo = codigoSubprocesso.value;
         const acao = acaoPrincipalMapa.value;
-        if (!codigo || !acao) return;
+        if (!acao) return;
+        const codigo = obterCodigoSubprocessoObrigatorio();
         await executarComNotificacaoDeErro(TEXTOS.comum.ERRO_OPERACAO, async () => {
             if (acao.codigo === "HOMOLOGAR") {
                 await homologarMapa(codigo, {observacao});
@@ -118,19 +116,14 @@ export function useMapaAnaliseFluxo({
             await focarPrimeiroErroInvalido();
             return;
         }
-        const codigo = codigoSubprocesso.value;
-        if (!codigo) return;
         await executarComNotificacaoDeErro(TEXTOS.mapa.ERRO_DEVOLVER, async () => {
-            await devolverMapa(codigo, {justificativa: observacaoDevolucao.value});
+            await devolverMapa(obterCodigoSubprocessoObrigatorio(), {justificativa: observacaoDevolucao.value});
             await concluirAcaoPainel(TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA, fecharModalDevolucao);
         });
     }
 
     async function abrirModalHistorico() {
-        const codigo = codigoSubprocesso.value;
-        if (codigo) {
-            analisesCadastro.value = await listarAnalisesCadastro(codigo);
-        }
+        analisesCadastro.value = await listarAnalisesCadastro(obterCodigoSubprocessoObrigatorio());
         mostrarModalHistorico.value = true;
     }
 
