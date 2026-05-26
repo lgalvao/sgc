@@ -11,7 +11,7 @@ describe('mapaDisponibilizacao.ts', () => {
         atividadesSemCompetencia: ref<Array<{ codigo: number }>>([]),
         mostrarModalDisponibilizar: ref(false),
         limparErros: vi.fn(),
-        executarComSubprocesso: vi.fn(async (cb) => await cb(123)),
+        obterCodigoSubprocessoObrigatorio: vi.fn(() => 123),
         disponibilizarMapaFluxo: vi.fn().mockResolvedValue(undefined),
         concluirAcaoPainel: vi.fn().mockResolvedValue(undefined),
         aplicarErroNormalizado: vi.fn(),

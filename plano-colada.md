@@ -1,23 +1,38 @@
-# Plano Prático de Adoção do Pinia Colada no Frontend
+# Plano Prático de Simplificação Estrutural do Frontend
 
 ## Objetivo
 
-Reduzir a infraestrutura caseira de **server state** no frontend do SGC sem substituir o uso de `Pinia` para estado de aplicação, sessão e UI local.
+Reduzir a infraestrutura caseira no frontend do SGC em dois eixos:
 
-O foco é usar `Pinia Colada` para:
+- adoção de `Pinia Colada` para **server state**;
+- remoção de orquestração artificial, helpers transitivos e contratos internos obsoletos.
 
-- queries com cache;
-- deduplicação de requisições;
-- invalidação por chave;
-- estados de loading/erro de leitura remota;
-- simplificação de fluxos hoje baseados em `dadosValidos()`, `garantirDados()`, TTL manual e `invalidar()`.
+## Estado Atual
+
+### Já concluído
+
+- `historico`, `painel`, `processo`, `notificacoes admin` e `feedbacks admin` migrados para query cache;
+- remoção dos stores remotos manuais de `historico` e `processo`;
+- `painelStore` reduzido a estado local real;
+- invalidação por query consolidada nos domínios já migrados;
+- redução relevante da orquestração artificial em fluxos de processo, subprocesso, cadastro e mapa.
+
+### Diagnóstico novo
+
+Os ganhos fáceis com `Pinia Colada` já foram capturados. Os próximos ganhos não devem vir de “mais queries”, e sim de:
+
+- apertar contratos internos frouxos que preservam compatibilidades obsoletas;
+- eliminar APIs callback-based onde a dependência real é um valor obrigatório;
+- reduzir helpers que só empacotam `dependencias`, `estado` e `contexto`;
+- aceitar mudanças mais agressivas em contratos internos de composables/views quando o chamador é único ou controlado.
 
 ## Princípios
 
 - `Pinia` continua responsável por estado de aplicação e sessão.
 - `Pinia Colada` entra apenas onde o problema principal é **cache de dados remotos**.
 - Migrar por fatias pequenas, começando pelos casos mais simples.
-- Não reescrever `subprocesso` e `mapas` antes de provar ganho real em casos menores.
+- Preferir contratos explícitos a helpers genéricos quando a dependência real é obrigatória.
+- Mudar contratos internos obsoletos quando a compatibilidade já não paga o custo cognitivo.
 - Cada fase precisa terminar com validação real e redução perceptível de código.
 
 ## Escopo
@@ -202,6 +217,41 @@ Decidir com evidência se vale migrar parcialmente `subprocesso`, `mapas`, `unid
 
 Não migrar esses casos por simetria. Só migrar se os pilotos anteriores tiverem reduzido código e simplificado testes de verdade.
 
+## Fase 6 - Apertar Contratos Internos
+
+### Meta
+
+Parar de preservar contratos internos que ficaram obsoletos depois da simplificação de cache e orquestração.
+
+### Alvos
+
+- callbacks do tipo `executarComSubprocesso(cb)` quando a necessidade real é “obter `codigoSubprocesso` ou falhar”;
+- helpers do tipo `concluirAcaoPainel(mensagem, fecharModal)` quando um objeto explícito ou fechamento local for mais claro;
+- props/composables locais que ainda aceitam `number | string` sem necessidade real;
+- helpers que recebem `dependencias`, `estado` ou `contexto` inteiros só para acessar 2-3 campos.
+
+### Regra
+
+Se o contrato é interno ao módulo/feature e só aumenta indireção:
+
+1. preferir fechamentos locais;
+2. preferir dependências explícitas;
+3. remover compatibilidade de transição.
+
+### Critério de sucesso
+
+- menos callback nesting;
+- menos `ReturnType<typeof ...>` em contratos locais;
+- menos objetos “contexto/dependencias” artificiais;
+- testes mais diretos, sem aumento de fragilidade.
+
+## Próximos Passos Prioritários
+
+1. Apertar contratos internos dos fluxos de mapa.
+2. Reavaliar `subprocessoAcoesAdministrativas`, `mapaAnaliseFluxo` e `useMapaSugestoes` com viés mais agressivo.
+3. Revisar onde `codProcesso: number | string` ainda existe só por hábito e pode virar `number`.
+4. Só depois voltar para novos candidatos a `Pinia Colada`.
+
 ## Mudanças esperadas na arquitetura
 
 ### Depois das fases 1 a 4
@@ -240,4 +290,4 @@ O plano só está funcionando se, ao final das primeiras fases:
 - a invalidação ficar mais localizada;
 - os testes ficarem mais simples, não mais frágeis.
 
-Se isso não acontecer já no `historico` e no `painel`, interromper a adoção e reavaliar.
+Se os próximos cortes não reduzirem indireção real, parar a limpeza local e partir para mudanças de contrato mais agressivas nos módulos restantes.

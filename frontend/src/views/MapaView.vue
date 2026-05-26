@@ -355,20 +355,16 @@ const {
   devolverMapa: fluxoMapa.devolverMapa,
 });
 
-async function executarComSubprocesso(
-    callback: (id: number) => Promise<void>
-) {
+function obterCodigoSubprocessoObrigatorio(): number {
   const codSubp = codigoSubprocesso.value;
   if (!codSubp) throw new Error("Invariante violada: codigoSubprocesso não carregado");
-  await callback(codSubp);
+  return codSubp;
 }
 
 async function exportarMapaAtualPdf() {
   loadingExportacaoPdf.value = true;
   try {
-    await executarComSubprocesso((codSubprocessoAtual) =>
-        relatoriosService.downloadRelatorioMapaAtualPdf(codSubprocessoAtual)
-    );
+    await relatoriosService.downloadRelatorioMapaAtualPdf(obterCodigoSubprocessoObrigatorio());
   } catch (error) {
     logger.error("Erro ao exportar PDF do mapa atual:", error);
     notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
@@ -380,9 +376,7 @@ async function exportarMapaAtualPdf() {
 async function exportarMapaAtualCsv() {
   loadingExportacaoCsv.value = true;
   try {
-    await executarComSubprocesso((codSubprocessoAtual) =>
-        relatoriosService.downloadRelatorioMapaAtualCsv(codSubprocessoAtual)
-    );
+    await relatoriosService.downloadRelatorioMapaAtualCsv(obterCodigoSubprocessoObrigatorio());
   } catch (error) {
     logger.error("Erro ao exportar CSV do mapa atual:", error);
     notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
@@ -490,7 +484,7 @@ const {
   atividadesSemCompetencia,
   mostrarModalDisponibilizar,
   limparErros,
-  executarComSubprocesso,
+  obterCodigoSubprocessoObrigatorio,
   disponibilizarMapaFluxo: fluxoMapa.disponibilizarMapa,
   concluirAcaoPainel,
   aplicarErroNormalizado,

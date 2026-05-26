@@ -13,7 +13,7 @@ type DependenciasMapaDisponibilizacao = {
     atividadesSemCompetencia: ComputedRef<{ codigo: number }[]>;
     mostrarModalDisponibilizar: Ref<boolean>;
     limparErros: () => void;
-    executarComSubprocesso: (callback: (codigoSubprocesso: number) => Promise<void>) => Promise<void>;
+    obterCodigoSubprocessoObrigatorio: () => number;
     disponibilizarMapaFluxo: (codigoSubprocesso: number, request: DisponibilizarMapaRequest) => Promise<void>;
     concluirAcaoPainel: (mensagem: string, fecharModal: () => void) => Promise<void>;
     aplicarErroNormalizado: (error: ReturnType<typeof normalizarErro> | null) => void;
@@ -75,22 +75,21 @@ export function useMapaDisponibilizacao(dependencias: DependenciasMapaDisponibil
             return;
         }
 
-        await dependencias.executarComSubprocesso(async (codigoSubprocesso) => {
-            loadingDisponibilizacao.value = true;
-            try {
-                await dependencias.disponibilizarMapaFluxo(codigoSubprocesso, request);
-                await dependencias.concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_DISPONIBILIZADO, () => {
-                    dependencias.mostrarModalDisponibilizar.value = false;
-                    notificacaoDisponibilizacao.value = "";
-                    dependencias.limparErros();
-                });
-            } catch (error) {
-                logger.error(error);
-                dependencias.aplicarErroNormalizado(normalizarErro(error));
-            } finally {
-                loadingDisponibilizacao.value = false;
-            }
-        });
+        const codigoSubprocesso = dependencias.obterCodigoSubprocessoObrigatorio();
+        loadingDisponibilizacao.value = true;
+        try {
+            await dependencias.disponibilizarMapaFluxo(codigoSubprocesso, request);
+            await dependencias.concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_DISPONIBILIZADO, () => {
+                dependencias.mostrarModalDisponibilizar.value = false;
+                notificacaoDisponibilizacao.value = "";
+                dependencias.limparErros();
+            });
+        } catch (error) {
+            logger.error(error);
+            dependencias.aplicarErroNormalizado(normalizarErro(error));
+        } finally {
+            loadingDisponibilizacao.value = false;
+        }
     }
 
     return {

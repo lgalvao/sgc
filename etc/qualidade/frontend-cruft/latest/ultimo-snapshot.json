@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-26T00:17:01.563Z",
+  "geradoEm": "2026-05-26T00:22:07.512Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -170,7 +170,7 @@
     {
       "arquivo": "frontend/src/views/MapaView.vue",
       "camada": "view",
-      "linhas": 505,
+      "linhas": 499,
       "score": 10,
       "contagens": {
         "anyExplicito": 0,
@@ -525,7 +525,7 @@
       "arquivo": "frontend/src/views/MapaView.vue",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 505,
+      "linhas": 499,
       "imports": 34,
       "exports": 0,
       "exportsRuntime": [],
@@ -2088,7 +2088,7 @@
       "arquivo": "frontend/src/views/mapaDisponibilizacao.ts",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 139,
+      "linhas": 140,
       "imports": 6,
       "exports": 1,
       "exportsRuntime": [
