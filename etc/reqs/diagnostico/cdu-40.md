@@ -34,11 +34,14 @@ Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas
 
 8. O usuário clica em `Concluir autoavaliação`.
 
-9. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos.
+9. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos. 
+      
+   9.1 - caso exista competência `Importância` ou `Domínio` sem preenchidos, o sistema mostra a mensagem
+   `Preencha importância e domínio para todas as competências.` e interrompe a conclusão da autoavaliação. 
+      
+   9.2 -Caso positivo, o sistema altera a situação da avaliação individual do servidor para 'Autoavaliação concluída'.
 
-10. Caso positivo, o sistema altera a situação da avaliação individual do servidor para 'Autoavaliação concluída'.
-
-11. O sistema envia notificação por e-mail para o responsável pela unidade, com este modelo:
+10. O sistema envia notificação por e-mail para o responsável pela unidade, com este modelo:
 
     ```text
     Assunto: SGC: Autoavaliação de [NOME_SERVIDOR] submetida para análise
@@ -50,16 +53,12 @@ Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas
     A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-12. O sistema cria internamente um alerta com:
+11. O sistema cria internamente um alerta com:
     - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-13. O sistema mostra a mensagem `Autoavaliação concluída`.
+12. O sistema mostra a mensagem `Autoavaliação concluída`.
 
-## Fluxo alternativo
-
-1. No passo 9, caso exista competência sem `Importância` ou `Domínio` preenchidos, o sistema mostra a mensagem
-   `Preencha importância e domínio para todas as competências.` e interrompe a conclusão da autoavaliação.
