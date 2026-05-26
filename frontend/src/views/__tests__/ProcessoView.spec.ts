@@ -51,6 +51,9 @@ vi.mock("vue-router", () => ({
 vi.mock("@/composables/useProcessoQuery", async () => {
     return {
         CHAVE_QUERY_PROCESSO: ["processo"],
+        useInvalidacaoProcesso: () => ({
+            invalidarProcesso: vi.fn(),
+        }),
         useProcessoQuery: () => processoQueryMock,
     };
 });

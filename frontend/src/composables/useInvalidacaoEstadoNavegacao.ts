@@ -1,52 +1,28 @@
-import {useMapasStore} from "@/stores/mapas";
-import {useOrganizacaoStore} from "@/stores/organizacao";
-import {usePainelStore} from "@/stores/painel";
-import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useUnidadeStore} from "@/stores/unidade";
+import {useEstadoMapaNavegacao} from "@/composables/useEstadoMapaNavegacao";
+import {useEstadoOrganizacaoNavegacao} from "@/composables/useEstadoOrganizacaoNavegacao";
+import {useEstadoPainelNavegacao} from "@/composables/useEstadoPainelNavegacao";
+import {useEstadoSubprocessoNavegacao} from "@/composables/useEstadoSubprocessoNavegacao";
 
 export function useInvalidacaoEstadoNavegacao() {
-    const {invalidar: atualizarPainelLocal} = usePainelStore();
-    const {invalidar: atualizarSubprocessoLocal, limparContextoAtual: limparSubprocessoAtualLocal} = useSubprocessoStore();
-    const {invalidar: atualizarMapasLocais, marcarMapaParaAtualizacao: atualizarMapaLocalPorCodigo} = useMapasStore();
-    const {invalidar: atualizarUnidadeLocal} = useUnidadeStore();
-    const {invalidar: atualizarOrganizacaoLocal} = useOrganizacaoStore();
+    const painel = useEstadoPainelNavegacao();
+    const subprocesso = useEstadoSubprocessoNavegacao();
+    const mapa = useEstadoMapaNavegacao();
+    const organizacao = useEstadoOrganizacaoNavegacao();
 
-    function atualizarEstadoPainel(): void {
-        atualizarPainelLocal();
-    }
-
-    function atualizarEstadoSubprocesso(): void {
-        atualizarSubprocessoLocal();
-    }
-
-    function atualizarEstadoMapa(codigoSubprocesso?: number): void {
-        if (typeof codigoSubprocesso === "number") {
-            atualizarMapaLocalPorCodigo(codigoSubprocesso);
-            return;
-        }
-
-        atualizarMapasLocais();
-    }
-
-    function atualizarEstadoOrganizacional(): void {
-        atualizarUnidadeLocal();
-        atualizarOrganizacaoLocal();
-    }
-
-    function atualizarEstadoUnidade(): void {
-        atualizarUnidadeLocal();
-    }
-
-    function limparSubprocessoAtual(): void {
-        limparSubprocessoAtualLocal();
+    function resetarEstadoSessao(): void {
+        painel.resetarEstadoPainel();
+        subprocesso.resetarEstadoSubprocesso();
+        mapa.resetarEstadoMapa();
+        organizacao.resetarEstadoOrganizacional();
     }
 
     return {
-        atualizarEstadoMapa,
-        atualizarEstadoOrganizacional,
-        atualizarEstadoPainel,
-        atualizarEstadoSubprocesso,
-        atualizarEstadoUnidade,
-        limparSubprocessoAtual,
+        atualizarEstadoMapa: mapa.atualizarEstadoMapa,
+        atualizarEstadoOrganizacional: organizacao.atualizarEstadoOrganizacional,
+        atualizarEstadoPainel: painel.atualizarEstadoPainel,
+        atualizarEstadoSubprocesso: subprocesso.atualizarEstadoSubprocesso,
+        atualizarEstadoUnidade: organizacao.atualizarEstadoUnidade,
+        limparSubprocessoAtual: subprocesso.limparSubprocessoAtual,
+        resetarEstadoSessao,
     };
 }
