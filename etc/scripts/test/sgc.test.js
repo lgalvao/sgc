@@ -181,24 +181,56 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-auditar-"));
         const frontendDir = path.join(base, "frontend", "src");
 
+        await fs.outputFile(path.join(frontendDir, "stores", "unidade.ts"), "export const useUnidadeStore = () => ({ invalidar: () => undefined, obterUnidade: () => undefined, recarregarUnidade: () => undefined, dadosEdicaoValidos: () => true, sincronizarUnidade: () => undefined, marcarUnidadeParaAtualizacao: () => undefined, limparContextoAtual: () => undefined, resetar: () => undefined, contextoAtual: null, erroAtual: null, carregando: false });");
+        await fs.outputFile(path.join(frontendDir, "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await fs.outputFile(path.join(frontendDir, "composables", "useUnidadeTela.ts"), "export function useUnidadeTela() { return { carregar: () => undefined }; }");
+        await fs.outputFile(path.join(frontendDir, "router", "unidade.routes.ts"), "export const rotasUnidade = [];");
+
         await fs.outputFile(
             path.join(frontendDir, "views", "UnidadeView.vue"),
             [
                 "<script setup lang=\"ts\">",
+                "import {buscarUnidade} from '@/services/unidadeService';",
+                "import {useUnidadeTela} from '@/composables/useUnidadeTela';",
+                "import {rotasUnidade} from '@/router/unidade.routes';",
                 "const unidadeStore = useUnidadeStore();",
+                "const unidadeTela = useUnidadeTela();",
                 "function carregarDados(forcar = false) {",
-                "  return unidadeStore.obterUnidade(1, true);",
+                "  unidadeTela.carregar();",
+                "  unidadeStore.obterUnidade(1, true);",
+                "  unidadeStore.recarregarUnidade(1);",
+                "  unidadeStore.invalidar();",
+                "  return buscarUnidade();",
                 "}",
                 "const emCache = unidadeStore.cacheUnidades.get(1);",
                 "const stale = false;",
+                "console.log(rotasUnidade);",
                 "</script>"
             ].join("\n")
         );
         await fs.outputFile(
-            path.join(frontendDir, "stores", "unidade.ts"),
+            path.join(frontendDir, "composables", "useCadastroUnidade.ts"),
             [
-                "export function obterUnidade(codigo, forcar = false) {",
-                "  return forcar ? codigo : codigo;",
+                "interface DependenciasCadastroUnidade {",
+                "  alpha: string;",
+                "  beta: string;",
+                "  gamma: string;",
+                "  delta: string;",
+                "  epsilon: string;",
+                "  zeta: string;",
+                "}",
+                "export function useCadastroUnidade() {",
+                "  return {",
+                "    a: 1,",
+                "    b: 2,",
+                "    c: 3,",
+                "    d: 4,",
+                "    e: 5,",
+                "    f: 6,",
+                "    g: 7,",
+                "    h: 8,",
+                "    i: 9,",
+                "  };",
                 "}",
             ].join("\n")
         );
@@ -218,7 +250,12 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.resumo.metricas.viewsComVazamentoCache).toBe(1);
         expect(conteudo.resumo.metricas.acessosDiretosCache).toBe(1);
         expect(conteudo.resumo.metricas.booleanosPosicionais).toBe(1);
-        expect(conteudo.resumo.metricas.ocorrenciasForcar).toBeGreaterThanOrEqual(2);
+        expect(conteudo.resumo.metricas.ocorrenciasForcar).toBeGreaterThanOrEqual(1);
+        expect(conteudo.resumo.metricas.viewsComServiceDireto).toBe(1);
+        expect(conteudo.resumo.metricas.viewsComFanoutAlto).toBe(1);
+        expect(conteudo.resumo.metricas.arquivosComBolsaDependenciasLarga).toBe(1);
+        expect(conteudo.resumo.metricas.arquivosComSuperficieAmpla).toBe(1);
+        expect(conteudo.resumo.metricas.arquivosComMisturaCamadas).toBe(1);
         expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
     });
 

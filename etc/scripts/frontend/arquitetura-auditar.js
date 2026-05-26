@@ -64,16 +64,22 @@ async function main() {
     escreverLinha(`Score total: ${pc.bold(String(snapshot.resumo.scoreTotal))} (${snapshot.resumo.faixa})`);
     escreverLinha(`Arquivos de producao: ${snapshot.resumo.arquivosProducao}`);
     escreverLinha(`Views com vazamento de cache: ${snapshot.resumo.metricas.viewsComVazamentoCache}`);
+    escreverLinha(`Views com service direto: ${snapshot.resumo.metricas.viewsComServiceDireto}`);
+    escreverLinha(`Views com fan-out alto: ${snapshot.resumo.metricas.viewsComFanoutAlto}`);
     escreverLinha(`Acessos diretos a cache: ${snapshot.resumo.metricas.acessosDiretosCache}`);
     escreverLinha(`Metodos xxxEmCache consumidos: ${snapshot.resumo.metricas.metodosEmCache}`);
     escreverLinha(`Booleanos posicionais: ${snapshot.resumo.metricas.booleanosPosicionais}`);
     escreverLinha(`Ocorrencias de forcar: ${snapshot.resumo.metricas.ocorrenciasForcar}`);
+    escreverLinha(`Bolsas largas de dependencias/estado: ${snapshot.resumo.metricas.arquivosComBolsaDependenciasLarga}`);
+    escreverLinha(`Superficies exportadas amplas: ${snapshot.resumo.metricas.arquivosComSuperficieAmpla}`);
+    escreverLinha(`Arquivos com mistura de camadas: ${snapshot.resumo.metricas.arquivosComMisturaCamadas}`);
     escreverLinha(`Hubs centrais com sinais: ${snapshot.resumo.metricas.hubsCentraisComSinais}`);
     escreverLinha("");
     escreverLinha(pc.bold("Top 5 hotspots:"));
     snapshot.hotspots.slice(0, 5).forEach((hotspot, indice) => {
         escreverLinha(`${indice + 1}. ${hotspot.arquivo} [${hotspot.camada}]`);
         escreverLinha(`   Score: ${hotspot.score} | Sinais: ${hotspot.sinaisAtivos.join(", ")}`);
+        escreverLinha(`   Fan-out: ${hotspot.metricasAst.categoriasAcoplamento} categorias / ${hotspot.metricasAst.importacoesArquiteturais} imports`);
     });
 
     if (!args.includes("--sem-gravar")) {

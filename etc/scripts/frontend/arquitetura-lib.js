@@ -1,12 +1,25 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import ts from "typescript";
 import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
 
-const VERSAO_SCHEMA = "1.0.0";
+const VERSAO_SCHEMA = "2.0.0";
 const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "frontend-arquitetura", "latest");
 const CAMINHO_SNAPSHOT_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "ultimo-snapshot.json");
 const CAMINHO_RESUMO_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "ultimo-resumo.md");
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
+const EXTENSOES_RESOLUCAO = [".ts", ".vue", ".js", "/index.ts", "/index.vue", "/index.js"];
+const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"];
+const HUBS_CENTRAIS = new Set([
+    "frontend/src/stores/perfil.ts",
+    "frontend/src/stores/unidade.ts",
+    "frontend/src/stores/mapas.ts",
+    "frontend/src/composables/useInvalidacaoNavegacao.ts",
+    "frontend/src/composables/useCacheSync.ts",
+]);
+const NOMES_BOLSAS_LARGAS = /(Dependencias|Estado|Contexto)(?:[A-Z][A-Za-z0-9_]*)?$/;
+const NOMES_CHAMADAS_ESTRATEGIA = /^(invalidar|recarregar|sincronizar|marcar[A-Z].*Atualizacao|dados[A-Z].*Validos|limparContextoAtual|resetar)$/;
+const NOMES_CHAMADAS_INVALIDACAO = /^(invalidar|marcar[A-Z].*Atualizacao|limparContextoAtual|resetar)$/;
 
 const PADROES = {
     acessoDiretoCache: /\.\s*cache[A-Z][A-Za-z0-9_]*/g,
@@ -17,14 +30,6 @@ const PADROES = {
     palavraStale: /\bstale\b/g,
     palavraSnapshot: /\bsnapshot\b/g,
 };
-
-const HUBS_CENTRAIS = new Set([
-    "frontend/src/stores/perfil.ts",
-    "frontend/src/stores/unidade.ts",
-    "frontend/src/stores/mapas.ts",
-    "frontend/src/composables/useInvalidacaoNavegacao.ts",
-    "frontend/src/composables/useCacheSync.ts",
-]);
 
 function normalizarCaminho(caminhoArquivo) {
     return caminhoArquivo.split(path.sep).join("/");
@@ -89,19 +94,291 @@ async function listarArquivosFrontend(base) {
     return arquivos;
 }
 
-function calcularScoreArquivo(sinais) {
-    return (sinais.acessoDiretoCache * 8)
-        + (sinais.metodoEmCache * 6)
-        + (sinais.invalidacaoExplicita * 5)
-        + (sinais.booleanoPosicional * 4)
-        + (sinais.palavraForcar * 3)
-        + (sinais.palavraStale * 3)
-        + (sinais.palavraSnapshot * 2);
+function extrairCodigoScript(caminhoRelativo, conteudoOriginal) {
+    if (!caminhoRelativo.endsWith(".vue")) {
+        return conteudoOriginal;
+    }
+
+    const blocos = [...conteudoOriginal.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)]
+        .map((match) => match[1]?.trim() ?? "")
+        .filter(Boolean);
+
+    return blocos.join("\n\n");
+}
+
+function resolverImportacao(caminhoRelativo, especificador) {
+    if (especificador.startsWith("@/")) {
+        return normalizarCaminho(path.posix.join("frontend/src", especificador.slice(2)));
+    }
+
+    if (!especificador.startsWith(".")) {
+        return null;
+    }
+
+    const baseDiretorio = path.posix.dirname(caminhoRelativo);
+    const caminhoBase = path.posix.normalize(path.posix.join(baseDiretorio, especificador));
+    for (const extensao of EXTENSOES_RESOLUCAO) {
+        const candidato = normalizarCaminho(`${caminhoBase}${extensao}`);
+        if (ehArquivoProducaoFrontend(candidato) || candidato.startsWith("frontend/src/")) {
+            return candidato;
+        }
+    }
+
+    return normalizarCaminho(caminhoBase);
+}
+
+function classificarImportacaoResolvida(caminhoImportado) {
+    if (!caminhoImportado) return "externo";
+    if (caminhoImportado.startsWith("frontend/src/stores/")) return "store";
+    if (caminhoImportado.startsWith("frontend/src/composables/")) return "composable";
+    if (caminhoImportado.startsWith("frontend/src/services/")) return "service";
+    if (caminhoImportado.startsWith("frontend/src/router/")) return "router";
+    if (caminhoImportado.startsWith("frontend/src/views/")) return "view";
+    if (caminhoImportado.startsWith("frontend/src/components/")) return "component";
+    return "outro";
+}
+
+function criarAnaliseAst() {
+    return {
+        importsPorCategoria: {
+            store: new Set(),
+            composable: new Set(),
+            service: new Set(),
+            router: new Set(),
+            view: new Set(),
+            component: new Set(),
+            outro: new Set(),
+        },
+        aliasesServicosNamespace: new Set(),
+        aliasesServicosNomeados: new Set(),
+        variaveisStore: new Set(),
+        membrosStoreDesestruturados: new Set(),
+        chamadasStore: 0,
+        chamadasServiceDiretas: 0,
+        chamadasEstrategiaCache: 0,
+        chamadasInvalidacao: 0,
+        bolsasDependenciasLargas: 0,
+        superficieExportadaAmpla: 0,
+    };
+}
+
+function obterNomeChamada(expressao) {
+    if (ts.isIdentifier(expressao)) {
+        return expressao.text;
+    }
+    if (ts.isPropertyAccessExpression(expressao)) {
+        return expressao.name.text;
+    }
+    return null;
+}
+
+function adicionarSet(destino, valor) {
+    if (valor) {
+        destino.add(valor);
+    }
+}
+
+function contarMembrosBolsa(noTipo) {
+    if (ts.isTypeLiteralNode(noTipo)) {
+        return noTipo.members.length;
+    }
+    return 0;
+}
+
+function analisarSuperficieExportada(no, camada, analiseAst) {
+    if (!ts.isReturnStatement(no) || !no.expression || !ts.isObjectLiteralExpression(no.expression)) {
+        return;
+    }
+
+    const totalPropriedades = no.expression.properties.length;
+    const limite = camada === "store" ? 10 : 8;
+    if (totalPropriedades > limite) {
+        analiseAst.superficieExportadaAmpla += 1;
+    }
+}
+
+function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
+    const codigo = extrairCodigoScript(caminhoRelativo, conteudoOriginal);
+    const analiseAst = criarAnaliseAst();
+
+    if (!codigo.trim()) {
+        return analiseAst;
+    }
+
+    const arquivo = ts.createSourceFile(caminhoRelativo, codigo, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+
+    function visitar(no) {
+        if (ts.isImportDeclaration(no) && ts.isStringLiteral(no.moduleSpecifier)) {
+            const especificador = no.moduleSpecifier.text;
+            const resolvido = resolverImportacao(caminhoRelativo, especificador);
+            const categoria = classificarImportacaoResolvida(resolvido);
+            adicionarSet(analiseAst.importsPorCategoria[categoria] ?? analiseAst.importsPorCategoria.outro, resolvido ?? especificador);
+
+            const clausula = no.importClause;
+            if (categoria === "service" && clausula?.namedBindings) {
+                if (ts.isNamespaceImport(clausula.namedBindings)) {
+                    analiseAst.aliasesServicosNamespace.add(clausula.namedBindings.name.text);
+                }
+                if (ts.isNamedImports(clausula.namedBindings)) {
+                    clausula.namedBindings.elements.forEach((elemento) => {
+                        analiseAst.aliasesServicosNomeados.add(elemento.name.text);
+                    });
+                }
+            }
+        }
+
+        if (ts.isInterfaceDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text) && no.members.length > 5) {
+            analiseAst.bolsasDependenciasLargas += 1;
+        }
+
+        if (ts.isTypeAliasDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text)) {
+            const totalMembros = contarMembrosBolsa(no.type);
+            if (totalMembros > 5) {
+                analiseAst.bolsasDependenciasLargas += 1;
+            }
+        }
+
+        if ((ts.isFunctionDeclaration(no) || ts.isArrowFunction(no) || ts.isFunctionExpression(no)) && no.parameters) {
+            no.parameters.forEach((parametro) => {
+                if (!ts.isIdentifier(parametro.name)) {
+                    return;
+                }
+                if (!["dependencias", "estado", "contexto"].includes(parametro.name.text)) {
+                    return;
+                }
+                const totalMembros = parametro.type ? contarMembrosBolsa(parametro.type) : 0;
+                if (totalMembros > 5) {
+                    analiseAst.bolsasDependenciasLargas += 1;
+                }
+            });
+        }
+
+        if (ts.isVariableDeclaration(no) && no.initializer && ts.isCallExpression(no.initializer)) {
+            const nomeChamada = obterNomeChamada(no.initializer.expression);
+            if (nomeChamada && /^use[A-Z].*Store$/.test(nomeChamada)) {
+                if (ts.isIdentifier(no.name)) {
+                    analiseAst.variaveisStore.add(no.name.text);
+                }
+                if (ts.isObjectBindingPattern(no.name)) {
+                    no.name.elements.forEach((elemento) => {
+                        if (ts.isIdentifier(elemento.name)) {
+                            analiseAst.membrosStoreDesestruturados.add(elemento.name.text);
+                        }
+                    });
+                }
+            }
+        }
+
+        if (ts.isPropertyAccessExpression(no) && ts.isIdentifier(no.expression)) {
+            const alvo = no.expression.text;
+            const propriedade = no.name.text;
+
+            if (analiseAst.variaveisStore.has(alvo)) {
+                analiseAst.chamadasStore += 1;
+                if (NOMES_CHAMADAS_ESTRATEGIA.test(propriedade)) {
+                    analiseAst.chamadasEstrategiaCache += 1;
+                }
+                if (NOMES_CHAMADAS_INVALIDACAO.test(propriedade)) {
+                    analiseAst.chamadasInvalidacao += 1;
+                }
+            }
+
+            if (analiseAst.aliasesServicosNamespace.has(alvo) && ts.isCallExpression(no.parent) && no.parent.expression === no) {
+                analiseAst.chamadasServiceDiretas += 1;
+            }
+        }
+
+        if (ts.isCallExpression(no)) {
+            const nomeChamada = obterNomeChamada(no.expression);
+            if (nomeChamada && analiseAst.membrosStoreDesestruturados.has(nomeChamada)) {
+                analiseAst.chamadasStore += 1;
+                if (NOMES_CHAMADAS_ESTRATEGIA.test(nomeChamada)) {
+                    analiseAst.chamadasEstrategiaCache += 1;
+                }
+                if (NOMES_CHAMADAS_INVALIDACAO.test(nomeChamada)) {
+                    analiseAst.chamadasInvalidacao += 1;
+                }
+            }
+            if (nomeChamada && analiseAst.aliasesServicosNomeados.has(nomeChamada)) {
+                analiseAst.chamadasServiceDiretas += 1;
+            }
+        }
+
+        analisarSuperficieExportada(no, camada, analiseAst);
+        ts.forEachChild(no, visitar);
+    }
+
+    visitar(arquivo);
+    return analiseAst;
+}
+
+function computarSinaisLexicais(conteudo) {
+    return {
+        acessoDiretoCache: contarOcorrencias(conteudo, PADROES.acessoDiretoCache),
+        metodoEmCache: contarOcorrencias(conteudo, PADROES.metodoEmCache),
+        invalidacaoExplicita: contarOcorrencias(conteudo, PADROES.invalidacaoExplicita),
+        booleanoPosicional: contarOcorrencias(conteudo, PADROES.booleanoPosicional),
+        palavraForcar: contarOcorrencias(conteudo, PADROES.palavraForcar),
+        palavraStale: contarOcorrencias(conteudo, PADROES.palavraStale),
+        palavraSnapshot: contarOcorrencias(conteudo, PADROES.palavraSnapshot),
+    };
+}
+
+function contarCategoriasAcoplamento(importsPorCategoria) {
+    return CATEGORIAS_ACOPLAMENTO.filter((categoria) => importsPorCategoria[categoria].size > 0).length;
+}
+
+function contarImportacoesArquiteturais(importsPorCategoria) {
+    return CATEGORIAS_ACOPLAMENTO.reduce((total, categoria) => total + importsPorCategoria[categoria].size, 0);
+}
+
+function pesoServiceDireto(camada) {
+    if (camada === "view") return 10;
+    if (camada === "component") return 6;
+    if (camada === "store") return 4;
+    return 0;
+}
+
+function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) {
+    let total = 0;
+    total += (sinaisLexicais.acessoDiretoCache * 8)
+        + (sinaisLexicais.metodoEmCache * 6)
+        + (sinaisLexicais.invalidacaoExplicita * 5)
+        + (sinaisLexicais.booleanoPosicional * 4)
+        + (sinaisLexicais.palavraForcar * 3)
+        + (sinaisLexicais.palavraStale * 3)
+        + (sinaisLexicais.palavraSnapshot * 2);
+
+    const categoriasAcoplamento = contarCategoriasAcoplamento(analiseAst.importsPorCategoria);
+    const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
+
+    if (categoriasAcoplamento >= 3) {
+        total += 10 + ((categoriasAcoplamento - 3) * 4);
+    }
+    if (importacoesArquiteturais >= 5) {
+        total += (importacoesArquiteturais - 4) * 3;
+    }
+    if (analiseAst.chamadasStore >= 8) {
+        total += 8 + (Math.floor((analiseAst.chamadasStore - 8) / 4) * 3);
+    }
+    total += analiseAst.chamadasServiceDiretas * pesoServiceDireto(camada);
+    total += analiseAst.chamadasEstrategiaCache * (camada === "view" ? 8 : 5);
+    total += analiseAst.chamadasInvalidacao * (camada === "view" ? 10 : 6);
+    total += analiseAst.bolsasDependenciasLargas * 9;
+    if (camada === "store" || camada === "composable" || camada === "view" || camada === "component") {
+        total += analiseAst.superficieExportadaAmpla * 9;
+    }
+    if (hubCentral && total > 0) {
+        total += 6;
+    }
+
+    return total;
 }
 
 function calcularFaixa(score) {
-    if (score <= 20) return "bom";
-    if (score <= 60) return "atencao";
+    if (score === 0) return "excelente";
+    if (score <= 15) return "bom";
+    if (score <= 50) return "atencao";
     return "critico";
 }
 
@@ -112,9 +389,14 @@ function criarResumoMarkdown(snapshot) {
         `- Score total: **${snapshot.resumo.scoreTotal}** (${snapshot.resumo.faixa})`,
         `- Arquivos de producao: **${snapshot.resumo.arquivosProducao}**`,
         `- Views com vazamento de estrategia de cache: **${snapshot.resumo.metricas.viewsComVazamentoCache}**`,
+        `- Views com chamadas diretas a service: **${snapshot.resumo.metricas.viewsComServiceDireto}**`,
+        `- Views com fan-out arquitetural alto: **${snapshot.resumo.metricas.viewsComFanoutAlto}**`,
         `- Acessos diretos a cache de store: **${snapshot.resumo.metricas.acessosDiretosCache}**`,
         `- Chamadas com booleano posicional: **${snapshot.resumo.metricas.booleanosPosicionais}**`,
-        `- Ocorrencias de \`forcar\` em producao: **${snapshot.resumo.metricas.ocorrenciasForcar}**`,
+        `- Bolsas de dependencias/estado largas: **${snapshot.resumo.metricas.arquivosComBolsaDependenciasLarga}**`,
+        `- Superficies exportadas amplas: **${snapshot.resumo.metricas.arquivosComSuperficieAmpla}**`,
+        `- Arquivos com mistura de camadas arquiteturais: **${snapshot.resumo.metricas.arquivosComMisturaCamadas}**`,
+        `- Hubs centrais com sinais: **${snapshot.resumo.metricas.hubsCentraisComSinais}**`,
         "",
         "## Hotspots",
         "",
@@ -127,6 +409,7 @@ function criarResumoMarkdown(snapshot) {
             linhas.push(`${indice + 1}. \`${hotspot.arquivo}\` [${hotspot.camada}]`);
             linhas.push(`   - score: ${hotspot.score}`);
             linhas.push(`   - sinais: ${hotspot.sinaisAtivos.join(", ")}`);
+            linhas.push(`   - fan-out: ${hotspot.metricasAst.categoriasAcoplamento} categorias / ${hotspot.metricasAst.importacoesArquiteturais} imports arquiteturais`);
         });
     }
 
@@ -134,8 +417,9 @@ function criarResumoMarkdown(snapshot) {
     linhas.push("## Diretrizes acompanhadas");
     linhas.push("");
     linhas.push("- views nao devem conhecer estrategia de cache;");
+    linhas.push("- views nao devem chamar services diretamente quando existir borda de dominio/coordenacao;");
     linhas.push("- contratos de view devem ser orientados a caso de uso;");
-    linhas.push("- evitar `forcar`, `stale`, `snapshot`, `invalidar` e `xxxEmCache` na borda consumida pela view;");
+    linhas.push("- evitar bolsas largas de `dependencias` e `estado`;");
     linhas.push("- reduzir hubs centrais antes de expandir APIs locais.");
     linhas.push("");
 
@@ -148,12 +432,11 @@ async function gravarSnapshotArquitetura(snapshot, diretorioSaida = DIRETORIO_SA
     await fs.writeFile(path.join(diretorioSaida, path.basename(CAMINHO_RESUMO_PADRAO)), criarResumoMarkdown(snapshot));
 }
 
-async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
-    const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
-    const arquivos = await listarArquivosFrontend(baseResolvida);
-    const analisados = [];
-    const metricas = {
+function criarMetricasResumo() {
+    return {
         viewsComVazamentoCache: 0,
+        viewsComServiceDireto: 0,
+        viewsComFanoutAlto: 0,
         acessosDiretosCache: 0,
         metodosEmCache: 0,
         invalidacoesExplicitasEmViews: 0,
@@ -161,8 +444,40 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         ocorrenciasForcar: 0,
         ocorrenciasStale: 0,
         ocorrenciasSnapshot: 0,
+        arquivosComBolsaDependenciasLarga: 0,
+        arquivosComSuperficieAmpla: 0,
+        arquivosComMisturaCamadas: 0,
+        arquivosComAcoplamentoStoreAlto: 0,
+        arquivosComServiceDireto: 0,
+        chamadasEstrategiaCache: 0,
+        chamadasInvalidacao: 0,
         hubsCentraisComSinais: 0,
     };
+}
+
+function obterSinaisAtivos(sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais) {
+    const sinais = [];
+    for (const [nome, valor] of Object.entries(sinaisLexicais)) {
+        if (valor > 0) {
+            sinais.push(nome);
+        }
+    }
+    if (analiseAst.chamadasServiceDiretas > 0) sinais.push("serviceDireto");
+    if (analiseAst.chamadasEstrategiaCache > 0) sinais.push("estrategiaCache");
+    if (analiseAst.chamadasInvalidacao > 0) sinais.push("invalidacaoArquitetural");
+    if (analiseAst.bolsasDependenciasLargas > 0) sinais.push("bolsaDependenciasLarga");
+    if (analiseAst.superficieExportadaAmpla > 0) sinais.push("superficieAmpla");
+    if (categoriasAcoplamento >= 3) sinais.push("misturaCamadas");
+    if (importacoesArquiteturais >= 5) sinais.push("fanoutAlto");
+    if (analiseAst.chamadasStore >= 8) sinais.push("acoplamentoStoreAlto");
+    return sinais;
+}
+
+async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
+    const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
+    const arquivos = await listarArquivosFrontend(baseResolvida);
+    const analisados = [];
+    const metricas = criarMetricasResumo();
 
     for (const arquivo of arquivos) {
         const caminhoRelativo = normalizarCaminho(path.relative(baseResolvida, arquivo));
@@ -172,32 +487,60 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
 
         const conteudo = await fs.readFile(arquivo, "utf8");
         const camada = classificarCamada(caminhoRelativo);
-        const sinais = {
-            acessoDiretoCache: contarOcorrencias(conteudo, PADROES.acessoDiretoCache),
-            metodoEmCache: contarOcorrencias(conteudo, PADROES.metodoEmCache),
-            invalidacaoExplicita: contarOcorrencias(conteudo, PADROES.invalidacaoExplicita),
-            booleanoPosicional: contarOcorrencias(conteudo, PADROES.booleanoPosicional),
-            palavraForcar: contarOcorrencias(conteudo, PADROES.palavraForcar),
-            palavraStale: contarOcorrencias(conteudo, PADROES.palavraStale),
-            palavraSnapshot: contarOcorrencias(conteudo, PADROES.palavraSnapshot),
-        };
-        const score = calcularScoreArquivo(sinais);
-        const sinaisAtivos = Object.entries(sinais).filter(([, valor]) => valor > 0).map(([nome]) => nome);
+        const sinaisLexicais = computarSinaisLexicais(conteudo);
+        const analiseAst = analisarArquivoAst(caminhoRelativo, conteudo, camada);
+        const categoriasAcoplamento = contarCategoriasAcoplamento(analiseAst.importsPorCategoria);
+        const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
+        const hubCentral = HUBS_CENTRAIS.has(caminhoRelativo);
+        const score = calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral});
+        const sinaisAtivos = obterSinaisAtivos(sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais);
         const temSinal = sinaisAtivos.length > 0;
 
-        if (camada === "view" && temSinal) {
+        const vazamentoCacheView = camada === "view" && (
+            sinaisLexicais.acessoDiretoCache > 0
+            || sinaisLexicais.metodoEmCache > 0
+            || sinaisLexicais.invalidacaoExplicita > 0
+            || analiseAst.chamadasEstrategiaCache > 0
+            || analiseAst.chamadasInvalidacao > 0
+        );
+
+        if (vazamentoCacheView) {
             metricas.viewsComVazamentoCache += 1;
         }
-        metricas.acessosDiretosCache += sinais.acessoDiretoCache;
-        metricas.metodosEmCache += sinais.metodoEmCache;
-        if (camada === "view") {
-            metricas.invalidacoesExplicitasEmViews += sinais.invalidacaoExplicita;
+        if (camada === "view" && analiseAst.chamadasServiceDiretas > 0) {
+            metricas.viewsComServiceDireto += 1;
         }
-        metricas.booleanosPosicionais += sinais.booleanoPosicional;
-        metricas.ocorrenciasForcar += sinais.palavraForcar;
-        metricas.ocorrenciasStale += sinais.palavraStale;
-        metricas.ocorrenciasSnapshot += sinais.palavraSnapshot;
-        if (HUBS_CENTRAIS.has(caminhoRelativo) && temSinal) {
+        if (camada === "view" && (categoriasAcoplamento >= 3 || importacoesArquiteturais >= 5 || analiseAst.chamadasStore >= 8)) {
+            metricas.viewsComFanoutAlto += 1;
+        }
+
+        metricas.acessosDiretosCache += sinaisLexicais.acessoDiretoCache;
+        metricas.metodosEmCache += sinaisLexicais.metodoEmCache;
+        if (camada === "view") {
+            metricas.invalidacoesExplicitasEmViews += sinaisLexicais.invalidacaoExplicita;
+        }
+        metricas.booleanosPosicionais += sinaisLexicais.booleanoPosicional;
+        metricas.ocorrenciasForcar += sinaisLexicais.palavraForcar;
+        metricas.ocorrenciasStale += sinaisLexicais.palavraStale;
+        metricas.ocorrenciasSnapshot += sinaisLexicais.palavraSnapshot;
+        metricas.chamadasEstrategiaCache += analiseAst.chamadasEstrategiaCache;
+        metricas.chamadasInvalidacao += analiseAst.chamadasInvalidacao;
+        if (analiseAst.bolsasDependenciasLargas > 0) {
+            metricas.arquivosComBolsaDependenciasLarga += 1;
+        }
+        if (analiseAst.superficieExportadaAmpla > 0) {
+            metricas.arquivosComSuperficieAmpla += 1;
+        }
+        if (categoriasAcoplamento >= 3) {
+            metricas.arquivosComMisturaCamadas += 1;
+        }
+        if (analiseAst.chamadasStore >= 8) {
+            metricas.arquivosComAcoplamentoStoreAlto += 1;
+        }
+        if (analiseAst.chamadasServiceDiretas > 0) {
+            metricas.arquivosComServiceDireto += 1;
+        }
+        if (hubCentral && temSinal) {
             metricas.hubsCentraisComSinais += 1;
         }
 
@@ -206,15 +549,25 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             camada,
             linhas: conteudo.split(/\r?\n/).length,
             score,
-            sinais,
+            sinaisLexicais,
+            metricasAst: {
+                chamadasStore: analiseAst.chamadasStore,
+                chamadasServiceDiretas: analiseAst.chamadasServiceDiretas,
+                chamadasEstrategiaCache: analiseAst.chamadasEstrategiaCache,
+                chamadasInvalidacao: analiseAst.chamadasInvalidacao,
+                bolsasDependenciasLargas: analiseAst.bolsasDependenciasLargas,
+                superficieExportadaAmpla: analiseAst.superficieExportadaAmpla,
+                categoriasAcoplamento,
+                importacoesArquiteturais,
+            },
             sinaisAtivos,
-            hubCentral: HUBS_CENTRAIS.has(caminhoRelativo),
+            hubCentral,
         });
     }
 
     const hotspots = analisados
         .filter((arquivo) => arquivo.score > 0)
-        .sort((a, b) => b.score - a.score || b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo));
+        .sort((a, b) => b.score - a.score || b.metricasAst.importacoesArquiteturais - a.metricasAst.importacoesArquiteturais || b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo));
 
     const scoreTotal = hotspots.reduce((total, item) => total + item.score, 0);
 

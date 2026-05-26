@@ -30,20 +30,35 @@ Os ganhos fáceis com `Pinia Colada` já foram capturados. O que restou relevant
 
 ### Baseline da auditoria arquitetural
 
+A auditoria foi endurecida. Ela não mede mais só vocabulário literal (`cache`, `forcar`, `snapshot`), e agora incorpora análise estrutural de AST para:
+
+- fan-out arquitetural por arquivo;
+- chamadas diretas a store e service;
+- vazamento de estratégia de cache;
+- bolsas largas de `dependencias`/`estado`/`contexto`;
+- superfícies exportadas amplas;
+- mistura de camadas arquiteturais no mesmo arquivo.
+
 Última medição registrada por `node etc/scripts/sgc.js frontend arquitetura auditar`:
 
-- score total: `202` (`critico`);
-- views com vazamento de estratégia de cache: `3`;
-- acessos diretos a cache de store: `8`;
-- booleanos posicionais: `16`;
+- score total: `1136` (`critico`);
+- views com vazamento de estratégia de cache: `1`;
+- views com service direto: `12`;
+- views com fan-out alto: `10`;
+- acessos diretos a cache de store: `0`;
+- booleanos posicionais: `0`;
+- bolsas largas de dependências/estado: `10`;
+- superfícies exportadas amplas: `27`;
+- arquivos com mistura de camadas: `13`;
 - hubs centrais com sinais: `4`.
 
 Hotspots prioritários desta baseline:
 
-1. `frontend/src/stores/mapas.ts`
+1. `frontend/src/views/ProcessoCadastroView.vue`
 2. `frontend/src/composables/useInvalidacaoNavegacao.ts`
-3. `frontend/src/composables/useCadastroOrquestracao.ts`
-4. `frontend/src/composables/useCacheSync.ts`
+3. `frontend/src/views/AtribuicaoTemporariaView.vue`
+4. `frontend/src/stores/perfil.ts`
+5. `frontend/src/views/processoDetalheAcoes.ts`
 
 ### Metas de progresso arquitetural
 
@@ -51,16 +66,19 @@ As próximas rodadas devem ser medidas contra esta baseline. A meta não é “z
 
 Curto prazo:
 
-- tirar views e composables principais do domínio de `mapas` da API orientada a cache;
-- reduzir `stores/mapas.ts` como hub, trocando nomes e contratos mecânicos por operações semânticas;
-- cortar pelo menos um vazamento de estratégia de cache em view por rodada relevante.
+- atacar hotspots de `view` que ainda chamam service diretamente;
+- reduzir fan-out arquitetural das views centrais de processo, atribuição e mapas;
+- derrubar bolsas largas e superfícies amplas nos hubs restantes;
+- reduzir `useInvalidacaoNavegacao.ts` como hub transversal.
 
 Médio prazo:
 
-- levar `viewsComVazamentoCache` de `3` para `0`;
-- levar `acessosDiretosCache` de `8` para `0` fora dos stores;
-- reduzir `hubsCentraisComSinais` de `4` para `2` ou menos;
-- começar a derrubar `booleanosPosicionais` nos hubs restantes.
+- manter `viewsComVazamentoCache` em `0` ou `1` até zerar;
+- levar `viewsComServiceDireto` de `12` para menos de `5`;
+- levar `viewsComFanoutAlto` de `10` para menos de `4`;
+- levar `arquivosComBolsaDependenciasLarga` de `10` para menos de `4`;
+- levar `arquivosComSuperficieAmpla` de `27` para menos de `10`;
+- reduzir `hubsCentraisComSinais` de `4` para `2` ou menos.
 
 ### Padrão de emaranhamento observado
 
