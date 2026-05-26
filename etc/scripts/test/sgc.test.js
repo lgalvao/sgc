@@ -252,11 +252,14 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.resumo.metricas.booleanosPosicionais).toBe(1);
         expect(conteudo.resumo.metricas.ocorrenciasForcar).toBeGreaterThanOrEqual(1);
         expect(conteudo.resumo.metricas.viewsComServiceDireto).toBe(1);
+        expect(conteudo.resumo.metricas.viewsComServerStateCaseiro).toBe(1);
         expect(conteudo.resumo.metricas.viewsComFanoutAlto).toBe(1);
         expect(conteudo.resumo.metricas.arquivosComBolsaDependenciasLarga).toBe(1);
         expect(conteudo.resumo.metricas.arquivosComSuperficieAmpla).toBe(1);
         expect(conteudo.resumo.metricas.arquivosComMisturaCamadas).toBe(1);
+        expect(conteudo.resumo.metricas.arquivosComServerStateCaseiro).toBe(1);
         expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
+        expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
     });
 
     test("valida cruft do frontend com waiver de tamanho", async () => {

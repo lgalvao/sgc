@@ -33,7 +33,7 @@ async function main() {
         exibirAjudaComando({
             comandoSgc: "frontend arquitetura auditar",
             scriptDireto: "frontend/arquitetura-auditar.js",
-            descricao: "Audita vazamentos arquiteturais do frontend, com foco em estrategia de cache exposta nas views e hubs centrais sobrecarregados.",
+            descricao: "Audita vazamentos arquiteturais do frontend, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
             opcoes: [
                 "--json               Emite o snapshot em JSON.",
                 "--sem-gravar         Nao grava snapshot/resumo em disco.",
@@ -65,6 +65,7 @@ async function main() {
     escreverLinha(`Arquivos de producao: ${snapshot.resumo.arquivosProducao}`);
     escreverLinha(`Views com vazamento de cache: ${snapshot.resumo.metricas.viewsComVazamentoCache}`);
     escreverLinha(`Views com service direto: ${snapshot.resumo.metricas.viewsComServiceDireto}`);
+    escreverLinha(`Views com server state caseiro: ${snapshot.resumo.metricas.viewsComServerStateCaseiro}`);
     escreverLinha(`Views com fan-out alto: ${snapshot.resumo.metricas.viewsComFanoutAlto}`);
     escreverLinha(`Acessos diretos a cache: ${snapshot.resumo.metricas.acessosDiretosCache}`);
     escreverLinha(`Metodos xxxEmCache consumidos: ${snapshot.resumo.metricas.metodosEmCache}`);
@@ -73,6 +74,7 @@ async function main() {
     escreverLinha(`Bolsas largas de dependencias/estado: ${snapshot.resumo.metricas.arquivosComBolsaDependenciasLarga}`);
     escreverLinha(`Superficies exportadas amplas: ${snapshot.resumo.metricas.arquivosComSuperficieAmpla}`);
     escreverLinha(`Arquivos com mistura de camadas: ${snapshot.resumo.metricas.arquivosComMisturaCamadas}`);
+    escreverLinha(`Arquivos com server state caseiro: ${snapshot.resumo.metricas.arquivosComServerStateCaseiro}`);
     escreverLinha(`Hubs centrais com sinais: ${snapshot.resumo.metricas.hubsCentraisComSinais}`);
     escreverLinha("");
     escreverLinha(pc.bold("Top 5 hotspots:"));
