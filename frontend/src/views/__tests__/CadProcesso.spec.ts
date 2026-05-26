@@ -7,7 +7,6 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import {TEXTOS} from "@/constants/textos";
 import * as processoService from '@/services/processo';
 import {obterAmanhaFormatado} from "@/utils/date";
-import {useProcessoStore} from '@/stores/processo';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {useUnidadeStore} from '@/stores/unidade';
 import {useProcessoForm} from '@/composables/useProcessoForm';
@@ -814,7 +813,6 @@ describe('ProcessoCadastroView.vue', () => {
 
         it('invalida caches relacionados ao salvar processo', async () => {
             const {wrapper, pinia} = createWrapperCobertura();
-            const processoStore = useProcessoStore(pinia);
             const subprocessoStore = useSubprocessoStore(pinia);
 
             vi.mocked(processoService.criarProcesso).mockResolvedValue({codigo: 321} as any);
@@ -827,7 +825,6 @@ describe('ProcessoCadastroView.vue', () => {
             await (wrapper.vm as any).salvarProcesso();
             await flushPromises();
 
-            expect(processoStore.invalidar).toHaveBeenCalled();
             expect(subprocessoStore.invalidar).toHaveBeenCalled();
             expect(mockPush).toHaveBeenCalledWith('/painel');
         });

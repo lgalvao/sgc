@@ -1,7 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useInvalidacaoNavegacao} from "../useInvalidacaoNavegacao";
 import {usePainelStore} from "@/stores/painel";
-import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
 import {useUnidadeStore} from "@/stores/unidade";
@@ -23,13 +22,11 @@ describe("useInvalidacaoNavegacao", () => {
 
     it("deve invalidar caches do processo", () => {
         const painel = usePainelStore();
-        const processo = useProcessoStore();
         const subprocesso = useSubprocessoStore();
         const mapas = useMapasStore();
         const unidade = useUnidadeStore();
 
         vi.spyOn(painel, 'invalidar');
-        vi.spyOn(processo, 'invalidar');
         vi.spyOn(subprocesso, 'invalidar');
         vi.spyOn(mapas, 'invalidar');
         vi.spyOn(unidade, 'invalidar');
@@ -39,7 +36,7 @@ describe("useInvalidacaoNavegacao", () => {
 
         expect(painel.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
-        expect(processo.invalidar).toHaveBeenCalled();
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["processo"]});
         expect(subprocesso.invalidar).toHaveBeenCalled();
         expect(mapas.invalidar).toHaveBeenCalled();
         expect(unidade.invalidar).toHaveBeenCalled();
@@ -47,12 +44,10 @@ describe("useInvalidacaoNavegacao", () => {
 
     it("deve invalidar caches do subprocesso com opções", () => {
         const painel = usePainelStore();
-        const processo = useProcessoStore();
         const subprocesso = useSubprocessoStore();
         const mapas = useMapasStore();
 
         vi.spyOn(painel, 'invalidar');
-        vi.spyOn(processo, 'invalidar');
         vi.spyOn(subprocesso, 'invalidar');
         vi.spyOn(mapas, 'invalidar');
 
@@ -62,7 +57,7 @@ describe("useInvalidacaoNavegacao", () => {
 
         expect(painel.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
-        expect(processo.invalidar).not.toHaveBeenCalled();
+        expect(invalidateQueriesMock).not.toHaveBeenCalledWith({key: ["processo"]});
         expect(subprocesso.invalidar).toHaveBeenCalled();
         expect(mapas.invalidar).not.toHaveBeenCalled();
     });

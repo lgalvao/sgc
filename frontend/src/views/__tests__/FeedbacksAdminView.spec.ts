@@ -1,7 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import {createTestingPinia} from "@pinia/testing";
+import {PiniaColada} from "@pinia/colada";
 import {createMemoryHistory, createRouter} from "vue-router";
+import {createPinia} from "pinia";
 import FeedbacksAdminView from "../FeedbacksAdminView.vue";
 import {listarFeedbacksAdmin} from "@/services/feedbackAdminService";
 import {formatarDataHoraBR} from "@/utils";
@@ -17,9 +18,10 @@ const router = createRouter({
 });
 
 function montarComponente() {
+    const pinia = createPinia();
     return mount(FeedbacksAdminView, {
         global: {
-            plugins: [createTestingPinia({createSpy: vi.fn}), router],
+            plugins: [pinia, [PiniaColada, {}], router],
             stubs: {
                 LayoutPadrao: {template: "<div><slot/></div>"},
                 PageHeader: {template: "<div><slot name='actions'/></div>", props: ["title"]},

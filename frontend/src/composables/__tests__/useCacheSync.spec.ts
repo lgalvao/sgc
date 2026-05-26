@@ -3,7 +3,6 @@ import {useCacheSync} from '../useCacheSync';
 import {useUnidadeStore} from '@/stores/unidade';
 import {useOrganizacaoStore} from '@/stores/organizacao';
 import {usePainelStore} from '@/stores/painel';
-import {useProcessoStore} from '@/stores/processo';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {useMapasStore} from '@/stores/mapas';
 import {createPinia, setActivePinia} from 'pinia';
@@ -65,7 +64,6 @@ describe('useCacheSync', () => {
     let unidadeStore: any;
     let organizacaoStore: any;
     let painelStore: any;
-    let processoStore: any;
     let subprocessoStore: any;
     let mapasStore: any;
 
@@ -74,7 +72,6 @@ describe('useCacheSync', () => {
         unidadeStore = useUnidadeStore();
         organizacaoStore = useOrganizacaoStore();
         painelStore = usePainelStore();
-        processoStore = useProcessoStore();
         subprocessoStore = useSubprocessoStore();
         mapasStore = useMapasStore();
         lastInstance = null;
@@ -83,7 +80,6 @@ describe('useCacheSync', () => {
         vi.spyOn(unidadeStore, 'invalidar');
         vi.spyOn(organizacaoStore, 'invalidar');
         vi.spyOn(painelStore, 'invalidar');
-        vi.spyOn(processoStore, 'invalidar');
         vi.spyOn(subprocessoStore, 'invalidar');
         vi.spyOn(mapasStore, 'invalidar');
         vi.spyOn(logger, 'warn').mockImplementation(() => logger);
@@ -111,14 +107,11 @@ describe('useCacheSync', () => {
         expect(organizacaoStore.invalidar).toHaveBeenCalled();
         expect(painelStore.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['painel']});
-        expect(processoStore.invalidar).not.toHaveBeenCalled();
         expect(subprocessoStore.invalidar).not.toHaveBeenCalled();
         expect(mapasStore.invalidar).not.toHaveBeenCalled();
     });
 
-    it('deve preservar snapshots críticos ao invalidar por SSE organizacional', () => {
-        processoStore.contextoCompleto = {codigo: 100, descricao: 'Processo'} as any;
-        processoStore.codProcessoCarregado = 100;
+    it('deve preservar caches críticos e limpar marcações locais do painel ao invalidar por SSE organizacional', () => {
         subprocessoStore.contextoEdicao = {detalhes: {codigo: 200, situacao: 'MAPA'}} as any;
         mapasStore.definirMapaCompleto(200, {
             codigo: 1,
@@ -128,16 +121,12 @@ describe('useCacheSync', () => {
             atividades: [],
             situacao: 'EM_ANDAMENTO',
         } as any);
-        painelStore.definirDados([{codigo: 1} as any], [{codigo: 2} as any]);
+        painelStore.registrarLeitura([2]);
 
         fechamentosPendentes.push(useCacheSync());
         lastInstance?.emit('org-cache-refreshed', {});
 
-        expect(painelStore.dadosValidos()).toBe(false);
-        expect(painelStore.processos).toEqual([{codigo: 1}]);
-        expect(painelStore.alertas).toEqual([{codigo: 2}]);
-
-        expect(processoStore.contextoCompleto).toEqual(expect.objectContaining({codigo: 100}));
+        expect(painelStore.isMarcadoComoLido(2)).toBe(false);
         expect(subprocessoStore.contextoEdicao).toEqual(expect.objectContaining({
             detalhes: expect.objectContaining({codigo: 200}),
         }));

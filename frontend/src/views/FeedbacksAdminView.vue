@@ -166,16 +166,16 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {BAlert, BBadge, BButton, BModal, BTable} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import {useFeedbacksAdminQuery} from "@/composables/useFeedbacksAdminQuery";
 import {TEXTOS} from "@/constants/textos";
-import {type FeedbackAdmin, listarFeedbacksAdmin, obterUrlScreenshot} from "@/services/feedbackAdminService";
+import {type FeedbackAdmin, obterUrlScreenshot} from "@/services/feedbackAdminService";
 import {formatarDataHoraBR} from "@/utils";
-import {normalizarErro} from "@/utils/apiError";
 import {
   formatarMetadados,
   formatarTipo,
@@ -184,13 +184,15 @@ import {
   resumirNota
 } from "@/views/feedbacksAdminApresentacao";
 
-const feedbacks = ref<FeedbackAdmin[]>([]);
-const carregando = ref(true);
-const erro = ref<string | null>(null);
+const feedbacksQuery = useFeedbacksAdminQuery();
 const mostrarDetalhes = ref(false);
 const feedbackSelecionado = ref<FeedbackAdmin | null>(null);
 const mostrarImagemAmpliada = ref(false);
 const urlImagemAmpliada = ref("");
+
+const feedbacks = computed(() => feedbacksQuery.data.value ?? []);
+const carregando = computed(() => feedbacksQuery.isPending.value || feedbacksQuery.isLoading.value);
+const erro = computed(() => feedbacksQuery.error.value?.message || null);
 
 const campos = [
   {key: "tipo", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO},
@@ -212,18 +214,12 @@ function abrirImagemAmpliada(codigo: string) {
 }
 
 async function carregar() {
-  carregando.value = true;
-  erro.value = null;
-  try {
-    feedbacks.value = await listarFeedbacksAdmin();
-  } catch (error) {
-    erro.value = normalizarErro(error).mensagem;
-  } finally {
-    carregando.value = false;
-  }
+  await feedbacksQuery.refetch();
 }
 
-onMounted(carregar);
+onMounted(() => {
+  void feedbacksQuery.refetch();
+});
 </script>
 
 <style scoped>
