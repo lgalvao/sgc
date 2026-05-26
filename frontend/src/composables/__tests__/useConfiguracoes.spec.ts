@@ -1,6 +1,10 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {PiniaColada} from '@pinia/colada';
+import {mount} from '@vue/test-utils';
+import {defineComponent} from 'vue';
 import {useConfiguracoes} from '../useConfiguracoes';
 import * as configuracaoService from '@/services/configuracaoService';
+import {criarPiniaDeTeste} from '@/test-utils/storeTestHelpers';
 
 vi.mock('@/services/configuracaoService', () => ({
     buscarConfiguracoes: vi.fn(),
@@ -8,13 +12,31 @@ vi.mock('@/services/configuracaoService', () => ({
 }));
 
 describe('useConfiguracoes', () => {
+    function montarComposable() {
+        const pinia = criarPiniaDeTeste();
+        let composable!: ReturnType<typeof useConfiguracoes>;
+
+        mount(defineComponent({
+            setup() {
+                composable = useConfiguracoes();
+                return () => null;
+            },
+        }), {
+            global: {
+                plugins: [pinia, [PiniaColada, {}]],
+            },
+        });
+
+        return composable;
+    }
+
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
     });
 
     it('carregarConfiguracoes deve preencher configuracoes em caso de sucesso', async () => {
-        const composable = useConfiguracoes();
+        const composable = montarComposable();
         const mockData = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '60'}
         ];
@@ -29,7 +51,7 @@ describe('useConfiguracoes', () => {
     });
 
     it('carregarConfiguracoes deve definir erro em caso de falha', async () => {
-        const composable = useConfiguracoes();
+        const composable = montarComposable();
         vi.mocked(configuracaoService.buscarConfiguracoes).mockRejectedValue(new Error('Erro API'));
 
         await composable.carregarConfiguracoes();
@@ -40,7 +62,7 @@ describe('useConfiguracoes', () => {
     });
 
     it('salvarConfiguracoes deve atualizar configuracoes em caso de sucesso', async () => {
-        const composable = useConfiguracoes();
+        const composable = montarComposable();
         const novosParametros = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90'}
         ];
@@ -55,7 +77,7 @@ describe('useConfiguracoes', () => {
     });
 
     it('salvarConfiguracoes deve definir erro em caso de falha', async () => {
-        const composable = useConfiguracoes();
+        const composable = montarComposable();
         const novosParametros = [
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '90'}
         ];
@@ -67,44 +89,51 @@ describe('useConfiguracoes', () => {
         expect(composable.erro.value).toBe('Erro API');
     });
 
-    it('obterValor deve retornar valor correto ou padrao', () => {
-        const composable = useConfiguracoes();
-        composable.configuracoes.value = [
+    it('obterValor deve retornar valor correto ou padrao', async () => {
+        const composable = montarComposable();
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([
             {codigo: 1, chave: 'TESTE_KEY', descricao: 'Desc', valor: 'valor_teste'}
-        ];
+        ]);
+        await composable.carregarConfiguracoes();
 
         expect(composable.obterValor('TESTE_KEY')).toBe('valor_teste');
         expect(composable.obterValor('KEY_INEXISTENTE', 'padrao')).toBe('padrao');
     });
 
-    it('obterDiasInativacaoProcesso deve retornar valor configurado ou padrao', () => {
-        const composable = useConfiguracoes();
-        expect(composable.obterDiasInativacaoProcesso()).toBe(30);
+    it('obterDiasInativacaoProcesso deve retornar valor configurado ou padrao', async () => {
+        expect(montarComposable().obterDiasInativacaoProcesso()).toBe(30);
 
-        composable.configuracoes.value = [
+        const composableConfigurado = montarComposable();
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: '45'}
-        ];
-        expect(composable.obterDiasInativacaoProcesso()).toBe(45);
+        ]);
+        await composableConfigurado.carregarConfiguracoes();
+        expect(composableConfigurado.obterDiasInativacaoProcesso()).toBe(45);
 
-        composable.configuracoes.value = [
+        const composableInvalido = montarComposable();
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([
             {codigo: 1, chave: 'DIAS_INATIVACAO_PROCESSO', descricao: 'Desc', valor: 'abc'}
-        ];
-        expect(composable.obterDiasInativacaoProcesso()).toBe(30);
+        ]);
+        await composableInvalido.carregarConfiguracoes();
+        expect(composableInvalido.obterDiasInativacaoProcesso()).toBe(30);
     });
 
-    it('obterDiasAlertaNovo deve retornar valor configurado ou padrao', () => {
-        const composable = useConfiguracoes();
-        expect(composable.obterDiasAlertaNovo()).toBe(3);
+    it('obterDiasAlertaNovo deve retornar valor configurado ou padrao', async () => {
+        expect(montarComposable().obterDiasAlertaNovo()).toBe(3);
 
-        composable.configuracoes.value = [
+        const composableConfigurado = montarComposable();
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: '7'}
-        ];
-        expect(composable.obterDiasAlertaNovo()).toBe(7);
+        ]);
+        await composableConfigurado.carregarConfiguracoes();
+        expect(composableConfigurado.obterDiasAlertaNovo()).toBe(7);
 
-        composable.configuracoes.value = [
+        const composableInvalido = montarComposable();
+        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([
             {codigo: 1, chave: 'DIAS_ALERTA_NOVO', descricao: 'Desc', valor: 'xyz'}
-        ];
-        expect(composable.obterDiasAlertaNovo()).toBe(3);
+        ]);
+        await composableInvalido.carregarConfiguracoes();
+        expect(composableInvalido.obterDiasAlertaNovo()).toBe(3);
     });
 
 

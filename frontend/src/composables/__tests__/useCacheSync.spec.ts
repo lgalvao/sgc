@@ -5,16 +5,21 @@ import {useOrganizacaoStore} from '@/stores/organizacao';
 import {usePainelStore} from '@/stores/painel';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {useMapasStore} from '@/stores/mapas';
-import {createPinia, setActivePinia} from 'pinia';
 import {logger} from '@/utils';
+import {criarPiniaDeTeste} from '@/test-utils/storeTestHelpers';
 
 const invalidateQueriesMock = vi.fn();
 
-vi.mock('@pinia/colada', () => ({
-    useQueryCache: () => ({
-        invalidateQueries: invalidateQueriesMock,
-    }),
-}));
+vi.mock('@pinia/colada', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@pinia/colada')>();
+    return {
+        ...actual,
+        useQueryCache: () => ({
+            ...actual.useQueryCache(),
+            invalidateQueries: invalidateQueriesMock,
+        }),
+    };
+});
 
 // Global to hold the last created instance
 let lastInstance: EventSourceMock | null = null;
@@ -68,7 +73,7 @@ describe('useCacheSync', () => {
     let mapasStore: any;
 
     beforeEach(() => {
-        setActivePinia(createPinia());
+        criarPiniaDeTeste();
         unidadeStore = useUnidadeStore();
         organizacaoStore = useOrganizacaoStore();
         painelStore = usePainelStore();

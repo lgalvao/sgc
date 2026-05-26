@@ -12,14 +12,16 @@ Reduzir a infraestrutura caseira no frontend do SGC em dois eixos:
 ### Já concluído
 
 - `historico`, `painel`, `processo`, `notificacoes admin` e `feedbacks admin` migrados para query cache;
+- `configuracoes` migrado para query cache e mutation cache;
 - remoção dos stores remotos manuais de `historico` e `processo`;
 - `painelStore` reduzido a estado local real;
 - invalidação por query consolidada nos domínios já migrados;
 - redução relevante da orquestração artificial em fluxos de processo, subprocesso, cadastro e mapa.
+- `organizacao` mantido fora de Colada por enquanto: a store é instanciada em contextos demais fora de `setup()`, e a migração limpa exigiria redesenho mais amplo dos consumidores.
 
 ### Diagnóstico novo
 
-Os ganhos fáceis com `Pinia Colada` já foram capturados. Os próximos ganhos não devem vir de “mais queries”, e sim de:
+Os ganhos fáceis com `Pinia Colada` já foram capturados. O que restou relevante em loading/cache é mais híbrido e não deve ser migrado por simetria. Os próximos ganhos devem vir de:
 
 - apertar contratos internos frouxos que preservam compatibilidades obsoletas;
 - eliminar APIs callback-based onde a dependência real é um valor obrigatório;
@@ -57,7 +59,7 @@ Os ganhos fáceis com `Pinia Colada` já foram capturados. Os próximos ganhos n
 - `subprocesso`;
 - `mapas`;
 - `unidade`;
-- `configuracoes`;
+- `organizacao`;
 - `relatorios`.
 
 ## Ordem de execução

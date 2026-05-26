@@ -1,10 +1,10 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {createPinia, setActivePinia} from "pinia";
 import {usePerfilStore} from "../perfil";
 import {useOrganizacaoStore} from "../organizacao";
 import * as usuarioService from "../../services/usuarioService";
 import {Perfil} from "@/types/tipos";
 import {ref} from "vue";
+import {criarPiniaDeTeste} from "@/test-utils/storeTestHelpers";
 
 vi.mock("../../services/usuarioService", () => ({
     login: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock("@/composables/useSessionStorage", () => ({
 
 describe("usePerfilStore", () => {
     beforeEach(() => {
-        setActivePinia(createPinia());
+        criarPiniaDeTeste();
         vi.clearAllMocks();
     });
 

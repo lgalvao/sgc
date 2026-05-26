@@ -8,6 +8,11 @@ import {useRoute} from "vue-router";
 
 vi.mock("@/components/layout/BarraNavegacao.vue", () => ({default: {template: '<div data-testid="barra-navegacao"></div>'}}));
 vi.mock("@/components/layout/MainNavbar.vue", () => ({default: {template: '<div data-testid="main-navbar"></div>'}}));
+vi.mock("@/composables/useConfiguracoes", () => ({
+    useConfiguracoes: () => ({
+        carregarConfiguracoes: vi.fn(),
+    }),
+}));
 vi.mock("bootstrap-vue-next", async () => {
     const actual = await vi.importActual("bootstrap-vue-next");
     return {

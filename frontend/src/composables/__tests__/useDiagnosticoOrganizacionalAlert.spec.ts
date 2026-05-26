@@ -1,12 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {effectScope, nextTick, ref} from "vue";
-import {createPinia, setActivePinia} from "pinia";
 import {useDiagnosticoOrganizacionalAlert} from "../useDiagnosticoOrganizacionalAlert";
 import {useOrganizacaoStore} from "@/stores/organizacao";
+import {criarPiniaDeTeste} from "@/test-utils/storeTestHelpers";
 
 describe("useDiagnosticoOrganizacionalAlert", () => {
     beforeEach(() => {
-        setActivePinia(createPinia());
+        criarPiniaDeTeste();
         vi.clearAllMocks();
     });
 
