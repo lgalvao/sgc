@@ -56,8 +56,13 @@ const {
         mockUnidadeStore: {
             cacheUnidades: new Map<number, unknown>(),
             cacheMapasVigentes: new Map<number, unknown>(),
+            possuiDadosTelaUnidade: vi.fn(),
+            obterDadosTelaUnidade: vi.fn(),
+            recarregarDadosTelaUnidade: vi.fn(),
             obterUnidade: vi.fn(),
+            recarregarUnidade: vi.fn(),
             obterReferenciaMapaVigente: vi.fn(),
+            recarregarReferenciaMapaVigente: vi.fn(),
         },
         notify: vi.fn(),
         downloadRelatorioMapaVigenteUnidadePdf: vi.fn(),
@@ -108,8 +113,21 @@ describe('UnidadeView.vue', () => {
         vi.clearAllMocks();
         mockUnidadeStore.cacheUnidades.clear();
         mockUnidadeStore.cacheMapasVigentes.clear();
+        mockUnidadeStore.possuiDadosTelaUnidade.mockImplementation((codigo: number) =>
+            mockUnidadeStore.cacheUnidades.has(codigo) && mockUnidadeStore.cacheMapasVigentes.has(codigo)
+        );
+        mockUnidadeStore.obterDadosTelaUnidade.mockImplementation(async (codigo: number) => ({
+            unidade: await mockObterUnidade(codigo),
+            mapaVigente: await mockObterReferenciaMapaVigente(codigo),
+        }));
+        mockUnidadeStore.recarregarDadosTelaUnidade.mockImplementation(async (codigo: number) => ({
+            unidade: await mockObterUnidade(codigo),
+            mapaVigente: await mockObterReferenciaMapaVigente(codigo),
+        }));
         mockUnidadeStore.obterUnidade = mockObterUnidade;
+        mockUnidadeStore.recarregarUnidade = mockObterUnidade;
         mockUnidadeStore.obterReferenciaMapaVigente = mockObterReferenciaMapaVigente;
+        mockUnidadeStore.recarregarReferenciaMapaVigente = mockObterReferenciaMapaVigente;
         mockObterUnidade.mockResolvedValue(mockUnidadeData);
         mockObterReferenciaMapaVigente.mockResolvedValue(null);
         downloadRelatorioMapaVigenteUnidadePdf.mockResolvedValue(undefined);
@@ -176,7 +194,7 @@ describe('UnidadeView.vue', () => {
 
     it('fetches data on mount', async () => {
         createWrapper();
-        expect(mockObterUnidade).toHaveBeenCalledWith(1, false);
+        expect(mockObterUnidade).toHaveBeenCalledWith(1);
     });
 
     it('renders unit details correctly', async () => {
@@ -307,7 +325,7 @@ describe('UnidadeView.vue', () => {
         const ativacao = hook?.call(wrapper.vm);
 
         expect(mockObterUnidade).toHaveBeenCalledTimes(2);
-        expect(mockObterReferenciaMapaVigente).toHaveBeenCalledTimes(2);
+        expect(mockObterReferenciaMapaVigente).toHaveBeenCalledTimes(1);
 
         resolver({
             ...mockUnidadeData,
@@ -339,7 +357,7 @@ describe('UnidadeView.vue', () => {
         expect(wrapper.text()).toContain('Atrib. temporária');
     });
 
-    it('reaplica o snapshot atualizado da store ao reativar a view', async () => {
+    it('recarrega os dados ao reativar a view', async () => {
         const unidadeComAtribuicao = {
             ...mockUnidadeData,
             tipoResponsabilidade: 'ATRIBUICAO_TEMPORARIA',
@@ -352,9 +370,11 @@ describe('UnidadeView.vue', () => {
             dataFimResponsabilidade: null
         };
 
-        mockObterUnidade
-            .mockResolvedValueOnce(unidadeComAtribuicao)
-            .mockResolvedValue(unidadeSemAtribuicao);
+        mockObterUnidade.mockResolvedValueOnce(unidadeComAtribuicao);
+        mockUnidadeStore.recarregarDadosTelaUnidade.mockResolvedValueOnce({
+            unidade: unidadeSemAtribuicao,
+            mapaVigente: null,
+        });
 
         const manterMontado = ref(true);
         const wrapper = createKeepAliveWrapper(manterMontado, {
@@ -367,15 +387,13 @@ describe('UnidadeView.vue', () => {
 
         expect(wrapper.find('[data-testid="unidade-view__btn-atribuicao-texto"]').text()).toBe('Editar atribuição');
 
-        mockUnidadeStore.cacheUnidades.set(1, unidadeSemAtribuicao);
-        mockUnidadeStore.cacheMapasVigentes.set(1, null);
-
         manterMontado.value = false;
         await nextTick();
         manterMontado.value = true;
         await flushPromises();
 
         expect(mockObterUnidade).toHaveBeenCalledTimes(1);
+        expect(mockUnidadeStore.recarregarDadosTelaUnidade).toHaveBeenCalledWith(1);
         expect(wrapper.find('[data-testid="unidade-view__btn-atribuicao-texto"]').text()).toBe('Criar atribuição');
         expect(wrapper.text()).toContain('Titular');
         expect(wrapper.text()).not.toContain('Responsável');
@@ -475,8 +493,8 @@ describe('UnidadeView.vue', () => {
         let resolve1!: (val: any) => void;
         mockObterUnidade.mockReturnValueOnce(new Promise(r => resolve1 = r));
         
-        const p1 = vm.carregarDados(true); // forcar=true to bypass some checks
-        const p2 = vm.carregarDados(true);
+        const p1 = vm.carregarDados();
+        const p2 = vm.carregarDados();
         
         resolve1(mockUnidadeData);
         await p1;
@@ -486,56 +504,13 @@ describe('UnidadeView.vue', () => {
         expect(mockObterUnidade).toHaveBeenCalledTimes(1); 
     });
 
-    it('possuiDadosLocaisValidos retorna falso quando dados divergem do cache', () => {
-        const {wrapper} = createWrapper();
-        const vm = wrapper.vm as any;
-        
-        vm.unidade = { codigo: 1 };
-        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1 });
-        mockUnidadeStore.cacheMapasVigentes.set(1, { codigo: 100 });
-        
-        // Case: unidade.value !== unidadeEmCache
-        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1, diff: true });
-        expect(vm.possuiDadosLocaisValidos()).toBe(false);
-
-        // Case: mapaVigente.value !== mapaVigenteEmCache
-        vm.unidade = mockUnidadeStore.cacheUnidades.get(1);
-        vm.mapaVigente = { codigo: 100 };
-        mockUnidadeStore.cacheMapasVigentes.set(1, { codigo: 100, diff: true });
-        expect(vm.possuiDadosLocaisValidos()).toBe(false);
-    });
-
-    it('reaplicarDadosDoCache retorna falso quando cache incompleto', () => {
-        const {wrapper} = createWrapper();
-        const vm = wrapper.vm as any;
-        
-        mockUnidadeStore.cacheUnidades.delete(1);
-        expect(vm.reaplicarDadosDoCache()).toBe(false);
-        
-        mockUnidadeStore.cacheUnidades.set(1, {});
-        mockUnidadeStore.cacheMapasVigentes.delete(1);
-        expect(vm.reaplicarDadosDoCache()).toBe(false);
-    });
-
-    it('deveExibirCarregamento depende de forcar e cache', () => {
-        const {wrapper} = createWrapper();
-        const vm = wrapper.vm as any;
-        
-        mockUnidadeStore.cacheUnidades.set(1, {});
-        expect(vm.deveExibirCarregamento(false)).toBe(false);
-        expect(vm.deveExibirCarregamento(true)).toBe(true);
-        
-        mockUnidadeStore.cacheUnidades.delete(1);
-        expect(vm.deveExibirCarregamento(false)).toBe(true);
-    });
-
     it('carregarDados lida com erro e define ultimoErro', async () => {
         const {wrapper} = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as any;
 
         mockObterUnidade.mockRejectedValueOnce({ response: { data: { message: 'Erro Customizado' } } });
-        await vm.carregarDados(true);
+        await vm.carregarDados();
         
         expect(vm.ultimoErro).toBe('Erro Customizado');
     });
@@ -576,34 +551,10 @@ describe('UnidadeView.vue', () => {
         await hook.call(vm);
         expect(mockObterUnidade).not.toHaveBeenCalled();
 
-        // CASE: possuiDadosLocaisValidos -> returns early
+        // CASE: carregamento inicial concluído -> recarrega via store
         vm.carregamentoInicialConcluido = true;
-        // Mock data to satisfy possuiDadosLocaisValidos
-        vm.unidade = { codigo: 1, sigla: 'TEST', nome: 'Test' };
-        vm.mapaVigente = { id: 100 };
-        mockUnidadeStore.cacheUnidades.set(1, vm.unidade);
-        mockUnidadeStore.cacheMapasVigentes.set(1, vm.mapaVigente);
-        vm.ultimoErro = null;
-        
-        mockObterUnidade.mockClear();
+        mockUnidadeStore.recarregarDadosTelaUnidade.mockClear();
         await hook.call(vm);
-        expect(mockObterUnidade).not.toHaveBeenCalled();
-
-        // CASE: reaplicarDadosDoCache -> returns early
-        // Make possuiDadosLocaisValidos false (by changing unit)
-        vm.unidade = { codigo: 99, sigla: 'OTHER', nome: 'Other' }; 
-        // But make reaplicarDadosDoCache true (satisfy its condition)
-        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1, sigla: 'TEST', nome: 'Test' });
-        mockUnidadeStore.cacheMapasVigentes.set(1, { id: 100 });
-        
-        mockObterUnidade.mockClear();
-        await hook.call(vm);
-        expect(mockObterUnidade).not.toHaveBeenCalled();
-
-        // CASE: none of above -> calls carregarDados
-        mockUnidadeStore.cacheUnidades.clear();
-        mockObterUnidade.mockClear();
-        await hook.call(vm);
-        expect(mockObterUnidade).toHaveBeenCalled();
+        expect(mockUnidadeStore.recarregarDadosTelaUnidade).toHaveBeenCalledWith(1);
     });
 });

@@ -79,6 +79,7 @@ describe("useUnidadeStore", () => {
 
         expect(res).toEqual(unidade);
         expect(store.cacheUnidades.get(1)).toEqual(unidade);
+        expect(store.possuiDadosTelaUnidade(1)).toBe(false);
     });
 
     it("invalidar deve limpar tudo", () => {
@@ -102,6 +103,24 @@ describe("useUnidadeStore", () => {
         await store.obterReferenciaMapaVigente(1);
         await store.obterReferenciaMapaVigente(1);
 
+        expect(unidadeService.buscarReferenciaMapaVigente).toHaveBeenCalledTimes(1);
+        expect(store.possuiDadosTelaUnidade(1)).toBe(false);
+    });
+
+    it("obterDadosTelaUnidade deve reutilizar cache combinado", async () => {
+        const store = useUnidadeStore();
+        const unidade = {codigo: 1, nome: "U", filhas: []};
+        const mapa = {codigo: 10};
+        vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue(unidade as any);
+        vi.mocked(unidadeService.buscarReferenciaMapaVigente).mockResolvedValue(mapa as any);
+
+        const primeiro = await store.obterDadosTelaUnidade(1);
+        const segundo = await store.obterDadosTelaUnidade(1);
+
+        expect(primeiro).toEqual({unidade, mapaVigente: mapa});
+        expect(segundo).toEqual({unidade, mapaVigente: mapa});
+        expect(store.possuiDadosTelaUnidade(1)).toBe(true);
+        expect(unidadeService.buscarArvoreUnidade).toHaveBeenCalledTimes(1);
         expect(unidadeService.buscarReferenciaMapaVigente).toHaveBeenCalledTimes(1);
     });
 });

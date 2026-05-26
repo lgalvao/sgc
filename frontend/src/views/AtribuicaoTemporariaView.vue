@@ -306,12 +306,12 @@ function preencherFormularioComAtribuicaoVigente() {
   resetarValidacao();
 }
 
-async function carregarDados(forcar = false) {
+async function carregarDados() {
   carregandoInicial.value = true;
   erroUsuario.value = "";
 
   try {
-    unidade.value = await unidadeStore.obterUnidade(props.codUnidade, forcar);
+    unidade.value = await unidadeStore.recarregarUnidade(props.codUnidade);
     atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(props.codUnidade);
     preencherFormularioComAtribuicaoVigente();
   } catch (error) {
@@ -333,11 +333,11 @@ onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  await carregarDados(true);
+  await carregarDados();
 });
 
 async function atualizarCachesPosMutacao() {
-  unidade.value = await unidadeStore.obterUnidade(props.codUnidade, true);
+  unidade.value = await unidadeStore.recarregarUnidade(props.codUnidade);
   atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(props.codUnidade);
   preencherFormularioComAtribuicaoVigente();
 }

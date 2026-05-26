@@ -177,6 +177,51 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.producao.arquivosAcimaTarget.service).toBe(1);
     });
 
+    test("audita vazamentos arquiteturais do frontend em um recorte controlado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-auditar-"));
+        const frontendDir = path.join(base, "frontend", "src");
+
+        await fs.outputFile(
+            path.join(frontendDir, "views", "UnidadeView.vue"),
+            [
+                "<script setup lang=\"ts\">",
+                "const unidadeStore = useUnidadeStore();",
+                "function carregarDados(forcar = false) {",
+                "  return unidadeStore.obterUnidade(1, true);",
+                "}",
+                "const emCache = unidadeStore.cacheUnidades.get(1);",
+                "const stale = false;",
+                "</script>"
+            ].join("\n")
+        );
+        await fs.outputFile(
+            path.join(frontendDir, "stores", "unidade.ts"),
+            [
+                "export function obterUnidade(codigo, forcar = false) {",
+                "  return forcar ? codigo : codigo;",
+                "}",
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "arquitetura",
+            "auditar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo.metricas.viewsComVazamentoCache).toBe(1);
+        expect(conteudo.resumo.metricas.acessosDiretosCache).toBe(1);
+        expect(conteudo.resumo.metricas.booleanosPosicionais).toBe(1);
+        expect(conteudo.resumo.metricas.ocorrenciasForcar).toBeGreaterThanOrEqual(2);
+        expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
+    });
+
     test("valida cruft do frontend com waiver de tamanho", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cruft-validar-"));
         const frontendDir = path.join(base, "frontend", "src");

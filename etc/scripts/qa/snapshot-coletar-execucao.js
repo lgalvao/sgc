@@ -13,10 +13,10 @@ const DIRETORIO_LATEST = path.join(DIRETORIO_DASHBOARD, "latest");
 const VERSAO_SCHEMA = "1.0.0";
 
 const PERFIS = {
-    rapido: ["backendUnitario", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "frontendTestIds", "sincroniaValidacoes"],
-    completo: ["backendUnitario", "backendIntegracao", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "e2ePlaywright", "frontendTestIds", "sincroniaValidacoes"],
+    rapido: ["backendUnitario", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "frontendArquitetura", "frontendTestIds", "sincroniaValidacoes"],
+    completo: ["backendUnitario", "backendIntegracao", "backendCobertura", "frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "frontendArquitetura", "e2ePlaywright", "frontendTestIds", "sincroniaValidacoes"],
     backend: ["backendUnitario", "backendIntegracao", "backendCobertura", "sincroniaValidacoes"],
-    frontend: ["frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "frontendTestIds", "sincroniaValidacoes"]
+    frontend: ["frontendCobertura", "frontendLint", "frontendTypecheck", "frontendCruft", "frontendArquitetura", "frontendTestIds", "sincroniaValidacoes"]
 };
 
 function caminhoRelativo(caminhoAbsoluto) {
@@ -195,6 +195,31 @@ const ADAPTADORES = {
         execucao.sumario = resultado.resumo
             ? `Score de cruft: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa}).`
             : "Validacao de cruft executada.";
+        return execucao;
+    },
+    async frontendArquitetura() {
+        const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "node etc/scripts/sgc.js frontend arquitetura auditar --json", ".");
+        const saida = await executarComando({
+            comando: "node",
+            args: ["etc/scripts/sgc.js", "frontend", "arquitetura", "auditar", "--json"],
+            cwd: DIRETORIO_RAIZ
+        });
+        const resultado = parseJsonSeguro(saida.stdout, {});
+        execucao.status = saida.code === 0 ? "sucesso" : "falha";
+        execucao.duracaoMs = saida.duracaoMs;
+        execucao.metricas = {
+            scoreTotal: resultado.resumo?.scoreTotal ?? null,
+            faixa: resultado.resumo?.faixa ?? null,
+            viewsComVazamentoCache: resultado.resumo?.metricas?.viewsComVazamentoCache ?? null,
+            acessosDiretosCache: resultado.resumo?.metricas?.acessosDiretosCache ?? null,
+            booleanosPosicionais: resultado.resumo?.metricas?.booleanosPosicionais ?? null,
+            ocorrenciasForcar: resultado.resumo?.metricas?.ocorrenciasForcar ?? null,
+            hubsCentraisComSinais: resultado.resumo?.metricas?.hubsCentraisComSinais ?? null,
+            hotspots: resultado.hotspots ?? [],
+        };
+        execucao.sumario = resultado.resumo
+            ? `Score arquitetural: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa}).`
+            : "Auditoria arquitetural executada.";
         return execucao;
     },
     async frontendTestIds() {

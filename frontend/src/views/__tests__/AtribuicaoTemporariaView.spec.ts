@@ -38,6 +38,7 @@ const {
         mockUnidadeStore: {
             cacheUnidades: new Map<number, unknown>(),
             obterUnidade: vi.fn().mockResolvedValue(unidade),
+            recarregarUnidade: vi.fn().mockResolvedValue(unidade),
         },
     };
 });
@@ -86,6 +87,7 @@ describe("AtribuicaoTemporariaView", () => {
         vi.clearAllMocks();
         mockUnidadeStore.cacheUnidades.clear();
         mockUnidadeStore.obterUnidade = mockObterUnidade;
+        mockUnidadeStore.recarregarUnidade = mockObterUnidade;
         mockObterUnidade.mockResolvedValue({
             codigo: 1,
             sigla: "TESTE",
@@ -177,7 +179,7 @@ describe("AtribuicaoTemporariaView", () => {
         const wrapper = mountView();
         await flushPromises();
 
-        expect(mockObterUnidade).toHaveBeenCalledWith(1, false);
+        expect(mockObterUnidade).toHaveBeenCalledWith(1);
         expect(mockBuscarAtribuicoes).toHaveBeenCalledWith(1);
         expect(wrapper.text()).toContain(TEXTOS.atribuicaoTemporaria.TITULO);
         expect(wrapper.text()).toContain("TESTE");
@@ -413,7 +415,7 @@ describe("AtribuicaoTemporariaView", () => {
             await hook.call(wrapper.vm);
         }
 
-        expect(mockObterUnidade).toHaveBeenCalledWith(1, true);
+        expect(mockObterUnidade).toHaveBeenCalledWith(1);
         expect(mockBuscarAtribuicoes).toHaveBeenCalledWith(1);
     });
 

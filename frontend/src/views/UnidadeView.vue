@@ -138,35 +138,7 @@ const loadingExportacaoPdf = ref(false);
 const loadingExportacaoCsv = ref(false);
 let carregamentoEmAndamento: Promise<void> | null = null;
 
-function possuiDadosLocaisValidos(): boolean {
-  const unidadeEmCache = unidadeStore.cacheUnidades.get(props.codUnidade);
-  const mapaVigenteEmCache = unidadeStore.cacheMapasVigentes.get(props.codUnidade);
-
-  return unidade.value?.codigo === props.codUnidade
-      && unidadeStore.cacheUnidades.has(props.codUnidade)
-      && unidadeStore.cacheMapasVigentes.has(props.codUnidade)
-      && unidade.value === unidadeEmCache
-      && mapaVigente.value === mapaVigenteEmCache
-      && !ultimoErro.value;
-}
-
-function reaplicarDadosDoCache(): boolean {
-  if (!unidadeStore.cacheUnidades.has(props.codUnidade) || !unidadeStore.cacheMapasVigentes.has(props.codUnidade)) {
-    return false;
-  }
-
-  unidade.value = unidadeStore.cacheUnidades.get(props.codUnidade) || null;
-  definirUnidadeAtual(unidade.value);
-  mapaVigente.value = unidadeStore.cacheMapasVigentes.get(props.codUnidade) || null;
-  carregandoPagina.value = false;
-  return true;
-}
-
-function deveExibirCarregamento(forcar: boolean): boolean {
-  return forcar || !unidadeStore.cacheUnidades.has(props.codUnidade);
-}
-
-async function carregarDados(forcar = false) {
+async function carregarDados() {
   if (carregamentoEmAndamento) {
     await carregamentoEmAndamento;
     return;
@@ -175,21 +147,17 @@ async function carregarDados(forcar = false) {
   ultimoErro.value = null;
 
   const tarefaCarregamento = (async () => {
-    if (deveExibirCarregamento(forcar)) {
+    if (!unidadeStore.possuiDadosTelaUnidade(props.codUnidade)) {
       carregandoPagina.value = true;
       unidade.value = null;
       mapaVigente.value = null;
     }
 
     try {
-      const [unidadeResp, mapaResp] = await Promise.all([
-        unidadeStore.obterUnidade(props.codUnidade, forcar),
-        unidadeStore.obterReferenciaMapaVigente(props.codUnidade, forcar),
-      ]);
-
-      unidade.value = unidadeResp;
+      const dadosTela = await unidadeStore.obterDadosTelaUnidade(props.codUnidade);
+      unidade.value = dadosTela.unidade;
       definirUnidadeAtual(unidade.value);
-      mapaVigente.value = mapaResp;
+      mapaVigente.value = dadosTela.mapaVigente;
     } catch (error: unknown) {
       ultimoErro.value = normalizarErro(error).mensagem || TEXTOS.unidade.ERRO_CARREGAR;
       logger.error("Erro ao carregar dados da unidade:", error);
@@ -252,13 +220,18 @@ onActivated(async () => {
   if (!carregamentoInicialConcluido.value) {
     return;
   }
-  if (possuiDadosLocaisValidos()) {
-    return;
+  try {
+    ultimoErro.value = null;
+    const dadosTela = await unidadeStore.recarregarDadosTelaUnidade(props.codUnidade);
+    unidade.value = dadosTela.unidade;
+    definirUnidadeAtual(unidade.value);
+    mapaVigente.value = dadosTela.mapaVigente;
+    carregandoPagina.value = false;
+  } catch (error: unknown) {
+    ultimoErro.value = normalizarErro(error).mensagem || TEXTOS.unidade.ERRO_CARREGAR;
+    logger.error("Erro ao recarregar dados da unidade:", error);
+    carregandoPagina.value = false;
   }
-  if (reaplicarDadosDoCache()) {
-    return;
-  }
-  await carregarDados();
 });
 watch(
     () => props.codUnidade,

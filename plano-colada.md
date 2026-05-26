@@ -28,14 +28,97 @@ Os ganhos fáceis com `Pinia Colada` já foram capturados. O que restou relevant
 - reduzir helpers que só empacotam `dependencias`, `estado` e `contexto`;
 - aceitar mudanças mais agressivas em contratos internos de composables/views quando o chamador é único ou controlado.
 
+### Padrão de emaranhamento observado
+
+Os nós mais difíceis do frontend não são apenas “arquivos grandes”. O padrão recorrente é uma mesma abstração concentrar responsabilidades demais ao mesmo tempo:
+
+- cache de dados remotos;
+- estado de sessão e autorização;
+- invalidação transversal;
+- navegação e ciclo de vida;
+- adaptação para teste, router e uso fora de `setup()`.
+
+Quando isso acontece, a simplificação local começa a render pouco. Foi esse padrão que apareceu, em graus diferentes, em:
+
+- `stores/perfil.ts`;
+- `stores/unidade.ts`;
+- `stores/mapas.ts`;
+- `stores/subprocesso/*`;
+- `useInvalidacaoNavegacao.ts`;
+- `useCacheSync.ts`;
+- composables de orquestração de cadastro, subprocesso e mapa.
+
+### Consequência prática
+
+Os próximos ganhos não devem vir principalmente de “mais limpeza interna”, e sim de reduzir o raio de ação dessas abstrações:
+
+- separar melhor `server state` de `application state`;
+- apertar contratos internos que hoje aceitam optionalidade ou generalidade artificiais;
+- mover integração transversal para a borda da aplicação;
+- quebrar hubs centrais em superfícies menores e mais honestas.
+
+### Mudança de direção do trabalho
+
+O trabalho deixa de ser principalmente “migrar mais coisas para Colada” ou “limpar arquivos grandes um a um”. A direção agora passa a ser arquitetural:
+
+- definir contratos corretos para views;
+- esconder estratégia de cache dos consumidores;
+- reduzir o número de abstrações centrais que coordenam tudo;
+- só então decidir se um domínio deve usar `Pinia`, `Pinia Colada` ou composição local.
+
 ## Princípios
 
 - `Pinia` continua responsável por estado de aplicação e sessão.
 - `Pinia Colada` entra apenas onde o problema principal é **cache de dados remotos**.
+- quando uma abstração mistura cache remoto com sessão, permissão, navegação e UI local, o primeiro passo é separar responsabilidades antes de “refatorar melhor”.
+- view não deve conhecer estratégia de cache, stale, snapshot, invalidação local, nem detalhes de reaproveitamento de dados.
+- contratos consumidos por view devem ser orientados a caso de uso da tela, não a mecanismo de armazenamento.
 - Migrar por fatias pequenas, começando pelos casos mais simples.
 - Preferir contratos explícitos a helpers genéricos quando a dependência real é obrigatória.
 - Mudar contratos internos obsoletos quando a compatibilidade já não paga o custo cognitivo.
 - Cada fase precisa terminar com validação real e redução perceptível de código.
+
+### Diretrizes arquiteturais para views
+
+As views devem operar com estes tipos de contrato:
+
+- `carregarDadosDaTela()`
+- `recarregarDadosDaTela()`, apenas quando a semântica de atualização explícita for relevante
+- `executarAcaoDeTela(...)`
+- estado pronto para renderização: `carregando`, `erro`, `dados`
+
+As views não devem operar com estes tipos de contrato:
+
+- `temXEmCache()`
+- `obterXEmCache()`
+- `forcar`
+- `stale`
+- `invalidar`
+- `reaplicarSnapshot`
+
+Se uma view precisa decidir entre “usar cache ou não”, então a abstração ainda está vazando detalhe estrutural.
+
+### Regra para contratos de leitura
+
+Para dados de tela, preferir nesta ordem:
+
+1. uma operação única semântica, por exemplo `carregarDadosTelaUnidade()`;
+2. uma operação complementar explícita de atualização, apenas se o caso de uso exigir distinção real;
+3. nunca expor `forcar`, `cache`, `stale` ou equivalentes para a view.
+
+Separar `obterDados` de `recarregarDados` só é aceitável quando o chamador realmente precisa escolher conscientemente entre reutilização e atualização. Se a view não deveria tomar essa decisão, a distinção deve ficar interna.
+
+### Regra para desfazer nós
+
+Diante de um emaranhamento, preferir nesta ordem:
+
+1. remover compatibilidade interna obsoleta;
+2. apertar o contrato para refletir a dependência real;
+3. separar estado remoto de estado local;
+4. quebrar a abstração central em unidades menores;
+5. só então simplificar a implementação restante.
+
+Isso evita refatoração cosmética, em que o código muda de forma mas preserva o mesmo acoplamento estrutural.
 
 ## Escopo
 
@@ -247,12 +330,73 @@ Se o contrato é interno ao módulo/feature e só aumenta indireção:
 - menos objetos “contexto/dependencias” artificiais;
 - testes mais diretos, sem aumento de fragilidade.
 
-## Próximos Passos Prioritários
+## Fase 7 - Desfazer Hubs Centrais
 
-1. Apertar contratos internos dos fluxos de mapa.
-2. Reavaliar `subprocessoAcoesAdministrativas`, `mapaAnaliseFluxo` e `useMapaSugestoes` com viés mais agressivo.
-3. Revisar onde `codProcesso: number | string` ainda existe só por hábito e pode virar `number`.
-4. Só depois voltar para novos candidatos a `Pinia Colada`.
+### Meta
+
+Atacar explicitamente os pontos que concentram responsabilidades demais e por isso travam novas simplificações.
+
+### Alvos prioritários
+
+- `stores/unidade.ts`
+- `stores/mapas.ts`
+- `stores/perfil.ts`
+- `useInvalidacaoNavegacao.ts`
+- `useCacheSync.ts`
+
+### Estratégia
+
+1. identificar qual responsabilidade de cada hub é realmente central e qual é acoplamento acidental;
+2. separar o que é:
+   sessão/autorização;
+   cache remoto;
+   invalidação;
+   snapshot local;
+   navegação/orquestração;
+3. quebrar o hub em superfícies menores com consumidores mais específicos;
+4. só depois reconsiderar migração adicional para `Pinia Colada`.
+
+### Observação importante
+
+`organizacao` virou o caso de referência aqui: a migração direta para Colada não pagou porque o problema principal não era o fetch, e sim o excesso de contextos de uso da store. O padrão deve ser tratado como alerta para os próximos candidatos híbridos.
+
+## Frente Arquitetural Prioritária
+
+### Frente 1 - Contratos de Tela
+
+Meta:
+remover das views qualquer decisão de estratégia de cache.
+
+Critério:
+- a view pede dados prontos;
+- a abstração decide como obter, reaproveitar ou atualizar;
+- `forcar`, `xxxEmCache`, `stale` e equivalentes desaparecem da borda consumida pela view.
+
+### Frente 2 - Hubs Centrais
+
+Meta:
+reduzir o poder dos hubs antes de continuar com novas migrações ou limpezas locais.
+
+Critério:
+- menos coordenação transversal em stores/composables centrais;
+- menos dependência entre sessão, cache, navegação e invalidação;
+- menor necessidade de mocks estruturais nos testes.
+
+### Frente 3 - Casos Híbridos
+
+Meta:
+reavaliar somente depois de melhorar contratos e bordas.
+
+Critério:
+- só migrar para Colada quando o problema principal for realmente `server state`;
+- se o nó principal for contexto de uso, contrato frouxo ou abstração central, resolver isso antes.
+
+## Próximos Passos Sugeridos em Ordem
+
+1. Revisar bordas de tela para remover estratégia de cache exposta, começando por `unidade`, `atribuicao temporaria` e telas análogas.
+2. Quebrar `stores/unidade.ts` e `stores/mapas.ts` por responsabilidade, em vez de continuar expandindo suas APIs.
+3. Reduzir `stores/perfil.ts` a sessão/autorização pura.
+4. Só depois retomar fluxos de mapa/subprocesso com contratos mais agressivos e menos compatibilidade.
 
 ## Mudanças esperadas na arquitetura
 
@@ -263,6 +407,13 @@ Se o contrato é interno ao módulo/feature e só aumenta indireção:
 - menos `onActivated()` com checagem manual de stale;
 - menos `loading/error` replicado por view;
 - invalidação mais semântica por chave de query.
+
+### Depois das frentes arquiteturais
+
+- views deixam de saber se existe cache;
+- stores e composables passam a expor contratos orientados a caso de uso;
+- hubs centrais perdem responsabilidade transversal;
+- migrações futuras para Colada ficam mais baratas e previsíveis.
 
 ### O que continua existindo
 
@@ -291,5 +442,6 @@ O plano só está funcionando se, ao final das primeiras fases:
 - houver menos estados duplicados de loading/erro;
 - a invalidação ficar mais localizada;
 - os testes ficarem mais simples, não mais frágeis.
+- views não precisarem mais decidir estratégia de cache.
 
 Se os próximos cortes não reduzirem indireção real, parar a limpeza local e partir para mudanças de contrato mais agressivas nos módulos restantes.

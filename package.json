@@ -13,6 +13,7 @@
     "smells:auditar": "node etc/scripts/sgc.js codigo smells auditar",
     "frontend:cruft": "node etc/scripts/sgc.js frontend cruft auditar",
     "frontend:cruft:check": "node etc/scripts/sgc.js frontend cruft validar",
+    "frontend:arquitetura": "node etc/scripts/sgc.js frontend arquitetura auditar",
     "qa:dashboard": "node etc/scripts/sgc.js qa snapshot coletar --perfil rapido",
     "qa:dashboard:serve": "node etc/scripts/sgc.js qa dashboard servir --porta 4179",
     "lint:ox": "oxlint e2e etc/scripts eslint.config.js playwright.config.ts --ignore-pattern e2e/lifecycle.js",
