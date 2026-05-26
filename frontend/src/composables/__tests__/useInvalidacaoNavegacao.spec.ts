@@ -70,7 +70,7 @@ describe("useInvalidacaoNavegacao", () => {
 
         vi.spyOn(painel, "invalidar");
         vi.spyOn(subprocesso, "invalidar");
-        vi.spyOn(mapas, "invalidar");
+        vi.spyOn(mapas, "marcarMapaParaAtualizacao");
 
         const {atualizarFluxoMapa} = useInvalidacaoNavegacao();
         atualizarFluxoMapa(321);
@@ -79,7 +79,7 @@ describe("useInvalidacaoNavegacao", () => {
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["processo"]});
         expect(subprocesso.invalidar).toHaveBeenCalled();
-        expect(mapas.invalidar).toHaveBeenCalledWith(321);
+        expect(mapas.marcarMapaParaAtualizacao).toHaveBeenCalledWith(321);
     });
 
     it("deve atualizar dados organizacionais", () => {

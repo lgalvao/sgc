@@ -1,4 +1,4 @@
-import {useQuery} from "@pinia/colada";
+import {useQuery, useQueryCache} from "@pinia/colada";
 import {computed} from "vue";
 import {buscarContextoCompleto} from "@/services/processo";
 import type {Processo} from "@/types/tipos";
@@ -15,4 +15,12 @@ export function useProcessoQuery(codigoProcesso: number) {
         initialData: () => null,
         staleTime: Infinity,
     });
+}
+
+export function useInvalidacaoProcesso() {
+    const queryCache = useQueryCache();
+
+    return {
+        invalidarProcesso: () => queryCache.invalidateQueries({key: CHAVE_QUERY_PROCESSO}),
+    };
 }
