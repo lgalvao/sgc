@@ -39,10 +39,6 @@ etc/scripts/.vitest/
 /backend/.apt_generated/
 /backend/.apt_generated_tests
 
-# Privacidade/segurança
-!.env.hom
-.env.*.local
-
 # Reports de testes
 backend/build/reports/tests/test/
 frontend/coverage/coverage-final.json

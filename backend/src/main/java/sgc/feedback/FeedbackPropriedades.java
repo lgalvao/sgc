@@ -4,7 +4,7 @@ import org.jspecify.annotations.*;
 import org.springframework.boot.context.properties.*;
 
 /**
- * Propriedades de configuração do módulo de feedback UAT.
+ * Propriedades de configuração do módulo de feedback.
  */
 @ConfigurationProperties(prefix = "sgc.feedback")
 public record FeedbackPropriedades(

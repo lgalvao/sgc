@@ -17,7 +17,7 @@ import java.util.*;
 public record SubmeterMapaAjustadoRequest(
         @NotBlank(message = Mensagens.JUSTIFICATIVA_OBRIGATORIA)
         @Size(max = 500, message = Mensagens.JUSTIFICATIVA_MAX)
-        @SanitizarHtml
+        @SanitizarHtmlFormatado
         String justificativa,
 
         @Nullable

@@ -7,9 +7,6 @@
     "e2e/**/*.ts",
     "e2e/**/*.js"
   ],
-  "ignoreBinaries": [
-    "semgrep"
-  ],
   "ignoreDependencies": [
     "commander",
     "picocolors"

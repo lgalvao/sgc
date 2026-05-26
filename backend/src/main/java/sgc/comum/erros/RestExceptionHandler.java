@@ -311,7 +311,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("Erro inesperado. Consulte o suporte com o código de rastreamento.")
+                .message("Erro inesperado.")
                 .code("ERRO_INTERNO")
                 .traceId(traceId)
                 .build();

@@ -914,6 +914,27 @@ describe('ProcessoCadastroView.vue', () => {
             loggerErrorSpy.mockRestore();
         });
 
+        it('não registra erro ao buscar unidades quando a requisição é cancelada', async () => {
+            const loggerErrorSpy = vi.spyOn(logger, 'error').mockImplementation(() => {});
+            const unidadeStore = useUnidadeStore(pinaRamoNaoCoberto);
+            unidadeStore.garantirArvoreElegibilidade = vi.fn().mockRejectedValue({
+                code: 'ERR_CANCELED',
+                name: 'CanceledError',
+                message: 'cancelado'
+            });
+
+            const wrapper = mount(ProcessoCadastroView, {
+                global: {plugins: [pinaRamoNaoCoberto], stubs: stubsNaoCobertos}
+            });
+            await flushPromises();
+
+            const vm = wrapper.vm as any;
+            await vm.buscarUnidadesParaProcesso('MAPEAMENTO');
+
+            expect(loggerErrorSpy).not.toHaveBeenCalled();
+            loggerErrorSpy.mockRestore();
+        });
+
         it('cobre onMounted carregar unidades se tipo ja definido', async () => {
             vi.mocked(useProcessoForm).mockReturnValueOnce({
                 tipo: ref('MAPEAMENTO'),

@@ -1,13 +1,14 @@
-# CDU-54 - Consultar feedbacks enviados
+# CDU-39 - Consultar feedbacks enviados
 
 **Ator:** ADMIN
 
 ## Descrição
 
-Permite ao administrador consultar os feedbacks enviados pelos usuários, visualizar seus detalhes, inspecionar metadados de contexto e ampliar a captura de tela associada quando ela estiver disponível no servidor.
+Permite ao administrador consultar os feedbacks enviados pelos usuários, visualizar seus detalhes, inspecionar metadados de contexto e visualizar a captura de tela associada, de forma ampliada, quando ela estiver disponível no servidor.
 
 ## Pré-condições
 
+- Perfil de homologação ou testes. Funcionalidade NÃO disponível em produção
 - Usuário autenticado com perfil `ADMIN`.
 - Módulo de feedback disponível no ambiente atual.
 

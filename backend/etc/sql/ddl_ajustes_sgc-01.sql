@@ -199,7 +199,7 @@ BEGIN
 END;
 /
 
-COMMENT ON TABLE FEEDBACK IS 'Registros de feedback coletados via widget de UAT.';
+COMMENT ON TABLE FEEDBACK IS 'Registros de feedback coletados via widget.';
 COMMENT ON COLUMN FEEDBACK.id IS 'Identificador unico (UUID).';
 COMMENT ON COLUMN FEEDBACK.tipo IS 'Tipo de feedback: BUG, SUGESTAO, QUESTAO, ELOGIO.';
 COMMENT ON COLUMN FEEDBACK.nota IS 'Descricao textual do feedback.';

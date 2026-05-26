@@ -18,7 +18,7 @@ import java.time.*;
 import java.util.*;
 
 /**
- * Serviço responsável por validar e persistir registros de feedback UAT.
+ * Serviço responsável por validar e persistir registros de feedback.
  *
  * <p>O {@code usuarioId} e {@code usuarioNome} armazenados na entidade são sempre
  * extraídos do contexto de segurança — os metadados do cliente são apenas informativos.

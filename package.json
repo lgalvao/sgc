@@ -19,8 +19,7 @@
     "lint": "npm run lint:ox && eslint e2e etc/scripts eslint.config.js playwright.config.ts --fix",
     "deps:audit": "knip",
     "deps:audit:all": "npm run deps:audit && npm --prefix frontend run deps:audit && npm --prefix etc/scripts run deps:audit",
-    "release": "release-it",
-    "sast": "semgrep scan --config p/java --config p/typescript --config p/javascript --config p/owasp-top-ten --config p/security-audit --config p/secrets --metrics=off"
+    "release": "release-it"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",

@@ -15,6 +15,6 @@ public record DisponibilizarMapaRequest(
         @NotNull(message = Mensagens.DATA_LIMITE_VALIDACAO_OBRIGATORIA)
         @Future(message = Mensagens.DATA_LIMITE_VALIDACAO_FUTURA) LocalDate dataLimite,
         @Size(max = 500, message = Mensagens.OBSERVACOES_MAX_500)
-        @SanitizarHtml
+        @SanitizarHtmlFormatado
         String observacoes) {
 }

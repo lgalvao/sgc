@@ -1,6 +1,6 @@
 # CDU-55 - Enviar feedback contextual
 
-**Ator:** usuário autenticado
+**Ator:** TODOS
 
 ## Descrição
 
@@ -8,6 +8,7 @@ Permite ao usuário autenticado enviar um feedback contextual sobre a tela atual
 
 ## Pré-condições
 
+- Perfil de homologação ou testes. Funcionalidade NÃO disponível em produção
 - Usuário autenticado.
 - Widget de feedback habilitado no build atual.
 - Endpoint de feedback disponível no ambiente atual.

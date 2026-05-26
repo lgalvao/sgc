@@ -152,7 +152,7 @@ class RestExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("Erro inesperado. Consulte o suporte com o código de rastreamento."));
+                .andExpect(jsonPath("$.message").value("Erro inesperado."));
     }
 
     @Test
@@ -364,7 +364,7 @@ class RestExceptionHandlerTest {
         ErroApi corpo = Objects.requireNonNull(response.getBody());
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(corpo.getMessage()).isEqualTo("Erro inesperado. Consulte o suporte com o código de rastreamento.");
+        assertThat(corpo.getMessage()).isEqualTo("Erro inesperado.");
         assertThat(corpo.getCode()).isEqualTo("ERRO_INTERNO");
     }
 

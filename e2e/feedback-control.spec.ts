@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/auth-fixtures.js';
 
-test.describe('Feedback Control - Widget de Feedback UAT', () => {
+test.describe('Feedback Control - Widget de Feedback', () => {
     test.beforeEach(async ({page, _autenticadoComoAdmin}) => {
         await page.goto('/painel');
     });

@@ -71,7 +71,7 @@ function criarFormularioFeedback(payload: PayloadFeedback, captura: Blob | null)
 }
 
 /**
- * Composable para captura de tela, montagem de metadados e envio de feedback UAT.
+ * Composable para captura de tela, montagem de metadados e envio de feedback.
  *
  * Disponível apenas em builds com VITE_FEEDBACK_WIDGET=true.
  */

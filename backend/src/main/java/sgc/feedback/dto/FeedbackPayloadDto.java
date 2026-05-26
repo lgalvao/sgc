@@ -16,7 +16,7 @@ import tools.jackson.databind.*;
  */
 public record FeedbackPayloadDto(
         @NotNull FeedbackTipo tipo,
-        @NotBlank @Size(min = 10, max = 500, message = Mensagens.OBSERVACOES_MAX_500) @SanitizarHtml String nota,
+        @NotBlank @Size(min = 10, max = 500, message = Mensagens.OBSERVACOES_MAX_500) @SanitizarHtmlFormatado String nota,
         @Nullable JsonNode metadados
 ) {
 }

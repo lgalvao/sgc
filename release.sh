@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+DIRETORIO_SCRIPT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+cd "$DIRETORIO_SCRIPT"
+
 NOME_SISTEMA="sgc"
 CONTAINER_CLI="${CONTAINER_CLI:-docker}"
 REGISTRY="${REGISTRY:-registry.tre-pe.gov.br/sesel}"
@@ -118,6 +121,13 @@ limpar_artefato_temporario() {
   rm -f "$ARQUIVO_JAR_DOCKER"
 }
 
+carregar_variaveis_ambiente() {
+  set -a
+  # shellcheck disable=SC1090
+  source "$ARQUIVO_ENV"
+  set +a
+}
+
 obter_valor_container() {
   local formato="$1"
   "$CONTAINER_CLI" inspect "$NOME_SISTEMA" --format "$formato" 2>/dev/null || true
@@ -168,6 +178,8 @@ if [[ ! -f "$ARQUIVO_COMPOSE" ]]; then
   echo "ERRO: arquivo $ARQUIVO_COMPOSE nao encontrado."
   exit 1
 fi
+
+carregar_variaveis_ambiente
 
 if [[ "$SEM_BUILD" == false ]]; then
   echo "==> Realizando build"
