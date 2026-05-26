@@ -1,47 +1,47 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **1136** (critico)
-- Arquivos de producao: **243**
+- Score total: **1094** (critico)
+- Arquivos de producao: **244**
 - Views com vazamento de estrategia de cache: **1**
-- Views com chamadas diretas a service: **12**
-- Views com fan-out arquitetural alto: **10**
+- Views com chamadas diretas a service: **11**
+- Views com fan-out arquitetural alto: **9**
 - Acessos diretos a cache de store: **0**
 - Chamadas com booleano posicional: **0**
 - Bolsas de dependencias/estado largas: **10**
-- Superficies exportadas amplas: **27**
+- Superficies exportadas amplas: **28**
 - Arquivos com mistura de camadas arquiteturais: **13**
 - Hubs centrais com sinais: **4**
 
 ## Hotspots
 
-1. `frontend/src/views/ProcessoCadastroView.vue` [view]
-   - score: 85
-   - sinais: serviceDireto, misturaCamadas, fanoutAlto
-   - fan-out: 3 categorias / 9 imports arquiteturais
-2. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
+1. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
    - score: 79
    - sinais: invalidacaoExplicita, estrategiaCache, invalidacaoArquitetural, fanoutAlto
    - fan-out: 2 categorias / 7 imports arquiteturais
-3. `frontend/src/views/AtribuicaoTemporariaView.vue` [view]
+2. `frontend/src/views/AtribuicaoTemporariaView.vue` [view]
    - score: 66
    - sinais: serviceDireto, misturaCamadas, fanoutAlto
    - fan-out: 3 categorias / 6 imports arquiteturais
-4. `frontend/src/stores/perfil.ts` [store]
+3. `frontend/src/stores/perfil.ts` [store]
    - score: 58
    - sinais: serviceDireto, bolsaDependenciasLarga, superficieAmpla, misturaCamadas, fanoutAlto
    - fan-out: 3 categorias / 8 imports arquiteturais
-5. `frontend/src/views/processoDetalheAcoes.ts` [view]
+4. `frontend/src/views/processoDetalheAcoes.ts` [view]
    - score: 51
    - sinais: serviceDireto, bolsaDependenciasLarga, superficieAmpla, misturaCamadas, fanoutAlto
    - fan-out: 3 categorias / 5 imports arquiteturais
-6. `frontend/src/composables/useFluxoSubprocesso.ts` [composable]
+5. `frontend/src/composables/useFluxoSubprocesso.ts` [composable]
    - score: 47
    - sinais: serviceDireto, estrategiaCache, invalidacaoArquitetural, superficieAmpla, misturaCamadas, fanoutAlto
    - fan-out: 3 categorias / 6 imports arquiteturais
-7. `frontend/src/views/MapaView.vue` [view]
+6. `frontend/src/views/MapaView.vue` [view]
    - score: 46
    - sinais: misturaCamadas, fanoutAlto
    - fan-out: 3 categorias / 16 imports arquiteturais
+7. `frontend/src/composables/useProcessoCadastroTela.ts` [composable]
+   - score: 43
+   - sinais: serviceDireto, superficieAmpla, misturaCamadas, fanoutAlto
+   - fan-out: 3 categorias / 9 imports arquiteturais
 8. `frontend/src/views/CadastroView.vue` [view]
    - score: 40
    - sinais: misturaCamadas, fanoutAlto

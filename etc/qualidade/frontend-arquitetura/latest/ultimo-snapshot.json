@@ -1,14 +1,14 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-26T21:06:13.485Z",
+  "geradoEm": "2026-05-26T21:19:30.549Z",
   "resumo": {
-    "arquivosProducao": 243,
-    "scoreTotal": 1136,
+    "arquivosProducao": 244,
+    "scoreTotal": 1094,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 1,
-      "viewsComServiceDireto": 12,
-      "viewsComFanoutAlto": 10,
+      "viewsComServiceDireto": 11,
+      "viewsComFanoutAlto": 9,
       "acessosDiretosCache": 0,
       "metodosEmCache": 0,
       "invalidacoesExplicitasEmViews": 0,
@@ -17,7 +17,7 @@
       "ocorrenciasStale": 0,
       "ocorrenciasSnapshot": 0,
       "arquivosComBolsaDependenciasLarga": 10,
-      "arquivosComSuperficieAmpla": 27,
+      "arquivosComSuperficieAmpla": 28,
       "arquivosComMisturaCamadas": 13,
       "arquivosComAcoplamentoStoreAlto": 5,
       "arquivosComServiceDireto": 34,
@@ -27,37 +27,6 @@
     }
   },
   "hotspots": [
-    {
-      "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
-      "camada": "view",
-      "linhas": 444,
-      "score": 85,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 5,
-        "chamadasServiceDiretas": 6,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 3,
-        "importacoesArquiteturais": 9
-      },
-      "sinaisAtivos": [
-        "serviceDireto",
-        "misturaCamadas",
-        "fanoutAlto"
-      ],
-      "hubCentral": false
-    },
     {
       "arquivo": "frontend/src/composables/useInvalidacaoNavegacao.ts",
       "camada": "composable",
@@ -246,6 +215,38 @@
         "importacoesArquiteturais": 16
       },
       "sinaisAtivos": [
+        "misturaCamadas",
+        "fanoutAlto"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useProcessoCadastroTela.ts",
+      "camada": "composable",
+      "linhas": 487,
+      "score": 43,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 6,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 2,
+        "categoriasAcoplamento": 3,
+        "importacoesArquiteturais": 9
+      },
+      "sinaisAtivos": [
+        "serviceDireto",
+        "superficieAmpla",
         "misturaCamadas",
         "fanoutAlto"
       ],
