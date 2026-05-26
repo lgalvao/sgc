@@ -12,64 +12,6 @@ interface CadastroOrquestracaoProps {
     codSubprocesso?: number;
 }
 
-interface EstadoCadastroOrquestracao {
-    atividades: Ref<Atividade[]>;
-    carregandoInicial: Ref<boolean>;
-    codigoSubprocesso: Ref<number | null>;
-    atividadesSnapshotInicial: Ref<string | null>;
-    unidade: Ref<Unidade | null>;
-    codMapa: Ref<number | null>;
-    carregamentoInicialConcluido: Ref<boolean>;
-}
-
-interface DependenciasCadastroOrquestracao {
-    subprocessoStore: ReturnType<typeof useSubprocessoStore>;
-    mapasStore: ReturnType<typeof useMapasStore>;
-    invalidarCachesSubprocesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesSubprocesso"];
-}
-
-function aplicarEstadoContexto(
-    estado: EstadoCadastroOrquestracao,
-    deps: DependenciasCadastroOrquestracao,
-    response: RespostaLocalCadastro,
-) {
-    estado.atividades.value = response.atividadesAtualizadas;
-    deps.subprocessoStore.atualizarStatusLocal({
-        ...response.subprocesso,
-        permissoes: response.permissoes
-    });
-    deps.mapasStore.invalidar(response.subprocesso.codigo);
-    deps.subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
-}
-
-function processarRespostaLocal(
-    estado: EstadoCadastroOrquestracao,
-    deps: DependenciasCadastroOrquestracao,
-    response: RespostaLocalCadastro,
-) {
-    aplicarEstadoContexto(estado, deps, response);
-    deps.invalidarCachesSubprocesso({incluirPainel: true});
-}
-
-function sincronizarEstadoInicialContexto(
-    estado: EstadoCadastroOrquestracao,
-    deps: DependenciasCadastroOrquestracao,
-    data: ContextoCadastroAtividadesSubprocesso,
-) {
-    aplicarEstadoContexto(estado, deps, {
-        subprocesso: {
-            codigo: data.detalhes.codigo,
-            situacao: data.detalhes.situacao,
-        },
-        permissoes: data.detalhes.permissoes,
-        atividadesAtualizadas: data.atividadesDisponiveis,
-    });
-
-    estado.atividadesSnapshotInicial.value = data.assinaturaCadastroReferencia ?? calcularAssinaturaCadastro(data.atividadesDisponiveis);
-    estado.unidade.value = data.unidade;
-    estado.codMapa.value = data.mapa.codigo;
-}
-
 function erroIntegracaoFoiCancelado(subprocessoStore: ReturnType<typeof useSubprocessoStore>): boolean {
     return subprocessoStore.erroIntegracaoContexto?.codigo === "REQUEST_CANCELADA";
 }
@@ -99,20 +41,32 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
     const unidade = ref<Unidade | null>(null);
     const codMapa = ref<number | null>(null);
     const carregamentoInicialConcluido = ref(false);
-    const estado = {
-        atividades,
-        carregandoInicial,
-        codigoSubprocesso,
-        atividadesSnapshotInicial,
-        unidade,
-        codMapa,
-        carregamentoInicialConcluido,
-    };
-    const dependencias = {
-        subprocessoStore,
-        mapasStore,
-        invalidarCachesSubprocesso,
-    };
+
+    function aplicarRespostaLocal(response: RespostaLocalCadastro) {
+        atividades.value = response.atividadesAtualizadas;
+        subprocessoStore.atualizarStatusLocal({
+            ...response.subprocesso,
+            permissoes: response.permissoes
+        });
+        mapasStore.invalidar(response.subprocesso.codigo);
+        subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
+    }
+
+    function sincronizarEstadoInicial(data: ContextoCadastroAtividadesSubprocesso) {
+        aplicarRespostaLocal({
+            subprocesso: {
+                codigo: data.detalhes.codigo,
+                situacao: data.detalhes.situacao,
+            },
+            permissoes: data.detalhes.permissoes,
+            atividadesAtualizadas: data.atividadesDisponiveis,
+        });
+
+        atividadesSnapshotInicial.value =
+            data.assinaturaCadastroReferencia ?? calcularAssinaturaCadastro(data.atividadesDisponiveis);
+        unidade.value = data.unidade;
+        codMapa.value = data.mapa.codigo;
+    }
 
     async function carregarContextoInicial() {
         try {
@@ -131,7 +85,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
             }
 
             codigoSubprocesso.value = data.detalhes.codigo;
-            sincronizarEstadoInicialContexto(estado, dependencias, data);
+            sincronizarEstadoInicial(data);
             return true;
         } finally {
             carregandoInicial.value = false;
@@ -164,8 +118,10 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         unidade,
         codMapa,
         carregarContextoInicial,
-        processarRespostaLocal: (response: RespostaLocalCadastro) => processarRespostaLocal(estado, dependencias, response),
-        sincronizarEstadoInicialContexto: (data: ContextoCadastroAtividadesSubprocesso) =>
-            sincronizarEstadoInicialContexto(estado, dependencias, data),
+        processarRespostaLocal: (response: RespostaLocalCadastro) => {
+            aplicarRespostaLocal(response);
+            invalidarCachesSubprocesso({incluirPainel: true});
+        },
+        sincronizarEstadoInicialContexto: sincronizarEstadoInicial,
     };
 }

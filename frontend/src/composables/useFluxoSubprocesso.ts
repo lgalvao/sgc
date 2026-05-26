@@ -38,11 +38,6 @@ interface OpcoesHomologacao extends OpcoesMensagemSucesso {
 type AcaoSemPayload = (codigoSubprocesso: number) => Promise<unknown>;
 type AcaoComPayload<T> = (codigoSubprocesso: number, payload: T) => Promise<unknown>;
 
-interface DependenciasFluxoSubprocesso {
-    executarAcaoWorkflow: (acao: () => Promise<unknown>, options?: WorkflowOptions) => Promise<boolean>;
-    executarComTratamentoDeErros: ReturnType<typeof useErrorHandler>["executarComTratamentoDeErros"];
-}
-
 function invalidarPainelEMapa(codigoSubprocesso: number) {
     return {
         incluirPainel: true,
@@ -88,79 +83,6 @@ async function executarRecargaContexto(
     await subprocessoStore.garantirContextoEdicao(codigoSubprocesso, true);
 }
 
-async function executarPosAcao(
-    options: WorkflowOptions,
-    deps: {
-        toastStore: ReturnType<typeof useToastStore>;
-        subprocessoStore: ReturnType<typeof useSubprocessoStore>;
-        router: ReturnType<typeof useRouter>;
-        invalidarCachesSubprocesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesSubprocesso"];
-    },
-) {
-    if (options.mensagemSucesso) {
-        deps.toastStore.setPending(options.mensagemSucesso);
-    }
-
-    if (options.invalidarCaches) {
-        deps.invalidarCachesSubprocesso(options.invalidarCaches);
-    }
-
-    if (options.redirecionarParaPainel) {
-        deps.subprocessoStore.limparContextoAtual();
-        await deps.router.push("/painel");
-        return;
-    }
-
-    if (options.redirecionarPara) {
-        deps.subprocessoStore.limparContextoAtual();
-        await deps.router.push(options.redirecionarPara);
-        return;
-    }
-
-    if (options.recarregarContexto) {
-        await executarRecargaContexto(
-            deps.subprocessoStore,
-            options.recarregarContexto.codigoSubprocesso,
-            options.recarregarContexto.tipo,
-        );
-    }
-}
-
-function criarAcaoPainel(
-    deps: DependenciasFluxoSubprocesso,
-    mensagemSucesso: string,
-    acao: AcaoSemPayload,
-) {
-    return (codigoSubprocesso: number) =>
-        deps.executarAcaoWorkflow(
-            () => acao(codigoSubprocesso),
-            workflowPainel(codigoSubprocesso, mensagemSucesso));
-}
-
-function criarAcaoRecarga(
-    deps: DependenciasFluxoSubprocesso,
-    tipo: "cadastro" | "edicao",
-    acao: AcaoSemPayload,
-) {
-    return (codigoSubprocesso: number) =>
-        deps.executarAcaoWorkflow(
-            () => acao(codigoSubprocesso),
-            workflowRecargaContexto(codigoSubprocesso, tipo),
-        );
-}
-
-function criarAcaoPainelComPayload<T>(
-    deps: DependenciasFluxoSubprocesso,
-    obterMensagemSucesso: (options?: OpcoesMensagemSucesso) => string,
-    acao: AcaoComPayload<T>,
-) {
-    return (codigoSubprocesso: number, payload: T, options?: OpcoesMensagemSucesso) =>
-        deps.executarAcaoWorkflow(
-            () => acao(codigoSubprocesso, payload),
-            workflowPainel(codigoSubprocesso, obterMensagemSucesso(options)),
-        );
-}
-
 export function useFluxoSubprocesso() {
     const {ultimoErro, limparErro, executarComTratamentoDeErros} = useErrorHandler();
     const subprocessoStore = useSubprocessoStore();
@@ -175,7 +97,33 @@ export function useFluxoSubprocesso() {
         try {
             await executarComTratamentoDeErros(async () => {
                 await acao();
-                await executarPosAcao(options, {toastStore, subprocessoStore, router, invalidarCachesSubprocesso});
+                if (options.mensagemSucesso) {
+                    toastStore.setPending(options.mensagemSucesso);
+                }
+
+                if (options.invalidarCaches) {
+                    invalidarCachesSubprocesso(options.invalidarCaches);
+                }
+
+                if (options.redirecionarParaPainel) {
+                    subprocessoStore.limparContextoAtual();
+                    await router.push("/painel");
+                    return;
+                }
+
+                if (options.redirecionarPara) {
+                    subprocessoStore.limparContextoAtual();
+                    await router.push(options.redirecionarPara);
+                    return;
+                }
+
+                if (options.recarregarContexto) {
+                    await executarRecargaContexto(
+                        subprocessoStore,
+                        options.recarregarContexto.codigoSubprocesso,
+                        options.recarregarContexto.tipo,
+                    );
+                }
             });
 
             return true;
@@ -184,50 +132,61 @@ export function useFluxoSubprocesso() {
         }
     }
 
-    const dependenciasFluxo = {
-        executarAcaoWorkflow,
-        executarComTratamentoDeErros,
-    };
-    const disponibilizarCadastro = criarAcaoPainel(
-        dependenciasFluxo,
-        TEXTOS_SUCESSO_ATIVIDADES.CADASTRO_ATIVIDADES_DISPONIBILIZADO,
-        cadastroService.disponibilizarCadastro,
-    );
-    const disponibilizarRevisaoCadastro = criarAcaoPainel(
-        dependenciasFluxo,
-        TEXTOS_SUCESSO_ATIVIDADES.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA,
-        cadastroService.disponibilizarRevisaoCadastro,
-    );
-    const iniciarRevisaoCadastro = criarAcaoRecarga(
-        dependenciasFluxo,
-        "cadastro",
-        cadastroService.iniciarRevisaoCadastro,
-    );
-    const cancelarInicioRevisaoCadastro = criarAcaoRecarga(
-        dependenciasFluxo,
-        "cadastro",
-        cadastroService.cancelarInicioRevisaoCadastro,
-    );
-    const devolverCadastro = criarAcaoPainelComPayload(
-        dependenciasFluxo,
-        () => TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA,
-        cadastroService.devolverCadastro,
-    );
-    const devolverRevisaoCadastro = criarAcaoPainelComPayload(
-        dependenciasFluxo,
-        () => TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA,
-        cadastroService.devolverRevisaoCadastro,
-    );
-    const aceitarCadastro = criarAcaoPainelComPayload(
-        dependenciasFluxo,
-        (options) => options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
-        cadastroService.aceitarCadastro,
-    );
-    const aceitarRevisaoCadastro = criarAcaoPainelComPayload(
-        dependenciasFluxo,
-        (options) => options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO,
-        cadastroService.aceitarRevisaoCadastro,
-    );
+    const disponibilizarCadastro = (codigoSubprocesso: number) =>
+        executarAcaoWorkflow(
+            () => cadastroService.disponibilizarCadastro(codigoSubprocesso),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.CADASTRO_ATIVIDADES_DISPONIBILIZADO),
+        );
+
+    const disponibilizarRevisaoCadastro = (codigoSubprocesso: number) =>
+        executarAcaoWorkflow(
+            () => cadastroService.disponibilizarRevisaoCadastro(codigoSubprocesso),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA),
+        );
+
+    const iniciarRevisaoCadastro = (codigoSubprocesso: number) =>
+        executarAcaoWorkflow(
+            () => cadastroService.iniciarRevisaoCadastro(codigoSubprocesso),
+            workflowRecargaContexto(codigoSubprocesso, "cadastro"),
+        );
+
+    const cancelarInicioRevisaoCadastro = (codigoSubprocesso: number) =>
+        executarAcaoWorkflow(
+            () => cadastroService.cancelarInicioRevisaoCadastro(codigoSubprocesso),
+            workflowRecargaContexto(codigoSubprocesso, "cadastro"),
+        );
+
+    const devolverCadastro = (codigoSubprocesso: number, payload: Parameters<typeof cadastroService.devolverCadastro>[1]) =>
+        executarAcaoWorkflow(
+            () => cadastroService.devolverCadastro(codigoSubprocesso, payload),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA),
+        );
+
+    const devolverRevisaoCadastro = (codigoSubprocesso: number, payload: Parameters<typeof cadastroService.devolverRevisaoCadastro>[1]) =>
+        executarAcaoWorkflow(
+            () => cadastroService.devolverRevisaoCadastro(codigoSubprocesso, payload),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA),
+        );
+
+    const aceitarCadastro = (
+        codigoSubprocesso: number,
+        payload: Parameters<typeof cadastroService.aceitarCadastro>[1],
+        options?: OpcoesMensagemSucesso,
+    ) =>
+        executarAcaoWorkflow(
+            () => cadastroService.aceitarCadastro(codigoSubprocesso, payload),
+            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO),
+        );
+
+    const aceitarRevisaoCadastro = (
+        codigoSubprocesso: number,
+        payload: Parameters<typeof cadastroService.aceitarRevisaoCadastro>[1],
+        options?: OpcoesMensagemSucesso,
+    ) =>
+        executarAcaoWorkflow(
+            () => cadastroService.aceitarRevisaoCadastro(codigoSubprocesso, payload),
+            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO),
+        );
 
     async function validarCadastro(codigoSubprocesso: number) {
         return executarComTratamentoDeErros(async () => subprocessoService.validarCadastro(codigoSubprocesso));
