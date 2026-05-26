@@ -200,7 +200,7 @@ const {notify} = useNotification();
 const toastStore = useToastStore();
 const subprocessoStore = useSubprocessoStore();
 const perfilStore = usePerfilStore();
-const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+const {atualizarFluxoMapa} = useInvalidacaoNavegacao();
 const subprocesso = computed(() => subprocessoStore.contextoEdicao?.detalhes ?? null);
 
 const {
@@ -308,12 +308,7 @@ const mensagemErroSugestoes = computed(() => {
 async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
   fecharModal();
   toastStore.setPending(mensagem);
-  invalidarCachesSubprocesso({
-    incluirPainel: true,
-    incluirProcesso: true,
-    incluirMapas: true,
-    codigoSubprocessoMapa: codigoSubprocesso.value ?? undefined,
-  });
+  atualizarFluxoMapa(codigoSubprocesso.value ?? undefined);
   await router.push({name: "Painel"});
 }
 

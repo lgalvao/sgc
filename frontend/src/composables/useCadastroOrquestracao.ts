@@ -33,7 +33,7 @@ async function buscarContextoInicial(
 export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
-    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+    const {atualizarFluxoSubprocessoEPainel} = useInvalidacaoNavegacao();
 
     const carregandoInicial = ref(true);
     const codigoSubprocesso = ref<number | null>(null);
@@ -120,7 +120,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         carregarContextoInicial,
         processarRespostaLocal: (response: RespostaLocalCadastro) => {
             aplicarRespostaLocal(response);
-            invalidarCachesSubprocesso({incluirPainel: true});
+            atualizarFluxoSubprocessoEPainel();
         },
         sincronizarEstadoInicialContexto: sincronizarEstadoInicial,
     };

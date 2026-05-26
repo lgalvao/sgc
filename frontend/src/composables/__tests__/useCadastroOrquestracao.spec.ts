@@ -19,7 +19,7 @@ const mapasStoreMock = {
     invalidar: vi.fn(),
 };
 
-const invalidarCachesSubprocessoMock = vi.fn();
+const atualizarFluxoSubprocessoEPainelMock = vi.fn();
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => storeMock
@@ -31,7 +31,7 @@ vi.mock("@/stores/mapas", () => ({
 
 vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
     useInvalidacaoNavegacao: () => ({
-        invalidarCachesSubprocesso: invalidarCachesSubprocessoMock,
+        atualizarFluxoSubprocessoEPainel: atualizarFluxoSubprocessoEPainelMock,
     }),
 }));
 
@@ -91,7 +91,7 @@ describe("useCadastroOrquestracao", () => {
 
         await carregarContextoInicial();
 
-        expect(invalidarCachesSubprocessoMock).not.toHaveBeenCalled();
+        expect(atualizarFluxoSubprocessoEPainelMock).not.toHaveBeenCalled();
     });
 
     it("deve invalidar caches de mapa e painel ao processar resposta de mutação", () => {
@@ -106,7 +106,7 @@ describe("useCadastroOrquestracao", () => {
         expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
         expect(mapasStoreMock.invalidar).toHaveBeenCalledWith(123);
         expect(storeMock.invalidarContextoEdicao).toHaveBeenCalledWith(123);
-        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({incluirPainel: true});
+        expect(atualizarFluxoSubprocessoEPainelMock).toHaveBeenCalled();
     });
 
     it("deve reaproveitar a assinatura de referência quando ela vier do backend", async () => {

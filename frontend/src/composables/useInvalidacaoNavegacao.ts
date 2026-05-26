@@ -5,13 +5,7 @@ import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useMapasStore} from "@/stores/mapas";
 import {useUnidadeStore} from "@/stores/unidade";
-
-interface OpcoesInvalidacaoSubprocesso {
-    incluirPainel?: boolean;
-    incluirProcesso?: boolean;
-    incluirMapas?: boolean;
-    codigoSubprocessoMapa?: number;
-}
+import {useOrganizacaoStore} from "@/stores/organizacao";
 
 /**
  * Ponto central de invalidação após mutações de processo/subprocesso.
@@ -25,58 +19,82 @@ export function useInvalidacaoNavegacao() {
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
     const unidadeStore = useUnidadeStore();
+    const organizacaoStore = useOrganizacaoStore();
+
+    function invalidarQueries(...chaves: Array<typeof CHAVE_QUERY_PAINEL | typeof CHAVE_QUERY_PROCESSO>): void {
+        chaves.forEach((key) => {
+            void queryCache.invalidateQueries({key});
+        });
+    }
+
+    function invalidarStores(...stores: Array<{ invalidar: () => void }>): void {
+        stores.forEach((store) => {
+            store.invalidar();
+        });
+    }
 
     function invalidarPainel(): void {
         painelStore.invalidar();
-        void queryCache.invalidateQueries({key: CHAVE_QUERY_PAINEL});
+        invalidarQueries(CHAVE_QUERY_PAINEL);
     }
 
     function invalidarProcesso(): void {
-        void queryCache.invalidateQueries({key: CHAVE_QUERY_PROCESSO});
+        invalidarQueries(CHAVE_QUERY_PROCESSO);
+    }
+
+    function invalidarMapas(codigoSubprocesso?: number): void {
+        if (typeof codigoSubprocesso === "number") {
+            mapasStore.invalidar(codigoSubprocesso);
+            return;
+        }
+
+        mapasStore.invalidar();
     }
 
     function limparEstadoSubprocessoAtual(): void {
         subprocessoStore.limparContextoAtual();
     }
 
-    function invalidarCachesProcesso(): void {
+    function atualizarFluxoProcesso(): void {
         invalidarPainel();
         invalidarProcesso();
-        subprocessoStore.invalidar();
-        mapasStore.invalidar();
-        unidadeStore.invalidar();
+        invalidarStores(subprocessoStore, unidadeStore);
+        invalidarMapas();
     }
 
-    function invalidarMapas(opcoes?: OpcoesInvalidacaoSubprocesso) {
-        if (!(opcoes?.incluirMapas ?? false)) {
-            return;
-        }
-
-        const codigoSubprocessoMapa = opcoes?.codigoSubprocessoMapa;
-        if (typeof codigoSubprocessoMapa === "number") {
-            mapasStore.invalidar(codigoSubprocessoMapa);
-            return;
-        }
-
-        mapasStore.invalidar();
+    function atualizarFluxoSubprocesso(): void {
+        invalidarStores(subprocessoStore);
     }
 
-    function invalidarCachesSubprocesso(opcoes?: OpcoesInvalidacaoSubprocesso): void {
-        if (opcoes?.incluirPainel) {
-            invalidarPainel();
-        }
-        if (opcoes?.incluirProcesso) {
-            invalidarProcesso();
-        }
-        subprocessoStore.invalidar();
-        // Mapas são pesados e nem toda ação de subprocesso altera esse domínio.
-        // Mantemos opt-in explícito para evitar recarregamentos desnecessários.
-        invalidarMapas(opcoes);
+    function atualizarFluxoSubprocessoEPainel(): void {
+        invalidarPainel();
+        invalidarStores(subprocessoStore);
+    }
+
+    function atualizarFluxoSubprocessoEProcesso(): void {
+        invalidarProcesso();
+        invalidarStores(subprocessoStore);
+    }
+
+    function atualizarFluxoMapa(codigoSubprocesso?: number): void {
+        invalidarPainel();
+        invalidarProcesso();
+        invalidarStores(subprocessoStore);
+        invalidarMapas(codigoSubprocesso);
+    }
+
+    function atualizarDadosOrganizacionais(): void {
+        invalidarStores(unidadeStore, organizacaoStore);
+        invalidarPainel();
     }
 
     return {
-        invalidarCachesProcesso,
-        invalidarCachesSubprocesso,
+        atualizarDadosOrganizacionais,
+        atualizarFluxoMapa,
+        atualizarFluxoProcesso,
+        atualizarFluxoSubprocesso,
+        atualizarFluxoSubprocessoEProcesso,
+        atualizarFluxoSubprocessoEPainel,
         limparEstadoSubprocessoAtual,
     };
 }

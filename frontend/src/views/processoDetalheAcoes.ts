@@ -49,7 +49,7 @@ export function useProcessoAcoes(dependencias: Dependencias) {
     const router = useRouter();
     const queryCache = useQueryCache();
     const toastStore = useToastStore();
-    const {invalidarCachesProcesso, invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+    const {atualizarFluxoProcesso, atualizarFluxoSubprocessoEProcesso} = useInvalidacaoNavegacao();
     const estado = criarEstado();
 
     async function confirmarFinalizacao() {
@@ -62,7 +62,7 @@ export function useProcessoAcoes(dependencias: Dependencias) {
             dependencias.limparErro();
             await processoService.finalizarProcesso(dependencias.codProcesso);
             toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
-            invalidarCachesProcesso();
+            atualizarFluxoProcesso();
             dependencias.processo.value = null;
             await queryCache.invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true});
             await router.push("/painel");
@@ -78,14 +78,14 @@ export function useProcessoAcoes(dependencias: Dependencias) {
 
         if (acao.redirecionarPainel) {
             toastStore.setPending(acao.mensagemSucesso);
-            invalidarCachesProcesso();
+            atualizarFluxoProcesso();
             dependencias.processo.value = null;
             await router.push("/painel");
             return;
         }
 
         dependencias.notify(acao.mensagemSucesso, "success");
-        invalidarCachesSubprocesso({incluirPainel: false, incluirProcesso: true});
+        atualizarFluxoSubprocessoEProcesso();
         await dependencias.carregarContextoCompleto();
     }
 

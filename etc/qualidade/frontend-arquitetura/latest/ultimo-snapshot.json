@@ -1,9 +1,9 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-26T12:23:17.519Z",
+  "geradoEm": "2026-05-26T12:28:56.042Z",
   "resumo": {
     "arquivosProducao": 243,
-    "scoreTotal": 131,
+    "scoreTotal": 96,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 3,
@@ -14,19 +14,19 @@
       "ocorrenciasForcar": 0,
       "ocorrenciasStale": 0,
       "ocorrenciasSnapshot": 1,
-      "hubsCentraisComSinais": 3
+      "hubsCentraisComSinais": 2
     }
   },
   "hotspots": [
     {
       "arquivo": "frontend/src/composables/useInvalidacaoNavegacao.ts",
       "camada": "composable",
-      "linhas": 83,
-      "score": 40,
+      "linhas": 101,
+      "score": 20,
       "sinais": {
         "acessoDiretoCache": 0,
         "metodoEmCache": 0,
-        "invalidacaoExplicita": 8,
+        "invalidacaoExplicita": 4,
         "booleanoPosicional": 0,
         "palavraForcar": 0,
         "palavraStale": 0,
@@ -58,25 +58,6 @@
       "hubCentral": false
     },
     {
-      "arquivo": "frontend/src/composables/useCacheSync.ts",
-      "camada": "composable",
-      "linhas": 69,
-      "score": 15,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 3,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita"
-      ],
-      "hubCentral": true
-    },
-    {
       "arquivo": "frontend/src/components/processo/SubprocessoCards.vue",
       "camada": "component",
       "linhas": 221,
@@ -98,7 +79,7 @@
     {
       "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
       "camada": "composable",
-      "linhas": 262,
+      "linhas": 263,
       "score": 8,
       "sinais": {
         "acessoDiretoCache": 0,

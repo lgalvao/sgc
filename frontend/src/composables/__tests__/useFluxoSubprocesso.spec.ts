@@ -37,7 +37,7 @@ const subprocessoStoreMock = {
     limparContextoAtual: vi.fn()
 };
 
-const invalidarCachesSubprocessoMock = vi.fn();
+const atualizarFluxoMapaMock = vi.fn();
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => subprocessoStoreMock
@@ -57,7 +57,7 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
     useInvalidacaoNavegacao: () => ({
-        invalidarCachesSubprocesso: invalidarCachesSubprocessoMock
+        atualizarFluxoMapa: atualizarFluxoMapaMock
     })
 }));
 
@@ -67,7 +67,7 @@ describe("useFluxoSubprocesso", () => {
         subprocessoStoreMock.garantirContextoCadastroAtividades.mockReset();
         subprocessoStoreMock.garantirContextoEdicao.mockReset();
         subprocessoStoreMock.limparContextoAtual.mockReset();
-        invalidarCachesSubprocessoMock.mockReset();
+        atualizarFluxoMapaMock.mockReset();
     });
 
     it("deve validar cadastro", async () => {
@@ -88,11 +88,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
-        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
-            incluirPainel: true,
-            incluirMapas: true,
-            codigoSubprocessoMapa: 123,
-        });
+        expect(atualizarFluxoMapaMock).toHaveBeenCalledWith(123);
         expect(subprocessoStoreMock.limparContextoAtual).toHaveBeenCalled();
     });
 
@@ -127,11 +123,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.devolverCadastro).toHaveBeenCalledWith(123, req);
-        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
-            incluirPainel: true,
-            incluirMapas: true,
-            codigoSubprocessoMapa: 123,
-        });
+        expect(atualizarFluxoMapaMock).toHaveBeenCalledWith(123);
     });
 
     it("deve aceitar cadastro", async () => {
@@ -143,11 +135,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.aceitarCadastro).toHaveBeenCalledWith(123, req);
-        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
-            incluirPainel: true,
-            incluirMapas: true,
-            codigoSubprocessoMapa: 123,
-        });
+        expect(atualizarFluxoMapaMock).toHaveBeenCalledWith(123);
     });
 
     it("deve homologar cadastro", async () => {
@@ -159,11 +147,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.homologarCadastro).toHaveBeenCalledWith(123, req);
-        expect(invalidarCachesSubprocessoMock).toHaveBeenCalledWith({
-            incluirPainel: true,
-            incluirMapas: true,
-            codigoSubprocessoMapa: 123,
-        });
+        expect(atualizarFluxoMapaMock).toHaveBeenCalledWith(123);
     });
 
     it("não deve invalidar caches ao homologar cadastro sem redirecionar para o painel", async () => {
@@ -176,7 +160,7 @@ describe("useFluxoSubprocesso", () => {
         });
 
         expect(success).toBe(true);
-        expect(invalidarCachesSubprocessoMock).not.toHaveBeenCalled();
+        expect(atualizarFluxoMapaMock).not.toHaveBeenCalled();
     });
 
     it("deve alterar data limite do subprocesso", async () => {

@@ -1,8 +1,4 @@
-import {useQueryCache} from "@pinia/colada";
-import {CHAVE_QUERY_PAINEL} from "@/composables/usePainelQuery";
-import {useUnidadeStore} from "@/stores/unidade";
-import {useOrganizacaoStore} from "@/stores/organizacao";
-import {usePainelStore} from "@/stores/painel";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {logger} from "@/utils";
 
 const EVENTO_CACHE_ATUALIZADO = "org-cache-refreshed";
@@ -17,13 +13,8 @@ const EVENTO_CACHE_ATUALIZADO = "org-cache-refreshed";
  * Deve ser chamado uma vez em App.vue após a autenticação do usuário.
  */
 export function useCacheSync() {
-    const queryCache = useQueryCache();
-    const invalidarCachesOrganizacionais = () => {
-        useUnidadeStore().invalidar();
-        useOrganizacaoStore().invalidar();
-        usePainelStore().invalidar();
-        void queryCache.invalidateQueries({key: CHAVE_QUERY_PAINEL});
-    };
+    const {atualizarDadosOrganizacionais} = useInvalidacaoNavegacao();
+    const sincronizarMudancaOrganizacional = () => atualizarDadosOrganizacionais();
     let encerradoManualmente = false;
     let source: EventSource | null = null;
     const handleErro = (event: Event) => {
@@ -44,7 +35,7 @@ export function useCacheSync() {
             return;
         }
         source = new EventSource("/api/eventos");
-        source.addEventListener(EVENTO_CACHE_ATUALIZADO, invalidarCachesOrganizacionais);
+        source.addEventListener(EVENTO_CACHE_ATUALIZADO, sincronizarMudancaOrganizacional);
         source.addEventListener("error", handleErro);
     };
     const handlePageHide = () => {

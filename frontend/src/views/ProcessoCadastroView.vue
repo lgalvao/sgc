@@ -186,7 +186,7 @@ const router = useRouter();
 const route = useRoute();
 const toastStore = useToastStore();
 const unidadeStore = useUnidadeStore();
-const {invalidarCachesProcesso} = useInvalidacaoNavegacao();
+const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
 const {notificacao, notify, notifyStructured, clear} = useNotification();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
 const {focarPrimeiroErroInvalido} = useValidacaoFormulario();
@@ -345,7 +345,7 @@ async function salvarProcesso() {
       await processoService.criarProcesso(request);
       toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_CRIADO);
     }
-    invalidarCachesProcesso();
+    atualizarFluxoProcesso();
     await router.push("/painel");
     limparCampos();
   } catch (error) {
@@ -404,7 +404,7 @@ async function iniciarProcessoComSelecaoDireta(codigosDiretos: number[]) {
     await processoService.iniciarProcesso(codigoProcesso, tipo.value, codigosDiretos);
     
     toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
-    invalidarCachesProcesso();
+    atualizarFluxoProcesso();
     await router.push("/painel");
     
     mostrarModalConfirmacao.value = false;
@@ -429,7 +429,7 @@ async function confirmarRemocao() {
   try {
     await processoService.excluirProcesso(processoEditando.value.codigo);
     toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_REMOVIDO(descRemovida));
-    invalidarCachesProcesso();
+    atualizarFluxoProcesso();
     await router.push("/painel");
     limparCampos();
     mostrarModalRemocao.value = false;

@@ -53,7 +53,7 @@ function abrirReabertura(estado: ReturnType<typeof criarEstado>, resetarValidaca
 }
 
 export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSubprocessoAcoesAdministrativas) {
-    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+    const {atualizarFluxoSubprocessoEPainel} = useInvalidacaoNavegacao();
     const toastStore = useToastStore();
     const estado = criarEstado();
 
@@ -68,7 +68,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
             await dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             estado.mostrarModalAlterarDataLimite.value = false;
             toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
-            invalidarCachesSubprocesso({incluirPainel: true});
+            atualizarFluxoSubprocessoEPainel();
             await dependencias.atualizarSubprocessoAtual();
         } catch (error) {
             logger.error(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, error);

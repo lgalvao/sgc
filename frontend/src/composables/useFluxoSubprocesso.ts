@@ -14,11 +14,7 @@ import type {HomologarCadastroRequest} from "@/types/tipos";
 interface WorkflowOptions {
     mensagemSucesso?: string;
     redirecionarParaPainel?: boolean;
-    invalidarCaches?: {
-        incluirPainel?: boolean;
-        incluirMapas?: boolean;
-        codigoSubprocessoMapa?: number;
-    };
+    aplicarAtualizacaoNavegacao?: () => void;
     redirecionarPara?: RouteLocationRaw;
     recarregarContexto?: {
         codigoSubprocesso: number;
@@ -38,19 +34,15 @@ interface OpcoesHomologacao extends OpcoesMensagemSucesso {
 type AcaoSemPayload = (codigoSubprocesso: number) => Promise<unknown>;
 type AcaoComPayload<T> = (codigoSubprocesso: number, payload: T) => Promise<unknown>;
 
-function invalidarPainelEMapa(codigoSubprocesso: number) {
-    return {
-        incluirPainel: true,
-        incluirMapas: true,
-        codigoSubprocessoMapa: codigoSubprocesso,
-    };
-}
-
-function workflowPainel(codigoSubprocesso: number, mensagemSucesso: string): WorkflowOptions {
+function workflowPainel(
+    codigoSubprocesso: number,
+    mensagemSucesso: string,
+    atualizarFluxoMapa: (codigoSubprocesso: number) => void,
+): WorkflowOptions {
     return {
         mensagemSucesso,
         redirecionarParaPainel: true,
-        invalidarCaches: invalidarPainelEMapa(codigoSubprocesso),
+        aplicarAtualizacaoNavegacao: () => atualizarFluxoMapa(codigoSubprocesso),
     };
 }
 
@@ -60,13 +52,20 @@ function workflowRecargaContexto(codigoSubprocesso: number, tipo: "cadastro" | "
     };
 }
 
-function workflowHomologacao(codigoSubprocesso: number, mensagemSucesso: string, options?: OpcoesHomologacao): WorkflowOptions {
+function workflowHomologacao(
+    codigoSubprocesso: number,
+    mensagemSucesso: string,
+    atualizarFluxoMapa: (codigoSubprocesso: number) => void,
+    options?: OpcoesHomologacao,
+): WorkflowOptions {
     const redirecionarParaPainel = options?.redirecionarParaPainel ?? true;
     return {
         mensagemSucesso,
         redirecionarParaPainel,
         redirecionarPara: options?.redirecionarPara,
-        invalidarCaches: redirecionarParaPainel ? invalidarPainelEMapa(codigoSubprocesso) : undefined,
+        aplicarAtualizacaoNavegacao: redirecionarParaPainel
+            ? () => atualizarFluxoMapa(codigoSubprocesso)
+            : undefined,
     };
 }
 
@@ -88,7 +87,7 @@ export function useFluxoSubprocesso() {
     const subprocessoStore = useSubprocessoStore();
     const toastStore = useToastStore();
     const router = useRouter();
-    const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
+    const {atualizarFluxoMapa} = useInvalidacaoNavegacao();
 
     async function executarAcaoWorkflow(
         acao: () => Promise<unknown>,
@@ -101,8 +100,8 @@ export function useFluxoSubprocesso() {
                     toastStore.setPending(options.mensagemSucesso);
                 }
 
-                if (options.invalidarCaches) {
-                    invalidarCachesSubprocesso(options.invalidarCaches);
+                if (options.aplicarAtualizacaoNavegacao) {
+                    options.aplicarAtualizacaoNavegacao();
                 }
 
                 if (options.redirecionarParaPainel) {
@@ -135,13 +134,13 @@ export function useFluxoSubprocesso() {
     const disponibilizarCadastro = (codigoSubprocesso: number) =>
         executarAcaoWorkflow(
             () => cadastroService.disponibilizarCadastro(codigoSubprocesso),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.CADASTRO_ATIVIDADES_DISPONIBILIZADO),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.CADASTRO_ATIVIDADES_DISPONIBILIZADO, atualizarFluxoMapa),
         );
 
     const disponibilizarRevisaoCadastro = (codigoSubprocesso: number) =>
         executarAcaoWorkflow(
             () => cadastroService.disponibilizarRevisaoCadastro(codigoSubprocesso),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_ATIVIDADES.REVISAO_CADASTRO_ATIVIDADES_DISPONIBILIZADA, atualizarFluxoMapa),
         );
 
     const iniciarRevisaoCadastro = (codigoSubprocesso: number) =>
@@ -159,13 +158,13 @@ export function useFluxoSubprocesso() {
     const devolverCadastro = (codigoSubprocesso: number, payload: Parameters<typeof cadastroService.devolverCadastro>[1]) =>
         executarAcaoWorkflow(
             () => cadastroService.devolverCadastro(codigoSubprocesso, payload),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA, atualizarFluxoMapa),
         );
 
     const devolverRevisaoCadastro = (codigoSubprocesso: number, payload: Parameters<typeof cadastroService.devolverRevisaoCadastro>[1]) =>
         executarAcaoWorkflow(
             () => cadastroService.devolverRevisaoCadastro(codigoSubprocesso, payload),
-            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA),
+            workflowPainel(codigoSubprocesso, TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA, atualizarFluxoMapa),
         );
 
     const aceitarCadastro = (
@@ -175,7 +174,7 @@ export function useFluxoSubprocesso() {
     ) =>
         executarAcaoWorkflow(
             () => cadastroService.aceitarCadastro(codigoSubprocesso, payload),
-            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO),
+            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO, atualizarFluxoMapa),
         );
 
     const aceitarRevisaoCadastro = (
@@ -185,7 +184,7 @@ export function useFluxoSubprocesso() {
     ) =>
         executarAcaoWorkflow(
             () => cadastroService.aceitarRevisaoCadastro(codigoSubprocesso, payload),
-            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO),
+            workflowPainel(codigoSubprocesso, options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.ACEITE_REGISTRADO, atualizarFluxoMapa),
         );
 
     async function validarCadastro(codigoSubprocesso: number) {
@@ -198,6 +197,7 @@ export function useFluxoSubprocesso() {
             workflowHomologacao(
                 codigoSubprocesso,
                 options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.HOMOLOGACAO_EFETIVADA,
+                atualizarFluxoMapa,
                 options,
             )
         );
@@ -209,6 +209,7 @@ export function useFluxoSubprocesso() {
             workflowHomologacao(
                 codigoSubprocesso,
                 options?.mensagemSucesso || TEXTOS_SUCESSO_SUBPROCESSO.HOMOLOGACAO_EFETIVADA,
+                atualizarFluxoMapa,
                 options,
             )
         );
