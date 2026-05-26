@@ -26,8 +26,6 @@ type DependenciasCadastroDisponibilizacao = {
     disponibilizarRevisaoCadastroFluxo: (codigoSubprocesso: number) => Promise<unknown>;
 };
 
-type EstadoDisponibilizacao = ReturnType<typeof criarEstado>;
-
 type ResultadoValidacaoLocal =
     | {tipo: "pode-validar"}
     | {tipo: "erro-validacao"; erros: ErroValidacao[]}
@@ -36,6 +34,60 @@ type ResultadoValidacaoLocal =
 export function useCadastroDisponibilizacao(dependencias: DependenciasCadastroDisponibilizacao) {
     const estado = criarEstado(dependencias.atividades);
 
+    async function disponibilizarCadastro() {
+        if (estado.loadingValidacao.value) {
+            return;
+        }
+
+        estado.limparErrosValidacao();
+        const validacaoLocal = validarLocalmente(dependencias);
+
+        if (validacaoLocal.tipo === "erro-validacao") {
+            estado.aplicarErrosValidacao(validacaoLocal.erros);
+            await nextTick();
+            return;
+        }
+        if (validacaoLocal.tipo === "acao-nao-permitida") {
+            estado.definirErroGlobal(validacaoLocal.mensagem);
+            return;
+        }
+
+        estado.loadingValidacao.value = true;
+        try {
+            const resultado = await dependencias.validarCadastro(dependencias.codigoSubprocesso.value!);
+            if (resultado.valido) {
+                dependencias.mostrarModalConfirmacao.value = true;
+                return;
+            }
+
+            estado.aplicarErrosValidacao(resultado.erros);
+            await nextTick();
+            dependencias.scrollParaPrimeiroErro();
+        } catch (error) {
+            estado.definirErroGlobal(normalizarErro(error).mensagem);
+        } finally {
+            estado.loadingValidacao.value = false;
+        }
+    }
+
+    async function confirmarDisponibilizacao() {
+        if (estado.loadingDisponibilizacao.value) {
+            return;
+        }
+
+        estado.loadingDisponibilizacao.value = true;
+        try {
+            if (dependencias.isRevisao.value) {
+                await dependencias.disponibilizarRevisaoCadastroFluxo(dependencias.codigoSubprocesso.value!);
+            } else {
+                await dependencias.disponibilizarCadastroFluxo(dependencias.codigoSubprocesso.value!);
+            }
+        } finally {
+            estado.loadingDisponibilizacao.value = false;
+        }
+        dependencias.mostrarModalConfirmacao.value = false;
+    }
+
     return {
         erroGlobal: estado.erroGlobal,
         erroTick: estado.erroTick,
@@ -43,64 +95,10 @@ export function useCadastroDisponibilizacao(dependencias: DependenciasCadastroDi
         loadingValidacao: estado.loadingValidacao,
         loadingDisponibilizacao: estado.loadingDisponibilizacao,
         limparErrosValidacao: estado.limparErrosValidacao,
-        disponibilizarCadastro: () => disponibilizar(dependencias, estado),
-        confirmarDisponibilizacao: () => confirmar(dependencias, estado),
+        disponibilizarCadastro,
+        confirmarDisponibilizacao,
         obterErroParaAtividade: (atividadeCodigo: number) => estado.mapaErros.value.get(atividadeCodigo),
     };
-}
-
-async function disponibilizar(dependencias: DependenciasCadastroDisponibilizacao, estado: EstadoDisponibilizacao) {
-    if (estado.loadingValidacao.value) {
-        return;
-    }
-
-    estado.limparErrosValidacao();
-    const validacaoLocal = validarLocalmente(dependencias);
-
-    if (validacaoLocal.tipo === "erro-validacao") {
-        estado.aplicarErrosValidacao(validacaoLocal.erros);
-        await nextTick();
-        return;
-    }
-    if (validacaoLocal.tipo === "acao-nao-permitida") {
-        estado.definirErroGlobal(validacaoLocal.mensagem);
-        return;
-    }
-
-    estado.loadingValidacao.value = true;
-    try {
-        const resultado = await dependencias.validarCadastro(dependencias.codigoSubprocesso.value!);
-        if (resultado.valido) {
-            dependencias.mostrarModalConfirmacao.value = true;
-            return;
-        }
-
-        estado.aplicarErrosValidacao(resultado.erros);
-        await nextTick();
-        dependencias.scrollParaPrimeiroErro();
-    } catch (error) {
-        estado.definirErroGlobal(normalizarErro(error).mensagem);
-    } finally {
-        estado.loadingValidacao.value = false;
-    }
-}
-
-async function confirmar(dependencias: DependenciasCadastroDisponibilizacao, estado: EstadoDisponibilizacao) {
-    if (estado.loadingDisponibilizacao.value) {
-        return;
-    }
-
-    estado.loadingDisponibilizacao.value = true;
-    try {
-        if (dependencias.isRevisao.value) {
-            await dependencias.disponibilizarRevisaoCadastroFluxo(dependencias.codigoSubprocesso.value!);
-        } else {
-            await dependencias.disponibilizarCadastroFluxo(dependencias.codigoSubprocesso.value!);
-        }
-    } finally {
-        estado.loadingDisponibilizacao.value = false;
-    }
-    dependencias.mostrarModalConfirmacao.value = false;
 }
 
 function validarLocalmente(dependencias: DependenciasCadastroDisponibilizacao): ResultadoValidacaoLocal {

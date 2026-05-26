@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-26T00:10:50.905Z",
+  "geradoEm": "2026-05-26T00:17:01.563Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -29,7 +29,7 @@
       "arquivosAcimaHard": {}
     },
     "testes": {
-      "anyExplicito": 572,
+      "anyExplicito": 573,
       "checksNull": 1,
       "fallbacksDefensivos": 6,
       "catchBlocks": 0,
@@ -138,7 +138,7 @@
     {
       "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
       "camada": "view",
-      "linhas": 441,
+      "linhas": 444,
       "score": 12,
       "contagens": {
         "anyExplicito": 0,
@@ -453,7 +453,7 @@
       "arquivo": "frontend/src/views/ProcessoCadastroView.vue",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 441,
+      "linhas": 444,
       "imports": 27,
       "exports": 0,
       "exportsRuntime": [],
@@ -1984,7 +1984,7 @@
       "arquivo": "frontend/src/views/cadastroDisponibilizacao.ts",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 200,
+      "linhas": 198,
       "imports": 6,
       "exports": 1,
       "exportsRuntime": [
@@ -2085,14 +2085,14 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/useCadastroAtividadesMutacoes.ts",
-      "camada": "composable",
+      "arquivo": "frontend/src/views/mapaDisponibilizacao.ts",
+      "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 137,
+      "linhas": 139,
       "imports": 6,
       "exports": 1,
       "exportsRuntime": [
-        "useCadastroAtividadesMutacoes"
+        "useMapaDisponibilizacao"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2111,14 +2111,14 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/mapaDisponibilizacao.ts",
-      "camada": "view",
+      "arquivo": "frontend/src/composables/useCadastroAtividadesMutacoes.ts",
+      "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 135,
+      "linhas": 137,
       "imports": 6,
       "exports": 1,
       "exportsRuntime": [
-        "useMapaDisponibilizacao"
+        "useCadastroAtividadesMutacoes"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2500,12 +2500,12 @@
       "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
       "camada": "view",
       "categoriaArquivo": "teste",
-      "linhas": 994,
+      "linhas": 1015,
       "imports": 13,
       "exports": 0,
       "exportsRuntime": [],
       "contagens": {
-        "anyExplicito": 50,
+        "anyExplicito": 51,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,

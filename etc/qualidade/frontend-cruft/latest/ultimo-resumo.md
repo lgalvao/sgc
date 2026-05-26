@@ -1,6 +1,6 @@
 # Auditoria de cruft do frontend
 
-Gerado em: 2026-05-26T00:10:50.905Z
+Gerado em: 2026-05-26T00:17:01.563Z
 Score total: 348 (critico)
 
 ## Resumo
@@ -26,7 +26,7 @@ Score total: 348 (critico)
 |---|---|---:|---:|---|
 | frontend/src/views/CadastroView.vue | view | 455 | 12 | fallbacksDefensivos: 4 |
 | frontend/src/views/PainelView.vue | view | 222 | 12 | fallbacksDefensivos: 4 |
-| frontend/src/views/ProcessoCadastroView.vue | view | 441 | 12 | catchBlocks: 6 |
+| frontend/src/views/ProcessoCadastroView.vue | view | 444 | 12 | catchBlocks: 6 |
 | frontend/src/views/UnidadeView.vue | view | 359 | 12 | fallbacksDefensivos: 2, catchBlocks: 3 |
 | frontend/src/views/MapaView.vue | view | 505 | 10 | fallbacksDefensivos: 2, catchBlocks: 2 |
 | frontend/src/components/unidade/useArvoreSelecao.ts | component | 178 | 9 | fallbacksDefensivos: 3 |

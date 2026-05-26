@@ -26,11 +26,11 @@ export interface SincronizarMapaContextoParams {
     mapaContextoAtual: Ref<{ detalhes: { codigo: number }; mapa: MapaCompleto } | null>;
 }
 
-type EstadoMapaDisponibilizacao = ReturnType<typeof criarEstado>;
-
 type ResultadoChecklistDisponibilizacao =
     | {tipo: "pode-disponibilizar"}
     | {tipo: "erro-validacao"; mensagem: string};
+
+type EstadoMapaDisponibilizacao = ReturnType<typeof criarEstado>;
 
 function criarEstado() {
     return {
@@ -62,48 +62,49 @@ function validarChecklistDisponibilizacao(dependencias: DependenciasMapaDisponib
     return {tipo: "pode-disponibilizar"};
 }
 
-async function disponibilizarMapa(
-    dependencias: DependenciasMapaDisponibilizacao,
-    estado: EstadoMapaDisponibilizacao,
-    request: DisponibilizarMapaRequest
-) {
-    if (estado.loadingDisponibilizacao.value) {
-        return;
-    }
-
-    await dependencias.executarComSubprocesso(async (codigoSubprocesso) => {
-        estado.loadingDisponibilizacao.value = true;
-        try {
-            await dependencias.disponibilizarMapaFluxo(codigoSubprocesso, request);
-            await dependencias.concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_DISPONIBILIZADO, () => {
-                dependencias.mostrarModalDisponibilizar.value = false;
-                estado.notificacaoDisponibilizacao.value = "";
-                dependencias.limparErros();
-            });
-        } catch (error) {
-            logger.error(error);
-            dependencias.aplicarErroNormalizado(normalizarErro(error));
-        } finally {
-            estado.loadingDisponibilizacao.value = false;
-        }
-    });
-}
-
 export function useMapaDisponibilizacao(dependencias: DependenciasMapaDisponibilizacao) {
-    const estado = criarEstado();
+    const {
+        notificacaoDisponibilizacao,
+        erroValidacaoMapa,
+        erroValidacaoMapaTick,
+        loadingDisponibilizacao,
+    } = criarEstado();
+
+    async function disponibilizarMapa(request: DisponibilizarMapaRequest) {
+        if (loadingDisponibilizacao.value) {
+            return;
+        }
+
+        await dependencias.executarComSubprocesso(async (codigoSubprocesso) => {
+            loadingDisponibilizacao.value = true;
+            try {
+                await dependencias.disponibilizarMapaFluxo(codigoSubprocesso, request);
+                await dependencias.concluirAcaoPainel(TEXTOS_SUCESSO_MAPA.MAPA_DISPONIBILIZADO, () => {
+                    dependencias.mostrarModalDisponibilizar.value = false;
+                    notificacaoDisponibilizacao.value = "";
+                    dependencias.limparErros();
+                });
+            } catch (error) {
+                logger.error(error);
+                dependencias.aplicarErroNormalizado(normalizarErro(error));
+            } finally {
+                loadingDisponibilizacao.value = false;
+            }
+        });
+    }
 
     return {
         podeConfirmarDisponibilizacao: computed(() => validarChecklistDisponibilizacao(dependencias).tipo === "pode-disponibilizar"),
-        erroValidacaoMapa: estado.erroValidacaoMapa,
-        erroValidacaoMapaTick: estado.erroValidacaoMapaTick,
-        loadingDisponibilizacao: estado.loadingDisponibilizacao,
-        notificacaoDisponibilizacao: estado.notificacaoDisponibilizacao,
+        erroValidacaoMapa,
+        erroValidacaoMapaTick,
+        loadingDisponibilizacao,
+        notificacaoDisponibilizacao,
         abrirModalDisponibilizar: () => {
-            estado.erroValidacaoMapa.value = "";
+            erroValidacaoMapa.value = "";
             const checklist = validarChecklistDisponibilizacao(dependencias);
             if (checklist.tipo === "erro-validacao") {
-                estado.erroValidacaoMapa.value = checklist.mensagem;
-                estado.erroValidacaoMapaTick.value += 1;
+                erroValidacaoMapa.value = checklist.mensagem;
+                erroValidacaoMapaTick.value += 1;
                 return;
             }
             dependencias.mostrarModalDisponibilizar.value = true;
@@ -111,11 +112,16 @@ export function useMapaDisponibilizacao(dependencias: DependenciasMapaDisponibil
         },
         fecharModalDisponibilizar: () => {
             dependencias.mostrarModalDisponibilizar.value = false;
-            estado.notificacaoDisponibilizacao.value = "";
+            notificacaoDisponibilizacao.value = "";
             dependencias.limparErros();
         },
-        disponibilizarMapa: (request: DisponibilizarMapaRequest) => disponibilizarMapa(dependencias, estado, request),
-        limparErroMapa: (erroMapa?: Ref<string | null>) => limparErroValidacaoMapa(estado, erroMapa),
+        disponibilizarMapa,
+        limparErroMapa: (erroMapa?: Ref<string | null>) => limparErroValidacaoMapa({
+            notificacaoDisponibilizacao,
+            erroValidacaoMapa,
+            erroValidacaoMapaTick,
+            loadingDisponibilizacao,
+        }, erroMapa),
         sincronizarMapaContexto: ({
             mapaAtualizado,
             codigoSubprocesso,
