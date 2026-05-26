@@ -89,6 +89,11 @@ vi.mock('@/services/relatoriosService', () => ({
         downloadRelatorioMapaVigenteUnidadeCsv,
     },
 }));
+vi.mock('@/utils/apiError', () => ({
+    normalizarErro: vi.fn((e) => ({
+        mensagem: e?.response?.data?.message || e?.message || 'Erro padrão'
+    })),
+}));
 
 const TreeTableStub = {
     template: '<div data-testid="tree-table"></div>',
@@ -375,5 +380,230 @@ describe('UnidadeView.vue', () => {
         expect(wrapper.text()).toContain('Titular');
         expect(wrapper.text()).not.toContain('Responsável');
         wrapper.unmount();
+    });
+
+    it('exportarMapaVigentePdf lida com erro', async () => {
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'CHEFE',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: false},
+            },
+        });
+        await flushPromises();
+
+        mockObterReferenciaMapaVigente.mockResolvedValueOnce(mockMapaVigente);
+        downloadRelatorioMapaVigenteUnidadePdf.mockRejectedValueOnce(new Error('Erro PDF'));
+
+        const vm = wrapper.vm as any;
+        vm.mapaVigente = mockMapaVigente;
+
+        await vm.exportarMapaVigentePdf();
+        expect(downloadRelatorioMapaVigenteUnidadePdf).toHaveBeenCalledWith(1);
+        expect(vm.loadingExportacaoPdf).toBe(false);
+    });
+
+    it('calcula corretamente as propriedades computadas de responsabilidade e titular', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // Caso Substituição com data
+        vm.unidade = {
+            ...mockUnidadeData,
+            tipoResponsabilidade: 'SUBSTITUTO',
+            dataFimResponsabilidade: '2026-12-31T23:59:59'
+        };
+        expect(vm.descricaoResponsabilidade).toContain('Substituição');
+        expect(vm.descricaoResponsabilidade).toContain('31/12/2026');
+
+        // Caso Atribuição Temporária sem data
+        vm.unidade = {
+            ...mockUnidadeData,
+            tipoResponsabilidade: 'ATRIBUICAO_TEMPORARIA',
+            dataFimResponsabilidade: null
+        };
+        expect(vm.descricaoResponsabilidade).toBe('Atrib. temporária');
+
+        // Caso Responsável não é Titular
+        vm.unidade = {
+            ...mockUnidadeData,
+            titular: {tituloEleitoral: '123'},
+            responsavel: {tituloEleitoral: '456'}
+        };
+        expect(vm.responsavelEhTitular).toBe(false);
+        expect(vm.titularExibivel).toBe(true);
+        expect(vm.labelContatoPrincipal).toContain('Responsável');
+
+        // Caso Responsável É Titular
+        vm.unidade = {
+            ...mockUnidadeData,
+            titular: {tituloEleitoral: '123'},
+            responsavel: {tituloEleitoral: '123'}
+        };
+        expect(vm.responsavelEhTitular).toBe(true);
+        expect(vm.titularExibivel).toBe(false);
+        expect(vm.labelContatoPrincipal).toContain('Titular');
+    });
+
+    it('exportarMapaVigenteCsv lida com erro', async () => {
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'CHEFE',
+                permissoesSessao: {mostrarCriarAtribuicaoTemporaria: false},
+            },
+        });
+        await flushPromises();
+
+        downloadRelatorioMapaVigenteUnidadeCsv.mockRejectedValueOnce(new Error('Erro CSV'));
+
+        const vm = wrapper.vm as any;
+        vm.mapaVigente = mockMapaVigente;
+
+        await vm.exportarMapaVigenteCsv();
+        expect(downloadRelatorioMapaVigenteUnidadeCsv).toHaveBeenCalledWith(1);
+        expect(vm.loadingExportacaoCsv).toBe(false);
+    });
+
+    it('carregarDados evita re-entrada', async () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        // Account for initial call during mount
+        await flushPromises();
+        mockObterUnidade.mockClear();
+        
+        let resolve1!: (val: any) => void;
+        mockObterUnidade.mockReturnValueOnce(new Promise(r => resolve1 = r));
+        
+        const p1 = vm.carregarDados(true); // forcar=true to bypass some checks
+        const p2 = vm.carregarDados(true);
+        
+        resolve1(mockUnidadeData);
+        await p1;
+        await p2;
+        
+        // Should only have been called once despite two calls to vm.carregarDados()
+        expect(mockObterUnidade).toHaveBeenCalledTimes(1); 
+    });
+
+    it('possuiDadosLocaisValidos retorna falso quando dados divergem do cache', () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        vm.unidade = { codigo: 1 };
+        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1 });
+        mockUnidadeStore.cacheMapasVigentes.set(1, { codigo: 100 });
+        
+        // Case: unidade.value !== unidadeEmCache
+        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1, diff: true });
+        expect(vm.possuiDadosLocaisValidos()).toBe(false);
+
+        // Case: mapaVigente.value !== mapaVigenteEmCache
+        vm.unidade = mockUnidadeStore.cacheUnidades.get(1);
+        vm.mapaVigente = { codigo: 100 };
+        mockUnidadeStore.cacheMapasVigentes.set(1, { codigo: 100, diff: true });
+        expect(vm.possuiDadosLocaisValidos()).toBe(false);
+    });
+
+    it('reaplicarDadosDoCache retorna falso quando cache incompleto', () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        mockUnidadeStore.cacheUnidades.delete(1);
+        expect(vm.reaplicarDadosDoCache()).toBe(false);
+        
+        mockUnidadeStore.cacheUnidades.set(1, {});
+        mockUnidadeStore.cacheMapasVigentes.delete(1);
+        expect(vm.reaplicarDadosDoCache()).toBe(false);
+    });
+
+    it('deveExibirCarregamento depende de forcar e cache', () => {
+        const {wrapper} = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        mockUnidadeStore.cacheUnidades.set(1, {});
+        expect(vm.deveExibirCarregamento(false)).toBe(false);
+        expect(vm.deveExibirCarregamento(true)).toBe(true);
+        
+        mockUnidadeStore.cacheUnidades.delete(1);
+        expect(vm.deveExibirCarregamento(false)).toBe(true);
+    });
+
+    it('carregarDados lida com erro e define ultimoErro', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        mockObterUnidade.mockRejectedValueOnce({ response: { data: { message: 'Erro Customizado' } } });
+        await vm.carregarDados(true);
+        
+        expect(vm.ultimoErro).toBe('Erro Customizado');
+    });
+
+    it('podeExportarMapaVigente computed property branches', async () => {
+        const {wrapper} = createWrapper({
+            perfil: {
+                perfilSelecionado: 'USER',
+            },
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // CASE 1: USER profile, has mapaVigente -> false
+        vm.mapaVigente = { id: 1 };
+        expect(vm.podeExportarMapaVigente).toBe(false);
+
+        // CASE 2: CHEFE profile, NO mapaVigente -> false
+        vm.perfilStore.perfilSelecionado = 'CHEFE';
+        vm.mapaVigente = null;
+        expect(vm.podeExportarMapaVigente).toBe(false);
+
+        // CASE 3: CHEFE profile, has mapaVigente -> true
+        vm.mapaVigente = { id: 1 };
+        expect(vm.podeExportarMapaVigente).toBe(true);
+    });
+
+    it('onActivated branches', async () => {
+        const {wrapper} = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        
+        const hook = ((wrapper.vm.$ as any).a)?.[0];
+        
+        // CASE: !carregamentoInicialConcluido -> returns early
+        vm.carregamentoInicialConcluido = false;
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).not.toHaveBeenCalled();
+
+        // CASE: possuiDadosLocaisValidos -> returns early
+        vm.carregamentoInicialConcluido = true;
+        // Mock data to satisfy possuiDadosLocaisValidos
+        vm.unidade = { codigo: 1, sigla: 'TEST', nome: 'Test' };
+        vm.mapaVigente = { id: 100 };
+        mockUnidadeStore.cacheUnidades.set(1, vm.unidade);
+        mockUnidadeStore.cacheMapasVigentes.set(1, vm.mapaVigente);
+        vm.ultimoErro = null;
+        
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).not.toHaveBeenCalled();
+
+        // CASE: reaplicarDadosDoCache -> returns early
+        // Make possuiDadosLocaisValidos false (by changing unit)
+        vm.unidade = { codigo: 99, sigla: 'OTHER', nome: 'Other' }; 
+        // But make reaplicarDadosDoCache true (satisfy its condition)
+        mockUnidadeStore.cacheUnidades.set(1, { codigo: 1, sigla: 'TEST', nome: 'Test' });
+        mockUnidadeStore.cacheMapasVigentes.set(1, { id: 100 });
+        
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).not.toHaveBeenCalled();
+
+        // CASE: none of above -> calls carregarDados
+        mockUnidadeStore.cacheUnidades.clear();
+        mockObterUnidade.mockClear();
+        await hook.call(vm);
+        expect(mockObterUnidade).toHaveBeenCalled();
     });
 });

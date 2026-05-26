@@ -82,17 +82,24 @@ import {ehDataEstritamenteFutura, formatarDataBR, obterAmanhaFormatado} from "@/
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import type {UnidadeSelecao} from "@/types/tipos";
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   id: string;
-  titulo: string;
-  texto: string;
-  rotuloBotao: string;
+  titulo?: string;
+  texto?: string;
+  rotuloBotao?: string;
   unidades: UnidadeSelecao[];
   unidadesPreSelecionadas: number[];
   mostrarDataLimite?: boolean;
   mostrarSituacao?: boolean;
   permitirVazio?: boolean;
-}>();
+}>(), {
+  titulo: "",
+  texto: "",
+  rotuloBotao: "",
+  mostrarDataLimite: false,
+  mostrarSituacao: true,
+  permitirVazio: false,
+});
 
 const emit = defineEmits<{
   'confirmar': [dados: { ids: number[], dataLimite?: string }];

@@ -1,6 +1,7 @@
 // noinspection JSUnusedGlobalSymbols,ES6ConvertVarToLetConst
 
 import {createBootstrap, vBTooltip} from "bootstrap-vue-next"; // Importar createBootstrap e vBTooltip
+import {PiniaColada} from "@pinia/colada";
 import {createPinia} from "pinia";
 import {createApp} from "vue";
 import {isErroCanceladoHttp, setRouter} from "@/axios-setup";
@@ -21,6 +22,7 @@ declare global {
 const app = createApp(App);
 const pinia = createPinia();
 app.use(pinia);
+app.use(PiniaColada);
 
 globalThis.pinia = pinia;
 

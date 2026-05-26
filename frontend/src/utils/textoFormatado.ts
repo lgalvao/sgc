@@ -12,7 +12,7 @@ export function extrairTextoPlanoHtml(html: string | null | undefined): string {
         .trim();
 }
 
-export function htmlTemConteudo(html: string | null | undefined): boolean {
+function htmlTemConteudo(html: string | null | undefined): boolean {
     return extrairTextoPlanoHtml(html).length > 0;
 }
 
@@ -26,11 +26,4 @@ export function normalizarHtmlEditor(html: string | null | undefined): string {
 
 export function obterComprimentoHtmlFormatado(html: string | null | undefined): number {
     return normalizarHtmlEditor(html).length;
-}
-
-export function excedeLimiteHtmlFormatado(
-    html: string | null | undefined,
-    limite = LIMITE_PADRAO_TEXTO_FORMATADO
-): boolean {
-    return obterComprimentoHtmlFormatado(html) > limite;
 }

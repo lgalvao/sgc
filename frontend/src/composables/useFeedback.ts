@@ -32,6 +32,44 @@ async function converterCanvasParaBlob(canvas: HTMLCanvasElement): Promise<Blob 
     })
 }
 
+async function capturarBlobTela(): Promise<Blob | null> {
+    try {
+        const canvas = await capturarCanvasPagina()
+        return await converterCanvasParaBlob(canvas)
+    } catch (erro) {
+        logger.error('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
+        return null
+    }
+}
+
+function criarMetadados(route: ReturnType<typeof useRoute>, perfilStore: ReturnType<typeof usePerfilStore>): MetadadosFeedback {
+    return {
+        usuarioCodigo: perfilStore.usuarioCodigo ? perfilStore.usuarioCodigo : '',
+        usuarioNome: perfilStore.usuarioNome ? perfilStore.usuarioNome : '',
+        rotaNome: route.name ? String(route.name) : '',
+        rotaCaminho: route.fullPath,
+        rotaQuery: JSON.stringify(route.query),
+        tituloPagina: document.title,
+        perfilAtivo: perfilStore.perfilSelecionado ?? null,
+        unidadeAtiva: perfilStore.unidadeSelecionadaSigla ?? null,
+        dataHora: new Date().toISOString(),
+        fusoHorario: new Date().getTimezoneOffset(),
+        userAgent: navigator.userAgent,
+        larguraTela: window.innerWidth,
+        alturaTela: window.innerHeight,
+        idioma: navigator.language,
+    }
+}
+
+function criarFormularioFeedback(payload: PayloadFeedback, captura: Blob | null): FormData {
+    const form = new FormData()
+    form.append('data', JSON.stringify(payload))
+    if (captura) {
+        form.append('screenshot', captura, 'screenshot.webp')
+    }
+    return form
+}
+
 /**
  * Composable para captura de tela, montagem de metadados e envio de feedback UAT.
  *
@@ -44,32 +82,7 @@ export function useFeedback() {
     const perfilStore = usePerfilStore()
 
     async function capturarTela(): Promise<void> {
-        try {
-            const canvas = await capturarCanvasPagina()
-            captura.value = await converterCanvasParaBlob(canvas)
-        } catch (erro) {
-            logger.error('[Feedback] Captura de tela falhou; prosseguindo sem screenshot.', erro)
-            captura.value = null
-        }
-    }
-
-    function montarMetadados(): MetadadosFeedback {
-        return {
-            usuarioCodigo: perfilStore.usuarioCodigo ?? '',
-            usuarioNome: perfilStore.usuarioNome ?? '',
-            rotaNome: String(route.name ?? ''),
-            rotaCaminho: route.fullPath,
-            rotaQuery: JSON.stringify(route.query),
-            tituloPagina: document.title,
-            perfilAtivo: perfilStore.perfilSelecionado ?? null,
-            unidadeAtiva: perfilStore.unidadeSelecionadaSigla ?? null,
-            dataHora: new Date().toISOString(),
-            fusoHorario: new Date().getTimezoneOffset(),
-            userAgent: navigator.userAgent,
-            larguraTela: window.innerWidth,
-            alturaTela: window.innerHeight,
-            idioma: navigator.language,
-        }
+        captura.value = await capturarBlobTela()
     }
 
     async function enviarFeedback(tipo: FeedbackTipo, nota: string): Promise<void> {
@@ -78,16 +91,9 @@ export function useFeedback() {
             const payload: PayloadFeedback = {
                 tipo,
                 nota,
-                metadados: montarMetadados(),
+                metadados: criarMetadados(route, perfilStore),
             }
-
-            const form = new FormData()
-            form.append('data', JSON.stringify(payload))
-            if (captura.value) {
-                form.append('screenshot', captura.value, 'screenshot.webp')
-            }
-
-            await apiClient.post('/feedback', form, {
+            await apiClient.post('/feedback', criarFormularioFeedback(payload, captura.value), {
                 headers: {'Content-Type': 'multipart/form-data'},
             })
         } finally {

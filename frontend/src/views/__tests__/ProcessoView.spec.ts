@@ -24,13 +24,23 @@ const mocks = {
     query: {}
 };
 
-const processoStoreMock = {
-    garantirContextoCompleto: vi.fn((codProcesso: number) => processoService.buscarContextoCompleto(codProcesso)),
-    invalidar: vi.fn(),
-    dadosValidos: vi.fn().mockReturnValue(false),
-    contextoCompleto: null as any,
-    codProcessoCarregado: null as number | null,
-    resetar: vi.fn(),
+const processoQueryData = ref<any>(null);
+let processoQueryEstaStale = false;
+const processoQueryMock = {
+    data: processoQueryData,
+    refetch: vi.fn(async () => {
+        const data = await processoService.buscarContextoCompleto(1);
+        processoQueryData.value = data;
+        return {data};
+    }),
+    refresh: vi.fn(async () => {
+        if (!processoQueryEstaStale) {
+            return {data: processoQueryData.value};
+        }
+        const data = await processoService.buscarContextoCompleto(1);
+        processoQueryData.value = data;
+        return {data};
+    }),
 };
 
 vi.mock("vue-router", () => ({
@@ -38,10 +48,10 @@ vi.mock("vue-router", () => ({
     useRouter: () => ({push: mocks.push})
 }));
 
-// Mock da useProcessoStore (Rodada 2) — delega ao processoService já mockado
-vi.mock("@/stores/processo", async () => {
+vi.mock("@/composables/useProcessoQuery", async () => {
     return {
-        useProcessoStore: () => processoStoreMock,
+        CHAVE_QUERY_PROCESSO: ["processo"],
+        useProcessoQuery: () => processoQueryMock,
     };
 });
 
@@ -374,13 +384,10 @@ describe("Processo.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        processoStoreMock.contextoCompleto = null;
-        processoStoreMock.codProcessoCarregado = null;
-        processoStoreMock.dadosValidos.mockReset();
-        processoStoreMock.dadosValidos.mockReturnValue(false);
-        processoStoreMock.garantirContextoCompleto.mockImplementation(
-            (codProcesso: number) => processoService.buscarContextoCompleto(codProcesso)
-        );
+        processoQueryData.value = null;
+        processoQueryEstaStale = false;
+        processoQueryMock.refetch.mockClear();
+        processoQueryMock.refresh.mockClear();
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
@@ -396,7 +403,6 @@ describe("Processo.vue", () => {
     });
 
     it("não recarrega o contexto ao reativar quando o cache ainda está válido", async () => {
-        processoStoreMock.dadosValidos.mockReturnValue(true);
         const manterMontado = ref(true);
         const wrapperKeepAlive = montarKeepAliveProcessoView(manterMontado);
 
@@ -413,7 +419,7 @@ describe("Processo.vue", () => {
     });
 
     it("recarrega o contexto ao reativar quando o cache está inválido", async () => {
-        processoStoreMock.dadosValidos.mockReturnValue(false);
+        processoQueryEstaStale = true;
         const manterMontado = ref(true);
         const wrapperKeepAlive = montarKeepAliveProcessoView(manterMontado);
 
@@ -430,7 +436,7 @@ describe("Processo.vue", () => {
     });
 
     it("mantém o snapshot e exibe erro se a recarga em background falhar", async () => {
-        processoStoreMock.dadosValidos.mockReturnValue(false);
+        processoQueryEstaStale = true;
         const manterMontado = ref(true);
         vi.mocked(processoService.buscarContextoCompleto)
             .mockResolvedValueOnce({

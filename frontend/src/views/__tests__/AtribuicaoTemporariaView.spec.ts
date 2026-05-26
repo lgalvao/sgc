@@ -385,4 +385,50 @@ describe("AtribuicaoTemporariaView", () => {
 
         expect(wrapper.text()).toContain("Falha ao remover atribuição");
     });
+
+    it("valida formulário antes de salvar", async () => {
+        const wrapper = mountView();
+        await flushPromises();
+
+        // Form is empty, should fail validation
+        await wrapper.find("[data-testid='cad-atribuicao__btn-salvar-atribuicao']").trigger("click");
+        await flushPromises();
+
+        expect(mockCriarAtribuicao).not.toHaveBeenCalled();
+        const vm = wrapper.vm as any;
+        expect(vm.mensagemErroUsuario).toBeTruthy();
+        expect(vm.mensagemErroDataInicio).toBeTruthy();
+        expect(vm.mensagemErroDataTermino).toBeTruthy();
+        expect(vm.mensagemErroJustificativa).toBeTruthy();
+    });
+
+    it("recarrega dados ao reativar a view", async () => {
+        const wrapper = mountView();
+        await flushPromises();
+        mockObterUnidade.mockClear();
+        mockBuscarAtribuicoes.mockClear();
+
+        const hook = ((wrapper.vm.$ as any).a)?.[0];
+        if (hook) {
+            await hook.call(wrapper.vm);
+        }
+
+        expect(mockObterUnidade).toHaveBeenCalledWith(1, true);
+        expect(mockBuscarAtribuicoes).toHaveBeenCalledWith(1);
+    });
+
+    it("previne remoção sem unidade ou atribuição vigente", async () => {
+        const wrapper = mountView();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+        
+        vm.unidade = null;
+        await vm.removerAtribuicao();
+        expect(mockRemoverAtribuicao).not.toHaveBeenCalled();
+
+        vm.unidade = { codigo: 1 };
+        vm.atribuicoes = []; // No vigente
+        await vm.removerAtribuicao();
+        expect(mockRemoverAtribuicao).not.toHaveBeenCalled();
+    });
 });

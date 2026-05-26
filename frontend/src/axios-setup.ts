@@ -7,6 +7,7 @@ import logger from "@/utils/logger";
 let routerInstance: Router | null = null;
 const CHAVE_MONITORAMENTO_SESSAO = 'sgc.monitoramento.ativo';
 const MODO_MONITORAMENTO = import.meta.env?.VITE_MONITORAMENTO_MODO || 'off';
+const isBrowser = typeof window !== 'undefined';
 
 type MetadadosMonitoramento = {
     correlacaoId: string;
@@ -29,17 +30,17 @@ let sessaoEmTransicao = false;
 let paginaEmDescarte = false;
 
 function registrarLifecyclePagina() {
-    if (globalThis.window === undefined) {
+    if (!isBrowser) {
         return;
     }
 
-    globalThis.window.addEventListener('pagehide', () => {
+    window.addEventListener('pagehide', () => {
         paginaEmDescarte = true;
     });
-    globalThis.window.addEventListener('beforeunload', () => {
+    window.addEventListener('beforeunload', () => {
         paginaEmDescarte = true;
     });
-    globalThis.window.addEventListener('pageshow', () => {
+    window.addEventListener('pageshow', () => {
         paginaEmDescarte = false;
     });
 }
@@ -51,17 +52,11 @@ export function setRouter(router: Router) {
 }
 
 function isMonitoramentoSolicitadoPorSessao(): boolean {
-    if (globalThis.window === undefined) {
-        return false;
-    }
-    return globalThis.sessionStorage.getItem(CHAVE_MONITORAMENTO_SESSAO) === 'true';
+    return isBrowser && window.sessionStorage[CHAVE_MONITORAMENTO_SESSAO] === 'true';
 }
 
 function isMonitoramentoSolicitadoPorUrl(): boolean {
-    if (globalThis.window === undefined) {
-        return false;
-    }
-    return new URLSearchParams(globalThis.location.search).get('monitoramento') === '1';
+    return isBrowser && new URLSearchParams(window.location.search).get('monitoramento') === '1';
 }
 
 function isMonitoramentoAtivo(): boolean {
@@ -127,7 +122,7 @@ export function finalizarTransicaoSessao() {
 }
 
 export function isErroCanceladoHttp(error: unknown): boolean {
-    if (typeof error !== "object" || error === null) {
+    if (typeof error !== "object" || !error) {
         return false;
     }
 
@@ -160,8 +155,8 @@ function calcularDuracao(inicioMs?: number): number {
 }
 
 function registrarConclusaoResposta(response: AxiosResponse) {
-    const config = (response.config || {}) as ConfiguracaoMonitorada;
-    const metadados = config.metadadosMonitoramento;
+    const config = response.config as ConfiguracaoMonitorada;
+    const metadados = config?.metadadosMonitoramento;
     limparControleCancelamento(config);
 
     if (!metadados?.monitoramentoAtivo) {

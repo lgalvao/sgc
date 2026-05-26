@@ -3,18 +3,19 @@ import {ref} from "vue";
 const CHAVE_TEMA_ESCURO = "temaEscuro";
 const temaEscuro = ref(false);
 const codigoUsuarioTema = ref<string | null>(null);
+const storage: Pick<Storage, "getItem" | "setItem"> = localStorage;
 
 function montarChaveTemaEscuro(codigoUsuario: string): string {
     return `${CHAVE_TEMA_ESCURO}:${codigoUsuario}`;
 }
 
 function lerTemaEscuroPorUsuario(codigoUsuario: string): boolean {
-    const valor = localStorage.getItem(montarChaveTemaEscuro(codigoUsuario));
+    const valor = storage.getItem(montarChaveTemaEscuro(codigoUsuario));
     return valor === "true";
 }
 
 function salvarTemaEscuroPorUsuario(codigoUsuario: string, novoValor: boolean) {
-    localStorage.setItem(montarChaveTemaEscuro(codigoUsuario), String(novoValor));
+    storage.setItem(montarChaveTemaEscuro(codigoUsuario), String(novoValor));
 }
 
 export function useTemaPreferencia() {

@@ -6,7 +6,6 @@ import * as usuarioService from "../services/usuarioService";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 import {useSessionStorage} from "@/composables/useSessionStorage";
 import {usePainelStore} from "@/stores/painel";
-import {useProcessoStore} from "@/stores/processo";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useUnidadeStore} from "@/stores/unidade";
 import {useMapasStore} from "@/stores/mapas";
@@ -37,7 +36,6 @@ interface EstadoSessaoRefs {
 
 interface StoresSessao {
     painelStore: ReturnType<typeof usePainelStore>;
-    processoStore: ReturnType<typeof useProcessoStore>;
     subprocessoStore: ReturnType<typeof useSubprocessoStore>;
     unidadeStore: ReturnType<typeof useUnidadeStore>;
     mapasStore: ReturnType<typeof useMapasStore>;
@@ -62,7 +60,6 @@ function obterUnidadeAtualSelecionada(
 
 function invalidarDadosDaSessao(stores: StoresSessao) {
     stores.painelStore.resetar();
-    stores.processoStore.resetar();
     stores.subprocessoStore.resetar();
     stores.unidadeStore.resetar();
     stores.mapasStore.resetar();
@@ -152,7 +149,6 @@ export const usePerfilStore = defineStore("perfil", () => {
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const unidadeAtualDetalhes = ref<Unidade | null>(null);
     const painelStore = usePainelStore();
-    const processoStore = useProcessoStore();
     const unidadeStore = useUnidadeStore();
     const subprocessoStore = useSubprocessoStore();
     const mapasStore = useMapasStore();
@@ -174,7 +170,6 @@ export const usePerfilStore = defineStore("perfil", () => {
     };
     const storesSessao: StoresSessao = {
         painelStore,
-        processoStore,
         subprocessoStore,
         unidadeStore,
         mapasStore,

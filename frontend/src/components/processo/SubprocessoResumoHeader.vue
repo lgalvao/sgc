@@ -51,7 +51,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
 <template>
   <div data-testid="header-subprocesso">
     <PageHeader
-        :subtitle="subprocesso.unidade?.nome ?? ''"
+        :subtitle="subprocesso.unidade?.nome"
         :title="subprocesso.unidade?.sigla ?? siglaUnidadeFallback"
         title-test-id="subprocesso-header__txt-header-unidade"
     >
@@ -129,7 +129,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
       <BCol md="6">
         <BCard class="h-100" data-testid="header-subprocesso-details-resp">
           <p class="mb-2"><strong>{{ TEXTOS.subprocesso.LABEL_TITULAR }}:</strong> {{
-              subprocesso.titular?.nome || ''
+              subprocesso.titular?.nome
             }}</p>
           <p class="ms-3 mb-3">
             <span v-if="subprocesso.titular?.ramal" class="me-3">
@@ -146,7 +146,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
               v-if="subprocesso.responsavel?.usuario?.nome && subprocesso.responsavel.usuario.nome !== subprocesso.titular?.nome">
             <p class="mb-2">
               <strong>{{ TEXTOS.subprocesso.LABEL_RESPONSAVEL }}:</strong> {{
-                subprocesso.responsavel.usuario.nome || ''
+                subprocesso.responsavel.usuario.nome
               }}
               <span v-if="subprocesso.responsavel.tipo" class="ms-1 small text-muted italic">
                 - {{ formatTipoResponsabilidade(subprocesso.responsavel) }}

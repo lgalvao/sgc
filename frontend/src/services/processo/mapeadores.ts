@@ -1,18 +1,18 @@
 import {SituacaoSubprocesso, type UnidadeParticipante} from "@/types/tipos";
 import type {Processo, ProcessoDetalheResponseBackend, UnidadeParticipanteDto} from "./types";
 
-export function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {
+function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {
     return {
         nome: dto.nome!,
         sigla: dto.sigla!,
         codUnidade: dto.codUnidade,
-        codSubprocesso: dto.codSubprocesso ?? 0,
+        codSubprocesso: dto.codSubprocesso !== undefined && dto.codSubprocesso !== null ? dto.codSubprocesso : 0,
         codUnidadeSuperior: dto.codUnidadeSuperior,
-        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso | undefined) ?? SituacaoSubprocesso.NAO_INICIADO,
-        dataLimite: dto.dataLimite ?? "",
+        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso | undefined) ? (dto.situacaoSubprocesso as SituacaoSubprocesso) : SituacaoSubprocesso.NAO_INICIADO,
+        dataLimite: dto.dataLimite ? dto.dataLimite : "",
         mapaCodigo: dto.mapaCodigo,
         localizacaoAtualCodigo: dto.localizacaoAtualCodigo,
-        filhos: (dto.filhos ?? []).map(mapearUnidadeParticipante),
+        filhos: (dto.filhos ? dto.filhos : []).map(mapearUnidadeParticipante),
     };
 }
 

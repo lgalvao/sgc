@@ -55,11 +55,11 @@ describe('LimpezaProcessosView', () => {
                         template: '<div v-if="modelValue" class="modal-stub"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
                         props: ['modelValue']
                     },
-                    BAlert: true,
-                    BCard: true,
+                    BAlert: {template: '<div><slot/></div>'},
+                    BCard: {template: '<div><slot/></div>'},
                     BFormGroup: {template: '<div><slot/><slot name="label"/></div>', props: ['state']},
-                    BFormInput: true,
-                    BFormInvalidFeedback: true
+                    BFormInput: {template: '<input data-testid="input-codigo-processo" type="number" @keydown.enter="$emit(\'keydown\', $event)" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['state', 'modelValue']},
+                    BFormInvalidFeedback: {template: '<div><slot/></div>', props: ['state']}
                 }
             }
         });
@@ -128,5 +128,32 @@ describe('LimpezaProcessosView', () => {
         vm.codigoProcesso = '';
         await vm.confirmarExclusao();
         expect(excluirProcessoCompleto).not.toHaveBeenCalled();
+    });
+
+    it('renders form inputs correctly with and without errors', async () => {
+        const wrapper = mountComponent();
+        const vm = wrapper.vm as any;
+
+        // With invalid/empty value
+        vm.codigoProcesso = '';
+        await wrapper.vm.$nextTick();
+        // mensagemErroCodigo should be truthy because !codigoConfirmacao is true
+        expect(vm.mensagemErroCodigo).toBeTruthy();
+        
+        // With valid value
+        vm.codigoProcesso = '999';
+        await wrapper.vm.$nextTick();
+        // mensagemErroCodigo should be empty because !codigoConfirmacao is false
+        expect(vm.mensagemErroCodigo).toBe('');
+    });
+
+    it('triggers abrirConfirmacao on enter keypress', async () => {
+        const wrapper = mountComponent();
+        const input = wrapper.find('[data-testid="input-codigo-processo"]');
+        
+        // Simulate enter press
+        await input.trigger('keydown.enter');
+        // Validates form
+        expect(mockValidarSubmissao).toHaveBeenCalled();
     });
 });

@@ -52,91 +52,77 @@ function abrirReabertura(estado: ReturnType<typeof criarEstado>, resetarValidaca
     estado.mostrarModalReabrir.value = true;
 }
 
-async function alterarDataLimite(args: {
-    dependencias: DependenciasSubprocessoAcoesAdministrativas;
-    estado: ReturnType<typeof criarEstado>;
-    invalidarCachesSubprocesso: ReturnType<typeof useInvalidacaoNavegacao>["invalidarCachesSubprocesso"];
-    toastStore: ReturnType<typeof useToastStore>;
-    novaData: string;
-}) {
-    const {dependencias, estado, invalidarCachesSubprocesso, toastStore, novaData} = args;
-    const detalhe = dependencias.subprocesso.value;
-    if (!novaData || !detalhe) {
-        return;
-    }
-
-    estado.loadingDataLimite.value = true;
-    try {
-        await dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
-        estado.mostrarModalAlterarDataLimite.value = false;
-        toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
-        invalidarCachesSubprocesso({incluirPainel: true});
-        await dependencias.atualizarSubprocessoAtual();
-    } catch (error) {
-        logger.error(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, error);
-        dependencias.notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, "danger");
-    } finally {
-        estado.loadingDataLimite.value = false;
-    }
-}
-
-async function confirmarReabertura(
-    dependencias: DependenciasSubprocessoAcoesAdministrativas,
-    estado: ReturnType<typeof criarEstado>
-) {
-    const justificativa = estado.justificativaReabertura.value.trim();
-    if (!dependencias.validarSubmissao(Boolean(justificativa))) {
-        void dependencias.focarPrimeiroErroInvalido();
-        return;
-    }
-
-    estado.loadingReabertura.value = true;
-    try {
-        const reabrir = estado.tipoReabertura.value === "revisao"
-            ? dependencias.reabrirRevisaoCadastro
-            : dependencias.reabrirCadastro;
-        const sucesso = await reabrir(dependencias.codigoSubprocesso.value!, justificativa);
-        if (!sucesso) {
-            return;
-        }
-
-        estado.mostrarModalReabrir.value = false;
-        estado.justificativaReabertura.value = "";
-        dependencias.exibirToastPendente();
-    } finally {
-        estado.loadingReabertura.value = false;
-    }
-}
-
-async function enviarLembrete(
-    dependencias: DependenciasSubprocessoAcoesAdministrativas,
-    estado: ReturnType<typeof criarEstado>,
-    toastStore: ReturnType<typeof useToastStore>
-) {
-    const detalhe = dependencias.subprocesso.value;
-    if (!detalhe || estado.loadingLembrete.value) {
-        return;
-    }
-
-    estado.loadingLembrete.value = true;
-    try {
-        await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
-        await dependencias.garantirContextoEdicao(dependencias.codigoSubprocesso.value!, true);
-        estado.modalLembreteAberto.value = false;
-        toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
-        dependencias.exibirToastPendente();
-    } catch (error) {
-        logger.error(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, error);
-        dependencias.notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, "danger");
-    } finally {
-        estado.loadingLembrete.value = false;
-    }
-}
-
 export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSubprocessoAcoesAdministrativas) {
     const {invalidarCachesSubprocesso} = useInvalidacaoNavegacao();
     const toastStore = useToastStore();
     const estado = criarEstado();
+
+    async function confirmarAlteracaoDataLimite(novaData: string) {
+        const detalhe = dependencias.subprocesso.value;
+        if (!novaData || !detalhe) {
+            return;
+        }
+
+        estado.loadingDataLimite.value = true;
+        try {
+            await dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
+            estado.mostrarModalAlterarDataLimite.value = false;
+            toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
+            invalidarCachesSubprocesso({incluirPainel: true});
+            await dependencias.atualizarSubprocessoAtual();
+        } catch (error) {
+            logger.error(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, error);
+            dependencias.notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, "danger");
+        } finally {
+            estado.loadingDataLimite.value = false;
+        }
+    }
+
+    async function confirmarReabertura() {
+        const justificativa = estado.justificativaReabertura.value.trim();
+        if (!dependencias.validarSubmissao(Boolean(justificativa))) {
+            void dependencias.focarPrimeiroErroInvalido();
+            return;
+        }
+
+        estado.loadingReabertura.value = true;
+        try {
+            const reabrir = estado.tipoReabertura.value === "revisao"
+                ? dependencias.reabrirRevisaoCadastro
+                : dependencias.reabrirCadastro;
+            const sucesso = await reabrir(dependencias.codigoSubprocesso.value!, justificativa);
+            if (!sucesso) {
+                return;
+            }
+
+            estado.mostrarModalReabrir.value = false;
+            estado.justificativaReabertura.value = "";
+            dependencias.exibirToastPendente();
+        } finally {
+            estado.loadingReabertura.value = false;
+        }
+    }
+
+    async function enviarLembreteConfirmado() {
+        const detalhe = dependencias.subprocesso.value;
+        if (!detalhe || estado.loadingLembrete.value) {
+            return;
+        }
+
+        estado.loadingLembrete.value = true;
+        try {
+            await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
+            await dependencias.garantirContextoEdicao(dependencias.codigoSubprocesso.value!, true);
+            estado.modalLembreteAberto.value = false;
+            toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
+            dependencias.exibirToastPendente();
+        } catch (error) {
+            logger.error(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, error);
+            dependencias.notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, "danger");
+        } finally {
+            estado.loadingLembrete.value = false;
+        }
+    }
 
     return {
         tipoReabertura: estado.tipoReabertura,
@@ -162,20 +148,19 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
         fecharModalAlterarDataLimite: () => {
             estado.mostrarModalAlterarDataLimite.value = false;
         },
-        confirmarAlteracaoDataLimite: (novaData: string) =>
-            alterarDataLimite({dependencias, estado, invalidarCachesSubprocesso, toastStore, novaData}),
+        confirmarAlteracaoDataLimite,
         abrirModalReabrirCadastro: () => abrirReabertura(estado, dependencias.resetarValidacao, "cadastro"),
         abrirModalReabrirRevisao: () => abrirReabertura(estado, dependencias.resetarValidacao, "revisao"),
         fecharModalReabrir: () => {
             estado.mostrarModalReabrir.value = false;
             estado.justificativaReabertura.value = "";
         },
-        confirmarReabertura: () => confirmarReabertura(dependencias, estado),
+        confirmarReabertura,
         confirmarEnviarLembrete: () => {
             if (dependencias.subprocesso.value) {
                 estado.modalLembreteAberto.value = true;
             }
         },
-        enviarLembreteConfirmado: () => enviarLembrete(dependencias, estado, toastStore),
+        enviarLembreteConfirmado,
     };
 }

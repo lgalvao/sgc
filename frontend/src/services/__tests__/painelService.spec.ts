@@ -1,57 +1,38 @@
 import {describe, expect, it, vi} from "vitest";
-import {setupServiceTest, testErrorHandling} from "@/test-utils/serviceTestHelpers";
-import * as service from "../painelService";
+import apiClient from "@/axios-setup";
+import {listarProcessos, marcarAlertasLidos, obterBootstrap} from "../painelService";
 
-vi.mock("@/mappers/processos", () => ({
-    mapProcessoResumoDtoToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
-}));
-vi.mock("@/mappers/alertas", () => ({
-    mapAlertaDtoToFrontend: vi.fn((dto) => ({...dto, mapped: true})),
+vi.mock("@/axios-setup", () => ({
+  default: {
+    get: vi.fn(),
+    post: vi.fn()
+  }
 }));
 
 describe("painelService", () => {
-    const {mockApi} = setupServiceTest();
+  it("obterBootstrap deve chamar endpoint", async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({data: {usuario: {}}});
+    await obterBootstrap();
+    expect(apiClient.get).toHaveBeenCalledWith("/painel/bootstrap");
+  });
 
-    describe("listarProcessos", () => {
-        it("deve buscar e mapear processos sem enviar o perfil", async () => {
-            const dtoList = [{codigo: 1, tipo: "MAPEAMENTO"}];
-            const responseData = {
-                content: dtoList,
-                totalPages: 1,
-                totalElements: 1,
-                number: 0,
-                size: 20,
-                first: true,
-                last: true,
-                empty: false,
-            };
-            mockApi.get.mockResolvedValueOnce({data: responseData});
-
-            const result = await service.listarProcessos({codUnidade: 1});
-
-            expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
-                params: {unidade: 1, page: 0, size: 20},
-            });
-            expect(result.content[0]).toEqual(dtoList[0]);
-        });
-
-        it("deve lidar com paginação", async () => {
-            mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarProcessos({page: 2, size: 10});
-            expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
-                params: {page: 2, size: 10},
-            });
-        });
-
-        it("deve lidar com ordenação", async () => {
-            mockApi.get.mockResolvedValueOnce({data: {content: []}});
-            await service.listarProcessos({page: 0, size: 10, sort: "descricao", order: "desc"});
-            expect(mockApi.get).toHaveBeenCalledWith("/painel/processos", {
-                params: {page: 0, size: 10, sort: "descricao,desc"},
-            });
-        });
-
-        testErrorHandling(() => service.listarProcessos({codUnidade: 1}));
+  it("listarProcessos deve formatar query params", async () => {
+    vi.mocked(apiClient.get).mockResolvedValue({data: {content: []}});
+    
+    await listarProcessos({codUnidade: 1, page: 2, sort: "descricao", order: "asc"});
+    
+    expect(apiClient.get).toHaveBeenCalledWith("/painel/processos", {
+      params: {
+        unidade: 1,
+        page: 2,
+        size: 20,
+        sort: "descricao,asc"
+      }
     });
+  });
 
+  it("marcarAlertasLidos deve chamar post", async () => {
+    await marcarAlertasLidos([1, 2]);
+    expect(apiClient.post).toHaveBeenCalledWith("/painel/alertas/marcar-lidos", [1, 2]);
+  });
 });

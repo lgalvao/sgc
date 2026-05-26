@@ -119,7 +119,8 @@ function ordenarComoArvoreUnidades(unidades: Unidade[]): Unidade[] {
 function filtrarArvoreSemMapaVigente(unidades: Unidade[], codigosSemMapaVigente: Set<number>): Unidade[] {
   return unidades
       .map((unidade): Unidade | null => {
-        const filhasFiltradas = filtrarArvoreSemMapaVigente(unidade.filhas ?? [], codigosSemMapaVigente);
+        const filhasValidas = unidade.filhas ? unidade.filhas : [];
+        const filhasFiltradas = filtrarArvoreSemMapaVigente(filhasValidas, codigosSemMapaVigente);
         const unidadeSemMapaVigente = codigosSemMapaVigente.has(unidade.codigo);
 
         if (!unidadeSemMapaVigente && filhasFiltradas.length === 0) {
@@ -131,7 +132,7 @@ function filtrarArvoreSemMapaVigente(unidades: Unidade[], codigosSemMapaVigente:
           filhas: filhasFiltradas
         };
       })
-      .filter((unidade): unidade is Unidade => unidade !== null);
+      .filter((unidade): unidade is Unidade => !!unidade);
 }
 
 function filtrarUnidadesExibidas(arvore: Unidade[]): Unidade[] {
@@ -150,10 +151,11 @@ const cardsRelatorio = computed<CardUnidade[]>(() => {
   const maesOrdenadas = ordenarComoArvoreUnidades(unidadesSemMapaVigenteArvore.value);
 
   return maesOrdenadas.map(unidadeMae => {
+    const filhasMae = unidadeMae.filhas ? unidadeMae.filhas : [];
     // Se for um agrupador visual (Zonas), as filhas já estão prontas/ordenadas
     const unidades = unidadeMae.tipo === "AGRUPADOR_VISUAL"
-        ? (unidadeMae.filhas ?? [])
-        : ordenarComoArvoreUnidades(unidadeMae.filhas ?? []);
+        ? filhasMae
+        : ordenarComoArvoreUnidades(filhasMae);
 
     return {
       chave: `card-unidade-${unidadeMae.codigo}`,

@@ -66,9 +66,9 @@ export function formatSituacaoSubprocesso(situacao: SituacaoSubprocesso | string
 export function calcularAssinaturaCadastro(atividades: Atividade[]): string {
     if (!atividades) return "";
     return atividades.map((a) => {
-        const descricao = (a.descricao || "").trim();
-        const conhecimentos = (a.conhecimentos || [])
-            .map((c) => (c.descricao || "").trim())
+        const descricao = a.descricao ? a.descricao.trim() : "";
+        const conhecimentos = (a.conhecimentos ? a.conhecimentos : [])
+            .map((c) => c.descricao ? c.descricao.trim() : "")
             .sort()
             .join("\u0001");
         return descricao + "\u0002" + conhecimentos;

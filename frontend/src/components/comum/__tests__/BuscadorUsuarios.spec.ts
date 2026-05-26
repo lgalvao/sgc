@@ -153,5 +153,47 @@ describe('BuscadorUsuarios.vue', () => {
         await wrapper.vm.$nextTick()
 
         expect(wrapper.find('[data-testid="lista-usuarios-pesquisa"]').exists()).toBe(false)
-    })
-})
+    });
+
+    it('deve selecionar usuario com Enter', async () => {
+        vi.mocked(usuarioService.pesquisarUsuarios).mockResolvedValue([{nome: 'Joao', tituloEleitoral: '1'}]);
+        const wrapper = mount(BuscadorUsuarios, { props: { termo: '' } });
+        const input = wrapper.find('input');
+        await input.setValue('Jo');
+        await aguardarProcessamento(wrapper);
+
+        await input.trigger('keydown', { key: 'Enter' });
+        expect(wrapper.emitted('update:selecionado')![0]).toEqual(['1']);
+    });
+
+    it('deve fechar dropdown com Escape', async () => {
+        vi.mocked(usuarioService.pesquisarUsuarios).mockResolvedValue([{nome: 'Joao', tituloEleitoral: '1'}]);
+        const wrapper = mount(BuscadorUsuarios, { props: { termo: '' } });
+        const input = wrapper.find('input');
+        await input.setValue('Jo');
+        await aguardarProcessamento(wrapper);
+
+        await input.trigger('keydown', { key: 'Escape' });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.find('[data-testid="lista-usuarios-pesquisa"]').exists()).toBe(false);
+    });
+
+    it('deve abrir dropdown com ArrowDown se termo minimo atingido', async () => {
+        const wrapper = mount(BuscadorUsuarios, { props: { termo: 'Jo' } });
+        const vm = wrapper.vm as any;
+        vm.mostrarResultadosUsuarios = false;
+        
+        await wrapper.find('input').trigger('keydown', { key: 'ArrowDown' });
+        expect(vm.mostrarResultadosUsuarios).toBe(true);
+    });
+
+    it('deve focar o input via expose', () => {
+        const wrapper = mount(BuscadorUsuarios, { props: { termo: '' } });
+        const vm = wrapper.vm as any;
+        const spy = vi.fn();
+        // Mocking the element's focus
+        vm.inputRef = { $el: { focus: spy } };
+        vm.focus();
+        expect(spy).toHaveBeenCalled();
+    });
+});

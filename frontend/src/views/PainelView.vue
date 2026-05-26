@@ -73,6 +73,7 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {formatarDataHoraBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from "@/stores/perfil";
+import {usePainelQuery} from "@/composables/usePainelQuery";
 import {usePerfil} from "@/composables/usePerfil";
 import {useToastStore} from "@/stores/toast";
 import {usePainelStore} from "@/stores/painel";
@@ -84,6 +85,7 @@ const perfilStore = usePerfilStore();
 const perfil = usePerfil();
 const toastStore = useToastStore();
 const painelStore = usePainelStore();
+const painelQuery = usePainelQuery();
 const toast = useToast();
 const carregandoPainel = ref(true);
 
@@ -94,7 +96,7 @@ const asc = ref(true);
 
 // Ordenação local: sem round-trip ao backend
 const processosOrdenados = computed(() => {
-  const lista = [...painelStore.processos];
+  const lista = [...(painelQuery.data.value?.processos ?? [])];
   const campo = criterio.value;
   const direcao = asc.value ? 1 : -1;
   return lista.sort((a, b) => {
@@ -107,7 +109,7 @@ const processosOrdenados = computed(() => {
 });
 
 // Alertas já ordenados pelo backend (desc dataHora); exibidos diretamente
-const alertas = computed(() => painelStore.alertas);
+const alertas = computed(() => painelQuery.data.value?.alertas ?? []);
 
 async function carregarDados() {
   const unidadeCodigo = perfilStore.unidadeSelecionada;
@@ -118,13 +120,9 @@ async function carregarDados() {
 
   carregandoPainel.value = true;
   try {
-    // Bootstrap: carrega processos e alertas em um único round-trip
-    const bootstrap = await painelService.obterBootstrap();
-
-    painelStore.definirDados(
-        bootstrap.processos,
-        bootstrap.alertas
-    );
+    const bootstrap = carregamentoInicialConcluido.value
+        ? (await painelQuery.refresh(true)).data
+        : (await painelQuery.refetch(true)).data;
 
     // Marcar não lidos como lidos: fire-and-forget, não bloqueia a tela
     const codigosNaoLidos = bootstrap.alertas
@@ -168,8 +166,6 @@ onMounted(async () => {
 onActivated(async () => {
   if (!carregamentoInicialConcluido.value) return;
   exibirToastPendente();
-  // Só recarrega se o cache foi invalidado (ex: após ação de workflow)
-  if (painelStore.dadosValidos()) return;
   await carregarDados();
 });
 

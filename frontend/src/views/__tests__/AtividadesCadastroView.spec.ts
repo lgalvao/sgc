@@ -12,6 +12,8 @@ import ConfirmacaoDisponibilizacaoModal from "@/components/mapa/ConfirmacaoDispo
 import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import ImpactoMapaModal from "@/components/mapa/ImpactoMapaModal.vue";
 import * as useAcessoModule from '@/composables/acesso';
+import * as useNotificationModule from '@/composables/useNotification';
+import {useNotification} from '@/composables/useNotification';
 import {TEXTOS} from "@/constants/textos";
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
@@ -32,6 +34,22 @@ vi.mock("@/utils/logger", () => ({
         info: vi.fn(),
         debug: vi.fn(),
     }
+}));
+
+const notificacaoMock = ref<any>(null);
+const notifyMock = vi.fn((mensagem, variante, dispensavel) => {
+    notificacaoMock.value = {mensagem, variante, dispensavel};
+});
+const clearMock = vi.fn(() => {
+    notificacaoMock.value = null;
+});
+
+vi.mock("@/composables/useNotification", () => ({
+    useNotification: vi.fn(() => ({
+        notify: notifyMock,
+        clear: clearMock,
+        notificacao: notificacaoMock
+    }))
 }));
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
@@ -894,6 +912,24 @@ describe("CadastroView.vue", () => {
         ]);
     });
 
+    it("handleImportAtividades exibe aviso quando resultado tem aviso", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as unknown as CadastroViewVm;
+
+        const resultadoComAviso = {
+            aviso: "Duplicatas encontradas",
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: criarContextoEdicao().detalhes.permissoes,
+            atividadesAtualizadas: []
+        };
+
+        await vm.handleImportAtividades(resultadoComAviso);
+
+        const notifyMock = vi.mocked(useNotificationModule.useNotification()).notify;
+        expect(notifyMock).toHaveBeenCalledWith(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
+    });
+
     it("deve gerenciar interações com formulários de atividades, modais de importação e alertas de erro", async () => {
         const wrapper = createWrapper();
         await flushPromises();
@@ -1074,5 +1110,67 @@ describe("CadastroView.vue", () => {
         // O teste deve falhar aqui se o bug persistir
         expect(vm.erroGlobal).toBe("Erro de validação");
         expect(wrapper.find('[data-testid="btn-dismiss-alert"]').exists()).toBe(true);
+    });
+
+    it("deve gerenciar interações com formulários de atividades, modais de importação e alertas de erro extras", async () => {
+        const wrapper = createWrapper();
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        // handleAdicionarAtividade branches
+        await vm.handleAdicionarAtividade();
+        expect(mockAtividadeForm.adicionarAtividade).toHaveBeenCalled();
+
+        // scrollParaPrimeiroErro branches
+        vm.errosValidacao = [{atividadeCodigo: 1, mensagem: 'erro'}];
+        const div = document.createElement('div');
+        div.scrollIntoView = vi.fn();
+        vm.setAtividadeRef(1, div);
+        vm.scrollParaPrimeiroErro();
+        expect(div.scrollIntoView).toHaveBeenCalled();
+
+        // handleImportAtividades branches (success case without warning)
+        await vm.handleImportAtividades({
+            aviso: null, 
+            atividadesAtualizadas: [], 
+            subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
+            permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
+        });
+        expect(notifyMock).toHaveBeenCalledWith(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
+    });
+
+    it("deve calcular assinatura e ordenar atividades corretamente", async () => {
+        const wrapper = createWrapper();
+        const vm = wrapper.vm as any;
+        
+        vm.atividades = [
+            {codigo: 1, descricao: 'B'},
+            {codigo: 2, descricao: 'A'},
+            {codigo: null, descricao: 'C'}
+        ];
+
+        expect(vm.atividadesOrdenadas[0].codigo).toBe(2);
+        expect(vm.atividadesOrdenadas[1].codigo).toBe(1);
+        expect(vm.atividadesOrdenadas[2].codigo).toBe(null);
+        
+        expect(vm.houveAlteracaoCadastro).toBe(true);
+    });
+
+    it("deve esconder edicao para chefe quando nao habilitado", async () => {
+        const wrapper = createWrapper({}, {
+            podeEditarCadastro: ref(true),
+            habilitarEditarCadastro: ref(false)
+        });
+        await flushPromises();
+        const vm = wrapper.vm as any;
+
+        const {usePerfilStore} = await import("@/stores/perfil");
+        const perfilStore = usePerfilStore();
+        perfilStore.perfilSelecionado = Perfil.CHEFE;
+
+        expect(vm.podeEditarCadastro).toBe(true);
+        expect(vm.habilitarEditarCadastro).toBe(false);
+        expect(vm.esconderEdicaoCadastroParaChefe).toBe(true);
+        expect(vm.mostrarControlesEdicaoCadastro).toBe(false);
     });
 });

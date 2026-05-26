@@ -1,27 +1,39 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import apiClient from "@/axios-setup";
-import {listarFeedbacksAdmin} from "../feedbackAdminService";
+import {listarFeedbacksAdmin, obterUrlScreenshot} from "../feedbackAdminService";
 
 vi.mock("@/axios-setup", () => ({
-    default: {
-        get: vi.fn(),
+  default: {
+    get: vi.fn(),
+    defaults: {
+      baseURL: "http://localhost:8080/api"
     }
+  }
 }));
 
 describe("feedbackAdminService", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
+  it("listarFeedbacksAdmin deve chamar o endpoint correto", async () => {
+    const mockData = [{codigo: "123"}];
+    vi.mocked(apiClient.get).mockResolvedValue({data: mockData});
+
+    const result = await listarFeedbacksAdmin(50);
+
+    expect(apiClient.get).toHaveBeenCalledWith("/feedback/listar", {
+      params: {limite: 50}
     });
+    expect(result).toEqual(mockData);
+  });
 
-    it("listarFeedbacksAdmin deve fazer GET para /feedback/listar com limite", async () => {
-        const mockData = [{codigo: "1", tipo: "BUG"}];
-        vi.mocked(apiClient.get).mockResolvedValue({data: mockData} as any);
+  it("obterUrlScreenshot deve construir a URL corretamente", () => {
+    const url = obterUrlScreenshot("abc");
+    expect(url).toBe("http://localhost:8080/api/feedback/abc/screenshot");
+  });
 
-        const resultado = await listarFeedbacksAdmin(25);
+  it("obterUrlScreenshot deve lidar com baseURL sem /api ou com slash", () => {
+    apiClient.defaults.baseURL = "http://api.teste/";
+    expect(obterUrlScreenshot("x")).toBe("http://api.teste/feedback/x/screenshot");
 
-        expect(apiClient.get).toHaveBeenCalledWith("/feedback/listar", {
-            params: {limite: 25}
-        });
-        expect(resultado).toEqual(mockData);
-    });
+    apiClient.defaults.baseURL = "";
+    expect(obterUrlScreenshot("y")).toBe("/api/feedback/y/screenshot");
+  });
 });
