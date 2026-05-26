@@ -78,7 +78,7 @@ const editor = new Editor({
 
         if (excedeuLimite && !estaReduzindoConteudoExistente) {
             erroComprimento.value = `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`;
-            emit("update:invalido", true);
+            atualizarEstadoInvalido(true);
             editorAtual.commands.setContent(ultimoConteudoValido.value, {emitUpdate: false});
             return;
         }
@@ -87,7 +87,7 @@ const editor = new Editor({
         erroComprimento.value = excedeuLimite
             ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
             : "";
-        emit("update:invalido", excedeuLimite);
+        atualizarEstadoInvalido(excedeuLimite);
         emit("update:modelValue", htmlNormalizado);
     },
 });
@@ -103,7 +103,7 @@ watch(() => props.modelValue, (valorAtual) => {
     erroComprimento.value = proximoConteudo.length > props.maximoCaracteres
         ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
         : "";
-    emit("update:invalido", proximoConteudo.length > props.maximoCaracteres);
+    atualizarEstadoInvalido(proximoConteudo.length > props.maximoCaracteres);
     editor.commands.setContent(proximoConteudo, {emitUpdate: false});
 }, {immediate: true});
 
@@ -156,6 +156,10 @@ function executarAcao(executar: () => boolean) {
     if (!props.desabilitado) {
         executar();
     }
+}
+
+function atualizarEstadoInvalido(estaInvalido: boolean) {
+    emit("update:invalido", estaInvalido);
 }
 
 function sincronizarPorDom(event: Event) {

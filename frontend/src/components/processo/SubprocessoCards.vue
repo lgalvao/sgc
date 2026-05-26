@@ -61,7 +61,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
-            @keydown="handleKeyDown($event, 'AutoavaliacaoDiagnostico', true)"
+            @keydown="handleKeyDownDiagnostico($event, 'AutoavaliacaoDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -85,7 +85,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
-            @keydown="handleKeyDown($event, 'OcupacoesCriticasDiagnostico', true)"
+            @keydown="handleKeyDownDiagnostico($event, 'OcupacoesCriticasDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -108,7 +108,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('MonitoramentoDiagnostico')"
-            @keydown="handleKeyDown($event, 'MonitoramentoDiagnostico', true)"
+            @keydown="handleKeyDownDiagnostico($event, 'MonitoramentoDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -174,14 +174,17 @@ function navegarParaDiag(routeName: string) {
   });
 }
 
-function handleKeyDown(event: KeyboardEvent, routeName: string, diag = false) {
+function handleKeyDown(event: KeyboardEvent, routeName: string) {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
-    if (diag) {
-      navegarParaDiag(routeName);
-    } else {
-      navegarPara(routeName);
-    }
+    navegarPara(routeName);
+  }
+}
+
+function handleKeyDownDiagnostico(event: KeyboardEvent, routeName: string) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    navegarParaDiag(routeName);
   }
 }
 
@@ -189,7 +192,8 @@ defineExpose({
   TipoProcessoEnum,
   navegarPara,
   navegarParaDiag,
-  handleKeyDown
+  handleKeyDown,
+  handleKeyDownDiagnostico,
 });
 </script>
 

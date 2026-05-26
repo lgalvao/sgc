@@ -108,7 +108,7 @@ function registrarErro(error: unknown) {
 
 async function carregarContextoCompleto() {
   limparErro();
-  const snapshotAnterior = processo.value;
+  const processoAnterior = processo.value;
 
   try {
     const resultado = carregamentoInicialConcluido.value
@@ -120,8 +120,8 @@ async function carregarContextoCompleto() {
     }
     return data;
   } catch (error) {
-    // Em recargas em background, mantemos o último snapshot até que haja sucesso ou usuário decida sair
-    processo.value = snapshotAnterior;
+    // Em recargas em background, mantemos o último processo carregado até que haja sucesso ou usuário decida sair
+    processo.value = processoAnterior;
     ultimoErro.value = normalizarErro(error);
     return null;
   }

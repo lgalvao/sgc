@@ -1,20 +1,20 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-26T12:28:56.042Z",
+  "geradoEm": "2026-05-26T12:44:30.561Z",
   "resumo": {
     "arquivosProducao": 243,
-    "scoreTotal": 96,
-    "faixa": "critico",
+    "scoreTotal": 20,
+    "faixa": "bom",
     "metricas": {
-      "viewsComVazamentoCache": 3,
+      "viewsComVazamentoCache": 0,
       "acessosDiretosCache": 0,
       "metodosEmCache": 0,
       "invalidacoesExplicitasEmViews": 0,
-      "booleanosPosicionais": 16,
+      "booleanosPosicionais": 0,
       "ocorrenciasForcar": 0,
       "ocorrenciasStale": 0,
-      "ocorrenciasSnapshot": 1,
-      "hubsCentraisComSinais": 2
+      "ocorrenciasSnapshot": 0,
+      "hubsCentraisComSinais": 1
     }
   },
   "hotspots": [
@@ -36,235 +36,6 @@
         "invalidacaoExplicita"
       ],
       "hubCentral": true
-    },
-    {
-      "arquivo": "frontend/src/composables/useCadastroOrquestracao.ts",
-      "camada": "composable",
-      "linhas": 128,
-      "score": 18,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 2,
-        "booleanoPosicional": 2,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita",
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/components/processo/SubprocessoCards.vue",
-      "camada": "component",
-      "linhas": 221,
-      "score": 12,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 3,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
-      "camada": "composable",
-      "linhas": 263,
-      "score": 8,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 2,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/stores/unidade.ts",
-      "camada": "store",
-      "linhas": 142,
-      "score": 8,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 2,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": true
-    },
-    {
-      "arquivo": "frontend/src/components/comum/EditorTextoRico.vue",
-      "camada": "component",
-      "linhas": 309,
-      "score": 4,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 1,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/subprocessoAcoesAdministrativas.ts",
-      "camada": "view",
-      "linhas": 167,
-      "score": 4,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 1,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/components/processo/TabelaProcessos.vue",
-      "camada": "component",
-      "linhas": 155,
-      "score": 4,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 1,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/subprocessoCarregamento.ts",
-      "camada": "view",
-      "linhas": 115,
-      "score": 4,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 1,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useMapaOrquestracao.ts",
-      "camada": "composable",
-      "linhas": 84,
-      "score": 4,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 1,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/components/processo/ProcessoSubprocessosTable.vue",
-      "camada": "component",
-      "linhas": 67,
-      "score": 4,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 1,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/components/processo/ProcessoInfo.vue",
-      "camada": "component",
-      "linhas": 45,
-      "score": 4,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 1,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "sinaisAtivos": [
-        "booleanoPosicional"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/ProcessoDetalheView.vue",
-      "camada": "view",
-      "linhas": 201,
-      "score": 2,
-      "sinais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 1
-      },
-      "sinaisAtivos": [
-        "palavraSnapshot"
-      ],
-      "hubCentral": false
     }
   ]
 }

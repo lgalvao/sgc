@@ -75,11 +75,11 @@ async function executarRecargaContexto(
     tipo: "cadastro" | "edicao",
 ) {
     if (tipo === "cadastro") {
-        await subprocessoStore.garantirContextoCadastroAtividades(codigoSubprocesso, true);
+        await subprocessoStore.recarregarContextoCadastroAtividades(codigoSubprocesso);
         return;
     }
 
-    await subprocessoStore.garantirContextoEdicao(codigoSubprocesso, true);
+    await subprocessoStore.recarregarContextoEdicao(codigoSubprocesso);
 }
 
 export function useFluxoSubprocesso() {

@@ -14,8 +14,9 @@ const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 const subprocessoStoreCacheMock = {
     contextoEdicao: null as any,
     erroIntegracaoContexto: null,
-    garantirContextoEdicao: vi.fn(),
-    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    obterContextoEdicao: vi.fn(),
+    obterContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    dadosEdicaoValidos: vi.fn(),
     limparContextoAtual: vi.fn(),
     invalidar: vi.fn(),
 };
@@ -137,10 +138,11 @@ describe("MapaView somente leitura", () => {
                 codUnidade: 1,
             },
         };
-        subprocessoStoreCacheMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+        subprocessoStoreCacheMock.obterContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
             codigo: 123,
             contexto,
         });
+        subprocessoStoreCacheMock.dadosEdicaoValidos.mockReturnValue(false);
 
         vi.mocked(subprocessoService.obterSugestoesMapa).mockResolvedValue("Sugestão persistida");
         vi.mocked(analiseService.listarAnalisesValidacao).mockResolvedValue([]);

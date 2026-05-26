@@ -4,8 +4,8 @@ import {flushPromises, mount} from "@vue/test-utils";
 import {useMapaOrquestracao} from "../useMapaOrquestracao";
 
 const subprocessoStoreMock = {
-    garantirContextoEdicao: vi.fn(),
-    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    obterContextoEdicao: vi.fn(),
+    obterContextoEdicaoPorProcessoEUnidade: vi.fn(),
     dadosEdicaoValidos: vi.fn(),
 };
 
@@ -41,7 +41,7 @@ describe("useMapaOrquestracao", () => {
             codProcesso: 1,
             sigla: "TEST",
         });
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
             codigo: 123,
             contexto: {
                 detalhes: {codigo: 123},
@@ -56,7 +56,7 @@ describe("useMapaOrquestracao", () => {
         expect(codigoSubprocesso.value).toBe(123);
         expect(unidade.value).toEqual(expect.objectContaining({sigla: "TEST"}));
         expect(mapasStoreMock.sincronizarMapa).toHaveBeenCalledWith(123, expect.objectContaining({codigo: 77}));
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST", false);
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST");
         expect(carregandoInicial.value).toBe(false);
     });
 
@@ -66,7 +66,7 @@ describe("useMapaOrquestracao", () => {
             sigla: "TEST",
             codSubprocesso: 456,
         });
-        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue({
+        subprocessoStoreMock.obterContextoEdicao.mockResolvedValue({
             detalhes: {codigo: 456},
             unidade: {sigla: "TEST", nome: "Unidade Teste"},
             mapa: {codigo: 88, competencias: []},
@@ -76,8 +76,8 @@ describe("useMapaOrquestracao", () => {
 
         expect(sucesso).toBe(true);
         expect(codigoSubprocesso.value).toBe(456);
-        expect(subprocessoStoreMock.garantirContextoEdicao).toHaveBeenCalledWith(456, false);
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
+        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(456);
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it("deve retornar false quando não conseguir resolver o subprocesso", async () => {
@@ -85,7 +85,7 @@ describe("useMapaOrquestracao", () => {
             codProcesso: 1,
             sigla: "TEST",
         });
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
 
         const sucesso = await carregarContextoInicial();
 
@@ -95,34 +95,34 @@ describe("useMapaOrquestracao", () => {
     });
 
     it("deve recarregar ao reativar quando o contexto estiver inválido", async () => {
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade
             .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
 
         const wrapper = mount(criarComponenteTeste({codProcesso: 1, sigla: "TEST"}));
         await wrapper.vm.carregarContextoInicial();
         await flushPromises();
 
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockClear();
         subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(false);
         // @ts-expect-error acesso interno para simular ativação keepAlive
         await wrapper.vm.$.a?.[0]();
 
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST", false);
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST");
     });
 
     it("não deve recarregar ao reativar quando o contexto ainda for válido", async () => {
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade
             .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
 
         const wrapper = mount(criarComponenteTeste({codProcesso: 1, sigla: "TEST"}));
         await wrapper.vm.carregarContextoInicial();
         await flushPromises();
 
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockClear();
         subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(true);
         // @ts-expect-error acesso interno para simular ativação keepAlive
         await wrapper.vm.$.a?.[0]();
 
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 });

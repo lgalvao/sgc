@@ -25,7 +25,7 @@ type DependenciasSubprocessoAcoesAdministrativas = {
     reabrirCadastro: (codigoSubprocesso: number, justificativa: string) => Promise<boolean>;
     reabrirRevisaoCadastro: (codigoSubprocesso: number, justificativa: string) => Promise<boolean>;
     enviarLembrete: (codProcesso: number, unidadeCodigo: number) => Promise<unknown>;
-    garantirContextoEdicao: (codigoSubprocesso: number, limpar: boolean) => Promise<unknown>;
+    recarregarContextoEdicao: (codigoSubprocesso: number) => Promise<unknown>;
 };
 
 function criarEstado() {
@@ -112,7 +112,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
         estado.loadingLembrete.value = true;
         try {
             await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
-            await dependencias.garantirContextoEdicao(dependencias.codigoSubprocesso.value!, true);
+            await dependencias.recarregarContextoEdicao(dependencias.codigoSubprocesso.value!);
             estado.modalLembreteAberto.value = false;
             toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
             dependencias.exibirToastPendente();

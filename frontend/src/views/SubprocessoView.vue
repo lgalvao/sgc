@@ -151,8 +151,10 @@ const {
   siglaUnidade: props.siglaUnidade,
   codSubprocesso: props.codSubprocesso,
   erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
-  garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
-  garantirContextoEdicaoPorProcessoEUnidade: subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade,
+  obterContextoEdicao: subprocessoStore.obterContextoEdicao,
+  recarregarContextoEdicao: subprocessoStore.recarregarContextoEdicao,
+  obterContextoEdicaoPorProcessoEUnidade: subprocessoStore.obterContextoEdicaoPorProcessoEUnidade,
+  recarregarContextoEdicaoPorProcessoEUnidade: subprocessoStore.recarregarContextoEdicaoPorProcessoEUnidade,
   dadosEdicaoValidos: subprocessoStore.dadosEdicaoValidos,
   exibirToastPendente,
 });
@@ -242,7 +244,7 @@ const {
   reabrirCadastro: fluxoSubprocesso.reabrirCadastro,
   reabrirRevisaoCadastro: fluxoSubprocesso.reabrirRevisaoCadastro,
   enviarLembrete: enviarLembreteService,
-  garantirContextoEdicao: subprocessoStore.garantirContextoEdicao,
+  recarregarContextoEdicao: subprocessoStore.recarregarContextoEdicao,
 });
 
 </script>

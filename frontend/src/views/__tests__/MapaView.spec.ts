@@ -43,8 +43,9 @@ vi.mock('@/composables/useNotification', () => ({
 const subprocessoStoreMock = {
     contextoEdicao: null as ContextoEdicaoSubprocesso | null,
     erroIntegracaoContexto: null as { message: string } | null,
-    garantirContextoEdicao: vi.fn(),
-    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    obterContextoEdicao: vi.fn(),
+    obterContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    dadosEdicaoValidos: vi.fn(),
     limparContextoAtual: vi.fn(),
     invalidar: vi.fn(),
 };
@@ -90,8 +91,9 @@ describe('MapaView', () => {
         vi.clearAllMocks();
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = null;
-        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue(null);
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessoStoreMock.obterContextoEdicao.mockResolvedValue(null);
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(false);
         fluxoMapaMock.erro = null;
         fluxoMapaMock.adicionarCompetencia = vi.fn();
         fluxoMapaMock.atualizarCompetencia = vi.fn();
@@ -147,7 +149,7 @@ describe('MapaView', () => {
             }
         });
 
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockResolvedValue(null);
 
         const wrapper = mount(MapaView, {
             global: {

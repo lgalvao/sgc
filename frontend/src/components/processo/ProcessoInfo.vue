@@ -7,7 +7,7 @@
       <strong>{{ TEXTOS.processo.INFO_SITUACAO }}:</strong> {{ formatSituacaoProcesso(situacao) }}
     </div>
     <div v-if="showDataLimite && dataLimite" class="mb-2">
-      <strong>{{ TEXTOS.processo.INFO_DATA_LIMITE }}:</strong> {{ formatDate(dataLimite, false) }}
+      <strong>{{ TEXTOS.processo.INFO_DATA_LIMITE }}:</strong> {{ formatarDataSemHorario(dataLimite) }}
     </div>
     <div v-if="showUnidades && numUnidades !== undefined" class="mb-2">
       <strong>{{ TEXTOS.processo.INFO_UNIDADES }}:</strong> {{ numUnidades }}
@@ -18,6 +18,12 @@
 <script lang="ts" setup>
 import {formatDate, formatSituacaoProcesso, formatTipoProcesso} from '@/utils/formatters';
 import {TEXTOS} from '@/constants/textos';
+
+const SEM_HORARIO = false;
+
+function formatarDataSemHorario(data: string) {
+  return formatDate(data, SEM_HORARIO);
+}
 
 withDefaults(
     defineProps<{

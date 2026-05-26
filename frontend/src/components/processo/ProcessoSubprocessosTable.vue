@@ -2,7 +2,7 @@
   <TreeTable
       :columns="colunas"
       :data="mapeamentoHierarquia"
-      :hide-controls="true"
+      hide-controls
       @row-click="emitirCliqueLinha"
   />
 </template>
@@ -23,7 +23,7 @@ type LinhaSubprocessoArvore = {
   situacaoTooltip: string;
   dataLimite: string;
   children: LinhaSubprocessoArvore[];
-  expanded: true;
+  expanded: boolean;
   clickable: boolean;
 };
 
@@ -53,11 +53,18 @@ function mapUnidades(unidades: UnidadeParticipante[]): LinhaSubprocessoArvore[] 
     sigla: u.sigla,
     situacao: formatSituacaoSubprocesso(u.situacaoSubprocesso),
     situacaoTooltip: formatSituacaoSubprocesso(u.situacaoSubprocesso),
-    dataLimite: formatDate(u.dataLimite, false),
+    dataLimite: formatarDataSemHorario(u.dataLimite),
     children: u.filhos ? mapUnidades(u.filhos) : [],
-    expanded: true,
+    expanded: EXPANDIDO_POR_PADRAO,
     clickable: u.codSubprocesso > 0
   }));
+}
+
+const EXPANDIDO_POR_PADRAO = true;
+const SEM_HORARIO = false;
+
+function formatarDataSemHorario(data: string) {
+  return formatDate(data, SEM_HORARIO);
 }
 
 function emitirCliqueLinha(item: unknown) {

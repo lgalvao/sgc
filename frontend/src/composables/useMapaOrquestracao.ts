@@ -23,13 +23,12 @@ async function buscarContextoEdicao(
     subprocessoStore: ReturnType<typeof useSubprocessoStore>,
 ): Promise<ContextoEdicaoSubprocesso | null> {
     if (typeof props.codSubprocesso === "number") {
-        return subprocessoStore.garantirContextoEdicao(props.codSubprocesso, false);
+        return subprocessoStore.obterContextoEdicao(props.codSubprocesso);
     }
 
-    const resultado = await subprocessoStore.garantirContextoEdicaoPorProcessoEUnidade(
+    const resultado = await subprocessoStore.obterContextoEdicaoPorProcessoEUnidade(
         Number(props.codProcesso),
         props.sigla,
-        false,
     );
     return resultado?.contexto ?? null;
 }

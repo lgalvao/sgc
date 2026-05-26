@@ -96,8 +96,10 @@ const fluxoSubprocessoMock = {
 const subprocessoStoreMock = reactive({
     contextoEdicao: null as { detalhes: SubprocessoDetalheMock } | null,
     erroIntegracaoContexto: null as { message: string; details?: string } | null,
-    garantirContextoEdicaoPorProcessoEUnidade: vi.fn(),
-    garantirContextoEdicao: vi.fn(),
+    obterContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    recarregarContextoEdicaoPorProcessoEUnidade: vi.fn(),
+    obterContextoEdicao: vi.fn(),
+    recarregarContextoEdicao: vi.fn(),
     dadosEdicaoValidos: vi.fn(),
     invalidar: vi.fn(),
     limparErroIntegracao: vi.fn(),
@@ -197,7 +199,7 @@ describe('SubprocessoView.vue', () => {
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = null;
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
             subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
             return {
                 codigo: 10,
@@ -206,7 +208,20 @@ describe('SubprocessoView.vue', () => {
                 }
             };
         });
-        subprocessoStoreMock.garantirContextoEdicao = vi.fn().mockImplementation(async () => {
+        subprocessoStoreMock.recarregarContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
+            subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
+            return {
+                codigo: 10,
+                contexto: {
+                    detalhes: mockSubprocesso,
+                }
+            };
+        });
+        subprocessoStoreMock.obterContextoEdicao = vi.fn().mockImplementation(async () => {
+            subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
+            return {detalhes: mockSubprocesso};
+        });
+        subprocessoStoreMock.recarregarContextoEdicao = vi.fn().mockImplementation(async () => {
             subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
             return {detalhes: mockSubprocesso};
         });
@@ -248,7 +263,7 @@ describe('SubprocessoView.vue', () => {
             stubActions: false,
         });
 
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockImplementation(async () => {
             subprocessoStoreMock.contextoEdicao = {detalhes: subprocessoToUse};
             return {
                 codigo: subprocessoToUse.codigo,
@@ -257,7 +272,14 @@ describe('SubprocessoView.vue', () => {
                 }
             };
         });
-        subprocessoStoreMock.garantirContextoEdicao.mockResolvedValue({detalhes: subprocessoToUse});
+        subprocessoStoreMock.recarregarContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
+            codigo: subprocessoToUse.codigo,
+            contexto: {
+                detalhes: subprocessoToUse,
+            }
+        });
+        subprocessoStoreMock.obterContextoEdicao.mockResolvedValue({detalhes: subprocessoToUse});
+        subprocessoStoreMock.recarregarContextoEdicao.mockResolvedValue({detalhes: subprocessoToUse});
 
         const wrapper = mount(SubprocessoView, {
             global: {
@@ -286,13 +308,13 @@ describe('SubprocessoView.vue', () => {
         mountComponent();
         await flushPromises();
 
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false);
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
     });
 
     it('recarrega dados ao reativar a view em keepAlive', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockClear();
         subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(false);
 
         const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
@@ -300,13 +322,13 @@ describe('SubprocessoView.vue', () => {
             await hook.call(wrapper.vm);
         }
         await flushPromises();
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', false);
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
     });
 
     it('não recarrega ao reativar quando o contexto atual ainda é válido', async () => {
         const {wrapper} = mountComponent();
         await flushPromises();
-        subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockClear();
         subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(true);
 
         const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
@@ -315,14 +337,14 @@ describe('SubprocessoView.vue', () => {
         }
         await flushPromises();
 
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it('mantem orçamento enxuto de chamadas no carregamento inicial do detalhe', async () => {
         mountComponent();
         await flushPromises();
 
-        expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
     });
 
     it('limpa subprocessoDetalhe imediatamente ao montar para evitar dados desatualizados', async () => {
@@ -690,4 +712,3 @@ describe('SubprocessoView.vue', () => {
         expect(cards.props('tipoProcesso')).toBe(TipoProcesso.MAPEAMENTO);
     });
 });
-

@@ -229,6 +229,10 @@ export const useMapasStore = defineStore("mapas", () => {
         invalidarMapa(estado, carregamentos, codigoSubprocesso);
     }
 
+    function marcarMapaParaAtualizacao(codigoSubprocesso: number): void {
+        invalidar(codigoSubprocesso);
+    }
+
     function resetar(): void {
         resetarMapas(estado, carregamentos);
     }
@@ -248,6 +252,7 @@ export const useMapasStore = defineStore("mapas", () => {
         sincronizarImpacto: sincronizarImpactoStore,
         carregarMapa,
         carregarImpacto,
+        marcarMapaParaAtualizacao,
         invalidarImpacto: invalidarImpactoStore,
         invalidar,
         resetar,

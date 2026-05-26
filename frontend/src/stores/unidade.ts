@@ -63,8 +63,8 @@ export const useUnidadeStore = defineStore("unidade", () => {
         invalidar();
     }
 
-    async function carregarUnidade(codigo: number, ignorarCache = false): Promise<Unidade | null> {
-        if (!ignorarCache && cacheUnidades.value.has(codigo)) {
+    async function carregarUnidadeDoCache(codigo: number): Promise<Unidade | null> {
+        if (cacheUnidades.value.has(codigo)) {
             return cacheUnidades.value.get(codigo)!;
         }
         const response = await buscarArvoreUnidade(codigo);
@@ -78,8 +78,20 @@ export const useUnidadeStore = defineStore("unidade", () => {
         return null;
     }
 
-    async function carregarReferenciaMapaVigente(codigo: number, ignorarCache = false): Promise<MapaVigenteReferencia | null> {
-        if (!ignorarCache && cacheMapasVigentes.value.has(codigo)) {
+    async function recarregarUnidadeNaOrigem(codigo: number): Promise<Unidade | null> {
+        const response = await buscarArvoreUnidade(codigo);
+        if (!response) {
+            return null;
+        }
+        if (response.codigo) {
+            cacheUnidades.value.set(codigo, response);
+            return response;
+        }
+        return null;
+    }
+
+    async function carregarReferenciaMapaVigenteDoCache(codigo: number): Promise<MapaVigenteReferencia | null> {
+        if (cacheMapasVigentes.value.has(codigo)) {
             return cacheMapasVigentes.value.get(codigo)!;
         }
         const mapa = await buscarReferenciaMapaVigente(codigo);
@@ -87,20 +99,26 @@ export const useUnidadeStore = defineStore("unidade", () => {
         return mapa;
     }
 
+    async function recarregarReferenciaMapaVigenteNaOrigem(codigo: number): Promise<MapaVigenteReferencia | null> {
+        const mapa = await buscarReferenciaMapaVigente(codigo);
+        cacheMapasVigentes.value.set(codigo, mapa);
+        return mapa;
+    }
+
     async function obterUnidade(codigo: number): Promise<Unidade | null> {
-        return carregarUnidade(codigo);
+        return carregarUnidadeDoCache(codigo);
     }
 
     async function recarregarUnidade(codigo: number): Promise<Unidade | null> {
-        return carregarUnidade(codigo, true);
+        return recarregarUnidadeNaOrigem(codigo);
     }
 
     async function obterReferenciaMapaVigente(codigo: number): Promise<MapaVigenteReferencia | null> {
-        return carregarReferenciaMapaVigente(codigo);
+        return carregarReferenciaMapaVigenteDoCache(codigo);
     }
 
     async function recarregarReferenciaMapaVigente(codigo: number): Promise<MapaVigenteReferencia | null> {
-        return carregarReferenciaMapaVigente(codigo, true);
+        return recarregarReferenciaMapaVigenteNaOrigem(codigo);
     }
 
     function possuiDadosTelaUnidade(codigo: number): boolean {

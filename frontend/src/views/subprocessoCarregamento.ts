@@ -8,11 +8,15 @@ type DependenciasSubprocessoCarregamento = {
     siglaUnidade: string;
     codSubprocesso?: number;
     erroIntegracaoContexto: ComputedRef<unknown>;
-    garantirContextoEdicao: (codigoSubprocesso: number, limpar: boolean) => Promise<ContextoEdicaoDireto>;
-    garantirContextoEdicaoPorProcessoEUnidade: (
+    obterContextoEdicao: (codigoSubprocesso: number) => Promise<ContextoEdicaoDireto>;
+    recarregarContextoEdicao: (codigoSubprocesso: number) => Promise<ContextoEdicaoDireto>;
+    obterContextoEdicaoPorProcessoEUnidade: (
         codProcesso: number,
         siglaUnidade: string,
-        limpar: boolean,
+    ) => Promise<ContextoEdicaoPorProcesso>;
+    recarregarContextoEdicaoPorProcessoEUnidade: (
+        codProcesso: number,
+        siglaUnidade: string,
     ) => Promise<ContextoEdicaoPorProcesso>;
     dadosEdicaoValidos: (codigoSubprocesso: number) => boolean;
     exibirToastPendente: () => void;
@@ -30,9 +34,16 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
     const {codigoSubprocesso, erroNaoEncontrado, carregamentoInicialConcluido} = criarEstado();
     let carregamentoEmAndamento: Promise<void> | null = null;
 
-    async function resolverCodigoSubprocesso(limpar: boolean) {
+    async function resolverCodigoSubprocesso(recarregar: boolean) {
+        const carregarContextoDireto = recarregar
+            ? dependencias.recarregarContextoEdicao
+            : dependencias.obterContextoEdicao;
+        const carregarContextoPorProcesso = recarregar
+            ? dependencias.recarregarContextoEdicaoPorProcessoEUnidade
+            : dependencias.obterContextoEdicaoPorProcessoEUnidade;
+
         if (typeof dependencias.codSubprocesso === "number") {
-            const contextoDireto = await dependencias.garantirContextoEdicao(dependencias.codSubprocesso, limpar);
+            const contextoDireto = await carregarContextoDireto(dependencias.codSubprocesso);
             if (contextoDireto) {
                 codigoSubprocesso.value = contextoDireto.detalhes.codigo;
                 erroNaoEncontrado.value = false;
@@ -40,10 +51,9 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
             }
         }
 
-        const contexto = await dependencias.garantirContextoEdicaoPorProcessoEUnidade(
+        const contexto = await carregarContextoPorProcesso(
             dependencias.codProcesso,
             dependencias.siglaUnidade,
-            limpar,
         );
         if (contexto) {
             codigoSubprocesso.value = contexto.codigo;
@@ -55,13 +65,13 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
         erroNaoEncontrado.value = !dependencias.erroIntegracaoContexto.value;
     }
 
-    async function carregarSubprocesso(limpar = false) {
-        if (!limpar && carregamentoEmAndamento) {
+    async function carregarSubprocesso(recarregar = false) {
+        if (!recarregar && carregamentoEmAndamento) {
             await carregamentoEmAndamento;
             return;
         }
 
-        const tarefa = resolverCodigoSubprocesso(limpar);
+        const tarefa = resolverCodigoSubprocesso(recarregar);
         carregamentoEmAndamento = tarefa;
         try {
             await tarefa;
@@ -77,20 +87,20 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
             return;
         }
 
-        await dependencias.garantirContextoEdicao(codigoSubprocesso.value, true);
+        await dependencias.recarregarContextoEdicao(codigoSubprocesso.value);
         dependencias.exibirToastPendente();
     }
 
     onMounted(async () => {
         dependencias.exibirToastPendente();
-        await carregarSubprocesso(false);
+        await carregarSubprocesso();
         carregamentoInicialConcluido.value = true;
     });
 
     watch(
         () => [dependencias.codProcesso, dependencias.siglaUnidade, dependencias.codSubprocesso],
         async () => {
-            await carregarSubprocesso(false);
+            await carregarSubprocesso();
         },
     );
 
@@ -102,7 +112,7 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
         if (typeof codigoSubprocesso.value === "number" && dependencias.dadosEdicaoValidos(codigoSubprocesso.value)) {
             return;
         }
-        await carregarSubprocesso(false);
+        await carregarSubprocesso();
     });
 
     return {

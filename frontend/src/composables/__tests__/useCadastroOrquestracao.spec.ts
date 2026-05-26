@@ -7,16 +7,18 @@ import * as formatters from "@/utils/formatters";
 import logger from "@/utils/logger";
 
 const storeMock = {
-    garantirContextoCadastroAtividades: vi.fn(),
-    garantirContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
+    obterContextoCadastroAtividades: vi.fn(),
+    recarregarContextoCadastroAtividades: vi.fn(),
+    obterContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
+    recarregarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     atualizarStatusLocal: vi.fn(),
-    invalidarContextoEdicao: vi.fn(),
+    marcarContextoEdicaoParaAtualizacao: vi.fn(),
     dadosCadastroValidos: vi.fn(),
     erroIntegracaoContexto: null as {codigo?: string} | null,
 };
 
 const mapasStoreMock = {
-    invalidar: vi.fn(),
+    marcarMapaParaAtualizacao: vi.fn(),
 };
 
 const atualizarFluxoSubprocessoEPainelMock = vi.fn();
@@ -56,7 +58,7 @@ describe("useCadastroOrquestracao", () => {
 
     it("deve carregar contexto inicial por processo e unidade", async () => {
         const {carregarContextoInicial, codigoSubprocesso, unidade, codMapa, atividadesSnapshotInicial} = useCadastroOrquestracao(props, atividades);
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
             detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [{codigo: 1, descricao: "Atividade"}],
             unidade: {sigla: "U", nome: "Unidade U"},
@@ -77,12 +79,12 @@ describe("useCadastroOrquestracao", () => {
             situacao: "S",
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS,
         });
-        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
+        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U");
     });
 
     it("carga inicial não deve invalidar o painel (operação de leitura)", async () => {
         const {carregarContextoInicial} = useCadastroOrquestracao(props, atividades);
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
             detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [],
             unidade: {sigla: "U", nome: "Unidade U"},
@@ -104,15 +106,15 @@ describe("useCadastroOrquestracao", () => {
         });
 
         expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
-        expect(mapasStoreMock.invalidar).toHaveBeenCalledWith(123);
-        expect(storeMock.invalidarContextoEdicao).toHaveBeenCalledWith(123);
+        expect(mapasStoreMock.marcarMapaParaAtualizacao).toHaveBeenCalledWith(123);
+        expect(storeMock.marcarContextoEdicaoParaAtualizacao).toHaveBeenCalledWith(123);
         expect(atualizarFluxoSubprocessoEPainelMock).toHaveBeenCalled();
     });
 
     it("deve reaproveitar a assinatura de referência quando ela vier do backend", async () => {
         const {carregarContextoInicial, atividadesSnapshotInicial} = useCadastroOrquestracao(props, atividades);
         const spyAssinatura = vi.spyOn(formatters, "calcularAssinaturaCadastro");
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
             detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [{codigo: 1, descricao: "Atividade"}],
             unidade: {sigla: "U", nome: "Unidade U"},
@@ -133,7 +135,7 @@ describe("useCadastroOrquestracao", () => {
             sigla: "U",
             codSubprocesso: 999,
         }, atividades);
-        vi.mocked(storeMock.garantirContextoCadastroAtividades).mockResolvedValue({
+        vi.mocked(storeMock.obterContextoCadastroAtividades).mockResolvedValue({
             detalhes: {codigo: 999, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [],
             unidade: {sigla: "U", nome: "Unidade U"},
@@ -144,13 +146,13 @@ describe("useCadastroOrquestracao", () => {
 
         expect(success).toBe(true);
         expect(codigoSubprocesso.value).toBe(999);
-        expect(storeMock.garantirContextoCadastroAtividades).toHaveBeenCalledWith(999, false);
-        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).not.toHaveBeenCalled();
+        expect(storeMock.obterContextoCadastroAtividades).toHaveBeenCalledWith(999);
+        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 
     it("deve retornar false quando contexto não for encontrado", async () => {
         const {carregarContextoInicial} = useCadastroOrquestracao(props, atividades);
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(null);
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue(null);
         const loggerSpy = vi.spyOn(logger, "error").mockImplementation(() => logger as never);
 
         const success = await carregarContextoInicial();
@@ -162,11 +164,12 @@ describe("useCadastroOrquestracao", () => {
     it("deve repetir a carga quando a primeira tentativa for cancelada na transição de sessão", async () => {
         const {carregarContextoInicial, codigoSubprocesso} = useCadastroOrquestracao(props, atividades);
         const loggerSpy = vi.spyOn(logger, "error").mockImplementation(() => logger as never);
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade)
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade)
             .mockImplementationOnce(async () => {
                 storeMock.erroIntegracaoContexto = {codigo: "REQUEST_CANCELADA"};
                 return null;
-            })
+            });
+        vi.mocked(storeMock.recarregarContextoCadastroAtividadesPorProcessoEUnidade)
             .mockImplementationOnce(async () => {
                 storeMock.erroIntegracaoContexto = null;
                 return {
@@ -181,13 +184,13 @@ describe("useCadastroOrquestracao", () => {
 
         expect(success).toBe(true);
         expect(codigoSubprocesso.value).toBe(123);
-        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U", false);
-        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(2, 1, "U", true);
+        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U");
+        expect(storeMock.recarregarContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U");
         expect(loggerSpy).not.toHaveBeenCalled();
     });
 
     it("deve recarregar ao reativar quando o contexto de cadastro estiver inválido", async () => {
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
             detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [],
             unidade: {sigla: "U", nome: "Unidade U"},
@@ -198,17 +201,17 @@ describe("useCadastroOrquestracao", () => {
         await wrapper.vm.carregarContextoInicial();
         await flushPromises();
 
-        storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade.mockClear();
+        storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade.mockClear();
         storeMock.dadosCadastroValidos.mockReturnValue(false);
 
         // @ts-expect-error acesso interno para simular ativação keepAlive
         await wrapper.vm.$.a?.[0]();
 
-        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U", false);
+        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenCalledWith(1, "U");
     });
 
     it("não deve recarregar ao reativar quando o contexto de cadastro ainda estiver válido", async () => {
-        vi.mocked(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
             detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [],
             unidade: {sigla: "U", nome: "Unidade U"},
@@ -219,12 +222,12 @@ describe("useCadastroOrquestracao", () => {
         await wrapper.vm.carregarContextoInicial();
         await flushPromises();
 
-        storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade.mockClear();
+        storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade.mockClear();
         storeMock.dadosCadastroValidos.mockReturnValue(true);
 
         // @ts-expect-error acesso interno para simular ativação keepAlive
         await wrapper.vm.$.a?.[0]();
 
-        expect(storeMock.garantirContextoCadastroAtividadesPorProcessoEUnidade).not.toHaveBeenCalled();
+        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).not.toHaveBeenCalled();
     });
 });

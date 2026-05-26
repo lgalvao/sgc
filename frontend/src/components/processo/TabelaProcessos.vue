@@ -62,6 +62,8 @@ const internalSortBy = computed(() => [{
   order: props.direcaoOrdenacaoAsc ? 'asc' : 'desc'
 }] satisfies BTableSortBy[]);
 
+const SEM_HORARIO = false;
+
 function handleSortChange(val: readonly BTableSortBy[] | undefined) {
   const sortBy = Array.isArray(val) ? val[0] : val;
   if (!sortBy) {
@@ -71,6 +73,10 @@ function handleSortChange(val: readonly BTableSortBy[] | undefined) {
   if (sortBy.key !== props.criterioOrdenacao || (sortBy.order === 'asc') !== props.direcaoOrdenacaoAsc) {
     emit("ordenar", sortBy.key);
   }
+}
+
+function formatarDataSemHorario(data?: string | null) {
+  return formatDate(data, SEM_HORARIO);
 }
 
 function handleSelecionarProcesso(processo: EventoLinhaProcesso) {
@@ -120,7 +126,7 @@ defineExpose({fields});
         @update:sort-by="handleSortChange"
     >
       <template #cell(dataFinalizacao)="{ item }">
-        {{ formatDate(item.dataFinalizacao, false) }}
+        {{ formatarDataSemHorario(item.dataFinalizacao) }}
       </template>
 
       <template #cell(situacao)="{ item }">

@@ -11,6 +11,9 @@ import type {ErroNormalizado} from "@/utils/apiError";
 import {usarOrquestradorContexto} from "./orquestrador";
 import {criarConfigs} from "./configs";
 
+const REAPROVEITAR_CONTEXTO = false;
+const RECARREGAR_CONTEXTO = true;
+
 export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicao = ref<ContextoEdicaoSubprocesso | null>(null);
     const contextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
@@ -84,6 +87,54 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         registrarContextoCadastro,
     });
 
+    function obterContextoEdicao(codigoSubprocesso: number) {
+        return orquestrador.garantirContextoPorCodigo(codigoSubprocesso, REAPROVEITAR_CONTEXTO, configEdicao);
+    }
+
+    function recarregarContextoEdicao(codigoSubprocesso: number) {
+        return orquestrador.garantirContextoPorCodigo(codigoSubprocesso, RECARREGAR_CONTEXTO, configEdicao);
+    }
+
+    function obterContextoEdicaoPorProcessoEUnidade(codigoProcesso: number, siglaUnidade: string) {
+        return orquestrador.garantirContextoPorProcessoEUnidade(codigoProcesso, siglaUnidade, {
+            limparAntes: REAPROVEITAR_CONTEXTO,
+            config: configEdicao,
+        });
+    }
+
+    function recarregarContextoEdicaoPorProcessoEUnidade(codigoProcesso: number, siglaUnidade: string) {
+        return orquestrador.garantirContextoPorProcessoEUnidade(codigoProcesso, siglaUnidade, {
+            limparAntes: RECARREGAR_CONTEXTO,
+            config: configEdicao,
+        });
+    }
+
+    function obterContextoCadastroAtividades(codigoSubprocesso: number) {
+        return orquestrador.garantirContextoPorCodigo(codigoSubprocesso, REAPROVEITAR_CONTEXTO, configCadastro);
+    }
+
+    function recarregarContextoCadastroAtividades(codigoSubprocesso: number) {
+        return orquestrador.garantirContextoPorCodigo(codigoSubprocesso, RECARREGAR_CONTEXTO, configCadastro);
+    }
+
+    async function obterContextoCadastroAtividadesPorProcessoEUnidade(codigoProcesso: number, siglaUnidade: string) {
+        return (await orquestrador.garantirContextoPorProcessoEUnidade(codigoProcesso, siglaUnidade, {
+            limparAntes: REAPROVEITAR_CONTEXTO,
+            config: configCadastro,
+        }))?.contexto ?? null;
+    }
+
+    async function recarregarContextoCadastroAtividadesPorProcessoEUnidade(codigoProcesso: number, siglaUnidade: string) {
+        return (await orquestrador.garantirContextoPorProcessoEUnidade(codigoProcesso, siglaUnidade, {
+            limparAntes: RECARREGAR_CONTEXTO,
+            config: configCadastro,
+        }))?.contexto ?? null;
+    }
+
+    function marcarContextoEdicaoParaAtualizacao(codigoSubprocesso?: number) {
+        invalidarContextoEdicao(codigoSubprocesso);
+    }
+
     return {
         contextoEdicao,
         contextoCadastro,
@@ -91,14 +142,18 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         dadosEdicaoValidos: (codigoSubprocesso: number) => dadosValidos(contextoEdicao, contextoEdicaoInvalido, codigoSubprocesso),
         dadosCadastroValidos: (codigoSubprocesso: number) => dadosValidos(contextoCadastro, contextoCadastroInvalido, codigoSubprocesso),
         invalidar,
-        invalidarContextoEdicao,
+        marcarContextoEdicaoParaAtualizacao,
         resetar,
         limparContextoAtual,
         limparErroIntegracao,
-        garantirContextoEdicao: (c: number, l = false) => orquestrador.garantirContextoPorCodigo(c, l, configEdicao),
-        garantirContextoEdicaoPorProcessoEUnidade: (p: number, s: string, l = false) => orquestrador.garantirContextoPorProcessoEUnidade(p, s, { limparAntes: l, config: configEdicao }),
-        garantirContextoCadastroAtividades: (c: number, l = false) => orquestrador.garantirContextoPorCodigo(c, l, configCadastro),
-        garantirContextoCadastroAtividadesPorProcessoEUnidade: async (p: number, s: string, l = false) => (await orquestrador.garantirContextoPorProcessoEUnidade(p, s, { limparAntes: l, config: configCadastro }))?.contexto ?? null,
+        obterContextoEdicao,
+        recarregarContextoEdicao,
+        obterContextoEdicaoPorProcessoEUnidade,
+        recarregarContextoEdicaoPorProcessoEUnidade,
+        obterContextoCadastroAtividades,
+        recarregarContextoCadastroAtividades,
+        obterContextoCadastroAtividadesPorProcessoEUnidade,
+        recarregarContextoCadastroAtividadesPorProcessoEUnidade,
         atualizarStatusLocal: (s: AtualizacaoStatusLocal) => {
             atualizarDetalhesContexto(contextoEdicao, contextoEdicaoInvalido, s);
             atualizarDetalhesContexto(contextoCadastro, contextoCadastroInvalido, s);

@@ -19,14 +19,24 @@ function erroIntegracaoFoiCancelado(subprocessoStore: ReturnType<typeof useSubpr
 async function buscarContextoInicial(
     props: CadastroOrquestracaoProps,
     subprocessoStore: ReturnType<typeof useSubprocessoStore>,
-    limparAntes = false,
 ) {
     return typeof props.codSubprocesso === "number"
-        ? await subprocessoStore.garantirContextoCadastroAtividades(props.codSubprocesso, limparAntes)
-        : await subprocessoStore.garantirContextoCadastroAtividadesPorProcessoEUnidade(
+        ? await subprocessoStore.obterContextoCadastroAtividades(props.codSubprocesso)
+        : await subprocessoStore.obterContextoCadastroAtividadesPorProcessoEUnidade(
             Number(props.codProcesso),
             props.sigla,
-            limparAntes,
+        );
+}
+
+async function recarregarContextoInicial(
+    props: CadastroOrquestracaoProps,
+    subprocessoStore: ReturnType<typeof useSubprocessoStore>,
+) {
+    return typeof props.codSubprocesso === "number"
+        ? await subprocessoStore.recarregarContextoCadastroAtividades(props.codSubprocesso)
+        : await subprocessoStore.recarregarContextoCadastroAtividadesPorProcessoEUnidade(
+            Number(props.codProcesso),
+            props.sigla,
         );
 }
 
@@ -48,8 +58,8 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
             ...response.subprocesso,
             permissoes: response.permissoes
         });
-        mapasStore.invalidar(response.subprocesso.codigo);
-        subprocessoStore.invalidarContextoEdicao(response.subprocesso.codigo);
+        mapasStore.marcarMapaParaAtualizacao(response.subprocesso.codigo);
+        subprocessoStore.marcarContextoEdicaoParaAtualizacao(response.subprocesso.codigo);
     }
 
     function sincronizarEstadoInicial(data: ContextoCadastroAtividadesSubprocesso) {
@@ -70,10 +80,10 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
 
     async function carregarContextoInicial() {
         try {
-            let data = await buscarContextoInicial(props, subprocessoStore, false);
+            let data = await buscarContextoInicial(props, subprocessoStore);
 
             if (!data && erroIntegracaoFoiCancelado(subprocessoStore)) {
-                data = await buscarContextoInicial(props, subprocessoStore, true);
+                data = await recarregarContextoInicial(props, subprocessoStore);
             }
 
             if (!data) {
