@@ -23,9 +23,6 @@ import {
 import {
     abrirAcaoCadastroPrincipal,
     abrirHistoricoAnalise,
-    acessarSubprocessoAdmin,
-    acessarSubprocessoChefeDireto,
-    acessarSubprocessoGestor,
     fecharHistoricoAnalise
 } from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';

@@ -24,9 +24,10 @@ test.describe('Accessibility Crawler (Axe-core)', () => {
     }> = [];
 
     test.afterAll(async () => {
-        const resultsPath = path.join(process.cwd(), 'a11y-scan-results.json');
-        fs.writeFileSync(resultsPath, JSON.stringify(scanResults, null, 2));
-        console.log(`Scan results saved to ${resultsPath}`);
+        if (process.env.SGC_RELATORIO_A11Y === 'sim') {
+            const resultsPath = path.join(process.cwd(), 'a11y-scan-results.json');
+            fs.writeFileSync(resultsPath, JSON.stringify(scanResults, null, 2));
+        }
     });
 
     for (const route of ROUTES) {
@@ -36,23 +37,19 @@ test.describe('Accessibility Crawler (Axe-core)', () => {
                 await page.waitForURL('/painel');
             }
             
-            console.log(`Navigating to ${route.path}...`);
             await page.goto(route.path);
             
             // Wait for some content to be visible to ensure vue has rendered
             await page.waitForTimeout(1000); 
 
             const accessibilityScanResults = await makeAxeBuilder().analyze();
-            expect(accessibilityScanResults.violations).toBeDefined();
+            expect(accessibilityScanResults.violations).toEqual([]);
             
             scanResults.push({
                 route: route.path,
                 name: route.name,
                 violations: accessibilityScanResults.violations
             });
-
-            // We don't fail the test here, we collect results for the report
-            console.log(`Route ${route.name}: Found ${accessibilityScanResults.violations.length} violations.`);
         });
     }
 });
