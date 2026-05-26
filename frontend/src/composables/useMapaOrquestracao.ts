@@ -41,7 +41,7 @@ export function useMapaOrquestracao(props: MapaOrquestracaoProps) {
 
     function sincronizarEstadoInicialContexto(data: ContextoEdicaoSubprocesso) {
         unidade.value = data.unidade;
-        mapasStore.definirMapaCompleto(data.detalhes.codigo, data.mapa);
+        mapasStore.sincronizarMapa(data.detalhes.codigo, data.mapa);
     }
 
     async function carregarContextoInicial() {
@@ -66,9 +66,7 @@ export function useMapaOrquestracao(props: MapaOrquestracaoProps) {
                 return;
             }
             const codigo = codigoSubprocesso.value;
-            if (typeof codigo === "number"
-                && subprocessoStore.dadosEdicaoValidos(codigo)
-                && mapasStore.dadosMapaValidos(codigo)) {
+            if (typeof codigo === "number" && subprocessoStore.dadosEdicaoValidos(codigo)) {
                 return;
             }
             await carregarContextoInicial();

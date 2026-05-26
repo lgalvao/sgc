@@ -2,7 +2,7 @@ import {type MaybeRefOrGetter, ref, toValue} from "vue";
 
 export function useImpactoMapaModal(
     codSubprocesso: MaybeRefOrGetter<number | null | undefined>,
-    buscarImpactoMapa: (codSubprocesso: number) => Promise<void>,
+    carregarImpacto: (codSubprocesso: number) => Promise<void>,
 ) {
     const mostrarModalImpacto = ref(false);
     const loadingImpacto = ref(false);
@@ -21,7 +21,7 @@ export function useImpactoMapaModal(
 
         loadingImpacto.value = true;
         try {
-            await buscarImpactoMapa(codigo);
+            await carregarImpacto(codigo);
         } finally {
             loadingImpacto.value = false;
         }

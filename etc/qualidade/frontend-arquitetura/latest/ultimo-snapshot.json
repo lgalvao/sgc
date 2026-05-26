@@ -1,44 +1,23 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-26T12:13:20.613Z",
+  "geradoEm": "2026-05-26T12:23:17.519Z",
   "resumo": {
     "arquivosProducao": 243,
-    "scoreTotal": 202,
+    "scoreTotal": 131,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 3,
-      "acessosDiretosCache": 8,
+      "acessosDiretosCache": 0,
       "metodosEmCache": 0,
       "invalidacoesExplicitasEmViews": 0,
       "booleanosPosicionais": 16,
       "ocorrenciasForcar": 0,
-      "ocorrenciasStale": 1,
-      "ocorrenciasSnapshot": 3,
-      "hubsCentraisComSinais": 4
+      "ocorrenciasStale": 0,
+      "ocorrenciasSnapshot": 1,
+      "hubsCentraisComSinais": 3
     }
   },
   "hotspots": [
-    {
-      "arquivo": "frontend/src/stores/mapas.ts",
-      "camada": "store",
-      "linhas": 256,
-      "score": 71,
-      "sinais": {
-        "acessoDiretoCache": 8,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 1,
-        "palavraSnapshot": 2
-      },
-      "sinaisAtivos": [
-        "acessoDiretoCache",
-        "palavraStale",
-        "palavraSnapshot"
-      ],
-      "hubCentral": true
-    },
     {
       "arquivo": "frontend/src/composables/useInvalidacaoNavegacao.ts",
       "camada": "composable",
@@ -233,7 +212,7 @@
     {
       "arquivo": "frontend/src/composables/useMapaOrquestracao.ts",
       "camada": "composable",
-      "linhas": 86,
+      "linhas": 84,
       "score": 4,
       "sinais": {
         "acessoDiretoCache": 0,

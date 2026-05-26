@@ -18,7 +18,7 @@ vi.mock("@/services/subprocessoService", () => ({
 
 vi.mock("@/stores/mapas", () => ({
     useMapasStore: vi.fn(() => ({
-        obterMapaCompletoCache: vi.fn().mockReturnValue(null)
+        obterMapa: vi.fn().mockReturnValue(null)
     }))
 }));
 
@@ -138,7 +138,7 @@ describe("useFluxoMapa", () => {
                 ]
             };
             vi.mocked(useMapasStore).mockReturnValue({
-                obterMapaCompletoCache: vi.fn().mockReturnValue(mockMapa)
+                obterMapa: vi.fn().mockReturnValue(mockMapa)
             } as any);
 
             const fluxoMapa = useFluxoMapa();
@@ -152,7 +152,7 @@ describe("useFluxoMapa", () => {
 
         it("deve lançar erro se competencia não for encontrada", async () => {
             vi.mocked(useMapasStore).mockReturnValue({
-                obterMapaCompletoCache: vi.fn().mockReturnValue({competencias: []})
+                obterMapa: vi.fn().mockReturnValue({competencias: []})
             } as any);
 
             const fluxoMapa = useFluxoMapa();

@@ -36,7 +36,7 @@ describe("useMapas", () => {
         };
         vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
 
         expect(service.obterMapaCompleto).toHaveBeenCalledWith(1);
         expect(mapas.mapaCompleto.value).toEqual(mockMapa);
@@ -54,8 +54,8 @@ describe("useMapas", () => {
         };
         vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-        await mapas.buscarMapaCompleto(1);
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
+        await mapas.carregarMapa(1);
 
         expect(service.obterMapaCompleto).toHaveBeenCalledTimes(1);
         expect(mapas.mapaCompleto.value).toEqual(mockMapa);
@@ -65,7 +65,7 @@ describe("useMapas", () => {
         const mapas = useMapas();
         vi.mocked(service.obterMapaCompleto).mockRejectedValue(new Error("Failed"));
 
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
 
         expect(mapas.erro.value).toBe("Failed");
     });
@@ -85,7 +85,7 @@ describe("useMapas", () => {
         };
         vi.mocked(service.verificarImpactosMapa).mockResolvedValue(mockImpacto);
 
-        await mapas.buscarImpactoMapa(1);
+        await mapas.carregarImpacto(1);
 
         expect(service.verificarImpactosMapa).toHaveBeenCalledWith(1);
         expect(mapas.impactoMapa.value).toEqual(mockImpacto);
@@ -106,14 +106,14 @@ describe("useMapas", () => {
         };
         vi.mocked(service.verificarImpactosMapa).mockResolvedValue(impacto);
 
-        await mapas.buscarImpactoMapa(1);
-        await mapas.buscarImpactoMapa(1);
+        await mapas.carregarImpacto(1);
+        await mapas.carregarImpacto(1);
 
         expect(service.verificarImpactosMapa).toHaveBeenCalledTimes(1);
         expect(mapas.impactoMapa.value).toEqual(impacto);
     });
 
-    it("deve manter snapshots separados por subprocesso em views keepAlive", async () => {
+    it("deve manter mapas separados por subprocesso em views keepAlive", async () => {
         const codigoAtual = ref<number | null>(1);
         const mapas = useMapas(codigoAtual);
         const mapaUm: MapaCompleto = {
@@ -136,9 +136,9 @@ describe("useMapas", () => {
             .mockResolvedValueOnce(mapaUm)
             .mockResolvedValueOnce(mapaDois);
 
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
         codigoAtual.value = 2;
-        await mapas.buscarMapaCompleto(2);
+        await mapas.carregarMapa(2);
         expect(mapas.mapaCompleto.value).toEqual(mapaDois);
 
         codigoAtual.value = 1;
@@ -148,7 +148,7 @@ describe("useMapas", () => {
     it("não deve buscar impacto se codSubprocesso for zero", async () => {
         const mapas = useMapas();
 
-        await mapas.buscarImpactoMapa(0);
+        await mapas.carregarImpacto(0);
 
         expect(service.verificarImpactosMapa).not.toHaveBeenCalled();
     });
@@ -176,32 +176,32 @@ describe("useMapas", () => {
             situacao: "EM_ANDAMENTO",
         });
 
-        await mapas.buscarImpactoMapa(1);
+        await mapas.carregarImpacto(1);
         expect(mapas.impactoMapa.value).toEqual(mockImpacto);
 
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
         expect(mapas.impactoMapa.value).toBeNull();
     });
 
-    it("deve preservar o último snapshot do mapa ao invalidar, mas marcá-lo como stale", async () => {
+    it("deve preservar o último mapa ao invalidar, mas marcá-lo para atualização", async () => {
         const codigoAtual = ref<number | null>(1);
         const mapas = useMapas(codigoAtual);
         const mapasStore = useMapasStore();
         const mockMapa: MapaCompleto = {
             codigo: 1,
             subprocessoCodigo: 1,
-            observacoes: "snapshot preservado",
+            observacoes: "mapa preservado",
             competencias: [],
             atividades: [],
             situacao: "EM_ANDAMENTO",
         };
         vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
         mapas.invalidar(1);
 
         expect(mapas.mapaCompleto.value).toEqual(mockMapa);
-        expect(mapasStore.dadosMapaValidos(1)).toBe(false);
+        expect(mapasStore.mapaDisponivel(1)).toBe(false);
     });
 
     it("deve voltar a buscar o mapa após invalidação explícita", async () => {
@@ -222,9 +222,9 @@ describe("useMapas", () => {
             .mockResolvedValueOnce(mapaInicial)
             .mockResolvedValueOnce(mapaAtualizado);
 
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
         mapas.invalidar(1);
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
 
         expect(service.obterMapaCompleto).toHaveBeenCalledTimes(2);
         expect(mapas.mapaCompleto.value).toEqual(mapaAtualizado);
@@ -232,6 +232,7 @@ describe("useMapas", () => {
 
     it("deve limpar totalmente o store ao resetar", async () => {
         const mapas = useMapas();
+        const mapasStore = useMapasStore();
         const mockMapa: MapaCompleto = {
             codigo: 1,
             subprocessoCodigo: 1,
@@ -242,12 +243,11 @@ describe("useMapas", () => {
         };
         vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
 
-        await mapas.buscarMapaCompleto(1);
+        await mapas.carregarMapa(1);
         mapas.resetar();
 
         expect(mapas.mapaCompleto.value).toBeNull();
-        expect(mapas.obterMapaCompletoCache(1)).toBeNull();
-        expect(mapas.dadosMapaValidos(1)).toBe(false);
+        expect(mapasStore.obterMapa(1)).toBeNull();
+        expect(mapasStore.mapaDisponivel(1)).toBe(false);
     });
 });
-

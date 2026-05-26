@@ -225,7 +225,7 @@ describe('MapaView', () => {
         const mapas = useMapas();
         const vm = wrapper.vm as unknown as MapaViewVm;
         vm.codigoSubprocesso = 456;
-        mapas.definirMapaCompleto(456, {
+        mapas.sincronizarMapa(456, {
             competencias: [{codigo: 1, descricao: 'Comp 1', atividades: [{codigo: 10}, {codigo: 20}]}]
         } as unknown as NonNullable<typeof mapas.mapaCompleto.value>);
 
@@ -263,7 +263,7 @@ describe('MapaView', () => {
         const mapas = useMapas();
         const vm = wrapper.vm as unknown as MapaViewVm;
         vm.codigoSubprocesso = 456;
-        mapas.definirMapaCompleto(456, {
+        mapas.sincronizarMapa(456, {
             competencias: [{codigo: 1, descricao: 'Comp 1', atividades: []}]
         } as unknown as NonNullable<typeof mapas.mapaCompleto.value>);
 

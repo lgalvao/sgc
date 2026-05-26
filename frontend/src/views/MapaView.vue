@@ -322,7 +322,7 @@ const {
   loadingImpacto,
   abrirModalImpacto,
   fecharModalImpacto,
-} = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
+} = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.carregarImpacto(codigo));
 
 const {
   abrirModalAceitar,
@@ -390,7 +390,7 @@ const sincronizarMapaStore = (mapaAtualizado: MapaCompleto | null | undefined) =
     sincronizarMapaContexto({
         mapaAtualizado,
         codigoSubprocesso: codigoSubprocesso.value,
-        definirMapaCompleto: mapasStore.definirMapaCompleto,
+        sincronizarMapa: mapasStore.sincronizarMapa,
         mapaContextoAtual: contextoEdicaoAtual,
     });
 

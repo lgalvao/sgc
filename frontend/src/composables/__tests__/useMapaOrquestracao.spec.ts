@@ -10,8 +10,7 @@ const subprocessoStoreMock = {
 };
 
 const mapasStoreMock = {
-    definirMapaCompleto: vi.fn(),
-    dadosMapaValidos: vi.fn(),
+    sincronizarMapa: vi.fn(),
 };
 
 vi.mock("@/stores/subprocesso", () => ({
@@ -35,7 +34,6 @@ describe("useMapaOrquestracao", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(false);
-        mapasStoreMock.dadosMapaValidos.mockReturnValue(false);
     });
 
     it("deve carregar contexto do mapa por processo e unidade", async () => {
@@ -57,7 +55,7 @@ describe("useMapaOrquestracao", () => {
         expect(sucesso).toBe(true);
         expect(codigoSubprocesso.value).toBe(123);
         expect(unidade.value).toEqual(expect.objectContaining({sigla: "TEST"}));
-        expect(mapasStoreMock.definirMapaCompleto).toHaveBeenCalledWith(123, expect.objectContaining({codigo: 77}));
+        expect(mapasStoreMock.sincronizarMapa).toHaveBeenCalledWith(123, expect.objectContaining({codigo: 77}));
         expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST", false);
         expect(carregandoInicial.value).toBe(false);
     });
@@ -92,11 +90,11 @@ describe("useMapaOrquestracao", () => {
         const sucesso = await carregarContextoInicial();
 
         expect(sucesso).toBe(false);
-        expect(mapasStoreMock.definirMapaCompleto).not.toHaveBeenCalled();
+        expect(mapasStoreMock.sincronizarMapa).not.toHaveBeenCalled();
         expect(carregandoInicial.value).toBe(false);
     });
 
-    it("deve recarregar ao reativar quando o contexto ou mapa estiver inválido", async () => {
+    it("deve recarregar ao reativar quando o contexto estiver inválido", async () => {
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade
             .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
 
@@ -105,16 +103,14 @@ describe("useMapaOrquestracao", () => {
         await flushPromises();
 
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
-        subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(true);
-        mapasStoreMock.dadosMapaValidos.mockReturnValue(false);
-
+        subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(false);
         // @ts-expect-error acesso interno para simular ativação keepAlive
         await wrapper.vm.$.a?.[0]();
 
         expect(subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, "TEST", false);
     });
 
-    it("não deve recarregar ao reativar quando contexto e mapa ainda forem válidos", async () => {
+    it("não deve recarregar ao reativar quando o contexto ainda for válido", async () => {
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade
             .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
 
@@ -124,8 +120,6 @@ describe("useMapaOrquestracao", () => {
 
         subprocessoStoreMock.garantirContextoEdicaoPorProcessoEUnidade.mockClear();
         subprocessoStoreMock.dadosEdicaoValidos.mockReturnValue(true);
-        mapasStoreMock.dadosMapaValidos.mockReturnValue(true);
-
         // @ts-expect-error acesso interno para simular ativação keepAlive
         await wrapper.vm.$.a?.[0]();
 

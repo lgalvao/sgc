@@ -22,7 +22,7 @@ type DependenciasMapaDisponibilizacao = {
 export interface SincronizarMapaContextoParams {
     mapaAtualizado: MapaCompleto | null | undefined;
     codigoSubprocesso: number | null;
-    definirMapaCompleto: (codigo: number, mapa: MapaCompleto) => void;
+    sincronizarMapa: (codigo: number, mapa: MapaCompleto) => void;
     mapaContextoAtual: Ref<{ detalhes: { codigo: number }; mapa: MapaCompleto } | null>;
 }
 
@@ -124,13 +124,13 @@ export function useMapaDisponibilizacao(dependencias: DependenciasMapaDisponibil
         sincronizarMapaContexto: ({
             mapaAtualizado,
             codigoSubprocesso,
-            definirMapaCompleto,
+            sincronizarMapa,
             mapaContextoAtual,
         }: SincronizarMapaContextoParams) => {
             if (!mapaAtualizado || !codigoSubprocesso) {
                 return;
             }
-            definirMapaCompleto(codigoSubprocesso, mapaAtualizado);
+            sincronizarMapa(codigoSubprocesso, mapaAtualizado);
             if (mapaContextoAtual.value?.detalhes.codigo === codigoSubprocesso) {
                 mapaContextoAtual.value.mapa = mapaAtualizado;
             }

@@ -297,7 +297,7 @@ const {
   loadingImpacto,
   abrirModalImpacto,
   fecharModalImpacto,
-} = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.buscarImpactoMapa(codigo));
+} = useImpactoMapaModal(codigoSubprocesso, (codigo) => mapasStore.carregarImpacto(codigo));
 
 const atividadeRefs = new Map<number, Element>();
 const atividadeFormRef = ref<InstanceType<typeof CadAtividadeForm> | null>(null);

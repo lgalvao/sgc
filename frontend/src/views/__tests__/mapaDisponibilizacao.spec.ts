@@ -93,18 +93,18 @@ describe('mapaDisponibilizacao.ts', () => {
     it('deve sincronizar o mapa no contexto', () => {
         const deps = criarDependencias()
         const {sincronizarMapaContexto} = useMapaDisponibilizacao(deps as any)
-        const definirMapaCompleto = vi.fn()
+        const sincronizarMapa = vi.fn()
         const mapaContextoAtual = ref({detalhes: {codigo: 123}, mapa: {} as any})
         const novoMapa = {codigo: 1, competencias: []} as any
 
         sincronizarMapaContexto({
             mapaAtualizado: novoMapa,
             codigoSubprocesso: 123,
-            definirMapaCompleto,
+            sincronizarMapa,
             mapaContextoAtual,
         })
 
-        expect(definirMapaCompleto).toHaveBeenCalledWith(123, novoMapa)
+        expect(sincronizarMapa).toHaveBeenCalledWith(123, novoMapa)
         expect(mapaContextoAtual.value.mapa).toEqual(novoMapa)
     })
 

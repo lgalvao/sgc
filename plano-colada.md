@@ -28,6 +28,40 @@ Os ganhos fáceis com `Pinia Colada` já foram capturados. O que restou relevant
 - reduzir helpers que só empacotam `dependencias`, `estado` e `contexto`;
 - aceitar mudanças mais agressivas em contratos internos de composables/views quando o chamador é único ou controlado.
 
+### Baseline da auditoria arquitetural
+
+Última medição registrada por `node etc/scripts/sgc.js frontend arquitetura auditar`:
+
+- score total: `202` (`critico`);
+- views com vazamento de estratégia de cache: `3`;
+- acessos diretos a cache de store: `8`;
+- booleanos posicionais: `16`;
+- hubs centrais com sinais: `4`.
+
+Hotspots prioritários desta baseline:
+
+1. `frontend/src/stores/mapas.ts`
+2. `frontend/src/composables/useInvalidacaoNavegacao.ts`
+3. `frontend/src/composables/useCadastroOrquestracao.ts`
+4. `frontend/src/composables/useCacheSync.ts`
+
+### Metas de progresso arquitetural
+
+As próximas rodadas devem ser medidas contra esta baseline. A meta não é “zerar o score”, e sim reduzir sinais estruturais nos pontos de maior custo cognitivo.
+
+Curto prazo:
+
+- tirar views e composables principais do domínio de `mapas` da API orientada a cache;
+- reduzir `stores/mapas.ts` como hub, trocando nomes e contratos mecânicos por operações semânticas;
+- cortar pelo menos um vazamento de estratégia de cache em view por rodada relevante.
+
+Médio prazo:
+
+- levar `viewsComVazamentoCache` de `3` para `0`;
+- levar `acessosDiretosCache` de `8` para `0` fora dos stores;
+- reduzir `hubsCentraisComSinais` de `4` para `2` ou menos;
+- começar a derrubar `booleanosPosicionais` nos hubs restantes.
+
 ### Padrão de emaranhamento observado
 
 Os nós mais difíceis do frontend não são apenas “arquivos grandes”. O padrão recorrente é uma mesma abstração concentrar responsabilidades demais ao mesmo tempo:

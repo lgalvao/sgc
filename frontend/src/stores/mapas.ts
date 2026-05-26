@@ -7,8 +7,8 @@ import {
 } from "@/services/subprocessoService";
 
 interface EstadoMapasRefs {
-    cacheMapaCompleto: Ref<Map<number, MapaCompleto>>;
-    codigosMapaInvalidos: Ref<Set<number>>;
+    mapasPorSubprocesso: Ref<Map<number, MapaCompleto>>;
+    mapasPendentesAtualizacao: Ref<Set<number>>;
     mapaCompleto: Ref<MapaCompleto | null>;
     impactoMapa: Ref<ImpactoMapa | null>;
     codigoMapaAtual: Ref<number | null>;
@@ -27,7 +27,7 @@ interface ContextoMapas {
 
 function sincronizarMapaAtual(estado: EstadoMapasRefs, codigo: number | null): void {
     estado.codigoMapaAtual.value = codigo;
-    estado.mapaCompleto.value = codigo === null ? null : (estado.cacheMapaCompleto.value.get(codigo) ?? null);
+    estado.mapaCompleto.value = codigo === null ? null : (estado.mapasPorSubprocesso.value.get(codigo) ?? null);
 }
 
 function sincronizarImpactoAtual(
@@ -39,20 +39,20 @@ function sincronizarImpactoAtual(
     estado.impactoMapa.value = codigo === null ? null : impacto;
 }
 
-function obterMapaCompletoCache(estado: EstadoMapasRefs, codigoSubprocesso: number): MapaCompleto | null {
-    return estado.cacheMapaCompleto.value.get(codigoSubprocesso) ?? null;
+function obterMapa(estado: EstadoMapasRefs, codigoSubprocesso: number): MapaCompleto | null {
+    return estado.mapasPorSubprocesso.value.get(codigoSubprocesso) ?? null;
 }
 
-function obterImpactoMapaCache(estado: EstadoMapasRefs, codigoSubprocesso: number): ImpactoMapa | null {
+function obterImpacto(estado: EstadoMapasRefs, codigoSubprocesso: number): ImpactoMapa | null {
     return estado.codigoImpactoAtual.value === codigoSubprocesso ? estado.impactoMapa.value : null;
 }
 
-function dadosMapaValidos(estado: EstadoMapasRefs, codigoSubprocesso: number): boolean {
-    return estado.cacheMapaCompleto.value.has(codigoSubprocesso)
-        && !estado.codigosMapaInvalidos.value.has(codigoSubprocesso);
+function mapaDisponivel(estado: EstadoMapasRefs, codigoSubprocesso: number): boolean {
+    return estado.mapasPorSubprocesso.value.has(codigoSubprocesso)
+        && !estado.mapasPendentesAtualizacao.value.has(codigoSubprocesso);
 }
 
-function dadosImpactoValidos(estado: EstadoMapasRefs, codigoSubprocesso: number): boolean {
+function impactoDisponivel(estado: EstadoMapasRefs, codigoSubprocesso: number): boolean {
     return estado.codigoImpactoAtual.value === codigoSubprocesso && estado.impactoMapa.value !== null;
 }
 
@@ -73,19 +73,19 @@ function invalidarImpacto(
     sincronizarImpactoAtual(estado, null);
 }
 
-function definirMapaCompleto(contexto: ContextoMapas, codigoSubprocesso: number, mapa: MapaCompleto | null): void {
+function sincronizarMapa(contexto: ContextoMapas, codigoSubprocesso: number, mapa: MapaCompleto | null): void {
     if (mapa) {
-        contexto.estado.cacheMapaCompleto.value.set(codigoSubprocesso, mapa);
+        contexto.estado.mapasPorSubprocesso.value.set(codigoSubprocesso, mapa);
     } else {
-        contexto.estado.cacheMapaCompleto.value.delete(codigoSubprocesso);
+        contexto.estado.mapasPorSubprocesso.value.delete(codigoSubprocesso);
     }
 
-    contexto.estado.codigosMapaInvalidos.value.delete(codigoSubprocesso);
+    contexto.estado.mapasPendentesAtualizacao.value.delete(codigoSubprocesso);
     invalidarImpacto(contexto.estado, contexto.carregamentos, codigoSubprocesso);
     sincronizarMapaAtual(contexto.estado, mapa ? codigoSubprocesso : null);
 }
 
-function definirImpactoMapa(estado: EstadoMapasRefs, codigoSubprocesso: number, impacto: ImpactoMapa | null): void {
+function sincronizarImpacto(estado: EstadoMapasRefs, codigoSubprocesso: number, impacto: ImpactoMapa | null): void {
     sincronizarImpactoAtual(estado, codigoSubprocesso, impacto);
 }
 
@@ -97,7 +97,7 @@ function criarCarregamentoMapa(
     const contexto = {estado, carregamentos};
     const promessaCarregamento = serviceObterMapaCompleto(codigoSubprocesso)
         .then((mapa) => {
-            definirMapaCompleto(contexto, codigoSubprocesso, mapa);
+            sincronizarMapa(contexto, codigoSubprocesso, mapa);
             return mapa;
         })
         .finally(() => carregamentos.mapa.delete(codigoSubprocesso));
@@ -113,7 +113,7 @@ function criarCarregamentoImpacto(
 ): Promise<ImpactoMapa> {
     const promessaCarregamento = serviceVerificarImpactosMapa(codigoSubprocesso)
         .then((impacto) => {
-            definirImpactoMapa(estado, codigoSubprocesso, impacto);
+            sincronizarImpacto(estado, codigoSubprocesso, impacto);
             return impacto;
         })
         .finally(() => carregamentos.impacto.delete(codigoSubprocesso));
@@ -128,20 +128,20 @@ function invalidarMapa(
     codigoSubprocesso?: number,
 ): void {
     if (typeof codigoSubprocesso === "number") {
-        estado.codigosMapaInvalidos.value.add(codigoSubprocesso);
+        estado.mapasPendentesAtualizacao.value.add(codigoSubprocesso);
         carregamentos.mapa.delete(codigoSubprocesso);
         invalidarImpacto(estado, carregamentos, codigoSubprocesso);
         return;
     }
 
-    estado.codigosMapaInvalidos.value = new Set(estado.cacheMapaCompleto.value.keys());
+    estado.mapasPendentesAtualizacao.value = new Set(estado.mapasPorSubprocesso.value.keys());
     carregamentos.mapa.clear();
     invalidarImpacto(estado, carregamentos);
 }
 
 function resetarMapas(estado: EstadoMapasRefs, carregamentos: CarregamentosMapas): void {
-    estado.cacheMapaCompleto.value.clear();
-    estado.codigosMapaInvalidos.value.clear();
+    estado.mapasPorSubprocesso.value.clear();
+    estado.mapasPendentesAtualizacao.value.clear();
     carregamentos.mapa.clear();
     carregamentos.impacto.clear();
     sincronizarMapaAtual(estado, null);
@@ -149,31 +149,31 @@ function resetarMapas(estado: EstadoMapasRefs, carregamentos: CarregamentosMapas
 }
 
 /**
- * Store de cache de sessão para dados do mapa de competências.
+ * Store de sessão para dados do mapa de competências.
  *
  * Política:
  * - escopo: sessão autenticada;
  * - chave: código do subprocesso;
- * - validade: sem TTL; reaproveita ao reativar a view enquanto o subprocesso
- *   não for invalidado explicitamente;
+ * - reaproveitamento: dados já resolvidos por subprocesso são reutilizados
+ *   enquanto não houver marcação de atualização pendente;
  * - invalidação: qualquer ação de workflow/mutação que altere o mapa marca o
- *   snapshot como stale, mas não o apaga imediatamente;
+ *   dado como pendente de atualização, mas não o apaga imediatamente;
  * - reset: logout, troca de perfil e limpeza explícita de sessão removem todo
  *   o estado do store.
  *
- * Mantemos o último snapshot acessado em refs simples por compatibilidade com
- * testes e composables legados, mas o cache efetivo é indexado por subprocesso.
+ * Mantemos o último mapa acessado em refs simples para consumo reativo das
+ * telas, enquanto a coleção efetiva segue indexada por subprocesso.
  */
 export const useMapasStore = defineStore("mapas", () => {
-    const cacheMapaCompleto = ref<Map<number, MapaCompleto>>(new Map());
-    const codigosMapaInvalidos = ref<Set<number>>(new Set());
+    const mapasPorSubprocesso = ref<Map<number, MapaCompleto>>(new Map());
+    const mapasPendentesAtualizacao = ref<Set<number>>(new Set());
     const mapaCompleto = ref<MapaCompleto | null>(null);
     const impactoMapa = ref<ImpactoMapa | null>(null);
     const codigoMapaAtual = ref<number | null>(null);
     const codigoImpactoAtual = ref<number | null>(null);
     const estado: EstadoMapasRefs = {
-        cacheMapaCompleto,
-        codigosMapaInvalidos,
+        mapasPorSubprocesso,
+        mapasPendentesAtualizacao,
         mapaCompleto,
         impactoMapa,
         codigoMapaAtual,
@@ -185,10 +185,10 @@ export const useMapasStore = defineStore("mapas", () => {
     };
     const contexto = {estado, carregamentos};
 
-    async function garantirMapaCompleto(codigoSubprocesso: number): Promise<MapaCompleto> {
-        if (dadosMapaValidos(estado, codigoSubprocesso)) {
+    async function carregarMapa(codigoSubprocesso: number): Promise<MapaCompleto> {
+        if (mapaDisponivel(estado, codigoSubprocesso)) {
             sincronizarMapaAtual(estado, codigoSubprocesso);
-            return estado.cacheMapaCompleto.value.get(codigoSubprocesso)!;
+            return estado.mapasPorSubprocesso.value.get(codigoSubprocesso)!;
         }
 
         const carregamentoExistente = carregamentos.mapa.get(codigoSubprocesso);
@@ -200,8 +200,8 @@ export const useMapasStore = defineStore("mapas", () => {
         return criarCarregamentoMapa(estado, carregamentos, codigoSubprocesso);
     }
 
-    async function garantirImpactoMapa(codigoSubprocesso: number): Promise<ImpactoMapa> {
-        if (dadosImpactoValidos(estado, codigoSubprocesso)) {
+    async function carregarImpacto(codigoSubprocesso: number): Promise<ImpactoMapa> {
+        if (impactoDisponivel(estado, codigoSubprocesso)) {
             return estado.impactoMapa.value!;
         }
 
@@ -217,12 +217,12 @@ export const useMapasStore = defineStore("mapas", () => {
         invalidarImpacto(estado, carregamentos, codigoSubprocesso);
     }
 
-    function definirMapaCompletoStore(codigoSubprocesso: number, mapa: MapaCompleto | null): void {
-        definirMapaCompleto(contexto, codigoSubprocesso, mapa);
+    function sincronizarMapaStore(codigoSubprocesso: number, mapa: MapaCompleto | null): void {
+        sincronizarMapa(contexto, codigoSubprocesso, mapa);
     }
 
-    function definirImpactoMapaStore(codigoSubprocesso: number, impacto: ImpactoMapa | null): void {
-        definirImpactoMapa(estado, codigoSubprocesso, impacto);
+    function sincronizarImpactoStore(codigoSubprocesso: number, impacto: ImpactoMapa | null): void {
+        sincronizarImpacto(estado, codigoSubprocesso, impacto);
     }
 
     function invalidar(codigoSubprocesso?: number): void {
@@ -234,20 +234,20 @@ export const useMapasStore = defineStore("mapas", () => {
     }
 
     return {
-        cacheMapaCompleto,
-        codigosMapaInvalidos,
+        mapasPorSubprocesso,
+        mapasPendentesAtualizacao,
         mapaCompleto,
         impactoMapa,
         codigoMapaAtual,
         codigoImpactoAtual,
-        obterMapaCompletoCache: (codigoSubprocesso: number) => obterMapaCompletoCache(estado, codigoSubprocesso),
-        obterImpactoMapaCache: (codigoSubprocesso: number) => obterImpactoMapaCache(estado, codigoSubprocesso),
-        dadosMapaValidos: (codigoSubprocesso: number) => dadosMapaValidos(estado, codigoSubprocesso),
-        dadosImpactoValidos: (codigoSubprocesso: number) => dadosImpactoValidos(estado, codigoSubprocesso),
-        definirMapaCompleto: definirMapaCompletoStore,
-        definirImpactoMapa: definirImpactoMapaStore,
-        garantirMapaCompleto,
-        garantirImpactoMapa,
+        obterMapa: (codigoSubprocesso: number) => obterMapa(estado, codigoSubprocesso),
+        obterImpacto: (codigoSubprocesso: number) => obterImpacto(estado, codigoSubprocesso),
+        mapaDisponivel: (codigoSubprocesso: number) => mapaDisponivel(estado, codigoSubprocesso),
+        impactoDisponivel: (codigoSubprocesso: number) => impactoDisponivel(estado, codigoSubprocesso),
+        sincronizarMapa: sincronizarMapaStore,
+        sincronizarImpacto: sincronizarImpactoStore,
+        carregarMapa,
+        carregarImpacto,
         invalidarImpacto: invalidarImpactoStore,
         invalidar,
         resetar,

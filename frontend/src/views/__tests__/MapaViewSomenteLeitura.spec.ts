@@ -168,12 +168,12 @@ describe("MapaView somente leitura", () => {
             impactoMapa: ref(null),
             carregando: ref(false),
             erro: ref(null),
-            definirMapaCompleto: vi.fn(),
-            definirImpactoMapa: vi.fn(),
+            sincronizarMapa: vi.fn(),
+            sincronizarImpacto: vi.fn(),
             invalidar: vi.fn(),
             invalidarImpacto: vi.fn(),
-            buscarMapaCompleto: vi.fn(),
-            buscarImpactoMapa: vi.fn(),
+            carregarMapa: vi.fn(),
+            carregarImpacto: vi.fn(),
         } as any);
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
@@ -348,4 +348,3 @@ describe("MapaView somente leitura", () => {
         expect(analiseService.listarAnalisesValidacao).toHaveBeenCalledWith(123);
     });
 });
-

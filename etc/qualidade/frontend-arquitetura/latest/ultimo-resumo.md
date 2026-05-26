@@ -1,42 +1,42 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **202** (critico)
+- Score total: **131** (critico)
 - Arquivos de producao: **243**
 - Views com vazamento de estrategia de cache: **3**
-- Acessos diretos a cache de store: **8**
+- Acessos diretos a cache de store: **0**
 - Chamadas com booleano posicional: **16**
 - Ocorrencias de `forcar` em producao: **0**
 
 ## Hotspots
 
-1. `frontend/src/stores/mapas.ts` [store]
-   - score: 71
-   - sinais: acessoDiretoCache, palavraStale, palavraSnapshot
-2. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
+1. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
    - score: 40
    - sinais: invalidacaoExplicita
-3. `frontend/src/composables/useCadastroOrquestracao.ts` [composable]
+2. `frontend/src/composables/useCadastroOrquestracao.ts` [composable]
    - score: 18
    - sinais: invalidacaoExplicita, booleanoPosicional
-4. `frontend/src/composables/useCacheSync.ts` [composable]
+3. `frontend/src/composables/useCacheSync.ts` [composable]
    - score: 15
    - sinais: invalidacaoExplicita
-5. `frontend/src/components/processo/SubprocessoCards.vue` [component]
+4. `frontend/src/components/processo/SubprocessoCards.vue` [component]
    - score: 12
    - sinais: booleanoPosicional
-6. `frontend/src/composables/useFluxoSubprocesso.ts` [composable]
+5. `frontend/src/composables/useFluxoSubprocesso.ts` [composable]
    - score: 8
    - sinais: booleanoPosicional
-7. `frontend/src/stores/unidade.ts` [store]
+6. `frontend/src/stores/unidade.ts` [store]
    - score: 8
    - sinais: booleanoPosicional
-8. `frontend/src/components/comum/EditorTextoRico.vue` [component]
+7. `frontend/src/components/comum/EditorTextoRico.vue` [component]
    - score: 4
    - sinais: booleanoPosicional
-9. `frontend/src/views/subprocessoAcoesAdministrativas.ts` [view]
+8. `frontend/src/views/subprocessoAcoesAdministrativas.ts` [view]
    - score: 4
    - sinais: booleanoPosicional
-10. `frontend/src/components/processo/TabelaProcessos.vue` [component]
+9. `frontend/src/components/processo/TabelaProcessos.vue` [component]
+   - score: 4
+   - sinais: booleanoPosicional
+10. `frontend/src/views/subprocessoCarregamento.ts` [view]
    - score: 4
    - sinais: booleanoPosicional
 

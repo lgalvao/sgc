@@ -13,7 +13,7 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         : computed(() => {
             const codigoAtual = toValue(codigoSubprocesso);
             return typeof codigoAtual === "number"
-                ? mapasStore.obterMapaCompletoCache(codigoAtual)
+                ? mapasStore.obterMapa(codigoAtual)
                 : null;
         });
     const impactoMapa = codigoSubprocesso === undefined
@@ -21,23 +21,23 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         : computed(() => {
             const codigoAtual = toValue(codigoSubprocesso);
             return typeof codigoAtual === "number"
-                ? mapasStore.obterImpactoMapaCache(codigoAtual)
+                ? mapasStore.obterImpacto(codigoAtual)
                 : null;
         });
 
-    async function buscarMapaCompleto(codSubprocesso: number) {
+    async function carregarMapa(codSubprocesso: number) {
         await executar(async () => {
-            await mapasStore.garantirMapaCompleto(codSubprocesso);
+            await mapasStore.carregarMapa(codSubprocesso);
         }, "Erro ao carregar mapa completo.", {relancarErro: false});
     }
 
-    async function buscarImpactoMapa(codSubprocesso: number) {
+    async function carregarImpacto(codSubprocesso: number) {
         if (!codSubprocesso) {
             return;
         }
 
         await executar(async () => {
-            await mapasStore.garantirImpactoMapa(codSubprocesso);
+            await mapasStore.carregarImpacto(codSubprocesso);
         }, "Erro ao verificar impactos.", {relancarErro: false});
     }
 
@@ -46,16 +46,12 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
         impactoMapa: impactoMapa as Ref<ImpactoMapa | null>,
         carregando,
         erro,
-        dadosMapaValidos: mapasStore.dadosMapaValidos,
-        dadosImpactoValidos: mapasStore.dadosImpactoValidos,
-        definirMapaCompleto: mapasStore.definirMapaCompleto,
-        definirImpactoMapa: mapasStore.definirImpactoMapa,
+        sincronizarMapa: mapasStore.sincronizarMapa,
+        sincronizarImpacto: mapasStore.sincronizarImpacto,
         invalidar: mapasStore.invalidar,
         invalidarImpacto: mapasStore.invalidarImpacto,
         resetar: mapasStore.resetar,
-        obterMapaCompletoCache: mapasStore.obterMapaCompletoCache,
-        obterImpactoMapaCache: mapasStore.obterImpactoMapaCache,
-        buscarMapaCompleto,
-        buscarImpactoMapa,
+        carregarMapa,
+        carregarImpacto,
     };
 }

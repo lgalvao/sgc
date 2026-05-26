@@ -118,7 +118,7 @@ describe('useCacheSync', () => {
 
     it('deve preservar caches críticos e limpar marcações locais do painel ao invalidar por SSE organizacional', () => {
         subprocessoStore.contextoEdicao = {detalhes: {codigo: 200, situacao: 'MAPA'}} as any;
-        mapasStore.definirMapaCompleto(200, {
+        mapasStore.sincronizarMapa(200, {
             codigo: 1,
             subprocessoCodigo: 200,
             observacoes: 'Mapa vivo',
@@ -135,11 +135,11 @@ describe('useCacheSync', () => {
         expect(subprocessoStore.contextoEdicao).toEqual(expect.objectContaining({
             detalhes: expect.objectContaining({codigo: 200}),
         }));
-        expect(mapasStore.obterMapaCompletoCache(200)).toEqual(expect.objectContaining({
+        expect(mapasStore.obterMapa(200)).toEqual(expect.objectContaining({
             subprocessoCodigo: 200,
             observacoes: 'Mapa vivo',
         }));
-        expect(mapasStore.dadosMapaValidos(200)).toBe(true);
+        expect(mapasStore.mapaDisponivel(200)).toBe(true);
     });
 
     it('não deve fechar a conexão em caso de erro transitório durante reconexão', () => {
