@@ -27,8 +27,8 @@ Base principal: Fluxo narrado e validado na reunião, com complementos mínimos 
    - situação atual da avaliação individual, com um dos valores:
      - `Autoavaliação não iniciada`;
      - `Autoavaliação concluída`;
-     - `Consenso criado`;
-     - `Consenso aprovado`;
+     - `Avaliação de consenso criado`;
+     - `Avaliação de Consenso aprovado`;
      - `Avaliação impossibilitada`.
 
 6. Conforme a situação do servidor, o sistema pode exibir as seguintes ações:
