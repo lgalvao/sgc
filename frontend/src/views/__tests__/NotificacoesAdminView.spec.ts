@@ -7,6 +7,7 @@ import {createMemoryHistory, createRouter} from 'vue-router';
 import {buscarUrlLeitorEmailTestes, listarNotificacoesAdmin, reenviarNotificacao} from '@/services/notificacaoService';
 import {formatarDestinatario} from "@/utils/notificacaoFormatters";
 import {ehModoProducao} from "@/utils/ambiente";
+import {usePerfilStore} from "@/stores/perfil";
 
 vi.mock('@/services/notificacaoService', async (importActual) => {
     const actual = await importActual<typeof import('@/services/notificacaoService')>();
@@ -47,6 +48,9 @@ describe('NotificacoesAdminView', () => {
 
     const mountComponent = () => {
         const pinia = createPinia();
+        const perfilStore = usePerfilStore(pinia);
+        perfilStore.perfilSelecionado = 'ADMIN' as any;
+
         return mount(NotificacoesAdminView, {
             global: {
                 plugins: [pinia, [PiniaColada, {}], router],

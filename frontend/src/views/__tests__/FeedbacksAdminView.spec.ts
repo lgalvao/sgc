@@ -6,6 +6,7 @@ import {createPinia} from "pinia";
 import FeedbacksAdminView from "../FeedbacksAdminView.vue";
 import {listarFeedbacksAdmin} from "@/services/feedbackAdminService";
 import {formatarDataHoraBR} from "@/utils";
+import {usePerfilStore} from "@/stores/perfil";
 
 vi.mock("@/services/feedbackAdminService", () => ({
     listarFeedbacksAdmin: vi.fn(),
@@ -19,6 +20,9 @@ const router = createRouter({
 
 function montarComponente() {
     const pinia = createPinia();
+    const perfilStore = usePerfilStore(pinia);
+    perfilStore.perfilSelecionado = "ADMIN" as any;
+    
     return mount(FeedbacksAdminView, {
         global: {
             plugins: [pinia, [PiniaColada, {}], router],
