@@ -8,7 +8,6 @@ export function useHistoricoQuery() {
     return useQuery<ProcessoResumo[], Error, ProcessoResumo[]>({
         key: CHAVE_QUERY_HISTORICO,
         query: () => buscarProcessosFinalizados(),
-        initialData: () => [],
         staleTime: Infinity,
     });
 }

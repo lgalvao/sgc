@@ -12,7 +12,6 @@ export function useProcessoQuery(codigoProcesso: number) {
         key: () => [...chave.value],
         query: async () => buscarContextoCompleto(codigoProcesso),
         enabled: () => Number.isFinite(codigoProcesso) && codigoProcesso > 0,
-        initialData: () => null,
         staleTime: Infinity,
     });
 }

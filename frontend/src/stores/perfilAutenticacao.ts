@@ -50,9 +50,9 @@ function montarSessaoPerfilSelecionado(
 }
 
 function concluirTransicaoSessao(atualizador: AtualizadorSessao, dados: DadosSessaoPerfil): void {
+    finalizarTransicaoSessao();
     atualizador.resetarEstadoAplicacao();
     atualizador.aplicarSessao(dados);
-    finalizarTransicaoSessao();
 }
 
 export async function iniciarLoginPerfil(
@@ -98,4 +98,5 @@ export async function encerrarLoginPerfil(atualizador: AtualizadorSessao): Promi
 
     atualizador.limparSessao();
     atualizador.resetarEstadoAplicacao();
+    finalizarTransicaoSessao();
 }

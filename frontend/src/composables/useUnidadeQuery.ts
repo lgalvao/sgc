@@ -52,7 +52,6 @@ export function useUnidadeQuery(codigoUnidade: MaybeRefOrGetter<number>) {
             const cod = toValue(codigoUnidade);
             return Number.isFinite(cod) && cod > 0;
         },
-        initialData: () => null,
         staleTime: Infinity,
     });
 }
@@ -81,7 +80,6 @@ export function useDadosTelaUnidadeQuery(codigoUnidade: MaybeRefOrGetter<number>
             const cod = toValue(codigoUnidade);
             return Number.isFinite(cod) && cod > 0;
         },
-        initialData: () => ({unidade: null, mapaVigente: null}),
         staleTime: Infinity,
     });
 }
@@ -94,7 +92,6 @@ export function useArvoreElegibilidadeQuery(
         key: () => [...CHAVE_QUERY_ARVORE_ELEGIBILIDADE, toValue(tipoProcesso) ?? "nenhuma", String(toValue(codProcesso) ?? "novo")],
         query: () => buscarArvoreComElegibilidade(toValue(tipoProcesso)!, toValue(codProcesso)),
         enabled: () => !!toValue(tipoProcesso),
-        initialData: () => [],
         staleTime: Infinity,
     });
 }
