@@ -109,6 +109,6 @@ onMounted(async () => {
 
 onActivated(async () => {
   if (!montadoUmaVez) return;
-  await carregarDadosTela(true);
+  await historicoQuery.refresh();
 });
 </script>

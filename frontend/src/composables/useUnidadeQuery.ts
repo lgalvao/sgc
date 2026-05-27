@@ -50,7 +50,7 @@ export function useUnidadeQuery(codigoUnidade: MaybeRefOrGetter<number>) {
         },
         enabled: () => {
             const cod = toValue(codigoUnidade);
-            return Number.isFinite(cod) && cod > 0;
+            return Number.isFinite(cod) && cod > 0 && !!perfilStore.perfilSelecionado;
         },
         staleTime: Infinity,
     });
@@ -78,7 +78,7 @@ export function useDadosTelaUnidadeQuery(codigoUnidade: MaybeRefOrGetter<number>
         },
         enabled: () => {
             const cod = toValue(codigoUnidade);
-            return Number.isFinite(cod) && cod > 0;
+            return Number.isFinite(cod) && cod > 0 && !!perfilStore.perfilSelecionado;
         },
         staleTime: Infinity,
     });
@@ -88,10 +88,11 @@ export function useArvoreElegibilidadeQuery(
     tipoProcesso: MaybeRefOrGetter<string | null>,
     codProcesso: MaybeRefOrGetter<number | undefined>
 ) {
+    const perfilStore = usePerfilStore();
     return useQuery<Unidade[], Error, Unidade[]>({
         key: () => [...CHAVE_QUERY_ARVORE_ELEGIBILIDADE, toValue(tipoProcesso) ?? "nenhuma", String(toValue(codProcesso) ?? "novo")],
         query: () => buscarArvoreComElegibilidade(toValue(tipoProcesso)!, toValue(codProcesso)),
-        enabled: () => !!toValue(tipoProcesso),
+        enabled: () => !!toValue(tipoProcesso) && !!perfilStore.perfilSelecionado,
         initialData: () => [],
         staleTime: Infinity,
     });

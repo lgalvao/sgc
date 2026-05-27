@@ -234,7 +234,7 @@ describe('PainelView', () => {
         const vm = wrapper.vm as unknown as { show: boolean };
         await flushPromises();
 
-        // 1 manual no onMounted (automático do Colada não disparou ou fundiu)
+        // 1 manual no onMounted
         expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
 
         // Deactivate
@@ -246,8 +246,8 @@ describe('PainelView', () => {
         await queryCache.invalidateQueries({key: ['painel']});
         vm.show = true;
         await flushPromises();
-        // 1 (mount) + 1 automático (Colada) + 1 manual (onActivated) = 3
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(3);
+        // +1 manual no onActivated (refresh percebe stale)
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
 
         // Deactivate
         vm.show = false;
@@ -256,8 +256,8 @@ describe('PainelView', () => {
         // Activate - cache VÁLIDO
         vm.show = true;
         await flushPromises();
-        // Permanece 3 pois o refresh() no onActivated respeita o cache válido
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(3); 
+        // Permanece 2 pois o refresh() no onActivated respeita o cache válido
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); 
     });
 
     it('deve mostrar estado vazio de alertas sem renderizar a tabela', async () => {

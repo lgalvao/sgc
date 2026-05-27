@@ -184,7 +184,9 @@ function criarFluxoCarga({
         if (!carregamentoInicialConcluido.value) {
             return;
         }
-        await carregarDados();
+        await unidadeQuery.refresh();
+        atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
+        preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
     });
 
     return {carregarDados};

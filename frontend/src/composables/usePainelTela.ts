@@ -90,7 +90,7 @@ export function usePainelTela() {
   onActivated(async () => {
     if (!carregamentoInicialConcluido.value) return;
     exibirToastPendente();
-    await carregarDados();
+    await painelQuery.refresh();
   });
 
   function ordenarPor(campo: keyof ProcessoResumo) {
