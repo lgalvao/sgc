@@ -197,7 +197,7 @@ function filtrarUnidadesPorSigla(unidadesOrigem: Unidade[], termo: string, force
 async function carregarUnidades() {
   erroDispensado.value = false;
   try {
-    await unidadesQuery.refresh(true);
+    await unidadesQuery.refetch();
   } catch {
     // O estado de erro já fica registrado na query.
   }

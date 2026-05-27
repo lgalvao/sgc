@@ -111,9 +111,7 @@ async function carregarContextoCompleto() {
   const processoAnterior = processo.value;
 
   try {
-    const resultado = carregamentoInicialConcluido.value
-        ? await processoQuery.refresh(true)
-        : await processoQuery.refetch(true);
+    const resultado = await processoQuery.refetch();
     const data = resultado.data;
     if (data) {
       processo.value = data;

@@ -89,7 +89,7 @@ let montadoUmaVez = false;
 async function carregarDadosTela(deveRecarregarHistorico: boolean) {
   const promessas = [];
   if (deveRecarregarHistorico) {
-    promessas.push(montadoUmaVez ? historicoQuery.refresh(true) : historicoQuery.refetch(true));
+    promessas.push(historicoQuery.refetch());
   }
   if (podeCarregarConfiguracoes.value) {
     promessas.push(carregarConfiguracoes());

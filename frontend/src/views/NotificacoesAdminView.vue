@@ -240,7 +240,7 @@ function limparHtmlPreview(html: string): string {
 
 async function carregar() {
   try {
-    await notificacoesQuery.refresh(true);
+    await notificacoesQuery.refetch();
   } catch (error) {
     notify(normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR, "danger");
   }

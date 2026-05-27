@@ -61,11 +61,7 @@ export function useConfiguracoes() {
 
     async function carregarConfiguracoes() {
         try {
-            if (configuracoesQuery.status.value === "success" || configuracoesQuery.status.value === "error") {
-                await configuracoesQuery.refresh(true);
-                return;
-            }
-            await configuracoesQuery.refetch(true);
+            await configuracoesQuery.refetch();
         } catch {
             // O estado de erro já fica registrado na query.
         }

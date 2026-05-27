@@ -214,7 +214,7 @@ function abrirImagemAmpliada(codigo: string) {
 }
 
 async function carregar() {
-  await feedbacksQuery.refresh(true);
+  await feedbacksQuery.refetch();
 }
 </script>
 

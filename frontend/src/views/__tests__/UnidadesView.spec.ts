@@ -28,7 +28,7 @@ const unidadesQueryMock = {
     error: ref<Error | null>(null),
     isPending: ref(false),
     isLoading: ref(false),
-    refresh: vi.fn(),
+    refetch: vi.fn(),
     iniciado: false,
 };
 
@@ -36,7 +36,7 @@ vi.mock("@/composables/useUnidadesQuery", () => ({
     useUnidadesQuery: () => {
         if (!unidadesQueryMock.iniciado) {
             unidadesQueryMock.iniciado = true;
-            void unidadesQueryMock.refresh();
+            void unidadesQueryMock.refetch();
         }
         return unidadesQueryMock;
     },
@@ -104,7 +104,7 @@ describe("Unidades.vue", () => {
         unidadesQueryMock.isPending.value = false;
         unidadesQueryMock.isLoading.value = false;
         unidadesQueryMock.iniciado = false;
-        unidadesQueryMock.refresh.mockImplementation(async () => {
+        unidadesQueryMock.refetch.mockImplementation(async () => {
             unidadesQueryMock.isPending.value = true;
             try {
                 const data = await unidadeService.buscarTodasUnidades();

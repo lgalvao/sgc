@@ -20,12 +20,7 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
             if (codigoSubprocesso === undefined) {
                 codigoSubprocessoInterno.value = codSubprocesso;
             }
-            const codigoAtual = codigoConsulta.value;
-            if (codigoAtual === codSubprocesso && (mapaQuery.status.value === "success" || mapaQuery.status.value === "error")) {
-                await mapaQuery.refresh(true);
-                return;
-            }
-            await mapaQuery.refetch(true);
+            await mapaQuery.refetch();
         }, "Erro ao carregar mapa completo.", {relancarErro: false});
     }
 
@@ -38,12 +33,7 @@ export function useMapas(codigoSubprocesso?: MaybeRefOrGetter<number | null | un
             if (codigoSubprocesso === undefined) {
                 codigoSubprocessoInterno.value = codSubprocesso;
             }
-            const codigoAtual = codigoConsulta.value;
-            if (codigoAtual === codSubprocesso && (impactoQuery.status.value === "success" || impactoQuery.status.value === "error")) {
-                await impactoQuery.refresh(true);
-                return;
-            }
-            await impactoQuery.refetch(true);
+            await impactoQuery.refetch();
         }, "Erro ao verificar impactos.", {relancarErro: false});
     }
 

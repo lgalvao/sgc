@@ -162,7 +162,7 @@ function criarFluxoCarga({
         erroUsuario.value = "";
 
         try {
-            await unidadeQuery.refresh(true);
+            await unidadeQuery.refetch();
             atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
             preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
         } catch (error) {
@@ -234,7 +234,7 @@ function criarFluxoMutacao({
     async function atualizarCachesPosMutacao() {
         invalidarUnidade();
         invalidarDadosTelaUnidade();
-        await unidadeQuery.refresh(true);
+        await unidadeQuery.refetch();
         atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
         preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
     }

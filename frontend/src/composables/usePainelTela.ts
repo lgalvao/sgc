@@ -49,9 +49,8 @@ export function usePainelTela() {
 
     carregandoPainel.value = true;
     try {
-      const bootstrap = carregamentoInicialConcluido.value
-          ? (await painelQuery.refresh(true)).data
-          : (await painelQuery.refetch(true)).data;
+      const {data: bootstrap} = await painelQuery.refetch();
+      if (!bootstrap) return;
 
       const codigosNaoLidos = bootstrap.alertas
           .filter((a: Alerta) => !a.dataHoraLeitura && !painelStore.isMarcadoComoLido(a.codigo))
