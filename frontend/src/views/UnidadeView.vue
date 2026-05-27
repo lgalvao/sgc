@@ -5,7 +5,7 @@
         :model-value="true"
         dismissible
         variant="danger"
-        @dismissed="ultimoErro = null"
+        @dismissed="erroDispensado = true"
     >
       {{ ultimoErro }}
     </BAlert>
@@ -99,7 +99,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
-import {computed, onActivated, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import type {Responsavel, Unidade, Usuario} from "@/types/tipos";
 import TreeTable, {type TreeItem} from "@/components/comum/TreeTable.vue";
@@ -116,7 +116,7 @@ import {useNotification} from "@/composables/useNotification";
 import {usePerfilStore} from "@/stores/perfil";
 import {Perfil} from "@/types/comum";
 import {relatoriosService} from "@/services/relatoriosService";
-import {useUnidade} from "@/composables/useUnidadeQuery";
+import {useDadosTelaUnidadeQuery} from "@/composables/useUnidadeQuery";
 
 
 const props = defineProps<{ codUnidade: number }>();
@@ -127,22 +127,30 @@ const {notify} = useNotification();
 const {definirUnidadeAtual} = useUnidadeAtual();
 const perfilStore = usePerfilStore();
 
-const {
-  unidade,
-  mapaVigente,
-  carregando: carregandoPagina,
-  erro: ultimoErro,
-  carregar: carregarDados,
-  recarregar: recarregarDados,
-} = useUnidade(() => props.codUnidade);
-
-const carregamentoInicialConcluido = ref(false);
+const dadosTelaQuery = useDadosTelaUnidadeQuery(() => props.codUnidade);
 const loadingExportacaoPdf = ref(false);
 const loadingExportacaoCsv = ref(false);
+const erroDispensado = ref(false);
+
+const unidade = computed(() => dadosTelaQuery.data.value?.unidade ?? null);
+const mapaVigente = computed(() => dadosTelaQuery.data.value?.mapaVigente ?? null);
+const carregandoPagina = computed(() => dadosTelaQuery.isPending.value || dadosTelaQuery.isLoading.value);
+const ultimoErro = computed(() => {
+  if (erroDispensado.value || !dadosTelaQuery.error.value) {
+    return null;
+  }
+  return dadosTelaQuery.error.value.message;
+});
 
 watch(unidade, (novaUnidade) => {
   definirUnidadeAtual(novaUnidade);
 }, { immediate: true });
+
+watch(() => dadosTelaQuery.error.value, (novoErro) => {
+  if (novoErro) {
+    erroDispensado.value = false;
+  }
+});
 
 function irParaCriarAtribuicao() {
   router.push({path: `/unidade/${props.codUnidade}/atribuicao`});
@@ -183,22 +191,6 @@ async function exportarMapaVigenteCsv() {
     loadingExportacaoCsv.value = false;
   }
 }
-
-onActivated(async () => {
-  if (!carregamentoInicialConcluido.value) {
-    return;
-  }
-  await recarregarDados();
-});
-
-watch(
-    () => props.codUnidade,
-    async () => {
-      await carregarDados();
-      carregamentoInicialConcluido.value = true;
-    },
-    {immediate: true}
-);
 
 const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
 const subordinadas = computed(() => unidade.value?.filhas ?? []);

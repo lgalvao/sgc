@@ -166,7 +166,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {BAlert, BBadge, BButton, BModal, BTable} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -214,12 +214,8 @@ function abrirImagemAmpliada(codigo: string) {
 }
 
 async function carregar() {
-  await feedbacksQuery.refetch();
+  await feedbacksQuery.refresh(true);
 }
-
-onMounted(() => {
-  void feedbacksQuery.refetch();
-});
 </script>
 
 <style scoped>

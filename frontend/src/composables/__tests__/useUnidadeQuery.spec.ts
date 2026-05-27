@@ -4,7 +4,7 @@ import {createApp, ref} from "vue";
 import {PiniaColada} from "@pinia/colada";
 import {
     useArvoreElegibilidadeQuery,
-    useUnidade,
+    useDadosTelaUnidadeQuery,
     useInvalidacaoUnidade,
 } from "../useUnidadeQuery";
 import * as unidadeService from "@/services/unidadeService";
@@ -58,18 +58,18 @@ describe("useUnidadeQuery", () => {
         app.unmount();
     });
 
-    it("useUnidade deve expor propriedades reativas corretas", async () => {
+    it("useDadosTelaUnidadeQuery deve expor os dados da tela corretamente", async () => {
         const mockUnidade = {codigo: 1, nome: "U1", sigla: "U1", filhas: []};
         const mockMapa = {codigo: 99, dataInicio: "2026-01-01"};
         vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue(mockUnidade as any);
         vi.mocked(unidadeService.buscarReferenciaMapaVigente).mockResolvedValue(mockMapa as any);
 
-        const [{unidade, mapaVigente, carregar}, app] = withSetup(() => useUnidade(1));
+        const [query, app] = withSetup(() => useDadosTelaUnidadeQuery(1));
 
-        await carregar();
+        const res = await query.refetch(true);
 
-        expect(unidade.value).toEqual(mockUnidade);
-        expect(mapaVigente.value).toEqual(mockMapa);
+        expect(res.data?.unidade).toEqual(mockUnidade);
+        expect(res.data?.mapaVigente).toEqual(mockMapa);
         expect(unidadeService.buscarArvoreUnidade).toHaveBeenCalledWith(1);
         expect(unidadeService.buscarReferenciaMapaVigente).toHaveBeenCalledWith(1);
         app.unmount();

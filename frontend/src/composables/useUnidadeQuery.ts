@@ -1,4 +1,4 @@
-import {computed, ref, watch, toValue, type MaybeRefOrGetter} from "vue";
+import {computed, toValue, type MaybeRefOrGetter} from "vue";
 import {useQuery, useQueryCache} from "@pinia/colada";
 import {usePerfilStore} from "@/stores/perfil";
 import {
@@ -7,7 +7,6 @@ import {
     buscarReferenciaMapaVigente,
 } from "@/services/unidadeService";
 import type {MapaVigenteReferencia, Unidade} from "@/types/tipos";
-import {normalizarErro} from "@/utils/apiError";
 
 export interface DadosTelaUnidade {
     unidade: Unidade | null;
@@ -100,74 +99,6 @@ export function useArvoreElegibilidadeQuery(
     });
 }
 
-export function useUnidade(codigoUnidade: MaybeRefOrGetter<number>) {
-    const query = useDadosTelaUnidadeQuery(codigoUnidade);
-    const erroLocal = ref<string | null>(null);
-
-    const unidade = ref<Unidade | null>(null);
-    const mapaVigente = ref<MapaVigenteReferencia | null>(null);
-    const carregando = computed(() => query.isLoading.value);
-
-    watch(() => query.data.value, (newData) => {
-        unidade.value = newData?.unidade ?? null;
-        mapaVigente.value = newData?.mapaVigente ?? null;
-    }, { immediate: true });
-
-    watch(() => query.error.value, (newError) => {
-        if (newError) {
-            erroLocal.value = normalizarErro(newError).mensagem;
-        } else {
-            erroLocal.value = null;
-        }
-    });
-
-    let promessaCarregamento: Promise<void> | null = null;
-    let promessaRecarregamento: Promise<void> | null = null;
-
-    async function carregar(): Promise<void> {
-        if (promessaCarregamento) {
-            return promessaCarregamento;
-        }
-        erroLocal.value = null;
-        promessaCarregamento = (async () => {
-            try {
-                await query.refetch(true);
-            } catch (e: unknown) {
-                erroLocal.value = normalizarErro(e).mensagem;
-            } finally {
-                promessaCarregamento = null;
-            }
-        })();
-        return promessaCarregamento;
-    }
-
-    async function recarregar(): Promise<void> {
-        if (promessaRecarregamento) {
-            return promessaRecarregamento;
-        }
-        erroLocal.value = null;
-        promessaRecarregamento = (async () => {
-            try {
-                await query.refetch(true);
-            } catch (e: unknown) {
-                erroLocal.value = normalizarErro(e).mensagem;
-            } finally {
-                promessaRecarregamento = null;
-            }
-        })();
-        return promessaRecarregamento;
-    }
-
-    return {
-        unidade,
-        mapaVigente,
-        carregando,
-        erro: erroLocal,
-        carregar,
-        recarregar,
-    };
-}
-
 export function useInvalidacaoUnidade() {
     return {
         invalidarUnidade: () => useQueryCache().invalidateQueries({key: CHAVE_QUERY_UNIDADE}),
@@ -175,4 +106,3 @@ export function useInvalidacaoUnidade() {
         invalidarArvoreElegibilidade: () => useQueryCache().invalidateQueries({key: CHAVE_QUERY_ARVORE_ELEGIBILIDADE}),
     };
 }
-

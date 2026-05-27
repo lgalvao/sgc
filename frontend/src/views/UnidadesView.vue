@@ -85,7 +85,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onActivated, onMounted, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {BAlert, BButton} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -95,12 +95,12 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import TreeTable from "@/components/comum/TreeTable.vue";
 import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoAlert.vue";
 import ArvoreToolbar from "@/components/unidade/ArvoreToolbar.vue";
-import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
-import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useDiagnosticoOrganizacionalAlert} from "@/composables/useDiagnosticoOrganizacionalAlert";
 import {usePerfil} from "@/composables/usePerfil";
+import {useUnidadesQuery} from "@/composables/useUnidadesQuery";
+import {normalizarErro} from "@/utils/apiError";
 
 type LinhaUnidadeArvore = {
   codigo: number;
@@ -117,10 +117,12 @@ type TreeTableRef = {
   collapseAll: () => void;
 };
 
-const unidades = ref<Unidade[]>([]);
 const treeTableRef = ref<TreeTableRef | null>(null);
-const {carregando: isLoading, erro, executar} = useAsyncAction();
+const unidadesQuery = useUnidadesQuery();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
+const erroDispensado = ref(false);
+const unidades = computed(() => unidadesQuery.data.value ?? []);
+const isLoading = computed(() => unidadesQuery.isPending.value || unidadesQuery.isLoading.value);
 const {
   carregandoDiagnosticoOrganizacional,
   gruposDiagnostico,
@@ -130,12 +132,14 @@ const {
   dispensarAlertaDiagnostico,
 } = useDiagnosticoOrganizacionalAlert(unidades, mostrarDiagnosticoOrganizacional);
 const router = useRouter();
-const carregamentoInicialConcluido = ref(false);
 const termoBusca = ref("");
 
-const erroUnidades = computed(() =>
-    erro.value ? {message: erro.value} : null
-);
+const erroUnidades = computed(() => {
+  if (erroDispensado.value || !unidadesQuery.error.value) {
+    return null;
+  }
+  return {message: normalizarErro(unidadesQuery.error.value).mensagem};
+});
 const colunas = [
   {key: "unidade", label: TEXTOS.subprocesso.COLUNA_UNIDADE, width: "100%"},
 ];
@@ -155,12 +159,8 @@ const unidadesExibidas = computed(() => {
 const unidadesFiltradas = computed(() => filtrarUnidadesPorSigla(unidadesExibidas.value, termoBusca.value));
 const dadosArvore = computed(() => mapearUnidadesParaLinhas(unidadesFiltradas.value));
 
-function dadosLocaisValidos(): boolean {
-  return unidades.value.length > 0 && !erro.value;
-}
-
 function limparErro() {
-  erro.value = null;
+  erroDispensado.value = true;
 }
 
 function expandirTodasLinhas() {
@@ -195,9 +195,12 @@ function filtrarUnidadesPorSigla(unidadesOrigem: Unidade[], termo: string, force
 }
 
 async function carregarUnidades() {
-  await executar(async () => {
-    unidades.value = await buscarTodasUnidades();
-  }, TEXTOS.comum.ERRO_OPERACAO, {relancarErro: false});
+  erroDispensado.value = false;
+  try {
+    await unidadesQuery.refresh(true);
+  } catch {
+    // O estado de erro já fica registrado na query.
+  }
 }
 
 function mapearUnidadeParaLinha(unidade: Unidade): LinhaUnidadeArvore {
@@ -221,18 +224,9 @@ function abrirDetalheUnidade(item: unknown) {
   void router.push({path: `/unidade/${unidade.codigo}`});
 }
 
-onMounted(async () => {
-  await carregarUnidades();
-  carregamentoInicialConcluido.value = true;
-});
-
-onActivated(async () => {
-  if (!carregamentoInicialConcluido.value) {
-    return;
-  }
-
-  if (!dadosLocaisValidos()) {
-    await carregarUnidades();
+watch(() => unidadesQuery.error.value, (novoErro) => {
+  if (novoErro) {
+    erroDispensado.value = false;
   }
 });
 

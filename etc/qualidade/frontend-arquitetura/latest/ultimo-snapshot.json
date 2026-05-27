@@ -1,14 +1,14 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-26T22:49:33.810Z",
+  "geradoEm": "2026-05-27T02:35:31.576Z",
   "resumo": {
-    "arquivosProducao": 258,
-    "scoreTotal": 1032,
+    "arquivosProducao": 259,
+    "scoreTotal": 984,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 1,
-      "viewsComServiceDireto": 11,
-      "viewsComServerStateCaseiro": 2,
+      "viewsComServiceDireto": 9,
+      "viewsComServerStateCaseiro": 1,
       "viewsComFanoutAlto": 9,
       "acessosDiretosCache": 0,
       "metodosEmCache": 0,
@@ -20,9 +20,9 @@
       "arquivosComBolsaDependenciasLarga": 9,
       "arquivosComSuperficieAmpla": 27,
       "arquivosComMisturaCamadas": 11,
-      "arquivosComServerStateCaseiro": 3,
+      "arquivosComServerStateCaseiro": 2,
       "arquivosComAcoplamentoStoreAlto": 4,
-      "arquivosComServiceDireto": 36,
+      "arquivosComServiceDireto": 35,
       "chamadasEstrategiaCache": 13,
       "chamadasInvalidacao": 10,
       "hubsCentraisComSinais": 2
@@ -169,41 +169,6 @@
         "serviceDireto",
         "misturaCamadas",
         "acoplamentoStoreAlto"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/NotificacoesAdminView.vue",
-      "camada": "view",
-      "linhas": 308,
-      "score": 38,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 2,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 2,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
-        "serviceDireto",
-        "serverStateCaseiro"
       ],
       "hubCentral": false
     },
@@ -387,7 +352,7 @@
     {
       "arquivo": "frontend/src/views/FeedbacksAdminView.vue",
       "camada": "view",
-      "linhas": 244,
+      "linhas": 240,
       "score": 28,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -565,7 +530,7 @@
     {
       "arquivo": "frontend/src/composables/useAtribuicaoTemporariaTela.ts",
       "camada": "composable",
-      "linhas": 407,
+      "linhas": 413,
       "score": 25,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -742,7 +707,7 @@
     {
       "arquivo": "frontend/src/views/useFinalizacaoProcesso.ts",
       "camada": "view",
-      "linhas": 52,
+      "linhas": 51,
       "score": 20,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1125,7 +1090,7 @@
     {
       "arquivo": "frontend/src/views/UnidadeView.vue",
       "camada": "view",
-      "linhas": 291,
+      "linhas": 282,
       "score": 16,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1219,40 +1184,6 @@
         "superficieExportadaAmpla": 0,
         "categoriasAcoplamento": 1,
         "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "serviceDireto"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/UnidadesView.vue",
-      "camada": "view",
-      "linhas": 240,
-      "score": 10,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 1,
-        "coordenacaoServerStateCaseiro": 1,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 4
       },
       "sinaisAtivos": [
         "serviceDireto"
@@ -1540,7 +1471,7 @@
     {
       "arquivo": "frontend/src/composables/useConfiguracoes.ts",
       "camada": "composable",
-      "linhas": 111,
+      "linhas": 110,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1847,7 +1778,7 @@
     {
       "arquivo": "frontend/src/composables/useMapaQuery.ts",
       "camada": "composable",
-      "linhas": 137,
+      "linhas": 138,
       "score": 4,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1864,7 +1795,7 @@
         "chamadasEstrategiaCache": 0,
         "chamadasInvalidacao": 0,
         "chamadasColadaQuery": 2,
-        "chamadasColadaCache": 1,
+        "chamadasColadaCache": 6,
         "estadosAssincronosManuais": 0,
         "coordenacaoServerStateCaseiro": 2,
         "mapasPromessasDedupe": 0,

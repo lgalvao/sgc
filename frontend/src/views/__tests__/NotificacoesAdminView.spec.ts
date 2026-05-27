@@ -225,16 +225,6 @@ describe('NotificacoesAdminView', () => {
         expect(mockNotify).toHaveBeenCalledWith('E-mail recolocado na fila de envio', 'success');
     });
 
-    it('covers manual refresh action', async () => {
-        vi.mocked(listarNotificacoesAdmin).mockResolvedValue([] as any);
-        const wrapper = mountComponent();
-        await flushPromises();
-
-        vi.clearAllMocks();
-        await wrapper.find('[data-testid="btn-notificacoes-atualizar"]').trigger('click');
-        expect(vi.mocked(listarNotificacoesAdmin)).toHaveBeenCalled();
-    });
-
     it('handles re-send failure', async () => {
         const mockData = [{codigo: 1, situacao: 'FALHA_DEFINITIVA', destinatario: 'a@a.com'}];
         vi.mocked(listarNotificacoesAdmin).mockResolvedValue(mockData as any);

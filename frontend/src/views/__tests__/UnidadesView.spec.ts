@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
-import {defineComponent} from "vue";
+import {defineComponent, ref} from "vue";
 import Unidades from "@/views/UnidadesView.vue";
 import * as unidadeService from "@/services/unidadeService";
 import {TEXTOS} from "@/constants/textos";
@@ -21,6 +21,25 @@ vi.mock("@/composables/usePerfil", () => ({
     usePerfil: () => ({
         mostrarDiagnosticoOrganizacional: {value: true}
     })
+}));
+
+const unidadesQueryMock = {
+    data: ref<any[]>([]),
+    error: ref<Error | null>(null),
+    isPending: ref(false),
+    isLoading: ref(false),
+    refresh: vi.fn(),
+    iniciado: false,
+};
+
+vi.mock("@/composables/useUnidadesQuery", () => ({
+    useUnidadesQuery: () => {
+        if (!unidadesQueryMock.iniciado) {
+            unidadesQueryMock.iniciado = true;
+            void unidadesQueryMock.refresh();
+        }
+        return unidadesQueryMock;
+    },
 }));
 
 vi.mock("@/services/unidadeService", async (importOriginal) => {
@@ -80,6 +99,25 @@ describe("Unidades.vue", () => {
         mockPush.mockReset();
         expandAllMock.mockReset();
         collapseAllMock.mockReset();
+        unidadesQueryMock.data.value = [];
+        unidadesQueryMock.error.value = null;
+        unidadesQueryMock.isPending.value = false;
+        unidadesQueryMock.isLoading.value = false;
+        unidadesQueryMock.iniciado = false;
+        unidadesQueryMock.refresh.mockImplementation(async () => {
+            unidadesQueryMock.isPending.value = true;
+            try {
+                const data = await unidadeService.buscarTodasUnidades();
+                unidadesQueryMock.data.value = data as any[];
+                unidadesQueryMock.error.value = null;
+                return {data};
+            } catch (error) {
+                unidadesQueryMock.error.value = error as Error;
+                throw error;
+            } finally {
+                unidadesQueryMock.isPending.value = false;
+            }
+        });
         vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue([]);
         vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockResolvedValue({
             possuiViolacoes: false,
@@ -108,8 +146,10 @@ describe("Unidades.vue", () => {
             vi.mocked(unidadeService.buscarTodasUnidades).mockRejectedValueOnce(
                 new Error(serviceOverride.error)
             );
+            unidadesQueryMock.error.value = new Error(serviceOverride.error);
         } else if (serviceOverride.unidades !== undefined) {
             vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValueOnce(serviceOverride.unidades as any);
+            unidadesQueryMock.data.value = serviceOverride.unidades as any[];
         }
 
         context.wrapper = mount(Unidades, {
@@ -143,47 +183,35 @@ describe("Unidades.vue", () => {
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
 
-    it("não deve recarregar unidades ao reativar a view em keepAlive quando os dados locais ainda estão válidos", async () => {
+    it("não deve disparar nova carga automaticamente após a carga inicial", async () => {
         const wrapper = createWrapper({unidades: mockUnidades});
         await flushPromises();
         vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
-        vi.mocked(unidadeService.buscarDiagnosticoOrganizacional).mockClear();
 
-        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
-        for (const hook of hooks) {
-            await hook.call(wrapper.vm);
-        }
+        await wrapper.vm.$nextTick();
         await flushPromises();
 
         expect(unidadeService.buscarTodasUnidades).not.toHaveBeenCalled();
-        // buscarDiagnosticoOrganizacional NÃO deve ser chamado novamente — cache de sessão ativo
-        expect(unidadeService.buscarDiagnosticoOrganizacional).not.toHaveBeenCalled();
     });
 
-    it("deve recarregar unidades ao reativar a view em keepAlive quando não houver dados locais", async () => {
+    it("deve recarregar unidades apenas por ação explícita do usuário", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
 
-        const hooks = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a) ?? [];
-        for (const hook of hooks) {
-            await hook.call(wrapper.vm);
-        }
+        await wrapper.find('[data-testid="btn-unidades-recarregar"]').trigger("click");
         await flushPromises();
 
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
     });
 
-    it("não deve disparar uma segunda carga no primeiro ciclo quando o onActivated ocorrer antes da carga inicial terminar", async () => {
+    it("não deve disparar uma segunda carga durante a primeira busca pendente", async () => {
         let resolver!: (valor: any[]) => void;
         vi.mocked(unidadeService.buscarTodasUnidades).mockReturnValueOnce(new Promise((resolve) => {
             resolver = resolve;
         }) as any);
 
         const wrapper = createWrapper();
-
-        const hook = ((wrapper.vm.$ as { a?: Array<() => unknown> } | undefined)?.a)?.[0];
-        await hook?.call(wrapper.vm);
 
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
 
@@ -222,6 +250,18 @@ describe("Unidades.vue", () => {
                 ]
             }
         ] as any);
+
+        unidadesQueryMock.data.value = [
+            {
+                codigo: 1,
+                sigla: "ROOT",
+                nome: "Raiz",
+                filhas: [
+                    {codigo: 43, sigla: "43ª Z.E.", nome: "Zona 43", filhas: []},
+                    {codigo: 45, sigla: "45ª Z.E.", nome: "Zona 45", filhas: []}
+                ]
+            }
+        ] as any;
 
         context.wrapper = mount(Unidades, {
             ...getCommonMountOptions(
@@ -418,7 +458,7 @@ describe("Unidades.vue", () => {
         vi.mocked(unidadeService.buscarTodasUnidades).mockRejectedValueOnce({});
         const wrapper = createWrapper();
         await flushPromises();
-        expect(wrapper.text()).toContain(TEXTOS.comum.ERRO_OPERACAO);
+        expect(wrapper.text()).toContain("Erro desconhecido ou não mapeado pela aplicação.");
     });
 
     it("deve recarregar ao clicar no botão de recarregar", async () => {

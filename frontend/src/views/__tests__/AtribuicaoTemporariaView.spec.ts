@@ -36,6 +36,7 @@ const {
         mockRemoverAtribuicao: vi.fn().mockResolvedValue(undefined),
         mockRecarregarDiagnostico: vi.fn().mockResolvedValue(undefined),
         unidadeQueryMock: {
+            data: {value: null as any},
             refresh: vi.fn(),
             refetch: vi.fn(),
         },
@@ -99,8 +100,17 @@ describe("AtribuicaoTemporariaView", () => {
             filhas: [],
         };
         mockObterUnidade.mockResolvedValue(unidade);
-        unidadeQueryMock.refresh.mockImplementation(async () => ({data: await mockObterUnidade(1)}));
-        unidadeQueryMock.refetch.mockImplementation(async () => ({data: await mockObterUnidade(1)}));
+        unidadeQueryMock.data.value = unidade;
+        unidadeQueryMock.refresh.mockImplementation(async () => {
+            const data = await mockObterUnidade(1);
+            unidadeQueryMock.data.value = data;
+            return {data};
+        });
+        unidadeQueryMock.refetch.mockImplementation(async () => {
+            const data = await mockObterUnidade(1);
+            unidadeQueryMock.data.value = data;
+            return {data};
+        });
         mockBuscarAtribuicoes.mockResolvedValue([]);
     });
 
@@ -427,12 +437,12 @@ describe("AtribuicaoTemporariaView", () => {
         const wrapper = mountView();
         await flushPromises();
         const vm = wrapper.vm as any;
-        
-        vm.unidade = null;
+
+        unidadeQueryMock.data.value = null;
         await vm.removerAtribuicao();
         expect(mockRemoverAtribuicao).not.toHaveBeenCalled();
 
-        vm.unidade = { codigo: 1 };
+        unidadeQueryMock.data.value = {codigo: 1};
         vm.atribuicoes = []; // No vigente
         await vm.removerAtribuicao();
         expect(mockRemoverAtribuicao).not.toHaveBeenCalled();

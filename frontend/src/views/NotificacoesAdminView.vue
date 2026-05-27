@@ -146,7 +146,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {BAlert, BButton, BModal} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
@@ -155,14 +155,16 @@ import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import NotificacaoTabela from "@/components/administracao/NotificacaoTabela.vue";
-import {useNotificacoesAdminQuery} from "@/composables/useNotificacoesAdminQuery";
+import {
+  useNotificacoesAdminQuery,
+  useReenvioNotificacaoMutation,
+  useUrlLeitorEmailTestesQuery
+} from "@/composables/useNotificacoesAdminQuery";
 import {TEXTOS} from "@/constants/textos";
 import {TIPOS_NOTIFICACAO_LABELS} from "@/constants/notificacoes";
 import {
-  buscarUrlLeitorEmailTestes,
   type Notificacao,
   obterStatusNotificacao,
-  reenviarNotificacao,
 } from "@/services/notificacaoService";
 import {formatarDataHoraBR} from "@/utils";
 import {ehModoProducao} from "@/utils/ambiente";
@@ -171,6 +173,8 @@ import {useNotification} from "@/composables/useNotification";
 
 const {notificacao, notify, clear} = useNotification();
 const notificacoesQuery = useNotificacoesAdminQuery();
+const leitorEmailTestesQuery = useUrlLeitorEmailTestesQuery();
+const reenvioMutation = useReenvioNotificacaoMutation();
 
 const itemSelecionado = ref<Notificacao | null>(null);
 const itemParaPreview = ref<Notificacao | null>(null);
@@ -178,12 +182,12 @@ const itemParaDetalhes = ref<Notificacao | null>(null);
 const mostrarModalReenvio = ref(false);
 const mostrarPreview = ref(false);
 const mostrarDetalhes = ref(false);
-const reenviando = ref(false);
-const urlLeitorEmailTestes = ref<string>();
 
 const carregando = computed(() => notificacoesQuery.isPending.value || notificacoesQuery.isLoading.value);
 const erro = computed(() => notificacoesQuery.error.value?.message || null);
 const itensOrdenados = notificacoesQuery.itensOrdenados;
+const reenviando = computed(() => reenvioMutation.isLoading.value);
+const urlLeitorEmailTestes = computed(() => leitorEmailTestesQuery.data.value ?? undefined);
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
 
 function formatarDataOuHifen(valor?: string | null): string {
@@ -236,17 +240,9 @@ function limparHtmlPreview(html: string): string {
 
 async function carregar() {
   try {
-    await notificacoesQuery.refetch(true);
+    await notificacoesQuery.refresh(true);
   } catch (error) {
     notify(normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR, "danger");
-  }
-}
-
-async function carregarUrlLeitorEmailTestes() {
-  try {
-    urlLeitorEmailTestes.value = (await buscarUrlLeitorEmailTestes()) ?? undefined;
-  } catch {
-    urlLeitorEmailTestes.value = undefined;
   }
 }
 
@@ -267,24 +263,15 @@ function confirmarReenvio(item: Notificacao) {
 
 async function reenviar() {
   if (!itemSelecionado.value) return;
-  reenviando.value = true;
   try {
-    await reenviarNotificacao(itemSelecionado.value.codigo);
+    await reenvioMutation.mutateAsync(itemSelecionado.value.codigo);
     notify(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO, "success");
     mostrarModalReenvio.value = false;
     itemSelecionado.value = null;
-    await carregar();
   } catch (error) {
     notify(normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO, "danger");
-  } finally {
-    reenviando.value = false;
   }
 }
-
-onMounted(() => {
-  void notificacoesQuery.refetch();
-  void carregarUrlLeitorEmailTestes();
-});
 </script>
 
 <style scoped>

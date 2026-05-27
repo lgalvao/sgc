@@ -156,7 +156,7 @@ function criarFluxoCarga({
     erroFormulario: Ref<string>;
     erroUsuario: Ref<string>;
     resetarValidacao: () => void;
-    unidade: Ref<Unidade | null>;
+    unidade: Readonly<Ref<Unidade | null>>;
     unidadeQuery: ReturnType<typeof useUnidadeQuery>;
 }) {
     async function carregarDados() {
@@ -164,8 +164,7 @@ function criarFluxoCarga({
         erroUsuario.value = "";
 
         try {
-            const res = await unidadeQuery.refetch(true);
-            unidade.value = (res && typeof res === "object" && "data" in res) ? (res as { data: Unidade | null }).data : res;
+            await unidadeQuery.refresh(true);
             atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
             preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
         } catch (error) {
@@ -227,7 +226,7 @@ function criarFluxoMutacao({
     notify: (mensagem: string, variante?: VarianteAlerta, dispensavel?: boolean) => void;
     organizacaoStore: ReturnType<typeof useOrganizacaoStore>;
     resetarValidacao: () => void;
-    unidade: Ref<Unidade | null>;
+    unidade: Readonly<Ref<Unidade | null>>;
     unidadeQuery: ReturnType<typeof useUnidadeQuery>;
     validarSubmissao: (valido: boolean) => boolean;
     focarPrimeiroErroInvalido: () => Promise<void>;
@@ -237,8 +236,7 @@ function criarFluxoMutacao({
     async function atualizarCachesPosMutacao() {
         invalidarUnidade();
         invalidarDadosTelaUnidade();
-        const res = await unidadeQuery.refetch(true);
-        unidade.value = (res && typeof res === "object" && "data" in res) ? (res as { data: Unidade | null }).data : res;
+        await unidadeQuery.refresh(true);
         atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
         preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
     }
@@ -323,7 +321,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
     const unidadeQuery = useUnidadeQuery(codigoUnidade);
     const organizacaoStore = useOrganizacaoStore();
     const campos = criarEstadoCampos();
-    const unidade = ref<Unidade | null>(null);
+    const unidade = computed(() => unidadeQuery.data.value ?? null);
     const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
     const isLoading = ref(false);
     const carregandoInicial = ref(true);
