@@ -101,7 +101,7 @@ import {BAlert, BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from 
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import {computed, onActivated, ref, watch} from "vue";
 import {useRouter} from "vue-router";
-import type {MapaVigenteReferencia, Responsavel, Unidade, Usuario} from "@/types/tipos";
+import type {Responsavel, Unidade, Usuario} from "@/types/tipos";
 import TreeTable, {type TreeItem} from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
@@ -110,7 +110,6 @@ import UnidadeContatoInfo from "@/components/unidade/UnidadeContatoInfo.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useUnidadeAtual} from "@/composables/useUnidadeAtual";
 import {formatarDataBR, logger} from "@/utils";
-import {normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useNotification} from "@/composables/useNotification";

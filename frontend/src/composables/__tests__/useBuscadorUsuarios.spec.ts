@@ -1,6 +1,6 @@
 import {describe, expect, it, vi, beforeEach, afterEach} from 'vitest';
 import {defineComponent, ref} from 'vue';
-import {mount, flushPromises} from '@vue/test-utils';
+import {mount} from '@vue/test-utils';
 import {useBuscadorUsuarios} from '../useBuscadorUsuarios';
 import * as usuarioService from '@/services/usuarioService';
 
@@ -24,7 +24,10 @@ describe('useBuscadorUsuarios.ts', () => {
     });
 
     const TestComponent = defineComponent({
-        props: ['termo', 'selecionado'],
+        props: {
+            termo: { type: String, required: true },
+            selecionado: { type: String as import('vue').PropType<string | null>, default: null }
+        },
         setup(props) {
             const termoRef = ref(props.termo);
             const selecionadoRef = ref(props.selecionado);

@@ -17,7 +17,7 @@ import type {Unidade} from "@/types/tipos";
 import {obterHojeFormatado} from "@/utils/date";
 import {logger} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
-import {useUnidadeQuery} from "@/composables/useUnidadeQuery";
+import {useUnidadeQuery, useInvalidacaoUnidade} from "@/composables/useUnidadeQuery";
 
 interface EstadoCampos {
     usuarioSelecionado: Ref<string | null>;
@@ -104,12 +104,14 @@ function criarFormularioValido(campos: EstadoCampos) {
 
 function criarApresentacao(campos: EstadoCampos, atribuicoes: Ref<AtribuicaoTemporaria[]>) {
     const atribuicaoVigente = computed(() => {
+        if (atribuicoes.value.length === 0) return null;
         const agora = new Date();
-        return atribuicoes.value.find((atribuicao: AtribuicaoTemporaria) => {
+        const active = atribuicoes.value.find((atribuicao: AtribuicaoTemporaria) => {
             const dataInicioAtribuicao = new Date(atribuicao.dataInicio);
             const dataTerminoAtribuicao = new Date(atribuicao.dataTermino);
             return dataInicioAtribuicao <= agora && dataTerminoAtribuicao >= agora;
-        }) ?? null;
+        });
+        return active ?? atribuicoes.value[0] ?? null;
     });
 
     const modoEdicao = computed(() => Boolean(atribuicaoVigente.value));
@@ -162,7 +164,8 @@ function criarFluxoCarga({
         erroUsuario.value = "";
 
         try {
-            unidade.value = (await unidadeQuery.refresh(true)).data;
+            const res = await unidadeQuery.refetch(true);
+            unidade.value = (res && typeof res === "object" && "data" in res) ? (res as { data: Unidade | null }).data : res;
             atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
             preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
         } catch (error) {
@@ -229,8 +232,13 @@ function criarFluxoMutacao({
     validarSubmissao: (valido: boolean) => boolean;
     focarPrimeiroErroInvalido: () => Promise<void>;
 }) {
+    const {invalidarUnidade, invalidarDadosTelaUnidade} = useInvalidacaoUnidade();
+
     async function atualizarCachesPosMutacao() {
-        unidade.value = (await unidadeQuery.refresh(true)).data;
+        invalidarUnidade();
+        invalidarDadosTelaUnidade();
+        const res = await unidadeQuery.refetch(true);
+        unidade.value = (res && typeof res === "object" && "data" in res) ? (res as { data: Unidade | null }).data : res;
         atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
         preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
     }

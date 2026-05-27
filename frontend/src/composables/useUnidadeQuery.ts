@@ -148,7 +148,7 @@ export function useUnidade(codigoUnidade: MaybeRefOrGetter<number>) {
         erroLocal.value = null;
         promessaRecarregamento = (async () => {
             try {
-                await query.refresh(true);
+                await query.refetch(true);
             } catch (e: unknown) {
                 erroLocal.value = normalizarErro(e).mensagem;
             } finally {

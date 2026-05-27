@@ -41,7 +41,7 @@ const unidadeStoreMock = {
     invalidar: vi.fn(),
 };
 
-const useUnidadeStore = (pinia?: any) => unidadeStoreMock;
+const useUnidadeStore = (_?: any) => unidadeStoreMock;
 
 vi.mock('@/composables/useUnidadeQuery', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@/composables/useUnidadeQuery')>();

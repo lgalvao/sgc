@@ -37,6 +37,7 @@ const {
         mockRecarregarDiagnostico: vi.fn().mockResolvedValue(undefined),
         unidadeQueryMock: {
             refresh: vi.fn(),
+            refetch: vi.fn(),
         },
     };
 });
@@ -49,6 +50,11 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/composables/useUnidadeQuery", () => ({
     useUnidadeQuery: () => unidadeQueryMock,
+    useInvalidacaoUnidade: () => ({
+        invalidarUnidade: vi.fn(),
+        invalidarDadosTelaUnidade: vi.fn(),
+        invalidarArvoreElegibilidade: vi.fn(),
+    }),
 }));
 
 vi.mock("@/stores/organizacao", () => ({
@@ -94,6 +100,7 @@ describe("AtribuicaoTemporariaView", () => {
         };
         mockObterUnidade.mockResolvedValue(unidade);
         unidadeQueryMock.refresh.mockImplementation(async () => ({data: await mockObterUnidade(1)}));
+        unidadeQueryMock.refetch.mockImplementation(async () => ({data: await mockObterUnidade(1)}));
         mockBuscarAtribuicoes.mockResolvedValue([]);
     });
 

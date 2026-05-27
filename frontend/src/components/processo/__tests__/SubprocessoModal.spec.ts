@@ -42,7 +42,6 @@ describe('SubprocessoModal.vue', () => {
     });
 
     it('valida data limite minima e erros de validacao', async () => {
-        const amanha = '2026-05-14';
         const dataFimEtapaAnterior = new Date('2026-05-20T12:00:00');
         const ultimaDataLimite = new Date('2026-05-25T12:00:00');
 

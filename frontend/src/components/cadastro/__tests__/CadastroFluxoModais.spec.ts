@@ -24,16 +24,6 @@ describe("CadastroFluxoModais", () => {
     loadingDevolucaoAnalise: false,
   };
 
-  const stubs = {
-    ImportarAtividadesModal: true,
-    ImpactoMapaModal: true,
-    ConfirmacaoDisponibilizacaoModal: true,
-    HistoricoAnaliseModal: true,
-    ModalConfirmacao: true,
-    ModalAceiteCadastro: true,
-    ModalDevolucaoCadastro: true,
-  };
-
   it("reage a emissões de sub-componentes e exerce computeds", async () => {
     const wrapper = mount(CadastroFluxoModais, {
       props: {...defaultProps, codigoSubprocesso: 123, dadosRemocao: {tipo: "atividade"}},

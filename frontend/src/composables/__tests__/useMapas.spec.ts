@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref} from "vue";
+import {ref, toValue} from "vue";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 import * as service from "@/services/subprocessoService";
 import {useMapas} from "../useMapas";
@@ -50,7 +50,6 @@ const cacheMapaMock = {
 };
 
 vi.mock("@/composables/useMapaQuery", () => {
-    const {toValue} = require("vue");
     return {
         CHAVE_QUERY_MAPA: ["mapa"],
         CHAVE_QUERY_IMPACTO_MAPA: ["impacto-mapa"],
@@ -70,7 +69,7 @@ vi.mock("@/composables/useMapaQuery", () => {
                 } catch (e: any) {
                     mapaQueryState.status.value = "error";
                     mapaQueryState.data.value = null;
-                    throw new Error(e?.message ?? "Erro");
+                    throw new Error(e?.message ?? "Erro", {cause: e});
                 }
             }),
             // refresh: simula staleTime=Infinity — só busca se stale (não "success")
