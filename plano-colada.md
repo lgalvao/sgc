@@ -44,18 +44,18 @@ A auditoria foi endurecida. Ela não mede mais só vocabulário literal (`cache`
 
 Última medição registrada por `node etc/scripts/sgc.js frontend arquitetura auditar`:
 
-- score total: `984` (`critico`);
-- views com vazamento de estratégia de cache: `1`;
-- views com service direto: `9`;
-- views com server state caseiro: `1`;
-- views com fan-out alto: `9`;
-- acessos diretos a cache de store: `0`;
-- booleanos posicionais: `1`;
-- bolsas largas de dependências/estado: `9`;
-- superfícies exportadas amplas: `27`;
-- arquivos com mistura de camadas: `11`;
-- arquivos com server state caseiro: `2`;
-- hubs centrais com sinais: `2`.
+- score total: `984` (`critico`)
+- views com vazamento de estratégia de cache: `1`
+- views com service direto: `9`
+- views com server state caseiro: `1`
+- views com fan-out alto: `9`
+- acessos diretos a cache de store: `0`
+- booleanos posicionais: `1`
+- bolsas largas de dependências/estado: `9`
+- superfícies exportadas amplas: `27`
+- arquivos com mistura de camadas: `11`
+- arquivos com server state caseiro: `2`
+- hubs centrais com sinais: `2`
 
 Hotspots prioritários desta baseline:
 
@@ -145,7 +145,7 @@ O trabalho deixa de ser principalmente “migrar mais coisas para Colada” ou �
 - definir contratos corretos para views;
 - esconder estratégia de cache dos consumidores;
 - reduzir o número de abstrações centrais que coordenam tudo;
-- só então decidir se um domínio deve usar `Pinia`, `Pinia Colada` ou composição local.
+- só então decidir se um domínio deve usar `Pinia`, `Pinia Colada` or composição local.
 
 ## Princípios
 
@@ -228,7 +228,7 @@ Isso evita refatoração cosmética, em que o código muda de forma mas preserva
 
 ## Ordem de execução
 
-## Fase 0 - Preparação
+## Fase 0 - Preparação [CONCLUÍDO]
 
 ### Meta
 
@@ -255,7 +255,7 @@ Instalar e preparar a infraestrutura mínima do `Pinia Colada` sem alterar compo
 - nenhum comportamento existente muda;
 - typecheck e lint seguem verdes.
 
-## Fase 1 - Piloto no Histórico
+## Fase 1 - Piloto no Histórico [CONCLUÍDO]
 
 ### Meta
 
@@ -285,7 +285,7 @@ Substituir o cache manual do histórico por uma query simples.
 - navegação em `keepAlive` não força gambiarras de recarga;
 - testes da view e fluxo de histórico continuam passando.
 
-## Fase 2 - Migração do Painel
+## Fase 2 - Migração do Painel [CONCLUÍDO]
 
 ### Meta
 
@@ -318,7 +318,7 @@ Trocar o cache manual do painel por query com invalidação explícita.
 - mutações que afetam o painel continuam refletindo após invalidação;
 - evento SSE continua forçando recarga na próxima leitura.
 
-## Fase 3 - Contexto de Processo
+## Fase 3 - Contexto de Processo [CONCLUÍDO]
 
 ### Meta
 
@@ -343,7 +343,7 @@ Migrar o contexto completo de processo, hoje tratado como cache/dedupe manual.
 - keepAlive não exige recarga manual baseada em store stale;
 - mutações continuam invalidando a query certa.
 
-## Fase 4 - Leituras Administrativas Simples
+## Fase 4 - Leituras Administrativas Simples [CONCLUÍDO]
 
 ### Meta
 
@@ -366,7 +366,7 @@ Usar Colada diretamente em views que hoje fazem fetch manual com `ref + try/fina
 - refresh explícito continua funcionando;
 - modais e ações seguem intactos.
 
-## Fase 5 - Reavaliação dos Casos Híbridos
+## Fase 5 - Reavaliação dos Casos Híbridos [EM ANDAMENTO / DESIGN]
 
 ### Meta
 
@@ -383,7 +383,7 @@ Decidir com evidência se vale migrar parcialmente `subprocesso`, `mapas`, `unid
 
 Não migrar esses casos por simetria. Só migrar se os pilotos anteriores tiverem reduzido código e simplificado testes de verdade.
 
-## Fase 6 - Apertar Contratos Internos
+## Fase 6 - Apertar Contratos Internos [PLANEJADO]
 
 ### Meta
 
@@ -411,7 +411,7 @@ Se o contrato é interno ao módulo/feature e só aumenta indireção:
 - menos objetos “contexto/dependencias” artificiais;
 - testes mais diretos, sem aumento de fragilidade.
 
-## Fase 7 - Desfazer Hubs Centrais
+## Fase 7 - Desfazer Hubs Centrais [PLANEJADO]
 
 ### Meta
 
@@ -435,7 +435,7 @@ Atacar explicitamente os pontos que concentram responsabilidades demais e por is
    snapshot local;
    navegação/orquestração;
 3. quebrar o hub em superfícies menores com consumidores mais específicos;
-4. só depois reconsiderar migração adicional para `Pinia Colada`.
+4. só depois considerar migração adicional para `Pinia Colada`.
 
 ### Observação importante
 

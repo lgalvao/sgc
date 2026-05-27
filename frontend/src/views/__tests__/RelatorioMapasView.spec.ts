@@ -1,19 +1,24 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {flushPromises, mount} from "@vue/test-utils";
+import {ref} from "vue";
 import RelatorioMapasView from "@/views/RelatorioMapasView.vue";
 import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentTestHelpers";
-import * as unidadeService from "@/services/unidadeService";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {Perfil} from "@/types/tipos";
+import * as relatoriosQueryModule from "@/composables/useRelatorioMapasQuery";
 
-vi.mock("@/services/unidadeService", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("@/services/unidadeService")>();
-    return {
-        ...actual,
-        buscarTodasUnidades: vi.fn(),
-        buscarCodigosUnidadesComMapaVigente: vi.fn(),
-    };
-});
+const mockUnidadesDisponiveis = ref<any[]>([]);
+const mockIsLoading = ref(false);
+const mockIsPending = ref(false);
+
+vi.mock("@/composables/useRelatorioMapasQuery", () => ({
+    useRelatorioUnidadesComMapaQuery: () => ({
+        data: mockUnidadesDisponiveis,
+        isLoading: mockIsLoading,
+        isPending: mockIsPending,
+        refetch: vi.fn(),
+    })
+}));
 
 describe("RelatorioMapasView.vue", () => {
     const ctx = setupComponentTest();
@@ -45,68 +50,54 @@ describe("RelatorioMapasView.vue", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue([
+        mockIsLoading.value = false;
+        mockIsPending.value = false;
+        mockUnidadesDisponiveis.value = [
             {
                 codigo: 999,
                 sigla: "ADMIN",
                 nome: "Administração",
+                isElegivel: false,
                 filhas: [
                     {
                         codigo: 1,
                         sigla: "SA",
                         nome: "Secretaria A",
+                        isElegivel: false,
                         filhas: [
                             {
                                 codigo: 10,
                                 sigla: "COSIS",
                                 nome: "Coordenadoria de Sistemas",
-                                filhas: []
-                            },
-                            {
-                                codigo: 11,
-                                sigla: "COAUD",
-                                nome: "Coordenadoria de Auditoria",
+                                isElegivel: true,
                                 filhas: []
                             }
                         ]
                     }
                 ]
             }
-        ] as any);
-        vi.mocked(unidadeService.buscarCodigosUnidadesComMapaVigente).mockResolvedValue([10]);
+        ];
     });
 
-    it("deve carregar unidades e codigos com mapa vigente ao montar", async () => {
+    it("deve carregar query de unidades com mapa vigente ao montar", async () => {
+        const querySpy = vi.spyOn(relatoriosQueryModule, "useRelatorioUnidadesComMapaQuery");
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
         await flushPromises();
 
-        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
-        expect(unidadeService.buscarCodigosUnidadesComMapaVigente).toHaveBeenCalled();
+        expect(querySpy).toHaveBeenCalled();
     });
 
-    it("deve mostrar apenas ramos que levam a unidades com mapa vigente", async () => {
+    it("deve mostrar ramos disponíveis retornados pela query", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
         await flushPromises();
 
-        const vm = ctx.wrapper.vm as unknown as {
-            unidadesDisponiveis: Array<{
-                sigla: string;
-                isElegivel?: boolean;
-                filhas?: Array<{
-                    sigla: string;
-                    isElegivel?: boolean;
-                    filhas?: Array<{ sigla: string; isElegivel?: boolean }>;
-                }>;
-            }>;
-        };
+        const vm = ctx.wrapper.vm as any;
 
         expect(vm.unidadesDisponiveis[0].sigla).toBe("ADMIN");
         expect(vm.unidadesDisponiveis[0].isElegivel).toBe(false);
         expect(vm.unidadesDisponiveis[0].filhas?.[0].sigla).toBe("SA");
-        expect(vm.unidadesDisponiveis[0].filhas?.[0].isElegivel).toBe(false);
-        expect(vm.unidadesDisponiveis[0].filhas?.[0].filhas).toEqual([
-            expect.objectContaining({sigla: "COSIS", isElegivel: true}),
-        ]);
+        expect(vm.unidadesDisponiveis[0].filhas?.[0].filhas?.[0].sigla).toBe("COSIS");
+        expect(vm.unidadesDisponiveis[0].filhas?.[0].filhas?.[0].isElegivel).toBe(true);
     });
 
     it("deve enviar as unidades selecionadas ao gerar html", async () => {
@@ -195,23 +186,6 @@ describe("RelatorioMapasView.vue", () => {
         expect(ctx.wrapper.text()).toContain("Conhecimento 1");
     });
 
-    it("deve restringir a árvore à unidade ativa e subordinadas quando perfil for GESTOR", async () => {
-        ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({
-            perfil: {
-                perfilSelecionado: Perfil.GESTOR,
-                unidadeSelecionada: 1
-            }
-        }, stubs));
-        await flushPromises();
-
-        const vm = ctx.wrapper.vm as unknown as {
-            unidadesDisponiveis: Array<{ sigla: string; filhas?: Array<{ sigla: string }> }>;
-        };
-
-        expect(vm.unidadesDisponiveis).toHaveLength(1);
-        expect(vm.unidadesDisponiveis[0].sigla).toBe("SA");
-    });
-
     it("deve encerrar o carregamento mesmo quando gerar relatório falhar", async () => {
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({}, stubs));
         await flushPromises();
@@ -228,7 +202,7 @@ describe("RelatorioMapasView.vue", () => {
     });
 
     it("deve mostrar alerta para ADMIN quando não houver mapas vigentes", async () => {
-        vi.mocked(unidadeService.buscarCodigosUnidadesComMapaVigente).mockResolvedValue([]);
+        mockUnidadesDisponiveis.value = [];
 
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({
             perfil: {
@@ -243,7 +217,7 @@ describe("RelatorioMapasView.vue", () => {
     });
 
     it("deve mostrar alerta específico para GESTOR quando não houver mapas vigentes na subárvore", async () => {
-        vi.mocked(unidadeService.buscarCodigosUnidadesComMapaVigente).mockResolvedValue([]);
+        mockUnidadesDisponiveis.value = [];
 
         ctx.wrapper = mount(RelatorioMapasView, getCommonMountOptions({
             perfil: {

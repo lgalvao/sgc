@@ -50,108 +50,49 @@ import RelatorioMapasFiltros from "@/components/relatorios/RelatorioMapasFiltros
 import RelatorioMapaVigenteCard from "@/components/relatorios/RelatorioMapaVigenteCard.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {usePerfilStore} from "@/stores/perfil";
+import {useRelatorioUnidadesComMapaQuery} from "@/composables/useRelatorioMapasQuery";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
-import {Perfil, type Unidade} from "@/types/tipos";
+import {Perfil} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
-import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
 
 const relatoriosStore = useRelatoriosStore();
 const perfilStore = usePerfilStore();
 const {notify} = useNotification();
 
-const unidadesDisponiveis = ref<Unidade[]>([]);
 const unidadesSelecionadas = ref<number[]>([]);
-const carregando = ref(false);
+const acaoCarregando = ref(false);
+
+const unidadesQuery = useRelatorioUnidadesComMapaQuery();
+const unidadesDisponiveis = computed(() => unidadesQuery.data.value ?? []);
+
+const carregando = computed(() => unidadesQuery.isLoading.value || unidadesQuery.isPending.value || acaoCarregando.value);
 const relatorioMapas = computed(() => relatoriosStore.relatorioMapas);
 const temUnidadesSelecionadas = computed(() => unidadesSelecionadas.value.length > 0);
 const semMapasDisponiveis = computed(() => !carregando.value && unidadesDisponiveis.value.length === 0);
+
 const mensagemSemMapasDisponiveis = computed(() =>
     perfilStore.perfilSelecionado === Perfil.GESTOR
         ? "Não há mapas vigentes para sua unidade ou unidades subordinadas."
         : "Não há mapas vigentes."
 );
 
-function aplicarElegibilidadeMapaVigente(unidades: Unidade[], codigosElegiveis: Set<number>): Unidade[] {
-  return unidades.map(unidade => ({
-    ...unidade,
-    isElegivel: codigosElegiveis.has(unidade.codigo),
-    filhas: unidade.filhas ? aplicarElegibilidadeMapaVigente(unidade.filhas, codigosElegiveis) : []
-  }));
-}
-
-function filtrarArvorePorMapaVigente(unidades: Unidade[]): Unidade[] {
-  return unidades
-      .map((unidade): Unidade | null => {
-        const filhasFiltradas = unidade.filhas ? filtrarArvorePorMapaVigente(unidade.filhas) : [];
-        const manterUnidade = unidade.isElegivel === true || filhasFiltradas.length > 0;
-
-        if (!manterUnidade) {
-          return null;
-        }
-
-        return {
-          ...unidade,
-          filhas: filhasFiltradas
-        };
-      })
-      .filter((unidade): unidade is Unidade => unidade !== null);
-}
-
-function buscarSubarvore(unidades: Unidade[], codigoRaiz: number): Unidade[] {
-  for (const unidade of unidades) {
-    if (unidade.codigo === codigoRaiz) {
-      return [unidade];
-    }
-
-    const encontrada = buscarSubarvore(unidade.filhas ?? [], codigoRaiz);
-    if (encontrada.length > 0) {
-      return encontrada;
-    }
-  }
-
-  return [];
-}
-
-function aplicarEscopoPerfil(unidades: Unidade[]): Unidade[] {
-  if (perfilStore.perfilSelecionado !== Perfil.GESTOR || !perfilStore.unidadeSelecionada) {
-    return unidades;
-  }
-
-  return buscarSubarvore(unidades, perfilStore.unidadeSelecionada);
-}
-
-async function carregarUnidades() {
-  const [arvore, codigosComMapa] = await Promise.all([
-    buscarTodasUnidades(),
-    buscarCodigosUnidadesComMapaVigente()
-  ]);
-  const unidadesComElegibilidade = aplicarElegibilidadeMapaVigente(
-      arvore,
-      new Set(codigosComMapa)
-  );
-  unidadesDisponiveis.value = aplicarEscopoPerfil(
-      filtrarArvorePorMapaVigente(unidadesComElegibilidade)
-  );
-}
-
 async function exportarPdf() {
   if (!temUnidadesSelecionadas.value) return;
-  carregando.value = true;
+  acaoCarregando.value = true;
   await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value)
       .catch(() => notify(TEXTOS_RELATORIOS.ERRO_GERAR, "danger"))
-      .finally(() => { carregando.value = false; });
+      .finally(() => { acaoCarregando.value = false; });
 }
 
 async function gerarRelatorio() {
   if (!temUnidadesSelecionadas.value) return;
-  carregando.value = true;
+  acaoCarregando.value = true;
   await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value)
       .catch(() => notify(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"))
-      .finally(() => { carregando.value = false; });
+      .finally(() => { acaoCarregando.value = false; });
 }
 
 onMounted(() => {
   relatoriosStore.limparRelatorio();
-  carregarUnidades();
 });
 </script>
