@@ -185,7 +185,14 @@ onActivated(async () => {
   if (!codProcesso || !carregamentoInicialConcluido.value) {
     return;
   }
-  await carregarContextoCompleto();
+  try {
+    const {data} = await processoQuery.refresh();
+    if (data) {
+      processo.value = data;
+    }
+  } catch (error) {
+    ultimoErro.value = normalizarErro(error);
+  }
 });
 
 defineExpose({

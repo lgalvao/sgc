@@ -186,7 +186,7 @@ describe('HistoricoView.vue', () => {
     });
 
     it('deve lidar com datas nulas ao comparar processos na ordenação', async () => {
-        vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValueOnce([
+        vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValue([
             {codigo: 1, dataFinalizacao: '2023-01-01', descricao: 'A'},
             {codigo: 2, dataFinalizacao: null, descricao: 'B'},
             {codigo: 3, dataFinalizacao: '2023-01-02', descricao: 'C'},
@@ -197,9 +197,10 @@ describe('HistoricoView.vue', () => {
 
         const processosOrdenados = wrapper.vm.processosOrdenados;
         expect(processosOrdenados).toHaveLength(3);
-        // dataFinalizacao: [2023-01-01, null, 2023-01-02]
-        // Ordenação padrão desc: [2023-01-02, 2023-01-01, null] -> códigos [3, 1, 2]
+        // dataFinalizacao: [2023-01-01 (cod 1), null (cod 2), 2023-01-02 (cod 3)]
+        // Ordenação padrão desc: [2023-01-02 (3), 2023-01-01 (1), null (2)]
         expect(processosOrdenados[0].codigo).toBe(3);
-        expect(processosOrdenados[processosOrdenados.length - 1].codigo).toBe(2);
+        expect(processosOrdenados[1].codigo).toBe(1);
+        expect(processosOrdenados[2].codigo).toBe(2);
     });
 });

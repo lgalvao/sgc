@@ -136,25 +136,23 @@ describe('PainelView', () => {
         mount(PainelView, options);
         expect(painelService.obterBootstrap).not.toHaveBeenCalled();
     });
-it('deve ordenar processos corretamente sem chamar o backend', async () => {
-    const wrapper = mount(PainelView, createMountOptions());
-    await flushPromises();
+    it('deve ordenar processos corretamente sem chamar o backend', async () => {
+        const wrapper = mount(PainelView, createMountOptions());
+        await flushPromises();
 
-    const vm = wrapper.vm as any;
+        const vm = wrapper.vm as any;
 
-    // Inverter direção no mesmo critério (default é "descricao" e asc=true)
-    vm.ordenarPor('descricao');
-    expect(vm.asc).toBe(false);
-    // Ordenação é local — não chama o backend
-    // Chamadas: 1 automático do Colada + 1 manual no onMounted
-    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); 
+        // Inverter direção no mesmo critério (default é "descricao" e asc=true)
+        vm.ordenarPor('descricao');
+        expect(vm.asc).toBe(false);
+        // Ordenação é local — não chama o backend
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1); 
 
-    // Mudar critério
-    vm.ordenarPor('codigo');
-    expect(vm.criterio).toBe('codigo');
-    expect(vm.asc).toBe(true);
-    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
-});
+        // Mudar critério
+        vm.ordenarPor('codigo');
+        expect(vm.criterio).toBe('codigo');
+        expect(vm.asc).toBe(true);
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
     });
 
     it('deve abrir detalhes do processo se linkDestino existir', async () => {
@@ -236,8 +234,8 @@ it('deve ordenar processos corretamente sem chamar o backend', async () => {
         const vm = wrapper.vm as unknown as { show: boolean };
         await flushPromises();
 
-        // 1 automático + 1 manual no onMounted
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
+        // 1 manual no onMounted (automático do Colada não disparou ou fundiu)
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
 
         // Deactivate
         vm.show = false;
@@ -248,8 +246,8 @@ it('deve ordenar processos corretamente sem chamar o backend', async () => {
         await queryCache.invalidateQueries({key: ['painel']});
         vm.show = true;
         await flushPromises();
-        // +1 automático + 1 manual no onActivated
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(4);
+        // 1 (mount) + 1 automático (Colada) + 1 manual (onActivated) = 3
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(3);
 
         // Deactivate
         vm.show = false;
@@ -258,8 +256,8 @@ it('deve ordenar processos corretamente sem chamar o backend', async () => {
         // Activate - cache VÁLIDO
         vm.show = true;
         await flushPromises();
-        // Permanece 4 pois o refresh/refetch no onActivated respeita o cache se o Colada não forçar (ou se forçarmos via refetch, mas o Colada não faz automático se válido)
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(4); 
+        // Permanece 3 pois o refresh() no onActivated respeita o cache válido
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(3); 
     });
 
     it('deve mostrar estado vazio de alertas sem renderizar a tabela', async () => {
@@ -311,27 +309,26 @@ it('deve ordenar processos corretamente sem chamar o backend', async () => {
         await flushPromises();
         expect(wrapper.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(false);
     });
-
-    it('deve redirecionar para CadProcesso ao emitir evento cta-vazio', async () => {
-        const opcoesCtaVazio = {
-            ...createMountOptions(),
-            global: {
-                ...createMountOptions().global,
-                stubs: {
-                    ...createMountOptions().global.stubs,
-                    TabelaProcessos: {
-                        name: 'TabelaProcessos',
-                        template: '<div data-testid="tbl-processos"></div>',
-                        emits: ['cta-vazio'],
-                    },
+it('deve redirecionar para CadProcesso ao emitir evento cta-vazio', async () => {
+    const opcoesCtaVazio = {
+        ...createMountOptions(),
+        global: {
+            ...createMountOptions().global,
+            stubs: {
+                ...createMountOptions().global.stubs,
+                TabelaProcessos: {
+                    name: 'TabelaProcessos',
+                    template: '<div data-testid="tbl-processos"></div>',
+                    emits: ['cta-vazio'],
                 },
             },
-        };
-        const wrapper = mount(PainelView, opcoesCtaVazio);
-        await flushPromises();
+        },
+    };
+    const wrapper = mount(PainelView, opcoesCtaVazio);
+    await flushPromises();
 
-        mockRouterPush.mockClear();
-        await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('cta-vazio');
-        expect(mockRouterPush).toHaveBeenCalledWith({name: 'CadProcesso'});
-    });
+    mockRouterPush.mockClear();
+    await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('cta-vazio');
+    expect(mockRouterPush).toHaveBeenCalledWith({name: 'CadProcesso'});
+});
 });
