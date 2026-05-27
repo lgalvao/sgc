@@ -90,8 +90,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, useToast} from "bootstrap-vue-next";
-import {computed} from "vue";
+import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoFluxoModais from "@/components/processo/SubprocessoFluxoModais.vue";
@@ -99,152 +98,65 @@ import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimenta
 import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import {useNotification} from "@/composables/useNotification";
-import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
-import {enviarLembrete as enviarLembreteService} from "@/services/processo";
-
-import {useAcesso} from "@/composables/acesso";
-import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
-import {analisarData, formatarDataBR} from "@/utils";
-import {formatSituacaoSubprocesso} from "@/utils/formatters";
-import {TEXTOS} from "@/constants/textos";
-import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useToastStore} from "@/stores/toast";
-import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
-import {useSubprocessoAcoesAdministrativas} from "@/views/subprocessoAcoesAdministrativas";
-import {useSubprocessoCarregamento} from "@/views/subprocessoCarregamento";
+import {useSubprocessoTela} from "@/composables/useSubprocessoTela";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
-function formatDataSimples(dataStr: string | null): string {
-  return dataStr ? formatarDataBR(dataStr) : '';
-}
-
-function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
-  if (!resp?.tipo) return '';
-  if (resp.tipo === 'Substituição' && resp.dataFim) {
-    return `Substituição (até ${formatDataSimples(resp.dataFim)})`;
-  } else if (resp.tipo === 'Atribuição temporária' && resp.dataFim) {
-    return `Atrib. temporária (até ${formatDataSimples(resp.dataFim)})`;
-  }
-  return resp.tipo;
-}
-
-const subprocessoStore = useSubprocessoStore();
-const fluxoSubprocesso = useFluxoSubprocesso();
-const {notificacao, notify, clear} = useNotification();
-const toastStore = useToastStore();
-const toast = useToast();
-const {
-  validarSubmissao,
-  resetarValidacao,
-  deveExibirErro,
-  focarPrimeiroErroInvalido
-} = useValidacaoFormulario();
+const tela = useSubprocessoTela(props);
 
 const {
-  codigoSubprocesso,
-  erroNaoEncontrado,
-  atualizarSubprocessoAtual,
-} = useSubprocessoCarregamento({
-  codProcesso: props.codProcesso,
-  siglaUnidade: props.siglaUnidade,
-  codSubprocesso: props.codSubprocesso,
-  erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
-  obterContextoEdicao: subprocessoStore.obterContextoEdicao,
-  recarregarContextoEdicao: subprocessoStore.recarregarContextoEdicao,
-  obterContextoEdicaoPorProcessoEUnidade: subprocessoStore.obterContextoEdicaoPorProcessoEUnidade,
-  recarregarContextoEdicaoPorProcessoEUnidade: subprocessoStore.recarregarContextoEdicaoPorProcessoEUnidade,
-  dadosEdicaoValidos: subprocessoStore.dadosEdicaoValidos,
-  exibirToastPendente,
-});
-
-const subprocesso = computed<SubprocessoDetalhe | null>(() => {
-  const detalhes = subprocessoStore.contextoEdicao?.detalhes ?? null;
-  if (!detalhes) return null;
-  if (typeof codigoSubprocesso.value !== "number") return null;
-  return detalhes.codigo === codigoSubprocesso.value ? detalhes : null;
-});
-
-const {
+  subprocessoStore,
+  notificacao,
+  clear,
+  subprocesso,
+  formatDataSimples,
+  formatSituacaoSubprocesso,
+  formatTipoResponsabilidade,
   habilitarAlterarDataLimite,
+  habilitarEnviarLembrete,
   habilitarReabrirCadastro,
   habilitarReabrirRevisao,
-  habilitarEnviarLembrete,
+  mostrarAcoesCabecalho,
   mostrarAlterarDataLimite,
+  mostrarEnviarLembrete,
   mostrarReabrirCadastro,
   mostrarReabrirRevisao,
-  mostrarEnviarLembrete
-} = useAcesso(subprocesso);
-
-const mostrarAcoesCabecalho = computed(() =>
-    mostrarAlterarDataLimite.value
-    || mostrarReabrirCadastro.value
-    || mostrarReabrirRevisao.value
-    || mostrarEnviarLembrete.value
-);
-
-const movimentacoes = computed<Movimentacao[]>(
-    () => subprocesso.value?.movimentacoes ?? [],
-);
-const dataLimite = computed(() => {
-  if (subprocesso.value?.prazoEtapaAtual) {
-    return analisarData(subprocesso.value.prazoEtapaAtual);
-  }
-  const ultimaDataLimite = subprocesso.value?.ultimaDataLimiteSubprocesso;
-  return ultimaDataLimite ? analisarData(ultimaDataLimite) : null;
-});
-
-function exibirToastPendente() {
-  const pendente = toastStore.consumePending();
-  if (pendente) {
-    toast.create({
-      props: {
-        body: pendente.body,
-        variant: 'success',
-        modelValue: 4000,
-        pos: 'bottom-end',
-        noProgress: true,
-      }
-    });
-  }
-}
-
-const {
-  tipoReabertura,
+  codigoSubprocesso,
+  movimentacoes,
+  erroNaoEncontrado,
+  TEXTOS,
+  TipoProcesso,
+  dataLimite,
+  analisarData,
   justificativaReabertura,
+  loadingDataLimite,
+  loadingLembrete,
+  loadingReabertura,
+  mensagemErroJustificativa,
   modalLembreteAberto,
   mostrarModalAlterarDataLimite,
   mostrarModalReabrir,
-  loadingDataLimite,
-  loadingReabertura,
-  loadingLembrete,
-  mensagemErroJustificativa,
+  tipoReabertura,
   abrirModalAlterarDataLimite,
-  fecharModalAlterarDataLimite,
-  confirmarAlteracaoDataLimite,
   abrirModalReabrirCadastro,
   abrirModalReabrirRevisao,
-  confirmarReabertura,
   confirmarEnviarLembrete,
+  confirmarAlteracaoDataLimite,
   enviarLembreteConfirmado,
-} = useSubprocessoAcoesAdministrativas({
-  subprocesso,
-  codigoSubprocesso,
-  codProcesso: props.codProcesso,
-  habilitarAlterarDataLimite,
-  deveExibirErro,
-  resetarValidacao,
-  validarSubmissao,
-  focarPrimeiroErroInvalido,
-  notify,
-  atualizarSubprocessoAtual,
-  exibirToastPendente,
-  alterarDataLimiteSubprocesso: fluxoSubprocesso.alterarDataLimiteSubprocesso,
-  reabrirCadastro: fluxoSubprocesso.reabrirCadastro,
-  reabrirRevisaoCadastro: fluxoSubprocesso.reabrirRevisaoCadastro,
-  enviarLembrete: enviarLembreteService,
-  recarregarContextoEdicao: subprocessoStore.recarregarContextoEdicao,
-});
+  confirmarReabertura,
+  fecharModalAlterarDataLimite,
+} = tela;
 
+defineExpose({
+  mostrarModalAlterarDataLimite: tela.mostrarModalAlterarDataLimite,
+  mostrarModalReabrir: tela.mostrarModalReabrir,
+  modalLembreteAberto: tela.modalLembreteAberto,
+  tipoReabertura: tela.tipoReabertura,
+  notify: tela.notify,
+  confirmarAlteracaoDataLimite: tela.confirmarAlteracaoDataLimite,
+  abrirModalAlterarDataLimite: tela.abrirModalAlterarDataLimite,
+  erroNaoEncontrado: tela.erroNaoEncontrado,
+  formatTipoResponsabilidade: tela.formatTipoResponsabilidade,
+  formatDataSimples: tela.formatDataSimples,
+});
 </script>

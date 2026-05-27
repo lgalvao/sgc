@@ -11,7 +11,7 @@ vi.mock("@/services/unidadeService", () => ({
     buscarCodigosUnidadesComMapaVigente: vi.fn(),
 }));
 
-let mockPerfilStore = {
+const mockPerfilStore = {
     usuarioCodigo: "123",
     perfilSelecionado: Perfil.ADMIN as Perfil | null,
     unidadeSelecionada: null as number | null,

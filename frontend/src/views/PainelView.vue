@@ -63,159 +63,41 @@
 </template>
 
 <script lang="ts" setup>
-import {BButton, BTable, useToast} from "bootstrap-vue-next";
-import {computed, onActivated, onMounted, ref} from "vue";
+import {BButton, BTable} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import {formatarDataHoraBR} from "@/utils";
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
-import {usePerfilStore} from "@/stores/perfil";
-import {usePainelQuery} from "@/composables/usePainelQuery";
-import {usePerfil} from "@/composables/usePerfil";
-import {useToastStore} from "@/stores/toast";
-import {usePainelStore} from "@/stores/painel";
-import type {Alerta, ProcessoResumo} from "@/types/tipos";
-import * as painelService from "@/services/painelService";
+import {usePainelTela} from "@/composables/usePainelTela";
 import {TEXTOS} from "@/constants/textos";
-
-const perfilStore = usePerfilStore();
-const perfil = usePerfil();
-const toastStore = useToastStore();
-const painelStore = usePainelStore();
-const painelQuery = usePainelQuery();
-const toast = useToast();
-const carregandoPainel = ref(true);
 
 const router = useRouter();
 
-const criterio = ref<keyof ProcessoResumo>("descricao");
-const asc = ref(true);
+const tela = usePainelTela();
 
-// Ordenação local: sem round-trip ao backend
-const processosOrdenados = computed(() => {
-  const lista = [...(painelQuery.data.value?.processos ?? [])];
-  const campo = criterio.value;
-  const direcao = asc.value ? 1 : -1;
-  return lista.sort((a, b) => {
-    const va = a[campo] ?? "";
-    const vb = b[campo] ?? "";
-    if (va < vb) return -1 * direcao;
-    if (va > vb) return 1 * direcao;
-    return 0;
-  });
+const {
+  perfil,
+  criterio,
+  asc,
+  processosOrdenados,
+  alertas,
+  carregandoPainel,
+  camposAlertas,
+  rowClassAlerta,
+  rowAttrAlerta,
+  ordenarPor,
+  abrirDetalhesProcesso,
+} = tela;
+
+defineExpose({
+  ordenarPor: tela.ordenarPor,
+  asc: tela.asc,
+  criterio: tela.criterio,
+  abrirDetalhesProcesso: tela.abrirDetalhesProcesso,
+  rowClassAlerta: tela.rowClassAlerta,
+  rowAttrAlerta: tela.rowAttrAlerta,
+  processosOrdenados: tela.processosOrdenados,
 });
-
-// Alertas já ordenados pelo backend (desc dataHora); exibidos diretamente
-const alertas = computed(() => painelQuery.data.value?.alertas ?? []);
-
-async function carregarDados() {
-  const unidadeCodigo = perfilStore.unidadeSelecionada;
-  if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
-    carregandoPainel.value = false;
-    return;
-  }
-
-  carregandoPainel.value = true;
-  try {
-    const bootstrap = carregamentoInicialConcluido.value
-        ? (await painelQuery.refresh(true)).data
-        : (await painelQuery.refetch(true)).data;
-
-    // Marcar não lidos como lidos: fire-and-forget, não bloqueia a tela
-    const codigosNaoLidos = bootstrap.alertas
-        .filter((a: Alerta) => !a.dataHoraLeitura && !painelStore.isMarcadoComoLido(a.codigo))
-        .map((a: Alerta) => a.codigo);
-    if (codigosNaoLidos.length > 0) {
-      painelStore.registrarLeitura(codigosNaoLidos);
-      painelService.marcarAlertasLidos(codigosNaoLidos).catch(() => {/* silencioso: não crítico para a UI */
-      });
-    }
-  } finally {
-    carregandoPainel.value = false;
-  }
-}
-
-function exibirToastPendente() {
-  const pendente = toastStore.consumePending();
-  if (pendente) {
-    toast.create({
-      props: {
-        body: pendente.body,
-        variant: 'success',
-        modelValue: 4000,
-        pos: 'bottom-end',
-        noProgress: true,
-      }
-    });
-    return true;
-  }
-  return false;
-}
-
-const carregamentoInicialConcluido = ref(false);
-
-onMounted(async () => {
-  exibirToastPendente();
-  await carregarDados();
-  carregamentoInicialConcluido.value = true;
-});
-
-onActivated(async () => {
-  if (!carregamentoInicialConcluido.value) return;
-  exibirToastPendente();
-  await carregarDados();
-});
-
-function ordenarPor(campo: keyof ProcessoResumo) {
-  if (criterio.value === campo) {
-    asc.value = !asc.value;
-  } else {
-    criterio.value = campo;
-    asc.value = true;
-  }
-  // Ordenação aplicada localmente via computed — sem chamada ao backend
-}
-
-function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
-  if (processo && processo.linkDestino) {
-    router.push(processo.linkDestino);
-  }
-}
-
-const camposAlertas = [
-  {
-    key: "dataHora",
-    label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA,
-    sortable: false,
-    formatter: ({value}: { value: unknown }) => formatarDataHoraBR(value as string | Date)
-  },
-  {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
-  {
-    key: "processo",
-    label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO,
-    sortable: false,
-    formatter: ({value}: { value: unknown }) => {
-      if (typeof value === "string" && value.trim().length > 0) {
-        return value;
-      }
-      return "-";
-    }
-  },
-  {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},
-];
-
-const rowClassAlerta = (item: Alerta | null, type = "row") => {
-  if (!item || type !== "row") return "";
-  return item.dataHoraLeitura ? "" : "fw-bold";
-};
-
-const rowAttrAlerta = (item: Alerta | null, type = "row") => {
-  if (item && type === "row") {
-    return {'data-testid': `row-alerta-${item.codigo}`};
-  }
-  return {};
-};
 </script>

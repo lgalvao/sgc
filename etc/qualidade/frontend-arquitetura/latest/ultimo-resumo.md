@@ -1,37 +1,37 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **931** (critico)
-- Arquivos de producao: **262**
-- Views com vazamento de estrategia de cache: **1**
-- Views com chamadas diretas a service: **8**
+- Score total: **943** (critico)
+- Arquivos de producao: **268**
+- Views com vazamento de estrategia de cache: **0**
+- Views com chamadas diretas a service: **6**
 - Views com server state caseiro: **1**
-- Views com fan-out arquitetural alto: **8**
+- Views com fan-out arquitetural alto: **3**
 - Acessos diretos a cache de store: **0**
 - Chamadas com booleano posicional: **1**
 - Bolsas de dependencias/estado largas: **9**
-- Superficies exportadas amplas: **27**
+- Superficies exportadas amplas: **32**
 - Arquivos com mistura de camadas arquiteturais: **10**
 - Arquivos com server state caseiro: **2**
 - Hubs centrais com sinais: **2**
 
 ## Hotspots
 
-1. `frontend/src/views/MapaView.vue` [view]
-   - score: 46
-   - sinais: misturaCamadas, fanoutAlto
+1. `frontend/src/composables/useMapaTela.ts` [composable]
+   - score: 55
+   - sinais: superficieAmpla, misturaCamadas, fanoutAlto
    - fan-out: 3 categorias / 16 imports arquiteturais
-2. `frontend/src/views/CadastroView.vue` [view]
-   - score: 40
-   - sinais: misturaCamadas, fanoutAlto
+2. `frontend/src/composables/useCadastroTela.ts` [composable]
+   - score: 49
+   - sinais: superficieAmpla, misturaCamadas, fanoutAlto
    - fan-out: 3 categorias / 14 imports arquiteturais
-3. `frontend/src/composables/useEstadoSubprocessoNavegacao.ts` [composable]
+3. `frontend/src/composables/useSubprocessoTela.ts` [composable]
+   - score: 41
+   - sinais: estrategiaCache, superficieAmpla, misturaCamadas, fanoutAlto, acoplamentoStoreAlto
+   - fan-out: 3 categorias / 7 imports arquiteturais
+4. `frontend/src/composables/useEstadoSubprocessoNavegacao.ts` [composable]
    - score: 38
    - sinais: invalidacaoExplicita, estrategiaCache, invalidacaoArquitetural
    - fan-out: 1 categorias / 1 imports arquiteturais
-4. `frontend/src/views/SubprocessoView.vue` [view]
-   - score: 35
-   - sinais: estrategiaCache, misturaCamadas, fanoutAlto, acoplamentoStoreAlto
-   - fan-out: 3 categorias / 7 imports arquiteturais
 5. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
    - score: 31
    - sinais: invalidacaoExplicita

@@ -1,0 +1,161 @@
+import {computed, onActivated, onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {useToast} from "bootstrap-vue-next";
+import {usePerfilStore} from "@/stores/perfil";
+import {usePainelQuery} from "@/composables/usePainelQuery";
+import {usePerfil} from "@/composables/usePerfil";
+import {useToastStore} from "@/stores/toast";
+import {usePainelStore} from "@/stores/painel";
+import type {Alerta, ProcessoResumo} from "@/types/tipos";
+import * as painelService from "@/services/painelService";
+import {TEXTOS} from "@/constants/textos";
+import {formatarDataHoraBR} from "@/utils";
+
+export function usePainelTela() {
+  const perfilStore = usePerfilStore();
+  const perfil = usePerfil();
+  const toastStore = useToastStore();
+  const painelStore = usePainelStore();
+  const painelQuery = usePainelQuery();
+  const toast = useToast();
+  const carregandoPainel = ref(true);
+  const router = useRouter();
+
+  const criterio = ref<keyof ProcessoResumo>("descricao");
+  const asc = ref(true);
+
+  const processosOrdenados = computed(() => {
+    const lista = [...(painelQuery.data.value?.processos ?? [])];
+    const campo = criterio.value;
+    const direcao = asc.value ? 1 : -1;
+    return lista.sort((a, b) => {
+      const va = a[campo] ?? "";
+      const vb = b[campo] ?? "";
+      if (va < vb) return -1 * direcao;
+      if (va > vb) return 1 * direcao;
+      return 0;
+    });
+  });
+
+  const alertas = computed(() => painelQuery.data.value?.alertas ?? []);
+  const carregamentoInicialConcluido = ref(false);
+
+  async function carregarDados() {
+    const unidadeCodigo = perfilStore.unidadeSelecionada;
+    if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
+      carregandoPainel.value = false;
+      return;
+    }
+
+    carregandoPainel.value = true;
+    try {
+      const bootstrap = carregamentoInicialConcluido.value
+          ? (await painelQuery.refresh(true)).data
+          : (await painelQuery.refetch(true)).data;
+
+      const codigosNaoLidos = bootstrap.alertas
+          .filter((a: Alerta) => !a.dataHoraLeitura && !painelStore.isMarcadoComoLido(a.codigo))
+          .map((a: Alerta) => a.codigo);
+      if (codigosNaoLidos.length > 0) {
+        painelStore.registrarLeitura(codigosNaoLidos);
+        painelService.marcarAlertasLidos(codigosNaoLidos).catch(() => {});
+      }
+    } finally {
+      carregandoPainel.value = false;
+    }
+  }
+
+  function exibirToastPendente() {
+    const pendente = toastStore.consumePending();
+    if (pendente) {
+      toast.create({
+        props: {
+          body: pendente.body,
+          variant: 'success',
+          modelValue: 4000,
+          pos: 'bottom-end',
+          noProgress: true,
+        }
+      });
+      return true;
+    }
+    return false;
+  }
+
+  onMounted(async () => {
+    exibirToastPendente();
+    await carregarDados();
+    carregamentoInicialConcluido.value = true;
+  });
+
+  onActivated(async () => {
+    if (!carregamentoInicialConcluido.value) return;
+    exibirToastPendente();
+    await carregarDados();
+  });
+
+  function ordenarPor(campo: keyof ProcessoResumo) {
+    if (criterio.value === campo) {
+      asc.value = !asc.value;
+    } else {
+      criterio.value = campo;
+      asc.value = true;
+    }
+  }
+
+  function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
+    if (processo && processo.linkDestino) {
+      router.push(processo.linkDestino);
+    }
+  }
+
+  const camposAlertas = [
+    {
+      key: "dataHora",
+      label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA,
+      sortable: false,
+      formatter: ({value}: { value: unknown }) => formatarDataHoraBR(value as string | Date)
+    },
+    {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
+    {
+      key: "processo",
+      label: TEXTOS.painel.CAMPOS_ALERTAS.PROCESSO,
+      sortable: false,
+      formatter: ({value}: { value: unknown }) => {
+        if (typeof value === "string" && value.trim().length > 0) {
+          return value;
+        }
+        return "-";
+      }
+    },
+    {key: "origem", label: TEXTOS.painel.CAMPOS_ALERTAS.ORIGEM},
+  ];
+
+  const rowClassAlerta = (item: Alerta | null, type = "row") => {
+    if (!item || type !== "row") return "";
+    return item.dataHoraLeitura ? "" : "fw-bold";
+  };
+
+  const rowAttrAlerta = (item: Alerta | null, type = "row") => {
+    if (item && type === "row") {
+      return {'data-testid': `row-alerta-${item.codigo}`};
+    }
+    return {};
+  };
+
+  return {
+    perfil,
+    router,
+    criterio,
+    asc,
+    processosOrdenados,
+    alertas,
+    carregandoPainel,
+    camposAlertas,
+    rowClassAlerta,
+    rowAttrAlerta,
+    ordenarPor,
+    abrirDetalhesProcesso,
+    carregarDados
+  };
+}
