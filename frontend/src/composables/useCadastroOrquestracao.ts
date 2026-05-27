@@ -117,7 +117,11 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
                 return;
             }
 
-            await carregarContextoInicial();
+            try {
+                await carregarContextoInicial();
+            } catch (e) {
+                // Erros em recarga de background são ignorados para manter a estabilidade da UI
+            }
         });
     }
 

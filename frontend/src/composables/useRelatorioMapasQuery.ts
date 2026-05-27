@@ -74,6 +74,7 @@ export function useRelatorioUnidadesComMapaQuery() {
             const filtrada = filtrarArvorePorMapaVigente(comElegibilidade);
             return aplicarEscopoPerfil(filtrada, perfilStore.perfilSelecionado, perfilStore.unidadeSelecionada);
         },
+        enabled: () => !!perfilStore.perfilSelecionado,
         staleTime: Infinity,
     });
 

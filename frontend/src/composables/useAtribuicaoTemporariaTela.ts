@@ -184,9 +184,13 @@ function criarFluxoCarga({
         if (!carregamentoInicialConcluido.value) {
             return;
         }
-        await unidadeQuery.refresh();
-        atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
-        preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
+        try {
+            await unidadeQuery.refresh();
+            atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
+            preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
+        } catch (e) {
+            // Ignorar erros de recarga em background
+        }
     });
 
     return {carregarDados};

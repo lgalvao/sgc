@@ -112,7 +112,11 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
         if (typeof codigoSubprocesso.value === "number" && dependencias.dadosEdicaoValidos(codigoSubprocesso.value)) {
             return;
         }
-        await carregarSubprocesso();
+        try {
+            await carregarSubprocesso();
+        } catch (e) {
+            // Erros em recarga de background são ignorados para manter a estabilidade da UI
+        }
     });
 
     return {

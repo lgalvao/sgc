@@ -109,6 +109,10 @@ onMounted(async () => {
 
 onActivated(async () => {
   if (!montadoUmaVez) return;
-  await historicoQuery.refresh();
+  try {
+    await historicoQuery.refresh();
+  } catch (e) {
+    // Erros em recarga de background no histórico são ignorados para manter a UI estável
+  }
 });
 </script>
