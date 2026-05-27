@@ -49,13 +49,13 @@ export default [
             "no-console": ["error", {allow: ["error"]}],
 
             // Regras de Qualidade de Engenharia de Software
-            "complexity": "off",
-            "max-params": "off",
-            "max-depth": "off",
-            "max-nested-callbacks": "off",
-            "max-lines": "off",
-            "max-lines-per-function": "off",
-            "max-statements": "off",
+            "complexity": ["warn", 12],
+            "max-params": ["error", 3],
+            "max-depth": ["error", 4],
+            "max-nested-callbacks": ["error", 3],
+            "max-lines": ["warn", { max: 500, skipComments: true, skipBlankLines: true }],
+            "max-lines-per-function": ["warn", { max: 140, skipComments: true, skipBlankLines: true }],
+            "max-statements": ["warn", 28],
         },
     },
     // 5. Overrides para Testes, Stories e Tipagens (Desabilita regras estritas de complexidade/any)

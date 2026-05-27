@@ -211,7 +211,7 @@ describe("Unidades.vue", () => {
             resolver = resolve;
         }) as any);
 
-        const wrapper = createWrapper();
+        createWrapper();
 
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalledTimes(1);
 

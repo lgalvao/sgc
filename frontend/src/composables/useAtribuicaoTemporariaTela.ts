@@ -144,7 +144,6 @@ function criarFluxoCarga({
     erroFormulario,
     erroUsuario,
     resetarValidacao,
-    unidade,
     unidadeQuery
 }: {
     atribuicaoVigente: Ref<AtribuicaoTemporaria | null>;
@@ -156,7 +155,6 @@ function criarFluxoCarga({
     erroFormulario: Ref<string>;
     erroUsuario: Ref<string>;
     resetarValidacao: () => void;
-    unidade: Readonly<Ref<Unidade | null>>;
     unidadeQuery: ReturnType<typeof useUnidadeQuery>;
 }) {
     async function carregarDados() {
@@ -351,7 +349,6 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         erroFormulario,
         erroUsuario,
         resetarValidacao,
-        unidade,
         unidadeQuery
     });
     const {removerAtribuicao, salvarAtribuicao} = criarFluxoMutacao({
