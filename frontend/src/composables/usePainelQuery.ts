@@ -19,6 +19,7 @@ export function usePainelQuery() {
         key: () => [...chave.value],
         query: () => obterBootstrap(),
         enabled: () => Boolean(perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada),
+        initialData: () => ({processos: [], alertas: []}),
         staleTime: Infinity,
     });
 }

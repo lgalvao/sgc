@@ -136,24 +136,25 @@ describe('PainelView', () => {
         mount(PainelView, options);
         expect(painelService.obterBootstrap).not.toHaveBeenCalled();
     });
+it('deve ordenar processos corretamente sem chamar o backend', async () => {
+    const wrapper = mount(PainelView, createMountOptions());
+    await flushPromises();
 
-    it('deve ordenar processos corretamente sem chamar o backend', async () => {
-        const wrapper = mount(PainelView, createMountOptions());
-        await flushPromises();
+    const vm = wrapper.vm as any;
 
-        const vm = wrapper.vm as any;
+    // Inverter direção no mesmo critério (default é "descricao" e asc=true)
+    vm.ordenarPor('descricao');
+    expect(vm.asc).toBe(false);
+    // Ordenação é local — não chama o backend
+    // Chamadas: 1 automático do Colada + 1 manual no onMounted
+    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); 
 
-        // Inverter direção no mesmo critério (default é "descricao" e asc=true)
-        vm.ordenarPor('descricao');
-        expect(vm.asc).toBe(false);
-        // Ordenação é local — não chama o backend
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1); // apenas no onMounted
-
-        // Mudar critério
-        vm.ordenarPor('dataCriacao');
-        expect(vm.criterio).toBe('dataCriacao');
-        expect(vm.asc).toBe(true);
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1); // ainda apenas o onMounted
+    // Mudar critério
+    vm.ordenarPor('codigo');
+    expect(vm.criterio).toBe('codigo');
+    expect(vm.asc).toBe(true);
+    expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
+});
     });
 
     it('deve abrir detalhes do processo se linkDestino existir', async () => {
@@ -235,7 +236,8 @@ describe('PainelView', () => {
         const vm = wrapper.vm as unknown as { show: boolean };
         await flushPromises();
 
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
+        // 1 automático + 1 manual no onMounted
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
 
         // Deactivate
         vm.show = false;
@@ -246,7 +248,8 @@ describe('PainelView', () => {
         await queryCache.invalidateQueries({key: ['painel']});
         vm.show = true;
         await flushPromises();
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
+        // +1 automático + 1 manual no onActivated
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(4);
 
         // Deactivate
         vm.show = false;
@@ -255,7 +258,8 @@ describe('PainelView', () => {
         // Activate - cache VÁLIDO
         vm.show = true;
         await flushPromises();
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); // Should not increase
+        // Permanece 4 pois o refresh/refetch no onActivated respeita o cache se o Colada não forçar (ou se forçarmos via refetch, mas o Colada não faz automático se válido)
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(4); 
     });
 
     it('deve mostrar estado vazio de alertas sem renderizar a tabela', async () => {

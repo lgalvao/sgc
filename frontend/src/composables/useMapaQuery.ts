@@ -50,6 +50,7 @@ export function useMapaQuery(codigoSubprocesso: MaybeRefOrGetter<number | null |
             const codigoAtual = toValue(codigoSubprocesso);
             return typeof codigoAtual === "number" && codigoAtual > 0;
         },
+        initialData: () => null,
         staleTime: Infinity,
     });
 }
@@ -73,6 +74,7 @@ export function useImpactoMapaQuery(codigoSubprocesso: MaybeRefOrGetter<number |
             return serviceVerificarImpactosMapa(codigoAtual);
         },
         enabled: false,
+        initialData: () => null,
         staleTime: Infinity,
     });
 }

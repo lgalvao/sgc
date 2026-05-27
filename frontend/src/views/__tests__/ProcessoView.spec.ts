@@ -410,6 +410,7 @@ describe("Processo.vue", () => {
         const wrapperKeepAlive = montarKeepAliveProcessoView(manterMontado);
 
         await flushPromises();
+        // Limpa chamadas do onMounted (automática + manual)
         vi.mocked(processoService.buscarContextoCompleto).mockClear();
 
         manterMontado.value = false;
@@ -417,6 +418,8 @@ describe("Processo.vue", () => {
         manterMontado.value = true;
         await flushPromises();
 
+        // No onActivated, chamamos carregarContextoCompleto() que faz refresh().
+        // Como o cache está válido e o mock de refresh respeita isso, não deve haver nova chamada ao serviço.
         expect(processoService.buscarContextoCompleto).not.toHaveBeenCalled();
         wrapperKeepAlive.unmount();
     });

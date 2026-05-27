@@ -197,6 +197,9 @@ describe('HistoricoView.vue', () => {
 
         const processosOrdenados = wrapper.vm.processosOrdenados;
         expect(processosOrdenados).toHaveLength(3);
-        expect(processosOrdenados[processosOrdenados.length - 1].codigo).toBe(2); // null vai para o fim (desc)
+        // dataFinalizacao: [2023-01-01, null, 2023-01-02]
+        // Ordenação padrão desc: [2023-01-02, 2023-01-01, null] -> códigos [3, 1, 2]
+        expect(processosOrdenados[0].codigo).toBe(3);
+        expect(processosOrdenados[processosOrdenados.length - 1].codigo).toBe(2);
     });
 });

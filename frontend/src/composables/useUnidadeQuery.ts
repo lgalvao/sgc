@@ -92,6 +92,7 @@ export function useArvoreElegibilidadeQuery(
         key: () => [...CHAVE_QUERY_ARVORE_ELEGIBILIDADE, toValue(tipoProcesso) ?? "nenhuma", String(toValue(codProcesso) ?? "novo")],
         query: () => buscarArvoreComElegibilidade(toValue(tipoProcesso)!, toValue(codProcesso)),
         enabled: () => !!toValue(tipoProcesso),
+        initialData: () => [],
         staleTime: Infinity,
     });
 }

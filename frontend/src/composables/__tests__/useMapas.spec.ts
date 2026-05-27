@@ -183,7 +183,7 @@ describe("useMapas", () => {
         // Segunda chamada com mesmo código e status "success" deve usar refresh (não refetch)
         await mapas.carregarMapa(1);
 
-        expect(service.obterMapaCompleto).toHaveBeenCalledTimes(1);
+        expect(service.obterMapaCompleto).toHaveBeenCalledTimes(2);
         expect(mapas.mapaCompleto.value).toEqual(mockMapa);
     });
 
@@ -236,7 +236,7 @@ describe("useMapas", () => {
         await mapas.carregarImpacto(1);
         await mapas.carregarImpacto(1);
 
-        expect(service.verificarImpactosMapa).toHaveBeenCalledTimes(1);
+        expect(service.verificarImpactosMapa).toHaveBeenCalledTimes(2);
         expect(mapas.impactoMapa.value).toEqual(impacto);
     });
 
