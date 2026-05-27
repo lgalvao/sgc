@@ -49,7 +49,7 @@ export function usePainelTela() {
 
     carregandoPainel.value = true;
     try {
-      const {data: bootstrap} = await painelQuery.refetch();
+      const {data: bootstrap} = await painelQuery.refresh();
       if (!bootstrap) return;
 
       const codigosNaoLidos = bootstrap.alertas
