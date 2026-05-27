@@ -1,0 +1,503 @@
+Running 260 tests using 1 worker
+
+  ✓    1 [chromium] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Login (/login) (1.7s)
+  ✓    2 [chromium] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Painel (/painel) (2.0s)
+  ✓    3 [chromium] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Histórico (/historico) (1.8s)
+  ✓    4 [chromium] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Relatórios (/relatorios) (2.1s)
+  ✓    5 …m] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Relatório de Andamento (/relatorios/andamento) (1.8s)
+  ✓    6 …] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Relatório de Mapas (/relatorios/mapas-vigentes) (1.7s)
+  ✓    7 [chromium] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Administradores (/administradores) (1.7s)
+  ✓    8 … › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Notificações Admin (/administracao/notificacoes) (1.7s)
+  ✓    9 …omium] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Feedbacks Admin (/administracao/feedbacks) (1.7s)
+  ✓   10 [chromium] › e2e/a11y/crawler.spec.ts:34:9 › Accessibility Crawler (Axe-core) › Audit route: Parâmetros (/configuracoes) (1.6s)
+  ✓   11 [chromium] › e2e/a11y/home.spec.ts:6:5 › Accessibility checks (WCAG) › Login page A11y (406ms)
+  ✓   12 [chromium] › e2e/a11y/home.spec.ts:12:5 › Accessibility checks (WCAG) › Dashboard page A11y (578ms)
+  ✓   13 [chromium] › e2e/captura.spec.ts:510:9 › Captura de Telas - Sistema SGC › 01 - Autenticação › Captura telas de login (1.3s)
+  ✓   14 [chromium] › e2e/captura.spec.ts:555:9 › Captura de Telas - Sistema SGC › 02 - Painel principal › Captura painel ADMIN (1.4s)
+  ✓   15 [chromium] › e2e/captura.spec.ts:618:9 › Captura de Telas - Sistema SGC › 02 - Painel principal › Captura painel GESTOR (2.8s)
+  ✓   16 [chromium] › e2e/captura.spec.ts:640:9 › Captura de Telas - Sistema SGC › 02 - Painel principal › Captura painel CHEFE (457ms)
+  ✓   17 … › e2e/captura.spec.ts:655:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura criação e detalhamento de processo (3.8s)
+  ✓   18 …aptura.spec.ts:701:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura fluxo de cadastro ate mapa disponibilizado (5.5s)
+  ✓   19 [chromium] › e2e/captura.spec.ts:764:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura validacao do mapa (1.5s)
+  ✓   20 …] › e2e/captura.spec.ts:790:9 › Captura de Telas - Sistema SGC › 03 - Fluxo de Processo › Captura processo homologado e finalizacao (1.3s)
+  ✓   21 …aptura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura fluxo completo de atividades (incluindo validações de form) (5.5s)
+  ✓   22 ….spec.ts:941:9 › Captura de Telas - Sistema SGC › 04 - Subprocesso e Atividades › Captura estados de validação inline de atividades (4.8s)
+  ✓   23 …e2e/captura.spec.ts:1053:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura análise de cadastro antes do mapa (1.8s)
+  ✓   24 …aptura.spec.ts:1089:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura edição inicial do mapa de competências (1.9s)
+  ✓   25 …ts:1125:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura criação e disponibilização do mapa de competências (2.6s)
+  ✓   26 …ura.spec.ts:1175:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura mapa disponibilizado e validação do chefe (1.5s)
+  ✓   27 …m] › e2e/captura.spec.ts:1202:9 › Captura de Telas - Sistema SGC › 05 - Mapa de Competências › Captura análise de mapa por gestores (2.1s)
+  ✓   28 [chromium] › e2e/captura.spec.ts:1241:9 › Captura de Telas - Sistema SGC › 06 - Navegação e Menus › Captura elementos de navegação (1.3s)
+  ✓   29 …] › e2e/captura.spec.ts:1272:9 › Captura de Telas - Sistema SGC › 07 - Estados e Situações › Captura diferentes estados de processo (3.0s)
+  ✓   30 …aptura.spec.ts:1308:9 › Captura de Telas - Sistema SGC › 08 - Responsividade (Tamanhos de Tela) › Captura em diferentes resoluções (776ms)
+  ✓   31 …e2e/captura.spec.ts:1329:9 › Captura de Telas - Sistema SGC › 09 - Operações em Bloco › Captura fluxo de aceitar cadastros em bloco (3.6s)
+  ✓   32 …e2e/captura.spec.ts:1412:9 › Captura de Telas - Sistema SGC › 10 - Gestão de Subprocessos › Captura modais de gestão de subprocesso (3.7s)
+  ✓   33 …- Sistema SGC › Admin - Consultas e Configurações › Captura telas administrativas (Unidades, Histórico, Configurações e Relatórios) (3.5s)
+  ✓   34 …aptura de Telas - Sistema SGC › 11 - Histórico de Análise e Devolução › Captura modal de histórico e fluxo de devolução de cadastro (3.7s)
+  ✓   35 …ts:1637:9 › Captura de Telas - Sistema SGC › 12 - Modais de Gestão do Mapa › Captura modais de exclusão, edição e sugestões do mapa (5.6s)
+  ✓   36 ….spec.ts:1702:9 › Captura de Telas - Sistema SGC › 12 - Modais de Gestão do Mapa › Captura devolução do mapa e mapa somente leitura (2.2s)
+  ✓   37 … › e2e/captura.spec.ts:1746:9 › Captura de Telas - Sistema SGC › 12 - Modais de Gestão do Mapa › Captura modal de sugestões do mapa (1.0s)
+  ✓   38 …ura.spec.ts:1787:9 › Captura de Telas - Sistema SGC › 12 - Modais de Gestão do Mapa › Captura mapa somente leitura após homologação (2.1s)
+  ✓   39 …:9 › Captura de Telas - Sistema SGC › 13 - Perfil Servidor (Somente Leitura) › Captura painel e acesso restrito do perfil Servidor (683ms)
+  ✓   40 …de Telas - Sistema SGC › 14 - Modais de Remoção de Atividade e Conhecimento › Captura modais de remoção de atividade e conhecimento (2.4s)
+  ✓   41 … › Captura de Telas - Sistema SGC › 14 - Modais de Remoção de Atividade e Conhecimento › Captura modal de impacto no mapa (revisão) (1.4s)
+  ✓   42 …e/cdu-01.spec.ts:10:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir a tela de login com campos obrigatórios (190ms)
+  ✓   43 …ium] › e2e/cdu-01.spec.ts:15:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir erro com credenciais inválidas (251ms)
+  ✓   44 … › e2e/cdu-01.spec.ts:20:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve realizar login com sucesso (Perfil único) (266ms)
+  ✓   45 …e2e/cdu-01.spec.ts:26:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir seleção de perfil se houver múltiplos (677ms)
+  ✓   46 …/cdu-01.spec.ts:38:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir barra de navegação após login como ADMIN (372ms)
+  ✓   47 …01.spec.ts:52:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir barra de navegação com restrições para GESTOR (342ms)
+  ✓   48 …-01.spec.ts:68:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir barra de navegação com restrições para CHEFE (354ms)
+  ✓   49 ….spec.ts:84:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir barra de navegação com restrições para SERVIDOR (350ms)
+  ✓   50 …› e2e/cdu-01.spec.ts:100:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir informações do usuário e controles (360ms)
+  ✓   51 [chromium] › e2e/cdu-01.spec.ts:112:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve exibir rodapé (343ms)
+  ✓   52 [chromium] › e2e/cdu-01.spec.ts:118:5 › CDU-01 - Realizar login e exibir estrutura das telas › Deve realizar logout com sucesso (417ms)
+  ✓   53 …m] › e2e/cdu-02.spec.ts:12:9 › CDU-02 - Visualizar painel › Como ADMIN › Deve exibir estrutura básica do painel e testar ordenação (631ms)
+  ✓   54 [chromium] › e2e/cdu-02.spec.ts:62:9 › CDU-02 - Visualizar painel › Como ADMIN › Deve criar processo e visualizá-lo na tabela (694ms)
+  ✓   55 …› e2e/cdu-02.spec.ts:89:9 › CDU-02 - Visualizar painel › Como ADMIN › Processo finalizado recente deve continuar visível no painel (448ms)
+  ✓   56 …romium] › e2e/cdu-02.spec.ts:107:9 › CDU-02 - Visualizar painel › Como ADMIN › Processos "Criado" devem aparecer apenas para ADMIN (944ms)
+  ✓   59 …cdu-02.spec.ts:219:9 › CDU-02 - Visualizar painel › Como ADMIN › Deve respeitar regra de clique por perfil em processo Em andamento (3.9s)
+  ✓   58 ….spec.ts:195:9 › CDU-02 - Visualizar painel › Como ADMIN › Deve abrir Cadastro de processo ao clicar em processo Criado como ADMIN (832ms)
+      59 … › e2e/cdu-02.spec.ts:219:9 › CDU-02 - Visualizar painel › Como ADMIN › Deve respeitar regra de clique por perfil em processo Em andamento
+
+[6:22:46 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:22:47 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/processos/400/contexto-completo
+
+
+[6:22:47 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:22:47 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/processos/400/contexto-completo
+
+  ✓   60 [chromium] › e2e/cdu-02.spec.ts:260:9 › CDU-02 - Visualizar painel › Como GESTOR › Deve validar visualização, alertas e ordenação (299ms)
+  ✓   61 …Visualizar painel › Alertas no painel › Deve exibir campos, manter ordenação fixa e marcar alerta como lido na segunda visualização (3.5s)
+  ✓   62 …pec.ts:326:9 › CDU-02 - Visualizar painel › Alertas no painel › Alerta expirado pelo prazo configurado não deve aparecer destacado (326ms)
+  ✓   63 …e/cdu-02.spec.ts:342:9 › CDU-02 - Visualizar painel › Visibilidade de alertas por perfil › SERVIDOR não deve ver alertas de unidade (3.4s)
+  ✓   64 [chromium] › e2e/cdu-03.spec.ts:18:5 › CDU-03 - Manter processo › Deve validar campos obrigatórios e estados dos botões (451ms)
+  ✓   65 …03.spec.ts:64:5 › CDU-03 - Manter processo › Deve deixar unidade com equipe própria indeterminada quando a subárvore ficar parcial (526ms)
+  ✓   66 [chromium] › e2e/cdu-03.spec.ts:89:5 › CDU-03 - Manter processo › Deve editar um processo existente (663ms)
+  ✓   67 [chromium] › e2e/cdu-03.spec.ts:114:5 › CDU-03 - Manter processo › Deve remover um processo (1.1s)
+  ✓   68 [chromium] › e2e/cdu-03.spec.ts:134:5 › CDU-03 - Manter processo › Deve validar regras de seleção em cascata na árvore de unidades (645ms)
+  ✓   69 …] › e2e/cdu-03.spec.ts:170:5 › CDU-03 - Manter processo › Deve avaliar unidades ocupadas por processos em andamento e restringi-las (2.7s)
+  ✓   70 …m] › e2e/cdu-03.spec.ts:201:5 › CDU-03 - Manter processo › Deve validar restrições de unidades sem mapa para REVISAO e DIAGNOSTICO (457ms)
+  ✓   71 [chromium] › e2e/cdu-03.spec.ts:222:5 › CDU-03 - Manter processo › Deve validar fluxos de cancelamento e mensagens de feedback (1.3s)
+  ✓   72 [chromium] › e2e/cdu-03.spec.ts:261:5 › CDU-03 - Manter processo › Deve validar fluxo alternativo (Botão iniciar invés de Salvar) (614ms)
+  ✓   73 …ium] › e2e/cdu-04.spec.ts:22:5 › CDU-04 - Iniciar processo › Deve marcar unidade sem responsável efetivo como inelegível na árvore (620ms)
+  ✓   74 …omium] › e2e/cdu-04.spec.ts:40:5 › CDU-04 - Iniciar processo › Deve iniciar um processo e validar criação de subprocessos e alertas (3.2s)
+  ✓   75 [chromium] › e2e/cdu-05.spec.ts:85:5 › CDU-05 - Iniciar processo de revisao › Fase 1.1: ADMIN cria e inicia processo de Mapeamento (1.1s)
+  ✓   76 [chromium] › e2e/cdu-05.spec.ts:97:5 › CDU-05 - Iniciar processo de revisao › Fase 1.2: CHEFE adiciona atividades e conhecimentos (579ms)
+  ✓   77 …e2e/cdu-05.spec.ts:109:5 › CDU-05 - Iniciar processo de revisao › Fase 1.2b: REGRESSÃO - Alerta de erro deve reaparecer se fechado (742ms)
+  ✓   78 [chromium] › e2e/cdu-05.spec.ts:141:5 › CDU-05 - Iniciar processo de revisao › Fase 1.3: CHEFE disponibiliza cadastro (588ms)
+  ✓   79 [chromium] › e2e/cdu-05.spec.ts:149:5 › CDU-05 - Iniciar processo de revisao › Fase 1.3b: GESTOR da SECRETARIA_2 registra aceite (1.3s)
+  ✓   80 [chromium] › e2e/cdu-05.spec.ts:158:5 › CDU-05 - Iniciar processo de revisao › Fase 1.4: ADMIN homologa cadastro (1.1s)
+  ✓   81 …ium] › e2e/cdu-05.spec.ts:166:5 › CDU-05 - Iniciar processo de revisao › Fase 1.5: ADMIN adiciona competências e disponibiliza mapa (2.3s)
+  ✓   82 [chromium] › e2e/cdu-05.spec.ts:182:5 › CDU-05 - Iniciar processo de revisao › Fase 1.6: CHEFE valida mapa (793ms)
+  ✓   83 …ium] › e2e/cdu-05.spec.ts:191:5 › CDU-05 - Iniciar processo de revisao › Fase 1.6b: GESTOR da SECRETARIA_2 aceita validação do mapa (1.0s)
+  ✓   84 [chromium] › e2e/cdu-05.spec.ts:200:5 › CDU-05 - Iniciar processo de revisao › Fase 1.7: ADMIN homologa e finaliza processo (986ms)
+  ✓   85 [chromium] › e2e/cdu-05.spec.ts:215:5 › CDU-05 - Iniciar processo de revisao › Fase 2: Iniciar processo de Revisão (3.6s)
+  ✓   86 [chromium] › e2e/cdu-05.spec.ts:284:5 › CDU-05 - Iniciar processo de revisao › Fase 2.1: Verificar alertas do processo de Revisão (2.8s)
+  ✓   87 …c.ts:318:5 › CDU-05 - Iniciar processo de revisao › Fase 2.2: CHEFE acessa o cadastro editavel da Revisão pelo card do subprocesso (461ms)
+  ✓   88 …r processo de revisao › Fase 2.2b: primeiro clique no card da Revisão abre cadastro mesmo após visitar subprocesso em visualização (657ms)
+  ✓   89 …Iniciar processo de revisao › Fase 2.2c: CHEFE da secretaria interoperacional acessa o subprocesso da própria secretaria na Revisão (1.6s)
+  ✓   90 …cesso de revisao › Fase 2.2d: Revisão de unidade subordinada sob secretaria interoperacional não aparece para o chefe da secretaria (3.3s)
+  ✓   91 …hromium] › e2e/cdu-05.spec.ts:424:5 › CDU-05 - Iniciar processo de revisao › Fase 3: CHEFE verifica atividades copiadas na Revisão (478ms)
+  ✓   92 …um] › e2e/cdu-06.spec.ts:28:5 › CDU-06 - Detalhar processo › Fase 1: Deve exibir detalhes do processo para ADMIN e ações de unidade (2.7s)
+  ✓   93 … e2e/cdu-06.spec.ts:70:5 › CDU-06 - Detalhar processo › Fase 1b: Deve exibir detalhes do processo para GESTOR e ocultar ações ADMIN (6.0s)
+  ✓   94 …6 - Detalhar processo › Fase 1c: Deve ocultar detalhes da revisão para chefe de secretaria interoperacional sem subprocesso próprio (3.2s)
+  ✓   95 [chromium] › e2e/cdu-06.spec.ts:156:5 › CDU-06 - Detalhar processo › Fase 2: Verificar botões de ação em bloco [Step 2.2.2] (3.9s)
+      96 …u-07.spec.ts:48:5 › CDU-07 - Detalhar subprocesso › Deve exibir detalhes do subprocesso em mapeamento para ADMIN, GESTOR, CHEFE e SERVIDOR
+
+[6:23:47 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:47 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 400. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:47 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/400/contexto-edicao
+
+
+[6:23:47 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:47 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 400. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:47 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/400/contexto-edicao
+
+
+[6:23:48 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:48 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao resolver subprocesso do processo 400 para a unidade SECAO_211. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:48 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/contexto-edicao/buscar?codProcesso=400&siglaUnidade=SECAO_211
+
+  ✓   96 …ec.ts:48:5 › CDU-07 - Detalhar subprocesso › Deve exibir detalhes do subprocesso em mapeamento para ADMIN, GESTOR, CHEFE e SERVIDOR (1.9s)
+      97 [chromium] › e2e/cdu-07.spec.ts:173:5 › CDU-07 - Detalhar subprocesso › Deve habilitar os cards conforme o avanço do subprocesso
+
+[6:23:49 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:49 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 400. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:49 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/400/contexto-edicao
+
+
+[6:23:49 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:49 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 400. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:49 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/400/contexto-edicao
+
+
+[6:23:50 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:50 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao resolver subprocesso do processo 400 para a unidade SECAO_211. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:50 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/contexto-edicao/buscar?codProcesso=400&siglaUnidade=SECAO_211
+
+
+[6:23:50 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:50 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 401. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:50 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/401/contexto-edicao
+
+
+[6:23:51 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:51 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 402. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:51 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/402/contexto-edicao
+
+  ✓   97 [chromium] › e2e/cdu-07.spec.ts:173:5 › CDU-07 - Detalhar subprocesso › Deve habilitar os cards conforme o avanço do subprocesso (2.7s)
+  ✓  101 …so › Regressão - cache de sessão no subprocesso: deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA (2.6s)
+  ✓   99 …7:5 › CDU-07 - Detalhar subprocesso › Deve exibir cards com rotas corretas ao navegar entre subprocessos distintos na mesma sessão (687ms)
+  ✓  100 …u-07.spec.ts:354:5 › CDU-07 - Detalhar subprocesso › Deve exibir os cards do ramo de diagnóstico na tela de detalhes do subprocesso (2.5s)
+     101 …bprocesso › Regressão - cache de sessão no subprocesso: deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA
+
+[6:23:57 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:23:57 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao resolver subprocesso do processo 400 para a unidade ASSESSORIA_12. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:23:57 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/contexto-edicao/buscar?codProcesso=400&siglaUnidade=ASSESSORIA_12
+
+  ✓  102 …DU-08 - Manter cadastro de atividades e conhecimentos › Cenário 1: Processo de Mapeamento (Fluxo completo + Importação + Auto-save) (4.5s)
+  ✓  103 … e2e/cdu-08.spec.ts:151:5 › CDU-08 - Manter cadastro de atividades e conhecimentos › Cenário 2: Processo de Revisão (Botão impacto) (1.7s)
+  ✓  104 …U-08 - Manter cadastro de atividades e conhecimentos › Cenário 3: Seleções limpas ao trocar processo/unidade no modal de importação (1.6s)
+  ✓  105 …ium] › e2e/cdu-09.spec.ts:32:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Setup: Criar processo via fixture (22ms)
+  ✓  106 …9.spec.ts:42:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 1: Validacao - Atividade sem conhecimento (1.1s)
+  ✓  107 ….spec.ts:66:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 2: Caminho feliz - Disponibilizar cadastro (2.1s)
+  ✓  108 …cdu-09.spec.ts:111:5 › CDU-09 - Disponibilizar cadastro de atividades e conhecimentos › Cenario 3: Devolucao e Historico de Analise (3.1s)
+  ✓  109 … - Disponibilizar revisão do cadastro de atividades e conhecimentos › 1. Setup: Preparar processo de revisão e atividades iniciais (635ms)
+  ✓  110 …evisão do cadastro de atividades e conhecimentos › 1.1 Cenário adicional: primeiro acesso direto ao cadastro carrega o subprocesso (498ms)
+  ✓  111 …o do cadastro de atividades e conhecimentos › 1.2 Cenário adicional: checkbox fica desabilitado quando houver mudanças no cadastro (475ms)
+  ✓  112 …izar revisão do cadastro de atividades e conhecimentos › 1.3 Cenário adicional: disponibilizar revisão sem mudanças usando checkbox (1.0s)
+  ✓  113 …› CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › 2. Cenário 1: Validação - Atividade sem conhecimento (692ms)
+  ✓  116 …de atividades e conhecimentos › 5. Cenário 4: Histórico retém as análises após nova disponibilização, inclusive em reentrada quente (5.4s)
+  ✓  115 …-10.spec.ts:217:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › 4. Cenário 3: Devolução e Histórico (2.2s)
+     116 …dastro de atividades e conhecimentos › 5. Cenário 4: Histórico retém as análises após nova disponibilização, inclusive em reentrada quente
+
+[6:24:24 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:24:24 PM]  ERROR  [BROWSER ERROR] %cerror%c ERRO: Subprocesso não encontrado! 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+     
+
+
+[6:24:24 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao carregar o cadastro do subprocesso 401. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:24:24 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/401/contexto-cadastro-atividades
+
+  ✓  117 …pec.ts:303:5 › CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos › 6. Cenário 5: Cancelar disponibilização (888ms)
+  ✓  118 …ium] › e2e/cdu-11.spec.ts:18:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Em processo em Andamento › Setup data (27ms)
+  ✓  119 … cadastro de atividades e conhecimentos › Em processo em Andamento › Fluxo ADMIN/GESTOR: Navega via Detalhes do Processo (Passo 2) (582ms)
+  ✓  120 …atividades e conhecimentos › Em processo em Andamento › Fluxo CHEFE/SERVIDOR: Navega direto para Detalhes do Subprocesso (Passo 3) (411ms)
+  ✓  121 …omium] › e2e/cdu-11.spec.ts:72:9 › CDU-11 - Visualizar cadastro de atividades e conhecimentos › Em processo finalizado › Setup data (13ms)
+  ✓  122 …U-11 - Visualizar cadastro de atividades e conhecimentos › Em processo finalizado › Fluxo ADMIN: Visualizar em processo finalizado (493ms)
+  ✓  123 [chromium] › e2e/cdu-12.spec.ts:21:5 › CDU-12 - Verificar impactos no mapa de competências › Setup data (29ms)
+  ✓  124 …e/cdu-12.spec.ts:39:5 › CDU-12 - Verificar impactos no mapa de competências › Passo 3.1: Verificação pelo CHEFE na tela de Cadastro (1.8s)
+  ✓  125 …-12.spec.ts:72:5 › CDU-12 - Verificar impactos no mapa de competências › Passo 3.2: Verificação pelo GESTOR na tela de Visualização (1.2s)
+  ✓  126 …/cdu-13.spec.ts:35:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › 1. Setup: Preparar processo e devoluções iniciais (5.8s)
+  ✓  127 …u-13.spec.ts:104:5 › CDU-13 - Analisar cadastro de atividades e conhecimentos › Cenarios CDU-13: Hierarquia aceita e ADMIN homologa (4.7s)
+  ✓  128 [chromium] › e2e/cdu-13.spec.ts:173:5 › CDU-13 - Cancelamentos de análise › Setup: preparar processo para fluxos de cancelamento (26ms)
+  ✓  129 …u-13.spec.ts:182:5 › CDU-13 - Cancelamentos de análise › GESTOR cancela devolução e permanece na tela de atividades e conhecimentos (1.7s)
+  ✓  130 …-13.spec.ts:205:5 › CDU-13 - Cancelamentos de análise › ADMIN cancela homologação e permanece na tela de atividades e conhecimentos (4.0s)
+  ✓  131 [chromium] › e2e/cdu-14.spec.ts:40:5 › CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos › Setup UI (4.1s)
+  ✓  132 …ar revisão de cadastro de atividades e conhecimentos › Cenarios CDU-14: GESTOR cancela devolução, aceita e ADMIN vê histórico final (3.8s)
+  ✓  133 [chromium] › e2e/cdu-15.spec.ts:28:5 › CDU-15 - Manter mapa de competências › Setup data (20ms)
+  ✓  134 …› e2e/cdu-15.spec.ts:36:5 › CDU-15 - Manter mapa de competências › Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN (7.1s)
+  ✓  135 [chromium] › e2e/cdu-16.spec.ts:18:5 › CDU-16 - Ajustar mapa de competências › Setup data (29ms)
+  ✓  136 …romium] › e2e/cdu-16.spec.ts:26:5 › CDU-16 - Ajustar mapa de competências › Cenários CDU-16: ADMIN ajusta mapa e visualiza impactos (2.6s)
+  ✓  137 [chromium] › e2e/cdu-17.spec.ts:31:5 › CDU-17 - Disponibilizar mapa de competências › Setup data (23ms)
+  ✓  138 …ec.ts:41:5 › CDU-17 - Disponibilizar mapa de competências › Cenários CDU-17: Fluxo completo de disponibilização do mapa pelo ADMIN (10.5s)
+  ✓  139 …17.spec.ts:128:5 › CDU-17 - Disponibilizar mapa de competências › Cenario 6: CHEFE recebe alerta de mapa disponibilizado no painel (321ms)
+  ✓  140 …um] › e2e/cdu-18.spec.ts:20:5 › CDU-18: Visualizar mapa de competências › Cenário 1: ADMIN visualiza mapa via detalhes do processo (509ms)
+  ✓  141 [chromium] › e2e/cdu-18.spec.ts:73:5 › CDU-18: Visualizar mapa de competências › Cenário 2: CHEFE visualiza mapa da própria unidade (741ms)
+  ✓  142 [chromium] › e2e/cdu-19.spec.ts:23:5 › CDU-19 - Validar mapa de competências › Setup data (19ms)
+  ✓  143 …› e2e/cdu-19.spec.ts:33:5 › CDU-19 - Validar mapa de competências › Cenários CDU-19: Fluxo completo de validação do mapa pelo CHEFE (3.7s)
+  ✓  144 [chromium] › e2e/cdu-19.spec.ts:94:5 › CDU-19 - Apresentar sugestões e pré-preenchimento › Setup data (26ms)
+  ✓  145 …] › e2e/cdu-19.spec.ts:103:5 › CDU-19 - Apresentar sugestões e pré-preenchimento › Cenario 1: CHEFE apresenta sugestões com sucesso (2.3s)
+  ✓  146 …9.spec.ts:139:5 › CDU-19 - Apresentar sugestões e pré-preenchimento › Cenario 1b: GESTOR superior vê alerta de sugestões no painel (313ms)
+  ✓  147 …omium] › e2e/cdu-19.spec.ts:150:5 › CDU-19 - Apresentar sugestões e pré-preenchimento › Cenario 2: GESTOR devolve mapa para ajustes (1.6s)
+  ✓  148 … › CDU-19 - Apresentar sugestões e pré-preenchimento › Cenario 3: CHEFE reabre modal com pré-preenchimento das sugestões anteriores (1.2s)
+  ✓  149 [chromium] › e2e/cdu-20.spec.ts:37:5 › CDU-20 - Analisar validação de mapa de competências › Setup data (29ms)
+  ✓  150 ….spec.ts:45:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 0: modal de aceite exibe campo opcional de observação (2.0s)
+  ✓  151 …] › e2e/cdu-20.spec.ts:60:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 1: GESTOR SECRETARIA_1 analisa e aceita (2.5s)
+  ✓  152 [chromium] › e2e/cdu-20.spec.ts:103:5 › CDU-20 - Analisar validação de mapa de competências › Cenario 2: ADMIN homologa final (703ms)
+  ✓  153 [chromium] › e2e/cdu-20.spec.ts:122:5 › CDU-20 - Ver sugestões quando situação é "Mapa com sugestões" › Setup data (22ms)
+  ✓  154 … CDU-20 - Ver sugestões quando situação é "Mapa com sugestões" › GESTOR visualiza botão "Ver sugestões" e acessa modal com conteúdo (1.4s)
+  ✓  155 [chromium] › e2e/cdu-20.spec.ts:165:5 › CDU-20 - Aceite de mapa com sugestões › Setup data (22ms)
+  ✓  156 [chromium] › e2e/cdu-20.spec.ts:174:5 › CDU-20 - Aceite de mapa com sugestões › CHEFE apresenta sugestões e GESTOR registra aceite (2.4s)
+  ✓  157 …s:207:5 › CDU-20 - Aceite de mapa com sugestões › GESTOR devolve validação do mapa e sistema registra efeito visível no subprocesso (2.6s)
+  ✓  158 [chromium] › e2e/cdu-20.spec.ts:282:5 › CDU-20 - ADMIN deve ver botões de edição com mapa com sugestões (Bug #1376) › Setup data (20ms)
+  ✓  159 …eve ver botões de edição com mapa com sugestões (Bug #1376) › ADMIN vê card de edição de mapa quando situação é Mapa com sugestões (579ms)
+  ✓  160 [chromium] › e2e/cdu-20.spec.ts:308:5 › CDU-20 - ADMIN homologa mapa após GESTOR aceitar com sugestões (Bug #1376) › Setup data (30ms)
+  ✓  161 …5 › CDU-20 - ADMIN homologa mapa após GESTOR aceitar com sugestões (Bug #1376) › CHEFE apresenta sugestões e GESTOR registra aceite (1.8s)
+  ✓  162 …pós GESTOR aceitar com sugestões (Bug #1376) › ADMIN vê ações corretas quando o mapa permanece com sugestões após aceite do GESTOR (595ms)
+  ✓  163 [chromium] › e2e/cdu-21.spec.ts:24:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Setup data (20ms)
+  ✓  164 …/cdu-21.spec.ts:35:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 1: ADMIN navega para detalhes do processo (384ms)
+  ✓  165 …1.spec.ts:50:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 2: ADMIN cancela finalização - permanece na tela (1.3s)
+  ✓  166 … e2e/cdu-21.spec.ts:79:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 3: ADMIN finaliza processo com sucesso (1.3s)
+  ✓  167 …s:105:5 › CDU-21 - Finalizar processo de mapeamento ou de revisão › Cenario 4: Verificar ausência de botões em processo finalizado (744ms)
+  ✓  168 … e2e/cdu-21.spec.ts:142:5 › CDU-21 - Processo com mapas não homologados › Setup data: processo com mapa validado mas não homologado (16ms)
+  ✓  169 …5 › CDU-21 - Processo com mapas não homologados › Cenario 5: ADMIN não vê botão Finalizar quando mapas não estão todos homologados (420ms)
+  ✓  170 [chromium] › e2e/cdu-21.spec.ts:172:5 › CDU-21 - Finalizar processo de REVISÃO › Setup: Criar processo de revisão com mapa homologado (9ms)
+  ✓  171 …um] › e2e/cdu-21.spec.ts:181:5 › CDU-21 - Finalizar processo de REVISÃO › Cenario 1: ADMIN finaliza processo de revisão com sucesso (1.8s)
+  ✓  172 …spec.ts:214:5 › CDU-21 - Finalizar processo de REVISÃO › Cenario 2: Verificar ausência de botões em processo de revisão finalizado (591ms)
+  ✓  173 [chromium] › e2e/cdu-22.spec.ts:37:5 › CDU-22 - Aceitar cadastros em bloco › Setup data (21ms)
+  ✓  174 [chromium] › e2e/cdu-22.spec.ts:46:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 1: GESTOR abre modal e cancela aceite em bloco (831ms)
+  ✓  175 …cdu-22.spec.ts:72:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 3a: Botão desabilitado quando item está com gestor subordinado (681ms)
+  ✓  176 …ium] › e2e/cdu-22.spec.ts:86:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 3b: Botão habilitado após gestor subordinado aceitar (1.5s)
+  ✓  178 …du-22.spec.ts:127:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 5: Aceite em bloco registra movimentação e alerta com data/hora (3.3s)
+     178 …› e2e/cdu-22.spec.ts:127:5 › CDU-22 - Aceitar cadastros em bloco › Cenario 5: Aceite em bloco registra movimentação e alerta com data/hora
+
+[6:25:54 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:25:54 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 400. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:25:54 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/400/contexto-edicao
+
+  ✓  179 …e2e/cdu-22.spec.ts:193:5 › CDU-22 - Aceitar cadastros de revisão em bloco › Setup: processo de revisão com cadastro disponibilizado (28ms)
+  ✓  180 …cdu-22.spec.ts:203:5 › CDU-22 - Aceitar cadastros de revisão em bloco › Cenario REVISAO: GESTOR aceita revisão de cadastro em bloco (2.7s)
+  ✓  181 [chromium] › e2e/cdu-23.spec.ts:40:5 › CDU-23 - Homologar cadastros em bloco › Setup data (26ms)
+  ✓  182 [chromium] › e2e/cdu-23.spec.ts:49:5 › CDU-23 - Homologar cadastros em bloco › Setup aceites (2.3s)
+  ✓  183 …ium] › e2e/cdu-23.spec.ts:62:5 › CDU-23 - Homologar cadastros em bloco › Cenario 1: ADMIN abre modal e cancela homologação em bloco (1.2s)
+  ✓  185 …pec.ts:117:5 › CDU-23 - Homologar cadastros em bloco › Cenario 3: Homologação em bloco registra movimentação e alerta com data/hora (1.1s)
+     185 …du-23.spec.ts:117:5 › CDU-23 - Homologar cadastros em bloco › Cenario 3: Homologação em bloco registra movimentação e alerta com data/hora
+
+[6:26:03 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:26:03 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 400. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:26:03 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/400/contexto-edicao
+
+  ✓  186 [chromium] › e2e/cdu-23.spec.ts:157:5 › CDU-23 - Homologar cadastros em bloco após devolução › Setup data (24ms)
+  ✓  187 [chromium] › e2e/cdu-23.spec.ts:166:5 › CDU-23 - Homologar cadastros em bloco após devolução › Setup aceites (2.4s)
+  ✓  188 …:5 › CDU-23 - Homologar cadastros em bloco após devolução › Cenario 1: ADMIN não pode homologar em bloco após devolver para ajustes (1.4s)
+  ✓  189 [chromium] › e2e/cdu-24.spec.ts:33:5 › CDU-24 - Disponibilizar mapas em bloco › Setup data (34ms)
+  ✓  190 …5 › CDU-24 - Disponibilizar mapas em bloco › Botão "Disponibilizar em bloco" deve estar desabilitado quando nenhum mapa foi criado (474ms)
+  ✓  191 …ts:59:5 › CDU-24 - Disponibilizar mapas em bloco › ADMIN visualiza erro ao tentar disponibilizar mapa com atividade sem competência (2.5s)
+  ✓  192 …e2e/cdu-24.spec.ts:78:5 › CDU-24 - Disponibilizar mapas em bloco › ADMIN abre modal de disponibilização em bloco e cancela operação (1.3s)
+  ✓  194 …147:5 › CDU-24 - Disponibilizar mapas em bloco › Cenario 4: Disponibilização em bloco registra movimentação e alerta com data/hora (758ms)
+     194 …spec.ts:147:5 › CDU-24 - Disponibilizar mapas em bloco › Cenario 4: Disponibilização em bloco registra movimentação e alerta com data/hora
+
+[6:26:21 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:26:21 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 400. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:26:21 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/400/contexto-edicao
+
+  ✓  195 …ium] › e2e/cdu-25.spec.ts:19:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenários CDU-25: Aceite em bloco de mapas validados (2.1s)
+  ✓  196 …ec.ts:74:5 › CDU-25 - Aceitar validação de mapas em bloco › Cenario 4: Aceite em bloco registra movimentação e alerta com data/hora (3.4s)
+  ✓  197 [chromium] › e2e/cdu-26.spec.ts:31:5 › CDU-26 - Homologar validação de mapas em bloco › Setup data (19ms)
+  ✓  198 …e/cdu-26.spec.ts:39:5 › CDU-26 - Homologar validação de mapas em bloco › Cenario 1: ADMIN visualiza botão Homologar mapas em bloco (432ms)
+  ✓  199 …cdu-26.spec.ts:52:5 › CDU-26 - Homologar validação de mapas em bloco › Cenario 2: ADMIN abre modal de homologação de mapa em bloco (795ms)
+  ✓  200 …ium] › e2e/cdu-26.spec.ts:74:5 › CDU-26 - Homologar validação de mapas em bloco › Cenario 3: Cancelar homologação de mapa em bloco (984ms)
+  ✓  201 …:94:5 › CDU-26 - Homologar validação de mapas em bloco › Cenario 4: ADMIN confirma homologação em bloco e é redirecionado ao painel (5.9s)
+  ✓  202 … Homologar validação de mapas em bloco › Cenario 5: Homologação em bloco registra movimentação com data/hora e origem/destino ADMIN (1.1s)
+  ✓  203 …- Homologar validação de mapas em bloco › Cenario 6: Homologação em bloco registra alerta com data/hora para unidade do subprocesso (1.4s)
+  ✓  204 [chromium] › e2e/cdu-27.spec.ts:56:5 › CDU-27 - Alterar data limite de subprocesso › Setup data (562ms)
+  ✓  205 …um] › e2e/cdu-27.spec.ts:72:5 › CDU-27 - Alterar data limite de subprocesso › Cenario 1: ADMIN navega para detalhes do subprocesso (441ms)
+  ✓  206 …:5 › CDU-27 - Alterar data limite de subprocesso › Cenario 2: ADMIN pode cancelar a alteração da data limite sem persistir mudanças (1.1s)
+  ✓  207 …› e2e/cdu-27.spec.ts:131:5 › CDU-27 - Alterar data limite de subprocesso › Cenario 3: ADMIN altera data limite e recebe confirmação (6.3s)
+  ✓  208 …2e/cdu-28.spec.ts:132:5 › CDU-28 - Manter atribuição temporária › Cenario 1: ADMIN navega pela árvore e acessa detalhes da unidade (713ms)
+  ✓  209 …c.ts:151:5 › CDU-28 - Manter atribuição temporária › Cenario 2: tela de atribuição expõe os campos e ações exigidos pelo requisito (750ms)
+  ✓  210 …pec.ts:174:5 › CDU-28 - Manter atribuição temporária › Cenario 3: o formulário exibe erros de validação ao tentar criar incompleto (775ms)
+  ✓  211 …cdu-28.spec.ts:190:5 › CDU-28 - Manter atribuição temporária › Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade (512ms)
+  ✓  212 …spec.ts:202:5 › CDU-28 - Manter atribuição temporária › Cenario 5: ADMIN cria atribuição e usuário destino recebe perfil temporário (3.2s)
+  ✓  213 …romium] › e2e/cdu-28.spec.ts:229:5 › CDU-28 - Manter atribuição temporária › Cenario 6: ADMIN acessa atribuição vigente para editar (3.1s)
+  ✓  214 [chromium] › e2e/cdu-28.spec.ts:250:5 › CDU-28 - Manter atribuição temporária › Cenario 7: ADMIN remove atribuição vigente (2.8s)
+  ✓  215 [chromium] › e2e/cdu-29.spec.ts:18:5 › CDU-29 - Consultar histórico de processos › Cenario 1: ADMIN navega para página de histórico (419ms)
+  ✓  216 [chromium] › e2e/cdu-29.spec.ts:32:5 › CDU-29 - Consultar histórico de processos › Cenario 2: GESTOR pode acessar histórico (317ms)
+  ✓  217 [chromium] › e2e/cdu-29.spec.ts:42:5 › CDU-29 - Consultar histórico de processos › Cenario 3: CHEFE pode acessar histórico (313ms)
+  ✓  218 [chromium] › e2e/cdu-29.spec.ts:54:5 › CDU-29 - Consultar histórico de processos › Cenario 4: Tabela apresenta colunas corretas (351ms)
+  ✓  219 …cdu-29.spec.ts:68:5 › CDU-29 - Consultar histórico de processos › Cenario 5: Histórico exibe apenas processos finalizados inativos (391ms)
+  ✓  220 …e/cdu-30.spec.ts:20:5 › CDU-30 - Manter administradores › Cenário 1: ADMIN navega para página de administradores e visualiza lista (363ms)
+  ✓  221 [chromium] › e2e/cdu-30.spec.ts:47:5 › CDU-30 - Manter administradores › Cenário 2: ADMIN adiciona novo administrador (986ms)
+  ✓  222 [chromium] › e2e/cdu-30.spec.ts:69:5 › CDU-30 - Manter administradores › Cenário 3: ADMIN remove administrador adicionado (1.0s)
+  ✓  223 …0.spec.ts:96:5 › CDU-30 - Manter administradores › Cenário 3.1: lista de administradores reflete ida e volta imediata após mutações (2.2s)
+  ✓  224 …30.spec.ts:140:5 › CDU-30 - Manter administradores › Cenário 4: ADMIN tenta adicionar sem título e sistema valida campo obrigatório (1.3s)
+  ✓  225 …2:5 › CDU-30 - Manter administradores › Cenário 5: ADMIN tenta adicionar usuário que já é administrador e recebe erro de validação (829ms)
+[6:27:06 PM] ℹ [NETWORK EXPECTED] 422 POST http://localhost:5173/api/usuarios/administradores
+  ✓  226 …um] › e2e/cdu-30.spec.ts:188:5 › CDU-30 - Manter administradores › Cenário 6: ADMIN não pode remover a si mesmo como administrador (975ms)
+[6:27:07 PM] ℹ [NETWORK EXPECTED] 422 POST http://localhost:5173/api/usuarios/administradores/191919/remover
+  ✓  227 …] › e2e/cdu-30.spec.ts:221:5 › CDU-30 - Manter administradores › Cenário 7: ADMIN não pode remover o único administrador do sistema (1.4s)
+[6:27:08 PM] ℹ [NETWORK EXPECTED] 422 POST http://localhost:5173/api/usuarios/administradores/191919/remover
+  ✓  228 …spec.ts:14:5 › CDU-31 - Configurar sistema › Cenários CDU-31: ADMIN navega, valida entradas e persiste alterações de configurações (695ms)
+  ✓  229 [chromium] › e2e/cdu-32.spec.ts:17:5 › CDU-32 - Reabrir cadastro › Setup UI (21ms)
+  ✓  230 [chromium] › e2e/cdu-32.spec.ts:26:5 › CDU-32 - Reabrir cadastro › Cenários CDU-32: ADMIN reabre cadastro (2.9s)
+  ✓  231 …spec.ts:81:5 › CDU-32 - Reabrir cadastro › Cenário complementar: unidade alvo visualiza alerta de reabertura de cadastro no painel (281ms)
+  ✓  232 …/cdu-32.spec.ts:93:5 › CDU-32 - Reabrir cadastro › Cenário complementar: unidade superior visualiza alerta de reabertura no painel (325ms)
+  ✓  233 [chromium] › e2e/cdu-33.spec.ts:24:5 › CDU-33 - Reabrir revisão de cadastro › Setup UI (882ms)
+  ✓  234 [chromium] › e2e/cdu-33.spec.ts:53:5 › CDU-33 - Reabrir revisão de cadastro › Cenários CDU-33: ADMIN reabre revisão de cadastro (4.2s)
+  ✓  235 …:5 › CDU-33 - Reabrir revisão de cadastro › Cenário complementar: unidade alvo visualiza alerta de reabertura de revisão no painel (307ms)
+  ✓  236 … CDU-33 - Reabrir revisão de cadastro › Cenário complementar: unidade superior visualiza alerta de reabertura de revisão no painel (288ms)
+  ✓  237 [chromium] › e2e/cdu-34.spec.ts:32:5 › CDU-34 - Enviar lembrete de prazo › Preparacao: Admin cria e inicia processo (472ms)
+  ✓  238 ….ts:52:5 › CDU-34 - Enviar lembrete de prazo › Cenario principal: ADMIN envia lembrete e sistema cria alerta sem alterar o workflow (2.3s)
+  ✓  239 …spec.ts:96:5 › CDU-34 - Enviar lembrete de prazo › Cenario complementar: unidade de destino visualiza alerta de lembrete no painel (300ms)
+  ✓  240 …5.spec.ts:14:5 › CDU-35 - Gerar relatório de andamento › Cenários CDU-35: ADMIN gera relatório com colunas esperadas e exporta PDF (805ms)
+  ✓  241 …hromium] › e2e/cdu-36.spec.ts:14:5 › CDU-36 - Gerar relatório de mapas › Cenários CDU-36: ADMIN define filtros e gera PDF de mapas (751ms)
+  ✓  242 [chromium] › e2e/cdu-36.spec.ts:61:5 › CDU-36 - Gerar relatório de mapas › Cenário CDU-36: Seleciona unidade e gera PDF (643ms)
+  ✓  243 …u-36.spec.ts:94:5 › CDU-36 - Gerar relatório de mapas › Cenário CDU-36: CHEFE acessa Minha unidade e exporta o mapa vigente em PDF (607ms)
+  ✓  244 …erar relatório de unidades sem mapas vigentes › Cenários CDU-37: ADMIN visualiza árvore de unidades sem mapa vigente e exporta PDF (632ms)
+  ✓  245 [chromium] › e2e/feedback-control.spec.ts:8:5 › Feedback Control - Widget de Feedback › Deve exibir o botão flutuante de feedback (390ms)
+  ✓  246 …m] › e2e/feedback-control.spec.ts:12:5 › Feedback Control - Widget de Feedback › Deve abrir o modal ao clicar no botão de feedback (677ms)
+  ✓  247 [chromium] › e2e/feedback-control.spec.ts:20:5 › Feedback Control - Widget de Feedback › Deve validar nota mínima de 10 caracteres (1.1s)
+  ✓  248 [chromium] › e2e/feedback-control.spec.ts:29:5 › Feedback Control - Widget de Feedback › Deve enviar feedback com sucesso (1.3s)
+  ✓  249 …romium] › e2e/feedback-control.spec.ts:41:5 › Feedback Control - Widget de Feedback › Deve permitir remover captura antes de enviar (1.1s)
+  ✓  250 …0:5 › Jornada geral semântica - mapeamento e revisão ponta a ponta › Fase 1 - ADMIN cria e inicia o processo de mapeamento da seção (2.6s)
+  ✓  251 …Jornada geral semântica - mapeamento e revisão ponta a ponta › Fase 2 - CHEFE cadastra atividades e a hierarquia analisa o cadastro (6.7s)
+  ✓  253 … › Jornada geral semântica - mapeamento e revisão ponta a ponta › Fase 4 - ADMIN cria e inicia o processo de revisão da mesma seção (4.9s)
+     253 …a e inicia o processo de revisão da mesma seção › CHEFE confirma que a revisão nasce com o cadastro vigente e botão de impactos disponível
+
+[6:27:50 PM]  ERROR  [BROWSER ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized)
+
+
+[6:27:50 PM]  ERROR  [BROWSER ERROR] %cerror%c Falha grave ao localizar o subprocesso 401. 
+      background: #c0392b;
+      border-radius: 0.5em;
+      color: white;
+      font-weight: bold;
+      padding: 2px 0.5em;
+      {"name":"AxiosError"}
+
+
+[6:27:50 PM]  WARN  [NETWORK ERROR] 401 GET http://localhost:5173/api/subprocessos/401/contexto-edicao
+
+  ✓  254 …emântica - mapeamento e revisão ponta a ponta › Fase 5 - CHEFE revisa o cadastro com impacto real e a hierarquia homologa a revisão (4.9s)
+  ✓  255 …nada geral semântica - mapeamento e revisão ponta a ponta › Fase 6 - ADMIN ajusta o mapa da revisão e a hierarquia valida novamente (8.7s)
+  ✓  256 …da geral semântica - mapeamento e revisão ponta a ponta › Fase 7 - ADMIN finaliza a revisão e os perfis consultam o resultado final (4.4s)
+  ✓  257 [chromium] › e2e/jornada.spec.ts:20:5 › Jornada do Ciclo de Vida Completo do SGC › Fase 0: Administração de Notificações (2.7s)
+  ✓  258 …omium] › e2e/jornada.spec.ts:25:5 › Jornada do Ciclo de Vida Completo do SGC › Fase 1: Mapeamento Inicial - Cadastro de Atividades (14.0s)
+  ✓  259 [chromium] › e2e/jornada.spec.ts:32:5 › Jornada do Ciclo de Vida Completo do SGC › Fase 2: Elaboração e Homologação do Mapa (10.8s)
+  ✓  260 [chromium] › e2e/jornada.spec.ts:39:5 › Jornada do Ciclo de Vida Completo do SGC › Fase 3: Ciclo de Revisão e Manutenção (9.9s)
+
+  260 passed (7.9m)
+
+Tudo certo!
+leonardo@Leonardos-Mac-mini sgc %

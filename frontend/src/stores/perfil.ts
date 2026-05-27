@@ -4,7 +4,7 @@ import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/types/autentic
 import type {Perfil, Unidade} from "@/types/tipos";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 import {useSessionStorage} from "@/composables/useSessionStorage";
-import {useInvalidacaoEstadoNavegacao} from "@/composables/useInvalidacaoEstadoNavegacao";
+import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {concluirLoginPerfil, encerrarLoginPerfil, iniciarLoginPerfil, type DadosSessaoPerfil} from "@/stores/perfilAutenticacao";
 
 interface EstadoSessaoRefs {
@@ -81,7 +81,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     const versaoSessao = ref(0);
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const unidadeAtualDetalhes = ref<Unidade | null>(null);
-    const {resetarEstadoSessao} = useInvalidacaoEstadoNavegacao();
+    const {resetarEstadoSessao} = useInvalidacaoNavegacao();
 
     const unidadeAtual = computed(() =>
         obterUnidadeAtualSelecionada(perfilSelecionado.value, unidadeSelecionada.value, perfisUnidades.value)

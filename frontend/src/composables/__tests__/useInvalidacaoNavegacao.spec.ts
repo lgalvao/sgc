@@ -102,4 +102,24 @@ describe("useInvalidacaoNavegacao", () => {
 
         expect(subprocesso.limparContextoAtual).toHaveBeenCalled();
     });
+
+    it("deve resetar estado da sessão ao fazer logout", () => {
+        const painel = usePainelStore();
+        const subprocesso = useSubprocessoStore();
+        const organizacao = useOrganizacaoStore();
+        vi.spyOn(painel, "resetar");
+        vi.spyOn(subprocesso, "resetar");
+        vi.spyOn(organizacao, "resetar");
+
+        const {resetarEstadoSessao} = useInvalidacaoNavegacao();
+        resetarEstadoSessao();
+
+        expect(painel.resetar).toHaveBeenCalled();
+        expect(subprocesso.resetar).toHaveBeenCalled();
+        expect(organizacao.resetar).toHaveBeenCalled();
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["mapa"]});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["unidade"]});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["dados-tela-unidade"]});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["unidade", "arvore-elegibilidade"]});
+    });
 });

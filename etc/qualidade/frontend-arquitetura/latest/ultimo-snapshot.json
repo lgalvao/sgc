@@ -1,9 +1,9 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-27T12:27:38.099Z",
+  "geradoEm": "2026-05-27T23:58:59.306Z",
   "resumo": {
-    "arquivosProducao": 268,
-    "scoreTotal": 943,
+    "arquivosProducao": 262,
+    "scoreTotal": 1035,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 0,
@@ -21,14 +21,52 @@
       "arquivosComSuperficieAmpla": 32,
       "arquivosComMisturaCamadas": 10,
       "arquivosComServerStateCaseiro": 2,
-      "arquivosComAcoplamentoStoreAlto": 3,
+      "arquivosComAcoplamentoStoreAlto": 4,
       "arquivosComServiceDireto": 36,
-      "chamadasEstrategiaCache": 13,
-      "chamadasInvalidacao": 10,
+      "chamadasEstrategiaCache": 20,
+      "chamadasInvalidacao": 17,
       "hubsCentraisComSinais": 2
     }
   },
   "hotspots": [
+    {
+      "arquivo": "frontend/src/composables/useInvalidacaoNavegacao.ts",
+      "camada": "composable",
+      "linhas": 92,
+      "score": 230,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 10,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 14,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 14,
+        "chamadasInvalidacao": 14,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 7
+      },
+      "sinaisAtivos": [
+        "invalidacaoExplicita",
+        "estrategiaCache",
+        "invalidacaoArquitetural",
+        "fanoutAlto",
+        "acoplamentoStoreAlto"
+      ],
+      "hubCentral": true
+    },
     {
       "arquivo": "frontend/src/composables/useMapaTela.ts",
       "camada": "composable",
@@ -104,7 +142,7 @@
     {
       "arquivo": "frontend/src/composables/useSubprocessoTela.ts",
       "camada": "composable",
-      "linhas": 206,
+      "linhas": 207,
       "score": 41,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -116,7 +154,7 @@
         "palavraSnapshot": 0
       },
       "metricasAst": {
-        "chamadasStore": 9,
+        "chamadasStore": 11,
         "chamadasServiceDiretas": 0,
         "chamadasEstrategiaCache": 1,
         "chamadasInvalidacao": 0,
@@ -138,76 +176,6 @@
         "acoplamentoStoreAlto"
       ],
       "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useEstadoSubprocessoNavegacao.ts",
-      "camada": "composable",
-      "linhas": 24,
-      "score": 38,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 1,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 3,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 3,
-        "chamadasInvalidacao": 3,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita",
-        "estrategiaCache",
-        "invalidacaoArquitetural"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useInvalidacaoNavegacao.ts",
-      "camada": "composable",
-      "linhas": 64,
-      "score": 31,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 5,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 2
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita"
-      ],
-      "hubCentral": true
     },
     {
       "arquivo": "frontend/src/views/AdministradoresView.vue",
@@ -315,78 +283,6 @@
       "hubCentral": false
     },
     {
-      "arquivo": "frontend/src/composables/useEstadoOrganizacaoNavegacao.ts",
-      "camada": "composable",
-      "linhas": 34,
-      "score": 27,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 1,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 2,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 2,
-        "chamadasInvalidacao": 2,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 2
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita",
-        "estrategiaCache",
-        "invalidacaoArquitetural"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useEstadoPainelNavegacao.ts",
-      "camada": "composable",
-      "linhas": 19,
-      "score": 27,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 1,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 2,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 2,
-        "chamadasInvalidacao": 2,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita",
-        "estrategiaCache",
-        "invalidacaoArquitetural"
-      ],
-      "hubCentral": false
-    },
-    {
       "arquivo": "frontend/src/views/cadastroDisponibilizacao.ts",
       "camada": "view",
       "linhas": 198,
@@ -424,7 +320,7 @@
     {
       "arquivo": "frontend/src/composables/useAtribuicaoTemporariaTela.ts",
       "camada": "composable",
-      "linhas": 410,
+      "linhas": 416,
       "score": 25,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -437,7 +333,7 @@
       },
       "metricasAst": {
         "chamadasStore": 0,
-        "chamadasServiceDiretas": 5,
+        "chamadasServiceDiretas": 6,
         "chamadasEstrategiaCache": 0,
         "chamadasInvalidacao": 0,
         "chamadasColadaQuery": 0,
@@ -497,7 +393,7 @@
     {
       "arquivo": "frontend/src/composables/usePainelTela.ts",
       "camada": "composable",
-      "linhas": 162,
+      "linhas": 165,
       "score": 25,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -638,7 +534,7 @@
     {
       "arquivo": "frontend/src/composables/useCadastroOrquestracao.ts",
       "camada": "composable",
-      "linhas": 138,
+      "linhas": 142,
       "score": 21,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -779,7 +675,7 @@
     {
       "arquivo": "frontend/src/composables/useMapas.ts",
       "camada": "composable",
-      "linhas": 67,
+      "linhas": 57,
       "score": 19,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1056,43 +952,9 @@
       "hubCentral": false
     },
     {
-      "arquivo": "frontend/src/composables/useEstadoMapaNavegacao.ts",
-      "camada": "composable",
-      "linhas": 20,
-      "score": 15,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 3,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita"
-      ],
-      "hubCentral": false
-    },
-    {
       "arquivo": "frontend/src/stores/perfilAutenticacao.ts",
       "camada": "store",
-      "linhas": 102,
+      "linhas": 103,
       "score": 12,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1439,7 +1301,7 @@
     {
       "arquivo": "frontend/src/composables/useConfiguracoes.ts",
       "camada": "composable",
-      "linhas": 110,
+      "linhas": 106,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1644,7 +1506,7 @@
     {
       "arquivo": "frontend/src/views/subprocessoCarregamento.ts",
       "camada": "view",
-      "linhas": 125,
+      "linhas": 132,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1712,7 +1574,7 @@
     {
       "arquivo": "frontend/src/composables/useMapaOrquestracao.ts",
       "camada": "composable",
-      "linhas": 83,
+      "linhas": 87,
       "score": 5,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1746,7 +1608,7 @@
     {
       "arquivo": "frontend/src/composables/useMapaQuery.ts",
       "camada": "composable",
-      "linhas": 138,
+      "linhas": 136,
       "score": 4,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -1758,7 +1620,7 @@
         "palavraSnapshot": 0
       },
       "metricasAst": {
-        "chamadasStore": 0,
+        "chamadasStore": 1,
         "chamadasServiceDiretas": 2,
         "chamadasEstrategiaCache": 0,
         "chamadasInvalidacao": 0,

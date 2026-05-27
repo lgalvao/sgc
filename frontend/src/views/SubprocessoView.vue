@@ -42,16 +42,16 @@
 
       <SubprocessoMovimentacoes :movimentacoes="movimentacoes"/>
     </div>
-    <div v-else-if="subprocessoStore.erroIntegracaoContexto" class="py-2">
+    <div v-else-if="erroIntegracaoContexto" class="py-2">
       <BAlert
           :model-value="true"
           dismissible
           variant="danger"
-          @dismissed="subprocessoStore.limparErroIntegracao()"
+          @dismissed="limparErroIntegracao()"
       >
-        {{ subprocessoStore.erroIntegracaoContexto.mensagem }}
-        <div v-if="subprocessoStore.erroIntegracaoContexto.detalhes">
-          <small>Detalhes: {{ subprocessoStore.erroIntegracaoContexto.detalhes }}</small>
+        {{ erroIntegracaoContexto.mensagem }}
+        <div v-if="erroIntegracaoContexto.detalhes">
+          <small>Detalhes: {{ erroIntegracaoContexto.detalhes }}</small>
         </div>
       </BAlert>
     </div>
@@ -105,7 +105,8 @@ const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubpro
 const tela = useSubprocessoTela(props);
 
 const {
-  subprocessoStore,
+  erroIntegracaoContexto,
+  limparErroIntegracao,
   notificacao,
   clear,
   subprocesso,

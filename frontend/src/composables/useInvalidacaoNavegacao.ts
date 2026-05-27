@@ -1,54 +1,81 @@
-import {useInvalidacaoEstadoNavegacao} from "@/composables/useInvalidacaoEstadoNavegacao";
-import {useInvalidacaoQueriesNavegacao} from "@/composables/useInvalidacaoQueriesNavegacao";
+import {useCacheMapa} from "@/composables/useMapaQuery";
+import {useInvalidacaoPainel} from "@/composables/usePainelQuery";
+import {useInvalidacaoProcesso} from "@/composables/useProcessoQuery";
+import {useInvalidacaoUnidade} from "@/composables/useUnidadeQuery";
+import {useOrganizacaoStore} from "@/stores/organizacao";
+import {usePainelStore} from "@/stores/painel";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 
 /**
  * Ponto central de invalidação após mutações de processo/subprocesso.
  *
- * `painel` e `processo` já vivem em query cache; `subprocesso`, `mapas`
- * e `unidade` ainda mantêm estado local que precisa ser invalidado.
+ * `painel`, `processo` e `mapas` vivem em query cache; `subprocesso`,
+ * `organizacao` e `unidade` ainda mantêm estado local que precisa ser invalidado.
  */
 export function useInvalidacaoNavegacao() {
-    const queries = useInvalidacaoQueriesNavegacao();
-    const estado = useInvalidacaoEstadoNavegacao();
+    const {invalidarPainel} = useInvalidacaoPainel();
+    const {invalidarProcesso} = useInvalidacaoProcesso();
+    const {invalidarMapa} = useCacheMapa();
+    const {invalidarUnidade, invalidarDadosTelaUnidade, invalidarArvoreElegibilidade} = useInvalidacaoUnidade();
+    const painelStore = usePainelStore();
+    const subprocessoStore = useSubprocessoStore();
+    const organizacaoStore = useOrganizacaoStore();
 
     function atualizarFluxoProcesso(): void {
-        queries.invalidarFluxoProcessoRemoto();
-        estado.atualizarEstadoPainel();
-        estado.atualizarEstadoSubprocesso();
-        estado.atualizarEstadoUnidade();
-        estado.atualizarEstadoMapa();
+        invalidarPainel();
+        invalidarProcesso();
+        painelStore.invalidar();
+        subprocessoStore.invalidar();
+        invalidarMapa();
+        invalidarUnidade();
+        invalidarDadosTelaUnidade();
+        invalidarArvoreElegibilidade();
     }
 
     function atualizarFluxoSubprocesso(): void {
-        estado.atualizarEstadoSubprocesso();
+        subprocessoStore.invalidar();
     }
 
     function atualizarFluxoSubprocessoEPainel(): void {
-        queries.invalidarFluxoSubprocessoEPainelRemoto();
-        estado.atualizarEstadoPainel();
-        estado.atualizarEstadoSubprocesso();
+        invalidarPainel();
+        painelStore.invalidar();
+        subprocessoStore.invalidar();
     }
 
     function atualizarFluxoSubprocessoEProcesso(): void {
-        queries.invalidarFluxoSubprocessoEProcessoRemoto();
-        estado.atualizarEstadoSubprocesso();
+        invalidarProcesso();
+        subprocessoStore.invalidar();
     }
 
     function atualizarFluxoMapa(codigoSubprocesso?: number): void {
-        queries.invalidarFluxoMapaRemoto();
-        estado.atualizarEstadoPainel();
-        estado.atualizarEstadoSubprocesso();
-        estado.atualizarEstadoMapa(codigoSubprocesso);
+        invalidarPainel();
+        invalidarProcesso();
+        painelStore.invalidar();
+        subprocessoStore.invalidar();
+        invalidarMapa(codigoSubprocesso);
     }
 
     function atualizarDadosOrganizacionais(): void {
-        estado.atualizarEstadoOrganizacional();
-        estado.atualizarEstadoPainel();
-        queries.invalidarDadosOrganizacionaisRemotos();
+        organizacaoStore.invalidar();
+        painelStore.invalidar();
+        invalidarPainel();
+        invalidarUnidade();
+        invalidarDadosTelaUnidade();
+        invalidarArvoreElegibilidade();
     }
 
     function limparEstadoSubprocessoAtual(): void {
-        estado.limparSubprocessoAtual();
+        subprocessoStore.limparContextoAtual();
+    }
+
+    function resetarEstadoSessao(): void {
+        painelStore.resetar();
+        subprocessoStore.resetar();
+        invalidarMapa();
+        organizacaoStore.resetar();
+        invalidarUnidade();
+        invalidarDadosTelaUnidade();
+        invalidarArvoreElegibilidade();
     }
 
     return {
@@ -59,5 +86,6 @@ export function useInvalidacaoNavegacao() {
         atualizarFluxoSubprocessoEProcesso,
         atualizarFluxoSubprocessoEPainel,
         limparEstadoSubprocessoAtual,
+        resetarEstadoSessao,
     };
 }

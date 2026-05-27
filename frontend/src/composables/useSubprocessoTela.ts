@@ -160,7 +160,8 @@ export function useSubprocessoTela(props: SubprocessoTelaProps) {
     });
 
     return {
-        subprocessoStore,
+        erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
+        limparErroIntegracao: () => subprocessoStore.limparErroIntegracao(),
         notificacao,
         clear,
         subprocesso,
