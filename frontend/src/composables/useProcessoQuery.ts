@@ -1,5 +1,6 @@
 import {useQuery, useQueryCache} from "@pinia/colada";
 import {computed} from "vue";
+import {usePerfilStore} from "@/stores/perfil";
 import {buscarContextoCompleto} from "@/services/processo";
 import type {Processo} from "@/types/tipos";
 
