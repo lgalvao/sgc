@@ -13,7 +13,7 @@ export function useProcessoQuery(codigoProcesso: number) {
     return useQuery<Processo | null, Error, Processo | null>({
         key: () => [...chave.value],
         query: async () => buscarContextoCompleto(codigoProcesso),
-        enabled: () => Number.isFinite(codigoProcesso) && codigoProcesso > 0 && !!perfilStore.perfilSelecionado,
+        enabled: false,
         staleTime: Infinity,
     });
 }

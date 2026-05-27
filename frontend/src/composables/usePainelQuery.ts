@@ -18,7 +18,7 @@ export function usePainelQuery() {
     return useQuery<PainelBootstrap, Error, PainelBootstrap>({
         key: () => [...chave.value],
         query: () => obterBootstrap(),
-        enabled: () => Boolean(perfilStore.perfilSelecionado && perfilStore.unidadeSelecionada),
+        enabled: false,
         staleTime: Infinity,
     });
 }

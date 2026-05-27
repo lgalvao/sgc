@@ -47,8 +47,11 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
             if (contextoDireto) {
                 codigoSubprocesso.value = contextoDireto.detalhes.codigo;
                 erroNaoEncontrado.value = false;
-                return;
+            } else {
+                codigoSubprocesso.value = null;
+                erroNaoEncontrado.value = true;
             }
+            return;
         }
 
         const contexto = await carregarContextoPorProcesso(
