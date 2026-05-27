@@ -5,6 +5,7 @@ import {getCommonMountOptions, setupComponentTest} from "@/test-utils/componentT
 import NavBar from "../layout/MainNavbar.vue";
 import {usePerfil} from "@/composables/usePerfil";
 import {useTemaPreferencia} from "@/composables/useTemaPreferencia";
+import {usePerfilStore} from "@/stores/perfil";
 
 vi.mock("@/composables/usePerfil");
 vi.mock("@/composables/useTemaPreferencia");
@@ -243,7 +244,7 @@ describe("MainNavbar.vue", () => {
         expect(relatoriosLink).toBeUndefined();
     });
 
-    it("deve chamar router.push ao fazer logout", async () => {
+    it("deve navegar para login antes de encerrar a sessao no logout", async () => {
         vi.mocked(usePerfil).mockReturnValue({
             perfilSelecionado: ref("ADMIN"),
             unidadeSelecionada: ref("456"),
@@ -261,6 +262,7 @@ describe("MainNavbar.vue", () => {
             }
         });
         ctx.wrapper = mount(NavBar, options);
+        const perfilStore = usePerfilStore();
 
         const logoutNavItem = ctx.wrapper.find('[data-testid="btn-logout"]');
 
@@ -273,6 +275,10 @@ describe("MainNavbar.vue", () => {
         }
 
         expect(mockPush).toHaveBeenCalledWith("/login");
+        expect(perfilStore.logout).toHaveBeenCalledTimes(1);
+        expect(mockPush.mock.invocationCallOrder[0]).toBeLessThan(
+            vi.mocked(perfilStore.logout).mock.invocationCallOrder[0]
+        );
     });
 
     it("deve atualizar isMobile ao redimensionar a janela", () => {

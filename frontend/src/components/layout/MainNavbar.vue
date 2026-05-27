@@ -186,8 +186,8 @@ function alternarTema() {
 }
 
 async function handleLogout() {
-  await perfilStore.logout();
   await router.push("/login");
+  await perfilStore.logout();
 }
 </script>
 
