@@ -9,14 +9,17 @@ import {
     type ReenvioNotificacaoResponse,
 } from "@/services/notificacaoService";
 import {ehModoProducao} from "@/utils/ambiente";
+import {usePerfilStore} from "@/stores/perfil";
 
 export const CHAVE_QUERY_NOTIFICACOES_ADMIN = ["notificacoes-admin"] as const;
 export const CHAVE_QUERY_LEITOR_EMAIL_TESTES = ["leitor-email-testes"] as const;
 
 export function useNotificacoesAdminQuery() {
+    const perfilStore = usePerfilStore();
     const query = useQuery<Notificacao[]>({
         key: CHAVE_QUERY_NOTIFICACOES_ADMIN,
         query: () => listarNotificacoesAdmin(),
+        enabled: () => !!perfilStore.perfilSelecionado,
         staleTime: Infinity,
     });
 
@@ -29,10 +32,11 @@ export function useNotificacoesAdminQuery() {
 }
 
 export function useUrlLeitorEmailTestesQuery() {
+    const perfilStore = usePerfilStore();
     return useQuery<string | null>({
         key: CHAVE_QUERY_LEITOR_EMAIL_TESTES,
         query: () => buscarUrlLeitorEmailTestes(),
-        enabled: () => !ehModoProducao(),
+        enabled: () => !ehModoProducao() && !!perfilStore.perfilSelecionado,
         staleTime: Infinity,
     });
 }
