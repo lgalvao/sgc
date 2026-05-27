@@ -13,11 +13,14 @@ Reduzir a infraestrutura caseira no frontend do SGC em dois eixos:
 
 - `historico`, `painel`, `processo`, `notificacoes admin` e `feedbacks admin` migrados para query cache;
 - `configuracoes` migrado para query cache e mutation cache;
+- `unidade` migrado para query cache nas telas principais (`UnidadeView`, `UnidadesView` e fluxo de atribuição temporária);
+- `notificacoes admin` evoluído para usar query + mutation também para reenvio e URL do leitor de e-mails de teste;
 - remoção dos stores remotos manuais de `historico` e `processo`;
 - `painelStore` reduzido a estado local real;
 - invalidação por query consolidada nos domínios já migrados;
 - redução relevante da orquestração artificial em fluxos de processo, subprocesso, cadastro e mapa.
 - `organizacao` mantido fora de Colada por enquanto: a store é instanciada em contextos demais fora de `setup()`, e a migração limpa exigiria redesenho mais amplo dos consumidores.
+- a régua de lint estrutural foi restaurada após um desvio temporário que havia desligado regras de complexidade, tamanho e parâmetros.
 
 ### Diagnóstico novo
 
@@ -41,24 +44,26 @@ A auditoria foi endurecida. Ela não mede mais só vocabulário literal (`cache`
 
 Última medição registrada por `node etc/scripts/sgc.js frontend arquitetura auditar`:
 
-- score total: `1136` (`critico`);
+- score total: `984` (`critico`);
 - views com vazamento de estratégia de cache: `1`;
-- views com service direto: `12`;
-- views com fan-out alto: `10`;
+- views com service direto: `9`;
+- views com server state caseiro: `1`;
+- views com fan-out alto: `9`;
 - acessos diretos a cache de store: `0`;
-- booleanos posicionais: `0`;
-- bolsas largas de dependências/estado: `10`;
+- booleanos posicionais: `1`;
+- bolsas largas de dependências/estado: `9`;
 - superfícies exportadas amplas: `27`;
-- arquivos com mistura de camadas: `13`;
-- hubs centrais com sinais: `4`.
+- arquivos com mistura de camadas: `11`;
+- arquivos com server state caseiro: `2`;
+- hubs centrais com sinais: `2`.
 
 Hotspots prioritários desta baseline:
 
-1. `frontend/src/views/ProcessoCadastroView.vue`
-2. `frontend/src/composables/useInvalidacaoNavegacao.ts`
-3. `frontend/src/views/AtribuicaoTemporariaView.vue`
-4. `frontend/src/stores/perfil.ts`
-5. `frontend/src/views/processoDetalheAcoes.ts`
+1. `frontend/src/views/MapaView.vue`
+2. `frontend/src/composables/useProcessoCadastroTela.ts`
+3. `frontend/src/views/CadastroView.vue`
+4. `frontend/src/views/RelatorioMapasView.vue`
+5. `frontend/src/composables/useEstadoSubprocessoNavegacao.ts`
 
 ### Metas de progresso arquitetural
 
@@ -74,11 +79,35 @@ Curto prazo:
 Médio prazo:
 
 - manter `viewsComVazamentoCache` em `0` ou `1` até zerar;
-- levar `viewsComServiceDireto` de `12` para menos de `5`;
-- levar `viewsComFanoutAlto` de `10` para menos de `4`;
-- levar `arquivosComBolsaDependenciasLarga` de `10` para menos de `4`;
+- levar `viewsComServiceDireto` de `9` para menos de `5`;
+- levar `viewsComServerStateCaseiro` de `1` para `0`;
+- levar `viewsComFanoutAlto` de `9` para menos de `4`;
+- levar `arquivosComBolsaDependenciasLarga` de `9` para menos de `4`;
 - levar `arquivosComSuperficieAmpla` de `27` para menos de `10`;
-- reduzir `hubsCentraisComSinais` de `4` para `2` ou menos.
+- reduzir `hubsCentraisComSinais` de `2` para `1` ou menos.
+
+### Situação da régua
+
+As regras de lint estrutural (`complexity`, `max-params`, `max-depth`, `max-nested-callbacks`, `max-lines`,
+`max-lines-per-function`, `max-statements`) foram restauradas. Elas não devem ser desligadas novamente para “passar o
+gate”.
+
+Quando a régua acusar excesso, a ação esperada é uma destas:
+
+- simplificar o código;
+- quebrar a função/arquivo em contratos menores;
+- ou recalibrar explicitamente o limite com justificativa técnica.
+
+O estado atual do `quality:lint` ainda expõe warnings reais, principalmente em:
+
+- `MapaView` e fluxo de mapa;
+- `useProcessoCadastroTela`;
+- `CadastroView`;
+- `useAtribuicaoTemporariaTela`;
+- `useCadastroOrquestracao`;
+- `useFluxoMapa`;
+- `useBreadcrumbs`;
+- `stores/subprocesso/index.ts`.
 
 ### Padrão de emaranhamento observado
 
