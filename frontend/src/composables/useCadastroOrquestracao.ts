@@ -32,10 +32,11 @@ async function recarregarContextoInicial(
     subprocessoStore: ReturnType<typeof useSubprocessoStore>,
 ) {
     return typeof props.codSubprocesso === "number"
-        ? await subprocessoStore.recarregarContextoCadastroAtividades(props.codSubprocesso)
-        : await subprocessoStore.recarregarContextoCadastroAtividadesPorProcessoEUnidade(
+        ? await subprocessoStore.obterContextoCadastroAtividades(props.codSubprocesso, {forcar: true})
+        : await subprocessoStore.obterContextoCadastroAtividadesPorProcessoEUnidade(
             Number(props.codProcesso),
             props.sigla,
+            {forcar: true},
         );
 }
 

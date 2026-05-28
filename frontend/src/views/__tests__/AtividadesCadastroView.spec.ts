@@ -136,8 +136,6 @@ type SubprocessoStoreMock = {
     buscarContextoCadastroAtividades: ReturnType<typeof vi.fn>;
     obterContextoCadastroAtividadesPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     obterContextoCadastroAtividades: ReturnType<typeof vi.fn>;
-    recarregarContextoCadastroAtividadesPorProcessoEUnidade: ReturnType<typeof vi.fn>;
-    recarregarContextoCadastroAtividades: ReturnType<typeof vi.fn>;
     buscarContextoEdicaoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
     buscarContextoEdicao: ReturnType<typeof vi.fn>;
     buscarSubprocessoPorProcessoEUnidade: ReturnType<typeof vi.fn>;
@@ -221,8 +219,6 @@ const subprocessosMock = reactive({
     buscarContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
     obterContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
     obterContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
-    recarregarContextoCadastroAtividadesPorProcessoEUnidade: buscarContextoCadastroAtividadesPorProcessoEUnidadeMock,
-    recarregarContextoCadastroAtividades: buscarContextoCadastroAtividadesMock,
     buscarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     buscarContextoEdicao: vi.fn(),
     buscarSubprocessoPorProcessoEUnidade: vi.fn(),
@@ -449,8 +445,6 @@ describe("CadastroView.vue", () => {
         subprocessosMock.marcarContextoEdicaoParaAtualizacao = vi.fn();
         subprocessosMock.obterContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(criarContextoEdicao());
         subprocessosMock.obterContextoCadastroAtividades.mockResolvedValue(criarContextoEdicao());
-        subprocessosMock.recarregarContextoCadastroAtividadesPorProcessoEUnidade.mockResolvedValue(criarContextoEdicao());
-        subprocessosMock.recarregarContextoCadastroAtividades.mockResolvedValue(criarContextoEdicao());
         vi.mocked(useFluxoSubprocessoModule.useFluxoSubprocesso).mockReturnValue({
             ultimoErro: ref(null),
             limparErro: vi.fn(),

@@ -8,9 +8,7 @@ import logger from "@/utils/logger";
 
 const storeMock = {
     obterContextoCadastroAtividades: vi.fn(),
-    recarregarContextoCadastroAtividades: vi.fn(),
     obterContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
-    recarregarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     atualizarStatusLocal: vi.fn(),
     dadosCadastroValidos: vi.fn(),
     erroIntegracaoContexto: null as {codigo?: string} | null,
@@ -158,7 +156,7 @@ describe("useCadastroOrquestracao", () => {
                 storeMock.erroIntegracaoContexto = {codigo: "REQUEST_CANCELADA"};
                 return null;
             });
-        vi.mocked(storeMock.recarregarContextoCadastroAtividadesPorProcessoEUnidade)
+        vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade)
             .mockImplementationOnce(async () => {
                 storeMock.erroIntegracaoContexto = null;
                 return {
@@ -174,7 +172,7 @@ describe("useCadastroOrquestracao", () => {
         expect(success).toBe(true);
         expect(codigoSubprocesso.value).toBe(123);
         expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U");
-        expect(storeMock.recarregarContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U");
+        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(2, 1, "U", {forcar: true});
         expect(loggerSpy).not.toHaveBeenCalled();
     });
 

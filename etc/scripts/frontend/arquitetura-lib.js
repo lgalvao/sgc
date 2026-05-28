@@ -25,7 +25,6 @@ const NOMES_COORDENACAO_SERVER_STATE_CASEIRO = /^(garantirDados|dados[A-Z].*Vali
 const CHAMADAS_COLADA_QUERY = new Set(["useQuery", "useMutation", "useInfiniteQuery"]);
 const CHAMADAS_COLADA_CACHE = new Set(["useQueryCache"]);
 const PADROES = {
-    palavraForcar: /\bforcar\b/g,
     palavraStale: /\bstale\b/g,
     palavraSnapshot: /\bsnapshot\b/g,
 };
@@ -335,7 +334,6 @@ function computarSinaisLexicais(sourceFile, conteudoOriginal) {
         metodoEmCache,
         invalidacaoExplicita,
         booleanoPosicional,
-        palavraForcar: contarOcorrencias(conteudoOriginal, PADROES.palavraForcar),
         palavraStale: contarOcorrencias(conteudoOriginal, PADROES.palavraStale),
         palavraSnapshot: contarOcorrencias(conteudoOriginal, PADROES.palavraSnapshot),
     };
@@ -532,7 +530,6 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
     total += (sinaisLexicais.acessoDiretoCache * 8)
         + (sinaisLexicais.metodoEmCache * 6)
         + (sinaisLexicais.booleanoPosicional * 4)
-        + (sinaisLexicais.palavraForcar * 3)
         + (sinaisLexicais.palavraStale * 3)
         + (sinaisLexicais.palavraSnapshot * 2);
 
@@ -638,7 +635,6 @@ function criarMetricasResumo() {
         metodosEmCache: 0,
         invalidacoesExplicitasEmViews: 0,
         booleanosPosicionais: 0,
-        ocorrenciasForcar: 0,
         ocorrenciasStale: 0,
         ocorrenciasSnapshot: 0,
         arquivosComBolsaDependenciasLarga: 0,
@@ -706,7 +702,6 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             metodoEmCache: 0,
             invalidacaoExplicita: 0,
             booleanoPosicional: 0,
-            palavraForcar: contarOcorrencias(conteudo, PADROES.palavraForcar),
             palavraStale: contarOcorrencias(conteudo, PADROES.palavraStale),
             palavraSnapshot: contarOcorrencias(conteudo, PADROES.palavraSnapshot),
         };
@@ -745,7 +740,6 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             metricas.invalidacoesExplicitasEmViews += sinaisLexicais.invalidacaoExplicita;
         }
         metricas.booleanosPosicionais += sinaisLexicais.booleanoPosicional;
-        metricas.ocorrenciasForcar += sinaisLexicais.palavraForcar;
         metricas.ocorrenciasStale += sinaisLexicais.palavraStale;
         metricas.ocorrenciasSnapshot += sinaisLexicais.palavraSnapshot;
         metricas.chamadasEstrategiaCache += analiseAst.chamadasEstrategiaCache;

@@ -1,6 +1,6 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-28T15:00:52.734Z",
+  "geradoEm": "2026-05-28T15:29:57.800Z",
   "resumo": {
     "arquivosProducao": 265,
     "scoreTotal": 35,
@@ -14,7 +14,6 @@
       "metodosEmCache": 0,
       "invalidacoesExplicitasEmViews": 0,
       "booleanosPosicionais": 0,
-      "ocorrenciasForcar": 0,
       "ocorrenciasStale": 0,
       "ocorrenciasSnapshot": 0,
       "arquivosComBolsaDependenciasLarga": 0,
@@ -32,14 +31,13 @@
     {
       "arquivo": "frontend/src/stores/subprocesso/index.ts",
       "camada": "store",
-      "linhas": 158,
+      "linhas": 137,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
         "metodoEmCache": 0,
         "invalidacaoExplicita": 0,
         "booleanoPosicional": 0,
-        "palavraForcar": 0,
         "palavraStale": 0,
         "palavraSnapshot": 0
       },
@@ -51,7 +49,7 @@
         "chamadasColadaQuery": 0,
         "chamadasColadaCache": 0,
         "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 6,
+        "coordenacaoServerStateCaseiro": 2,
         "mapasPromessasDedupe": 0,
         "bolsasDependenciasLargas": 0,
         "superficieExportadaAmpla": 1,
@@ -73,7 +71,6 @@
         "metodoEmCache": 0,
         "invalidacaoExplicita": 0,
         "booleanoPosicional": 0,
-        "palavraForcar": 0,
         "palavraStale": 0,
         "palavraSnapshot": 0
       },
@@ -100,14 +97,13 @@
     {
       "arquivo": "frontend/src/composables/useBuscadorUsuarios.ts",
       "camada": "composable",
-      "linhas": 124,
+      "linhas": 123,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
         "metodoEmCache": 0,
         "invalidacaoExplicita": 0,
         "booleanoPosicional": 0,
-        "palavraForcar": 0,
         "palavraStale": 0,
         "palavraSnapshot": 0
       },
@@ -141,7 +137,6 @@
         "metodoEmCache": 0,
         "invalidacaoExplicita": 0,
         "booleanoPosicional": 0,
-        "palavraForcar": 0,
         "palavraStale": 0,
         "palavraSnapshot": 0
       },

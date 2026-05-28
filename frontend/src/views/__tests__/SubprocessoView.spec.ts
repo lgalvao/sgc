@@ -97,9 +97,7 @@ const subprocessoStoreMock = reactive({
     contextoEdicao: null as { detalhes: SubprocessoDetalheMock } | null,
     erroIntegracaoContexto: null as { message: string; details?: string } | null,
     obterContextoEdicaoPorProcessoEUnidade: vi.fn(),
-    recarregarContextoEdicaoPorProcessoEUnidade: vi.fn(),
     obterContextoEdicao: vi.fn(),
-    recarregarContextoEdicao: vi.fn(),
     dadosEdicaoValidos: vi.fn(),
     invalidar: vi.fn(),
     limparErroIntegracao: vi.fn(),
@@ -208,20 +206,7 @@ describe('SubprocessoView.vue', () => {
                 }
             };
         });
-        subprocessoStoreMock.recarregarContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
-            subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
-            return {
-                codigo: 10,
-                contexto: {
-                    detalhes: mockSubprocesso,
-                }
-            };
-        });
         subprocessoStoreMock.obterContextoEdicao = vi.fn().mockImplementation(async () => {
-            subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
-            return {detalhes: mockSubprocesso};
-        });
-        subprocessoStoreMock.recarregarContextoEdicao = vi.fn().mockImplementation(async () => {
             subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
             return {detalhes: mockSubprocesso};
         });
@@ -272,14 +257,7 @@ describe('SubprocessoView.vue', () => {
                 }
             };
         });
-        subprocessoStoreMock.recarregarContextoEdicaoPorProcessoEUnidade.mockResolvedValue({
-            codigo: subprocessoToUse.codigo,
-            contexto: {
-                detalhes: subprocessoToUse,
-            }
-        });
         subprocessoStoreMock.obterContextoEdicao.mockResolvedValue({detalhes: subprocessoToUse});
-        subprocessoStoreMock.recarregarContextoEdicao.mockResolvedValue({detalhes: subprocessoToUse});
 
         const wrapper = mount(SubprocessoView, {
             global: {
@@ -308,7 +286,7 @@ describe('SubprocessoView.vue', () => {
         mountComponent();
         await flushPromises();
 
-        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {forcar: false});
     });
 
     it('recarrega dados ao reativar a view em keepAlive', async () => {
@@ -322,7 +300,7 @@ describe('SubprocessoView.vue', () => {
             await hook.call(wrapper.vm);
         }
         await flushPromises();
-        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST');
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {forcar: false});
     });
 
     it('não recarrega ao reativar quando o contexto atual ainda é válido', async () => {

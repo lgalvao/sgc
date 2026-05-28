@@ -117,7 +117,6 @@ export function useBuscadorUsuarios(
         aoAlterarTermo,
         selecionarUsuario,
         agendarOcultacao,
-        limparResultados,
         calcularProximoIndice,
     };
 }

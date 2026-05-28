@@ -113,7 +113,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
         estado.loadingLembrete.value = true;
         try {
             await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
-            await subprocessoStore.recarregarContextoEdicao(dependencias.codigoSubprocesso.value!);
+            await subprocessoStore.obterContextoEdicao(dependencias.codigoSubprocesso.value!, {forcar: true});
             estado.modalLembreteAberto.value = false;
             toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
             dependencias.exibirToastPendente();

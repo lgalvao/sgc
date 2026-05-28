@@ -32,8 +32,8 @@ vi.mock("@/composables/useErrorHandler", () => ({
 }));
 
 const subprocessoStoreMock = {
-    recarregarContextoCadastroAtividades: vi.fn(),
-    recarregarContextoEdicao: vi.fn(),
+    obterContextoCadastroAtividades: vi.fn(),
+    obterContextoEdicao: vi.fn(),
     limparContextoAtual: vi.fn()
 };
 
@@ -66,8 +66,8 @@ vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
 describe("useFluxoSubprocesso", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        subprocessoStoreMock.recarregarContextoCadastroAtividades.mockReset();
-        subprocessoStoreMock.recarregarContextoEdicao.mockReset();
+        subprocessoStoreMock.obterContextoCadastroAtividades.mockReset();
+        subprocessoStoreMock.obterContextoEdicao.mockReset();
         subprocessoStoreMock.limparContextoAtual.mockReset();
         atualizarFluxoMapaMock.mockReset();
     });
@@ -102,7 +102,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.iniciarRevisaoCadastro).toHaveBeenCalledWith(123);
-        expect(subprocessoStoreMock.recarregarContextoCadastroAtividades).toHaveBeenCalledWith(123);
+        expect(subprocessoStoreMock.obterContextoCadastroAtividades).toHaveBeenCalledWith(123, {forcar: true});
     });
 
     it("deve cancelar início de revisão", async () => {
@@ -113,7 +113,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.cancelarInicioRevisaoCadastro).toHaveBeenCalledWith(123);
-        expect(subprocessoStoreMock.recarregarContextoCadastroAtividades).toHaveBeenCalledWith(123);
+        expect(subprocessoStoreMock.obterContextoCadastroAtividades).toHaveBeenCalledWith(123, {forcar: true});
     });
 
     it("deve devolver cadastro", async () => {
@@ -183,7 +183,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(subprocessoService.reabrirCadastro).toHaveBeenCalledWith(123, "justificativa");
-        expect(subprocessoStoreMock.recarregarContextoEdicao).toHaveBeenCalledWith(123);
+        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(123, {forcar: true});
     });
 
     it("deve lidar com erro na ação de workflow", async () => {

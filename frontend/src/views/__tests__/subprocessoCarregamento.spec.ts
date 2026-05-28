@@ -6,9 +6,7 @@ import {useSubprocessoCarregamento} from '../subprocessoCarregamento'
 const subprocessoStoreMock = {
     erroIntegracaoContexto: null as unknown,
     obterContextoEdicao: vi.fn().mockResolvedValue(null),
-    recarregarContextoEdicao: vi.fn().mockResolvedValue(null),
     obterContextoEdicaoPorProcessoEUnidade: vi.fn().mockResolvedValue(null),
-    recarregarContextoEdicaoPorProcessoEUnidade: vi.fn().mockResolvedValue(null),
     dadosEdicaoValidos: vi.fn().mockReturnValue(false),
 }
 
@@ -20,9 +18,7 @@ describe('subprocessoCarregamento.ts', () => {
     beforeEach(() => {
         subprocessoStoreMock.erroIntegracaoContexto = null
         subprocessoStoreMock.obterContextoEdicao = vi.fn().mockResolvedValue(null)
-        subprocessoStoreMock.recarregarContextoEdicao = vi.fn().mockResolvedValue(null)
         subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade = vi.fn().mockResolvedValue(null)
-        subprocessoStoreMock.recarregarContextoEdicaoPorProcessoEUnidade = vi.fn().mockResolvedValue(null)
         subprocessoStoreMock.dadosEdicaoValidos = vi.fn().mockReturnValue(false)
         vi.useFakeTimers()
     })
@@ -57,7 +53,7 @@ describe('subprocessoCarregamento.ts', () => {
         await flushPromises()
 
         expect(deps.exibirToastPendente).toHaveBeenCalled()
-        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(456)
+        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(456, {forcar: false})
         expect(wrapper.vm.codigoSubprocesso).toBe(456)
         expect(wrapper.vm.erroNaoEncontrado).toBe(false)
     })
@@ -69,7 +65,7 @@ describe('subprocessoCarregamento.ts', () => {
         const wrapper = mount(TestComponent(deps))
         await flushPromises()
 
-        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST')
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {forcar: false})
         expect(wrapper.vm.codigoSubprocesso).toBe(789)
     })
 
@@ -91,16 +87,17 @@ describe('subprocessoCarregamento.ts', () => {
         await flushPromises()
 
         await wrapper.vm.atualizarSubprocessoAtual()
-        expect(subprocessoStoreMock.recarregarContextoEdicao).toHaveBeenCalledWith(123)
+        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(123, {forcar: true})
     })
 
     it('deve observar mudanças nas dependências', async () => {
-        subprocessoStoreMock.recarregarContextoEdicaoPorProcessoEUnidade = vi.fn().mockResolvedValue({codigo: 111})
+        subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade = vi.fn().mockResolvedValue({codigo: 111})
         const deps = criarDependencias()
         const wrapper = mount(TestComponent(deps))
         await flushPromises()
 
         await wrapper.vm.carregarSubprocesso(true)
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenLastCalledWith(1, 'TEST', {forcar: true})
         expect(wrapper.vm.codigoSubprocesso).toBe(111)
     })
 
@@ -115,7 +112,7 @@ describe('subprocessoCarregamento.ts', () => {
 
         // @ts-expect-error - Acessando hook privado do vue para simular ativação
         await wrapper.vm.$.a?.[0]()
-        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST')
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {forcar: false})
     })
 
     it('não deve recarregar no onActivated quando o contexto atual ainda for válido', async () => {

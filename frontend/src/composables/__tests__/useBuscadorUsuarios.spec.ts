@@ -132,15 +132,18 @@ describe('useBuscadorUsuarios.ts', () => {
         expect(vm.usuariosEncontrados).toEqual([]);
     });
 
-    it('limparResultados early returns if already clean', () => {
+    it('aoAlterarTermo mantém estado limpo quando o termo fica vazio', () => {
         const wrapper = mount(TestComponent, { props: { termo: '', selecionado: null } });
         const vm = wrapper.vm as any;
         vm.usuariosEncontrados = [];
         vm.mostrarResultadosUsuarios = false;
         vm.pesquisandoUsuarios = false;
-        
-        vm.limparResultados();
-        // Should return early
+
+        vm.aoAlterarTermo('');
+
+        expect(vm.usuariosEncontrados).toEqual([]);
+        expect(vm.mostrarResultadosUsuarios).toBe(false);
+        expect(vm.pesquisandoUsuarios).toBe(false);
     });
 
     it('watch termo clears results if empty', async () => {
