@@ -24,6 +24,6 @@ public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, 
         WHERE a.diagnostico.codigo = :diagnosticoCodigo 
         AND a.servidor.tituloEleitoral = :servidorTitulo
     """)
-    List<AvaliacaoServidor> buascarAvaliacoesDoServidor(@Param("diagnosticoCodigo") long diagnosticoCodigo,
+    List<AvaliacaoServidor> buscarAvaliacoesDoServidor(@Param("diagnosticoCodigo") long diagnosticoCodigo,
                                                         @Param("servidorTitulo") String servidorTitulo);
 }
