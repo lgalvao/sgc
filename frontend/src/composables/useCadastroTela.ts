@@ -13,17 +13,19 @@ import {useCadastroRevisaoSemMudancas} from "@/composables/useCadastroRevisaoSem
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
 import {useCadastroAnaliseFluxo} from "@/views/cadastroAnaliseFluxo";
-import {useCadastroDisponibilizacao} from "@/views/cadastroDisponibilizacao";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import {
     type Atividade,
     type AtividadeOperacaoResponse,
+    type ErroValidacao,
     Perfil,
     type PermissoesSubprocesso,
+    SituacaoSubprocesso,
     TipoProcesso
 } from "@/types/tipos";
-import {calcularAssinaturaCadastro} from "@/utils/formatters";
+import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/formatters";
 import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
+import {normalizarErro} from "@/utils/apiError";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
 import {extrairTextoPlanoHtml} from "@/utils/textoFormatado";
@@ -113,6 +115,45 @@ export function useCadastroTela(props: CadastroTelaProps) {
     });
 
     const {executarComTratamentoDeErros, ultimoErro} = useErrorHandler();
+
+    const loadingValidacao = ref(false);
+    const loadingDisponibilizacao = ref(false);
+    const errosValidacao = ref<ErroValidacao[]>([]);
+    const erroGlobal = ref<string | null>(null);
+    const erroTick = ref(0);
+
+    const mapaErros = computed(() => {
+        const mapa = new Map<number, string>();
+        for (const erro of errosValidacao.value) {
+            if (!erro.atividadeCodigo) continue;
+            const atividade = atividades.value.find((item) => item.codigo === erro.atividadeCodigo);
+            if (!atividade?.conhecimentos || atividade.conhecimentos.length === 0) {
+                mapa.set(erro.atividadeCodigo, erro.mensagem);
+            }
+        }
+        return mapa;
+    });
+
+    function limparErrosValidacao() {
+        errosValidacao.value = [];
+        erroGlobal.value = null;
+    }
+
+    function definirErroGlobal(mensagem: string) {
+        limparErrosValidacao();
+        erroGlobal.value = mensagem;
+    }
+
+    function aplicarErrosValidacao(erros: ErroValidacao[]) {
+        limparErrosValidacao();
+        erroTick.value++;
+        errosValidacao.value = erros;
+        erroGlobal.value = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
+    }
+
+    function obterErroParaAtividade(atividadeCodigo: number) {
+        return mapaErros.value.get(atividadeCodigo);
+    }
 
     const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
 
@@ -206,29 +247,60 @@ export function useCadastroTela(props: CadastroTelaProps) {
         }
     }
 
-    const {
-        erroGlobal,
-        erroTick,
-        errosValidacao,
-        loadingValidacao,
-        loadingDisponibilizacao,
-        limparErrosValidacao,
-        disponibilizarCadastro,
-        confirmarDisponibilizacao,
-        obterErroParaAtividade,
-    } = useCadastroDisponibilizacao({
-        atividades,
-        codigoSubprocesso,
-        situacaoAtual,
-        isRevisao,
-        houveAlteracaoCadastro,
-        disponibilizacaoSemMudancas,
-        mostrarModalConfirmacao,
-        scrollParaPrimeiroErro,
-        validarCadastro: fluxoSubprocesso.validarCadastro,
-        disponibilizarCadastroFluxo: fluxoSubprocesso.disponibilizarCadastro,
-        disponibilizarRevisaoCadastroFluxo: fluxoSubprocesso.disponibilizarRevisaoCadastro,
-    });
+    async function disponibilizarCadastro() {
+        if (loadingValidacao.value) return;
+
+        limparErrosValidacao();
+        const validacaoLocal = _validarLocalmente(
+            atividades,
+            isRevisao,
+            houveAlteracaoCadastro,
+            disponibilizacaoSemMudancas,
+            situacaoAtual,
+        );
+
+        if (validacaoLocal.tipo === "erro-validacao") {
+            aplicarErrosValidacao(validacaoLocal.erros);
+            await nextTick();
+            return;
+        }
+        if (validacaoLocal.tipo === "acao-nao-permitida") {
+            definirErroGlobal(validacaoLocal.mensagem);
+            return;
+        }
+
+        loadingValidacao.value = true;
+        try {
+            const resultado = await fluxoSubprocesso.validarCadastro(codigoSubprocesso.value!);
+            if (resultado.valido) {
+                mostrarModalConfirmacao.value = true;
+                return;
+            }
+            aplicarErrosValidacao(resultado.erros);
+            await nextTick();
+            scrollParaPrimeiroErro();
+        } catch (error) {
+            definirErroGlobal(normalizarErro(error).mensagem);
+        } finally {
+            loadingValidacao.value = false;
+        }
+    }
+
+    async function confirmarDisponibilizacao() {
+        if (loadingDisponibilizacao.value) return;
+
+        loadingDisponibilizacao.value = true;
+        try {
+            if (isRevisao.value) {
+                await fluxoSubprocesso.disponibilizarRevisaoCadastro(codigoSubprocesso.value!);
+            } else {
+                await fluxoSubprocesso.disponibilizarCadastro(codigoSubprocesso.value!);
+            }
+        } finally {
+            loadingDisponibilizacao.value = false;
+        }
+        mostrarModalConfirmacao.value = false;
+    }
 
     const erroGlobalFormatado = computed(() =>
         erroGlobal.value ? {mensagem: erroGlobal.value} : null
@@ -382,4 +454,40 @@ export function useCadastroTela(props: CadastroTelaProps) {
         podeEditarCadastro,
         esconderEdicaoCadastroParaChefe
     };
+}
+
+type _ResultadoValidacaoLocal =
+    | {tipo: "pode-validar"}
+    | {tipo: "erro-validacao"; erros: ErroValidacao[]}
+    | {tipo: "acao-nao-permitida"; mensagem: string};
+
+function _validarLocalmente(
+    atividades: {value: Atividade[]},
+    isRevisao: {value: boolean},
+    houveAlteracaoCadastro: {value: boolean},
+    disponibilizacaoSemMudancas: {value: boolean},
+    situacaoAtual: {value: SituacaoSubprocesso | string | undefined}
+): _ResultadoValidacaoLocal {
+    const cadastroIncompleto = atividades.value.length === 0
+        || atividades.value.some((atividade) => !atividade.conhecimentos || atividade.conhecimentos.length === 0);
+
+    if (cadastroIncompleto) {
+        return {tipo: "erro-validacao", erros: [{tipo: "PRE_VALIDACAO", mensagem: TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO}]};
+    }
+    if (isRevisao.value && !houveAlteracaoCadastro.value && !disponibilizacaoSemMudancas.value) {
+        return {tipo: "erro-validacao", erros: [{tipo: "PRE_VALIDACAO", mensagem: TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO}]};
+    }
+
+    const situacaoReferencia = isRevisao.value
+        ? SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO
+        : SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO;
+
+    if (situacaoAtual.value !== situacaoReferencia) {
+        return {
+            tipo: "acao-nao-permitida",
+            mensagem: TEXTOS.comum.ACAO_NAO_PERMITIDA_SITUACAO(formatSituacaoSubprocesso(situacaoReferencia))
+        };
+    }
+
+    return {tipo: "pode-validar"};
 }

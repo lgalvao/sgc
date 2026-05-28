@@ -1,15 +1,15 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-28T00:34:04.738Z",
+  "geradoEm": "2026-05-28T01:30:15.216Z",
   "resumo": {
-    "arquivosProducao": 262,
-    "scoreTotal": 524,
+    "arquivosProducao": 264,
+    "scoreTotal": 348,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 0,
-      "viewsComServiceDireto": 4,
-      "viewsComServerStateCaseiro": 1,
-      "viewsComFanoutAlto": 1,
+      "viewsComServiceDireto": 1,
+      "viewsComServerStateCaseiro": 0,
+      "viewsComFanoutAlto": 0,
       "acessosDiretosCache": 0,
       "metodosEmCache": 0,
       "invalidacoesExplicitasEmViews": 0,
@@ -17,296 +17,18 @@
       "ocorrenciasForcar": 0,
       "ocorrenciasStale": 0,
       "ocorrenciasSnapshot": 0,
-      "arquivosComBolsaDependenciasLarga": 9,
-      "arquivosComSuperficieAmpla": 25,
-      "arquivosComMisturaCamadas": 1,
-      "arquivosComServerStateCaseiro": 2,
+      "arquivosComBolsaDependenciasLarga": 8,
+      "arquivosComSuperficieAmpla": 23,
+      "arquivosComMisturaCamadas": 0,
+      "arquivosComServerStateCaseiro": 1,
       "arquivosComAcoplamentoStoreAlto": 0,
-      "arquivosComServiceDireto": 36,
-      "chamadasEstrategiaCache": 20,
-      "chamadasInvalidacao": 17,
-      "hubsCentraisComSinais": 1
+      "arquivosComServiceDireto": 35,
+      "chamadasEstrategiaCache": 19,
+      "chamadasInvalidacao": 16,
+      "hubsCentraisComSinais": 2
     }
   },
   "hotspots": [
-    {
-      "arquivo": "frontend/src/views/AdministradoresView.vue",
-      "camada": "view",
-      "linhas": 251,
-      "score": 30,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 3,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 4
-      },
-      "sinaisAtivos": [
-        "serviceDireto"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/FeedbacksAdminView.vue",
-      "camada": "view",
-      "linhas": 240,
-      "score": 28,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 2,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 2
-      },
-      "sinaisAtivos": [
-        "serviceDireto",
-        "serverStateCaseiro"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/cadastroDisponibilizacao.ts",
-      "camada": "composable",
-      "linhas": 198,
-      "score": 27,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 2,
-        "categoriasAcoplamento": 0,
-        "importacoesArquiteturais": 0
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/components/atividades/ImportarAtividadesModal.vue",
-      "camada": "component",
-      "linhas": 405,
-      "score": 24,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 4,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 4
-      },
-      "sinaisAtivos": [
-        "serviceDireto"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useFluxoSubprocessoExecucao.ts",
-      "camada": "composable",
-      "linhas": 86,
-      "score": 22,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 3,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 2,
-        "chamadasInvalidacao": 2,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 1,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 4
-      },
-      "sinaisAtivos": [
-        "estrategiaCache",
-        "invalidacaoArquitetural"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useCadastroOrquestracao.ts",
-      "camada": "composable",
-      "linhas": 142,
-      "score": 21,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 1,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 3,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 2,
-        "chamadasInvalidacao": 1,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 1,
-        "coordenacaoServerStateCaseiro": 3,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita",
-        "estrategiaCache",
-        "invalidacaoArquitetural"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/RelatorioAndamentoView.vue",
-      "camada": "view",
-      "linhas": 111,
-      "score": 20,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 4,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 1,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 3,
-        "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
-        "serviceDireto",
-        "misturaCamadas"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/usePerfil.ts",
-      "camada": "composable",
-      "linhas": 38,
-      "score": 20,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 12,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
     {
       "arquivo": "frontend/src/composables/useMapas.ts",
       "camada": "composable",
@@ -655,6 +377,38 @@
       "hubCentral": false
     },
     {
+      "arquivo": "frontend/src/composables/usePerfil.ts",
+      "camada": "composable",
+      "linhas": 38,
+      "score": 11,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 12,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 1,
+        "importacoesArquiteturais": 1
+      },
+      "sinaisAtivos": [],
+      "hubCentral": false
+    },
+    {
       "arquivo": "frontend/src/views/LimpezaProcessosView.vue",
       "camada": "view",
       "linhas": 128,
@@ -687,6 +441,40 @@
         "serviceDireto"
       ],
       "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useInvalidacaoNavegacao.ts",
+      "camada": "composable",
+      "linhas": 100,
+      "score": 9,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 12,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 16,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 16,
+        "chamadasInvalidacao": 16,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 1,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 7
+      },
+      "sinaisAtivos": [
+        "superficieAmpla"
+      ],
+      "hubCentral": true
     },
     {
       "arquivo": "frontend/src/stores/subprocesso/index.ts",
@@ -988,7 +776,7 @@
         "chamadasInvalidacao": 0,
         "chamadasColadaQuery": 2,
         "chamadasColadaCache": 1,
-        "estadosAssincronosManuais": 1,
+        "estadosAssincronosManuais": 0,
         "coordenacaoServerStateCaseiro": 0,
         "mapasPromessasDedupe": 0,
         "bolsasDependenciasLargas": 0,
@@ -998,40 +786,6 @@
       },
       "sinaisAtivos": [
         "serviceDireto",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useFeedback.ts",
-      "camada": "composable",
-      "linhas": 116,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -1236,6 +990,40 @@
         "importacoesArquiteturais": 4
       },
       "sinaisAtivos": [],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useCadastroOrquestracao.ts",
+      "camada": "composable",
+      "linhas": 138,
+      "score": 5,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 2,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 1,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 1,
+        "coordenacaoServerStateCaseiro": 3,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "estrategiaCache"
+      ],
       "hubCentral": false
     },
     {

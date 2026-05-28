@@ -1,11 +1,21 @@
-import {describe, expect, it} from "vitest";
+import {describe, expect, it, vi} from "vitest";
 import {
   formatarMetadados,
   formatarTipo,
   obterIconeTipo,
+  obterUrlScreenshot,
   obterVarianteTipo,
   resumirNota
 } from "../feedbacksAdminApresentacao";
+
+vi.mock("@/axios-setup", () => ({
+  default: {
+    get: vi.fn(),
+    defaults: {
+      baseURL: "http://localhost:8080/api"
+    }
+  }
+}));
 
 describe("feedbacksAdminApresentacao", () => {
   describe("formatarTipo", () => {
@@ -140,6 +150,21 @@ describe("feedbacksAdminApresentacao", () => {
       const metadata = {dataInvalida: "2026-13-45T25:61:00Z"};
       const formatado = formatarMetadados(JSON.stringify(metadata));
       expect(formatado["DataInvalida"]).toBe("Data inválida");
+    });
+  });
+
+  describe("obterUrlScreenshot", () => {
+    it("deve construir a URL corretamente", () => {
+      expect(obterUrlScreenshot("abc")).toBe("http://localhost:8080/api/feedback/abc/screenshot");
+    });
+
+    it("deve lidar com baseURL com slash ou vazio", async () => {
+      const apiClient = (await import("@/axios-setup")).default;
+      apiClient.defaults.baseURL = "http://api.teste/";
+      expect(obterUrlScreenshot("x")).toBe("http://api.teste/feedback/x/screenshot");
+
+      apiClient.defaults.baseURL = "";
+      expect(obterUrlScreenshot("y")).toBe("/api/feedback/y/screenshot");
     });
   });
 });

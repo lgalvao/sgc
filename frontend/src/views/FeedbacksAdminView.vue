@@ -174,12 +174,13 @@ import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {useFeedbacksAdminQuery} from "@/composables/useFeedbacksAdminQuery";
 import {TEXTOS} from "@/constants/textos";
-import {type FeedbackAdmin, obterUrlScreenshot} from "@/services/feedbackAdminService";
+import type {FeedbackAdmin} from "@/services/feedbackAdminService";
 import {formatarDataHoraBR} from "@/utils";
 import {
   formatarMetadados,
   formatarTipo,
   obterIconeTipo,
+  obterUrlScreenshot,
   obterVarianteTipo,
   resumirNota
 } from "@/views/feedbacksAdminApresentacao";

@@ -2,15 +2,16 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {flushPromises, mount} from '@vue/test-utils';
 import {ref} from 'vue';
 import RelatorioAndamentoView from '@/views/RelatorioAndamentoView.vue';
-import * as painelService from '@/services/painelService';
 import {TEXTOS_RELATORIOS} from '@/constants/textos-relatorios';
 
 const buscarRelatorioAndamento = vi.fn().mockResolvedValue(undefined);
 const exportarAndamentoPdf = vi.fn().mockResolvedValue(undefined);
 const limparRelatorio = vi.fn();
 const notify = vi.fn();
+const carregarProcessos = vi.fn().mockResolvedValue(undefined);
 
 const relatorioAndamento = ref<any[]>([]);
+const processosDisponiveis = ref<any[]>([{codigo: 1, descricao: 'Processo 1'}]);
 
 vi.mock('@/stores/relatorios', () => ({
     useRelatoriosStore: () => ({
@@ -23,9 +24,10 @@ vi.mock('@/stores/relatorios', () => ({
     })
 }));
 
-vi.mock('@/services/painelService', () => ({
-    listarProcessos: vi.fn().mockResolvedValue({
-        content: [{codigo: 1, descricao: 'Processo 1'}]
+vi.mock('@/composables/useRelatorioAndamentoTela', () => ({
+    useRelatorioAndamentoTela: () => ({
+        get processosDisponiveis() { return processosDisponiveis; },
+        carregarProcessos,
     })
 }));
 
@@ -58,6 +60,7 @@ describe('RelatorioAndamentoView', () => {
         vi.clearAllMocks();
         buscarRelatorioAndamento.mockResolvedValue(undefined);
         exportarAndamentoPdf.mockResolvedValue(undefined);
+        carregarProcessos.mockResolvedValue(undefined);
         relatorioAndamento.value = [{
             siglaUnidade: 'U1',
             nomeUnidade: 'Unidade 1',
@@ -71,9 +74,6 @@ describe('RelatorioAndamentoView', () => {
             responsavel: 'Responsavel 1',
             titular: 'Responsavel 1',
         }];
-        vi.mocked(painelService.listarProcessos).mockResolvedValue({
-            content: [{codigo: 1, descricao: 'Processo 1'}]
-        } as any);
     });
 
     it('deve exibir cards com informações formatadas do relatório', async () => {
@@ -98,10 +98,11 @@ describe('RelatorioAndamentoView', () => {
     });
 
     it('cobre falha em carregarProcessos', async () => {
-        vi.mocked(painelService.listarProcessos).mockRejectedValue(new Error("Erro simulado"));
+        carregarProcessos.mockRejectedValueOnce(new Error("Erro simulado"));
         mount(RelatorioAndamentoView, {global: {stubs}});
         await flushPromises();
-        expect(notify).toHaveBeenCalledWith("Erro ao carregar processos", "danger");
+        // O erro é tratado dentro do composable; apenas verificamos que carregarProcessos foi chamado
+        expect(carregarProcessos).toHaveBeenCalled();
     });
 
     it('cobre gerarRelatorio com e sem erro', async () => {

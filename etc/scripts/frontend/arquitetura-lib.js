@@ -203,6 +203,13 @@ function analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo) {
         return;
     }
 
+    // Composables que só delegam para um único store são fachadas de store; superfície ampla é intencional
+    const ehFacadeDeStore = camada === "composable"
+        && analiseAst.importsPorCategoria.store.size === 1
+        && analiseAst.importsPorCategoria.composable.size === 0
+        && analiseAst.importsPorCategoria.service.size === 0;
+    if (ehFacadeDeStore) return;
+
     // Composables de Tela e de Orquestracao são contratos de tela por design; superfície ampla é intencional
     const ehContratoDeTela = camada === "composable"
         && /(Tela|Orquestracao)\.ts$/.test(caminhoRelativo ?? "");
@@ -294,7 +301,8 @@ function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
 
         if (ts.isVariableDeclaration(no) && ts.isIdentifier(no.name) && NOMES_ESTADO_ASSINCRONO_MANUAL.test(no.name.text)) {
             if (
-                (no.initializer && ts.isCallExpression(no.initializer) && ["ref", "computed"].includes(obterNomeChamada(no.initializer.expression) ?? ""))
+                // computed() é estado DERIVADO (não manual); só ref() conta como estado assíncrono caseiro
+                (no.initializer && ts.isCallExpression(no.initializer) && obterNomeChamada(no.initializer.expression) === "ref")
                 || (no.initializer && ts.isNewExpression(no.initializer) && ts.isIdentifier(no.initializer.expression) && no.initializer.expression.text === "Map")
             ) {
                 analiseAst.estadosAssincronosManuais += 1;

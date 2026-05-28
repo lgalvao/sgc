@@ -39,20 +39,18 @@ import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
-import * as painelService from "@/services/painelService";
-import type {ProcessoResumo} from "@/types/tipos";
+import {useRelatorioAndamentoTela} from "@/composables/useRelatorioAndamentoTela";
 import {useNotification} from "@/composables/useNotification";
 import {formatarDataBR, formatarDataHoraBR} from "@/utils/date";
 
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
+const {processosDisponiveis, carregarProcessos} = useRelatorioAndamentoTela();
 
 const codProcessoSelecionado = ref<number | null>(null);
-const processosDisponiveis = ref<ProcessoResumo[]>([]);
 const carregando = ref(false);
 
 const relatorioAndamento = computed(() => relatoriosStore.relatorioAndamento);
-
 
 const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(item => {
   const dt1 = item.dataLimiteEtapa1;
@@ -77,15 +75,6 @@ const opcoesProcessos = computed(() => [
   {value: null, text: TEXTOS_RELATORIOS.SELECIONE},
   ...processosDisponiveis.value.map(p => ({value: p.codigo, text: p.descricao}))
 ]);
-
-async function carregarProcessos() {
-  try {
-    const response = await painelService.listarProcessos({page: 0, size: 100});
-    processosDisponiveis.value = response?.content ?? [];
-  } catch {
-    notify("Erro ao carregar processos", "danger");
-  }
-}
 
 async function gerarRelatorio() {
   if (!codProcessoSelecionado.value) return;

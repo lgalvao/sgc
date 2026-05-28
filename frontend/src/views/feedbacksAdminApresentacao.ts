@@ -1,4 +1,5 @@
 import {formatarDataHoraBR} from "@/utils";
+import apiClient from "@/axios-setup";
 
 export type VarianteTipoFeedback = "danger" | "primary" | "info" | "success" | "secondary";
 
@@ -161,4 +162,11 @@ function formatarValorMetadado(chave: string, valor: unknown): unknown {
   }
 
   return valor;
+}
+
+
+export function obterUrlScreenshot(codigo: string): string {
+  const baseUrl = apiClient.defaults.baseURL || "/api";
+  const base = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  return `${base}/feedback/${codigo}/screenshot`;
 }

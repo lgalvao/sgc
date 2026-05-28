@@ -10,8 +10,15 @@ import {usePerfilStore} from "@/stores/perfil";
 
 vi.mock("@/services/feedbackAdminService", () => ({
     listarFeedbacksAdmin: vi.fn(),
-    obterUrlScreenshot: vi.fn().mockReturnValue("http://localhost:8080/api/feedback/abc/screenshot"),
 }));
+
+vi.mock("@/views/feedbacksAdminApresentacao", async () => {
+    const real = await vi.importActual<typeof import("@/views/feedbacksAdminApresentacao")>("@/views/feedbacksAdminApresentacao");
+    return {
+        ...real,
+        obterUrlScreenshot: vi.fn().mockReturnValue("http://localhost:8080/api/feedback/abc/screenshot"),
+    };
+});
 
 const router = createRouter({
     history: createMemoryHistory(),
