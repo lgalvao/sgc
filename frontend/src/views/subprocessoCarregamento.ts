@@ -1,24 +1,10 @@
-import {type ComputedRef, onActivated, onMounted, ref, watch} from "vue";
-
-type ContextoEdicaoDireto = { detalhes: { codigo: number } } | null;
-type ContextoEdicaoPorProcesso = { codigo: number } | null;
+import {onActivated, onMounted, ref, watch} from "vue";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 
 type DependenciasSubprocessoCarregamento = {
     codProcesso: number;
     siglaUnidade: string;
     codSubprocesso?: number;
-    erroIntegracaoContexto: ComputedRef<unknown>;
-    obterContextoEdicao: (codigoSubprocesso: number) => Promise<ContextoEdicaoDireto>;
-    recarregarContextoEdicao: (codigoSubprocesso: number) => Promise<ContextoEdicaoDireto>;
-    obterContextoEdicaoPorProcessoEUnidade: (
-        codProcesso: number,
-        siglaUnidade: string,
-    ) => Promise<ContextoEdicaoPorProcesso>;
-    recarregarContextoEdicaoPorProcessoEUnidade: (
-        codProcesso: number,
-        siglaUnidade: string,
-    ) => Promise<ContextoEdicaoPorProcesso>;
-    dadosEdicaoValidos: (codigoSubprocesso: number) => boolean;
     exibirToastPendente: () => void;
 };
 
@@ -31,16 +17,17 @@ function criarEstado() {
 }
 
 export function useSubprocessoCarregamento(dependencias: DependenciasSubprocessoCarregamento) {
+    const subprocessoStore = useSubprocessoStore();
     const {codigoSubprocesso, erroNaoEncontrado, carregamentoInicialConcluido} = criarEstado();
     let carregamentoEmAndamento: Promise<void> | null = null;
 
     async function resolverCodigoSubprocesso(recarregar: boolean) {
         const carregarContextoDireto = recarregar
-            ? dependencias.recarregarContextoEdicao
-            : dependencias.obterContextoEdicao;
+            ? subprocessoStore.recarregarContextoEdicao
+            : subprocessoStore.obterContextoEdicao;
         const carregarContextoPorProcesso = recarregar
-            ? dependencias.recarregarContextoEdicaoPorProcessoEUnidade
-            : dependencias.obterContextoEdicaoPorProcessoEUnidade;
+            ? subprocessoStore.recarregarContextoEdicaoPorProcessoEUnidade
+            : subprocessoStore.obterContextoEdicaoPorProcessoEUnidade;
 
         if (typeof dependencias.codSubprocesso === "number") {
             const contextoDireto = await carregarContextoDireto(dependencias.codSubprocesso);
@@ -65,7 +52,7 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
         }
 
         codigoSubprocesso.value = null;
-        erroNaoEncontrado.value = !dependencias.erroIntegracaoContexto.value;
+        erroNaoEncontrado.value = !subprocessoStore.erroIntegracaoContexto;
     }
 
     async function carregarSubprocesso(recarregar = false) {
@@ -90,7 +77,7 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
             return;
         }
 
-        await dependencias.recarregarContextoEdicao(codigoSubprocesso.value);
+        await subprocessoStore.recarregarContextoEdicao(codigoSubprocesso.value);
         dependencias.exibirToastPendente();
     }
 
@@ -112,7 +99,7 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
         if (!carregamentoInicialConcluido.value) {
             return;
         }
-        if (typeof codigoSubprocesso.value === "number" && dependencias.dadosEdicaoValidos(codigoSubprocesso.value)) {
+        if (typeof codigoSubprocesso.value === "number" && subprocessoStore.dadosEdicaoValidos(codigoSubprocesso.value)) {
             return;
         }
         try {

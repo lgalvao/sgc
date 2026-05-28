@@ -295,26 +295,6 @@ describe("subprocesso store (cache e dedupe)", () => {
             expect(store.dadosEdicaoValidos(10)).toBe(true);
         });
 
-        it("deve invalidar apenas o contexto de edição do subprocesso informado", () => {
-            const store = useSubprocessoStore();
-            store.contextoEdicao = {detalhes: {codigo: 10, situacao: "MAPA"}} as any;
-            store.contextoCadastro = {detalhes: {codigo: 10, situacao: "CADASTRO"}} as any;
-
-            store.marcarContextoEdicaoParaAtualizacao(10);
-
-            expect(store.dadosEdicaoValidos(10)).toBe(false);
-            expect(store.dadosCadastroValidos(10)).toBe(true);
-        });
-
-        it("não deve invalidar contexto de edição quando o código não corresponde", () => {
-            const store = useSubprocessoStore();
-            store.contextoEdicao = {detalhes: {codigo: 10, situacao: "MAPA"}} as any;
-
-            store.marcarContextoEdicaoParaAtualizacao(11);
-
-            expect(store.dadosEdicaoValidos(10)).toBe(true);
-        });
-
         it("deve resetar o estado completo", () => {
             const store = useSubprocessoStore();
             store.contextoEdicao = {detalhes: {codigo: 1}} as any;

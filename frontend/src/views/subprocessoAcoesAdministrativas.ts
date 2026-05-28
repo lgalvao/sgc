@@ -6,6 +6,7 @@ import type {SubprocessoDetalhe} from "@/types/tipos";
 import {formatarDataBR} from "@/utils";
 import logger from "@/utils/logger";
 import {useToastStore} from "@/stores/toast";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 
 type TipoReabertura = "cadastro" | "revisao";
 
@@ -25,7 +26,6 @@ type DependenciasSubprocessoAcoesAdministrativas = {
     reabrirCadastro: (codigoSubprocesso: number, justificativa: string) => Promise<boolean>;
     reabrirRevisaoCadastro: (codigoSubprocesso: number, justificativa: string) => Promise<boolean>;
     enviarLembrete: (codProcesso: number, unidadeCodigo: number) => Promise<unknown>;
-    recarregarContextoEdicao: (codigoSubprocesso: number) => Promise<unknown>;
 };
 
 function criarEstado() {
@@ -55,6 +55,7 @@ function abrirReabertura(estado: ReturnType<typeof criarEstado>, resetarValidaca
 export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSubprocessoAcoesAdministrativas) {
     const {atualizarFluxoSubprocessoEPainel} = useInvalidacaoNavegacao();
     const toastStore = useToastStore();
+    const subprocessoStore = useSubprocessoStore();
     const estado = criarEstado();
 
     async function confirmarAlteracaoDataLimite(novaData: string) {
@@ -112,7 +113,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
         estado.loadingLembrete.value = true;
         try {
             await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
-            await dependencias.recarregarContextoEdicao(dependencias.codigoSubprocesso.value!);
+            await subprocessoStore.recarregarContextoEdicao(dependencias.codigoSubprocesso.value!);
             estado.modalLembreteAberto.value = false;
             toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
             dependencias.exibirToastPendente();

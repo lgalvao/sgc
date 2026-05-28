@@ -131,10 +131,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         }))?.contexto ?? null;
     }
 
-    function marcarContextoEdicaoParaAtualizacao(codigoSubprocesso?: number) {
-        invalidarContextoEdicao(codigoSubprocesso);
-    }
-
     return {
         contextoEdicao,
         contextoCadastro,
@@ -142,7 +138,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         dadosEdicaoValidos: (codigoSubprocesso: number) => dadosValidos(contextoEdicao, contextoEdicaoInvalido, codigoSubprocesso),
         dadosCadastroValidos: (codigoSubprocesso: number) => dadosValidos(contextoCadastro, contextoCadastroInvalido, codigoSubprocesso),
         invalidar,
-        marcarContextoEdicaoParaAtualizacao,
         resetar,
         limparContextoAtual,
         limparErroIntegracao,

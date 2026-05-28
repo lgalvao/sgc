@@ -75,12 +75,6 @@ export function useSubprocessoTela(props: SubprocessoTelaProps) {
         codProcesso: props.codProcesso,
         siglaUnidade: props.siglaUnidade,
         codSubprocesso: props.codSubprocesso,
-        erroIntegracaoContexto: computed(() => subprocessoStore.erroIntegracaoContexto),
-        obterContextoEdicao: subprocessoStore.obterContextoEdicao,
-        recarregarContextoEdicao: subprocessoStore.recarregarContextoEdicao,
-        obterContextoEdicaoPorProcessoEUnidade: subprocessoStore.obterContextoEdicaoPorProcessoEUnidade,
-        recarregarContextoEdicaoPorProcessoEUnidade: subprocessoStore.recarregarContextoEdicaoPorProcessoEUnidade,
-        dadosEdicaoValidos: subprocessoStore.dadosEdicaoValidos,
         exibirToastPendente,
     });
 
@@ -156,7 +150,6 @@ export function useSubprocessoTela(props: SubprocessoTelaProps) {
         reabrirCadastro: fluxoSubprocesso.reabrirCadastro,
         reabrirRevisaoCadastro: fluxoSubprocesso.reabrirRevisaoCadastro,
         enviarLembrete: enviarLembreteService,
-        recarregarContextoEdicao: subprocessoStore.recarregarContextoEdicao,
     });
 
     return {
