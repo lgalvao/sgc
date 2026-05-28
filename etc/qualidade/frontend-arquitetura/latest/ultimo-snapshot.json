@@ -1,9 +1,9 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-28T12:40:59.606Z",
+  "geradoEm": "2026-05-28T13:19:25.151Z",
   "resumo": {
     "arquivosProducao": 264,
-    "scoreTotal": 203,
+    "scoreTotal": 185,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 0,
@@ -20,50 +20,15 @@
       "arquivosComBolsaDependenciasLarga": 1,
       "arquivosComSuperficieAmpla": 16,
       "arquivosComMisturaCamadas": 0,
-      "arquivosComServerStateCaseiro": 1,
+      "arquivosComServerStateCaseiro": 0,
       "arquivosComAcoplamentoStoreAlto": 0,
       "arquivosComServiceDireto": 35,
-      "chamadasEstrategiaCache": 19,
-      "chamadasInvalidacao": 16,
+      "chamadasEstrategiaCache": 17,
+      "chamadasInvalidacao": 14,
       "hubsCentraisComSinais": 2
     }
   },
   "hotspots": [
-    {
-      "arquivo": "frontend/src/stores/organizacao.ts",
-      "camada": "store",
-      "linhas": 91,
-      "score": 18,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 2,
-        "coordenacaoServerStateCaseiro": 2,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "serviceDireto",
-        "serverStateCaseiro"
-      ],
-      "hubCentral": false
-    },
     {
       "arquivo": "frontend/src/composables/useSubprocessoTela.ts",
       "camada": "composable",
@@ -206,17 +171,17 @@
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
         "metodoEmCache": 0,
-        "invalidacaoExplicita": 12,
+        "invalidacaoExplicita": 11,
         "booleanoPosicional": 0,
         "palavraForcar": 0,
         "palavraStale": 0,
         "palavraSnapshot": 0
       },
       "metricasAst": {
-        "chamadasStore": 16,
+        "chamadasStore": 14,
         "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 16,
-        "chamadasInvalidacao": 16,
+        "chamadasEstrategiaCache": 14,
+        "chamadasInvalidacao": 14,
         "chamadasColadaQuery": 0,
         "chamadasColadaCache": 0,
         "estadosAssincronosManuais": 0,
@@ -371,9 +336,9 @@
       "hubCentral": false
     },
     {
-      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
+      "arquivo": "frontend/src/composables/useFluxoCadastroSubprocesso.ts",
       "camada": "composable",
-      "linhas": 151,
+      "linhas": 148,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -385,8 +350,8 @@
         "palavraSnapshot": 0
       },
       "metricasAst": {
-        "chamadasStore": 4,
-        "chamadasServiceDiretas": 1,
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 10,
         "chamadasEstrategiaCache": 0,
         "chamadasInvalidacao": 0,
         "chamadasColadaQuery": 0,
@@ -406,9 +371,9 @@
       "hubCentral": false
     },
     {
-      "arquivo": "frontend/src/composables/useFluxoCadastroSubprocesso.ts",
+      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
       "camada": "composable",
-      "linhas": 148,
+      "linhas": 144,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -421,7 +386,7 @@
       },
       "metricasAst": {
         "chamadasStore": 0,
-        "chamadasServiceDiretas": 10,
+        "chamadasServiceDiretas": 1,
         "chamadasEstrategiaCache": 0,
         "chamadasInvalidacao": 0,
         "chamadasColadaQuery": 0,
