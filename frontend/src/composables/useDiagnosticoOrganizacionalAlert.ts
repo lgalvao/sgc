@@ -1,5 +1,5 @@
 import {computed, ref, type Ref, watch} from "vue";
-import {useOrganizacaoStore} from "@/stores/organizacao";
+import {useDiagnosticoOrganizacionalQuery} from "@/composables/useDiagnosticoOrganizacionalQuery";
 import {buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
 
@@ -12,22 +12,24 @@ export function useDiagnosticoOrganizacionalAlert(
     unidades: Ref<Unidade[]>,
     mostrarDiagnosticoOrganizacional: Ref<boolean>,
 ) {
-    const organizacaoStore = useOrganizacaoStore();
-    
+    const query = useDiagnosticoOrganizacionalQuery();
+
     // Estado local reativo do composable
     const unidadesReferencia = ref<Unidade[]>([]);
     const carregandoUnidadesReferencia = ref(false);
     const unidadesReferenciaCarregadas = ref(false);
     const alertaDiagnosticoDispensado = ref(false);
 
-    const carregandoDiagnosticoOrganizacional = computed(() => organizacaoStore.carregando);
-    const erroDiagnosticoOrganizacional = computed(() => organizacaoStore.erroDiagnostico);
-    const diagnosticoOrganizacional = computed(() => organizacaoStore.diagnostico);
+    const carregandoDiagnosticoOrganizacional = computed(() => query.isLoading.value);
+    const erroDiagnosticoOrganizacional = computed(() =>
+        query.error.value ? "Não foi possível verificar as pendências organizacionais." : null
+    );
+    const diagnosticoOrganizacional = computed(() => query.data.value ?? null);
     const gruposDiagnostico = computed(() => {
         const grupos = diagnosticoOrganizacional.value?.grupos;
         return grupos ? grupos : [];
     });
-    
+
     const resumoDiagnostico = computed(() => {
         const erro = erroDiagnosticoOrganizacional.value;
         if (erro) return erro;
@@ -62,16 +64,7 @@ export function useDiagnosticoOrganizacionalAlert(
         && !alertaDiagnosticoDispensado.value
     );
 
-    // Watcher para garantir o diagnóstico organizacional da loja Pinia
-    watch(
-        () => mostrarDiagnosticoOrganizacional.value,
-        async (deveExibir) => {
-            await organizacaoStore.garantirDiagnostico(deveExibir);
-        },
-        {immediate: true},
-    );
-
-    // Watcher para carregar as unidades de referência de forma reativa sob demanda
+    // Watcher para carregar unidades de referência de forma reativa sob demanda
     watch(
         [() => mostrarDiagnosticoOrganizacional.value, gruposDiagnostico, unidades],
         async () => {

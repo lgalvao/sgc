@@ -58,9 +58,9 @@ vi.mock("@/composables/useUnidadeQuery", () => ({
     }),
 }));
 
-vi.mock("@/stores/organizacao", () => ({
-    useOrganizacaoStore: () => ({
-        recarregarDiagnostico: mockRecarregarDiagnostico,
+vi.mock("@/composables/useDiagnosticoOrganizacionalQuery", () => ({
+    useInvalidacaoDiagnosticoOrganizacional: () => ({
+        invalidarDiagnostico: vi.fn(),
     }),
 }));
 

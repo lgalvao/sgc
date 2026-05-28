@@ -35,6 +35,19 @@ vi.mock('@/services/unidadeService', async (importOriginal) => {
     };
 });
 
+const diagnosticoQueryMock = {
+    data: ref<any>(null),
+    isLoading: ref(false),
+    error: ref<Error | null>(null),
+};
+
+vi.mock('@/composables/useDiagnosticoOrganizacionalQuery', () => ({
+    useDiagnosticoOrganizacionalQuery: () => diagnosticoQueryMock,
+    useInvalidacaoDiagnosticoOrganizacional: () => ({
+        invalidarDiagnostico: vi.fn(),
+    }),
+}));
+
 const unidadeStoreMock = {
     garantirArvoreElegibilidade: vi.fn().mockResolvedValue([]),
     invalidarCache: vi.fn(),
@@ -212,6 +225,9 @@ describe('ProcessoCadastroView.vue', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([]);
+        diagnosticoQueryMock.data.value = null;
+        diagnosticoQueryMock.isLoading.value = false;
+        diagnosticoQueryMock.error.value = null;
         mockPush.mockReset();
         mockRoute.query = {};
     });
@@ -234,26 +250,22 @@ describe('ProcessoCadastroView.vue', () => {
             {codigo: 43, sigla: '43ª Z.E.', nome: 'Zona 43', filhas: []}
         ] as any);
 
+        diagnosticoQueryMock.data.value = {
+            possuiViolacoes: true,
+            resumo: 'Há inconsistências organizacionais.',
+            quantidadeTiposViolacao: 1,
+            quantidadeOcorrencias: 1,
+            grupos: [
+                {
+                    tipo: 'Unidade sem responsável',
+                    quantidadeOcorrencias: 1,
+                    ocorrencias: ['sigla=43ª Z.E., tipo=OPERACIONAL']
+                }
+            ]
+        };
+
         const {wrapper} = createWrapper({
             perfil: {permissoesSessao: permissoesAdmin},
-            organizacao: {
-                diagnostico: {
-                    possuiViolacoes: true,
-                    resumo: 'Há inconsistências organizacionais.',
-                    quantidadeTiposViolacao: 1,
-                    quantidadeOcorrencias: 1,
-                    grupos: [
-                        {
-                            tipo: 'Unidade sem responsável',
-                            quantidadeOcorrencias: 1,
-                            ocorrencias: ['sigla=43ª Z.E., tipo=OPERACIONAL']
-                        }
-                    ]
-                },
-                erroDiagnostico: null,
-                carregado: true,
-                carregando: false
-            }
         });
 
         wrapper.vm.tipo = 'MAPEAMENTO';

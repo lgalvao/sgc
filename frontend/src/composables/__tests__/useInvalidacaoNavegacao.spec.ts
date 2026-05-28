@@ -2,8 +2,6 @@ import {beforeEach, describe, expect, it, vi} from "vitest";
 import {useInvalidacaoNavegacao} from "../useInvalidacaoNavegacao";
 import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-
-import {useOrganizacaoStore} from "@/stores/organizacao";
 import {createPinia, setActivePinia} from "pinia";
 
 const invalidateQueriesMock = vi.fn();
@@ -76,19 +74,17 @@ describe("useInvalidacaoNavegacao", () => {
         expect(subprocesso.invalidar).toHaveBeenCalled();
     });
 
-    it("deve atualizar dados organizacionais", () => {
+    it("deve atualizar dados organizacionais invalidando diagnóstico e unidades", () => {
         const painel = usePainelStore();
-        const organizacao = useOrganizacaoStore();
         vi.spyOn(painel, "invalidar");
-        vi.spyOn(organizacao, "invalidar");
 
         const {atualizarDadosOrganizacionais} = useInvalidacaoNavegacao();
         atualizarDadosOrganizacionais();
 
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["diagnostico-organizacional"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["unidade"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["dados-tela-unidade"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["unidade", "arvore-elegibilidade"]});
-        expect(organizacao.invalidar).toHaveBeenCalled();
         expect(painel.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
     });
@@ -106,17 +102,15 @@ describe("useInvalidacaoNavegacao", () => {
     it("deve resetar estado da sessão ao fazer logout", () => {
         const painel = usePainelStore();
         const subprocesso = useSubprocessoStore();
-        const organizacao = useOrganizacaoStore();
         vi.spyOn(painel, "resetar");
         vi.spyOn(subprocesso, "resetar");
-        vi.spyOn(organizacao, "resetar");
 
         const {resetarEstadoSessao} = useInvalidacaoNavegacao();
         resetarEstadoSessao();
 
         expect(painel.resetar).toHaveBeenCalled();
         expect(subprocesso.resetar).toHaveBeenCalled();
-        expect(organizacao.resetar).toHaveBeenCalled();
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["diagnostico-organizacional"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["mapa"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["unidade"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["dados-tela-unidade"]});

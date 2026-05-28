@@ -23,6 +23,19 @@ vi.mock("@/composables/usePerfil", () => ({
     })
 }));
 
+const diagnosticoQueryMock = {
+    data: ref<any>(null),
+    isLoading: ref(false),
+    error: ref<Error | null>(null),
+};
+
+vi.mock("@/composables/useDiagnosticoOrganizacionalQuery", () => ({
+    useDiagnosticoOrganizacionalQuery: () => diagnosticoQueryMock,
+    useInvalidacaoDiagnosticoOrganizacional: () => ({
+        invalidarDiagnostico: vi.fn(),
+    }),
+}));
+
 const unidadesQueryMock = {
     data: ref<any[]>([]),
     error: ref<Error | null>(null),
@@ -98,6 +111,9 @@ describe("Unidades.vue", () => {
         vi.clearAllMocks();
         mockPush.mockReset();
         expandAllMock.mockReset();
+        diagnosticoQueryMock.data.value = null;
+        diagnosticoQueryMock.isLoading.value = false;
+        diagnosticoQueryMock.error.value = null;
         collapseAllMock.mockReset();
         unidadesQueryMock.data.value = [];
         unidadesQueryMock.error.value = null;
@@ -220,7 +236,7 @@ describe("Unidades.vue", () => {
     });
 
     it("deve exibir alerta com links para todas as unidades sem responsável", async () => {
-        // Pré-popula a organizacaoStore via initialState (evita dependência da chamada HTTP)
+        // Controla os dados do diagnóstico via mock da query (organizacaoStore foi removido)
         const diagMock = {
             possuiViolacoes: true,
             resumo: "Foram encontradas 3 inconsistencias.",
@@ -263,11 +279,11 @@ describe("Unidades.vue", () => {
             }
         ] as any;
 
+        diagnosticoQueryMock.data.value = diagMock;
+
         context.wrapper = mount(Unidades, {
             ...getCommonMountOptions(
-                {
-                    organizacao: {diagnostico: diagMock, erroDiagnostico: null, carregado: true}
-                },
+                {},
                 {
                     PageHeader: {
                         template: "<div><h1>Page header</h1><slot name='description' /><slot name='actions' /></div>"

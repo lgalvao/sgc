@@ -1,7 +1,6 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {useCacheSync} from '../useCacheSync';
 
-import {useOrganizacaoStore} from '@/stores/organizacao';
 import {usePainelStore} from '@/stores/painel';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {logger} from '@/utils';
@@ -69,19 +68,16 @@ class EventSourceMock {
 vi.stubGlobal('EventSource', EventSourceMock);
 
 describe('useCacheSync', () => {
-    let organizacaoStore: any;
     let painelStore: any;
     let subprocessoStore: any;
 
     beforeEach(() => {
         criarPiniaDeTeste();
-        organizacaoStore = useOrganizacaoStore();
         painelStore = usePainelStore();
         subprocessoStore = useSubprocessoStore();
         lastInstance = null;
         instanciasCriadas.length = 0;
         vi.clearAllMocks();
-        vi.spyOn(organizacaoStore, 'invalidar');
         vi.spyOn(painelStore, 'invalidar');
         vi.spyOn(subprocessoStore, 'invalidar');
         vi.spyOn(logger, 'warn').mockImplementation(() => logger);
@@ -107,7 +103,7 @@ describe('useCacheSync', () => {
 
         lastInstance?.emit('org-cache-refreshed', {});
 
-        expect(organizacaoStore.invalidar).toHaveBeenCalled();
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-organizacional']});
         expect(painelStore.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['painel']});
         expect(subprocessoStore.invalidar).not.toHaveBeenCalled();

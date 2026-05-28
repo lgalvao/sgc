@@ -1,6 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {usePerfilStore} from "../perfil";
-import {useOrganizacaoStore} from "../organizacao";
 import * as usuarioService from "../../services/usuarioService";
 import {Perfil} from "@/types/tipos";
 import {ref} from "vue";
@@ -28,9 +27,6 @@ describe("usePerfilStore", () => {
 
     it("deve realizar login com sucesso e definir sessao se houver um unico perfil", async () => {
         const store = usePerfilStore();
-        const organizacaoStore = useOrganizacaoStore();
-        organizacaoStore.diagnostico = {possuiViolacoes: true} as any;
-        organizacaoStore.carregado = true as any;
 
         const mockFluxo = {
             autenticado: true,
@@ -54,8 +50,6 @@ describe("usePerfilStore", () => {
         expect(store.unidadeSelecionadaSigla).toBe("U1");
         expect(store.usuarioNome).toBe("Teste");
         expect(store.usuarioCodigo).toBe("123");
-        expect(organizacaoStore.diagnostico).toBeNull();
-        expect(organizacaoStore.carregado).toBe(false);
     });
 
     it("deve propagar erro 404 no login", async () => {
@@ -88,19 +82,14 @@ describe("usePerfilStore", () => {
         expect(store.usuarioCodigo).toBe("123");
     });
 
-    it("deve realizar logout", async () => {
+    it("deve realizar logout e limpar sessão local", async () => {
         const store = usePerfilStore();
-        const organizacaoStore = useOrganizacaoStore();
         store.usuarioCodigo = "123" as any;
-        organizacaoStore.diagnostico = {possuiViolacoes: true} as any;
-        organizacaoStore.carregado = true as any;
 
         await store.logout();
 
         expect(store.usuarioCodigo).toBeNull();
         expect(usuarioService.logout).toHaveBeenCalled();
-        expect(organizacaoStore.diagnostico).toBeNull();
-        expect(organizacaoStore.carregado).toBe(false);
     });
 
     it("deve avancar a versao da sessao em login e logout, mesmo ao reutilizar o mesmo usuario", async () => {
