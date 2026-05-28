@@ -44,7 +44,6 @@ const cacheMapaMock = {
     invalidarMapa: vi.fn(),
     invalidarImpacto: vi.fn(),
     sincronizarMapa: vi.fn(),
-    sincronizarImpacto: vi.fn(),
     obterMapa: vi.fn(),
     obterImpacto: vi.fn(),
 };
@@ -137,9 +136,6 @@ describe("useMapas", () => {
             mapaQueryState.status.value = "success";
             cacheMapaMock.invalidarImpacto();
         });
-        cacheMapaMock.sincronizarImpacto.mockImplementation((_codigo: number, impacto: ImpactoMapa | null) => {
-            impactoQueryState.data.value = impacto;
-        });
     });
 
     it("deve inicializar com valores nulos", () => {
@@ -147,54 +143,6 @@ describe("useMapas", () => {
 
         expect(mapas.mapaCompleto.value).toBeNull();
         expect(mapas.impactoMapa.value).toBeNull();
-    });
-
-    it("deve buscar mapa completo com sucesso", async () => {
-        const mockMapa: MapaCompleto = {
-            codigo: 1,
-            subprocessoCodigo: 1,
-            observacoes: "teste",
-            competencias: [],
-            atividades: [],
-            situacao: "EM_ANDAMENTO",
-        };
-        vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
-
-        const mapas = useMapas();
-        await mapas.carregarMapa(1);
-
-        expect(service.obterMapaCompleto).toHaveBeenCalledWith(1);
-        expect(mapas.mapaCompleto.value).toEqual(mockMapa);
-    });
-
-    it("deve reaproveitar o cache do mapa por subprocesso ao reativar a view", async () => {
-        const mockMapa: MapaCompleto = {
-            codigo: 1,
-            subprocessoCodigo: 1,
-            observacoes: "teste",
-            competencias: [],
-            atividades: [],
-            situacao: "EM_ANDAMENTO",
-        };
-        vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
-
-        const mapas = useMapas();
-        await mapas.carregarMapa(1);
-        // Segunda chamada com mesmo código e status "success" deve usar refresh (não refetch)
-        await mapas.carregarMapa(1);
-
-        expect(service.obterMapaCompleto).toHaveBeenCalledTimes(2);
-        expect(mapas.mapaCompleto.value).toEqual(mockMapa);
-    });
-
-    it("deve definir erro em caso de falha ao buscar mapa completo", async () => {
-        vi.mocked(service.obterMapaCompleto).mockRejectedValue(new Error("Failed"));
-
-        const mapas = useMapas();
-        await mapas.carregarMapa(1);
-
-        // useAsyncAction usa a mensagem do erro lançado quando disponível
-        expect(mapas.erro.value).toBe("Failed");
     });
 
     it("deve buscar impacto do mapa com sucesso", async () => {
@@ -211,7 +159,7 @@ describe("useMapas", () => {
         };
         vi.mocked(service.verificarImpactosMapa).mockResolvedValue(mockImpacto);
 
-        const mapas = useMapas();
+        const mapas = useMapas(ref(1));
         await mapas.carregarImpacto(1);
 
         expect(service.verificarImpactosMapa).toHaveBeenCalledWith(1);
@@ -232,46 +180,12 @@ describe("useMapas", () => {
         };
         vi.mocked(service.verificarImpactosMapa).mockResolvedValue(impacto);
 
-        const mapas = useMapas();
+        const mapas = useMapas(ref(1));
         await mapas.carregarImpacto(1);
         await mapas.carregarImpacto(1);
 
         expect(service.verificarImpactosMapa).toHaveBeenCalledTimes(2);
         expect(mapas.impactoMapa.value).toEqual(impacto);
-    });
-
-    it("deve manter mapas separados por subprocesso em views keepAlive", async () => {
-        const codigoAtual = ref<number | null>(1);
-        const mapas = useMapas(codigoAtual);
-        const mapaUm: MapaCompleto = {
-            codigo: 1,
-            subprocessoCodigo: 1,
-            observacoes: "mapa 1",
-            competencias: [],
-            atividades: [],
-            situacao: "EM_ANDAMENTO",
-        };
-        const mapaDois: MapaCompleto = {
-            codigo: 2,
-            subprocessoCodigo: 2,
-            observacoes: "mapa 2",
-            competencias: [],
-            atividades: [],
-            situacao: "EM_ANDAMENTO",
-        };
-        vi.mocked(service.obterMapaCompleto)
-            .mockResolvedValueOnce(mapaUm)
-            .mockResolvedValueOnce(mapaDois);
-
-        await mapas.carregarMapa(1);
-        expect(mapas.mapaCompleto.value).toEqual(mapaUm);
-
-        // Reinicia o status para simular nova entrada de cache quando o código muda
-        mapaQueryState.status.value = "idle";
-        codigoAtual.value = 2;
-        await mapas.carregarMapa(2);
-        expect(mapas.mapaCompleto.value).toEqual(mapaDois);
-        expect(service.obterMapaCompleto).toHaveBeenCalledTimes(2);
     });
 
     it("não deve buscar impacto se codSubprocesso for zero", async () => {
@@ -283,7 +197,7 @@ describe("useMapas", () => {
     });
 
     it("deve invalidar o impacto quando sincronizarMapa é chamado com mapa novo", async () => {
-        const mapas = useMapas();
+        const mapas = useMapas(ref(1));
         const mockImpacto: ImpactoMapa = {
             temImpactos: true,
             totalAtividadesInseridas: 0,
@@ -307,72 +221,9 @@ describe("useMapas", () => {
         expect(mapas.impactoMapa.value).toBeNull();
     });
 
-    it("deve marcar mapa como stale ao invalidar (invalidarMapa é chamado)", async () => {
-        const codigoAtual = ref<number | null>(1);
-        const mapas = useMapas(codigoAtual);
-        const mockMapa: MapaCompleto = {
-            codigo: 1,
-            subprocessoCodigo: 1,
-            observacoes: "mapa preservado",
-            competencias: [],
-            atividades: [],
-            situacao: "EM_ANDAMENTO",
-        };
-        vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
-
-        await mapas.carregarMapa(1);
-        expect(mapas.mapaCompleto.value).toEqual(mockMapa);
-
+    it("deve delegar invalidacao de mapa para o cache", () => {
+        const mapas = useMapas();
         mapas.invalidar(1);
-
-        // invalidarMapa deve ter sido chamado com o código correto
         expect(cacheMapaMock.invalidarMapa).toHaveBeenCalledWith(1);
-        // O mock de invalidarMapa limpa o dado e status (simula stale)
-        expect(mapas.mapaCompleto.value).toBeNull();
-        expect(mapaQueryState.status.value).toBe("idle");
-    });
-
-    it("deve voltar a buscar o mapa após invalidação explícita", async () => {
-        const mapas = useMapas();
-        const mapaInicial: MapaCompleto = {
-            codigo: 1,
-            subprocessoCodigo: 1,
-            observacoes: "antes",
-            competencias: [],
-            atividades: [],
-            situacao: "EM_ANDAMENTO",
-        };
-        const mapaAtualizado: MapaCompleto = {
-            ...mapaInicial,
-            observacoes: "depois",
-        };
-        vi.mocked(service.obterMapaCompleto)
-            .mockResolvedValueOnce(mapaInicial)
-            .mockResolvedValueOnce(mapaAtualizado);
-
-        await mapas.carregarMapa(1);
-        mapas.invalidar(1);
-        await mapas.carregarMapa(1);
-
-        expect(service.obterMapaCompleto).toHaveBeenCalledTimes(2);
-        expect(mapas.mapaCompleto.value).toEqual(mapaAtualizado);
-    });
-
-    it("deve limpar totalmente o store ao resetar", async () => {
-        const mapas = useMapas();
-        const mockMapa: MapaCompleto = {
-            codigo: 1,
-            subprocessoCodigo: 1,
-            observacoes: "limpar",
-            competencias: [],
-            atividades: [],
-            situacao: "EM_ANDAMENTO",
-        };
-        vi.mocked(service.obterMapaCompleto).mockResolvedValue(mockMapa);
-
-        await mapas.carregarMapa(1);
-        mapas.resetar();
-
-        expect(mapas.mapaCompleto.value).toBeNull();
     });
 });

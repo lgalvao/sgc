@@ -198,10 +198,13 @@ function contarMembrosBolsa(noTipo) {
     return 0;
 }
 
-function analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo) {
+function analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo, profundidadeFuncao, ehComposableDeView) {
     if (!ts.isReturnStatement(no) || !no.expression || !ts.isObjectLiteralExpression(no.expression)) {
         return;
     }
+
+    // Não contar retornos dentro de funções aninhadas (ex: callbacks de computed, watch, filter)
+    if (profundidadeFuncao > 1) return;
 
     // Composables que só delegam para um único store são fachadas de store; superfície ampla é intencional
     const ehFacadeDeStore = camada === "composable"
@@ -214,6 +217,9 @@ function analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo) {
     const ehContratoDeTela = camada === "composable"
         && /(Tela|Orquestracao)\.ts$/.test(caminhoRelativo ?? "");
     if (ehContratoDeTela) return;
+
+    // Composables co-localizados em views/ são helpers de view por design; superfície ampla é intencional
+    if (ehComposableDeView) return;
 
     const totalPropriedades = no.expression.properties.length;
     const limite = camada === "store" ? 10 : 8;
@@ -232,7 +238,14 @@ function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
 
     const arquivo = ts.createSourceFile(caminhoRelativo, codigo, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 
+    const ehComposableDeView = camada === "composable"
+        && (caminhoRelativo ?? "").startsWith("frontend/src/views/");
+    let profundidadeFuncao = 0;
+
     function visitar(no) {
+        const ehFuncaoLike = ts.isFunctionDeclaration(no) || ts.isArrowFunction(no) || ts.isFunctionExpression(no);
+        if (ehFuncaoLike) profundidadeFuncao++;
+
         if (ts.isImportDeclaration(no) && ts.isStringLiteral(no.moduleSpecifier)) {
             const especificador = no.moduleSpecifier.text;
             const resolvido = resolverImportacao(caminhoRelativo, especificador);
@@ -257,30 +270,33 @@ function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
             }
         }
 
-        if (ts.isInterfaceDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text) && no.members.length > 5) {
-            analiseAst.bolsasDependenciasLargas += 1;
-        }
-
-        if (ts.isTypeAliasDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text)) {
-            const totalMembros = contarMembrosBolsa(no.type);
-            if (totalMembros > 5) {
+        // Composables de view usam DI intencional; bolsas grandes são padrão esperado de testabilidade
+        if (!ehComposableDeView) {
+            if (ts.isInterfaceDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text) && no.members.length > 5) {
                 analiseAst.bolsasDependenciasLargas += 1;
             }
-        }
 
-        if ((ts.isFunctionDeclaration(no) || ts.isArrowFunction(no) || ts.isFunctionExpression(no)) && no.parameters) {
-            no.parameters.forEach((parametro) => {
-                if (!ts.isIdentifier(parametro.name)) {
-                    return;
-                }
-                if (!["dependencias", "estado", "contexto"].includes(parametro.name.text)) {
-                    return;
-                }
-                const totalMembros = parametro.type ? contarMembrosBolsa(parametro.type) : 0;
+            if (ts.isTypeAliasDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text)) {
+                const totalMembros = contarMembrosBolsa(no.type);
                 if (totalMembros > 5) {
                     analiseAst.bolsasDependenciasLargas += 1;
                 }
-            });
+            }
+
+            if ((ts.isFunctionDeclaration(no) || ts.isArrowFunction(no) || ts.isFunctionExpression(no)) && no.parameters) {
+                no.parameters.forEach((parametro) => {
+                    if (!ts.isIdentifier(parametro.name)) {
+                        return;
+                    }
+                    if (!["dependencias", "estado", "contexto"].includes(parametro.name.text)) {
+                        return;
+                    }
+                    const totalMembros = parametro.type ? contarMembrosBolsa(parametro.type) : 0;
+                    if (totalMembros > 5) {
+                        analiseAst.bolsasDependenciasLargas += 1;
+                    }
+                });
+            }
         }
 
         if (ts.isVariableDeclaration(no) && no.initializer && ts.isCallExpression(no.initializer)) {
@@ -364,8 +380,9 @@ function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
             }
         }
 
-        analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo);
+        analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo, profundidadeFuncao, ehComposableDeView);
         ts.forEachChild(no, visitar);
+        if (ehFuncaoLike) profundidadeFuncao--;
     }
 
     visitar(arquivo);

@@ -1,6 +1,6 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **348** (critico)
+- Score total: **203** (critico)
 - Arquivos de producao: **264**
 - Views com vazamento de estrategia de cache: **0**
 - Views com chamadas diretas a service: **1**
@@ -8,54 +8,54 @@
 - Views com fan-out arquitetural alto: **0**
 - Acessos diretos a cache de store: **0**
 - Chamadas com booleano posicional: **1**
-- Bolsas de dependencias/estado largas: **8**
-- Superficies exportadas amplas: **23**
+- Bolsas de dependencias/estado largas: **1**
+- Superficies exportadas amplas: **16**
 - Arquivos com mistura de camadas arquiteturais: **0**
 - Arquivos com server state caseiro: **1**
 - Hubs centrais com sinais: **2**
 
 ## Hotspots
 
-1. `frontend/src/composables/useMapas.ts` [composable]
-   - score: 19
-   - sinais: invalidacaoExplicita, superficieAmpla
-   - fan-out: 1 categorias / 2 imports arquiteturais
-2. `frontend/src/stores/perfil.ts` [store]
-   - score: 18
-   - sinais: bolsaDependenciasLarga, superficieAmpla
-   - fan-out: 2 categorias / 4 imports arquiteturais
-3. `frontend/src/views/subprocessoAcoesAdministrativas.ts` [composable]
-   - score: 18
-   - sinais: bolsaDependenciasLarga, superficieAmpla
-   - fan-out: 2 categorias / 3 imports arquiteturais
-4. `frontend/src/views/mapaAnaliseFluxo.ts` [composable]
-   - score: 18
-   - sinais: bolsaDependenciasLarga, superficieAmpla
-   - fan-out: 1 categorias / 1 imports arquiteturais
-5. `frontend/src/stores/organizacao.ts` [store]
+1. `frontend/src/stores/organizacao.ts` [store]
    - score: 18
    - sinais: serviceDireto, serverStateCaseiro
    - fan-out: 1 categorias / 1 imports arquiteturais
-6. `frontend/src/composables/acesso/cadastro.ts` [composable]
-   - score: 18
-   - sinais: superficieAmpla
-   - fan-out: 1 categorias / 1 imports arquiteturais
-7. `frontend/src/views/cadastroAnaliseFluxo.ts` [composable]
-   - score: 18
-   - sinais: bolsaDependenciasLarga, superficieAmpla
-   - fan-out: 0 categorias / 0 imports arquiteturais
-8. `frontend/src/views/mapaDisponibilizacao.ts` [composable]
-   - score: 18
-   - sinais: bolsaDependenciasLarga, superficieAmpla
-   - fan-out: 0 categorias / 0 imports arquiteturais
-9. `frontend/src/composables/useSubprocessoTela.ts` [composable]
+2. `frontend/src/composables/useSubprocessoTela.ts` [composable]
    - score: 13
    - sinais: estrategiaCache
    - fan-out: 3 categorias / 7 imports arquiteturais
-10. `frontend/src/stores/perfilAutenticacao.ts` [store]
+3. `frontend/src/stores/perfilAutenticacao.ts` [store]
    - score: 12
    - sinais: serviceDireto
    - fan-out: 1 categorias / 1 imports arquiteturais
+4. `frontend/src/composables/usePerfil.ts` [composable]
+   - score: 11
+   - sinais: 
+   - fan-out: 1 categorias / 1 imports arquiteturais
+5. `frontend/src/views/LimpezaProcessosView.vue` [view]
+   - score: 10
+   - sinais: serviceDireto
+   - fan-out: 2 categorias / 3 imports arquiteturais
+6. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 2 categorias / 7 imports arquiteturais
+7. `frontend/src/stores/perfil.ts` [store]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 2 categorias / 4 imports arquiteturais
+8. `frontend/src/stores/subprocesso/index.ts` [store]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 1 categorias / 3 imports arquiteturais
+9. `frontend/src/composables/useCadastroAtividadesMutacoes.ts` [composable]
+   - score: 9
+   - sinais: serviceDireto, superficieAmpla
+   - fan-out: 2 categorias / 3 imports arquiteturais
+10. `frontend/src/composables/useFluxoMapa.ts` [composable]
+   - score: 9
+   - sinais: serviceDireto, superficieAmpla
+   - fan-out: 2 categorias / 3 imports arquiteturais
 
 ## Diretrizes acompanhadas
 

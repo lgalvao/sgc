@@ -1,23 +1,11 @@
 import {defineStore} from "pinia";
-import {computed, ref, type Ref} from "vue";
+import {computed, ref} from "vue";
 import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/types/autenticacao";
 import type {Perfil, Unidade} from "@/types/tipos";
 import {useLocalStorage} from "@/composables/useLocalStorage";
 import {useSessionStorage} from "@/composables/useSessionStorage";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {concluirLoginPerfil, encerrarLoginPerfil, iniciarLoginPerfil, type DadosSessaoPerfil} from "@/stores/perfilAutenticacao";
-
-interface EstadoSessaoRefs {
-    usuarioCodigo: Ref<string | null>;
-    perfilSelecionado: Ref<Perfil | null>;
-    unidadeSelecionada: Ref<number | null>;
-    unidadeSelecionadaSigla: Ref<string | null>;
-    permissoesSessao: Ref<PermissoesSessao | null>;
-    usuarioNome: Ref<string | null>;
-    versaoSessao: Ref<number>;
-    perfisUnidades: Ref<PerfilUnidade[]>;
-    unidadeAtualDetalhes: Ref<Unidade | null>;
-}
 
 function obterUnidadeAtualSelecionada(
     perfilSelecionado: Perfil | null,
@@ -33,41 +21,6 @@ function obterUnidadeAtualSelecionada(
     }
 
     return perfisUnidades.find((perfilUnidade) => perfilUnidade.perfil === perfilSelecionado)?.unidade.codigo ?? null;
-}
-function avancarVersaoSessao(estado: EstadoSessaoRefs) {
-    estado.versaoSessao.value += 1;
-}
-
-function atualizarIdentificacaoSessao(estado: EstadoSessaoRefs, dados: DadosSessaoPerfil) {
-    estado.usuarioNome.value = dados.nome;
-    if (dados.tituloEleitoral) {
-        estado.usuarioCodigo.value = dados.tituloEleitoral;
-    }
-}
-
-function atualizarAutorizacaoSessao(estado: EstadoSessaoRefs, dados: DadosSessaoPerfil) {
-    estado.perfilSelecionado.value = dados.perfil;
-    estado.unidadeSelecionada.value = dados.unidadeCodigo;
-    estado.unidadeSelecionadaSigla.value = dados.unidadeSigla;
-    estado.permissoesSessao.value = dados.permissoes;
-}
-
-function aplicarSessaoPerfil(estado: EstadoSessaoRefs, dados: DadosSessaoPerfil) {
-    avancarVersaoSessao(estado);
-    atualizarAutorizacaoSessao(estado, dados);
-    atualizarIdentificacaoSessao(estado, dados);
-}
-
-function limparSessaoLocal(estado: EstadoSessaoRefs) {
-    avancarVersaoSessao(estado);
-    estado.usuarioCodigo.value = null;
-    estado.perfilSelecionado.value = null;
-    estado.unidadeSelecionada.value = null;
-    estado.unidadeSelecionadaSigla.value = null;
-    estado.permissoesSessao.value = null;
-    estado.usuarioNome.value = null;
-    estado.perfisUnidades.value = [];
-    estado.unidadeAtualDetalhes.value = null;
 }
 
 export const usePerfilStore = defineStore("perfil", () => {
@@ -86,23 +39,49 @@ export const usePerfilStore = defineStore("perfil", () => {
     const unidadeAtual = computed(() =>
         obterUnidadeAtualSelecionada(perfilSelecionado.value, unidadeSelecionada.value, perfisUnidades.value)
     );
-    const estadoSessao: EstadoSessaoRefs = {
-        usuarioCodigo,
-        perfilSelecionado,
-        unidadeSelecionada,
-        unidadeSelecionadaSigla,
-        permissoesSessao,
-        usuarioNome,
-        versaoSessao,
-        perfisUnidades,
-        unidadeAtualDetalhes,
-    };
+
+    function avancarVersaoSessao() {
+        versaoSessao.value += 1;
+    }
+
+    function atualizarIdentificacaoSessao(dados: DadosSessaoPerfil) {
+        usuarioNome.value = dados.nome;
+        if (dados.tituloEleitoral) {
+            usuarioCodigo.value = dados.tituloEleitoral;
+        }
+    }
+
+    function atualizarAutorizacaoSessao(dados: DadosSessaoPerfil) {
+        perfilSelecionado.value = dados.perfil;
+        unidadeSelecionada.value = dados.unidadeCodigo;
+        unidadeSelecionadaSigla.value = dados.unidadeSigla;
+        permissoesSessao.value = dados.permissoes;
+    }
+
+    function aplicarSessaoPerfil(dados: DadosSessaoPerfil) {
+        avancarVersaoSessao();
+        atualizarAutorizacaoSessao(dados);
+        atualizarIdentificacaoSessao(dados);
+    }
+
+    function limparSessaoLocal() {
+        avancarVersaoSessao();
+        usuarioCodigo.value = null;
+        perfilSelecionado.value = null;
+        unidadeSelecionada.value = null;
+        unidadeSelecionadaSigla.value = null;
+        permissoesSessao.value = null;
+        usuarioNome.value = null;
+        perfisUnidades.value = [];
+        unidadeAtualDetalhes.value = null;
+    }
+
     const autenticacaoPerfil = {
-        aplicarSessao: (dados: DadosSessaoPerfil) => aplicarSessaoPerfil(estadoSessao, dados),
+        aplicarSessao: aplicarSessaoPerfil,
         atualizarPerfisUnidades: (novosPerfisUnidades: PerfilUnidade[]) => {
             perfisUnidades.value = novosPerfisUnidades;
         },
-        limparSessao: () => limparSessaoLocal(estadoSessao),
+        limparSessao: limparSessaoLocal,
         resetarEstadoAplicacao: resetarEstadoSessao,
     };
 

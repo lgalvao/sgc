@@ -1,9 +1,9 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-28T01:30:15.216Z",
+  "geradoEm": "2026-05-28T01:55:21.184Z",
   "resumo": {
     "arquivosProducao": 264,
-    "scoreTotal": 348,
+    "scoreTotal": 203,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 0,
@@ -17,8 +17,8 @@
       "ocorrenciasForcar": 0,
       "ocorrenciasStale": 0,
       "ocorrenciasSnapshot": 0,
-      "arquivosComBolsaDependenciasLarga": 8,
-      "arquivosComSuperficieAmpla": 23,
+      "arquivosComBolsaDependenciasLarga": 1,
+      "arquivosComSuperficieAmpla": 16,
       "arquivosComMisturaCamadas": 0,
       "arquivosComServerStateCaseiro": 1,
       "arquivosComAcoplamentoStoreAlto": 0,
@@ -29,146 +29,6 @@
     }
   },
   "hotspots": [
-    {
-      "arquivo": "frontend/src/composables/useMapas.ts",
-      "camada": "composable",
-      "linhas": 57,
-      "score": 19,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 2,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 2
-      },
-      "sinaisAtivos": [
-        "invalidacaoExplicita",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/stores/perfil.ts",
-      "camada": "store",
-      "linhas": 142,
-      "score": 18,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 4
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga",
-        "superficieAmpla"
-      ],
-      "hubCentral": true
-    },
-    {
-      "arquivo": "frontend/src/views/subprocessoAcoesAdministrativas.ts",
-      "camada": "composable",
-      "linhas": 167,
-      "score": 18,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 2,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/mapaAnaliseFluxo.ts",
-      "camada": "composable",
-      "linhas": 152,
-      "score": 18,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
     {
       "arquivo": "frontend/src/stores/organizacao.ts",
       "camada": "store",
@@ -201,110 +61,6 @@
       "sinaisAtivos": [
         "serviceDireto",
         "serverStateCaseiro"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/acesso/cadastro.ts",
-      "camada": "composable",
-      "linhas": 67,
-      "score": 18,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 2,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/cadastroAnaliseFluxo.ts",
-      "camada": "composable",
-      "linhas": 191,
-      "score": 18,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 0,
-        "importacoesArquiteturais": 0
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/mapaDisponibilizacao.ts",
-      "camada": "composable",
-      "linhas": 140,
-      "score": 18,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 0,
-        "importacoesArquiteturais": 0
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga",
-        "superficieAmpla"
       ],
       "hubCentral": false
     },
@@ -477,6 +233,40 @@
       "hubCentral": true
     },
     {
+      "arquivo": "frontend/src/stores/perfil.ts",
+      "camada": "store",
+      "linhas": 121,
+      "score": 9,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 1,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 4
+      },
+      "sinaisAtivos": [
+        "superficieAmpla"
+      ],
+      "hubCentral": true
+    },
+    {
       "arquivo": "frontend/src/stores/subprocesso/index.ts",
       "camada": "store",
       "linhas": 163,
@@ -572,41 +362,6 @@
         "bolsasDependenciasLargas": 0,
         "superficieExportadaAmpla": 1,
         "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
-        "serviceDireto",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/useAcoesBlocoProcesso.ts",
-      "camada": "composable",
-      "linhas": 96,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 1,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 3,
         "importacoesArquiteturais": 3
       },
       "sinaisAtivos": [
@@ -825,40 +580,6 @@
       "hubCentral": false
     },
     {
-      "arquivo": "frontend/src/views/processoDetalheTipos.ts",
-      "camada": "composable",
-      "linhas": 31,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga"
-      ],
-      "hubCentral": false
-    },
-    {
       "arquivo": "frontend/src/stores/subprocesso/tipos.ts",
       "camada": "store",
       "linhas": 22,
@@ -923,40 +644,6 @@
       },
       "sinaisAtivos": [
         "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/subprocessoCarregamento.ts",
-      "camada": "composable",
-      "linhas": 132,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 1,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 1,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 0,
-        "importacoesArquiteturais": 0
-      },
-      "sinaisAtivos": [
-        "bolsaDependenciasLarga"
       ],
       "hubCentral": false
     },
