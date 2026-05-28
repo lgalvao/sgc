@@ -1,61 +1,37 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **144** (critico)
+- Score total: **35** (atencao)
 - Arquivos de producao: **265**
 - Views com vazamento de estrategia de cache: **0**
 - Views com chamadas diretas a service: **0**
 - Views com server state caseiro: **0**
 - Views com fan-out arquitetural alto: **0**
 - Acessos diretos a cache de store: **0**
-- Chamadas com booleano posicional: **1**
-- Bolsas de dependencias/estado largas: **1**
-- Superficies exportadas amplas: **16**
+- Chamadas com booleano posicional: **0**
+- Bolsas de dependencias/estado largas: **0**
+- Superficies exportadas amplas: **9**
 - Arquivos com mistura de camadas arquiteturais: **0**
 - Arquivos com server state caseiro: **0**
-- Hubs centrais com sinais: **2**
+- Hubs centrais com sinais: **0**
 
 ## Hotspots
 
-1. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 7 imports arquiteturais
-2. `frontend/src/stores/perfil.ts` [store]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 4 imports arquiteturais
-3. `frontend/src/stores/subprocesso/index.ts` [store]
+1. `frontend/src/stores/subprocesso/index.ts` [store]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 1 categorias / 3 imports arquiteturais
-4. `frontend/src/composables/useCadastroAtividadesMutacoes.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 3 imports arquiteturais
-5. `frontend/src/composables/useFluxoMapa.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 3 imports arquiteturais
-6. `frontend/src/composables/useFluxoCadastroSubprocesso.ts` [composable]
+2. `frontend/src/composables/useMapaSugestoes.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 2 imports arquiteturais
-7. `frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts` [composable]
+3. `frontend/src/composables/useBuscadorUsuarios.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 2 imports arquiteturais
-8. `frontend/src/composables/useMapaSugestoes.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 2 imports arquiteturais
-9. `frontend/src/composables/useBuscadorUsuarios.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 2 imports arquiteturais
-10. `frontend/src/composables/useConfiguracoes.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 2 imports arquiteturais
+4. `frontend/src/App.vue` [outro]
+   - score: 8
+   - sinais: 
+   - fan-out: 2 categorias / 4 imports arquiteturais
 
 ## Diretrizes acompanhadas
 

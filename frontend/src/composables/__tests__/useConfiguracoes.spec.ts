@@ -89,17 +89,6 @@ describe('useConfiguracoes', () => {
         expect(composable.erro.value).toBe('Erro API');
     });
 
-    it('obterValor deve retornar valor correto ou padrao', async () => {
-        const composable = montarComposable();
-        vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([
-            {codigo: 1, chave: 'TESTE_KEY', descricao: 'Desc', valor: 'valor_teste'}
-        ]);
-        await composable.carregarConfiguracoes();
-
-        expect(composable.obterValor('TESTE_KEY')).toBe('valor_teste');
-        expect(composable.obterValor('KEY_INEXISTENTE', 'padrao')).toBe('padrao');
-    });
-
     it('obterDiasInativacaoProcesso deve retornar valor configurado ou padrao', async () => {
         expect(montarComposable().obterDiasInativacaoProcesso()).toBe(30);
 

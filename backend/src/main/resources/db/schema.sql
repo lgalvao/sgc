@@ -612,7 +612,7 @@ create table if not exists sgc.ocupacao_critica
     diagnostico_codigo   bigint not null,
     servidor_titulo      varchar(12) not null,
     competencia_codigo   bigint not null,
-    situacao_capacitacao varchar(10) not null check (situacao_capacitacao in ('NA', 'AC', 'EC', 'C', 'I')),
+    situacao_capacitacao varchar(2) not null check (situacao_capacitacao in ('NA', 'AC', 'EC', 'C', 'I')),
     constraint pk_ocupacao_critica primary key (codigo),
     constraint fk_ocupacao_diagnostico foreign key (diagnostico_codigo) references sgc.diagnostico,
     constraint fk_ocupacao_servidor foreign key (servidor_titulo) references sgc.vw_usuario,

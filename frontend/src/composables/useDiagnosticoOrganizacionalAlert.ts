@@ -99,7 +99,6 @@ export function useDiagnosticoOrganizacionalAlert(
     return {
         carregandoDiagnosticoOrganizacional,
         erroDiagnosticoOrganizacional,
-        diagnosticoOrganizacional,
         gruposDiagnostico,
         resumoDiagnostico,
         unidadesSemResponsavel,
@@ -107,7 +106,6 @@ export function useDiagnosticoOrganizacionalAlert(
         dispensarAlertaDiagnostico: () => {
             alertaDiagnosticoDispensado.value = true;
         },
-        alertaDiagnosticoDispensado,
     };
 }
 

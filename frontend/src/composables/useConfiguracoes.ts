@@ -98,7 +98,6 @@ export function useConfiguracoes() {
         erro,
         carregarConfiguracoes,
         salvarConfiguracoes,
-        obterValor,
         obterDiasInativacaoProcesso,
         obterDiasAlertaNovo,
     };

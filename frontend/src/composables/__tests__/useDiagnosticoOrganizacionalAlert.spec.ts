@@ -38,7 +38,6 @@ describe("useDiagnosticoOrganizacionalAlert", () => {
         await nextTick();
 
         expect(resultado!.exibirAlertaDiagnostico.value).toBe(true);
-        expect(resultado!.diagnosticoOrganizacional.value?.possuiViolacoes).toBe(true);
 
         scope.stop();
     });

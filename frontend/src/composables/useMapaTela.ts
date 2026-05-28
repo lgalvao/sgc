@@ -14,7 +14,8 @@ import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {listarAnalisesValidacao} from "@/services/analiseService";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useMapaOrquestracao} from "@/composables/useMapaOrquestracao";
-import {useMapaSugestoes} from "@/composables/useMapaSugestoes";
+import {useVerSugestoes} from "@/composables/useVerSugestoes";
+import {useEnviarSugestoes} from "@/composables/useEnviarSugestoes";
 import {useMapaAnaliseFluxo} from "@/views/mapaAnaliseFluxo";
 import {useMapaDisponibilizacao} from "@/views/mapaDisponibilizacao";
 import {normalizarErro} from "@/utils/apiError";
@@ -129,24 +130,30 @@ export function useMapaTela(props: MapaTelaProps) {
     }
 
     const {
-        sugestoes,
         sugestoesVisualizacao,
         loadingSugestoesVisualizacao,
-        loadingSugestoesEnvio,
-        mostrarModalSugestoes,
         mostrarModalVerSugestoes,
         verSugestoes,
         fecharModalVerSugestoes,
+    } = useVerSugestoes({
+        obterCodigoSubprocessoObrigatorio,
+        notify,
+    });
+
+    const {
+        sugestoes,
+        loadingSugestoesEnvio,
+        mostrarModalSugestoes,
         abrirModalSugestoes,
         fecharModalSugestoes,
         confirmarSugestoes,
-    } = useMapaSugestoes({
+    } = useEnviarSugestoes({
         obterCodigoSubprocessoObrigatorio,
         notify,
         concluirAcaoPainel,
         validarSubmissao,
         focarPrimeiroErroInvalido,
-        resetarValidacao
+        resetarValidacao,
     });
 
     const mensagemErroDevolucao = computed(() => {

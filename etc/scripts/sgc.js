@@ -65,6 +65,7 @@ criarComandoScript(frontendCruft, "validar", "Valida budgets e waivers do cruft 
 
 const frontendArquitetura = frontend.command("arquitetura").description("Auditorias de arquitetura e vazamento de contratos no frontend.");
 criarComandoScript(frontendArquitetura, "auditar", "Audita vazamentos arquiteturais e estrategia de cache exposta no frontend.", "etc/scripts/frontend/arquitetura-auditar.js");
+criarComandoScript(frontendArquitetura, "validar", "Valida regras arquiteturais do frontend (gate duro).", "etc/scripts/frontend/arquitetura-validar.js");
 
 const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
 criarComandoScript(frontendViews, "validacoes-auditar", "Audita links e validacoes nas views.", "etc/scripts/frontend/views-validacoes-auditar.js");

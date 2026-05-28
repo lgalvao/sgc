@@ -260,6 +260,138 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.resumo.metricas.arquivosComServerStateCaseiro).toBe(1);
         expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
         expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
+        expect(conteudo.hotspots.some((hotspot) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
+    });
+
+    test("tipos internos de store nao disparam bolsaDependenciasLarga", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-contexto-store-"));
+        await fs.outputFile(
+            path.join(base, "frontend", "src", "stores", "subprocesso", "tipos.ts"),
+            `export type ConfiguracaoContexto<T> = {
+                tipoCodigo: string;
+                tipoProcessoUnidade: string;
+                contextoRef: unknown;
+                contextoInvalidoRef: unknown;
+                codigosPorProcessoUnidade: unknown;
+                buscarPorCodigo: () => Promise<unknown>;
+                buscarPorProcessoEUnidade: () => Promise<unknown>;
+                registrar: () => void;
+                mensagemCodigo: () => string;
+                mensagemProcessoUnidade: () => string;
+            };`
+        );
+        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base]);
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo.metricas.arquivosComBolsaDependenciasLarga).toBe(0);
+    });
+
+    test("hub central nao dispara superficieAmpla", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-hub-central-"));
+        const frontendDir = path.join(base, "frontend", "src");
+
+        await fs.outputFile(
+            path.join(frontendDir, "stores", "perfil.ts"),
+            [
+                "import {defineStore} from 'pinia';",
+                "export const usePerfilStore = defineStore('perfil', () => {",
+                "  return {",
+                "    a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12,",
+                "  };",
+                "});",
+                "export const perfilA = 1;",
+                "export const perfilB = 2;",
+                "export const perfilC = 3;",
+                "export const perfilD = 4;",
+                "export const perfilE = 5;",
+                "export const perfilF = 6;",
+                "export const perfilG = 7;",
+                "export const perfilH = 8;",
+                "export const perfilI = 9;",
+                "export const perfilJ = 10;",
+                "export const perfilK = 11;",
+                "export const perfilL = 12;",
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        const hotspot = conteudo.hotspots.find((item) => item.arquivo === "frontend/src/stores/perfil.ts");
+        expect(hotspot).toBeUndefined();
+    });
+
+    test("gate arquitetural falha quando view importa service diretamente", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-gate-falha-"));
+        const frontendDir = path.join(base, "frontend");
+
+        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+            compilerOptions: {
+                baseUrl: ".",
+                paths: {
+                    "@/*": ["./src/*"],
+                },
+            },
+            include: ["src/**/*.ts", "src/**/*.vue"],
+        });
+        await fs.outputFile(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await fs.outputFile(
+            path.join(frontendDir, "src", "views", "UnidadeView.vue"),
+            [
+                "<script setup lang=\"ts\">",
+                "import {buscarUnidade} from '../services/unidadeService';",
+                "void buscarUnidade();",
+                "</script>",
+            ].join("\n")
+        );
+        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+
+        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        expect(resultado.exitCode).not.toBe(0);
+        expect(resultado.stdout).toContain("view-sem-service-direto");
+    });
+
+    test("gate arquitetural passa quando view usa composable", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-gate-ok-"));
+        const frontendDir = path.join(base, "frontend");
+
+        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+            compilerOptions: {
+                baseUrl: ".",
+                paths: {
+                    "@/*": ["./src/*"],
+                },
+            },
+            include: ["src/**/*.ts", "src/**/*.vue"],
+        });
+        await fs.outputFile(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await fs.outputFile(
+            path.join(frontendDir, "src", "composables", "useUnidadeTela.ts"),
+            [
+                "import {buscarUnidade} from '../services/unidadeService';",
+                "export function useUnidadeTela() {",
+                "  return { carregar: () => buscarUnidade() };",
+                "}",
+            ].join("\n")
+        );
+        await fs.outputFile(
+            path.join(frontendDir, "src", "views", "UnidadeView.vue"),
+            [
+                "<script setup lang=\"ts\">",
+                "import {useUnidadeTela} from '../composables/useUnidadeTela';",
+                "const tela = useUnidadeTela();",
+                "void tela.carregar();",
+                "</script>",
+            ].join("\n")
+        );
+        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+
+        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Nenhuma violacao arquitetural encontrada");
     });
 
     test("composable fachada de store não é penalizado por chamadasStore >= 8", async () => {

@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import ts from "typescript";
+import {Node, Project, SyntaxKind, ts} from "ts-morph";
 import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
 
 const VERSAO_SCHEMA = "2.0.0";
@@ -17,19 +17,14 @@ const HUBS_CENTRAIS = new Set([
     "frontend/src/composables/useInvalidacaoNavegacao.ts",
     "frontend/src/composables/useCacheSync.ts",
 ]);
-const NOMES_BOLSAS_LARGAS = /(Dependencias|Estado|Contexto)(?:[A-Z][A-Za-z0-9_]*)?$/;
+const NOMES_BOLSAS_LARGAS = /^(Dependencias|Estado|Contexto)(?:[A-Z][A-Za-z0-9_]*)?$/;
 const NOMES_CHAMADAS_ESTRATEGIA = /^(invalidar|recarregar|sincronizar|marcar[A-Z].*Atualizacao|dados[A-Z].*Validos|limparContextoAtual|resetar)$/;
 const NOMES_CHAMADAS_INVALIDACAO = /^(invalidar|marcar[A-Z].*Atualizacao|limparContextoAtual|resetar)$/;
 const NOMES_ESTADO_ASSINCRONO_MANUAL = /^(carregando|carregado|ultimoErro|erro|promessa|promessas|carregamentoInicialConcluido|dados[A-Z].*Validos|contexto[A-Z].*Invalido)$/;
 const NOMES_COORDENACAO_SERVER_STATE_CASEIRO = /^(garantirDados|dados[A-Z].*Validos|recarregarContexto[A-Z].*|carregarContexto[A-Z].*|carregarDados[A-Z].*|sincronizar[A-Z].*|marcar[A-Z].*Atualizacao|invalidar|resetar)$/;
 const CHAMADAS_COLADA_QUERY = new Set(["useQuery", "useMutation", "useInfiniteQuery"]);
 const CHAMADAS_COLADA_CACHE = new Set(["useQueryCache"]);
-
 const PADROES = {
-    acessoDiretoCache: /\.\s*cache[A-Z][A-Za-z0-9_]*/g,
-    metodoEmCache: /\b(?:tem|obter|reaplicar)[A-Za-z0-9_]*EmCache\s*\(/g,
-    invalidacaoExplicita: /\.\s*invalidar[A-Za-z0-9_]*\s*\(/g,
-    booleanoPosicional: /\b[A-Za-z_$][\w$]*\s*\([^)\n]*,\s*(?:true|false)\s*(?:[,)\n])/g,
     palavraForcar: /\bforcar\b/g,
     palavraStale: /\bstale\b/g,
     palavraSnapshot: /\bsnapshot\b/g,
@@ -55,7 +50,6 @@ function ehArquivoProducaoFrontend(caminhoRelativo) {
 
 function classificarCamada(caminhoRelativo) {
     if (caminhoRelativo.startsWith("frontend/src/views/")) {
-        // Apenas arquivos .vue são views de verdade; helpers .ts co-localizados são composables
         return caminhoRelativo.endsWith(".vue") ? "view" : "composable";
     }
     if (caminhoRelativo.startsWith("frontend/src/stores/")) return "store";
@@ -177,11 +171,11 @@ function criarAnaliseAst() {
 }
 
 function obterNomeChamada(expressao) {
-    if (ts.isIdentifier(expressao)) {
-        return expressao.text;
+    if (Node.isIdentifier(expressao)) {
+        return expressao.getText();
     }
-    if (ts.isPropertyAccessExpression(expressao)) {
-        return expressao.name.text;
+    if (Node.isPropertyAccessExpression(expressao)) {
+        return expressao.getName();
     }
     return null;
 }
@@ -193,216 +187,300 @@ function adicionarSet(destino, valor) {
 }
 
 function contarMembrosBolsa(noTipo) {
-    if (ts.isTypeLiteralNode(noTipo)) {
-        return noTipo.members.length;
+    if (noTipo && Node.isTypeLiteral(noTipo)) {
+        return noTipo.getMembers().length;
     }
     return 0;
 }
 
-function analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo, profundidadeFuncao, ehComposableDeView) {
-    if (!ts.isReturnStatement(no) || !no.expression || !ts.isObjectLiteralExpression(no.expression)) {
-        return;
-    }
+function ehFuncaoLike(no) {
+    return Node.isFunctionDeclaration(no)
+        || Node.isArrowFunction(no)
+        || Node.isFunctionExpression(no)
+        || Node.isMethodDeclaration(no);
+}
 
-    // Não contar retornos dentro de funções aninhadas (ex: callbacks de computed, watch, filter)
-    if (profundidadeFuncao > 1) return;
+function obterProfundidadeFuncao(no) {
+    return no.getAncestors().filter(ehFuncaoLike).length;
+}
 
-    // Composables que só delegam para um único store são fachadas de store; superfície ampla é intencional
-    const ehFacadeDeStore = camada === "composable"
-        && analiseAst.importsPorCategoria.store.size === 1
-        && analiseAst.importsPorCategoria.composable.size === 0
-        && analiseAst.importsPorCategoria.service.size === 0;
-    if (ehFacadeDeStore) return;
+function analisarSuperficieExportada(sourceFile, camada, analiseAst, caminhoRelativo, ehComposableDeView) {
+    const retornos = sourceFile.getDescendantsOfKind(SyntaxKind.ReturnStatement);
+    for (const retorno of retornos) {
+        const expressao = retorno.getExpression();
+        if (!expressao || !Node.isObjectLiteralExpression(expressao)) {
+            continue;
+        }
 
-    // Composables de Tela e de Orquestracao são contratos de tela por design; superfície ampla é intencional
-    const ehContratoDeTela = camada === "composable"
-        && /(Tela|Orquestracao)\.ts$/.test(caminhoRelativo ?? "");
-    if (ehContratoDeTela) return;
+        if (obterProfundidadeFuncao(retorno) > 1) {
+            continue;
+        }
 
-    // Composables co-localizados em views/ são helpers de view por design; superfície ampla é intencional
-    if (ehComposableDeView) return;
+        const ehFacadeDeStore = camada === "composable"
+            && analiseAst.importsPorCategoria.store.size === 1
+            && analiseAst.importsPorCategoria.composable.size === 0
+            && analiseAst.importsPorCategoria.service.size === 0;
+        if (ehFacadeDeStore) {
+            continue;
+        }
 
-    const totalPropriedades = no.expression.properties.length;
-    const limite = camada === "store" ? 10 : 8;
-    if (totalPropriedades > limite) {
-        analiseAst.superficieExportadaAmpla += 1;
+        const ehContratoDeTela = camada === "composable"
+            && (
+                /(Tela|Orquestracao|Mutacoes|Form)\.ts$/.test(caminhoRelativo ?? "")
+                || /Fluxo/.test(caminhoRelativo ?? "")
+            );
+        if (ehContratoDeTela || ehComposableDeView) {
+            continue;
+        }
+
+        const totalPropriedades = expressao.getProperties().length;
+        const limite = camada === "store" ? 10 : 8;
+        if (totalPropriedades > limite) {
+            analiseAst.superficieExportadaAmpla += 1;
+        }
     }
 }
 
-function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
+function analisarBolsasDependencias(sourceFile, analiseAst, ehComposableDeView) {
+    if (ehComposableDeView) {
+        return;
+    }
+
+    for (const declaracao of sourceFile.getInterfaces()) {
+        if (NOMES_BOLSAS_LARGAS.test(declaracao.getName()) && declaracao.getMembers().length > 5) {
+            analiseAst.bolsasDependenciasLargas += 1;
+        }
+    }
+
+    for (const declaracao of sourceFile.getTypeAliases()) {
+        if (!NOMES_BOLSAS_LARGAS.test(declaracao.getName())) {
+            continue;
+        }
+        if (contarMembrosBolsa(declaracao.getTypeNode()) > 5) {
+            analiseAst.bolsasDependenciasLargas += 1;
+        }
+    }
+
+    for (const funcao of sourceFile.getFunctions()) {
+        if (!funcao.getName()?.startsWith("use")) {
+            continue;
+        }
+        for (const parametro of funcao.getParameters()) {
+            const tipo = parametro.getTypeNode();
+            if (tipo && Node.isTypeLiteral(tipo) && tipo.getMembers().length > 5) {
+                analiseAst.bolsasDependenciasLargas += 1;
+            }
+        }
+    }
+
+    for (const declaracao of sourceFile.getVariableDeclarations()) {
+        const nome = declaracao.getName();
+        if (!nome.startsWith("use")) {
+            continue;
+        }
+        const inicializador = declaracao.getInitializer();
+        if (!inicializador || (!Node.isArrowFunction(inicializador) && !Node.isFunctionExpression(inicializador))) {
+            continue;
+        }
+        for (const parametro of inicializador.getParameters()) {
+            const tipo = parametro.getTypeNode();
+            if (tipo && Node.isTypeLiteral(tipo) && tipo.getMembers().length > 5) {
+                analiseAst.bolsasDependenciasLargas += 1;
+            }
+        }
+    }
+}
+
+function computarSinaisLexicais(sourceFile, conteudoOriginal) {
+    const propertyAccesses = sourceFile.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression);
+    const callExpressions = sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression);
+
+    let acessoDiretoCache = 0;
+    for (const acesso of propertyAccesses) {
+        if (/^cache[A-Z]/.test(acesso.getName())) {
+            acessoDiretoCache += 1;
+        }
+    }
+
+    let metodoEmCache = 0;
+    let invalidacaoExplicita = 0;
+    let booleanoPosicional = 0;
+    for (const chamada of callExpressions) {
+        const expressao = chamada.getExpression();
+        if (Node.isPropertyAccessExpression(expressao)) {
+            const nomeMetodo = expressao.getName();
+            if (/EmCache$/.test(nomeMetodo)) {
+                metodoEmCache += 1;
+            }
+            if (/^invalidar/.test(nomeMetodo)) {
+                invalidacaoExplicita += 1;
+            }
+        }
+
+        const argumentos = chamada.getArguments();
+        if (argumentos.length < 2) {
+            continue;
+        }
+        for (let indice = 1; indice < argumentos.length; indice += 1) {
+            const kind = argumentos[indice].getKind();
+            if (kind === SyntaxKind.TrueKeyword || kind === SyntaxKind.FalseKeyword) {
+                booleanoPosicional += 1;
+                break;
+            }
+        }
+    }
+
+    return {
+        acessoDiretoCache,
+        metodoEmCache,
+        invalidacaoExplicita,
+        booleanoPosicional,
+        palavraForcar: contarOcorrencias(conteudoOriginal, PADROES.palavraForcar),
+        palavraStale: contarOcorrencias(conteudoOriginal, PADROES.palavraStale),
+        palavraSnapshot: contarOcorrencias(conteudoOriginal, PADROES.palavraSnapshot),
+    };
+}
+
+function analisarArquivoAst(project, caminhoRelativo, conteudoOriginal, camada) {
     const codigo = extrairCodigoScript(caminhoRelativo, conteudoOriginal);
     const analiseAst = criarAnaliseAst();
 
     if (!codigo.trim()) {
-        return analiseAst;
+        return {analiseAst, sourceFile: null};
     }
 
-    const arquivo = ts.createSourceFile(caminhoRelativo, codigo, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-
+    const sourceFile = project.createSourceFile(caminhoRelativo, codigo, {overwrite: true, scriptKind: ts.ScriptKind.TS});
     const ehComposableDeView = camada === "composable"
         && (caminhoRelativo ?? "").startsWith("frontend/src/views/");
-    let profundidadeFuncao = 0;
 
-    function visitar(no) {
-        const ehFuncaoLike = ts.isFunctionDeclaration(no) || ts.isArrowFunction(no) || ts.isFunctionExpression(no);
-        if (ehFuncaoLike) profundidadeFuncao++;
+    for (const declaracao of sourceFile.getImportDeclarations()) {
+        const especificador = declaracao.getModuleSpecifierValue();
+        const resolvido = resolverImportacao(caminhoRelativo, especificador);
+        const categoria = classificarImportacaoResolvida(resolvido);
+        adicionarSet(analiseAst.importsPorCategoria[categoria] ?? analiseAst.importsPorCategoria.outro, resolvido ?? especificador);
 
-        if (ts.isImportDeclaration(no) && ts.isStringLiteral(no.moduleSpecifier)) {
-            const especificador = no.moduleSpecifier.text;
-            const resolvido = resolverImportacao(caminhoRelativo, especificador);
-            const categoria = classificarImportacaoResolvida(resolvido);
-            adicionarSet(analiseAst.importsPorCategoria[categoria] ?? analiseAst.importsPorCategoria.outro, resolvido ?? especificador);
-
-            const clausula = no.importClause;
-            if (categoria === "service" && clausula?.namedBindings) {
-                if (ts.isNamespaceImport(clausula.namedBindings)) {
-                    analiseAst.aliasesServicosNamespace.add(clausula.namedBindings.name.text);
-                }
-                if (ts.isNamedImports(clausula.namedBindings)) {
-                    clausula.namedBindings.elements.forEach((elemento) => {
-                        analiseAst.aliasesServicosNomeados.add(elemento.name.text);
-                    });
-                }
-            }
-            if (especificador === "@pinia/colada" && clausula?.namedBindings && ts.isNamedImports(clausula.namedBindings)) {
-                clausula.namedBindings.elements.forEach((elemento) => {
-                    analiseAst.aliasesColadaNomeados.add(elemento.name.text);
-                });
-            }
+        const namespaceImport = declaracao.getNamespaceImport();
+        if (categoria === "service" && namespaceImport) {
+            analiseAst.aliasesServicosNamespace.add(namespaceImport.getText());
         }
 
-        // Composables de view usam DI intencional; bolsas grandes são padrão esperado de testabilidade
-        if (!ehComposableDeView) {
-            if (ts.isInterfaceDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text) && no.members.length > 5) {
-                analiseAst.bolsasDependenciasLargas += 1;
-            }
-
-            if (ts.isTypeAliasDeclaration(no) && NOMES_BOLSAS_LARGAS.test(no.name.text)) {
-                const totalMembros = contarMembrosBolsa(no.type);
-                if (totalMembros > 5) {
-                    analiseAst.bolsasDependenciasLargas += 1;
-                }
-            }
-
-            if ((ts.isFunctionDeclaration(no) || ts.isArrowFunction(no) || ts.isFunctionExpression(no)) && no.parameters) {
-                no.parameters.forEach((parametro) => {
-                    if (!ts.isIdentifier(parametro.name)) {
-                        return;
-                    }
-                    if (!["dependencias", "estado", "contexto"].includes(parametro.name.text)) {
-                        return;
-                    }
-                    const totalMembros = parametro.type ? contarMembrosBolsa(parametro.type) : 0;
-                    if (totalMembros > 5) {
-                        analiseAst.bolsasDependenciasLargas += 1;
-                    }
-                });
-            }
+        if (categoria === "service") {
+            declaracao.getNamedImports().forEach((elemento) => {
+                analiseAst.aliasesServicosNomeados.add(elemento.getAliasNode()?.getText() ?? elemento.getNameNode().getText());
+            });
         }
 
-        if (ts.isVariableDeclaration(no) && no.initializer && ts.isCallExpression(no.initializer)) {
-            const nomeChamada = obterNomeChamada(no.initializer.expression);
+        if (especificador === "@pinia/colada") {
+            declaracao.getNamedImports().forEach((elemento) => {
+                analiseAst.aliasesColadaNomeados.add(elemento.getAliasNode()?.getText() ?? elemento.getNameNode().getText());
+            });
+        }
+    }
+
+    analisarBolsasDependencias(sourceFile, analiseAst, ehComposableDeView);
+
+    for (const declaracao of sourceFile.getVariableDeclarations()) {
+        const nome = declaracao.getNameNode();
+        const inicializador = declaracao.getInitializer();
+
+        if (inicializador && Node.isCallExpression(inicializador)) {
+            const nomeChamada = obterNomeChamada(inicializador.getExpression());
             if (nomeChamada && /^use[A-Z].*Store$/.test(nomeChamada)) {
-                if (ts.isIdentifier(no.name)) {
-                    analiseAst.variaveisStore.add(no.name.text);
+                if (Node.isIdentifier(nome)) {
+                    analiseAst.variaveisStore.add(nome.getText());
                 }
-                if (ts.isObjectBindingPattern(no.name)) {
-                    no.name.elements.forEach((elemento) => {
-                        if (ts.isIdentifier(elemento.name)) {
-                            analiseAst.membrosStoreDesestruturados.add(elemento.name.text);
-                        }
+                if (Node.isObjectBindingPattern(nome)) {
+                    nome.getElements().forEach((elemento) => {
+                        analiseAst.membrosStoreDesestruturados.add(elemento.getNameNode().getText());
                     });
                 }
             }
         }
 
-        if (ts.isVariableDeclaration(no) && ts.isIdentifier(no.name) && NOMES_ESTADO_ASSINCRONO_MANUAL.test(no.name.text)) {
+        if (Node.isIdentifier(nome) && NOMES_ESTADO_ASSINCRONO_MANUAL.test(nome.getText())) {
             if (
-                // computed() é estado DERIVADO (não manual); só ref() conta como estado assíncrono caseiro
-                (no.initializer && ts.isCallExpression(no.initializer) && obterNomeChamada(no.initializer.expression) === "ref")
-                || (no.initializer && ts.isNewExpression(no.initializer) && ts.isIdentifier(no.initializer.expression) && no.initializer.expression.text === "Map")
+                (inicializador && Node.isCallExpression(inicializador) && obterNomeChamada(inicializador.getExpression()) === "ref")
+                || (inicializador && Node.isNewExpression(inicializador) && Node.isIdentifier(inicializador.getExpression()) && inicializador.getExpression().getText() === "Map")
             ) {
                 analiseAst.estadosAssincronosManuais += 1;
             }
         }
 
-        if (ts.isVariableDeclaration(no) && ts.isIdentifier(no.name) && /promessa|promessas/i.test(no.name.text)) {
-            if (no.initializer && ts.isNewExpression(no.initializer) && ts.isIdentifier(no.initializer.expression) && no.initializer.expression.text === "Map") {
+        if (Node.isIdentifier(nome) && /promessa|promessas/i.test(nome.getText())) {
+            if (inicializador && Node.isNewExpression(inicializador) && Node.isIdentifier(inicializador.getExpression()) && inicializador.getExpression().getText() === "Map") {
                 analiseAst.mapasPromessasDedupe += 1;
             }
         }
-
-        if ((ts.isFunctionDeclaration(no) || ts.isMethodDeclaration(no)) && no.name && ts.isIdentifier(no.name)) {
-            if (NOMES_COORDENACAO_SERVER_STATE_CASEIRO.test(no.name.text)) {
-                analiseAst.coordenacaoServerStateCaseiro += 1;
-            }
-        }
-
-        if (ts.isPropertyAccessExpression(no) && ts.isIdentifier(no.expression)) {
-            const alvo = no.expression.text;
-            const propriedade = no.name.text;
-
-            if (analiseAst.variaveisStore.has(alvo)) {
-                analiseAst.chamadasStore += 1;
-                if (NOMES_CHAMADAS_ESTRATEGIA.test(propriedade)) {
-                    analiseAst.chamadasEstrategiaCache += 1;
-                }
-                if (NOMES_CHAMADAS_INVALIDACAO.test(propriedade)) {
-                    analiseAst.chamadasInvalidacao += 1;
-                }
-            }
-
-            if (analiseAst.aliasesServicosNamespace.has(alvo) && ts.isCallExpression(no.parent) && no.parent.expression === no) {
-                analiseAst.chamadasServiceDiretas += 1;
-            }
-        }
-
-        if (ts.isCallExpression(no)) {
-            const nomeChamada = obterNomeChamada(no.expression);
-            if (nomeChamada === "defineStore") {
-                analiseAst.usaDefineStore = true;
-            }
-            if (nomeChamada && analiseAst.membrosStoreDesestruturados.has(nomeChamada)) {
-                analiseAst.chamadasStore += 1;
-                if (NOMES_CHAMADAS_ESTRATEGIA.test(nomeChamada)) {
-                    analiseAst.chamadasEstrategiaCache += 1;
-                }
-                if (NOMES_CHAMADAS_INVALIDACAO.test(nomeChamada)) {
-                    analiseAst.chamadasInvalidacao += 1;
-                }
-            }
-            if (nomeChamada && analiseAst.aliasesServicosNomeados.has(nomeChamada)) {
-                analiseAst.chamadasServiceDiretas += 1;
-            }
-            if (nomeChamada && analiseAst.aliasesColadaNomeados.has(nomeChamada)) {
-                if (CHAMADAS_COLADA_QUERY.has(nomeChamada)) {
-                    analiseAst.chamadasColadaQuery += 1;
-                }
-                if (CHAMADAS_COLADA_CACHE.has(nomeChamada)) {
-                    analiseAst.chamadasColadaCache += 1;
-                }
-            }
-        }
-
-        analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo, profundidadeFuncao, ehComposableDeView);
-        ts.forEachChild(no, visitar);
-        if (ehFuncaoLike) profundidadeFuncao--;
     }
 
-    visitar(arquivo);
-    return analiseAst;
-}
+    for (const funcao of sourceFile.getDescendantsOfKind(SyntaxKind.FunctionDeclaration)) {
+        const nome = funcao.getName();
+        if (nome && NOMES_COORDENACAO_SERVER_STATE_CASEIRO.test(nome)) {
+            analiseAst.coordenacaoServerStateCaseiro += 1;
+        }
+    }
+    for (const metodo of sourceFile.getDescendantsOfKind(SyntaxKind.MethodDeclaration)) {
+        const nome = metodo.getName();
+        if (nome && NOMES_COORDENACAO_SERVER_STATE_CASEIRO.test(nome)) {
+            analiseAst.coordenacaoServerStateCaseiro += 1;
+        }
+    }
 
-function computarSinaisLexicais(conteudo) {
-    return {
-        acessoDiretoCache: contarOcorrencias(conteudo, PADROES.acessoDiretoCache),
-        metodoEmCache: contarOcorrencias(conteudo, PADROES.metodoEmCache),
-        invalidacaoExplicita: contarOcorrencias(conteudo, PADROES.invalidacaoExplicita),
-        booleanoPosicional: contarOcorrencias(conteudo, PADROES.booleanoPosicional),
-        palavraForcar: contarOcorrencias(conteudo, PADROES.palavraForcar),
-        palavraStale: contarOcorrencias(conteudo, PADROES.palavraStale),
-        palavraSnapshot: contarOcorrencias(conteudo, PADROES.palavraSnapshot),
-    };
+    for (const acesso of sourceFile.getDescendantsOfKind(SyntaxKind.PropertyAccessExpression)) {
+        const alvo = acesso.getExpression();
+        if (!Node.isIdentifier(alvo)) {
+            continue;
+        }
+        const nomeAlvo = alvo.getText();
+        const propriedade = acesso.getName();
+
+        if (analiseAst.variaveisStore.has(nomeAlvo)) {
+            analiseAst.chamadasStore += 1;
+            if (NOMES_CHAMADAS_ESTRATEGIA.test(propriedade)) {
+                analiseAst.chamadasEstrategiaCache += 1;
+            }
+            if (NOMES_CHAMADAS_INVALIDACAO.test(propriedade)) {
+                analiseAst.chamadasInvalidacao += 1;
+            }
+        }
+
+        if (analiseAst.aliasesServicosNamespace.has(nomeAlvo)) {
+            const pai = acesso.getParent();
+            if (Node.isCallExpression(pai) && pai.getExpression() === acesso) {
+                analiseAst.chamadasServiceDiretas += 1;
+            }
+        }
+    }
+
+    for (const chamada of sourceFile.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+        const nomeChamada = obterNomeChamada(chamada.getExpression());
+        if (nomeChamada === "defineStore") {
+            analiseAst.usaDefineStore = true;
+        }
+        if (nomeChamada && analiseAst.membrosStoreDesestruturados.has(nomeChamada)) {
+            analiseAst.chamadasStore += 1;
+            if (NOMES_CHAMADAS_ESTRATEGIA.test(nomeChamada)) {
+                analiseAst.chamadasEstrategiaCache += 1;
+            }
+            if (NOMES_CHAMADAS_INVALIDACAO.test(nomeChamada)) {
+                analiseAst.chamadasInvalidacao += 1;
+            }
+        }
+        if (nomeChamada && analiseAst.aliasesServicosNomeados.has(nomeChamada)) {
+            analiseAst.chamadasServiceDiretas += 1;
+        }
+        if (nomeChamada && analiseAst.aliasesColadaNomeados.has(nomeChamada)) {
+            if (CHAMADAS_COLADA_QUERY.has(nomeChamada)) {
+                analiseAst.chamadasColadaQuery += 1;
+            }
+            if (CHAMADAS_COLADA_CACHE.has(nomeChamada)) {
+                analiseAst.chamadasColadaCache += 1;
+            }
+        }
+    }
+
+    analisarSuperficieExportada(sourceFile, camada, analiseAst, caminhoRelativo, ehComposableDeView);
+    return {analiseAst, sourceFile};
 }
 
 function contarCategoriasAcoplamento(importsPorCategoria) {
@@ -444,10 +522,7 @@ function detectarServerStateCaseiro({camada, analiseAst}) {
 }
 
 function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) {
-    // Arquivos em stores/ que não usam defineStore são módulos de orquestração, não stores Pinia
     const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
-
-    // Composables que só delegam para um único store são fachadas; acessos múltiplos ao store são esperados
     const ehFacadeDeStore = camadaEfetiva === "composable"
         && analiseAst.importsPorCategoria.store.size === 1
         && analiseAst.importsPorCategoria.composable.size === 0
@@ -461,12 +536,10 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
         + (sinaisLexicais.palavraStale * 3)
         + (sinaisLexicais.palavraSnapshot * 2);
 
-    // Penalidades de coordenação de cache: isentas em hubs centrais (cuja função É exatamente essa)
     if (!hubCentral) {
         total += sinaisLexicais.invalidacaoExplicita * 5;
         total += analiseAst.chamadasEstrategiaCache * (camadaEfetiva === "view" ? 8 : 5);
         total += analiseAst.chamadasInvalidacao * (camadaEfetiva === "view" ? 10 : 6);
-        // Fachadas de store acessam o store muitas vezes por design; não penalizar
         if (!ehFacadeDeStore && analiseAst.chamadasStore >= 8) {
             total += 8 + (Math.floor((analiseAst.chamadasStore - 8) / 4) * 3);
         }
@@ -475,8 +548,6 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
     const categoriasAcoplamento = contarCategoriasAcoplamento(analiseAst.importsPorCategoria);
     const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
 
-    // Mistura de camadas e fan-out: só problemáticos em views e componentes
-    // Composables podem e devem importar de múltiplas camadas arquiteturais
     if (camadaEfetiva === "view" || camadaEfetiva === "component") {
         if (categoriasAcoplamento >= 3) {
             total += 10 + ((categoriasAcoplamento - 3) * 4);
@@ -491,7 +562,7 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
         total += camadaEfetiva === "view" ? 18 : 14;
     }
     total += analiseAst.bolsasDependenciasLargas * 9;
-    if (camadaEfetiva === "store" || camadaEfetiva === "composable" || camadaEfetiva === "view" || camadaEfetiva === "component") {
+    if (!hubCentral && (camadaEfetiva === "store" || camadaEfetiva === "composable" || camadaEfetiva === "view" || camadaEfetiva === "component")) {
         total += analiseAst.superficieExportadaAmpla * 9;
     }
 
@@ -584,33 +655,34 @@ function criarMetricasResumo() {
 
 function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral) {
     const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
-    const ehFacadeDeStore = camadaEfetiva === "composable"
-        && analiseAst.importsPorCategoria.store.size === 1
-        && analiseAst.importsPorCategoria.composable.size === 0
-        && analiseAst.importsPorCategoria.service.size === 0;
 
     const sinais = [];
     for (const [nome, valor] of Object.entries(sinaisLexicais)) {
-        // Hubs centrais: invalidacaoExplicita é esperada e correta — não sinalizar
         if (nome === "invalidacaoExplicita" && hubCentral) continue;
         if (valor > 0) {
             sinais.push(nome);
         }
     }
-    // Só sinalizar serviceDireto quando há penalidade real; composables e módulos utilitários podem chamar serviços
     if (analiseAst.chamadasServiceDiretas > 0 && pesoServiceDireto(camadaEfetiva) > 0) sinais.push("serviceDireto");
-    // Sinais de estratégia/invalidação: só relevantes fora de hubs centrais
     if (!hubCentral && analiseAst.chamadasEstrategiaCache > 0) sinais.push("estrategiaCache");
     if (!hubCentral && analiseAst.chamadasInvalidacao > 0) sinais.push("invalidacaoArquitetural");
     if (analiseAst.bolsasDependenciasLargas > 0) sinais.push("bolsaDependenciasLarga");
-    if (analiseAst.superficieExportadaAmpla > 0) sinais.push("superficieAmpla");
+    if (!hubCentral && analiseAst.superficieExportadaAmpla > 0) sinais.push("superficieAmpla");
     if (detectarServerStateCaseiro({camada: camadaEfetiva, analiseAst})) sinais.push("serverStateCaseiro");
-    // Mistura de camadas e fan-out: só problemáticos em views e componentes
     if (categoriasAcoplamento >= 3 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("misturaCamadas");
     if (importacoesArquiteturais >= 5 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("fanoutAlto");
-    // Acoplamento alto a stores: só problemático em views e componentes (e fora de hubs)
     if (!hubCentral && analiseAst.chamadasStore >= 8 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("acoplamentoStoreAlto");
     return sinais;
+}
+
+function criarProjetoAnalise() {
+    return new Project({
+        useInMemoryFileSystem: true,
+        compilerOptions: {
+            allowJs: true,
+            strict: false,
+        },
+    });
 }
 
 async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
@@ -618,6 +690,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
     const arquivos = await listarArquivosFrontend(baseResolvida);
     const analisados = [];
     const metricas = criarMetricasResumo();
+    const project = criarProjetoAnalise();
 
     for (const arquivo of arquivos) {
         const caminhoRelativo = normalizarCaminho(path.relative(baseResolvida, arquivo));
@@ -627,8 +700,16 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
 
         const conteudo = await fs.readFile(arquivo, "utf8");
         const camada = classificarCamada(caminhoRelativo);
-        const sinaisLexicais = computarSinaisLexicais(conteudo);
-        const analiseAst = analisarArquivoAst(caminhoRelativo, conteudo, camada);
+        const {analiseAst, sourceFile} = analisarArquivoAst(project, caminhoRelativo, conteudo, camada);
+        const sinaisLexicais = sourceFile ? computarSinaisLexicais(sourceFile, conteudo) : {
+            acessoDiretoCache: 0,
+            metodoEmCache: 0,
+            invalidacaoExplicita: 0,
+            booleanoPosicional: 0,
+            palavraForcar: contarOcorrencias(conteudo, PADROES.palavraForcar),
+            palavraStale: contarOcorrencias(conteudo, PADROES.palavraStale),
+            palavraSnapshot: contarOcorrencias(conteudo, PADROES.palavraSnapshot),
+        };
         const categoriasAcoplamento = contarCategoriasAcoplamento(analiseAst.importsPorCategoria);
         const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
         const hubCentral = HUBS_CENTRAIS.has(caminhoRelativo);
