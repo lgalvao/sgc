@@ -1,13 +1,13 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-28T13:19:25.151Z",
+  "geradoEm": "2026-05-28T13:31:09.865Z",
   "resumo": {
-    "arquivosProducao": 264,
-    "scoreTotal": 185,
+    "arquivosProducao": 265,
+    "scoreTotal": 152,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 0,
-      "viewsComServiceDireto": 1,
+      "viewsComServiceDireto": 0,
       "viewsComServerStateCaseiro": 0,
       "viewsComFanoutAlto": 0,
       "acessosDiretosCache": 0,
@@ -60,106 +60,6 @@
       },
       "sinaisAtivos": [
         "estrategiaCache"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/stores/perfilAutenticacao.ts",
-      "camada": "store",
-      "linhas": 103,
-      "score": 12,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 3,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [
-        "serviceDireto"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/usePerfil.ts",
-      "camada": "composable",
-      "linhas": 38,
-      "score": 11,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 12,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 1
-      },
-      "sinaisAtivos": [],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/views/LimpezaProcessosView.vue",
-      "camada": "view",
-      "linhas": 128,
-      "score": 10,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
-        "serviceDireto"
       ],
       "hubCentral": false
     },
@@ -295,7 +195,6 @@
         "importacoesArquiteturais": 3
       },
       "sinaisAtivos": [
-        "serviceDireto",
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -330,7 +229,6 @@
         "importacoesArquiteturais": 3
       },
       "sinaisAtivos": [
-        "serviceDireto",
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -365,7 +263,6 @@
         "importacoesArquiteturais": 2
       },
       "sinaisAtivos": [
-        "serviceDireto",
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -400,7 +297,6 @@
         "importacoesArquiteturais": 2
       },
       "sinaisAtivos": [
-        "serviceDireto",
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -435,7 +331,6 @@
         "importacoesArquiteturais": 2
       },
       "sinaisAtivos": [
-        "serviceDireto",
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -470,7 +365,6 @@
         "importacoesArquiteturais": 2
       },
       "sinaisAtivos": [
-        "serviceDireto",
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -505,7 +399,6 @@
         "importacoesArquiteturais": 2
       },
       "sinaisAtivos": [
-        "serviceDireto",
         "superficieAmpla"
       ],
       "hubCentral": false
@@ -742,8 +635,7 @@
         "importacoesArquiteturais": 2
       },
       "sinaisAtivos": [
-        "booleanoPosicional",
-        "serviceDireto"
+        "booleanoPosicional"
       ],
       "hubCentral": false
     }

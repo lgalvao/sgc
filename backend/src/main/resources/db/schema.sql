@@ -575,6 +575,7 @@ alter table if exists sgc.vw_responsabilidade
     add constraint fk_responsabilidade_unidade foreign key (unidade_codigo) references sgc.vw_unidade;
 alter table if exists sgc.vw_responsabilidade
     add constraint fk_responsabilidade_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
+
 -- Tabelas do Módulo de Diagnóstico
 create table if not exists sgc.diagnostico
 (

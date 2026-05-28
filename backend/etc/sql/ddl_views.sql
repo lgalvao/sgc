@@ -1,115 +1,180 @@
 -- #################################################################
--- SCRIPT DDL ORACLE PARA CRIAÇÃO DAS VIEWS DO MODELO DE DADOS SGC
+-- SCRIPT DDL ORACLE PARA CRIACAO DAS VIEWS DO MODELO DE DADOS SGC
+-- VERSAO OTIMIZADA - CODEX
 -- #################################################################
-
--- Permissões necessárias no SRH2
-
-GRANT SELECT ON SRH2.UNIDADE_TSE TO SGC;
-GRANT SELECT ON SRH2.LOTACAO TO SGC;
-GRANT SELECT ON SRH2.QFC_OCUP_COM TO SGC;
-GRANT SELECT ON SRH2.QFC_VAGAS_COM TO SGC;
-GRANT SELECT ON SRH2.SERVIDOR TO SGC;
-GRANT SELECT ON SRH2.LOT_RAMAIS_SERVIDORES TO SGC;
-GRANT SELECT ON SRH2.QFC_SUBST_COM TO SGC;
-
--- Permissões necessárias no CORAU (SIGMA)
-
-GRANT SELECT ON CORAU.RESP_CENTRAL TO SGC;
-GRANT SELECT ON CORAU.EVENTO TO SGC;
-GRANT SELECT ON CORAU.CT_CENTRAL TO SGC;
-GRANT SELECT ON CORAU.CT_ZONA TO SGC;
+--
+-- Objetivo desta versao:
+-- * manter os mesmos nomes e colunas das views atuais;
+-- * reduzir regex, subconsultas correlacionadas e reprocessamento de VW_UNIDADE;
+-- * tornar filtros temporais mais amigaveis a indices, sem TRUNC nas colunas.
 
 -- 1. View VW_VINCULACAO_UNIDADE
+-- Otimizacao: substitui SYS_CONNECT_BY_PATH + REGEXP por caminhada hierarquica direta
+-- a partir de cada unidade atual. LISTAGG ignora NULL, preservando NULL quando nao
+-- existem historicos alem da unidade anterior.
 
 CREATE OR REPLACE VIEW VW_VINCULACAO_UNIDADE
             (unidade_atual_codigo, unidade_anterior_codigo, demais_unidades_historicas) AS
-WITH HistoricoCompleto AS (
-    -- 1. CTE: Encontra o caminho completo da raiz até a atual
-    SELECT t.CD,
-           t.COD_UNID_TSE_ANT,
-           -- Constrói o caminho completo da raiz para a atual
-           LTRIM(SYS_CONNECT_BY_PATH(t.CD, '->'), '->') AS Caminho_Completo,
-           LEVEL                                        AS Nivel
-    FROM SRH2.UNIDADE_TSE t
-    START WITH t.COD_UNID_TSE_ANT IS NULL
-    CONNECT BY NOCYCLE PRIOR t.CD = t.COD_UNID_TSE_ANT),
-     HistoricoExtinto AS (
-         -- 2. CTE: Processa o histórico para tokenização e LISTAGG
-         SELECT h.CD,
-                h.COD_UNID_TSE_ANT,
-                h.Nivel,
-                CASE
-                    -- A string histórica só é gerada se o nível for maior que 2 (i.e., existe mais que Atual e Antecessor)
-                    WHEN h.Nivel > 2 THEN
-                        REGEXP_SUBSTR(
-                                h.Caminho_Completo,
-                                '^(.*?)->[^>]+->[^>]+$', -- Expressão para isolar o histórico
-                                1, 1, 'i', 1
-                        )
-                    END AS Historico_String_Pura
-         FROM HistoricoCompleto h)
-SELECT u.CD                                     AS unidade_atual_codigo,
-       u.COD_UNID_TSE_ANT                       AS unidade_anterior_codigo,
-       (
-           -- 3. Subconsulta para tokenização, inversão e concatenação (EXECUTADA SOMENTE SE HOUVER HISTÓRICO)
-           SELECT LISTAGG(
-                          LTRIM(REGEXP_SUBSTR(he.Historico_String_Pura, '[^-]+', 1, LEVEL), ' >'),
-                          ', '
-                  ) WITHIN
-                              GROUP (ORDER BY LEVEL DESC)
-           FROM DUAL
-           CONNECT BY LEVEL <= REGEXP_COUNT(he.Historico_String_Pura
-                                   , '->') + 1) AS demais_unidades_historicas
-FROM SRH2.UNIDADE_TSE u -- Tabela Principal (274 registros)
-         LEFT JOIN
-     HistoricoExtinto he
-     ON u.CD = he.CD
-WHERE
-   -- FILTRO DE ATIVIDADE CONFORME SOLICITADO
-    u.SIT_UNID = 'C'
-   OR u.SIT_UNID LIKE 'O%'
-ORDER BY u.CD;
+WITH hierarquia AS (
+    SELECT CONNECT_BY_ROOT u.cd               AS unidade_atual_codigo,
+           CONNECT_BY_ROOT u.cod_unid_tse_ant AS unidade_anterior_codigo,
+           u.cd                               AS unidade_historica_codigo,
+           LEVEL                              AS nivel
+    FROM srh2.unidade_tse u
+    START WITH u.sit_unid = 'C'
+            OR u.sit_unid LIKE 'O%'
+    CONNECT BY NOCYCLE PRIOR u.cod_unid_tse_ant = u.cd
+)
+SELECT unidade_atual_codigo,
+       unidade_anterior_codigo,
+       LISTAGG(
+               CASE WHEN nivel >= 3 THEN unidade_historica_codigo END,
+               ', '
+       ) WITHIN GROUP (ORDER BY nivel) AS demais_unidades_historicas
+FROM hierarquia
+GROUP BY unidade_atual_codigo, unidade_anterior_codigo;
 
 
 -- 2. View VW_ZONA_RESP_CENTRAL
+-- Otimizacao: remove SELECT * intermediario e usa predicados temporais sargable.
+-- A condicao abaixo equivale ao intervalo legado baseado em TRUNC:
+-- sysdate between trunc(datainicio) and trunc(datatermino + 1).
 
 CREATE OR REPLACE VIEW VW_ZONA_RESP_CENTRAL
             (codigo_central, sigla_central, codigo_zona_resp, sigla_zona_resp, data_inicio_resp, data_fim_resp) AS
-select uni_c.cd             as codigo_central,
-       uni_c.sigla_unid_tse as sigla_central,
-       uni_z.cd             as codigo_zona_resp,
-       uni_z.sigla_unid_tse as sigla_zona_resp,
-       r.datainicio         as data_inicio_resp,
-       r.datatermino        as data_fim_resp
-from (select * from srh2.unidade_tse where sigla_unid_tse like 'CAE%' and sit_unid not like 'E%') uni_c
-         join corau.ct_central c on uni_c.sigla_unid_tse = substr(c.sigla, 1, 5)
-         left join (select e.id, e.datainicio, e.datatermino, rc.central_id, rc.zona_id
-                    from corau.evento e
-                             join corau.resp_central rc on e.id = rc.id
-                    where sysdate between trunc(e.datainicio) and trunc(e.datatermino + 1)) r on c.id = r.central_id
-         left join corau.ct_zona z on r.zona_id = z.id
-         left join (select * from srh2.unidade_tse where num_ze is not null and sit_unid not like 'E%') uni_z
-                   on z.numero = uni_z.num_ze
+SELECT uni_c.cd             AS codigo_central,
+       uni_c.sigla_unid_tse AS sigla_central,
+       uni_z.cd             AS codigo_zona_resp,
+       uni_z.sigla_unid_tse AS sigla_zona_resp,
+       r.datainicio         AS data_inicio_resp,
+       r.datatermino        AS data_fim_resp
+FROM (
+         SELECT cd, sigla_unid_tse
+         FROM srh2.unidade_tse
+         WHERE sigla_unid_tse LIKE 'CAE%'
+           AND sit_unid NOT LIKE 'E%'
+     ) uni_c
+         JOIN corau.ct_central c
+              ON uni_c.sigla_unid_tse = SUBSTR(c.sigla, 1, 5)
+         LEFT JOIN (
+             SELECT e.datainicio,
+                    e.datatermino,
+                    rc.central_id,
+                    rc.zona_id
+             FROM corau.evento e
+                      JOIN corau.resp_central rc
+                           ON e.id = rc.id
+             WHERE e.datainicio < TRUNC(SYSDATE) + 1
+               AND e.datatermino >= TRUNC(SYSDATE)
+         ) r
+                   ON c.id = r.central_id
+         LEFT JOIN corau.ct_zona z
+                   ON r.zona_id = z.id
+         LEFT JOIN (
+             SELECT cd, sigla_unid_tse, num_ze
+             FROM srh2.unidade_tse
+             WHERE num_ze IS NOT NULL
+               AND sit_unid NOT LIKE 'E%'
+         ) uni_z
+                   ON z.numero = uni_z.num_ze;
 
 
 -- 3. View VW_UNIDADE
+-- Otimizacao: calcula lotacao, quantidade de filhas, filhas complexas e titulares uma
+-- unica vez em CTEs agregadas. A regra de classificacao de tipo segue a view original.
 
 CREATE OR REPLACE VIEW VW_UNIDADE
             (codigo, nome, sigla, matricula_titular, titulo_titular, data_inicio_titularidade, tipo, situacao,
              unidade_superior_codigo)
 AS
-WITH tb_unidade AS (select cd,
-                           ds,
-                           sigla_unid_tse,
-                           sit_unid,
-                           case
-                               when sigla_unid_tse like 'CAE%' and sit_unid not like 'E%' then (select codigo_zona_resp
-                                                                                                from vw_zona_resp_central
-                                                                                                where codigo_central = cd)
-                               when cod_unid_super in (6, 19, 37, 634, 635, 637) then 1
-                               else cod_unid_super end as cod_unid_super
-                    from srh2.unidade_tse
-                    where cd not in (1, 6, 19, 37, 634, 635, 637))
+WITH zona_responsavel AS (
+    SELECT codigo_central,
+           MIN(codigo_zona_resp) AS codigo_zona_resp
+    FROM VW_ZONA_RESP_CENTRAL
+    GROUP BY codigo_central
+),
+tb_unidade AS (
+    SELECT u.cd,
+           u.ds,
+           u.sigla_unid_tse,
+           u.sit_unid,
+           CASE
+               WHEN u.sigla_unid_tse LIKE 'CAE%' AND u.sit_unid NOT LIKE 'E%' THEN zr.codigo_zona_resp
+               WHEN u.cod_unid_super IN (6, 19, 37, 634, 635, 637) THEN 1
+               ELSE u.cod_unid_super
+           END AS cod_unid_super
+    FROM srh2.unidade_tse u
+             LEFT JOIN zona_responsavel zr
+                       ON zr.codigo_central = u.cd
+    WHERE u.cd NOT IN (1, 6, 19, 37, 634, 635, 637)
+),
+lotacao_direta AS (
+    SELECT cod_unid_tse,
+           COUNT(1) AS qtd_servidores
+    FROM srh2.lotacao
+    WHERE dt_fim_lotacao IS NULL
+    GROUP BY cod_unid_tse
+),
+filhas_ativas AS (
+    SELECT cod_unid_super,
+           COUNT(1) AS qtd_unidades_filhas
+    FROM tb_unidade
+    WHERE cod_unid_super IS NOT NULL
+      AND sit_unid NOT LIKE 'E%'
+    GROUP BY cod_unid_super
+),
+filhas_folha_com_um_servidor AS (
+    SELECT uf.cod_unid_super,
+           SUM(CASE WHEN ld.qtd_servidores = 1 THEN 1 ELSE 0 END) AS qtd_servidores
+    FROM tb_unidade uf
+             JOIN lotacao_direta ld
+                  ON ld.cod_unid_tse = uf.cd
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM tb_unidade neta
+        WHERE neta.cod_unid_super = uf.cd
+    )
+    GROUP BY uf.cod_unid_super
+),
+lotacao_calculada AS (
+    SELECT ld.cod_unid_tse,
+           ld.qtd_servidores + NVL(ff.qtd_servidores, 0) AS qtd_servidores
+    FROM lotacao_direta ld
+             LEFT JOIN filhas_folha_com_um_servidor ff
+                       ON ff.cod_unid_super = ld.cod_unid_tse
+),
+filhas_complexas AS (
+    SELECT uf.cod_unid_super,
+           COUNT(1) AS qtd_filhas_complexas
+    FROM tb_unidade uf
+             LEFT JOIN lotacao_direta ld
+                       ON ld.cod_unid_tse = uf.cd
+    WHERE NVL(ld.qtd_servidores, 0) > 1
+       OR EXISTS (
+        SELECT 1
+        FROM tb_unidade neta
+        WHERE neta.cod_unid_super = uf.cd
+    )
+    GROUP BY uf.cod_unid_super
+),
+titulares AS (
+    SELECT l.cod_unid_tse,
+           s.mat_servidor,
+           s.num_tit_ele,
+           c.dt_ingresso
+    FROM srh2.qfc_ocup_com c
+             JOIN srh2.qfc_vagas_com v
+                  ON c.cod_comissionado = v.cod_comissionado
+                 AND c.nome_com = v.nome_com
+                 AND c.num_vaga_com = v.num_vaga_com
+             JOIN srh2.lotacao l
+                  ON c.mat_servidor = l.mat_servidor
+                 AND l.dt_fim_lotacao IS NULL
+             JOIN srh2.servidor s
+                  ON c.mat_servidor = s.mat_servidor
+    WHERE c.dt_dispensa IS NULL
+      AND NVL(c.titular_com, 0) = 1
+)
 SELECT codigo,
        nome,
        sigla,
@@ -119,169 +184,185 @@ SELECT codigo,
        tipo,
        situacao,
        unidade_superior_codigo
-FROM (select u.cd                                                           as codigo,
-             u.ds                                                           as nome,
-             u.sigla_unid_tse                                               as sigla,
-             c.mat_servidor                                                 as matricula_titular,
-             c.num_tit_ele                                                  as titulo_titular,
-             c.dt_ingresso                                                  as data_inicio_titularidade,
-             case
-                 when u.sit_unid like 'E%' then ''
-                 when nvl(p.qtd_unidades_filhas, 0) = 0 then case
-                                                                 when nvl(l.qtd_servidores, 0) < 2 then 'SEM_EQUIPE'
-                                                                 else 'OPERACIONAL' end
-                 when not exists (select 1
-                                  from tb_unidade uf
-                                  where uf.cod_unid_super = u.cd
-                                    and ((select count(1)
-                                          from srh2.lotacao
-                                          where dt_fim_lotacao is null
-                                            and cod_unid_tse = uf.cd) > 1
-                                      or exists (select 1 from tb_unidade where cod_unid_super = uf.cd)))
-                     then 'OPERACIONAL'
-                 when nvl(l.qtd_servidores, 0) > 1 then 'INTEROPERACIONAL'
-                 else 'INTERMEDIARIA'
-                 end                                                        as tipo,
-             case when u.sit_unid like 'E%' then 'INATIVA' else 'ATIVA' end as situacao,
-             u.cod_unid_super                                               as unidade_superior_codigo,
-             nvl(l.qtd_servidores, 0)                                       as qtd_servidores_lotados,
-             nvl(p.qtd_unidades_filhas, 0)                                  as qtd_unidades_filhas
-      from tb_unidade u
-               left join (select l1.cod_unid_tse,
-                                 count(1) + nvl((select sum(DECODE(qtd_servidores, 1, 1, 0))
-                                                 from (select l2.cod_unid_tse, u2.cod_unid_super, count(1) as qtd_servidores
-                                                       from srh2.lotacao l2
-                                                                join tb_unidade u2 on l2.cod_unid_tse = u2.cd
-                                                       where l2.dt_fim_lotacao is null
-                                                         and not exists (select 1
-                                                                         from tb_unidade
-                                                                         where cod_unid_super = u2.cd
-                                                                           and sit_unid not like 'E%')
-                                                       group by l2.cod_unid_tse, u2.cod_unid_super)
-                                                 where cod_unid_super = l1.cod_unid_tse), 0) as qtd_servidores
-                          from srh2.lotacao l1
-                          where l1.dt_fim_lotacao is null
-                          group by l1.cod_unid_tse) l on u.cd = l.cod_unid_tse
-               left join (select cod_unid_super, count(1) as qtd_unidades_filhas
-                          from tb_unidade
-                          where cod_unid_super is not null
-                            and sit_unid not like 'E%'
-                          group by cod_unid_super) p on u.cd = p.cod_unid_super
-               left join (select v.num_vaga_com,
-                                 l.cod_unid_tse,
-                                 s.mat_servidor,
-                                 s.num_tit_ele,
-                                 c.dt_ingresso,
-                                 c.cod_comissionado,
-                                 v.nom_atu_com,
-                                 v.vago
-                          from srh2.qfc_ocup_com c
-                                   join srh2.qfc_vagas_com v on c.cod_comissionado = v.cod_comissionado and
-                                                                c.nome_com = v.nome_com and
-                                                                c.num_vaga_com = v.num_vaga_com
-                                   join srh2.lotacao l on c.mat_servidor = l.mat_servidor and l.dt_fim_lotacao is null
-                                   join srh2.servidor s on c.mat_servidor = s.mat_servidor
-                          where c.dt_dispensa is null
-                            and nvl(c.titular_com, 0) = 1) c on u.cd = c.cod_unid_tse
-      union
-      select 1,
-             'UNIDADE RAIZ ADMINISTRATIVA',
-             'ADMIN',
-             null,
-             null,
-             null,
-             'RAIZ',
-             'ATIVA',
-             null,
-             0,
-             0
-      from dual);
+FROM (
+         SELECT u.cd                                                           AS codigo,
+                u.ds                                                           AS nome,
+                u.sigla_unid_tse                                               AS sigla,
+                t.mat_servidor                                                 AS matricula_titular,
+                t.num_tit_ele                                                  AS titulo_titular,
+                t.dt_ingresso                                                  AS data_inicio_titularidade,
+                CASE
+                    WHEN u.sit_unid LIKE 'E%' THEN ''
+                    WHEN NVL(fa.qtd_unidades_filhas, 0) = 0 THEN
+                        CASE
+                            WHEN NVL(lc.qtd_servidores, 0) < 2 THEN 'SEM_EQUIPE'
+                            ELSE 'OPERACIONAL'
+                        END
+                    WHEN NVL(fc.qtd_filhas_complexas, 0) = 0 THEN 'OPERACIONAL'
+                    WHEN NVL(lc.qtd_servidores, 0) > 1 THEN 'INTEROPERACIONAL'
+                    ELSE 'INTERMEDIARIA'
+                END                                                            AS tipo,
+                CASE WHEN u.sit_unid LIKE 'E%' THEN 'INATIVA' ELSE 'ATIVA' END AS situacao,
+                u.cod_unid_super                                               AS unidade_superior_codigo
+         FROM tb_unidade u
+                  LEFT JOIN lotacao_calculada lc
+                            ON lc.cod_unid_tse = u.cd
+                  LEFT JOIN filhas_ativas fa
+                            ON fa.cod_unid_super = u.cd
+                  LEFT JOIN filhas_complexas fc
+                            ON fc.cod_unid_super = u.cd
+                  LEFT JOIN titulares t
+                            ON t.cod_unid_tse = u.cd
+         UNION
+         SELECT 1,
+                'UNIDADE RAIZ ADMINISTRATIVA',
+                'ADMIN',
+                NULL,
+                NULL,
+                NULL,
+                'RAIZ',
+                'ATIVA',
+                NULL
+         FROM dual
+     );
 
 
 -- 4. View VW_USUARIO
+-- Otimizacao: substitui subconsulta por linha contra VW_UNIDADE por joins sobre CTE
+-- materializavel pelo otimizador. O literal legado 'SEM EQUIPE' foi mantido para
+-- preservar a semantica da view original.
 
 CREATE OR REPLACE VIEW VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
-select s.num_tit_ele                   as titulo,
-       s.mat_servidor                  as matricula,
-       s.nom                           as nome,
-       s.e_mail                        as email,
-       r.ramal_servidor                as ramal,
-       l.cod_unid_tse                  as unidade_lot_codigo,
-       (select decode(tipo, 'SEM EQUIPE',
-                      decode(unidade_superior_codigo,
-                             1, case
-                                    when sigla = 'GP' then (select codigo
-                                                            from VW_UNIDADE
-                                                            where sigla = 'ASPRE'
-                                                              and tipo = 'OPERACIONAL')
-                                    else (select codigo
-                                          from VW_UNIDADE
-                                          where sigla = 'SEDOC'
-                                            and tipo = 'OPERACIONAL') end,
-                             unidade_superior_codigo),
-                      codigo)
-        from VW_UNIDADE
-        where codigo = l.cod_unid_tse) as unidade_comp_codigo
-from srh2.servidor s
-         join srh2.lotacao l on s.mat_servidor = l.mat_servidor and l.dt_fim_lotacao is null
-         outer apply (select ramal_servidor
-                      from (select ramal_servidor
-                            from srh2.lot_ramais_servidores
-                            where mat_servidor = s.mat_servidor
-                              and unid_lot = l.cod_unid_tse
-                              and ramal_principal = 1
-                            order by dt_ini_lotacao desc)
-                      where rownum = 1) r;
+WITH unidade AS (
+    SELECT codigo,
+           sigla,
+           tipo,
+           unidade_superior_codigo
+    FROM VW_UNIDADE
+),
+unidade_apoio AS (
+    SELECT MIN(CASE WHEN sigla = 'ASPRE' AND tipo = 'OPERACIONAL' THEN codigo END) AS codigo_aspre,
+           MIN(CASE WHEN sigla = 'SEDOC' AND tipo = 'OPERACIONAL' THEN codigo END) AS codigo_sedoc
+    FROM unidade
+)
+SELECT s.num_tit_ele    AS titulo,
+       s.mat_servidor   AS matricula,
+       s.nom            AS nome,
+       s.e_mail         AS email,
+       r.ramal_servidor AS ramal,
+       l.cod_unid_tse   AS unidade_lot_codigo,
+       CASE
+           WHEN u.tipo = 'SEM EQUIPE' THEN
+               CASE
+                   WHEN u.unidade_superior_codigo = 1 THEN
+                       CASE
+                           WHEN u.sigla = 'GP' THEN ua.codigo_aspre
+                           ELSE ua.codigo_sedoc
+                       END
+                   ELSE u.unidade_superior_codigo
+               END
+           ELSE u.codigo
+       END              AS unidade_comp_codigo
+FROM srh2.servidor s
+         JOIN srh2.lotacao l
+              ON s.mat_servidor = l.mat_servidor
+             AND l.dt_fim_lotacao IS NULL
+         LEFT JOIN unidade u
+                   ON u.codigo = l.cod_unid_tse
+         CROSS JOIN unidade_apoio ua
+         OUTER APPLY (
+             SELECT ramal_servidor
+             FROM (
+                      SELECT ramal_servidor
+                      FROM srh2.lot_ramais_servidores
+                      WHERE mat_servidor = s.mat_servidor
+                        AND unid_lot = l.cod_unid_tse
+                        AND ramal_principal = 1
+                      ORDER BY dt_ini_lotacao DESC
+                  )
+             WHERE ROWNUM = 1
+         ) r;
+
 
 -- 5. View VW_RESPONSABILIDADE
+-- Otimizacao: reutiliza VW_UNIDADE otimizada e torna os filtros de vigencia sargable.
 
 CREATE OR REPLACE VIEW VW_RESPONSABILIDADE
             (unidade_codigo, usuario_matricula, usuario_titulo, tipo, data_inicio, data_fim) AS
-select u.codigo                                                                as unidade_codigo,
-       coalesce(a.usuario_matricula, s.mat_serv_com_subs, u.matricula_titular) as usuario_matricula,
-       coalesce(a.usuario_titulo, s.num_tit_ele, u.titulo_titular)             as usuario_titulo,
-       case
-           when a.usuario_matricula is not null then 'ATRIBUICAO_TEMPORARIA'
-           when s.mat_serv_com_subs is not null then 'SUBSTITUTO'
-           else 'TITULAR' end                                                  as tipo,
-       coalesce(a.data_inicio, s.dt_ini_subst, u.data_inicio_titularidade)     as data_inicio,
-       coalesce(a.data_termino, s.dt_fim_subst)                                as data_fim
-from (select codigo, matricula_titular, titulo_titular, data_inicio_titularidade
-      from VW_UNIDADE
-      where situacao = 'ATIVA'
-        and tipo in ('OPERACIONAL', 'INTEROPERACIONAL', 'INTERMEDIARIA')) u
-         left join (select sub.mat_servidor, sub.mat_serv_com_subs, s.num_tit_ele, sub.dt_ini_subst, sub.dt_fim_subst
-                    from srh2.qfc_ocup_com c
-                             join srh2.qfc_subst_com sub
-                                  on c.mat_servidor = sub.mat_servidor and c.dt_ingresso = sub.dt_ingresso and
-                                     c.tp_ocup_com = sub.tp_ocup_com
-                             join srh2.servidor s on sub.mat_serv_com_subs = s.mat_servidor
-                    where nvl(c.titular_com, 0) = 1
-                      and sysdate between trunc(sub.dt_ini_subst) and trunc(sub.dt_fim_subst + 1)) s
-                   on u.matricula_titular = s.mat_servidor
-         left join (select unidade_codigo, usuario_matricula, usuario_titulo, data_inicio, data_termino
-                    from ATRIBUICAO_TEMPORARIA
-                    where sysdate between trunc(data_inicio) and trunc(data_termino + 1)) a
-                   on u.codigo = a.unidade_codigo;
+SELECT u.codigo                                                                AS unidade_codigo,
+       COALESCE(a.usuario_matricula, s.mat_serv_com_subs, u.matricula_titular) AS usuario_matricula,
+       COALESCE(a.usuario_titulo, s.num_tit_ele, u.titulo_titular)             AS usuario_titulo,
+       CASE
+           WHEN a.usuario_matricula IS NOT NULL THEN 'ATRIBUICAO_TEMPORARIA'
+           WHEN s.mat_serv_com_subs IS NOT NULL THEN 'SUBSTITUTO'
+           ELSE 'TITULAR'
+       END                                                                     AS tipo,
+       COALESCE(a.data_inicio, s.dt_ini_subst, u.data_inicio_titularidade)     AS data_inicio,
+       COALESCE(a.data_termino, s.dt_fim_subst)                                AS data_fim
+FROM (
+         SELECT codigo, matricula_titular, titulo_titular, data_inicio_titularidade
+         FROM VW_UNIDADE
+         WHERE situacao = 'ATIVA'
+           AND tipo IN ('OPERACIONAL', 'INTEROPERACIONAL', 'INTERMEDIARIA')
+     ) u
+         LEFT JOIN (
+             SELECT sub.mat_servidor,
+                    sub.mat_serv_com_subs,
+                    s.num_tit_ele,
+                    sub.dt_ini_subst,
+                    sub.dt_fim_subst
+             FROM srh2.qfc_ocup_com c
+                      JOIN srh2.qfc_subst_com sub
+                           ON c.mat_servidor = sub.mat_servidor
+                          AND c.dt_ingresso = sub.dt_ingresso
+                          AND c.tp_ocup_com = sub.tp_ocup_com
+                      JOIN srh2.servidor s
+                           ON sub.mat_serv_com_subs = s.mat_servidor
+             WHERE NVL(c.titular_com, 0) = 1
+               AND sub.dt_ini_subst < TRUNC(SYSDATE) + 1
+               AND sub.dt_fim_subst >= TRUNC(SYSDATE)
+         ) s
+                   ON u.matricula_titular = s.mat_servidor
+         LEFT JOIN (
+             SELECT unidade_codigo,
+                    usuario_matricula,
+                    usuario_titulo,
+                    data_inicio,
+                    data_termino
+             FROM atribuicao_temporaria
+             WHERE data_inicio < TRUNC(SYSDATE) + 1
+               AND data_termino >= TRUNC(SYSDATE)
+         ) a
+                   ON u.codigo = a.unidade_codigo;
 
 
 -- 6. View VW_USUARIO_PERFIL_UNIDADE
+-- Otimizacao: depende das views acima ja otimizadas. UNION foi preservado para manter
+-- a deduplicacao da view original.
 
 CREATE OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) AS
-select usuario_titulo, perfil, unidade_codigo
-from (select a.usuario_titulo, 'ADMIN' as perfil, 1 as unidade_codigo
-      from administrador a
-               join VW_USUARIO u on u.titulo = a.usuario_titulo
-      union
-      select r.usuario_titulo, 'GESTOR' as perfil, r.unidade_codigo
-      from VW_RESPONSABILIDADE r
-               join VW_UNIDADE u on r.unidade_codigo = u.codigo and u.tipo in ('INTERMEDIARIA', 'INTEROPERACIONAL')
-      union
-      select r.usuario_titulo, 'CHEFE' as perfil, r.unidade_codigo
-      from VW_RESPONSABILIDADE r
-               join VW_UNIDADE u on r.unidade_codigo = u.codigo and u.tipo in ('INTEROPERACIONAL', 'OPERACIONAL')
-      union
-      select usu.titulo as usuario_titulo, 'SERVIDOR' as perfil, uni.codigo as unidade_codigo
-      from VW_USUARIO usu
-               join VW_UNIDADE uni on usu.unidade_comp_codigo = uni.codigo
-      where usu.titulo <> uni.titulo_titular);
+SELECT usuario_titulo, perfil, unidade_codigo
+FROM (
+         SELECT a.usuario_titulo, 'ADMIN' AS perfil, 1 AS unidade_codigo
+         FROM administrador a
+                  JOIN VW_USUARIO u
+                       ON u.titulo = a.usuario_titulo
+         UNION
+         SELECT r.usuario_titulo, 'GESTOR' AS perfil, r.unidade_codigo
+         FROM VW_RESPONSABILIDADE r
+                  JOIN VW_UNIDADE u
+                       ON r.unidade_codigo = u.codigo
+                      AND u.tipo IN ('INTERMEDIARIA', 'INTEROPERACIONAL')
+         UNION
+         SELECT r.usuario_titulo, 'CHEFE' AS perfil, r.unidade_codigo
+         FROM VW_RESPONSABILIDADE r
+                  JOIN VW_UNIDADE u
+                       ON r.unidade_codigo = u.codigo
+                      AND u.tipo IN ('INTEROPERACIONAL', 'OPERACIONAL')
+         UNION
+         SELECT usu.titulo AS usuario_titulo, 'SERVIDOR' AS perfil, uni.codigo AS unidade_codigo
+         FROM VW_USUARIO usu
+                  JOIN VW_UNIDADE uni
+                       ON usu.unidade_comp_codigo = uni.codigo
+         WHERE usu.titulo <> uni.titulo_titular
+     );

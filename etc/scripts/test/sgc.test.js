@@ -262,6 +262,120 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
     });
 
+    test("composable fachada de store não é penalizado por chamadasStore >= 8", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-facade-"));
+        const frontendDir = path.join(base, "frontend", "src");
+
+        await fs.outputFile(
+            path.join(frontendDir, "stores", "perfil.ts"),
+            "import {defineStore} from 'pinia'; export const usePerfilStore = defineStore('perfil', () => ({ a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12 }));"
+        );
+
+        // Composable que só delega para uma única store (fachada) — acessa a store 12 vezes
+        await fs.outputFile(
+            path.join(frontendDir, "composables", "usePerfil.ts"),
+            [
+                "import {computed} from 'vue';",
+                "import {usePerfilStore} from '@/stores/perfil';",
+                "export function usePerfil() {",
+                "  const store = usePerfilStore();",
+                "  return {",
+                "    a: computed(() => store.a),",
+                "    b: computed(() => store.b),",
+                "    c: computed(() => store.c),",
+                "    d: computed(() => store.d),",
+                "    e: computed(() => store.e),",
+                "    f: computed(() => store.f),",
+                "    g: computed(() => store.g),",
+                "    h: computed(() => store.h),",
+                "    i: computed(() => store.i),",
+                "    j: computed(() => store.j),",
+                "    k: computed(() => store.k),",
+                "    l: computed(() => store.l),",
+                "  };",
+                "}",
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base,
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        const hotspot = conteudo.hotspots.find((h) => h.arquivo.endsWith("usePerfil.ts"));
+        // Fachada de store: acessar a store muitas vezes é esperado — sem penalidade
+        expect(hotspot).toBeUndefined();
+    });
+
+    test("módulo em stores/ sem defineStore não é penalizado como store Pinia", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-nao-store-"));
+        const frontendDir = path.join(base, "frontend", "src");
+
+        await fs.outputFile(
+            path.join(frontendDir, "services", "autenticacaoService.ts"),
+            "export async function login() { return null; } export async function logout() { return null; } export async function renovar() { return null; }"
+        );
+
+        // Módulo de funções puras em stores/ que NÃO usa defineStore (orquestração de autenticação)
+        await fs.outputFile(
+            path.join(frontendDir, "stores", "autenticacao.ts"),
+            [
+                "import * as autenticacaoService from '@/services/autenticacaoService';",
+                "export async function entrar() { return autenticacaoService.login(); }",
+                "export async function sair() { return autenticacaoService.logout(); }",
+                "export async function renovarSessao() { return autenticacaoService.renovar(); }",
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base,
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        const hotspot = conteudo.hotspots.find((h) => h.arquivo.endsWith("autenticacao.ts"));
+        // Orquestração sem defineStore: chamar serviços é esperado — sem score nem sinal serviceDireto
+        expect(hotspot).toBeUndefined();
+    });
+
+    test("composable que chama serviço diretamente não recebe sinal serviceDireto", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-composable-servico-"));
+        const frontendDir = path.join(base, "frontend", "src");
+
+        await fs.outputFile(
+            path.join(frontendDir, "services", "itemService.ts"),
+            "export async function buscarItens() { return []; }"
+        );
+
+        // Composable com superfície exportada ampla E chamada de serviço direta
+        // → deve aparecer em hotspots pelo superficieAmpla, mas NÃO pelo serviceDireto
+        await fs.outputFile(
+            path.join(frontendDir, "composables", "useItens.ts"),
+            [
+                "import * as itemService from '@/services/itemService';",
+                "export function useItens() {",
+                "  return {",
+                "    a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9,",
+                "    carregar: () => itemService.buscarItens(),",
+                "  };",
+                "}",
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "frontend", "arquitetura", "auditar", "--json", "--sem-gravar", "--base", base,
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        const hotspot = conteudo.hotspots.find((h) => h.arquivo.endsWith("useItens.ts"));
+        // Composable aparece por superficieAmpla, mas chamar serviços não é sinalizado
+        expect(hotspot).toBeDefined();
+        expect(hotspot.sinaisAtivos).toContain("superficieAmpla");
+        expect(hotspot.sinaisAtivos).not.toContain("serviceDireto");
+    });
+
     test("valida cruft do frontend com waiver de tamanho", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cruft-validar-"));
         const frontendDir = path.join(base, "frontend", "src");

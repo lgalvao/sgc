@@ -65,7 +65,6 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
 import {BAlert, BCard, BFormGroup, BFormInput} from 'bootstrap-vue-next';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
@@ -73,55 +72,17 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import {TEXTOS} from '@/constants/textos';
-import {useNotification} from '@/composables/useNotification';
-import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
-import {normalizarErro} from '@/utils/apiError';
-import {excluirProcessoCompleto} from '@/services/processo';
+import {useLimpezaProcessosTela} from '@/composables/useLimpezaProcessosTela';
 
-const {notificacao, notify, clear} = useNotification();
 const {
-  validarSubmissao,
-  deveExibirErro,
-  focarPrimeiroErroInvalido
-} = useValidacaoFormulario();
-
-const codigoProcesso = ref('');
-const excluindo = ref(false);
-const mostrarConfirmacao = ref(false);
-
-const codigoConfirmacao = computed<number | undefined>(() => {
-  const codigo = Number(codigoProcesso.value);
-  return Number.isInteger(codigo) && codigo > 0 ? codigo : undefined;
-});
-
-const mensagemErroCodigo = computed(() => {
-  return deveExibirErro(!codigoConfirmacao.value) ? TEXTOS.administracao.LIMPEZA_ERRO_CODIGO : '';
-});
-
-async function abrirConfirmacao() {
-  if (!validarSubmissao(!!codigoConfirmacao.value)) {
-    await focarPrimeiroErroInvalido();
-    return;
-  }
-
-  mostrarConfirmacao.value = true;
-}
-
-async function confirmarExclusao() {
-  if (!codigoConfirmacao.value) {
-    return;
-  }
-
-  excluindo.value = true;
-  try {
-    await excluirProcessoCompleto(codigoConfirmacao.value);
-    mostrarConfirmacao.value = false;
-    codigoProcesso.value = '';
-    notify(TEXTOS.administracao.LIMPEZA_SUCESSO, 'success');
-  } catch (error) {
-    notify(normalizarErro(error).mensagem, 'danger');
-  } finally {
-    excluindo.value = false;
-  }
-}
+  codigoProcesso,
+  codigoConfirmacao,
+  excluindo,
+  mensagemErroCodigo,
+  mostrarConfirmacao,
+  notificacao,
+  clear,
+  abrirConfirmacao,
+  confirmarExclusao,
+} = useLimpezaProcessosTela();
 </script>

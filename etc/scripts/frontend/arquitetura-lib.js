@@ -172,6 +172,7 @@ function criarAnaliseAst() {
         mapasPromessasDedupe: 0,
         bolsasDependenciasLargas: 0,
         superficieExportadaAmpla: 0,
+        usaDefineStore: false,
     };
 }
 
@@ -358,6 +359,9 @@ function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
 
         if (ts.isCallExpression(no)) {
             const nomeChamada = obterNomeChamada(no.expression);
+            if (nomeChamada === "defineStore") {
+                analiseAst.usaDefineStore = true;
+            }
             if (nomeChamada && analiseAst.membrosStoreDesestruturados.has(nomeChamada)) {
                 analiseAst.chamadasStore += 1;
                 if (NOMES_CHAMADAS_ESTRATEGIA.test(nomeChamada)) {
@@ -440,6 +444,15 @@ function detectarServerStateCaseiro({camada, analiseAst}) {
 }
 
 function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) {
+    // Arquivos em stores/ que não usam defineStore são módulos de orquestração, não stores Pinia
+    const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
+
+    // Composables que só delegam para um único store são fachadas; acessos múltiplos ao store são esperados
+    const ehFacadeDeStore = camadaEfetiva === "composable"
+        && analiseAst.importsPorCategoria.store.size === 1
+        && analiseAst.importsPorCategoria.composable.size === 0
+        && analiseAst.importsPorCategoria.service.size === 0;
+
     let total = 0;
     total += (sinaisLexicais.acessoDiretoCache * 8)
         + (sinaisLexicais.metodoEmCache * 6)
@@ -451,9 +464,10 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
     // Penalidades de coordenação de cache: isentas em hubs centrais (cuja função É exatamente essa)
     if (!hubCentral) {
         total += sinaisLexicais.invalidacaoExplicita * 5;
-        total += analiseAst.chamadasEstrategiaCache * (camada === "view" ? 8 : 5);
-        total += analiseAst.chamadasInvalidacao * (camada === "view" ? 10 : 6);
-        if (analiseAst.chamadasStore >= 8) {
+        total += analiseAst.chamadasEstrategiaCache * (camadaEfetiva === "view" ? 8 : 5);
+        total += analiseAst.chamadasInvalidacao * (camadaEfetiva === "view" ? 10 : 6);
+        // Fachadas de store acessam o store muitas vezes por design; não penalizar
+        if (!ehFacadeDeStore && analiseAst.chamadasStore >= 8) {
             total += 8 + (Math.floor((analiseAst.chamadasStore - 8) / 4) * 3);
         }
     }
@@ -463,7 +477,7 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
 
     // Mistura de camadas e fan-out: só problemáticos em views e componentes
     // Composables podem e devem importar de múltiplas camadas arquiteturais
-    if (camada === "view" || camada === "component") {
+    if (camadaEfetiva === "view" || camadaEfetiva === "component") {
         if (categoriasAcoplamento >= 3) {
             total += 10 + ((categoriasAcoplamento - 3) * 4);
         }
@@ -472,12 +486,12 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
         }
     }
 
-    total += analiseAst.chamadasServiceDiretas * pesoServiceDireto(camada);
-    if (detectarServerStateCaseiro({camada, analiseAst})) {
-        total += camada === "view" ? 18 : 14;
+    total += analiseAst.chamadasServiceDiretas * pesoServiceDireto(camadaEfetiva);
+    if (detectarServerStateCaseiro({camada: camadaEfetiva, analiseAst})) {
+        total += camadaEfetiva === "view" ? 18 : 14;
     }
     total += analiseAst.bolsasDependenciasLargas * 9;
-    if (camada === "store" || camada === "composable" || camada === "view" || camada === "component") {
+    if (camadaEfetiva === "store" || camadaEfetiva === "composable" || camadaEfetiva === "view" || camadaEfetiva === "component") {
         total += analiseAst.superficieExportadaAmpla * 9;
     }
 
@@ -569,6 +583,12 @@ function criarMetricasResumo() {
 }
 
 function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral) {
+    const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
+    const ehFacadeDeStore = camadaEfetiva === "composable"
+        && analiseAst.importsPorCategoria.store.size === 1
+        && analiseAst.importsPorCategoria.composable.size === 0
+        && analiseAst.importsPorCategoria.service.size === 0;
+
     const sinais = [];
     for (const [nome, valor] of Object.entries(sinaisLexicais)) {
         // Hubs centrais: invalidacaoExplicita é esperada e correta — não sinalizar
@@ -577,18 +597,19 @@ function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplam
             sinais.push(nome);
         }
     }
-    if (analiseAst.chamadasServiceDiretas > 0) sinais.push("serviceDireto");
+    // Só sinalizar serviceDireto quando há penalidade real; composables e módulos utilitários podem chamar serviços
+    if (analiseAst.chamadasServiceDiretas > 0 && pesoServiceDireto(camadaEfetiva) > 0) sinais.push("serviceDireto");
     // Sinais de estratégia/invalidação: só relevantes fora de hubs centrais
     if (!hubCentral && analiseAst.chamadasEstrategiaCache > 0) sinais.push("estrategiaCache");
     if (!hubCentral && analiseAst.chamadasInvalidacao > 0) sinais.push("invalidacaoArquitetural");
     if (analiseAst.bolsasDependenciasLargas > 0) sinais.push("bolsaDependenciasLarga");
     if (analiseAst.superficieExportadaAmpla > 0) sinais.push("superficieAmpla");
-    if (detectarServerStateCaseiro({camada, analiseAst})) sinais.push("serverStateCaseiro");
+    if (detectarServerStateCaseiro({camada: camadaEfetiva, analiseAst})) sinais.push("serverStateCaseiro");
     // Mistura de camadas e fan-out: só problemáticos em views e componentes
-    if (categoriasAcoplamento >= 3 && (camada === "view" || camada === "component")) sinais.push("misturaCamadas");
-    if (importacoesArquiteturais >= 5 && (camada === "view" || camada === "component")) sinais.push("fanoutAlto");
+    if (categoriasAcoplamento >= 3 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("misturaCamadas");
+    if (importacoesArquiteturais >= 5 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("fanoutAlto");
     // Acoplamento alto a stores: só problemático em views e componentes (e fora de hubs)
-    if (!hubCentral && analiseAst.chamadasStore >= 8 && (camada === "view" || camada === "component")) sinais.push("acoplamentoStoreAlto");
+    if (!hubCentral && analiseAst.chamadasStore >= 8 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("acoplamentoStoreAlto");
     return sinais;
 }
 
