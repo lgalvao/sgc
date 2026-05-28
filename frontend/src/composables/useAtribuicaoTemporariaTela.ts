@@ -12,7 +12,7 @@ import {
     criarAtribuicaoTemporaria,
     removerAtribuicaoTemporaria
 } from "@/services/atribuicaoTemporariaService";
-import {useOrganizacaoStore} from "@/stores/organizacao";
+import {useInvalidacaoDiagnosticoOrganizacional} from "@/composables/useDiagnosticoOrganizacionalQuery";
 import type {Unidade} from "@/types/tipos";
 import {obterHojeFormatado} from "@/utils/date";
 import {logger} from "@/utils";
@@ -204,12 +204,11 @@ function criarFluxoMutacao({
     erroFormulario,
     erroUsuario,
     formularioValido,
+    invalidarDiagnostico,
     isLoading,
     modoEdicao,
-    mostrarDiagnosticoOrganizacional,
     mostrarModalRemocao,
     notify,
-    organizacaoStore,
     resetarValidacao,
     unidade,
     unidadeQuery,
@@ -223,12 +222,11 @@ function criarFluxoMutacao({
     erroFormulario: Ref<string>;
     erroUsuario: Ref<string>;
     formularioValido: Ref<boolean>;
+    invalidarDiagnostico: () => void;
     isLoading: Ref<boolean>;
     modoEdicao: Ref<boolean>;
-    mostrarDiagnosticoOrganizacional: Ref<boolean>;
     mostrarModalRemocao: Ref<boolean>;
     notify: (mensagem: string, variante?: VarianteAlerta, dispensavel?: boolean) => void;
-    organizacaoStore: ReturnType<typeof useOrganizacaoStore>;
     resetarValidacao: () => void;
     unidade: Readonly<Ref<Unidade | null>>;
     unidadeQuery: ReturnType<typeof useUnidadeQuery>;
@@ -274,7 +272,7 @@ function criarFluxoMutacao({
                 await criarAtribuicaoTemporaria(unidadeAtual.codigo, request);
             }
 
-            await organizacaoStore.recarregarDiagnostico(mostrarDiagnosticoOrganizacional.value);
+            invalidarDiagnostico();
             await atualizarCachesPosMutacao();
             notify(
                 estavaEmEdicao
@@ -302,7 +300,7 @@ function criarFluxoMutacao({
 
         try {
             await removerAtribuicaoTemporaria(unidadeAtual.codigo, atribuicaoAtual.codigo);
-            await organizacaoStore.recarregarDiagnostico(mostrarDiagnosticoOrganizacional.value);
+            invalidarDiagnostico();
             await atualizarCachesPosMutacao();
             mostrarModalRemocao.value = false;
             resetarFormularioAtribuicao(campos, resetarValidacao);
@@ -323,7 +321,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
     const {notificacao, notify, clear} = useNotification();
     const {mostrarDiagnosticoOrganizacional} = usePerfil();
     const unidadeQuery = useUnidadeQuery(codigoUnidade);
-    const organizacaoStore = useOrganizacaoStore();
+    const {invalidarDiagnostico} = useInvalidacaoDiagnosticoOrganizacional();
     const campos = criarEstadoCampos();
     const unidade = computed(() => unidadeQuery.data.value ?? null);
     const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
@@ -365,12 +363,11 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         erroFormulario,
         erroUsuario,
         formularioValido,
+        invalidarDiagnostico,
         isLoading,
         modoEdicao,
-        mostrarDiagnosticoOrganizacional,
         mostrarModalRemocao,
         notify,
-        organizacaoStore,
         resetarValidacao,
         unidade,
         unidadeQuery,

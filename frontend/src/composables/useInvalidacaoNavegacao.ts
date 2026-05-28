@@ -2,24 +2,24 @@ import {useCacheMapa} from "@/composables/useMapaQuery";
 import {useInvalidacaoPainel} from "@/composables/usePainelQuery";
 import {useInvalidacaoProcesso} from "@/composables/useProcessoQuery";
 import {useInvalidacaoUnidade} from "@/composables/useUnidadeQuery";
-import {useOrganizacaoStore} from "@/stores/organizacao";
+import {useInvalidacaoDiagnosticoOrganizacional} from "@/composables/useDiagnosticoOrganizacionalQuery";
 import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 
 /**
  * Ponto central de invalidação após mutações de processo/subprocesso.
  *
- * `painel`, `processo` e `mapas` vivem em query cache; `subprocesso`,
- * `organizacao` e `unidade` ainda mantêm estado local que precisa ser invalidado.
+ * `painel`, `processo`, `mapas` e `diagnostico-organizacional` vivem em query cache.
+ * `subprocesso` ainda mantém estado local que precisa ser invalidado manualmente.
  */
 export function useInvalidacaoNavegacao() {
     const {invalidarPainel} = useInvalidacaoPainel();
     const {invalidarProcesso} = useInvalidacaoProcesso();
     const {invalidarMapa} = useCacheMapa();
     const {invalidarUnidade, invalidarDadosTelaUnidade, invalidarArvoreElegibilidade} = useInvalidacaoUnidade();
+    const {invalidarDiagnostico} = useInvalidacaoDiagnosticoOrganizacional();
     const painelStore = usePainelStore();
     const subprocessoStore = useSubprocessoStore();
-    const organizacaoStore = useOrganizacaoStore();
 
     function atualizarFluxoProcesso(): void {
         invalidarPainel();
@@ -63,7 +63,7 @@ export function useInvalidacaoNavegacao() {
     }
 
     function atualizarDadosOrganizacionais(): void {
-        organizacaoStore.invalidar();
+        invalidarDiagnostico();
         painelStore.invalidar();
         invalidarPainel();
         invalidarUnidade();
@@ -79,7 +79,7 @@ export function useInvalidacaoNavegacao() {
         painelStore.resetar();
         subprocessoStore.resetar();
         invalidarMapa();
-        organizacaoStore.resetar();
+        invalidarDiagnostico();
         invalidarUnidade();
         invalidarDadosTelaUnidade();
         invalidarArvoreElegibilidade();

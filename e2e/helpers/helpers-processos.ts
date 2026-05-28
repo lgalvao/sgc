@@ -405,6 +405,10 @@ export async function finalizarProcesso(page: Page) {
     const botaoFinalizar = page.getByTestId('btn-processo-finalizar');
     await expect(botaoFinalizar).toBeEnabled();
     await botaoFinalizar.click();
+    // Registra antes do clique para não perder a resposta: o painel usa KeepAlive e onActivated
+    // dispara o refresh() do bootstrap em background, sem exibir loading state.
+    const respostaBootstrap = page.waitForResponse(r => r.url().includes('/api/painel/bootstrap') && r.ok());
     await page.getByTestId('btn-finalizar-processo-confirmar').click();
     await page.waitForURL(/\/painel(?:\?.*)?$/);
+    await respostaBootstrap;
 }
