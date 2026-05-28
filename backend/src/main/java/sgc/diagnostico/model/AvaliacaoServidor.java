@@ -30,13 +30,11 @@ public class AvaliacaoServidor extends EntidadeBase {
     @JoinColumn(name = "competencia_codigo", nullable = false)
     private Competencia competencia;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name ="importancia", length = 10)
-    private NivelAvaliacao importancia;
+    @Column(name ="importancia")
+    private Integer importancia;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "dominio", length = 10)
-    private NivelAvaliacao dominio;
+    @Column(name = "dominio")
+    private Integer dominio;
 
     @Column(name = "gap")
     private Integer gap;
@@ -48,19 +46,11 @@ public class AvaliacaoServidor extends EntidadeBase {
     @Column(name = "situacao_servidor", length = 50, nullable = false)
     private SituacaoAvaliacaoServidor situacaoServidor;
 
-    /**
-     * Calcula e atualiza o valor do GAP (Importância - Domínio)
-     * desconsiderando casos onde Importância ou Domínio sejam NA.
-     */
-
     public void calculaGap() {
-        if(importancia == null || dominio == null ||
-                importancia == NivelAvaliacao.NA || dominio == NivelAvaliacao.NA ){
+        if (importancia == null || dominio == null || importancia == 0 || dominio == 0) {
             this.gap = null;
-        }else{
-            int valorImportancia = Integer.parseInt(importancia.name().substring(1));
-            int valorDominio = Integer.parseInt(dominio.name().substring(1));
-            this.gap = valorImportancia - valorDominio;
+        } else {
+            this.gap = importancia - dominio;
         }
     }
 
