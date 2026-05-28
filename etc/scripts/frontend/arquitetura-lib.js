@@ -329,11 +329,19 @@ function computarSinaisLexicais(sourceFile, conteudoOriginal) {
         }
     }
 
+    let palavraForcar = 0;
+    sourceFile.getDescendantsOfKind(SyntaxKind.Identifier).forEach((id) => {
+        if (id.getText() === "forcar") {
+            palavraForcar += 1;
+        }
+    });
+
     return {
         acessoDiretoCache,
         metodoEmCache,
         invalidacaoExplicita,
         booleanoPosicional,
+        palavraForcar,
         palavraStale: contarOcorrencias(conteudoOriginal, PADROES.palavraStale),
         palavraSnapshot: contarOcorrencias(conteudoOriginal, PADROES.palavraSnapshot),
     };
@@ -637,6 +645,7 @@ function criarMetricasResumo() {
         booleanosPosicionais: 0,
         ocorrenciasStale: 0,
         ocorrenciasSnapshot: 0,
+        ocorrenciasForcar: 0,
         arquivosComBolsaDependenciasLarga: 0,
         arquivosComSuperficieAmpla: 0,
         arquivosComMisturaCamadas: 0,
@@ -702,6 +711,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             metodoEmCache: 0,
             invalidacaoExplicita: 0,
             booleanoPosicional: 0,
+            palavraForcar: 0,
             palavraStale: contarOcorrencias(conteudo, PADROES.palavraStale),
             palavraSnapshot: contarOcorrencias(conteudo, PADROES.palavraSnapshot),
         };
@@ -719,6 +729,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             || sinaisLexicais.invalidacaoExplicita > 0
             || analiseAst.chamadasEstrategiaCache > 0
             || analiseAst.chamadasInvalidacao > 0
+            || sinaisLexicais.palavraForcar > 0
         );
 
         if (vazamentoCacheView) {
@@ -742,6 +753,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         metricas.booleanosPosicionais += sinaisLexicais.booleanoPosicional;
         metricas.ocorrenciasStale += sinaisLexicais.palavraStale;
         metricas.ocorrenciasSnapshot += sinaisLexicais.palavraSnapshot;
+        metricas.ocorrenciasForcar += sinaisLexicais.palavraForcar;
         metricas.chamadasEstrategiaCache += analiseAst.chamadasEstrategiaCache;
         metricas.chamadasInvalidacao += analiseAst.chamadasInvalidacao;
         if (analiseAst.bolsasDependenciasLargas > 0) {
