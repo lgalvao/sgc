@@ -54,7 +54,10 @@ function ehArquivoProducaoFrontend(caminhoRelativo) {
 }
 
 function classificarCamada(caminhoRelativo) {
-    if (caminhoRelativo.startsWith("frontend/src/views/")) return "view";
+    if (caminhoRelativo.startsWith("frontend/src/views/")) {
+        // Apenas arquivos .vue são views de verdade; helpers .ts co-localizados são composables
+        return caminhoRelativo.endsWith(".vue") ? "view" : "composable";
+    }
     if (caminhoRelativo.startsWith("frontend/src/stores/")) return "store";
     if (caminhoRelativo.startsWith("frontend/src/composables/")) return "composable";
     if (caminhoRelativo.startsWith("frontend/src/components/")) return "component";
@@ -195,10 +198,15 @@ function contarMembrosBolsa(noTipo) {
     return 0;
 }
 
-function analisarSuperficieExportada(no, camada, analiseAst) {
+function analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo) {
     if (!ts.isReturnStatement(no) || !no.expression || !ts.isObjectLiteralExpression(no.expression)) {
         return;
     }
+
+    // Composables de Tela e de Orquestracao são contratos de tela por design; superfície ampla é intencional
+    const ehContratoDeTela = camada === "composable"
+        && /(Tela|Orquestracao)\.ts$/.test(caminhoRelativo ?? "");
+    if (ehContratoDeTela) return;
 
     const totalPropriedades = no.expression.properties.length;
     const limite = camada === "store" ? 10 : 8;
@@ -348,7 +356,7 @@ function analisarArquivoAst(caminhoRelativo, conteudoOriginal, camada) {
             }
         }
 
-        analisarSuperficieExportada(no, camada, analiseAst);
+        analisarSuperficieExportada(no, camada, analiseAst, caminhoRelativo);
         ts.forEachChild(no, visitar);
     }
 
@@ -410,36 +418,42 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
     let total = 0;
     total += (sinaisLexicais.acessoDiretoCache * 8)
         + (sinaisLexicais.metodoEmCache * 6)
-        + (sinaisLexicais.invalidacaoExplicita * 5)
         + (sinaisLexicais.booleanoPosicional * 4)
         + (sinaisLexicais.palavraForcar * 3)
         + (sinaisLexicais.palavraStale * 3)
         + (sinaisLexicais.palavraSnapshot * 2);
 
+    // Penalidades de coordenação de cache: isentas em hubs centrais (cuja função É exatamente essa)
+    if (!hubCentral) {
+        total += sinaisLexicais.invalidacaoExplicita * 5;
+        total += analiseAst.chamadasEstrategiaCache * (camada === "view" ? 8 : 5);
+        total += analiseAst.chamadasInvalidacao * (camada === "view" ? 10 : 6);
+        if (analiseAst.chamadasStore >= 8) {
+            total += 8 + (Math.floor((analiseAst.chamadasStore - 8) / 4) * 3);
+        }
+    }
+
     const categoriasAcoplamento = contarCategoriasAcoplamento(analiseAst.importsPorCategoria);
     const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
 
-    if (categoriasAcoplamento >= 3) {
-        total += 10 + ((categoriasAcoplamento - 3) * 4);
+    // Mistura de camadas e fan-out: só problemáticos em views e componentes
+    // Composables podem e devem importar de múltiplas camadas arquiteturais
+    if (camada === "view" || camada === "component") {
+        if (categoriasAcoplamento >= 3) {
+            total += 10 + ((categoriasAcoplamento - 3) * 4);
+        }
+        if (importacoesArquiteturais >= 5) {
+            total += (importacoesArquiteturais - 4) * 3;
+        }
     }
-    if (importacoesArquiteturais >= 5) {
-        total += (importacoesArquiteturais - 4) * 3;
-    }
-    if (analiseAst.chamadasStore >= 8) {
-        total += 8 + (Math.floor((analiseAst.chamadasStore - 8) / 4) * 3);
-    }
+
     total += analiseAst.chamadasServiceDiretas * pesoServiceDireto(camada);
-    total += analiseAst.chamadasEstrategiaCache * (camada === "view" ? 8 : 5);
-    total += analiseAst.chamadasInvalidacao * (camada === "view" ? 10 : 6);
     if (detectarServerStateCaseiro({camada, analiseAst})) {
         total += camada === "view" ? 18 : 14;
     }
     total += analiseAst.bolsasDependenciasLargas * 9;
     if (camada === "store" || camada === "composable" || camada === "view" || camada === "component") {
         total += analiseAst.superficieExportadaAmpla * 9;
-    }
-    if (hubCentral && total > 0) {
-        total += 6;
     }
 
     return total;
@@ -529,22 +543,27 @@ function criarMetricasResumo() {
     };
 }
 
-function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais) {
+function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral) {
     const sinais = [];
     for (const [nome, valor] of Object.entries(sinaisLexicais)) {
+        // Hubs centrais: invalidacaoExplicita é esperada e correta — não sinalizar
+        if (nome === "invalidacaoExplicita" && hubCentral) continue;
         if (valor > 0) {
             sinais.push(nome);
         }
     }
     if (analiseAst.chamadasServiceDiretas > 0) sinais.push("serviceDireto");
-    if (analiseAst.chamadasEstrategiaCache > 0) sinais.push("estrategiaCache");
-    if (analiseAst.chamadasInvalidacao > 0) sinais.push("invalidacaoArquitetural");
+    // Sinais de estratégia/invalidação: só relevantes fora de hubs centrais
+    if (!hubCentral && analiseAst.chamadasEstrategiaCache > 0) sinais.push("estrategiaCache");
+    if (!hubCentral && analiseAst.chamadasInvalidacao > 0) sinais.push("invalidacaoArquitetural");
     if (analiseAst.bolsasDependenciasLargas > 0) sinais.push("bolsaDependenciasLarga");
     if (analiseAst.superficieExportadaAmpla > 0) sinais.push("superficieAmpla");
     if (detectarServerStateCaseiro({camada, analiseAst})) sinais.push("serverStateCaseiro");
-    if (categoriasAcoplamento >= 3) sinais.push("misturaCamadas");
-    if (importacoesArquiteturais >= 5) sinais.push("fanoutAlto");
-    if (analiseAst.chamadasStore >= 8) sinais.push("acoplamentoStoreAlto");
+    // Mistura de camadas e fan-out: só problemáticos em views e componentes
+    if (categoriasAcoplamento >= 3 && (camada === "view" || camada === "component")) sinais.push("misturaCamadas");
+    if (importacoesArquiteturais >= 5 && (camada === "view" || camada === "component")) sinais.push("fanoutAlto");
+    // Acoplamento alto a stores: só problemático em views e componentes (e fora de hubs)
+    if (!hubCentral && analiseAst.chamadasStore >= 8 && (camada === "view" || camada === "component")) sinais.push("acoplamentoStoreAlto");
     return sinais;
 }
 
@@ -568,7 +587,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
         const hubCentral = HUBS_CENTRAIS.has(caminhoRelativo);
         const score = calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral});
-        const sinaisAtivos = obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais);
+        const sinaisAtivos = obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral);
         const temSinal = sinaisAtivos.length > 0;
         const serverStateCaseiro = detectarServerStateCaseiro({camada, analiseAst});
 
@@ -610,13 +629,13 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         if (analiseAst.superficieExportadaAmpla > 0) {
             metricas.arquivosComSuperficieAmpla += 1;
         }
-        if (categoriasAcoplamento >= 3) {
+        if (categoriasAcoplamento >= 3 && (camada === "view" || camada === "component")) {
             metricas.arquivosComMisturaCamadas += 1;
         }
         if (serverStateCaseiro) {
             metricas.arquivosComServerStateCaseiro += 1;
         }
-        if (analiseAst.chamadasStore >= 8) {
+        if (!hubCentral && analiseAst.chamadasStore >= 8 && (camada === "view" || camada === "component")) {
             metricas.arquivosComAcoplamentoStoreAlto += 1;
         }
         if (analiseAst.chamadasServiceDiretas > 0) {

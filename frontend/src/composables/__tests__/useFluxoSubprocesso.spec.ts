@@ -38,6 +38,7 @@ const subprocessoStoreMock = {
 };
 
 const atualizarFluxoMapaMock = vi.fn();
+const limparEstadoSubprocessoAtualMock = vi.fn();
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => subprocessoStoreMock
@@ -57,7 +58,8 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
     useInvalidacaoNavegacao: () => ({
-        atualizarFluxoMapa: atualizarFluxoMapaMock
+        atualizarFluxoMapa: atualizarFluxoMapaMock,
+        limparEstadoSubprocessoAtual: limparEstadoSubprocessoAtualMock,
     })
 }));
 
@@ -89,7 +91,7 @@ describe("useFluxoSubprocesso", () => {
         expect(success).toBe(true);
         expect(cadastroService.disponibilizarCadastro).toHaveBeenCalledWith(123);
         expect(atualizarFluxoMapaMock).toHaveBeenCalledWith(123);
-        expect(subprocessoStoreMock.limparContextoAtual).toHaveBeenCalled();
+        expect(limparEstadoSubprocessoAtualMock).toHaveBeenCalled();
     });
 
     it("deve iniciar revisão de cadastro", async () => {

@@ -4,7 +4,6 @@ import {useSubprocessoStore} from "@/stores/subprocesso";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {calcularAssinaturaCadastro} from "@/utils/formatters";
 import logger from "@/utils/logger";
-import {useCacheMapa} from "@/composables/useMapaQuery";
 
 interface CadastroOrquestracaoProps {
     codProcesso: number | string;
@@ -42,8 +41,7 @@ async function recarregarContextoInicial(
 
 export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, atividades: Ref<Atividade[]>) {
     const subprocessoStore = useSubprocessoStore();
-    const cacheMapa = useCacheMapa();
-    const {atualizarFluxoSubprocessoEPainel} = useInvalidacaoNavegacao();
+    const {atualizarFluxoCadastro} = useInvalidacaoNavegacao();
 
     const carregandoInicial = ref(true);
     const codigoSubprocesso = ref<number | null>(null);
@@ -58,8 +56,6 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
             ...response.subprocesso,
             permissoes: response.permissoes
         });
-        cacheMapa.invalidarMapa(response.subprocesso.codigo);
-        subprocessoStore.marcarContextoEdicaoParaAtualizacao(response.subprocesso.codigo);
     }
 
     function sincronizarEstadoInicial(data: ContextoCadastroAtividadesSubprocesso) {
@@ -134,7 +130,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         carregarContextoInicial,
         processarRespostaLocal: (response: RespostaLocalCadastro) => {
             aplicarRespostaLocal(response);
-            atualizarFluxoSubprocessoEPainel();
+            atualizarFluxoCadastro(response.subprocesso.codigo);
         },
         sincronizarEstadoInicialContexto: sincronizarEstadoInicial,
     };

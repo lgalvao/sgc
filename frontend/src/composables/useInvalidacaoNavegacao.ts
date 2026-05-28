@@ -42,6 +42,13 @@ export function useInvalidacaoNavegacao() {
         subprocessoStore.invalidar();
     }
 
+    function atualizarFluxoCadastro(codigoSubprocesso: number): void {
+        invalidarPainel();
+        painelStore.invalidar();
+        subprocessoStore.invalidar();
+        invalidarMapa(codigoSubprocesso);
+    }
+
     function atualizarFluxoSubprocessoEProcesso(): void {
         invalidarProcesso();
         subprocessoStore.invalidar();
@@ -80,6 +87,7 @@ export function useInvalidacaoNavegacao() {
 
     return {
         atualizarDadosOrganizacionais,
+        atualizarFluxoCadastro,
         atualizarFluxoMapa,
         atualizarFluxoProcesso,
         atualizarFluxoSubprocesso,

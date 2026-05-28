@@ -12,28 +12,19 @@ const storeMock = {
     obterContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     recarregarContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     atualizarStatusLocal: vi.fn(),
-    marcarContextoEdicaoParaAtualizacao: vi.fn(),
     dadosCadastroValidos: vi.fn(),
     erroIntegracaoContexto: null as {codigo?: string} | null,
 };
 
-const cacheMapaMock = {
-    invalidarMapa: vi.fn(),
-};
-
-const atualizarFluxoSubprocessoEPainelMock = vi.fn();
+const atualizarFluxoCadastroMock = vi.fn();
 
 vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => storeMock
 }));
 
-vi.mock("@/composables/useMapaQuery", () => ({
-    useCacheMapa: () => cacheMapaMock
-}));
-
 vi.mock("@/composables/useInvalidacaoNavegacao", () => ({
     useInvalidacaoNavegacao: () => ({
-        atualizarFluxoSubprocessoEPainel: atualizarFluxoSubprocessoEPainelMock,
+        atualizarFluxoCadastro: atualizarFluxoCadastroMock,
     }),
 }));
 
@@ -93,7 +84,7 @@ describe("useCadastroOrquestracao", () => {
 
         await carregarContextoInicial();
 
-        expect(atualizarFluxoSubprocessoEPainelMock).not.toHaveBeenCalled();
+        expect(atualizarFluxoCadastroMock).not.toHaveBeenCalled();
     });
 
     it("deve invalidar caches de mapa e painel ao processar resposta de mutação", () => {
@@ -106,9 +97,7 @@ describe("useCadastroOrquestracao", () => {
         });
 
         expect(atividades.value).toEqual([{codigo: 9, descricao: "Atualizada"}]);
-        expect(cacheMapaMock.invalidarMapa).toHaveBeenCalledWith(123);
-        expect(storeMock.marcarContextoEdicaoParaAtualizacao).toHaveBeenCalledWith(123);
-        expect(atualizarFluxoSubprocessoEPainelMock).toHaveBeenCalled();
+        expect(atualizarFluxoCadastroMock).toHaveBeenCalledWith(123);
     });
 
     it("deve reaproveitar a assinatura de referência quando ela vier do backend", async () => {

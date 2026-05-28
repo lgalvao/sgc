@@ -35,7 +35,7 @@ export function useFluxoSubprocessoExecucao() {
     const subprocessoStore = useSubprocessoStore();
     const toastStore = useToastStore();
     const router = useRouter();
-    const {atualizarFluxoMapa} = useInvalidacaoNavegacao();
+    const {atualizarFluxoMapa, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
 
     async function executarAcaoWorkflow(
         acao: () => Promise<unknown>,
@@ -54,13 +54,13 @@ export function useFluxoSubprocessoExecucao() {
                 }
 
                 if (workflow.redirecionarParaPainel) {
-                    subprocessoStore.limparContextoAtual();
+                    limparEstadoSubprocessoAtual();
                     await router.push("/painel");
                     return;
                 }
 
                 if (workflow.redirecionarPara) {
-                    subprocessoStore.limparContextoAtual();
+                    limparEstadoSubprocessoAtual();
                     await router.push(workflow.redirecionarPara);
                     return;
                 }

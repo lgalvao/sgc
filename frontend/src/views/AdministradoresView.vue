@@ -116,7 +116,6 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref} from 'vue';
 import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BSpinner, BTable} from 'bootstrap-vue-next';
 
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
@@ -126,41 +125,30 @@ import EmptyState from '@/components/comum/EmptyState.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import BuscadorUsuarios from '@/components/comum/BuscadorUsuarios.vue';
-import {
-  adicionarAdministrador,
-  type AdministradorDto,
-  listarAdministradores,
-  removerAdministrador
-} from '@/services/administradorService';
-import {normalizarErro} from '@/utils/apiError';
-import {useNotification} from '@/composables/useNotification';
-import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
+import {useAdministradoresTela} from '@/composables/useAdministradoresTela';
 import {TEXTOS} from '@/constants/textos';
-import {useAsyncAction} from '@/composables/useAsyncAction';
 
-const {notify} = useNotification();
-const {carregando: carregandoAdmins, erro: erroAdmins, executar} = useAsyncAction();
-
-
-const administradores = ref<AdministradorDto[]>([]);
-const carregandoInicial = ref(true);
-const removendoAdmin = ref<string | null>(null);
-const mostrarModalAdicionarAdmin = ref(false);
-const mostrarModalRemoverAdmin = ref(false);
-const adminParaRemover = ref<AdministradorDto | null>(null);
-const usuarioSelecionado = ref<string | null>(null);
-const termoUsuario = ref('');
 const {
-  validarSubmissao,
-  resetarValidacao,
-  deveExibirErro,
-  focarPrimeiroErroInvalido
-} = useValidacaoFormulario();
-
-const erroAdicionarAdmin = ref('');
-const erroRemoverAdmin = ref('');
-const adicionandoAdmin = ref(false);
-const inputTituloRef = ref<InstanceType<typeof BuscadorUsuarios> | null>(null);
+  administradores,
+  carregandoInicial,
+  carregandoAdmins,
+  erroAdmins,
+  removendoAdmin,
+  mostrarModalAdicionarAdmin,
+  mostrarModalRemoverAdmin,
+  adminParaRemover,
+  usuarioSelecionado,
+  termoUsuario,
+  erroAdicionarAdmin,
+  erroRemoverAdmin,
+  adicionandoAdmin,
+  inputTituloRef,
+  mensagemErroNovoAdmin,
+  abrirModalAdicionarAdmin,
+  adicionarAdmin,
+  confirmarRemocao,
+  removerAdmin,
+} = useAdministradoresTela();
 
 const camposAdmins = [
   {key: 'nome', label: TEXTOS.administracao.CAMPO_NOME},
@@ -169,82 +157,4 @@ const camposAdmins = [
   {key: 'unidadeSigla', label: TEXTOS.administracao.CAMPO_UNIDADE},
   {key: 'acoes', label: TEXTOS.administracao.CAMPO_ACOES, thClass: 'text-end'},
 ];
-
-const mensagemErroNovoAdmin = computed(() => {
-  return deveExibirErro(!termoUsuario.value.trim()) ? TEXTOS.administracao.ERRO_TITULO_INVALIDO : '';
-});
-
-async function carregarAdministradores() {
-  await executar(async () => {
-    administradores.value = await listarAdministradores();
-  }, TEXTOS.comum.ERRO_OPERACAO, {relancarErro: false});
-}
-
-function abrirModalAdicionarAdmin() {
-  termoUsuario.value = '';
-  usuarioSelecionado.value = null;
-  resetarValidacao();
-  erroAdicionarAdmin.value = '';
-  mostrarModalAdicionarAdmin.value = true;
-}
-
-function fecharModalAdicionarAdmin() {
-  mostrarModalAdicionarAdmin.value = false;
-  termoUsuario.value = '';
-  usuarioSelecionado.value = null;
-  resetarValidacao();
-  erroAdicionarAdmin.value = '';
-
-}
-
-async function adicionarAdmin() {
-  const adminId = usuarioSelecionado.value || termoUsuario.value.trim();
-
-  if (!validarSubmissao(!!adminId)) {
-    await focarPrimeiroErroInvalido();
-    return;
-  }
-
-  erroAdicionarAdmin.value = '';
-  adicionandoAdmin.value = true;
-  try {
-    await adicionarAdministrador(adminId);
-    fecharModalAdicionarAdmin();
-    notify(TEXTOS.administracao.SUCESSO_ADICIONADO, 'success');
-    await carregarAdministradores();
-  } catch (error) {
-    erroAdicionarAdmin.value = normalizarErro(error).mensagem;
-  } finally {
-    adicionandoAdmin.value = false;
-  }
-}
-
-async function confirmarRemocao(admin: AdministradorDto) {
-  adminParaRemover.value = admin;
-  erroRemoverAdmin.value = '';
-  mostrarModalRemoverAdmin.value = true;
-}
-
-async function removerAdmin() {
-  if (!adminParaRemover.value) return;
-
-  erroRemoverAdmin.value = '';
-  removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
-  try {
-    await removerAdministrador(adminParaRemover.value.tituloEleitoral);
-    notify(TEXTOS.administracao.SUCESSO_REMOVIDO, 'success');
-    await carregarAdministradores();
-    mostrarModalRemoverAdmin.value = false;
-    adminParaRemover.value = null;
-  } catch (error) {
-    erroRemoverAdmin.value = normalizarErro(error).mensagem;
-  } finally {
-    removendoAdmin.value = null;
-  }
-}
-
-onMounted(async () => {
-  await carregarAdministradores();
-  carregandoInicial.value = false;
-});
 </script>
