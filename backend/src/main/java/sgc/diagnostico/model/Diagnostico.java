@@ -23,7 +23,7 @@ public class Diagnostico extends EntidadeBase {
     private Subprocesso subprocesso;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "situcao", length = 50, nullable = false)
+    @Column(name = "situacao", length = 50, nullable = false)
     private SituacaoDiagnostico situacao;
 
     @Column(name = "data_conclusao")
@@ -34,7 +34,7 @@ public class Diagnostico extends EntidadeBase {
 
     @OneToMany(mappedBy = "diagnostico", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<AvaliacaoServidor> avaliaoServidores = new ArrayList<>();
+    private List<AvaliacaoServidor> avaliacaoServidores = new ArrayList<>();
 
     @OneToMany(mappedBy = "diagnostico", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

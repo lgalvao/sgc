@@ -12,7 +12,7 @@ public interface DiagnosticoRepo extends JpaRepository<Diagnostico, Integer> {
 
     @Query("""
             SELECT d from Diagnostico d 
-            LEFT JOIN FETCH d.avaliaoServidores
+            LEFT JOIN FETCH d.avaliacaoServidores
             LEFT JOIN FETCH d.ocupacaoCriticas
             WHERE d.subprocesso.codigo = :subprocessoCodigo     
     """)
