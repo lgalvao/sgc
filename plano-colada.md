@@ -21,6 +21,10 @@ Reduzir a infraestrutura caseira no frontend do SGC em dois eixos:
 - redução relevante da orquestração artificial em fluxos de processo, subprocesso, cadastro e mapa.
 - `organizacao` mantido fora de Colada por enquanto: a store é instanciada em contextos demais fora de `setup()`, e a migração limpa exigiria redesenho mais amplo dos consumidores.
 - a régua de lint estrutural foi restaurada após um desvio temporário que havia desligado regras de complexidade, tamanho e parâmetros.
+- auditoria arquitetural recalibrada para reduzir orientação perversa (retornos aninhados não contam como superfície exportada da função principal).
+- composables co-localizados em `views/` passaram a ser tratados como contrato de tela para DI/superfície, evitando falso positivo estrutural.
+- `useMapas` foi simplificado para contrato atual do Colada, removendo API morta e testes legados acoplados.
+- `stores/perfil.ts` foi limpo com remoção da bolsa artificial `EstadoSessaoRefs` e helpers inlinados no escopo real da store.
 
 ### Diagnóstico novo
 
@@ -44,26 +48,26 @@ A auditoria foi endurecida. Ela não mede mais só vocabulário literal (`cache`
 
 Última medição registrada por `node etc/scripts/sgc.js frontend arquitetura auditar`:
 
-- score total: `984` (`critico`)
-- views com vazamento de estratégia de cache: `1`
-- views com service direto: `9`
-- views com server state caseiro: `1`
-- views com fan-out alto: `9`
+- score total: `203` (`critico`)
+- views com vazamento de estratégia de cache: `0`
+- views com service direto: `1`
+- views com server state caseiro: `0`
+- views com fan-out alto: `0`
 - acessos diretos a cache de store: `0`
 - booleanos posicionais: `1`
-- bolsas largas de dependências/estado: `9`
-- superfícies exportadas amplas: `27`
-- arquivos com mistura de camadas: `11`
-- arquivos com server state caseiro: `2`
+- bolsas largas de dependências/estado: `1`
+- superfícies exportadas amplas: `16`
+- arquivos com mistura de camadas: `0`
+- arquivos com server state caseiro: `1`
 - hubs centrais com sinais: `2`
 
 Hotspots prioritários desta baseline:
 
-1. `frontend/src/views/MapaView.vue`
-2. `frontend/src/composables/useProcessoCadastroTela.ts`
-3. `frontend/src/views/CadastroView.vue`
-4. `frontend/src/views/RelatorioMapasView.vue`
-5. `frontend/src/composables/useEstadoSubprocessoNavegacao.ts`
+1. `frontend/src/stores/organizacao.ts`
+2. `frontend/src/composables/useSubprocessoTela.ts`
+3. `frontend/src/stores/perfilAutenticacao.ts`
+4. `frontend/src/composables/usePerfil.ts`
+5. `frontend/src/views/LimpezaProcessosView.vue`
 
 ### Metas de progresso arquitetural
 
@@ -71,19 +75,19 @@ As próximas rodadas devem ser medidas contra esta baseline. A meta não é “z
 
 Curto prazo:
 
-- atacar hotspots de `view` que ainda chamam service diretamente;
-- reduzir fan-out arquitetural das views centrais de processo, atribuição e mapas;
-- derrubar bolsas largas e superfícies amplas nos hubs restantes;
-- reduzir `useInvalidacaoNavegacao.ts` como hub transversal.
+- remover o `serviceDireto` remanescente em view (`LimpezaProcessosView.vue`);
+- reduzir os dois hubs centrais que ainda sinalizam (`organizacao` e `perfilAutenticacao`);
+- atacar `useSubprocessoTela.ts` para diminuir estratégia de cache exposta;
+- continuar reduzindo superfícies amplas em composables/stores remanescentes.
 
 Médio prazo:
 
-- manter `viewsComVazamentoCache` em `0` ou `1` até zerar;
-- levar `viewsComServiceDireto` de `9` para menos de `5`;
-- levar `viewsComServerStateCaseiro` de `1` para `0`;
-- levar `viewsComFanoutAlto` de `9` para menos de `4`;
-- levar `arquivosComBolsaDependenciasLarga` de `9` para menos de `4`;
-- levar `arquivosComSuperficieAmpla` de `27` para menos de `10`;
+- manter `viewsComVazamentoCache` em `0`;
+- levar `viewsComServiceDireto` de `1` para `0`;
+- manter `viewsComServerStateCaseiro` em `0`;
+- manter `viewsComFanoutAlto` em `0`;
+- levar `arquivosComBolsaDependenciasLarga` de `1` para `0`;
+- levar `arquivosComSuperficieAmpla` de `16` para menos de `10`;
 - reduzir `hubsCentraisComSinais` de `2` para `1` ou menos.
 
 ### Situação da régua
@@ -100,13 +104,10 @@ Quando a régua acusar excesso, a ação esperada é uma destas:
 
 O estado atual do `quality:lint` ainda expõe warnings reais, principalmente em:
 
-- `MapaView` e fluxo de mapa;
-- `useProcessoCadastroTela`;
-- `CadastroView`;
-- `useAtribuicaoTemporariaTela`;
-- `useCadastroOrquestracao`;
-- `useFluxoMapa`;
-- `useBreadcrumbs`;
+- `stores/organizacao.ts`;
+- `useSubprocessoTela.ts`;
+- `stores/perfilAutenticacao.ts`;
+- `usePerfil.ts`;
 - `stores/subprocesso/index.ts`.
 
 ### Padrão de emaranhamento observado
@@ -419,11 +420,11 @@ Atacar explicitamente os pontos que concentram responsabilidades demais e por is
 
 ### Alvos prioritários
 
-- `stores/unidade.ts`
-- `stores/mapas.ts`
-- `stores/perfil.ts`
-- `useInvalidacaoNavegacao.ts`
-- `useCacheSync.ts`
+- `stores/organizacao.ts`
+- `composables/useSubprocessoTela.ts`
+- `stores/perfilAutenticacao.ts`
+- `composables/usePerfil.ts`
+- `views/LimpezaProcessosView.vue`
 
 ### Estratégia
 
@@ -474,10 +475,10 @@ Critério:
 
 ## Próximos Passos Sugeridos em Ordem
 
-1. Revisar bordas de tela para remover estratégia de cache exposta, começando por `unidade`, `atribuicao temporaria` e telas análogas.
-2. Quebrar `stores/unidade.ts` e `stores/mapas.ts` por responsabilidade, em vez de continuar expandindo suas APIs.
-3. Reduzir `stores/perfil.ts` a sessão/autorização pura.
-4. Só depois retomar fluxos de mapa/subprocesso com contratos mais agressivos e menos compatibilidade.
+1. Eliminar `serviceDireto` de `LimpezaProcessosView.vue` movendo a borda para composable/store de caso de uso.
+2. Quebrar responsabilidades transversais em `stores/organizacao.ts` (service + server-state caseiro no mesmo ponto).
+3. Enxugar `useSubprocessoTela.ts` para reduzir estratégia de cache exposta e superfície de contrato.
+4. Reduzir `stores/perfilAutenticacao.ts` e `usePerfil.ts` para contratos menores e menos pass-through.
 
 ## Mudanças esperadas na arquitetura
 
