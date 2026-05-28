@@ -1,6 +1,6 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **152** (critico)
+- Score total: **144** (critico)
 - Arquivos de producao: **265**
 - Views com vazamento de estrategia de cache: **0**
 - Views com chamadas diretas a service: **0**
@@ -16,43 +16,43 @@
 
 ## Hotspots
 
-1. `frontend/src/composables/useSubprocessoTela.ts` [composable]
-   - score: 13
-   - sinais: estrategiaCache
-   - fan-out: 3 categorias / 7 imports arquiteturais
-2. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
+1. `frontend/src/composables/useInvalidacaoNavegacao.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 7 imports arquiteturais
-3. `frontend/src/stores/perfil.ts` [store]
+2. `frontend/src/stores/perfil.ts` [store]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 4 imports arquiteturais
-4. `frontend/src/stores/subprocesso/index.ts` [store]
+3. `frontend/src/stores/subprocesso/index.ts` [store]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 1 categorias / 3 imports arquiteturais
-5. `frontend/src/composables/useCadastroAtividadesMutacoes.ts` [composable]
+4. `frontend/src/composables/useCadastroAtividadesMutacoes.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 3 imports arquiteturais
-6. `frontend/src/composables/useFluxoMapa.ts` [composable]
+5. `frontend/src/composables/useFluxoMapa.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 3 imports arquiteturais
-7. `frontend/src/composables/useFluxoCadastroSubprocesso.ts` [composable]
+6. `frontend/src/composables/useFluxoCadastroSubprocesso.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 2 imports arquiteturais
-8. `frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts` [composable]
+7. `frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 2 imports arquiteturais
-9. `frontend/src/composables/useMapaSugestoes.ts` [composable]
+8. `frontend/src/composables/useMapaSugestoes.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 2 imports arquiteturais
-10. `frontend/src/composables/useBuscadorUsuarios.ts` [composable]
+9. `frontend/src/composables/useBuscadorUsuarios.ts` [composable]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 2 categorias / 2 imports arquiteturais
+10. `frontend/src/composables/useConfiguracoes.ts` [composable]
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 2 categorias / 2 imports arquiteturais

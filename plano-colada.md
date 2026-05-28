@@ -69,14 +69,9 @@ Quando a régua acusar excesso, a ação esperada é:
 
 ## O que falta fazer
 
-### 1. `LimpezaProcessosView.vue` — service direto em view
+### 1. `LimpezaProcessosView.vue` — service direto em view ✅ CONCLUÍDO
 
-**Problema**: A view importa e chama `excluirProcessoCompleto` diretamente de `@/services/processo`.
-Isso é o único `serviceDireto` remanescente em views.
-
-**Ação**: Mover a chamada de serviço para um composable de caso de uso
-(ex: `useLimpezaProcessos.ts`) e fazer a view consumir apenas o composable.
-O composable fica responsável por loading, erro e chamada ao service.
+**Ação**: Lógica extraída para `useLimpezaProcessosTela.ts`. View reduzida para ~12 linhas. `viewsComServiceDireto` → 0.
 
 ---
 
@@ -97,54 +92,39 @@ O composable fica responsável por loading, erro e chamada ao service.
 
 ### 3. `stores/subprocesso/index.ts` — hub de cache manual complexo
 
-**Problema**: A store gerencia dois contextos (`edicao` e `cadastro`) com deduplicação manual via `Map<string, Promise>`, flags `invalido`, e 8+ métodos `obter/recarregar` variantes.
-É o principal candidato a redução de complexidade estrutural.
+**Problema**: A store gerencia dois contextos (`edicao` e `cadastro`) com deduplicação manual via `Map<string, Promise>`, flags `invalido`, e 8+ métodos `obter/recarregar` variantes. Score 9 (`superficieAmpla`, 18 símbolos exportados).
 
-**Ação**: Separar as responsabilidades em etapas:
+**Parcialmente resolvido**: `marcarContextoEdicaoParaAtualizacao` (código morto) removido.
 
-1. Identificar quais variantes de `obter/recarregar` têm chamadores distintos vs. sobrepostos
-2. Consolidar variantes redundantes
-3. Esconder o mecanismo de dedupe (`Map` de carregamentos) completamente na camada interna
-4. Avaliar se `contextoEdicao` e `contextoCadastro` podem ser queries Colada independentes
+**Pendente**: Consolidar variantes por código vs. por processo/unidade — ex: `obterContextoEdicao(chave)` aceitando ambos os padrões reduziria o surface a ~12 símbolos.
 
 ---
 
-### 4. `composables/useSubprocessoTela.ts` — superfície ampla e estratégia de cache exposta
+### 4. `composables/useSubprocessoTela.ts` — estratégia de cache exposta ✅ CONCLUÍDO
 
-**Problema**: O composable retorna 30+ símbolos, recebe referências diretas a métodos internos da `subprocessoStore`
-(`obterContextoEdicao`, `recarregarContextoEdicao`, `dadosEdicaoValidos` etc.) e os passa para `useSubprocessoCarregamento`.
-A estratégia de cache da store está visível na borda do composable.
-
-**Ação**:
-
-1. Reduzir a superfície exportada — agrupar o que for estado de modal/validação em objetos locais
-2. Encapsular a dependência em `subprocessoStore` dentro do próprio composable, sem passar métodos como parâmetros
-3. Separar a lógica de carregamento de contexto da lógica de ações administrativas
+**Ação**: `useSubprocessoCarregamento` e `useSubprocessoAcoesAdministrativas` passaram a chamar `useSubprocessoStore()` diretamente, eliminando os 7 métodos de store passados como DI. Sinal `estrategiaCache` removido. Score total: 152 → 144.
 
 ---
 
-### 5. `stores/perfilAutenticacao.ts` e `composables/usePerfil.ts` — avaliar real necessidade
+### 5. `stores/perfilAutenticacao.ts` e `composables/usePerfil.ts` ✅ CONCLUÍDO
 
-**Situação atual**: `perfilAutenticacao.ts` já foi refatorado para módulo de funções puras (não é mais uma store Pinia).
-`usePerfil.ts` é um wrapper simples e enxuto sobre `perfilStore`.
-
-**Ação**: Verificar com `node etc/scripts/sgc.js frontend arquitetura auditar` se ainda constam como hotspots.
-Se o score deles caiu, remover da lista de prioridade e focar os esforços nos itens 1–4.
+**Situação**: Falsos positivos eliminados via correção do script de auditoria (`arquitetura-lib.js`). Ambos saíram dos hotspots.
 
 ---
 
 ## Metas de progresso arquitetural
 
-| Métrica                             | Baseline | Meta     |
-| ----------------------------------- | -------- | -------- |
-| `viewsComServiceDireto`             | 1        | 0        |
-| `arquivosComServerStateCaseiro`     | 1        | 0        |
-| `arquivosComSuperficieAmpla`        | 16       | < 10     |
-| `hubsCentraisComSinais`             | 2        | ≤ 1      |
-| `arquivosComBolsaDependenciasLarga` | 1        | 0        |
-| `viewsComVazamentoCache`            | 0        | manter 0 |
-| `viewsComFanoutAlto`                | 0        | manter 0 |
-| `viewsComServerStateCaseiro`        | 0        | manter 0 |
+| Métrica                             | Baseline | Meta     | Atual   |
+| ----------------------------------- | -------- | -------- | ------- |
+| `viewsComServiceDireto`             | 1        | 0        | **0** ✅ |
+| `arquivosComServerStateCaseiro`     | 1        | 0        | 1       |
+| `arquivosComSuperficieAmpla`        | 16       | < 10     | 16      |
+| `hubsCentraisComSinais`             | 2        | ≤ 1      | 2       |
+| `arquivosComBolsaDependenciasLarga` | 1        | 0        | 1       |
+| `viewsComVazamentoCache`            | 0        | manter 0 | **0** ✅ |
+| `viewsComFanoutAlto`                | 0        | manter 0 | **0** ✅ |
+| `viewsComServerStateCaseiro`        | 0        | manter 0 | **0** ✅ |
+| Score arquitetural total            | 175      | < 100    | **144** |
 
 Medir com: `node etc/scripts/sgc.js frontend arquitetura auditar`
 

@@ -1,9 +1,9 @@
 {
   "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-28T13:31:09.865Z",
+  "geradoEm": "2026-05-28T13:58:08.732Z",
   "resumo": {
     "arquivosProducao": 265,
-    "scoreTotal": 152,
+    "scoreTotal": 144,
     "faixa": "critico",
     "metricas": {
       "viewsComVazamentoCache": 0,
@@ -29,40 +29,6 @@
     }
   },
   "hotspots": [
-    {
-      "arquivo": "frontend/src/composables/useSubprocessoTela.ts",
-      "camada": "composable",
-      "linhas": 207,
-      "score": 13,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 11,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 1,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 3,
-        "importacoesArquiteturais": 7
-      },
-      "sinaisAtivos": [
-        "estrategiaCache"
-      ],
-      "hubCentral": false
-    },
     {
       "arquivo": "frontend/src/composables/useInvalidacaoNavegacao.ts",
       "camada": "composable",
@@ -134,7 +100,7 @@
     {
       "arquivo": "frontend/src/stores/subprocesso/index.ts",
       "camada": "store",
-      "linhas": 163,
+      "linhas": 158,
       "score": 9,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
@@ -153,7 +119,7 @@
         "chamadasColadaQuery": 0,
         "chamadasColadaCache": 0,
         "estadosAssincronosManuais": 2,
-        "coordenacaoServerStateCaseiro": 7,
+        "coordenacaoServerStateCaseiro": 6,
         "mapasPromessasDedupe": 0,
         "bolsasDependenciasLargas": 0,
         "superficieExportadaAmpla": 1,
@@ -599,6 +565,40 @@
         "superficieExportadaAmpla": 0,
         "categoriasAcoplamento": 2,
         "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "estrategiaCache"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/views/subprocessoCarregamento.ts",
+      "camada": "composable",
+      "linhas": 119,
+      "score": 5,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 7,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 1,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 1,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 1,
+        "importacoesArquiteturais": 1
       },
       "sinaisAtivos": [
         "estrategiaCache"
