@@ -1,6 +1,6 @@
 {
   "versaoSchema": "3.0.0",
-  "geradoEm": "2026-05-29T16:54:23.675Z",
+  "geradoEm": "2026-05-29T17:18:55.592Z",
   "resumo": {
     "arquivosProducao": 265,
     "scoreTotal": 27,
@@ -22,7 +22,7 @@
       "arquivosComMisturaCamadas": 0,
       "arquivosComServerStateCaseiro": 0,
       "arquivosComAcoplamentoStoreAlto": 0,
-      "arquivosComServiceDireto": 34,
+      "arquivosComServiceDireto": 35,
       "chamadasEstrategiaCache": 0,
       "chamadasInvalidacao": 0,
       "hubsCentraisComSinais": 0,
@@ -588,7 +588,7 @@
         "frontend/src/composables/useMapaSugestoes.ts",
         "frontend/src/composables/useMapaTela.ts"
       ],
-      "totalLinhas": 952
+      "totalLinhas": 953
     },
     "Mapas": {
       "arquivos": [
