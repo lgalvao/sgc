@@ -1,7 +1,7 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **27** (atencao)
-- Arquivos de producao: **265**
+- Score total: **11** (bom)
+- Arquivos de producao: **263**
 - Views com vazamento de estrategia de cache: **0**
 - Views com chamadas diretas a service: **0**
 - Views com server state caseiro: **0**
@@ -14,7 +14,7 @@
 - Arquivos com server state caseiro: **0**
 - Hubs centrais com sinais: **0**
 - Fachadas puras (composables sem lógica): **0**
-- Composables minúsculos (< 30L): **10**
+- Composables minúsculos (< 30L): **2**
 - Famílias pulverizadas (>= 4 membros): **4**
 
 ## Hotspots
@@ -23,39 +23,11 @@
    - score: 9
    - sinais: superficieAmpla
    - fan-out: 1 categorias / 3 imports arquiteturais
-2. `frontend/src/App.vue` [outro]
-   - score: 8
-   - sinais: 
-   - fan-out: 2 categorias / 4 imports arquiteturais
-3. `frontend/src/composables/useFluxoSubprocesso.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 1 categorias / 3 imports arquiteturais
-4. `frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts` [composable]
+2. `frontend/src/composables/useRelatorioAndamentoTela.ts` [composable]
    - score: 1
    - sinais: arquivoMinusculo
    - fan-out: 2 categorias / 2 imports arquiteturais
-5. `frontend/src/composables/useProcessoQuery.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 2 categorias / 2 imports arquiteturais
-6. `frontend/src/composables/useHistoricoQuery.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 2 categorias / 2 imports arquiteturais
-7. `frontend/src/composables/useUnidadesQuery.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 2 categorias / 2 imports arquiteturais
-8. `frontend/src/composables/useRelatorioAndamentoTela.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 2 categorias / 2 imports arquiteturais
-9. `frontend/src/composables/useFeedbacksAdminQuery.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 2 categorias / 2 imports arquiteturais
-10. `frontend/src/composables/useUnidadeAtual.ts` [composable]
+3. `frontend/src/composables/useUnidadeAtual.ts` [composable]
    - score: 1
    - sinais: arquivoMinusculo
    - fan-out: 1 categorias / 1 imports arquiteturais
@@ -76,7 +48,7 @@
 - `frontend/src/composables/useMapaSugestoes.ts`
 - `frontend/src/composables/useMapaTela.ts`
 
-### Processo (5 arquivos, 581 linhas)
+### Processo (5 arquivos, 582 linhas)
 - `frontend/src/composables/useProcessoCadastroCarga.ts`
 - `frontend/src/composables/useProcessoCadastroTela.ts`
 - `frontend/src/composables/useProcessoForm.ts`
@@ -97,12 +69,30 @@ Arquivos com sinais suprimidos via `@sgc-auditoria ignorar:` com motivo explíci
 - `frontend/src/composables/useBuscadorUsuarios.ts`
   - sinais ignorados: superficieAmpla
   - motivo: Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue, extraído para testabilidade
+- `frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+- `frontend/src/composables/useFeedbacksAdminQuery.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query — pequeno por design
 - `frontend/src/composables/useFluxoSubprocesso.ts`
-  - sinais ignorados: fachadaPura
+  - sinais ignorados: fachadaPura, arquivoMinusculo
   - motivo: Fachada de coordenação deliberada: injeta `execucao` como dependência em useFluxoCadastroSubprocesso e useFluxoAdministrativoSubprocesso, isolando os consumers desse detalhe
+- `frontend/src/composables/useHistoricoQuery.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 - `frontend/src/composables/useMapaSugestoes.ts`
   - sinais ignorados: superficieAmpla
   - motivo: Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por useMapaTela
+- `frontend/src/composables/usePainelQuery.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+- `frontend/src/composables/useProcessoQuery.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+- `frontend/src/composables/useUnidadesQuery.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 
 ## Diretrizes acompanhadas
 

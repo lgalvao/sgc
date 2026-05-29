@@ -1,7 +1,5 @@
 import {nextTick} from "vue";
 import {beforeEach, describe, expect, it} from "vitest";
-import {useLocalStorage} from "@/composables/useLocalStorage";
-import {useSessionStorage} from "@/composables/useSessionStorage";
 import {useWebStorage} from "@/composables/useWebStorage";
 
 type ArmazenamentoFake = {
@@ -85,9 +83,9 @@ describe("armazenamento web composables", () => {
         });
     });
 
-    describe("wrappers públicos", () => {
-        it("useLocalStorage deve persistir no localStorage sem tocar sessionStorage", async () => {
-            const valor = useLocalStorage("chave-local", "padrao");
+    describe("com localStorage e sessionStorage reais", () => {
+        it("deve persistir no localStorage sem tocar sessionStorage", async () => {
+            const valor = useWebStorage(localStorage, "chave-local", "padrao");
 
             valor.value = "novo-valor";
             await nextTick();
@@ -96,8 +94,8 @@ describe("armazenamento web composables", () => {
             expect(sessionStorage.getItem("chave-local")).toBeNull();
         });
 
-        it("useSessionStorage deve persistir no sessionStorage sem tocar localStorage", async () => {
-            const valor = useSessionStorage("chave-sessao", "padrao");
+        it("deve persistir no sessionStorage sem tocar localStorage", async () => {
+            const valor = useWebStorage(sessionStorage, "chave-sessao", "padrao");
 
             valor.value = "novo-valor";
             await nextTick();

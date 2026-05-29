@@ -11,6 +11,7 @@ const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 const EXTENSOES_RESOLUCAO = [".ts", ".vue", ".js", "/index.ts", "/index.vue", "/index.js"];
 const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"];
 const HUBS_CENTRAIS = new Set([
+    "frontend/src/App.vue",
     "frontend/src/stores/perfil.ts",
     "frontend/src/stores/unidade.ts",
     "frontend/src/stores/mapas.ts",
@@ -777,7 +778,7 @@ function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplam
     if (detectarServerStateCaseiro({camada: camadaEfetiva, analiseAst})) sinais.push("serverStateCaseiro");
     if (categoriasAcoplamento >= 3 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("misturaCamadas");
     if (importacoesArquiteturais >= 5 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("fanoutAlto");
-    if (!hubCentral && analiseAst.chamadasStore >= 8 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("acoplamentoStoreAlto");
+    if (!hubCentral && analiseAst.chamadasStore >= 8) sinais.push("acoplamentoStoreAlto");
     if (fachadaPura) sinais.push("fachadaPura");
     else if (arquivoMinusculo) sinais.push("arquivoMinusculo");
     return sinais;
