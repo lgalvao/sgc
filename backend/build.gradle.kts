@@ -339,6 +339,9 @@ tasks.register("fuzz") {
             jarFile.absolutePath
         )
         
+        // Define o diretório de trabalho como o diretório do subprojeto 'backend' para resolver caminhos relativos corretamente
+        processoBuilder.directory(project.projectDir)
+        
         processoBuilder.redirectOutput(logFuzz)
         processoBuilder.redirectError(logFuzz)
         
@@ -351,16 +354,17 @@ tasks.register("fuzz") {
         
         while (System.currentTimeMillis() - startTime < timeoutMs) {
             try {
-                val url = URI("http://localhost:10000/actuator/health").toURL()
+                val url = URI("http://localhost:10000/swagger-ui.html").toURL()
                 val conexao = url.openConnection() as HttpURLConnection
                 conexao.connectTimeout = 1000
                 conexao.readTimeout = 1000
-                if (conexao.responseCode == 200) {
+                val responseCode = conexao.responseCode
+                if (responseCode in 100..599) {
                     conectado = true
                     break
                 }
             } catch (e: Exception) {
-                // Ignora e espera a porta subir
+                // Ignora e espera a porta subir (ex: Connection Refused)
             }
             Thread.sleep(1500)
         }
@@ -409,6 +413,7 @@ tasks.register("fuzz") {
         )
         
         try {
+            println("Tentando executar o WuppieFuzz nativo...")
             val processoFuzz = ProcessBuilder(comandoFuzzer)
                 .inheritIO()
                 .start()
@@ -416,9 +421,32 @@ tasks.register("fuzz") {
             val exitCode = processoFuzz.waitFor()
             println("WuppieFuzz finalizado com codigo de saida: $exitCode")
         } catch (e: Exception) {
-            println("\n[Aviso] Nao foi possivel executar o comando 'wuppiefuzz': ${e.message}")
-            println("Certifique-se de que a ferramenta 'wuppiefuzz' esta instalada e disponivel no PATH.")
-            println("Veja as instrucoes de instalacao no arquivo: ${project.rootDir}/etc/fuzzing/README.md")
+            println("\n[Aviso] Nao foi possivel executar o comando 'wuppiefuzz' nativo: ${e.message}")
+            println("Tentando executar o WuppieFuzz via Docker (imagem 'wuppiefuzz')...")
+            
+            // Se o WuppieFuzz não estiver nativo, tenta rodar o contêiner docker usando a rede host
+            val comandoDocker = listOf(
+                "docker", "run", "--rm",
+                "--network", "host",
+                "-v", "${pastaResultados.absolutePath}:/reports",
+                "wuppiefuzz",
+                "-o", "http://localhost:10000/api-docs",
+                "-h", "Authorization: Bearer $tokenJwt",
+                "-d", "/reports"
+            )
+            
+            try {
+                val processoDocker = ProcessBuilder(comandoDocker)
+                    .inheritIO()
+                    .start()
+                
+                val exitCode = processoDocker.waitFor()
+                println("WuppieFuzz (via Docker) finalizado com codigo de saida: $exitCode")
+            } catch (dockerEx: Exception) {
+                println("\n[Erro] Nao foi possivel executar o WuppieFuzz via Docker: ${dockerEx.message}")
+                println("Certifique-se de que o Docker esta ativo e que a imagem 'wuppiefuzz' foi criada localmente.")
+                println("Instrucoes completas de uso do Docker ou instalacao manual em: ${project.rootDir}/etc/fuzzing/README.md")
+            }
         } finally {
             println("-----------------------------------------------------------------")
             println("Finalizando o backend do SGC local...")

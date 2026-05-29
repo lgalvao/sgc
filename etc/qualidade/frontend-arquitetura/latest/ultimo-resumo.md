@@ -18,7 +18,7 @@
 
 1. `frontend/src/stores/subprocesso/index.ts` [store]
    - score: 9
-   - sinais: superficieAmpla
+   - sinais: palavraForcar, superficieAmpla
    - fan-out: 1 categorias / 3 imports arquiteturais
 2. `frontend/src/composables/useMapaSugestoes.ts` [composable]
    - score: 9
