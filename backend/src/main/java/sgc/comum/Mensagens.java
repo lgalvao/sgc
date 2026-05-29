@@ -178,6 +178,10 @@ public final class Mensagens {
     public static final String HIST_MAPA_VALIDACAO_DEVOLVIDA = "Validação do mapa devolvida para ajustes";
     public static final String HIST_MAPA_VALIDACAO_ACEITA = "Validação do mapa aceita";
     public static final String HIST_MAPA_HOMOLOGADO = "Mapa homologado";
+    public static final String HIST_DIAGNOSTICO_CONCLUIDO = "Diagnóstico concluído";
+    public static final String HIST_DIAGNOSTICO_DEVOLVIDO = "Diagnóstico devolvido para ajustes";
+    public static final String HIST_DIAGNOSTICO_ACEITO = "Diagnóstico aceito";
+    public static final String HIST_DIAGNOSTICO_HOMOLOGADO = "Diagnóstico homologado";
     public static final String HIST_PROCESSO_INICIADO = "Processo iniciado";
 
     // ── Templates de Alertas ─────────────────────────────────────────────────
