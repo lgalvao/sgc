@@ -4,6 +4,7 @@ import logger from "@/utils/logger";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
 import type {VarianteAlerta} from "@/composables/useNotification";
+import {obterSugestoesMapa, apresentarSugestoes} from "@/services/subprocessoService";
 
 interface UseMapaSugestoesOptions {
     obterCodigoSubprocessoObrigatorio: () => number;

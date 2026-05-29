@@ -43,6 +43,17 @@ vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => subprocessoStoreCacheMock,
 }));
 
+// Evita dependência de PiniaColada (useQueryCache) no contexto de testes de componente
+vi.mock("@/composables/useMapaOrquestracao", () => ({
+    useMapaOrquestracao: () => ({
+        carregandoInicial: ref(false),
+        codigoSubprocesso: ref(123),
+        unidade: ref({sigla: 'TESTE', nome: 'Unidade Teste'}),
+        carregarContextoInicial: vi.fn().mockResolvedValue(true),
+        sincronizarEstadoInicialContexto: vi.fn(),
+    }),
+}));
+
 const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
     PageHeader: {
