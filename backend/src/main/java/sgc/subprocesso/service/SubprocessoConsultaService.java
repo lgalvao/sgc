@@ -202,6 +202,10 @@ public class SubprocessoConsultaService {
         return movimentacaoRepo.listarPorSubprocessoPaginado(sp.getCodigo(), PageRequest.of(0, 15));
     }
 
+    public List<Movimentacao> listarMovimentacoesOrdenadas(Long subprocessoCodigo) {
+        return movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoCodigo);
+    }
+
     private ContextoConsultaSubprocesso montarContextoConsultaLeve(Subprocesso sp) {
         return montarContextoConsulta(sp, List.of());
     }

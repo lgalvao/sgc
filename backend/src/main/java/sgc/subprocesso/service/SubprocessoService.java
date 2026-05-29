@@ -18,6 +18,7 @@ import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
+import sgc.diagnostico.service.DiagnosticoFluxoService;
 
 import java.util.*;
 import java.util.function.*;
@@ -45,6 +46,7 @@ public class SubprocessoService {
     private final CopiaMapaService copiaMapaService;
     private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoConsultaService consultaService;
+    private final DiagnosticoFluxoService diagnosticoFluxoService;
 
     @Transactional
     public Mapa salvarMapa(Long codSubprocesso, SalvarMapaRequest request) {
@@ -166,6 +168,7 @@ public class SubprocessoService {
                 .situacaoInicial(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO)
                 .descMovimentacao("Processo de diagnóstico iniciado")
                 .build());
+        diagnosticoFluxoService.inicializarDiagnostico(subprocessoSalvo);
         log.info("Criado subprocesso {} para unidade {}", subprocessoSalvo.getCodigo(), command.unidade().getSigla());
     }
 

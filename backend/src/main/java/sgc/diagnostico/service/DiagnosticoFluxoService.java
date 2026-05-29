@@ -13,12 +13,13 @@ import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
+import sgc.organizacao.service.UsuarioService;
 import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.MovimentacaoRepo;
 import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.TipoAcaoAnalise;
 import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.model.TipoTransicao;
@@ -26,8 +27,13 @@ import sgc.subprocesso.service.SubprocessoConsultaService;
 import sgc.subprocesso.service.LocalizacaoSubprocessoService;
 import sgc.subprocesso.service.SubprocessoTransicaoService;
 import sgc.subprocesso.service.SubprocessoValidacaoService;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.model.Competencia;
+import sgc.diagnostico.model.AvaliacaoServidor;
+import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,11 +48,39 @@ public class DiagnosticoFluxoService {
     private final SubprocessoTransicaoService transicaoService;
     private final SubprocessoValidacaoService subprocessoValidacaoService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
-    private final MovimentacaoRepo movimentacaoRepo;
     private final UnidadeService unidadeService;
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final HierarquiaService hierarquiaService;
     private final UsuarioFacade usuarioFacade;
+    private final UsuarioService usuarioService;
+
+    public void inicializarDiagnostico(Subprocesso subprocesso) {
+        Diagnostico diagnostico = Diagnostico.builder()
+                .subprocesso(subprocesso)
+                .situacao(SituacaoDiagnostico.EM_ANDAMENTO)
+                .build();
+
+        List<Usuario> servidores = usuarioService.buscarPorUnidadeLotacao(subprocesso.getUnidade().getCodigo());
+        List<AvaliacaoServidor> avaliacoes = new ArrayList<>();
+
+        Mapa mapa = subprocesso.getMapa();
+        if (mapa != null && mapa.getCompetencias() != null) {
+            for (Usuario servidor : servidores) {
+                for (Competencia competencia : mapa.getCompetencias()) {
+                    AvaliacaoServidor avaliacao = AvaliacaoServidor.builder()
+                            .diagnostico(diagnostico)
+                            .servidor(servidor)
+                            .competencia(competencia)
+                            .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA)
+                            .build();
+                    avaliacoes.add(avaliacao);
+                }
+            }
+        }
+
+        diagnostico.setAvaliacaoServidores(avaliacoes);
+        diagnosticoRepo.save(diagnostico);
+    }
 
     public void concluirDiagnosticoUnidade(Long codSubprocesso) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
@@ -175,7 +209,7 @@ public class DiagnosticoFluxoService {
     }
 
     private Unidade obterUnidadeDevolucao(sgc.subprocesso.model.Subprocesso subprocesso, Unidade unidadeAnalise) {
-        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocesso.getCodigo());
+        List<Movimentacao> movimentacoes = subprocessoConsultaService.listarMovimentacoesOrdenadas(subprocesso.getCodigo());
 
         return movimentacoes.stream()
                 .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))

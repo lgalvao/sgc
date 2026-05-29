@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, Integer> {
+public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, Long> {
 
     @Query("""
         SELECT a FROM AvaliacaoServidor a 

@@ -9,6 +9,7 @@ import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,14 +77,14 @@ public class AnaliseHistoricoService {
         Set<String> titulos = analises.stream()
                 .map(Analise::getUsuarioTitulo)
                 .filter(Objects::nonNull)
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
 
         if (titulos.isEmpty()) {
             return Map.of();
         }
 
         return usuarioService.buscarConsultasPorTitulos(titulos).stream()
-                .collect(java.util.stream.Collectors.toMap(
+                .collect(Collectors.toMap(
                         UsuarioConsultaLeitura::tituloEleitoral,
                         UsuarioConsultaLeitura::nome,
                         (n1, n2) -> n1
@@ -92,8 +93,9 @@ public class AnaliseHistoricoService {
 
     private String formatarAcaoDescricao(TipoAcaoAnalise acao) {
         return switch (acao) {
-            case ACEITE_MAPEAMENTO, ACEITE_REVISAO -> "Aceite";
-            case DEVOLUCAO_MAPEAMENTO, DEVOLUCAO_REVISAO -> "Devolução";
+            case ACEITE_MAPEAMENTO, ACEITE_REVISAO, ACEITE_DIAGNOSTICO  -> "Aceite";
+            case DEVOLUCAO_MAPEAMENTO, DEVOLUCAO_REVISAO, DEVOLUCAO_DIAGNOSTICO -> "Devolução";
+
         };
     }
 }

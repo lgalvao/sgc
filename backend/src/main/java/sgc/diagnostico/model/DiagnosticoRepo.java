@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface DiagnosticoRepo extends JpaRepository<Diagnostico, Integer> {
+public interface DiagnosticoRepo extends JpaRepository<Diagnostico, Long> {
 
     @Query("""
             SELECT d from Diagnostico d 
