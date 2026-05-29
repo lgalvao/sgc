@@ -1,3 +1,4 @@
+// @sgc-auditoria ignorar: superficieAmpla | Store dual-context (edicao + cadastro) com três níveis de invalidação (limpar, invalidar, resetar); 14 exports são inerentes ao contrato mínimo de dois contextos independentes
 import {defineStore} from "pinia";
 import {ref} from "vue";
 import type {ContextoCadastroAtividadesSubprocesso, ContextoEdicaoSubprocesso} from "@/types/tipos";

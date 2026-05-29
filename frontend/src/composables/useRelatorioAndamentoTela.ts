@@ -1,3 +1,4 @@
+// @sgc-auditoria ignorar: arquivoMinusculo | Composable de tela simples — funcionalidade de relatório de andamento não tem complexidade que justifique mais código
 import {ref} from "vue";
 import type {ProcessoResumo} from "@/types/tipos";
 import * as painelService from "@/services/painelService";

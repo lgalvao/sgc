@@ -1,6 +1,6 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **11** (bom)
+- Score total: **0** (excelente)
 - Arquivos de producao: **263**
 - Views com vazamento de estrategia de cache: **0**
 - Views com chamadas diretas a service: **0**
@@ -9,28 +9,17 @@
 - Acessos diretos a cache de store: **0**
 - Chamadas com booleano posicional: **0**
 - Bolsas de dependencias/estado largas: **0**
-- Superficies exportadas amplas: **5**
+- Superficies exportadas amplas: **4**
 - Arquivos com mistura de camadas arquiteturais: **0**
 - Arquivos com server state caseiro: **0**
 - Hubs centrais com sinais: **0**
 - Fachadas puras (composables sem lógica): **0**
-- Composables minúsculos (< 30L): **2**
+- Composables minúsculos (< 30L): **0**
 - Famílias pulverizadas (>= 4 membros): **4**
 
 ## Hotspots
 
-1. `frontend/src/stores/subprocesso/index.ts` [store]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 1 categorias / 3 imports arquiteturais
-2. `frontend/src/composables/useRelatorioAndamentoTela.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 2 categorias / 2 imports arquiteturais
-3. `frontend/src/composables/useUnidadeAtual.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 1 categorias / 1 imports arquiteturais
+Nenhum hotspot arquitetural detectado.
 
 ## Famílias de composables pulverizadas
 
@@ -90,9 +79,18 @@ Arquivos com sinais suprimidos via `@sgc-auditoria ignorar:` com motivo explíci
 - `frontend/src/composables/useProcessoQuery.ts`
   - sinais ignorados: arquivoMinusculo
   - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+- `frontend/src/composables/useRelatorioAndamentoTela.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: Composable de tela simples — funcionalidade de relatório de andamento não tem complexidade que justifique mais código
+- `frontend/src/composables/useUnidadeAtual.ts`
+  - sinais ignorados: arquivoMinusculo
+  - motivo: Abstração deliberada: fornece acesso reativo + setter para unidadeAtualDetalhes; dois consumidores (useBreadcrumbs, useUnidadeTela) tornam o inline inadequado
 - `frontend/src/composables/useUnidadesQuery.ts`
   - sinais ignorados: arquivoMinusculo
   - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+- `frontend/src/stores/subprocesso/index.ts`
+  - sinais ignorados: superficieAmpla
+  - motivo: Store dual-context (edicao + cadastro) com três níveis de invalidação (limpar, invalidar, resetar); 14 exports são inerentes ao contrato mínimo de dois contextos independentes
 
 ## Diretrizes acompanhadas
 
