@@ -32,7 +32,15 @@ public enum TipoNotificacao {
     MAPA_VALIDADO("Mapa validado"),
     MAPA_VALIDACAO_DEVOLVIDA("Validação de mapa devolvida"),
     MAPA_VALIDACAO_ACEITA("Validação de mapa aceita"),
-    MAPA_HOMOLOGADO("Mapa homologado");
+    MAPA_HOMOLOGADO("Mapa homologado"),
+
+    AUTOAVALIACAO_CONCLUIDA("Autoavaliação concluída"),
+    CONSENSO_DISPONIVEL("Consenso disponível"),
+    CONSENSO_APROVADO("Consenso aprovado"),
+    DIAGNOSTICO_CONCLUIDO("Diagnóstico concluído"),
+    DIAGNOSTICO_DEVOLVIDO("Diagnóstico devolvido"),
+    DIAGNOSTICO_ACEITO("Diagnóstico aceito"),
+    DIAGNOSTICO_HOMOLOGADO("Diagnóstico homologado");
 
     private final String descricao;
 }

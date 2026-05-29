@@ -114,8 +114,10 @@ public enum SituacaoSubprocesso {
 
     private boolean transicaoDiagnostico(SituacaoSubprocesso nova) {
         return switch (this) {
-            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO -> nova == DIAGNOSTICO_MONITORAMENTO;
+            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO ->
+                    nova == DIAGNOSTICO_MONITORAMENTO || nova == DIAGNOSTICO_CONCLUIDO;
             case DIAGNOSTICO_MONITORAMENTO -> nova == DIAGNOSTICO_CONCLUIDO;
+            case DIAGNOSTICO_CONCLUIDO -> nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
             default -> false;
         };
     }

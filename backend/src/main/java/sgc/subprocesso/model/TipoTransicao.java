@@ -120,6 +120,34 @@ public enum TipoTransicao {
             null,
             null,
             null
+    ),
+
+    DIAGNOSTICO_CONCLUIDO(
+            Mensagens.HIST_DIAGNOSTICO_CONCLUIDO,
+            null,
+            null,
+            null
+    ),
+
+    DIAGNOSTICO_DEVOLVIDO(
+            Mensagens.HIST_DIAGNOSTICO_DEVOLVIDO,
+            null,
+            null,
+            null
+    ),
+
+    DIAGNOSTICO_ACEITO(
+            Mensagens.HIST_DIAGNOSTICO_ACEITO,
+            null,
+            null,
+            null
+    ),
+
+    DIAGNOSTICO_HOMOLOGADO(
+            Mensagens.HIST_DIAGNOSTICO_HOMOLOGADO,
+            null,
+            null,
+            null
     );
 
     private final String descMovimentacao;

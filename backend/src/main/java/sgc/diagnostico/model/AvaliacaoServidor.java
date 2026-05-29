@@ -46,12 +46,4 @@ public class AvaliacaoServidor extends EntidadeBase {
     @Column(name = "situacao_servidor", length = 50, nullable = false)
     private SituacaoAvaliacaoServidor situacaoServidor;
 
-    public void calculaGap() {
-        if (importancia == null || dominio == null || importancia == 0 || dominio == 0) {
-            this.gap = null;
-        } else {
-            this.gap = importancia - dominio;
-        }
-    }
-
 }
