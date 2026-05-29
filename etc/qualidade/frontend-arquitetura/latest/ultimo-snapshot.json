@@ -1,9 +1,9 @@
 {
-  "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-29T15:54:11.676Z",
+  "versaoSchema": "3.0.0",
+  "geradoEm": "2026-05-29T16:22:19.562Z",
   "resumo": {
     "arquivosProducao": 265,
-    "scoreTotal": 35,
+    "scoreTotal": 47,
     "faixa": "atencao",
     "metricas": {
       "viewsComVazamentoCache": 0,
@@ -25,7 +25,10 @@
       "arquivosComServiceDireto": 35,
       "chamadasEstrategiaCache": 0,
       "chamadasInvalidacao": 0,
-      "hubsCentraisComSinais": 0
+      "hubsCentraisComSinais": 0,
+      "composablesMinusculos": 9,
+      "fachadasPuras": 1,
+      "familiasPulverizadas": 4
     }
   },
   "hotspots": [
@@ -163,6 +166,591 @@
       },
       "sinaisAtivos": [],
       "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
+      "camada": "composable",
+      "linhas": 18,
+      "score": 3,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 1,
+        "importacoesArquiteturais": 3
+      },
+      "sinaisAtivos": [
+        "fachadaPura"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts",
+      "camada": "composable",
+      "linhas": 29,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 1,
+        "chamadasColadaCache": 1,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useProcessoQuery.ts",
+      "camada": "composable",
+      "linhas": 26,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 1,
+        "chamadasColadaCache": 1,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useHistoricoQuery.ts",
+      "camada": "composable",
+      "linhas": 23,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 1,
+        "chamadasColadaCache": 1,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useUnidadesQuery.ts",
+      "camada": "composable",
+      "linhas": 23,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 1,
+        "chamadasColadaCache": 1,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useRelatorioAndamentoTela.ts",
+      "camada": "composable",
+      "linhas": 21,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useFeedbacksAdminQuery.ts",
+      "camada": "composable",
+      "linhas": 16,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 1,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useUnidadeAtual.ts",
+      "camada": "composable",
+      "linhas": 19,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 1,
+        "importacoesArquiteturais": 1
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useLocalStorage.ts",
+      "camada": "composable",
+      "linhas": 10,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 1,
+        "importacoesArquiteturais": 1
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useSessionStorage.ts",
+      "camada": "composable",
+      "linhas": 10,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 1,
+        "importacoesArquiteturais": 1
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
     }
-  ]
+  ],
+  "familias": {
+    "Administradores": {
+      "arquivos": [
+        "frontend/src/composables/useAdministradoresTela.ts"
+      ],
+      "totalLinhas": 135
+    },
+    "Async": {
+      "arquivos": [
+        "frontend/src/composables/useAsyncAction.ts"
+      ],
+      "totalLinhas": 66
+    },
+    "Atividade": {
+      "arquivos": [
+        "frontend/src/composables/useAtividadeForm.ts"
+      ],
+      "totalLinhas": 34
+    },
+    "Atribuicao": {
+      "arquivos": [
+        "frontend/src/composables/useAtribuicaoTemporariaTela.ts"
+      ],
+      "totalLinhas": 413
+    },
+    "Breadcrumbs": {
+      "arquivos": [
+        "frontend/src/composables/useBreadcrumbs.ts"
+      ],
+      "totalLinhas": 164
+    },
+    "Buscador": {
+      "arquivos": [
+        "frontend/src/composables/useBuscadorUsuarios.ts"
+      ],
+      "totalLinhas": 123
+    },
+    "Cache": {
+      "arquivos": [
+        "frontend/src/composables/useCacheSync.ts"
+      ],
+      "totalLinhas": 60
+    },
+    "Cadastro": {
+      "arquivos": [
+        "frontend/src/composables/useCadastroAtividadesMutacoes.ts",
+        "frontend/src/composables/useCadastroOrquestracao.ts",
+        "frontend/src/composables/useCadastroRevisaoSemMudancas.ts",
+        "frontend/src/composables/useCadastroTela.ts"
+      ],
+      "totalLinhas": 909
+    },
+    "Configuracoes": {
+      "arquivos": [
+        "frontend/src/composables/useConfiguracoes.ts"
+      ],
+      "totalLinhas": 105
+    },
+    "Conhecimento": {
+      "arquivos": [
+        "frontend/src/composables/useConhecimentoMutacoes.ts"
+      ],
+      "totalLinhas": 37
+    },
+    "Diagnostico": {
+      "arquivos": [
+        "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
+        "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts"
+      ],
+      "totalLinhas": 171
+    },
+    "Error": {
+      "arquivos": [
+        "frontend/src/composables/useErrorHandler.ts"
+      ],
+      "totalLinhas": 47
+    },
+    "Feedback": {
+      "arquivos": [
+        "frontend/src/composables/useFeedback.ts"
+      ],
+      "totalLinhas": 116
+    },
+    "Feedbacks": {
+      "arquivos": [
+        "frontend/src/composables/useFeedbacksAdminQuery.ts"
+      ],
+      "totalLinhas": 16
+    },
+    "Fluxo": {
+      "arquivos": [
+        "frontend/src/composables/useFluxoAdministrativoSubprocesso.ts",
+        "frontend/src/composables/useFluxoCadastroSubprocesso.ts",
+        "frontend/src/composables/useFluxoMapa.ts",
+        "frontend/src/composables/useFluxoSubprocesso.ts",
+        "frontend/src/composables/useFluxoSubprocessoExecucao.ts"
+      ],
+      "totalLinhas": 423
+    },
+    "Form": {
+      "arquivos": [
+        "frontend/src/composables/useFormErrors.ts"
+      ],
+      "totalLinhas": 39
+    },
+    "Historico": {
+      "arquivos": [
+        "frontend/src/composables/useHistoricoQuery.ts"
+      ],
+      "totalLinhas": 23
+    },
+    "Impacto": {
+      "arquivos": [
+        "frontend/src/composables/useImpactoMapaModal.ts"
+      ],
+      "totalLinhas": 41
+    },
+    "Importar": {
+      "arquivos": [
+        "frontend/src/composables/useImportarAtividadesTela.ts"
+      ],
+      "totalLinhas": 197
+    },
+    "Invalidacao": {
+      "arquivos": [
+        "frontend/src/composables/useInvalidacaoNavegacao.ts"
+      ],
+      "totalLinhas": 100
+    },
+    "Limpeza": {
+      "arquivos": [
+        "frontend/src/composables/useLimpezaProcessosTela.ts"
+      ],
+      "totalLinhas": 61
+    },
+    "Local": {
+      "arquivos": [
+        "frontend/src/composables/useLocalStorage.ts"
+      ],
+      "totalLinhas": 10
+    },
+    "Mapa": {
+      "arquivos": [
+        "frontend/src/composables/useMapaCompetenciasMutacoes.ts",
+        "frontend/src/composables/useMapaOrquestracao.ts",
+        "frontend/src/composables/useMapaQuery.ts",
+        "frontend/src/composables/useMapaSugestoes.ts",
+        "frontend/src/composables/useMapaTela.ts"
+      ],
+      "totalLinhas": 952
+    },
+    "Mapas": {
+      "arquivos": [
+        "frontend/src/composables/useMapas.ts"
+      ],
+      "totalLinhas": 35
+    },
+    "Notificacoes": {
+      "arquivos": [
+        "frontend/src/composables/useNotificacoesAdminQuery.ts"
+      ],
+      "totalLinhas": 52
+    },
+    "Notification": {
+      "arquivos": [
+        "frontend/src/composables/useNotification.ts"
+      ],
+      "totalLinhas": 44
+    },
+    "Painel": {
+      "arquivos": [
+        "frontend/src/composables/usePainelQuery.ts",
+        "frontend/src/composables/usePainelTela.ts"
+      ],
+      "totalLinhas": 196
+    },
+    "Perfil": {
+      "arquivos": [
+        "frontend/src/composables/usePerfil.ts"
+      ],
+      "totalLinhas": 38
+    },
+    "Processo": {
+      "arquivos": [
+        "frontend/src/composables/useProcessoCadastroCarga.ts",
+        "frontend/src/composables/useProcessoCadastroTela.ts",
+        "frontend/src/composables/useProcessoForm.ts",
+        "frontend/src/composables/useProcessoMutacoes.ts",
+        "frontend/src/composables/useProcessoQuery.ts"
+      ],
+      "totalLinhas": 581
+    },
+    "Relatorio": {
+      "arquivos": [
+        "frontend/src/composables/useRelatorioAndamentoTela.ts",
+        "frontend/src/composables/useRelatorioMapasQuery.ts",
+        "frontend/src/composables/useRelatorioUnidadesSemMapasTela.ts"
+      ],
+      "totalLinhas": 235
+    },
+    "Session": {
+      "arquivos": [
+        "frontend/src/composables/useSessionStorage.ts"
+      ],
+      "totalLinhas": 10
+    },
+    "Subprocesso": {
+      "arquivos": [
+        "frontend/src/composables/useSubprocessoTela.ts"
+      ],
+      "totalLinhas": 200
+    },
+    "Tema": {
+      "arquivos": [
+        "frontend/src/composables/useTemaPreferencia.ts"
+      ],
+      "totalLinhas": 49
+    },
+    "Unidade": {
+      "arquivos": [
+        "frontend/src/composables/useUnidadeAtual.ts",
+        "frontend/src/composables/useUnidadeQuery.ts",
+        "frontend/src/composables/useUnidadeTela.ts"
+      ],
+      "totalLinhas": 330
+    },
+    "Unidades": {
+      "arquivos": [
+        "frontend/src/composables/useUnidadesQuery.ts"
+      ],
+      "totalLinhas": 23
+    },
+    "Validacao": {
+      "arquivos": [
+        "frontend/src/composables/useValidacaoFormulario.ts"
+      ],
+      "totalLinhas": 38
+    },
+    "Web": {
+      "arquivos": [
+        "frontend/src/composables/useWebStorage.ts"
+      ],
+      "totalLinhas": 36
+    }
+  }
 }

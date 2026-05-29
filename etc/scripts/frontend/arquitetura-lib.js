@@ -3,7 +3,7 @@ import path from "node:path";
 import {Node, Project, SyntaxKind, ts} from "ts-morph";
 import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
 
-const VERSAO_SCHEMA = "2.0.0";
+const VERSAO_SCHEMA = "3.0.0";
 const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "frontend-arquitetura", "latest");
 const CAMINHO_SNAPSHOT_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "ultimo-snapshot.json");
 const CAMINHO_RESUMO_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "ultimo-resumo.md");
@@ -28,6 +28,9 @@ const PADROES = {
     palavraStale: /\bstale\b/g,
     palavraSnapshot: /\bsnapshot\b/g,
 };
+const LIMITE_LINHAS_FACHADA_PURA = 25;
+const LIMITE_LINHAS_ARQUIVO_MINUSCULO = 30;
+const LIMITE_FAMILIA_PULVERIZADA = 4;
 
 function normalizarCaminho(caminhoArquivo) {
     return caminhoArquivo.split(path.sep).join("/");
@@ -527,7 +530,65 @@ function detectarServerStateCaseiro({camada, analiseAst}) {
     return false;
 }
 
-function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) {
+/**
+ * Detecta composables que são fachadas puras: apenas importam e re-exportam outros
+ * composables, sem lógica própria (sem ref, computed, calls a services/stores).
+ * Usa análise AST positiva — não regex negativa.
+ */
+function detectarFachadaPura(camada, analiseAst, sourceFile, linhas, caminhoRelativo, hubCentral) {
+    if (camada !== "composable" || hubCentral || linhas >= LIMITE_LINHAS_FACHADA_PURA) return false;
+    if (!sourceFile) return false;
+    if (!caminhoRelativo.startsWith("frontend/src/composables/")) return false;
+    if (analiseAst.importsPorCategoria.store.size > 0) return false;
+    if (analiseAst.importsPorCategoria.service.size > 0) return false;
+    if (analiseAst.importsPorCategoria.composable.size < 2) return false;
+
+    const funcoesExportadas = sourceFile.getFunctions().filter(
+        (f) => f.isExported() && f.getName()?.startsWith("use"),
+    );
+    if (funcoesExportadas.length !== 1) return false;
+
+    const corpo = funcoesExportadas[0].getBody();
+    if (!corpo) return false;
+
+    let temReturn = false;
+    for (const stmt of corpo.getStatements()) {
+        if (Node.isVariableStatement(stmt)) {
+            for (const decl of stmt.getDeclarationList().getDeclarations()) {
+                const init = decl.getInitializer();
+                if (init && Node.isCallExpression(init)) {
+                    const nome = obterNomeChamada(init.getExpression());
+                    if (!nome?.startsWith("use")) return false;
+                }
+            }
+            continue;
+        }
+        if (Node.isReturnStatement(stmt)) {
+            temReturn = true;
+            const expr = stmt.getExpression();
+            if (!expr || !Node.isObjectLiteralExpression(expr)) return false;
+            for (const prop of expr.getProperties()) {
+                if (!Node.isSpreadAssignment(prop) && !Node.isShorthandPropertyAssignment(prop)) return false;
+            }
+            continue;
+        }
+        return false;
+    }
+    return temReturn;
+}
+
+/**
+ * Detecta composables pequenos demais para justificar arquivo próprio.
+ * Restrito a `composables/use*.ts` — exclui views, tipos e utilitários sem prefixo `use`.
+ */
+function detectarArquivoMinusculo(caminhoRelativo, linhas, hubCentral) {
+    return !hubCentral
+        && linhas < LIMITE_LINHAS_ARQUIVO_MINUSCULO
+        && caminhoRelativo.startsWith("frontend/src/composables/")
+        && path.basename(caminhoRelativo).startsWith("use");
+}
+
+function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo}) {
     const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
     const ehFacadeDeStore = camadaEfetiva === "composable"
         && analiseAst.importsPorCategoria.store.size === 1
@@ -571,6 +632,9 @@ function calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral}) 
         total += analiseAst.superficieExportadaAmpla * 9;
     }
 
+    if (fachadaPura) total += 3;
+    else if (arquivoMinusculo) total += 1;
+
     return total;
 }
 
@@ -598,6 +662,9 @@ function criarResumoMarkdown(snapshot) {
         `- Arquivos com mistura de camadas arquiteturais: **${snapshot.resumo.metricas.arquivosComMisturaCamadas}**`,
         `- Arquivos com server state caseiro: **${snapshot.resumo.metricas.arquivosComServerStateCaseiro}**`,
         `- Hubs centrais com sinais: **${snapshot.resumo.metricas.hubsCentraisComSinais}**`,
+        `- Fachadas puras (composables sem lógica): **${snapshot.resumo.metricas.fachadasPuras}**`,
+        `- Composables minúsculos (< ${LIMITE_LINHAS_ARQUIVO_MINUSCULO}L): **${snapshot.resumo.metricas.composablesMinusculos}**`,
+        `- Famílias pulverizadas (>= ${LIMITE_FAMILIA_PULVERIZADA} membros): **${snapshot.resumo.metricas.familiasPulverizadas}**`,
         "",
         "## Hotspots",
         "",
@@ -612,6 +679,37 @@ function criarResumoMarkdown(snapshot) {
             linhas.push(`   - sinais: ${hotspot.sinaisAtivos.join(", ")}`);
             linhas.push(`   - fan-out: ${hotspot.metricasAst.categoriasAcoplamento} categorias / ${hotspot.metricasAst.importacoesArquiteturais} imports arquiteturais`);
         });
+    }
+
+    if (snapshot.familias) {
+        const familiasGrandes = Object.entries(snapshot.familias)
+            .filter(([, f]) => f.arquivos.length >= LIMITE_FAMILIA_PULVERIZADA)
+            .sort(([, a], [, b]) => b.arquivos.length - a.arquivos.length);
+        if (familiasGrandes.length > 0) {
+            linhas.push("");
+            linhas.push("## Famílias de composables pulverizadas");
+            linhas.push("");
+            for (const [nome, familia] of familiasGrandes) {
+                linhas.push(`### ${nome} (${familia.arquivos.length} arquivos, ${familia.totalLinhas} linhas)`);
+                for (const arq of familia.arquivos.sort()) {
+                    linhas.push(`- \`${arq}\``);
+                }
+                linhas.push("");
+            }
+        }
+    }
+
+    if (snapshot.excecoesDocumentadas?.length > 0) {
+        linhas.push("");
+        linhas.push("## Exceções documentadas");
+        linhas.push("");
+        linhas.push("Arquivos com sinais suprimidos via `@sgc-auditoria ignorar:` com motivo explícito:");
+        linhas.push("");
+        for (const excecao of snapshot.excecoesDocumentadas) {
+            linhas.push(`- \`${excecao.arquivo}\``);
+            linhas.push(`  - sinais ignorados: ${excecao.sinais.join(", ")}`);
+            linhas.push(`  - motivo: ${excecao.motivo}`);
+        }
     }
 
     linhas.push("");
@@ -655,10 +753,13 @@ function criarMetricasResumo() {
         chamadasEstrategiaCache: 0,
         chamadasInvalidacao: 0,
         hubsCentraisComSinais: 0,
+        composablesMinusculos: 0,
+        fachadasPuras: 0,
+        familiasPulverizadas: 0,
     };
 }
 
-function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral) {
+function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral, fachadaPura, arquivoMinusculo) {
     const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
 
     const sinais = [];
@@ -677,6 +778,8 @@ function obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplam
     if (categoriasAcoplamento >= 3 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("misturaCamadas");
     if (importacoesArquiteturais >= 5 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("fanoutAlto");
     if (!hubCentral && analiseAst.chamadasStore >= 8 && (camadaEfetiva === "view" || camadaEfetiva === "component")) sinais.push("acoplamentoStoreAlto");
+    if (fachadaPura) sinais.push("fachadaPura");
+    else if (arquivoMinusculo) sinais.push("arquivoMinusculo");
     return sinais;
 }
 
@@ -690,12 +793,56 @@ function criarProjetoAnalise() {
     });
 }
 
+/**
+ * Agrupa arquivos de composables por "família" — o primeiro token CamelCase após o prefixo `use`.
+ * Ex.: useFluxoSubprocessoExecucao → família "Fluxo"; useBuscadorUsuarios → "Buscador".
+ * Retorna objeto { [familia]: { arquivos: string[], totalLinhas: number } }.
+ */
+function calcularFamilias(analisados) {
+    const familias = {};
+    for (const arquivo of analisados) {
+        if (!arquivo.arquivo.startsWith("frontend/src/composables/")) continue;
+        const nome = path.basename(arquivo.arquivo, ".ts");
+        if (!nome.startsWith("use")) continue;
+        const semUse = nome.slice(3);
+        const match = semUse.match(/^[A-Z][a-z]+/);
+        if (!match) continue;
+        const familia = match[0];
+        if (!familias[familia]) familias[familia] = {arquivos: [], totalLinhas: 0};
+        familias[familia].arquivos.push(arquivo.arquivo);
+        familias[familia].totalLinhas += arquivo.linhas;
+    }
+    return familias;
+}
+
+/**
+ * Lê anotações `@sgc-auditoria ignorar: <sinais> | <motivo>` do conteúdo do arquivo.
+ * Formato: // @sgc-auditoria ignorar: superficieAmpla, fachadaPura | Motivo explícito aqui
+ * Retorna um Set com os nomes dos sinais a ignorar para este arquivo.
+ * Efeito colateral: registra cada exceção em `excecoesDocumentadas` para o relatório.
+ */
+function lerExcecoesAuditoria(conteudo, caminhoRelativo, excecoesDocumentadas) {
+    const sinaisExcetos = new Set();
+    const regex = /\/\/ @sgc-auditoria ignorar:\s*([^|]+)\|\s*(.+)/g;
+    let match;
+    while ((match = regex.exec(conteudo)) !== null) {
+        const sinais = match[1].split(",").map((s) => s.trim()).filter(Boolean);
+        const motivo = match[2].trim();
+        for (const sinal of sinais) {
+            sinaisExcetos.add(sinal);
+        }
+        excecoesDocumentadas.push({arquivo: caminhoRelativo, sinais, motivo});
+    }
+    return sinaisExcetos;
+}
+
 async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const arquivos = await listarArquivosFrontend(baseResolvida);
     const analisados = [];
     const metricas = criarMetricasResumo();
     const project = criarProjetoAnalise();
+    const excecoesDocumentadas = [];
 
     for (const arquivo of arquivos) {
         const caminhoRelativo = normalizarCaminho(path.relative(baseResolvida, arquivo));
@@ -706,6 +853,12 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         const conteudo = await fs.readFile(arquivo, "utf8");
         const camada = classificarCamada(caminhoRelativo);
         const {analiseAst, sourceFile} = analisarArquivoAst(project, caminhoRelativo, conteudo, camada);
+        const sinaisExcetos = lerExcecoesAuditoria(conteudo, caminhoRelativo, excecoesDocumentadas);
+
+        // Aplicar exceções documentadas antes de qualquer cálculo
+        if (sinaisExcetos.has("superficieAmpla")) analiseAst.superficieExportadaAmpla = 0;
+        if (sinaisExcetos.has("bolsaDependenciasLarga")) analiseAst.bolsasDependenciasLargas = 0;
+
         const sinaisLexicais = sourceFile ? computarSinaisLexicais(sourceFile, conteudo) : {
             acessoDiretoCache: 0,
             metodoEmCache: 0,
@@ -718,8 +871,11 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         const categoriasAcoplamento = contarCategoriasAcoplamento(analiseAst.importsPorCategoria);
         const importacoesArquiteturais = contarImportacoesArquiteturais(analiseAst.importsPorCategoria);
         const hubCentral = HUBS_CENTRAIS.has(caminhoRelativo);
-        const score = calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral});
-        const sinaisAtivos = obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral);
+        const linhas = conteudo.split(/\r?\n/).length;
+        const fachadaPura = !sinaisExcetos.has("fachadaPura") && detectarFachadaPura(camada, analiseAst, sourceFile, linhas, caminhoRelativo, hubCentral);
+        const arquivoMinusculo = !fachadaPura && !sinaisExcetos.has("arquivoMinusculo") && detectarArquivoMinusculo(caminhoRelativo, linhas, hubCentral);
+        const score = calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo});
+        const sinaisAtivos = obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral, fachadaPura, arquivoMinusculo);
         const temSinal = sinaisAtivos.length > 0;
         const serverStateCaseiro = detectarServerStateCaseiro({camada, analiseAst});
 
@@ -759,7 +915,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         if (analiseAst.bolsasDependenciasLargas > 0) {
             metricas.arquivosComBolsaDependenciasLarga += 1;
         }
-        if (analiseAst.superficieExportadaAmpla > 0) {
+        if (!hubCentral && analiseAst.superficieExportadaAmpla > 0) {
             metricas.arquivosComSuperficieAmpla += 1;
         }
         if (categoriasAcoplamento >= 3 && (camada === "view" || camada === "component")) {
@@ -778,10 +934,13 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             metricas.hubsCentraisComSinais += 1;
         }
 
+        if (fachadaPura) metricas.fachadasPuras += 1;
+        else if (arquivoMinusculo) metricas.composablesMinusculos += 1;
+
         analisados.push({
             arquivo: caminhoRelativo,
             camada,
-            linhas: conteudo.split(/\r?\n/).length,
+            linhas,
             score,
             sinaisLexicais,
             metricasAst: {
@@ -808,6 +967,11 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         .filter((arquivo) => arquivo.score > 0)
         .sort((a, b) => b.score - a.score || b.metricasAst.importacoesArquiteturais - a.metricasAst.importacoesArquiteturais || b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo));
 
+    const familias = calcularFamilias(analisados);
+    metricas.familiasPulverizadas = Object.values(familias).filter(
+        (f) => f.arquivos.length >= LIMITE_FAMILIA_PULVERIZADA,
+    ).length;
+
     const scoreTotal = hotspots.reduce((total, item) => total + item.score, 0);
 
     return {
@@ -820,6 +984,8 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             metricas,
         },
         hotspots,
+        familias,
+        excecoesDocumentadas,
     };
 }
 

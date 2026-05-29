@@ -53,7 +53,7 @@ describe('subprocessoCarregamento.ts', () => {
         await flushPromises()
 
         expect(deps.exibirToastPendente).toHaveBeenCalled()
-        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(456, {forcar: false})
+        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(456, {recarregar: false})
         expect(wrapper.vm.codigoSubprocesso).toBe(456)
         expect(wrapper.vm.erroNaoEncontrado).toBe(false)
     })
@@ -65,7 +65,7 @@ describe('subprocessoCarregamento.ts', () => {
         const wrapper = mount(TestComponent(deps))
         await flushPromises()
 
-        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {forcar: false})
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {recarregar: false})
         expect(wrapper.vm.codigoSubprocesso).toBe(789)
     })
 
@@ -87,7 +87,7 @@ describe('subprocessoCarregamento.ts', () => {
         await flushPromises()
 
         await wrapper.vm.atualizarSubprocessoAtual()
-        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(123, {forcar: true})
+        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(123, {recarregar: true})
     })
 
     it('deve observar mudanças nas dependências', async () => {
@@ -97,7 +97,7 @@ describe('subprocessoCarregamento.ts', () => {
         await flushPromises()
 
         await wrapper.vm.carregarSubprocesso(true)
-        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenLastCalledWith(1, 'TEST', {forcar: true})
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenLastCalledWith(1, 'TEST', {recarregar: true})
         expect(wrapper.vm.codigoSubprocesso).toBe(111)
     })
 
@@ -112,7 +112,7 @@ describe('subprocessoCarregamento.ts', () => {
 
         // @ts-expect-error - Acessando hook privado do vue para simular ativação
         await wrapper.vm.$.a?.[0]()
-        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {forcar: false})
+        expect(subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledWith(1, 'TEST', {recarregar: false})
     })
 
     it('não deve recarregar no onActivated quando o contexto atual ainda for válido', async () => {

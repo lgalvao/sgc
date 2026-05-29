@@ -21,11 +21,11 @@ async function recarregarContextoSubprocesso(
     recarga: NonNullable<WorkflowSubprocesso["recarregarContexto"]>,
 ) {
     if (recarga.tipo === "cadastro") {
-        await subprocessoStore.obterContextoCadastroAtividades(recarga.codigoSubprocesso, {forcar: true});
+        await subprocessoStore.obterContextoCadastroAtividades(recarga.codigoSubprocesso, {recarregar: true});
         return;
     }
 
-    await subprocessoStore.obterContextoEdicao(recarga.codigoSubprocesso, {forcar: true});
+    await subprocessoStore.obterContextoEdicao(recarga.codigoSubprocesso, {recarregar: true});
 }
 
 export type ExecucaoFluxoSubprocesso = ReturnType<typeof useFluxoSubprocessoExecucao>;

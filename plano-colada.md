@@ -1,136 +1,92 @@
 # Plano de Simplificação Estrutural do Frontend (SGC)
 
-## Contexto
+## Estado atual
 
-As fases de migração para `Pinia Colada` nos domínios simples estão concluídas.
-Os ganhos fáceis foram capturados. O que resta é trabalho arquitetural:
-apertar contratos, reduzir hubs centrais e eliminar server state caseiro nos nós que resistiram.
-
----
-
-## Princípios
-
-- **`Pinia`** → estado de aplicação e sessão (perfil, toast, UI local, formulários).
-- **`Pinia Colada`** → apenas onde o problema principal é cache de dados remotos e a chave de query é clara e estável.
-- Quando uma abstração mistura cache remoto com sessão, permissão, navegação e UI local, o primeiro passo é **separar responsabilidades**, não refatorar a implementação interna.
-- View não deve conhecer estratégia de cache, `stale`, `snapshot`, `invalidar`, `forcar` ou equivalentes.
-- Contratos consumidos por view devem ser orientados a **caso de uso da tela**, não a mecanismo de armazenamento.
-- Não migrar domínios para Colada por simetria — só quando o problema principal for realmente server state.
-- Mudar contratos internos obsoletos quando a compatibilidade já não paga o custo cognitivo.
-- Cada mudança deve reduzir código ou simplificar testes de verdade.
-
----
-
-## Diretrizes para contratos de tela (views)
-
-### O que a view deve receber
-
-- `carregarDadosDaTela()`
-- `recarregarDadosDaTela()` — apenas quando a semântica de atualização explícita for relevante
-- `executarAcaoDeTela(...)`
-- Estado pronto para renderização: `carregando`, `erro`, `dados`
-
-### O que a view **não** deve ver
-
-- `temXEmCache()`, `obterXEmCache()`
-- `forcar`, `stale`, `invalidar`, `reaplicarSnapshot`
-- Distinção entre "obter do cache" vs "recarregar" — essa decisão deve ficar interna à abstração
-
-Se uma view precisa decidir entre "usar cache ou não", a abstração ainda está vazando detalhe estrutural.
-
----
-
-## Diretrizes para desfazer nós complexos
-
-Diante de emaranhamento, na ordem:
-
-1. Remover compatibilidade interna obsoleta
-2. Apertar o contrato para refletir a dependência real
-3. Separar estado remoto de estado local
-4. Quebrar a abstração central em unidades menores
-5. Só então simplificar a implementação restante
-
-Evita refatoração cosmética onde o código muda de forma mas preserva o mesmo acoplamento.
-
----
-
-## Régua de lint estrutural
-
-As regras de lint estrutural (`complexity`, `max-params`, `max-depth`, `max-nested-callbacks`,
-`max-lines`, `max-lines-per-function`, `max-statements`) estão ativas e **não devem ser desligadas** para "passar o gate".
-
-Quando a régua acusar excesso, a ação esperada é:
-
-- simplificar o código; ou
-- quebrar a função/arquivo em contratos menores; ou
-- recalibrar explicitamente o limite com justificativa técnica.
-
----
-
-## O que falta fazer
-
-### 1. `LimpezaProcessosView.vue` — service direto em view ✅ CONCLUÍDO
-
-**Ação**: Lógica extraída para `useLimpezaProcessosTela.ts`. View reduzida para ~12 linhas. `viewsComServiceDireto` → 0.
-
----
-
-### 2. `stores/organizacao.ts` — server state caseiro
-
-**Problema**: A store ainda implementa cache manual completo:
-`carregado`, `carregando`, `carregamentoEmAndamento`, `dadosValidos()`, `garantirDiagnostico()`, `invalidar()`.
-É o único arquivo ainda marcado como `arquivosComServerStateCaseiro: 1`.
-
-**Opções**:
-
-- Migrar para `useQuery` do Pinia Colada (chave: `["diagnostico-organizacional"]`), já que o diagnóstico é leitura simples de sessão.
-- Ou, se o contexto de instanciação fora de `setup()` ainda for um impeditivo real, ao menos encapsular o cache interno e remover `invalidar()` e `dadosValidos()` da superfície pública.
-
-**Ação prioritária**: avaliar se os consumidores atuais permitem migração para query. Se sim, migrar. Se não, encapsular e reduzir superfície.
-
----
-
-### 3. `stores/subprocesso/index.ts` — hub de cache manual complexo
-
-**Problema**: A store gerencia dois contextos (`edicao` e `cadastro`) com deduplicação manual via `Map<string, Promise>`, flags `invalido`, e 8+ métodos `obter/recarregar` variantes. Score 9 (`superficieAmpla`, 18 símbolos exportados).
-
-**Parcialmente resolvido**: `marcarContextoEdicaoParaAtualizacao` (código morto) removido.
-
-**Pendente**: Consolidar variantes por código vs. por processo/unidade — ex: `obterContextoEdicao(chave)` aceitando ambos os padrões reduziria o surface a ~12 símbolos.
-
----
-
-### 4. `composables/useSubprocessoTela.ts` — estratégia de cache exposta ✅ CONCLUÍDO
-
-**Ação**: `useSubprocessoCarregamento` e `useSubprocessoAcoesAdministrativas` passaram a chamar `useSubprocessoStore()` diretamente, eliminando os 7 métodos de store passados como DI. Sinal `estrategiaCache` removido. Score total: 152 → 144.
-
----
-
-### 5. `stores/perfilAutenticacao.ts` e `composables/usePerfil.ts` ✅ CONCLUÍDO
-
-**Situação**: Falsos positivos eliminados via correção do script de auditoria (`arquitetura-lib.js`). Ambos saíram dos hotspots.
-
----
-
-## Metas de progresso arquitetural
-
-| Métrica                             | Baseline | Meta     | Atual   |
-| ----------------------------------- | -------- | -------- | ------- |
-| `viewsComServiceDireto`             | 1        | 0        | **0** ✅ |
-| `arquivosComServerStateCaseiro`     | 1        | 0        | 1       |
-| `arquivosComSuperficieAmpla`        | 16       | < 10     | 16      |
-| `hubsCentraisComSinais`             | 2        | ≤ 1      | 2       |
-| `arquivosComBolsaDependenciasLarga` | 1        | 0        | 1       |
-| `viewsComVazamentoCache`            | 0        | manter 0 | **0** ✅ |
-| `viewsComFanoutAlto`                | 0        | manter 0 | **0** ✅ |
-| `viewsComServerStateCaseiro`        | 0        | manter 0 | **0** ✅ |
-| Score arquitetural total            | 175      | < 100    | **144** |
+Score arquitetural: **47** (medido em 2026-05-29, após adição de sinais de fragmentação).
+Todos os problemas estruturais graves foram resolvidos. Restam três hotspots de coesão e sinais de fragmentação de composables.
 
 Medir com: `node etc/scripts/sgc.js frontend arquitetura auditar`
 
 ---
 
-## Lições Aprendidas no Trabalho de Limpeza e Refatoração
+## Métricas atuais
+
+| Métrica                         | Atual | Meta     |
+| ------------------------------- | ----- | -------- |
+| Score total                     | 47    | < 25     |
+| `superficieAmpla` (arquivos)    | 9     | < 6      |
+| `palavraForcar` (ocorrências)   | 20    | 0        |
+| `fachadasPuras`                 | 1     | 0        |
+| `composablesMinusculos`         | 9     | < 4      |
+| `familiasPulverizadas`          | 4     | < 2      |
+| demais sinais                   | 0     | manter 0 |
+
+---
+
+## O que falta fazer
+
+### 1. `stores/subprocesso/index.ts` — `forcar` exposto + superfície ampla
+
+**Problema**: A store expõe o parâmetro `{forcar}` em `obterContextoEdicao` e
+`obterContextoCadastroAtividades`. Consumidores em views (`subprocessoCarregamento.ts`,
+`subprocessoAcoesAdministrativas.ts`) passam `{forcar: true}` diretamente, violando
+o princípio de que views não devem conhecer estratégia de cache.
+
+**Ação**:
+- Remover `{forcar}` da API pública da store — a decisão de limpar cache deve ficar
+  interna à store (baseada em evento/sinal, não em parâmetro passado por view).
+- Consumidores em composables (`useFluxoSubprocessoExecucao`, `useCadastroOrquestracao`)
+  que precisam de recarga forçada devem usar um método semântico (ex: `invalidarContexto()`).
+
+---
+
+### 2. `composables/useMapaSugestoes.ts` — superfície ampla
+
+**Problema**: Sinal `superficieAmpla` — o composable exporta mais símbolos do que
+o contrato de tela exige.
+
+**Ação**: Auditar o que é consumido externamente e tornar interno o que for detalhe
+de implementação.
+
+---
+
+### 3. `composables/useBuscadorUsuarios.ts` — superfície ampla
+
+**Problema**: Mesmo padrão do item anterior.
+
+**Ação**: Idem — estreitar o contrato público ao mínimo necessário pelos consumidores.
+
+### 4. Fachada pura — `composables/useFluxoSubprocesso.ts`
+
+**Problema**: Composable de 17 linhas que não tem lógica própria — apenas importa três outros
+composables e re-exporta seus resultados (`useFluxoMapa`, `useFluxoSubprocessoExecucao`,
+`useFluxoAdministrativoSubprocesso`). Isso indica que o ponto de entrada do módulo é o próprio
+consumidor, não uma abstração real.
+
+**Ação**: Verificar quem consome `useFluxoSubprocesso`. Se for apenas uma view, inlinar as três
+chamadas direto nela. Se houver múltiplos consumidores, avaliar se o papel de fachada é justificado
+e, em caso positivo, adicionar à lista `HUBS_CENTRAIS`.
+
+---
+
+### 5. Fragmentação de composables (9 minúsculos, 4 famílias)
+
+**Problema**: Há 9 composables com menos de 30 linhas que dificilmente justificam arquivo próprio,
+e 4 famílias com 4–5 membros (Fluxo, Mapa, Processo, Cadastro) que apontam para pulverização de
+domínio.
+
+**Ação sugerida por família**:
+- **Fluxo** (5 arquivos, 423L): `useFluxoSubprocesso` é fachada pura (ver item 4); os demais
+  cobrem fluxos distintos — avaliar fusão de `useFluxoAdministrativoSubprocesso` com
+  `useFluxoSubprocessoExecucao` se tiverem consumidores sobrepostos.
+- **Mapa** (5 arquivos, 952L): família densa, avaliar consolidar `useMapaQuery` + `useMapaSugestoes`
+  em um único composable de domínio (isso também resolveria o sinal `superficieAmpla` de sugestões).
+- **Processo** (5 arquivos, 581L): avaliar se `useProcessoQuery` (arquivo minúsculo) pode ser
+  absorvido por `useProcessoCadastroCarga`.
+- **Cadastro** (4 arquivos, 909L): família justificada pela separação de responsabilidades
+  (mutações, orquestração, revisão, tela) — inspecionar antes de consolidar.
+
+--- no Trabalho de Limpeza e Refatoração
 
 1. **Evitar Acoplamento de Testes de View com Queries do Pinia Colada**:
    

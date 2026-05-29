@@ -1,3 +1,4 @@
+// @sgc-auditoria ignorar: superficieAmpla | Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue, extraído para testabilidade
 import {computed, onBeforeUnmount, ref, type Ref, watch} from 'vue';
 import {pesquisarUsuarios} from '@/services/usuarioService';
 import type {UsuarioPesquisa} from '@/types/tipos';

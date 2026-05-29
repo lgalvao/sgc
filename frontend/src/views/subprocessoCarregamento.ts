@@ -25,7 +25,7 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
         if (typeof dependencias.codSubprocesso === "number") {
             const contextoDireto = await subprocessoStore.obterContextoEdicao(
                 dependencias.codSubprocesso,
-                {forcar: recarregar},
+                {recarregar},
             );
             if (contextoDireto) {
                 codigoSubprocesso.value = contextoDireto.detalhes.codigo;
@@ -40,7 +40,7 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
         const contexto = await subprocessoStore.obterContextoEdicaoPorProcessoEUnidade(
             dependencias.codProcesso,
             dependencias.siglaUnidade,
-            {forcar: recarregar},
+            {recarregar},
         );
         if (contexto) {
             codigoSubprocesso.value = contexto.codigo;
@@ -74,7 +74,7 @@ export function useSubprocessoCarregamento(dependencias: DependenciasSubprocesso
             return;
         }
 
-        await subprocessoStore.obterContextoEdicao(codigoSubprocesso.value, {forcar: true});
+        await subprocessoStore.obterContextoEdicao(codigoSubprocesso.value, {recarregar: true});
         dependencias.exibirToastPendente();
     }
 

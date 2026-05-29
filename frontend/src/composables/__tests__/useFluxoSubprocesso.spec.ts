@@ -102,7 +102,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.iniciarRevisaoCadastro).toHaveBeenCalledWith(123);
-        expect(subprocessoStoreMock.obterContextoCadastroAtividades).toHaveBeenCalledWith(123, {forcar: true});
+        expect(subprocessoStoreMock.obterContextoCadastroAtividades).toHaveBeenCalledWith(123, {recarregar: true});
     });
 
     it("deve cancelar início de revisão", async () => {
@@ -113,7 +113,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(cadastroService.cancelarInicioRevisaoCadastro).toHaveBeenCalledWith(123);
-        expect(subprocessoStoreMock.obterContextoCadastroAtividades).toHaveBeenCalledWith(123, {forcar: true});
+        expect(subprocessoStoreMock.obterContextoCadastroAtividades).toHaveBeenCalledWith(123, {recarregar: true});
     });
 
     it("deve devolver cadastro", async () => {
@@ -183,7 +183,7 @@ describe("useFluxoSubprocesso", () => {
 
         expect(success).toBe(true);
         expect(subprocessoService.reabrirCadastro).toHaveBeenCalledWith(123, "justificativa");
-        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(123, {forcar: true});
+        expect(subprocessoStoreMock.obterContextoEdicao).toHaveBeenCalledWith(123, {recarregar: true});
     });
 
     it("deve lidar com erro na ação de workflow", async () => {
