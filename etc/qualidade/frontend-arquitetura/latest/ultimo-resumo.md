@@ -1,6 +1,6 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **47** (atencao)
+- Score total: **27** (atencao)
 - Arquivos de producao: **265**
 - Views com vazamento de estrategia de cache: **0**
 - Views com chamadas diretas a service: **0**
@@ -9,60 +9,60 @@
 - Acessos diretos a cache de store: **0**
 - Chamadas com booleano posicional: **0**
 - Bolsas de dependencias/estado largas: **0**
-- Superficies exportadas amplas: **9**
+- Superficies exportadas amplas: **5**
 - Arquivos com mistura de camadas arquiteturais: **0**
 - Arquivos com server state caseiro: **0**
 - Hubs centrais com sinais: **0**
-- Fachadas puras (composables sem lógica): **1**
-- Composables minúsculos (< 30L): **9**
+- Fachadas puras (composables sem lógica): **0**
+- Composables minúsculos (< 30L): **10**
 - Famílias pulverizadas (>= 4 membros): **4**
 
 ## Hotspots
 
 1. `frontend/src/stores/subprocesso/index.ts` [store]
    - score: 9
-   - sinais: palavraForcar, superficieAmpla
+   - sinais: superficieAmpla
    - fan-out: 1 categorias / 3 imports arquiteturais
-2. `frontend/src/composables/useMapaSugestoes.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 2 imports arquiteturais
-3. `frontend/src/composables/useBuscadorUsuarios.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 2 categorias / 2 imports arquiteturais
-4. `frontend/src/App.vue` [outro]
+2. `frontend/src/App.vue` [outro]
    - score: 8
    - sinais: 
    - fan-out: 2 categorias / 4 imports arquiteturais
-5. `frontend/src/composables/useFluxoSubprocesso.ts` [composable]
-   - score: 3
-   - sinais: fachadaPura
+3. `frontend/src/composables/useFluxoSubprocesso.ts` [composable]
+   - score: 1
+   - sinais: arquivoMinusculo
    - fan-out: 1 categorias / 3 imports arquiteturais
-6. `frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts` [composable]
+4. `frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts` [composable]
    - score: 1
    - sinais: arquivoMinusculo
    - fan-out: 2 categorias / 2 imports arquiteturais
-7. `frontend/src/composables/useProcessoQuery.ts` [composable]
+5. `frontend/src/composables/useProcessoQuery.ts` [composable]
    - score: 1
    - sinais: arquivoMinusculo
    - fan-out: 2 categorias / 2 imports arquiteturais
-8. `frontend/src/composables/useHistoricoQuery.ts` [composable]
+6. `frontend/src/composables/useHistoricoQuery.ts` [composable]
    - score: 1
    - sinais: arquivoMinusculo
    - fan-out: 2 categorias / 2 imports arquiteturais
-9. `frontend/src/composables/useUnidadesQuery.ts` [composable]
+7. `frontend/src/composables/useUnidadesQuery.ts` [composable]
    - score: 1
    - sinais: arquivoMinusculo
    - fan-out: 2 categorias / 2 imports arquiteturais
-10. `frontend/src/composables/useRelatorioAndamentoTela.ts` [composable]
+8. `frontend/src/composables/useRelatorioAndamentoTela.ts` [composable]
    - score: 1
    - sinais: arquivoMinusculo
    - fan-out: 2 categorias / 2 imports arquiteturais
+9. `frontend/src/composables/useFeedbacksAdminQuery.ts` [composable]
+   - score: 1
+   - sinais: arquivoMinusculo
+   - fan-out: 2 categorias / 2 imports arquiteturais
+10. `frontend/src/composables/useUnidadeAtual.ts` [composable]
+   - score: 1
+   - sinais: arquivoMinusculo
+   - fan-out: 1 categorias / 1 imports arquiteturais
 
 ## Famílias de composables pulverizadas
 
-### Fluxo (5 arquivos, 423 linhas)
+### Fluxo (5 arquivos, 424 linhas)
 - `frontend/src/composables/useFluxoAdministrativoSubprocesso.ts`
 - `frontend/src/composables/useFluxoCadastroSubprocesso.ts`
 - `frontend/src/composables/useFluxoMapa.ts`
@@ -89,6 +89,20 @@
 - `frontend/src/composables/useCadastroRevisaoSemMudancas.ts`
 - `frontend/src/composables/useCadastroTela.ts`
 
+
+## Exceções documentadas
+
+Arquivos com sinais suprimidos via `@sgc-auditoria ignorar:` com motivo explícito:
+
+- `frontend/src/composables/useBuscadorUsuarios.ts`
+  - sinais ignorados: superficieAmpla
+  - motivo: Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue, extraído para testabilidade
+- `frontend/src/composables/useFluxoSubprocesso.ts`
+  - sinais ignorados: fachadaPura
+  - motivo: Fachada de coordenação deliberada: injeta `execucao` como dependência em useFluxoCadastroSubprocesso e useFluxoAdministrativoSubprocesso, isolando os consumers desse detalhe
+- `frontend/src/composables/useMapaSugestoes.ts`
+  - sinais ignorados: superficieAmpla
+  - motivo: Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por useMapaTela
 
 ## Diretrizes acompanhadas
 

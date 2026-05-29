@@ -1,9 +1,9 @@
 {
   "versaoSchema": "3.0.0",
-  "geradoEm": "2026-05-29T16:22:19.562Z",
+  "geradoEm": "2026-05-29T16:54:23.675Z",
   "resumo": {
     "arquivosProducao": 265,
-    "scoreTotal": 47,
+    "scoreTotal": 27,
     "faixa": "atencao",
     "metricas": {
       "viewsComVazamentoCache": 0,
@@ -16,18 +16,18 @@
       "booleanosPosicionais": 0,
       "ocorrenciasStale": 0,
       "ocorrenciasSnapshot": 0,
-      "ocorrenciasForcar": 20,
+      "ocorrenciasForcar": 0,
       "arquivosComBolsaDependenciasLarga": 0,
-      "arquivosComSuperficieAmpla": 9,
+      "arquivosComSuperficieAmpla": 5,
       "arquivosComMisturaCamadas": 0,
       "arquivosComServerStateCaseiro": 0,
       "arquivosComAcoplamentoStoreAlto": 0,
-      "arquivosComServiceDireto": 35,
+      "arquivosComServiceDireto": 34,
       "chamadasEstrategiaCache": 0,
       "chamadasInvalidacao": 0,
       "hubsCentraisComSinais": 0,
-      "composablesMinusculos": 9,
-      "fachadasPuras": 1,
+      "composablesMinusculos": 10,
+      "fachadasPuras": 0,
       "familiasPulverizadas": 4
     }
   },
@@ -42,7 +42,7 @@
         "metodoEmCache": 0,
         "invalidacaoExplicita": 0,
         "booleanoPosicional": 0,
-        "palavraForcar": 12,
+        "palavraForcar": 0,
         "palavraStale": 0,
         "palavraSnapshot": 0
       },
@@ -60,75 +60,6 @@
         "superficieExportadaAmpla": 1,
         "categoriasAcoplamento": 1,
         "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
-        "palavraForcar",
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
-      "camada": "composable",
-      "linhas": 137,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 2,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 2
-      },
-      "sinaisAtivos": [
-        "superficieAmpla"
-      ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/composables/useBuscadorUsuarios.ts",
-      "camada": "composable",
-      "linhas": 123,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraForcar": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 2
       },
       "sinaisAtivos": [
         "superficieAmpla"
@@ -170,8 +101,8 @@
     {
       "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
       "camada": "composable",
-      "linhas": 18,
-      "score": 3,
+      "linhas": 19,
+      "score": 1,
       "sinaisLexicais": {
         "acessoDiretoCache": 0,
         "metodoEmCache": 0,
@@ -197,7 +128,7 @@
         "importacoesArquiteturais": 3
       },
       "sinaisAtivos": [
-        "fachadaPura"
+        "arquivoMinusculo"
       ],
       "hubCentral": false
     },
@@ -543,7 +474,7 @@
       "arquivos": [
         "frontend/src/composables/useBuscadorUsuarios.ts"
       ],
-      "totalLinhas": 123
+      "totalLinhas": 124
     },
     "Cache": {
       "arquivos": [
@@ -605,7 +536,7 @@
         "frontend/src/composables/useFluxoSubprocesso.ts",
         "frontend/src/composables/useFluxoSubprocessoExecucao.ts"
       ],
-      "totalLinhas": 423
+      "totalLinhas": 424
     },
     "Form": {
       "arquivos": [
@@ -752,5 +683,28 @@
       ],
       "totalLinhas": 36
     }
-  }
+  },
+  "excecoesDocumentadas": [
+    {
+      "arquivo": "frontend/src/composables/useBuscadorUsuarios.ts",
+      "sinais": [
+        "superficieAmpla"
+      ],
+      "motivo": "Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue, extraído para testabilidade"
+    },
+    {
+      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
+      "sinais": [
+        "fachadaPura"
+      ],
+      "motivo": "Fachada de coordenação deliberada: injeta `execucao` como dependência em useFluxoCadastroSubprocesso e useFluxoAdministrativoSubprocesso, isolando os consumers desse detalhe"
+    },
+    {
+      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
+      "sinais": [
+        "superficieAmpla"
+      ],
+      "motivo": "Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por useMapaTela"
+    }
+  ]
 }
