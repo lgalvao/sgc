@@ -189,6 +189,11 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('202020', 'GESTOR', 2);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('202021', '00202021', 'Paul McCartney', 'paul.mccartney@tre-pe.jus.br', '2021', 2, 2);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('202021', 'SERVIDOR', 2);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('212121', '00212121', 'George Harrison', 'george.harrison@tre-pe.jus.br', '2021', 11, 11);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('212121', 'CHEFE', 11);
@@ -207,6 +212,58 @@ INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_c
 VALUES ('242424', '00242424', 'Jon Lord', 'jon.lord@tre-pe.jus.br', '2024', 4, 4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('242424', 'SERVIDOR', 4);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('242425', '00242425', 'Slash', 'slash@tre-pe.jus.br', '2025', 4, 4);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('242425', 'SERVIDOR', 4);
+
+-- Servidores adicionais para ASSESSORIA_12 (Unidade 4)
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('242426', '00242426', 'Duff McKagan', 'duff.mckagan@tre-pe.jus.br', '2026', 4, 4);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('242426', 'SERVIDOR', 4);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('242427', '00242427', 'Izzy Stradlin', 'izzy.stradlin@tre-pe.jus.br', '2027', 4, 4);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('242427', 'SERVIDOR', 4);
+
+-- Servidores adicionais para outras unidades para garantir servidores em todas
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('222224', '00222224', 'Kurt Cobain', 'kurt.cobain@tre-pe.jus.br', '2055', 5, 5);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('222224', 'SERVIDOR', 5);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('303031', '00303031', 'Eddie Vedder', 'eddie.vedder@tre-pe.jus.br', '2088', 8, 8);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('303031', 'SERVIDOR', 8);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('222225', '00222225', 'Chris Cornell', 'chris.cornell@tre-pe.jus.br', '2099', 9, 9);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('222225', 'SERVIDOR', 9);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('212122', '00212122', 'Freddie Mercury', 'freddie.mercury@tre-pe.jus.br', '2111', 11, 11);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('212122', 'SERVIDOR', 11);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('888889', '00888889', 'Ozzy Osbourne', 'ozzy.osbourne@tre-pe.jus.br', '2133', 13, 13);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('888889', 'SERVIDOR', 13);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('999998', '00999998', 'David Gilmour', 'david.gilmour@tre-pe.jus.br', '2144', 14, 14);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('999998', 'SERVIDOR', 14);
+
+INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
+VALUES ('131314', '00131314', 'Keith Richards', 'keith.richards@tre-pe.jus.br', '2177', 17, 17);
+INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
+VALUES ('131314', 'SERVIDOR', 17);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('252525', '00252525', 'Bruce Springsteen', 'bruce.springsteen@tre-pe.jus.br', '2025', 7, 7);

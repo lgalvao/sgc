@@ -39,7 +39,7 @@ public class AvaliacaoServidor extends EntidadeBase {
     @Column(name = "gap")
     private Integer gap;
 
-    @Column(name = "observacao")
+    @Column(name = "observacoes")
     private String observacao;
 
     @Enumerated(EnumType.STRING)
