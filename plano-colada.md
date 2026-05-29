@@ -2,8 +2,8 @@
 
 ## Estado atual
 
-Score arquitetural: **47** (medido em 2026-05-29, após adição de sinais de fragmentação).
-Todos os problemas estruturais graves foram resolvidos. Restam três hotspots de coesão e sinais de fragmentação de composables.
+Score arquitetural: **27** (medido em 2026-05-29).
+`forcar→recarregar` concluído. `fachadaPura` zerado. Testes todos passando (1364 unitários).
 
 Medir com: `node etc/scripts/sgc.js frontend arquitetura auditar`
 
@@ -13,11 +13,11 @@ Medir com: `node etc/scripts/sgc.js frontend arquitetura auditar`
 
 | Métrica                         | Atual | Meta     |
 | ------------------------------- | ----- | -------- |
-| Score total                     | 47    | < 25     |
-| `superficieAmpla` (arquivos)    | 9     | < 6      |
-| `palavraForcar` (ocorrências)   | 20    | 0        |
-| `fachadasPuras`                 | 1     | 0        |
-| `composablesMinusculos`         | 9     | < 4      |
+| Score total                     | 27    | < 25     |
+| `superficieAmpla` (arquivos)    | 5     | < 6 ✅   |
+| `palavraForcar` (ocorrências)   | 0     | 0 ✅     |
+| `fachadasPuras`                 | 0     | 0 ✅     |
+| `composablesMinusculos`         | 10    | < 4      |
 | `familiasPulverizadas`          | 4     | < 2      |
 | demais sinais                   | 0     | manter 0 |
 
@@ -25,96 +25,62 @@ Medir com: `node etc/scripts/sgc.js frontend arquitetura auditar`
 
 ## O que falta fazer
 
-### 1. `stores/subprocesso/index.ts` — `forcar` exposto + superfície ampla
+### Prioridade 1 — Bug do audit: `App.vue` score=8 sem sinal visível
 
-**Problema**: A store expõe o parâmetro `{forcar}` em `obterContextoEdicao` e
-`obterContextoCadastroAtividades`. Consumidores em views (`subprocessoCarregamento.ts`,
-`subprocessoAcoesAdministrativas.ts`) passam `{forcar: true}` diretamente, violando
-o princípio de que views não devem conhecer estratégia de cache.
+`App.vue` é classificado como `outro` (fora de views/components/stores/composables).
+`calcularScoreArquivo` adiciona +8 por `chamadasStore >= 8` para qualquer camada não-hub,
+mas `obterSinaisAtivos` só exibe o sinal `acoplamentoStoreAlto` para `view/component`.
+Resultado: 8 pontos invisíveis no score.
 
-**Ação**:
-- Remover `{forcar}` da API pública da store — a decisão de limpar cache deve ficar
-  interna à store (baseada em evento/sinal, não em parâmetro passado por view).
-- Consumidores em composables (`useFluxoSubprocessoExecucao`, `useCadastroOrquestracao`)
-  que precisam de recarga forçada devem usar um método semântico (ex: `invalidarContexto()`).
+**Ação A** (semântica): adicionar `"frontend/src/App.vue"` à lista `HUBS_CENTRAIS` em
+`arquitetura-lib.js` — App.vue É o hub raiz; chamar stores ali é correto por design.
+**Ação B** (consistência): ajustar `obterSinaisAtivos` (linha 780) para exibir
+`acoplamentoStoreAlto` para qualquer camada onde a penalidade é aplicada, não só `view/component`.
 
----
-
-### 2. `composables/useMapaSugestoes.ts` — superfície ampla
-
-**Problema**: Sinal `superficieAmpla` — o composable exporta mais símbolos do que
-o contrato de tela exige.
-
-**Ação**: Auditar o que é consumido externamente e tornar interno o que for detalhe
-de implementação.
+Impacto estimado: **-8 pontos** → score cai para ~19.
 
 ---
 
-### 3. `composables/useBuscadorUsuarios.ts` — superfície ampla
+### Prioridade 2 — Composables minúsculos (10 arquivos, meta < 4)
 
-**Problema**: Mesmo padrão do item anterior.
+Análise dos 10 composables < 30 linhas identificou dois grupos:
 
-**Ação**: Idem — estreitar o contrato público ao mínimo necessário pelos consumidores.
+**Grupo A — padrão Pinia Colada (pequenos por design):**
+`useProcessoQuery`, `useHistoricoQuery`, `usePainelQuery`, `useDiagnosticoOrganizacionalQuery`,
+`useFeedbacksAdminQuery`, `useUnidadesQuery`.
+Cada um exporta chave de query + hook de invalidação — é o padrão correto do Pinia Colada.
+**Ação**: anotar cada um com `// @sgc-auditoria ignorar: arquivoMinusculo | padrão Pinia Colada`.
+Impacto: **-6 pontos** (cada arquivo = 1 ponto).
 
-### 4. Fachada pura — `composables/useFluxoSubprocesso.ts`
+**Grupo B — wrappers desnecessários:**
+`useLocalStorage.ts` (5L) e `useSessionStorage.ts` (5L) são wrappers triviais de `useWebStorage`.
+O único consumidor é `stores/perfil.ts`.
+**Ação**: deletar os dois arquivos; em `perfil.ts` chamar `useWebStorage(localStorage, ...)` e
+`useWebStorage(sessionStorage, ...)` diretamente.
+Impacto: **-2 pontos**.
 
-**Problema**: Composable de 17 linhas que não tem lógica própria — apenas importa três outros
-composables e re-exporta seus resultados (`useFluxoMapa`, `useFluxoSubprocessoExecucao`,
-`useFluxoAdministrativoSubprocesso`). Isso indica que o ponto de entrada do módulo é o próprio
-consumidor, não uma abstração real.
-
-**Ação**: Verificar quem consome `useFluxoSubprocesso`. Se for apenas uma view, inlinar as três
-chamadas direto nela. Se houver múltiplos consumidores, avaliar se o papel de fachada é justificado
-e, em caso positivo, adicionar à lista `HUBS_CENTRAIS`.
+**Restante:**
+`useFluxoSubprocesso.ts` (15L) — já tem annotation `ignorar: fachadaPura`, mas falta
+`arquivoMinusculo`. Atualizar annotation.
+Impacto: **-1 ponto**.
 
 ---
 
-### 5. Fragmentação de composables (9 minúsculos, 4 famílias)
+### Prioridade 3 — Famílias pulverizadas (4 famílias, meta < 2)
 
-**Problema**: Há 9 composables com menos de 30 linhas que dificilmente justificam arquivo próprio,
-e 4 famílias com 4–5 membros (Fluxo, Mapa, Processo, Cadastro) que apontam para pulverização de
-domínio.
+As 4 famílias (Fluxo, Mapa, Processo, Cadastro) têm 4–6 membros cada.
+Consolidações agressivas foram descartadas nesta rodada: os satélites de Cadastro e Mapa
+têm testes unitários dedicados que seriam perdidos no merge.
 
-**Ação sugerida por família**:
-- **Fluxo** (5 arquivos, 423L): `useFluxoSubprocesso` é fachada pura (ver item 4); os demais
-  cobrem fluxos distintos — avaliar fusão de `useFluxoAdministrativoSubprocesso` com
-  `useFluxoSubprocessoExecucao` se tiverem consumidores sobrepostos.
-- **Mapa** (5 arquivos, 952L): família densa, avaliar consolidar `useMapaQuery` + `useMapaSugestoes`
-  em um único composable de domínio (isso também resolveria o sinal `superficieAmpla` de sugestões).
-- **Processo** (5 arquivos, 581L): avaliar se `useProcessoQuery` (arquivo minúsculo) pode ser
-  absorvido por `useProcessoCadastroCarga`.
-- **Cadastro** (4 arquivos, 909L): família justificada pela separação de responsabilidades
-  (mutações, orquestração, revisão, tela) — inspecionar antes de consolidar.
-
---- no Trabalho de Limpeza e Refatoração
-
-1. **Evitar Acoplamento de Testes de View com Queries do Pinia Colada**:
-   
-   - Componentes que utilizam `useQuery` dependem da inicialização de plugins adicionais do Pinia no contexto de testes. Em testes de visualização (specs de view), é preferível isolar a lógica usando `vi.mock()` para os composables que englobam a query (ex: `useDiagnosticoOrganizacionalQuery`), em vez de tentar configurar o ecossistema completo da query no `createTestingPinia`.
-   - Isso evita o erro `TypeError: Cannot read properties of undefined (reading 'ext')` e mantém o teste focado apenas nas reações da interface aos estados de dados.
-
-2. **Uso de Mocks Reativos em Testes**:
-   
-   - Ao mockar composables de queries/stores, retorne referências reativas (`ref`). Isso possibilita alterar dinamicamente o estado de resposta (ex: alterando `mockQuery.data.value`) dentro de testes individuais ou no `beforeEach`, sem precisar reinstanciar ou remontar o componente globalmente.
-   - Sempre certifique-se de resetar os valores dos mocks em `beforeEach` para que mutações efetuadas por um teste não contaminem a execução dos testes subsequentes.
-
-3. **Remoção Absoluta de Código e Configurações Mortas**:
-   
-   - Ao refatorar uma store ou composable (ex: removendo a dependência da `organizacaoStore`), faça a varredura completa nos arquivos `.spec.ts` correspondentes para eliminar inicializações de dados que não existem mais (ex: propriedades sob `initialState` no Pinia mockado).
-   - Manter configurações obsoletas de Pinia gera falsos positivos de sucesso ou pode causar erros silenciosos difíceis de rastrear.
-
-4. **Correção de Testes Pré-existentes de Forma Proativa**:
-   
-   - Ao deparar-se com falhas de testes pré-existentes durante a refatoração, resolva-as imediatamente. Muitas vezes as falhas ocorrem por dependências cruzadas ocultas ou estados de inicialização inválidos que vieram à tona com o isolamento adequado dos componentes.
+**Ação conservadora**: verificar se `familiasPulverizadas` cai naturalmente após remover
+composables minúsculos do Grupo A e B acima (cada família perde membros minúsculos).
+Reavaliar o sinal após as prioridades 1 e 2.
 
 ---
 
 ## Validação por mudança
 
 ```bash
-npm run quality:lint
-npm run quality:typecheck
-npm run test:unit
+npm run lint && npm run typecheck && npm run test:unit
+node etc/scripts/sgc.js frontend arquitetura auditar
 ```
-
-Quando a mudança tocar navegação relevante, validar também o fluxo real da tela afetada.
