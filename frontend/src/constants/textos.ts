@@ -14,6 +14,7 @@ import {
 } from "./textos-processo.js";
 import {TEXTOS_MOVIMENTACAO, TEXTOS_SUBPROCESSO, TEXTOS_SUCESSO_SUBPROCESSO} from "./textos-subprocesso.js";
 import {TEXTOS_TREE_TABLE, TEXTOS_UNIDADE, TEXTOS_UNIDADES} from "./textos-unidades.js";
+import {TEXTOS_DIAGNOSTICO} from "./textos-diagnostico.js";
 
 /**
  * Agregador temporário de textos estáticos do sistema.
@@ -48,4 +49,5 @@ export const TEXTOS = {
     processo: TEXTOS_PROCESSO,
     acaoBloco: TEXTOS_ACAO_BLOCO,
     configuracoes: TEXTOS_CONFIGURACOES,
+    diagnostico: TEXTOS_DIAGNOSTICO,
 } as const;

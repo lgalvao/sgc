@@ -4,3 +4,4 @@ export * from "./mapa";
 export * from "./processo";
 export * from "./subprocesso";
 export * from "./diagnostico";
+export * from "./diagnostico-competencias";

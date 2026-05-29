@@ -5,11 +5,13 @@ import {Perfil} from "@/types/tipos";
 import mainRoutes from "./main.routes";
 import processoRoutes from "./processo.routes";
 import unidadeRoutes from "./unidade.routes";
+import diagnosticoRoutes from "./diagnostico.routes";
 
 const routes: RouteRecordRaw[] = [
     ...mainRoutes,
     ...processoRoutes,
-    ...unidadeRoutes
+    ...unidadeRoutes,
+    ...diagnosticoRoutes,
 ];
 
 const isTest = import.meta.env?.VITEST || (typeof process !== "undefined" && process.env?.VITEST);
