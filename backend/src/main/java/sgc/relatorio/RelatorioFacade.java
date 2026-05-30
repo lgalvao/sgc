@@ -202,11 +202,15 @@ public class RelatorioFacade {
                 return;
             }
 
-            for (UnidadeRelatorioSemMapa card : resultado.arvoreOrganizada()) {
-                adicionarSecaoUnidadesSemMapa(document, card);
-            }
-        } catch (Exception e) {
+            processarUnidadesNoPdf(document, resultado.arvoreOrganizada());
+        } catch (DocumentException | IOException e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
+        }
+    }
+
+    void processarUnidadesNoPdf(Document document, List<UnidadeRelatorioSemMapa> unidades) throws DocumentException {
+        for (UnidadeRelatorioSemMapa card : unidades) {
+            adicionarSecaoUnidadesSemMapa(document, card);
         }
     }
 
@@ -417,7 +421,7 @@ public class RelatorioFacade {
         return dataHora == null ? "-" : dataHora.format(FORMATADOR_DATA_HORA);
     }
 
-    private void adicionarCabecalhoRelatorio(Document document, CabecalhoRelatorio cabecalho) throws DocumentException, IOException {
+    void adicionarCabecalhoRelatorio(Document document, CabecalhoRelatorio cabecalho) throws DocumentException, IOException {
         PdfPTable tabelaCabecalho = new PdfPTable(new float[]{1.1f, 5f});
         tabelaCabecalho.setWidthPercentage(100f);
         tabelaCabecalho.setSpacingAfter(12f);
@@ -769,8 +773,12 @@ public class RelatorioFacade {
         return valor != null && valor.trim().toUpperCase(Locale.ROOT).contains(TIPO_ZONA_ELEITORAL);
     }
 
-    private boolean ehSiglaZonaEleitoral(@Nullable String valor) {
-        return valor != null && valor.trim().matches("(?i)Z\\.?\\s*E\\.?");
+    boolean ehSiglaZonaEleitoral(@Nullable String valor) {
+        if (valor == null) {
+            return false;
+        }
+        String limpo = valor.trim().toUpperCase(Locale.ROOT);
+        return "ZE".equals(limpo) || "Z.E.".equals(limpo) || "Z E".equals(limpo) || "Z. E.".equals(limpo);
     }
 
     private boolean ehTextoSecretaria(@Nullable String valor) {
@@ -822,8 +830,8 @@ public class RelatorioFacade {
         return Integer.compare(partesA.size(), partesB.size());
     }
 
-    private List<String> separarSegmentos(String texto) {
-        if (texto == null || texto.isBlank()) {
+    List<String> separarSegmentos(String texto) {
+        if (texto.isBlank()) {
             return List.of("");
         }
 
@@ -869,7 +877,10 @@ public class RelatorioFacade {
         return imagem;
     }
 
-    private String formatarSituacaoPdf(String situacao) {
+    String formatarSituacaoPdf(@Nullable String situacao) {
+        if (situacao == null || situacao.isBlank()) {
+            return "-";
+        }
         String[] partes = situacao.toLowerCase(Locale.ROOT).split("_");
         StringJoiner joiner = new StringJoiner(" ");
         for (String parte : partes) {
@@ -881,7 +892,7 @@ public class RelatorioFacade {
         return joiner.toString();
     }
 
-    private record CabecalhoRelatorio(
+    record CabecalhoRelatorio(
             String titulo,
             String rotuloSubtitulo,
             String subtitulo,

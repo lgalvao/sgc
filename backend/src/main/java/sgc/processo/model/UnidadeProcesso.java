@@ -23,7 +23,7 @@ public class UnidadeProcesso implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private static final java.util.Set<TipoUnidade> TIPOS_SNAPSHOT_SUPORTADOS =
-            java.util.EnumSet.of(TipoUnidade.OPERACIONAL, TipoUnidade.INTERMEDIARIA, TipoUnidade.INTEROPERACIONAL);
+            java.util.EnumSet.of(TipoUnidade.OPERACIONAL, TipoUnidade.INTERMEDIARIA, TipoUnidade.INTEROPERACIONAL, TipoUnidade.RAIZ);
 
     @EmbeddedId
     private UnidadeProcessoId codigo = new UnidadeProcessoId();

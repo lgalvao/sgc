@@ -79,15 +79,44 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             Long codigoIgnorar = 1L;
             when(processoRepo.listarUnidadesEmSituacoesExcetoProcesso(anyList(), eq(codigoIgnorar)))
                     .thenReturn(List.of(10L, 20L));
+Set<Long> resultado = processoService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
 
-            Set<Long> resultado = processoService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
+assertThat(resultado).containsExactlyInAnyOrder(10L, 20L);
+}
 
-            assertThat(resultado).containsExactlyInAnyOrder(10L, 20L);
-        }
+@Test
+@DisplayName("Deve identificar corretamente situações de cadastro para processamento em bloco")
+void deveIdentificarSituacoesCadastroParaProcessamentoEmBloco() {
+Long codProcesso = 1L;
+ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
+        List.of(10L, 20L, 30L),
+        ACEITAR
+);
+
+Usuario usuario = new Usuario();
+usuario.setPerfilAtivo(Perfil.ADMIN);
+when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+Subprocesso s1 = Subprocesso.builder().codigo(101L).situacao(REVISAO_CADASTRO_DISPONIBILIZADA).unidade(Unidade.builder().codigo(10L).build()).build();
+Subprocesso s2 = Subprocesso.builder().codigo(102L).situacao(REVISAO_CADASTRO_HOMOLOGADA).unidade(Unidade.builder().codigo(20L).build()).build();
+Subprocesso s3 = Subprocesso.builder().codigo(103L).situacao(MAPEAMENTO_MAPA_CRIADO).unidade(Unidade.builder().codigo(30L).build()).build();
+
+when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
+        .thenReturn(List.of(s1, s2, s3));
+when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(true);
+
+processoService.executarAcaoEmBloco(codProcesso, req);
+
+// s1 e s2 são de cadastro
+verify(cadastroFluxoService).aceitarCadastroEmBloco(argThat(list -> list.containsAll(List.of(101L, 102L))));
+// s3 é de validação (não cadastro)
+verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(103L)));
+}
+}
 
 
-    @Nested
-    @DisplayName("Workflow e Inicialização")
+@Nested
+@DisplayName("Workflow e Inicialização")
     class Workflow {
         @Test
         @DisplayName("Deve iniciar mapeamento com sucesso e salvar")
@@ -1929,9 +1958,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         when(repo.buscar(Processo.class, 77L)).thenReturn(processo);
 
         assertThatThrownBy(() -> processoService.finalizar(77L))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(Mensagens.SITUACAO_INVALIDA);
-    }
-    }
-}
-
+            .isInstanceOf(ErroValidacao.class)
+            .hasMessageContaining(Mensagens.SITUACAO_INVALIDA);
+        }
+        }

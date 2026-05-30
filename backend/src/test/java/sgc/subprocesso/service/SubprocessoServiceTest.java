@@ -629,4 +629,35 @@ class SubprocessoServiceTest {
             }
         }
     }
+
+    @Test
+    @DisplayName("importarAtividades deve lancar IllegalStateException quando mapa nao possui codigo")
+    void importarAtividadesDeveLancarIllegalStateExceptionQuandoMapaNaoPossuiCodigo() {
+        Long codOrigem = 1L;
+        Long codDestino = 2L;
+        List<Long> itens = List.of(10L);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        spOrigem.setMapa(new Mapa()); // Mapa sem codigo (null) - Lacuna linha 451
+        spOrigem.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        spOrigem.setUnidade(new Unidade());
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        spDestino.setUnidade(new Unidade());
+        Mapa mapaDestino = new Mapa();
+        mapaDestino.setCodigo(200L);
+        spDestino.setMapa(mapaDestino);
+
+        when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
+        when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
+
+        assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem, itens))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("com mapa sem código associado");
+    }
 }

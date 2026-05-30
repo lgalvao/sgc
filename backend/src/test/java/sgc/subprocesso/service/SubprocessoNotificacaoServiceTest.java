@@ -680,6 +680,26 @@ class SubprocessoNotificacaoServiceTest {
                 .hasMessageContaining("Template ausente para contexto teste");
     }
 
+    @Test
+    @DisplayName("Deve retornar sem criar notificação superior quando não houver template superior")
+    void deveRetornarSemCriarNotificacaoSuperiorQuandoNaoHouverTemplate() {
+        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
+        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        // CADASTRO_HOMOLOGADO não possui template superior
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_HOMOLOGADO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .build());
+
+        // Verifica que não enfileirou nada (não tem template email normal nem superior)
+        verify(notificacaoService, never()).enfileirar(any());
+    }
+
 
 
 }

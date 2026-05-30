@@ -414,7 +414,11 @@ class UnidadeHierarquiaServiceTest {
         @DisplayName("Deve tolerar unidade ausente no mapa durante montagem da hierarquia")
         void deveTolerarUnidadeAusenteNoMapaDuranteMontagemHierarquia() {
             UnidadeHierarquiaLeitura mockLeitura = mock(UnidadeHierarquiaLeitura.class);
-            when(mockLeitura.codigo()).thenReturn(1L, 999L);
+            // u.codigo() é chamado:
+            // 1. no teste de elegibilidade (linha 222)
+            // 2. no mapeamento inicial (linha 231)
+            // 3. na montagem da árvore (linha 234 - onde queremos o null)
+            when(mockLeitura.codigo()).thenReturn(1L, 1L, 999L);
             when(mockLeitura.nome()).thenReturn("Unidade Inexistente");
             when(mockLeitura.sigla()).thenReturn("UI");
             when(mockLeitura.tipo()).thenReturn(TipoUnidade.OPERACIONAL);

@@ -62,6 +62,35 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
     }
 
     @Test
+    @DisplayName("Deve disparar notificações de início cobrindo todos os tipos de unidade organizacional")
+    void deveDispararNotificacoesInicioParaTodosTiposDeUnidade() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setDescricao("Teste Cobertura Tipos Unidade");
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+        // Lacuna E: RAIZ, INTEROPERACIONAL, OPERACIONAL, INTERMEDIARIA
+        Unidade uRaiz = criarUnidadeValida(1L); uRaiz.setTipo(TipoUnidade.RAIZ);
+        Unidade uInterop = criarUnidadeValida(2L); uInterop.setTipo(TipoUnidade.INTEROPERACIONAL);
+        Unidade uOper = criarUnidadeValida(3L);
+        Unidade uIntermed = criarUnidadeValida(4L); uIntermed.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        when(repo.buscar(Processo.class, id)).thenReturn(processo);
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uRaiz, uInterop, uOper, uIntermed));
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
+                .thenReturn("<html>inicio</html>");
+        mockarResponsaveisEfetivos();
+
+        processoService.iniciar(id, List.of(1L, 2L, 3L, 4L));
+
+        // Verifica se notificou as unidades (operacionais/raiz e intermediárias/interoperacionais)
+        verify(notificacaoService, atLeast(4)).enfileirar(any());
+    }
+
+    @Test
     @DisplayName("Deve finalizar processo criando notificacao por email")
     void deveFinalizarProcessoQuandoTudoHomologado() {
         Long id = 100L;

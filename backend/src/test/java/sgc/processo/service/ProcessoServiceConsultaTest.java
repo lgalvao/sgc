@@ -64,6 +64,242 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         }
 
         @Test
+        @DisplayName("Deve testar elegibilidade de disponibilização em bloco para múltiplas situações")
+        void deveTestarElegibilidadeDisponibilizacaoBloco() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            // Lacuna A: REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_AJUSTADO, REVISAO_CADASTRO_HOMOLOGADA
+            Subprocesso s1 = new Subprocesso();
+            s1.setCodigo(101L);
+            s1.setSituacao(REVISAO_MAPA_COM_SUGESTOES);
+            Unidade u1 = criarUnidadeValida(10L);
+            s1.setUnidade(u1);
+
+            Subprocesso s2 = new Subprocesso();
+            s2.setCodigo(102L);
+            s2.setSituacao(REVISAO_MAPA_AJUSTADO);
+            Unidade u2 = criarUnidadeValida(20L);
+            s2.setUnidade(u2);
+
+            Subprocesso s3 = new Subprocesso();
+            s3.setCodigo(103L);
+            s3.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
+            Unidade u3 = criarUnidadeValida(30L);
+            s3.setUnidade(u3);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(MAPEAMENTO);
+            p.adicionarParticipantes(Set.of(u1, u2, u3));
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(s1, s2, s3));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
+                    s1.getCodigo(), u1,
+                    s2.getCodigo(), u1,
+                    s3.getCodigo(), u1
+            ));
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, true);
+
+            assertThat(result.getElegiveis()).extracting(SubprocessoElegivelDto::isHabilitarDisponibilizarMapaBloco)
+                    .containsExactly(true, true, true);
+        }
+
+        @Test
+        @DisplayName("Deve retornar null na última data limite quando ambas forem nulas")
+        void deveRetornarNullNaUltimaDataLimiteQuandoAmbasNulas() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Unidade u = criarUnidadeValida(10L);
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(u);
+            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO); // Garantir elegibilidade
+            sp.setDataLimiteEtapa1(null); // Lacuna linha 991 (Case 1: A=null, B=null)
+            sp.setDataLimiteEtapa2(null);
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(MAPEAMENTO);
+            p.adicionarParticipantes(Set.of(u));
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, true);
+
+            assertThat(result.getElegiveis().get(0).getUltimaDataLimite()).isNull();
+        }
+
+        @Test
+        @DisplayName("Deve retornar data limite da etapa 2 quando for a única preenchida")
+        void deveRetornarDataLimiteEtapa2QuandoUnicaPreenchida() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Unidade u = criarUnidadeValida(10L);
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(u);
+            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+            sp.setDataLimiteEtapa1(null);
+            LocalDateTime data2 = LocalDateTime.now();
+            sp.setDataLimiteEtapa2(data2); // Lacuna linha 991 (Case 2: A=null, B!=null)
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(MAPEAMENTO);
+            p.adicionarParticipantes(Set.of(u));
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, true);
+
+            assertThat(result.getElegiveis().get(0).getUltimaDataLimite()).isEqualTo(data2);
+        }
+
+        @Test
+        @DisplayName("Deve cobrir branch de subprocesso sem processo na permissão de escrita")
+        void deveCobrirSubprocessoSemProcessoNaPermissao() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Unidade u = criarUnidadeValida(10L);
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setUnidade(u);
+            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+            sp.setProcesso(null); // Lacuna linha 807 - processo == null
+
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(MAPEAMENTO);
+            p.adicionarParticipantes(Set.of(u));
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, true);
+
+            assertThat(result.getElegiveis().get(0).isHabilitarDisponibilizarMapaBloco()).isTrue();
+        }
+
+        @Test
+        @DisplayName("Deve desabilitar ações em bloco quando processo está finalizado")
+        void deveDesabilitarAcoesBlocoQuandoProcessoFinalizado() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setUnidadeAtivaCodigo(10L);
+            usuario.setPerfilAtivo(Perfil.CHEFE);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Unidade u = criarUnidadeValida(10L);
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setSituacao(SituacaoProcesso.FINALIZADO); // Lacuna C e B
+            p.setTipo(MAPEAMENTO);
+            p.adicionarParticipantes(Set.of(u));
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
+            sp.setUnidade(u);
+            sp.setProcesso(p);
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, true);
+
+            // Lacuna C: todas as ações devem estar desabilitadas pois o processo está FINALIZADO
+            assertThat(result.getAcoesBloco()).allSatisfy(acao -> assertThat(acao.isHabilitar()).isFalse());
+        }
+
+        @Test
+        @DisplayName("Deve desabilitar ação em bloco quando perfil não possui permissão")
+        void deveDesabilitarAcaoBlocoQuandoPerfilNaoPermite() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.SERVIDOR); // Perfil que geralmente não homologa
+            usuario.setUnidadeAtivaCodigo(10L);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Unidade u = criarUnidadeValida(10L);
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(MAPEAMENTO);
+            p.adicionarParticipantes(Set.of(u));
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
+            sp.setUnidade(u);
+            sp.setProcesso(p);
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, true);
+
+            // Homologação deve estar desabilitada para SERVIDOR (Lacuna linha 807 - permitePerfil = false)
+            assertThat(result.getAcoesBloco()).filteredOn(a -> a.getCodigo().contains("homologar"))
+                    .allSatisfy(acao -> assertThat(acao.isHabilitar()).isFalse());
+        }
+
+        @Test
+        @DisplayName("Deve desabilitar ação em bloco quando não há unidades elegíveis")
+        void deveDesabilitarAcaoBlocoQuandoNaoHaUnidades() {
+            Long codProcesso = 1L;
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+            Unidade u = criarUnidadeValida(10L);
+            Processo p = new Processo();
+            p.setCodigo(codProcesso);
+            p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+            p.setTipo(MAPEAMENTO);
+            p.adicionarParticipantes(Set.of(u));
+            when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
+
+            // Subprocesso não elegível para nenhuma ação em bloco
+            Subprocesso sp = new Subprocesso();
+            sp.setCodigo(100L);
+            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+            sp.setUnidade(u);
+            sp.setProcesso(p);
+
+            when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
+
+            ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, true);
+
+            assertThat(result.getAcoesBloco()).allSatisfy(acao -> assertThat(acao.isHabilitar()).isFalse());
+        }
+
+        @Test
         @DisplayName("Deve listar subprocessos elegíveis para ação em bloco")
         void deveListarSubprocessosElegiveis() {
             Long codProcesso = 1L;
@@ -693,6 +929,131 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         assertThat(resultado).isNotNull();
         // Ações de bloco devem estar vazias ou desabilitadas
         assertThat(resultado.getAcoesBloco()).allSatisfy(acao -> assertThat(acao.isHabilitar()).isFalse());
+    }
+
+    @Test
+    @DisplayName("verificarPermissaoEscritaEmBloco deve permitir acao quando processo ativo e perfil permitido")
+    void devePermitirEscritaQuandoAtivoEPermitido() {
+        Long cod = 1L;
+        Unidade uni = criarUnidadeValida(10L);
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
+        p.adicionarParticipantes(Set.of(uni));
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
+        ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
+        assertThat(res.getElegiveis().get(0).isHabilitarDisponibilizarMapaBloco()).isTrue();
+    }
+
+    @Test
+    @DisplayName("verificarPermissaoEscritaEmBloco deve negar quando processo finalizado")
+    void deveNegarEscritaQuandoProcessoFinalizado() {
+        Long cod = 1L;
+        Unidade uni = criarUnidadeValida(10L);
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(SituacaoProcesso.FINALIZADO); p.setTipo(MAPEAMENTO);
+        p.adicionarParticipantes(Set.of(uni));
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
+        ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
+        
+        // Se o processo está FINALIZADO, nenhuma ação é permitida, então elegiveis deve ser vazio
+        assertThat(res.getElegiveis()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("verificarPermissaoEscritaEmBloco deve permitir quando processo é nulo")
+    void devePermitirEscritaQuandoProcessoNulo() {
+        Long cod = 1L;
+        Unidade uni = criarUnidadeValida(10L);
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
+        p.adicionarParticipantes(Set.of(uni));
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(null); 
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
+        ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
+        assertThat(res.getElegiveis().get(0).isHabilitarDisponibilizarMapaBloco()).isTrue();
+    }
+
+    @Test
+    @DisplayName("verificarPermissaoEscritaEmBloco deve negar quando perfil não permitido")
+    void deveNegarEscritaQuandoPerfilNaoPermitido() {
+        Long cod = 1L;
+        Unidade uni = criarUnidadeValida(10L);
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        lenient().when(unidadeHierarquiaService.buscarIdsDescendentes(anyLong())).thenReturn(List.of(10L));
+        Usuario gestor = new Usuario(); gestor.setPerfilAtivo(Perfil.GESTOR); gestor.setUnidadeAtivaCodigo(10L);
+        when(usuarioService.usuarioAutenticado()).thenReturn(gestor);
+        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
+        p.adicionarParticipantes(Set.of(uni));
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
+        ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
+        assertThat(res.getElegiveis().get(0).isHabilitarDisponibilizarMapaBloco()).isFalse();
+    }
+
+    @Test
+    @DisplayName("criarAcaoBloco deve cobrir todas as combinações de branch na linha 934")
+    void deveCobrirTodasCombinacoesHabilitacaoAcaoBloco() {
+        Long cod = 1L;
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setTipo(MAPEAMENTO);
+
+        Usuario admin = new Usuario();
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(10L);
+
+        Usuario servidor = new Usuario();
+        servidor.setPerfilAtivo(Perfil.SERVIDOR);
+        servidor.setUnidadeAtivaCodigo(10L);
+
+        Unidade uni = criarUnidadeValida(10L);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(uni);
+        sp.setProcesso(p);
+
+        // Case 1: perfilPermite=false (A=false) -> servidor tentando homologar
+        when(repo.buscar(Processo.class, cod)).thenReturn(p);
+        when(usuarioService.usuarioAutenticado()).thenReturn(servidor);
+        p.setSituacao(EM_ANDAMENTO);
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
+        
+        ProcessoDetalheDto res1 = processoService.obterDetalhesCompleto(cod, true);
+        assertThat(res1.getAcoesBloco()).filteredOn(a -> a.getCodigo().contains("homologar"))
+                .allSatisfy(a -> assertThat(a.isHabilitar()).isFalse());
+
+        // Case 2: perfilPermite=true, processoAtivo=false (A=true, B=false) -> admin, processo FINALIZADO
+        when(usuarioService.usuarioAutenticado()).thenReturn(admin);
+        p.setSituacao(SituacaoProcesso.FINALIZADO);
+        ProcessoDetalheDto res2 = processoService.obterDetalhesCompleto(cod, true);
+        assertThat(res2.getAcoesBloco()).allSatisfy(a -> assertThat(a.isHabilitar()).isFalse());
+
+        // Case 3: perfilPermite=true, processoAtivo=true, temUnidades=false (A=true, B=true, C=false)
+        p.setSituacao(EM_ANDAMENTO);
+        when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of()); // Sem unidades elegiveis
+        ProcessoDetalheDto res3 = processoService.obterDetalhesCompleto(cod, true);
+        assertThat(res3.getAcoesBloco()).allSatisfy(a -> assertThat(a.isHabilitar()).isFalse());
     }
 
 }
