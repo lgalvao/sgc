@@ -10,16 +10,21 @@ const CAMINHO_PADRAO_OUTPUT = "backend-coverage-auditoria.md";
 
 function calcularScoreImpacto(classe) {
     // Fatores de risco: 
-    // 1. Complexidade total (mais lógica = mais risco)
-    // 2. Linhas não cobertas (lacuna direta)
-    // 3. Branches não cobertos (lógica condicional ignorada)
-    const pesoComplexidade = 2.0;
+    // Classes complexas com lacunas são os verdadeiros hotspots.
+    // Se não há lacunas (100% de cobertura), o score deve ser 0.
+    
+    if (classe.linhasPerdidas === 0 && classe.branchesPerdidos === 0) {
+        return 0;
+    }
+
     const pesoLinhas = 1.0;
     const pesoBranches = 1.5;
+    const fatorComplexidade = 1 + (classe.complexidade / 50); // Multiplicador baseado na complexidade
 
-    return (classe.complexidade * pesoComplexidade) +
-        (classe.linhasPerdidas * pesoLinhas) +
-        (classe.branchesPerdidos * pesoBranches);
+    const scoreLacunas = (classe.linhasPerdidas * pesoLinhas) +
+                         (classe.branchesPerdidos * pesoBranches);
+
+    return scoreLacunas * fatorComplexidade;
 }
 
 function obterPrioridade(score) {

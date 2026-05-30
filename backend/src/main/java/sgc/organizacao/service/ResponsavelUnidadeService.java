@@ -403,8 +403,4 @@ public class ResponsavelUnidadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), siglaUnidade));
     }
 
-    private ResponsabilidadeUnidadeLeitura buscarResponsabilidadeDetalhada(Long unidadeCodigo) {
-        return responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(unidadeCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo));
-    }
 }

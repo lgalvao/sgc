@@ -104,6 +104,7 @@ export function useCacheMapa() {
     function invalidarMapa(codigoSubprocesso?: number): void {
         const queryCache = useQueryCache();
         if (typeof codigoSubprocesso === "number") {
+            queryCache.setQueryData(criarChaveMapa(codigoSubprocesso, obterContextoSessao()), null);
             queryCache.invalidateQueries({key: criarChaveMapa(codigoSubprocesso, obterContextoSessao()), exact: true});
             invalidarImpacto(codigoSubprocesso);
             return;

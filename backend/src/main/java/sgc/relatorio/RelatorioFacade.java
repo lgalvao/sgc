@@ -98,7 +98,9 @@ public class RelatorioFacade {
             ));
 
             adicionarCartoesAndamento(document, relatorios);
-        } catch (DocumentException | IOException e) {
+        } catch (DocumentException e) {
+            throw new IllegalStateException("Erro ao gerar PDF", e);
+        } catch (IOException e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
         }
     }
@@ -203,7 +205,9 @@ public class RelatorioFacade {
             }
 
             processarUnidadesNoPdf(document, resultado.arvoreOrganizada());
-        } catch (DocumentException | IOException e) {
+        } catch (DocumentException e) {
+            throw new IllegalStateException("Erro ao gerar PDF", e);
+        } catch (IOException e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
         }
     }
@@ -387,7 +391,9 @@ public class RelatorioFacade {
             for (RelatorioMapaDto relatorio : relatorios) {
                 secaoConsumer.accept(document, relatorio);
             }
-        } catch (DocumentException | IOException e) {
+        } catch (DocumentException e) {
+            throw new IllegalStateException("Erro ao gerar PDF", e);
+        } catch (IOException e) {
             throw new IllegalStateException("Erro ao gerar PDF", e);
         }
     }
@@ -769,6 +775,9 @@ public class RelatorioFacade {
         return ehTextoSecretaria(nome);
     }
 
+    private static final java.util.regex.Pattern PADRAO_SIGLA_ZE = 
+            java.util.regex.Pattern.compile("(?i)^Z\\.?\\s*E\\.?$");
+
     private boolean ehTextoZonaEleitoral(@Nullable String valor) {
         return valor != null && valor.trim().toUpperCase(Locale.ROOT).contains(TIPO_ZONA_ELEITORAL);
     }
@@ -777,12 +786,14 @@ public class RelatorioFacade {
         if (valor == null) {
             return false;
         }
-        String limpo = valor.trim().toUpperCase(Locale.ROOT);
-        return "ZE".equals(limpo) || "Z.E.".equals(limpo) || "Z E".equals(limpo) || "Z. E.".equals(limpo);
+        return PADRAO_SIGLA_ZE.matcher(valor.trim()).matches();
     }
 
-    private boolean ehTextoSecretaria(@Nullable String valor) {
-        return valor != null && valor.trim().toUpperCase(Locale.ROOT).contains(TERMO_SECRETARIA);
+    boolean ehTextoSecretaria(@Nullable String valor) {
+        if (valor == null || valor.isBlank()) {
+            return false;
+        }
+        return valor.trim().toUpperCase(Locale.ROOT).contains(TERMO_SECRETARIA);
     }
 
     private UnidadeRelatorioSemMapa criarGrupoZonasEleitorais(
