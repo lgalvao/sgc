@@ -84,13 +84,10 @@ public class UnidadeProcesso implements Serializable {
     }
 
     public @Nullable Long getUnidadeCodigo() {
-        return codigo != null ? codigo.getUnidadeCodigo() : null;
+        return codigo.getUnidadeCodigo();
     }
 
     public void setUnidadeCodigo(Long unidadeCodigo) {
-        if (codigo == null) {
-            codigo = new UnidadeProcessoId();
-        }
         codigo.setUnidadeCodigo(unidadeCodigo);
     }
 

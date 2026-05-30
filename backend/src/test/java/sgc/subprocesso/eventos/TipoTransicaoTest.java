@@ -27,4 +27,16 @@ class TipoTransicaoTest {
         String alerta = tipo.formatarAlerta("SIGLA");
         assertThat(alerta).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve verificar os métodos enviaEmail e notificacaoSuperior corretamente")
+    void deveVerificarMetodosDeEnvioDeEmail() {
+        TipoTransicao comEmail = TipoTransicao.CADASTRO_DISPONIBILIZADO;
+        assertThat(comEmail.enviaEmail()).isTrue();
+        assertThat(comEmail.notificacaoSuperior()).isTrue();
+
+        TipoTransicao semEmail = TipoTransicao.CADASTRO_HOMOLOGADO;
+        assertThat(semEmail.enviaEmail()).isFalse();
+        assertThat(semEmail.notificacaoSuperior()).isFalse();
+    }
 }

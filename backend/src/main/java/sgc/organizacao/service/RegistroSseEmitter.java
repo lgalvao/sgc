@@ -22,6 +22,22 @@ public class RegistroSseEmitter {
 
     private final CopyOnWriteArrayList<SseEmitter> emissores = new CopyOnWriteArrayList<>();
 
+    @FunctionalInterface
+    public interface SseSender {
+        void send(SseEmitter emitter, String evento) throws IOException;
+    }
+
+    private final SseSender sender;
+
+    public RegistroSseEmitter() {
+        this.sender = (emitter, evento) -> emitter.send(SseEmitter.event().name(evento).data(""));
+    }
+
+    // Construtor package-private para testes
+    RegistroSseEmitter(SseSender sender) {
+        this.sender = sender;
+    }
+
     /**
      * Registra um novo emissor SSE para o cliente conectado.
      */
@@ -41,11 +57,16 @@ public class RegistroSseEmitter {
     public void transmitir(String evento) {
         for (SseEmitter emitter : emissores) {
             try {
-                emitter.send(SseEmitter.event().name(evento).data(""));
+                sender.send(emitter, evento);
             } catch (IOException e) {
                 emissores.remove(emitter);
                 log.debug("Emissor SSE removido após erro de envio: {}", e.getMessage());
             }
         }
+    }
+
+    // Método package-private observável para testes (Padrão 3)
+    int obterQuantidadeEmissores() {
+        return emissores.size();
     }
 }

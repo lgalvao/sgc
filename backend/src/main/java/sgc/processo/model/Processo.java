@@ -88,7 +88,6 @@ public class Processo extends EntidadeBase {
     }
 
     public List<Long> getCodigosParticipantes() {
-        if (participantes == null) return List.of();
         return participantes.stream()
                 .map(UnidadeProcesso::getUnidadeCodigoPersistido)
                 .toList();
@@ -97,7 +96,6 @@ public class Processo extends EntidadeBase {
     @JsonView(ProcessoViews.Publica.class)
     @JsonProperty("unidadesParticipantes")
     public String getSiglasParticipantes() {
-        if (participantes == null) return "";
         return participantes.stream()
                 .map(UnidadeProcesso::getSigla)
                 .filter(Objects::nonNull)

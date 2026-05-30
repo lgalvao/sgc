@@ -312,10 +312,10 @@ function computarSinaisLexicais(sourceFile, conteudoOriginal) {
         const expressao = chamada.getExpression();
         if (Node.isPropertyAccessExpression(expressao)) {
             const nomeMetodo = expressao.getName();
-            if (/EmCache$/.test(nomeMetodo)) {
+            if (nomeMetodo.endsWith("EmCache")) {
                 metodoEmCache += 1;
             }
-            if (/^invalidar/.test(nomeMetodo)) {
+            if (nomeMetodo.startsWith("invalidar")) {
                 invalidacaoExplicita += 1;
             }
         }
@@ -874,7 +874,12 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
         const hubCentral = HUBS_CENTRAIS.has(caminhoRelativo);
         const linhas = conteudo.split(/\r?\n/).length;
         const fachadaPura = !sinaisExcetos.has("fachadaPura") && detectarFachadaPura(camada, analiseAst, sourceFile, linhas, caminhoRelativo, hubCentral);
-        const arquivoMinusculo = !fachadaPura && !sinaisExcetos.has("arquivoMinusculo") && detectarArquivoMinusculo(caminhoRelativo, linhas, hubCentral);
+        const camadaEfetiva = (camada === "store" && !analiseAst.usaDefineStore) ? "outro" : camada;
+        const ehFacadeDeStore = camadaEfetiva === "composable"
+            && analiseAst.importsPorCategoria.store.size === 1
+            && analiseAst.importsPorCategoria.composable.size === 0
+            && analiseAst.importsPorCategoria.service.size === 0;
+        const arquivoMinusculo = !fachadaPura && !ehFacadeDeStore && !sinaisExcetos.has("arquivoMinusculo") && detectarArquivoMinusculo(caminhoRelativo, linhas, hubCentral);
         const score = calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo});
         const sinaisAtivos = obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral, fachadaPura, arquivoMinusculo);
         const temSinal = sinaisAtivos.length > 0;

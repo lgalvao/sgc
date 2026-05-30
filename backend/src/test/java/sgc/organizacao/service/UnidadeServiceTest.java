@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.model.*;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
@@ -258,5 +259,54 @@ class UnidadeServiceTest {
                     l.stream().anyMatch(um -> Objects.equals(um.getUnidadeCodigoPersistido(), 20L) && um.getMapaVigente() == mapa2);
         }));
         verify(cacheOrganizacaoService).invalidarAposCommit();
+    }
+
+    @Test
+    @DisplayName("buscarPorCodigo - Lança ErroEntidadeNaoEncontrada se unidade não encontrada")
+    void buscarPorCodigo_NaoEncontrada() {
+        when(unidadeRepo.buscarPorCodigoComResponsavel(999L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarPorCodigo(999L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
+                .hasMessageContaining("999");
+    }
+
+    @Test
+    @DisplayName("buscarPorSigla - Lança ErroEntidadeNaoEncontrada se unidade não encontrada")
+    void buscarPorSigla_NaoEncontrada() {
+        when(unidadeRepo.buscarPorSiglaComSuperior("XXX")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarPorSigla("XXX"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarPorSiglaComResponsavel - Lança ErroEntidadeNaoEncontrada se unidade não encontrada")
+    void buscarPorSiglaComResponsavel_NaoEncontrada() {
+        when(unidadeRepo.buscarPorSiglaComResponsavel("XXX")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarPorSiglaComResponsavel("XXX"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarCodigoPorSigla - Lança ErroEntidadeNaoEncontrada se unidade não encontrada")
+    void buscarCodigoPorSigla_NaoEncontrada() {
+        when(unidadeRepo.buscarCodigoAtivoPorSigla("XXX")).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarCodigoPorSigla("XXX"))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarSiglaPorCodigo - Lança ErroEntidadeNaoEncontrada se unidade não encontrada")
+    void buscarSiglaPorCodigo_NaoEncontrada() {
+        when(unidadeRepo.buscarSiglaPorCodigo(999L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarSiglaPorCodigo(999L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarPorCodigoComSuperior - Lança ErroEntidadeNaoEncontrada se unidade não encontrada")
+    void buscarPorCodigoComSuperior_NaoEncontrada() {
+        when(unidadeRepo.buscarPorCodigoComSuperior(999L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscarPorCodigoComSuperior(999L))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
 }
