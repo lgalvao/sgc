@@ -466,5 +466,8 @@ class AlertaFacadeTest {
                 .anyMatch(a -> a.getUnidadeDestino().equals(operacional) && a.getDescricao().contains("Início do processo"))
                 .anyMatch(a -> a.getUnidadeDestino().equals(intermediaria) && a.getDescricao().contains("Início do processo em unidade(s) subordinada(s)"));
     }
+
+
 }
+
 

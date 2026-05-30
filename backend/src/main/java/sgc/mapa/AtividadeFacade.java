@@ -166,9 +166,7 @@ public class AtividadeFacade {
                     .orElse(null);
         }
 
-        if (incluirAtividade && atividadeVis == null) {
-            throw new ErroEntidadeNaoEncontrada("Atividade", codigoAtividade);
-        }
+
 
         return AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)

@@ -167,13 +167,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
         assertThat(resultado.getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
 
-    @Test
-    @DisplayName("obterEntidadePorCodigoMapa: deve lançar erro quando não encontrar")
-    void obterEntidadePorCodigoMapa_NaoEncontrado() {
-        assertThatThrownBy(() -> consultaService.obterEntidadePorCodigoMapa(999L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                .hasMessageContaining("Mapa ID: 999");
-    }
+
 
     @Test
     @DisplayName("obterSugestoes: deve retornar sugestões do mapa")

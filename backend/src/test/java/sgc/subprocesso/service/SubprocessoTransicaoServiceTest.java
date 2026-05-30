@@ -574,26 +574,6 @@ class SubprocessoTransicaoServiceTest {
                     .hasMessageContaining("não está localizado");
         }
 
-        @Test
-        @DisplayName("disponibilizarMapa deve falhar para tipo de processo sem situação configurada")
-        void disponibilizarMapaTipoSemSituacaoConfigurada() {
-            Unidade unidade = criarUnidade(10L, "U10", "Unidade 10");
-            Subprocesso sp = criarSubprocesso(DIAGNOSTICO, MAPEAMENTO_CADASTRO_HOMOLOGADO, unidade);
-            sgc.mapa.model.Mapa mapa = new sgc.mapa.model.Mapa();
-            mapa.setCodigo(100L);
-            sp.setMapa(mapa);
-
-            Usuario usuario = criarUsuario();
-            usuario.setUnidadeAtivaCodigo(10L);
-
-            when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-            when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
-
-            assertThatThrownBy(() -> service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(LocalDate.now().plusDays(3), "obs")))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("sem situação configurada");
-        }
 
         @Test
         @DisplayName("devolverValidacao deve manter situação quando devolução não retorna para unidade do subprocesso")

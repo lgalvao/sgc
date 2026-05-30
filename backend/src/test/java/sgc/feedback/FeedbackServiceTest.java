@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.mock.web.*;
 import sgc.comum.erros.*;
+import sgc.comum.model.ComumRepo;
 import sgc.feedback.dto.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
@@ -30,6 +31,9 @@ class FeedbackServiceTest {
     @Mock
     private UsuarioFacade usuarioFacade;
 
+    @Mock
+    private ComumRepo comumRepo;
+
     private FeedbackService service;
     private FeedbackPropriedades propriedades;
     private ObjectMapper objectMapper;
@@ -41,7 +45,7 @@ class FeedbackServiceTest {
         Path dirTemp = Files.createTempDirectory("sgc-feedback-test-");
         propriedades = new FeedbackPropriedades(dirTemp.toString(), 5_242_880L);
         objectMapper = new ObjectMapper();
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
 
         usuarioMock = new Usuario();
         usuarioMock.setTituloEleitoral("12345");
@@ -189,7 +193,7 @@ class FeedbackServiceTest {
         ObjectMapper objectMapperComFalha = mock(ObjectMapper.class);
         when(objectMapperComFalha.writeValueAsString(any())).thenThrow(new RuntimeException("falha serializacao"));
         FeedbackService servicoComFalhaNaSerializacao = new FeedbackService(
-                repo, propriedades, usuarioFacade, objectMapperComFalha);
+                repo, propriedades, usuarioFacade, objectMapperComFalha, comumRepo);
 
         JsonNode metadados = objectMapper.createObjectNode().put("rotaCaminho", "/painel");
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug no painel", metadados);
@@ -213,7 +217,7 @@ class FeedbackServiceTest {
     @DisplayName("deve ignorar screenshot quando screenshot-dir não está configurado")
     void deveIgnorarScreenshotSemDirConfigurado() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
         configurarUsuarioMock();
 
         var payload = new FeedbackPayloadDto(FeedbackTipo.ELOGIO, "Sistema excelente, parabéns ao time!", null);
@@ -327,7 +331,7 @@ class FeedbackServiceTest {
                 .codigo(codigo)
                 .caminhoScreenshot(tempFile.toString())
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         byte[] resultado = service.obterScreenshot(codigo);
 
@@ -339,7 +343,7 @@ class FeedbackServiceTest {
     @DisplayName("deve lançar ErroEntidadeNaoEncontrada quando feedback não existe")
     void deveLancarErroQuandoFeedbackNaoExiste() {
         UUID codigo = UUID.randomUUID();
-        when(repo.findById(codigo)).thenReturn(Optional.empty());
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenThrow(new ErroEntidadeNaoEncontrada("Feedback", codigo));
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
@@ -353,7 +357,7 @@ class FeedbackServiceTest {
                 .codigo(codigo)
                 .caminhoScreenshot(null)
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -368,7 +372,7 @@ class FeedbackServiceTest {
                 .codigo(codigo)
                 .caminhoScreenshot("arquivo-inexistente.webp")
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -383,7 +387,7 @@ class FeedbackServiceTest {
                 .codigo(codigo)
                 .caminhoScreenshot("pasta\\arquivo.webp")
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -399,7 +403,7 @@ class FeedbackServiceTest {
                 .codigo(codigo)
                 .caminhoScreenshot(diretorio.toString())
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroInconsistenciaInterna.class)
@@ -410,13 +414,13 @@ class FeedbackServiceTest {
     @DisplayName("deve usar diretório padrão quando screenshot-dir estiver em branco")
     void deveUsarDiretorioPadraoQuandoConfiguracaoEmBranco() {
         propriedades = new FeedbackPropriedades("   ", 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
         UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
                 .codigo(codigo)
                 .caminhoScreenshot("arquivo-inexistente.webp")
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -495,7 +499,7 @@ class FeedbackServiceTest {
                 .codigo(codigo)
                 .caminhoScreenshot("  ")
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -506,7 +510,7 @@ class FeedbackServiceTest {
     @DisplayName("deve descartar screenshot quando screenshotDir for nulo")
     void deveDescartarScreenshotQuandoScreenshotDirForNulo() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
         configurarUsuarioMock();
         var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", null);
@@ -521,7 +525,7 @@ class FeedbackServiceTest {
     @DisplayName("deve ignorar screenshot quando screenshotDir estiver em branco")
     void deveIgnorarScreenshotComDirEmBranco() {
         propriedades = new FeedbackPropriedades("   ", 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
         configurarUsuarioMock();
         var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", null);
@@ -540,7 +544,7 @@ class FeedbackServiceTest {
         Files.createDirectories(arquivoNoLugarDoDiretorio.getParent());
         Files.writeString(arquivoNoLugarDoDiretorio, "arquivo");
         propriedades = new FeedbackPropriedades(arquivoNoLugarDoDiretorio.toString(), 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota com screenshot", null);
         var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
         when(repo.save(any())).thenReturn(FeedbackRegistro.builder().codigo(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
@@ -558,13 +562,13 @@ class FeedbackServiceTest {
     @DisplayName("deve usar caminho padrão quando screenshotDir for nulo na resolução de caminho")
     void deveUsarCaminhosPadraoQuandoScreenshotDirForNuloNaResolucao() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper);
+        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
         UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
                 .codigo(codigo)
                 .caminhoScreenshot("arquivo-inexistente.webp")
                 .build();
-        when(repo.findById(codigo)).thenReturn(Optional.of(registro));
+        when(comumRepo.buscar(FeedbackRegistro.class, codigo)).thenReturn(registro);
 
         assertThatThrownBy(() -> service.obterScreenshot(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)

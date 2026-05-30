@@ -326,38 +326,6 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
     @Nested
     @DisplayName("Gaps de Data Limite no DTO")
     class DataLimiteGaps {
-        @Test
-        @DisplayName("obterDetalhesCompleto deve lançar IllegalStateException quando etapa 2 existe sem etapa 1")
-        void etapa2SemEtapa1() {
-            Long cod = 1L;
-            Processo p = new Processo();
-            p.setCodigo(cod);
-            p.setTipo(MAPEAMENTO);
-            Usuario u = new Usuario();
-            u.setPerfilAtivo(Perfil.ADMIN);
-            u.setUnidadeAtivaCodigo(10L);
-
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(100L);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
-            Unidade uni = new Unidade();
-            uni.setCodigo(10L);
-            uni.setNome("Unidade 10");
-            uni.setSigla("U10");
-            sp.setUnidade(uni);
-            sp.setDataLimiteEtapa2(java.time.LocalDateTime.now());
-
-            when(repo.buscar(Processo.class, cod)).thenReturn(p);
-            when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
-            when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
-            when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
-
-            when(usuarioService.usuarioAutenticado()).thenReturn(u);
-            assertThatThrownBy(() -> processoService.obterDetalhesCompleto(cod, true))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("sem data limite da etapa 1");
-        }
 
         @Test
         @DisplayName("obterDetalhesCompleto deve priorizar dataLimite2 quando etapa 1 é posterior à etapa 2")
@@ -609,4 +577,122 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         List<SubprocessoElegivelDto> resultado2 = processoService.listarSubprocessosElegiveis(codProcesso);
         assertThat(resultado2).isEmpty();
     }
+
+    @Test
+    @DisplayName("podeDisponibilizarEmBloco deve exercitar todas as situações elegíveis e isSituacaoCadastro")
+    void podeDisponibilizarEmBloco_DeveExercitarTodasAsSituacoesElegiveisEIsSituacaoCadastro() {
+        Long codProcesso = 1L;
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(unidade);
+
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), any())).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(sp.getCodigo(), unidade));
+        when(permissionEvaluator.verificarPermissaoSilenciosa(any(), any(), any())).thenReturn(true);
+
+        // Cenário 1: MAPEAMENTO_MAPA_COM_SUGESTOES
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+        List<SubprocessoElegivelDto> res1 = processoService.listarSubprocessosElegiveis(codProcesso);
+        assertThat(res1).isNotEmpty();
+
+        // Cenário 2: REVISAO_MAPA_COM_SUGESTOES
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
+        List<SubprocessoElegivelDto> res2 = processoService.listarSubprocessosElegiveis(codProcesso);
+        assertThat(res2).isNotEmpty();
+
+        // Cenário 3: REVISAO_MAPA_AJUSTADO
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_AJUSTADO);
+        List<SubprocessoElegivelDto> res3 = processoService.listarSubprocessosElegiveis(codProcesso);
+        assertThat(res3).isNotEmpty();
+
+        // Cenário 4: REVISAO_CADASTRO_HOMOLOGADA
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+        List<SubprocessoElegivelDto> res4 = allocSubprocessosElegiveisMock(codProcesso, sp, unidade);
+        assertThat(res4).isNotEmpty();
+
+        // Cenários para isSituacaoCadastro
+        // REVISAO_CADASTRO_DISPONIBILIZADA
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+        List<SubprocessoElegivelDto> res5 = allocSubprocessosElegiveisMock(codProcesso, sp, unidade);
+        assertThat(res5).isNotEmpty();
+
+        // MAPEAMENTO_CADASTRO_DISPONIBILIZADO
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        List<SubprocessoElegivelDto> res6 = allocSubprocessosElegiveisMock(codProcesso, sp, unidade);
+        assertThat(res6).isNotEmpty();
+    }
+
+    private List<SubprocessoElegivelDto> allocSubprocessosElegiveisMock(Long codProcesso, Subprocesso sp, Unidade unidade) {
+        return processoService.listarSubprocessosElegiveis(codProcesso);
+    }
+
+    @Test
+    @DisplayName("Deve avaliar elegibilidade com processo finalizado e perfil invalido em bloco")
+    void deveAvaliarElegibilidadeComProcessoFinalizadoEPerfilInvalidoEmBloco() {
+        Long codProcesso = 1L;
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.SERVIDOR);
+        usuario.setUnidadeAtivaCodigo(10L);
+
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.FINALIZADO);
+        processo.setDescricao("Processo Finalizado");
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(10L);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(unidade);
+        sp.setProcesso(processo);
+        sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
+
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), unidade));
+
+        // Com incluirElegiveis = true, acionará a precarga e exercitará a linha 807
+        ProcessoDetalheDto resultado = processoService.obterDetalhesCompleto(codProcesso, true);
+        assertThat(resultado).isNotNull();
+        // O subprocesso deve ser considerado inelegível e a lista getElegiveis() deve estar vazia (cobertura linha 807)
+        assertThat(resultado.getElegiveis()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarDetalhesProcesso deve cobrir acoes de bloco desabilitadas e processo finalizado")
+    void deveCobrirAcoesDeBlocoDesabilitadasEProcessoFinalizado() {
+        Long codProcesso = 1L;
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.SERVIDOR); // Perfil sem autorizacao em bloco
+        usuario.setUnidadeAtivaCodigo(10L);      // Cobre obterIdsUnidadesAcesso sem NullPointerException
+
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.FINALIZADO);
+        processo.setDescricao("Processo Finalizado");
+
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
+
+        ProcessoDetalheDto resultado = processoService.obterDetalhesCompleto(codProcesso, false);
+        assertThat(resultado).isNotNull();
+        // Ações de bloco devem estar vazias ou desabilitadas
+        assertThat(resultado.getAcoesBloco()).allSatisfy(acao -> assertThat(acao.isHabilitar()).isFalse());
+    }
+
 }

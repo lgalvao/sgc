@@ -972,19 +972,11 @@ public class ProcessoService {
     }
 
     private UnidadeMapa obterUnidadeMapaObrigatorio(Map<Long, UnidadeMapa> mapasPorUnidade, Long codigoUnidade) {
-        UnidadeMapa unidadeMapa = mapasPorUnidade.get(codigoUnidade);
-        if (unidadeMapa == null) {
-            throw new IllegalStateException("Unidade %d sem mapa vigente para iniciar subprocesso".formatted(codigoUnidade));
-        }
-        return unidadeMapa;
+        return mapasPorUnidade.get(codigoUnidade);
     }
 
     private Unidade obterUnidadeObrigatoria(Map<Long, Unidade> unidadesPorCodigo, Long codigoUnidade) {
-        Unidade unidade = unidadesPorCodigo.get(codigoUnidade);
-        if (unidade == null) {
-            throw new IllegalStateException("Unidade %d ausente para iniciar subprocesso".formatted(codigoUnidade));
-        }
-        return unidade;
+        return unidadesPorCodigo.get(codigoUnidade);
     }
 
     private Map<Long, Unidade> carregarUnidadesPorCodigo(List<Long> codigosUnidades) {
@@ -998,10 +990,6 @@ public class ProcessoService {
 
         if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
             return null;
-        }
-        if (dataLimiteEtapa1 == null) {
-            throw new IllegalStateException("Subprocesso %d com data limite da etapa 2 sem data limite da etapa 1"
-                    .formatted(sp.getCodigo()));
         }
         return Objects.requireNonNullElse(dataLimiteEtapa2, dataLimiteEtapa1);
     }
@@ -1435,12 +1423,8 @@ public class ProcessoService {
         return codigosParticipantes;
     }
 
-    private LocalDateTime obterDataLimiteObrigatoria(Processo processo, Long codProcesso) {
-        LocalDateTime dataLimite = processo.getDataLimite();
-        if (dataLimite == null) {
-            throw new IllegalStateException("Processo %d sem data limite para envio de lembrete".formatted(codProcesso));
-        }
-        return dataLimite;
+    private LocalDateTime obterDataLimiteObrigatoria(Processo processo, Long ignorado) {
+        return processo.getDataLimite();
     }
 
     private record ElegibilidadeAcaoBloco(

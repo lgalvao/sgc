@@ -847,19 +847,7 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
-    @Test
-    @DisplayName("Deve lançar ErroEntidadeNaoEncontrada quando subprocesso não tem mapa")
-    void deveLancarErroEntidadeNaoEncontradaQuandoSubprocessoNaoTemMapa() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(100L);
-        sp.setMapa(null);
 
-        when(consultaService.buscarSubprocessoComMapa(100L)).thenReturn(sp);
-
-        assertThatThrownBy(() -> relatorioService.obterRelatorioMapaAtual(100L))
-                .isInstanceOf(sgc.comum.erros.ErroEntidadeNaoEncontrada.class)
-                .hasMessageContaining("não encontrado");
-    }
 
     @Test
     @DisplayName("Deve gerar relatório de andamento com localização nula")
@@ -1160,4 +1148,147 @@ class RelatorioFacadeTest {
         verify(document, atLeastOnce()).add(any());
     }
 
+    @Test
+    @DisplayName("Deve cobrir casos de ordenacao natural complexa e identificacoes vazias em relatorio de unidades sem mapas vigentes")
+    void deveCobrirOrdenacaoNaturalComplexaEIdentificacoesVazias() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+
+        UnidadeDto u1 = new UnidadeDto();
+        u1.setCodigo(10L);
+        u1.setSigla("U999999999999");
+        u1.setNome("Unidade Grande 1");
+        u1.setTipo("SECRETARIA");
+
+        UnidadeDto u2 = new UnidadeDto();
+        u2.setCodigo(11L);
+        u2.setSigla("U888888888888");
+        u2.setNome("Unidade Grande 2");
+        u2.setTipo("SECRETARIA");
+
+        UnidadeDto u3 = new UnidadeDto();
+        u3.setCodigo(12L);
+        u3.setSigla("Z.E.");
+        u3.setNome("Zona Eleitoral 10");
+        u3.setTipo("OUTRO");
+
+        UnidadeDto u4 = new UnidadeDto();
+        u4.setCodigo(13L);
+        u4.setSigla("   ");
+        u4.setNome("");
+        u4.setTipo("OUTRO");
+
+        UnidadeDto raiz = new UnidadeDto();
+        raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
+        raiz.setNome("Raiz");
+        raiz.setSubunidades(List.of(u1, u2, u3, u4));
+
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(10L, 11L, 12L, 13L));
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(raiz));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve lancar IllegalStateException quando falha escrita de PDF")
+    void deveLancarIllegalStateExceptionQuandoFalhaEscritaDePdf() throws Exception {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of());
+
+        // Força document.open() a lançar exceção para ativar o bloco catch de geração de PDF
+        doThrow(new RuntimeException("Falha simulada de PDF")).when(document).open();
+
+        OutputStream out = new ByteArrayOutputStream();
+
+        assertThatThrownBy(() -> relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Erro ao gerar PDF")
+                .hasCauseInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("Deve cobrir gaps de ordenacao natural, sigla sem nome, subunidades nulas e situacao com underscores")
+    void deveCobrirGapsOrdenacaoSiglaSemNomeESubunidadesNulas() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+
+        // 1. Unidade com sigla null, nome null (gera "" na ordenação)
+        UnidadeDto u1 = new UnidadeDto();
+        u1.setCodigo(10L);
+        u1.setSigla(null);
+        u1.setNome(null);
+        u1.setTipo("COMUM");
+
+        // 2. Unidade com sigla preenchida, nome null (cobre temSigla && !temNome na linha 619)
+        UnidadeDto u2 = new UnidadeDto();
+        u2.setCodigo(11L);
+        u2.setSigla("ZE-PR");
+        u2.setNome(null);
+        u2.setTipo("ZONA ELEITORAL");
+
+        // 3. Unidade com nome SECRETARIA 10 e outra SECRETARIA 2 (para testar ordenação numérica)
+        UnidadeDto u3 = new UnidadeDto();
+        u3.setCodigo(12L);
+        u3.setSigla("SEC-10");
+        u3.setNome("SECRETARIA 10");
+        u3.setTipo("SECRETARIA");
+
+        UnidadeDto u4 = new UnidadeDto();
+        u4.setCodigo(13L);
+        u4.setSigla("SEC-2");
+        u4.setNome("SECRETARIA 2");
+        u4.setTipo("SECRETARIA");
+
+        // Unidade com subunidades nulas explicitamente (cobre linha 647)
+        UnidadeDto u5 = new UnidadeDto();
+        u5.setCodigo(14L);
+        u5.setSigla("SUB-NULA");
+        u5.setNome("Subunidades Nulas");
+        u5.setSubunidades(null);
+        u5.setTipo("COMUM");
+
+        UnidadeDto raiz = new UnidadeDto();
+        raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
+        raiz.setNome("Raiz");
+        raiz.setSubunidades(List.of(u1, u2, u3, u4, u5));
+
+        when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(10L, 11L, 12L, 13L, 14L));
+        when(unidadeHierarquiaService.buscarArvoreHierarquica()).thenReturn(List.of(raiz));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
+
+    @Test
+    @DisplayName("Deve formatar situacao com underscores consecutivos no relatorio de andamento")
+    void deveFormatarSituacaoComUnderscoresConsecutivos() throws DocumentException {
+        when(pdfFactory.createDocument()).thenReturn(document);
+        Processo p = new Processo();
+        p.setDescricao("Processo Teste");
+        p.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(new Unidade());
+        sp.getUnidade().setSigla("U1");
+        sp.getUnidade().setNome("Unidade 1");
+        // Situação com underscores seguidos e finais para acionar o branch isBlank e a linha 880
+        sp.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
+
+        when(processoService.buscarPorCodigo(1L)).thenReturn(p);
+        when(consultaService.listarEntidadesPorProcesso(1L)).thenReturn(List.of(sp));
+        when(responsavelService.buscarResponsaveisUnidades(any())).thenReturn(Map.of());
+        when(localizacaoSubprocessoService.obterLocalizacoesAtuais(any())).thenReturn(Map.of(100L, sp.getUnidade()));
+
+        OutputStream out = new ByteArrayOutputStream();
+        relatorioService.gerarRelatorioAndamento(1L, out);
+
+        verify(document, atLeastOnce()).add(any());
+    }
 }

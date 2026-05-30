@@ -36,15 +36,15 @@ public class SubprocessoNotificacaoService {
     public void registrarComunicacoesTransicao(NotificacaoCommand cmd) {
         TipoTransicao tipoTransicao = cmd.tipoTransicao();
         if (tipoTransicao.geraAlerta()) {
-            executarAlertaSemInterromperEmail(() -> criarAlertaTransicao(cmd), "transicao", cmd.subprocesso().getCodigo());
+            criarAlertaTransicao(cmd);
         }
         if (tipoTransicao.enviaEmail()) {
-            criarNotificacoesTransicao(cmd);
+            executarNotificacaoSemInterromperAlerta(() -> criarNotificacoesTransicao(cmd), "transicao", cmd.subprocesso().getCodigo());
         }
     }
 
     public void registrarAlertaTransicao(NotificacaoCommand cmd) {
-        executarAlertaSemInterromperEmail(() -> criarAlertaTransicao(cmd), "transicao", cmd.subprocesso().getCodigo());
+        criarAlertaTransicao(cmd);
     }
 
     private void criarAlertaTransicao(NotificacaoCommand cmd) {
@@ -69,12 +69,8 @@ public class SubprocessoNotificacaoService {
     }
 
     public void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
-        executarAlertaSemInterromperEmail(
-                () -> alertaFacade.criarAlertaAlteracaoDataLimite(
-                        sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa),
-                "alteracao-data-limite",
-                sp.getCodigo()
-        );
+        alertaFacade.criarAlertaAlteracaoDataLimite(
+                sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa);
 
         Map<String, Object> variaveis = new HashMap<>();
         String assunto = AssuntosNotificacao.dataLimiteAlterada();
@@ -89,15 +85,17 @@ public class SubprocessoNotificacaoService {
         String chave = "subprocesso:%d:data-limite-alterada:etapa:%d:data:%s"
                 .formatted(sp.getCodigo(), etapa, novaDataFormatada);
 
-        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                .subprocesso(sp)
-                .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
-                .unidadeDestinoSigla(sp.getUnidade().getSigla())
-                .destinatario(emailDestino)
-                .assunto(assunto)
-                .corpoHtml(corpo)
-                .chaveIdempotencia(chave)
-                .build());
+        executarNotificacaoSemInterromperAlerta(() -> {
+            notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                    .subprocesso(sp)
+                    .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
+                    .unidadeDestinoSigla(sp.getUnidade().getSigla())
+                    .destinatario(emailDestino)
+                    .assunto(assunto)
+                    .corpoHtml(corpo)
+                    .chaveIdempotencia(chave)
+                    .build());
+        }, "alteracao-data-limite", sp.getCodigo());
     }
 
     public void notificarHomologacaoMapa(Subprocesso sp) {
@@ -141,29 +139,24 @@ public class SubprocessoNotificacaoService {
     }
 
     private void notificarResponsavelPessoal(NotificacaoCommand cmd, Unidade unidade, EmailGerado emailDireto) {
-        UnidadeResponsavelDto responsavel;
-        try {
-            responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
-        } catch (sgc.comum.erros.ErroEntidadeNaoEncontrada ex) {
-            log.warn("Responsavel nao encontrado para unidade {}; email pessoal nao enviado.", unidade.getCodigo());
-            return;
-        }
-
-        String titulo = responsavel.substitutoTitulo();
-        if (titulo != null) {
-            usuarioService.buscarOpt(titulo).ifPresent(u -> {
-                if (!u.getEmail().isBlank()) {
-                    criarNotificacao(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), OrigemNotificacao.RESPONSAVEL, unidade.getSigla(), titulo));
-                }
-            });
-        }
+        responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo())
+                .ifPresent(responsavel -> {
+                    String titulo = responsavel.substitutoTitulo();
+                    if (titulo != null) {
+                        usuarioService.buscarOpt(titulo).ifPresent(u -> {
+                            if (!u.getEmail().isBlank()) {
+                                criarNotificacao(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), OrigemNotificacao.RESPONSAVEL, unidade.getSigla(), titulo));
+                            }
+                        });
+                    }
+                });
     }
 
     private void criarNotificacaoSuperior(NotificacaoCommand cmd, Map<String, Object> variaveisBase) {
-        String templateEmailSuperior = cmd.tipoTransicao().getTemplateEmailSuperior();
-        if (templateEmailSuperior == null || templateEmailSuperior.isBlank()) {
-            return;
-        }
+        String templateEmailSuperior = obterTemplateObrigatorio(
+                cmd.tipoTransicao().getTemplateEmailSuperior(),
+                "e-mail superior"
+        );
 
         String assunto = criarAssunto(cmd.tipoTransicao(), cmd.subprocesso(), true);
         Long codigoUnidade = cmd.subprocesso().getUnidade().getCodigo();
@@ -456,12 +449,12 @@ public class SubprocessoNotificacaoService {
         return template;
     }
 
-    private void executarAlertaSemInterromperEmail(Runnable acaoAlerta, String contexto, Long codigoSubprocesso) {
+    private void executarNotificacaoSemInterromperAlerta(Runnable acaoNotificacao, String contexto, Long codigoSubprocesso) {
         try {
-            acaoAlerta.run();
+            acaoNotificacao.run();
         } catch (RuntimeException ex) {
             log.warn(
-                    "Falha ao criar alerta ({}) para subprocesso {}. Fluxo de e-mail sera mantido.",
+                    "Falha ao enviar notificação de e-mail ({}) para subprocesso {}. Fluxo de alerta será mantido.",
                     contexto,
                     codigoSubprocesso,
                     ex

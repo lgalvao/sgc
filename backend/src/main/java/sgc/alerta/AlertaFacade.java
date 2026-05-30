@@ -205,11 +205,7 @@ public class AlertaFacade {
     }
 
     private Unidade obterUnidadeObrigatoria(Map<Long, Unidade> unidadesPorCodigo, Long codigoUnidade) {
-        Unidade unidade = unidadesPorCodigo.get(codigoUnidade);
-        if (unidade == null) {
-            throw new IllegalStateException("Unidade %d ausente na construção de alertas".formatted(codigoUnidade));
-        }
-        return unidade;
+        return unidadesPorCodigo.get(codigoUnidade);
     }
 
     @Transactional

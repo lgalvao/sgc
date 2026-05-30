@@ -22,7 +22,7 @@ public class SubprocessoSituacaoService {
     @Transactional
     public void atualizarSituacaoPorMapa(Long mapaCodigo, boolean temAtividades) {
         Subprocesso subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Subprocesso", "Mapa ID: " + mapaCodigo));
+                .orElseThrow();
 
         reconciliarSituacao(subprocesso, temAtividades);
     }

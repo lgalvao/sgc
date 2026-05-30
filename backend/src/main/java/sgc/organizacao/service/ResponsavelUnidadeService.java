@@ -10,6 +10,7 @@ import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.config.*;
 import sgc.comum.erros.*;
+import sgc.comum.model.ComumRepo;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -43,6 +44,7 @@ public class ResponsavelUnidadeService {
     private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final ConfigAplicacao configAplicacao;
+    private final ComumRepo repo;
 
 
     /**
@@ -103,8 +105,7 @@ public class ResponsavelUnidadeService {
      */
     @Transactional
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
-        Unidade unidade = unidadeRepo.findById(codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
+        Unidade unidade = repo.buscar(Unidade.class, codUnidade);
         Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
         AtribuicaoTemporaria atribuicao = montarAtribuicaoTemporaria(new AtribuicaoTemporaria(), unidade, usuario, request);
 
@@ -115,8 +116,7 @@ public class ResponsavelUnidadeService {
 
     @Transactional
     public void atualizarAtribuicaoTemporaria(Long codUnidade, Long codigoAtribuicao, CriarAtribuicaoRequest request) {
-        Unidade unidade = unidadeRepo.findById(codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
+        Unidade unidade = repo.buscar(Unidade.class, codUnidade);
         AtribuicaoTemporaria atribuicao = buscarAtribuicaoObrigatoria(codigoAtribuicao);
         validarPertencimentoUnidade(atribuicao, codUnidade);
         Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
@@ -135,13 +135,11 @@ public class ResponsavelUnidadeService {
     }
 
     private Usuario buscarUsuarioObrigatorio(String titulo) {
-        return usuarioRepo.findById(titulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
+        return repo.buscar(Usuario.class, titulo);
     }
 
     private AtribuicaoTemporaria buscarAtribuicaoObrigatoria(Long codigoAtribuicao) {
-        return atribuicaoTemporariaRepo.findById(codigoAtribuicao)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(AtribuicaoTemporaria.class.getSimpleName(), codigoAtribuicao));
+        return repo.buscar(AtribuicaoTemporaria.class, codigoAtribuicao);
     }
 
     private void validarPertencimentoUnidade(AtribuicaoTemporaria atribuicao, Long codUnidade) {
@@ -262,8 +260,7 @@ public class ResponsavelUnidadeService {
         }
 
         ResponsabilidadeUnidadeLeitura responsabilidade = responsabilidadeOpt.get();
-        return usuarioRepo.findById(responsabilidade.usuarioTitulo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
+        return repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
     }
 
     /**
@@ -290,8 +287,7 @@ public class ResponsavelUnidadeService {
         }
 
         ResponsabilidadeUnidadeLeitura responsabilidade = responsabilidadeOpt.get();
-        Usuario usuario = usuarioRepo.findById(responsabilidade.usuarioTitulo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
+        Usuario usuario = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
 
         return ResponsavelDto.builder()
                 .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
@@ -302,16 +298,24 @@ public class ResponsavelUnidadeService {
     }
 
     /**
+     * Busca o responsável (titular e substituto) de uma unidade de forma segura, retornando Optional.
+     */
+    public Optional<UnidadeResponsavelDto> buscarResponsavelUnidadeOpt(Long unidadeCodigo) {
+        List<ResponsabilidadeUnidadeResumoLeitura> lista = responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(unidadeCodigo));
+        if (lista.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(montarResponsavelDto(lista.getFirst()));
+    }
+
+    /**
      * Busca o responsável (titular e substituto) de uma unidade.
      *
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
      */
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        List<ResponsabilidadeUnidadeResumoLeitura> lista = responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(unidadeCodigo));
-        if (lista.isEmpty()) {
-            throw new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo);
-        }
-        return montarResponsavelDto(lista.getFirst());
+        return buscarResponsavelUnidadeOpt(unidadeCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo));
     }
 
     /**

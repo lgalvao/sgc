@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.*;
 import org.springframework.web.multipart.*;
 import sgc.comum.erros.*;
 import sgc.feedback.dto.*;
+import sgc.comum.model.ComumRepo;
 import sgc.organizacao.*;
 import tools.jackson.databind.*;
 
@@ -33,6 +34,7 @@ public class FeedbackService {
     private final FeedbackPropriedades propriedades;
     private final UsuarioFacade usuarioFacade;
     private final ObjectMapper objectMapper;
+    private final ComumRepo comumRepo;
 
     /**
      * Registra um novo feedback, opcionalmente com screenshot.
@@ -93,8 +95,7 @@ public class FeedbackService {
      */
     @Transactional(readOnly = true)
     public byte[] obterScreenshot(UUID codigo) {
-        FeedbackRegistro registro = repo.findById(codigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Feedback", codigo));
+        FeedbackRegistro registro = comumRepo.buscar(FeedbackRegistro.class, codigo);
 
         String nomeOuCaminho = registro.getCaminhoScreenshot();
         if (nomeOuCaminho == null || nomeOuCaminho.isBlank()) {

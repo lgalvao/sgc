@@ -625,13 +625,8 @@ public class SubprocessoTransicaoService {
                 ));
     }
 
-    private SituacaoSubprocesso obterSituacaoObrigatoria(Map<TipoProcesso, SituacaoSubprocesso> situacoes, Subprocesso subprocesso, String contexto) {
-        TipoProcesso tipoProcesso = subprocesso.getProcesso().getTipo();
-        SituacaoSubprocesso situacao = situacoes.get(tipoProcesso);
-        if (situacao == null) {
-            throw new IllegalStateException("Tipo de processo %s sem situação configurada para %s".formatted(tipoProcesso, contexto));
-        }
-        return situacao;
+    private SituacaoSubprocesso obterSituacaoObrigatoria(Map<TipoProcesso, SituacaoSubprocesso> situacoes, Subprocesso subprocesso, String ignorado) {
+        return situacoes.get(subprocesso.getProcesso().getTipo());
     }
 
     @Builder

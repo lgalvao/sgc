@@ -126,12 +126,6 @@ public class SubprocessoValidacaoService {
     }
 
     public void validarSituacaoPermitida(Subprocesso subprocesso, Set<SituacaoSubprocesso> permitidas) {
-        if (subprocesso.getSituacao() == null) {
-            throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
-        }
-        if (permitidas.isEmpty()) {
-            throw new IllegalArgumentException("Conjunto de situações permitidas não pode ser vazio");
-        }
         if (!permitidas.contains(subprocesso.getSituacao())) {
             String permitidasStr = String.join(", ",
                     permitidas.stream().map(SituacaoSubprocesso::name).toList());
@@ -142,28 +136,16 @@ public class SubprocessoValidacaoService {
     }
 
     public void validarSituacaoPermitida(Subprocesso subprocesso, SituacaoSubprocesso... permitidas) {
-        if (permitidas.length == 0) {
-            throw new IllegalArgumentException("Pelo menos uma situação permitida deve ser fornecida");
-        }
         validarSituacaoPermitida(subprocesso, Set.of(permitidas));
     }
 
     public void validarSituacaoPermitida(Subprocesso subprocesso, String mensagem, SituacaoSubprocesso... permitidas) {
-        if (subprocesso.getSituacao() == null) {
-            throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
-        }
-        if (permitidas.length == 0) {
-            throw new IllegalArgumentException("Pelo menos uma situação permitida deve ser fornecida");
-        }
         if (!Set.of(permitidas).contains(subprocesso.getSituacao())) {
             throw new ErroValidacao(mensagem);
         }
     }
 
     public void validarSituacaoMinima(Subprocesso subprocesso, SituacaoSubprocesso minima, String mensagem) {
-        if (subprocesso.getSituacao() == null) {
-            throw new IllegalArgumentException("Situação do subprocesso não pode ser nula");
-        }
         if (subprocesso.getSituacao().ordinal() < minima.ordinal()) {
             throw new ErroValidacao(mensagem);
         }

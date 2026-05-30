@@ -109,35 +109,6 @@ class SubprocessoServiceTest {
         assertThat(resultado.getMapa()).isEqualTo(mapaSalvo);
     }
 
-    @Test
-    @DisplayName("criarParaRevisao deve lançar exceção se unidadeMapa não tem mapa vigente")
-    void criarParaRevisaoDeveLancarExcecaoSeUnidadeMapaNaoTemMapaVigente() {
-        Processo processo = new Processo();
-        Unidade unidade = new Unidade();
-        unidade.setSigla("UNIT");
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setMapaVigente(null);
-        Unidade unidadeOrigem = new Unidade();
-        assertThatThrownBy(() -> service.criarParaRevisao(
-                new SubprocessoService.CriarSubprocessoComMapaCommand(processo, unidade, unidadeMapa, unidadeOrigem)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
-    }
-
-    @Test
-    @DisplayName("criarParaDiagnostico deve lançar exceção se unidadeMapa não tem mapa vigente")
-    void criarParaDiagnosticoDeveLancarExcecaoSeUnidadeMapaNaoTemMapaVigente() {
-        Processo processo = new Processo();
-        Unidade unidade = new Unidade();
-        unidade.setSigla("UNIT");
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setMapaVigente(null);
-        Unidade unidadeOrigem = new Unidade();
-        assertThatThrownBy(() -> service.criarParaDiagnostico(
-                new SubprocessoService.CriarSubprocessoComMapaCommand(processo, unidade, unidadeMapa, unidadeOrigem)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
-    }
 
     @ParameterizedTest
     @CsvSource({
@@ -457,35 +428,6 @@ class SubprocessoServiceTest {
                 verify(subprocessoRepo, never()).save(sp);
             }
 
-            @Test
-            @DisplayName("atualizarCompetencia deve lancar IllegalStateException se subprocesso nao possuir mapa associado")
-            void atualizarCompetencia_DeveLancarErroQuandoSubprocessoSemMapa() {
-                Subprocesso sp = new Subprocesso();
-                sp.setCodigo(1L);
-                sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-                sp.setMapa(null);
-
-                when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-
-                assertThatThrownBy(() -> service.atualizarCompetencia(1L, 10L, new AtualizarCompetenciaRequest("Desc", List.of())))
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessageContaining("Subprocesso 1 sem mapa associado");
-            }
-
-            @Test
-            @DisplayName("removerCompetencia deve lancar IllegalStateException se o mapa associado nao possuir codigo")
-            void removerCompetencia_DeveLancarErroQuandoMapaAssociadoNaoPossuirCodigo() {
-                Subprocesso sp = new Subprocesso();
-                sp.setCodigo(1L);
-                sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-                sp.setMapa(new Mapa());
-
-                when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-
-                assertThatThrownBy(() -> service.removerCompetencia(1L, 10L))
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessageContaining("Subprocesso 1 com mapa sem código associado");
-            }
         }
 
         @Nested

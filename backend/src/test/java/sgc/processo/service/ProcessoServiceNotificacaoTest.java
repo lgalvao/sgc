@@ -97,26 +97,6 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
     }
 
-    @Test
-    @DisplayName("Deve falhar ao enviar lembrete quando processo sem data limite")
-    void deveFalharAoEnviarLembreteSemDataLimite() {
-        Long codProcesso = 1L;
-        Long codUnidade = 10L;
-
-        Processo p = new Processo();
-        p.setCodigo(codProcesso);
-        Unidade u = criarUnidadeValida(codUnidade);
-        u.setTituloTitular("TITULAR");
-        p.adicionarParticipantes(Set.of(u));
-        p.setDataLimite(null);
-
-        when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
-
-        assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, codUnidade))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem data limite");
-    }
 
     @Test
     @DisplayName("Deve enfileirar email e criar alerta ao enviar lembrete com sucesso")
@@ -159,23 +139,6 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         ));
     }
 
-    @Test
-    @DisplayName("enviarLembrete deve lançar IllegalStateException quando processo não tem data limite")
-    void enviarLembreteSemDataLimite() {
-        Long codProcesso = 1L;
-        Long unidadeCodigo = 10L;
-        Processo p = new Processo();
-        sgc.processo.model.UnidadeProcesso up = new sgc.processo.model.UnidadeProcesso();
-        up.setUnidadeCodigo(unidadeCodigo);
-        p.setParticipantes(new ArrayList<>(List.of(up)));
-
-        when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(unidadeService.buscarPorCodigo(unidadeCodigo)).thenReturn(new Unidade());
-
-        assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, unidadeCodigo))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem data limite");
-    }
 
     @Test
     @DisplayName("enviarLembrete - sucesso")

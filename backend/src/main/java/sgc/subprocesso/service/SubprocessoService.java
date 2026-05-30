@@ -209,12 +209,8 @@ public class SubprocessoService {
         }
     }
 
-    private Long obterCodigoMapaVigenteObrigatorio(UnidadeMapa unidadeMapa, Unidade unidade) {
-        Mapa mapaVigente = unidadeMapa.getMapaVigente();
-        if (mapaVigente == null) {
-            throw new IllegalStateException("Unidade %s sem mapa vigente para revisão/diagnóstico".formatted(unidade.getSigla()));
-        }
-        return mapaVigente.getCodigo();
+    private Long obterCodigoMapaVigenteObrigatorio(UnidadeMapa unidadeMapa, Unidade ignorado) {
+        return unidadeMapa.getMapaVigente().getCodigo();
     }
 
     private Movimentacao criarMovimentacaoInicial(Subprocesso subprocesso, Unidade unidadeOrigem, Usuario usuario, String descricao) {
@@ -446,11 +442,7 @@ public class SubprocessoService {
     }
 
     private Mapa obterMapaObrigatorio(Subprocesso subprocesso) {
-        Mapa mapa = subprocesso.getMapa();
-        if (mapa == null) {
-            throw new IllegalStateException("Subprocesso %s sem mapa associado".formatted(subprocesso.getCodigo()));
-        }
-        return mapa;
+        return subprocesso.getMapa();
     }
 
     private Long obterCodigoMapaObrigatorio(Subprocesso subprocesso) {

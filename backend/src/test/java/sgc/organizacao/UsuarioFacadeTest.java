@@ -231,7 +231,7 @@ class UsuarioFacadeTest {
         void deveBuscarPerfisFiltrandoInativos() {
             String titulo = "123";
             Usuario user = criarUsuario(titulo);
-            when(usuarioService.buscar(titulo)).thenReturn(user);
+            when(usuarioService.buscarOpt(titulo)).thenReturn(Optional.of(user));
 
             when(usuarioService.buscarAutorizacoesPerfil(titulo)).thenReturn(List.of(
                     new UsuarioPerfilAutorizacaoLeitura(titulo, Perfil.CHEFE, 1L, "U1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA),
@@ -247,7 +247,7 @@ class UsuarioFacadeTest {
         @Test
         @DisplayName("Deve falhar se usuário não encontrado ao buscar perfis")
         void deveFalharSeUsuarioNaoEncontradoAoBuscarPerfis() {
-            when(usuarioService.buscar("999")).thenThrow(new sgc.comum.erros.ErroEntidadeNaoEncontrada("Usuario", "999"));
+            when(usuarioService.buscarOpt("999")).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> facade.buscarPerfisUsuario("999"))
                     .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)

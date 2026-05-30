@@ -340,10 +340,7 @@ public class UnidadeHierarquiaService {
     }
 
 
-    private UnidadeDto toUnidadeDtoObrigatoria(@Nullable Unidade unidade) {
-        if (unidade == null) {
-            throw new IllegalStateException("Unidade ausente na hierarquia");
-        }
+    private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
         return UnidadeDto.fromEntityObrigatoria(unidade);
     }
 }

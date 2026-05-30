@@ -108,14 +108,10 @@ public class UsuarioFacade {
 
     @Transactional(readOnly = true)
     public List<PerfilDto> buscarPerfisUsuario(String titulo) {
-        Usuario usuario;
-        try {
-            usuario = usuarioService.buscar(titulo);
-        } catch (ErroEntidadeNaoEncontrada _) {
-            throw new ErroInconsistenciaInterna(
-                    "Usuario %s ausente ao buscar perfis; isso indica inconsistencia interna do sistema".formatted(titulo)
-            );
-        }
+        Usuario usuario = usuarioService.buscarOpt(titulo)
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Usuario %s ausente ao buscar perfis; isso indica inconsistencia interna do sistema".formatted(titulo)
+                ));
         List<UsuarioPerfilAutorizacaoLeitura> atribuicoes = usuarioService.buscarAutorizacoesPerfil(usuario.getTituloEleitoral());
         return atribuicoes.stream()
                 .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)

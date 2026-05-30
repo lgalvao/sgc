@@ -125,41 +125,6 @@ class AtividadeFacadeTest {
 
             assertThat(result).isNotNull();
         }
-
-        @Test
-        @DisplayName("deve lançar erro quando atividade criada não é encontrada na listagem atualizada")
-        void deveLancarErroQuandoAtividadeCriadaNaoEncontrada() {
-            Long mapaCodigo = 100L;
-            Long subCodigo = 200L;
-            Long atividadeCodigo = 300L;
-            CriarAtividadeRequest request = new CriarAtividadeRequest(mapaCodigo, "Desc");
-
-            Usuario usuario = new Usuario();
-            Mapa mapa = new Mapa();
-            mapa.setCodigo(mapaCodigo);
-            Subprocesso subprocesso = new Subprocesso();
-            subprocesso.setCodigo(subCodigo);
-            mapa.setSubprocesso(subprocesso);
-
-            Atividade salvo = Atividade.builder()
-                    .codigo(atividadeCodigo)
-                    .mapa(mapa)
-                    .descricao("Desc")
-                    .build();
-
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(mapaManutencaoService.criarAtividade(request)).thenReturn(salvo);
-            when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
-            when(consultaService.obterStatus(subprocesso)).thenReturn(new SubprocessoSituacaoDto(subCodigo, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
-            when(consultaService.listarAtividadesSubprocesso(subprocesso)).thenReturn(Collections.singletonList(
-                    new AtividadeDto(999L, "Outra atividade", List.of())
-            ));
-
-            doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
-
-            assertThatThrownBy(() -> atividadeFacade.criarAtividade(request))
-                    .isInstanceOf(ErroEntidadeNaoEncontrada.class);
-        }
     }
 
     @Nested

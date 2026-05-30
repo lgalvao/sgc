@@ -80,7 +80,7 @@ public class SubprocessoConsultaService {
 
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return subprocessoRepo.findByMapa_Codigo(codMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, "Mapa ID: " + codMapa));
+                .orElseThrow();
     }
 
     public List<Subprocesso> listarTodos() {

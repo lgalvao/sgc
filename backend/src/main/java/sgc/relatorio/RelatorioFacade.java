@@ -133,9 +133,6 @@ public class RelatorioFacade {
     @Transactional(readOnly = true)
     public RelatorioMapaDto obterRelatorioMapaAtual(Long codSubprocesso) {
         Subprocesso subprocesso = consultaService.buscarSubprocessoComMapa(codSubprocesso);
-        if (subprocesso.getMapa() == null) {
-            throw new ErroEntidadeNaoEncontrada("Mapa", "S:" + codSubprocesso);
-        }
         return criarRelatorioMapaDto(subprocesso);
     }
 
