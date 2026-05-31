@@ -50,7 +50,7 @@ describe("MainNavbar.vue", () => {
             mostrarArvoreCompletaUnidades: ref(false),
             mostrarMenuConfiguracoes: ref(false),
             mostrarMenuAdministradores: ref(false),
-            isAdmin: ref(false),
+            ehAdmin: ref(false),
             podeVerRelatorios: ref(true),
         } as any);
     });
@@ -68,7 +68,7 @@ describe("MainNavbar.vue", () => {
             mostrarArvoreCompletaUnidades: ref(true),
             mostrarMenuConfiguracoes: ref(true),
             mostrarMenuAdministradores: ref(true),
-            isAdmin: ref(true),
+            ehAdmin: ref(true),
             podeVerRelatorios: ref(true),
         } as any);
 
@@ -109,7 +109,7 @@ describe("MainNavbar.vue", () => {
             mostrarArvoreCompletaUnidades: ref(false),
             mostrarMenuConfiguracoes: ref(false),
             mostrarMenuAdministradores: ref(false),
-            isAdmin: ref(false),
+            ehAdmin: ref(false),
         } as any);
 
         const options = getCommonMountOptions({
@@ -165,7 +165,7 @@ describe("MainNavbar.vue", () => {
             mostrarArvoreCompletaUnidades: ref(true),
             mostrarMenuConfiguracoes: ref(true),
             mostrarMenuAdministradores: ref(true),
-            isAdmin: ref(true),
+            ehAdmin: ref(true),
         } as any);
 
         const options = getCommonMountOptions({
@@ -200,7 +200,7 @@ describe("MainNavbar.vue", () => {
             mostrarArvoreCompletaUnidades: ref(false),
             mostrarMenuConfiguracoes: ref(false),
             mostrarMenuAdministradores: ref(false),
-            isAdmin: ref(false),
+            ehAdmin: ref(false),
         } as any);
 
         const options = getCommonMountOptions({
@@ -225,7 +225,7 @@ describe("MainNavbar.vue", () => {
             mostrarArvoreCompletaUnidades: ref(false),
             mostrarMenuConfiguracoes: ref(false),
             mostrarMenuAdministradores: ref(false),
-            isAdmin: ref(false),
+            ehAdmin: ref(false),
             podeVerRelatorios: ref(false),
         } as any);
 
@@ -251,7 +251,7 @@ describe("MainNavbar.vue", () => {
             mostrarArvoreCompletaUnidades: ref(true),
             mostrarMenuConfiguracoes: ref(true),
             mostrarMenuAdministradores: ref(true),
-            isAdmin: ref(true),
+            ehAdmin: ref(true),
         } as any);
 
         const options = getCommonMountOptions({
@@ -281,19 +281,19 @@ describe("MainNavbar.vue", () => {
         );
     });
 
-    it("deve atualizar isMobile ao redimensionar a janela", () => {
+    it("deve atualizar ehMobile ao redimensionar a janela", () => {
         const options = getCommonMountOptions({});
         const wrapper = mount(NavBar, options);
 
-        expect((wrapper.vm as any).isMobile).toBe(false);
+        expect((wrapper.vm as any).ehMobile).toBe(false);
 
         globalThis.innerWidth = 500;
         globalThis.dispatchEvent(new Event('resize'));
-        expect((wrapper.vm as any).isMobile).toBe(true);
+        expect((wrapper.vm as any).ehMobile).toBe(true);
 
         globalThis.innerWidth = 1200;
         globalThis.dispatchEvent(new Event('resize'));
-        expect((wrapper.vm as any).isMobile).toBe(false);
+        expect((wrapper.vm as any).ehMobile).toBe(false);
     });
 
     it("deve remover event listener ao desmontar", () => {
