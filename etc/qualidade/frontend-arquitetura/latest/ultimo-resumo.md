@@ -30,7 +30,7 @@ Nenhum hotspot arquitetural detectado.
 - `frontend/src/composables/useFluxoSubprocesso.ts`
 - `frontend/src/composables/useFluxoSubprocessoExecucao.ts`
 
-### Mapa (5 arquivos, 953 linhas)
+### Mapa (5 arquivos, 954 linhas)
 - `frontend/src/composables/useMapaCompetenciasMutacoes.ts`
 - `frontend/src/composables/useMapaOrquestracao.ts`
 - `frontend/src/composables/useMapaQuery.ts`

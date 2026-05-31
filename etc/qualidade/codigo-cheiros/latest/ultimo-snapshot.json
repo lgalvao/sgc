@@ -1,34 +1,34 @@
 {
-  "geradoEm": "2026-05-28T13:57:35.182Z",
-  "base": "C:\\sgc",
+  "geradoEm": "2026-05-31T22:56:16.428Z",
+  "base": "/Users/leonardo/sgc",
   "pontuacao": {
-    "total": 1413,
+    "total": 1396,
     "faixa": "critico",
     "porEscopo": {
-      "backend": 796,
+      "backend": 758,
       "frontend": 60,
-      "frontend_testes": 557
+      "frontend_testes": 578
     }
   },
   "contagens": {
     "backend_nullable_dto": 52,
-    "backend_null_checks": 259,
+    "backend_null_checks": 240,
     "backend_objects_null": 9,
     "frontend_any_producao": 1,
-    "frontend_any_testes": 557,
+    "frontend_any_testes": 578,
     "frontend_catch_any": 2,
     "frontend_null_checks": 18,
     "frontend_fallback_or": 14
   },
   "deltas": {
-    "backend_nullable_dto": 52,
-    "backend_null_checks": 259,
-    "backend_objects_null": 9,
-    "frontend_any_producao": 1,
-    "frontend_any_testes": 557,
-    "frontend_catch_any": 2,
-    "frontend_null_checks": 18,
-    "frontend_fallback_or": 14
+    "backend_nullable_dto": 0,
+    "backend_null_checks": -19,
+    "backend_objects_null": 0,
+    "frontend_any_producao": 0,
+    "frontend_any_testes": 21,
+    "frontend_catch_any": 0,
+    "frontend_null_checks": 0,
+    "frontend_fallback_or": 0
   },
   "hotspots": [
     {
@@ -40,9 +40,9 @@
     },
     {
       "arquivo": "backend/src/main/java/sgc/relatorio/RelatorioFacade.java",
-      "pontuacao": 42,
+      "pontuacao": 40,
       "categorias": {
-        "backend_null_checks": 20,
+        "backend_null_checks": 19,
         "backend_objects_null": 1
       }
     },
@@ -69,14 +69,6 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
-      "pontuacao": 30,
-      "categorias": {
-        "backend_null_checks": 14,
-        "backend_objects_null": 1
-      }
-    },
-    {
       "arquivo": "frontend/src/stores/__tests__/subprocesso.spec.ts",
       "pontuacao": 28,
       "categorias": {
@@ -88,6 +80,14 @@
       "pontuacao": 26,
       "categorias": {
         "backend_null_checks": 13
+      }
+    },
+    {
+      "arquivo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pontuacao": 22,
+      "categorias": {
+        "backend_null_checks": 10,
+        "backend_objects_null": 1
       }
     },
     {
@@ -134,7 +134,7 @@
       }
     },
     {
-      "arquivo": "backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java",
+      "arquivo": "backend/src/main/java/sgc/seguranca/login/GerenciadorJwt.java",
       "pontuacao": 18,
       "categorias": {
         "backend_null_checks": 9

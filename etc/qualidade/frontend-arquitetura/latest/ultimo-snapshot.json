@@ -1,6 +1,6 @@
 {
   "versaoSchema": "3.0.0",
-  "geradoEm": "2026-05-29T17:45:31.526Z",
+  "geradoEm": "2026-05-31T22:56:16.884Z",
   "resumo": {
     "arquivosProducao": 263,
     "scoreTotal": 0,
@@ -175,7 +175,7 @@
         "frontend/src/composables/useMapaSugestoes.ts",
         "frontend/src/composables/useMapaTela.ts"
       ],
-      "totalLinhas": 953
+      "totalLinhas": 954
     },
     "Mapas": {
       "arquivos": [
