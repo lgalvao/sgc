@@ -410,6 +410,46 @@ Isso é pouco para o estágio atual do projeto, em que os problemas mais caros e
 
 Transformar o toolkit em mecanismo ativo de governança da qualidade estrutural, especialmente no backend e na integração, e não apenas em apoio para frontend e cobertura.
 
+### Princípio de adoção
+
+Sempre preferir reaproveitar o ecossistema open source antes de criar nova lógica caseira.
+
+O toolkit deve atuar como:
+
+- orquestrador;
+- adaptador ao contexto do SGC;
+- consolidador de relatórios;
+- calibrador de políticas;
+- provedor de DX local.
+
+O toolkit não deve reinventar:
+
+- parser de AST maduro;
+- diff de OpenAPI;
+- geração de tipos a partir de schema;
+- varredura estrutural de Java;
+- engine de refatoração automatizada;
+- fuzzing orientado a OpenAPI;
+- motor estável de regras semânticas.
+
+### Regra de decisão
+
+Antes de criar um novo script do zero, responder:
+
+1. já existe ferramenta open source madura para isso?
+2. ela produz CLI/JSON integrável ao `sgc.js`?
+3. o problema é genérico o bastante para a ferramenta resolver bem?
+4. o valor do script local está em adaptar a política do SGC, e não em reimplementar o motor?
+
+Se as respostas forem majoritariamente “sim”, o caminho preferencial é integrar a ferramenta ao toolkit.
+
+### Onde o código caseiro continua valendo
+
+- quando a regra depende de convenções muito específicas do SGC;
+- quando precisamos consolidar múltiplas ferramentas em um relatório único;
+- quando o ajuste fino da política local é mais importante do que a detecção bruta;
+- quando a ferramenta externa detecta o sinal, mas não o prioriza do jeito útil para este repositório.
+
 ### Diretriz
 
 Antes de criar novos gates duros, criar auditorias de leitura e priorização.
@@ -525,7 +565,80 @@ As novas auditorias devem seguir o padrão útil que o toolkit já usa no fronte
 - classificação por severidade e não só por contagem;
 - relatórios com “por que isso importa” e “primeiro corte sugerido”.
 
-## 8.5 O que não fazer no toolkit
+## 8.5 Base open source recomendada
+
+As integrações abaixo têm boa aderência ao stack atual do SGC e reduzem a necessidade de reinventar mecanismos centrais.
+
+### Reforçar o que já existe
+
+- **ArchUnit** para regras arquiteturais Java mais ambiciosas, incluindo camadas, ciclos e dependências proibidas.
+- **Springdoc/OpenAPI** como fonte de verdade do contrato HTTP, em vez de tipagem manual paralela no frontend.
+
+### Adotar como motores principais
+
+- **OpenRewrite**
+  - papel: refatoração automatizada e recipes para Java/Gradle;
+  - uso no SGC: remover padrões repetitivos, consolidar APIs antigas, ajustar imports/FQNs, padronizar migrações estruturais.
+
+- **jQAssistant**
+  - papel: análise estrutural baseada em grafo sobre artefatos Java e regras em Cypher;
+  - uso no SGC: coesão de backend, dependências entre módulos, separação API/implementação, detecção de ciclos e regras próprias de arquitetura;
+  - encaixe ideal: backend estrutural e relatórios ricos para `qa snapshot`.
+
+- **Semgrep CE**
+  - papel: regras estáticas open source para Java/TypeScript com integração simples em CLI/CI;
+  - uso no SGC: detectar padrões semânticos repetidos que hoje exigem scripts próprios mais frágeis;
+  - encaixe ideal: guardrails rápidos e diff-aware para backend, frontend e integração.
+
+- **openapi-typescript**
+  - papel: gerar tipos TypeScript estritos a partir de OpenAPI 3.x;
+  - uso no SGC: reduzir drift entre DTO backend e tipos frontend;
+  - encaixe ideal: substituir gradualmente contratos manuais frouxos em `services/` e `types/`.
+
+- **openapi-diff**
+  - papel: comparar especificações OpenAPI e identificar mudanças compatíveis ou breaking;
+  - uso no SGC: validar evolução de contrato entre snapshots, branches ou baseline de release;
+  - encaixe ideal: `integracao contratos auditar` e `integracao contratos validar`.
+
+- **Schemathesis**
+  - papel: teste e fuzzing orientado a OpenAPI, inclusive workflows stateful;
+  - uso no SGC: atacar bugs de integração e contrato que não aparecem bem em teste unitário;
+  - encaixe ideal: perfis de QA mais profundos, especialmente para API e sessão/autorização.
+
+### Ferramentas a avaliar em segunda onda
+
+- ferramentas de análise de dependência/ciclo para TypeScript caso os relatórios próprios do frontend deixem de ser suficientes;
+- geradores de cliente tipado OpenAPI se o projeto quiser ir além de tipos estáticos e padronizar fetching;
+- scanners OSS de vulnerabilidade/SCA apenas se a necessidade for estruturalmente relevante ao fluxo de qualidade do SGC.
+
+## 8.6 Mapa de adoção sugerido
+
+### O que integrar primeiro
+
+- `openapi-typescript`
+- `openapi-diff`
+- expansão de `ArchUnit`
+- prova de conceito com `Semgrep CE`
+
+Motivo:
+
+- retorno alto;
+- baixo atrito de adoção;
+- impacto direto em backend/integração;
+- pouca necessidade de infraestrutura nova.
+
+### O que validar em piloto antes de consolidar
+
+- `jQAssistant`
+- `Schemathesis`
+- `OpenRewrite` via recipes selecionadas
+
+Motivo:
+
+- ferramentas poderosas, mas que exigem calibração melhor para evitar ruído;
+- o valor cresce muito quando bem integradas ao domínio local.
+
+## 8.7 O que não fazer no toolkit
 
 - gate duro cedo demais para heurística ainda instável;
 - score único opaco sem breakdown;
