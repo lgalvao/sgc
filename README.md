@@ -37,7 +37,6 @@ sgc/
 │   └── scripts/             # CLI de automação e auditoria do projeto
 ├── deploy/                  # Artefatos auxiliares de implantação
 ├── compose.hom.yaml         # Stack de homologação
-├── compose.monitoring.yaml  # Stack complementar de monitoramento
 ├── build.gradle.kts         # Orquestração Gradle raiz
 └── package.json             # Comandos raiz para lint, typecheck, Vitest e Playwright
 ```
@@ -241,7 +240,6 @@ npm run test:e2e
 - `application.yml` expõe Actuator por perfil
 - perfis `hom` e `prod` habilitam `metrics`, `logfile` e `prometheus`
 - `MonitoramentoAspect` e `FiltroMonitoramentoHttp` permitem diagnosticar lentidão
-- `compose.monitoring.yaml` complementa a stack com Prometheus/Grafana
 
 ## Convenções relevantes do projeto
 

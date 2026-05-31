@@ -170,7 +170,7 @@ export function useMapaTela(props: MapaTelaProps) {
         abrirModalDevolucao,
         confirmarValidacao,
         confirmarAceitacao,
-        handleConfirmarDevolucao,
+        confirmarDevolucao,
         fecharModalHistorico,
         verHistorico,
     } = useMapaAnaliseFluxo({
@@ -415,7 +415,7 @@ export function useMapaTela(props: MapaTelaProps) {
         removerAtividadeAssociada,
         disponibilizarMapa,
         confirmarAceitacao,
-        handleConfirmarDevolucao,
+        confirmarDevolucao,
         confirmarExclusaoCompetencia,
         confirmarSugestoes,
         confirmarValidacao,

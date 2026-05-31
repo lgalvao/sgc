@@ -5,16 +5,28 @@ Este plano estabelece as estratégias, os cenários específicos e os designs de
 ---
 
 ## 📊 Estado Atual da Cobertura
-* **Cobertura Global (Instruções):** 99.43%
-* **Cobertura de Linhas:** 99.62%
-* **Cobertura de Branches:** 98.75%
-* **Complexidade Ciclomática Total:** 3005
+
+> [!NOTE]
+> **Plano parcialmente concluído.** As lacunas de `ProcessoService`, `SubprocessoNotificacaoService` e `UnidadeHierarquiaService` foram resolvidas. Apenas `RelatorioFacade` permanece com 1 branch faltando.
+
+* **Cobertura Global (Instruções):** 99,56%
+* **Cobertura de Linhas:** 99,71%
+* **Cobertura de Branches:** 99,74%
+* **Complexidade Ciclomática Total:** 2973
+
+_Auditoria gerada em: 30/05/2026_
 
 ---
 
-## 🎯 Classes Hotspot e Lacunas Identificadas
+## 🎯 Classes Hotspot e Laçunas Identificadas
 
-Abaixo, detalhamos cada uma das 4 classes que possuem lacunas de testes, com as linhas exatas pendentes e a receita comportamental para testar cada branch sem violar as regras de integridade arquitetural do projeto.
+> [!IMPORTANT]
+> Das 4 classes originalmente identificadas, **3 foram totalmente resolvidas**. Apenas `RelatorioFacade` permanece com 1 branch pendente (linha 208).
+
+Classes **já resolvidas** (sem lacunas):
+- `sgc.processo.service.ProcessoService` ✅
+- `sgc.subprocesso.service.SubprocessoNotificacaoService` ✅
+- `sgc.organizacao.service.UnidadeHierarquiaService` ✅
 
 ---
 
@@ -101,9 +113,12 @@ Abaixo, detalhamos cada uma das 4 classes que possuem lacunas de testes, com as 
 
 ---
 
-### 2. `sgc.relatorio.RelatorioFacade` (Risco: 311.0 | 2 Linhas e 10 Branches Faltando)
-* **Arquivo de Teste Relacionados:**
+### 1. `sgc.relatorio.RelatorioFacade` (**⏳ Pendente** — Risco: 5.9 | 1 Branch Faltando)
+* **Arquivo de Teste Relacionado:**
   - [RelatorioFacadeTest.java](file:///Users/leonardo/sgc/backend/src/test/java/sgc/relatorio/service/RelatorioFacadeTest.java)
+
+> [!NOTE]
+> Apenas a **Lacuna A** (branch da exceção na geração de PDF, linha 208) permanece pendente. As demais lacunas listadas abaixo foram cobertas.
 
 #### 🔍 Lacunas de Linhas/Branches e Estratégia de Cobertura
 
@@ -204,92 +219,25 @@ Abaixo, detalhamos cada uma das 4 classes que possuem lacunas de testes, com as 
 
 ---
 
-### 3. `sgc.subprocesso.service.SubprocessoNotificacaoService` (Risco: 142.0 | 1 Linha e 2 Branches Faltando)
-* **Arquivo de Teste Relacionados:**
-  - [SubprocessoNotificacaoServiceTest.java](file:///Users/leonardo/sgc/backend/src/test/java/sgc/subprocesso/service/SubprocessoNotificacaoServiceTest.java)
+## Classes Resolvidas (histórico)
 
-#### 🔍 Lacunas de Linhas/Branches e Estratégia de Cobertura
+### 2. ~~`sgc.subprocesso.service.SubprocessoNotificacaoService`~~ ✅
 
-#### **Lacuna A: Sem Template Superior de Notificação (Linha 158 / Linha 157 | 1 Linha e 2 Branches)**
-* **Código Relacionado:**
-  ```java
-  String templateEmailSuperior = cmd.tipoTransicao().getTemplateEmailSuperior();
-  if (templateEmailSuperior == null || templateEmailSuperior.isBlank()) {
-      return;
-  }
-  ```
-* **Estratégia de Teste:**
-  O método `criarNotificacaoSuperior` retorna imediatamente na linha 158 se a transição de fluxo não exigir envio de email para a unidade superior. Para cobrir este branch, basta incluir em `SubprocessoNotificacaoServiceTest` um cenário de transição onde:
-  1. `getTemplateEmailSuperior()` retorne `null`.
-  2. `getTemplateEmailSuperior()` retorne uma string vazia (`""`).
+Lacunas resolvidas. Sem branches faltando.
 
 ---
 
-### 4. `sgc.organizacao.service.UnidadeHierarquiaService` (Risco: 137.0 | 2 Linhas e 2 Branches Faltando)
-* **Arquivo de Teste Relacionados:**
-  - [UnidadeHierarquiaServiceTest.java](file:///Users/leonardo/sgc/backend/src/test/java/sgc/organizacao/service/UnidadeHierarquiaServiceTest.java)
+### 3. ~~`sgc.organizacao.service.UnidadeHierarquiaService`~~ ✅
 
-#### 🔍 Lacunas de Linhas/Branches e Estratégia de Cobertura
-
-> [!CAUTION]
-> A linha 235 (`continue;` quando a unidade não está presente no `mapaUnidades`) teoricamente é inalcançável sob fluxos normais de banco de dados, pois o primeiro loop itera sobre o mesmo conjunto de dados populando o mapa. Usaremos uma técnica brilhante com Mockito para simular um comportamento de mutação dinâmica a fim de exercitar este branch sem violar a restrição de não uso de reflexão.
-
-#### **Lacuna A: Unidade Inexistente no Segundo Loop (Linha 235 / Linha 234 | 1 Linha e 1 Branch)**
-* **Código Relacionado:**
-  ```java
-  UnidadeDto dto = mapaUnidades.get(u.codigo());
-  if (dto == null) {
-      continue;
-  }
-  ```
-* **Estratégia de Teste:**
-  Criar um teste em `UnidadeHierarquiaServiceTest` que forneça um mock da interface `UnidadeHierarquiaLeitura` cuja chamada ao método `codigo()` retorne um valor no primeiro loop (ex: `1L`) e um valor diferente no segundo loop (ex: `999L`).
-  ```java
-  @Test
-  void deveTolerarUnidadeAusenteNoMapaDuranteMontagemHierarquia() {
-      // Cria um mock dinâmico que retorna 1L na primeira chamada e 2L na segunda
-      UnidadeHierarquiaLeitura mockLeitura = mock(UnidadeHierarquiaLeitura.class);
-      when(mockLeitura.codigo()).thenReturn(1L, 2L);
-      when(mockLeitura.nome()).thenReturn("Unidade Teste");
-      when(mockLeitura.sigla()).thenReturn("UT");
-      
-      // O repositório retornará esse item com comportamento mutável
-      when(unidadeHierarquiaRepository.buscarTodosLeitura()).thenReturn(List.of(mockLeitura));
-      
-      // Ao buscar a árvore hierárquica, o fluxo tolerará o dto nulo e cobrirá a linha 235!
-      List<UnidadeDto> resultado = unidadeHierarquiaService.buscarArvoreHierarquica();
-      assertThat(resultado).isEmpty();
-  }
-  ```
-
-#### **Lacuna B: Cópia de Árvore com Subunidades Nulas (Linha 279 / Linha 278 | 1 Linha e 1 Branch)**
-* **Código Relacionado:**
-  ```java
-  List<UnidadeDto> subunidades = dto.getSubunidades() == null
-          ? new ArrayList<>()
-          : dto.getSubunidades().stream;
-  ```
-* **Estratégia de Teste:**
-  O método `copiarArvore` é acionado ao buscar uma subárvore específica. Para forçar `dto.getSubunidades() == null`, podemos mockar a chamada recursiva de `buscarArvoreHierarquica` no self-spy para retornar uma árvore em que um nó possua explicitamente `subunidades = null`, e então acionar `buscarArvore(codigo)` para esse nó.
-  ```java
-  @Test
-  void deveCopiarArvoreQuandoSubunidadesForNulo() {
-      // Cria um DTO com subunidades nulas
-      UnidadeDto dtoComSubunidadesNulas = UnidadeDto.builder()
-              .codigo(10L)
-              .nome("Unidade Nula")
-              .sigla("UN")
-              .subunidades(null)
-              .build();
-              
-      // Executa a busca da árvore que ativará copiarComResponsavelAtual
-      UnidadeDto copia = unidadeHierarquiaService.copiarArvoreExternamente(dtoComSubunidadesNulas);
-      
-      assertThat(copia.getSubunidades()).isEmpty();
-  }
-  ```
+Lacunas resolvidas. Sem branches faltando.
 
 ---
+
+### 4. ~~`sgc.processo.service.ProcessoService`~~ ✅
+
+Lacunas resolvidas. Sem branches faltando.
+
+
 
 ## 🛠️ Regras de Ouro para a Escrita dos Testes
 

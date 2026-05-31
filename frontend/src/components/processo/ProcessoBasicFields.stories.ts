@@ -8,7 +8,7 @@ const meta: Meta<typeof ProcessoBasicFields> = {
     component: ProcessoBasicFields,
     tags: ['autodocs'],
     argTypes: {
-        isEdit: {control: 'boolean'},
+        modoEdicao: {control: 'boolean'},
     },
 };
 

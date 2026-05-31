@@ -1,10 +1,10 @@
-﻿<template>
+<template>
   <div>
     <!-- Modal de confirmação cadastro -->
     <ModalConfirmacao
         :auto-close="false"
         :cancel-title="TEXTOS.comum.BOTAO_CANCELAR"
-        :loading="isLoadingConfirmacao"
+        :loading="carregandoConfirmacao"
         :model-value="mostrarConfirmacao"
         :ok-title="TEXTOS.comum.BOTAO_INICIAR"
         :titulo="TEXTOS.processo.cadastro.INICIAR_TITULO"
@@ -28,7 +28,7 @@
     <!-- Modal de confirmação de remoção -->
     <ModalConfirmacao
         :auto-close="false"
-        :loading="isLoadingRemocao"
+        :loading="carregandoRemocao"
         :model-value="mostrarRemocao"
         :ok-title="TEXTOS.processo.cadastro.BOTAO_REMOVER"
         :titulo="TEXTOS.processo.cadastro.REMOVER_TITULO"
@@ -48,8 +48,8 @@ import {TEXTOS} from "@/constants/textos";
 defineProps<{
   mostrarConfirmacao: boolean;
   mostrarRemocao: boolean;
-  isLoadingConfirmacao: boolean;
-  isLoadingRemocao: boolean;
+  carregandoConfirmacao: boolean;
+  carregandoRemocao: boolean;
   descricao: string;
   tipoLabel: string;
   totalUnidades: number;

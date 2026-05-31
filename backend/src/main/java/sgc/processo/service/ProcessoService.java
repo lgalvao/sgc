@@ -1423,6 +1423,7 @@ public class ProcessoService {
         return codigosParticipantes;
     }
 
+    @SuppressWarnings("unused")
     private LocalDateTime obterDataLimiteObrigatoria(Processo processo, Long ignorado) {
         return processo.getDataLimite();
     }

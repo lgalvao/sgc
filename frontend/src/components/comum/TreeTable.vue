@@ -67,7 +67,7 @@
               :item="item"
               :level="item.level"
               @toggle="toggleExpand"
-              @row-click="handleTreeRowClick"
+              @row-click="aoClicarNaLinhaDaArvore"
           />
         </TransitionGroup>
         <tbody v-else>
@@ -298,7 +298,7 @@ const collapseAll = () => {
   });
 };
 
-const handleTreeRowClick = (clickedItem: TreeItem) => {
+const aoClicarNaLinhaDaArvore = (clickedItem: TreeItem) => {
   emit("row-click", toRaw(clickedItem));
 };
 
@@ -308,7 +308,7 @@ defineExpose({
   toggleExpand,
   expandAll,
   collapseAll,
-  handleTreeRowClick,
+  aoClicarNaLinhaDaArvore,
 });
 </script>
 

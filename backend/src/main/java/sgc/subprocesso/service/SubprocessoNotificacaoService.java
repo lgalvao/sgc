@@ -23,7 +23,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class SubprocessoNotificacaoService {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final AlertaFacade alertaFacade;
     private final NotificacaoService notificacaoService;
@@ -198,21 +198,18 @@ public class SubprocessoNotificacaoService {
                 .build());
     }
 
-    private void criarNotificacaoComChave(
-            NotificacaoCommand cmd,
-            EmailGerado email,
-            TipoNotificacao tipoNotificacao,
-            String sufixoChave
-    ) {
+    private void criarNotificacaoComChave(NotificacaoComChaveCommand notificacaoComChave) {
+        NotificacaoCommand cmd = notificacaoComChave.cmd();
+        EmailGerado email = notificacaoComChave.email();
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(cmd.subprocesso())
-                .tipoNotificacao(tipoNotificacao)
+                .tipoNotificacao(notificacaoComChave.tipoNotificacao())
                 .unidadeDestinoSigla(email.unidadeSigla())
                 .usuarioDestinoTitulo(email.usuarioTitulo())
                 .destinatario(email.destinatario())
                 .assunto(email.assunto())
                 .corpoHtml(email.corpo())
-                .chaveIdempotencia(chaveIdempotenciaComSufixo(cmd, email, sufixoChave))
+                .chaveIdempotencia(chaveIdempotenciaComSufixo(cmd, email, notificacaoComChave.sufixoChave()))
                 .build());
     }
 
@@ -269,7 +266,7 @@ public class SubprocessoNotificacaoService {
         String assunto = criarAssunto(tipoTransicao, sp, false);
         String corpo = processarTemplate(template, variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(unidade), assunto, corpo, OrigemNotificacao.DIRETO, unidade.getSigla(), null);
-        criarNotificacaoComChave(cmd, email, tipoNotificacao, "bloco-direto");
+        criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, tipoNotificacao, "bloco-direto"));
         notificarResponsavelPessoal(cmd, unidade, email);
     }
 
@@ -292,7 +289,7 @@ public class SubprocessoNotificacaoService {
                 variaveis
         );
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
-        criarNotificacaoComChave(cmd, email, tipoNotificacao, "bloco-superior");
+        criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, tipoNotificacao, "bloco-superior"));
     }
 
     private void criarNotificacaoConsolidadaDisponibilizacaoMapaBloco(Unidade superior, List<Subprocesso> subprocessos) {
@@ -309,7 +306,7 @@ public class SubprocessoNotificacaoService {
         String assunto = AssuntosNotificacao.disponibilizacaoMapaBloco();
         String corpo = processarTemplate("mapa-disponibilizado-bloco-superior", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
-        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_DISPONIBILIZADO, "bloco-superior");
+        criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, TipoNotificacao.MAPA_DISPONIBILIZADO, "bloco-superior"));
     }
 
     private void criarNotificacaoDiretaAceiteValidacaoBloco(Subprocesso sp) {
@@ -325,7 +322,7 @@ public class SubprocessoNotificacaoService {
         String assunto = AssuntosNotificacao.aceiteValidacaoBlocoDireto(unidade.getSigla());
         String corpo = processarTemplate("validacao-mapa-aceita-bloco-unidade", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(unidade), assunto, corpo, OrigemNotificacao.DIRETO, unidade.getSigla(), null);
-        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-direto");
+        criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-direto"));
         notificarResponsavelPessoal(cmd, unidade, email);
     }
 
@@ -342,7 +339,7 @@ public class SubprocessoNotificacaoService {
         String assunto = AssuntosNotificacao.aceiteValidacaoBlocoSuperior();
         String corpo = processarTemplate("validacao-mapa-aceita-bloco-superior", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
-        criarNotificacaoComChave(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-superior");
+        criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-superior"));
     }
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {
@@ -382,13 +379,13 @@ public class SubprocessoNotificacaoService {
         variaveis.put("tipoProcesso", processo.getTipo().name());
 
         if (subprocesso.getDataLimiteEtapa1() != null) {
-            variaveis.put("dataLimiteEtapa1", subprocesso.getDataLimiteEtapa1().format(DATE_FORMATTER));
+            variaveis.put("dataLimiteEtapa1", subprocesso.getDataLimiteEtapa1().format(FORMATO_DATA));
         }
 
         LocalDateTime dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
         if (dataLimiteEtapa2 != null) {
-            variaveis.put("dataLimiteEtapa2", dataLimiteEtapa2.format(DATE_FORMATTER));
-            variaveis.put("dataLimiteValidacao", dataLimiteEtapa2.format(DATE_FORMATTER));
+            variaveis.put("dataLimiteEtapa2", dataLimiteEtapa2.format(FORMATO_DATA));
+            variaveis.put("dataLimiteValidacao", dataLimiteEtapa2.format(FORMATO_DATA));
         }
 
         String observacoes = Objects.requireNonNullElse(cmd.observacoes(), "-");
@@ -410,7 +407,7 @@ public class SubprocessoNotificacaoService {
                 .sorted()
                 .toList());
         if (base.getDataLimiteEtapa2() != null) {
-            variaveis.put("dataLimiteValidacao", base.getDataLimiteEtapa2().format(DATE_FORMATTER));
+            variaveis.put("dataLimiteValidacao", base.getDataLimiteEtapa2().format(FORMATO_DATA));
         }
         return variaveis;
     }
@@ -468,5 +465,13 @@ public class SubprocessoNotificacaoService {
 
     private record EmailGerado(String destinatario, String assunto, String corpo, OrigemNotificacao origem,
                                @Nullable String unidadeSigla, @Nullable String usuarioTitulo) {
+    }
+
+    private record NotificacaoComChaveCommand(
+            NotificacaoCommand cmd,
+            EmailGerado email,
+            TipoNotificacao tipoNotificacao,
+            String sufixoChave
+    ) {
     }
 }

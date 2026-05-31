@@ -209,6 +209,7 @@ public class SubprocessoService {
         }
     }
 
+    @SuppressWarnings("unused")
     private Long obterCodigoMapaVigenteObrigatorio(UnidadeMapa unidadeMapa, Unidade ignorado) {
         return unidadeMapa.getMapaVigente().getCodigo();
     }

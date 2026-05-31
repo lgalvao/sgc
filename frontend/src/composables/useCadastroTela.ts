@@ -217,7 +217,7 @@ export function useCadastroTela(props: CadastroTelaProps) {
         adicionarAtividadeAction
     });
 
-    async function handleImportAtividades(resultado: AtividadeOperacaoResponse) {
+    async function aoImportarAtividades(resultado: AtividadeOperacaoResponse) {
         mostrarModalImportar.value = false;
         clear();
         await nextTick();
@@ -359,7 +359,7 @@ export function useCadastroTela(props: CadastroTelaProps) {
         devolverRevisaoCadastro: fluxoSubprocesso.devolverRevisaoCadastro,
     });
 
-    async function handleAdicionarAtividade() {
+    async function adicionarNovaAtividade() {
         const sucesso = await adicionarAtividade();
         await nextTick();
         if (sucesso || erroNovaAtividade.value) atividadeFormRef.value?.inputRef?.$el?.focus();
@@ -426,13 +426,13 @@ export function useCadastroTela(props: CadastroTelaProps) {
         loadingValidacao,
         atividadeFormRef,
         setAtividadeRef,
-        handleImportAtividades,
+        aoImportarAtividades,
         confirmarDevolucaoAnalise,
         confirmarDisponibilizacao,
         confirmarRemocao,
         confirmarValidacaoAnalise,
         fecharModalImpacto,
-        handleAdicionarAtividade,
+        adicionarNovaAtividade,
         salvarEdicaoAtividade,
         removerAtividade,
         adicionarConhecimento,

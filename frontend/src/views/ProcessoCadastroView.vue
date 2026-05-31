@@ -26,9 +26,9 @@
         <ProcessoFormFields
             ref="formFieldsRef"
             v-model="formData"
-            :field-errors="fieldErrors"
-            :is-edit="!!processoEditando"
-            :is-loading-unidades="isLoadingUnidades"
+            :erros-campos="fieldErrors"
+            :modo-edicao="!!processoEditando"
+            :carregando-unidades="isLoadingUnidades"
             :unidades="unidades"
         />
 
@@ -81,8 +81,8 @@
         v-model:mostrar-confirmacao="mostrarModalConfirmacao"
         v-model:mostrar-remocao="mostrarModalRemocao"
         :descricao="descricao"
-        :is-loading-confirmacao="isStarting"
-        :is-loading-remocao="isRemoving"
+        :carregando-confirmacao="isStarting"
+        :carregando-remocao="isRemoving"
         :tipo-label="tipo || '-'"
         :total-unidades="unidadesSelecionadas.length"
         @confirmar-iniciar="confirmarIniciarProcesso"

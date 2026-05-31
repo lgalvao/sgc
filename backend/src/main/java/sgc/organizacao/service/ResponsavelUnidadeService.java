@@ -107,7 +107,7 @@ public class ResponsavelUnidadeService {
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
         Unidade unidade = repo.buscar(Unidade.class, codUnidade);
         Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
-        AtribuicaoTemporaria atribuicao = montarAtribuicaoTemporaria(new AtribuicaoTemporaria(), unidade, usuario, request);
+        AtribuicaoTemporaria atribuicao = montarAtribuicaoTemporaria(new ContextoAtribuicaoTemporaria(new AtribuicaoTemporaria(), unidade, usuario, request));
 
         AtribuicaoTemporaria atribuicaoSalva = atribuicaoTemporariaRepo.save(atribuicao);
         criarNotificacoesAtribuicaoTemporaria(atribuicaoSalva, usuario);
@@ -121,7 +121,7 @@ public class ResponsavelUnidadeService {
         validarPertencimentoUnidade(atribuicao, codUnidade);
         Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
 
-        montarAtribuicaoTemporaria(atribuicao, unidade, usuario, request);
+        montarAtribuicaoTemporaria(new ContextoAtribuicaoTemporaria(atribuicao, unidade, usuario, request));
         atribuicaoTemporariaRepo.save(atribuicao);
         cacheOrganizacaoService.invalidarAposCommit();
     }
@@ -148,12 +148,12 @@ public class ResponsavelUnidadeService {
         }
     }
 
-    private AtribuicaoTemporaria montarAtribuicaoTemporaria(
-            AtribuicaoTemporaria atribuicao,
-            Unidade unidade,
-            Usuario usuario,
-            CriarAtribuicaoRequest request
-    ) {
+    private AtribuicaoTemporaria montarAtribuicaoTemporaria(ContextoAtribuicaoTemporaria contexto) {
+        AtribuicaoTemporaria atribuicao = contexto.atribuicao();
+        Unidade unidade = contexto.unidade();
+        Usuario usuario = contexto.usuario();
+        CriarAtribuicaoRequest request = contexto.request();
+
         LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
         if (request.dataTermino().isBefore(inicio)) {
             throw new ErroValidacao(Mensagens.DATA_FIM_DEVE_SER_POSTERIOR);
@@ -161,7 +161,7 @@ public class ResponsavelUnidadeService {
 
         LocalDateTime dataInicio = request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now();
         LocalDateTime dataTermino = request.dataTermino().atTime(23, 59, 59);
-        validarSobreposicaoPeriodo(unidade.getCodigo(), dataInicio, dataTermino, atribuicao.getCodigo());
+        validarSobreposicaoPeriodo(new PeriodoAtribuicaoDto(unidade.getCodigo(), dataInicio, dataTermino, atribuicao.getCodigo()));
 
         return atribuicao
                 .setUnidade(unidade)
@@ -172,13 +172,9 @@ public class ResponsavelUnidadeService {
                 .setJustificativa(request.justificativa());
     }
 
-    private void validarSobreposicaoPeriodo(
-            Long codUnidade,
-            LocalDateTime dataInicio,
-            LocalDateTime dataTermino,
-            Long codigoIgnorado
-    ) {
-        if (atribuicaoTemporariaRepo.existeSobreposicaoPeriodo(codUnidade, dataInicio, dataTermino, codigoIgnorado)) {
+    private void validarSobreposicaoPeriodo(PeriodoAtribuicaoDto periodo) {
+        if (atribuicaoTemporariaRepo.existeSobreposicaoPeriodo(
+                periodo.codUnidade(), periodo.dataInicio(), periodo.dataTermino(), periodo.codigoIgnorado())) {
             throw new ErroValidacao(Mensagens.ATRIBUICAO_TEMPORARIA_SOBREPOSTA);
         }
     }
@@ -401,6 +397,22 @@ public class ResponsavelUnidadeService {
     private Long buscarCodigoUnidadePorSigla(String siglaUnidade) {
         return unidadeRepo.buscarCodigoAtivoPorSigla(siglaUnidade)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), siglaUnidade));
+    }
+
+    private record ContextoAtribuicaoTemporaria(
+            AtribuicaoTemporaria atribuicao,
+            Unidade unidade,
+            Usuario usuario,
+            CriarAtribuicaoRequest request
+    ) {
+    }
+
+    private record PeriodoAtribuicaoDto(
+            Long codUnidade,
+            LocalDateTime dataInicio,
+            LocalDateTime dataTermino,
+            Long codigoIgnorado
+    ) {
     }
 
 }

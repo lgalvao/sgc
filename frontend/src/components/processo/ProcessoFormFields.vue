@@ -3,9 +3,9 @@
     <ProcessoBasicFields
         ref="basicFieldsRef"
         :descricao="modelValue.descricao"
-        :erro-descricao="fieldErrors.descricao"
-        :erro-tipo="fieldErrors.tipo"
-        :is-edit="isEdit"
+        :erro-descricao="errosCampos.descricao"
+        :erro-tipo="errosCampos.tipo"
+        :modo-edicao="modoEdicao"
         :tipo="modelValue.tipo"
         @update:descricao="updateField('descricao', $event)"
         @update:tipo="updateField('tipo', $event)"
@@ -13,8 +13,8 @@
 
     <ProcessoUnidadesField
         ref="unidadesFieldRef"
-        :erro="fieldErrors.unidades"
-        :is-loading="isLoadingUnidades"
+        :erro="errosCampos.unidades"
+        :carregando="carregandoUnidades"
         :model-value="modelValue.unidadesSelecionadas"
         :unidades="unidades"
         @update:model-value="updateField('unidadesSelecionadas', $event)"
@@ -22,7 +22,7 @@
 
     <ProcessoDeadlineField
         ref="deadlineFieldRef"
-        :erro="fieldErrors.dataLimite"
+        :erro="errosCampos.dataLimite"
         :model-value="modelValue.dataLimite"
         @update:model-value="updateField('dataLimite', $event)"
     />
@@ -53,10 +53,10 @@ interface FieldErrors {
 
 const props = defineProps<{
   modelValue: ProcessoFormData;
-  fieldErrors: FieldErrors;
+  errosCampos: FieldErrors;
   unidades: Unidade[];
-  isLoadingUnidades: boolean;
-  isEdit?: boolean;
+  carregandoUnidades: boolean;
+  modoEdicao?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -75,10 +75,10 @@ function updateField<K extends keyof ProcessoFormData>(field: K, value: Processo
 }
 
 function focarPrimeiroErro() {
-  const erros = props.fieldErrors;
+  const erros = props.errosCampos;
   if (erros.descricao) {
     basicFieldsRef.value?.focarDescricao();
-  } else if (!props.isEdit && erros.tipo) {
+  } else if (!props.modoEdicao && erros.tipo) {
     // Tipo foca via seletor interno se necessário, ou deixamos para o focarPrimeiroErroInvalido global
   } else if (erros.unidades) {
     unidadesFieldRef.value?.focar();

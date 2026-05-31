@@ -37,9 +37,9 @@ const initialData = {
 export const NovoProcesso: Story = {
     args: {
         modelValue: initialData,
-        fieldErrors: {},
+        errosCampos: {},
         unidades: mockUnidades,
-        isLoadingUnidades: false,
+        carregandoUnidades: false,
     },
     render: (args) => ({
         components: {ProcessoFormFields},
@@ -47,7 +47,7 @@ export const NovoProcesso: Story = {
             const form = ref(args.modelValue);
             return {args, form};
         },
-        template: '<ProcessoFormFields v-bind="args" v-model="form" :unidades="args.unidades" :field-errors="args.fieldErrors" :is-loading-unidades="args.isLoadingUnidades" />',
+        template: '<ProcessoFormFields v-bind="args" v-model="form" :unidades="args.unidades" :field-errors="args.errosCampos" :is-loading-unidades="args.carregandoUnidades" />',
     }),
 };
 
@@ -59,31 +59,31 @@ export const Preenchido: Story = {
             unidadesSelecionadas: [2],
             dataLimite: '2025-12-31',
         },
-        fieldErrors: {},
+        errosCampos: {},
         unidades: mockUnidades,
-        isLoadingUnidades: false,
+        carregandoUnidades: false,
     },
 };
 
 export const ComErros: Story = {
     args: {
         modelValue: initialData,
-        fieldErrors: {
+        errosCampos: {
             descricao: 'A descrição é obrigatória.',
             tipo: 'Selecione um tipo de processo.',
             unidades: 'Selecione pelo menos uma unidade.',
             dataLimite: 'A data limite é inválida.',
         },
         unidades: mockUnidades,
-        isLoadingUnidades: false,
+        carregandoUnidades: false,
     },
 };
 
 export const CarregandoUnidades: Story = {
     args: {
         modelValue: initialData,
-        fieldErrors: {},
+        errosCampos: {},
         unidades: [],
-        isLoadingUnidades: true,
+        carregandoUnidades: true,
     },
 };

@@ -64,7 +64,7 @@ const internalSortBy = computed(() => [{
 
 const SEM_HORARIO = false;
 
-function handleSortChange(val: readonly BTableSortBy[] | undefined) {
+function aoMudarOrdenacao(val: readonly BTableSortBy[] | undefined) {
   const sortBy = Array.isArray(val) ? val[0] : val;
   if (!sortBy) {
     return;
@@ -79,7 +79,7 @@ function formatarDataSemHorario(data?: string | null) {
   return formatDate(data, SEM_HORARIO);
 }
 
-function handleSelecionarProcesso(processo: EventoLinhaProcesso) {
+function aoSelecionarProcesso(processo: EventoLinhaProcesso) {
   const item = "item" in processo ? processo.item : processo;
   emit("selecionarProcesso", item);
 }
@@ -98,7 +98,7 @@ function rowAttr(item: ProcessoResumo | null, type: string) {
         const key = e.key.toLowerCase();
         if (key === "enter" || key === " " || key === "space") {
           e.preventDefault();
-          handleSelecionarProcesso(item);
+          aoSelecionarProcesso(item);
         }
       }
     };
@@ -122,8 +122,8 @@ defineExpose({fields});
         hover
         responsive
         stacked="md"
-        @row-clicked="handleSelecionarProcesso"
-        @update:sort-by="handleSortChange"
+        @row-clicked="aoSelecionarProcesso"
+        @update:sort-by="aoMudarOrdenacao"
     >
       <template #cell(dataFinalizacao)="{ item }">
         {{ formatarDataSemHorario(item.dataFinalizacao) }}

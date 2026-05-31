@@ -11,7 +11,7 @@
         tabindex="-1"
     >
       <ArvoreUnidades
-          v-if="!isLoading"
+          v-if="!carregando"
           :model-value="modelValue"
           :unidades="unidades"
           @update:model-value="$emit('update:modelValue', $event)"
@@ -40,7 +40,7 @@ import type {Unidade} from "@/types/tipos";
 defineProps<{
   modelValue: number[];
   unidades: Unidade[];
-  isLoading: boolean;
+  carregando: boolean;
   erro?: string;
 }>();
 

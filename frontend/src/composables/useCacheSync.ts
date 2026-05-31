@@ -17,7 +17,7 @@ export function useCacheSync() {
     const sincronizarMudancaOrganizacional = () => atualizarDadosOrganizacionais();
     let encerradoManualmente = false;
     let source: EventSource | null = null;
-    const handleErro = (event: Event) => {
+    const aoDarErro = (event: Event) => {
         if (encerradoManualmente || !source) {
             return;
         }
@@ -36,23 +36,23 @@ export function useCacheSync() {
         }
         source = new EventSource("/api/eventos");
         source.addEventListener(EVENTO_CACHE_ATUALIZADO, sincronizarMudancaOrganizacional);
-        source.addEventListener("error", handleErro);
+        source.addEventListener("error", aoDarErro);
     };
-    const handlePageHide = () => {
+    const aoOcultarPagina = () => {
         if (encerradoManualmente) {
             return;
         }
         desconectar();
     };
     conectar();
-    globalThis.window?.addEventListener("pagehide", handlePageHide);
-    globalThis.window?.addEventListener("beforeunload", handlePageHide);
+    globalThis.window?.addEventListener("pagehide", aoOcultarPagina);
+    globalThis.window?.addEventListener("beforeunload", aoOcultarPagina);
     globalThis.window?.addEventListener("pageshow", conectar);
 
     return () => {
         encerradoManualmente = true;
-        globalThis.window?.removeEventListener("pagehide", handlePageHide);
-        globalThis.window?.removeEventListener("beforeunload", handlePageHide);
+        globalThis.window?.removeEventListener("pagehide", aoOcultarPagina);
+        globalThis.window?.removeEventListener("beforeunload", aoOcultarPagina);
         globalThis.window?.removeEventListener("pageshow", conectar);
         desconectar();
     };

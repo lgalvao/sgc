@@ -73,7 +73,7 @@ test.describe.serial('CDU-20 - Analisar validação de mapa de competências', (
 
         // Validação inline: submit vazio não prossegue e exibe erro local
         await abrirDevolucaoMapa(page);
-        const modalDevolucao = page.locator('.modal.show').filter({hasText: 'Devolver mapa'});
+        const modalDevolucao = page.getByRole('dialog').filter({hasText: 'Devolver mapa'});
         await expect(modalDevolucao).toBeVisible();
         await expect(modalDevolucao.getByTestId('btn-devolucao-mapa-confirmar')).toBeEnabled();
         await modalDevolucao.getByTestId('btn-devolucao-mapa-confirmar').click();
@@ -222,7 +222,7 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
         await navegarParaMapa(page);
 
         await abrirDevolucaoMapa(page);
-        const modal = page.locator('.modal.show').filter({hasText: 'Devolver mapa'});
+        const modal = page.getByRole('dialog').filter({hasText: 'Devolver mapa'});
         await expect(modal).toBeVisible();
         await expect(modal).toContainText('Devolver mapa');
         await expect(modal).toContainText('Confirma a devolução da validação do mapa para ajustes?');

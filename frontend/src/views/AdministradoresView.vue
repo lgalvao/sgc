@@ -34,6 +34,7 @@
 
       <BTable
           v-else
+          data-testid="tbl-administradores"
           :fields="camposAdmins"
           :items="administradores"
           :busy="carregandoAdmins"

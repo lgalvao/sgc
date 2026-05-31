@@ -25,11 +25,11 @@
           <BForm
               class="p-0"
               data-testid="form-login"
-              @submit.prevent="handleLogin"
+              @submit.prevent="aoLogar"
           >
             <LoginCredenciaisCampos
                 :caps-lock-ativado="capsLockAtivado"
-                :is-loading="isLoading"
+                :carregando="isLoading"
                 :login-bloqueado="selecionandoPerfil"
                 :mostrar-acao-trocar-titulo-eleitoral="selecionandoPerfil"
                 :mensagem-erro-senha="mensagemErroSenha"
@@ -165,7 +165,7 @@ function trocarTituloEleitoral() {
   resetarValidacao();
 }
 
-const handleLogin = async () => {
+const aoLogar = async () => {
   if (!selecionandoPerfil.value) {
     await performInitialLogin();
   } else {
@@ -185,7 +185,7 @@ const performInitialLogin = async () => {
 
     if (fluxoLogin.autenticado) {
       resetarValidacao();
-      await handlePostAuth();
+      await aposAutenticacao();
     } else {
       notify(TEXTOS.login.ERRO_CREDENCIAIS, 'danger');
     }
@@ -210,7 +210,7 @@ const performInitialLogin = async () => {
   }
 };
 
-const handlePostAuth = async () => {
+const aposAutenticacao = async () => {
   if (perfilStore.perfisUnidades.length > 1) {
     loginStep.value = 2;
   } else if (perfilStore.perfisUnidades.length === 1) {

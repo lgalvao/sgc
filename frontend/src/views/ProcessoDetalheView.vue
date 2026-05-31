@@ -90,7 +90,7 @@ type LinhaCliqueSubprocesso = {
 const route = useRoute();
 const router = useRouter();
 const {notificacao, notify, clear} = useNotification();
-const {isAdmin} = usePerfil();
+const {ehAdmin} = usePerfil();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processoQuery = useProcessoQuery(codProcesso);
 const processo = ref<Processo | null>(null);
@@ -127,7 +127,7 @@ async function carregarContextoCompleto() {
 
 const participantesHierarquia = computed(() => processo.value ? processo.value.unidades : []);
 const podeFinalizar = computed(() => !!processo.value?.podeFinalizar);
-const mostrarFinalizarProcesso = computed(() => isAdmin.value);
+const mostrarFinalizarProcesso = computed(() => ehAdmin.value);
 const acoesBlocoVisiveis = computed(() => {
   const acoes = processo.value?.acoesBloco;
   return acoes ? acoes.filter(acao => acao.mostrar) : [];

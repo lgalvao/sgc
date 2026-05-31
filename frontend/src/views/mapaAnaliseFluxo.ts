@@ -111,7 +111,7 @@ export function useMapaAnaliseFluxo({
         });
     }
 
-    async function handleConfirmarDevolucao() {
+    async function confirmarDevolucao() {
         if (!validarSubmissao(!!observacaoDevolucao.value.trim())) {
             await focarPrimeiroErroInvalido();
             return;
@@ -144,7 +144,7 @@ export function useMapaAnaliseFluxo({
         fecharModalDevolucao,
         confirmarValidacao,
         confirmarAceitacao,
-        handleConfirmarDevolucao,
+        confirmarDevolucao,
         fecharModalHistorico,
         verHistorico,
     };

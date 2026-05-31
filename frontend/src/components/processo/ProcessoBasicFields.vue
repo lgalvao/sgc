@@ -26,10 +26,10 @@
       </template>
       <BFormSelect
           id="tipo"
-          :disabled="isEdit"
+          :disabled="modoEdicao"
           :model-value="tipo"
           :options="tipoOptions"
-          :state="isEdit ? null : (erroTipo ? false : null)"
+          :state="modoEdicao ? null : (erroTipo ? false : null)"
           aria-required="true"
           data-testid="sel-processo-tipo"
           @update:model-value="$emit('update:tipo', $event as TipoProcesso)"
@@ -38,7 +38,7 @@
           <BFormSelectOption :value="null" disabled>-- Selecione o tipo --</BFormSelectOption>
         </template>
       </BFormSelect>
-      <BFormInvalidFeedback :state="isEdit ? null : (erroTipo ? false : null)">
+      <BFormInvalidFeedback :state="modoEdicao ? null : (erroTipo ? false : null)">
         {{ erroTipo }}
       </BFormInvalidFeedback>
     </BFormGroup>
@@ -55,7 +55,7 @@ defineProps<{
   tipo: TipoProcesso | null;
   erroDescricao?: string;
   erroTipo?: string;
-  isEdit?: boolean;
+  modoEdicao?: boolean;
 }>();
 
 defineEmits<{

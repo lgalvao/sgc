@@ -127,7 +127,7 @@
         <div class="d-flex justify-content-end gap-2 mt-4">
           <BButton
               v-if="modoEdicao"
-              :disabled="isLoading"
+              :disabled="carregando"
               class="btn-acao-footer"
               data-testid="btn-remover-atribuicao"
               variant="outline-danger"
@@ -136,7 +136,7 @@
             {{ TEXTOS.atribuicaoTemporaria.BOTAO_REMOVER }}
           </BButton>
           <BButton
-              :disabled="isLoading"
+              :disabled="carregando"
               class="btn-acao-footer"
               data-testid="btn-cancelar-atribuicao"
               variant="outline-secondary"
@@ -145,8 +145,8 @@
             {{ TEXTOS.comum.BOTAO_CANCELAR }}
           </BButton>
           <LoadingButton
-              :disabled="isLoading"
-              :loading="isLoading"
+              :disabled="carregando"
+              :loading="carregando"
               :loading-text="textoBotaoSalvando"
               :text="textoBotaoSalvar"
               class="btn-acao-footer"
@@ -159,7 +159,7 @@
 
       <ModalConfirmacao
           v-model="mostrarModalRemocao"
-          :loading="isLoading"
+          :loading="carregando"
           :auto-close="false"
           :ok-title="TEXTOS.comum.BOTAO_REMOVER"
           :titulo="TEXTOS.atribuicaoTemporaria.MODAL_REMOVER_TITULO"
@@ -202,7 +202,7 @@ const {
   erroFormulario,
   formularioValido,
   irParaUnidade,
-  isLoading,
+  carregando,
   justificativa,
   mensagemErroDataInicio,
   mensagemErroDataTermino,
@@ -229,7 +229,7 @@ defineExpose({
   dataTermino,
   erroFormulario,
   formularioValido,
-  isLoading,
+  carregando,
   justificativa,
   mensagemErroDataInicio,
   mensagemErroDataTermino,

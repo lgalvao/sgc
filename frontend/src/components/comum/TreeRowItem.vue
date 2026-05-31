@@ -3,9 +3,9 @@
       :class="[ item.clickable === false ? 'tree-row-disabled' : 'tree-row' ]"
       :data-testid="'tree-table-row-' + item.codigo"
       :tabindex="item.clickable !== false ? 0 : undefined"
-      @click="handleRowClick"
-      @keydown.enter="handleRowClick"
-      @keydown.space="handleRowClick"
+      @click="aoClicarNaLinha"
+      @keydown.enter="aoClicarNaLinha"
+      @keydown.space="aoClicarNaLinha"
   >
     <td
         v-for="(column, index) in columns"
@@ -99,14 +99,14 @@ const obterEstiloPrimeiraColuna = (level: number) => ({
   "--tree-table-recuo-nivel": `${level * RECUO_NIVEL_REM}rem`,
 });
 
-const handleRowClick = () => {
+const aoClicarNaLinha = () => {
   if (props.item.clickable === false) return;
   emit("row-click", props.item);
 };
 
 defineExpose({
   toggleExpand,
-  handleRowClick,
+  aoClicarNaLinha,
 });
 </script>
 

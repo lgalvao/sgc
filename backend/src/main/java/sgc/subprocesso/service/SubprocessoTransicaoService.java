@@ -30,7 +30,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @RequiredArgsConstructor
 @Transactional
 public class SubprocessoTransicaoService {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final Map<TipoProcesso, SituacaoSubprocesso> SITUACAO_MAPA_DISPONIBILIZADO = Map.of(
             MAPEAMENTO, MAPEAMENTO_MAPA_DISPONIBILIZADO,
             REVISAO, REVISAO_MAPA_DISPONIBILIZADO
@@ -590,7 +590,7 @@ public class SubprocessoTransicaoService {
     }
 
     private void executarEfeitosDerivadosAlteracaoDataLimite(Subprocesso sp, LocalDate novaDataLimite, SituacaoSubprocesso situacaoSp) {
-        String novaDataFormatada = novaDataLimite.format(DATE_FORMATTER);
+        String novaDataFormatada = novaDataLimite.format(FORMATO_DATA);
         int etapa = obterEtapaPorSituacao(situacaoSp);
         notificarAlteracaoDataLimite(sp, novaDataFormatada, etapa);
     }
@@ -625,6 +625,7 @@ public class SubprocessoTransicaoService {
                 ));
     }
 
+    @SuppressWarnings("unused")
     private SituacaoSubprocesso obterSituacaoObrigatoria(Map<TipoProcesso, SituacaoSubprocesso> situacoes, Subprocesso subprocesso, String ignorado) {
         return situacoes.get(subprocesso.getProcesso().getTipo());
     }

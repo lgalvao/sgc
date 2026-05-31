@@ -17,7 +17,7 @@ interface UseProcessoMutacoesParams {
     mostrarModalConfirmacao: Ref<boolean>;
     mostrarModalRemocao: Ref<boolean>;
     modalUnidadesComEquipePropriaRef: Ref<any>;
-    handleApiErrors: (error: unknown, titulo: string, mensagemPadrao: string) => void;
+    tratarErrosApi: (error: unknown, titulo: string, mensagemPadrao: string) => void;
 }
 
 export function useProcessoMutacoes({
@@ -28,7 +28,7 @@ export function useProcessoMutacoes({
     mostrarModalConfirmacao,
     mostrarModalRemocao,
     modalUnidadesComEquipePropriaRef,
-    handleApiErrors
+    tratarErrosApi
 }: UseProcessoMutacoesParams) {
     const router = useRouter();
     const toastStore = useToastStore();
@@ -55,7 +55,7 @@ export function useProcessoMutacoes({
             await router.push("/painel");
             formulario.limpar();
         } catch (error) {
-            handleApiErrors(error, "Erro ao salvar processo", "Não foi possível salvar o processo.");
+            tratarErrosApi(error, "Erro ao salvar processo", "Não foi possível salvar o processo.");
         } finally {
             isSaving.value = false;
         }
@@ -83,7 +83,7 @@ export function useProcessoMutacoes({
             } catch (error) {
                 mostrarModalConfirmacao.value = false;
                 modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
-                handleApiErrors(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
+                tratarErrosApi(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
                 return;
             }
 
@@ -100,7 +100,7 @@ export function useProcessoMutacoes({
         } catch (error) {
             mostrarModalConfirmacao.value = false;
             modalUnidadesComEquipePropriaRef.value?.fechar();
-            handleApiErrors(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
+            tratarErrosApi(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
         } finally {
             modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
             isStarting.value = false;
@@ -141,7 +141,7 @@ export function useProcessoMutacoes({
             mostrarModalRemocao.value = false;
         } catch (error) {
             mostrarModalRemocao.value = false;
-            handleApiErrors(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
+            tratarErrosApi(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
         } finally {
             isRemoving.value = false;
         }

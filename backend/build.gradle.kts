@@ -50,7 +50,7 @@ dependencies {
     implementation(libs.jjwt.api)
     implementation(libs.rhino)
     implementation(libs.caffeine)
-    implementation(libs.h2)
+    runtimeOnly(libs.h2)
     implementation(libs.springdoc.openapi)
 
     val envAmbiente = project.findProperty("ENV")?.toString()
@@ -129,10 +129,10 @@ tasks.named<BootRun>("bootRun") {
         arquivo.useLines { lines ->
             lines.filter { it.isNotBlank() && !it.trim().startsWith("#") }
                 .forEach { line ->
-                    val parts = line.split("=", limit = 2)
-                    if (parts.size == 2) {
-                        val chave = parts[0].trim()
-                        val valor = parts[1].trim()
+                    val partes = line.split("=", limit = 2)
+                    if (partes.size == 2) {
+                        val chave = partes[0].trim()
+                        val valor = partes[1].trim()
                         val jaDefinidoNoAmbiente = environment.containsKey(chave) || System.getenv().containsKey(chave)
                         if (sobrescreverExistente || !jaDefinidoNoAmbiente) {
                             environment(chave, valor)
@@ -175,6 +175,7 @@ tasks.withType<Test> {
     }
 
     val slowTests = mutableListOf<Pair<String, Long>>()
+    // Flag de depuração: mude para true localmente para exibir os 5 testes mais lentos após a execução.
     val showSlowTests = false
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}

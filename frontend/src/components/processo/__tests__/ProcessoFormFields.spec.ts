@@ -15,9 +15,9 @@ function criarWrapper(props = {}) {
     return mount(ProcessoFormFields, {
         props: {
             modelValue: modelValueBase,
-            fieldErrors: {},
+            errosCampos: {},
             unidades: [],
-            isLoadingUnidades: false,
+            carregandoUnidades: false,
             ...props
         },
         attachTo: document.body,
@@ -35,14 +35,14 @@ function criarWrapper(props = {}) {
 describe("ProcessoFormFields.vue", () => {
 
     it("não deve focar automaticamente nos campos quando há erro no mount", async () => {
-        const wrapper = criarWrapper({fieldErrors: {descricao: "Erro"}});
+        const wrapper = criarWrapper({errosCampos: {descricao: "Erro"}});
         await nextTick();
         const inputDescricao = wrapper.find('[data-testid="inp-processo-descricao"]');
         expect(inputDescricao.element).not.toBe(document.activeElement);
     });
 
     it("foca no campo correto quando focarPrimeiroErro é chamado manualmente para descricao", async () => {
-        const wrapper = criarWrapper({fieldErrors: {descricao: "Erro"}});
+        const wrapper = criarWrapper({errosCampos: {descricao: "Erro"}});
         await nextTick();
 
         (wrapper.vm as any).focarPrimeiroErro();
@@ -54,7 +54,7 @@ describe("ProcessoFormFields.vue", () => {
 
     it("pula foco do tipo no JSDOM mas foca em outros", async () => {
         // Como o tipo está dando problemas no contain, focamos nos outros e apenas verificamos se a função não quebra para o tipo
-        const wrapper = criarWrapper({fieldErrors: {tipo: "Erro"}});
+        const wrapper = criarWrapper({errosCampos: {tipo: "Erro"}});
         await nextTick();
         (wrapper.vm as any).focarPrimeiroErro();
         await nextTick();
@@ -62,7 +62,7 @@ describe("ProcessoFormFields.vue", () => {
     });
 
     it("foca no campo correto quando focarPrimeiroErro é chamado manualmente para unidades", async () => {
-        const wrapper = criarWrapper({fieldErrors: {unidades: "Erro"}});
+        const wrapper = criarWrapper({errosCampos: {unidades: "Erro"}});
         await nextTick();
 
         (wrapper.vm as any).focarPrimeiroErro();
@@ -73,7 +73,7 @@ describe("ProcessoFormFields.vue", () => {
     });
 
     it("foca no campo correto quando focarPrimeiroErro é chamado manualmente para dataLimite", async () => {
-        const wrapper = criarWrapper({fieldErrors: {dataLimite: "Erro"}});
+        const wrapper = criarWrapper({errosCampos: {dataLimite: "Erro"}});
         await nextTick();
 
         (wrapper.vm as any).focarPrimeiroErro();
@@ -84,7 +84,7 @@ describe("ProcessoFormFields.vue", () => {
     });
 
     it("não faz nada no focarPrimeiroErro se não houver erros", async () => {
-        const wrapper = criarWrapper({fieldErrors: {}});
+        const wrapper = criarWrapper({errosCampos: {}});
         const initialActive = document.activeElement;
 
         (wrapper.vm as any).focarPrimeiroErro();
@@ -95,7 +95,7 @@ describe("ProcessoFormFields.vue", () => {
 
     it("não foca no campo tipo se for edição", async () => {
         const wrapper = criarWrapper({
-            fieldErrors: {tipo: "Erro"},
+            errosCampos: {tipo: "Erro"},
             isEdit: true
         });
         const initialActive = document.activeElement;
@@ -150,8 +150,8 @@ describe("ProcessoFormFields.vue", () => {
         });
     });
 
-    it("mostra spinner quando isLoadingUnidades é true", () => {
-        const wrapper = criarWrapper({isLoadingUnidades: true});
+    it("mostra spinner quando carregandoUnidades é true", () => {
+        const wrapper = criarWrapper({carregandoUnidades: true});
         expect(wrapper.find('.spinner-border').exists()).toBe(true);
         expect(wrapper.text()).toContain('Carregando unidades...');
     });

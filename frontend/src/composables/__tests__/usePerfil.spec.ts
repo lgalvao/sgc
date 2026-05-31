@@ -75,9 +75,9 @@ describe("usePerfil", () => {
             permissoesSessao: permissoesAdmin,
         }));
 
-        const {isAdmin} = usePerfil();
+        const {ehAdmin} = usePerfil();
 
-        expect(isAdmin.value).toBe(true);
+        expect(ehAdmin.value).toBe(true);
     });
 
     it("deve permitir relatorios para admin e gestor", () => {

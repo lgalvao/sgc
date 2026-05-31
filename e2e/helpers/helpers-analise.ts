@@ -140,7 +140,7 @@ async function realizarDevolucao(page: Page, observacao: string = '') {
     const btnDevolver = await abrirAcaoCadastroDevolver(page);
     await expect(btnDevolver).toBeEnabled();
     await btnDevolver.click();
-    const modal = page.locator('.modal.show');
+    const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
 
     if (observacao) {
@@ -174,7 +174,7 @@ export async function cancelarDevolucao(page: Page) {
     await btnDevolver.click();
 
     // Verificar modal de devolução
-    const modal = page.locator('.modal.show');
+    const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
 
     await modal.getByTestId('btn-modal-confirmacao-cancelar').click();
@@ -193,7 +193,7 @@ async function realizarAceite(page: Page, observacao: string = '') {
     const btnAceitar = await abrirAcaoCadastroPrincipal(page);
     await expect(btnAceitar).toBeEnabled();
     await btnAceitar.click();
-    const modal = page.locator('.modal.show');
+    const modal = page.getByRole('dialog');
     await expect(modal).toBeVisible();
     await expect(modal.getByText(/Confirma o aceite/i)).toBeVisible();
 
