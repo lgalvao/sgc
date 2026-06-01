@@ -1,10 +1,8 @@
 # CDU-39 - Iniciar processo de diagnóstico
+[REVISADO]
 
 Ator: ADMIN
 
-Maturidade: Média
-
-Base principal: Fluxo narrado e validado na reunião, complementado por paralelismo com os processos de mapeamento e revisão.
 
 ## Pré-condições
 
@@ -20,33 +18,23 @@ Base principal: Fluxo narrado e validado na reunião, complementado por paraleli
 
 3. O usuário clica em `Iniciar processo`.
 
-4. O sistema mostra diálogo de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e
-   todas as unidades participantes serão notificadas por e-mail.", com botões `Confirmar` e `Cancelar`.
+4. O sistema mostra diálogo de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail.", com botões `Iniciar` e `Cancelar`.
 
-5. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma
-   tela.
+5. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma tela.
 
-6. O usuário confirma.
+6. O usuário clica em `Iniciar`.
+   
+7. O sistema armazena internamente uma cópia da árvore de unidades participantes, incluindo os servidores lotados em  cada unidade participante no momento e a vincula com o processo.
 
-7. O sistema armazena internamente uma cópia da árvore de unidades participantes, incluindo os servidores lotados em
-   cada unidade participante no momento da iniciação do processo, e a vincula com o processo.
+   [PENDENCIA: Precisa mesmo de um snaphsot das unidades para diagnostico?]
 
 8. O sistema muda a situação do processo para 'Em andamento'.
 
-9. O sistema cria internamente um subprocesso para cada unidade operacional ou interoperacional participante, com os
-   seguintes campos e valores iniciais:
+9. O sistema cria um subprocesso para cada uma das unidades operacionais ou interoperacionais participantes, com os seguintes campos e valores iniciais:
    - `Data limite etapa 1`: data copiada da data limite do processo;
    - `Situação`: 'Não iniciado';
-   - `Sugestões`: campo de texto formatado reservado para uso futuro das unidades;
-   - `Observações`: campo de texto formatado reservado para uso futuro pelo perfil ADMIN.
-
-   PENDÊNCIA DE REFINAMENTO: a presença explícita dos campos `Sugestões` e `Observações` foi mantida por paralelismo
-   com os outros tipos de subprocesso. Confirmar se ambos também farão parte do diagnóstico e com qual uso funcional.
-
-10. O sistema cria internamente, para cada subprocesso, uma cópia do mapa de competências vigente da unidade
-    participante, vinculando-a ao subprocesso correspondente.
-
-11. O sistema registra uma movimentação para cada subprocesso criado com:
+    
+10. O sistema registra uma movimentação para cada subprocesso criado com:
     - `Data/hora`: data/hora atual;
     - `Unidade origem`: 'ADMIN';
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO];
@@ -65,7 +53,7 @@ Base principal: Fluxo narrado e validado na reunião, complementado por paraleli
 
     Já é possível realizar o diagnóstico de competências no Sistema de Gestão de Competências ([URL_SISTEMA]).
 
-    O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+    O prazo para conclusão desta etapa é [DATA_LIMITE].
     ```
 
     12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
@@ -92,17 +80,13 @@ Base principal: Fluxo narrado e validado na reunião, complementado por paraleli
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
-    13.2. Para cada unidade intermediária será criado um alerta com:
+    13.2. Para cada unidade intermediária imediatamente superior à unidade participante, será criado um alerta com:
     - `Descrição`: "Início do processo em unidade(s) subordinada(s)"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE]
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-    13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade
-    intermediária, como especificado acima.
+    [PENDENCIA: Como fica a agregação das unidades? Confirmar com outros CDUs paralelos.] 
 
-## Observação
-
-PENDÊNCIA DE REFINAMENTO: os modelos de e-mail e alerta acima seguem o padrão já adotado nos outros processos e o fluxo
-validado em reunião, mas ainda podem precisar de ajuste fino de redação junto à área de negócio.
+  13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade intermediária, como especificado acima.

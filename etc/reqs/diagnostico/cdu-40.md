@@ -1,16 +1,12 @@
 # CDU-40 - Realizar autoavaliação de diagnóstico
+[REVISADO]
 
 Ator: SERVIDOR
-
-Maturidade: Alta
-
-Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas do usuário.
 
 ## Pré-condições
 
 - Login realizado com perfil SERVIDOR
 - Processo de diagnóstico em andamento com participação da unidade do servidor
-- Servidor participante do snapshot do processo e com avaliação individual não impossibilitada
 
 ## Fluxo principal
 
@@ -20,26 +16,23 @@ Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas
 
 3. O usuário clica no card `Diagnóstico da equipe`.
 
-4. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade.
-
-5. Para cada competência, o sistema mostra:
+4. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e, para cada competência:
    - a descrição da competência;
-   - opção para detalhar as atividades e conhecimentos associados à competência;
-   - campo `Importância`, com opções `NA`, `1`, `2`, `3`, `4`, `5` e `6`;
-   - campo `Domínio`, com opções `NA`, `1`, `2`, `3`, `4`, `5` e `6`.
+   - opção para mostrar as atividades e conhecimentos associados à competência;
+   - campo `Importância`, com opções `NA` e os números de `1` a `6`;
+   - campo `Domínio`, com opções `NA` e os números de `1` a `6`.
 
-6. O usuário preenche os valores desejados para todas as competências.
+6. O usuário escolher os valores desejados para cada uma das competências.
 
-7. O sistema salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
+7. Durante a edição, o sistema salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
 
 8. O usuário clica em `Concluir autoavaliação`.
 
 9. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos. 
       
-   9.1 - caso exista competência `Importância` ou `Domínio` sem preenchidos, o sistema mostra a mensagem
-   `Preencha importância e domínio para todas as competências.` e interrompe a conclusão da autoavaliação. 
+   9.1. caso exista competência com valores sem preencher o sistema mostra a mensagem `Preencha importância e domínio para todas as competências.` e interrompe a conclusão da autoavaliação. 
       
-   9.2 -Caso positivo, o sistema altera a situação da avaliação individual do servidor para 'Autoavaliação concluída'.
+   9.2. Caso tudo estiver preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?", com botões `Confirmar` e `Cancelar`; uma vez confirmado, altera a situação da avaliação individual do servidor para 'Autoavaliação concluída'.
 
 10. O sistema envia notificação por e-mail para o responsável pela unidade, com este modelo:
 
@@ -60,5 +53,4 @@ Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-12. O sistema mostra a mensagem `Autoavaliação concluída`.
-
+12. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Autoavaliação concluída`.

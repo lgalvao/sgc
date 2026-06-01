@@ -47,7 +47,7 @@ O foco deste plano não é aumentar contagem de testes nem cobertura nominal. O 
 - Backend god objects ainda presentes: `ProcessoService` (1290L, 18 deps), `SubprocessoTransicaoService` (592L, 13 deps), `SubprocessoController` (479L, 54 métodos).
 - `frontend_test_any`: 578 ocorrências de `any` nos testes de frontend.
 - Backend null checks defensivos: 240 ocorrências.
-- Tratamento de erro ainda mistura responsabilidades (Frente 4 pendente).
+- Tratamento de erros ainda mistura responsabilidades (Frente 4 pendente).
 - Duplicação conceitual entre frentes ainda não atacada (Frente 5 pendente).
 
 ---
