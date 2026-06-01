@@ -4,7 +4,7 @@ import {SituacaoSubprocesso} from "@/types/tipos";
 import type {ProcessoDetalheResponseBackend, UnidadeParticipanteDto} from "../types";
 
 describe("processo/mapeadores", () => {
-  it("mapearProcessoDetalhe deve transformar DTO em modelo com defaults sem mascarar contrato obrigatório", () => {
+  it("mapearProcessoDetalhe deve passar nulos de codSubprocesso e situacaoSubprocesso sem aplicar defaults", () => {
     const dto: ProcessoDetalheResponseBackend = {
       codigo: 1,
       descricao: "Processo 1",
@@ -39,8 +39,8 @@ describe("processo/mapeadores", () => {
     const model = mapearProcessoDetalhe(dto);
 
     expect(model.codigo).toBe(1);
-    expect(model.unidades[0].codSubprocesso).toBe(0);
-    expect(model.unidades[0].situacaoSubprocesso).toBe(SituacaoSubprocesso.NAO_INICIADO);
+    expect(model.unidades[0].codSubprocesso).toBe(null);
+    expect(model.unidades[0].situacaoSubprocesso).toBe(null);
     expect(model.unidades[0].filhos).toEqual([]);
   });
 
@@ -93,7 +93,7 @@ describe("processo/mapeadores", () => {
       nome: "Unidade 2",
       sigla: "U2",
       codUnidade: 20,
-      codSubprocesso: 0,
+      codSubprocesso: null,
     });
   });
 });

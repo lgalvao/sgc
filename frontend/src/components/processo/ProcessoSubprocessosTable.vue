@@ -16,7 +16,7 @@ import {TEXTOS} from "@/constants/textos";
 
 type LinhaSubprocessoArvore = {
   codigo: number;
-  codSubprocesso: number;
+  codSubprocesso: number | null;
   unidadeAtual: string;
   sigla: string;
   situacao: string;
@@ -56,7 +56,7 @@ function mapUnidades(unidades: UnidadeParticipante[]): LinhaSubprocessoArvore[] 
     dataLimite: formatarDataSemHorario(u.dataLimite),
     children: u.filhos ? mapUnidades(u.filhos) : [],
     expanded: EXPANDIDO_POR_PADRAO,
-    clickable: u.codSubprocesso > 0
+    clickable: u.codSubprocesso !== null
   }));
 }
 

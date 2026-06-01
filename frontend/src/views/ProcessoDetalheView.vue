@@ -84,7 +84,7 @@ import {TEXTOS} from "@/constants/textos";
 type LinhaCliqueSubprocesso = {
   clickable?: boolean;
   sigla?: string;
-  codSubprocesso?: number;
+  codSubprocesso?: number | null;
 };
 
 const route = useRoute();
