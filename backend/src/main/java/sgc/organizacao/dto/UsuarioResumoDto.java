@@ -3,7 +3,7 @@ package sgc.organizacao.dto;
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.OrganizacaoViews;
 
 @Builder
 public record UsuarioResumoDto(
@@ -18,18 +18,4 @@ public record UsuarioResumoDto(
         @JsonView(OrganizacaoViews.Publica.class)
         String ramal
 ) {
-    public static @Nullable UsuarioResumoDto fromEntity(@Nullable Usuario usuario) {
-        if (usuario == null) return null;
-        return fromEntityObrigatorio(usuario);
-    }
-
-    public static UsuarioResumoDto fromEntityObrigatorio(Usuario usuario) {
-        return UsuarioResumoDto.builder()
-                .tituloEleitoral(usuario.getTituloEleitoral())
-                .matricula(usuario.getMatricula())
-                .nome(usuario.getNome())
-                .email(usuario.getEmail())
-                .ramal(usuario.getRamal())
-                .build();
-    }
 }

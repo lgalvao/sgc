@@ -1,11 +1,14 @@
 package sgc.organizacao.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 
 import static org.assertj.core.api.Assertions.*;
 
 class UnidadeResumoDtoTest {
+    private final OrganizacaoDtoMapper mapper = new OrganizacaoDtoMapper();
+
 
     @Test
     void deveCriarAPartirDeEntidade() {
@@ -17,7 +20,7 @@ class UnidadeResumoDtoTest {
                 .tituloTitular("Chefe")
                 .build();
 
-        var dto = UnidadeResumoDto.fromEntityObrigatoria(unidade);
+        var dto = mapper.paraUnidadeResumoObrigatoria(unidade);
 
         assertThat(dto.codigo()).isEqualTo(1L);
         assertThat(dto.nome()).isEqualTo("Nome da Unidade");
@@ -34,7 +37,7 @@ class UnidadeResumoDtoTest {
                 .sigla("SIG")
                 .build();
 
-        var dto = UnidadeResumoDto.fromEntityObrigatoria(unidade);
+        var dto = mapper.paraUnidadeResumoObrigatoria(unidade);
 
         assertThat(dto.codigo()).isEqualTo(1L);
         assertThat(dto.nome()).isEqualTo("Nome da Unidade");
@@ -45,22 +48,22 @@ class UnidadeResumoDtoTest {
 
     @Test
     void deveLancarExcecaoQuandoEntidadeForNula() {
-        assertThatThrownBy(() -> UnidadeResumoDto.fromEntityObrigatoria(null))
+        assertThatThrownBy(() -> mapper.paraUnidadeResumoObrigatoria(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Unidade obrigatoria para resumo");
     }
 
     @Test
     void deveLancarExcecaoQuandoCamposObrigatoriosFaltarem() {
-        assertThatThrownBy(() -> UnidadeResumoDto.fromResumoObrigatorio(null, "Nome", "SIG", TipoUnidade.OPERACIONAL, "Chefe"))
+        assertThatThrownBy(() -> UnidadeResumoDto.fromResumoObrigatorio(null, "Nome", "SIG", TipoUnidade.OPERACIONAL.name(), "Chefe"))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Codigo da unidade obrigatorio");
 
-        assertThatThrownBy(() -> UnidadeResumoDto.fromResumoObrigatorio(1L, null, "SIG", TipoUnidade.OPERACIONAL, "Chefe"))
+        assertThatThrownBy(() -> UnidadeResumoDto.fromResumoObrigatorio(1L, null, "SIG", TipoUnidade.OPERACIONAL.name(), "Chefe"))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Nome da unidade obrigatorio");
 
-        assertThatThrownBy(() -> UnidadeResumoDto.fromResumoObrigatorio(1L, "Nome", null, TipoUnidade.OPERACIONAL, "Chefe"))
+        assertThatThrownBy(() -> UnidadeResumoDto.fromResumoObrigatorio(1L, "Nome", null, TipoUnidade.OPERACIONAL.name(), "Chefe"))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Sigla da unidade obrigatoria");
     }

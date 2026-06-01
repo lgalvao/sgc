@@ -4,6 +4,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.mapa.*;
+import sgc.organizacao.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
@@ -19,6 +21,11 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes do Serviço de Visualização de Mapa")
 @SuppressWarnings("NullAway.Init")
 class MapaVisualizacaoServiceTest {
+    @Spy
+    private MapaDtoMapper mapaDtoMapper = new MapaDtoMapper();
+    @Spy
+    private OrganizacaoDtoMapper organizacaoDtoMapper = new OrganizacaoDtoMapper();
+
     @Mock
     private CompetenciaRepo competenciaRepo;
     @Mock
@@ -166,7 +173,7 @@ class MapaVisualizacaoServiceTest {
 
         MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
         assertThat(res).isNotNull();
-        assertThat(res.unidade()).isEqualTo(UnidadeResumoDto.fromEntityObrigatoria(u));
+        assertThat(res.unidade()).isEqualTo(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(u));
         assertThat(res.competencias()).isEmpty();
         assertThat(res.atividadesSemCompetencia()).isEmpty();
     }
@@ -224,7 +231,7 @@ class MapaVisualizacaoServiceTest {
         MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
 
         assertThat(res).isNotNull();
-        assertThat(res.unidade()).isEqualTo(UnidadeResumoDto.fromEntityObrigatoria(unidade));
+        assertThat(res.unidade()).isEqualTo(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(unidade));
         assertThat(res.atividadesSemCompetencia()).isEmpty();
         assertThat(res.competencias()).isEmpty();
     }

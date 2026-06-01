@@ -32,6 +32,8 @@ public class ProcessoController {
     private final ProcessoService processoService;
     private final SubprocessoConsultaService consultaService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
+    private final ProcessoDtoMapper processoDtoMapper;
+    private final sgc.subprocesso.SubprocessoDtoMapper subprocessoDtoMapper;
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -44,7 +46,7 @@ public class ProcessoController {
                 .buildAndExpand(codigo)
                 .toUri();
 
-        return ResponseEntity.created(uri).body(ProcessoResumoDto.fromEntity(criado));
+        return ResponseEntity.created(uri).body(processoDtoMapper.paraResumo(criado));
     }
 
     @GetMapping("/{codigo}")
@@ -52,7 +54,7 @@ public class ProcessoController {
     public ResponseEntity<ProcessoResumoDto> obterPorCodigo(@PathVariable Long codigo) {
         return processoService
                 .buscarOpt(codigo)
-                .map(ProcessoResumoDto::fromEntity)
+                .map(processoDtoMapper::paraResumo)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -62,7 +64,7 @@ public class ProcessoController {
     public ResponseEntity<ProcessoResumoDto> atualizar(
             @PathVariable Long codigo, @Valid @RequestBody AtualizarProcessoRequest requisicao) {
         Processo atualizado = processoService.atualizar(codigo, requisicao);
-        return ResponseEntity.ok(ProcessoResumoDto.fromEntity(atualizado));
+        return ResponseEntity.ok(processoDtoMapper.paraResumo(atualizado));
     }
 
     @PostMapping("/{codigo}/excluir")
@@ -80,7 +82,7 @@ public class ProcessoController {
                 ? processoService.listarParaImportacao()
                 : processoService.listarFinalizados();
         return ResponseEntity.ok(processos.stream()
-                .map(ProcessoResumoDto::fromEntity)
+                .map(processoDtoMapper::paraResumo)
                 .toList());
     }
 
@@ -116,7 +118,7 @@ public class ProcessoController {
     @Operation(summary = "Lista todos os processos com situação EM_ANDAMENTO")
     public ResponseEntity<List<ProcessoResumoDto>> listarAtivos() {
         return ResponseEntity.ok(processoService.listarAtivos().stream()
-                .map(ProcessoResumoDto::fromEntity)
+                .map(processoDtoMapper::paraResumo)
                 .toList());
     }
 
@@ -144,7 +146,7 @@ public class ProcessoController {
         processoService.iniciar(codigo, req.unidades());
 
         Processo processoAtualizado = processoService.buscarPorCodigoComParticipantes(codigo);
-        return ResponseEntity.ok(ProcessoResumoDto.fromEntity(processoAtualizado));
+        return ResponseEntity.ok(processoDtoMapper.paraResumo(processoAtualizado));
     }
 
     @PostMapping("/{codigo}/finalizar")
@@ -176,7 +178,7 @@ public class ProcessoController {
     @Operation(summary = "Lista todos os subprocessos de um processo")
     public ResponseEntity<List<SubprocessoListagemDto>> listarSubprocessos(@PathVariable Long codigo) {
         return ResponseEntity.ok(consultaService.listarEntidadesPorProcesso(codigo).stream()
-                .map(SubprocessoListagemDto::fromEntity)
+                .map(subprocessoDtoMapper::paraListagem)
                 .toList());
     }
 

@@ -27,6 +27,9 @@ public class SubprocessoVisualizacaoService {
     private final SubprocessoAcessoService acessoService;
     private final AnaliseRepo analiseRepo;
     private final AnaliseHistoricoService analiseHistoricoService;
+    private final sgc.mapa.MapaDtoMapper mapaDtoMapper;
+    private final sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper;
+    private final sgc.subprocesso.SubprocessoDtoMapper subprocessoDtoMapper;
 
     public MapaVisualizacaoResponse mapaParaVisualizacao(Subprocesso sp) {
         return mapaVisualizacaoService.obterMapaParaVisualizacao(sp);
@@ -42,9 +45,9 @@ public class SubprocessoVisualizacaoService {
         Usuario titular = buscarTitularUnidade(unidadeAlvo);
 
         return SubprocessoDetalheResponse.builder()
-                .subprocesso(SubprocessoResumoDto.fromEntity(subprocesso))
+                .subprocesso(subprocessoDtoMapper.paraResumo(subprocesso))
                 .responsavel(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(unidadeAlvo.getCodigo()))
-                .titular(UsuarioResumoDto.fromEntity(titular))
+                .titular(organizacaoDtoMapper.paraUsuarioResumo(titular))
                 .movimentacoes(listarMovimentacoesDto(movimentacoes))
                 .localizacaoAtual(contexto.localizacaoAtual().getSigla())
                 .permissoes(acessoService.resolverPermissoes(contexto))
@@ -55,7 +58,7 @@ public class SubprocessoVisualizacaoService {
         Subprocesso subprocesso = contexto.subprocesso();
 
         return SubprocessoDetalheResponse.builder()
-                .subprocesso(SubprocessoResumoDto.fromEntity(subprocesso))
+                .subprocesso(subprocessoDtoMapper.paraResumo(subprocesso))
                 .responsavel(null)
                 .titular(null)
                 .movimentacoes(List.of())
@@ -68,10 +71,10 @@ public class SubprocessoVisualizacaoService {
         Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo());
 
         return new ContextoEdicaoResponse(
-                UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()),
-                SubprocessoResumoDto.fromEntity(subprocesso),
+                organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()),
+                subprocessoDtoMapper.paraResumo(subprocesso),
                 detalhes,
-                MapaCompletoDto.fromEntity(mapaCompleto)
+                mapaDtoMapper.paraMapaCompletoDto(mapaCompleto)
         );
     }
 
@@ -81,9 +84,9 @@ public class SubprocessoVisualizacaoService {
             List<AtividadeDto> atividadesDisponiveis
     ) {
         return new ContextoCadastroAtividadesResponse(
-                UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()),
+                organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()),
                 detalhes,
-                MapaResumoDto.fromEntity(subprocesso.getMapa()),
+                mapaDtoMapper.paraMapaResumoDto(subprocesso.getMapa()),
                 atividadesDisponiveis,
                 obterAssinaturaCadastroReferencia(subprocesso, atividadesDisponiveis)
         );
@@ -132,7 +135,7 @@ public class SubprocessoVisualizacaoService {
                     .map(mapaManutencaoService::atividadesMapaCodigoComConhecimentos)
                     .orElseGet(List::of)
                     .stream()
-                    .map(AtividadeDto::fromEntity)
+                    .map(mapaDtoMapper::paraAtividadeDto)
                     .toList();
         }
 

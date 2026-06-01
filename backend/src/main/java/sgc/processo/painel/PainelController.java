@@ -8,6 +8,7 @@ import org.springframework.data.web.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.alerta.*;
 import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
@@ -24,6 +25,7 @@ import java.util.*;
 public class PainelController {
     private final PainelFacade painelFacade;
     private final UsuarioFacade usuarioFacade;
+    private final AlertaDtoMapper alertaDtoMapper;
 
     @GetMapping("/bootstrap")
     @Operation(summary = "Obtém todos os dados iniciais do painel (processos e alertas) em uma única chamada")
@@ -52,7 +54,7 @@ public class PainelController {
     public ResponseEntity<Page<AlertaDto>> listarAlertas(@PageableDefault(size = 20) Pageable pageable) {
         ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
         Page<Alerta> page = painelFacade.listarAlertas(contextoUsuario, pageable);
-        return ResponseEntity.ok(page.map(AlertaDto::fromEntity));
+        return ResponseEntity.ok(page.map(alertaDtoMapper::paraAlertaDto));
     }
 
     /**

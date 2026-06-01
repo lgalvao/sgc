@@ -45,6 +45,7 @@ public class ResponsavelUnidadeService {
     private final EmailModelosService emailModelosService;
     private final ConfigAplicacao configAplicacao;
     private final ComumRepo repo;
+    private final sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper;
 
 
     /**
@@ -91,7 +92,7 @@ public class ResponsavelUnidadeService {
                 .codigo(atribuicao.getCodigo())
                 .unidadeCodigo(atribuicao.getUnidade().getCodigo())
                 .unidadeSigla(atribuicao.getUnidade().getSigla())
-                .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
+                .usuario(organizacaoDtoMapper.paraUsuarioResumoObrigatorio(usuario))
                 .dataInicio(atribuicao.getDataInicio())
                 .dataTermino(atribuicao.getDataTermino())
                 .justificativa(atribuicao.getJustificativa())
@@ -286,7 +287,7 @@ public class ResponsavelUnidadeService {
         Usuario usuario = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
 
         return ResponsavelDto.builder()
-                .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
+                .usuario(organizacaoDtoMapper.paraUsuarioResumoObrigatorio(usuario))
                 .tipo(responsabilidade.tipo())
                 .dataInicio(responsabilidade.dataInicio())
                 .dataFim(responsabilidade.dataFim())

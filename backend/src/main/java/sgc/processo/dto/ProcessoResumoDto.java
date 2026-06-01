@@ -22,16 +22,4 @@ public record ProcessoResumoDto(
         String unidadesParticipantes,
         String linkDestino
 ) {
-    public static ProcessoResumoDto fromEntity(Processo processo) {
-        return ProcessoResumoDto.builder()
-                .codigo(processo.getCodigo())
-                .descricao(processo.getDescricao())
-                .situacao(processo.getSituacao())
-                .tipo(processo.getTipo().name())
-                .dataLimite(processo.getDataLimite())
-                .dataCriacao(processo.getDataCriacao())
-                .dataFinalizacao(processo.getDataFinalizacao())
-                .unidadesParticipantes(processo.getSiglasParticipantes())
-                .build();
-    }
 }

@@ -29,6 +29,7 @@ import static java.util.stream.Collectors.*;
 @Slf4j
 public class PainelFacade {
     private final AlertaFacade alertaFacade;
+    private final AlertaDtoMapper alertaDtoMapper;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeService unidadeService;
     private final ProcessoService processoService;
@@ -235,7 +236,7 @@ public class PainelFacade {
 
         return PainelBootstrapDto.builder()
                 .processos(processos.getContent())
-                .alertas(alertas.getContent().stream().map(AlertaDto::fromEntity).toList())
+                .alertas(alertas.getContent().stream().map(alertaDtoMapper::paraAlertaDto).toList())
                 .build();
     }
 

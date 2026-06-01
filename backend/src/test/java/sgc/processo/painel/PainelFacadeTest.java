@@ -40,6 +40,8 @@ class PainelFacadeTest {
     private UnidadeHierarquiaService hierarquiaService;
     @Mock
     private UnidadeService unidadeService;
+    @Spy
+    private AlertaDtoMapper alertaDtoMapper = new AlertaDtoMapper();
 
     @InjectMocks
     private PainelFacade painelFacade;

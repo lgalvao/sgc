@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.mapa.*;
 import sgc.mapa.model.*;
 
 import java.util.*;
@@ -9,6 +10,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("CompetenciaMapaDto")
 class CompetenciaMapaDtoTest {
+
+    private final MapaDtoMapper mapper = new MapaDtoMapper();
 
     @Test
     @DisplayName("deve mapear competencia com atividades")
@@ -23,7 +26,7 @@ class CompetenciaMapaDtoTest {
         competencia.setDescricao("Competencia");
         competencia.setAtividades(new LinkedHashSet<>(List.of(atividade)));
 
-        CompetenciaMapaDto dto = CompetenciaMapaDto.fromEntity(competencia);
+        CompetenciaMapaDto dto = mapper.paraCompetenciaMapaDto(competencia);
 
         assertThat(dto.codigo()).isEqualTo(10L);
         assertThat(dto.atividades()).singleElement().satisfies(item -> {

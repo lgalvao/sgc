@@ -39,12 +39,13 @@ public class SubprocessoController {
     private final UnidadeService unidadeService;
     private final UsuarioFacade usuarioService;
     private final SgcPermissionEvaluator permissionEvaluator;
+    private final SubprocessoDtoMapper subprocessoDtoMapper;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<SubprocessoListagemDto> listar() {
         return consultaService.listarTodos().stream()
-                .map(SubprocessoListagemDto::fromEntity)
+                .map(subprocessoDtoMapper::paraListagem)
                 .toList();
     }
 
@@ -77,7 +78,7 @@ public class SubprocessoController {
         Long codSubprocesso = salvo.getCodigo();
         var subprocessoCriado = consultaService.buscarSubprocesso(codSubprocesso);
         URI uri = URI.create("/api/subprocessos/%d".formatted(codSubprocesso));
-        return ResponseEntity.created(uri).body(SubprocessoResumoDto.fromEntity(subprocessoCriado));
+        return ResponseEntity.created(uri).body(subprocessoDtoMapper.paraResumo(subprocessoCriado));
     }
 
     @PostMapping("/{codSubprocesso}/atualizar")
@@ -86,7 +87,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso, @Valid @RequestBody AtualizarSubprocessoRequest request) {
         subprocessoService.atualizarEntidade(codSubprocesso, request.paraCommand());
         var subprocessoAtualizado = consultaService.buscarSubprocesso(codSubprocesso);
-        return ResponseEntity.ok(SubprocessoResumoDto.fromEntity(subprocessoAtualizado));
+        return ResponseEntity.ok(subprocessoDtoMapper.paraResumo(subprocessoAtualizado));
     }
 
     @PostMapping("/{codSubprocesso}/excluir")

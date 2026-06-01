@@ -2,8 +2,10 @@ package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -12,6 +14,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("SubprocessoResumoDto")
 class SubprocessoResumoDtoTest {
+    private final SubprocessoDtoMapper mapper = new SubprocessoDtoMapper(new OrganizacaoDtoMapper());
+
 
     @Test
     @DisplayName("deve mapear subprocesso resumo com dependencias obrigatorias")
@@ -43,7 +47,7 @@ class SubprocessoResumoDtoTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.of(2025, 1, 10, 10, 0));
 
-        SubprocessoResumoDto dto = SubprocessoResumoDto.fromEntity(subprocesso);
+        SubprocessoResumoDto dto = mapper.paraResumo(subprocesso);
 
         assertThat(dto.codigo()).isEqualTo(20L);
         assertThat(dto.codProcesso()).isEqualTo(50L);
@@ -58,7 +62,7 @@ class SubprocessoResumoDtoTest {
     void deveFalharQuandoProcessoOuUnidadeEstiveremAusentes() {
         Subprocesso subprocesso = new Subprocesso();
 
-        assertThatThrownBy(() -> SubprocessoResumoDto.fromEntity(subprocesso))
+        assertThatThrownBy(() -> mapper.paraResumo(subprocesso))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Subprocesso deve possuir processo e unidade associados");
     }
@@ -76,7 +80,7 @@ class SubprocessoResumoDtoTest {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setProcesso(processo);
 
-        assertThatThrownBy(() -> SubprocessoResumoDto.fromEntity(subprocesso))
+        assertThatThrownBy(() -> mapper.paraResumo(subprocesso))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Subprocesso deve possuir processo e unidade associados");
     }
@@ -111,7 +115,7 @@ class SubprocessoResumoDtoTest {
         subprocesso.setDataLimiteEtapa1(etapa1);
         subprocesso.setDataLimiteEtapa2(etapa2);
 
-        SubprocessoResumoDto dto = SubprocessoResumoDto.fromEntity(subprocesso);
+        SubprocessoResumoDto dto = mapper.paraResumo(subprocesso);
 
         assertThat(dto.ultimaDataLimite()).isEqualTo(etapa1);
     }
@@ -146,7 +150,7 @@ class SubprocessoResumoDtoTest {
         subprocesso.setDataLimiteEtapa1(etapa1);
         subprocesso.setDataLimiteEtapa2(etapa2);
 
-        SubprocessoResumoDto dto = SubprocessoResumoDto.fromEntity(subprocesso);
+        SubprocessoResumoDto dto = mapper.paraResumo(subprocesso);
 
         assertThat(dto.ultimaDataLimite()).isEqualTo(etapa2);
     }

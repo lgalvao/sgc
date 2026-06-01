@@ -17,6 +17,7 @@ import java.util.*;
 @PreAuthorize("isAuthenticated()")
 public class NotificacaoController {
     private final NotificacaoService notificacaoService;
+    private final AlertaDtoMapper alertaDtoMapper;
 
     @GetMapping
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
@@ -26,7 +27,7 @@ public class NotificacaoController {
             @RequestParam(defaultValue = "20") int limite) {
         List<NotificacaoDto> notificacoes = notificacaoService.listarPorSubprocesso(codSubprocesso, limite)
                 .stream()
-                .map(NotificacaoDto::fromEntity)
+                .map(alertaDtoMapper::paraNotificacaoDto)
                 .toList();
 
         return ResponseEntity.ok(notificacoes);

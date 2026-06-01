@@ -18,6 +18,7 @@ import java.util.*;
 public class AlertaController {
     private final AlertaFacade alertaFacade;
     private final UsuarioFacade usuarioFacade;
+    private final AlertaDtoMapper alertaDtoMapper;
 
     @GetMapping
     @Operation(summary = "Lista todos os alertas do usuário autenticado usando o contexto do JWT")
@@ -25,7 +26,7 @@ public class AlertaController {
         ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
         List<Alerta> alertas = alertaFacade.alertasPorUsuario(contextoUsuario);
 
-        return ResponseEntity.ok(alertas.stream().map(AlertaDto::fromEntity).toList());
+        return ResponseEntity.ok(alertas.stream().map(alertaDtoMapper::paraAlertaDto).toList());
     }
 
     @GetMapping("/nao-lidos")
@@ -34,7 +35,7 @@ public class AlertaController {
         ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
         List<Alerta> alertas = alertaFacade.listarNaoLidos(contextoUsuario);
 
-        return ResponseEntity.ok(alertas.stream().map(AlertaDto::fromEntity).toList());
+        return ResponseEntity.ok(alertas.stream().map(alertaDtoMapper::paraAlertaDto).toList());
     }
 
 }

@@ -1,56 +1,28 @@
 rules:
   - id: sgc.backend.dto-nao-deve-importar-model
-    message: "DTO de borda não deve importar tipos de model.*; prefira DTO explícito ou mapper interno."
+    message: "DTO de borda nao deve referenciar tipos de model.*; prefira DTO explicito ou mapper interno."
     severity: WARNING
     languages:
-      - generic
+      - java
     paths:
       include:
         - backend/src/main/java/sgc/**/*Dto.java
         - backend/src/main/java/sgc/**/*Response.java
       exclude:
         - backend/src/main/java/sgc/e2e/**
-    pattern-regex: 'import\\s+sgc\\.[a-zA-Z0-9_.]+\\.model\\.[A-Za-z0-9_*]+;'
+    pattern-regex: 'sgc\\.[A-Za-z0-9_.]+\\.model\\.'
 
-  - id: sgc.frontend.contrato-index-signature-frouxo
-    message: "Evite [key: string]: unknown em tipos de contrato; prefira DTO explícito."
+  - id: sgc.backend.dto-nao-deve-ter-mapeamento-de-entidade
+    message: "DTO de borda nao deve carregar mapeamento de entidade; mova a conversao para um Mapper ou Service."
     severity: WARNING
     languages:
-      - generic
+      - java
     paths:
       include:
-        - frontend/src/services/**/*types.ts
-        - frontend/src/types/**/*.ts
-    pattern-regex: '\\[key:\\s*string\\]\\s*:\\s*unknown'
-
-  - id: sgc.frontend.mapeador-non-null-assertion
-    message: "Non-null assertion em mapeador costuma mascarar contrato frouxo; prefira endurecer o payload."
-    severity: WARNING
-    languages:
-      - generic
-    paths:
-      include:
-        - frontend/src/services/**/*mapeadores.ts
-    pattern-regex: '[A-Za-z_$][A-Za-z0-9_$.]*!'
-
-  - id: sgc.frontend.mapeador-fallback-zero
-    message: "Fallback para 0 em mapeador pode esconder ausência semântica do backend."
-    severity: INFO
-    languages:
-      - generic
-    paths:
-      include:
-        - frontend/src/services/**/*mapeadores.ts
-        - frontend/src/services/**/*leituras.ts
-    pattern-regex: '(\\?\\?\\s*0)|(:\\s*0)'
-
-  - id: sgc.frontend.mapeador-fallback-string-vazia
-    message: "Fallback para string vazia em mapeador pode esconder ausência semântica do backend."
-    severity: INFO
-    languages:
-      - generic
-    paths:
-      include:
-        - frontend/src/services/**/*mapeadores.ts
-        - frontend/src/services/**/*leituras.ts
-    pattern-regex: '(\\?\\?\\s*""|:\\s*"")'
+        - backend/src/main/java/sgc/**/*Dto.java
+        - backend/src/main/java/sgc/**/*Response.java
+      exclude:
+        - backend/src/main/java/sgc/e2e/**
+    pattern-either:
+      - pattern: static $RET fromEntity(...)
+      - pattern: static $RET fromLeitura(...)

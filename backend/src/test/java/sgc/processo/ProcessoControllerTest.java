@@ -14,11 +14,13 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 import sgc.seguranca.*;
+import sgc.subprocesso.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
@@ -32,7 +34,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProcessoController.class)
-@Import({RestExceptionHandler.class, SgcPermissionEvaluator.class})
+@Import({
+        RestExceptionHandler.class,
+        SgcPermissionEvaluator.class,
+        ProcessoDtoMapper.class,
+        SubprocessoDtoMapper.class,
+        OrganizacaoDtoMapper.class
+})
 @EnableMethodSecurity
 @Tag("integration")
 @DisplayName("ProcessoController")
@@ -692,7 +700,13 @@ class ProcessoControllerTest {
         @BeforeEach
         void setUp() {
             processoServiceMock = mock(ProcessoService.class);
-            controller = new ProcessoController(processoServiceMock, consultaService, localizacaoSubprocessoService);
+            controller = new ProcessoController(
+                    processoServiceMock,
+                    consultaService,
+                    localizacaoSubprocessoService,
+                    new sgc.processo.ProcessoDtoMapper(),
+                    new sgc.subprocesso.SubprocessoDtoMapper(new sgc.organizacao.OrganizacaoDtoMapper())
+            );
         }
 
         @Test

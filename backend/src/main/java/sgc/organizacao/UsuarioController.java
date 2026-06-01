@@ -21,12 +21,13 @@ import java.util.*;
 public class UsuarioController {
     private final UsuarioFacade usuarioFacade;
     private final UsuarioService usuarioService;
+    private final OrganizacaoDtoMapper organizacaoDtoMapper;
 
     @GetMapping("/{titulo}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public ResponseEntity<UsuarioConsultaDto> buscarUsuarioPorTitulo(@PathVariable String titulo) {
         return usuarioService.buscarConsultaPorTitulo(titulo)
-                .map(UsuarioConsultaDto::fromLeitura)
+                .map(organizacaoDtoMapper::paraUsuarioConsultaDto)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

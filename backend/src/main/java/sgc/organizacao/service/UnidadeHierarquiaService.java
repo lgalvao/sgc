@@ -25,6 +25,7 @@ public class UnidadeHierarquiaService {
     private final UnidadeService unidadeService;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final ObjectProvider<UnidadeHierarquiaService> selfProvider;
+    private final sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper;
 
     /**
      * Busca a árvore hierárquica completa de unidades.
@@ -219,7 +220,7 @@ public class UnidadeHierarquiaService {
                     u.nome(),
                     u.sigla(),
                     u.unidadeSuperiorCodigo(),
-                    u.tipo(),
+                    u.tipo() != null ? u.tipo().name() : null,
                     u.tituloTitular()
             );
             dto.setElegivel(isElegivel);
@@ -263,7 +264,7 @@ public class UnidadeHierarquiaService {
     private UnidadeDto copiarComResponsavelAtual(UnidadeDto dto, Long codigo) {
         UnidadeDto copia = copiarArvore(dto);
         Unidade unidadeCompleta = unidadeService.buscarPorCodigo(codigo);
-        UnidadeDto dtoCompleto = UnidadeDto.fromEntityObrigatoria(unidadeCompleta);
+        UnidadeDto dtoCompleto = organizacaoDtoMapper.paraUnidadeDtoObrigatoria(unidadeCompleta);
         
         copia.setResponsavel(dtoCompleto.getResponsavel());
         copia.setTitular(dtoCompleto.getTitular());
@@ -341,6 +342,6 @@ public class UnidadeHierarquiaService {
 
 
     private UnidadeDto toUnidadeDtoObrigatoria(Unidade unidade) {
-        return UnidadeDto.fromEntityObrigatoria(unidade);
+        return organizacaoDtoMapper.paraUnidadeDtoObrigatoria(unidade);
     }
 }

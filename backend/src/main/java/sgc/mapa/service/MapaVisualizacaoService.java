@@ -8,6 +8,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -23,6 +24,8 @@ import java.util.*;
 public class MapaVisualizacaoService {
     private final MapaRepo mapaRepo;
     private final CompetenciaRepo competenciaRepo;
+    private final sgc.mapa.MapaDtoMapper mapaDtoMapper;
+    private final OrganizacaoDtoMapper organizacaoDtoMapper;
 
     public MapaVisualizacaoResponse obterMapaParaVisualizacao(Subprocesso subprocesso) {
         return mapaRepo.buscarCompletoPorSubprocesso(subprocesso.getCodigo())
@@ -40,7 +43,7 @@ public class MapaVisualizacaoService {
 
     private MapaVisualizacaoResponse montarRespostaComMapa(Subprocesso subprocesso, Mapa mapa) {
         List<CompetenciaMapaDto> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo()).stream()
-                .map(CompetenciaMapaDto::fromEntity)
+                .map(mapaDtoMapper::paraCompetenciaMapaDto)
                 .toList();
         Set<Long> codAtividadesComCompetencia = new HashSet<>();
         competencias.forEach(comp -> comp.atividades().stream()
@@ -51,11 +54,11 @@ public class MapaVisualizacaoService {
         Set<Atividade> atividadesMapa = mapa.getAtividades();
         List<AtividadeMapaDto> atividadesSemCompetencia = atividadesMapa.stream()
                 .filter(a -> !codAtividadesComCompetencia.contains(a.getCodigo()))
-                .map(AtividadeMapaDto::fromEntity)
+                .map(mapaDtoMapper::paraAtividadeMapaDto)
                 .toList();
 
         return MapaVisualizacaoResponse.builder()
-                .unidade(UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()))
+                .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()))
                 .competencias(competencias)
                 .atividadesSemCompetencia(atividadesSemCompetencia)
                 .sugestoes(Objects.toString(mapa.getSugestoes(), ""))
@@ -64,7 +67,7 @@ public class MapaVisualizacaoService {
 
     private MapaVisualizacaoResponse criarRespostaVazia(Subprocesso subprocesso) {
         return MapaVisualizacaoResponse.builder()
-                .unidade(UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()))
+                .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()))
                 .competencias(List.of())
                 .atividadesSemCompetencia(List.of())
                 .build();

@@ -136,7 +136,7 @@ public class LoginFacade {
                 atribuicao.unidadeCodigo(),
                 atribuicao.unidadeNome(),
                 atribuicao.unidadeSigla(),
-                atribuicao.unidadeTipo(),
+                atribuicao.unidadeTipo() != null ? atribuicao.unidadeTipo().name() : null,
                 null
         );
     }

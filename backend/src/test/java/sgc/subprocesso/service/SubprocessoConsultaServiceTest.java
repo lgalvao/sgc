@@ -5,7 +5,9 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.erros.*;
+import sgc.mapa.*;
 import sgc.mapa.dto.*;
+import sgc.organizacao.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -27,6 +29,11 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @DisplayName("SubprocessoConsultaService")
 @SuppressWarnings("NullAway.Init")
 class SubprocessoConsultaServiceTest {
+    private final MapaDtoMapper mapaDtoMapper = new MapaDtoMapper();
+    private final OrganizacaoDtoMapper organizacaoDtoMapper = new OrganizacaoDtoMapper();
+    private final sgc.subprocesso.SubprocessoDtoMapper subprocessoDtoMapper =
+            new sgc.subprocesso.SubprocessoDtoMapper(organizacaoDtoMapper);
+
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
@@ -60,7 +67,8 @@ class SubprocessoConsultaServiceTest {
         SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
         SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
         SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
-                usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
+                usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo,
+                analiseHistoricoService, mapaDtoMapper, organizacaoDtoMapper, subprocessoDtoMapper);
 
         service = new SubprocessoConsultaService(
                 subprocessoRepo,
@@ -69,7 +77,9 @@ class SubprocessoConsultaServiceTest {
                 validacaoService,
                 contextoConsultaService,
                 acessoService,
-                visualizacaoService
+                visualizacaoService,
+                mapaDtoMapper,
+                subprocessoDtoMapper
         );
     }
 
@@ -146,7 +156,7 @@ class SubprocessoConsultaServiceTest {
         var response = service.obterContextoCadastroAtividades(codSubprocesso);
 
         assertThat(response).isNotNull();
-        assertThat(response.unidade()).isEqualTo(UnidadeResumoDto.fromEntityObrigatoria(unidade));
+        assertThat(response.unidade()).isEqualTo(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(unidade));
         assertThat(response.assinaturaCadastroReferencia()).isEmpty();
     }
 
@@ -223,7 +233,7 @@ class SubprocessoConsultaServiceTest {
             SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
             SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
                     usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService,
-                    acessoService, analiseRepo, analiseHistoricoServiceMock);
+                    acessoService, analiseRepo, analiseHistoricoServiceMock, mapaDtoMapper, organizacaoDtoMapper, subprocessoDtoMapper);
 
             target = new SubprocessoConsultaService(
                     subprocessoRepo,
@@ -232,7 +242,9 @@ class SubprocessoConsultaServiceTest {
                     validacaoService,
                     new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService),
                     acessoService,
-                    visualizacaoService
+                    visualizacaoService,
+                    mapaDtoMapper,
+                    subprocessoDtoMapper
             );
         }
 
@@ -553,7 +565,8 @@ class SubprocessoConsultaServiceTest {
 
             SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
             SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
-                    usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
+                    usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo,
+                    analiseHistoricoService, mapaDtoMapper, organizacaoDtoMapper, subprocessoDtoMapper);
             SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
 
             service = new SubprocessoConsultaService(
@@ -563,7 +576,9 @@ class SubprocessoConsultaServiceTest {
                     validacaoService,
                     contextoConsultaService,
                     acessoService,
-                    visualizacaoService
+                    visualizacaoService,
+                    mapaDtoMapper,
+                    subprocessoDtoMapper
             );
         }
 

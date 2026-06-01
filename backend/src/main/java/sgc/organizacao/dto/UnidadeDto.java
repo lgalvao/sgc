@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
 import sgc.comum.*;
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.OrganizacaoViews;
 
 import java.time.*;
 import java.util.*;
@@ -70,55 +70,12 @@ public class UnidadeDto {
     @JsonView(OrganizacaoViews.Publica.class)
     private UsuarioResumoDto responsavel;
 
-    public static @Nullable UnidadeDto fromEntity(@Nullable Unidade entity) {
-        if (entity == null) return null;
-        return fromEntityObrigatoria(entity);
-    }
-
-    public static UnidadeDto fromEntityObrigatoria(Unidade entity) {
-        Objects.requireNonNull(entity, "Unidade obrigatoria para montagem do DTO");
-
-        UnidadeDto dto = fromResumoObrigatorio(
-                entity.getCodigo(),
-                entity.getNome(),
-                entity.getSigla(),
-                entity.getUnidadeSuperior() != null ? entity.getUnidadeSuperior().getCodigo() : null,
-                entity.getTipo(),
-                entity.getTituloTitular()
-        );
-
-        dto.setTitular(UsuarioResumoDto.fromEntity(entity.getTitular()));
-
-        Responsabilidade responsabilidade = entity.getResponsabilidade();
-        if (responsabilidade != null) {
-            dto.setResponsavel(UsuarioResumoDto.fromEntity(responsabilidade.getUsuario()));
-            dto.setTipoResponsabilidade(responsabilidade.getTipo());
-            dto.setDataInicioResponsabilidade(responsabilidade.getDataInicio());
-            dto.setDataFimResponsabilidade(responsabilidade.getDataFim());
-        }
-
-        return dto;
-    }
-
-    public static UnidadeDto fromEntityResumoObrigatoria(Unidade entity) {
-        Objects.requireNonNull(entity, "Unidade obrigatoria para resumo");
-
-        return fromResumoObrigatorio(
-                entity.getCodigo(),
-                entity.getNome(),
-                entity.getSigla(),
-                null,
-                entity.getTipo(),
-                entity.getTituloTitular()
-        );
-    }
-
     public static UnidadeDto fromResumoObrigatorio(
             Long codigo,
             String nome,
             String sigla,
             Long codigoPai,
-            TipoUnidade tipo,
+            String tipo,
             String tituloTitular
     ) {
         return UnidadeDto.builder()
@@ -126,7 +83,7 @@ public class UnidadeDto {
                 .nome(Objects.requireNonNull(nome, "Nome da unidade obrigatorio"))
                 .sigla(Objects.requireNonNull(sigla, "Sigla da unidade obrigatoria"))
                 .codigoPai(codigoPai)
-                .tipo(tipo != null ? tipo.name() : null)
+                .tipo(tipo)
                 .tituloTitular(tituloTitular)
                 .build();
     }

@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
+import sgc.alerta.*;
 import sgc.alerta.model.*;
 import sgc.integracao.mocks.*;
 import sgc.organizacao.*;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PainelController.class)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, AlertaDtoMapper.class})
 @DisplayName("PainelController - Testes de Controller")
 class PainelControllerTest {
 

@@ -8,6 +8,8 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("ConfiguracaoDto")
 class ConfiguracaoDtoTest {
 
+    private final ConfiguracaoMapper mapper = new ConfiguracaoMapper();
+
     @Test
     @DisplayName("deve mapear parametro para dto")
     void deveMapearParametroParaDto() {
@@ -17,7 +19,7 @@ class ConfiguracaoDtoTest {
         configuracao.setDescricao("Tema atual");
         configuracao.setValor("claro");
 
-        ConfiguracaoDto dto = ConfiguracaoDto.fromEntity(configuracao);
+        ConfiguracaoDto dto = mapper.paraDto(configuracao);
 
         assertThat(dto.codigo()).isEqualTo(1L);
         assertThat(dto.chave()).isEqualTo("tema");

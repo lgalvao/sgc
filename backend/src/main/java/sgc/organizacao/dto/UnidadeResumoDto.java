@@ -1,7 +1,6 @@
 package sgc.organizacao.dto;
 
 import lombok.*;
-import sgc.organizacao.model.*;
 
 import java.util.*;
 
@@ -13,29 +12,18 @@ public record UnidadeResumoDto(
         String tipo,
         String tituloTitular) {
 
-    public static UnidadeResumoDto fromEntityObrigatoria(Unidade unidade) {
-        Objects.requireNonNull(unidade, "Unidade obrigatoria para resumo");
-        return fromResumoObrigatorio(
-                unidade.getCodigo(),
-                unidade.getNome(),
-                unidade.getSigla(),
-                unidade.getTipo(),
-                unidade.getTituloTitular()
-        );
-    }
-
     public static UnidadeResumoDto fromResumoObrigatorio(
             Long codigo,
             String nome,
             String sigla,
-            TipoUnidade tipo,
+            String tipo,
             String tituloTitular
     ) {
         return UnidadeResumoDto.builder()
                 .codigo(Objects.requireNonNull(codigo, "Codigo da unidade obrigatorio"))
                 .nome(Objects.requireNonNull(nome, "Nome da unidade obrigatorio"))
                 .sigla(Objects.requireNonNull(sigla, "Sigla da unidade obrigatoria"))
-                .tipo(tipo != null ? tipo.name() : null)
+                .tipo(tipo)
                 .tituloTitular(tituloTitular)
                 .build();
     }

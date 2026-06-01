@@ -30,16 +30,17 @@ public class AtividadeFacade {
     private final SubprocessoConsultaService consultaService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final UsuarioFacade usuarioService;
+    private final MapaDtoMapper mapaDtoMapper;
 
     @Transactional(readOnly = true)
     public AtividadeDto obterAtividadePorCodigo(Long codAtividade) {
-        return AtividadeDto.fromEntity(mapaManutencaoService.atividadeCodigo(codAtividade));
+        return mapaDtoMapper.paraAtividadeDto(mapaManutencaoService.atividadeCodigo(codAtividade));
     }
 
     @Transactional(readOnly = true)
     public List<ConhecimentoResumoDto> listarConhecimentosPorAtividade(Long codAtividade) {
         return mapaManutencaoService.conhecimentosCodigoAtividade(codAtividade).stream()
-                .map(ConhecimentoResumoDto::fromEntity)
+                .map(mapaDtoMapper::paraConhecimentoResumoDto)
                 .toList();
     }
 
