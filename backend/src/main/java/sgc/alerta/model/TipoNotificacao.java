@@ -34,9 +34,9 @@ public enum TipoNotificacao {
     MAPA_VALIDACAO_ACEITA("Validação de mapa aceita"),
     MAPA_HOMOLOGADO("Mapa homologado"),
 
-    AUTOAVALIACAO_CONCLUIDA("Autoavaliação concluída"),
-    CONSENSO_DISPONIVEL("Consenso disponível"),
-    CONSENSO_APROVADO("Consenso aprovado"),
+    DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA("Autoavaliação concluída"),
+    DIAGNOSTICO_CONSENSO_DISPONIVEL("Consenso disponível"),
+    DIAGNOSTICOCONSENSO_APROVADO("Consenso aprovado"),
     DIAGNOSTICO_CONCLUIDO("Diagnóstico concluído"),
     DIAGNOSTICO_DEVOLVIDO("Diagnóstico devolvido"),
     DIAGNOSTICO_ACEITO("Diagnóstico aceito"),

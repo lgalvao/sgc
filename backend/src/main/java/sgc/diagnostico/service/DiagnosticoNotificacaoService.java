@@ -45,7 +45,7 @@ public class DiagnosticoNotificacaoService {
                 <p>A análise já pode ser realizada no Sistema de Gestão de Competências (%s).</p>
                 """.formatted(unidade.getSigla(), nomeServidor, sp.getProcesso().getDescricao(), urlSistema());
 
-        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.AUTOAVALIACAO_CONCLUIDA, assunto, corpo,
+        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA, assunto, corpo,
                 "diagnostico:%d:autoavaliacao:%s".formatted(sp.getCodigo(), servidorTitulo));
 
         alertaFacade.criarAlertaTransicao(
@@ -74,7 +74,7 @@ public class DiagnosticoNotificacaoService {
 
         enfileirarNotificacao(sp, unidade,
                 new DestinatarioNotificacao(servidor.getEmail(), servidor.getTituloEleitoral(), servidor.getNome()),
-                TipoNotificacao.CONSENSO_DISPONIVEL,
+                TipoNotificacao.DIAGNOSTICO_CONSENSO_DISPONIVEL,
                 assunto,
                 corpo,
                 "diagnostico:%d:consenso-disponivel:%s".formatted(sp.getCodigo(), servidorTitulo));
@@ -100,7 +100,7 @@ public class DiagnosticoNotificacaoService {
                 <p>Acompanhe o processo no Sistema de Gestão de Competências (%s).</p>
                 """.formatted(unidade.getSigla(), nomeServidor, sp.getProcesso().getDescricao(), urlSistema());
 
-        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.CONSENSO_APROVADO, assunto, corpo,
+        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICOCONSENSO_APROVADO, assunto, corpo,
                 "diagnostico:%d:consenso-aprovado:%s".formatted(sp.getCodigo(), servidorTitulo));
 
         alertaFacade.criarAlertaTransicao(
