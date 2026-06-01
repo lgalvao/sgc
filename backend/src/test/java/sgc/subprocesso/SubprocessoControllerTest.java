@@ -13,6 +13,7 @@ import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SubprocessoController.class)
-@Import(RestExceptionHandler.class)
+@Import({RestExceptionHandler.class, SubprocessoDtoMapper.class, OrganizacaoDtoMapper.class})
 @DisplayName("SubprocessoController")
 class SubprocessoControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
@@ -110,7 +111,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter status do subprocesso")
         @WithMockUser(roles = "GESTOR")
         void deveObterStatus() throws Exception {
-            SubprocessoSituacaoDto dto = new SubprocessoSituacaoDto(1L, SituacaoSubprocesso.NAO_INICIADO);
+            SubprocessoSituacaoDto dto = new SubprocessoSituacaoDto(1L, SituacaoSubprocesso.NAO_INICIADO.name());
             when(consultaService.obterStatus(1L)).thenReturn(dto);
 
             mockMvc.perform(get("/api/subprocessos/1/status"))
@@ -895,8 +896,8 @@ class SubprocessoControllerTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
             when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO))).thenReturn(analise);
             when(analiseHistoricoService.converter(analise)).thenReturn(new AnaliseHistoricoDto(
-                    TipoAnalise.VALIDACAO,
-                    TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                TipoAnalise.VALIDACAO.name(),
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
                     "Aceite",
                     "123456789012",
                     "Usuário Teste",
@@ -1094,8 +1095,8 @@ class SubprocessoControllerTest {
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO))).thenReturn(a);
         when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
-                TipoAnalise.VALIDACAO,
-                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                TipoAnalise.VALIDACAO.name(),
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
                 "Aceite",
                 "123456789012",
                 "Usuário Teste",
@@ -1127,8 +1128,8 @@ class SubprocessoControllerTest {
         Analise a = new Analise();
         when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO))).thenReturn(a);
         when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
-                TipoAnalise.CADASTRO,
-                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+                TipoAnalise.CADASTRO.name(),
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
                 "Aceite",
                 "123456789012",
                 "Usuário Teste",

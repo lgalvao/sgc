@@ -834,7 +834,7 @@ public class ProcessoService {
                 .unidadeNome(sp.getUnidade().getNome())
                 .unidadeSigla(sp.getUnidade().getSigla())
                 .localizacaoCodigo(localizacao.getCodigo())
-                .situacao(sp.getSituacao())
+                .situacao(sp.getSituacao().name())
                 .habilitarAceitarCadastroBloco(elegibilidade.habilitarAceitarCadastroBloco())
                 .habilitarAceitarMapaBloco(elegibilidade.habilitarAceitarMapaBloco())
                 .habilitarHomologarCadastroBloco(elegibilidade.habilitarHomologarCadastroBloco())

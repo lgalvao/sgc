@@ -66,11 +66,12 @@ public class LoginController {
         if (perfis.size() == 1) {
             PerfilUnidadeDto perfilUnidade = perfis.getFirst();
             EntrarRequest entrarRequest = EntrarRequest.builder()
-                    .perfil(perfilUnidade.perfil().name())
+                    .perfil(perfilUnidade.perfil())
                     .unidadeCodigo(perfilUnidade.unidade().codigo())
                     .build();
             String token = loginFacade.entrar(entrarRequest, request.tituloEleitoral(), perfis);
             Usuario usuario = usuarioFacade.buscarPorLogin(request.tituloEleitoral());
+            Perfil perfilSelecionado = Perfil.valueOf(perfilUnidade.perfil());
 
             adicionarCookieJwt(httpResponse, token);
             limparCookiePreAuth(httpResponse);
@@ -78,9 +79,9 @@ public class LoginController {
             EntrarResponse sessao = EntrarResponse.builder()
                     .tituloEleitoral(request.tituloEleitoral())
                     .nome(usuario.getNome())
-                    .perfil(perfilUnidade.perfil())
+                    .perfil(perfilSelecionado.name())
                     .unidadeCodigo(perfilUnidade.unidade().codigo())
-                    .permissoes(construirPermissoesSessao(perfilUnidade.perfil()))
+                    .permissoes(construirPermissoesSessao(perfilSelecionado))
                     .build();
 
             return ResponseEntity.ok(FluxoLoginResponse.builder()
@@ -120,7 +121,7 @@ public class LoginController {
         EntrarResponse response = EntrarResponse.builder()
                 .tituloEleitoral(tituloEleitoral)
                 .nome(usuario.getNome())
-                .perfil(Perfil.valueOf(request.perfil()))
+                .perfil(request.perfil())
                 .unidadeCodigo(request.unidadeCodigo())
                 .permissoes(construirPermissoesSessao(Perfil.valueOf(request.perfil())))
                 .build();

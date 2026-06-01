@@ -120,7 +120,7 @@ class LoginFacadeTest {
 
         EntrarRequest req = new EntrarRequest("ADMIN", 1L);
         List<PerfilUnidadeDto> autorizacoes = List.of(
-                new PerfilUnidadeDto(Perfil.GESTOR, sgc.organizacao.dto.UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build())
+                new PerfilUnidadeDto(Perfil.GESTOR.name(), sgc.organizacao.dto.UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build())
         );
 
         assertThatThrownBy(() -> loginFacade.entrar(req, "123", autorizacoes))
@@ -189,7 +189,7 @@ class LoginFacadeTest {
 
         List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
         assertThat(result).hasSize(1);
-        assertThat(result.getFirst().perfil()).isEqualTo(Perfil.GESTOR);
+        assertThat(result.getFirst().perfil()).isEqualTo(Perfil.GESTOR.name());
     }
 
     @Test
@@ -219,7 +219,7 @@ class LoginFacadeTest {
         List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
 
         assertThat(result).singleElement().satisfies(perfil -> {
-            assertThat(perfil.perfil()).isEqualTo(Perfil.GESTOR);
+            assertThat(perfil.perfil()).isEqualTo(Perfil.GESTOR.name());
             assertThat(perfil.unidade().codigo()).isEqualTo(1L);
         });
     }

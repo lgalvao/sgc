@@ -31,7 +31,7 @@ public class SubprocessoDtoMapper {
         return SubprocessoResumoDto.builder()
                 .codigo(subprocesso.getCodigo())
                 .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()))
-                .situacao(subprocesso.getSituacao())
+                .situacao(subprocesso.getSituacao().name())
                 .dataLimiteEtapa1(dataLimiteEtapa1)
                 .dataFimEtapa1(subprocesso.getDataFimEtapa1())
                 .dataLimiteEtapa2(dataLimiteEtapa2)
@@ -42,7 +42,7 @@ public class SubprocessoDtoMapper {
                 .codMapa(subprocesso.getCodMapa())
                 .processoDescricao(processo.getDescricao())
                 .dataCriacaoProcesso(processo.getDataCriacao())
-                .tipoProcesso(processo.getTipo())
+                .tipoProcesso(processo.getTipo() != null ? processo.getTipo().name() : null)
                 .isEmAndamento(subprocesso.isEmAndamento())
                 .etapaAtual(subprocesso.getEtapaAtual())
                 .build();

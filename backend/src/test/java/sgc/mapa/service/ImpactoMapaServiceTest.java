@@ -626,8 +626,8 @@ class ImpactoMapaServiceTest {
             assertThat(competenciaImpactada.atividadesAfetadas()).contains("Atividade removida: Atividade removida");
             assertThat(competenciaImpactada.atividadesAfetadas().stream()
                     .anyMatch(detalhe -> detalhe.contains("Atividade alterada"))).isTrue();
-            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA);
-            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
+            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA.name());
+            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA.name());
             assertThat(competenciaImpactada.tiposImpacto().size()).isEqualTo(2);
         }
 
@@ -726,7 +726,7 @@ class ImpactoMapaServiceTest {
             AtividadeImpactadaDto alt = response.alteradas().getFirst();
             assertThat(alt.descricaoAnterior()).isEqualTo("Descrição Antiga");
             assertThat(alt.descricao()).isEqualTo("Descrição Nova");
-            assertThat(alt.tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA);
+            assertThat(alt.tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA.name());
 
             // Verifica se a competência foi impactada pela alteração de nome
             assertThat(response.competenciasImpactadas().size()).isEqualTo(1);

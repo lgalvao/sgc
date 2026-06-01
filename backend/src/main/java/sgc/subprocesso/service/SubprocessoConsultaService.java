@@ -76,7 +76,7 @@ public class SubprocessoConsultaService {
     public SubprocessoSituacaoDto obterStatus(Subprocesso subprocesso) {
         return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
-                .situacao(subprocesso.getSituacao())
+                .situacao(subprocesso.getSituacao().name())
                 .build();
     }
 

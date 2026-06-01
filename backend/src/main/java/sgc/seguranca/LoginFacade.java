@@ -91,16 +91,16 @@ public class LoginFacade {
         Perfil perfilSolicitado = Perfil.valueOf(request.perfil());
 
         if (perfilSolicitado == ADMIN) {
-            boolean temPerfilAdmin = autorizacoes.stream().anyMatch(pu -> pu.perfil() == ADMIN);
+            boolean temPerfilAdmin = autorizacoes.stream().anyMatch(pu -> ADMIN.name().equals(pu.perfil()));
             if (!temPerfilAdmin) {
                 throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_ACESSO_PERFIL);
             }
         } else {
             boolean autorizado = autorizacoes.stream()
                     .anyMatch(pu -> {
-                        Perfil perfil = pu.perfil();
+                        String perfil = pu.perfil();
                         Long codigoUnidade = pu.unidade().codigo();
-                        return perfil == perfilSolicitado && codigoUnidade.equals(codUnidade);
+                        return perfilSolicitado.name().equals(perfil) && codigoUnidade.equals(codUnidade);
                     });
             if (!autorizado) {
                 throw new ErroAcessoNegado(Mensagens.SEM_PERMISSAO_ACESSO_PERFIL);
@@ -126,7 +126,7 @@ public class LoginFacade {
         return atribuicoes.stream()
                 .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
                 .map(atribuicao -> new PerfilUnidadeDto(
-                        atribuicao.perfil(),
+                        atribuicao.perfil().name(),
                         toUnidadeResumoObrigatoria(atribuicao)))
                 .toList();
     }

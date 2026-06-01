@@ -2,8 +2,6 @@ package sgc.subprocesso.dto;
 
 import lombok.*;
 import sgc.organizacao.dto.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.model.*;
 
 import java.time.*;
 
@@ -11,7 +9,7 @@ import java.time.*;
 public record SubprocessoListagemDto(
         Long codigo,
         UnidadeResumoDto unidade,
-        SituacaoSubprocesso situacao,
+        String situacao,
         LocalDateTime dataLimiteEtapa1,
         LocalDateTime dataFimEtapa1,
         LocalDateTime dataLimiteEtapa2,
@@ -21,7 +19,7 @@ public record SubprocessoListagemDto(
         Long codMapa,
         String processoDescricao,
         LocalDateTime dataCriacaoProcesso,
-        TipoProcesso tipoProcesso,
+        String tipoProcesso,
         boolean isEmAndamento,
         Integer etapaAtual) {
 }

@@ -1,7 +1,6 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import sgc.subprocesso.model.*;
 
 /**
  * DTO que representa o status atual de um subprocesso.
@@ -12,6 +11,6 @@ import sgc.subprocesso.model.*;
 @Builder
 public record SubprocessoSituacaoDto(
         Long codigo,
-        SituacaoSubprocesso situacao
+        String situacao
 ) {
 }

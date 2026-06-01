@@ -4,8 +4,10 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -16,6 +18,10 @@ import static org.mockito.Mockito.*;
 class SubprocessoVisualizacaoServiceTest {
     @Mock
     private SubprocessoAcessoService acessoService;
+    @Spy
+    private OrganizacaoDtoMapper organizacaoDtoMapper = new OrganizacaoDtoMapper();
+    @Spy
+    private SubprocessoDtoMapper subprocessoDtoMapper = new SubprocessoDtoMapper(new OrganizacaoDtoMapper());
 
     @InjectMocks
     private SubprocessoVisualizacaoService service;

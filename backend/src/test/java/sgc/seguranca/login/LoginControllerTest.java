@@ -69,7 +69,7 @@ class LoginControllerTest {
     void login_SessaoDiretaComSucesso() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
@@ -102,8 +102,8 @@ class LoginControllerTest {
         AutenticarRequest req = criarRequestPadrao();
         UnidadeResumoDto unidadeUm = UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build();
         UnidadeResumoDto unidadeDois = UnidadeResumoDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build();
-        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE, unidadeUm);
-        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR, unidadeDois);
+        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE.name(), unidadeUm);
+        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR.name(), unidadeDois);
 
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
         when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(primeiro, segundo));
@@ -146,7 +146,7 @@ class LoginControllerTest {
         AutenticarRequest req = criarRequestPadrao();
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
@@ -333,7 +333,7 @@ class LoginControllerTest {
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
         when(loginFacade.buscarAutorizacoesUsuario("123"))
-                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
+                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto)));
         when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
@@ -361,7 +361,7 @@ class LoginControllerTest {
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
         when(loginFacade.buscarAutorizacoesUsuario("123"))
-                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
+                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto)));
         when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
@@ -386,7 +386,7 @@ class LoginControllerTest {
     void loginDiretoDeveIgnorarLimitadorQuandoORequestNaoInformarIp() {
         AutenticarRequest req = criarRequestPadrao();
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
@@ -412,9 +412,9 @@ class LoginControllerTest {
     @DisplayName("login direto deve exigir seleção quando houver múltiplos perfis")
     void loginDiretoDeveExigirSelecaoQuandoHouverMultiplosPerfis() {
         AutenticarRequest req = criarRequestPadrao();
-        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE,
+        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE.name(),
                 UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build());
-        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR,
+        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR.name(),
                 UnidadeResumoDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build());
 
         when(loginFacade.autenticar("123", "senha")).thenReturn(true);
@@ -444,7 +444,7 @@ class LoginControllerTest {
             UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
             when(loginFacade.autenticar("123", "senha")).thenReturn(true);
             when(loginFacade.buscarAutorizacoesUsuario("123"))
-                    .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
+                    .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto)));
             when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
             Usuario usuario = new Usuario();
             usuario.setNome("Admin user");

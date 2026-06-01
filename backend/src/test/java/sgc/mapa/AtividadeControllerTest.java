@@ -67,7 +67,7 @@ class AtividadeControllerTest {
 
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                     .atividade(dto)
-                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO).build())
+                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO.name()).build())
                     .build();
 
             Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
@@ -120,7 +120,7 @@ class AtividadeControllerTest {
         void deveRetornarErroQuandoCriacaoNaoRetornaAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                     .atividade(null)
-                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO).build())
+                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO.name()).build())
                     .build();
             Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
 

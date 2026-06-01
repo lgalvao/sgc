@@ -21,5 +21,5 @@ public record CompetenciaImpactadaDto(
         List<String> atividadesAfetadas,
 
         @JsonView(MapaViews.Publica.class)
-        List<TipoImpactoCompetencia> tiposImpacto) {
+        List<String> tiposImpacto) {
 }

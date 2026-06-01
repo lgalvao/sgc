@@ -16,7 +16,7 @@ public record AtividadeImpactadaDto(
         @JsonView(MapaViews.Publica.class)
         String descricao,
         @JsonView(MapaViews.Publica.class)
-        TipoImpactoAtividade tipoImpacto,
+        String tipoImpacto,
         @JsonView(MapaViews.Publica.class)
         String descricaoAnterior,
         @JsonView(MapaViews.Publica.class)
