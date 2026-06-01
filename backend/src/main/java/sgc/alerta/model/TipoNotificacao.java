@@ -36,7 +36,7 @@ public enum TipoNotificacao {
 
     DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA("Autoavaliação concluída"),
     DIAGNOSTICO_CONSENSO_DISPONIVEL("Consenso disponível"),
-    DIAGNOSTICOCONSENSO_APROVADO("Consenso aprovado"),
+    DIAGNOSTICO_CONSENSO_APROVADO("Consenso aprovado"),
     DIAGNOSTICO_CONCLUIDO("Diagnóstico concluído"),
     DIAGNOSTICO_DEVOLVIDO("Diagnóstico devolvido"),
     DIAGNOSTICO_ACEITO("Diagnóstico aceito"),

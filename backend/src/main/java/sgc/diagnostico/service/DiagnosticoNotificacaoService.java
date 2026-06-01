@@ -131,7 +131,7 @@ public class DiagnosticoNotificacaoService {
                 <p>Acompanhe o processo no Sistema de Gestão de Competências (%s).</p>
                 """.formatted(unidade.getSigla(), nomeServidor, sp.getProcesso().getDescricao(), urlSistema());
 
-        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICOCONSENSO_APROVADO, assunto, corpo,
+        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_CONSENSO_APROVADO, assunto, corpo,
                 "diagnostico:%d:consenso-aprovado:%s".formatted(sp.getCodigo(), servidorTitulo));
 
         alertaFacade.criarAlertaTransicao(
