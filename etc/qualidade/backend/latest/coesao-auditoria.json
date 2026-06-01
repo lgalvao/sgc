@@ -1,0 +1,1022 @@
+{
+  "geradoEm": "2026-06-01T01:29:13.797Z",
+  "criterio": "Services com 3+ categorias de responsabilidade: consulta, mutação, workflow, notificação, permissão.",
+  "resumo": {
+    "totalAnalisados": 33,
+    "criticos": 1,
+    "alertas": 0,
+    "ok": 32
+  },
+  "hotspots": [
+    {
+      "nomeArquivo": "ProcessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pacote": "sgc.processo.service",
+      "totalMetodos": 21,
+      "porCategoria": {
+        "consulta": [
+          "buscarPorCodigo",
+          "buscarPorCodigoComParticipantes",
+          "buscarOpt",
+          "listarFinalizados",
+          "listarParaImportacao",
+          "listarAtivos",
+          "listarTodos",
+          "listarIniciadosPorParticipantes",
+          "listarIniciadosPorSubprocessos",
+          "listarUnidadesBloqueadasPorTipo",
+          "buscarIdsUnidadesComProcessosAtivos",
+          "listarSubprocessosElegiveis",
+          "obterDetalhesCompleto",
+          "checarAcesso"
+        ],
+        "mutacao": [
+          "criar",
+          "atualizar",
+          "apagar"
+        ],
+        "workflow": [
+          "iniciar",
+          "finalizar",
+          "executarAcaoEmBloco"
+        ],
+        "notificacao": [
+          "enviarLembrete"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta",
+        "mutacao",
+        "workflow",
+        "notificacao"
+      ],
+      "quantidadeCategorias": 4,
+      "severidade": "critico",
+      "motivos": [
+        "consulta/leitura (14)",
+        "mutação/escrita (3)",
+        "workflow/transição (3)",
+        "notificação/comunicação (1)"
+      ]
+    }
+  ],
+  "todos": [
+    {
+      "nomeArquivo": "ProcessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pacote": "sgc.processo.service",
+      "totalMetodos": 21,
+      "porCategoria": {
+        "consulta": [
+          "buscarPorCodigo",
+          "buscarPorCodigoComParticipantes",
+          "buscarOpt",
+          "listarFinalizados",
+          "listarParaImportacao",
+          "listarAtivos",
+          "listarTodos",
+          "listarIniciadosPorParticipantes",
+          "listarIniciadosPorSubprocessos",
+          "listarUnidadesBloqueadasPorTipo",
+          "buscarIdsUnidadesComProcessosAtivos",
+          "listarSubprocessosElegiveis",
+          "obterDetalhesCompleto",
+          "checarAcesso"
+        ],
+        "mutacao": [
+          "criar",
+          "atualizar",
+          "apagar"
+        ],
+        "workflow": [
+          "iniciar",
+          "finalizar",
+          "executarAcaoEmBloco"
+        ],
+        "notificacao": [
+          "enviarLembrete"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta",
+        "mutacao",
+        "workflow",
+        "notificacao"
+      ],
+      "quantidadeCategorias": 4,
+      "severidade": "critico",
+      "motivos": [
+        "consulta/leitura (14)",
+        "mutação/escrita (3)",
+        "workflow/transição (3)",
+        "notificação/comunicação (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "ConfiguracaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/configuracoes/ConfiguracaoService.java",
+      "pacote": "sgc.configuracoes",
+      "totalMetodos": 8,
+      "porCategoria": {
+        "consulta": [
+          "buscarTodos",
+          "buscarPorCodigo",
+          "buscarPorChave",
+          "buscarDiasInativacaoProcesso",
+          "buscarDiasAlertaNovo",
+          "buscarValorInteiro"
+        ],
+        "mutacao": [
+          "salvar",
+          "atualizar"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta",
+        "mutacao"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (6)",
+        "mutação/escrita (2)"
+      ]
+    },
+    {
+      "nomeArquivo": "FeedbackService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/feedback/FeedbackService.java",
+      "pacote": "sgc.feedback",
+      "totalMetodos": 3,
+      "porCategoria": {
+        "mutacao": [
+          "registrar"
+        ],
+        "consulta": [
+          "listarRecentes",
+          "obterScreenshot"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao",
+        "consulta"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (1)",
+        "consulta/leitura (2)"
+      ]
+    },
+    {
+      "nomeArquivo": "MapaManutencaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/MapaManutencaoService.java",
+      "pacote": "sgc.mapa.service",
+      "totalMetodos": 40,
+      "porCategoria": {
+        "consulta": [
+          "listarAtividades",
+          "buscarMapasPorSubprocessos"
+        ],
+        "outro": [
+          "atividadeCodigo",
+          "atividadesCodigos",
+          "atividadesMapaCodigo",
+          "atividadesMapaCodigoSemRels",
+          "atividadesMapaCodigoComConhecimentos",
+          "competenciaCodigo",
+          "competenciasCodMapa",
+          "competenciasCodMapaSemRels",
+          "codigosAssociacoesCompetenciaAtividade",
+          "conhecimentosCodigoAtividade",
+          "conhecimentosCodMapa",
+          "competenciasCodigos",
+          "mapas",
+          "mapaVigenteUnidade",
+          "mapaSubprocesso",
+          "mapaCompletoSubprocesso",
+          "mapaComCompetenciasEAtividadesSubprocesso",
+          "mapaCodigo",
+          "mapaExiste",
+          "reconciliarSituacaoSubprocesso",
+          "reconciliarSituacaoSubprocesso"
+        ],
+        "mutacao": [
+          "criarAtividade",
+          "atualizarAtividade",
+          "atualizarDescricoesAtividadeEmBloco",
+          "excluirAtividade",
+          "salvarMapa",
+          "criarMapa",
+          "atualizarEstadoMapa",
+          "salvarMapas",
+          "salvarCompetencia",
+          "salvarCompetencias",
+          "criarCompetenciaComAtividades",
+          "atualizarCompetencia",
+          "removerCompetencia",
+          "criarConhecimento",
+          "atualizarConhecimento",
+          "excluirConhecimento",
+          "excluirMapa"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta",
+        "mutacao"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (2)",
+        "mutação/escrita (17)"
+      ]
+    },
+    {
+      "nomeArquivo": "ResponsavelUnidadeService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 13,
+      "porCategoria": {
+        "consulta": [
+          "buscarTodasAtribuicoes",
+          "buscarAtribuicoesPorUnidade",
+          "buscarResponsavelAtual",
+          "buscarResponsabilidadeDetalhadaAtual",
+          "buscarResponsabilidadeDetalhadaAtual",
+          "buscarResponsavelUnidadeOpt",
+          "buscarResponsavelUnidade",
+          "buscarResponsaveisUnidades",
+          "buscarUnidadesOndeEhResponsavel"
+        ],
+        "mutacao": [
+          "criarAtribuicaoTemporaria",
+          "atualizarAtribuicaoTemporaria",
+          "removerAtribuicaoTemporaria"
+        ],
+        "outro": [
+          "todasPossuemResponsavelEfetivo"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta",
+        "mutacao"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (9)",
+        "mutação/escrita (3)"
+      ]
+    },
+    {
+      "nomeArquivo": "UsuarioService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UsuarioService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 16,
+      "porCategoria": {
+        "consulta": [
+          "buscar",
+          "buscarOpt",
+          "buscarOptComUnidadeLotacao",
+          "buscarPorUnidadeLotacao",
+          "buscarConsultaPorTitulo",
+          "buscarConsultasPorUnidadeLotacao",
+          "buscarPorTitulos",
+          "buscarConsultasPorTitulos",
+          "pesquisarPorNome",
+          "buscarAutorizacoesPerfil",
+          "buscarPerfisPorUsuarioTitulo",
+          "buscarAdministradores"
+        ],
+        "outro": [
+          "carregarAuthorities",
+          "adicionarAdministrador",
+          "isAdministrador"
+        ],
+        "mutacao": [
+          "removerAdministrador"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta",
+        "mutacao"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (12)",
+        "mutação/escrita (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoConsultaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 41,
+      "porCategoria": {
+        "outro": [
+          "mapaParaVisualizacao",
+          "mapaCompletoDtoPorSubprocesso",
+          "unidadeAlvo",
+          "situacao",
+          "isMesmaUnidadeAlvo",
+          "isUnidadeAlvoNaHierarquiaUsuario",
+          "isChefe",
+          "isGestor",
+          "isAdmin",
+          "isGestorOuAdmin"
+        ],
+        "consulta": [
+          "verificarImpactos",
+          "obterSugestoes",
+          "buscarSubprocesso",
+          "buscarSubprocessoComMapa",
+          "listarEntidadesPorProcesso",
+          "obterStatus",
+          "obterStatus",
+          "obterEntidadePorCodigoMapa",
+          "listarTodos",
+          "obterCadastro",
+          "obterCadastro",
+          "obterEntidadePorProcessoEUnidade",
+          "listarEntidadesPorProcessoEUnidades",
+          "listarPorProcessoESituacoes",
+          "listarPorProcessoEUnidadeCodigosESituacoes",
+          "listarPorProcessoUnidadeESituacoes",
+          "obterDetalhes",
+          "obterDetalhes",
+          "obterContextoEdicao",
+          "obterContextoEdicao",
+          "obterContextoCadastroAtividades",
+          "obterPermissoesUI",
+          "obterPermissoesUI",
+          "listarAtividadesSubprocesso",
+          "listarAtividadesSubprocesso",
+          "listarAtividadesParaImportacao",
+          "listarHistoricoCadastro",
+          "listarHistoricoValidacao",
+          "obterMapaParaAjuste",
+          "listarMovimentacoes"
+        ],
+        "workflow": [
+          "validarCadastro"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta",
+        "workflow"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (30)",
+        "workflow/transição (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoNotificacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoNotificacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 8,
+      "porCategoria": {
+        "mutacao": [
+          "registrarComunicacoesTransicao",
+          "registrarAlertaTransicao"
+        ],
+        "outro": [
+          "getEmailUnidade"
+        ],
+        "notificacao": [
+          "notificarAlteracaoDataLimite",
+          "notificarHomologacaoMapa",
+          "notificarAceiteCadastroEmBloco",
+          "notificarDisponibilizacaoMapaEmBloco",
+          "notificarAceiteValidacaoEmBloco"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao",
+        "notificacao"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (2)",
+        "notificação/comunicação (5)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoTransicaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 17,
+      "porCategoria": {
+        "mutacao": [
+          "registrarTransicao",
+          "registrarTransicaoSemEmail",
+          "registrarAnalise",
+          "registrarAnaliseSemEmail",
+          "criarAnalise",
+          "alterarDataLimite"
+        ],
+        "workflow": [
+          "disponibilizarMapa",
+          "disponibilizarMapaEmBloco",
+          "disponibilizarMapaEmBloco",
+          "submeterMapaAjustado",
+          "validarMapa",
+          "devolverValidacao",
+          "aceitarValidacao",
+          "aceitarValidacaoEmBloco",
+          "homologarValidacao",
+          "homologarValidacaoEmBloco"
+        ],
+        "outro": [
+          "apresentarSugestoes"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao",
+        "workflow"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (6)",
+        "workflow/transição (10)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoValidacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoValidacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 13,
+      "porCategoria": {
+        "workflow": [
+          "validarExistenciaAtividades",
+          "validarAssociacoesMapa",
+          "validarMapaParaDisponibilizacao",
+          "validarCadastro",
+          "validarSituacaoPermitida",
+          "validarSituacaoPermitida",
+          "validarSituacaoPermitida",
+          "validarSituacaoMinima",
+          "validarRequisitosNegocioParaDisponibilizacao",
+          "validarSubprocessosParaFinalizacao"
+        ],
+        "consulta": [
+          "verificarAcessoUnidadeAoProcesso"
+        ],
+        "outro": [
+          "ofValido",
+          "ofInvalido"
+        ]
+      },
+      "categoriasPresentes": [
+        "workflow",
+        "consulta"
+      ],
+      "quantidadeCategorias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "workflow/transição (10)",
+        "consulta/leitura (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "AlertaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/AlertaService.java",
+      "pacote": "sgc.alerta",
+      "totalMetodos": 9,
+      "porCategoria": {
+        "outro": [
+          "porCodigo",
+          "alertaUsuario",
+          "alertasUsuarios",
+          "dataHoraLeituraAlertaUsuario"
+        ],
+        "consulta": [
+          "listarParaServidor",
+          "listarParaGestao",
+          "listarParaServidorPaginado",
+          "listarParaGestaoPaginado",
+          "listarPorCodigos"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (5)"
+      ]
+    },
+    {
+      "nomeArquivo": "EmailModelosService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/EmailModelosService.java",
+      "pacote": "sgc.alerta",
+      "totalMetodos": 9,
+      "porCategoria": {
+        "mutacao": [
+          "criarEmailInicioProcessoConsolidado",
+          "criarAssuntoInicioProcesso",
+          "criarAssuntoProcessoFinalizado",
+          "criarAssuntoProcessoFinalizadoUnidadesSubordinadas",
+          "criarAssuntoLembretePrazo",
+          "criarEmailProcessoFinalizadoPorUnidade",
+          "criarEmailProcessoFinalizadoUnidadesSubordinadas",
+          "criarEmailLembretePrazo",
+          "criarEmailAtribuicaoTemporaria"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (9)"
+      ]
+    },
+    {
+      "nomeArquivo": "EmailService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/EmailService.java",
+      "pacote": "sgc.alerta",
+      "totalMetodos": 2,
+      "porCategoria": {
+        "notificacao": [
+          "enviarEmail",
+          "enviarEmailHtml"
+        ]
+      },
+      "categoriasPresentes": [
+        "notificacao"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "notificação/comunicação (2)"
+      ]
+    },
+    {
+      "nomeArquivo": "NotificacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/NotificacaoService.java",
+      "pacote": "sgc.alerta",
+      "totalMetodos": 10,
+      "porCategoria": {
+        "outro": [
+          "enfileirar",
+          "reenfileirarFalhasDefinitivasPorSubprocesso",
+          "reenviarPorCodigo",
+          "marcarEnviandoSeDisponivel",
+          "marcarEnviado",
+          "marcarFalha"
+        ],
+        "consulta": [
+          "listarPendentes",
+          "listarPorSubprocesso",
+          "listarTodasAdmin",
+          "listarResumoSubprocessosAtivos"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (4)"
+      ]
+    },
+    {
+      "nomeArquivo": "ImpactoMapaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/ImpactoMapaService.java",
+      "pacote": "sgc.mapa.service",
+      "totalMetodos": 3,
+      "porCategoria": {
+        "consulta": [
+          "verificarImpactos"
+        ],
+        "outro": [
+          "calcularImpactos",
+          "podeVisualizarImpactos"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "MapaSalvamentoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java",
+      "pacote": "sgc.mapa.service",
+      "totalMetodos": 1,
+      "porCategoria": {
+        "mutacao": [
+          "salvarMapaCompleto"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "MapaVisualizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/MapaVisualizacaoService.java",
+      "pacote": "sgc.mapa.service",
+      "totalMetodos": 1,
+      "porCategoria": {
+        "consulta": [
+          "obterMapaParaVisualizacao"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "CacheViewsOrganizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/CacheViewsOrganizacaoService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 8,
+      "porCategoria": {
+        "consulta": [
+          "listarTodasUnidades",
+          "listarTodosUsuarios",
+          "listarTodasResponsabilidades",
+          "listarTodosPerfisUnidade"
+        ],
+        "outro": [
+          "evictarUnidades",
+          "evictarUsuarios",
+          "evictarResponsabilidades",
+          "evictarPerfisUnidade"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (4)"
+      ]
+    },
+    {
+      "nomeArquivo": "UnidadeHierarquiaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 13,
+      "porCategoria": {
+        "consulta": [
+          "buscarArvoreHierarquica",
+          "buscarArvoreComElegibilidade",
+          "buscarArvoreComElegibilidade",
+          "buscarIdsDescendentes",
+          "buscarDescendentes",
+          "buscarMapaFilhoPai",
+          "buscarCodigosSuperiores",
+          "buscarCodigoPai",
+          "buscarMapaHierarquia",
+          "buscarArvore",
+          "buscarSiglasSubordinadas",
+          "buscarSiglaSuperior",
+          "buscarSubordinadas"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (13)"
+      ]
+    },
+    {
+      "nomeArquivo": "UnidadeService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UnidadeService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 18,
+      "porCategoria": {
+        "consulta": [
+          "buscarPorCodigo",
+          "buscarPorSigla",
+          "buscarPorSiglaComResponsavel",
+          "buscarCodigoPorSigla",
+          "buscarAdmin",
+          "buscarPorCodigos",
+          "buscarSiglasPorCodigos",
+          "buscarResumosPorCodigos",
+          "buscarSiglaPorCodigo",
+          "buscarPorCodigoComSuperior",
+          "buscarReferenciaMapaVigente",
+          "buscarTodosCodigosUnidadesComMapa",
+          "buscarCodigosUnidadesSemMapaVigente",
+          "buscarMapasPorUnidades",
+          "buscarMapaVigente"
+        ],
+        "outro": [
+          "temMapaVigente",
+          "definirMapaVigente",
+          "definirMapasVigentesEmBloco"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (15)"
+      ]
+    },
+    {
+      "nomeArquivo": "UsuarioPerfilCacheService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UsuarioPerfilCacheService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 1,
+      "porCategoria": {
+        "consulta": [
+          "buscarAutorizacoesPerfil"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "ProcessoExclusaoCompletaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/service/ProcessoExclusaoCompletaService.java",
+      "pacote": "sgc.processo.service",
+      "totalMetodos": 1,
+      "porCategoria": {
+        "mutacao": [
+          "excluirCompleto"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "CadastroFluxoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/CadastroFluxoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 13,
+      "porCategoria": {
+        "workflow": [
+          "disponibilizarCadastro",
+          "disponibilizarCadastro",
+          "iniciarRevisaoCadastro",
+          "cancelarInicioRevisaoCadastro",
+          "disponibilizarRevisao",
+          "disponibilizarRevisao",
+          "devolver",
+          "aceitar",
+          "aceitarCadastroEmBloco",
+          "homologar",
+          "homologarCadastroEmBloco",
+          "reabrirCadastro",
+          "reabrirRevisaoCadastro"
+        ]
+      },
+      "categoriasPresentes": [
+        "workflow"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "workflow/transição (13)"
+      ]
+    },
+    {
+      "nomeArquivo": "LocalizacaoSubprocessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/LocalizacaoSubprocessoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 2,
+      "porCategoria": {
+        "consulta": [
+          "obterLocalizacaoAtual",
+          "obterLocalizacoesAtuais"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (2)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 15,
+      "porCategoria": {
+        "mutacao": [
+          "salvarMapa",
+          "criarEntidade",
+          "atualizarEntidade",
+          "excluir",
+          "criarParaMapeamento",
+          "criarParaRevisao",
+          "criarParaDiagnostico",
+          "salvarMapaSubprocesso",
+          "atualizarCompetencia",
+          "removerCompetencia",
+          "salvarAjustesMapa"
+        ],
+        "outro": [
+          "adicionarCompetencia",
+          "getSubprocessoParaEdicao",
+          "importarAtividades",
+          "unidades"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (11)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoSituacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoSituacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 2,
+      "porCategoria": {
+        "mutacao": [
+          "atualizarSituacaoPorMapa"
+        ],
+        "outro": [
+          "reconciliarSituacao"
+        ]
+      },
+      "categoriasPresentes": [
+        "mutacao"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "mutação/escrita (1)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoVisualizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoVisualizacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 9,
+      "porCategoria": {
+        "outro": [
+          "mapaParaVisualizacao",
+          "construirDetalhe",
+          "construirDetalheCadastro",
+          "montarContextoEdicao",
+          "montarContextoCadastroAtividades"
+        ],
+        "consulta": [
+          "verificarImpactos",
+          "listarHistoricoCadastro",
+          "listarHistoricoValidacao",
+          "obterMapaParaAjuste"
+        ]
+      },
+      "categoriasPresentes": [
+        "consulta"
+      ],
+      "quantidadeCategorias": 1,
+      "severidade": "ok",
+      "motivos": [
+        "consulta/leitura (4)"
+      ]
+    },
+    {
+      "nomeArquivo": "CopiaMapaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/CopiaMapaService.java",
+      "pacote": "sgc.mapa.service",
+      "totalMetodos": 2,
+      "porCategoria": {
+        "outro": [
+          "copiarMapaParaUnidade",
+          "importarAtividadesDeOutroMapa"
+        ]
+      },
+      "categoriasPresentes": [],
+      "quantidadeCategorias": 0,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "CacheOrganizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/CacheOrganizacaoService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 2,
+      "porCategoria": {
+        "outro": [
+          "invalidarAposCommit",
+          "afterCommit"
+        ]
+      },
+      "categoriasPresentes": [],
+      "quantidadeCategorias": 0,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "HierarquiaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/HierarquiaService.java",
+      "pacote": "sgc.organizacao.service",
+      "totalMetodos": 4,
+      "porCategoria": {
+        "outro": [
+          "isResponsavel",
+          "isSubordinada",
+          "ehMesmaOuSubordinada",
+          "isSuperiorImediata"
+        ]
+      },
+      "categoriasPresentes": [],
+      "quantidadeCategorias": 0,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "AnaliseHistoricoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/AnaliseHistoricoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 2,
+      "porCategoria": {
+        "outro": [
+          "converter",
+          "converterLista"
+        ]
+      },
+      "categoriasPresentes": [],
+      "quantidadeCategorias": 0,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "SubprocessoAcessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoAcessoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 1,
+      "porCategoria": {
+        "outro": [
+          "resolverPermissoes"
+        ]
+      },
+      "categoriasPresentes": [],
+      "quantidadeCategorias": 0,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "SubprocessoContextoConsultaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoContextoConsultaService.java",
+      "pacote": "sgc.subprocesso.service",
+      "totalMetodos": 1,
+      "porCategoria": {
+        "outro": [
+          "montar"
+        ]
+      },
+      "categoriasPresentes": [],
+      "quantidadeCategorias": 0,
+      "severidade": "ok",
+      "motivos": []
+    }
+  ]
+}

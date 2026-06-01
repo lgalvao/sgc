@@ -408,7 +408,7 @@ public class E2eController {
     }
 
     private Processo criarProcessoRevisaoCadastroDisponibilizadoFixture(ProcessoFixtureRequest request) {
-        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        int diasLimite = request.resolverDiasLimite();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
 
         ProcessoFixtureRequest requestMapeamento = ProcessoFixtureRequest.mapaBase(request.unidadeSigla(), diasLimite);
@@ -534,11 +534,11 @@ public class E2eController {
 
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
         Unidade admin = unidadeService.buscarAdmin();
-        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        int diasLimite = request.resolverDiasLimite();
         LocalDateTime agora = LocalDateTime.now();
 
         Processo processo = Processo.builder()
-                .descricao(descricaoFixture(request))
+                .descricao(descricaoFixture(request, TipoProcesso.REVISAO))
                 .tipo(TipoProcesso.REVISAO)
                 .situacao(SituacaoProcesso.EM_ANDAMENTO)
                 .dataCriacao(agora)
@@ -581,7 +581,7 @@ public class E2eController {
             throw new ErroValidacao("Unidade é obrigatória");
         }
 
-        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        int diasLimite = request.resolverDiasLimite();
         Unidade unidade = unidadeService.buscarPorSigla(request.unidadeSigla());
         Long codUnidade = unidade.getCodigo();
         Unidade admin = unidadeService.buscarAdmin();
@@ -681,12 +681,12 @@ public class E2eController {
                 codSubprocesso, codOrigem, codDestino, TITULO_USUARIO_FIXTURE_ADMIN, LocalDateTime.now(), descricao);
     }
 
-    private String descricaoFixture(ProcessoFixtureRequest request) {
+    private String descricaoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         String descReq = request.descricao();
         if (descReq != null && !descReq.isBlank()) {
             return descReq;
         }
-        return "Processo fixture E2E " + TipoProcesso.REVISAO.name() + " " + System.currentTimeMillis();
+        return "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
     }
 
     /**
@@ -717,16 +717,10 @@ public class E2eController {
 
         Long codUnidade = unidadeService.buscarCodigoPorSigla(request.unidadeSigla());
 
-        int diasLimite = request.diasLimite() != null ? request.diasLimite() : 30;
+        int diasLimite = request.resolverDiasLimite();
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
 
-        String descricao;
-        String descReq = request.descricao();
-        if (descReq != null && !descReq.isBlank()) {
-            descricao = descReq;
-        } else {
-            descricao = "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
-        }
+        String descricao = descricaoFixture(request, tipo);
 
         CriarProcessoRequest criarReq = CriarProcessoRequest.builder()
                 .descricao(descricao)
@@ -788,6 +782,10 @@ public class E2eController {
 
         private static ProcessoFixtureRequest mapaBase(String unidadeSigla, Integer diasLimite) {
             return iniciado("Mapa base fixture " + System.currentTimeMillis(), unidadeSigla, diasLimite);
+        }
+
+        public int resolverDiasLimite() {
+            return diasLimite != null ? diasLimite : 30;
         }
     }
 }

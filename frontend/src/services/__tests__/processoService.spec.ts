@@ -74,7 +74,7 @@ describe('processoService', () => {
 
         expect(result[1].nome).toBe('Unidade 2');
         expect(result[1].sigla).toBe('U2');
-        expect(result[1].codSubprocesso).toBe(0);
+        expect(result[1].codSubprocesso).toBeNull();
         expect(result[1].dataLimite).toBeUndefined();
         expect(result[1].mapaCodigo).toBeUndefined();
         expect(result[1].localizacaoAtualCodigo).toBeUndefined();

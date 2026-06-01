@@ -8,6 +8,9 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   test: {
+    env: {
+      TZ: "America/Sao_Paulo",
+    },
     reporters: "dot",
     onConsoleLog(log: string) {
       if (log.includes('decodeEntities')) return false;

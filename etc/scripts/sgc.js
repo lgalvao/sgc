@@ -38,6 +38,12 @@ criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobert
 criarComandoScript(backendCobertura, "jornada", "Executa a jornada consolidada de cobertura do backend.", "etc/scripts/backend/cobertura-jornada.js");
 criarComandoScript(backendCobertura, "cruzada", "Auditoria de cobertura cruzada e independente (Backend).", "etc/scripts/backend/cobertura-cruzada.js");
 
+const backendArquitetura = backend.command("arquitetura").description("Auditorias de arquitetura do backend.");
+criarComandoScript(backendArquitetura, "auditar", "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.", "etc/scripts/backend/arquitetura-auditar.js");
+
+const backendCoesao = backend.command("coesao").description("Auditorias de coesao do backend.");
+criarComandoScript(backendCoesao, "auditar", "Audita Services com responsabilidades misturadas (consulta, mutacao, workflow, notificacao).", "etc/scripts/backend/coesao-auditar.js");
+
 const backendContratos = backend.command("contratos").description("Auditorias de contratos HTTP e DTOs publicos do backend.");
 criarComandoScript(backendContratos, "auditar", "Audita vazamentos de model.* em DTOs expostos por controllers.", "etc/scripts/backend/contratos-auditar.js");
 

@@ -17,19 +17,85 @@ O foco deste plano não é aumentar contagem de testes nem cobertura nominal. O 
 
 ## Estado atual resumido
 
+> Atualizado em: 2026-06-01
+
+### Métricas correntes
+
+| Indicador | Valor | Tendência |
+|---|---|---|
+| Backend testes | 2126 ✅ | estável |
+| Frontend testes | 1388 ✅ | +3 corrigidos |
+| Frontend arquitetura (score) | 0 ✅ | excelente |
+| Backend god objects críticos | 3 🔴 | pendente |
+| Smells score total | 1388 🟡 | -8 pts nesta rodada |
+| Backend @Nullable DTOs | 52 🟡 | em redução |
+| Backend null checks | 232 🟡 | -8 nesta rodada |
+| Frontend test any | 578 🟡 | ativo |
+| Contratos HTTP vazando model.\* | 0 ✅ | resolvido |
+
 ### Sinais positivos
 
-- `./gradlew :backend:qualityCheckFast --console=plain` passou com `2125` testes.
-- `npm run typecheck` na raiz passou.
-- O frontend já recebeu simplificação relevante recente e a auditoria arquitetural dele está controlada.
+- Borda HTTP limpa: `backend contratos auditar` → 0 achados.
+- Frontend arquitetura: score 0 (excelente), todas as regras passando.
+- Toolkit expandido com cobertura de backend estrutural e integração.
+- Semgrep CE integrado com regras próprias do SGC.
+- ArchUnit expandido com regras de coesão, ciclos e repos delegados artificiais.
+- 3 testes frontend corrigidos (timezone + contrato de mapeador).
 
 ### Sinais de dívida ainda ativa
 
-- `npm --prefix frontend run quality:lint` ainda falha.
-- O backend concentra os maiores hubs de complexidade do sistema.
-- A borda backend/frontend ainda vaza detalhes de modelo interno.
-- Parte dos gates de cobertura/mutação está configurada com thresholds neutros.
-- O tratamento de erro mistura preocupação de infraestrutura, navegação e UX.
+- Backend god objects ainda presentes: `ProcessoService` (1290L, 18 deps), `SubprocessoTransicaoService` (592L, 13 deps), `SubprocessoController` (479L, 54 métodos).
+- `frontend_test_any`: 578 ocorrências de `any` nos testes de frontend.
+- Backend null checks defensivos: 240 ocorrências.
+- Tratamento de erro ainda mistura responsabilidades (Frente 4 pendente).
+- Duplicação conceitual entre frentes ainda não atacada (Frente 5 pendente).
+
+---
+
+## Histórico de execução
+
+### Rodada 1 — mai/2026
+
+**Frente 1 ✅ Concluída**
+- `MapaVisualizacaoResponse`, `ContextoEdicaoResponse`, `ContextoCadastroAtividadesResponse` purificados de dependências de `model.*`.
+- `backend contratos auditar` valida: 0 achados.
+
+**Frente 3 ✅ Parcial**
+- Mapper `mapearUnidadeImportacao`: `codSubprocesso ?? null` (fallback zero removido).
+- Regras Semgrep para mapeadores frouxos adicionadas (`sgc-qualidade.yml`).
+
+**Frente 7 ✅ Parcial**
+- Semgrep CE integrado (`codigo semgrep auditar`).
+- ArchUnit expandido com 4 novas regras de arquitetura.
+
+**Frente 8 ✅ Substancialmente concluída**
+- `backend arquitetura auditar`: god objects por linhas, métodos, dependências.
+- `backend coesao auditar`: services com responsabilidades mistas.
+- `backend contratos auditar`: vazamento de `model.*` em DTOs.
+- `integracao contratos exportar-openapi`: exporta OpenAPI atual.
+- `integracao contratos gerar-tipos`: gera tipos TypeScript via openapi-typescript.
+- `integracao contratos diff`: compara versões OpenAPI.
+- `integracao contratos fixar-baseline`: promove baseline de comparação.
+- `codigo semgrep auditar`: regras estáticas próprias do SGC.
+
+**Infraestrutura / correções**
+- 3 testes frontend corrigidos: `processoService.spec.ts` (contrato correto), `feedbacksAdminApresentacao.spec.ts` e `SubprocessoMovimentacoes.spec.ts` (timezone America/Sao_Paulo no vitest.config.ts).
+
+---
+
+### Rodada 2 — jun/2026
+
+**E2eController — eliminação de duplicações**
+- `ProcessoFixtureRequest.resolverDiasLimite()`: extraído do padrão `diasLimite != null ? diasLimite : 30` repetido em 4 métodos fixture → centralizado em 1 ponto.
+- `descricaoFixture(request, tipo)`: generalizado para aceitar `TipoProcesso` como parâmetro; bloco `if/else` inline em `criarProcessoFixture` substituído por chamada ao helper.
+
+**RelatorioFacade — Optional chain**
+- `criarRelatorioAndamentoDto`: 4 null checks explícitos sobre `respDto` / `titularNome` / `substitutoNome` substituídos por cadeia `Optional.ofNullable().map().orElse()`.
+
+**Resultado**
+- Backend null checks: 240 → 232 (-8)
+- Smells score: 1396 → 1388 (-8 pts)
+- 2126 testes backend + 1388 testes frontend passando.
 
 ---
 

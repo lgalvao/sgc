@@ -63,9 +63,9 @@ export interface UnidadeParticipante {
     nome: string;
     sigla: string;
     codUnidade: number;
-    codSubprocesso: number;
+    codSubprocesso: number | null;
     codUnidadeSuperior?: number;
-    situacaoSubprocesso: SituacaoSubprocesso;
+    situacaoSubprocesso: SituacaoSubprocesso | null;
     localizacaoAtualCodigo?: number;
     dataLimite: string;
     mapaCodigo?: number;
@@ -76,7 +76,7 @@ export interface UnidadeImportacao {
     nome: string;
     sigla: string;
     codUnidade: number;
-    codSubprocesso: number;
+    codSubprocesso: number | null;
     codUnidadeSuperior?: number;
     situacaoSubprocesso?: SituacaoSubprocesso;
     localizacaoAtualCodigo?: number;
