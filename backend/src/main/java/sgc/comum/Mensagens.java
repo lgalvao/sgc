@@ -197,6 +197,10 @@ public final class Mensagens {
     public static final String ALERTA_MAPA_VALIDACAO_DEVOLVIDA = "Validação do mapa da unidade %s devolvida para ajustes";
     public static final String ALERTA_MAPA_VALIDACAO_ACEITA = "Validação do mapa da unidade %s submetida para análise";
     public static final String ALERTA_MAPA_HOMOLOGADO = "Mapa de competências da unidade %s homologado";
+    public static final String ALERTA_DIAGNOSTICO_CONCLUIDO = "Diagnóstico da unidade %s concluído";
+    public static final String ALERTA_DIAGNOSTICO_DEVOLVIDO = "Diagnóstico da unidade %s devolvido para ajustes";
+    public static final String ALERTA_DIAGNOSTICO_ACEITO = "Diagnóstico da unidade %s submetido para análise";
+    public static final String ALERTA_DIAGNOSTICO_HOMOLOGADO = "Diagnóstico da unidade %s homologado";
 
     // ── Notificações e E-mails ───────────────────────────────────────────────
     private Mensagens() {

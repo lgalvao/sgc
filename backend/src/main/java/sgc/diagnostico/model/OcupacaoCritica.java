@@ -32,7 +32,7 @@ public class OcupacaoCritica extends EntidadeBase {
     private Competencia competencia;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "situacao_capacitado", length = 10, nullable = false)
+    @Column(name = "situacao_capacitacao", length = 10, nullable = false)
     private SituacaoCapacitacao situacaoCapacitacao;
 
 }

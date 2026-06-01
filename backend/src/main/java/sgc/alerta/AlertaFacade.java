@@ -170,13 +170,18 @@ public class AlertaFacade {
 
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long cod : codsOperacionais) {
+            Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
+            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && "ADMIN".equalsIgnoreCase(unidadeDestino.getSigla())) continue;
             alertasCriados.add(criarAlertaEntidade(processo, unidadeRaiz(),
-                    obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo"));
+                    unidadeDestino, "Início do processo"));
         }
 
         for (Long cod : codsIntermediarias) {
+            if (codsOperacionais.contains(cod)) continue;
+            Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
+            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && "ADMIN".equalsIgnoreCase(unidadeDestino.getSigla())) continue;
             alertasCriados.add(criarAlertaEntidade(processo, unidadeRaiz(),
-                    obterUnidadeObrigatoria(todasUnidadesMap, cod), "Início do processo em unidade(s) subordinada(s)"));
+                    unidadeDestino, "Início do processo em unidade(s) subordinada(s)"));
         }
 
         return alertaService.salvarTodos(alertasCriados);

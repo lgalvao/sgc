@@ -27,6 +27,11 @@ public class UsuarioFacade {
     private final ResponsavelUnidadeService responsavelUnidadeService;
 
     @Transactional(readOnly = true)
+    public List<Usuario> buscarPorUnidadeLotacao(Long codUnidade) {
+        return usuarioService.buscarPorUnidadeLotacao(codUnidade);
+    }
+
+    @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
         Usuario usuario = usuarioService.buscarOpt(titulo).orElse(null);
         if (usuario != null) {

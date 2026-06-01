@@ -32,6 +32,37 @@ public class DiagnosticoNotificacaoService {
     private final UnidadeService unidadeService;
     private final ConfigAplicacao configAplicacao;
 
+    public void notificarInicioProcessoServidor(Subprocesso sp, Usuario servidor) {
+        if (servidor.getEmail() == null || servidor.getEmail().isBlank()) {
+            log.warn("Servidor {} sem email para notificação de início de diagnóstico.", servidor.getTituloEleitoral());
+            return;
+        }
+
+        String nomeProcesso = sp.getProcesso().getDescricao();
+        String dataLimite = sp.getDataLimiteEtapa1().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String assunto = "SGC: Autoavaliação de diagnóstico de competências disponível";
+
+        String corpo = """
+                <p>Prezado(a) %s,</p>
+                <p>O processo de diagnóstico de competências técnicas <strong>%s</strong> foi iniciado para a sua unidade (<strong>%s</strong>).</p>
+                <p>A sua autoavaliação já está disponível para preenchimento no Sistema de Gestão de Competências.</p>
+                <p>O prazo para conclusão desta etapa é <strong>%s</strong>.</p>
+                <p>Acompanhe o processo no Sistema de Gestão de Competências (%s).</p>
+                """.formatted(servidor.getNome(), nomeProcesso, sp.getUnidade().getSigla(), dataLimite, urlSistema());
+
+        enfileirarNotificacao(sp, sp.getUnidade(),
+                new DestinatarioNotificacao(servidor.getEmail(), servidor.getTituloEleitoral(), servidor.getNome()),
+                TipoNotificacao.PROCESSO_INICIADO,
+                assunto,
+                corpo,
+                "diagnostico:%d:inicio:servidor:%s".formatted(sp.getCodigo(), servidor.getTituloEleitoral()));
+
+        alertaFacade.criarAlertaPessoal(
+                servidor.getTituloEleitoral(),
+                "Sua autoavaliação de diagnóstico no processo %s está disponível. Prazo: %s".formatted(nomeProcesso, dataLimite)
+        );
+    }
+
     public void notificarAutoavaliacaoConcluida(Subprocesso sp, String servidorTitulo) {
         Usuario servidor = usuarioService.buscarOpt(servidorTitulo).orElse(null);
         String nomeServidor = servidor != null ? servidor.getNome() : servidorTitulo;
@@ -183,8 +214,7 @@ public class DiagnosticoNotificacaoService {
         String corpo = """
                 <p>Prezado(a) responsável pela %s,</p>
                 <p>O diagnóstico da sua unidade no processo %s foi homologado.</p>
-                <p>Acompanhe o processo no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(unidadeSubprocesso.getSigla(), sp.getProcesso().getDescricao(), urlSistema());
+                """.formatted(unidadeSubprocesso.getSigla(), sp.getProcesso().getDescricao());
 
         enfileirarNotificacao(sp, unidadeSubprocesso, destinatario, TipoNotificacao.DIAGNOSTICO_HOMOLOGADO, assunto, corpo,
                 "diagnostico:%d:homologado".formatted(sp.getCodigo()));

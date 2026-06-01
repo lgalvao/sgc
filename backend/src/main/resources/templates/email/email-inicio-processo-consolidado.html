@@ -18,6 +18,9 @@
                 Já é possível realizar a revisão do seu cadastro de atividades e conhecimentos no Sistema de Gestão de
                 Competências (<a href="https://sgc.tre-pe.jus.br">SGC</a>).
             </p>
+            <p th:if="${tipoProcesso == 'DIAGNOSTICO'}">
+                Já é possível realizar a autoavaliação de competências no Sistema de Gestão de Competências.
+            </p>
             <p>O prazo para conclusão desta etapa do processo é <strong th:text="${dataLimite}"></strong>.</p>
         </div>
 
@@ -34,8 +37,12 @@
                 Estas unidades já podem iniciar a revisão do cadastro de atividades e conhecimentos. À medida que estas
                 revisões forem sendo disponibilizadas, será possível visualizar e realizar a sua validação.
             </p>
+            <p th:if="${tipoProcesso == 'DIAGNOSTICO'}">
+                Estas unidades já podem iniciar a autoavaliação de competências. À medida que estas avaliações forem sendo
+                concluídas, será possível visualizar e realizar a sua validação.
+            </p>
             <p>O prazo para conclusão desta etapa do processo é <strong th:text="${dataLimite}"></strong>.</p>
-            <p>
+            <p th:if="${tipoProcesso != 'DIAGNOSTICO'}">
                 Acompanhe o processo no Sistema de Gestão de Competências:
                 <a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>.
             </p>

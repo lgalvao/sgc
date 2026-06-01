@@ -67,6 +67,7 @@ public class ProcessoService {
     private final CadastroFluxoService cadastroFluxoService;
     private final ConfiguracaoService configuracaoService;
     private final MapaManutencaoService mapaManutencaoService;
+    private final sgc.diagnostico.service.DiagnosticoNotificacaoService diagnosticoNotificacaoService;
 
 
     @Transactional(readOnly = true)
@@ -1059,20 +1060,26 @@ public class ProcessoService {
 
         for (Long cod : codsOperacionais) {
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
+            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && isUnidadeAdmin(unidadeDestino)) continue;
+            Subprocesso sp = subprocessoPorUnidade.get(unidadeDestino.getCodigo());
             criarNotificacaoInicio(
                     processo,
                     unidadeDestino,
                     true,
                     subordinadasPorSuperior,
                     dataLimite,
-                    subprocessoPorUnidade.get(unidadeDestino.getCodigo())
+                    sp
             );
+            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && sp != null) {
+                notificarServidoresDiagnostico(sp);
+            }
         }
 
         for (Long cod : codsIntermediarias) {
             // Se já foi notificada como operacional, não notifica como intermediária
             if (codsOperacionais.contains(cod)) continue;
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
+            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && isUnidadeAdmin(unidadeDestino)) continue;
             criarNotificacaoInicio(
                     processo,
                     unidadeDestino,
@@ -1081,6 +1088,13 @@ public class ProcessoService {
                     dataLimite,
                     subprocessoPorUnidade.get(unidadeDestino.getCodigo())
             );
+        }
+    }
+
+    private void notificarServidoresDiagnostico(Subprocesso sp) {
+        List<Usuario> servidores = usuarioService.buscarPorUnidadeLotacao(sp.getUnidade().getCodigo());
+        for (Usuario servidor : servidores) {
+            diagnosticoNotificacaoService.notificarInicioProcessoServidor(sp, servidor);
         }
     }
 
