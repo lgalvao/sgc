@@ -145,9 +145,9 @@ public enum TipoTransicao {
 
     DIAGNOSTICO_HOMOLOGADO(
             Mensagens.HIST_DIAGNOSTICO_HOMOLOGADO,
-            Mensagens.ALERTA_DIAGNOSTICO_HOMOLOGADO,
-            "diagnostico-homologado",
-            "diagnostico-homologado-superior"
+            null,
+            null,
+            null
     );
 
     private final String descMovimentacao;
