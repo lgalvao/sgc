@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:replace="~{_layout :: email(cabecalho=~{::cabecalho}, conteudo=~{::conteudo})}">
+    <th:block th:fragment="cabecalho">
+        <h1>Consenso disponível para validação</h1>
+    </th:block>
+    <th:block th:fragment="conteudo">
+        <p>Prezado(a) <strong th:text="${nomeServidor}">SERVIDOR</strong>,</p>
+
+        <p>
+            A chefia da unidade <strong th:text="${siglaUnidade}">UNIDADE</strong> registrou a avaliação de consenso do processo
+            <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+        </p>
+
+        <p>
+            O consenso já pode ser consultado e validado no Sistema de Gestão de Competências:
+            <a th:href="${urlSistema}" th:text="${urlSistema}">URL</a>.
+        </p>
+    </th:block>
+</th:block>
+</body>
+</html>

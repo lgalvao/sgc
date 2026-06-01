@@ -119,6 +119,81 @@ public class EmailModelosService {
         return templateEngine.process("atribuicao-temporaria", ctx);
     }
 
+    public String criarEmailDiagnosticoInicioServidor(String nomeServidor, String nomeProcesso, String siglaUnidade, LocalDateTime dataLimite, String urlSistema) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Autoavaliação de diagnóstico disponível");
+        ctx.setVariable("nomeServidor", nomeServidor);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        ctx.setVariable(VAR_DATA_LIMITE, dataLimite.format(FORMATADOR));
+        ctx.setVariable("urlSistema", urlSistema);
+        return templateEngine.process("diagnostico-inicio-servidor", ctx);
+    }
+
+    public String criarEmailDiagnosticoAutoavaliacaoConcluida(String siglaUnidade, String nomeServidor, String nomeProcesso) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Autoavaliação concluída");
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        ctx.setVariable("nomeServidor", nomeServidor);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        return templateEngine.process("diagnostico-autoavaliacao-concluida", ctx);
+    }
+
+    public String criarEmailDiagnosticoConsensoDisponivel(String nomeServidor, String siglaUnidade, String nomeProcesso, String urlSistema) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Consenso disponível para validação");
+        ctx.setVariable("nomeServidor", nomeServidor);
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        ctx.setVariable("urlSistema", urlSistema);
+        return templateEngine.process("diagnostico-consenso-disponivel", ctx);
+    }
+
+    public String criarEmailDiagnosticoConsensoAprovado(String siglaUnidade, String nomeServidor, String nomeProcesso) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Consenso aprovado");
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        ctx.setVariable("nomeServidor", nomeServidor);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        return templateEngine.process("diagnostico-consenso-aprovado", ctx);
+    }
+
+    public String criarEmailDiagnosticoConcluido(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Diagnóstico concluído");
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
+        ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        return templateEngine.process("diagnostico-concluido", ctx);
+    }
+
+    public String criarEmailDiagnosticoDevolvido(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso, String observacoes) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Diagnóstico devolvido");
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
+        ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        ctx.setVariable("observacoes", observacoes);
+        return templateEngine.process("diagnostico-devolvido", ctx);
+    }
+
+    public String criarEmailDiagnosticoAceito(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Diagnóstico aceito");
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
+        ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        return templateEngine.process("diagnostico-aceito", ctx);
+    }
+
+    public String criarEmailDiagnosticoHomologado(String siglaUnidade, String nomeProcesso) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Diagnóstico homologado");
+        ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        return templateEngine.process("diagnostico-homologado", ctx);
+    }
+
     public record EmailAtribuicaoTemporariaCommand(
             String assunto,
             String nomeServidor,

@@ -31,6 +31,7 @@ public class DiagnosticoNotificacaoService {
     private final UsuarioService usuarioService;
     private final UnidadeService unidadeService;
     private final ConfigAplicacao configAplicacao;
+    private final sgc.alerta.EmailModelosService emailModelosService;
 
     public void notificarInicioProcessoServidor(Subprocesso sp, Usuario servidor) {
         if (servidor.getEmail() == null || servidor.getEmail().isBlank()) {
@@ -42,13 +43,13 @@ public class DiagnosticoNotificacaoService {
         String dataLimite = sp.getDataLimiteEtapa1().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String assunto = "SGC: Autoavaliação de diagnóstico de competências disponível";
 
-        String corpo = """
-                <p>Prezado(a) %s,</p>
-                <p>O processo de diagnóstico de competências técnicas <strong>%s</strong> foi iniciado para a sua unidade (<strong>%s</strong>).</p>
-                <p>A sua autoavaliação já está disponível para preenchimento no Sistema de Gestão de Competências.</p>
-                <p>O prazo para conclusão desta etapa é <strong>%s</strong>.</p>
-                <p>Acompanhe o processo no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(servidor.getNome(), nomeProcesso, sp.getUnidade().getSigla(), dataLimite, urlSistema());
+        String corpo = emailModelosService.criarEmailDiagnosticoInicioServidor(
+                servidor.getNome(),
+                nomeProcesso,
+                sp.getUnidade().getSigla(),
+                sp.getDataLimiteEtapa1(),
+                urlSistema()
+        );
 
         enfileirarNotificacao(sp, sp.getUnidade(),
                 new DestinatarioNotificacao(servidor.getEmail(), servidor.getTituloEleitoral(), servidor.getNome()),
@@ -70,11 +71,11 @@ public class DiagnosticoNotificacaoService {
 
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidade);
         String assunto = "SGC: Autoavaliação de %s submetida para análise".formatted(nomeServidor);
-        String corpo = """
-                <p>Prezado(a) responsável pela %s,</p>
-                <p>O servidor %s concluiu a autoavaliação no processo %s.</p>
-                <p>A análise já pode ser realizada no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(unidade.getSigla(), nomeServidor, sp.getProcesso().getDescricao(), urlSistema());
+        String corpo = emailModelosService.criarEmailDiagnosticoAutoavaliacaoConcluida(
+                unidade.getSigla(),
+                nomeServidor,
+                sp.getProcesso().getDescricao()
+        );
 
         enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA, assunto, corpo,
                 "diagnostico:%d:autoavaliacao:%s".formatted(sp.getCodigo(), servidorTitulo));
@@ -97,11 +98,12 @@ public class DiagnosticoNotificacaoService {
         Unidade unidade = sp.getUnidade();
 
         String assunto = "SGC: Avaliação de consenso de %s disponível para validação".formatted(servidor.getNome());
-        String corpo = """
-                <p>Prezado(a) %s,</p>
-                <p>A chefia da unidade %s registrou a avaliação de consenso do processo %s.</p>
-                <p>O consenso já pode ser consultado e validado no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(servidor.getNome(), unidade.getSigla(), sp.getProcesso().getDescricao(), urlSistema());
+        String corpo = emailModelosService.criarEmailDiagnosticoConsensoDisponivel(
+                servidor.getNome(),
+                unidade.getSigla(),
+                sp.getProcesso().getDescricao(),
+                urlSistema()
+        );
 
         enfileirarNotificacao(sp, unidade,
                 new DestinatarioNotificacao(servidor.getEmail(), servidor.getTituloEleitoral(), servidor.getNome()),
@@ -125,11 +127,11 @@ public class DiagnosticoNotificacaoService {
 
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidade);
         String assunto = "SGC: Avaliação de consenso de %s aprovada".formatted(nomeServidor);
-        String corpo = """
-                <p>Prezado(a) responsável pela %s,</p>
-                <p>O servidor %s aprovou a avaliação de consenso do processo %s.</p>
-                <p>Acompanhe o processo no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(unidade.getSigla(), nomeServidor, sp.getProcesso().getDescricao(), urlSistema());
+        String corpo = emailModelosService.criarEmailDiagnosticoConsensoAprovado(
+                unidade.getSigla(),
+                nomeServidor,
+                sp.getProcesso().getDescricao()
+        );
 
         enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_CONSENSO_APROVADO, assunto, corpo,
                 "diagnostico:%d:consenso-aprovado:%s".formatted(sp.getCodigo(), servidorTitulo));
@@ -146,11 +148,11 @@ public class DiagnosticoNotificacaoService {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
         String assunto = "SGC: Diagnóstico da unidade %s concluído".formatted(unidadeSubprocesso.getSigla());
-        String corpo = """
-                <p>Prezado(a) responsável pela %s,</p>
-                <p>O diagnóstico da unidade %s no processo %s foi concluído.</p>
-                <p>A análise já pode ser realizada no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(unidadeSuperior.getSigla(), unidadeSubprocesso.getSigla(), sp.getProcesso().getDescricao(), urlSistema());
+        String corpo = emailModelosService.criarEmailDiagnosticoConcluido(
+                unidadeSuperior.getSigla(),
+                unidadeSubprocesso.getSigla(),
+                sp.getProcesso().getDescricao()
+        );
 
         enfileirarNotificacao(sp, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_CONCLUIDO, assunto, corpo,
                 "diagnostico:%d:concluido:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
@@ -167,11 +169,12 @@ public class DiagnosticoNotificacaoService {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeDevolucao);
         String assunto = "SGC: Diagnóstico da unidade %s devolvido para ajustes".formatted(unidadeSubprocesso.getSigla());
-        String corpo = """
-                <p>Prezado(a) responsável pela %s,</p>
-                <p>O diagnóstico da unidade %s no processo %s foi devolvido para ajustes.</p>
-                <p>Acompanhe o processo no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(unidadeDevolucao.getSigla(), unidadeSubprocesso.getSigla(), sp.getProcesso().getDescricao(), urlSistema());
+        String corpo = emailModelosService.criarEmailDiagnosticoDevolvido(
+                unidadeDevolucao.getSigla(),
+                unidadeSubprocesso.getSigla(),
+                sp.getProcesso().getDescricao(),
+                null // Buscar observações da movimentação se necessário
+        );
 
         enfileirarNotificacao(sp, unidadeDevolucao, destinatario, TipoNotificacao.DIAGNOSTICO_DEVOLVIDO, assunto, corpo,
                 "diagnostico:%d:devolvido:destino:%d".formatted(sp.getCodigo(), unidadeDevolucao.getCodigo()));
@@ -188,11 +191,11 @@ public class DiagnosticoNotificacaoService {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
         String assunto = "SGC: Diagnóstico da unidade %s submetido para análise".formatted(unidadeSubprocesso.getSigla());
-        String corpo = """
-                <p>Prezado(a) responsável pela %s,</p>
-                <p>O diagnóstico da unidade %s no processo %s foi aceito e submetido para análise por essa unidade.</p>
-                <p>A análise já pode ser realizada no Sistema de Gestão de Competências (%s).</p>
-                """.formatted(unidadeSuperior.getSigla(), unidadeSubprocesso.getSigla(), sp.getProcesso().getDescricao(), urlSistema());
+        String corpo = emailModelosService.criarEmailDiagnosticoAceito(
+                unidadeSuperior.getSigla(),
+                unidadeSubprocesso.getSigla(),
+                sp.getProcesso().getDescricao()
+        );
 
         enfileirarNotificacao(sp, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_ACEITO, assunto, corpo,
                 "diagnostico:%d:aceito:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
@@ -207,14 +210,14 @@ public class DiagnosticoNotificacaoService {
 
     public void notificarDiagnosticoHomologado(Subprocesso sp) {
         Unidade unidadeSubprocesso = sp.getUnidade();
-        Unidade admin = unidadeService.buscarAdmin();
+        Unidade admin = unidadeRaiz();
 
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSubprocesso);
         String assunto = "SGC: Diagnóstico da unidade %s homologado".formatted(unidadeSubprocesso.getSigla());
-        String corpo = """
-                <p>Prezado(a) responsável pela %s,</p>
-                <p>O diagnóstico da sua unidade no processo %s foi homologado.</p>
-                """.formatted(unidadeSubprocesso.getSigla(), sp.getProcesso().getDescricao());
+        String corpo = emailModelosService.criarEmailDiagnosticoHomologado(
+                unidadeSubprocesso.getSigla(),
+                sp.getProcesso().getDescricao()
+        );
 
         enfileirarNotificacao(sp, unidadeSubprocesso, destinatario, TipoNotificacao.DIAGNOSTICO_HOMOLOGADO, assunto, corpo,
                 "diagnostico:%d:homologado".formatted(sp.getCodigo()));
@@ -225,6 +228,10 @@ public class DiagnosticoNotificacaoService {
                 admin,
                 unidadeSubprocesso
         );
+    }
+
+    private Unidade unidadeRaiz() {
+        return unidadeService.buscarAdmin();
     }
 
     private void enfileirarNotificacao(
