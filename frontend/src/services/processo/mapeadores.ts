@@ -23,7 +23,7 @@ export function mapearUnidadeImportacao(dto: UnidadeParticipanteDto): UnidadeImp
         codUnidade: dto.codUnidade,
         codSubprocesso: dto.codSubprocesso ?? null,
         codUnidadeSuperior: dto.codUnidadeSuperior ?? undefined,
-        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso) ?? undefined,
+        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso | null) ?? undefined,
         dataLimite: dto.dataLimite ?? undefined,
         mapaCodigo: dto.mapaCodigo ?? undefined,
         localizacaoAtualCodigo: dto.localizacaoAtualCodigo ?? undefined,

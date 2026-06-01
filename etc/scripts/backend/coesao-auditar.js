@@ -44,7 +44,7 @@ function normalizarCaminho(caminho) {
 }
 
 function extrairNomesMetodosPublicos(conteudo) {
-    const regex = /^\s+public\s+(?:static\s+)?(?!class|interface|enum|record\b)(?:(?:@\w+(?:\(.*?\))?\s+)*)(?:[\w<>[\],\s]+)\s+([a-z]\w*)\s*\(/gm;
+    const regex = /^\s+public\s+(?:static\s+)?(?!class|interface|enum|record\b)(?:(?:@\w+(?:\([^)]*\))?\s+)*)(?:[\w<>[\],\s]+)\s+([a-z]\w*)\s*\(/gm;
     const nomes = [];
     for (const correspondencia of conteudo.matchAll(regex)) {
         if (correspondencia[1]) nomes.push(correspondencia[1]);
