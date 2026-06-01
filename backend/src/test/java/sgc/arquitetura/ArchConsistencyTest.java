@@ -192,6 +192,48 @@ public class ArchConsistencyTest {
             .because("Controllers devem receber DTOs/requests explícitos, não entidades JPA no corpo HTTP");
 
     @ArchTest
+    static final ArchRule controllers_should_not_expose_internal_model_types_in_http_contracts = methods()
+            .that()
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController.class)
+            .and()
+            .areDeclaredInClassesThat()
+            .doNotHaveSimpleName("E2eController")
+            .should(new ArchCondition<>("not expose internal model types in HTTP contracts") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    try {
+                        if (contemModeloInternoAplicacao(method.reflect().getGenericReturnType())) {
+                            String mensagem = String.format(
+                                    "Método %s.%s expõe tipo interno de model no retorno HTTP: %s",
+                                    method.getOwner().getSimpleName(), method.getName(), method.getDescription());
+                            events.add(SimpleConditionEvent.violated(method, mensagem));
+                        }
+
+                        for (java.lang.reflect.Parameter parametro : method.reflect().getParameters()) {
+                            if (parametro.isAnnotationPresent(RequestBody.class)
+                                    && contemModeloInternoAplicacao(parametro.getParameterizedType())) {
+                                String mensagem = String.format(
+                                        "Método %s.%s recebe tipo interno de model em @RequestBody: %s",
+                                        method.getOwner().getSimpleName(),
+                                        method.getName(),
+                                        parametro.getParameterizedType().getTypeName());
+                                events.add(SimpleConditionEvent.violated(method, mensagem));
+                            }
+                        }
+                    } catch (Exception e) {
+                        String mensagem = String.format(
+                                "Não foi possível inspecionar contrato HTTP de %s.%s: %s",
+                                method.getOwner().getSimpleName(), method.getName(), e.getMessage());
+                        events.add(SimpleConditionEvent.violated(method, mensagem));
+                    }
+                }
+            })
+            .because("Controllers da aplicação devem expor DTOs explícitos e não tipos internos de model no contrato HTTP");
+
+    @ArchTest
     static final ArchRule controllers_should_not_use_json_view_except_e2e = noMethods()
             .that()
             .areDeclaredInClassesThat()
@@ -450,6 +492,51 @@ public class ArchConsistencyTest {
 
         if (tipo instanceof GenericArrayType genericArrayType) {
             return contemEntidadeJpa(genericArrayType.getGenericComponentType());
+        }
+
+        return false;
+    }
+
+    private static boolean contemModeloInternoAplicacao(Type tipo) {
+        if (tipo instanceof Class<?> classe) {
+            Package pacote = classe.getPackage();
+            if (pacote == null) {
+                return false;
+            }
+            String nomePacote = pacote.getName();
+            return nomePacote.startsWith("sgc.")
+                    && nomePacote.contains(".model")
+                    && !classe.isEnum();
+        }
+
+        if (tipo instanceof ParameterizedType parameterizedType) {
+            if (contemModeloInternoAplicacao(parameterizedType.getRawType())) {
+                return true;
+            }
+            for (Type argumento : parameterizedType.getActualTypeArguments()) {
+                if (contemModeloInternoAplicacao(argumento)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (tipo instanceof WildcardType wildcardType) {
+            for (Type upperBound : wildcardType.getUpperBounds()) {
+                if (contemModeloInternoAplicacao(upperBound)) {
+                    return true;
+                }
+            }
+            for (Type lowerBound : wildcardType.getLowerBounds()) {
+                if (contemModeloInternoAplicacao(lowerBound)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (tipo instanceof GenericArrayType genericArrayType) {
+            return contemModeloInternoAplicacao(genericArrayType.getGenericComponentType());
         }
 
         return false;

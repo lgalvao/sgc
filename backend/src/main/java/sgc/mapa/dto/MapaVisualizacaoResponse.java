@@ -2,8 +2,8 @@ package sgc.mapa.dto;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
+import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.model.*;
 
 import java.util.*;
 
@@ -13,13 +13,13 @@ import java.util.*;
 @Builder
 public record MapaVisualizacaoResponse(
         @JsonView(MapaViews.Publica.class)
-        Unidade unidade,
+        UnidadeResumoDto unidade,
 
         @JsonView(MapaViews.Publica.class)
-        List<Competencia> competencias,
+        List<CompetenciaMapaDto> competencias,
 
         @JsonView(MapaViews.Publica.class)
-        List<Atividade> atividadesSemCompetencia,
+        List<AtividadeMapaDto> atividadesSemCompetencia,
 
         @JsonView(MapaViews.Publica.class)
         String sugestoes

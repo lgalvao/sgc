@@ -1,12 +1,22 @@
 ---
 name: simplificacao-codigo
-description: Use quando o objetivo for simplificar código no SGC de forma full-stack, sem quebrar contratos, requisitos ou regras de acesso. Indicado para consolidar duplicações internas, reduzir acoplamento acidental, estreitar superfícies de services/composables/stores, eliminar efeitos colaterais escondidos, remover código morto e explicitar dependências em backend Java/Spring e frontend Vue/TypeScript.
+description: Use quando o objetivo for simplificar código no SGC com foco sistêmico, sem quebrar contratos, requisitos ou regras de acesso. Indicado para consolidar duplicações internas, reduzir acoplamento acidental, endurecer bordas HTTP, estreitar superfícies de services/composables/stores, eliminar efeitos colaterais escondidos, remover código morto e explicitar dependências em backend Java/Spring e frontend Vue/TypeScript.
 ---
 
-# Simplificação Full-Stack no SGC
+# Simplificação Sistêmica no SGC
 
-Use este skill para rodadas de simplificação incremental em código já existente, tratando backend e frontend como partes
-do mesmo fluxo de negócio.
+Use este skill para rodadas de simplificação incremental em código já existente, tratando backend, frontend, integração
+e toolkit como partes do mesmo sistema.
+
+Ele não serve apenas para "deixar código menor". Ele existe para reduzir dívida estrutural cara, especialmente quando o
+problema real está em uma destas fronteiras:
+
+- backend com baixa coesão;
+- contratos HTTP frouxos;
+- frontend compensando deriva de payload;
+- regra duplicada entre camadas;
+- tratamento de erro espalhado;
+- auditorias manuais que deveriam virar comando recorrente no `sgc.js`.
 
 ## Fontes de verdade
 
@@ -15,6 +25,7 @@ Antes de simplificar, confirme as restrições nestas fontes:
 - `etc/reqs`
 - `etc/docs/acesso.md`
 - `AGENTS.md`
+- `plano-qualidade.md`, se existir
 - `plano-simplificacao.md`, se existir
 
 No SGC, requisitos e regras de acesso têm precedência sobre preferência de refatoração.
@@ -26,11 +37,13 @@ Reduzir complexidade acidental preservando:
 - comportamento funcional;
 - aderência aos requisitos em `etc/reqs`;
 - contratos HTTP;
+- contratos de integração entre backend e frontend;
 - DTOs externos;
 - lazy loading protegido por DTO no backend;
 - regras de acesso e permissões;
 - textos e fluxos relevantes de UI;
-- estabilidade de testes.
+- estabilidade de testes;
+- governança de qualidade já capturada no toolkit.
 
 ## Princípios
 
@@ -62,6 +75,18 @@ Reduzir complexidade acidental preservando:
    Se a lógica ainda pertence claramente a uma única tela ou fluxo, prefira helper local de view ou componente local de
    apresentação antes de inventar camada genérica.
 
+9. Corrigir o ponto de verdade mais próximo da regra.
+   Se a inconsistência nasce no backend, não estabilize isso com heurística no frontend. Se a regra é de borda, trate a
+   borda. Se a dor é recorrente, transforme a auditoria em ferramenta.
+
+10. Usar o toolkit como mecanismo de recorrência.
+    Quando uma simplificação revela um problema estrutural repetível, avalie se ele deve virar comando no `sgc.js`,
+    budget, auditoria ou snapshot.
+
+11. Preferir integração de ferramenta OSS à reinvenção.
+    Se o problema já é bem resolvido por ferramenta madura do ecossistema, o papel do SGC é orquestrar, calibrar e
+    consolidar no toolkit, não reconstruir o motor do zero.
+
 ## Guardrails do SGC
 
 ### Backend
@@ -72,10 +97,15 @@ Reduzir complexidade acidental preservando:
 - Não mover controller para acesso direto a repositório quando houver regra de negócio, segurança, transação ou montagem
   de resposta.
 - Não simplificar permissão sem confronto explícito com `etc/docs/acesso.md`.
+- Não manter DTO público importando `model.*` quando o endpoint é parte da aplicação e não fixture técnica de E2E.
 - Em `subprocesso`, simplifique antes duplicações de busca, validação e contexto; evite fusões amplas de serviço.
 - Prefira helpers privados, `command`/DTO interno e centralização de leitura antes de criar abstrações novas.
 - Se o frontend estiver reconstruindo regra de acesso, workflow ou disponibilidade por falta de sinal no DTO, prefira
   completar o contrato backend em vez de espalhar heurística no cliente.
+- Se um service/controlador/facade virou hub com responsabilidades demais, prefira quebrar por caso de uso real, não por
+  camada cosmética nem por contagem de linhas.
+- Se a simplificação tocar controller ou DTO, confirme explicitamente se o retorno continua sendo contrato HTTP estável
+  e separado do domínio.
 - Se houver muitos parâmetros, use objeto de transporte, em linha com `AGENTS.md`.
 - Se a simplificação alterar contrato interno real, atualize os testes.
 - Se Gradle falhar só ao armazenar cache, repita sem cache antes de tratar como regressão de código.
@@ -96,11 +126,29 @@ Reduzir complexidade acidental preservando:
   visível e ficar desabilitado.
 - Se o backend não separar claramente "pode mostrar" de "pode executar", prefira endurecer o DTO/contrato na borda a
   recriar regra de permissão no frontend.
+- Não manter tipos frouxos, `Partial<>`, `[key: string]: unknown`, `!`, `as` e defaults silenciosos em respostas
+  centrais só para tolerar deriva de payload.
 - Não reintroduzir `Perfil`, `isAdmin`, `isChefe`, `isGestor` ou equivalentes para decidir UI quando o backend já
   entrega permissões estruturadas.
 - Não manter API pública de store, composable ou view apenas para sustentar testes antigos; ajuste ou apague os testes
   quando a superfície de produção encolher.
 - Preserve textos, navegação e comportamento exigidos por `etc/reqs`.
+
+### Integração Backend/Frontend
+
+- Não aceitar "funciona porque o frontend corrige" como estado final.
+- Não estabilizar drift de contrato com fallback silencioso quando o backend pode produzir dado correto.
+- Não duplicar regra de workflow, elegibilidade, visibilidade ou permissão nas duas camadas sem motivo documentado.
+- Se a mesma normalização aparece em service, store e view, isso é sinal de contrato frouxo ou borda mal definida.
+- Se um contrato é crítico e recorrente, considere extração para OpenAPI, geração de tipos ou auditoria automatizada.
+
+### Toolkit e Ferramentas
+
+- Não criar script local ad hoc quando o problema merece comando nomeado, ajuda, saída JSON e reuso no `sgc.js`.
+- Não esconder heurística importante em prompt ou memória quando ela pode virar auditoria reproduzível.
+- Não reconstruir do zero o que ferramentas como `ArchUnit`, `Semgrep`, `openapi-diff`, `openapi-typescript`,
+  `Schemathesis`, `jQAssistant` ou `OpenRewrite` já resolvem bem.
+- O toolkit deve orquestrar, consolidar e contextualizar a análise para o SGC.
 
 ## Heurísticas Full-Stack
 
@@ -108,10 +156,13 @@ Reduzir complexidade acidental preservando:
 
 - métodos de service que repetem a mesma busca, validação ou montagem de contexto;
 - facades ou services pass-through sem regra real;
+- controllers grandes misturando consulta, workflow, manutenção, contexto e administração;
 - branches longos variando só por enum, flag ou tipo de fluxo;
 - validações de negócio duplicadas em mais de um ponto do workflow;
 - consultas iguais espalhadas em services diferentes;
-- testes que ainda mockam collaborators antigos após uma consolidação.
+- testes que ainda mockam collaborators antigos após uma consolidação;
+- DTOs públicos que ainda importam tipos `model.*`;
+- montagem de resposta HTTP misturada à coleta de domínio e à decisão de permissão.
 
 ### Backend: alvos ruins
 
@@ -131,6 +182,8 @@ Reduzir complexidade acidental preservando:
 - estado exposto mas sem uso em produção;
 - services ou wrappers que só repassam chamada sem agregar contrato;
 - DTOs/permissões que já distinguem capacidade e habilitação, mas cujo frontend ainda trata isso como uma única flag;
+- contratos de resposta com opcionais demais para dados que deveriam ser obrigatórios;
+- mapeadores que preenchem ausência de backend com enum default, string vazia ou `0`;
 - views grandes que ainda misturam orquestração de fluxo e seções visuais que podem virar componente local de
   apresentação;
 - arquivos centrais cujo código pode ser fatiado por responsabilidade real sem alterar o contrato externo;
@@ -148,6 +201,35 @@ Reduzir complexidade acidental preservando:
 - mover blocos grandes para outro arquivo sem reduzir superfície, acoplamento ou responsabilidade real;
 - simplificação que muda textos, navegação ou permissões fora do que `etc/reqs` permite.
 
+### Integração: bons alvos
+
+- backend entregando dado incompleto que o frontend recompõe de forma defensiva;
+- tipos frontend mais permissivos que o contrato backend real;
+- divergência entre nomes de campos, nulabilidade e obrigatoriedade;
+- duplicação de decisão entre permissão backend e habilitação frontend;
+- contratos de contexto grandes demais, porém ainda mal definidos.
+
+### Integração: alvos ruins
+
+- aceitar fallback silencioso só porque evita quebrar teste antigo;
+- gerar tipagem manual paralela se a fonte de verdade do contrato já pode ser publicada;
+- tratar drift estrutural com comentário, convenção verbal ou prompt em vez de ajuste de contrato ou auditoria.
+
+### Toolkit: bons alvos
+
+- auditoria manual repetida em várias rodadas;
+- detecção de smell estrutural com critério objetivo;
+- comparação backend/frontend que pode emitir Markdown e JSON;
+- validação diff-aware que pode virar gate ou snapshot;
+- integração leve de ferramenta OSS com boa relação sinal/ruído.
+
+### Toolkit: alvos ruins
+
+- script opaco sem saída estruturada;
+- score mágico sem hotspot legível;
+- ferramenta nova sem encaixe claro em comando, relatório ou decisão de equipe;
+- duplicar analisador de terceiros só para manter tudo "caseiro".
+
 ## Fluxo recomendado
 
 1. Mapear o acoplamento real.
@@ -155,6 +237,7 @@ Reduzir complexidade acidental preservando:
 - Quem lê o estado ou a regra.
 - Quem escreve ou decide.
 - Se a dependência é explícita, herdada ou duplicada.
+- Se o problema está na lógica local, na borda HTTP, na integração ou no toolkit.
 
 1. Classificar o alvo.
 
@@ -165,7 +248,10 @@ Reduzir complexidade acidental preservando:
 - wrapper fino;
 - contrato frouxo na borda;
 - regra de permissão reconstruída no cliente;
-- código morto.
+- código morto;
+- baixa coesão de backend;
+- deriva de integração;
+- heurística que deveria virar auditoria.
 
 1. Escolher o menor corte seguro.
 
@@ -173,6 +259,8 @@ Reduzir complexidade acidental preservando:
 - Não misturar simplificação estrutural com mudança de regra.
 - Se a simplificação tocar visibilidade de ação, confirme explicitamente se o comportamento correto é ocultar ou
   desabilitar.
+- Se a simplificação tocar contrato HTTP, confirme explicitamente quem é a fonte de verdade e quais consumidores reais
+  dependem dele.
 - Só considere um arquivo realmente simplificado se a superfície pública, o acoplamento ou a responsabilidade dele
   tiverem diminuído de forma verificável.
 
@@ -190,6 +278,9 @@ Reduzir complexidade acidental preservando:
   inferência implícita no componente.
 - Se a borda do service já consegue normalizar DTO, status, permissões ou datas de forma estável, concentre isso ali e
   pare de repetir defaults e defensividade na store e na view.
+- Se a mesma checagem estrutural já apareceu mais de uma vez na sessão, avalie transformá-la em auditoria do toolkit.
+- Se houver ferramenta OSS madura para o problema, prefira integrar a ferramenta e adicionar adaptação local ao `sgc.js`
+  em vez de ampliar heurística caseira sem necessidade.
 
 1. Validar logo após cada bloco.
 
@@ -201,6 +292,7 @@ Backend:
 ./gradlew :backend:compileTestJava
 ./gradlew :backend:test --tests "sgc.algum.pacote.AlgumTeste"
 ./gradlew --no-configuration-cache :backend:compileTestJava
+node etc/scripts/sgc.js backend contratos auditar
 ```
 
 Frontend:
@@ -209,26 +301,35 @@ Frontend:
 npx vitest run <arquivos> --reporter=dot --no-color
 npm run typecheck
 npm run lint
+node etc/scripts/sgc.js frontend arquitetura auditar
+node etc/scripts/sgc.js frontend cruft auditar
+node etc/scripts/sgc.js codigo smells auditar
 ```
 
 1. Registrar aprendizado.
 
 - Atualize `plano-simplificacao.md` quando a rodada gerar critério novo ou novo mapa de risco.
+- Atualize `plano-qualidade.md` quando a rodada alterar direção estrutural, critério de integração ou evolução do toolkit.
+- Se a rodada revelou problema repetível, proponha comando, budget, waiver ou snapshot correspondente.
 
 ## Perguntas de decisão
 
 - Esta classe ou camada agrega contrato real ou só repassa chamadas?
 - Esta duplicação está no backend, no frontend ou atravessa a fronteira entre os dois?
+- O problema real está na implementação, no contrato, ou na ausência de auditoria reproduzível?
 - Esta dependência precisa mesmo ser global?
 - Esta regra pode ser centralizada sem mudar o contrato externo?
 - O melhor corte aqui é um helper local de view, um componente local de apresentação, ou um contrato compartilhado mais
   forte na borda?
+- Este fallback existe por requisito ou só por tolerância a drift?
 - Estou mantendo alguma API pública apenas porque os testes antigos se acostumaram com ela?
 - Estou simplificando uma regra de UX real ou apenas apagando um estado desabilitado que parecia redundante?
 - A distinção entre "ação inexistente para este perfil" e "ação indisponível neste contexto" continua preservada?
 - A leitura do fluxo ficou mais curta?
 - Há algum collaborator implícito que pode virar dado explícito?
 - Existe código morto liberado por esta simplificação?
+- Esta auditoria deveria virar comando do `sgc.js`?
+- Existe ferramenta OSS melhor do que heurística local para este problema?
 - A mudança continua alinhada com `etc/reqs` e `etc/docs/acesso.md`?
 
 ## Saída esperada
@@ -238,4 +339,5 @@ Ao usar este skill, entregue:
 - simplificação concreta no código;
 - validação focada;
 - aprendizado curto da rodada;
-- próximo alvo natural.
+- próximo alvo natural;
+- quando fizer sentido, proposta concreta de evolução do toolkit ou da auditoria associada.

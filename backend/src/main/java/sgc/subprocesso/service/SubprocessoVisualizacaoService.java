@@ -68,7 +68,7 @@ public class SubprocessoVisualizacaoService {
         Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo());
 
         return new ContextoEdicaoResponse(
-                subprocesso.getUnidade(),
+                UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()),
                 SubprocessoResumoDto.fromEntity(subprocesso),
                 detalhes,
                 MapaCompletoDto.fromEntity(mapaCompleto)
@@ -81,7 +81,7 @@ public class SubprocessoVisualizacaoService {
             List<AtividadeDto> atividadesDisponiveis
     ) {
         return new ContextoCadastroAtividadesResponse(
-                subprocesso.getUnidade(),
+                UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()),
                 detalhes,
                 MapaResumoDto.fromEntity(subprocesso.getMapa()),
                 atividadesDisponiveis,

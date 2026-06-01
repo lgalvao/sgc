@@ -146,7 +146,7 @@ class SubprocessoConsultaServiceTest {
         var response = service.obterContextoCadastroAtividades(codSubprocesso);
 
         assertThat(response).isNotNull();
-        assertThat(response.unidade()).isEqualTo(unidade);
+        assertThat(response.unidade()).isEqualTo(UnidadeResumoDto.fromEntityObrigatoria(unidade));
         assertThat(response.assinaturaCadastroReferencia()).isEmpty();
     }
 

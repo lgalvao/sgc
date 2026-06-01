@@ -38,6 +38,9 @@ criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobert
 criarComandoScript(backendCobertura, "jornada", "Executa a jornada consolidada de cobertura do backend.", "etc/scripts/backend/cobertura-jornada.js");
 criarComandoScript(backendCobertura, "cruzada", "Auditoria de cobertura cruzada e independente (Backend).", "etc/scripts/backend/cobertura-cruzada.js");
 
+const backendContratos = backend.command("contratos").description("Auditorias de contratos HTTP e DTOs publicos do backend.");
+criarComandoScript(backendContratos, "auditar", "Audita vazamentos de model.* em DTOs expostos por controllers.", "etc/scripts/backend/contratos-auditar.js");
+
 const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
 criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "etc/scripts/backend/testes-analisar.js");
 criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "etc/scripts/backend/testes-priorizar.js");
@@ -87,6 +90,8 @@ criarComandoScript(frontendA11y, "processar", "Processa os resultados do crawler
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 const codigoSmells = codigo.command("smells").description("Auditorias de cheiros de codigo.");
 criarComandoScript(codigoSmells, "auditar", "Gera snapshot de sinais de complexidade acidental e codigo defensivo.", "etc/scripts/codigo/smells-auditar.js");
+const codigoSemgrep = codigo.command("semgrep").description("Auditorias estruturais com Semgrep OSS.");
+criarComandoScript(codigoSemgrep, "auditar", "Executa regras locais de Semgrep para backend, frontend e integração.", "etc/scripts/codigo/semgrep-auditar.js");
 const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
 criarComandoScript(codigoNomes, "coletar-simbolos", "Gera inventario de pacotes, arquivos, tipos e membros.", "etc/scripts/codigo/nomes-simbolos-coletar.js");
 criarComandoScript(codigoNomes, "auditar-consistencia", "Audita padroes e divergencias de nomenclatura.", "etc/scripts/codigo/nomes-consistencia-auditar.js");
@@ -94,6 +99,13 @@ criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e ca
 
 const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
 criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "etc/scripts/e2e/limpar.js");
+
+const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira backend/frontend.");
+const integracaoContratos = integracao.command("contratos").description("Auditorias e artefatos de contrato HTTP.");
+criarComandoScript(integracaoContratos, "exportar-openapi", "Exporta o OpenAPI atual da aplicação para arquivo local.", "etc/scripts/integracao/contratos-exportar-openapi.js");
+criarComandoScript(integracaoContratos, "gerar-tipos", "Gera tipos TypeScript a partir do OpenAPI da aplicação.", "etc/scripts/integracao/contratos-gerar-tipos.js");
+criarComandoScript(integracaoContratos, "diff", "Compara duas versões do OpenAPI e resume mudanças de contrato.", "etc/scripts/integracao/contratos-diff.js");
+criarComandoScript(integracaoContratos, "fixar-baseline", "Promove o OpenAPI mais recente como baseline de comparação.", "etc/scripts/integracao/contratos-fixar-baseline.js");
 
 const comunicacao = program.command("comunicacao").description("Ferramentas de auditoria de comunicacao, templates e notificacoes.");
 criarComandoScript(comunicacao, "cobertura-notificacoes", "Audita a cobertura de testes de notificacoes e modelos de email.", "etc/scripts/auditar-cobertura-notificacoes.js");

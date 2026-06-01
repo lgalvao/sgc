@@ -8,6 +8,7 @@ import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -38,19 +39,23 @@ public class MapaVisualizacaoService {
     }
 
     private MapaVisualizacaoResponse montarRespostaComMapa(Subprocesso subprocesso, Mapa mapa) {
-        List<Competencia> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo());
+        List<CompetenciaMapaDto> competencias = competenciaRepo.findByMapa_Codigo(mapa.getCodigo()).stream()
+                .map(CompetenciaMapaDto::fromEntity)
+                .toList();
         Set<Long> codAtividadesComCompetencia = new HashSet<>();
-        competencias.forEach(comp -> comp.getAtividades().stream()
-                .map(EntidadeBase::getCodigo)
+        competencias.forEach(comp -> comp.atividades().stream()
+                .map(AtividadeMapaDto::codigo)
+                .filter(Objects::nonNull)
                 .forEach(codAtividadesComCompetencia::add));
 
         Set<Atividade> atividadesMapa = mapa.getAtividades();
-        List<Atividade> atividadesSemCompetencia = atividadesMapa.stream()
+        List<AtividadeMapaDto> atividadesSemCompetencia = atividadesMapa.stream()
                 .filter(a -> !codAtividadesComCompetencia.contains(a.getCodigo()))
+                .map(AtividadeMapaDto::fromEntity)
                 .toList();
 
         return MapaVisualizacaoResponse.builder()
-                .unidade(subprocesso.getUnidade())
+                .unidade(UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()))
                 .competencias(competencias)
                 .atividadesSemCompetencia(atividadesSemCompetencia)
                 .sugestoes(Objects.toString(mapa.getSugestoes(), ""))
@@ -59,7 +64,7 @@ public class MapaVisualizacaoService {
 
     private MapaVisualizacaoResponse criarRespostaVazia(Subprocesso subprocesso) {
         return MapaVisualizacaoResponse.builder()
-                .unidade(subprocesso.getUnidade())
+                .unidade(UnidadeResumoDto.fromEntityObrigatoria(subprocesso.getUnidade()))
                 .competencias(List.of())
                 .atividadesSemCompetencia(List.of())
                 .build();

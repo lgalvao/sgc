@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.mapa.dto.*;
+import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
@@ -25,14 +26,22 @@ class MapaVisualizacaoServiceTest {
     @InjectMocks
     private MapaVisualizacaoService service;
 
+    private Unidade criarUnidade(Long codigo, String sigla, String nome) {
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codigo);
+        unidade.setSigla(sigla);
+        unidade.setNome(nome);
+        unidade.setTipo(TipoUnidade.OPERACIONAL);
+        return unidade;
+    }
+
     @Test
     @DisplayName("Deve obter mapa para visualização")
     void deveObterMapaParaVisualizacao() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
 
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(100L);
+        Unidade unidade = criarUnidade(100L, "UND100", "Unidade 100");
         sub.setUnidade(unidade);
 
         Atividade ativ1 = new Atividade();
@@ -61,7 +70,7 @@ class MapaVisualizacaoServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.competencias()).hasSize(1);
         assertThat(response.atividadesSemCompetencia()).hasSize(1);
-        assertThat(response.atividadesSemCompetencia().getFirst().getCodigo()).isEqualTo(2L);
+        assertThat(response.atividadesSemCompetencia().getFirst().codigo()).isEqualTo(2L);
     }
 
     @Test
@@ -69,7 +78,7 @@ class MapaVisualizacaoServiceTest {
     void deveRetornarVazioCasoNaoEncontreMapaMasSituacaoOk() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
-        sub.setUnidade(new Unidade());
+        sub.setUnidade(criarUnidade(101L, "UND101", "Unidade 101"));
         sub.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
 
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
@@ -86,7 +95,7 @@ class MapaVisualizacaoServiceTest {
     void deveLancarErroSeNaoEncontrarMapaNaSituacaoDeMapa() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
-        sub.setUnidade(new Unidade());
+        sub.setUnidade(criarUnidade(102L, "UND102", "Unidade 102"));
         sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
@@ -101,7 +110,7 @@ class MapaVisualizacaoServiceTest {
     void deveTratarSubprocessoComSituacaoDeCadastro() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
-        sub.setUnidade(new Unidade());
+        sub.setUnidade(criarUnidade(103L, "UND103", "Unidade 103"));
         sub.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
@@ -117,7 +126,7 @@ class MapaVisualizacaoServiceTest {
     void deveMapearConhecimentos() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
-        sub.setUnidade(new Unidade());
+        sub.setUnidade(criarUnidade(104L, "UND104", "Unidade 104"));
 
         Atividade ativ = new Atividade();
         ativ.setCodigo(1L);
@@ -139,9 +148,9 @@ class MapaVisualizacaoServiceTest {
 
         MapaVisualizacaoResponse response = service.obterMapaParaVisualizacao(sub);
 
-        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos()).hasSize(1);
-        assertThat(response.atividadesSemCompetencia().getFirst().getConhecimentos().stream().findFirst())
-                .hasValueSatisfying(conhecimento -> assertThat(conhecimento.getDescricao()).isEqualTo("K1"));
+        assertThat(response.atividadesSemCompetencia().getFirst().conhecimentos()).hasSize(1);
+        assertThat(response.atividadesSemCompetencia().getFirst().conhecimentos().stream().findFirst())
+                .hasValueSatisfying(conhecimento -> assertThat(conhecimento.descricao()).isEqualTo("K1"));
     }
 
     @Test
@@ -151,13 +160,13 @@ class MapaVisualizacaoServiceTest {
         sub.setCodigo(1L);
         sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
-        Unidade u = new Unidade();
+        Unidade u = criarUnidade(105L, "UND105", "Unidade 105");
         sub.setUnidade(u);
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
 
         MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
         assertThat(res).isNotNull();
-        assertThat(res.unidade()).isEqualTo(u);
+        assertThat(res.unidade()).isEqualTo(UnidadeResumoDto.fromEntityObrigatoria(u));
         assertThat(res.competencias()).isEmpty();
         assertThat(res.atividadesSemCompetencia()).isEmpty();
     }
@@ -168,7 +177,7 @@ class MapaVisualizacaoServiceTest {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(1L);
         sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
-        sub.setUnidade(new Unidade());
+        sub.setUnidade(criarUnidade(106L, "UND106", "Unidade 106"));
         sub.setMapa(new Mapa());
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
 
@@ -183,7 +192,7 @@ class MapaVisualizacaoServiceTest {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(3L);
         sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
-        sub.setUnidade(new Unidade());
+        sub.setUnidade(criarUnidade(107L, "UND107", "Unidade 107"));
         Mapa mapaPendurado = new Mapa();
         mapaPendurado.setCodigo(300L);
         mapaPendurado.setAtividades(Set.of());
@@ -201,8 +210,7 @@ class MapaVisualizacaoServiceTest {
     void deveRetornarAtividadesVaziasQuandoMapaSemAtividades() {
         Subprocesso sub = new Subprocesso();
         sub.setCodigo(2L);
-        Unidade unidade = new Unidade();
-        unidade.setCodigo(20L);
+        Unidade unidade = criarUnidade(20L, "UND020", "Unidade 20");
         sub.setUnidade(unidade);
 
         Mapa mapa = new Mapa();
@@ -216,7 +224,7 @@ class MapaVisualizacaoServiceTest {
         MapaVisualizacaoResponse res = service.obterMapaParaVisualizacao(sub);
 
         assertThat(res).isNotNull();
-        assertThat(res.unidade()).isEqualTo(unidade);
+        assertThat(res.unidade()).isEqualTo(UnidadeResumoDto.fromEntityObrigatoria(unidade));
         assertThat(res.atividadesSemCompetencia()).isEmpty();
         assertThat(res.competencias()).isEmpty();
     }

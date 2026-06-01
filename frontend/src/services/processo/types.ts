@@ -20,31 +20,18 @@ export type {
 
 export interface UnidadeParticipanteDto {
     codUnidade: number;
-    codUnidadeSuperior?: number;
-    sigla?: string;
-    nome?: string;
-    codSubprocesso?: number;
-    situacaoSubprocesso?: string;
-    dataLimite?: string;
-    mapaCodigo?: number;
-    localizacaoAtualCodigo?: number;
-    filhos?: UnidadeParticipanteDto[];
+    codUnidadeSuperior: number | null;
+    sigla: string;
+    nome: string;
+    codSubprocesso: number | null;
+    situacaoSubprocesso: string | null;
+    dataLimite: string | null;
+    mapaCodigo: number | null;
+    localizacaoAtualCodigo: number | null;
+    filhos: UnidadeParticipanteDto[];
 }
 
-export interface ProcessoDetalheDto {
-    codigo?: number;
-    tipo?: string;
-    situacao?: string;
-    dataCriacao?: string;
-    dataInicio?: string;
-    dataFinalizacao?: string;
-    unidades?: UnidadeParticipanteDto[];
-    acoesBloco?: unknown[];
-
-    [key: string]: unknown; // Para campos adicionais do spread
-}
-
-export interface ProcessoDetalheResponseBackend extends ProcessoDetalheDto {
+export interface ProcessoDetalheResponseBackend {
     codigo: number;
     descricao: string;
     tipo: TipoProcesso;
