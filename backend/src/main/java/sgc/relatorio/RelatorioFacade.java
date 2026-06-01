@@ -346,11 +346,13 @@ public class RelatorioFacade {
         Unidade unidade = sp.getUnidade();
         UnidadeResponsavelDto respDto = responsaveisPorUnidade.get(unidade.getCodigo());
 
-        String titular = respDto != null && respDto.titularNome() != null ? respDto.titularNome() : "Não designado";
-        String responsavel = titular;
-        if (respDto != null && respDto.substitutoNome() != null) {
-            responsavel = respDto.substitutoNome() + " (Substituição)";
-        }
+        String titular = Optional.ofNullable(respDto)
+                .map(UnidadeResponsavelDto::titularNome)
+                .orElse("Não designado");
+        String responsavel = Optional.ofNullable(respDto)
+                .map(UnidadeResponsavelDto::substitutoNome)
+                .map(nome -> nome + " (Substituição)")
+                .orElse(titular);
 
         String localizacao = localizacaoUnidade != null ? localizacaoUnidade.getSigla() : "-";
 
