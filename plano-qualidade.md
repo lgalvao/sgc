@@ -27,9 +27,9 @@ O foco deste plano não é aumentar contagem de testes nem cobertura nominal. O 
 | Frontend testes | 1388 ✅ | +3 corrigidos |
 | Frontend arquitetura (score) | 0 ✅ | excelente |
 | Backend god objects críticos | 3 🔴 | pendente |
-| Smells score total | 1396 🟡 | em redução |
+| Smells score total | 1388 🟡 | -8 pts nesta rodada |
 | Backend @Nullable DTOs | 52 🟡 | em redução |
-| Backend null checks | 240 🟡 | -19 na última rodada |
+| Backend null checks | 232 🟡 | -8 nesta rodada |
 | Frontend test any | 578 🟡 | ativo |
 | Contratos HTTP vazando model.\* | 0 ✅ | resolvido |
 
@@ -80,6 +80,22 @@ O foco deste plano não é aumentar contagem de testes nem cobertura nominal. O 
 
 **Infraestrutura / correções**
 - 3 testes frontend corrigidos: `processoService.spec.ts` (contrato correto), `feedbacksAdminApresentacao.spec.ts` e `SubprocessoMovimentacoes.spec.ts` (timezone America/Sao_Paulo no vitest.config.ts).
+
+---
+
+### Rodada 2 — jun/2026
+
+**E2eController — eliminação de duplicações**
+- `ProcessoFixtureRequest.resolverDiasLimite()`: extraído do padrão `diasLimite != null ? diasLimite : 30` repetido em 4 métodos fixture → centralizado em 1 ponto.
+- `descricaoFixture(request, tipo)`: generalizado para aceitar `TipoProcesso` como parâmetro; bloco `if/else` inline em `criarProcessoFixture` substituído por chamada ao helper.
+
+**RelatorioFacade — Optional chain**
+- `criarRelatorioAndamentoDto`: 4 null checks explícitos sobre `respDto` / `titularNome` / `substitutoNome` substituídos por cadeia `Optional.ofNullable().map().orElse()`.
+
+**Resultado**
+- Backend null checks: 240 → 232 (-8)
+- Smells score: 1396 → 1388 (-8 pts)
+- 2126 testes backend + 1388 testes frontend passando.
 
 ---
 
