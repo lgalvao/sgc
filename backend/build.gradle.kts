@@ -1,9 +1,7 @@
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
-import java.net.URI
-import java.net.HttpURLConnection
-import java.util.concurrent.TimeUnit
+import java.net.*
 
 val argumentosJvmSemAvisoUnsafe = listOf(
     "--sun-misc-unsafe-memory-access=allow"

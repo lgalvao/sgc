@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.mock.web.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.ComumRepo;
+import sgc.comum.model.*;
 import sgc.feedback.dto.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;

@@ -3,7 +3,6 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
 import sgc.fixture.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;

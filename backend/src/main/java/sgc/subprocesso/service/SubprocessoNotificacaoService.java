@@ -8,7 +8,6 @@ import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;

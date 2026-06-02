@@ -3,7 +3,7 @@ package sgc.organizacao.service;
 import org.junit.jupiter.api.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 
-import java.io.IOException;
+import java.io.*;
 
 import static org.assertj.core.api.Assertions.*;
 

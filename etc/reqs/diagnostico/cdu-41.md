@@ -1,4 +1,4 @@
-# CDU-41 - Acompanhar diagnóstico da equipe
+# CDU-41 - Acompanhar diagnóstico da unidade
 [REVISADO]
 
 Ator: CHEFE
@@ -14,23 +14,20 @@ Ator: CHEFE
 
 2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade.
    
-3. O usuário clica no card `Diagnóstico da equipe`.
+3. O usuário clica no card `Monitoramento`.
    
-4. O sistema apresenta a tela `Diagnóstico da equipe`, listando os servidores lotados na unidade do subprocesso.
-
-5. Para cada servidor, o sistema mostra:
-   - `Nome`;
-   - `Situação`, com a situação atual da avaliação individual e estes valores possíveis:
-     - `Autoavaliação não iniciada`;
+4. O sistema apresenta a tela `Monitoramento de diagnóstico`, com a situação dos servidores lotados na unidade do usuário. Para cada servidor, são mostrados:
+   - `Nome` : nome completo do servidor
+   - `Situação`: situação atual da avaliação individual e estes valores possíveis:
+     - `Autoavaliação não realizada`;
      - `Autoavaliação concluída`;
      - `Avaliação de consenso criada`;
      - `Avaliação de consenso aprovada`;
      - `Avaliação impossibilitada`.
-
-6. Conforme a situação, o sistema mostra as seguintes ações, condicionalmente:
-   - `Criar avaliação de consenso`, quando a situação for `Autoavaliação concluída`;
-   - `Editar avaliação de consenso`, quando a situação for `Consenso criado` ou `Consenso aprovado`;
-   - `Indicar impossibilidade`, enquanto a avaliação individual ainda não estiver impossibilitada;
-   - `Visualizar consenso`, quando já existir consenso criado para o servidor.
-
-7. O usuário acompanha as pendências da equipe, identifica os servidores ainda não concluídos e aciona as operações desejadas.
+   - `Ações`, com zero ou mais itens, que variam com a situação de cada servidor:
+     - `Criar avaliação de consenso`, quando a situação for `Autoavaliação concluída`;
+     - `Editar avaliação de consenso`, quando a situação for `Avaliação de consenso criado` ou `Avaliação de consenso aprovado`;
+     - `Indicar impossibilidade`, enquanto a avaliação individual ainda não estiver impossibilitada;
+     - `Visualizar consenso`, quando já existir avaliação de consenso criado para o servidor.
+    
+5. O usuário realiza analisa a situação do diagnóstico dos servidores e aciona as operações necessárias.

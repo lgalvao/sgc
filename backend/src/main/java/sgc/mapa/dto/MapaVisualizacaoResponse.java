@@ -2,8 +2,8 @@ package sgc.mapa.dto;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.*;
-import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.dto.*;
 
 import java.util.*;
 

@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.cache.*;
 import org.springframework.jdbc.core.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.ComumRepo;
+import sgc.comum.model.*;
 import sgc.processo.model.*;
 
 import java.util.*;

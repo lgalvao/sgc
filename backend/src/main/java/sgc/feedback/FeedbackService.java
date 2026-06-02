@@ -8,8 +8,8 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.multipart.*;
 import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.feedback.dto.*;
-import sgc.comum.model.ComumRepo;
 import sgc.organizacao.*;
 import tools.jackson.databind.*;
 

@@ -7,8 +7,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
-import sgc.comum.model.ComumRepo;
+import sgc.comum.model.*;
 import sgc.processo.model.*;
 
 import java.util.*;

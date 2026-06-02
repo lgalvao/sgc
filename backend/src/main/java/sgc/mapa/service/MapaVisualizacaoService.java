@@ -5,7 +5,6 @@ import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;

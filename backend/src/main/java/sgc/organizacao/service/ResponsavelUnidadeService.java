@@ -10,7 +10,7 @@ import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.config.*;
 import sgc.comum.erros.*;
-import sgc.comum.model.ComumRepo;
+import sgc.comum.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 

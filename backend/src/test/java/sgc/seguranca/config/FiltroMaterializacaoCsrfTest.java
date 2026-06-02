@@ -1,14 +1,11 @@
 package sgc.seguranca.config;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.security.web.csrf.CsrfToken;
-import sgc.seguranca.config.ConfigSeguranca.FiltroMaterializacaoCsrf;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import org.junit.jupiter.api.*;
+import org.springframework.security.web.csrf.*;
+import sgc.seguranca.config.ConfigSeguranca.*;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.*;
 
 @DisplayName("FiltroMaterializacaoCsrf")

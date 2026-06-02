@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 

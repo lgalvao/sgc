@@ -1,11 +1,11 @@
 package sgc.seguranca.sanitizacao;
 
 import org.junit.jupiter.api.*;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import static org.mockito.Mockito.*;
+import tools.jackson.core.*;
+import tools.jackson.databind.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class UtilSanitizacaoTest {
     @Test

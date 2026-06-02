@@ -3,7 +3,6 @@
 
 Ator: ADMIN
 
-
 ## Pré-condições
 
 - Login realizado com perfil ADMIN
@@ -16,17 +15,15 @@ Ator: ADMIN
 2. O sistema muda para a tela `Cadastro de processo`. Os campos aparecem preenchidos com os dados do processo
    selecionado.
 
-3. O usuário clica em `Iniciar processo`.
+3. O usuário clica em `Iniciar`.
 
-4. O sistema mostra diálogo de confirmação: "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail.", com botões `Iniciar` e `Cancelar`.
-
+4. O sistema mostra uma tela de confirmação, com texto "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail." e botões `Iniciar` e `Cancelar`.
+   
 5. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma tela.
 
-6. O usuário clica em `Iniciar`.
+6. O usuário clica em `Iniciar`, dentro da tela de confirmação.
    
-7. O sistema armazena internamente uma cópia da árvore de unidades participantes, incluindo os servidores lotados em  cada unidade participante no momento e a vincula com o processo.
-
-   [PENDENCIA: Precisa mesmo de um snaphsot das unidades para diagnostico?]
+7. O sistema armazena internamente uma cópia (snapshot) da árvore de unidades participantes, incluindo todos os servidores lotados em cada unidade participante no momento, e a vincula com o processo.
 
 8. O sistema muda a situação do processo para 'Em andamento'.
 

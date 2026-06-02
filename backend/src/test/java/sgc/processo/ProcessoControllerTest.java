@@ -62,8 +62,10 @@ class ProcessoControllerTest {
 
     @MockitoBean
     private SubprocessoService subprocessoService;
+
     @MockitoBean
     private SubprocessoConsultaService consultaService;
+
     @MockitoBean
     private LocalizacaoSubprocessoService localizacaoSubprocessoService;
 

@@ -1,10 +1,6 @@
-# CDU-45 - Preencher ocupações críticas
+# CDU-45 - Preencher situação de capacitação
 
 Ator: CHEFE
-
-Maturidade: Média
-
-Base principal: Fluxo narrado e validado na reunião, com interpretação operacional do conceito de ocupações críticas.
 
 ## Pré-condições
 
@@ -17,26 +13,33 @@ Base principal: Fluxo narrado e validado na reunião, com interpretação operac
 
 2. O sistema mostra a tela `Detalhes do subprocesso` da unidade.
 
-3. O usuário clica no card `Ocupações críticas`.
+3. O usuário clica no card `Situação de capacitação`.
 
-4. O sistema apresenta uma grade contendo, para cada servidor participante do snapshot da unidade e para cada
-   competência vigente da unidade, um campo `Situação de capacitação`.
-
-5. O campo `Situação de capacitação` deverá admitir os seguintes valores:
+4. O sistema apresenta uma tabela contendo, para cada servidor participante da unidade e para cada
+   competência vigente da unidade, um campo editável `Situação de capacitação`, que admite os seguintes valores:
    - `NA` (Não se aplica);
    - `AC` (A capacitar);
    - `EC` (Em capacitação);
    - `C` (Capacitado);
    - `I` (Instrutor).
+   Inicialmente, todos os valores de situação estarão vazios.   
 
-6. O usuário informa os valores desejados.
+- Exemplo de tabela, depois de preenchida com situações:
 
-7. O sistema salva automaticamente cada alteração realizada.
+     | Nome          | Competência | Situação de capacitação |
+     |:--------------| :---- | :---- |
+     | BOB MARLEY    | Desc. Competência 1 | NA \- Não se aplica |
+     |               | Desc. Competência 2 | I \- Instrutor |
+     |               | Desc. Competência 3 | Em capacitação |
+     | DAVID BOWIE   | Desc. Competência 1 | NA \- Não se aplica |
+     |               | Desc. Competência 2 | C \- Capacitado |
+     |               | Desc. Competência 3 | Em capacitação |
+     | ELVIS PRESLEY | Desc. Competência 1 | I \- Instrutor |
+     |               | Desc. Competência 2 | C \- Capacitado  |
+     |               | Desc. Competência 3 | Em capacitação |
+   
+5. O usuário informa os valores para cada para competência/servidor.
 
-8. O sistema mostra a mensagem `Informações atualizadas`.
+6. O sistema salva automaticamente cada alteração realizada.
 
-## Observação
-
-PENDÊNCIA DE REFINAMENTO: a grade por servidor e por competência foi adotada como interpretação principal do conceito de
-`Ocupações críticas`. Confirmar se a área de negócio deseja algum resumo adicional por unidade ou outro recorte de
-visualização.
+7. O usuário não precisa confirmar o cadastro de situações de capacitação na primeira 'rodada', podendo retornar a esta tela em outro momento para finalizar. 

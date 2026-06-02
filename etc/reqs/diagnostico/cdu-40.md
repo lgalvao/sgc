@@ -14,17 +14,17 @@ Ator: SERVIDOR
 
 2. O sistema mostra a tela `Detalhes do subprocesso` da unidade do servidor.
 
-3. O usuário clica no card `Diagnóstico da equipe`.
+3. O usuário clica no card `Autoavaliação`.
 
 4. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e, para cada competência:
-   - a descrição da competência;
-   - opção para mostrar as atividades e conhecimentos associados à competência;
+   - descrição da competência;
+   - botão `Atividade e conhecimentos`, que permite mostrar as atividades e conhecimentos associados à competência;
    - campo `Importância`, com opções `NA` e os números de `1` a `6`;
    - campo `Domínio`, com opções `NA` e os números de `1` a `6`.
 
-6. O usuário escolher os valores desejados para cada uma das competências.
+6. O usuário escolhe os valores desejados para cada uma das competências.
 
-7. Durante a edição, o sistema salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
+7. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
 
 8. O usuário clica em `Concluir autoavaliação`.
 
@@ -34,7 +34,7 @@ Ator: SERVIDOR
       
    9.2. Caso tudo estiver preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?", com botões `Confirmar` e `Cancelar`; uma vez confirmado, altera a situação da avaliação individual do servidor para 'Autoavaliação concluída'.
 
-10. O sistema envia notificação por e-mail para o responsável pela unidade, com este modelo:
+10. O sistema envia uma notificação por e-mail para o responsável pela unidade, com este modelo:
 
     ```text
     Assunto: SGC: Autoavaliação de [NOME_SERVIDOR] submetida para análise

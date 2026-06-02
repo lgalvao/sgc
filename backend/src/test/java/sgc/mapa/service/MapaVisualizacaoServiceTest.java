@@ -7,8 +7,8 @@ import org.mockito.junit.jupiter.*;
 import sgc.mapa.*;
 import sgc.organizacao.*;
 import sgc.mapa.dto.*;
-import sgc.organizacao.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 

@@ -1,9 +1,9 @@
 package sgc.relatorio;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
-import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.openpdf.text.*;
@@ -16,7 +16,6 @@ import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
-import sgc.relatorio.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
