@@ -1,6 +1,6 @@
 {
   "rules": {
-    "complexity": ["warn", 12],
+    "complexity": ["warn", 8],
     "max-params": ["error", 3],
     "max-depth": ["error", 4],
     "max-nested-callbacks": ["error", 3],
