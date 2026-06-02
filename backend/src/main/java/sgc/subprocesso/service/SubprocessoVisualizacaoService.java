@@ -103,7 +103,7 @@ public class SubprocessoVisualizacaoService {
     public MapaAjusteDto obterMapaParaAjuste(Subprocesso sp) {
         Long codMapa = sp.getMapa().getCodigo();
 
-        return MapaAjusteDto.of(
+        return mapaDtoMapper.paraMapaAjusteDto(
                 sp,
                 obterAnaliseMaisRecentePorTipo(sp.getCodigo()),
                 mapaManutencaoService.competenciasCodMapaSemRels(codMapa),

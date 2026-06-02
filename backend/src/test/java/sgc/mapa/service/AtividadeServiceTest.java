@@ -21,9 +21,9 @@ import static org.mockito.Mockito.*;
 import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AtividadeFacade")
+@DisplayName("AtividadeService")
 @SuppressWarnings("NullAway.Init")
-class AtividadeFacadeTest {
+class AtividadeServiceTest {
     @Mock
     private MapaManutencaoService mapaManutencaoService;
     @Mock
@@ -36,7 +36,7 @@ class AtividadeFacadeTest {
     private MapaDtoMapper mapaDtoMapper;
 
     @InjectMocks
-    private AtividadeFacade atividadeFacade;
+    private AtividadeService atividadeService;
 
     @Nested
     @DisplayName("obterAtividadePorId")
@@ -54,7 +54,7 @@ class AtividadeFacadeTest {
 
             when(mapaManutencaoService.atividadeCodigo(atividadeCodigo)).thenReturn(expected);
 
-            AtividadeDto result = atividadeFacade.obterAtividadePorCodigo(atividadeCodigo);
+            AtividadeDto result = atividadeService.obterAtividadePorCodigo(atividadeCodigo);
 
             assertThat(result).isNotNull();
             assertThat(result.codigo()).isEqualTo(expected.getCodigo());
@@ -78,7 +78,7 @@ class AtividadeFacadeTest {
 
             when(mapaManutencaoService.conhecimentosCodigoAtividade(atividadeCodigo)).thenReturn(expected);
 
-            List<ConhecimentoResumoDto> result = atividadeFacade.listarConhecimentosPorAtividade(atividadeCodigo);
+            List<ConhecimentoResumoDto> result = atividadeService.listarConhecimentosPorAtividade(atividadeCodigo);
 
             assertThat(result).isNotNull();
             assertThat(result).hasSize(2);
@@ -122,7 +122,7 @@ class AtividadeFacadeTest {
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
-            AtividadeOperacaoResponse result = atividadeFacade.criarAtividade(request);
+            AtividadeOperacaoResponse result = atividadeService.criarAtividade(request);
 
             assertThat(result).isNotNull();
         }
@@ -163,7 +163,7 @@ class AtividadeFacadeTest {
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
-            AtividadeOperacaoResponse result = atividadeFacade.atualizarAtividade(atividadeCodigo, request);
+            AtividadeOperacaoResponse result = atividadeService.atualizarAtividade(atividadeCodigo, request);
 
             assertThat(result).isNotNull();
             verify(mapaManutencaoService).atualizarAtividade(atividadeCodigo, request);
@@ -200,7 +200,7 @@ class AtividadeFacadeTest {
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
-            AtividadeOperacaoResponse result = atividadeFacade.excluirAtividade(atividadeCodigo);
+            AtividadeOperacaoResponse result = atividadeService.excluirAtividade(atividadeCodigo);
 
             assertThat(result).isNotNull();
             verify(mapaManutencaoService).excluirAtividade(atividadeCodigo);
@@ -248,7 +248,7 @@ class AtividadeFacadeTest {
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
-            ResultadoOperacaoConhecimento result = atividadeFacade.criarConhecimento(atividadeCodigo, request);
+            ResultadoOperacaoConhecimento result = atividadeService.criarConhecimento(atividadeCodigo, request);
 
             assertThat(result).isNotNull();
             assertThat(result.novoConhecimentoCodigo()).isEqualTo(500L);
@@ -289,7 +289,7 @@ class AtividadeFacadeTest {
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
-            AtividadeOperacaoResponse result = atividadeFacade.atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
+            AtividadeOperacaoResponse result = atividadeService.atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
 
             assertThat(result).isNotNull();
             verify(mapaManutencaoService).atualizarConhecimento(atividadeCodigo, conhecimentoCodigo, request);
@@ -329,7 +329,7 @@ class AtividadeFacadeTest {
 
             doReturn(true).when(permissionEvaluator).verificarPermissao(any(Usuario.class), any(Subprocesso.class), any(AcaoPermissao.class));
 
-            AtividadeOperacaoResponse result = atividadeFacade.excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
+            AtividadeOperacaoResponse result = atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
 
             assertThat(result).isNotNull();
             verify(mapaManutencaoService).excluirConhecimento(atividadeCodigo, conhecimentoCodigo);
@@ -353,7 +353,7 @@ class AtividadeFacadeTest {
             when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(false);
 
             assertThatThrownBy(() ->
-                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")))
+                    atividadeService.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")))
                     .isInstanceOf(sgc.comum.erros.ErroAcessoNegado.class);
         }
 
@@ -371,7 +371,7 @@ class AtividadeFacadeTest {
             when(permissionEvaluator.verificarPermissao(usuario, subprocesso, EDITAR_CADASTRO)).thenReturn(true);
 
             assertThatThrownBy(() ->
-                    atividadeFacade.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")))
+                    atividadeService.criarAtividade(new CriarAtividadeRequest(mapaCodigo, "Descricao")))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
         }
     }

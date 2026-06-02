@@ -35,7 +35,7 @@ class PainelControllerTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @MockitoBean
-    private PainelFacade painelFacade;
+    private PainelService painelService;
     @MockitoBean
     private UsuarioFacade usuarioFacade;
 
@@ -51,7 +51,7 @@ class PainelControllerTest {
         when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<ProcessoResumoDto> page = new PageImpl<>(Collections.emptyList());
-        when(painelFacade.listarProcessos(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
+        when(painelService.listarProcessos(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/processos")
                         .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
@@ -72,7 +72,7 @@ class PainelControllerTest {
         when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<Alerta> page = new PageImpl<>(Collections.emptyList());
-        when(painelFacade.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
+        when(painelService.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
@@ -96,7 +96,7 @@ class PainelControllerTest {
                 .processos(Collections.emptyList())
                 .alertas(Collections.emptyList())
                 .build();
-        when(painelFacade.obterBootstrap(any(ContextoUsuarioAutenticado.class))).thenReturn(dto);
+        when(painelService.obterBootstrap(any(ContextoUsuarioAutenticado.class))).thenReturn(dto);
 
         mockMvc.perform(get("/api/painel/bootstrap")
                         .with(authentication(new UsernamePasswordAuthenticationToken(usuarioMock, null, usuarioMock.getAuthorities())))
@@ -124,7 +124,7 @@ class PainelControllerTest {
                         .content("[1, 2, 3]"))
                 .andExpect(status().isNoContent());
 
-        verify(painelFacade).marcarAlertasLidos(any(ContextoUsuarioAutenticado.class), eq(List.of(1L, 2L, 3L)));
+        verify(painelService).marcarAlertasLidos(any(ContextoUsuarioAutenticado.class), eq(List.of(1L, 2L, 3L)));
     }
 
     @Test
@@ -139,7 +139,7 @@ class PainelControllerTest {
         when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<Alerta> page = new PageImpl<>(Collections.emptyList());
-        when(painelFacade.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
+        when(painelService.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/api/painel/alertas")
                         .param("usuarioTitulo", "ATAQUE_IDOR")
@@ -148,7 +148,7 @@ class PainelControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(painelFacade).listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class));
+        verify(painelService).listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class));
     }
 
 }

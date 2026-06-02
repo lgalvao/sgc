@@ -55,6 +55,9 @@ class ResponsavelUnidadeServiceTest {
     @Mock
     private ComumRepo repo;
 
+    @Spy
+    private sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper = new sgc.organizacao.OrganizacaoDtoMapper();
+
     @InjectMocks
     private ResponsavelUnidadeService service;
 
@@ -946,4 +949,3 @@ class ResponsavelUnidadeServiceTest {
                 .hasMessageContaining("Responsável ou titular oficial ausente");
     }
 }
-

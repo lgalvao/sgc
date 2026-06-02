@@ -127,7 +127,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
 
         assertThat(historicoDevolucao).hasSize(1);
         assertThat(historicoDevolucao.getFirst().acao())
-                .isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
+                .isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO.name());
         assertThat(historicoDevolucao.getFirst().unidadeSigla()).isNotNull();
         assertThat(historicoDevolucao.getFirst().observacoes())
                 .isEqualTo("Justificativa da devolução");
@@ -198,7 +198,7 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         List<AnaliseHistoricoDto> historicoAceite = objectMapper.readValue(responseAceite, new TypeReference<>() {
         });
         assertThat(historicoAceite).hasSize(2);
-        assertThat(historicoAceite.getFirst().acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(historicoAceite.getFirst().acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO.name());
         assertThat(historicoAceite.getFirst().unidadeSigla()).isNotNull();
 
         // Adicionar verificação de Movimentacao e Alerta após aceite

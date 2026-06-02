@@ -1,6 +1,5 @@
 package sgc.processo.model;
 
-import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
@@ -26,29 +25,23 @@ public class Processo extends EntidadeBase {
 
     @Builder.Default
     @Column(name = "data_criacao", nullable = false)
-    @JsonView(ProcessoViews.Publica.class)
     private LocalDateTime dataCriacao = LocalDateTime.now();
 
     @Column(name = "data_finalizacao")
-    @JsonView(ProcessoViews.Publica.class)
     private LocalDateTime dataFinalizacao;
 
     @Column(name = "data_limite", nullable = false)
-    @JsonView(ProcessoViews.Publica.class)
     private LocalDateTime dataLimite;
 
     @Column(name = "descricao", nullable = false)
-    @JsonView({ProcessoViews.Publica.class, ComumViews.Publica.class})
     private String descricao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 20, nullable = false)
-    @JsonView(ProcessoViews.Publica.class)
     private SituacaoProcesso situacao;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", length = 20, nullable = false)
-    @JsonView({ProcessoViews.Publica.class, ComumViews.Publica.class})
     private TipoProcesso tipo;
 
     /**
@@ -93,8 +86,6 @@ public class Processo extends EntidadeBase {
                 .toList();
     }
 
-    @JsonView(ProcessoViews.Publica.class)
-    @JsonProperty("unidadesParticipantes")
     public String getSiglasParticipantes() {
         return participantes.stream()
                 .map(UnidadeProcesso::getSigla)
@@ -103,5 +94,3 @@ public class Processo extends EntidadeBase {
                 .collect(Collectors.joining(", "));
     }
 }
-
-

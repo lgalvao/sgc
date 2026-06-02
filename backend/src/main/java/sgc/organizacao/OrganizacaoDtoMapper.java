@@ -101,4 +101,38 @@ public class OrganizacaoDtoMapper {
                 .perfis(List.of())
                 .build();
     }
+
+    public PerfilDto paraPerfilDto(UsuarioPerfilAutorizacaoLeitura atribuicao) {
+        return PerfilDto.builder()
+                .usuarioTitulo(atribuicao.usuarioTitulo())
+                .unidadeCodigo(atribuicao.unidadeCodigo())
+                .unidadeNome(atribuicao.unidadeNome())
+                .perfil(atribuicao.perfil().name())
+                .descricao(atribuicao.perfil().name())
+                .build();
+    }
+
+    public AdministradorDto paraAdministradorDto(Usuario usuario) {
+        Unidade unidadeLotacao = usuario.getUnidadeLotacao();
+
+        return AdministradorDto.builder()
+                .tituloEleitoral(usuario.getTituloEleitoral())
+                .nome(usuario.getNome())
+                .matricula(usuario.getMatricula())
+                .unidadeCodigo(unidadeLotacao.getCodigo())
+                .unidadeSigla(unidadeLotacao.getSigla())
+                .build();
+    }
+
+    public AtribuicaoDto paraAtribuicaoDto(AtribuicaoTemporaria atribuicao, Usuario usuario) {
+        return AtribuicaoDto.builder()
+                .codigo(atribuicao.getCodigo())
+                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
+                .unidadeSigla(atribuicao.getUnidade().getSigla())
+                .usuario(paraUsuarioResumoObrigatorio(usuario))
+                .dataInicio(atribuicao.getDataInicio())
+                .dataTermino(atribuicao.getDataTermino())
+                .justificativa(atribuicao.getJustificativa())
+                .build();
+    }
 }

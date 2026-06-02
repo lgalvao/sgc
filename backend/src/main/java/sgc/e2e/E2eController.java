@@ -1,6 +1,5 @@
 package sgc.e2e;
 
-import com.fasterxml.jackson.annotation.*;
 import jakarta.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
@@ -21,6 +20,7 @@ import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
@@ -47,6 +47,7 @@ public class E2eController {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final ProcessoService processoService;
     private final ProcessoRepo processoRepo;
+    private final ProcessoDtoMapper processoDtoMapper;
     private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
     private final UnidadeService unidadeService;
@@ -244,9 +245,8 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
-        return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
+    public ProcessoResumoDto criarProcessoMapeamento(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO)));
     }
 
     /**
@@ -254,9 +254,8 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-revisao")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
-        return executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.REVISAO));
+    public ProcessoResumoDto criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.REVISAO)));
     }
 
     /**
@@ -264,8 +263,7 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-finalizado-com-atividades")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoFinalizadoComAtividades(@RequestBody ProcessoFixtureRequest request) {
+    public ProcessoResumoDto criarProcessoFinalizadoComAtividades(@RequestBody ProcessoFixtureRequest request) {
         Processo processo = executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.MAPEAMENTO));
         Long codProcesso = processo.getCodigo();
 
@@ -297,7 +295,7 @@ public class E2eController {
         jdbcTemplate.update("INSERT INTO sgc.unidade_mapa (unidade_codigo, mapa_vigente_codigo) VALUES (?, ?)", codUnidade, codMapa);
         limparCaches();
 
-        return processoService.buscarPorCodigo(codProcesso);
+        return processoResumoFixture(processoService.buscarPorCodigo(codProcesso));
     }
 
     /**
@@ -305,9 +303,8 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento-com-cadastro-disponibilizado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoMapeamentoComCadastroDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
-        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_CADASTRO_DISPONIBILIZADO");
+    public ProcessoResumoDto criarProcessoMapeamentoComCadastroDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_CADASTRO_DISPONIBILIZADO"));
     }
 
     /**
@@ -315,9 +312,8 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-disponibilizado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoMapeamentoComMapaDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
-        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_DISPONIBILIZADO");
+    public ProcessoResumoDto criarProcessoMapeamentoComMapaDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_DISPONIBILIZADO"));
     }
 
     /**
@@ -325,8 +321,7 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-com-sugestoes")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoMapeamentoComMapaComSugestoes(@RequestBody ProcessoFixtureRequest request) {
+    public ProcessoResumoDto criarProcessoMapeamentoComMapaComSugestoes(@RequestBody ProcessoFixtureRequest request) {
         Processo processo = criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_COM_SUGESTOES");
         Long codUnidade = unidadeService.buscarCodigoPorSigla(request.unidadeSigla());
         Long codSubprocesso = subprocessoRepo
@@ -336,7 +331,7 @@ public class E2eController {
         Mapa mapa = mapaRepo.buscarPorSubprocesso(codSubprocesso).orElseThrow();
         mapa.setSugestoes("Sugestão de ajuste na competência via fixture E2E");
         mapaRepo.save(mapa);
-        return processoService.buscarPorCodigo(processo.getCodigo());
+        return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
     }
 
     /**
@@ -344,9 +339,8 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-validado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoMapeamentoComMapaValidado(@RequestBody ProcessoFixtureRequest request) {
-        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_VALIDADO");
+    public ProcessoResumoDto criarProcessoMapeamentoComMapaValidado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_VALIDADO"));
     }
 
     /**
@@ -354,9 +348,8 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento-com-mapa-homologado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoMapeamentoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
-        return criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_HOMOLOGADO");
+    public ProcessoResumoDto criarProcessoMapeamentoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(criarProcessoMapeamentoComMapaNaSituacao(request, "MAPEAMENTO_MAPA_HOMOLOGADO"));
     }
 
     /**
@@ -365,9 +358,8 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-mapeamento-com-cadastro-homologado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoMapeamentoComCadastroHomologado(@RequestBody ProcessoFixtureRequest request) {
-        return executeAsAdmin(() -> criarProcessoMapeamentoCadastroHomologadoFixture(request));
+    public ProcessoResumoDto criarProcessoMapeamentoComCadastroHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(executeAsAdmin(() -> criarProcessoMapeamentoCadastroHomologadoFixture(request)));
     }
 
     /**
@@ -376,9 +368,8 @@ public class E2eController {
     @SuppressWarnings("UnusedReturnValue")
     @PostMapping("/fixtures/processo-revisao-com-mapa-homologado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoRevisaoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
-        return executeAsAdmin(() -> criarProcessoRevisaoHomologadoFixture(request));
+    public ProcessoResumoDto criarProcessoRevisaoComMapaHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(executeAsAdmin(() -> criarProcessoRevisaoHomologadoFixture(request)));
     }
 
     /**
@@ -388,9 +379,8 @@ public class E2eController {
     @SuppressWarnings("UnusedReturnValue")
     @PostMapping("/fixtures/processo-revisao-com-cadastro-homologado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoRevisaoComCadastroHomologado(@RequestBody ProcessoFixtureRequest request) {
-        return executeAsAdmin(() -> criarProcessoRevisaoCadastroHomologadoFixture(request));
+    public ProcessoResumoDto criarProcessoRevisaoComCadastroHomologado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(executeAsAdmin(() -> criarProcessoRevisaoCadastroHomologadoFixture(request)));
     }
 
     /**
@@ -398,9 +388,12 @@ public class E2eController {
      */
     @PostMapping("/fixtures/processo-revisao-com-cadastro-disponibilizado")
     @Transactional
-    @JsonView(ProcessoViews.Publica.class)
-    public Processo criarProcessoRevisaoComCadastroDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
-        return executeAsAdmin(() -> criarProcessoRevisaoCadastroDisponibilizadoFixture(request));
+    public ProcessoResumoDto criarProcessoRevisaoComCadastroDisponibilizado(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(executeAsAdmin(() -> criarProcessoRevisaoCadastroDisponibilizadoFixture(request)));
+    }
+
+    private ProcessoResumoDto processoResumoFixture(Processo processo) {
+        return processoDtoMapper.paraResumo(processo);
     }
 
     private Processo criarProcessoMapeamentoComMapaNaSituacao(ProcessoFixtureRequest request, String situacaoSubprocesso) {

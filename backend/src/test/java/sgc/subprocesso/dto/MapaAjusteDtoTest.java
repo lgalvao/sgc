@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.mapa.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
@@ -11,6 +12,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de MapaAjusteDto")
 class MapaAjusteDtoTest {
+    private final MapaDtoMapper mapaDtoMapper = new MapaDtoMapper();
     private Subprocesso subprocesso;
 
     @BeforeEach
@@ -43,15 +45,15 @@ class MapaAjusteDtoTest {
     }
 
     @Nested
-    @DisplayName("Método de criação estático of")
-    class OfMethodTests {
+    @DisplayName("Mapper de criação")
+    class MapperTests {
         @Test
         @DisplayName("Deve mapear corretamente os dados básicos")
         void deveMapearDadosBasicos() {
             Analise analise = new Analise();
             analise.setObservacoes("Justificativa teste");
 
-            MapaAjusteDto dto = MapaAjusteDto.of(
+            MapaAjusteDto dto = mapaDtoMapper.paraMapaAjusteDto(
                     subprocesso, analise, List.of(), List.of(), List.of());
 
             assertThat(dto.getCodMapa()).isEqualTo(100L);
@@ -79,7 +81,7 @@ class MapaAjusteDtoTest {
             // Execute
             Analise analise = new Analise();
             analise.setObservacoes("");
-            MapaAjusteDto dto = MapaAjusteDto.of(
+            MapaAjusteDto dto = mapaDtoMapper.paraMapaAjusteDto(
                     subprocesso, analise, List.of(comp), List.of(ativ), List.of(con));
 
             assertThat(dto.getCompetencias()).hasSize(1);

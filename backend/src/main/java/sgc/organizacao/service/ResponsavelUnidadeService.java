@@ -88,15 +88,7 @@ public class ResponsavelUnidadeService {
                 .orElseThrow(() -> new IllegalStateException(
                         "Usuário ausente para atribuição temporária %d".formatted(atribuicao.getCodigo())));
 
-        return AtribuicaoDto.builder()
-                .codigo(atribuicao.getCodigo())
-                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
-                .unidadeSigla(atribuicao.getUnidade().getSigla())
-                .usuario(organizacaoDtoMapper.paraUsuarioResumoObrigatorio(usuario))
-                .dataInicio(atribuicao.getDataInicio())
-                .dataTermino(atribuicao.getDataTermino())
-                .justificativa(atribuicao.getJustificativa())
-                .build();
+        return organizacaoDtoMapper.paraAtribuicaoDto(atribuicao, usuario);
     }
 
     /**

@@ -22,12 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Testes de integração para o ciclo de vida de atividades e conhecimentos.
- * Exercita AtividadeFacade, AtividadeController e MapaManutencaoService via HTTP real.
+ * Exercita AtividadeService, AtividadeController e MapaManutencaoService via HTTP real.
  */
 @Tag("integration")
 @Transactional
-@DisplayName("AtividadeFacade — integração")
-class AtividadeFacadeIntegrationTest extends BaseIntegrationTest {
+@DisplayName("AtividadeService — integração")
+class AtividadeServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private EntityManager entityManager;

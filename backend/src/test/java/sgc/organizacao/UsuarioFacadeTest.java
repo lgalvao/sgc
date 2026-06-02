@@ -27,6 +27,9 @@ class UsuarioFacadeTest {
     @Mock
     private ResponsavelUnidadeService responsavelUnidadeService;
 
+    @Spy
+    private OrganizacaoDtoMapper organizacaoDtoMapper = new OrganizacaoDtoMapper();
+
     @InjectMocks
     private UsuarioFacade facade;
 

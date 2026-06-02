@@ -5,7 +5,6 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
 import sgc.comum.*;
-import sgc.organizacao.model.OrganizacaoViews;
 
 import java.time.*;
 import java.util.*;
@@ -22,52 +21,38 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnidadeDto {
-    @JsonView(OrganizacaoViews.Publica.class)
     private Long codigo;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     private String nome;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     @NotBlank(message = Mensagens.SIGLA_OBRIGATORIA)
-
     @Size(max = 20, message = Mensagens.SIGLA_MAX)
     private String sigla;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     private Long codigoPai;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     private String tipo;
 
     @Builder.Default
-    @JsonView(OrganizacaoViews.Publica.class)
     private List<UnidadeDto> subunidades = new ArrayList<>();
 
-    @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("tituloTitular")
     private String tituloTitular;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("isElegivel")
     private boolean isElegivel;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("tipoResponsabilidade")
     private String tipoResponsabilidade;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("dataInicioResponsabilidade")
     private LocalDateTime dataInicioResponsabilidade;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     @JsonProperty("dataFimResponsabilidade")
     private LocalDateTime dataFimResponsabilidade;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     private UsuarioResumoDto titular;
 
-    @JsonView(OrganizacaoViews.Publica.class)
     private UsuarioResumoDto responsavel;
 
     public static UnidadeDto fromResumoObrigatorio(

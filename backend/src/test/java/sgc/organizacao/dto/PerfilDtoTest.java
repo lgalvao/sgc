@@ -1,21 +1,11 @@
 package sgc.organizacao.dto;
 
 import org.junit.jupiter.api.*;
-import sgc.organizacao.model.*;
 
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("PerfilDto Tests")
 class PerfilDtoTest {
-
-    @Test
-    @DisplayName("Deve cobrir o método from")
-    void deveCobrirMethodFrom() {
-        PerfilDto dto = PerfilDto.from(Perfil.ADMIN);
-        assertThat(dto.perfil()).isEqualTo("ADMIN");
-        assertThat(dto.descricao()).isEqualTo("ADMIN");
-        assertThat(dto.usuarioTitulo()).isNull();
-    }
 
     @Test
     @DisplayName("Deve cobrir o construtor e getters do record")

@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UsuarioController.class)
-@Import(RestExceptionHandler.class)
+@Import({RestExceptionHandler.class, OrganizacaoDtoMapper.class})
 @Tag("integration")
 @DisplayName("UsuarioController - Testes de Integração")
 class UsuarioControllerTest {

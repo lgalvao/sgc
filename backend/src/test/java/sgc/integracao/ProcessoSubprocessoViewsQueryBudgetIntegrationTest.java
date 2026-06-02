@@ -37,7 +37,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     @Autowired
     private EntityManagerFactory entityManagerFactory;
     @Autowired
-    private PainelFacade painelFacade;
+    private PainelService painelService;
     @Autowired
     private SubprocessoConsultaService subprocessoConsultaService;
     @Autowired
@@ -84,7 +84,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     @DisplayName("Painel deve listar processos sem lookup unitario por item")
     void painelDeveListarProcessosSemLookupUnitarioPorItem() {
         MetricasExecucaoTeste.ResultadoMedicao medicao = medir("painel.listarProcessos", () -> {
-            Page<ProcessoResumoDto> pagina = painelFacade.listarProcessos(
+            Page<ProcessoResumoDto> pagina = painelService.listarProcessos(
                     new ContextoUsuarioAutenticado(
                             usuarioChefe.getTituloEleitoral(),
                             unidadeFilha.getCodigo(),
@@ -122,7 +122,7 @@ class ProcessoSubprocessoViewsQueryBudgetIntegrationTest extends BaseIntegration
     @DisplayName("Painel deve listar alertas sem lookup unitario de leitura")
     void painelDeveListarAlertasSemLookupUnitarioDeLeitura() {
         MetricasExecucaoTeste.ResultadoMedicao medicao = medir("painel.listarAlertas", () -> {
-            Page<Alerta> pagina = painelFacade.listarAlertas(
+            Page<Alerta> pagina = painelService.listarAlertas(
                     new ContextoUsuarioAutenticado(
                             usuarioAdmin.getTituloEleitoral(),
                             unidadeFilha.getCodigo(),

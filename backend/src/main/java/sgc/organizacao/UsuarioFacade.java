@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.*;
 public class UsuarioFacade {
     private final UsuarioService usuarioService;
     private final ResponsavelUnidadeService responsavelUnidadeService;
+    private final OrganizacaoDtoMapper organizacaoDtoMapper;
 
     @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
@@ -115,7 +116,7 @@ public class UsuarioFacade {
         List<UsuarioPerfilAutorizacaoLeitura> atribuicoes = usuarioService.buscarAutorizacoesPerfil(usuario.getTituloEleitoral());
         return atribuicoes.stream()
                 .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
-                .map(this::toPerfilDto)
+                .map(organizacaoDtoMapper::paraPerfilDto)
                 .toList();
     }
 
@@ -131,23 +132,13 @@ public class UsuarioFacade {
                 .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
     }
 
-    private PerfilDto toPerfilDto(UsuarioPerfilAutorizacaoLeitura atribuicao) {
-        return PerfilDto.builder()
-                .usuarioTitulo(atribuicao.usuarioTitulo())
-                .unidadeCodigo(atribuicao.unidadeCodigo())
-                .unidadeNome(atribuicao.unidadeNome())
-                .perfil(atribuicao.perfil().name())
-                .descricao(atribuicao.perfil().name())
-                .build();
-    }
-
     @Transactional(readOnly = true)
     public List<AdministradorDto> listarAdministradores() {
         return usuarioService.buscarAdministradores().stream()
                 .map(Administrador::getUsuarioTitulo)
                 .filter(Objects::nonNull)
                 .flatMap(titulo -> usuarioService.buscarOptComUnidadeLotacao(titulo).stream())
-                .map(this::toAdministradorDto)
+                .map(organizacaoDtoMapper::paraAdministradorDto)
                 .toList();
     }
 
@@ -159,7 +150,7 @@ public class UsuarioFacade {
         usuarioService.adicionarAdministrador(usuarioTitulo);
 
         log.info("Administrador {} adicionado", MascaraUtil.mascarar(usuarioTitulo));
-        return toAdministradorDto(usuario);
+        return organizacaoDtoMapper.paraAdministradorDto(usuario);
     }
 
     @Transactional
@@ -171,17 +162,5 @@ public class UsuarioFacade {
 
         usuarioService.removerAdministrador(usuarioTitulo);
         log.info("Administrador {} removido.", MascaraUtil.mascarar(usuarioTitulo));
-    }
-
-    private AdministradorDto toAdministradorDto(Usuario usuario) {
-        Unidade unidadeLotacao = usuario.getUnidadeLotacao();
-
-        return AdministradorDto.builder()
-                .tituloEleitoral(usuario.getTituloEleitoral())
-                .nome(usuario.getNome())
-                .matricula(usuario.getMatricula())
-                .unidadeCodigo(unidadeLotacao.getCodigo())
-                .unidadeSigla(unidadeLotacao.getSigla())
-                .build();
     }
 }

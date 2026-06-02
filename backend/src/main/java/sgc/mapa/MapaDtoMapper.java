@@ -1,8 +1,11 @@
 package sgc.mapa;
 
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -75,5 +78,65 @@ public class MapaDtoMapper {
                         .map(this::paraAtividadeMapaDto)
                         .toList(),
                 null);
+    }
+
+    public MapaAjusteDto paraMapaAjusteDto(
+            Subprocesso subprocesso,
+            @Nullable Analise analise,
+            List<Competencia> competencias,
+            List<Atividade> atividades,
+            List<Conhecimento> conhecimentos) {
+        Map<Long, List<Conhecimento>> conhecimentosPorAtividade = conhecimentos.stream()
+                .collect(Collectors.groupingBy(conhecimento -> conhecimento.getAtividade().getCodigo()));
+
+        List<CompetenciaAjusteDto> competenciaDtos = competencias.stream()
+                .map(competencia -> paraCompetenciaAjusteDto(competencia, atividades, conhecimentosPorAtividade))
+                .toList();
+
+        return MapaAjusteDto.builder()
+                .codMapa(subprocesso.getMapa().getCodigo())
+                .unidadeNome(subprocesso.getUnidade().getNome())
+                .competencias(competenciaDtos)
+                .justificativaDevolucao(analise != null ? analise.getObservacoes() : null)
+                .build();
+    }
+
+    private CompetenciaAjusteDto paraCompetenciaAjusteDto(
+            Competencia competencia,
+            List<Atividade> atividades,
+            Map<Long, List<Conhecimento>> conhecimentosPorAtividade) {
+        return CompetenciaAjusteDto.builder()
+                .codCompetencia(competencia.getCodigo())
+                .nome(competencia.getDescricao())
+                .atividades(atividades.stream()
+                        .map(atividade -> paraAtividadeAjusteDto(competencia, atividade, conhecimentosPorAtividade))
+                        .toList())
+                .build();
+    }
+
+    private AtividadeAjusteDto paraAtividadeAjusteDto(
+            Competencia competencia,
+            Atividade atividade,
+            Map<Long, List<Conhecimento>> conhecimentosPorAtividade) {
+        boolean vinculada = competencia.getAtividades().contains(atividade);
+        List<ConhecimentoAjusteDto> conhecimentos = conhecimentosPorAtividade
+                .getOrDefault(atividade.getCodigo(), List.of())
+                .stream()
+                .map(conhecimento -> paraConhecimentoAjusteDto(conhecimento, vinculada))
+                .toList();
+
+        return AtividadeAjusteDto.builder()
+                .codAtividade(atividade.getCodigo())
+                .nome(atividade.getDescricao())
+                .conhecimentos(conhecimentos)
+                .build();
+    }
+
+    private ConhecimentoAjusteDto paraConhecimentoAjusteDto(Conhecimento conhecimento, boolean incluido) {
+        return ConhecimentoAjusteDto.builder()
+                .conhecimentoCodigo(conhecimento.getCodigo())
+                .nome(conhecimento.getDescricao())
+                .incluido(incluido)
+                .build();
     }
 }

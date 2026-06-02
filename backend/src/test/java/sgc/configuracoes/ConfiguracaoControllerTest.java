@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ConfiguracaoController.class)
+@Import(ConfiguracaoMapper.class)
 @DisplayName("Testes do ConfiguracaoController")
 class ConfiguracaoControllerTest {
 

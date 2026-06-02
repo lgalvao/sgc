@@ -36,6 +36,9 @@ class UnidadeHierarquiaServiceTest {
     @Mock
     private ObjectProvider<UnidadeHierarquiaService> selfProvider;
 
+    @Spy
+    private sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper = new sgc.organizacao.OrganizacaoDtoMapper();
+
     @InjectMocks
     private UnidadeHierarquiaService service;
 

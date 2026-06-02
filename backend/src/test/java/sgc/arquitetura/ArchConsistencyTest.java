@@ -249,6 +249,8 @@ public class ArchConsistencyTest {
     static final ArchRule dto_packages_with_explicit_http_contracts_should_not_use_json_view = classes()
             .that()
             .resideInAnyPackage(
+                    "sgc.organizacao.dto..",
+                    "sgc.mapa.dto..",
                     "sgc.processo.dto..",
                     "sgc.subprocesso.dto..",
                     "sgc.seguranca.dto..",
@@ -276,6 +278,15 @@ public class ArchConsistencyTest {
                 }
             })
             .because("Nos módulos já migrados, a borda HTTP deve ser descrita por DTOs explícitos e estáveis, sem serialização condicional por view");
+
+    @ArchTest
+    static final ArchRule only_models_and_e2e_adapter_should_depend_on_json_views = noClasses()
+            .that()
+            .resideOutsideOfPackages("sgc..model..", "sgc.e2e..")
+            .should()
+            .accessClassesThat()
+            .haveSimpleNameEndingWith("Views")
+            .because("Classes *Views e JsonView ficam contidas no legado de entidades/model e no adapter de E2E, sem voltar a contaminar contratos, services ou controllers da aplicação");
 
     @ArchTest
     static final ArchRule controllers_should_not_use_authentication_principal = methods()

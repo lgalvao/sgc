@@ -22,9 +22,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("PainelFacade Test")
+@DisplayName("PainelService Test")
 @SuppressWarnings("NullAway.Init")
-class PainelFacadeTest {
+class PainelServiceTest {
     private static final ContextoUsuarioAutenticado CONTEXTO_ADMIN =
             new ContextoUsuarioAutenticado("123", 100L, Perfil.ADMIN);
     private static final ContextoUsuarioAutenticado CONTEXTO_GESTOR =
@@ -44,7 +44,7 @@ class PainelFacadeTest {
     private AlertaDtoMapper alertaDtoMapper = new AlertaDtoMapper();
 
     @InjectMocks
-    private PainelFacade painelFacade;
+    private PainelService painelService;
 
     @Test
     @DisplayName("Deve listar processos para ADMIN")
@@ -54,7 +54,7 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(page);
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/cadastro?codProcesso=1");
@@ -69,7 +69,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarDescendentes(eq(100L), anyMap())).thenReturn(List.of(101L));
         when(processoService.listarIniciadosPorSubprocessos(anyList(), any(Pageable.class))).thenReturn(page);
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_GESTOR, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_GESTOR, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1");
@@ -93,7 +93,7 @@ class PainelFacadeTest {
         when(processoService.listarIniciadosPorSubprocessos(anyList(), any(Pageable.class))).thenReturn(page);
         when(unidadeService.buscarSiglaPorCodigo(100L)).thenReturn(unidade.getSigla());
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_CHEFE, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_CHEFE, PageRequest.of(0, 10));
 
         assertThat(result).hasSize(2);
         assertThat(result.getContent().getFirst().linkDestino()).isEqualTo("/processo/1/ASSESSORIA_22");
@@ -107,7 +107,7 @@ class PainelFacadeTest {
         when(unidadeService.buscarSiglaPorCodigo(100L)).thenThrow(new RuntimeException("Erro"));
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        assertThatThrownBy(() -> painelFacade.listarProcessos(CONTEXTO_CHEFE, pageRequest))
+        assertThatThrownBy(() -> painelService.listarProcessos(CONTEXTO_CHEFE, pageRequest))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Erro");
     }
@@ -132,7 +132,7 @@ class PainelFacadeTest {
         when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
+        Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
 
         assertThat(result).hasSize(1);
         assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
@@ -157,7 +157,7 @@ class PainelFacadeTest {
             return null;
         }).when(alertaFacade).aplicarPrazoConfiguradoLeituraAutomatica(anyCollection());
 
-        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
+        Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
 
         assertThat(result.getContent()).singleElement().satisfies(alerta ->
                 assertThat(alerta.getDataHoraLeitura()).isEqualTo(alerta.getDataHora().plusDays(3))
@@ -185,7 +185,7 @@ class PainelFacadeTest {
         when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, sorted);
+        Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, sorted);
         assertThat(result).hasSize(1);
     }
 
@@ -210,7 +210,7 @@ class PainelFacadeTest {
         when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
-        Page<Alerta> result = painelFacade.listarAlertas(CONTEXTO_ADMIN, unsortedPaged);
+        Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, unsortedPaged);
         assertThat(result).hasSize(1);
     }
 
@@ -220,7 +220,7 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of()));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, Pageable.unpaged());
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, Pageable.unpaged());
 
         assertThat(result).isEmpty();
         verify(processoService).listarTodos(Pageable.unpaged());
@@ -247,7 +247,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(new HashMap<>());
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1");
     }
 
@@ -277,7 +277,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U1");
     }
 
@@ -304,7 +304,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U2");
     }
 
@@ -332,7 +332,7 @@ class PainelFacadeTest {
 
         when(unidadeService.buscarSiglasPorCodigos(List.of(2L))).thenReturn(List.of("U2"));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEqualTo("U2");
     }
 
@@ -355,7 +355,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result).isNotEmpty();
     }
 
@@ -386,7 +386,7 @@ class PainelFacadeTest {
         when(unidadeService.buscarSiglasPorCodigos(argThat(list -> list.contains(1L) && list.contains(2L))))
                 .thenReturn(List.of("U1", "U2"));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1", "U2");
     }
 
@@ -401,7 +401,7 @@ class PainelFacadeTest {
         ContextoUsuarioAutenticado contextoChefe = new ContextoUsuarioAutenticado("123", 10L, Perfil.CHEFE);
         doReturn(null).when(unidadeService).buscarSiglaPorCodigo(10L);
 
-        assertThatThrownBy(() -> painelFacade.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
+        assertThatThrownBy(() -> painelService.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Sigla da unidade do usuário ausente");
     }
@@ -417,7 +417,7 @@ class PainelFacadeTest {
         ContextoUsuarioAutenticado contextoChefe = new ContextoUsuarioAutenticado("123", 10L, Perfil.CHEFE);
         when(unidadeService.buscarSiglaPorCodigo(10L)).thenReturn("  ");
 
-        assertThatThrownBy(() -> painelFacade.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
+        assertThatThrownBy(() -> painelService.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Sigla da unidade do usuário ausente");
     }
@@ -425,14 +425,14 @@ class PainelFacadeTest {
     @Test
     @DisplayName("Deve marcar alertas como lidos")
     void deveMarcarAlertasLidos() {
-        painelFacade.marcarAlertasLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
+        painelService.marcarAlertasLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
         verify(alertaFacade).marcarComoLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
     }
 
     @Test
     @DisplayName("Não deve chamar alertaFacade se lista de alertas estiver vazia")
     void naoDeveMarcarAlertasLidosSeListaVazia() {
-        painelFacade.marcarAlertasLidos(CONTEXTO_ADMIN, Collections.emptyList());
+        painelService.marcarAlertasLidos(CONTEXTO_ADMIN, Collections.emptyList());
         verify(alertaFacade, never()).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
     }
 
@@ -456,7 +456,7 @@ class PainelFacadeTest {
         when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(pageAlertas);
         when(alertaFacade.obterMapaDataHoraLeitura(anyString(), anyList())).thenReturn(Map.of());
 
-        sgc.processo.painel.dto.PainelBootstrapDto bootstrap = painelFacade.obterBootstrap(CONTEXTO_ADMIN);
+        sgc.processo.painel.dto.PainelBootstrapDto bootstrap = painelService.obterBootstrap(CONTEXTO_ADMIN);
 
         assertThat(bootstrap.getProcessos()).hasSize(1);
         assertThat(bootstrap.getAlertas()).hasSize(1);
@@ -483,7 +483,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         verify(processoService).listarTodos(any());
     }
 
@@ -494,7 +494,7 @@ class PainelFacadeTest {
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of()));
 
         Pageable sorted = PageRequest.of(0, 10, Sort.by("descricao"));
-        painelFacade.listarProcessos(CONTEXTO_ADMIN, sorted);
+        painelService.listarProcessos(CONTEXTO_ADMIN, sorted);
 
         verify(processoService).listarTodos(sorted);
     }
@@ -525,7 +525,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         verify(processoService).listarTodos(any());
     }
 
@@ -544,7 +544,7 @@ class PainelFacadeTest {
 
         when(processoService.listarTodos(any())).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(contexto, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(contexto, PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().getFirst().unidadesParticipantes()).isEmpty();
@@ -585,7 +585,7 @@ class PainelFacadeTest {
         when(unidadeService.buscarSiglasPorCodigos(argThat(list -> list.contains(1L) && list.contains(2L) && list.contains(3L))))
                 .thenReturn(List.of("U1", "U2", "U3"));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result.getContent().getFirst().unidadesParticipantes()).contains("U1", "U2", "U3", "VAL");
     }
 
@@ -610,7 +610,7 @@ class PainelFacadeTest {
         when(hierarquiaService.buscarMapaHierarquia()).thenReturn(hierarquia);
         when(processoService.listarTodos(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(p)));
 
-        Page<ProcessoResumoDto> result = painelFacade.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
+        Page<ProcessoResumoDto> result = painelService.listarProcessos(CONTEXTO_ADMIN, PageRequest.of(0, 10));
         assertThat(result).isNotEmpty();
     }
 

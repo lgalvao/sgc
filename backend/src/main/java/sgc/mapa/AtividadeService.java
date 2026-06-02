@@ -25,7 +25,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Transactional
 @Slf4j
 @RequiredArgsConstructor
-public class AtividadeFacade {
+public class AtividadeService {
     private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoConsultaService consultaService;
     private final SgcPermissionEvaluator permissionEvaluator;

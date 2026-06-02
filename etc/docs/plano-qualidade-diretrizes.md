@@ -52,6 +52,7 @@ A direção oficial do backend é:
 Referência:
 
 - [Borda HTTP do backend](/Users/leonardo/sgc/etc/docs/backend-borda-http.md)
+- [ADR 0001 - Contratos HTTP Explícitos no Backend](/Users/leonardo/sgc/etc/docs/adr/0001-contratos-http-explicitos.md)
 
 ### 3.2. `JsonView` não é o padrão da borda
 
@@ -62,6 +63,10 @@ Direção atual:
 - não usar `JsonView` como mecanismo principal de montagem de contrato HTTP nos módulos já migrados;
 - `JsonView` pode continuar existindo em legado e no adapter `e2e`, mas não deve orientar código novo;
 - se houver dúvida entre reaproveitar um objeto com `JsonView` ou declarar contrato explícito, a decisão correta é declarar contrato explícito.
+
+Referência:
+
+- [ADR 0002 - Conter JsonView no Legado de Model e no Adapter E2E](/Users/leonardo/sgc/etc/docs/adr/0002-conter-jsonview-no-adapter-e2e.md)
 
 ### 3.3. Melhorar qualidade não é “burlar auditoria”
 

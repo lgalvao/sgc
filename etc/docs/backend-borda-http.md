@@ -49,6 +49,11 @@ Use mapper explícito quando pelo menos um destes pontos ocorrer:
 - O adapter `e2e` pode continuar usando `@JsonView` enquanto existir dependência operacional dele.
 - Módulos ainda não migrados podem conviver temporariamente com `@JsonView`, mas não devem ser usados como referência para código novo.
 
+## ADRs relacionadas
+
+- [ADR 0001 - Contratos HTTP Explícitos no Backend](/Users/leonardo/sgc/etc/docs/adr/0001-contratos-http-explicitos.md)
+- [ADR 0002 - Conter JsonView no Legado de Model e no Adapter E2E](/Users/leonardo/sgc/etc/docs/adr/0002-conter-jsonview-no-adapter-e2e.md)
+
 ## Regra de decisão
 
 Se houver dúvida entre reaproveitar estrutura interna ou declarar contrato explícito, a decisão padrão é declarar contrato explícito.
