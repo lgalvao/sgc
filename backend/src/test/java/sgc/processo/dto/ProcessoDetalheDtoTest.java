@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.processo.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.ProcessoDetalheDto.*;
@@ -11,10 +12,11 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("ProcessoDetalheDto Test suite")
 class ProcessoDetalheDtoTest {
+    private final ProcessoDtoMapper mapper = new ProcessoDtoMapper();
 
     @Test
-    @DisplayName("UnidadeParticipanteDto.fromUnidade deve mapear campos corretamente")
-    void fromUnidadeDeveMapearCampos() {
+    @DisplayName("ProcessoDtoMapper.paraUnidadeParticipante(Unidade) deve mapear campos corretamente")
+    void paraUnidadeParticipanteDeveMapearCampos() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setNome("Unidade 1");
@@ -23,7 +25,7 @@ class ProcessoDetalheDtoTest {
         superior.setCodigo(2L);
         unidade.setUnidadeSuperior(superior);
 
-        UnidadeParticipanteDto dto = UnidadeParticipanteDto.fromUnidade(unidade);
+        UnidadeParticipanteDto dto = mapper.paraUnidadeParticipante(unidade);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodUnidade()).isEqualTo(1L);
@@ -34,28 +36,28 @@ class ProcessoDetalheDtoTest {
     }
 
     @Test
-    @DisplayName("UnidadeParticipanteDto.fromUnidade deve lidar com unidade superior null")
-    void fromUnidadeDeveLidarComSuperiorNull() {
+    @DisplayName("ProcessoDtoMapper.paraUnidadeParticipante(Unidade) deve lidar com unidade superior null")
+    void paraUnidadeParticipanteDeveLidarComSuperiorNull() {
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
         unidade.setUnidadeSuperior(null);
 
-        UnidadeParticipanteDto dto = UnidadeParticipanteDto.fromUnidade(unidade);
+        UnidadeParticipanteDto dto = mapper.paraUnidadeParticipante(unidade);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodUnidadeSuperior()).isNull();
     }
 
     @Test
-    @DisplayName("UnidadeParticipanteDto.fromSnapshot deve mapear campos corretamente")
-    void fromSnapshotDeveMapearCampos() {
+    @DisplayName("ProcessoDtoMapper.paraUnidadeParticipante(Snapshot) deve mapear campos corretamente")
+    void paraUnidadeParticipanteSnapshotDeveMapearCampos() {
         UnidadeProcesso snapshot = new UnidadeProcesso();
         snapshot.setUnidadeCodigo(10L);
         snapshot.setNome("Snapshot unidade");
         snapshot.setSigla("SU");
         snapshot.setUnidadeSuperiorCodigo(20L);
 
-        UnidadeParticipanteDto dto = UnidadeParticipanteDto.fromSnapshot(snapshot);
+        UnidadeParticipanteDto dto = mapper.paraUnidadeParticipante(snapshot);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodUnidade()).isEqualTo(10L);
@@ -73,7 +75,7 @@ class ProcessoDetalheDtoTest {
         unidade.setNome("Unidade 1");
         unidade.setSigla("U1");
 
-        UnidadeParticipanteDto dto = UnidadeParticipanteDto.fromUnidade(unidade);
+        UnidadeParticipanteDto dto = mapper.paraUnidadeParticipante(unidade);
 
         Mapa mapa = new Mapa();
         mapa.setCodigo(99L);
@@ -87,9 +89,9 @@ class ProcessoDetalheDtoTest {
         Unidade localizacao = new Unidade();
         localizacao.setCodigo(77L);
 
-        dto.preencherComSubprocesso(subprocesso, localizacao);
+        mapper.preencherParticipanteComSubprocesso(dto, subprocesso, localizacao);
 
-        assertThat(dto.getSituacaoSubprocesso()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(dto.getSituacaoSubprocesso()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name());
         assertThat(dto.getDataLimite()).isEqualTo(java.time.LocalDateTime.of(2026, 1, 15, 10, 0));
         assertThat(dto.getCodSubprocesso()).isEqualTo(30L);
         assertThat(dto.getMapaCodigo()).isEqualTo(99L);

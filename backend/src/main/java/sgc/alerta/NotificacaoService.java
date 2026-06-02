@@ -22,6 +22,7 @@ public class NotificacaoService {
 
     private final NotificacaoEmailRepo notificacaoEmailRepo;
     private final Clock clock;
+    private final AlertaDtoMapper alertaDtoMapper;
 
     public NotificacaoEmail enfileirar(EnfileirarNotificacaoCommand cmd) {
         if (notificacaoEmailRepo.existsByChaveIdempotencia(cmd.chaveIdempotencia())) {
@@ -80,7 +81,7 @@ public class NotificacaoService {
     public List<NotificacaoSubprocessoResumoDto> listarResumoSubprocessosAtivos() {
         return notificacaoEmailRepo.resumirPorSubprocessosDeProcessosAtivos()
                 .stream()
-                .map(NotificacaoSubprocessoResumoDto::fromQuery)
+                .map(alertaDtoMapper::paraNotificacaoSubprocessoResumo)
                 .toList();
     }
 

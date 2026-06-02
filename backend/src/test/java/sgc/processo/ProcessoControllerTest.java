@@ -226,7 +226,7 @@ class ProcessoControllerTest {
                     .codigo(1L)
                     .descricao("Processo detalhado")
                     .tipo(TipoProcesso.MAPEAMENTO.name())
-                    .situacao(SituacaoProcesso.CRIADO)
+                    .situacao(SituacaoProcesso.CRIADO.name())
                     .dataCriacao(LocalDateTime.now())
                     .build();
 

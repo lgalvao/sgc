@@ -1,7 +1,9 @@
 package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.subprocesso.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -10,13 +12,14 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("MovimentacaoDto")
 class MovimentacaoDtoTest {
+    private final SubprocessoDtoMapper mapper = new SubprocessoDtoMapper(new OrganizacaoDtoMapper());
 
     @Test
     @DisplayName("deve mapear movimentacao com origem e destino obrigatorios")
     void deveMapearMovimentacaoComOrigemEDestinoObrigatorios() {
         Movimentacao movimentacao = criarMovimentacao();
 
-        MovimentacaoDto dto = MovimentacaoDto.from(movimentacao);
+        MovimentacaoDto dto = mapper.paraMovimentacao(movimentacao);
 
         assertThat(dto.codigo()).isEqualTo(7L);
         assertThat(dto.unidadeOrigemSigla()).isEqualTo("ORG");

@@ -131,7 +131,7 @@ class NotificacaoAdminIntegrationTest extends BaseIntegrationTest {
                     assertThat(item.totalNotificacoes()).isEqualTo(2);
                     assertThat(item.enviadas()).isEqualTo(1);
                     assertThat(item.falhasDefinitivas()).isEqualTo(1);
-                    assertThat(item.statusGeral().name()).isEqualTo("FALHA_DEFINITIVA");
+                    assertThat(item.statusGeral()).isEqualTo("FALHA_DEFINITIVA");
                     assertThat(item.ultimoErro()).isEqualTo("SMTP indisponível");
                     assertThat(item.podeReenviar()).isTrue();
                 });

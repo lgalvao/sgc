@@ -166,7 +166,7 @@ public class SubprocessoVisualizacaoService {
 
     private List<MovimentacaoDto> listarMovimentacoesDto(List<Movimentacao> movimentacoes) {
         return movimentacoes.stream()
-                .map(MovimentacaoDto::from)
+                .map(subprocessoDtoMapper::paraMovimentacao)
                 .toList();
     }
 }

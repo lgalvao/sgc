@@ -1,7 +1,6 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import sgc.processo.model.*;
 
 import java.time.*;
 
@@ -12,7 +11,7 @@ import java.time.*;
 public record ProcessoResumoDto(
         Long codigo,
         String descricao,
-        SituacaoProcesso situacao,
+        String situacao,
         String tipo,
         LocalDateTime dataLimite,
         LocalDateTime dataCriacao,

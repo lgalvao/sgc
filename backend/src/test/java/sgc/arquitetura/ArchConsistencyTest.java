@@ -246,6 +246,38 @@ public class ArchConsistencyTest {
             .because("Controllers da aplicação devem usar DTOs explícitos; @JsonView fica restrito ao adapter interno de E2E");
 
     @ArchTest
+    static final ArchRule dto_packages_with_explicit_http_contracts_should_not_use_json_view = classes()
+            .that()
+            .resideInAnyPackage(
+                    "sgc.processo.dto..",
+                    "sgc.subprocesso.dto..",
+                    "sgc.seguranca.dto..",
+                    "sgc.alerta.dto..")
+            .should(new ArchCondition<>("não usar @JsonView em DTOs de contratos HTTP explícitos") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    if (item.isAnnotatedWith(JsonView.class)) {
+                        events.add(SimpleConditionEvent.violated(
+                                item,
+                                "Classe " + item.getName() + " usa @JsonView em DTO de contrato HTTP explícito"));
+                    }
+
+                    item.getFields().stream()
+                            .filter(field -> field.isAnnotatedWith(JsonView.class))
+                            .forEach(field -> events.add(SimpleConditionEvent.violated(
+                                    field,
+                                    "Campo " + field.getFullName() + " usa @JsonView em DTO de contrato HTTP explícito")));
+
+                    item.getMethods().stream()
+                            .filter(method -> method.isAnnotatedWith(JsonView.class))
+                            .forEach(method -> events.add(SimpleConditionEvent.violated(
+                                    method,
+                                    "Método " + method.getFullName() + " usa @JsonView em DTO de contrato HTTP explícito")));
+                }
+            })
+            .because("Nos módulos já migrados, a borda HTTP deve ser descrita por DTOs explícitos e estáveis, sem serialização condicional por view");
+
+    @ArchTest
     static final ArchRule controllers_should_not_use_authentication_principal = methods()
             .that()
             .arePublic()

@@ -99,9 +99,14 @@ Isso explica por que o módulo possui serviços explícitos de contexto e visual
 ## Regras arquiteturais importantes
 
 - DTOs na fronteira HTTP, nunca entidades JPA;
+- contratos HTTP explícitos, sem `@JsonView` como mecanismo de montagem de resposta;
 - leitura e escrita separadas por serviços especializados;
 - autorização baseada em `@PreAuthorize` + `SgcPermissionEvaluator`;
 - ações de workflow expostas por endpoints `POST` com verbo explícito.
+
+Referência geral do padrão:
+
+- [Borda HTTP do backend](../../../../../../etc/docs/backend-borda-http.md)
 
 ## Testes relacionados
 

@@ -101,12 +101,15 @@ public class ProcessoController {
         Map<Long, Unidade> localizacoesPorSubprocesso = localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessosPorUnidade.values());
         List<ProcessoDetalheDto.UnidadeParticipanteDto> dtos = processo.getParticipantes().stream()
                 .map(snapshot -> {
-                    ProcessoDetalheDto.UnidadeParticipanteDto dto = ProcessoDetalheDto.UnidadeParticipanteDto.fromSnapshot(snapshot);
+                    ProcessoDetalheDto.UnidadeParticipanteDto dto = processoDtoMapper.paraUnidadeParticipante(snapshot);
                     Subprocesso subprocesso = subprocessosPorUnidade.get(snapshot.getUnidadeCodigoPersistido());
                     if (subprocesso != null) {
-                        dto.preencherComSubprocesso(subprocesso,
+                        processoDtoMapper.preencherParticipanteComSubprocesso(
+                                dto,
+                                subprocesso,
                                 java.util.Objects.requireNonNullElseGet(localizacoesPorSubprocesso.get(subprocesso.getCodigo()),
-                                        () -> localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)));
+                                        () -> localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso))
+                        );
                     }
                     return dto;
                 })

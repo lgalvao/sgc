@@ -4,6 +4,7 @@ import org.springframework.stereotype.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -81,6 +82,26 @@ public class SubprocessoDtoMapper {
                 .codigo(subprocesso.getCodigo())
                 .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()))
                 .atividades(atividades)
+                .build();
+    }
+
+    public MovimentacaoDto paraMovimentacao(Movimentacao movimentacao) {
+        Unidade unidadeOrigem = movimentacao.getUnidadeOrigem();
+        Unidade unidadeDestino = movimentacao.getUnidadeDestino();
+        Usuario usuario = movimentacao.getUsuario();
+
+        return MovimentacaoDto.builder()
+                .codigo(movimentacao.getCodigo())
+                .dataHora(movimentacao.getDataHora())
+                .unidadeOrigemCodigo(unidadeOrigem.getCodigo())
+                .unidadeOrigemSigla(unidadeOrigem.getSigla())
+                .unidadeOrigemNome(unidadeOrigem.getNome())
+                .unidadeDestinoCodigo(unidadeDestino.getCodigo())
+                .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .unidadeDestinoNome(unidadeDestino.getNome())
+                .usuarioTitulo(usuario.getTituloEleitoral())
+                .usuarioNome(usuario.getNome())
+                .descricao(movimentacao.getDescricao())
                 .build();
     }
 

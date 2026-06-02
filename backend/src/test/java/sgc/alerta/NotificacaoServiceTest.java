@@ -26,11 +26,12 @@ class NotificacaoServiceTest {
     @Captor
     private ArgumentCaptor<NotificacaoEmail> notificacaoCaptor;
 
+    private final AlertaDtoMapper alertaDtoMapper = new AlertaDtoMapper();
     private NotificacaoService service;
 
     @BeforeEach
     void setUp() {
-        service = new NotificacaoService(notificacaoEmailRepo, Clock.fixed(INSTANTE_FIXO, ZONA));
+        service = new NotificacaoService(notificacaoEmailRepo, Clock.fixed(INSTANTE_FIXO, ZONA), alertaDtoMapper);
     }
 
     @Test
@@ -316,7 +317,7 @@ class NotificacaoServiceTest {
         assertThat(resultado).singleElement().satisfies(resumo -> {
             assertThat(resumo.subprocessoCodigo()).isEqualTo(10L);
             assertThat(resumo.processoDescricao()).isEqualTo("Processo ativo");
-            assertThat(resumo.statusGeral().name()).isEqualTo("PENDENTE");
+            assertThat(resumo.statusGeral()).isEqualTo("PENDENTE");
             assertThat(resumo.podeReenviar()).isFalse();
         });
     }

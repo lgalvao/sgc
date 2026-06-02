@@ -1,6 +1,7 @@
 package sgc.alerta.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.alerta.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -8,52 +9,53 @@ import java.time.*;
 import static org.assertj.core.api.Assertions.*;
 
 class NotificacaoSubprocessoResumoDtoTest {
+    private final AlertaDtoMapper mapper = new AlertaDtoMapper();
 
     @Test
     void shouldCreateDtoWithFalhaDefinitiva() {
         NotificacaoSubprocessoResumoQuery query = createQuery(10, 0, 0, 0, 0, 1);
-        NotificacaoSubprocessoResumoDto dto = NotificacaoSubprocessoResumoDto.fromQuery(query);
-        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.FALHA_DEFINITIVA);
+        NotificacaoSubprocessoResumoDto dto = mapper.paraNotificacaoSubprocessoResumo(query);
+        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.FALHA_DEFINITIVA.name());
         assertThat(dto.podeReenviar()).isTrue();
     }
 
     @Test
     void shouldCreateDtoWithFalhaTemporaria() {
         NotificacaoSubprocessoResumoQuery query = createQuery(10, 0, 0, 0, 1, 0);
-        NotificacaoSubprocessoResumoDto dto = NotificacaoSubprocessoResumoDto.fromQuery(query);
-        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.FALHA_TEMPORARIA);
+        NotificacaoSubprocessoResumoDto dto = mapper.paraNotificacaoSubprocessoResumo(query);
+        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.FALHA_TEMPORARIA.name());
         assertThat(dto.podeReenviar()).isFalse();
     }
 
     @Test
     void shouldCreateDtoWithPendenteFromPendentes() {
         NotificacaoSubprocessoResumoQuery query = createQuery(10, 1, 0, 0, 0, 0);
-        NotificacaoSubprocessoResumoDto dto = NotificacaoSubprocessoResumoDto.fromQuery(query);
-        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.PENDENTE);
+        NotificacaoSubprocessoResumoDto dto = mapper.paraNotificacaoSubprocessoResumo(query);
+        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.PENDENTE.name());
         assertThat(dto.podeReenviar()).isFalse();
     }
 
     @Test
     void shouldCreateDtoWithPendenteFromEnviando() {
         NotificacaoSubprocessoResumoQuery query = createQuery(10, 0, 1, 0, 0, 0);
-        NotificacaoSubprocessoResumoDto dto = NotificacaoSubprocessoResumoDto.fromQuery(query);
-        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.PENDENTE);
+        NotificacaoSubprocessoResumoDto dto = mapper.paraNotificacaoSubprocessoResumo(query);
+        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.PENDENTE.name());
         assertThat(dto.podeReenviar()).isFalse();
     }
 
     @Test
     void shouldCreateDtoWithInconsistente() {
         NotificacaoSubprocessoResumoQuery query = createQuery(0, 0, 0, 0, 0, 0);
-        NotificacaoSubprocessoResumoDto dto = NotificacaoSubprocessoResumoDto.fromQuery(query);
-        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.INCONSISTENTE);
+        NotificacaoSubprocessoResumoDto dto = mapper.paraNotificacaoSubprocessoResumo(query);
+        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.INCONSISTENTE.name());
         assertThat(dto.podeReenviar()).isFalse();
     }
 
     @Test
     void shouldCreateDtoWithOk() {
         NotificacaoSubprocessoResumoQuery query = createQuery(10, 0, 0, 10, 0, 0);
-        NotificacaoSubprocessoResumoDto dto = NotificacaoSubprocessoResumoDto.fromQuery(query);
-        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.OK);
+        NotificacaoSubprocessoResumoDto dto = mapper.paraNotificacaoSubprocessoResumo(query);
+        assertThat(dto.statusGeral()).isEqualTo(SituacaoNotificacao.OK.name());
         assertThat(dto.podeReenviar()).isFalse();
     }
 
@@ -65,13 +67,13 @@ class NotificacaoSubprocessoResumoDtoTest {
                 1L, 2L, "Processo", "SIGLA", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
                 10, 1, 2, 3, 4, 0, ultima, proxima, 5, "Erro"
         );
-        NotificacaoSubprocessoResumoDto dto = NotificacaoSubprocessoResumoDto.fromQuery(query);
+        NotificacaoSubprocessoResumoDto dto = mapper.paraNotificacaoSubprocessoResumo(query);
 
         assertThat(dto.subprocessoCodigo()).isEqualTo(1L);
         assertThat(dto.processoCodigo()).isEqualTo(2L);
         assertThat(dto.processoDescricao()).isEqualTo("Processo");
         assertThat(dto.unidadeSigla()).isEqualTo("SIGLA");
-        assertThat(dto.situacaoSubprocesso()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(dto.situacaoSubprocesso()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name());
         assertThat(dto.totalNotificacoes()).isEqualTo(10);
         assertThat(dto.pendentes()).isEqualTo(1);
         assertThat(dto.enviando()).isEqualTo(2);

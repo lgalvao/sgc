@@ -10,6 +10,7 @@ import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.service.*;
@@ -61,6 +62,8 @@ public abstract class ProcessoServiceTestBase {
     protected ConfiguracaoService configuracaoService;
     @Mock
     protected MapaManutencaoService mapaManutencaoService;
+    @Spy
+    protected ProcessoDtoMapper processoDtoMapper = new ProcessoDtoMapper();
 
     protected void mockarResponsaveisEfetivos() {
         when(responsavelUnidadeService.todasPossuemResponsavelEfetivo(anyList())).thenReturn(true);

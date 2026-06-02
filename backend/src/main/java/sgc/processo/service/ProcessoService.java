@@ -67,6 +67,7 @@ public class ProcessoService {
     private final CadastroFluxoService cadastroFluxoService;
     private final ConfiguracaoService configuracaoService;
     private final MapaManutencaoService mapaManutencaoService;
+    private final sgc.processo.ProcessoDtoMapper processoDtoMapper;
 
 
     @Transactional(readOnly = true)
@@ -356,23 +357,16 @@ public class ProcessoService {
         Set<Long> unidadesAcesso = obterIdsUnidadesAcesso(processo, usuario);
         Perfil perfil = usuario.getPerfilAtivo();
 
-        ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
-                .codigo(processo.getCodigo())
-                .descricao(processo.getDescricao())
-                .situacao(processo.getSituacao())
-                .tipo(processo.getTipo().name())
-                .dataCriacao(processo.getDataCriacao())
-                .dataFinalizacao(processo.getDataFinalizacao())
-                .dataLimite(processo.getDataLimite())
-                .podeFinalizar(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)
-                        && validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido())
-                .podeHomologarCadastro(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
-                .podeHomologarMapa(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil))
-                .podeAceitarCadastroBloco(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
-                .podeAceitarMapaBloco(AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil))
-                .podeDisponibilizarMapaBloco(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil))
-                .unidades(new ArrayList<>())
-                .build();
+        ProcessoDetalheDto dto = processoDtoMapper.criarDetalheBase(
+                processo,
+                permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)
+                        && validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido(),
+                AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+        );
 
         montarHierarquiaNoDto(dto, processo, subprocessos, unidadesAcesso, localizacoesPorSubprocesso);
         List<Subprocesso> subprocessosVisiveis = usuario.getPerfilAtivo() == Perfil.ADMIN
@@ -636,11 +630,15 @@ public class ProcessoService {
                 .filter(p -> acesso.contains(p.getUnidadeCodigoPersistido()))
                 .forEach(p -> {
                     Long codigoUnidadeParticipante = p.getUnidadeCodigoPersistido();
-                    UnidadeParticipanteDto uDto = UnidadeParticipanteDto.fromSnapshot(p);
+                    UnidadeParticipanteDto uDto = processoDtoMapper.paraUnidadeParticipante(p);
                     Subprocesso sp = mapSp.get(codigoUnidadeParticipante);
                     validarDadosBasicosParticipante(processo.getCodigo(), uDto);
                     if (sp != null) {
-                        uDto.preencherComSubprocesso(sp, obterLocalizacaoAtual(sp, localizacoesPorSubprocesso));
+                        processoDtoMapper.preencherParticipanteComSubprocesso(
+                                uDto,
+                                sp,
+                                obterLocalizacaoAtual(sp, localizacoesPorSubprocesso)
+                        );
                     }
                     mapDto.put(codigoUnidadeParticipante, uDto);
                 });
@@ -932,20 +930,20 @@ public class ProcessoService {
     private ProcessoDetalheDto.AcaoBlocoDto criarAcaoBloco(AcaoBlocoContexto contexto) {
         boolean temUnidades = !contexto.unidades().isEmpty();
         boolean habilitar = contexto.perfilPermite() && contexto.processoAtivo() && temUnidades;
-        return ProcessoDetalheDto.AcaoBlocoDto.builder()
-                .codigo(contexto.codigo())
-                .acao(contexto.acao())
-                .mostrar(contexto.perfilPermite())
-                .habilitar(habilitar)
-                .requerDataLimite(contexto.requerDataLimite())
-                .redirecionarPainel(contexto.redirecionarPainel())
-                .rotulo(contexto.rotulo())
-                .titulo(contexto.titulo())
-                .texto(contexto.texto())
-                .rotuloBotao(contexto.rotuloBotao())
-                .mensagemSucesso(contexto.mensagemSucesso())
-                .unidades(new ArrayList<>(contexto.unidades()))
-                .build();
+        return processoDtoMapper.criarAcaoBloco(
+                contexto.codigo(),
+                contexto.acao(),
+                contexto.perfilPermite(),
+                habilitar,
+                contexto.requerDataLimite(),
+                contexto.redirecionarPainel(),
+                contexto.rotulo(),
+                contexto.titulo(),
+                contexto.texto(),
+                contexto.rotuloBotao(),
+                contexto.mensagemSucesso(),
+                contexto.unidades()
+        );
     }
 
     private List<SubprocessoElegivelDto> filtrarElegiveis(

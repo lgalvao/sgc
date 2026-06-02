@@ -110,7 +110,13 @@ Implementa autenticação e autorização. O ponto central é `SgcPermissionEval
 - services não devem acessar repositórios de outros módulos indiscriminadamente;
 - controllers expõem DTOs, não entidades JPA;
 - controllers não recebem entidades JPA em `@RequestBody`;
+- módulos já migrados não devem usar `@JsonView` em DTOs de contrato HTTP explícito;
 - pacotes com services/controllers devem permanecer `@NullMarked`.
+
+Diretriz de referência da borda HTTP:
+
+- [Borda HTTP do backend](../etc/docs/backend-borda-http.md)
+- [Plano de Qualidade - Diretrizes](/Users/leonardo/sgc/etc/docs/plano-qualidade-diretrizes.md)
 
 ## Segurança e modelo de autorização
 

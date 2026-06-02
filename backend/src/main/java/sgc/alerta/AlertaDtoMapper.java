@@ -45,4 +45,43 @@ public class AlertaDtoMapper {
                 .ultimoErro(notificacao.getUltimoErro())
                 .build();
     }
+
+    public NotificacaoSubprocessoResumoDto paraNotificacaoSubprocessoResumo(NotificacaoSubprocessoResumoQuery query) {
+        sgc.alerta.dto.SituacaoNotificacao status = calcularStatusGeral(query);
+        return new NotificacaoSubprocessoResumoDto(
+                query.subprocessoCodigo(),
+                query.processoCodigo(),
+                query.processoDescricao(),
+                query.unidadeSigla(),
+                query.situacaoSubprocesso() != null ? query.situacaoSubprocesso().name() : null,
+                query.totalNotificacoes(),
+                query.pendentes(),
+                query.enviando(),
+                query.enviadas(),
+                query.falhasTemporarias(),
+                query.falhasDefinitivas(),
+                status.name(),
+                query.ultimaNotificacaoEm(),
+                query.proximaTentativaEm(),
+                query.maiorTentativas(),
+                query.ultimoErro(),
+                query.falhasDefinitivas() > 0
+        );
+    }
+
+    private sgc.alerta.dto.SituacaoNotificacao calcularStatusGeral(NotificacaoSubprocessoResumoQuery query) {
+        if (query.falhasDefinitivas() > 0) {
+            return sgc.alerta.dto.SituacaoNotificacao.FALHA_DEFINITIVA;
+        }
+        if (query.falhasTemporarias() > 0) {
+            return sgc.alerta.dto.SituacaoNotificacao.FALHA_TEMPORARIA;
+        }
+        if (query.pendentes() > 0 || query.enviando() > 0) {
+            return sgc.alerta.dto.SituacaoNotificacao.PENDENTE;
+        }
+        if (query.totalNotificacoes() == 0) {
+            return sgc.alerta.dto.SituacaoNotificacao.INCONSISTENTE;
+        }
+        return sgc.alerta.dto.SituacaoNotificacao.OK;
+    }
 }

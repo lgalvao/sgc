@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AlertaController.class)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, AlertaDtoMapper.class})
 @DisplayName("AlertaController")
 class AlertaControllerTest {
 
