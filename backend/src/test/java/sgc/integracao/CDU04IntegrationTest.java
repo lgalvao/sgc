@@ -74,7 +74,7 @@ class CDU04IntegrationTest extends BaseIntegrationTest {
         unidadeRepo.save(unidadeLivre);
 
         // Também precisamos associar o perfil CHEFE ao usuário na unidade para que ele
-        // seja encontrado pelo UsuarioFacade
+        // seja encontrado pelo UsuarioAplicacaoService
         UsuarioPerfil perfilChefe = UsuarioPerfil.builder()
                 .usuarioTitulo(titular.getTituloEleitoral())
                 .unidadeCodigo(unidadeLivre.getCodigo())

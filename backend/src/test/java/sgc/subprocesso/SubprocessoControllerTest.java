@@ -53,7 +53,7 @@ class SubprocessoControllerTest {
     private UnidadeService unidadeService;
 
     @MockitoBean
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private sgc.organizacao.UsuarioAplicacaoService usuarioService;
 
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;

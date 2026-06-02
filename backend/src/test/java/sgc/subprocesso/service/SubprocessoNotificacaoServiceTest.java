@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 class SubprocessoNotificacaoServiceTest {
 
     @Mock
-    private AlertaFacade alertaService;
+    private AlertaAplicacaoService alertaService;
     @Mock
     private NotificacaoService notificacaoService;
     @Mock

@@ -93,7 +93,7 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         };
     }
 
-    // ── API pública para facades/services ───────────────────────────
+    // ── API pública para services de aplicação ──────────────────────
 
     public boolean verificarPermissao(@Nullable Usuario usuario, @Nullable Object alvo, AcaoPermissao acao) {
         return verificarPermissao(usuario, alvo, acao, true);

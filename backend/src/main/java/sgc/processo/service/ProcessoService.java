@@ -58,8 +58,8 @@ public class ProcessoService {
     private final SubprocessoConsultaService consultaService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final SubprocessoValidacaoService validacaoService;
-    private final UsuarioFacade usuarioService;
-    private final AlertaFacade servicoAlertas;
+    private final UsuarioAplicacaoService usuarioService;
+    private final AlertaAplicacaoService servicoAlertas;
     private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final SgcPermissionEvaluator permissionEvaluator;

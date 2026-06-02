@@ -24,7 +24,7 @@ import java.util.*;
 public class SubprocessoNotificacaoService {
     private static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final AlertaFacade alertaFacade;
+    private final AlertaAplicacaoService alertaAplicacaoService;
     private final NotificacaoService notificacaoService;
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
@@ -50,7 +50,7 @@ public class SubprocessoNotificacaoService {
         Subprocesso subprocesso = cmd.subprocesso();
         String sigla = subprocesso.getUnidade().getSigla();
         String descricao = cmd.tipoTransicao().formatarAlerta(sigla);
-        alertaFacade.criarAlertaTransicao(subprocesso.getProcesso(), descricao, cmd.unidadeOrigem(), cmd.unidadeDestino());
+        alertaAplicacaoService.criarAlertaTransicao(subprocesso.getProcesso(), descricao, cmd.unidadeOrigem(), cmd.unidadeDestino());
     }
 
     private void criarNotificacoesTransicao(NotificacaoCommand cmd) {
@@ -68,7 +68,7 @@ public class SubprocessoNotificacaoService {
     }
 
     public void notificarAlteracaoDataLimite(Subprocesso sp, String novaDataFormatada, int etapa) {
-        alertaFacade.criarAlertaAlteracaoDataLimite(
+        alertaAplicacaoService.criarAlertaAlteracaoDataLimite(
                 sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa);
 
         Map<String, Object> variaveis = new HashMap<>();

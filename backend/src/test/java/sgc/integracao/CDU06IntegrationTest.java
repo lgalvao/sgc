@@ -31,7 +31,7 @@ class CDU06IntegrationTest extends BaseIntegrationTest {
     private static final String TEST_USER_ID = "123456789";
 
     @MockitoBean
-    private UsuarioFacade usuarioService;
+    private UsuarioAplicacaoService usuarioService;
 
     @Autowired
     private UsuarioRepo usuarioRepo;

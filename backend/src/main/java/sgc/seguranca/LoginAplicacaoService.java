@@ -24,20 +24,20 @@ import static sgc.organizacao.model.Perfil.*;
  */
 @Service
 @Slf4j
-public class LoginFacade {
+public class LoginAplicacaoService {
     private final @Nullable ClienteAcessoAd clienteAcessoAd;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final UnidadeService unidadeService;
     private final GerenciadorJwt gerenciadorJwt;
     private final UsuarioService usuarioService;
 
-    public LoginFacade(UsuarioFacade usuarioFacade,
+    public LoginAplicacaoService(UsuarioAplicacaoService usuarioAplicacaoService,
                        GerenciadorJwt gerenciadorJwt,
                        @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
                        UnidadeService unidadeService,
                        UsuarioService usuarioService) {
 
-        this.usuarioFacade = usuarioFacade;
+        this.usuarioAplicacaoService = usuarioAplicacaoService;
         this.gerenciadorJwt = gerenciadorJwt;
         this.clienteAcessoAd = clienteAcessoAd;
         this.unidadeService = unidadeService;
@@ -117,7 +117,7 @@ public class LoginFacade {
     }
 
     private List<PerfilUnidadeDto> buscarAutorizacoes(String tituloEleitoral) {
-        Usuario usuario = usuarioFacade.carregarUsuarioParaAutenticacao(tituloEleitoral);
+        Usuario usuario = usuarioAplicacaoService.carregarUsuarioParaAutenticacao(tituloEleitoral);
         if (usuario == null) {
             throw new ErroAutenticacao(Mensagens.CREDENCIAIS_INVALIDAS);
         }

@@ -31,7 +31,7 @@ class AtividadeServiceTest {
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
-    private UsuarioFacade usuarioService;
+    private UsuarioAplicacaoService usuarioService;
     @Spy
     private MapaDtoMapper mapaDtoMapper;
 

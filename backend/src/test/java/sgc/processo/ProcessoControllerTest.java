@@ -626,7 +626,7 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser(roles = "ADMIN")
-        @DisplayName("enviarLembrete deve chamar facade")
+        @DisplayName("enviarLembrete deve chamar service")
         void deveEnviarLembrete() throws Exception {
             EnviarLembreteRequest req = new EnviarLembreteRequest(10L);
             mockMvc.perform(post("/api/processos/1/enviar-lembrete")
@@ -728,7 +728,7 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @DisplayName("executarAcaoEmBloco chama facade e retorna 200")
+        @DisplayName("executarAcaoEmBloco chama service e retorna 200")
         void executarAcaoEmBloco_Sucesso() {
             Long codigo = 1L;
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.ACEITAR, LocalDate.now());

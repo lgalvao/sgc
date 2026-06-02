@@ -48,7 +48,7 @@ class SubprocessoTransicaoServiceTest {
     @Mock
     private HierarquiaService hierarquiaService;
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
     private ImpactoMapaService impactoMapaService;
     @Mock
@@ -56,7 +56,7 @@ class SubprocessoTransicaoServiceTest {
     @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
     @Mock
-    private AlertaFacade alertaService;
+    private AlertaAplicacaoService alertaService;
 
     @InjectMocks
     private SubprocessoTransicaoService service;
@@ -110,7 +110,7 @@ class SubprocessoTransicaoServiceTest {
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(1L);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
         service.aceitarValidacao(1L, "Aceite final");
 
@@ -148,7 +148,7 @@ class SubprocessoTransicaoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(1L);
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
         service.apresentarSugestoes(1L, "Novas sugestões");
 
@@ -170,7 +170,7 @@ class SubprocessoTransicaoServiceTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
         service.validarMapa(1L);
 
@@ -247,7 +247,7 @@ class SubprocessoTransicaoServiceTest {
 
             Usuario usuario = criarUsuario();
             usuario.setUnidadeAtivaCodigo(10L);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, req))
                     .isInstanceOf(sgc.comum.erros.ErroValidacao.class);
@@ -266,7 +266,7 @@ class SubprocessoTransicaoServiceTest {
             SubmeterMapaAjustadoRequest req = new SubmeterMapaAjustadoRequest("Justificativa", null, List.of());
             Usuario usuario = criarUsuario();
             usuario.setUnidadeAtivaCodigo(10L);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             service.submeterMapaAjustado(1L, req);
 
@@ -295,7 +295,7 @@ class SubprocessoTransicaoServiceTest {
 
             Usuario usuario = criarUsuario();
             usuario.setUnidadeAtivaCodigo(10L);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             service.devolverValidacao(1L, "Justif");
 
@@ -315,7 +315,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uOrigem);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             doThrow(new sgc.comum.erros.ErroValidacao("Situação inválida"))
                     .when(validacaoService)
                     .validarSituacaoPermitida(eq(sp), any(SituacaoSubprocesso[].class));
@@ -339,7 +339,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uOrigem);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             doThrow(new sgc.comum.erros.ErroValidacao("Situação inválida"))
                     .when(validacaoService)
                     .validarSituacaoPermitida(eq(sp), any(SituacaoSubprocesso[].class));
@@ -379,7 +379,7 @@ class SubprocessoTransicaoServiceTest {
 
             Usuario usuario = criarUsuario();
             usuario.setUnidadeAtivaCodigo(10L);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             service.disponibilizarMapa(1L, req);
 
@@ -413,7 +413,7 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             service.aceitarValidacao(1L, "Obs");
 
@@ -451,7 +451,7 @@ class SubprocessoTransicaoServiceTest {
             DisponibilizarMapaRequest req = new DisponibilizarMapaRequest(LocalDate.of(2026, 1, 15), "Obs");
             Usuario usuario = new Usuario();
             usuario.setUnidadeAtivaCodigo(1L);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             service.disponibilizarMapa(1L, req);
 
@@ -480,7 +480,7 @@ class SubprocessoTransicaoServiceTest {
 
             Usuario usuario = new Usuario();
             usuario.setUnidadeAtivaCodigo(1L);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(LocalDate.of(2026, 1, 15), "   "));
 
@@ -524,7 +524,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(1L))).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(null); // Admin na raiz
 
             service.aceitarValidacaoEmBloco(List.of(1L));
@@ -545,7 +545,7 @@ class SubprocessoTransicaoServiceTest {
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(u);
             when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(null);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             when(analiseRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
             service.aceitarValidacao(1L, "Obs");
@@ -567,7 +567,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAtual);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
             assertThatThrownBy(() -> service.disponibilizarMapa(1L, new DisponibilizarMapaRequest(LocalDate.now().plusDays(1), null)))
                     .isInstanceOf(sgc.comum.erros.ErroAcessoNegado.class)
@@ -595,7 +595,7 @@ class SubprocessoTransicaoServiceTest {
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
             when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
             when(hierarquiaService.isSubordinada(unidadeDevolucao, unidadeAnalise)).thenReturn(true);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             when(analiseRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
             service.devolverValidacao(1L, "just");
@@ -625,7 +625,7 @@ class SubprocessoTransicaoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
         when(hierarquiaService.isSubordinada(unidadeSubprocesso, unidadeAnalise)).thenReturn(true);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         when(analiseRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         service.devolverValidacao(1L, "Ajustar");
@@ -653,7 +653,7 @@ class SubprocessoTransicaoServiceTest {
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
         assertThatThrownBy(() -> service.devolverValidacao(1L, "Justificativa"))
                 .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
@@ -690,7 +690,7 @@ class SubprocessoTransicaoServiceTest {
 
         when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(1L))).thenReturn(List.of(subprocesso));
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(null);
 
         service.aceitarValidacaoEmBloco(List.of(1L));

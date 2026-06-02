@@ -31,7 +31,7 @@ O objetivo é maximizar clareza e consistência na integração com o frontend. 
 ## Padrão preferido
 
 1. O controller recebe request DTO.
-2. O service/facade executa a regra de negócio.
+2. O service executa a regra de negócio.
 3. Um mapper explícito traduz domínio para contrato HTTP.
 4. O controller responde com response DTO estável.
 

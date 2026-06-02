@@ -41,7 +41,7 @@ class ResponsavelUnidadeServiceTest {
     private CacheOrganizacaoService cacheOrganizacaoService;
 
     @Mock
-    private AlertaFacade alertaFacade;
+    private AlertaAplicacaoService alertaAplicacaoService;
 
     @Mock
     private NotificacaoService notificacaoService;
@@ -221,7 +221,7 @@ class ResponsavelUnidadeServiceTest {
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
             Alerta alerta = Alerta.builder().codigo(10L).usuarioDestinoTitulo(usuario.getTituloEleitoral()).build();
-            when(alertaFacade.criarAlertaPessoal(
+            when(alertaAplicacaoService.criarAlertaPessoal(
                     usuario.getTituloEleitoral(),
                     "Atribuição temporária para unidade UNIT"
             )).thenReturn(alerta);
@@ -287,7 +287,7 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+            when(alertaAplicacaoService.criarAlertaPessoal(eq("123"), anyString()))
                     .thenReturn(Alerta.builder().codigo(10L).build());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");
@@ -321,7 +321,7 @@ class ResponsavelUnidadeServiceTest {
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
             doThrow(new IllegalStateException("falha alerta"))
-                    .when(alertaFacade).criarAlertaPessoal(eq("123"), anyString());
+                    .when(alertaAplicacaoService).criarAlertaPessoal(eq("123"), anyString());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");
 
@@ -347,7 +347,7 @@ class ResponsavelUnidadeServiceTest {
 
             verify(atribuicaoTemporariaRepo, never()).save(any());
             verifyNoInteractions(cacheOrganizacaoService);
-            verifyNoInteractions(alertaFacade);
+            verifyNoInteractions(alertaAplicacaoService);
             verifyNoInteractions(notificacaoService);
         }
 
@@ -403,7 +403,7 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+            when(alertaAplicacaoService.criarAlertaPessoal(eq("123"), anyString()))
                     .thenReturn(Alerta.builder().codigo(10L).build());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");
@@ -442,7 +442,7 @@ class ResponsavelUnidadeServiceTest {
             when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+            when(alertaAplicacaoService.criarAlertaPessoal(eq("123"), anyString()))
                     .thenReturn(Alerta.builder().codigo(10L).build());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");

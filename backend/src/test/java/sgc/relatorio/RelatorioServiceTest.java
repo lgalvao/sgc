@@ -27,9 +27,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("RelatorioFacade Test")
+@DisplayName("RelatorioService Test")
 @SuppressWarnings("NullAway.Init")
-class RelatorioFacadeTest {
+class RelatorioServiceTest {
     @Mock
     private ProcessoService processoService;
     @Mock
@@ -45,17 +45,17 @@ class RelatorioFacadeTest {
     @Mock
     private LocalizacaoSubprocessoService localizacaoSubprocessoService;
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
     private PdfFactory pdfFactory;
     @Mock
     private Document document;
 
     @InjectMocks
-    private RelatorioFacade relatorioService;
+    private RelatorioService relatorioService;
 
     private void mockContextoAdmin() {
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
             "111111111111",
             999L,
             Perfil.ADMIN
@@ -581,7 +581,7 @@ class RelatorioFacadeTest {
     }
 
     private void mockContextoUsuario(Perfil perfil, Long unidadeAtivaCodigo) {
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
             "111111111111",
             unidadeAtivaCodigo,
             perfil
@@ -1196,7 +1196,7 @@ class RelatorioFacadeTest {
     @Test
     @DisplayName("Deve lancar IllegalStateException quando falha escrita de PDF")
     void deveLancarIllegalStateExceptionQuandoFalhaEscritaDePdf() throws Exception {
-        RelatorioFacade spyRelatorioService = spy(relatorioService);
+        RelatorioService spyRelatorioService = spy(relatorioService);
         when(pdfFactory.createDocument()).thenReturn(document);
 
         // Raiz com filho para garantir que tente adicionar algo ao documento
@@ -1486,7 +1486,7 @@ class RelatorioFacadeTest {
         @Test
         @DisplayName("Deve cobrir IOException no relatorio")
         void deveCobrirIOExceptionNoRelatorio() throws Exception {
-            RelatorioFacade spyService = spy(relatorioService);
+            RelatorioService spyService = spy(relatorioService);
             when(pdfFactory.createDocument()).thenReturn(document);
             
             // Força IOException no cabeçalho para atingir o catch de IOException em gerarRelatorioUnidadesSemMapasVigentes
@@ -1509,7 +1509,7 @@ class RelatorioFacadeTest {
         @Test
         @DisplayName("Deve cobrir IOException no relatorio de andamento")
         void deveCobrirIOExceptionNoRelatorioAndamento() throws Exception {
-            RelatorioFacade spyService = spy(relatorioService);
+            RelatorioService spyService = spy(relatorioService);
             when(pdfFactory.createDocument()).thenReturn(document);
             Processo p = new Processo(); p.setDescricao("P1"); p.setTipo(TipoProcesso.MAPEAMENTO);
             when(processoService.buscarPorCodigo(1L)).thenReturn(p);
@@ -1524,7 +1524,7 @@ class RelatorioFacadeTest {
         @Test
         @DisplayName("Deve cobrir IOException no relatorio de mapas")
         void deveCobrirIOExceptionNoRelatorioMapas() throws Exception {
-            RelatorioFacade spyService = spy(relatorioService);
+            RelatorioService spyService = spy(relatorioService);
             when(pdfFactory.createDocument()).thenReturn(document);
             mockContextoAdmin();
             when(unidadeService.buscarMapasPorUnidades(any())).thenReturn(List.of());

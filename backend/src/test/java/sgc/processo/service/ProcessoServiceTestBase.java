@@ -45,9 +45,9 @@ public abstract class ProcessoServiceTestBase {
     @Mock
     protected SubprocessoValidacaoService validacaoService;
     @Mock
-    protected UsuarioFacade usuarioService;
+    protected UsuarioAplicacaoService usuarioService;
     @Mock
-    protected AlertaFacade servicoAlertas;
+    protected AlertaAplicacaoService servicoAlertas;
     @Mock
     protected NotificacaoService notificacaoService;
     @Mock

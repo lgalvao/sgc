@@ -20,7 +20,7 @@ import java.util.stream.*;
 @RequiredArgsConstructor
 public class SubprocessoVisualizacaoService {
 
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final MapaManutencaoService mapaManutencaoService;
     private final MapaVisualizacaoService mapaVisualizacaoService;
     private final ImpactoMapaService impactoMapaService;
@@ -46,7 +46,7 @@ public class SubprocessoVisualizacaoService {
 
         return SubprocessoDetalheResponse.builder()
                 .subprocesso(subprocessoDtoMapper.paraResumo(subprocesso))
-                .responsavel(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(unidadeAlvo.getCodigo()))
+                .responsavel(usuarioAplicacaoService.buscarResponsabilidadeDetalhadaAtual(unidadeAlvo.getCodigo()))
                 .titular(organizacaoDtoMapper.paraUsuarioResumo(titular))
                 .movimentacoes(listarMovimentacoesDto(movimentacoes))
                 .localizacaoAtual(contexto.localizacaoAtual().getSigla())
@@ -161,7 +161,7 @@ public class SubprocessoVisualizacaoService {
         if (tituloTitular == null || tituloTitular.isBlank()) {
             return null;
         }
-        return usuarioFacade.buscarUsuarioSemAtribuicoes(tituloTitular);
+        return usuarioAplicacaoService.buscarUsuarioSemAtribuicoes(tituloTitular);
     }
 
     private List<MovimentacaoDto> listarMovimentacoesDto(List<Movimentacao> movimentacoes) {

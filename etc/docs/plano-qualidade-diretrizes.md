@@ -68,7 +68,21 @@ Referência:
 
 - [ADR 0002 - Conter JsonView no Legado de Model e no Adapter E2E](/Users/leonardo/sgc/etc/docs/adr/0002-conter-jsonview-no-adapter-e2e.md)
 
-### 3.3. Melhorar qualidade não é “burlar auditoria”
+### 3.3. `Facade` não é padrão aceito no backend atual
+
+O sistema atual não justifica uma categoria arquitetural separada chamada `Facade`.
+
+Direção oficial:
+
+- não criar classes com sufixo `Facade`;
+- reclassificar legados restantes para `Service` ou `AplicacaoService`;
+- usar nomes que expressem o papel real da classe.
+
+Referência:
+
+- [ADR 0003 - Não Usar Facade no Backend Atual](/Users/leonardo/sgc/etc/docs/adr/0003-nao-usar-facade.md)
+
+### 3.4. Melhorar qualidade não é “burlar auditoria”
 
 Auditorias, grep, Semgrep, ArchUnit e scripts existem para ajudar a localizar dívida, não para ditar soluções cosméticas.
 
@@ -127,7 +141,7 @@ Escolha trabalhos que reduzam pelo menos um destes problemas:
 
 - vazamento de domínio na borda HTTP;
 - falta de clareza de contrato backend/frontend;
-- responsabilidades misturadas em controller/service/facade;
+- responsabilidades misturadas em controller/service/orquestração de aplicação;
 - duplicação conceitual de montagem de resposta;
 - inconsistência de nomenclatura ou shape entre fluxos equivalentes;
 - tratamento de erro ambíguo ou espalhado.
@@ -158,7 +172,7 @@ Boa unidade de corte:
 
 - um contrato HTTP inteiro;
 - um grupo de DTOs correlatos;
-- uma responsabilidade concreta extraída de service/facade;
+- uma responsabilidade concreta extraída de service ou application service;
 - uma família coerente de inconsistências.
 
 Má unidade de corte:

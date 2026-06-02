@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UsuarioFacade - Testes unitários")
-class UsuarioFacadeTest {
+@DisplayName("UsuarioAplicacaoService - Testes unitários")
+class UsuarioAplicacaoServiceTest {
 
     @Mock
     private UsuarioService usuarioService;
@@ -31,7 +31,7 @@ class UsuarioFacadeTest {
     private OrganizacaoDtoMapper organizacaoDtoMapper = new OrganizacaoDtoMapper();
 
     @InjectMocks
-    private UsuarioFacade facade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     // Métodos auxiliares
     private Usuario criarUsuario(String titulo) {
@@ -83,7 +83,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscar(titulo)).thenReturn(usuario);
             when(usuarioService.buscarPerfisPorUsuarioTitulo(titulo)).thenReturn(List.of());
 
-            Usuario resultado = facade.usuarioAutenticado();
+            Usuario resultado = usuarioAplicacaoService.usuarioAutenticado();
 
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).buscarPerfisPorUsuarioTitulo(titulo);
@@ -94,7 +94,7 @@ class UsuarioFacadeTest {
         @DisplayName("Deve lançar ErroAcessoNegado se não autenticado")
         void deveLancarErroAcessoNegadoSeNaoAutenticado() {
             SecurityContextHolder.clearContext();
-            assertThatThrownBy(() -> facade.usuarioAutenticado())
+            assertThatThrownBy(() -> usuarioAplicacaoService.usuarioAutenticado())
                     .isInstanceOf(ErroAcessoNegado.class);
         }
 
@@ -105,7 +105,7 @@ class UsuarioFacadeTest {
             when(auth.isAuthenticated()).thenReturn(true);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            assertThatThrownBy(() -> facade.usuarioAutenticado())
+            assertThatThrownBy(() -> usuarioAplicacaoService.usuarioAutenticado())
                     .isInstanceOf(ErroAcessoNegado.class);
             SecurityContextHolder.clearContext();
         }
@@ -117,7 +117,7 @@ class UsuarioFacadeTest {
             when(auth.isAuthenticated()).thenReturn(false);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            assertThatThrownBy(() -> facade.usuarioAutenticado())
+            assertThatThrownBy(() -> usuarioAplicacaoService.usuarioAutenticado())
                     .isInstanceOf(ErroAcessoNegado.class);
 
             SecurityContextHolder.clearContext();
@@ -134,7 +134,7 @@ class UsuarioFacadeTest {
             when(context.getAuthentication()).thenReturn(auth);
             SecurityContextHolder.setContext(context);
 
-            Usuario resultado = facade.usuarioAutenticado();
+            Usuario resultado = usuarioAplicacaoService.usuarioAutenticado();
 
             assertThat(resultado).isSameAs(usuario);
             verifyNoInteractions(usuarioService);
@@ -156,7 +156,7 @@ class UsuarioFacadeTest {
                     .thenReturn(Optional.of(usuario));
             when(usuarioService.buscarPerfisPorUsuarioTitulo(titulo)).thenReturn(List.of());
 
-            Usuario resultado = facade.carregarUsuarioParaAutenticacao(titulo);
+            Usuario resultado = usuarioAplicacaoService.carregarUsuarioParaAutenticacao(titulo);
 
             assertThat(resultado.getTituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).buscarPerfisPorUsuarioTitulo(titulo);
@@ -166,7 +166,7 @@ class UsuarioFacadeTest {
         @DisplayName("Deve retornar null se usuário não encontrado")
         void deveRetornarNullSeNaoEncontrado() {
             when(usuarioService.buscarOpt(any())).thenReturn(Optional.empty());
-            assertThat(facade.carregarUsuarioParaAutenticacao("1")).isNull();
+            assertThat(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("1")).isNull();
         }
 
         @Test
@@ -177,7 +177,7 @@ class UsuarioFacadeTest {
 
             when(usuarioService.buscarOpt(titulo)).thenReturn(Optional.of(usuario));
 
-            Usuario resultado = facade.carregarUsuarioSemAtribuicoesParaAutenticacao(titulo);
+            Usuario resultado = usuarioAplicacaoService.carregarUsuarioSemAtribuicoesParaAutenticacao(titulo);
 
             assertThat(resultado).isSameAs(usuario);
             verify(usuarioService, never()).buscarPerfisPorUsuarioTitulo(any());
@@ -188,7 +188,7 @@ class UsuarioFacadeTest {
         void deveRetornarNullNaAutenticacaoLeveSeNaoEncontrado() {
             when(usuarioService.buscarOpt("1")).thenReturn(Optional.empty());
 
-            assertThat(facade.carregarUsuarioSemAtribuicoesParaAutenticacao("1")).isNull();
+            assertThat(usuarioAplicacaoService.carregarUsuarioSemAtribuicoesParaAutenticacao("1")).isNull();
             verify(usuarioService, never()).buscarPerfisPorUsuarioTitulo(any());
         }
 
@@ -200,7 +200,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscar(login)).thenReturn(usuario);
             when(usuarioService.buscarPerfisPorUsuarioTitulo(login)).thenReturn(List.of());
 
-            Usuario resultado = facade.buscarPorLogin(login);
+            Usuario resultado = usuarioAplicacaoService.buscarPorLogin(login);
 
             assertThat(resultado).isSameAs(usuario);
             verify(usuarioService).buscarPerfisPorUsuarioTitulo(login);
@@ -213,7 +213,7 @@ class UsuarioFacadeTest {
         @Test
         @DisplayName("Deve buscar responsabilidade detalhada delegando ao service")
         void deveBuscarResponsabilidadeDetalhada() {
-            facade.buscarResponsabilidadeDetalhadaAtual("SIGLA");
+            usuarioAplicacaoService.buscarResponsabilidadeDetalhadaAtual("SIGLA");
             verify(responsavelUnidadeService).buscarResponsabilidadeDetalhadaAtual("SIGLA");
         }
 
@@ -223,7 +223,7 @@ class UsuarioFacadeTest {
             Usuario usuario = criarUsuario("999");
             when(responsavelUnidadeService.buscarResponsavelAtual("UNI")).thenReturn(usuario);
 
-            Usuario resultado = facade.buscarResponsavelAtual("UNI");
+            Usuario resultado = usuarioAplicacaoService.buscarResponsavelAtual("UNI");
 
             assertThat(resultado).isSameAs(usuario);
             verify(responsavelUnidadeService).buscarResponsavelAtual("UNI");
@@ -241,7 +241,7 @@ class UsuarioFacadeTest {
                     new UsuarioPerfilAutorizacaoLeitura(titulo, Perfil.GESTOR, 2L, "U2", "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.INATIVA)
             ));
 
-            List<PerfilDto> result = facade.buscarPerfisUsuario(titulo);
+            List<PerfilDto> result = usuarioAplicacaoService.buscarPerfisUsuario(titulo);
 
             assertThat(result).hasSize(1);
             assertThat(result.getFirst().unidadeCodigo()).isEqualTo(1L);
@@ -252,7 +252,7 @@ class UsuarioFacadeTest {
         void deveFalharSeUsuarioNaoEncontradoAoBuscarPerfis() {
             when(usuarioService.buscarOpt("999")).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> facade.buscarPerfisUsuario("999"))
+            assertThatThrownBy(() -> usuarioAplicacaoService.buscarPerfisUsuario("999"))
                     .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                     .hasMessageContaining("inconsistencia interna do sistema");
         }
@@ -273,7 +273,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarAdministradores()).thenReturn(List.of(admin));
             when(usuarioService.buscarOptComUnidadeLotacao(titulo)).thenReturn(Optional.of(usuario));
 
-            List<AdministradorDto> resultado = facade.listarAdministradores();
+            List<AdministradorDto> resultado = usuarioAplicacaoService.listarAdministradores();
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().tituloEleitoral()).isEqualTo(titulo);
@@ -288,7 +288,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarAdministradores()).thenReturn(List.of(admin));
             when(usuarioService.buscarOptComUnidadeLotacao("titulo-fantasma")).thenReturn(Optional.empty());
 
-            List<AdministradorDto> resultado = facade.listarAdministradores();
+            List<AdministradorDto> resultado = usuarioAplicacaoService.listarAdministradores();
 
             assertThat(resultado).isEmpty();
         }
@@ -302,7 +302,7 @@ class UsuarioFacadeTest {
 
             when(usuarioService.buscarOptComUnidadeLotacao(titulo)).thenReturn(Optional.of(usuario));
 
-            AdministradorDto resultado = facade.adicionarAdministrador(titulo);
+            AdministradorDto resultado = usuarioAplicacaoService.adicionarAdministrador(titulo);
 
             assertThat(resultado.tituloEleitoral()).isEqualTo(titulo);
             verify(usuarioService).adicionarAdministrador(titulo);
@@ -318,7 +318,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscar(tituloAtual)).thenReturn(criarUsuario(tituloAtual));
             when(usuarioService.buscarPerfisPorUsuarioTitulo(tituloAtual)).thenReturn(List.of(Perfil.ADMIN));
 
-            facade.removerAdministrador(tituloRemover);
+            usuarioAplicacaoService.removerAdministrador(tituloRemover);
 
             verify(usuarioService).removerAdministrador(tituloRemover);
             SecurityContextHolder.clearContext();
@@ -330,7 +330,7 @@ class UsuarioFacadeTest {
             configurarAutenticacao("111");
             when(usuarioService.buscar("111")).thenReturn(criarUsuario("111"));
             when(usuarioService.buscarPerfisPorUsuarioTitulo("111")).thenReturn(List.of(Perfil.ADMIN));
-            assertThatThrownBy(() -> facade.removerAdministrador("111"))
+            assertThatThrownBy(() -> usuarioAplicacaoService.removerAdministrador("111"))
                     .isInstanceOf(ErroValidacao.class);
             SecurityContextHolder.clearContext();
         }
@@ -351,7 +351,7 @@ class UsuarioFacadeTest {
             when(usuarioService.buscarPorTitulos(titulos))
                     .thenReturn(List.of(usuario1, usuario2));
 
-            Map<String, Usuario> resultado = facade.buscarUsuariosPorTitulos(titulos);
+            Map<String, Usuario> resultado = usuarioAplicacaoService.buscarUsuariosPorTitulos(titulos);
 
             assertThat(resultado).hasSize(2).containsKeys("111111", "222222");
         }
@@ -364,7 +364,7 @@ class UsuarioFacadeTest {
 
             when(usuarioService.buscarPorTitulos(anyList())).thenReturn(List.of(u1, u1));
 
-            Map<String, Usuario> resultado = facade.buscarUsuariosPorTitulos(titulos);
+            Map<String, Usuario> resultado = usuarioAplicacaoService.buscarUsuariosPorTitulos(titulos);
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.get("1")).isEqualTo(u1);

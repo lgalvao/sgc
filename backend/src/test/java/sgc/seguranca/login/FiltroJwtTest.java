@@ -25,7 +25,7 @@ class FiltroJwtTest {
     @Mock
     private GerenciadorJwt jwtService;
     @Mock
-    private UsuarioFacade usuarioService;
+    private UsuarioAplicacaoService usuarioService;
     @Mock
     private ListaNegraJwt listaNegraJwt;
     @Mock

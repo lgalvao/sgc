@@ -19,7 +19,7 @@ import java.util.*;
 @Tag(name = "Usuários", description = "Gerenciamento de usuários e administradores")
 @PreAuthorize("isAuthenticated()")
 public class UsuarioController {
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final UsuarioService usuarioService;
     private final OrganizacaoDtoMapper organizacaoDtoMapper;
 
@@ -42,7 +42,7 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Lista todos os administradores")
     public ResponseEntity<List<AdministradorDto>> listarAdministradores() {
-        return ResponseEntity.ok(usuarioFacade.listarAdministradores());
+        return ResponseEntity.ok(usuarioAplicacaoService.listarAdministradores());
     }
 
     @PostMapping("/administradores")
@@ -51,7 +51,7 @@ public class UsuarioController {
     public ResponseEntity<AdministradorDto> adicionarAdministrador(
             @jakarta.validation.Valid @RequestBody AdicionarAdministradorRequest request) {
 
-        AdministradorDto administrador = usuarioFacade.adicionarAdministrador(request.tituloEleitoral());
+        AdministradorDto administrador = usuarioAplicacaoService.adicionarAdministrador(request.tituloEleitoral());
         return ResponseEntity.ok(administrador);
     }
 
@@ -60,7 +60,7 @@ public class UsuarioController {
     @Operation(summary = "Remove um administrador")
     public ResponseEntity<Void> removerAdministrador(
             @PathVariable String usuarioTitulo) {
-        usuarioFacade.removerAdministrador(usuarioTitulo);
+        usuarioAplicacaoService.removerAdministrador(usuarioTitulo);
         return ResponseEntity.ok().build();
     }
 }

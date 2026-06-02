@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UsuarioFacade {
+public class UsuarioAplicacaoService {
     private final UsuarioService usuarioService;
     private final ResponsavelUnidadeService responsavelUnidadeService;
     private final OrganizacaoDtoMapper organizacaoDtoMapper;

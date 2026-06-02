@@ -35,11 +35,11 @@ public class CadastroFluxoService {
     private final SubprocessoConsultaService consultaService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final SubprocessoValidacaoService validacaoService;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final UnidadeService unidadeService;
     private final HierarquiaService hierarquiaService;
     private final UnidadeHierarquiaService unidadeHierarquiaService;
-    private final AlertaFacade alertaService;
+    private final AlertaAplicacaoService alertaService;
     private final SubprocessoTransicaoService transicaoService;
     private final SubprocessoNotificacaoService notificacaoService;
 
@@ -60,7 +60,7 @@ public class CadastroFluxoService {
         log.info("Disponibilizando cadastro do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         disponibilizar(sp, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, TipoTransicao.CADASTRO_DISPONIBILIZADO, usuario, observacoes);
     }
 
@@ -95,25 +95,25 @@ public class CadastroFluxoService {
         log.info("Disponibilizando revisão do subprocesso {}", codSubprocesso);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_EM_ANDAMENTO);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario, observacoes);
     }
 
     public void devolver(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         executarDevolucao(sp, usuario, observacoes);
     }
 
     public void aceitar(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         executarAceite(sp, usuario, observacoes);
     }
 
     @Transactional
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
         subprocessos.forEach(sp -> executarAceite(sp, usuario, "Avaliação em bloco", false));
         notificacaoService.notificarAceiteCadastroEmBloco(subprocessos);
@@ -121,12 +121,12 @@ public class CadastroFluxoService {
 
     public void homologar(Long codSubprocesso, @Nullable String observacoes) {
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         executarHomologacao(sp, usuario, observacoes);
     }
 
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
         subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco"));
     }
@@ -250,7 +250,7 @@ public class CadastroFluxoService {
                 Mensagens.ERRO_SUBPROCESSO_EM_FASE.formatted(cmd.revisao() ? ETAPA_REVISAO : ETAPA_CADASTRO)
         );
 
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
 
         sp.setSituacao(cmd.novaSituacao());
         sp.setDataFimEtapa1(null);

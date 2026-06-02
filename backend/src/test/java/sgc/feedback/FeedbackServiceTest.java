@@ -29,7 +29,7 @@ class FeedbackServiceTest {
     private FeedbackRepo repo;
 
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Mock
     private ComumRepo comumRepo;
@@ -45,7 +45,7 @@ class FeedbackServiceTest {
         Path dirTemp = Files.createTempDirectory("sgc-feedback-test-");
         propriedades = new FeedbackPropriedades(dirTemp.toString(), 5_242_880L);
         objectMapper = new ObjectMapper();
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
+        service = new FeedbackService(repo, propriedades, usuarioAplicacaoService, objectMapper, comumRepo);
 
         usuarioMock = new Usuario();
         usuarioMock.setTituloEleitoral("12345");
@@ -53,7 +53,7 @@ class FeedbackServiceTest {
     }
 
     private void configurarUsuarioMock() {
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioMock);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuarioMock);
     }
 
     @Test
@@ -193,7 +193,7 @@ class FeedbackServiceTest {
         ObjectMapper objectMapperComFalha = mock(ObjectMapper.class);
         when(objectMapperComFalha.writeValueAsString(any())).thenThrow(new RuntimeException("falha serializacao"));
         FeedbackService servicoComFalhaNaSerializacao = new FeedbackService(
-                repo, propriedades, usuarioFacade, objectMapperComFalha, comumRepo);
+                repo, propriedades, usuarioAplicacaoService, objectMapperComFalha, comumRepo);
 
         JsonNode metadados = objectMapper.createObjectNode().put("rotaCaminho", "/painel");
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Bug no painel", metadados);
@@ -217,7 +217,7 @@ class FeedbackServiceTest {
     @DisplayName("deve ignorar screenshot quando screenshot-dir não está configurado")
     void deveIgnorarScreenshotSemDirConfigurado() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
+        service = new FeedbackService(repo, propriedades, usuarioAplicacaoService, objectMapper, comumRepo);
         configurarUsuarioMock();
 
         var payload = new FeedbackPayloadDto(FeedbackTipo.ELOGIO, "Sistema excelente, parabéns ao time!", null);
@@ -414,7 +414,7 @@ class FeedbackServiceTest {
     @DisplayName("deve usar diretório padrão quando screenshot-dir estiver em branco")
     void deveUsarDiretorioPadraoQuandoConfiguracaoEmBranco() {
         propriedades = new FeedbackPropriedades("   ", 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
+        service = new FeedbackService(repo, propriedades, usuarioAplicacaoService, objectMapper, comumRepo);
         UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
                 .codigo(codigo)
@@ -510,7 +510,7 @@ class FeedbackServiceTest {
     @DisplayName("deve descartar screenshot quando screenshotDir for nulo")
     void deveDescartarScreenshotQuandoScreenshotDirForNulo() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
+        service = new FeedbackService(repo, propriedades, usuarioAplicacaoService, objectMapper, comumRepo);
         configurarUsuarioMock();
         var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", null);
@@ -525,7 +525,7 @@ class FeedbackServiceTest {
     @DisplayName("deve ignorar screenshot quando screenshotDir estiver em branco")
     void deveIgnorarScreenshotComDirEmBranco() {
         propriedades = new FeedbackPropriedades("   ", 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
+        service = new FeedbackService(repo, propriedades, usuarioAplicacaoService, objectMapper, comumRepo);
         configurarUsuarioMock();
         var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota", null);
@@ -544,7 +544,7 @@ class FeedbackServiceTest {
         Files.createDirectories(arquivoNoLugarDoDiretorio.getParent());
         Files.writeString(arquivoNoLugarDoDiretorio, "arquivo");
         propriedades = new FeedbackPropriedades(arquivoNoLugarDoDiretorio.toString(), 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
+        service = new FeedbackService(repo, propriedades, usuarioAplicacaoService, objectMapper, comumRepo);
         var payload = new FeedbackPayloadDto(FeedbackTipo.BUG, "Nota com screenshot", null);
         var screenshot = new MockMultipartFile("screenshot", "img.webp", "image/webp", "bytes".getBytes());
         when(repo.save(any())).thenReturn(FeedbackRegistro.builder().codigo(UUID.randomUUID()).enviadoEm(OffsetDateTime.now()).build());
@@ -562,7 +562,7 @@ class FeedbackServiceTest {
     @DisplayName("deve usar caminho padrão quando screenshotDir for nulo na resolução de caminho")
     void deveUsarCaminhosPadraoQuandoScreenshotDirForNuloNaResolucao() {
         propriedades = new FeedbackPropriedades(null, 5_242_880L);
-        service = new FeedbackService(repo, propriedades, usuarioFacade, objectMapper, comumRepo);
+        service = new FeedbackService(repo, propriedades, usuarioAplicacaoService, objectMapper, comumRepo);
         UUID codigo = UUID.randomUUID();
         var registro = FeedbackRegistro.builder()
                 .codigo(codigo)

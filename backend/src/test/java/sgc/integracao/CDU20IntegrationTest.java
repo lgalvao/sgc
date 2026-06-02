@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-20: Analisar validação de mapa de competências")
 class CDU20IntegrationTest extends BaseIntegrationTest {
     @Autowired
-    private UsuarioFacade usuarioService;
+    private UsuarioAplicacaoService usuarioService;
 
     @Autowired
     private AlertaRepo alertaRepo;

@@ -35,7 +35,7 @@ class PainelServiceTest {
     @Mock
     private ProcessoService processoService;
     @Mock
-    private AlertaFacade alertaFacade;
+    private AlertaAplicacaoService alertaAplicacaoService;
     @Mock
     private UnidadeHierarquiaService hierarquiaService;
     @Mock
@@ -128,8 +128,8 @@ class PainelServiceTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
-        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
+        when(alertaAplicacaoService.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
+        when(alertaAplicacaoService.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
         Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
@@ -138,7 +138,7 @@ class PainelServiceTest {
         assertThat(result.getContent().getFirst().getDataHoraLeitura()).isNotNull();
         assertThat(result.getContent().getFirst().getDescricao()).contains("Lembrete");
         assertThat(result.getContent().getFirst().getProcesso().getDescricao()).isEqualTo("Processo teste");
-        verify(alertaFacade).aplicarPrazoConfiguradoLeituraAutomatica(result.getContent());
+        verify(alertaAplicacaoService).aplicarPrazoConfiguradoLeituraAutomatica(result.getContent());
     }
 
     @Test
@@ -149,13 +149,13 @@ class PainelServiceTest {
         alertaAntigo.setDataHora(LocalDateTime.now().minusDays(5));
 
         Page<Alerta> page = new PageImpl<>(List.of(alertaAntigo));
-        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
-        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(5L))).thenReturn(Map.of());
+        when(alertaAplicacaoService.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
+        when(alertaAplicacaoService.obterMapaDataHoraLeitura("123", List.of(5L))).thenReturn(Map.of());
         doAnswer(invocation -> {
             Collection<Alerta> alertas = invocation.getArgument(0);
             alertas.forEach(alerta -> alerta.setDataHoraLeitura(alerta.getDataHora().plusDays(3)));
             return null;
-        }).when(alertaFacade).aplicarPrazoConfiguradoLeituraAutomatica(anyCollection());
+        }).when(alertaAplicacaoService).aplicarPrazoConfiguradoLeituraAutomatica(anyCollection());
 
         Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, Pageable.unpaged());
 
@@ -181,8 +181,8 @@ class PainelServiceTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
-        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
+        when(alertaAplicacaoService.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
+        when(alertaAplicacaoService.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
         Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, sorted);
@@ -206,8 +206,8 @@ class PainelServiceTest {
         a.setDataHora(LocalDateTime.now());
 
         Page<Alerta> page = new PageImpl<>(List.of(a));
-        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
-        when(alertaFacade.obterMapaDataHoraLeitura("123", List.of(1L)))
+        when(alertaAplicacaoService.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(page);
+        when(alertaAplicacaoService.obterMapaDataHoraLeitura("123", List.of(1L)))
                 .thenReturn(Map.of(1L, LocalDateTime.now()));
 
         Page<Alerta> result = painelService.listarAlertas(CONTEXTO_ADMIN, unsortedPaged);
@@ -426,14 +426,14 @@ class PainelServiceTest {
     @DisplayName("Deve marcar alertas como lidos")
     void deveMarcarAlertasLidos() {
         painelService.marcarAlertasLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
-        verify(alertaFacade).marcarComoLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
+        verify(alertaAplicacaoService).marcarComoLidos(CONTEXTO_ADMIN, List.of(1L, 2L));
     }
 
     @Test
-    @DisplayName("Não deve chamar alertaFacade se lista de alertas estiver vazia")
+    @DisplayName("Não deve chamar alertaAplicacaoService se lista de alertas estiver vazia")
     void naoDeveMarcarAlertasLidosSeListaVazia() {
         painelService.marcarAlertasLidos(CONTEXTO_ADMIN, Collections.emptyList());
-        verify(alertaFacade, never()).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
+        verify(alertaAplicacaoService, never()).marcarComoLidos(any(ContextoUsuarioAutenticado.class), anyList());
     }
 
     @Test
@@ -453,8 +453,8 @@ class PainelServiceTest {
         alerta.setUnidadeDestino(new Unidade());
         Page<Alerta> pageAlertas = new PageImpl<>(List.of(alerta));
 
-        when(alertaFacade.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(pageAlertas);
-        when(alertaFacade.obterMapaDataHoraLeitura(anyString(), anyList())).thenReturn(Map.of());
+        when(alertaAplicacaoService.listarPorUnidade(eq(CONTEXTO_ADMIN), any(Pageable.class))).thenReturn(pageAlertas);
+        when(alertaAplicacaoService.obterMapaDataHoraLeitura(anyString(), anyList())).thenReturn(Map.of());
 
         sgc.processo.painel.dto.PainelBootstrapDto bootstrap = painelService.obterBootstrap(CONTEXTO_ADMIN);
 

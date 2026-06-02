@@ -29,7 +29,7 @@ public class AtividadeService {
     private final MapaManutencaoService mapaManutencaoService;
     private final SubprocessoConsultaService consultaService;
     private final SgcPermissionEvaluator permissionEvaluator;
-    private final UsuarioFacade usuarioService;
+    private final UsuarioAplicacaoService usuarioService;
     private final MapaDtoMapper mapaDtoMapper;
 
     @Transactional(readOnly = true)

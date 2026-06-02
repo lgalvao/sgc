@@ -22,7 +22,7 @@ class SubprocessoContextoConsultaServiceTest {
     private UnidadeService unidadeService;
 
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Mock
     private HierarquiaService hierarquiaService;
@@ -59,7 +59,7 @@ class SubprocessoContextoConsultaServiceTest {
         ContextoUsuarioAutenticado contextoUsuario = new ContextoUsuarioAutenticado(
                 "123", 200L, Perfil.CHEFE);
 
-        when(usuarioFacade.contextoAutenticado()).thenReturn(contextoUsuario);
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(contextoUsuario);
         when(unidadeService.buscarPorCodigoComSuperior(200L)).thenReturn(unidadeUsuario);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeUsuario);
         when(hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario)).thenReturn(false);
@@ -79,7 +79,7 @@ class SubprocessoContextoConsultaServiceTest {
         ContextoUsuarioAutenticado contextoUsuario = new ContextoUsuarioAutenticado(
                 "456", 100L, Perfil.SERVIDOR);
 
-        when(usuarioFacade.contextoAutenticado()).thenReturn(contextoUsuario);
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(contextoUsuario);
         when(unidadeService.buscarPorCodigoComSuperior(100L)).thenReturn(unidadeAlvo);
 
         Unidade unidadeDestino = new Unidade();

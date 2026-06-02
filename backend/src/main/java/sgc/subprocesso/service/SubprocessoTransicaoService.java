@@ -57,9 +57,9 @@ public class SubprocessoTransicaoService {
     private final UnidadeService unidadeService;
     private final HierarquiaService hierarquiaService;
     private final UnidadeHierarquiaService unidadeHierarquiaService;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final MapaManutencaoService mapaManutencaoService;
-    private final AlertaFacade alertaFacade;
+    private final AlertaAplicacaoService alertaAplicacaoService;
 
     private static @Nullable String normalizarTexto(@Nullable String texto) {
         if (!StringUtils.hasText(texto)) {
@@ -160,7 +160,7 @@ public class SubprocessoTransicaoService {
     }
 
     public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Analise analise = Analise.builder()
                 .subprocesso(sp)
                 .dataHora(LocalDateTime.now())
@@ -177,13 +177,13 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void disponibilizarMapa(Long codSubprocesso, DisponibilizarMapaRequest request) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         executarDisponibilizacaoMapa(codSubprocesso, request, usuario);
     }
 
     @Transactional
     public void disponibilizarMapaEmBloco(List<Long> subprocessoCodigos, DisponibilizarMapaRequest request) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
         subprocessos.forEach(subprocesso -> executarDisponibilizacaoMapa(subprocesso, request, usuario, false));
         notificacaoService.notificarDisponibilizacaoMapaEmBloco(subprocessos);
@@ -254,7 +254,7 @@ public class SubprocessoTransicaoService {
     }
 
     public void submeterMapaAjustado(Long codSubprocesso, SubmeterMapaAjustadoRequest request) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validarLocalizacaoEscrita(sp, usuario);
         validacaoService.validarSituacaoPermitida(sp, REVISAO_CADASTRO_HOMOLOGADA, REVISAO_MAPA_AJUSTADO);
@@ -279,7 +279,7 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void apresentarSugestoes(Long codSubprocesso, @Nullable String sugestoes) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validarLocalizacaoEscrita(sp, usuario);
         validacaoService.validarSituacaoPermitida(sp,
@@ -300,7 +300,7 @@ public class SubprocessoTransicaoService {
 
     @Transactional
     public void validarMapa(Long codSubprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validarLocalizacaoEscrita(sp, usuario);
         validacaoService.validarSituacaoPermitida(sp,
@@ -316,7 +316,7 @@ public class SubprocessoTransicaoService {
     }
 
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validarLocalizacaoEscrita(sp, usuario);
         validarSituacaoPermitidaParaDevolucao(usuario, sp);
@@ -356,13 +356,13 @@ public class SubprocessoTransicaoService {
     }
 
     public void aceitarValidacao(Long codSubprocesso, @Nullable String observacoes) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         executarAceiteValidacao(sp, observacoes, usuario);
     }
 
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
         subprocessos.forEach(sp -> executarAceiteValidacao(sp, null, usuario, false));
         notificacaoService.notificarAceiteValidacaoEmBloco(subprocessos);
@@ -397,14 +397,14 @@ public class SubprocessoTransicaoService {
     }
 
     public void homologarValidacao(Long codSubprocesso, @Nullable String observacoes) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validarLocalizacaoEscrita(sp, usuario);
         executarHomologacaoValidacao(sp, observacoes, usuario);
     }
 
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
         subprocessos.forEach(sp -> executarHomologacaoValidacao(sp, null, usuario, true));
     }
@@ -423,7 +423,7 @@ public class SubprocessoTransicaoService {
 
         registrarTransicaoDentroDoAdmin(sp, TipoTransicao.MAPA_HOMOLOGADO, usuario, normalizarTexto(observacoes));
         if (notificarUnidade) {
-            alertaFacade.criarAlertaTransicao(
+            alertaAplicacaoService.criarAlertaTransicao(
                     sp.getProcesso(),
                     Mensagens.ALERTA_MAPA_HOMOLOGADO.formatted(sp.getUnidade().getSigla()),
                     obterUnidadeAdmin(),

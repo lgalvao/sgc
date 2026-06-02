@@ -28,11 +28,11 @@ public class ImpactoMapaService {
     private final CompetenciaRepo competenciaRepo;
     private final MapaManutencaoService mapaManutencaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         validarPermissaoVisualizacaoImpacto(subprocesso, usuario);
 
         return calcularImpactos(subprocesso);
@@ -87,7 +87,7 @@ public class ImpactoMapaService {
         if (subprocesso.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
             return false;
         }
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         return permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)
                 && situacaoPermiteVisualizarImpactos(usuario.getPerfilAtivo(), subprocesso.getSituacao());
     }

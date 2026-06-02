@@ -19,9 +19,9 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AlertaFacade Test")
+@DisplayName("AlertaAplicacaoService Test")
 @SuppressWarnings("NullAway.Init")
-class AlertaFacadeTest {
+class AlertaAplicacaoServiceTest {
     private static final ContextoUsuarioAutenticado CONTEXTO_GESTAO =
             new ContextoUsuarioAutenticado("123", 1L, Perfil.GESTOR);
     private static final ContextoUsuarioAutenticado CONTEXTO_SERVIDOR =
@@ -39,7 +39,7 @@ class AlertaFacadeTest {
     private ConfiguracaoService configuracaoService;
 
     @InjectMocks
-    private AlertaFacade alertaFacade;
+    private AlertaAplicacaoService alertaAplicacaoService;
 
     @Captor
     private ArgumentCaptor<List<AlertaUsuario>> alertaUsuarioListCaptor;
@@ -60,7 +60,7 @@ class AlertaFacadeTest {
         when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of(leitura));
         when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
 
-        List<Alerta> resultado = alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
+        List<Alerta> resultado = alertaAplicacaoService.alertasPorUsuario(CONTEXTO_GESTAO);
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().getDataHoraLeitura()).isNull();
@@ -78,7 +78,7 @@ class AlertaFacadeTest {
         when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of());
         when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
 
-        List<Alerta> resultado = alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
+        List<Alerta> resultado = alertaAplicacaoService.alertasPorUsuario(CONTEXTO_GESTAO);
 
         assertThat(resultado).hasSize(1);
         assertThat(resultado.getFirst().getDataHoraLeitura()).isNotNull();
@@ -111,7 +111,7 @@ class AlertaFacadeTest {
         when(unidadeHierarquiaService.buscarCodigosSuperiores(3L)).thenReturn(List.of(2L, 1L));
         when(unidadeService.buscarPorCodigos(List.of(1L, 2L))).thenReturn(List.of(raiz, superior));
         when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
-        List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(interoperacional));
+        List<Alerta> alertas = alertaAplicacaoService.criarAlertasProcessoIniciado(processo, List.of(interoperacional));
 
         assertThat(alertas)
                 .isNotEmpty()
@@ -124,7 +124,7 @@ class AlertaFacadeTest {
         Optional<LocalDateTime> dataHora = Optional.of(LocalDateTime.now());
         when(alertaService.dataHoraLeituraAlertaUsuario(1L, "123")).thenReturn(dataHora);
 
-        Optional<LocalDateTime> result = alertaFacade.obterDataHoraLeitura(1L, "123");
+        Optional<LocalDateTime> result = alertaAplicacaoService.obterDataHoraLeitura(1L, "123");
 
         assertThat(result).isEqualTo(dataHora);
         verify(alertaService).dataHoraLeituraAlertaUsuario(1L, "123");
@@ -140,7 +140,7 @@ class AlertaFacadeTest {
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
         when(alertaService.salvar(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Alerta alerta = alertaFacade.criarAlertaPessoal("123", "Atribuição temporária para unidade X");
+        Alerta alerta = alertaAplicacaoService.criarAlertaPessoal("123", "Atribuição temporária para unidade X");
 
         assertThat(alerta.getProcesso()).isNull();
         assertThat(alerta.getUnidadeDestino()).isNull();
@@ -163,7 +163,7 @@ class AlertaFacadeTest {
 
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
         when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
-        List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(raiz));
+        List<Alerta> alertas = alertaAplicacaoService.criarAlertasProcessoIniciado(processo, List.of(raiz));
 
         assertThat(alertas)
                 .isNotEmpty()
@@ -187,7 +187,7 @@ class AlertaFacadeTest {
 
         when(alertaService.alertasUsuarios(titulo, codigos)).thenReturn(List.of(au1, au2));
 
-        Map<Long, LocalDateTime> mapa = alertaFacade.obterMapaDataHoraLeitura(titulo, codigos);
+        Map<Long, LocalDateTime> mapa = alertaAplicacaoService.obterMapaDataHoraLeitura(titulo, codigos);
 
         assertThat(mapa)
                 .hasSize(1)
@@ -219,7 +219,7 @@ class AlertaFacadeTest {
         a3.setCodigo(3L);
         when(alertaService.listarPorCodigos(List.of(3L))).thenReturn(List.of(a3));
 
-        alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, codigos);
+        alertaAplicacaoService.marcarComoLidos(CONTEXTO_SERVIDOR, codigos);
 
         verify(alertaService).salvarAlertasUsuarios(alertaUsuarioListCaptor.capture());
 
@@ -240,7 +240,7 @@ class AlertaFacadeTest {
             String titulo = "123";
             when(alertaService.listarParaServidor(titulo)).thenReturn(Collections.emptyList());
 
-            alertaFacade.alertasPorUsuario(CONTEXTO_SERVIDOR);
+            alertaAplicacaoService.alertasPorUsuario(CONTEXTO_SERVIDOR);
 
             verify(alertaService).listarParaServidor(titulo);
             verify(alertaService, never()).listarParaGestao(anyLong(), anyString());
@@ -253,7 +253,7 @@ class AlertaFacadeTest {
             Long codUnidade = 1L;
             when(alertaService.listarParaGestao(codUnidade, titulo)).thenReturn(Collections.emptyList());
 
-            alertaFacade.alertasPorUsuario(CONTEXTO_GESTAO);
+            alertaAplicacaoService.alertasPorUsuario(CONTEXTO_GESTAO);
 
             verify(alertaService).listarParaGestao(codUnidade, titulo);
             verify(alertaService, never()).listarParaServidor(anyString());
@@ -279,7 +279,7 @@ class AlertaFacadeTest {
 
             when(alertaService.alertasUsuarios(eq(titulo), anyList())).thenReturn(List.of(au1));
 
-            List<Alerta> resultado = alertaFacade.listarNaoLidos(CONTEXTO_GESTAO);
+            List<Alerta> resultado = alertaAplicacaoService.listarNaoLidos(CONTEXTO_GESTAO);
 
             assertThat(resultado).hasSize(1);
             assertThat(resultado.getFirst().getCodigo()).isEqualTo(2L);
@@ -295,7 +295,7 @@ class AlertaFacadeTest {
             Pageable p = Pageable.unpaged();
             when(alertaService.listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class))).thenReturn(Page.empty());
 
-            alertaFacade.listarPorUnidade(CONTEXTO_GESTAO, p);
+            alertaAplicacaoService.listarPorUnidade(CONTEXTO_GESTAO, p);
 
             verify(alertaService).listarParaGestaoPaginado(eq(1L), anyString(), any(Pageable.class));
         }
@@ -306,7 +306,7 @@ class AlertaFacadeTest {
             Pageable p = Pageable.unpaged();
             when(alertaService.listarParaServidorPaginado(anyString(), any(Pageable.class))).thenReturn(Page.empty());
 
-            alertaFacade.listarPorUnidade(CONTEXTO_SERVIDOR, p);
+            alertaAplicacaoService.listarPorUnidade(CONTEXTO_SERVIDOR, p);
 
             verify(alertaService).listarParaServidorPaginado(anyString(), any(Pageable.class));
         }
@@ -345,7 +345,7 @@ class AlertaFacadeTest {
                 .thenReturn(List.of(leituraExistente, leituraExistenteDuplicada));
         when(alertaService.listarPorCodigos(List.of(codigoNovoDuplicado))).thenReturn(List.of(alertaNovo, alertaNovoDuplicado));
 
-        alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(codigoExistenteDuplicado, codigoNovoDuplicado));
+        alertaAplicacaoService.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(codigoExistenteDuplicado, codigoNovoDuplicado));
 
         verify(alertaService).salvarAlertasUsuarios(alertaUsuarioListCaptor.capture());
         List<AlertaUsuario> salvos = alertaUsuarioListCaptor.getValue();
@@ -367,7 +367,7 @@ class AlertaFacadeTest {
         @Test
         @DisplayName("Não deve fazer nada se lista de códigos for vazia")
         void naoDeveFazerNadaSeVazia() {
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, Collections.emptyList());
+            alertaAplicacaoService.marcarComoLidos(CONTEXTO_SERVIDOR, Collections.emptyList());
 
             verify(alertaService, never()).alertasUsuarios(anyString(), anyList());
             verify(alertaService, never()).salvarAlertasUsuarios(anyList());
@@ -382,7 +382,7 @@ class AlertaFacadeTest {
 
             when(alertaService.alertasUsuarios("123", List.of(1L))).thenReturn(List.of(alertaUsuario));
 
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L));
+            alertaAplicacaoService.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L));
 
             assertThat(alertaUsuario.getDataHoraLeitura()).isNotNull();
             verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.contains(alertaUsuario)));
@@ -401,7 +401,7 @@ class AlertaFacadeTest {
             usuario.setTituloEleitoral("123");
             when(usuarioService.buscar("123")).thenReturn(usuario);
 
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(2L));
+            alertaAplicacaoService.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(2L));
 
             verify(alertaService).salvarAlertasUsuarios(argThat(list -> list.stream().anyMatch(au -> au.getCodigo().getAlertaCodigo() == 2L)));
         }
@@ -412,7 +412,7 @@ class AlertaFacadeTest {
             when(alertaService.alertasUsuarios("123", List.of(3L))).thenReturn(Collections.emptyList());
             when(alertaService.listarPorCodigos(List.of(3L))).thenReturn(Collections.emptyList());
 
-            alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(3L));
+            alertaAplicacaoService.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(3L));
 
             verify(alertaService, never()).salvarAlertasUsuarios(anyList());
         }
@@ -428,7 +428,7 @@ class AlertaFacadeTest {
             doThrow(new org.springframework.dao.DataIntegrityViolationException("Simulação de concorrência"))
                     .when(alertaService).salvarAlertasUsuarios(anyList());
 
-            assertThatCode(() -> alertaFacade.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L)))
+            assertThatCode(() -> alertaAplicacaoService.marcarComoLidos(CONTEXTO_SERVIDOR, List.of(1L)))
                     .doesNotThrowAnyException();
         }
     }
@@ -459,7 +459,7 @@ class AlertaFacadeTest {
         when(unidadeHierarquiaService.buscarCodigosSuperiores(5L)).thenReturn(Collections.emptyList());
         when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        List<Alerta> alertas = alertaFacade.criarAlertasProcessoIniciado(processo, List.of(operacional, intermediaria));
+        List<Alerta> alertas = alertaAplicacaoService.criarAlertasProcessoIniciado(processo, List.of(operacional, intermediaria));
 
         assertThat(alertas).hasSize(2);
         assertThat(alertas)
@@ -469,5 +469,4 @@ class AlertaFacadeTest {
 
 
 }
-
 

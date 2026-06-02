@@ -37,7 +37,7 @@ class PainelControllerTest {
     @MockitoBean
     private PainelService painelService;
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Test
     @DisplayName("GET /api/painel/processos - Deve listar processos com sucesso usando contexto do Token")
@@ -48,7 +48,7 @@ class PainelControllerTest {
                 .unidadeAtivaCodigo(1L)
                 .build();
         usuarioMock.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<ProcessoResumoDto> page = new PageImpl<>(Collections.emptyList());
         when(painelService.listarProcessos(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
@@ -69,7 +69,7 @@ class PainelControllerTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
                 .build();
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<Alerta> page = new PageImpl<>(Collections.emptyList());
         when(painelService.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);
@@ -90,7 +90,7 @@ class PainelControllerTest {
                 .unidadeAtivaCodigo(1L)
                 .build();
         usuarioMock.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         sgc.processo.painel.dto.PainelBootstrapDto dto = sgc.processo.painel.dto.PainelBootstrapDto.builder()
                 .processos(Collections.emptyList())
@@ -115,7 +115,7 @@ class PainelControllerTest {
                 .unidadeAtivaCodigo(1L)
                 .build();
         usuarioMock.setAuthorities(Set.of(Perfil.ADMIN.toGrantedAuthority()));
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         mockMvc.perform(post("/api/painel/alertas/marcar-lidos")
                         .with(csrf())
@@ -136,7 +136,7 @@ class PainelControllerTest {
                 .perfilAtivo(Perfil.ADMIN)
                 .authorities(Set.of(Perfil.ADMIN.toGrantedAuthority()))
                 .build();
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("123", 1L, Perfil.ADMIN));
 
         Page<Alerta> page = new PageImpl<>(Collections.emptyList());
         when(painelService.listarAlertas(any(ContextoUsuarioAutenticado.class), any(Pageable.class))).thenReturn(page);

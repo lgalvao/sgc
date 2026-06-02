@@ -32,7 +32,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class RelatorioFacade {
+public class RelatorioService {
     private static final String NOME_SISTEMA = "Sistema de Gestão de Competências";
     private static final DateTimeFormatter FORMATADOR_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter FORMATADOR_DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -59,7 +59,7 @@ public class RelatorioFacade {
     private final UnidadeService unidadeService;
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final PdfFactory pdfFactory;
 
     @Transactional(readOnly = true)
@@ -251,7 +251,7 @@ public class RelatorioFacade {
 
     private Set<Long> validarEscopoRelatorioMapas(List<Long> codigosUnidades) {
         Set<Long> codigosNormalizados = new LinkedHashSet<>(codigosUnidades);
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
 
         if (contextoUsuario.perfil() == Perfil.ADMIN) {
             return codigosNormalizados;
@@ -274,7 +274,7 @@ public class RelatorioFacade {
     }
 
     private void validarEscopoRelatorioMapaVigenteUnidade(Long codUnidade) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
 
         if (contextoUsuario.perfil() == Perfil.ADMIN) {
             return;

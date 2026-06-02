@@ -62,7 +62,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
     private HierarquiaService hierarquiaService;
 
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @MockitoBean
     private ImpactoMapaService impactoMapaService;
@@ -71,7 +71,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
     private MapaManutencaoService mapaManutencaoService;
 
     @MockitoBean
-    private AlertaFacade alertaService;
+    private AlertaAplicacaoService alertaService;
 
     private Processo criarProcessoPersistido(TipoProcesso tipo) {
         Processo processo = new Processo();
@@ -131,7 +131,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
                     .motivo("Motivo")
                     .build();
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             Analise analise = transicaoService.criarAnalise(sp, request, TipoAnalise.CADASTRO);
 
@@ -265,7 +265,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
             when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(mapa.getCodigo()))
                     .thenReturn(java.util.List.of());
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             cadastroFluxoService.disponibilizarCadastro(sp.getCodigo());
 
@@ -320,7 +320,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
                     .dataLimite(proc.getDataCriacao().toLocalDate().plusDays(1))
                     .build();
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             transicaoService.disponibilizarMapa(sp.getCodigo(), request);
 
@@ -366,7 +366,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
                     .dataLimiteEtapa2(java.time.LocalDateTime.of(2025, 12, 31, 0, 0))
                     .build();
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             transicaoService.submeterMapaAjustado(sp.getCodigo(), request);
 
@@ -422,7 +422,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
             when(unidadeService.buscarPorSigla("U6")).thenReturn(uSp);
             when(hierarquiaService.isSubordinada(uSp, uAnalise)).thenReturn(true);
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             transicaoService.devolverValidacao(sp.getCodigo(), "justificativa erro");
 
@@ -469,7 +469,7 @@ class SubprocessoTransicaoServiceIntegrationTest {
 
             when(unidadeService.buscarPorSigla("U7")).thenReturn(uSp);
 
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             transicaoService.aceitarValidacao(sp.getCodigo(), "Observacao aceite");
 

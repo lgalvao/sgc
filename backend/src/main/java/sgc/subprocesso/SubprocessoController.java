@@ -37,7 +37,7 @@ public class SubprocessoController {
     private final SubprocessoTransicaoService transicaoService;
     private final CadastroFluxoService cadastroFluxoService;
     private final UnidadeService unidadeService;
-    private final UsuarioFacade usuarioService;
+    private final UsuarioAplicacaoService usuarioService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoDtoMapper subprocessoDtoMapper;
 

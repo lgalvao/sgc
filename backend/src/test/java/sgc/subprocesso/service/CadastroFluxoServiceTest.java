@@ -35,7 +35,7 @@ class CadastroFluxoServiceTest {
     @Mock
     private SubprocessoValidacaoService validacaoService;
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
     private UnidadeService unidadeService;
     @Mock
@@ -43,7 +43,7 @@ class CadastroFluxoServiceTest {
     @Mock
     private UnidadeHierarquiaService unidadeHierarquiaService;
     @Mock
-    private AlertaFacade alertaService;
+    private AlertaAplicacaoService alertaService;
     @Mock
     private SubprocessoTransicaoService transicaoService;
     @Mock
@@ -72,7 +72,7 @@ class CadastroFluxoServiceTest {
         sp.setMapa(new sgc.mapa.model.Mapa());
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
         when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
 
@@ -106,7 +106,7 @@ class CadastroFluxoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(spMap)).thenReturn(spMap.getUnidade());
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(spRev)).thenReturn(spRev.getUnidade());
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
 
         service.aceitarCadastroEmBloco(List.of(10L, 20L));
 
@@ -131,7 +131,7 @@ class CadastroFluxoServiceTest {
         when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
 
         service.homologarCadastroEmBloco(List.of(10L, 20L));
 
@@ -149,7 +149,7 @@ class CadastroFluxoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
 
         assertThatThrownBy(() -> service.devolver(1L, "Obs"))
                 .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
@@ -163,7 +163,7 @@ class CadastroFluxoServiceTest {
         Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_CADASTRO_DISPONIBILIZADA, u);
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(criarUsuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
 
         service.aceitar(1L, "Obs");
         assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_DISPONIBILIZADA);
@@ -192,7 +192,7 @@ class CadastroFluxoServiceTest {
         sp.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
         when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(30L);
         when(unidadeService.buscarPorCodigo(30L)).thenReturn(sup1);
@@ -224,7 +224,7 @@ class CadastroFluxoServiceTest {
         sp.setSituacaoForcada(REVISAO_MAPA_HOMOLOGADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
         when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(30L);
         when(unidadeService.buscarPorCodigo(30L)).thenReturn(sup);
@@ -300,7 +300,7 @@ class CadastroFluxoServiceTest {
         when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
         when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
 
         service.devolver(1L, "Obs");
 
@@ -325,7 +325,7 @@ class CadastroFluxoServiceTest {
         sp.setUnidade(unidade);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
         service.homologar(1L, "Obs");
@@ -390,7 +390,7 @@ class CadastroFluxoServiceTest {
         sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
         service.homologar(100L, "   ");
@@ -408,7 +408,7 @@ class CadastroFluxoServiceTest {
         sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
 
         service.homologar(100L, "  texto com espaco  ");
@@ -452,7 +452,7 @@ class CadastroFluxoServiceTest {
         sp.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
         when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(null);
 

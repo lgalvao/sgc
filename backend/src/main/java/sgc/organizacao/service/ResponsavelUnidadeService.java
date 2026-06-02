@@ -40,7 +40,7 @@ public class ResponsavelUnidadeService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
-    private final AlertaFacade alertaFacade;
+    private final AlertaAplicacaoService alertaAplicacaoService;
     private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final ConfigAplicacao configAplicacao;
@@ -202,7 +202,7 @@ public class ResponsavelUnidadeService {
 
     private void criarAlertaSemInterromperNotificacao(Usuario usuario, String siglaUnidade) {
         try {
-            alertaFacade.criarAlertaPessoal(
+            alertaAplicacaoService.criarAlertaPessoal(
                     usuario.getTituloEleitoral(),
                     "Atribuição temporária para unidade %s".formatted(siglaUnidade)
             );

@@ -36,7 +36,7 @@ public class SubprocessoService {
             NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO);
     private final ComumRepo repo;
     private final UnidadeService unidadeService;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final MapaSalvamentoService mapaSalvamentoService;
     private final SgcPermissionEvaluator permissionEvaluator;
     private final SubprocessoValidacaoService validacaoService;
@@ -110,7 +110,7 @@ public class SubprocessoService {
 
     @Transactional
     public void criarParaMapeamento(CriarSubprocessosMapeamentoCommand command) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Processo processo = command.processo();
         Unidade unidadeOrigem = command.unidadeOrigem();
         List<Unidade> unidadesElegiveis = listarUnidadesElegiveisParaMapeamento(command.unidades());
@@ -142,7 +142,7 @@ public class SubprocessoService {
     }
 
     public void criarParaRevisao(CriarSubprocessoComMapaCommand command) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         criarSubprocessoComMapa(ContextoCriacaoSubprocesso.builder()
                 .processo(command.processo())
                 .unidade(command.unidade())
@@ -156,7 +156,7 @@ public class SubprocessoService {
     }
 
     public void criarParaDiagnostico(CriarSubprocessoComMapaCommand command) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso subprocessoSalvo = criarSubprocessoComMapa(ContextoCriacaoSubprocesso.builder()
                 .processo(command.processo())
                 .unidade(command.unidade())
@@ -427,7 +427,7 @@ public class SubprocessoService {
         Subprocesso subprocessoDestino = repo.buscar(Subprocesso.class, codSubprocessoDestino);
         validarDestinoParaImportacao(subprocessoDestino);
 
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         validarPermissaoImportacaoNoDestino(usuario, subprocessoDestino);
 
         Subprocesso subprocessoOrigem = repo.buscar(Subprocesso.class, codSubprocessoOrigem);

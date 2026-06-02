@@ -17,12 +17,12 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("LoginFacade")
+@DisplayName("LoginAplicacaoService")
 @SuppressWarnings("NullAway.Init")
-class LoginFacadeTest {
+class LoginAplicacaoServiceTest {
 
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
     private GerenciadorJwt gerenciadorJwt;
     @Mock
@@ -32,12 +32,12 @@ class LoginFacadeTest {
     @Mock
     private UsuarioService usuarioServiceInterno;
 
-    private LoginFacade loginFacade;
+    private LoginAplicacaoService loginAplicacaoService;
 
     @BeforeEach
     void setUp() {
-        loginFacade = new LoginFacade(
-                usuarioFacade,
+        loginAplicacaoService = new LoginAplicacaoService(
+                usuarioAplicacaoService,
                 gerenciadorJwt,
                 clienteAcessoAd,
                 unidadeService,
@@ -48,30 +48,30 @@ class LoginFacadeTest {
     @Test
     @DisplayName("autenticar deve retornar false se clienteAcessoAd for null")
     void autenticar_ClienteAdNull() {
-        LoginFacade facadeSemAd = new LoginFacade(usuarioFacade, gerenciadorJwt, null, unidadeService, usuarioServiceInterno);
-        assertThat(facadeSemAd.autenticar("123", "senha")).isFalse();
+        LoginAplicacaoService loginAplicacaoServiceSemAd = new LoginAplicacaoService(usuarioAplicacaoService, gerenciadorJwt, null, unidadeService, usuarioServiceInterno);
+        assertThat(loginAplicacaoServiceSemAd.autenticar("123", "senha")).isFalse();
     }
 
     @Test
     @DisplayName("autenticar deve chamar clienteAcessoAd")
     void autenticar_Sucesso() {
         doNothing().when(clienteAcessoAd).autenticar("123", "senha");
-        assertThat(loginFacade.autenticar("123", "senha")).isTrue();
+        assertThat(loginAplicacaoService.autenticar("123", "senha")).isTrue();
     }
 
     @Test
     @DisplayName("autenticar deve retornar false em caso de ErroAutenticacao")
     void autenticar_ErroAutenticacao() {
         doThrow(new ErroAutenticacao("Falha")).when(clienteAcessoAd).autenticar("123", "senha");
-        assertThat(loginFacade.autenticar("123", "senha")).isFalse();
+        assertThat(loginAplicacaoService.autenticar("123", "senha")).isFalse();
     }
 
     @Test
     @DisplayName("entrar deve falhar se usuário não encontrado")
     void entrar_UsuarioNaoEncontrado() {
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
+        when(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("123")).thenReturn(null);
         EntrarRequest req = new EntrarRequest("ADMIN", 1L);
-        assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
+        assertThatThrownBy(() -> loginAplicacaoService.entrar(req, "123"))
                 .isInstanceOf(ErroAutenticacao.class);
     }
 
@@ -80,7 +80,7 @@ class LoginFacadeTest {
     void entrar_AdminSucesso() {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
+        when(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -94,7 +94,7 @@ class LoginFacadeTest {
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
 
         EntrarRequest req = new EntrarRequest("ADMIN", 1L);
-        assertThat(loginFacade.entrar(req, "123")).isEqualTo("token");
+        assertThat(loginAplicacaoService.entrar(req, "123")).isEqualTo("token");
     }
 
     @Test
@@ -102,11 +102,11 @@ class LoginFacadeTest {
     void entrar_AdminFalha() {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
+        when(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
         when(usuarioServiceInterno.buscarAutorizacoesPerfil("123")).thenReturn(List.of());
 
         EntrarRequest req = new EntrarRequest("ADMIN", 1L);
-        assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
+        assertThatThrownBy(() -> loginAplicacaoService.entrar(req, "123"))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
 
@@ -123,7 +123,7 @@ class LoginFacadeTest {
                 new PerfilUnidadeDto(Perfil.GESTOR.name(), sgc.organizacao.dto.UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build())
         );
 
-        assertThatThrownBy(() -> loginFacade.entrar(req, "123", autorizacoes))
+        assertThatThrownBy(() -> loginAplicacaoService.entrar(req, "123", autorizacoes))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
 
@@ -132,7 +132,7 @@ class LoginFacadeTest {
     void entrar_GestorSucesso() {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
+        when(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -146,7 +146,7 @@ class LoginFacadeTest {
         when(unidadeService.buscarPorCodigo(1L)).thenReturn(unidade);
 
         EntrarRequest req = new EntrarRequest("GESTOR", 1L);
-        assertThat(loginFacade.entrar(req, "123")).isEqualTo("token");
+        assertThat(loginAplicacaoService.entrar(req, "123")).isEqualTo("token");
     }
 
     @Test
@@ -154,7 +154,7 @@ class LoginFacadeTest {
     void entrar_GestorUnidadeErrada() {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
+        when(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(2L);
@@ -166,7 +166,7 @@ class LoginFacadeTest {
         ));
 
         EntrarRequest req = new EntrarRequest("GESTOR", 1L);
-        assertThatThrownBy(() -> loginFacade.entrar(req, "123"))
+        assertThatThrownBy(() -> loginAplicacaoService.entrar(req, "123"))
                 .isInstanceOf(ErroAcessoNegado.class);
     }
 
@@ -175,7 +175,7 @@ class LoginFacadeTest {
     void buscarAutorizacoesUsuario_Sucesso() {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
+        when(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(1L);
@@ -187,7 +187,7 @@ class LoginFacadeTest {
                 new UsuarioPerfilAutorizacaoLeitura("123", Perfil.GESTOR, 1L, "Unidade 1", "U1", TipoUnidade.OPERACIONAL, SituacaoUnidade.ATIVA)
         ));
 
-        List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
+        List<PerfilUnidadeDto> result = loginAplicacaoService.buscarAutorizacoesUsuario("123");
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().perfil()).isEqualTo(Perfil.GESTOR.name());
     }
@@ -197,7 +197,7 @@ class LoginFacadeTest {
     void buscarAutorizacoesUsuario_DeveFiltrarUnidadesInativas() {
         Usuario user = new Usuario();
         user.setTituloEleitoral("123");
-        when(usuarioFacade.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
+        when(usuarioAplicacaoService.carregarUsuarioParaAutenticacao("123")).thenReturn(user);
 
         Unidade unidadeAtiva = new Unidade();
         unidadeAtiva.setCodigo(1L);
@@ -216,7 +216,7 @@ class LoginFacadeTest {
                 new UsuarioPerfilAutorizacaoLeitura("123", Perfil.CHEFE, 2L, "Unidade 2", "U2", TipoUnidade.OPERACIONAL, SituacaoUnidade.INATIVA)
         ));
 
-        List<PerfilUnidadeDto> result = loginFacade.buscarAutorizacoesUsuario("123");
+        List<PerfilUnidadeDto> result = loginAplicacaoService.buscarAutorizacoesUsuario("123");
 
         assertThat(result).singleElement().satisfies(perfil -> {
             assertThat(perfil.perfil()).isEqualTo(Perfil.GESTOR.name());

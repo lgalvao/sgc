@@ -38,7 +38,7 @@ class SubprocessoServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
     private ImpactoMapaService impactoMapaService;
     @Mock
@@ -454,7 +454,7 @@ class SubprocessoServiceTest {
                 u4.setCodigo(4L);
                 u4.setTipo(TipoUnidade.INTERMEDIARIA);
 
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
 
                 service.criarParaMapeamento(
                         new SubprocessoService.CriarSubprocessosMapeamentoCommand(p, List.of(u1, u2, u3, u4), unidadeOrigem));
@@ -537,7 +537,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(eq(user), any(), any())).thenReturn(true);
                 service.importarAtividades(1L, 2L, List.of());
 
@@ -554,7 +554,7 @@ class SubprocessoServiceTest {
                 Subprocesso sp = criarSubprocessoComMapa(null);
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(false);
 
                 List<Long> itens = List.of();
@@ -578,7 +578,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
                 when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(true);
 
@@ -603,7 +603,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(eq(user), eq(spDest), any())).thenReturn(true);
                 when(permissionEvaluator.verificarPermissao(eq(user), eq(spOrig), any())).thenReturn(true);
 
@@ -620,7 +620,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
                 when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(false);
 
@@ -653,7 +653,7 @@ class SubprocessoServiceTest {
 
         when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
         when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
 
         assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem, itens))

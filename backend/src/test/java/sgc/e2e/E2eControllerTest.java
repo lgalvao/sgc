@@ -57,7 +57,7 @@ class E2eControllerTest {
     private ResourceLoader resourceLoader;
 
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Mock
     private ProcessoRepo processoRepo;
@@ -387,7 +387,7 @@ class E2eControllerTest {
         private ProcessoService processoServiceMock;
         private UnidadeService unidadeServiceMock;
         private ResourceLoader resourceLoaderMock;
-        private UsuarioFacade usuarioFacadeMock;
+        private UsuarioAplicacaoService usuarioAplicacaoServiceMock;
         private E2eController controllerIsolado;
 
         @BeforeEach
@@ -397,7 +397,7 @@ class E2eControllerTest {
             processoServiceMock = mock(ProcessoService.class);
             unidadeServiceMock = mock(UnidadeService.class);
             resourceLoaderMock = mock(ResourceLoader.class);
-            usuarioFacadeMock = mock(UsuarioFacade.class);
+            usuarioAplicacaoServiceMock = mock(UsuarioAplicacaoService.class);
             var processoRepoMock = mock(ProcessoRepo.class);
             var subprocessoRepoMock = mock(SubprocessoRepo.class);
             var mapaRepoMock = mock(MapaRepo.class);
@@ -452,7 +452,7 @@ class E2eControllerTest {
 
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoServiceMock.criar(any())).thenReturn(dto);
-            when(usuarioFacadeMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
+            when(usuarioAplicacaoServiceMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
             doThrow(new ErroValidacao("Erro 1, Erro 2"))
                     .when(processoServiceMock).iniciar(eq(100L), anyList());
@@ -471,7 +471,7 @@ class E2eControllerTest {
 
             Processo dto = Processo.builder().codigo(100L).build();
             when(processoServiceMock.criar(any())).thenReturn(dto);
-            when(usuarioFacadeMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
+            when(usuarioAplicacaoServiceMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
             doNothing().when(processoServiceMock).iniciar(eq(100L), anyList()); // Sucesso
 

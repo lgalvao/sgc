@@ -21,7 +21,7 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AlertaFacade {
+public class AlertaAplicacaoService {
     private final AlertaService alertaService;
     private final UsuarioService usuarioService;
     private final UnidadeService unidadeService;

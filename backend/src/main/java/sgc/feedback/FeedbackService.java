@@ -32,7 +32,7 @@ public class FeedbackService {
 
     private final FeedbackRepo repo;
     private final FeedbackPropriedades propriedades;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final ObjectMapper objectMapper;
     private final ComumRepo comumRepo;
 
@@ -47,7 +47,7 @@ public class FeedbackService {
         validarNota(payload.nota());
         validarScreenshot(screenshot);
 
-        var usuario = usuarioFacade.usuarioAutenticado();
+        var usuario = usuarioAplicacaoService.usuarioAutenticado();
         String metadataJson = serializarMetadados(payload.metadados());
         String caminhoScreenshot = salvarScreenshot(screenshot);
 

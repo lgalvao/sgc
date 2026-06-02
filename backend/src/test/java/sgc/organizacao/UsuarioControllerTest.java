@@ -36,7 +36,7 @@ class UsuarioControllerTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @MockitoBean
     private UsuarioService usuarioService;
@@ -79,7 +79,7 @@ class UsuarioControllerTest {
     @WithMockUser(roles = "ADMIN")
     void listarAdministradores_Sucesso() throws Exception {
         AdministradorDto adm = AdministradorDto.builder().nome("Admin").build();
-        when(usuarioFacade.listarAdministradores()).thenReturn(List.of(adm));
+        when(usuarioAplicacaoService.listarAdministradores()).thenReturn(List.of(adm));
 
         mockMvc.perform(get("/api/usuarios/administradores"))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ class UsuarioControllerTest {
     @WithMockUser(roles = "ADMIN")
     void adicionarAdministrador_Sucesso() throws Exception {
         AdministradorDto adm = AdministradorDto.builder().tituloEleitoral("123").nome("Admin").build();
-        when(usuarioFacade.adicionarAdministrador("123")).thenReturn(adm);
+        when(usuarioAplicacaoService.adicionarAdministrador("123")).thenReturn(adm);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -145,7 +145,7 @@ class UsuarioControllerTest {
         Usuario usuarioAtual = new Usuario();
         usuarioAtual.setTituloEleitoral("999");
         usuarioAtual.setAuthorities(Set.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("999", 1L, Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("999", 1L, Perfil.ADMIN));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/usuarios/administradores/123/remover")
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
@@ -154,7 +154,7 @@ class UsuarioControllerTest {
 
         ArgumentCaptor<String> captorTitulo = ArgumentCaptor.forClass(String.class);
 
-        Mockito.verify(usuarioFacade).removerAdministrador(captorTitulo.capture());
+        Mockito.verify(usuarioAplicacaoService).removerAdministrador(captorTitulo.capture());
 
         Assertions.assertThat(captorTitulo.getValue())
                 .as("Título do usuário a ser removido (PathVariable)")

@@ -104,17 +104,10 @@ public class ArchConsistencyTest {
             .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
 
     @ArchTest
-    static final ArchRule facades_should_have_facade_suffix = classes()
-            .that()
-            .resideInAPackage("..service..")
-            .and()
-            .areAnnotatedWith(Service.class)
-            .and()
-            .haveSimpleNameContaining("Facade")
+    static final ArchRule production_code_should_not_use_facade_suffix = noClasses()
             .should()
             .haveSimpleNameEndingWith("Facade")
-            .allowEmptyShould(true)
-            .because("Facade classes should have 'Facade' as suffix for consistency");
+            .because("O backend atual do SGC não adota Facade como categoria arquitetural; use Service ou AplicacaoService");
 
     @ArchTest
     static final ArchRule dtos_should_not_be_jpa_entities = noClasses()
@@ -334,7 +327,7 @@ public class ArchConsistencyTest {
             .arePublic()
             .and()
             .areDeclaredInClassesThat()
-            .haveSimpleNameEndingWith("Facade")
+            .haveSimpleNameEndingWith("AplicacaoService")
             .should(new ArchCondition<>("não receber Usuario como Configuração de aplicação") {
                 @Override
                 public void check(JavaMethod method, ConditionEvents events) {
@@ -363,7 +356,7 @@ public class ArchConsistencyTest {
                     }
                 }
             })
-            .because("Controller, Facade e Service de aplicação não devem receber Usuario para representar o usuário autenticado atual");
+            .because("Controller e services de aplicação não devem receber Usuario para representar o usuário autenticado atual");
 
     @ArchTest
     static final ArchRule only_security_organization_and_e2e_should_access_security_context_holder = noClasses()

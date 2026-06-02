@@ -24,13 +24,13 @@ import java.util.*;
 @PreAuthorize("isAuthenticated()")
 public class PainelController {
     private final PainelService painelService;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final AlertaDtoMapper alertaDtoMapper;
 
     @GetMapping("/bootstrap")
     @Operation(summary = "Obtém todos os dados iniciais do painel (processos e alertas) em uma única chamada")
     public ResponseEntity<PainelBootstrapDto> obterBootstrap() {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
         return ResponseEntity.ok(painelService.obterBootstrap(contextoUsuario));
     }
 
@@ -40,7 +40,7 @@ public class PainelController {
     @GetMapping("/processos")
     @Operation(summary = "Lista processos para o painel com base no contexto do Token JWT")
     public ResponseEntity<Page<ProcessoResumoDto>> listarProcessos(@PageableDefault(size = 20) Pageable pageable) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
         Page<ProcessoResumoDto> page = painelService.listarProcessos(contextoUsuario, pageable);
         return ResponseEntity.ok(page);
     }
@@ -52,7 +52,7 @@ public class PainelController {
     @GetMapping("/alertas")
     @Operation(summary = "Lista alertas para o painel com base no contexto do Token JWT")
     public ResponseEntity<Page<AlertaDto>> listarAlertas(@PageableDefault(size = 20) Pageable pageable) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
         Page<Alerta> page = painelService.listarAlertas(contextoUsuario, pageable);
         return ResponseEntity.ok(page.map(alertaDtoMapper::paraAlertaDto));
     }
@@ -64,7 +64,7 @@ public class PainelController {
     @PostMapping("/alertas/marcar-lidos")
     @Operation(summary = "Marca alertas como lidos para o usuário autenticado")
     public ResponseEntity<Void> marcarAlertasLidos(@RequestBody List<Long> codigos) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
         painelService.marcarAlertasLidos(contextoUsuario, codigos);
         return ResponseEntity.noContent().build();
     }

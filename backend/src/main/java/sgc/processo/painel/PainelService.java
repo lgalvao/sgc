@@ -28,7 +28,7 @@ import static java.util.stream.Collectors.*;
 @Transactional(readOnly = true)
 @Slf4j
 public class PainelService {
-    private final AlertaFacade alertaFacade;
+    private final AlertaAplicacaoService alertaAplicacaoService;
     private final AlertaDtoMapper alertaDtoMapper;
     private final UnidadeHierarquiaService hierarquiaService;
     private final UnidadeService unidadeService;
@@ -82,12 +82,12 @@ public class PainelService {
                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
                 : pageable;
 
-        Page<Alerta> alertasPage = alertaFacade.listarPorUnidade(contextoUsuario, sortedPageable);
-        Map<Long, LocalDateTime> leiturasPorAlerta = alertaFacade.obterMapaDataHoraLeitura(
+        Page<Alerta> alertasPage = alertaAplicacaoService.listarPorUnidade(contextoUsuario, sortedPageable);
+        Map<Long, LocalDateTime> leiturasPorAlerta = alertaAplicacaoService.obterMapaDataHoraLeitura(
                 contextoUsuario.usuarioTitulo(),
                 alertasPage.stream().map(Alerta::getCodigo).toList());
         alertasPage.forEach(alerta -> alerta.setDataHoraLeitura(leiturasPorAlerta.get(alerta.getCodigo())));
-        alertaFacade.aplicarPrazoConfiguradoLeituraAutomatica(alertasPage.getContent());
+        alertaAplicacaoService.aplicarPrazoConfiguradoLeituraAutomatica(alertasPage.getContent());
         return alertasPage;
     }
 
@@ -96,7 +96,7 @@ public class PainelService {
         if (codigos.isEmpty()) {
             return;
         }
-        alertaFacade.marcarComoLidos(contextoUsuario, codigos);
+        alertaAplicacaoService.marcarComoLidos(contextoUsuario, codigos);
     }
 
     private ProcessoResumoDto paraProcessoResumoDto(Processo processo,
