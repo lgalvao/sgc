@@ -3,10 +3,11 @@ package sgc.diagnostico.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.model.ComumRepo;
 import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.DiagnosticoRepo;
 import sgc.diagnostico.model.SituacaoDiagnostico;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
@@ -42,6 +43,7 @@ import java.util.Objects;
 @Transactional
 public class DiagnosticoFluxoService {
     private final DiagnosticoRepo diagnosticoRepo;
+    private final ComumRepo repo;
     private final DiagnosticoValidacaoService validacaoService;
     private final DiagnosticoNotificacaoService notificacaoService;
     private final SubprocessoConsultaService subprocessoConsultaService;
@@ -83,8 +85,7 @@ public class DiagnosticoFluxoService {
     }
 
     public void concluirDiagnosticoUnidade(Long codSubprocesso) {
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         validacaoService.validarConclusaoUnidade(diagnostico.getCodigo());
 
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
@@ -101,6 +102,7 @@ public class DiagnosticoFluxoService {
         Unidade unidadeOrigem = subprocesso.getUnidade();
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeOrigem.getCodigo());
         if (unidadeDestino == null) {
+            // Caso ocorra na unidade ADMIN (topo da hierarquia), que não possui superior imediato
             unidadeDestino = unidadeOrigem;
         }
 
@@ -119,13 +121,16 @@ public class DiagnosticoFluxoService {
     }
 
     public void devolverDiagnostico(Long codSubprocesso, @Nullable String observacao) {
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
-        Unidade unidadeDevolucao = obterUnidadeDevolucao(subprocesso, unidadeAnalise);
+        Unidade unidadeDevolucao = obterUnidadeDevolucao(subprocesso, unidadeAnalise)
+                .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
+                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
+                                .formatted(subprocesso.getCodigo(), unidadeAnalise.getCodigo())
+                ));
 
         SituacaoSubprocesso novaSituacao = SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO;
         if (Objects.equals(unidadeDevolucao.getCodigo(), subprocesso.getUnidade().getCodigo())) {
@@ -155,8 +160,7 @@ public class DiagnosticoFluxoService {
     }
 
     public void validarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
@@ -187,8 +191,7 @@ public class DiagnosticoFluxoService {
     }
 
     public void homologarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
@@ -208,18 +211,14 @@ public class DiagnosticoFluxoService {
         notificacaoService.notificarDiagnosticoHomologado(subprocesso);
     }
 
-    private Unidade obterUnidadeDevolucao(sgc.subprocesso.model.Subprocesso subprocesso, Unidade unidadeAnalise) {
+    private Optional<Unidade> obterUnidadeDevolucao(sgc.subprocesso.model.Subprocesso subprocesso, Unidade unidadeAnalise) {
         List<Movimentacao> movimentacoes = subprocessoConsultaService.listarMovimentacoesOrdenadas(subprocesso.getCodigo());
 
         return movimentacoes.stream()
                 .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
                 .map(Movimentacao::getUnidadeOrigem)
                 .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
-                .findFirst()
-                .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
-                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
-                                .formatted(subprocesso.getCodigo(), unidadeAnalise.getCodigo())
-                ));
+                .findFirst();
     }
 
     private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {
