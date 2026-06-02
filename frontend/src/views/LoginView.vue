@@ -29,7 +29,7 @@
           >
             <LoginCredenciaisCampos
                 :caps-lock-ativado="capsLockAtivado"
-                :carregando="isLoading"
+                :carregando="carregando"
                 :login-bloqueado="selecionandoPerfil"
                 :mostrar-acao-trocar-titulo-eleitoral="selecionandoPerfil"
                 :mensagem-erro-senha="mensagemErroSenha"
@@ -61,7 +61,7 @@
 
             <LoadingButton
                 :aria-label="TEXTOS.comum.BOTAO_ENTRAR"
-                :loading="isLoading"
+                :loading="carregando"
                 :loading-text="TEXTOS.login.ENTRANDO"
                 :text="TEXTOS.comum.BOTAO_ENTRAR"
                 class="w-100"
@@ -110,7 +110,7 @@ const titulo = ref("");
 const senha = ref("");
 const loginStep = ref(1);
 const parSelecionado = ref<PerfilUnidade | null>(null);
-const isLoading = ref(false);
+const carregando = ref(false);
 const showPassword = ref(false);
 const capsLockAtivado = ref(false);
 
@@ -179,7 +179,7 @@ const performInitialLogin = async () => {
     return;
   }
 
-  isLoading.value = true;
+  carregando.value = true;
   try {
     const fluxoLogin = await perfilStore.iniciarLogin(titulo.value, senha.value);
 
@@ -206,7 +206,7 @@ const performInitialLogin = async () => {
       notify(TEXTOS.login.ERRO_GENERICO, 'danger');
     }
   } finally {
-    isLoading.value = false;
+    carregando.value = false;
   }
 };
 
@@ -226,7 +226,7 @@ const performProfileSelection = async () => {
     return;
   }
 
-  isLoading.value = true;
+  carregando.value = true;
   try {
     if (parSelecionado.value) {
       await perfilStore.concluirLoginComPerfil(parSelecionado.value);
@@ -245,7 +245,7 @@ const performProfileSelection = async () => {
     logger.error("Erro ao selecionar perfil:", error);
     notify(TEXTOS.login.ERRO_SELECAO_PERFIL, 'danger');
   } finally {
-    isLoading.value = false;
+    carregando.value = false;
   }
 };
 </script>

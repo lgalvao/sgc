@@ -7,15 +7,15 @@ describe('Toast store', () => {
         setActivePinia(createPinia());
     });
 
-    it('deve inicializar com pendingToast null', () => {
+    it('deve inicializar com toastPendente null', () => {
         const store = useToastStore();
-        expect(store.pendingToast).toBeNull();
+        expect(store.toastPendente).toBeNull();
     });
 
     it('deve setar uma mensagem pending', () => {
         const store = useToastStore();
         store.setPending('Mensagem de teste');
-        expect(store.pendingToast).toEqual({body: 'Mensagem de teste'});
+        expect(store.toastPendente).toEqual({mensagem: 'Mensagem de teste'});
     });
 
     it('deve consumir a mensagem pending e retornar o valor', () => {
@@ -24,8 +24,8 @@ describe('Toast store', () => {
 
         const consumed = store.consumePending();
 
-        expect(consumed).toEqual({body: 'Mensagem de teste'});
-        expect(store.pendingToast).toBeNull();
+        expect(consumed).toEqual({mensagem: 'Mensagem de teste'});
+        expect(store.toastPendente).toBeNull();
     });
 
     it('deve retornar null se nao houver mensagem pendente ao consumir', () => {
