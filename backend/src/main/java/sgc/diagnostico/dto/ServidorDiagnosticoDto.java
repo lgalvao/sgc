@@ -1,7 +1,9 @@
 package sgc.diagnostico.dto;
 
+import lombok.Builder;
 import java.util.List;
 
+@Builder
 public record ServidorDiagnosticoDto(
         String servidorTitulo,
         String servidorNome,

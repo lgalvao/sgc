@@ -1,10 +1,13 @@
 package sgc.diagnostico.dto;
 
+import lombok.Builder;
 import java.util.List;
 
+@Builder
 public record DiagnosticoEquipeDto(
         List<Item> servidores
 ) {
+    @Builder
     public record Item(
             String servidorTitulo,
             String servidorNome,

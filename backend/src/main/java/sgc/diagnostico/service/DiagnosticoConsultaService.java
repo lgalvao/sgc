@@ -3,7 +3,7 @@ package sgc.diagnostico.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.model.ComumRepo;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
 import sgc.organizacao.UsuarioFacade;
@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class DiagnosticoConsultaService {
-    private final DiagnosticoRepo diagnosticoRepo;
+    private final ComumRepo repo;
     private final AvaliacaoServidorRepo avaliacaoRepo;
     private final OcupacaoCriticaRepo ocupacaoRepo;
     private final SubprocessoConsultaService subprocessoConsultaService;
@@ -30,46 +30,68 @@ public class DiagnosticoConsultaService {
     public DiagnosticoContextoDto obterContexto(Long codSubprocesso) {
         Subprocesso sp = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         List<CompetenciaResumoDto> competencias = sp.getMapa().getCompetencias().stream()
-                .map(c -> new CompetenciaResumoDto(c.getCodigo(), c.getDescricao()))
+                .map(c -> CompetenciaResumoDto.builder()
+                        .competenciaCodigo(c.getCodigo())
+                        .descricao(c.getDescricao())
+                        .build())
                 .toList();
-        return new DiagnosticoContextoDto(
-                sp.getProcesso().getCodigo(),
-                sp.getCodigo(),
-                sp.getUnidade().getCodigo(),
-                sp.getUnidade().getSigla(),
-                sp.getUnidade().getNome(),
-                sp.getSituacao().name(),
-                competencias
-        );
+        return DiagnosticoContextoDto.builder()
+                .processoCodigo(sp.getProcesso().getCodigo())
+                .subprocessoCodigo(sp.getCodigo())
+                .unidadeCodigo(sp.getUnidade().getCodigo())
+                .unidadeSigla(sp.getUnidade().getSigla())
+                .unidadeNome(sp.getUnidade().getNome())
+                .situacaoSubprocesso(sp.getSituacao().name())
+                .competencias(competencias)
+                .build();
     }
 
     public AutoavaliacaoDto obterAutoavaliacao(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
-        List<AvaliacaoCompetenciaDto> competencias = avaliacaoRepo.buscarAvaliacoesDoServidor(
-                        diagnostico.getCodigo(), usuario.getTituloEleitoral())
-                .stream()
-                .map(a -> new AvaliacaoCompetenciaDto(a.getCompetencia().getCodigo(), a.getImportancia(), a.getDominio()))
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
+        List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
+                diagnostico.getCodigo(), usuario.getTituloEleitoral());
+        List<AvaliacaoCompetenciaDto> competencias = avaliacoes.stream()
+                .map(a -> AvaliacaoCompetenciaDto.builder()
+                        .competenciaCodigo(a.getCompetencia().getCodigo())
+                        .importancia(a.getImportancia())
+                        .dominio(a.getDominio())
+                        .build())
                 .toList();
-        return new AutoavaliacaoDto(competencias, obterSituacaoServidor(diagnostico, usuario.getTituloEleitoral()));
+        String situacaoServidor = avaliacoes.stream()
+                .findFirst()
+                .map(a -> a.getSituacaoServidor().name())
+                .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA.name());
+        return AutoavaliacaoDto.builder()
+                .competencias(competencias)
+                .situacaoServidor(situacaoServidor)
+                .build();
     }
 
     public ConsensoDto obterConsenso(Long codSubprocesso) {
         Usuario usuario = usuarioFacade.usuarioAutenticado();
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
-        List<AvaliacaoCompetenciaDto> competencias = avaliacaoRepo.buscarAvaliacoesDoServidor(
-                        diagnostico.getCodigo(), usuario.getTituloEleitoral())
-                .stream()
-                .map(a -> new AvaliacaoCompetenciaDto(a.getCompetencia().getCodigo(), a.getImportancia(), a.getDominio()))
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
+        List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
+                diagnostico.getCodigo(), usuario.getTituloEleitoral());
+        List<AvaliacaoCompetenciaDto> competencias = avaliacoes.stream()
+                .map(a -> AvaliacaoCompetenciaDto.builder()
+                        .competenciaCodigo(a.getCompetencia().getCodigo())
+                        .importancia(a.getImportancia())
+                        .dominio(a.getDominio())
+                        .build())
                 .toList();
-        return new ConsensoDto(competencias, obterSituacaoServidor(diagnostico, usuario.getTituloEleitoral()));
+        String situacaoServidor = avaliacoes.stream()
+                .findFirst()
+                .map(a -> a.getSituacaoServidor().name())
+                .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA.name());
+        return ConsensoDto.builder()
+                .competencias(competencias)
+                .situacaoServidor(situacaoServidor)
+                .build();
     }
 
     public DiagnosticoEquipeDto obterEquipe(Long codSubprocesso) {
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
 
         Map<String, SituacaoAvaliacaoServidor> situacoes = new HashMap<>();
@@ -81,27 +103,31 @@ public class DiagnosticoConsultaService {
         }
 
         List<DiagnosticoEquipeDto.Item> itens = situacoes.entrySet().stream()
-                .map(e -> new DiagnosticoEquipeDto.Item(e.getKey(), nomes.get(e.getKey()), e.getValue().name()))
+                .map(e -> DiagnosticoEquipeDto.Item.builder()
+                        .servidorTitulo(e.getKey())
+                        .servidorNome(nomes.get(e.getKey()))
+                        .situacaoServidor(e.getValue().name())
+                        .build())
                 .toList();
 
-        return new DiagnosticoEquipeDto(itens);
+        return DiagnosticoEquipeDto.builder()
+                .servidores(itens)
+                .build();
     }
 
     public DiagnosticoUnidadeDto obterDiagnosticoUnidade(Long codSubprocesso) {
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
         var ocupacoes = ocupacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
-        var movimentacoes = subprocessoConsultaService.listarMovimentacoes(
-                subprocessoConsultaService.buscarSubprocesso(codSubprocesso));
+        var movimentacoes = subprocessoConsultaService.listarMovimentacoes(subprocesso);
 
-        UnidadeResumoDto unidade = new UnidadeResumoDto(
-                subprocesso.getUnidade().getCodigo(),
-                subprocesso.getUnidade().getSigla(),
-                subprocesso.getUnidade().getNome(),
-                subprocesso.getSituacao().name()
-        );
+        UnidadeResumoDto unidade = UnidadeResumoDto.builder()
+                .unidadeCodigo(subprocesso.getUnidade().getCodigo())
+                .unidadeSigla(subprocesso.getUnidade().getSigla())
+                .unidadeNome(subprocesso.getUnidade().getNome())
+                .situacaoSubprocesso(subprocesso.getSituacao().name())
+                .build();
 
         Map<String, List<AvaliacaoServidor>> porServidor = avaliacoes.stream()
                 .collect(java.util.stream.Collectors.groupingBy(
@@ -114,40 +140,39 @@ public class DiagnosticoConsultaService {
                 .map(lista -> {
                     AvaliacaoServidor primeiro = lista.getFirst();
                     List<AvaliacaoCompetenciaDto> consenso = lista.stream()
-                            .map(a -> new AvaliacaoCompetenciaDto(
-                                    a.getCompetencia().getCodigo(),
-                                    a.getImportancia(),
-                                    a.getDominio()
-                            ))
+                            .map(a -> AvaliacaoCompetenciaDto.builder()
+                                    .competenciaCodigo(a.getCompetencia().getCodigo())
+                                    .importancia(a.getImportancia())
+                                    .dominio(a.getDominio())
+                                    .build())
                             .toList();
-                    return new ServidorDiagnosticoDto(
-                            primeiro.getServidor().getTituloEleitoral(),
-                            primeiro.getServidor().getNome(),
-                            primeiro.getSituacaoServidor().name(),
-                            consenso
-                    );
+                    return ServidorDiagnosticoDto.builder()
+                            .servidorTitulo(primeiro.getServidor().getTituloEleitoral())
+                            .servidorNome(primeiro.getServidor().getNome())
+                            .situacaoServidor(primeiro.getSituacaoServidor().name())
+                            .consenso(consenso)
+                            .build();
                 })
                 .toList();
 
         List<OcupacaoCriticaDto> ocupacoesCriticas = ocupacoes.stream()
-                .map(o -> new OcupacaoCriticaDto(
-                        o.getCompetencia().getCodigo(),
-                        o.getServidor().getTituloEleitoral(),
-                        o.getSituacaoCapacitacao().name()
-                ))
+                .map(o -> OcupacaoCriticaDto.builder()
+                        .competenciaCodigo(o.getCompetencia().getCodigo())
+                        .servidorTitulo(o.getServidor().getTituloEleitoral())
+                        .situacaoCapacitacao(o.getSituacaoCapacitacao().name())
+                        .build())
                 .toList();
 
         List<MovimentacaoDto> movimentacoesDto = movimentacoes.stream()
                 .map(MovimentacaoDto::from)
                 .toList();
 
-        return new DiagnosticoUnidadeDto(unidade, servidores, ocupacoesCriticas, movimentacoesDto);
+        return DiagnosticoUnidadeDto.builder()
+                .unidade(unidade)
+                .servidores(servidores)
+                .ocupacoesCriticas(ocupacoesCriticas)
+                .movimentacoes(movimentacoesDto)
+                .build();
     }
 
-    private String obterSituacaoServidor(Diagnostico diagnostico, String servidorTitulo) {
-        return avaliacaoRepo.buscarAvaliacoesDoServidor(diagnostico.getCodigo(), servidorTitulo).stream()
-                .findFirst()
-                .map(a -> a.getSituacaoServidor().name())
-                .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA.name());
-    }
 }

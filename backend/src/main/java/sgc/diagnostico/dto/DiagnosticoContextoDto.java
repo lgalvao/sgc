@@ -1,7 +1,9 @@
 package sgc.diagnostico.dto;
 
+import lombok.Builder;
 import java.util.List;
 
+@Builder
 public record DiagnosticoContextoDto(
         Long processoCodigo,
         Long subprocessoCodigo,

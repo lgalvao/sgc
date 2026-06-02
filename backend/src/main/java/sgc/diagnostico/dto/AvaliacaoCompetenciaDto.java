@@ -3,7 +3,9 @@ package sgc.diagnostico.dto;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 public record AvaliacaoCompetenciaDto(
         @NotNull Long competenciaCodigo,
         @Min(0) @Max(6) Integer importancia,
