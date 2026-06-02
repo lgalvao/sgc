@@ -215,7 +215,6 @@ public class ProcessoService {
                 .toList();
     }
 
-
     public Processo criar(CriarProcessoRequest req) {
         List<Long> codigosUnidades = new ArrayList<>(req.unidades());
         Map<Long, Unidade> unidadesPorCodigo = carregarUnidadesPorCodigo(codigosUnidades);
@@ -346,7 +345,6 @@ public class ProcessoService {
         }
         throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
     }
-
 
     @Transactional(readOnly = true)
     public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, boolean incluirElegiveis) {
@@ -864,7 +862,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_ACEITE_CADASTRO_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("aceitar-mapa")
                         .acao(ACEITAR)
@@ -879,7 +876,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_ACEITE_MAPA_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("homologar-cadastro")
                         .acao(HOMOLOGAR)
@@ -894,7 +890,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_CADASTRO_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("homologar-mapa")
                         .acao(HOMOLOGAR)
@@ -909,7 +904,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_MAPA_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("disponibilizar-mapa")
                         .acao(DISPONIBILIZAR)
@@ -968,6 +962,7 @@ public class ProcessoService {
         return situacao == MAPEAMENTO_MAPA_VALIDADO
                 || situacao == REVISAO_MAPA_VALIDADO;
     }
+
 
     private UnidadeMapa obterUnidadeMapaObrigatorio(Map<Long, UnidadeMapa> mapasPorUnidade, Long codigoUnidade) {
         return mapasPorUnidade.get(codigoUnidade);
@@ -1288,6 +1283,14 @@ public class ProcessoService {
         );
     }
 
+    public boolean checarAcesso(@Nullable Authentication auth, Long cod) {
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario usuario)) return false;
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) return true;
+
+        List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
+        return !consultaService.listarEntidadesPorProcessoEUnidades(cod, unidadesAcesso).isEmpty();
+    }
+
     private void executarDisponibilizacaoMapaEmBloco(
             DisponibilizarMapaEmBlocoCommand command,
             Usuario usuario,
@@ -1345,15 +1348,6 @@ public class ProcessoService {
         return s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
                 s == REVISAO_CADASTRO_DISPONIBILIZADA ||
                 s == REVISAO_CADASTRO_HOMOLOGADA;
-    }
-
-    // Check permission helper
-    public boolean checarAcesso(@Nullable Authentication auth, Long cod) {
-        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario usuario)) return false;
-        if (usuario.getPerfilAtivo() == Perfil.ADMIN) return true;
-
-        List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
-        return !consultaService.listarEntidadesPorProcessoEUnidades(cod, unidadesAcesso).isEmpty();
     }
 
     private void validarSelecaoBloco(List<Long> codigos, List<Subprocesso> list) {
@@ -1475,4 +1469,5 @@ public class ProcessoService {
             boolean processoAtivo
     ) {
     }
+
 }
