@@ -35,14 +35,13 @@ export const usePerfilStore = defineStore("perfil", () => {
     const versaoSessao = ref(0);
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const unidadeAtualDetalhes = ref<Unidade | null>(null);
-    const queryCache = useQueryCache();
     const painelStore = usePainelStore();
     const subprocessoStore = useSubprocessoStore();
 
     function resetarEstadoAplicacao() {
         painelStore.resetar();
         subprocessoStore.resetar();
-        queryCache.invalidateQueries();
+        useQueryCache().invalidateQueries();
     }
 
     const unidadeAtual = computed(() =>

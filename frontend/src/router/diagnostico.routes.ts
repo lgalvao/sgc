@@ -9,17 +9,17 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
             codSubprocesso: Number(route.params.codSubprocesso),
             siglaUnidade: route.params.siglaUnidade as string,
         }),
-        meta: {title: 'Autoavaliação — Diagnóstico'},
+        meta: {title: 'Autoavaliação - Diagnóstico'},
     },
     {
-        path: '/diagnostico/:codSubprocesso/:siglaUnidade/ocupacoes-criticas',
+        path: '/diagnostico/:codSubprocesso/:siglaUnidade/situacao-capacitacao',
         name: 'OcupacoesCriticasDiagnostico',
         component: () => import('@/views/OcupacoesCriticasDiagnosticoView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codSubprocesso: Number(route.params.codSubprocesso),
             siglaUnidade: route.params.siglaUnidade as string,
         }),
-        meta: {title: 'Ocupações Críticas — Diagnóstico'},
+        meta: {title: 'Situação de Capacitação - Diagnóstico'},
     },
     {
         path: '/diagnostico/:codSubprocesso/:siglaUnidade/monitoramento',
@@ -29,7 +29,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
             codSubprocesso: Number(route.params.codSubprocesso),
             siglaUnidade: route.params.siglaUnidade as string,
         }),
-        meta: {title: 'Monitoramento — Diagnóstico'},
+        meta: {title: 'Monitoramento - Diagnóstico'},
     },
     {
         path: '/diagnostico/:codSubprocesso/:siglaUnidade/consenso/:servidorTitulo',
@@ -40,7 +40,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
             siglaUnidade: route.params.siglaUnidade as string,
             servidorTitulo: route.params.servidorTitulo as string,
         }),
-        meta: {title: 'Consenso — Diagnóstico'},
+        meta: {title: 'Avaliação de Consenso - Diagnóstico'},
     },
     {
         path: '/diagnostico/:codSubprocesso/:siglaUnidade/unidade',
@@ -50,7 +50,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
             codSubprocesso: Number(route.params.codSubprocesso),
             siglaUnidade: route.params.siglaUnidade as string,
         }),
-        meta: {title: 'Análise da Unidade — Diagnóstico'},
+        meta: {title: 'Análise da Unidade - Diagnóstico'},
     },
 ];
 

@@ -3,7 +3,6 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
-      <!-- Cabeçalho com dados da unidade -->
       <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <div>
           <h1 class="h4 mb-1">
@@ -11,19 +10,18 @@
             {{ TEXTOS.diagnostico.TITULO_AUTOAVALIACAO }}
           </h1>
           <div v-if="contexto" class="text-muted small">
-            <strong>{{ contexto.unidadeSigla }}</strong> — {{ contexto.unidadeNome }}
+            <strong>{{ contexto.unidadeSigla }}</strong> - {{ contexto.unidadeNome }}
             <BBadge :variant="varianteSituacao" class="ms-2">
               {{ contexto.situacaoDiagnostico }}
             </BBadge>
           </div>
         </div>
-        <BButton variant="outline-secondary" size="sm" @click="voltar">
+        <BButton size="sm" variant="outline-secondary" @click="voltar">
           <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
           {{ TEXTOS.diagnostico.BTN_VOLTAR }}
         </BButton>
       </div>
 
-      <!-- Alerta de erro -->
       <AppAlert
           v-if="erroMensagem"
           :mensagem="erroMensagem"
@@ -31,7 +29,6 @@
           @dismissed="erroMensagem = ''"
       />
 
-      <!-- Alerta de sucesso -->
       <AppAlert
           v-if="alertaSucesso"
           :mensagem="alertaSucesso"
@@ -39,7 +36,6 @@
           @dismissed="alertaSucesso = ''"
       />
 
-      <!-- Badge de autosave -->
       <div class="mb-3 text-muted small d-flex align-items-center gap-2">
         <template v-if="salvandoAutomaticamente">
           <BSpinner small variant="secondary"/>
@@ -51,38 +47,36 @@
         </template>
       </div>
 
-      <!-- Indicador de situação do servidor -->
       <BAlert
           v-if="ehAutoavaliacaoConcluida && !ehChefe"
-          variant="info"
           :model-value="true"
           class="mb-4"
+          variant="info"
       >
         <i aria-hidden="true" class="bi bi-info-circle me-2"/>
-        Sua autoavaliação foi concluída. Aguarde o consenso da chefia.
+        Sua autoavaliação foi concluída. Aguarde a avaliação de consenso da chefia.
       </BAlert>
 
       <BAlert
           v-if="ehConsensoCriado && !ehChefe"
-          variant="warning"
           :model-value="true"
           class="mb-4"
+          variant="warning"
       >
         <i aria-hidden="true" class="bi bi-exclamation-triangle me-2"/>
-        A chefia registrou um consenso. Consulte e aprove ou discorde.
+        A chefia registrou a avaliação de consenso. Revise e aprove para finalizar.
       </BAlert>
 
       <BAlert
           v-if="ehConsensoAprovado"
-          variant="success"
           :model-value="true"
           class="mb-4"
+          variant="success"
       >
         <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        Consenso aprovado. Avaliação finalizada.
+        Avaliação de consenso aprovada. Fluxo finalizado.
       </BAlert>
 
-      <!-- Tabela de competências -->
       <BCard class="mb-4">
         <BCardHeader>
           <strong>{{ TEXTOS.diagnostico.TITULO_AUTOAVALIACAO }}</strong>
@@ -91,10 +85,10 @@
         <BTable
             :fields="colunas"
             :items="competenciasComDescricao"
+            hover
             responsive
             small
             striped
-            hover
         >
           <template #cell(importancia)="{ item }">
             <BFormSelect
@@ -124,7 +118,6 @@
         </BTable>
       </BCard>
 
-      <!-- Ações do servidor -->
       <div v-if="!ehChefe && podeEditar" class="d-flex gap-2 mb-4">
         <BButton
             :disabled="concluindo"
@@ -137,7 +130,6 @@
         </BButton>
       </div>
 
-      <!-- Ações do servidor para aprovar consenso -->
       <div v-if="ehConsensoCriado && !ehChefe" class="d-flex gap-2 mb-4">
         <BButton
             :disabled="aprovando"
@@ -150,11 +142,10 @@
         </BButton>
       </div>
 
-      <!-- Acompanhamento da equipe (para chefia) -->
       <BCard v-if="ehChefe" class="mb-4">
         <BCardHeader>
           <strong>Equipe</strong>
-          <BBadge v-if="pendentes > 0" variant="warning" class="ms-2">
+          <BBadge v-if="pendentes > 0" class="ms-2" variant="warning">
             {{ pendentes }} pendente(s)
           </BBadge>
         </BCardHeader>
@@ -186,9 +177,9 @@
                   :data-testid="`btn-impossibilitar-${membro.servidorTitulo}`"
                   size="sm"
                   variant="outline-danger"
-                  @click="abrirModalImpossibilitar(membro.servidorTitulo)"
+                  @click="abrirModalImpossibilitar(membro)"
               >
-                Impossibilitar
+                {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
               </BButton>
             </div>
           </BListGroupItem>
@@ -196,7 +187,6 @@
       </BCard>
     </template>
 
-    <!-- Modal: Concluir autoavaliação -->
     <ModalConfirmacao
         v-model="modalConcluirAberto"
         :loading="concluindo"
@@ -207,7 +197,6 @@
         @confirmar="confirmarConcluir"
     />
 
-    <!-- Modal: Aprovar consenso -->
     <ModalConfirmacao
         v-model="modalAprovarAberto"
         :loading="aprovando"
@@ -219,14 +208,15 @@
         @confirmar="confirmarAprovar"
     />
 
-    <!-- Modal: Impossibilitar avaliação -->
     <BModal
         v-model="modalImpossibilitarAberto"
         :title="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_TITULO"
         centered
         @hide="fecharModalImpossibilitar"
     >
-      <p>{{ TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM }}</p>
+      <p v-if="servidorParaImpossibilitar" class="mb-3">
+        {{ TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorParaImpossibilitar.servidorNome) }}
+      </p>
       <BFormTextarea
           v-model="justificativaImpossibilidade"
           :placeholder="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_PLACEHOLDER"
@@ -237,7 +227,7 @@
         {{ erroJustificativa }}
       </BFormText>
       <template #footer>
-        <BButton variant="link" class="text-secondary" @click="fecharModalImpossibilitar">Cancelar</BButton>
+        <BButton class="text-secondary" variant="link" @click="fecharModalImpossibilitar">Cancelar</BButton>
         <BButton
             :disabled="impossibilitando"
             data-testid="btn-confirmar-impossibilitar"
@@ -245,7 +235,7 @@
             @click="confirmarImpossibilitar"
         >
           <BSpinner v-if="impossibilitando" aria-hidden="true" class="me-1" small/>
-          Impossibilitar
+          {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
         </BButton>
       </template>
     </BModal>
@@ -255,6 +245,7 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
+import {useQueryCache} from '@pinia/colada';
 import {
   BAlert,
   BBadge,
@@ -274,14 +265,15 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
-import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
+import {CHAVE_DIAGNOSTICO, useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {useEquipeDiagnostico} from '@/composables/useEquipeDiagnostico';
+import {impossibilitarAvaliacao} from '@/services/diagnosticoService';
 import {usePerfilStore} from '@/stores/perfil';
-import {Perfil} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
-import type {SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
+import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
+import {Perfil} from '@/types/tipos';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -290,8 +282,8 @@ const props = defineProps<{
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
+const cache = useQueryCache();
 
-// ── Composables ──────────────────────────────────────────────────────────────
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 
 const {
@@ -309,22 +301,18 @@ const {
 const {
   aprovando,
   erroAprovar,
-  erroImpossibilitar,
-  impossibilitando,
   aprovarConsenso,
-  impossibilitarAvaliacao,
 } = useConsensoDiagnostico(props.codSubprocesso);
 
 const {itens: itensEquipe, pendentes} = useEquipeDiagnostico(props.codSubprocesso);
 
-// ── Perfil ───────────────────────────────────────────────────────────────────
-const ehChefe = computed(() =>
-  perfilStore.perfilSelecionado === Perfil.CHEFE ||
-  perfilStore.perfilSelecionado === Perfil.GESTOR ||
-  perfilStore.perfilSelecionado === Perfil.ADMIN,
+const ehChefe = computed(
+  () =>
+    perfilStore.perfilSelecionado === Perfil.CHEFE ||
+    perfilStore.perfilSelecionado === Perfil.GESTOR ||
+    perfilStore.perfilSelecionado === Perfil.ADMIN,
 );
 
-// ── Estado das situações ─────────────────────────────────────────────────────
 const ehAutoavaliacaoConcluida = computed(() => situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA');
 const ehConsensoCriado = computed(() => situacaoServidor.value === 'CONSENSO_CRIADO');
 const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
@@ -334,17 +322,16 @@ const podeEditar = computed(
     situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA',
 );
 
-// ── Alertas ──────────────────────────────────────────────────────────────────
 const erroMensagem = ref('');
 const alertaSucesso = ref('');
 
-// ── Modais ───────────────────────────────────────────────────────────────────
 const modalConcluirAberto = ref(false);
 const modalAprovarAberto = ref(false);
 const modalImpossibilitarAberto = ref(false);
-const servidorParaImpossibilitar = ref('');
+const servidorParaImpossibilitar = ref<ItemEquipeDiagnostico | null>(null);
 const justificativaImpossibilidade = ref('');
 const erroJustificativa = ref('');
+const impossibilitando = ref(false);
 
 function abrirModalConcluir() {
   modalConcluirAberto.value = true;
@@ -354,8 +341,8 @@ function abrirModalAprovar() {
   modalAprovarAberto.value = true;
 }
 
-function abrirModalImpossibilitar(titulo: string) {
-  servidorParaImpossibilitar.value = titulo;
+function abrirModalImpossibilitar(servidor: ItemEquipeDiagnostico) {
+  servidorParaImpossibilitar.value = servidor;
   justificativaImpossibilidade.value = '';
   erroJustificativa.value = '';
   modalImpossibilitarAberto.value = true;
@@ -388,16 +375,26 @@ async function confirmarImpossibilitar() {
     erroJustificativa.value = TEXTOS.diagnostico.ERRO_JUSTIFICATIVA_OBRIGATORIA;
     return;
   }
+  if (!servidorParaImpossibilitar.value) return;
+
   try {
-    await impossibilitarAvaliacao(servidorParaImpossibilitar.value, justificativaImpossibilidade.value);
+    impossibilitando.value = true;
+    await impossibilitarAvaliacao(
+      props.codSubprocesso,
+      servidorParaImpossibilitar.value.servidorTitulo,
+      {justificativa: justificativaImpossibilidade.value},
+    );
     fecharModalImpossibilitar();
     alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
+    void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'equipe', props.codSubprocesso]});
+    void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', props.codSubprocesso]});
   } catch {
-    erroMensagem.value = erroImpossibilitar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+  } finally {
+    impossibilitando.value = false;
   }
 }
 
-// ── Navegação ────────────────────────────────────────────────────────────────
 function navegarParaConsenso(servidorTitulo: string) {
   void router.push({
     name: 'ConsensoDiagnostico',
@@ -421,7 +418,6 @@ function podeImpossibilitar(situacao: SituacaoAvaliacaoServidor) {
   );
 }
 
-// ── Formatação ───────────────────────────────────────────────────────────────
 const varianteSituacao = computed(() => {
   switch (contexto.value?.situacaoSubprocesso) {
     case 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO':
@@ -465,26 +461,23 @@ function formatarNota(valor: number | null): string {
   return String(valor);
 }
 
-// ── Colunas da tabela ────────────────────────────────────────────────────────
 const colunas = [
-  {key: 'competenciaCodigo', label: 'Código'},
+  {key: 'competenciaCodigo', label: 'Codigo'},
   {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
   {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
   {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
 ];
 
-// Adiciona descricao a partir do contexto
 const competenciasComDescricao = computed(() => {
   const mapa = Object.fromEntries(
     (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
   );
   return competenciasLocais.value.map((c) => ({
     ...c,
-    descricao: mapa[c.competenciaCodigo] ?? `Competência ${c.competenciaCodigo}`,
+    descricao: mapa[c.competenciaCodigo] ?? `Competencia ${c.competenciaCodigo}`,
   }));
 });
 
-// Opções de nota para os selects (NA + 1-6). `0` representa "Não se aplica".
 const opcoesNota = [
   {value: 0, text: 'NA'},
   {value: 1, text: '1'},

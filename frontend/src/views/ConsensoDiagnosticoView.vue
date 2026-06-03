@@ -30,12 +30,18 @@
           variante="danger"
           @dismissed="erroMensagem = ''"
       />
-      <AppAlert
-          v-if="alertaSucesso"
-          :mensagem="alertaSucesso"
-          variante="success"
-          @dismissed="alertaSucesso = ''"
-      />
+
+      <!-- Badge de autosave -->
+      <div class="mb-3 text-muted small d-flex align-items-center gap-2">
+        <template v-if="salvandoAutomaticamente">
+          <BSpinner small variant="secondary"/>
+          {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
+        </template>
+        <template v-else-if="autoguardado">
+          <i aria-hidden="true" class="bi bi-check-circle text-success"/>
+          {{ TEXTOS.diagnostico.LABEL_AUTOGUARDADO }}
+        </template>
+      </div>
 
       <!-- Aviso de consenso já aprovado -->
       <BAlert
@@ -45,10 +51,10 @@
           variant="success"
       >
         <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        O consenso deste servidor já foi aprovado. Apenas visualização.
+        A avaliação de consenso deste servidor já foi aprovada. Apenas visualização.
       </BAlert>
 
-      <!-- Tabela de competências com consenso -->
+      <!-- Tabela de competências com consenso (CDU-44) -->
       <BCard class="mb-4">
         <BCardHeader>
           <strong>{{ TEXTOS.diagnostico.TITULO_CONSENSO }}</strong>
@@ -62,12 +68,14 @@
             small
             striped
         >
+          <!-- Colunas do servidor — somente leitura -->
           <template #cell(autoimportancia)="{ item }">
             <span>{{ formatarNota(item.autoimportancia) }}</span>
           </template>
           <template #cell(autodominio)="{ item }">
             <span>{{ formatarNota(item.autodominio) }}</span>
           </template>
+          <!-- Colunas da chefia — editáveis quando não aprovado -->
           <template #cell(chefiaImportancia)="{ item }">
             <BFormSelect
                 v-if="ehChefe && !ehConsensoAprovado"
@@ -90,6 +98,7 @@
             />
             <span v-else>{{ formatarNota(item.chefiaDominio) }}</span>
           </template>
+          <!-- Colunas de consenso — editáveis quando não aprovado -->
           <template #cell(consensoImportancia)="{ item }">
             <BFormSelect
                 v-if="ehChefe && !ehConsensoAprovado"
@@ -115,33 +124,16 @@
         </BTable>
       </BCard>
 
-      <!-- Campo de motivo de reabertura (quando chefia reabre consenso já aprovado) -->
-      <BCard v-if="ehChefe && precisaMotivo" class="mb-4">
-        <BCardHeader>
-          <strong>{{ TEXTOS.diagnostico.MODAL_MOTIVO_REABERTURA_TITULO }}</strong>
-        </BCardHeader>
-        <BCardBody>
-          <BFormTextarea
-              v-model="motivoReabertura"
-              :placeholder="TEXTOS.diagnostico.MODAL_MOTIVO_REABERTURA_PLACEHOLDER"
-              data-testid="textarea-motivo-reabertura"
-              rows="3"
-          />
-        </BCardBody>
-      </BCard>
-
-      <!-- Ações -->
-      <div class="d-flex gap-2 flex-wrap">
-        <!-- Chefia: salvar consenso -->
+      <!-- Ação: Aprovar consenso (servidor logado, CDU-45) -->
+      <div v-if="!ehChefe && !ehConsensoAprovado" class="d-flex gap-2 flex-wrap">
         <BButton
-            v-if="ehChefe && !ehConsensoAprovado"
-            :disabled="salvando"
-            data-testid="btn-salvar-consenso"
+            :disabled="aprovando"
+            data-testid="btn-aprovar-consenso"
             variant="primary"
-            @click="confirmarSalvarConsenso"
+            @click="confirmarAprovarConsenso"
         >
-          <BSpinner v-if="salvando" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_SALVAR_CONSENSO }}
+          <BSpinner v-if="aprovando" aria-hidden="true" class="me-1" small/>
+          {{ TEXTOS.diagnostico.BTN_APROVAR_CONSENSO }}
         </BButton>
       </div>
     </template>
@@ -156,10 +148,8 @@ import {
   BBadge,
   BButton,
   BCard,
-  BCardBody,
   BCardHeader,
   BFormSelect,
-  BFormTextarea,
   BSpinner,
   BTable,
 } from 'bootstrap-vue-next';
@@ -186,16 +176,18 @@ const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {
   competenciasLocais,
   competenciasDetalhadasLocais,
-  motivoReabertura,
   situacaoServidor,
+  ehConsensoAprovado,
   carregando,
-  salvando,
-  erroSalvar,
+  salvandoAutomaticamente,
+  autoguardado,
+  aprovando,
+  erroAprovar,
   atualizarNotaDetalhada,
-  salvarConsenso,
+  aprovarConsenso,
 } = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
 
-// ── Perfil ───────────────────────────────────────────────────────────────────
+// « Perfil »
 const ehChefe = computed(
   () =>
     perfilStore.perfilSelecionado === Perfil.CHEFE ||
@@ -203,24 +195,19 @@ const ehChefe = computed(
     perfilStore.perfilSelecionado === Perfil.ADMIN,
 );
 
-const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
-const precisaMotivo = computed(() => ehConsensoAprovado.value && ehChefe.value);
-
-// ── Alertas ───────────────────────────────────────────────────────────────────
+// « Alertas »
 const erroMensagem = ref('');
-const alertaSucesso = ref('');
 
-async function confirmarSalvarConsenso() {
+async function confirmarAprovarConsenso() {
   try {
-    await salvarConsenso(props.servidorTitulo, motivoReabertura.value || undefined);
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_CONSENSO_SALVO;
+    await aprovarConsenso();
     void router.back();
   } catch {
-    erroMensagem.value = erroSalvar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    erroMensagem.value = erroAprovar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
   }
 }
 
-// ── Formatação ────────────────────────────────────────────────────────────────
+// « Formatação »
 const varianteSituacao = computed(() => {
   switch (situacaoServidor.value) {
     case 'CONSENSO_APROVADO':

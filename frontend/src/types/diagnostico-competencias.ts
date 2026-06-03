@@ -128,7 +128,6 @@ export interface AutoavaliacaoRequest {
 export interface ConsensoRequest {
     competencias: AvaliacaoCompetencia[];
     competenciasDetalhadas?: ConsensoCompetenciaDetalhada[];
-    motivoReabertura?: string;
 }
 
 export interface OcupacaoCriticaRequest {

@@ -7,11 +7,11 @@
       <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <div>
           <h1 class="h4 mb-1">
-            <i aria-hidden="true" class="bi bi-people text-primary me-2"/>
-            {{ TEXTOS.diagnostico.TITULO_OCUPACOES_CRITICAS }}
+            <i aria-hidden="true" class="bi bi-award text-primary me-2"/>
+            {{ TEXTOS.diagnostico.TITULO_SITUACAO_CAPACITACAO }}
           </h1>
           <div v-if="unidade" class="text-muted small">
-            <strong>{{ unidade.unidadeSigla }}</strong> — {{ unidade.unidadeNome }}
+            <strong>{{ unidade.unidadeSigla }}</strong> - {{ unidade.unidadeNome }}
             <BBadge :variant="varianteSituacao" class="ms-2">{{ unidade.situacaoSubprocesso }}</BBadge>
           </div>
         </div>
@@ -55,20 +55,20 @@
           class="mb-3"
       >
         <i aria-hidden="true" class="bi bi-exclamation-triangle me-2"/>
-        Existem <strong>{{ pendentes }}</strong> ocupações críticas sem situação definida.
+        Existem <strong>{{ pendentes }}</strong> situações de capacitação sem valor definido.
       </BAlert>
 
-      <!-- Tabela de ocupações críticas -->
+      <!-- Tabela de situação de capacitação -->
       <BCard class="mb-4">
         <BCardHeader>
-          <strong>{{ TEXTOS.diagnostico.TITULO_OCUPACOES_CRITICAS }}</strong>
+          <strong>{{ TEXTOS.diagnostico.TITULO_SITUACAO_CAPACITACAO }}</strong>
         </BCardHeader>
 
         <EmptyState
             v-if="ocupacoesLocais.length === 0"
-            :description="TEXTOS.diagnostico.VAZIO_OCUPACOES_TEXTO"
-            :title="TEXTOS.diagnostico.VAZIO_OCUPACOES_TITULO"
-            icon="bi-people"
+            :description="TEXTOS.diagnostico.VAZIO_CAPACITACAO_TEXTO"
+            :title="TEXTOS.diagnostico.VAZIO_CAPACITACAO_TITULO"
+            icon="bi-award"
         />
 
         <BTable
@@ -163,11 +163,11 @@ const {
 
 const {concluindo, erroConcluir, concluirDiagnostico} = useFluxoDiagnostico(props.codSubprocesso);
 
-// ── Alertas ──────────────────────────────────────────────────────────────────
+// « Alertas »
 const erroMensagem = ref('');
 const alertaSucesso = ref('');
 
-// ── Modal ────────────────────────────────────────────────────────────────────
+// « Modal »
 const modalConcluirAberto = ref(false);
 
 function abrirModalConcluir() {
@@ -184,7 +184,7 @@ async function confirmarConcluir() {
   }
 }
 
-// ── Formatação ────────────────────────────────────────────────────────────────
+// « Formatação »
 const varianteSituacao = computed(() => {
   switch (unidade.value?.situacaoSubprocesso) {
     case 'DIAGNOSTICO_CONCLUIDO':
@@ -207,9 +207,9 @@ const ocupacoesComDescricao = computed(() => {
   }));
 });
 
-// ── Opções de capacitação ─────────────────────────────────────────────────────
+// « Opções de capacitação »
 const opcoesCapacitacao = [
-  {value: null, text: '—'},
+  {value: null, text: '-'},
   {value: 'NA', text: TEXTOS.diagnostico.CAPACITACAO_NA},
   {value: 'AC', text: TEXTOS.diagnostico.CAPACITACAO_AC},
   {value: 'EC', text: TEXTOS.diagnostico.CAPACITACAO_EC},

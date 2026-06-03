@@ -3,7 +3,6 @@ import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {
     aprovarConsenso,
-    impossibilitarAvaliacao,
     obterConsenso,
     obterConsensoServidor,
     salvarConsenso,
@@ -25,10 +24,10 @@ function chaveAutoavaliacao(codSubprocesso: number) {
 
 /**
  * Composable de consenso de diagnóstico.
- * - Query do consenso do servidor logado.
- * - Mutation de salvar consenso (para chefia, passando servidorTitulo).
+ * - Query do consenso do servidor logado (ou de um servidor específico passado pela chefia).
+ * - Autosave: qualquer edição dispara salvamento após debounce de 800ms.
+ *   O autosave só ocorre quando o consenso NÃO está aprovado (CDU-44).
  * - Mutation de aprovar consenso (para o servidor logado).
- * - Mutation de impossibilitar avaliação (para chefia).
  */
 export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: string) {
     const perfilStore = usePerfilStore();
@@ -46,7 +45,11 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     // Estado local editável pela chefia
     const competenciasLocais = ref<AvaliacaoCompetencia[]>([]);
     const competenciasDetalhadasLocais = ref<ConsensoCompetenciaDetalhada[]>([]);
-    const motivoReabertura = ref('');
+
+    // Estado de autosave
+    const salvandoAutomaticamente = ref(false);
+    const autoguardado = ref(false);
+    let _timer: ReturnType<typeof setTimeout> | null = null;
 
     watch(
         () => query.data.value,
@@ -59,9 +62,12 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         {immediate: true},
     );
 
+    const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_REALIZADA');
+    const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
+
     const mutacaoSalvar = useMutation({
-        mutation: ({servidorTitulo, motivo}: {servidorTitulo: string; motivo?: string}) =>
-            salvarConsenso(codSubprocesso, servidorTitulo, {
+        mutation: (titulo: string) =>
+            salvarConsenso(codSubprocesso, titulo, {
                 competencias: competenciasDetalhadasLocais.value.length > 0
                     ? competenciasDetalhadasLocais.value.map((item) => ({
                         competenciaCodigo: item.competenciaCodigo,
@@ -72,11 +78,11 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
                 competenciasDetalhadas: competenciasDetalhadasLocais.value.length > 0
                     ? competenciasDetalhadasLocais.value
                     : undefined,
-                motivoReabertura: motivo || undefined,
             }),
         onSuccess: () => {
             void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, servidorTitulo)});
             void cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
+            autoguardado.value = true;
         },
     });
 
@@ -89,17 +95,27 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         },
     });
 
-    const mutacaoImpossibilitar = useMutation({
-        mutation: ({servidorTitulo, justificativa}: {servidorTitulo: string; justificativa: string}) =>
-            impossibilitarAvaliacao(codSubprocesso, servidorTitulo, {justificativa}),
-        onSuccess: () => {
-            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
-        },
-    });
+    /** Dispara autosave com debounce. Só salva se não estiver aprovado. */
+    function agendarAutosave() {
+        if (ehConsensoAprovado.value || !servidorTitulo) return;
+        autoguardado.value = false;
+        if (_timer) clearTimeout(_timer);
+        _timer = setTimeout(async () => {
+            salvandoAutomaticamente.value = true;
+            try {
+                await mutacaoSalvar.mutateAsync(servidorTitulo);
+            } finally {
+                salvandoAutomaticamente.value = false;
+            }
+        }, 800);
+    }
 
     function atualizarNota(competenciaCodigo: number, campo: 'importancia' | 'dominio', valor: number | null) {
         const item = competenciasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
-        if (item) item[campo] = valor;
+        if (item) {
+            item[campo] = valor;
+            agendarAutosave();
+        }
     }
 
     function atualizarNotaDetalhada(
@@ -117,6 +133,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             if (atualizacao.campo === 'importancia') item.chefiaImportancia = atualizacao.valor;
             if (atualizacao.campo === 'dominio') item.chefiaDominio = atualizacao.valor;
 
+            // Autopreenchimento do consenso quando chefia coincide com servidor (CDU-44)
             const chefiaImportancia = atualizacao.campo === 'importancia' ? atualizacao.valor : item.chefiaImportancia;
             const chefiaDominio = atualizacao.campo === 'dominio' ? atualizacao.valor : item.chefiaDominio;
             if (item.autoimportancia === chefiaImportancia && item.autodominio === chefiaDominio) {
@@ -128,38 +145,32 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             if (atualizacao.campo === 'dominio') item.consensoDominio = atualizacao.valor;
         }
 
+        // Sincroniza lista simples com o consenso final
         const simples = competenciasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
         if (simples) {
             simples.importancia = item.consensoImportancia;
             simples.dominio = item.consensoDominio;
         }
+
+        agendarAutosave();
     }
 
-    const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_REALIZADA');
     const carregando = computed(() => query.status.value === 'pending');
-    const salvando = computed(() => mutacaoSalvar.isLoading.value);
     const aprovando = computed(() => mutacaoAprovar.isLoading.value);
-    const impossibilitando = computed(() => mutacaoImpossibilitar.isLoading.value);
 
     return {
         query,
         competenciasLocais,
         competenciasDetalhadasLocais,
-        motivoReabertura,
         situacaoServidor,
+        ehConsensoAprovado,
         carregando,
-        salvando,
+        salvandoAutomaticamente,
+        autoguardado,
         aprovando,
-        impossibilitando,
-        erroSalvar: computed(() => mutacaoSalvar.error.value),
         erroAprovar: computed(() => mutacaoAprovar.error.value),
-        erroImpossibilitar: computed(() => mutacaoImpossibilitar.error.value),
         atualizarNota,
         atualizarNotaDetalhada,
-        salvarConsenso: (servidorTitulo: string, motivo?: string) =>
-            mutacaoSalvar.mutateAsync({servidorTitulo, motivo}),
         aprovarConsenso: () => mutacaoAprovar.mutateAsync(),
-        impossibilitarAvaliacao: (servidorTitulo: string, justificativa: string) =>
-            mutacaoImpossibilitar.mutateAsync({servidorTitulo, justificativa}),
     };
 }

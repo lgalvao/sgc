@@ -82,6 +82,8 @@ export function useInvalidacaoNavegacao() {
         void invalidarProcesso();
         invalidarMapa();
         void invalidarUnidade();
+        void invalidarDadosTelaUnidade();
+        void invalidarArvoreElegibilidade();
         void invalidarDiagnostico();
     }
 

@@ -998,7 +998,7 @@ describe('ProcessoCadastroView.vue', () => {
             await vm.confirmarIniciarProcesso();
  
             expect(vm.mostrarModalConfirmacao).toBe(false);
-            expect(vm.notificacao?.mensagem).toBe(TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
+            expect(vm.notificacao?.mensagem).toBe(TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
         });
 
         it('cobre confirmarRemocao limpando campos', async () => {

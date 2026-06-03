@@ -6,7 +6,6 @@ import org.jspecify.annotations.Nullable;
 
 public record ConsensoRequest(
         @NotEmpty List<AvaliacaoCompetenciaDto> competencias,
-        @Nullable List<ConsensoCompetenciaDto> competenciasDetalhadas,
-        String motivoReabertura
+        @Nullable List<ConsensoCompetenciaDto> competenciasDetalhadas
 ) {
 }

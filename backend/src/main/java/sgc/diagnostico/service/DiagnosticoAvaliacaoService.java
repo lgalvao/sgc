@@ -85,10 +85,6 @@ public class DiagnosticoAvaliacaoService {
                         a -> a.getCompetencia().getCodigo(), a -> a));
 
         for (AvaliacaoServidor avaliacao : avaliacoes) {
-            if (avaliacao.getSituacaoServidor() == SituacaoAvaliacaoServidor.CONSENSO_APROVADO &&
-                    (request.motivoReabertura() == null || request.motivoReabertura().isBlank())) {
-                throw new ErroValidacao("Motivo da reabertura é obrigatório.");
-            }
             avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
         }
 

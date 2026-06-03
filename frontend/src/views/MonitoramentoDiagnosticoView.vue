@@ -11,7 +11,7 @@
             {{ TEXTOS.diagnostico.TITULO_MONITORAMENTO }}
           </h1>
           <div v-if="unidade" class="text-muted small">
-            <strong>{{ unidade.unidadeSigla }}</strong> — {{ unidade.unidadeNome }}
+            <strong>{{ unidade.unidadeSigla }}</strong> - {{ unidade.unidadeNome }}
             <BBadge :variant="varianteSituacao" class="ms-2">{{ situacao }}</BBadge>
           </div>
         </div>
@@ -54,7 +54,7 @@
         <BCol md="4">
           <BCard class="text-center h-100">
             <div class="display-6 fw-bold text-info">{{ ocupacoesCriticas.length }}</div>
-            <div class="text-muted small mt-1">Ocupações Críticas</div>
+            <div class="text-muted small mt-1">Situação de Capacitação</div>
           </BCard>
         </BCol>
       </BRow>
@@ -84,7 +84,58 @@
               {{ formatarSituacaoServidor(item.situacaoServidor) }}
             </BBadge>
           </template>
+          <template #cell(acoes)="{ item }">
+            <div class="d-flex gap-1 flex-nowrap">
+              <!-- Manter avaliação de consenso — sempre habilitado (CDU-43) -->
+              <BButton
+                  v-if="ehChefe"
+                  :data-testid="`btn-manter-consenso-${item.servidorTitulo}`"
+                  size="sm"
+                  variant="outline-primary"
+                  @click="navegarParaConsenso(item.servidorTitulo)"
+              >
+                <i aria-hidden="true" class="bi bi-pencil-square me-1"/>
+                {{ TEXTOS.diagnostico.BTN_MANTER_CONSENSO }}
+              </BButton>
+              <!-- Indicar impossibilidade — desabilitado se já impossibilitado (CDU-46) -->
+              <BButton
+                  v-if="ehChefe"
+                  :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
+                  :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
+                  size="sm"
+                  variant="outline-danger"
+                  @click="abrirModalImpossibilitar(item)"
+              >
+                <i aria-hidden="true" class="bi bi-x-circle me-1"/>
+                {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
+              </BButton>
+            </div>
+          </template>
         </BTable>
+      </BCard>
+
+      <!-- Movimentações -->
+      <BCard v-if="movimentacoes.length > 0" class="mb-4">
+        <BCardHeader>
+          <strong>Movimentações</strong>
+        </BCardHeader>
+        <BListGroup flush>
+          <BListGroupItem
+              v-for="(mov, indice) in movimentacoes"
+              :key="`${mov.dataHora}-${mov.descricao}-${indice}`"
+              class="py-2"
+          >
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-semibold small">{{ mov.descricao }}</div>
+                <div class="text-muted" style="font-size: 0.78rem">
+                  {{ mov.unidadeOrigem }} → {{ mov.unidadeDestino }}
+                </div>
+              </div>
+              <span class="text-muted" style="font-size: 0.78rem; white-space: nowrap">{{ mov.dataHora }}</span>
+            </div>
+          </BListGroupItem>
+        </BListGroup>
       </BCard>
 
       <!-- Ações de fluxo do gestor/admin -->
@@ -99,7 +150,6 @@
           <BSpinner v-if="validando" aria-hidden="true" class="me-1" small/>
           {{ TEXTOS.diagnostico.BTN_VALIDAR }}
         </BButton>
-
         <BButton
             v-if="podeDevolver"
             :disabled="devolvendo"
@@ -110,7 +160,6 @@
           <BSpinner v-if="devolvendo" aria-hidden="true" class="me-1" small/>
           {{ TEXTOS.diagnostico.BTN_DEVOLVER }}
         </BButton>
-
         <BButton
             v-if="podeHomologar"
             :disabled="homologando"
@@ -121,36 +170,40 @@
           <BSpinner v-if="homologando" aria-hidden="true" class="me-1" small/>
           {{ TEXTOS.diagnostico.BTN_HOMOLOGAR }}
         </BButton>
-
-        <BButton
-            data-testid="btn-ver-detalhes-unidade"
-            variant="outline-info"
-            @click="navegarParaDetalhes"
-        >
-          {{ TEXTOS.diagnostico.BTN_VER_DETALHES }}
-        </BButton>
       </div>
-
-      <!-- Histórico de movimentações -->
-      <BCard v-if="movimentacoes.length > 0" class="mb-4">
-        <BCardHeader><strong>Histórico</strong></BCardHeader>
-        <BListGroup flush>
-          <BListGroupItem
-              v-for="(mov, idx) in movimentacoes"
-              :key="idx"
-              class="small"
-          >
-            <div class="d-flex justify-content-between">
-              <span><strong>{{ mov.descricao }}</strong></span>
-              <span class="text-muted">{{ mov.dataHora }}</span>
-            </div>
-            <div class="text-muted">
-              {{ mov.unidadeOrigem }} → {{ mov.unidadeDestino }}
-            </div>
-          </BListGroupItem>
-        </BListGroup>
-      </BCard>
     </template>
+
+    <!-- Modal: Indicar impossibilidade (CDU-46) -->
+    <BModal
+        v-model="modalImpossibilitarAberto"
+        :title="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_TITULO"
+        centered
+    >
+      <p v-if="servidorSelecionado" class="mb-3">
+        {{ TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorSelecionado.servidorNome) }}
+      </p>
+      <BFormTextarea
+          v-model="justificativaImpossibilidade"
+          :placeholder="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_PLACEHOLDER"
+          data-testid="textarea-justificativa-impossibilidade"
+          rows="3"
+      />
+      <BFormText v-if="erroJustificativaImpossibilidade" class="text-danger">
+        {{ erroJustificativaImpossibilidade }}
+      </BFormText>
+      <template #footer>
+        <BButton class="text-secondary" variant="link" @click="modalImpossibilitarAberto = false">Cancelar</BButton>
+        <BButton
+            :disabled="impossibilitando"
+            data-testid="btn-confirmar-impossibilitar"
+            variant="danger"
+            @click="confirmarImpossibilitar"
+        >
+          <BSpinner v-if="impossibilitando" aria-hidden="true" class="me-1" small/>
+          Indicar impossibilidade
+        </BButton>
+      </template>
+    </BModal>
 
     <!-- Modal: Validar -->
     <BModal
@@ -235,6 +288,9 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
+import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
+import {useQueryCache} from '@pinia/colada';
+import {impossibilitarAvaliacao} from '@/services/diagnosticoService';
 import {
   BBadge,
   BButton,
@@ -259,7 +315,7 @@ import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {usePerfilStore} from '@/stores/perfil';
 import {Perfil} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
-import type {SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
+import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -268,6 +324,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
+const cache = useQueryCache();
 
 const {
   unidade,
@@ -291,18 +348,30 @@ const {
   homologarDiagnostico,
 } = useFluxoDiagnostico(props.codSubprocesso);
 
-// ── Estado local ──────────────────────────────────────────────────────────────
+// « Estado local »
 const erroMensagem = ref('');
 const alertaSucesso = ref('');
 const modalValidarAberto = ref(false);
 const modalDevolverAberto = ref(false);
 const modalHomologarAberto = ref(false);
+const modalImpossibilitarAberto = ref(false);
 const observacoesValidar = ref('');
 const justificativaDevolver = ref('');
 const erroJustificativaDevolver = ref('');
 const observacoesHomologar = ref('');
+const servidorSelecionado = ref<ServidorDiagnostico | null>(null);
+const justificativaImpossibilidade = ref('');
+const erroJustificativaImpossibilidade = ref('');
+const impossibilitando = ref(false);
 
-// ── Perfil e permissões ───────────────────────────────────────────────────────
+// « Perfil e permissões »
+const ehChefe = computed(
+  () =>
+    perfilStore.perfilSelecionado === Perfil.CHEFE ||
+    perfilStore.perfilSelecionado === Perfil.GESTOR ||
+    perfilStore.perfilSelecionado === Perfil.ADMIN,
+);
+
 const ehGestor = computed(
   () =>
     perfilStore.perfilSelecionado === Perfil.GESTOR ||
@@ -321,7 +390,50 @@ const podeHomologar = computed(
 
 const totalServidores = computed(() => servidores.value.length);
 
-// ── Modais ────────────────────────────────────────────────────────────────────
+// « Navegação »
+function navegarParaConsenso(servidorTitulo: string) {
+  void router.push({
+    name: 'ConsensoDiagnostico',
+    params: {
+      codSubprocesso: props.codSubprocesso,
+      siglaUnidade: props.siglaUnidade,
+      servidorTitulo,
+    },
+  });
+}
+
+// « Modal impossibilidade »
+function abrirModalImpossibilitar(servidor: ServidorDiagnostico) {
+  servidorSelecionado.value = servidor;
+  justificativaImpossibilidade.value = '';
+  erroJustificativaImpossibilidade.value = '';
+  modalImpossibilitarAberto.value = true;
+}
+
+async function confirmarImpossibilitar() {
+  if (!justificativaImpossibilidade.value.trim()) {
+    erroJustificativaImpossibilidade.value = TEXTOS.diagnostico.ERRO_JUSTIFICATIVA_OBRIGATORIA;
+    return;
+  }
+  if (!servidorSelecionado.value) return;
+  try {
+    impossibilitando.value = true;
+    await impossibilitarAvaliacao(
+      props.codSubprocesso,
+      servidorSelecionado.value.servidorTitulo,
+      {justificativa: justificativaImpossibilidade.value},
+    );
+    modalImpossibilitarAberto.value = false;
+    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
+    void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', props.codSubprocesso]});
+  } catch {
+    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+  } finally {
+    impossibilitando.value = false;
+  }
+}
+
+// « Modais de fluxo »
 function abrirModalValidar() {
   observacoesValidar.value = '';
   modalValidarAberto.value = true;
@@ -372,17 +484,7 @@ async function confirmarHomologar() {
   }
 }
 
-function navegarParaDetalhes() {
-  void router.push({
-    name: 'DiagnosticoUnidade',
-    params: {
-      codSubprocesso: props.codSubprocesso,
-      siglaUnidade: props.siglaUnidade,
-    },
-  });
-}
-
-// ── Formatação ────────────────────────────────────────────────────────────────
+// « Formatação »
 const varianteSituacao = computed(() => {
   switch (situacao.value) {
     case 'CONCLUIDO':
@@ -424,9 +526,9 @@ function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): 
   return mapa[situacaoServidor] ?? situacaoServidor;
 }
 
-const colunasServidores = [
+const colunasServidores = computed(() => [
   {key: 'servidorNome', label: TEXTOS.diagnostico.COLUNA_SERVIDOR},
-  {key: 'servidorTitulo', label: 'Título'},
   {key: 'situacaoServidor', label: TEXTOS.diagnostico.COLUNA_SITUACAO},
-];
+  ...(ehChefe.value ? [{key: 'acoes', label: TEXTOS.diagnostico.COLUNA_ACOES}] : []),
+]);
 </script>
