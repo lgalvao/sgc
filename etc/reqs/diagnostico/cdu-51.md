@@ -1,71 +1,65 @@
-# CDU-51 - Finalizar processo de diagnóstico
+# CDU-51 - Validar diagnósticos em bloco
 
-Ator: ADMIN
+Ator: GESTOR
 
 Maturidade: Média
 
-Base principal: Respostas do usuário sobre encerramento do processo, complementadas por paralelismo com a finalização de mapeamento e revisão.
+Base principal: Fluxo narrado e validado na reunião, complementado por paralelismo com as ações em bloco dos processos já existentes.
 
 ## Pré-condições
 
-- Login realizado com perfil ADMIN
-- Existência de processo de diagnóstico na situação 'Em andamento'
+- Login realizado com perfil GESTOR
+- Existência de processo de diagnóstico em andamento
+- Existência de mais de uma unidade subordinada com subprocesso em situação 'Concluído' e localização atual na unidade  do usuário
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
 2. O sistema mostra a tela `Detalhes do processo`.
 
-3. O usuário clica em `Finalizar`.
+3. Havendo unidades elegíveis, o sistema habilita o botão `Validar diagnósticos em bloco`.
 
-4. O sistema verifica se todos os subprocessos das unidades participantes estão na situação 'Homologado'.
+4. O usuário clica em `Validar diagnósticos em bloco`.
 
-5. Caso negativo, o sistema mostra a mensagem `Não é possível finalizar o processo enquanto houver unidades com
-   diagnóstico ainda não homologado`.
+5. O sistema abre modal de confirmação contendo:
+   - título `Validação de diagnósticos em bloco`;
+   - texto `Selecione as unidades cujos diagnósticos deverão ser aceitos`;
+   - lista das unidades elegíveis, apresentadas com checkbox selecionado por padrão, sigla e nome;
+   - botões `Cancelar` e `Registrar aceite`.
 
-6. Caso positivo, o sistema mostra diálogo de confirmação com:
-   - título `Finalização de processo`;
-   - mensagem `Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação liberará os relatórios consolidados do diagnóstico.`;
-   - botões `Cancelar` e `Finalizar`.
+6. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação.
 
-7. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
+7. O usuário escolhe as unidades desejadas e clica em `Registrar aceite`.
 
-8. O usuário confirma.
+8. Para cada unidade selecionada, o sistema:
+   - registra uma análise de resultado `Aceite`;
+   - registra uma movimentação com descrição `Diagnóstico aceito`;
+   - encaminha o subprocesso para a unidade superior.
 
-9. O sistema muda a situação do processo para 'Finalizado'.
-
-10. O sistema envia notificações por e-mail para todas as unidades participantes.
-
-    10.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo este modelo:
-
-    ```text
-    Assunto: SGC: Finalização do processo [DESCRICAO_PROCESSO]
-
-    Prezado(a) responsável pela [SIGLA_UNIDADE],
-
-    Comunicamos a finalização do processo [DESCRICAO_PROCESSO] para a sua unidade.
-
-    Os relatórios consolidados do diagnóstico já podem ser consultados no Sistema de Gestão de Competências ([URL_SISTEMA]).
-    ```
-
-    10.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
-    unidades subordinadas a elas, segundo o modelo:
+9. O sistema envia uma única notificação consolidada por e-mail para a unidade superior:
 
     ```text
-    Assunto: SGC: Finalização do processo [DESCRICAO_PROCESSO] em unidades subordinadas
+    Assunto: SGC: Diagnósticos de unidades subordinadas submetidos para análise
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE],
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
 
-    Comunicamos a finalização do processo [DESCRICAO_PROCESSO] para as unidades [SIGLAS_UNIDADES_SUBORDINADAS].
+    Os diagnósticos das unidades [LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS] no processo [DESCRICAO_PROCESSO] foram aceitos e submetidos para análise por essa unidade.
 
-    Os relatórios consolidados do diagnóstico já podem ser consultados no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    As análises já podem ser realizadas no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-11. O sistema redireciona para o `Painel` e mostra a mensagem `Processo finalizado`.
+10. O sistema cria internamente um alerta consolidado com:
+    - `Descrição`: "Diagnósticos das unidades [LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS] submetidos para análise"
+    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+
+11. O sistema mostra a mensagem `Diagnósticos aceitos em bloco`.
 
 ## Observação
 
-PENDÊNCIA DE REFINAMENTO: esta primeira versão libera os relatórios apenas na finalização completa do processo, por
-paralelismo com os módulos já existentes. Confirmar depois se haverá necessidade de consulta parcial após homologações
-individuais de unidade.
+PENDÊNCIA DE REFINAMENTO: esta versão assume uma notificação e um alerta consolidados por operação em bloco, mantendo
+as movimentações individualizadas por subprocesso. Confirmar depois se a área de negócio deseja também um registro
+agregado adicional no histórico.

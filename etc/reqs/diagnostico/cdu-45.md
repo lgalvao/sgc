@@ -1,45 +1,51 @@
-# CDU-45 - Preencher situação de capacitação
+# CDU-45 - Aprovar avaliação de consenso
 
-Ator: CHEFE
+Ator: SERVIDOR
 
 ## Pré-condições
 
-- Login realizado com perfil CHEFE
-- Processo de diagnóstico em andamento com participação da unidade do usuário
+- Login realizado com perfil SERVIDOR
+- Existência de avaliação de consenso criada para o servidor, para todas as competências 
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
+1. No `Painel`o usuário acessa um processo de diagnóstico em andamento da sua unidade.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` da unidade.
-
-3. O usuário clica no card `Situação de capacitação`.
-
-4. O sistema apresenta uma tabela contendo, para cada servidor participante da unidade e para cada
-   competência vigente da unidade, um campo editável `Situação de capacitação`, que admite os seguintes valores:
-   - `NA` (Não se aplica);
-   - `AC` (A capacitar);
-   - `EC` (Em capacitação);
-   - `C` (Capacitado);
-   - `I` (Instrutor).
-   Inicialmente, todos os valores de situação estarão vazios.   
-
-- Exemplo de tabela, depois de preenchida com situações:
-
-     | Nome          | Competência | Situação de capacitação |
-     |:--------------| :---- | :---- |
-     | BOB MARLEY    | Desc. Competência 1 | NA \- Não se aplica |
-     |               | Desc. Competência 2 | I \- Instrutor |
-     |               | Desc. Competência 3 | Em capacitação |
-     | DAVID BOWIE   | Desc. Competência 1 | NA \- Não se aplica |
-     |               | Desc. Competência 2 | C \- Capacitado |
-     |               | Desc. Competência 3 | Em capacitação |
-     | ELVIS PRESLEY | Desc. Competência 1 | I \- Instrutor |
-     |               | Desc. Competência 2 | C \- Capacitado  |
-     |               | Desc. Competência 3 | Em capacitação |
+2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade. 
    
-5. O usuário informa os valores para cada para competência/servidor.
+3. O usuário aciona o card `Avaliação de consenso`.
+   
+4. O sistema mostra uma grade com as descrições das competências e o valores da avaliação de consenso, com os valores importância e domínio para cada competência, como o seguinte exemplo:
 
-6. O sistema salva automaticamente cada alteração realizada.
+   | Competência | Importância | Domínio |
+   | :---- | :---: | :---: |
+   | Desc. competência 1 | 4 | 1 |
+   | Desc. competência 2 | NA | NA |
+   | Desc. competência 2 | 3 | 2 |
 
-7. O usuário não precisa confirmar o cadastro de situações de capacitação na primeira 'rodada', podendo retornar a esta tela em outro momento para finalizar. 
+ Ao final, o sistema mostra o botão `Aprovar consenso`.
+   
+5. O usuário aciona `Aprovar consenso`.
+
+3. O sistema altera a situação da avaliação do servidor para 'Avaliação de consenso aprovada'.
+
+4. O sistema envia notificação por e-mail para o responsável pela unidade:
+
+    ```text
+    Assunto: SGC: Avaliação de consenso de [NOME_SERVIDOR] aprovada
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+
+    O servidor [NOME_SERVIDOR] aprovou a avaliação de consenso do processo [DESCRICAO_PROCESSO].
+
+    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
+
+5. O sistema cria internamente um alerta com:
+    - `Descrição`: "Avaliação de consenso aprovada: [NOME_SERVIDOR] "
+    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+
+6. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem "Avaliação de consenso aprovada".

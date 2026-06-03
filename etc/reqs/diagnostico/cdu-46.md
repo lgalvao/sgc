@@ -2,37 +2,36 @@
 
 Ator: CHEFE
 
-Maturidade: Média
-
-Base principal: Fluxo narrado e validado na reunião, complementado por resposta do usuário sobre comportamento "tudo ou nada".
-
 ## Pré-condições
 
 - Login realizado com perfil CHEFE
-- Processo de diagnóstico em andamento
-- Existência de servidor da unidade cuja avaliação individual ainda não esteja na situação `Consenso aprovado`
+- Processo de diagnóstico em andamento para a unidade do usuário
+- Existência de servidor da unidade cuja avaliação individual ainda não tenha chegado à situação `Avaliação de consenso aprovada`.
 
 ## Fluxo principal
 
-1. Na tela `Diagnóstico da equipe`, o usuário escolhe o servidor desejado e aciona `Indicar impossibilidade`.
+1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O sistema abre modal com:
+2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade.
+
+3. O usuário clica no card `Monitoramento`.
+
+4. O sistema apresenta a tela `Monitoramento de diagnóstico`, com a situação dos servidores lotados na unidade do usuário. Para cada servidor, são mostrados:
+   - `Nome` : nome completo do servidor
+   - `Situação`: situação atual da avaliação individual
+   
+5. Na coluna de ações, o usuário escolhe a opção `Indicar impossibilidade
+
+6. O sistema abre um modal com:
    - título `Indicar impossibilidade de avaliação`;
-   - texto `Confirma a indicação de impossibilidade de avaliação para [NOME_SERVIDOR]?`;
+   - texto `Confirma a impossibilidade de avaliação para [NOME_SERVIDOR]?`;
    - campo obrigatório `Justificativa`;
-   - botões `Cancelar` e `Confirmar`.
+   - botões `Cancelar` e `Indicar impossibilidade`.
 
 3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
 
-4. O usuário informa a justificativa e clica em `Confirmar`.
-
-5. O sistema altera a situação da avaliação individual para `Avaliação impossibilitada`.
-
-6. O sistema passa a desconsiderar, para fins de conclusão da unidade e cálculos consolidados do ciclo, quaisquer
-   dados parciais anteriormente registrados para aquela avaliação individual.
-
-   PENDÊNCIA DE REFINAMENTO: esta especificação assume comportamento de "tudo ou nada" para a impossibilidade, isto é,
-   os dados parciais anteriores deixam de ter efeito no ciclo. Confirmar com a área de negócio se haverá necessidade de
-   preservar ou reaproveitar parte desses dados em algum cenário.
+4. O usuário informa a justificativa e clica em `Indicar impossibilidade`.
+   
+5. O sistema altera a situação da avaliação individual do servidor para `Avaliação impossibilitada`. e passa  a desconsiderar, para fins de conclusão da unidade, quaisquer dados parciais anteriormente registrados para aquela avaliação individual.
 
 7. O sistema mostra a mensagem `Impossibilidade registrada`.

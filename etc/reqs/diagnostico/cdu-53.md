@@ -1,10 +1,10 @@
-# CDU-53 - Gerar relatório de situação de capacitação
+# CDU-53 - Gerar relatório de gaps de diagnóstico
 
 Ator: ADMIN, GESTOR
 
 Maturidade: Média
 
-Base principal: Respostas do usuário sobre pacote mínimo de relatórios, com recorte inicial consolidado por unidade.
+Base principal: Respostas do usuário sobre pacote mínimo de relatórios, complementadas por regra inicial de cálculo.
 
 ## Pré-condições
 
@@ -15,30 +15,36 @@ Base principal: Respostas do usuário sobre pacote mínimo de relatórios, com r
 
 1. O usuário acessa `Relatórios` na barra de navegação.
 
-2. O usuário clica no card `Situação de capacitação`.
+2. O usuário clica no card `Gaps de diagnóstico`.
 
-3. O sistema mostra a tela `Relatório de situação de capacitação`, contendo:
+3. O sistema mostra a tela `Relatório de gaps de diagnóstico`, contendo:
    - seletor de processo de diagnóstico finalizado;
+   - campo `Consolidação`, com as opções `Por servidor`, `Por unidade` e `Por competência`;
    - botão `Gerar`;
    - botões de exportação `PDF` e `CSV`.
 
 4. Para o perfil GESTOR, a lista de processos deve ser filtrada para exibir apenas aqueles que envolvam a sua unidade
    ou subordinadas.
 
-5. O usuário seleciona o processo desejado e clica em `Gerar`.
+5. O usuário seleciona o processo e a forma de consolidação desejada, e clica em `Gerar`.
 
-6. O sistema apresenta uma prévia consolidada por unidade, contendo, para cada unidade participante visível ao usuário:
-   - sigla e nome da unidade;
-   - relação dos servidores da unidade;
-   - para cada servidor, a situação de capacitação registrada em cada competência;
-   - totalizadores por competência e por unidade, agrupando os quantitativos de `NA`, `AC`, `EC`, `C` e `I`.
+6. O sistema calcula os gaps usando a fórmula `Importância - Domínio`, desconsiderando dos cálculos consolidados as
+   linhas em que `Importância = NA` ou `Domínio = NA`.
 
-7. O usuário pode exportar a prévia em `PDF` ou `CSV`.
+   PENDÊNCIA DE REFINAMENTO: esta fórmula foi adotada como base inicial da especificação e ainda precisa de validação
+   funcional final com a área de negócio.
 
-8. O sistema gera o arquivo correspondente, contendo a mesma prévia visualizada, precedida por cabeçalho formal com
-   nome do sistema, data/hora da geração e identificação do processo selecionado.
+7. O sistema apresenta a prévia em tela de acordo com a consolidação escolhida:
+   - `Por servidor`: lista os servidores e seus gaps por competência;
+   - `Por unidade`: consolida os gaps por unidade participante;
+   - `Por competência`: consolida os gaps por competência, considerando o escopo visível ao usuário.
+
+8. O usuário pode exportar a prévia em `PDF` ou `CSV`.
+
+9. O sistema gera o arquivo correspondente, contendo a mesma consolidação visualizada, precedida por cabeçalho formal
+   com nome do sistema, data/hora da geração, processo e tipo de consolidação escolhida.
 
 ## Observação
 
-PENDÊNCIA DE REFINAMENTO: esta primeira versão especifica apenas a saída consolidada por unidade. Caso a área de
-negócio demande outros recortes analíticos, o caso de uso deverá ser expandido.
+PENDÊNCIA DE REFINAMENTO: filtros adicionais, ordenações e outros recortes analíticos ainda não foram detalhados nesta
+primeira versão.

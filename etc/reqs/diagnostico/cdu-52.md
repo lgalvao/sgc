@@ -1,50 +1,71 @@
-# CDU-52 - Gerar relatório de gaps de diagnóstico
+# CDU-52 - Finalizar processo de diagnóstico
 
-Ator: ADMIN, GESTOR
+Ator: ADMIN
 
 Maturidade: Média
 
-Base principal: Respostas do usuário sobre pacote mínimo de relatórios, complementadas por regra inicial de cálculo.
+Base principal: Respostas do usuário sobre encerramento do processo, complementadas por paralelismo com a finalização de mapeamento e revisão.
 
 ## Pré-condições
 
-- Login realizado com perfil ADMIN ou GESTOR
-- Existência de processo de diagnóstico na situação 'Finalizado'
+- Login realizado com perfil ADMIN
+- Existência de processo de diagnóstico na situação 'Em andamento'
 
 ## Fluxo principal
 
-1. O usuário acessa `Relatórios` na barra de navegação.
+1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O usuário clica no card `Gaps de diagnóstico`.
+2. O sistema mostra a tela `Detalhes do processo`.
 
-3. O sistema mostra a tela `Relatório de gaps de diagnóstico`, contendo:
-   - seletor de processo de diagnóstico finalizado;
-   - campo `Consolidação`, com as opções `Por servidor`, `Por unidade` e `Por competência`;
-   - botão `Gerar`;
-   - botões de exportação `PDF` e `CSV`.
+3. O usuário clica em `Finalizar`.
 
-4. Para o perfil GESTOR, a lista de processos deve ser filtrada para exibir apenas aqueles que envolvam a sua unidade
-   ou subordinadas.
+4. O sistema verifica se todos os subprocessos das unidades participantes estão na situação 'Homologado'.
 
-5. O usuário seleciona o processo e a forma de consolidação desejada, e clica em `Gerar`.
+5. Caso negativo, o sistema mostra a mensagem `Não é possível finalizar o processo enquanto houver unidades com
+   diagnóstico ainda não homologado`.
 
-6. O sistema calcula os gaps usando a fórmula `Importância - Domínio`, desconsiderando dos cálculos consolidados as
-   linhas em que `Importância = NA` ou `Domínio = NA`.
+6. Caso positivo, o sistema mostra diálogo de confirmação com:
+   - título `Finalização de processo`;
+   - mensagem `Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação liberará os relatórios consolidados do diagnóstico.`;
+   - botões `Cancelar` e `Finalizar`.
 
-   PENDÊNCIA DE REFINAMENTO: esta fórmula foi adotada como base inicial da especificação e ainda precisa de validação
-   funcional final com a área de negócio.
+7. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
 
-7. O sistema apresenta a prévia em tela de acordo com a consolidação escolhida:
-   - `Por servidor`: lista os servidores e seus gaps por competência;
-   - `Por unidade`: consolida os gaps por unidade participante;
-   - `Por competência`: consolida os gaps por competência, considerando o escopo visível ao usuário.
+8. O usuário confirma.
 
-8. O usuário pode exportar a prévia em `PDF` ou `CSV`.
+9. O sistema muda a situação do processo para 'Finalizado'.
 
-9. O sistema gera o arquivo correspondente, contendo a mesma consolidação visualizada, precedida por cabeçalho formal
-   com nome do sistema, data/hora da geração, processo e tipo de consolidação escolhida.
+10. O sistema envia notificações por e-mail para todas as unidades participantes.
+
+    10.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo este modelo:
+
+    ```text
+    Assunto: SGC: Finalização do processo [DESCRICAO_PROCESSO]
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE],
+
+    Comunicamos a finalização do processo [DESCRICAO_PROCESSO] para a sua unidade.
+
+    Os relatórios consolidados do diagnóstico já podem ser consultados no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
+
+    10.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
+    unidades subordinadas a elas, segundo o modelo:
+
+    ```text
+    Assunto: SGC: Finalização do processo [DESCRICAO_PROCESSO] em unidades subordinadas
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE],
+
+    Comunicamos a finalização do processo [DESCRICAO_PROCESSO] para as unidades [SIGLAS_UNIDADES_SUBORDINADAS].
+
+    Os relatórios consolidados do diagnóstico já podem ser consultados no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
+
+11. O sistema redireciona para o `Painel` e mostra a mensagem `Processo finalizado`.
 
 ## Observação
 
-PENDÊNCIA DE REFINAMENTO: filtros adicionais, ordenações e outros recortes analíticos ainda não foram detalhados nesta
-primeira versão.
+PENDÊNCIA DE REFINAMENTO: esta primeira versão libera os relatórios apenas na finalização completa do processo, por
+paralelismo com os módulos já existentes. Confirmar depois se haverá necessidade de consulta parcial após homologações
+individuais de unidade.

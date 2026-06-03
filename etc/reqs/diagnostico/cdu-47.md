@@ -1,69 +1,44 @@
-# CDU-47 - Concluir diagnóstico da unidade
+# CDU-47 - Preencher situação de capacitação
 
 Ator: CHEFE
-
-Maturidade: Alta
-
-Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas do usuário.
 
 ## Pré-condições
 
 - Login realizado com perfil CHEFE
-- Processo de diagnóstico em andamento
-- Subprocesso com localização atual na própria unidade
-- Todos os servidores da unidade com avaliação individual em `Consenso aprovado` ou `Avaliação impossibilitada`
-- Informações de ocupações críticas preenchidas para todos os servidores e competências da unidade
+- Processo de diagnóstico em andamento com participação da unidade do usuário
 
 ## Fluxo principal
 
-1. No `Detalhes do subprocesso`, o usuário clica no card `Diagnóstico da equipe`.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Diagnóstico da equipe`, com o botão `Concluir diagnóstico da unidade`.
+2. O sistema mostra a tela `Detalhes do subprocesso` da unidade.
 
-3. O usuário clica em `Concluir diagnóstico da unidade`.
+3. O usuário clica no card `Situação de capacitação`.
 
-4. O sistema verifica se todas as avaliações individuais estão em `Consenso aprovado` ou `Avaliação impossibilitada`,
-   e se as ocupações críticas foram integralmente preenchidas.
+4. O sistema apresenta uma tabela contendo, para cada servidor participante da unidade e para cada
+   competência vigente da unidade, um campo editável `Situação de capacitação`, que admite os seguintes valores:
+   - `NA` (Não se aplica);
+   - `AC` (A capacitar);
+   - `EC` (Em capacitação);
+   - `C`  (Capacitado);
+   - `I`  (Instrutor).
 
-5. Caso positivo, o sistema mostra modal de confirmação com:
-   - título `Concluir diagnóstico da unidade`;
-   - texto `Confirma a conclusão do diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO]?`;
-   - botões `Cancelar` e `Concluir`.
+- Exemplo de tabela, depois de preenchida com situações:
 
-6. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
+     | Nome          | Competência | Situação de capacitação |
+     |:--------------| :---- | :---- |
+     | BOB MARLEY    | Desc. Competência 1 | NA \- Não se aplica |
+     |               | Desc. Competência 2 | I \- Instrutor |
+     |               | Desc. Competência 3 | Em capacitação |
+     | DAVID BOWIE   | Desc. Competência 1 | NA \- Não se aplica |
+     |               | Desc. Competência 2 | C \- Capacitado |
+     |               | Desc. Competência 3 | Em capacitação |
+     | ELVIS PRESLEY | Desc. Competência 1 | I \- Instrutor |
+     |               | Desc. Competência 2 | C \- Capacitado  |
+     |               | Desc. Competência 3 | Em capacitação |
+   
+5. O usuário informa os valores para cada para competência/servidor.
 
-7. O usuário confirma.
+6. O sistema salva automaticamente cada alteração realizada.
 
-8. O sistema altera a situação do subprocesso para 'Concluído'.
-
-9. O sistema registra uma movimentação para o subprocesso com:
-   - `Data/hora`: [Data/hora atual];
-   - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO];
-   - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
-   - `Descrição`: 'Diagnóstico concluído'.
-
-10. O sistema envia notificação por e-mail para a unidade superior:
-
-    ```text
-    Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
-
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-
-    O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi concluído e submetido para análise.
-
-    A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
-    ```
-
-11. O sistema cria internamente um alerta com:
-    - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
-    - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
-
-12. O sistema redireciona para o `Painel` e mostra a mensagem `Diagnóstico concluído`.
-
-## Fluxo alternativo
-
-1. No passo 4, caso exista pendência, o sistema mostra a mensagem `Ainda existem avaliações ou ocupações críticas
-   pendentes.` e interrompe a operação.
+7. O usuário não precisa confirmar o cadastro de situações de capacitação de uma vez só, podendo retornar a esta tela em outro momento para finalizar. 

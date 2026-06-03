@@ -1,38 +1,69 @@
-# CDU-48 - Monitorar diagnóstico 
+# CDU-48 - Concluir diagnóstico da unidade
 
-Ator: GESTOR, ADMIN
+Ator: CHEFE
 
-Maturidade: Média
+Maturidade: Alta
 
-Base principal: Respostas do usuário sobre monitoramento na tela de detalhes do processo, complementadas por modelagem de acompanhamento.
+Base principal: Fluxo narrado e validado na reunião, confirmado pelas respostas do usuário.
 
 ## Pré-condições
 
-- Login realizado com perfil GESTOR ou ADMIN
-- Existência de processo de diagnóstico em andamento
+- Login realizado com perfil CHEFE
+- Processo de diagnóstico em andamento
+- Subprocesso com localização atual na própria unidade
+- Todos os servidores da unidade com avaliação individual em `Consenso aprovado` ou `Avaliação impossibilitada`
+- Informações de ocupações críticas preenchidas para todos os servidores e competências da unidade
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário clica em um processo de diagnóstico em andamento.
+1. No `Detalhes do subprocesso`, o usuário clica no card `Diagnóstico da equipe`.
 
-2. O sistema mostra a tela `Detalhes do processo`.
+2. O sistema mostra a tela `Diagnóstico da equipe`, com o botão `Concluir diagnóstico da unidade`.
 
-3. Na tela `Detalhes do processo`, o sistema apresenta uma tabela hierárquica com as unidades participantes do processo. Para cada unidade, mostra:
-   - sigla e nome;
-   - situação atual do subprocesso;
-   - data limite da etapa atual do subprocesso;
-   - localização atual do subprocesso.
+3. O usuário clica em `Concluir diagnóstico da unidade`.
 
-   3.1. Para o perfil GESTOR, a tabela hierarquica deve se limitar à própria unidade do usuário e às unidades subordinadas a ela, recursivamente.
+4. O sistema verifica se todas as avaliações individuais estão em `Consenso aprovado` ou `Avaliação impossibilitada`,
+   e se as ocupações críticas foram integralmente preenchidas.
 
-   3.2. Para o perfil ADMIN, a árvore exibida deve contemplar todas as unidades participantes do processo.
+5. Caso positivo, o sistema mostra modal de confirmação com:
+   - título `Concluir diagnóstico da unidade`;
+   - texto `Confirma a conclusão do diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO]?`;
+   - botões `Cancelar` e `Concluir`.
 
-4. O usuário clica em uma unidade 
-   
-5. O sistema mostra a tela `Detalhe do subprocesso` para a unidade selecionada.
-   
-6. O usuário clica no card `Monitoramento`.
+6. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
 
-7. O sistema mostra a tela `Monitoramento de diagnóstico`, com os 
+7. O usuário confirma.
 
-8. 
+8. O sistema altera a situação do subprocesso para 'Concluído'.
+
+9. O sistema registra uma movimentação para o subprocesso com:
+   - `Data/hora`: [Data/hora atual];
+   - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO];
+   - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
+   - `Descrição`: 'Diagnóstico concluído'.
+
+10. O sistema envia notificação por e-mail para a unidade superior:
+
+    ```text
+    Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
+
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+
+    O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi concluído e submetido para análise.
+
+    A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    ```
+
+11. O sistema cria internamente um alerta com:
+    - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+
+12. O sistema redireciona para o `Painel` e mostra a mensagem `Diagnóstico concluído`.
+
+## Fluxo alternativo
+
+1. No passo 4, caso exista pendência, o sistema mostra a mensagem `Ainda existem avaliações ou ocupações críticas
+   pendentes.` e interrompe a operação.

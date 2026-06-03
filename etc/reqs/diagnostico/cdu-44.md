@@ -1,43 +1,53 @@
-# CDU-44 - Aprovar avaliação de consenso
+# CDU-44 - Manter avaliação de consenso
 
-Ator: SERVIDOR
+Ator: CHEFE
 
 ## Pré-condições
 
-- Login realizado com perfil SERVIDOR
-- Existência de avaliação de consenso criada para o servidor, para todas as competências 
+- Login realizado com perfil CHEFE
+- Existencia de processo de diagnóstico em andamento
+- Existência de servidor da unidade com situação `Autoavaliação concluída`, `Avaliação de consenso criada` ou
+  `Avaliação de consenso aprovada`
 
 ## Fluxo principal
 
-1. No `Painel`o usuário acessa um processo de diagnóstico em andamento da sua unidade.
+1. No `Painel`, o usuario escolhe um processo de diagnostico em andamento.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, com os detalhes do subprocesso e apenas um card `Avaliações`. 
-   
-3. O usuário aciona o card `Avaliações`.
+2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade do usuário.
 
-4. O sistema mostra uma tabela com as competências e o valor da avaliação de consenso, de importância e domínio para cada competência, com um botão `Aprovar consenso`.
-   
-5. O usuário clica em `Aprovar consenso`.
+3. O usuário aciona o card `Avaliações de consenso`.
 
-3. O sistema altera a situação da avaliação do servidor para 'Avaliação de consenso aprovada'.
+4. O sistema mostra a tela `Avaliações de consenso`, contendo uma tabela dos servidores da unidade, com o nome do servidor e situação da avaliação individual.
 
-4. O sistema envia notificação por e-mail para o responsável pela unidade:
+5. O usuário aciona uma linha da tabela referente a um servidor.
 
-    ```text
-    Assunto: SGC: Avaliação de consenso de [NOME_SERVIDOR] aprovada
+6. O sistema mostra a tela `Avaliação de consenso de servidor` com:
+    - título "Avaliação de consenso"
+    - subtítulo com o nome do servidor
+    - grade de competências da unidade com estrutura abaixo:
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+|                     | Importância |       |          | Domínio  |       |          |
+  |:--------------------|-------------|-------|----------|----------|-------|----------|
+| Competência         | Servidor    | Chefe | Consenso | Servidor | Chefe | Consenso |
+| Desc. competência 1 | 1           | 5     | 3        | 2        | 2     | 2        |
+| Desc. competência 2 | NA          | 2     | 2        | 2        | 3     | 2        |
+| Desc. competência 2 | 3           | 2     | 3        | 3        | 1     | 2        |
 
-    O servidor [NOME_SERVIDOR] aprovou a avaliação de consenso do processo [DESCRICAO_PROCESSO].
+  **Regras:**
 
-    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
-    ```
+- Os campos `Importância` e `Domínio` do _servidor_ devem ser nao-editáveis e serem preenchidos com os valores
+  fornecidos na autoavaliação do servidor;
+- Os campos `Importância` e `Domínio` do _chefe_ devem estar abertos para preenchimento;
+- Os dois campos de `Consenso` devem estar abertos para preenchimento;
+- Se os valores `Importância` e `Domínio` forem iguais, o sistema deve preencher automaticamente o valor de `Consenso` com o valor do compartilhado.
 
-5. O sistema cria internamente um alerta com:
-    - `Descrição`: "Avaliação de consenso aprovada: [NOME_SERVIDOR] "
-    - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+**IMPORTANTE**: Se o servidor já tiver aprovado a avaliação de consenso (ou seja, estiver na situacao
+  `Avaliação de consenso aprovada`), o sistema permitirá apenas visualização dos dados acima.
 
-6. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem "Avaliação de consenso aprovada".
+7. Com a presença do servidor, o usuário preenche o valor de consenso.
+
+8. O sistema salva automaticamente cada alteração realizada.
+
+9. O usuário aciona o botão `Voltar` para mostrar a lista de servidores.
+
+10. O sistema volta a mostrar a tela `Avaliações de consenso`, onde o usuário poderá proceder ao prenchimento de consenso dos outros servidores.
