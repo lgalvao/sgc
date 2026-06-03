@@ -32,10 +32,13 @@ function chaveAutoavaliacao(codSubprocesso: number) {
 export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: string) {
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
+    const consensoDoServidorLogado = computed(() =>
+        servidorTitulo != null && String(servidorTitulo) === String(perfilStore.usuarioCodigo ?? '')
+    );
 
     const query = useQuery<Consenso>({
         key: () => chaveConsenso(codSubprocesso, servidorTitulo),
-        query: () => servidorTitulo
+        query: () => servidorTitulo && !consensoDoServidorLogado.value
             ? obterConsensoServidor(codSubprocesso, servidorTitulo)
             : obterConsenso(codSubprocesso),
         enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,

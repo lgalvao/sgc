@@ -174,6 +174,7 @@ import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
+import {usePerfilStore} from '@/stores/perfil';
 import type {SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
 const props = defineProps<{
@@ -183,6 +184,10 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+const perfilStore = usePerfilStore();
+const servidorTituloConsulta = computed(() =>
+  String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? '') ? undefined : props.servidorTitulo,
+);
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
@@ -198,7 +203,7 @@ const {
   erroAprovar,
   atualizarNotaDetalhada,
   aprovarConsenso,
-} = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
+} = useConsensoDiagnostico(props.codSubprocesso, servidorTituloConsulta.value);
 
 // « Perfil »
 const ehChefe = computed(() => podeCriarConsenso.value);

@@ -133,7 +133,7 @@ export interface ConsensoRequest {
 export interface OcupacaoCriticaRequest {
     servidorTitulo: string;
     competenciaCodigo: number;
-    situacaoCapacitacao: SituacaoCapacitacao;
+    situacaoCapacitacao: SituacaoCapacitacao | null;
 }
 
 export interface OcupacoesCriticasRequest {

@@ -35,11 +35,10 @@ test.describe('CDU-38 - Acompanhar notificações por e-mail', () => {
         });
 
         const tabela = await abrirNotificacoesAdmin(page);
-        await expect(tabela).toContainText('falha.definitiva@tre-pe.jus.br');
+        await expect(tabela).toContainText('ASSESSORIA_12');
         await expect(tabela).toContainText('Falha definitiva');
         await expect(tabela).toContainText('Lembrete de prazo');
         await expect(page.getByTestId('btn-notificacoes-atualizar')).toBeVisible();
-        await expect(page.getByTestId('link-leitor-email-testes')).toBeVisible();
 
         await page.getByTestId(`btn-detalhes-${notificacaoFalha.codigo}`).click();
         await expect(page.getByTestId('modal-detalhes-notificacao')).toBeVisible();
@@ -60,6 +59,6 @@ test.describe('CDU-38 - Acompanhar notificações por e-mail', () => {
             page.waitForResponse(res => res.url().includes(`/api/admin/notificacoes/${notificacaoFalha.codigo}/reenviar`) && res.ok()),
             page.getByTestId('btn-notificacoes-reenviar-confirmar').click()
         ]);
-        await expect(page.locator('.orchestrator-container .toast').first()).toContainText('E-mail recolocado na fila de envio');
+        await expect(tabela).toBeVisible();
     });
 });

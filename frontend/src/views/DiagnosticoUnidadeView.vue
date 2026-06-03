@@ -388,12 +388,14 @@ function formatarSituacaoServidor(s: SituacaoAvaliacaoServidor): string {
   }[s] ?? s;
 }
 
-function varianteCapacitacao(s: SituacaoCapacitacao): ColorVariant {
+function varianteCapacitacao(s: SituacaoCapacitacao | null): ColorVariant {
+  if (s === null) return 'light';
   const mapa: Record<SituacaoCapacitacao, ColorVariant> = {NA: 'secondary', AC: 'danger', EC: 'warning', C: 'success', I: 'primary'};
   return mapa[s] ?? 'light';
 }
 
-function formatarCapacitacao(s: SituacaoCapacitacao): string {
+function formatarCapacitacao(s: SituacaoCapacitacao | null): string {
+  if (s === null) return '-';
   return {
     NA: TEXTOS.diagnostico.CAPACITACAO_NA,
     AC: TEXTOS.diagnostico.CAPACITACAO_AC,

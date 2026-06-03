@@ -127,29 +127,6 @@
       >
         <BCard
             class="h-100 card-actionable"
-            data-testid="card-subprocesso-consenso"
-            role="button"
-            tabindex="0"
-            @click="navegarParaCardConsenso"
-            @keydown="aoPressionarTeclaConsenso"
-        >
-          <div class="card-click-area">
-            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
-              <i aria-hidden="true" class="bi bi-person-lines-fill text-primary flex-shrink-0 mt-1"></i>
-              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.CONSENSO_TITULO }}</span>
-            </BCardTitle>
-            <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.CONSENSO_TEXTO }}
-            </BCardText>
-          </div>
-        </BCard>
-      </BCol>
-      <BCol
-          class="mb-3"
-          md="4"
-      >
-        <BCard
-            class="h-100 card-actionable"
             data-testid="card-subprocesso-monitoramento"
             role="button"
             tabindex="0"
@@ -176,6 +153,7 @@ import {BCard, BCardText, BCardTitle, BCol, BRow} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/acesso";
+import {usePerfilStore} from "@/stores/perfil";
 import {type Mapa, type MapaCompleto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -192,6 +170,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
+const perfilStore = usePerfilStore();
 const subprocesso = computed(() => props.subprocesso ?? null);
 const permissoesDiagnostico = computed(() => subprocesso.value?.permissoes ?? null);
 
@@ -222,7 +201,7 @@ function navegarParaDiag(routeName: string) {
 }
 
 function navegarParaConsenso() {
-  const servidorTitulo = subprocesso.value?.titular?.tituloEleitoral;
+  const servidorTitulo = perfilStore.usuarioCodigo ?? subprocesso.value?.titular?.tituloEleitoral;
   if (!servidorTitulo) {
     return;
   }
