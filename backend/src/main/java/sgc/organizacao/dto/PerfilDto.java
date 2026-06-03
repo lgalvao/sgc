@@ -2,7 +2,6 @@ package sgc.organizacao.dto;
 
 import lombok.*;
 import sgc.comum.model.*;
-import sgc.organizacao.model.*;
 
 @Builder
 public record PerfilDto(
@@ -13,8 +12,4 @@ public record PerfilDto(
         String unidadeNome,
         String perfil,
         String descricao) {
-
-    public static PerfilDto from(Perfil perfil) {
-        return new PerfilDto(null, null, null, perfil.name(), perfil.name());
-    }
 }

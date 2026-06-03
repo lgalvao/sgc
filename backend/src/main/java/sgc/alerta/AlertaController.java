@@ -16,25 +16,26 @@ import java.util.*;
 @RequiredArgsConstructor
 @Tag(name = "Alertas", description = "Endpoints para gerenciamento de alertas")
 public class AlertaController {
-    private final AlertaFacade alertaFacade;
-    private final UsuarioFacade usuarioFacade;
+    private final AlertaAplicacaoService alertaAplicacaoService;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
+    private final AlertaDtoMapper alertaDtoMapper;
 
     @GetMapping
     @Operation(summary = "Lista todos os alertas do usuário autenticado usando o contexto do JWT")
     public ResponseEntity<List<AlertaDto>> listarAlertas() {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        List<Alerta> alertas = alertaFacade.alertasPorUsuario(contextoUsuario);
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
+        List<Alerta> alertas = alertaAplicacaoService.alertasPorUsuario(contextoUsuario);
 
-        return ResponseEntity.ok(alertas.stream().map(AlertaDto::fromEntity).toList());
+        return ResponseEntity.ok(alertas.stream().map(alertaDtoMapper::paraAlertaDto).toList());
     }
 
     @GetMapping("/nao-lidos")
     @Operation(summary = "Lista alertas não lidos do usuário autenticado usando o contexto do JWT")
     public ResponseEntity<List<AlertaDto>> listarNaoLidos() {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        List<Alerta> alertas = alertaFacade.listarNaoLidos(contextoUsuario);
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
+        List<Alerta> alertas = alertaAplicacaoService.listarNaoLidos(contextoUsuario);
 
-        return ResponseEntity.ok(alertas.stream().map(AlertaDto::fromEntity).toList());
+        return ResponseEntity.ok(alertas.stream().map(alertaDtoMapper::paraAlertaDto).toList());
     }
 
 }

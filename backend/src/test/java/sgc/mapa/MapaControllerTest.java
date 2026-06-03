@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MapaController.class)
-@Import(RestExceptionHandler.class)
+@Import({RestExceptionHandler.class, MapaDtoMapper.class})
 @Tag("integration")
 @DisplayName("Testes do Controller de Mapas")
 class MapaControllerTest {

@@ -1,4 +1,4 @@
-# CDU-49 - Analisar diagnóstico de unidade
+# CDU-49 - Analisar diagnóstico
 
 Ator: GESTOR, ADMIN
 

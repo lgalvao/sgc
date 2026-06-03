@@ -36,7 +36,7 @@ class AtividadeControllerTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @MockitoBean
-    private AtividadeFacade atividadeFacade;
+    private AtividadeService atividadeService;
 
     @Nested
     @DisplayName("Operações de Atividade")
@@ -50,7 +50,7 @@ class AtividadeControllerTest {
                     .descricao("Atividade teste")
                     .conhecimentos(List.of())
                     .build();
-            Mockito.when(atividadeFacade.obterAtividadePorCodigo(1L)).thenReturn(response);
+            Mockito.when(atividadeService.obterAtividadePorCodigo(1L)).thenReturn(response);
 
             mockMvc.perform(get("/api/atividades/1").with(user("123")))
                     .andDo(MockMvcResultHandlers.print())
@@ -67,10 +67,10 @@ class AtividadeControllerTest {
 
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                     .atividade(dto)
-                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO).build())
+                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO.name()).build())
                     .build();
 
-            Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
+            Mockito.when(atividadeService.criarAtividade(any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades")
                             .with(user("123").roles("CHEFE"))
@@ -80,7 +80,7 @@ class AtividadeControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(header().exists("Location"));
 
-            Mockito.verify(atividadeFacade).criarAtividade(any());
+            Mockito.verify(atividadeService).criarAtividade(any());
         }
 
         @Test
@@ -120,9 +120,9 @@ class AtividadeControllerTest {
         void deveRetornarErroQuandoCriacaoNaoRetornaAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder()
                     .atividade(null)
-                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO).build())
+                    .subprocesso(SubprocessoSituacaoDto.builder().codigo(1L).situacao(SituacaoSubprocesso.NAO_INICIADO.name()).build())
                     .build();
-            Mockito.when(atividadeFacade.criarAtividade(any())).thenReturn(response);
+            Mockito.when(atividadeService.criarAtividade(any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades")
                             .with(user("123").roles("CHEFE"))
@@ -136,7 +136,7 @@ class AtividadeControllerTest {
         @DisplayName("Deve atualizar atividade")
         void deveAtualizarAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
-            Mockito.when(atividadeFacade.atualizarAtividade(eq(1L), any())).thenReturn(response);
+            Mockito.when(atividadeService.atualizarAtividade(eq(1L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/atualizar")
                             .with(user("123").roles("CHEFE"))
@@ -145,7 +145,7 @@ class AtividadeControllerTest {
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isOk());
 
-            Mockito.verify(atividadeFacade).atualizarAtividade(eq(1L), any());
+            Mockito.verify(atividadeService).atualizarAtividade(eq(1L), any());
         }
 
         @Test
@@ -163,14 +163,14 @@ class AtividadeControllerTest {
         @DisplayName("Deve excluir atividade")
         void deveExcluirAtividade() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
-            Mockito.when(atividadeFacade.excluirAtividade(1L)).thenReturn(response);
+            Mockito.when(atividadeService.excluirAtividade(1L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/excluir")
                             .with(user("123").roles("CHEFE"))
                             .with(csrf()))
                     .andExpect(status().isOk());
 
-            Mockito.verify(atividadeFacade).excluirAtividade(1L);
+            Mockito.verify(atividadeService).excluirAtividade(1L);
         }
 
         @Test
@@ -190,7 +190,7 @@ class AtividadeControllerTest {
         @DisplayName("Deve listar conhecimentos")
         void deveListarConhecimentos() throws Exception {
             Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(1L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
-            Mockito.when(atividadeFacade.listarConhecimentosPorAtividade(1L)).thenReturn(List.of());
+            Mockito.when(atividadeService.listarConhecimentosPorAtividade(1L)).thenReturn(List.of());
             mockMvc.perform(get("/api/atividades/1/conhecimentos").with(user("123")))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").isArray())
@@ -202,7 +202,7 @@ class AtividadeControllerTest {
         void deveCriarConhecimento() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
             ResultadoOperacaoConhecimento resultado = new ResultadoOperacaoConhecimento(999L, response);
-            Mockito.when(atividadeFacade.criarConhecimento(eq(1L), any())).thenReturn(resultado);
+            Mockito.when(atividadeService.criarConhecimento(eq(1L), any())).thenReturn(resultado);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos")
                             .with(user("123").roles("CHEFE"))
@@ -212,14 +212,14 @@ class AtividadeControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(header().string("Location", Matchers.containsString("/999")));
 
-            Mockito.verify(atividadeFacade).criarConhecimento(eq(1L), any());
+            Mockito.verify(atividadeService).criarConhecimento(eq(1L), any());
         }
 
         @Test
         @DisplayName("Deve atualizar conhecimento")
         void deveAtualizarConhecimento() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
-            Mockito.when(atividadeFacade.atualizarConhecimento(eq(1L), eq(2L), any())).thenReturn(response);
+            Mockito.when(atividadeService.atualizarConhecimento(eq(1L), eq(2L), any())).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/atualizar")
                             .with(user("123").roles("CHEFE"))
@@ -228,21 +228,21 @@ class AtividadeControllerTest {
                             .content("{\"atividadeCodigo\": 1, \"descricao\": \"C1 Update\"}"))
                     .andExpect(status().isOk());
 
-            Mockito.verify(atividadeFacade).atualizarConhecimento(eq(1L), eq(2L), any());
+            Mockito.verify(atividadeService).atualizarConhecimento(eq(1L), eq(2L), any());
         }
 
         @Test
         @DisplayName("Deve excluir conhecimento")
         void deveExcluirConhecimento() throws Exception {
             AtividadeOperacaoResponse response = AtividadeOperacaoResponse.builder().build();
-            Mockito.when(atividadeFacade.excluirConhecimento(1L, 2L)).thenReturn(response);
+            Mockito.when(atividadeService.excluirConhecimento(1L, 2L)).thenReturn(response);
 
             mockMvc.perform(post("/api/atividades/1/conhecimentos/2/excluir")
                             .with(user("123").roles("CHEFE"))
                             .with(csrf()))
                     .andExpect(status().isOk());
 
-            Mockito.verify(atividadeFacade).excluirConhecimento(1L, 2L);
+            Mockito.verify(atividadeService).excluirConhecimento(1L, 2L);
         }
 
         @Test
@@ -294,21 +294,21 @@ class AtividadeControllerTest {
         void deveRetornarNotFoundAoObterAtividadeInexistente() throws Exception {
             Mockito.when(permissionEvaluator.hasPermission(any(org.springframework.security.core.Authentication.class), eq(999L), eq("Atividade"), eq("VISUALIZAR_SUBPROCESSO"))).thenReturn(true);
 
-            Mockito.when(atividadeFacade.obterAtividadePorCodigo(999L))
+            Mockito.when(atividadeService.obterAtividadePorCodigo(999L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(get("/api/atividades/999")
                             .with(user("123")))
                     .andExpect(status().isNotFound());
 
-            Mockito.verify(atividadeFacade).obterAtividadePorCodigo(999L);
+            Mockito.verify(atividadeService).obterAtividadePorCodigo(999L);
         }
 
         @Test
         @DisplayName("Deve retornar NotFound ao excluir atividade inexistente")
         void deveRetornarNotFoundAoExcluirAtividadeInexistente() throws Exception {
 
-            Mockito.when(atividadeFacade.excluirAtividade(999L))
+            Mockito.when(atividadeService.excluirAtividade(999L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(post("/api/atividades/999/excluir")
@@ -316,14 +316,14 @@ class AtividadeControllerTest {
                             .with(csrf()))
                     .andExpect(status().isNotFound());
 
-            Mockito.verify(atividadeFacade).excluirAtividade(999L);
+            Mockito.verify(atividadeService).excluirAtividade(999L);
         }
 
         @Test
         @DisplayName("Deve retornar NotFound ao atualizar atividade inexistente")
         void deveRetornarNotFoundAoAtualizarAtividadeInexistente() throws Exception {
 
-            Mockito.when(atividadeFacade.atualizarAtividade(eq(999L), any()))
+            Mockito.when(atividadeService.atualizarAtividade(eq(999L), any()))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(post("/api/atividades/999/atualizar")
@@ -333,14 +333,14 @@ class AtividadeControllerTest {
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
                     .andExpect(status().isNotFound());
 
-            Mockito.verify(atividadeFacade).atualizarAtividade(eq(999L), any());
+            Mockito.verify(atividadeService).atualizarAtividade(eq(999L), any());
         }
 
         @Test
         @DisplayName("Deve retornar NotFound ao excluir conhecimento de atividade inexistente")
         void deveRetornarNotFoundAoExcluirConhecimentoDeAtividadeInexistente() throws Exception {
 
-            Mockito.when(atividadeFacade.excluirConhecimento(999L, 2L))
+            Mockito.when(atividadeService.excluirConhecimento(999L, 2L))
                     .thenThrow(new ErroEntidadeNaoEncontrada("Atividade", 999L));
 
             mockMvc.perform(post("/api/atividades/999/conhecimentos/2/excluir")
@@ -348,7 +348,7 @@ class AtividadeControllerTest {
                             .with(csrf()))
                     .andExpect(status().isNotFound());
 
-            Mockito.verify(atividadeFacade).excluirConhecimento(999L, 2L);
+            Mockito.verify(atividadeService).excluirConhecimento(999L, 2L);
         }
     }
 }

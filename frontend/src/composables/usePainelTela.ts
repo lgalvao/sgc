@@ -69,7 +69,7 @@ export function usePainelTela() {
     if (pendente) {
       toast.create({
         props: {
-          body: pendente.body,
+          body: pendente.mensagem,
           variant: 'success',
           modelValue: 4000,
           pos: 'bottom-end',

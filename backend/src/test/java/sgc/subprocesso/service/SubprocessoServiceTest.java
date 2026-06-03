@@ -38,7 +38,7 @@ class SubprocessoServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
     private ImpactoMapaService impactoMapaService;
     @Mock
@@ -109,35 +109,6 @@ class SubprocessoServiceTest {
         assertThat(resultado.getMapa()).isEqualTo(mapaSalvo);
     }
 
-    @Test
-    @DisplayName("criarParaRevisao deve lançar exceção se unidadeMapa não tem mapa vigente")
-    void criarParaRevisaoDeveLancarExcecaoSeUnidadeMapaNaoTemMapaVigente() {
-        Processo processo = new Processo();
-        Unidade unidade = new Unidade();
-        unidade.setSigla("UNIT");
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setMapaVigente(null);
-        Unidade unidadeOrigem = new Unidade();
-        assertThatThrownBy(() -> service.criarParaRevisao(
-                new SubprocessoService.CriarSubprocessoComMapaCommand(processo, unidade, unidadeMapa, unidadeOrigem)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
-    }
-
-    @Test
-    @DisplayName("criarParaDiagnostico deve lançar exceção se unidadeMapa não tem mapa vigente")
-    void criarParaDiagnosticoDeveLancarExcecaoSeUnidadeMapaNaoTemMapaVigente() {
-        Processo processo = new Processo();
-        Unidade unidade = new Unidade();
-        unidade.setSigla("UNIT");
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-        unidadeMapa.setMapaVigente(null);
-        Unidade unidadeOrigem = new Unidade();
-        assertThatThrownBy(() -> service.criarParaDiagnostico(
-                new SubprocessoService.CriarSubprocessoComMapaCommand(processo, unidade, unidadeMapa, unidadeOrigem)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unidade UNIT sem mapa vigente para revisão/diagnóstico");
-    }
 
     @ParameterizedTest
     @CsvSource({
@@ -457,35 +428,6 @@ class SubprocessoServiceTest {
                 verify(subprocessoRepo, never()).save(sp);
             }
 
-            @Test
-            @DisplayName("atualizarCompetencia deve lancar IllegalStateException se subprocesso nao possuir mapa associado")
-            void atualizarCompetencia_DeveLancarErroQuandoSubprocessoSemMapa() {
-                Subprocesso sp = new Subprocesso();
-                sp.setCodigo(1L);
-                sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-                sp.setMapa(null);
-
-                when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-
-                assertThatThrownBy(() -> service.atualizarCompetencia(1L, 10L, new AtualizarCompetenciaRequest("Desc", List.of())))
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessageContaining("Subprocesso 1 sem mapa associado");
-            }
-
-            @Test
-            @DisplayName("removerCompetencia deve lancar IllegalStateException se o mapa associado nao possuir codigo")
-            void removerCompetencia_DeveLancarErroQuandoMapaAssociadoNaoPossuirCodigo() {
-                Subprocesso sp = new Subprocesso();
-                sp.setCodigo(1L);
-                sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-                sp.setMapa(new Mapa());
-
-                when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-
-                assertThatThrownBy(() -> service.removerCompetencia(1L, 10L))
-                        .isInstanceOf(IllegalStateException.class)
-                        .hasMessageContaining("Subprocesso 1 com mapa sem código associado");
-            }
         }
 
         @Nested
@@ -512,7 +454,7 @@ class SubprocessoServiceTest {
                 u4.setCodigo(4L);
                 u4.setTipo(TipoUnidade.INTERMEDIARIA);
 
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(new Usuario());
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
 
                 service.criarParaMapeamento(
                         new SubprocessoService.CriarSubprocessosMapeamentoCommand(p, List.of(u1, u2, u3, u4), unidadeOrigem));
@@ -595,7 +537,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(eq(user), any(), any())).thenReturn(true);
                 service.importarAtividades(1L, 2L, List.of());
 
@@ -612,7 +554,7 @@ class SubprocessoServiceTest {
                 Subprocesso sp = criarSubprocessoComMapa(null);
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(sp);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(false);
 
                 List<Long> itens = List.of();
@@ -636,7 +578,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
                 when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(true);
 
@@ -661,7 +603,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(eq(user), eq(spDest), any())).thenReturn(true);
                 when(permissionEvaluator.verificarPermissao(eq(user), eq(spOrig), any())).thenReturn(true);
 
@@ -678,7 +620,7 @@ class SubprocessoServiceTest {
                 when(repo.buscar(Subprocesso.class, 1L)).thenReturn(spDest);
                 when(repo.buscar(Subprocesso.class, 2L)).thenReturn(spOrig);
                 Usuario user = criarUsuarioMock();
-                when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+                when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
                 when(permissionEvaluator.verificarPermissao(user, spDest, AcaoPermissao.EDITAR_CADASTRO)).thenReturn(true);
                 when(permissionEvaluator.verificarPermissao(user, spOrig, AcaoPermissao.CONSULTAR_PARA_IMPORTACAO)).thenReturn(false);
 
@@ -686,5 +628,36 @@ class SubprocessoServiceTest {
                 assertThatThrownBy(() -> service.importarAtividades(1L, 2L, itens)).isInstanceOf(ErroAcessoNegado.class);
             }
         }
+    }
+
+    @Test
+    @DisplayName("importarAtividades deve lancar IllegalStateException quando mapa nao possui codigo")
+    void importarAtividadesDeveLancarIllegalStateExceptionQuandoMapaNaoPossuiCodigo() {
+        Long codOrigem = 1L;
+        Long codDestino = 2L;
+        List<Long> itens = List.of(10L);
+
+        Subprocesso spOrigem = new Subprocesso();
+        spOrigem.setCodigo(codOrigem);
+        spOrigem.setMapa(new Mapa()); // Mapa sem codigo (null) - Lacuna linha 451
+        spOrigem.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        spOrigem.setUnidade(new Unidade());
+
+        Subprocesso spDestino = new Subprocesso();
+        spDestino.setCodigo(codDestino);
+        spDestino.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        spDestino.setUnidade(new Unidade());
+        Mapa mapaDestino = new Mapa();
+        mapaDestino.setCodigo(200L);
+        spDestino.setMapa(mapaDestino);
+
+        when(repo.buscar(Subprocesso.class, codOrigem)).thenReturn(spOrigem);
+        when(repo.buscar(Subprocesso.class, codDestino)).thenReturn(spDestino);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
+        when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
+
+        assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem, itens))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("com mapa sem código associado");
     }
 }

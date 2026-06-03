@@ -39,7 +39,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private UnidadeRepo unidadeRepo;
     @Autowired
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Test
     @DisplayName("Deve manter budget de queries nas leituras organizacionais mais comuns")
@@ -78,7 +78,7 @@ class OrganizacaoViewsQueryBudgetIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve manter budget de queries ao listar administradores")
     void deveManterBudgetDeQueriesAoListarAdministradores() {
-        assertThat(contarQueriesViews(usuarioFacade::listarAdministradores)).isLessThanOrEqualTo(10);
+        assertThat(contarQueriesViews(usuarioAplicacaoService::listarAdministradores)).isLessThanOrEqualTo(10);
     }
 
     private void contarQueries(Runnable acao) {

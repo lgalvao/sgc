@@ -236,7 +236,7 @@ function tratarErroNaoAutorizado() {
     }
 }
 
-const handleResponseError = (error: import('axios').AxiosError) => {
+const tratarErroResposta = (error: import('axios').AxiosError) => {
     const config = error?.config as ConfiguracaoMonitorada;
     const metadados = config?.metadadosMonitoramento;
     limparControleCancelamento(config);
@@ -266,7 +266,7 @@ const handleResponseError = (error: import('axios').AxiosError) => {
 
 apiClient.interceptors.response.use(
     registrarConclusaoResposta,
-    handleResponseError,
+    tratarErroResposta,
 );
 
 export default apiClient;

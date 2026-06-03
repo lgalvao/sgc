@@ -10,6 +10,7 @@ import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.config.*;
 import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -39,10 +40,12 @@ public class ResponsavelUnidadeService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
-    private final AlertaFacade alertaFacade;
+    private final AlertaAplicacaoService alertaAplicacaoService;
     private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final ConfigAplicacao configAplicacao;
+    private final ComumRepo repo;
+    private final sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper;
 
 
     /**
@@ -85,15 +88,7 @@ public class ResponsavelUnidadeService {
                 .orElseThrow(() -> new IllegalStateException(
                         "Usuário ausente para atribuição temporária %d".formatted(atribuicao.getCodigo())));
 
-        return AtribuicaoDto.builder()
-                .codigo(atribuicao.getCodigo())
-                .unidadeCodigo(atribuicao.getUnidade().getCodigo())
-                .unidadeSigla(atribuicao.getUnidade().getSigla())
-                .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
-                .dataInicio(atribuicao.getDataInicio())
-                .dataTermino(atribuicao.getDataTermino())
-                .justificativa(atribuicao.getJustificativa())
-                .build();
+        return organizacaoDtoMapper.paraAtribuicaoDto(atribuicao, usuario);
     }
 
     /**
@@ -103,10 +98,9 @@ public class ResponsavelUnidadeService {
      */
     @Transactional
     public void criarAtribuicaoTemporaria(Long codUnidade, CriarAtribuicaoRequest request) {
-        Unidade unidade = unidadeRepo.findById(codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
+        Unidade unidade = repo.buscar(Unidade.class, codUnidade);
         Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
-        AtribuicaoTemporaria atribuicao = montarAtribuicaoTemporaria(new AtribuicaoTemporaria(), unidade, usuario, request);
+        AtribuicaoTemporaria atribuicao = montarAtribuicaoTemporaria(new ContextoAtribuicaoTemporaria(new AtribuicaoTemporaria(), unidade, usuario, request));
 
         AtribuicaoTemporaria atribuicaoSalva = atribuicaoTemporariaRepo.save(atribuicao);
         criarNotificacoesAtribuicaoTemporaria(atribuicaoSalva, usuario);
@@ -115,13 +109,12 @@ public class ResponsavelUnidadeService {
 
     @Transactional
     public void atualizarAtribuicaoTemporaria(Long codUnidade, Long codigoAtribuicao, CriarAtribuicaoRequest request) {
-        Unidade unidade = unidadeRepo.findById(codUnidade)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
+        Unidade unidade = repo.buscar(Unidade.class, codUnidade);
         AtribuicaoTemporaria atribuicao = buscarAtribuicaoObrigatoria(codigoAtribuicao);
         validarPertencimentoUnidade(atribuicao, codUnidade);
         Usuario usuario = buscarUsuarioObrigatorio(request.tituloEleitoralUsuario());
 
-        montarAtribuicaoTemporaria(atribuicao, unidade, usuario, request);
+        montarAtribuicaoTemporaria(new ContextoAtribuicaoTemporaria(atribuicao, unidade, usuario, request));
         atribuicaoTemporariaRepo.save(atribuicao);
         cacheOrganizacaoService.invalidarAposCommit();
     }
@@ -135,13 +128,11 @@ public class ResponsavelUnidadeService {
     }
 
     private Usuario buscarUsuarioObrigatorio(String titulo) {
-        return usuarioRepo.findById(titulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
+        return repo.buscar(Usuario.class, titulo);
     }
 
     private AtribuicaoTemporaria buscarAtribuicaoObrigatoria(Long codigoAtribuicao) {
-        return atribuicaoTemporariaRepo.findById(codigoAtribuicao)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(AtribuicaoTemporaria.class.getSimpleName(), codigoAtribuicao));
+        return repo.buscar(AtribuicaoTemporaria.class, codigoAtribuicao);
     }
 
     private void validarPertencimentoUnidade(AtribuicaoTemporaria atribuicao, Long codUnidade) {
@@ -150,12 +141,12 @@ public class ResponsavelUnidadeService {
         }
     }
 
-    private AtribuicaoTemporaria montarAtribuicaoTemporaria(
-            AtribuicaoTemporaria atribuicao,
-            Unidade unidade,
-            Usuario usuario,
-            CriarAtribuicaoRequest request
-    ) {
+    private AtribuicaoTemporaria montarAtribuicaoTemporaria(ContextoAtribuicaoTemporaria contexto) {
+        AtribuicaoTemporaria atribuicao = contexto.atribuicao();
+        Unidade unidade = contexto.unidade();
+        Usuario usuario = contexto.usuario();
+        CriarAtribuicaoRequest request = contexto.request();
+
         LocalDate inicio = request.dataInicio() != null ? request.dataInicio() : LocalDate.now();
         if (request.dataTermino().isBefore(inicio)) {
             throw new ErroValidacao(Mensagens.DATA_FIM_DEVE_SER_POSTERIOR);
@@ -163,7 +154,7 @@ public class ResponsavelUnidadeService {
 
         LocalDateTime dataInicio = request.dataInicio() != null ? request.dataInicio().atStartOfDay() : LocalDateTime.now();
         LocalDateTime dataTermino = request.dataTermino().atTime(23, 59, 59);
-        validarSobreposicaoPeriodo(unidade.getCodigo(), dataInicio, dataTermino, atribuicao.getCodigo());
+        validarSobreposicaoPeriodo(new PeriodoAtribuicaoDto(unidade.getCodigo(), dataInicio, dataTermino, atribuicao.getCodigo()));
 
         return atribuicao
                 .setUnidade(unidade)
@@ -174,13 +165,9 @@ public class ResponsavelUnidadeService {
                 .setJustificativa(request.justificativa());
     }
 
-    private void validarSobreposicaoPeriodo(
-            Long codUnidade,
-            LocalDateTime dataInicio,
-            LocalDateTime dataTermino,
-            Long codigoIgnorado
-    ) {
-        if (atribuicaoTemporariaRepo.existeSobreposicaoPeriodo(codUnidade, dataInicio, dataTermino, codigoIgnorado)) {
+    private void validarSobreposicaoPeriodo(PeriodoAtribuicaoDto periodo) {
+        if (atribuicaoTemporariaRepo.existeSobreposicaoPeriodo(
+                periodo.codUnidade(), periodo.dataInicio(), periodo.dataTermino(), periodo.codigoIgnorado())) {
             throw new ErroValidacao(Mensagens.ATRIBUICAO_TEMPORARIA_SOBREPOSTA);
         }
     }
@@ -215,7 +202,7 @@ public class ResponsavelUnidadeService {
 
     private void criarAlertaSemInterromperNotificacao(Usuario usuario, String siglaUnidade) {
         try {
-            alertaFacade.criarAlertaPessoal(
+            alertaAplicacaoService.criarAlertaPessoal(
                     usuario.getTituloEleitoral(),
                     "Atribuição temporária para unidade %s".formatted(siglaUnidade)
             );
@@ -262,8 +249,7 @@ public class ResponsavelUnidadeService {
         }
 
         ResponsabilidadeUnidadeLeitura responsabilidade = responsabilidadeOpt.get();
-        return usuarioRepo.findById(responsabilidade.usuarioTitulo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
+        return repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
     }
 
     /**
@@ -290,15 +276,25 @@ public class ResponsavelUnidadeService {
         }
 
         ResponsabilidadeUnidadeLeitura responsabilidade = responsabilidadeOpt.get();
-        Usuario usuario = usuarioRepo.findById(responsabilidade.usuarioTitulo())
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), responsabilidade.usuarioTitulo()));
+        Usuario usuario = repo.buscar(Usuario.class, responsabilidade.usuarioTitulo());
 
         return ResponsavelDto.builder()
-                .usuario(UsuarioResumoDto.fromEntityObrigatorio(usuario))
+                .usuario(organizacaoDtoMapper.paraUsuarioResumoObrigatorio(usuario))
                 .tipo(responsabilidade.tipo())
                 .dataInicio(responsabilidade.dataInicio())
                 .dataFim(responsabilidade.dataFim())
                 .build();
+    }
+
+    /**
+     * Busca o responsável (titular e substituto) de uma unidade de forma segura, retornando Optional.
+     */
+    public Optional<UnidadeResponsavelDto> buscarResponsavelUnidadeOpt(Long unidadeCodigo) {
+        List<ResponsabilidadeUnidadeResumoLeitura> lista = responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(unidadeCodigo));
+        if (lista.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(montarResponsavelDto(lista.getFirst()));
     }
 
     /**
@@ -307,11 +303,8 @@ public class ResponsavelUnidadeService {
      * @throws ErroEntidadeNaoEncontrada se não houver responsável
      */
     public UnidadeResponsavelDto buscarResponsavelUnidade(Long unidadeCodigo) {
-        List<ResponsabilidadeUnidadeResumoLeitura> lista = responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(unidadeCodigo));
-        if (lista.isEmpty()) {
-            throw new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo);
-        }
-        return montarResponsavelDto(lista.getFirst());
+        return buscarResponsavelUnidadeOpt(unidadeCodigo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo));
     }
 
     /**
@@ -399,8 +392,20 @@ public class ResponsavelUnidadeService {
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), siglaUnidade));
     }
 
-    private ResponsabilidadeUnidadeLeitura buscarResponsabilidadeDetalhada(Long unidadeCodigo) {
-        return responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(unidadeCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Responsabilidade.class.getSimpleName(), unidadeCodigo));
+    private record ContextoAtribuicaoTemporaria(
+            AtribuicaoTemporaria atribuicao,
+            Unidade unidade,
+            Usuario usuario,
+            CriarAtribuicaoRequest request
+    ) {
     }
+
+    private record PeriodoAtribuicaoDto(
+            Long codUnidade,
+            LocalDateTime dataInicio,
+            LocalDateTime dataTermino,
+            Long codigoIgnorado
+    ) {
+    }
+
 }

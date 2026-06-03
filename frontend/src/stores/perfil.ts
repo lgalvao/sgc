@@ -2,8 +2,7 @@ import {defineStore} from "pinia";
 import {computed, ref} from "vue";
 import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/types/autenticacao";
 import type {Perfil, Unidade} from "@/types/tipos";
-import {useLocalStorage} from "@/composables/useLocalStorage";
-import {useSessionStorage} from "@/composables/useSessionStorage";
+import {useWebStorage} from "@/composables/useWebStorage";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import {concluirLoginPerfil, encerrarLoginPerfil, iniciarLoginPerfil, type DadosSessaoPerfil} from "@/stores/perfilAutenticacao";
 
@@ -25,12 +24,12 @@ function obterUnidadeAtualSelecionada(
 
 export const usePerfilStore = defineStore("perfil", () => {
     // Estados sincronizados com localStorage/sessionStorage usando composable
-    const usuarioCodigo = useSessionStorage<string | null>("usuarioCodigo", null);
-    const perfilSelecionado = useLocalStorage<Perfil | null>("perfilSelecionado", null);
-    const unidadeSelecionada = useLocalStorage<number | null>("unidadeSelecionada", null);
-    const unidadeSelecionadaSigla = useLocalStorage<string | null>("unidadeSelecionadaSigla", null);
-    const permissoesSessao = useLocalStorage<PermissoesSessao | null>("permissoesSessao", null);
-    const usuarioNome = useSessionStorage<string | null>("usuarioNome", null);
+    const usuarioCodigo = useWebStorage<string | null>(sessionStorage, "usuarioCodigo", null);
+    const perfilSelecionado = useWebStorage<Perfil | null>(localStorage, "perfilSelecionado", null);
+    const unidadeSelecionada = useWebStorage<number | null>(localStorage, "unidadeSelecionada", null);
+    const unidadeSelecionadaSigla = useWebStorage<string | null>(localStorage, "unidadeSelecionadaSigla", null);
+    const permissoesSessao = useWebStorage<PermissoesSessao | null>(localStorage, "permissoesSessao", null);
+    const usuarioNome = useWebStorage<string | null>(sessionStorage, "usuarioNome", null);
     const versaoSessao = ref(0);
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const unidadeAtualDetalhes = ref<Unidade | null>(null);

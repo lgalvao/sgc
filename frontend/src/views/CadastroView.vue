@@ -66,7 +66,7 @@
           :disabled="!codigoSubprocesso || !habilitarEditarCadastro"
           :erro="erroNovaAtividade"
           :loading="loadingAdicionar"
-          @submit="handleAdicionarAtividade"
+          @submit="adicionarNovaAtividade"
       />
 
       <EmptyState
@@ -118,7 +118,7 @@
           :observacao-devolucao="observacaoDevolucao"
           :erro-observacao-devolucao="mensagemErroObservacaoDevolucao"
           :observacao-validacao="observacaoValidacao"
-          @importar="handleImportAtividades"
+          @importar="aoImportarAtividades"
           @confirmar-devolucao-analise="confirmarDevolucaoAnalise"
           @confirmar-disponibilizacao="confirmarDisponibilizacao"
           @confirmar-remocao="confirmarRemocao"
@@ -207,13 +207,13 @@ const {
   loadingValidacao,
   atividadeFormRef,
   setAtividadeRef,
-  handleImportAtividades,
+  aoImportarAtividades,
   confirmarDevolucaoAnalise,
   confirmarDisponibilizacao,
   confirmarRemocao,
   confirmarValidacaoAnalise,
   fecharModalImpacto,
-  handleAdicionarAtividade,
+  adicionarNovaAtividade,
   salvarEdicaoAtividade,
   removerAtividade,
   adicionarConhecimento,
@@ -239,7 +239,7 @@ defineExpose({
   errosValidacao: tela.errosValidacao,
   notificacao: tela.notificacao,
   novaAtividade: tela.novaAtividade,
-  handleImportAtividades: tela.handleImportAtividades,
+  aoImportarAtividades: tela.aoImportarAtividades,
   disponibilizarCadastro: tela.disponibilizarCadastro,
   adicionarAtividade: tela.adicionarAtividade,
   confirmarRemocao: tela.confirmarRemocao,

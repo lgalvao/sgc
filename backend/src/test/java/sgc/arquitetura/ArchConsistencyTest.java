@@ -104,17 +104,10 @@ public class ArchConsistencyTest {
             .because("Controllers e Services devem estar em pacotes @NullMarked para garantir null-safety");
 
     @ArchTest
-    static final ArchRule facades_should_have_facade_suffix = classes()
-            .that()
-            .resideInAPackage("..service..")
-            .and()
-            .areAnnotatedWith(Service.class)
-            .and()
-            .haveSimpleNameContaining("Facade")
+    static final ArchRule production_code_should_not_use_facade_suffix = noClasses()
             .should()
             .haveSimpleNameEndingWith("Facade")
-            .allowEmptyShould(true)
-            .because("Facade classes should have 'Facade' as suffix for consistency");
+            .because("O backend atual do SGC não adota Facade como categoria arquitetural; use Service ou AplicacaoService");
 
     @ArchTest
     static final ArchRule dtos_should_not_be_jpa_entities = noClasses()
@@ -192,6 +185,48 @@ public class ArchConsistencyTest {
             .because("Controllers devem receber DTOs/requests explícitos, não entidades JPA no corpo HTTP");
 
     @ArchTest
+    static final ArchRule controllers_should_not_expose_internal_model_types_in_http_contracts = methods()
+            .that()
+            .arePublic()
+            .and()
+            .areDeclaredInClassesThat()
+            .areAnnotatedWith(RestController.class)
+            .and()
+            .areDeclaredInClassesThat()
+            .doNotHaveSimpleName("E2eController")
+            .should(new ArchCondition<>("not expose internal model types in HTTP contracts") {
+                @Override
+                public void check(JavaMethod method, ConditionEvents events) {
+                    try {
+                        if (contemModeloInternoAplicacao(method.reflect().getGenericReturnType())) {
+                            String mensagem = String.format(
+                                    "Método %s.%s expõe tipo interno de model no retorno HTTP: %s",
+                                    method.getOwner().getSimpleName(), method.getName(), method.getDescription());
+                            events.add(SimpleConditionEvent.violated(method, mensagem));
+                        }
+
+                        for (java.lang.reflect.Parameter parametro : method.reflect().getParameters()) {
+                            if (parametro.isAnnotationPresent(RequestBody.class)
+                                    && contemModeloInternoAplicacao(parametro.getParameterizedType())) {
+                                String mensagem = String.format(
+                                        "Método %s.%s recebe tipo interno de model em @RequestBody: %s",
+                                        method.getOwner().getSimpleName(),
+                                        method.getName(),
+                                        parametro.getParameterizedType().getTypeName());
+                                events.add(SimpleConditionEvent.violated(method, mensagem));
+                            }
+                        }
+                    } catch (Exception e) {
+                        String mensagem = String.format(
+                                "Não foi possível inspecionar contrato HTTP de %s.%s: %s",
+                                method.getOwner().getSimpleName(), method.getName(), e.getMessage());
+                        events.add(SimpleConditionEvent.violated(method, mensagem));
+                    }
+                }
+            })
+            .because("Controllers da aplicação devem expor DTOs explícitos e não tipos internos de model no contrato HTTP");
+
+    @ArchTest
     static final ArchRule controllers_should_not_use_json_view_except_e2e = noMethods()
             .that()
             .areDeclaredInClassesThat()
@@ -202,6 +237,49 @@ public class ArchConsistencyTest {
             .should()
             .beAnnotatedWith(JsonView.class)
             .because("Controllers da aplicação devem usar DTOs explícitos; @JsonView fica restrito ao adapter interno de E2E");
+
+    @ArchTest
+    static final ArchRule dto_packages_with_explicit_http_contracts_should_not_use_json_view = classes()
+            .that()
+            .resideInAnyPackage(
+                    "sgc.organizacao.dto..",
+                    "sgc.mapa.dto..",
+                    "sgc.processo.dto..",
+                    "sgc.subprocesso.dto..",
+                    "sgc.seguranca.dto..",
+                    "sgc.alerta.dto..")
+            .should(new ArchCondition<>("não usar @JsonView em DTOs de contratos HTTP explícitos") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    if (item.isAnnotatedWith(JsonView.class)) {
+                        events.add(SimpleConditionEvent.violated(
+                                item,
+                                "Classe " + item.getName() + " usa @JsonView em DTO de contrato HTTP explícito"));
+                    }
+
+                    item.getFields().stream()
+                            .filter(field -> field.isAnnotatedWith(JsonView.class))
+                            .forEach(field -> events.add(SimpleConditionEvent.violated(
+                                    field,
+                                    "Campo " + field.getFullName() + " usa @JsonView em DTO de contrato HTTP explícito")));
+
+                    item.getMethods().stream()
+                            .filter(method -> method.isAnnotatedWith(JsonView.class))
+                            .forEach(method -> events.add(SimpleConditionEvent.violated(
+                                    method,
+                                    "Método " + method.getFullName() + " usa @JsonView em DTO de contrato HTTP explícito")));
+                }
+            })
+            .because("Nos módulos já migrados, a borda HTTP deve ser descrita por DTOs explícitos e estáveis, sem serialização condicional por view");
+
+    @ArchTest
+    static final ArchRule only_models_and_e2e_adapter_should_depend_on_json_views = noClasses()
+            .that()
+            .resideOutsideOfPackages("sgc..model..", "sgc.e2e..")
+            .should()
+            .accessClassesThat()
+            .haveSimpleNameEndingWith("Views")
+            .because("Classes *Views e JsonView ficam contidas no legado de entidades/model e no adapter de E2E, sem voltar a contaminar contratos, services ou controllers da aplicação");
 
     @ArchTest
     static final ArchRule controllers_should_not_use_authentication_principal = methods()
@@ -249,7 +327,7 @@ public class ArchConsistencyTest {
             .arePublic()
             .and()
             .areDeclaredInClassesThat()
-            .haveSimpleNameEndingWith("Facade")
+            .haveSimpleNameEndingWith("AplicacaoService")
             .should(new ArchCondition<>("não receber Usuario como Configuração de aplicação") {
                 @Override
                 public void check(JavaMethod method, ConditionEvents events) {
@@ -278,7 +356,7 @@ public class ArchConsistencyTest {
                     }
                 }
             })
-            .because("Controller, Facade e Service de aplicação não devem receber Usuario para representar o usuário autenticado atual");
+            .because("Controller e services de aplicação não devem receber Usuario para representar o usuário autenticado atual");
 
     @ArchTest
     static final ArchRule only_security_organization_and_e2e_should_access_security_context_holder = noClasses()
@@ -450,6 +528,51 @@ public class ArchConsistencyTest {
 
         if (tipo instanceof GenericArrayType genericArrayType) {
             return contemEntidadeJpa(genericArrayType.getGenericComponentType());
+        }
+
+        return false;
+    }
+
+    private static boolean contemModeloInternoAplicacao(Type tipo) {
+        if (tipo instanceof Class<?> classe) {
+            Package pacote = classe.getPackage();
+            if (pacote == null) {
+                return false;
+            }
+            String nomePacote = pacote.getName();
+            return nomePacote.startsWith("sgc.")
+                    && nomePacote.contains(".model")
+                    && !classe.isEnum();
+        }
+
+        if (tipo instanceof ParameterizedType parameterizedType) {
+            if (contemModeloInternoAplicacao(parameterizedType.getRawType())) {
+                return true;
+            }
+            for (Type argumento : parameterizedType.getActualTypeArguments()) {
+                if (contemModeloInternoAplicacao(argumento)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (tipo instanceof WildcardType wildcardType) {
+            for (Type upperBound : wildcardType.getUpperBounds()) {
+                if (contemModeloInternoAplicacao(upperBound)) {
+                    return true;
+                }
+            }
+            for (Type lowerBound : wildcardType.getLowerBounds()) {
+                if (contemModeloInternoAplicacao(lowerBound)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (tipo instanceof GenericArrayType genericArrayType) {
+            return contemModeloInternoAplicacao(genericArrayType.getGenericComponentType());
         }
 
         return false;

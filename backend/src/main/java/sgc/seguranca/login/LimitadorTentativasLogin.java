@@ -109,6 +109,10 @@ public class LimitadorTentativasLogin {
         return tentativasPorIp.size();
     }
 
+    Map<String, Deque<LocalDateTime>> getTentativasPorIp() {
+        return tentativasPorIp;
+    }
+
     public static class ErroMuitasTentativas extends ErroNegocioBase {
         public ErroMuitasTentativas(String message) {
             super(message, "MUITAS_TENTATIVAS", HttpStatus.TOO_MANY_REQUESTS);

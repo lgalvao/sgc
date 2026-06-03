@@ -31,6 +31,8 @@ public class SubprocessoConsultaService {
     private final SubprocessoContextoConsultaService contextoConsultaService;
     private final SubprocessoAcessoService acessoService;
     private final SubprocessoVisualizacaoService visualizacaoService;
+    private final sgc.mapa.MapaDtoMapper mapaDtoMapper;
+    private final sgc.subprocesso.SubprocessoDtoMapper subprocessoDtoMapper;
 
     public MapaVisualizacaoResponse mapaParaVisualizacao(Long codSubprocesso) {
         Subprocesso sp = buscarSubprocesso(codSubprocesso);
@@ -43,7 +45,7 @@ public class SubprocessoConsultaService {
     }
 
     public MapaCompletoDto mapaCompletoDtoPorSubprocesso(Long codSubprocesso) {
-        return MapaCompletoDto.fromEntity(mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso));
+        return mapaDtoMapper.paraMapaCompletoDto(mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso));
     }
 
     public SugestoesDto obterSugestoes(Long codSubprocesso) {
@@ -74,13 +76,13 @@ public class SubprocessoConsultaService {
     public SubprocessoSituacaoDto obterStatus(Subprocesso subprocesso) {
         return SubprocessoSituacaoDto.builder()
                 .codigo(subprocesso.getCodigo())
-                .situacao(subprocesso.getSituacao())
+                .situacao(subprocesso.getSituacao().name())
                 .build();
     }
 
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return subprocessoRepo.findByMapa_Codigo(codMapa)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(NOME_ENTIDADE, "Mapa ID: " + codMapa));
+                .orElseThrow();
     }
 
     public List<Subprocesso> listarTodos() {
@@ -93,7 +95,7 @@ public class SubprocessoConsultaService {
     }
 
     public SubprocessoCadastroDto obterCadastro(Subprocesso subprocesso) {
-        return SubprocessoCadastroDto.fromEntity(subprocesso, listarAtividadesSubprocesso(subprocesso));
+        return subprocessoDtoMapper.paraCadastro(subprocesso, listarAtividadesSubprocesso(subprocesso));
     }
 
     public Subprocesso obterEntidadePorProcessoEUnidade(Long codProcesso, Long codUnidade) {
@@ -173,7 +175,7 @@ public class SubprocessoConsultaService {
     public List<AtividadeDto> listarAtividadesSubprocesso(Subprocesso subprocesso) {
         Long codMapa = subprocesso.getMapa().getCodigo();
         return mapaManutencaoService.atividadesMapaCodigoComConhecimentos(codMapa).stream()
-                .map(AtividadeDto::fromEntity)
+                .map(mapaDtoMapper::paraAtividadeDto)
                 .toList();
     }
 

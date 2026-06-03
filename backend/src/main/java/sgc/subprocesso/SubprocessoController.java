@@ -6,7 +6,6 @@ import jakarta.validation.*;
 import lombok.*;
 import org.jspecify.annotations.*;
 import org.springframework.http.*;
-import org.springframework.security.access.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
@@ -37,14 +36,16 @@ public class SubprocessoController {
     private final SubprocessoTransicaoService transicaoService;
     private final CadastroFluxoService cadastroFluxoService;
     private final UnidadeService unidadeService;
-    private final UsuarioFacade usuarioService;
+    private final UsuarioAplicacaoService usuarioService;
     private final SgcPermissionEvaluator permissionEvaluator;
+    private final SubprocessoDtoMapper subprocessoDtoMapper;
+    private final SubprocessoApresentacaoService subprocessoApresentacaoService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<SubprocessoListagemDto> listar() {
         return consultaService.listarTodos().stream()
-                .map(SubprocessoListagemDto::fromEntity)
+                .map(subprocessoDtoMapper::paraListagem)
                 .toList();
     }
 
@@ -77,7 +78,7 @@ public class SubprocessoController {
         Long codSubprocesso = salvo.getCodigo();
         var subprocessoCriado = consultaService.buscarSubprocesso(codSubprocesso);
         URI uri = URI.create("/api/subprocessos/%d".formatted(codSubprocesso));
-        return ResponseEntity.created(uri).body(SubprocessoResumoDto.fromEntity(subprocessoCriado));
+        return ResponseEntity.created(uri).body(subprocessoDtoMapper.paraResumo(subprocessoCriado));
     }
 
     @PostMapping("/{codSubprocesso}/atualizar")
@@ -86,7 +87,7 @@ public class SubprocessoController {
             @PathVariable Long codSubprocesso, @Valid @RequestBody AtualizarSubprocessoRequest request) {
         subprocessoService.atualizarEntidade(codSubprocesso, request.paraCommand());
         var subprocessoAtualizado = consultaService.buscarSubprocesso(codSubprocesso);
-        return ResponseEntity.ok(SubprocessoResumoDto.fromEntity(subprocessoAtualizado));
+        return ResponseEntity.ok(subprocessoDtoMapper.paraResumo(subprocessoAtualizado));
     }
 
     @PostMapping("/{codSubprocesso}/excluir")
@@ -149,10 +150,7 @@ public class SubprocessoController {
             @RequestParam Long codProcesso,
             @RequestParam String siglaUnidade
     ) {
-        Long codUnidade = unidadeService.buscarCodigoPorSigla(siglaUnidade);
-        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
-        verificarPermissaoVisualizacao(subprocesso);
-        return ResponseEntity.ok(consultaService.obterContextoEdicao(subprocesso));
+        return ResponseEntity.ok(subprocessoApresentacaoService.obterContextoEdicaoPorProcessoEUnidade(codProcesso, siglaUnidade));
     }
 
     @GetMapping("/contexto-cadastro-atividades/buscar")
@@ -161,10 +159,7 @@ public class SubprocessoController {
             @RequestParam Long codProcesso,
             @RequestParam String siglaUnidade
     ) {
-        Long codUnidade = unidadeService.buscarCodigoPorSigla(siglaUnidade);
-        Subprocesso subprocesso = consultaService.obterEntidadePorProcessoEUnidade(codProcesso, codUnidade);
-        verificarPermissaoVisualizacao(subprocesso);
-        return ResponseEntity.ok(consultaService.obterContextoCadastroAtividades(subprocesso.getCodigo()));
+        return ResponseEntity.ok(subprocessoApresentacaoService.obterContextoCadastroAtividadesPorProcessoEUnidade(codProcesso, siglaUnidade));
     }
 
     @GetMapping("/{codSubprocesso}/atividades-importacao")
@@ -227,42 +222,42 @@ public class SubprocessoController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_CADASTRO')")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody JustificativaRequest request) {
-        executarDevolucao(codSubprocesso, request.justificativa());
+        cadastroFluxoService.devolver(codSubprocesso, sanitizar(request.justificativa()));
     }
 
     @PostMapping("/{codSubprocesso}/aceitar-cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_CADASTRO')")
     @Operation(summary = "Aceita o cadastro de atividades")
     public void aceitarCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
-        executarAceite(codSubprocesso, request.texto());
+        cadastroFluxoService.aceitar(codSubprocesso, sanitizar(request.texto()));
     }
 
     @PostMapping("/{codSubprocesso}/homologar-cadastro")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_CADASTRO')")
     @Operation(summary = "Homologa o cadastro de atividades")
     public void homologarCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
-        executarHomologacao(codSubprocesso, request.texto());
+        cadastroFluxoService.homologar(codSubprocesso, sanitizar(request.texto()));
     }
 
     @PostMapping("/{codSubprocesso}/devolver-revisao-cadastro")
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_REVISAO_CADASTRO')")
     public void devolverRevisaoCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody JustificativaRequest request) {
-        executarDevolucao(codSubprocesso, request.justificativa());
+        cadastroFluxoService.devolver(codSubprocesso, sanitizar(request.justificativa()));
     }
 
     @PostMapping("/{codSubprocesso}/aceitar-revisao-cadastro")
     @Operation(summary = "Aceita a revisão do cadastro de atividades")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'ACEITAR_REVISAO_CADASTRO')")
     public void aceitarRevisaoCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
-        executarAceite(codSubprocesso, request.texto());
+        cadastroFluxoService.aceitar(codSubprocesso, sanitizar(request.texto()));
     }
 
     @PostMapping("/{codSubprocesso}/homologar-revisao-cadastro")
     @Operation(summary = "Homologa a revisão do cadastro de atividades")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_REVISAO_CADASTRO')")
     public void homologarRevisaoCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody TextoOpcionalRequest request) {
-        executarHomologacao(codSubprocesso, request.texto());
+        cadastroFluxoService.homologar(codSubprocesso, sanitizar(request.texto()));
     }
 
     @PostMapping("/{codSubprocesso}/importar-atividades")
@@ -271,20 +266,7 @@ public class SubprocessoController {
     @Operation(summary = "Importa atividades de outro subprocesso")
     public AtividadeOperacaoResponse importarAtividades(
             @PathVariable Long codSubprocesso, @RequestBody @Valid ImportarAtividadesRequest request) {
-        SubprocessoService.ImportacaoAtividadesResultado resultado = subprocessoService.importarAtividades(
-                codSubprocesso,
-                request.codSubprocessoOrigem(),
-                request.codigosAtividades()
-        );
-        Long codigoSubprocessoDestino = resultado.codigoSubprocessoDestino();
-        return AtividadeOperacaoResponse.builder()
-                .atividade(null)
-                .subprocesso(consultaService.obterStatus(codigoSubprocessoDestino))
-                .atividadesAtualizadas(consultaService.listarAtividadesSubprocesso(codigoSubprocessoDestino))
-                .permissoes(consultaService.obterPermissoesUI(codigoSubprocessoDestino))
-                .message("Atividades importadas.")
-                .aviso(resultado.temDuplicatas() ? Mensagens.IMPORTACAO_ATIVIDADES_DUPLICADAS : null)
-                .build();
+        return subprocessoApresentacaoService.importarAtividades(codSubprocesso, request);
     }
 
     @PostMapping("/aceitar-cadastro-bloco")
@@ -462,23 +444,6 @@ public class SubprocessoController {
         return ResponseEntity.ok().build();
     }
 
-    private @Nullable String sanitizarTextoOpcional(@Nullable TextoOpcionalRequest request) {
-        if (request == null || request.texto() == null) {
-            return null;
-        }
-        return UtilSanitizacao.sanitizarFormatado(request.texto());
-    }
-
-    private void verificarPermissaoVisualizacao(Subprocesso subprocesso) {
-        if (!permissionEvaluator.verificarPermissao(
-                usuarioService.usuarioAutenticado(),
-                subprocesso,
-                AcaoPermissao.VISUALIZAR_SUBPROCESSO
-        )) {
-            throw new AccessDeniedException("Acesso negado ao subprocesso");
-        }
-    }
-
     @PostMapping("/{codSubprocesso}/submeter-mapa-ajustado")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'AJUSTAR_MAPA')")
     @Operation(summary = "Submete o mapa após ajustes solicitados")
@@ -509,7 +474,7 @@ public class SubprocessoController {
     @Operation(summary = "Cria uma análise de cadastro")
     public AnaliseHistoricoDto criarAnaliseCadastro(@PathVariable Long codSubprocesso,
                                                     @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
+        return subprocessoApresentacaoService.criarAnalise(codSubprocesso, request, TipoAnalise.CADASTRO);
     }
 
     @PostMapping("/{codSubprocesso}/analises-validacao")
@@ -518,30 +483,19 @@ public class SubprocessoController {
     @Operation(summary = "Cria uma análise de validação")
     public AnaliseHistoricoDto criarAnaliseValidacao(@PathVariable Long codSubprocesso,
                                                      @RequestBody @Valid CriarAnaliseRequest request) {
-        return criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
+        return subprocessoApresentacaoService.criarAnalise(codSubprocesso, request, TipoAnalise.VALIDACAO);
     }
 
-    private void executarDevolucao(Long codSubprocesso, String justificativa) {
-        cadastroFluxoService.devolver(codSubprocesso, sanitizar(justificativa));
-    }
-
-    private void executarAceite(Long codSubprocesso, @Nullable String texto) {
-        cadastroFluxoService.aceitar(codSubprocesso, sanitizar(texto));
-    }
-
-    private void executarHomologacao(Long codSubprocesso, @Nullable String texto) {
-        cadastroFluxoService.homologar(codSubprocesso, sanitizar(texto));
+    private @Nullable String sanitizarTextoOpcional(@Nullable TextoOpcionalRequest request) {
+        if (request == null || request.texto() == null) {
+            return null;
+        }
+        return UtilSanitizacao.sanitizarFormatado(request.texto());
     }
 
     private String sanitizar(@Nullable String texto) {
         return Optional.ofNullable(texto)
                 .map(UtilSanitizacao::sanitizarFormatado)
                 .orElse("");
-    }
-
-    private AnaliseHistoricoDto criarAnalise(Long codSubprocesso, CriarAnaliseRequest request, TipoAnalise tipo) {
-        Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
-        Analise analise = transicaoService.criarAnalise(sp, request, tipo);
-        return analiseHistoricoService.converter(analise);
     }
 }

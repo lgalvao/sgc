@@ -20,11 +20,7 @@ import {
     disponibilizarCadastro,
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
-import {
-    abrirAcaoCadastroPrincipal,
-    abrirHistoricoAnalise,
-    fecharHistoricoAnalise
-} from './helpers/helpers-analise.js';
+import {abrirAcaoCadastroPrincipal, abrirHistoricoAnalise, fecharHistoricoAnalise} from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import {

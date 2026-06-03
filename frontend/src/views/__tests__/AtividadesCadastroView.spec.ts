@@ -100,7 +100,7 @@ type CadastroViewVm = {
     notificacao: unknown;
     novaAtividade: string;
     podeHomologarCadastro?: boolean;
-    handleImportAtividades: (resultado: any) => Promise<void>;
+    aoImportarAtividades: (resultado: any) => Promise<void>;
     disponibilizarCadastro: () => Promise<void>;
     adicionarAtividade: () => Promise<void>;
     confirmarRemocao: () => Promise<void>;
@@ -917,7 +917,7 @@ describe("CadastroView.vue", () => {
         });
 
         const vm = wrapper.vm as unknown as CadastroViewVm;
-        await vm.handleImportAtividades({
+        await vm.aoImportarAtividades({
             subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
             permissoes: criarContextoEdicao().detalhes.permissoes,
             atividadesAtualizadas: [{
@@ -938,7 +938,7 @@ describe("CadastroView.vue", () => {
         ]);
     });
 
-    it("handleImportAtividades exibe aviso quando resultado tem aviso", async () => {
+    it("aoImportarAtividades exibe aviso quando resultado tem aviso", async () => {
         const wrapper = createWrapper();
         await flushPromises();
         const vm = wrapper.vm as unknown as CadastroViewVm;
@@ -950,7 +950,7 @@ describe("CadastroView.vue", () => {
             atividadesAtualizadas: []
         };
 
-        await vm.handleImportAtividades(resultadoComAviso);
+        await vm.aoImportarAtividades(resultadoComAviso);
 
         const notifyMock = vi.mocked(useNotificationModule.useNotification()).notify;
         expect(notifyMock).toHaveBeenCalledWith(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
@@ -1143,8 +1143,8 @@ describe("CadastroView.vue", () => {
         await flushPromises();
         const vm = wrapper.vm as any;
 
-        // handleAdicionarAtividade branches
-        await vm.handleAdicionarAtividade();
+        // adicionarAtividade branches
+        await vm.adicionarAtividade();
         expect(mockAtividadeForm.adicionarAtividade).toHaveBeenCalled();
 
         // scrollParaPrimeiroErro branches
@@ -1155,8 +1155,8 @@ describe("CadastroView.vue", () => {
         vm.scrollParaPrimeiroErro();
         expect(div.scrollIntoView).toHaveBeenCalled();
 
-        // handleImportAtividades branches (success case without warning)
-        await vm.handleImportAtividades({
+        // aoImportarAtividades branches (success case without warning)
+        await vm.aoImportarAtividades({
             aviso: null, 
             atividadesAtualizadas: [], 
             subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},

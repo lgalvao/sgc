@@ -71,7 +71,7 @@ class UnidadeProcessoTest {
     @DisplayName("deve falhar ao criar snapshot com tipo nao suportado")
     void deveFalharAoCriarSnapshotComTipoNaoSuportado() {
         Unidade unidade = criarUnidade();
-        unidade.setTipo(TipoUnidade.RAIZ);
+        unidade.setTipo(TipoUnidade.SEM_EQUIPE);
         Processo processo = new Processo();
         processo.setCodigo(10L);
 

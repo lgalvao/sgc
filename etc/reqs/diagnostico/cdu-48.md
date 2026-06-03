@@ -1,4 +1,4 @@
-# CDU-48 - Monitorar andamento do diagnóstico
+# CDU-48 - Monitorar diagnóstico 
 
 Ator: GESTOR, ADMIN
 
@@ -17,26 +17,22 @@ Base principal: Respostas do usuário sobre monitoramento na tela de detalhes do
 
 2. O sistema mostra a tela `Detalhes do processo`.
 
-3. Na tela `Detalhes do processo`, o sistema apresenta uma árvore com as unidades participantes do processo dentro do
-   escopo visível ao usuário.
-
-4. Para cada unidade apresentada, o sistema mostra:
+3. Na tela `Detalhes do processo`, o sistema apresenta uma tabela hierárquica com as unidades participantes do processo. Para cada unidade, mostra:
    - sigla e nome;
    - situação atual do subprocesso;
-   - data limite atual da unidade;
+   - data limite da etapa atual do subprocesso;
    - localização atual do subprocesso.
 
-5. Para o perfil GESTOR, a árvore exibida deve se limitar à própria unidade e às unidades subordinadas a ela,
-   recursivamente.
+   3.1. Para o perfil GESTOR, a tabela hierarquica deve se limitar à própria unidade do usuário e às unidades subordinadas a ela, recursivamente.
 
-6. Para o perfil ADMIN, a árvore exibida deve contemplar todas as unidades participantes do processo.
+   3.2. Para o perfil ADMIN, a árvore exibida deve contemplar todas as unidades participantes do processo.
 
-7. O usuário pode detalhar uma unidade para abrir a sua tela `Diagnóstico da unidade`.
+4. O usuário clica em uma unidade 
+   
+5. O sistema mostra a tela `Detalhe do subprocesso` para a unidade selecionada.
+   
+6. O usuário clica no card `Monitoramento`.
 
-8. O sistema pode destacar visualmente unidades com prazo vencido ou próximo do vencimento.
+7. O sistema mostra a tela `Monitoramento de diagnóstico`, com os 
 
-## Observação
-
-PENDÊNCIA DE REFINAMENTO: os campos mostrados na árvore e o destaque visual de prazos foram definidos como conjunto
-mínimo de acompanhamento. Confirmar depois se o processo exige outros indicadores, percentuais ou agregados na própria
-tela de detalhes do processo.
+8. 

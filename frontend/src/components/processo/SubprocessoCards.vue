@@ -11,7 +11,7 @@
             :tabindex="habilitarAcessoCadastro ? 0 : undefined"
             data-testid="card-subprocesso-atividades"
             @click="habilitarAcessoCadastro && navegarPara('SubprocessoCadastro')"
-            @keydown="habilitarAcessoCadastro && handleKeyDown($event, 'SubprocessoCadastro')"
+            @keydown="habilitarAcessoCadastro && aoPressionarTecla($event, 'SubprocessoCadastro')"
         >
           <div class="card-click-area">
             <BCardTitle :class="['d-flex align-items-start gap-3 mb-3', habilitarAcessoCadastro ? undefined : 'text-muted']">
@@ -35,7 +35,7 @@
             :role="mapaHabilitado ? 'button' : undefined"
             :tabindex="mapaHabilitado ? 0 : undefined"
             @click="mapaHabilitado && navegarPara('SubprocessoMapa')"
-            @keydown="mapaHabilitado && handleKeyDown($event, 'SubprocessoMapa')"
+            @keydown="mapaHabilitado && aoPressionarTecla($event, 'SubprocessoMapa')"
         >
           <div class="card-click-area">
             <BCardTitle :class="['d-flex align-items-start gap-3 mb-3', mapaHabilitado ? undefined : 'text-muted']">
@@ -61,7 +61,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('AutoavaliacaoDiagnostico')"
-            @keydown="handleKeyDownDiagnostico($event, 'AutoavaliacaoDiagnostico')"
+            @keydown="aoPressionarTeclaDiagnostico($event, 'AutoavaliacaoDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -85,7 +85,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
-            @keydown="handleKeyDownDiagnostico($event, 'OcupacoesCriticasDiagnostico')"
+            @keydown="aoPressionarTeclaDiagnostico($event, 'OcupacoesCriticasDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -108,7 +108,7 @@
             role="button"
             tabindex="0"
             @click="navegarParaDiag('MonitoramentoDiagnostico')"
-            @keydown="handleKeyDownDiagnostico($event, 'MonitoramentoDiagnostico')"
+            @keydown="aoPressionarTeclaDiagnostico($event, 'MonitoramentoDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -174,14 +174,14 @@ function navegarParaDiag(routeName: string) {
   });
 }
 
-function handleKeyDown(event: KeyboardEvent, routeName: string) {
+function aoPressionarTecla(event: KeyboardEvent, routeName: string) {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     navegarPara(routeName);
   }
 }
 
-function handleKeyDownDiagnostico(event: KeyboardEvent, routeName: string) {
+function aoPressionarTeclaDiagnostico(event: KeyboardEvent, routeName: string) {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     navegarParaDiag(routeName);
@@ -192,8 +192,8 @@ defineExpose({
   TipoProcessoEnum,
   navegarPara,
   navegarParaDiag,
-  handleKeyDown,
-  handleKeyDownDiagnostico,
+  aoPressionarTecla,
+  aoPressionarTeclaDiagnostico,
 });
 </script>
 

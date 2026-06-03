@@ -1,8 +1,6 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
-import sgc.organizacao.model.*;
-import sgc.subprocesso.model.*;
 
 import java.time.*;
 
@@ -20,23 +18,4 @@ public record MovimentacaoDto(
         String usuarioNome,
         String descricao
 ) {
-    public static MovimentacaoDto from(Movimentacao m) {
-        Unidade unidadeOrigem = m.getUnidadeOrigem();
-        Unidade unidadeDestino = m.getUnidadeDestino();
-        Usuario usuario = m.getUsuario();
-
-        return MovimentacaoDto.builder()
-                .codigo(m.getCodigo())
-                .dataHora(m.getDataHora())
-                .unidadeOrigemCodigo(unidadeOrigem.getCodigo())
-                .unidadeOrigemSigla(unidadeOrigem.getSigla())
-                .unidadeOrigemNome(unidadeOrigem.getNome())
-                .unidadeDestinoCodigo(unidadeDestino.getCodigo())
-                .unidadeDestinoSigla(unidadeDestino.getSigla())
-                .unidadeDestinoNome(unidadeDestino.getNome())
-                .usuarioTitulo(usuario.getTituloEleitoral())
-                .usuarioNome(usuario.getNome())
-                .descricao(m.getDescricao())
-                .build();
-    }
 }

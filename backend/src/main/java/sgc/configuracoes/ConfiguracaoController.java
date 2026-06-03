@@ -18,13 +18,14 @@ import java.util.*;
 @Validated
 public class ConfiguracaoController {
     private final ConfiguracaoService configuracaoService;
+    private final ConfiguracaoMapper configuracaoMapper;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas as configurações")
     public List<ConfiguracaoDto> listar() {
         return configuracaoService.buscarTodos().stream()
-                .map(ConfiguracaoDto::fromEntity)
+                .map(configuracaoMapper::paraDto)
                 .toList();
     }
 
@@ -42,7 +43,7 @@ public class ConfiguracaoController {
                 .toList();
 
         return configuracaoService.salvar(parametrosAtualizados).stream()
-                .map(ConfiguracaoDto::fromEntity)
+                .map(configuracaoMapper::paraDto)
                 .toList();
     }
 }

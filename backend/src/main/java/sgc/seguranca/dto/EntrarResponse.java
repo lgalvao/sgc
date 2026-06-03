@@ -1,7 +1,6 @@
 package sgc.seguranca.dto;
 
 import lombok.*;
-import sgc.organizacao.model.*;
 
 /**
  * DTO para resposta de login.
@@ -10,7 +9,7 @@ import sgc.organizacao.model.*;
 public record EntrarResponse(
         String tituloEleitoral,
         String nome,
-        Perfil perfil,
+        String perfil,
         Long unidadeCodigo,
         PermissoesSessaoResponse permissoes) {
 }

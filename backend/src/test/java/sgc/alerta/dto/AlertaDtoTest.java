@@ -1,6 +1,7 @@
 package sgc.alerta.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.alerta.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
@@ -12,12 +13,14 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("AlertaDto")
 class AlertaDtoTest {
 
+    private final AlertaDtoMapper mapper = new AlertaDtoMapper();
+
     @Test
     @DisplayName("deve mapear alerta a partir da entidade")
     void deveMapearAlertaAPartirDaEntidade() {
         Alerta alerta = criarAlerta();
 
-        AlertaDto dto = AlertaDto.fromEntity(alerta);
+        AlertaDto dto = mapper.paraAlertaDto(alerta);
 
         assertThat(dto.codigo()).isEqualTo(5L);
         assertThat(dto.codProcesso()).isEqualTo(10L);
@@ -41,7 +44,7 @@ class AlertaDtoTest {
         alerta.setDescricao("Alerta pessoal");
         alerta.setDataHora(LocalDateTime.of(2025, 1, 1, 10, 0));
 
-        AlertaDto dto = AlertaDto.fromEntity(alerta);
+        AlertaDto dto = mapper.paraAlertaDto(alerta);
 
         assertThat(dto.codigo()).isEqualTo(6L);
         assertThat(dto.codProcesso()).isNull();

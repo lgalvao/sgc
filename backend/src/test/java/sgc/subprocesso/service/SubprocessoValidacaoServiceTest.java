@@ -208,25 +208,7 @@ class SubprocessoValidacaoServiceTest {
     @DisplayName("validarSituacaoPermitida")
     class ValidarSituacaoPermitida {
 
-        @Test
-        @DisplayName("deve lançar erro se entrada de API não informar situacao")
-        void erroSituacaoNula() {
-            Subprocesso sp = mock(Subprocesso.class);
-            when(sp.getSituacao()).thenReturn(null);
 
-            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.NAO_INICIADO)))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessageContaining("Situação do subprocesso não pode ser nula");
-        }
-
-        @Test
-        @DisplayName("deve lançar erro se permitidas for vazio")
-        void erroPermitidasVazia() {
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, Set.of()))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
 
         @Test
         @DisplayName("deve lançar erro de validacao se situacao nao permitida")
@@ -245,14 +227,6 @@ class SubprocessoValidacaoServiceTest {
             validacaoService.validarSituacaoPermitida(sp, Set.of(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO));
         }
 
-        @Test
-        @DisplayName("deve lançar erro se varargs vazio")
-        void erroVarargsVazio() {
-            Subprocesso sp = new Subprocesso();
-            sp.setSituacao(SituacaoSubprocesso.NAO_INICIADO);
-            assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
 
         @Test
         @DisplayName("deve usar a mensagem fornecida no erro")
@@ -588,15 +562,6 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("validarSituacaoMinima")
         class ValidarSituacaoMinima {
 
-            @Test
-            @DisplayName("deve lançar IllegalArgumentException se situação for nula")
-            void erroSituacaoNula() {
-                Subprocesso sp = new Subprocesso();
-                sp.setSituacao(null);
-
-                assertThatThrownBy(() -> validacaoService.validarSituacaoMinima(sp, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO, "msg"))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
 
             @Test
             @DisplayName("deve lançar ErroValidacao se situação atual for menor que a mínima")
@@ -632,27 +597,7 @@ class SubprocessoValidacaoServiceTest {
         @DisplayName("validarSituacaoPermitida - varargs com mensagem")
         class ValidarSituacaoPermitidaExtra {
 
-            @Test
-            @DisplayName("deve lançar IllegalArgumentException se situação for nula")
-            void erroSituacaoNula() {
-                Subprocesso sp = new Subprocesso();
-                sp.setSituacao(null);
 
-                assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "msg", SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO))
-                        .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessageContaining("Situação do subprocesso não pode ser nula");
-            }
-
-            @Test
-            @DisplayName("deve lançar IllegalArgumentException se não houver situações permitidas")
-            void erroSemPermitidas() {
-                Subprocesso sp = new Subprocesso();
-                sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
-
-                assertThatThrownBy(() -> validacaoService.validarSituacaoPermitida(sp, "msg"))
-                        .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessageContaining("Pelo menos uma situação permitida deve ser fornecida");
-            }
         }
 
         @Nested

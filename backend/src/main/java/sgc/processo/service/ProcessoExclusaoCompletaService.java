@@ -7,7 +7,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.jdbc.core.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.processo.model.*;
 
 import java.util.*;
@@ -27,11 +27,10 @@ public class ProcessoExclusaoCompletaService {
     private final JdbcTemplate jdbcTemplate;
     private final ProcessoRepo processoRepo;
     private final CacheManager cacheManager;
+    private final ComumRepo comumRepo;
 
     public void excluirCompleto(Long codigo) {
-        if (!processoRepo.existsById(codigo)) {
-            throw new ErroEntidadeNaoEncontrada("Processo", codigo);
-        }
+        comumRepo.buscar(Processo.class, codigo);
 
         jdbcTemplate.update("DELETE FROM sgc.notificacao_email WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
 

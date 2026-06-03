@@ -9,8 +9,8 @@ describe("ProcessoSubprocessosTable.vue", () => {
             codUnidade: 1,
             sigla: "ADMIN",
             nome: "Administração",
-            codSubprocesso: 0, // Unidade sem subprocesso
-            situacaoSubprocesso: SituacaoSubprocesso.NAO_INICIADO,
+            codSubprocesso: null, // Unidade sem subprocesso
+            situacaoSubprocesso: null,
             dataLimite: "",
             filhos: [
                 {
@@ -39,8 +39,8 @@ describe("ProcessoSubprocessosTable.vue", () => {
         const data = treeTable.props('data') as Array<{
             sigla: string;
             clickable: boolean;
-            codSubprocesso: number;
-            children: Array<{ sigla: string; clickable: boolean; codSubprocesso: number }>;
+            codSubprocesso: number | null;
+            children: Array<{ sigla: string; clickable: boolean; codSubprocesso: number | null }>;
         }>;
 
         const admin = data.find((u) => u.sigla === "ADMIN");

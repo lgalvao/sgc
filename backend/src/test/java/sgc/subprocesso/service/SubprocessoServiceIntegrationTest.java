@@ -35,7 +35,7 @@ class SubprocessoServiceIntegrationTest {
     private SubprocessoConsultaService consultaService;
 
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @MockitoBean
     private JavaMailSenderImpl javaMailSender;
@@ -148,7 +148,7 @@ class SubprocessoServiceIntegrationTest {
 
             sgc.organizacao.model.Usuario user = new sgc.organizacao.model.Usuario();
             user.setTituloEleitoral("123");
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             subprocessoService.criarParaMapeamento(
                     new SubprocessoService.CriarSubprocessosMapeamentoCommand(proc, java.util.List.of(u), u));
@@ -205,12 +205,12 @@ class SubprocessoServiceIntegrationTest {
             usuario.setPerfilAtivo(Perfil.CHEFE);
             usuario.setUnidadeAtivaCodigo(sp.getUnidade().getCodigo());
 
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
                     usuario.getTituloEleitoral(),
                     sp.getUnidade().getCodigo(),
                     Perfil.CHEFE
             ));
-            doReturn(null).when(usuarioFacade).buscarResponsabilidadeDetalhadaAtual(sp.getUnidade().getCodigo());
+            doReturn(null).when(usuarioAplicacaoService).buscarResponsabilidadeDetalhadaAtual(sp.getUnidade().getCodigo());
 
             ContextoEdicaoResponse contexto = consultaService.obterContextoEdicao(sp.getCodigo());
 
@@ -439,13 +439,13 @@ class SubprocessoServiceIntegrationTest {
             user.setUnidadeLotacao(u); // Mesma unidade
             user.setUnidadeAtivaCodigo(u.getCodigo());
 
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
                     user.getTituloEleitoral(),
                     user.getUnidadeAtivaCodigo(),
                     user.getPerfilAtivo()
             ));
-            when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(anyString())).thenReturn(ResponsavelDto.builder().build());
-            when(usuarioFacade.buscarPorLogin(anyString())).thenReturn(user);
+            when(usuarioAplicacaoService.buscarResponsabilidadeDetalhadaAtual(anyString())).thenReturn(ResponsavelDto.builder().build());
+            when(usuarioAplicacaoService.buscarPorLogin(anyString())).thenReturn(user);
 
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities())

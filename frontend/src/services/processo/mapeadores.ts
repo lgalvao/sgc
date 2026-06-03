@@ -1,18 +1,32 @@
 import {SituacaoSubprocesso, type UnidadeParticipante} from "@/types/tipos";
-import type {Processo, ProcessoDetalheResponseBackend, UnidadeParticipanteDto} from "./types";
+import type {Processo, ProcessoDetalheResponseBackend, UnidadeImportacao, UnidadeParticipanteDto} from "./types";
 
 function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {
     return {
-        nome: dto.nome!,
-        sigla: dto.sigla!,
+        nome: dto.nome,
+        sigla: dto.sigla,
         codUnidade: dto.codUnidade,
-        codSubprocesso: dto.codSubprocesso !== undefined && dto.codSubprocesso !== null ? dto.codSubprocesso : 0,
-        codUnidadeSuperior: dto.codUnidadeSuperior,
-        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso | undefined) ? (dto.situacaoSubprocesso as SituacaoSubprocesso) : SituacaoSubprocesso.NAO_INICIADO,
-        dataLimite: dto.dataLimite ? dto.dataLimite : "",
-        mapaCodigo: dto.mapaCodigo,
-        localizacaoAtualCodigo: dto.localizacaoAtualCodigo,
-        filhos: (dto.filhos ? dto.filhos : []).map(mapearUnidadeParticipante),
+        codSubprocesso: dto.codSubprocesso ?? null,
+        codUnidadeSuperior: dto.codUnidadeSuperior ?? undefined,
+        situacaoSubprocesso: dto.situacaoSubprocesso as SituacaoSubprocesso | null,
+        dataLimite: dto.dataLimite ?? "",
+        mapaCodigo: dto.mapaCodigo ?? undefined,
+        localizacaoAtualCodigo: dto.localizacaoAtualCodigo ?? undefined,
+        filhos: dto.filhos.map(mapearUnidadeParticipante),
+    };
+}
+
+export function mapearUnidadeImportacao(dto: UnidadeParticipanteDto): UnidadeImportacao {
+    return {
+        nome: dto.nome,
+        sigla: dto.sigla,
+        codUnidade: dto.codUnidade,
+        codSubprocesso: dto.codSubprocesso ?? null,
+        codUnidadeSuperior: dto.codUnidadeSuperior ?? undefined,
+        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso | null) ?? undefined,
+        dataLimite: dto.dataLimite ?? undefined,
+        mapaCodigo: dto.mapaCodigo ?? undefined,
+        localizacaoAtualCodigo: dto.localizacaoAtualCodigo ?? undefined,
     };
 }
 

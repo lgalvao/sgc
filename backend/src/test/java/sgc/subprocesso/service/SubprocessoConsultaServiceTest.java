@@ -5,7 +5,9 @@ import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import sgc.comum.erros.*;
+import sgc.mapa.*;
 import sgc.mapa.dto.*;
+import sgc.organizacao.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -27,6 +29,11 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @DisplayName("SubprocessoConsultaService")
 @SuppressWarnings("NullAway.Init")
 class SubprocessoConsultaServiceTest {
+    private final MapaDtoMapper mapaDtoMapper = new MapaDtoMapper();
+    private final OrganizacaoDtoMapper organizacaoDtoMapper = new OrganizacaoDtoMapper();
+    private final sgc.subprocesso.SubprocessoDtoMapper subprocessoDtoMapper =
+            new sgc.subprocesso.SubprocessoDtoMapper(organizacaoDtoMapper);
+
     @Mock
     private SubprocessoRepo subprocessoRepo;
     @Mock
@@ -34,7 +41,7 @@ class SubprocessoConsultaServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private sgc.organizacao.UsuarioFacade usuarioFacade;
+    private sgc.organizacao.UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
     private sgc.organizacao.service.UsuarioService usuarioService;
     @Mock
@@ -57,10 +64,11 @@ class SubprocessoConsultaServiceTest {
     @BeforeEach
     void configurarDependenciasAdicionais() {
         AnaliseHistoricoService analiseHistoricoService = new AnaliseHistoricoService(unidadeService, usuarioService);
-        SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
+        SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioAplicacaoService, hierarquiaService, localizacaoSubprocessoService);
         SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
         SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
-                usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
+                usuarioAplicacaoService, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo,
+                analiseHistoricoService, mapaDtoMapper, organizacaoDtoMapper, subprocessoDtoMapper);
 
         service = new SubprocessoConsultaService(
                 subprocessoRepo,
@@ -69,7 +77,9 @@ class SubprocessoConsultaServiceTest {
                 validacaoService,
                 contextoConsultaService,
                 acessoService,
-                visualizacaoService
+                visualizacaoService,
+                mapaDtoMapper,
+                subprocessoDtoMapper
         );
     }
 
@@ -138,7 +148,7 @@ class SubprocessoConsultaServiceTest {
         sp.getProcesso().setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
 
         when(subprocessoRepo.buscarPorCodigoComMapa(codSubprocesso)).thenReturn(Optional.of(sp));
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new sgc.organizacao.ContextoUsuarioAutenticado("123", 100L, sgc.organizacao.model.Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new sgc.organizacao.ContextoUsuarioAutenticado("123", 100L, sgc.organizacao.model.Perfil.ADMIN));
         when(unidadeService.buscarPorCodigoComSuperior(100L)).thenReturn(unidade);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
         when(mapaManutencaoService.atividadesMapaCodigoComConhecimentos(500L)).thenReturn(List.of());
@@ -146,7 +156,7 @@ class SubprocessoConsultaServiceTest {
         var response = service.obterContextoCadastroAtividades(codSubprocesso);
 
         assertThat(response).isNotNull();
-        assertThat(response.unidade()).isEqualTo(unidade);
+        assertThat(response.unidade()).isEqualTo(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(unidade));
         assertThat(response.assinaturaCadastroReferencia()).isEmpty();
     }
 
@@ -168,7 +178,7 @@ class SubprocessoConsultaServiceTest {
         sp.setProcesso(new sgc.processo.model.Processo());
         sp.getProcesso().setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
 
-        when(usuarioFacade.contextoAutenticado()).thenReturn(new sgc.organizacao.ContextoUsuarioAutenticado("admin", 999L, sgc.organizacao.model.Perfil.ADMIN));
+        when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new sgc.organizacao.ContextoUsuarioAutenticado("admin", 999L, sgc.organizacao.model.Perfil.ADMIN));
         when(unidadeService.buscarPorCodigoComSuperior(999L)).thenReturn(unidadeAdmin);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAlvo);
         when(hierarquiaService.ehMesmaOuSubordinada(any(), any())).thenReturn(true);
@@ -222,22 +232,24 @@ class SubprocessoConsultaServiceTest {
         void configurarServicos() {
             SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
             SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
-                    usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService,
-                    acessoService, analiseRepo, analiseHistoricoServiceMock);
+                    usuarioAplicacaoService, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService,
+                    acessoService, analiseRepo, analiseHistoricoServiceMock, mapaDtoMapper, organizacaoDtoMapper, subprocessoDtoMapper);
 
             target = new SubprocessoConsultaService(
                     subprocessoRepo,
                     mapaManutencaoService,
                     movimentacaoRepo,
                     validacaoService,
-                    new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService),
+                    new SubprocessoContextoConsultaService(unidadeService, usuarioAplicacaoService, hierarquiaService, localizacaoSubprocessoService),
                     acessoService,
-                    visualizacaoService
+                    visualizacaoService,
+                    mapaDtoMapper,
+                    subprocessoDtoMapper
             );
         }
 
         private void stubContextoAutenticado(Usuario usuario) {
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
                     usuario.getTituloEleitoral(),
                     usuario.getUnidadeAtivaCodigo(),
                     usuario.getPerfilAtivo()
@@ -524,7 +536,7 @@ class SubprocessoConsultaServiceTest {
             sp.setUnidade(uni);
             sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("tit", 20L, Perfil.CHEFE));
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado("tit", 20L, Perfil.CHEFE));
             Unidade u20 = new Unidade();
             u20.setCodigo(20L);
             u20.setNome("Unidade 20");
@@ -553,8 +565,9 @@ class SubprocessoConsultaServiceTest {
 
             SubprocessoAcessoService acessoService = new SubprocessoAcessoService(impactoMapaService);
             SubprocessoVisualizacaoService visualizacaoService = new SubprocessoVisualizacaoService(
-                    usuarioFacade, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo, analiseHistoricoService);
-            SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioFacade, hierarquiaService, localizacaoSubprocessoService);
+                    usuarioAplicacaoService, mapaManutencaoService, mapaVisualizacaoService, impactoMapaService, acessoService, analiseRepo,
+                    analiseHistoricoService, mapaDtoMapper, organizacaoDtoMapper, subprocessoDtoMapper);
+            SubprocessoContextoConsultaService contextoConsultaService = new SubprocessoContextoConsultaService(unidadeService, usuarioAplicacaoService, hierarquiaService, localizacaoSubprocessoService);
 
             service = new SubprocessoConsultaService(
                     subprocessoRepo,
@@ -563,7 +576,9 @@ class SubprocessoConsultaServiceTest {
                     validacaoService,
                     contextoConsultaService,
                     acessoService,
-                    visualizacaoService
+                    visualizacaoService,
+                    mapaDtoMapper,
+                    subprocessoDtoMapper
             );
         }
 
@@ -593,7 +608,7 @@ class SubprocessoConsultaServiceTest {
         }
 
         private void stubContextoAutenticado(Usuario usuario) {
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
                     usuario.getTituloEleitoral(),
                     usuario.getUnidadeAtivaCodigo(),
                     usuario.getPerfilAtivo()
@@ -681,7 +696,7 @@ class SubprocessoConsultaServiceTest {
 
                 when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
                 stubContextoAutenticado(user);
-                when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
+                when(usuarioAplicacaoService.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
                 when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any())).thenReturn(List.of(u));
                 when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
 
@@ -721,7 +736,7 @@ class SubprocessoConsultaServiceTest {
                 stubContextoAutenticado(user);
                 when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any())).thenReturn(List.of(dest));
                 when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
-                when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
+                when(usuarioAplicacaoService.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
 
                 SubprocessoDetalheResponse res = service.obterDetalhes(1L);
                 assertThat(res.localizacaoAtual()).isEqualTo("U2");
@@ -753,7 +768,7 @@ class SubprocessoConsultaServiceTest {
                 stubContextoAutenticado(user);
                 when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(1L), any())).thenReturn(List.of(u));
                 when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(u);
-                when(usuarioFacade.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
+                when(usuarioAplicacaoService.buscarUsuarioSemAtribuicoes("titular")).thenReturn(user);
 
                 SubprocessoDetalheResponse res = service.obterDetalhes(1L);
                 assertThat(res.localizacaoAtual()).isEqualTo("U1");
@@ -782,13 +797,13 @@ class SubprocessoConsultaServiceTest {
                 when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(11L)).thenReturn(Optional.of(sp));
                 stubContextoAutenticado(usuario);
                 when(movimentacaoRepo.listarUltimasUnidadesDestinoPorSubprocesso(eq(11L), any())).thenReturn(List.of(unidade));
-                when(usuarioFacade.buscarResponsabilidadeDetalhadaAtual(11L)).thenReturn(responsavel);
+                when(usuarioAplicacaoService.buscarResponsabilidadeDetalhadaAtual(11L)).thenReturn(responsavel);
                 when(unidadeService.temMapaVigente(11L)).thenReturn(true);
 
                 SubprocessoDetalheResponse response = service.obterDetalhes(11L);
 
                 assertThat(response.titular()).isNull();
-                verify(usuarioFacade, never()).buscarPorLogin(anyString());
+                verify(usuarioAplicacaoService, never()).buscarPorLogin(anyString());
             }
 
             @Test

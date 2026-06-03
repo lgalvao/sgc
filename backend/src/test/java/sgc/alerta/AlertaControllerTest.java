@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AlertaController.class)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, AlertaDtoMapper.class})
 @DisplayName("AlertaController")
 class AlertaControllerTest {
 
@@ -30,9 +30,9 @@ class AlertaControllerTest {
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
     @MockitoBean
-    private AlertaFacade alertaFacade;
+    private AlertaAplicacaoService alertaAplicacaoService;
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Nested
     @DisplayName("Listar alertas")
@@ -45,9 +45,9 @@ class AlertaControllerTest {
                     .unidadeAtivaCodigo(1L)
                     .perfilAtivo(Perfil.GESTOR)
                     .build();
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
 
-            when(alertaFacade.alertasPorUsuario(any(ContextoUsuarioAutenticado.class)))
+            when(alertaAplicacaoService.alertasPorUsuario(any(ContextoUsuarioAutenticado.class)))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas")
@@ -57,7 +57,7 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaFacade).alertasPorUsuario(any(ContextoUsuarioAutenticado.class));
+            verify(alertaAplicacaoService).alertasPorUsuario(any(ContextoUsuarioAutenticado.class));
         }
 
         @Test
@@ -68,9 +68,9 @@ class AlertaControllerTest {
                     .unidadeAtivaCodigo(1L)
                     .perfilAtivo(Perfil.GESTOR)
                     .build();
-            when(usuarioFacade.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(TITULO_TESTE, 1L, Perfil.GESTOR));
 
-            when(alertaFacade.listarNaoLidos(any(ContextoUsuarioAutenticado.class)))
+            when(alertaAplicacaoService.listarNaoLidos(any(ContextoUsuarioAutenticado.class)))
                     .thenReturn(List.of());
 
             mockMvc.perform(get("/api/alertas/nao-lidos")
@@ -80,7 +80,7 @@ class AlertaControllerTest {
                     .andExpect(jsonPath("$").isArray())
                     .andExpect(jsonPath("$").isEmpty());
 
-            verify(alertaFacade).listarNaoLidos(any(ContextoUsuarioAutenticado.class));
+            verify(alertaAplicacaoService).listarNaoLidos(any(ContextoUsuarioAutenticado.class));
         }
     }
 

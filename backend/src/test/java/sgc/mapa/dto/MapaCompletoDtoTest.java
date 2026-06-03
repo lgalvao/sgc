@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.mapa.*;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.*;
 
@@ -10,6 +11,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("MapaCompletoDto")
 class MapaCompletoDtoTest {
+
+    private final MapaDtoMapper mapper = new MapaDtoMapper();
 
     @Test
     @DisplayName("deve mapear mapa completo com competencias")
@@ -33,7 +36,7 @@ class MapaCompletoDtoTest {
         mapa.setObservacoesDisponibilizacao("Observacoes");
         mapa.setCompetencias(new LinkedHashSet<>(List.of(competencia)));
 
-        MapaCompletoDto dto = MapaCompletoDto.fromEntity(mapa);
+        MapaCompletoDto dto = mapper.paraMapaCompletoDto(mapa);
 
         assertThat(dto.codigo()).isEqualTo(10L);
         assertThat(dto.subprocessoCodigo()).isEqualTo(70L);
@@ -58,7 +61,7 @@ class MapaCompletoDtoTest {
         mapa.setSubprocesso(subprocesso);
         mapa.setCompetencias(new LinkedHashSet<>());
 
-        MapaCompletoDto dto = MapaCompletoDto.fromEntity(mapa);
+        MapaCompletoDto dto = mapper.paraMapaCompletoDto(mapa);
 
         assertThat(dto.codigo()).isEqualTo(10L);
         assertThat(dto.subprocessoCodigo()).isEqualTo(70L);

@@ -7,7 +7,7 @@ interface Props {
   senha: string;
   loginBloqueado: boolean;
   mostrarAcaoTrocarTituloEleitoral?: boolean;
-  isLoading: boolean;
+  carregando: boolean;
   showPassword: boolean;
   capsLockAtivado: boolean;
   mensagemErroTitulo: string;
@@ -57,7 +57,7 @@ function atualizarSenha(valor: string | number | null) {
       <!-- eslint-disable vuejs-accessibility/no-autofocus -->
       <BFormInput
           id="titulo"
-          :disabled="isLoading"
+          :disabled="carregando"
           :model-value="titulo"
           :placeholder="TEXTOS.login.PLACEHOLDER_USUARIO"
           :readonly="loginBloqueado"
@@ -76,7 +76,7 @@ function atualizarSenha(valor: string | number | null) {
         <BButton
             v-if="mostrarAcaoTrocarTituloEleitoral"
             :aria-label="'Trocar usuário'"
-            :disabled="isLoading"
+            :disabled="carregando"
             :title="'Trocar usuário'"
             class="login-input-acao"
             data-testid="btn-login-trocar-titulo-eleitoral"
@@ -107,7 +107,7 @@ function atualizarSenha(valor: string | number | null) {
       <BFormInput
           id="senha"
           :autocomplete="showPassword ? 'off' : 'current-password'"
-          :disabled="isLoading"
+          :disabled="carregando"
           :model-value="senha"
           :placeholder="TEXTOS.login.PLACEHOLDER_SENHA"
           :readonly="loginBloqueado"
@@ -123,7 +123,7 @@ function atualizarSenha(valor: string | number | null) {
       <template #append>
         <BButton
             :aria-label="showPassword ? TEXTOS.login.OCULTAR_SENHA : TEXTOS.login.MOSTRAR_SENHA"
-            :disabled="isLoading"
+            :disabled="carregando"
             class="login-input-acao"
             variant="link"
             @click="emit('toggle-senha')"

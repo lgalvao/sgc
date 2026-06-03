@@ -23,8 +23,8 @@ import sgc.seguranca.login.*;
 public class TestSecurityConfig {
     @Bean
     @ConditionalOnBean(GerenciadorJwt.class)
-    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade, ListaNegraJwt listaNegraJwt) {
-        return new FiltroJwt(gerenciadorJwt, usuarioFacade, listaNegraJwt);
+    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioAplicacaoService usuarioAplicacaoService, ListaNegraJwt listaNegraJwt) {
+        return new FiltroJwt(gerenciadorJwt, usuarioAplicacaoService, listaNegraJwt);
     }
 
     @Bean

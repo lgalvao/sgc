@@ -24,19 +24,19 @@
 
       <BNavbarNav class="ms-auto align-items-lg-center">
         <BNavItem
-            v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: isMobile }"
+            v-b-tooltip.hover.bottom="{ title: perfilStore.usuarioNome || 'Usuário', disabled: ehMobile }"
             class="me-2 user-profile-item"
         >
           <div class="d-flex align-items-center navbar-principal-sgc__texto-secundario">
             <i aria-hidden="true" class="bi bi-person-circle me-2"/>
             <div class="user-info-text">
-              <span class="d-lg-inline">{{ isAdmin ? 'ADMIN' : `${perfilSelecionado} - ${unidadeSelecionada}` }}</span>
+              <span class="d-lg-inline">{{ ehAdmin ? 'ADMIN' : `${perfilSelecionado} - ${unidadeSelecionada}` }}</span>
             </div>
           </div>
         </BNavItem>
 
         <BNavItem
-            v-if="isAdmin"
+            v-if="ehAdmin"
             class="me-lg-1"
             data-testid="nav-link-notificacoes"
             title="Notificações"
@@ -91,7 +91,7 @@
         </BNavItem>
 
         <BNavItemDropdown
-            v-if="isAdmin"
+            v-if="ehAdmin"
             class="me-lg-1"
             data-testid="dropdown-acoes-especiais"
             no-caret
@@ -123,7 +123,7 @@
             class="me-lg-0"
             data-testid="btn-logout"
             title="Sair"
-            @click.prevent="handleLogout"
+            @click.prevent="sair"
         >
           <template #default>
             <span class="visually-hidden">Sair</span>
@@ -162,19 +162,19 @@ const {obterTemaEscuro, definirTemaEscuro} = useTemaPreferencia();
 const {
   perfilSelecionado,
   unidadeSelecionada,
-  isAdmin,
+  ehAdmin,
   podeVerRelatorios,
   mostrarArvoreCompletaUnidades,
   mostrarMenuConfiguracoes,
   mostrarMenuAdministradores
 } = usePerfil();
-const windowWidth = ref(window.innerWidth);
-const updateWidth = () => {
-  windowWidth.value = window.innerWidth;
+const larguraJanela = ref(window.innerWidth);
+const atualizarLargura = () => {
+  larguraJanela.value = window.innerWidth;
 };
-onMounted(() => window.addEventListener('resize', updateWidth));
-onUnmounted(() => window.removeEventListener('resize', updateWidth));
-const isMobile = computed(() => windowWidth.value < 992);
+onMounted(() => window.addEventListener('resize', atualizarLargura));
+onUnmounted(() => window.removeEventListener('resize', atualizarLargura));
+const ehMobile = computed(() => larguraJanela.value < 992);
 const labelUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? TEXTOS.comum.MENU_UNIDADES : TEXTOS.comum.MENU_MINHA_UNIDADE);
 const iconUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? 'bi bi-diagram-3 me-1' : 'bi bi-person me-1');
 const linkUnidade = computed(() => mostrarArvoreCompletaUnidades.value ? '/unidades' : `/unidade/${perfilStore.unidadeSelecionada}`);
@@ -185,7 +185,7 @@ function alternarTema() {
   definirTemaEscuro(!obterTemaEscuro());
 }
 
-async function handleLogout() {
+async function sair() {
   await router.push("/login");
   await perfilStore.logout();
 }

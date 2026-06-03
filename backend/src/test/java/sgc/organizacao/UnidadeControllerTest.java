@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UnidadeController.class)
 @EnableMethodSecurity
-@Import(RestExceptionHandler.class)
+@Import({RestExceptionHandler.class, OrganizacaoDtoMapper.class})
 @Tag("integration")
 @DisplayName("Testes do Controller de Unidade")
 class UnidadeControllerTest {

@@ -2,8 +2,6 @@ package sgc.subprocesso.dto;
 
 import lombok.*;
 import sgc.organizacao.dto.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.model.*;
 
 import java.time.*;
 
@@ -11,7 +9,7 @@ import java.time.*;
 public record SubprocessoListagemDto(
         Long codigo,
         UnidadeResumoDto unidade,
-        SituacaoSubprocesso situacao,
+        String situacao,
         LocalDateTime dataLimiteEtapa1,
         LocalDateTime dataFimEtapa1,
         LocalDateTime dataLimiteEtapa2,
@@ -21,31 +19,7 @@ public record SubprocessoListagemDto(
         Long codMapa,
         String processoDescricao,
         LocalDateTime dataCriacaoProcesso,
-        TipoProcesso tipoProcesso,
+        String tipoProcesso,
         boolean isEmAndamento,
         Integer etapaAtual) {
-
-    public static SubprocessoListagemDto fromEntity(Subprocesso subprocesso) {
-        return fromResumo(SubprocessoResumoDto.fromEntity(subprocesso));
-    }
-
-    static SubprocessoListagemDto fromResumo(SubprocessoResumoDto resumo) {
-        return SubprocessoListagemDto.builder()
-                .codigo(resumo.codigo())
-                .unidade(resumo.unidade())
-                .situacao(resumo.situacao())
-                .dataLimiteEtapa1(resumo.dataLimiteEtapa1())
-                .dataFimEtapa1(resumo.dataFimEtapa1())
-                .dataLimiteEtapa2(resumo.dataLimiteEtapa2())
-                .dataFimEtapa2(resumo.dataFimEtapa2())
-                .codProcesso(resumo.codProcesso())
-                .codUnidade(resumo.codUnidade())
-                .codMapa(resumo.codMapa())
-                .processoDescricao(resumo.processoDescricao())
-                .dataCriacaoProcesso(resumo.dataCriacaoProcesso())
-                .tipoProcesso(resumo.tipoProcesso())
-                .isEmAndamento(resumo.isEmAndamento())
-                .etapaAtual(resumo.etapaAtual())
-                .build();
-    }
 }

@@ -47,7 +47,7 @@ public class FeedbackController {
         try {
             payload = objectMapper.readValue(data, FeedbackPayloadDto.class);
         } catch (JacksonException e) {
-            throw new ErroValidacao("VALIDATION_ERROR", "payload inválido: " + e.getMessage());
+            throw new ErroValidacao("ERRO_VALIDACAO", "payload inválido: " + e.getMessage());
         }
         validar(payload);
         FeedbackRespostaDto resposta = feedbackService.registrar(payload, screenshot);
@@ -76,7 +76,7 @@ public class FeedbackController {
         if (!violations.isEmpty()) {
             var primeira = violations.iterator().next();
             throw new ErroValidacao(
-                    "VALIDATION_ERROR",
+                    "ERRO_VALIDACAO",
                     primeira.getPropertyPath() + " " + primeira.getMessage()
             );
         }

@@ -7,6 +7,7 @@ import org.mockito.junit.jupiter.*;
 import org.springframework.cache.*;
 import org.springframework.jdbc.core.*;
 import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.processo.model.*;
 
 import java.util.*;
@@ -27,6 +28,8 @@ class ProcessoExclusaoCompletaServiceTest {
     private Cache cacheA;
     @Mock
     private Cache cacheB;
+    @Mock
+    private ComumRepo comumRepo;
 
     @InjectMocks
     private ProcessoExclusaoCompletaService service;
@@ -34,7 +37,7 @@ class ProcessoExclusaoCompletaServiceTest {
     @Test
     @DisplayName("deve falhar quando o processo nao existe")
     void deveFalharQuandoProcessoNaoExiste() {
-        when(processoRepo.existsById(10L)).thenReturn(false);
+        when(comumRepo.buscar(Processo.class, 10L)).thenThrow(new ErroEntidadeNaoEncontrada("Processo", 10L));
 
         assertThatThrownBy(() -> service.excluirCompleto(10L))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class)
@@ -46,7 +49,7 @@ class ProcessoExclusaoCompletaServiceTest {
     @Test
     @DisplayName("deve excluir dependentes em ordem e limpar caches")
     void deveExcluirDependentesEmOrdemELimparCaches() {
-        when(processoRepo.existsById(10L)).thenReturn(true);
+        when(comumRepo.buscar(Processo.class, 10L)).thenReturn(new Processo());
         when(cacheManager.getCacheNames()).thenReturn(Set.of("cacheA", "cacheB"));
         when(cacheManager.getCache("cacheA")).thenReturn(cacheA);
         when(cacheManager.getCache("cacheB")).thenReturn(cacheB);
@@ -74,7 +77,7 @@ class ProcessoExclusaoCompletaServiceTest {
     @Test
     @DisplayName("deve pular tabelas opcionais de diagnostico ausentes")
     void devePularTabelasOpcionaisDeDiagnosticoAusentes() {
-        when(processoRepo.existsById(10L)).thenReturn(true);
+        when(comumRepo.buscar(Processo.class, 10L)).thenReturn(new Processo());
         when(cacheManager.getCacheNames()).thenReturn(Set.of());
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("AVALIACAO_SERVIDOR"))).thenReturn(0);
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("OCUPACAO_CRITICA"))).thenReturn(0);
@@ -91,7 +94,7 @@ class ProcessoExclusaoCompletaServiceTest {
     @Test
     @DisplayName("deve lidar com cache retornando null")
     void deveLidarComCacheRetornandoNull() {
-        when(processoRepo.existsById(10L)).thenReturn(true);
+        when(comumRepo.buscar(Processo.class, 10L)).thenReturn(new Processo());
         when(cacheManager.getCacheNames()).thenReturn(Set.of("cacheC"));
         when(cacheManager.getCache("cacheC")).thenReturn(null);
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(1);
@@ -106,7 +109,7 @@ class ProcessoExclusaoCompletaServiceTest {
     @Test
     @DisplayName("deve lidar com query de tabela existente retornando null")
     void deveLidarComQueryDeTabelaExistenteRetornandoNull() {
-        when(processoRepo.existsById(10L)).thenReturn(true);
+        when(comumRepo.buscar(Processo.class, 10L)).thenReturn(new Processo());
         when(cacheManager.getCacheNames()).thenReturn(Set.of());
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), anyString())).thenReturn(null);
 

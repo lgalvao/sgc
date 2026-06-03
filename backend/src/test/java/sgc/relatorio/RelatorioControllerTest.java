@@ -32,7 +32,7 @@ class RelatorioControllerTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @MockitoBean
-    private RelatorioFacade relatorioFacade;
+    private RelatorioService relatorioService;
 
     @MockitoBean
     private ProcessoService processoService;
@@ -52,7 +52,7 @@ class RelatorioControllerTest {
                 .responsavel("Responsável")
                 .titular("Responsável")
                 .build();
-        when(relatorioFacade.obterRelatorioAndamento(1L)).thenReturn(List.of(dto));
+        when(relatorioService.obterRelatorioAndamento(1L)).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/relatorios/andamento/1"))
                 .andExpect(status().isOk())
@@ -76,7 +76,7 @@ class RelatorioControllerTest {
                 .titular("Responsável")
                 .build();
         when(processoService.checarAcesso(any(), eq(1L))).thenReturn(true);
-        when(relatorioFacade.obterRelatorioAndamento(1L)).thenReturn(List.of(dto));
+        when(relatorioService.obterRelatorioAndamento(1L)).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/relatorios/andamento/1"))
                 .andExpect(status().isOk())
@@ -93,7 +93,7 @@ class RelatorioControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-andamento-%s.pdf".formatted(dataAtual)));
 
-        verify(relatorioFacade).gerarRelatorioAndamento(eq(1L), any());
+        verify(relatorioService).gerarRelatorioAndamento(eq(1L), any());
     }
 
     @Test
@@ -108,7 +108,7 @@ class RelatorioControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-andamento-%s.pdf".formatted(dataAtual)));
 
-        verify(relatorioFacade).gerarRelatorioAndamento(eq(1L), any());
+        verify(relatorioService).gerarRelatorioAndamento(eq(1L), any());
     }
 
     @Test
@@ -121,7 +121,7 @@ class RelatorioControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-mapas-%s.pdf".formatted(dataAtual)));
 
-        verify(relatorioFacade).gerarRelatorioMapas(eq(List.of(2L, 3L)), any());
+        verify(relatorioService).gerarRelatorioMapas(eq(List.of(2L, 3L)), any());
     }
 
     @Test
@@ -134,7 +134,7 @@ class RelatorioControllerTest {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE))
                 .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sgc-rel-mapas-%s.pdf".formatted(dataAtual)));
 
-        verify(relatorioFacade).gerarRelatorioMapas(eq(List.of(2L)), any());
+        verify(relatorioService).gerarRelatorioMapas(eq(List.of(2L)), any());
     }
 
     @Test
@@ -156,7 +156,7 @@ class RelatorioControllerTest {
                         ))
                 ))
         );
-        when(relatorioFacade.obterRelatorioMapas(List.of(2L, 3L))).thenReturn(List.of(dto));
+        when(relatorioService.obterRelatorioMapas(List.of(2L, 3L))).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/relatorios/mapas").param("codUnidade", "2").param("codUnidade", "3"))
                 .andExpect(status().isOk())
@@ -180,7 +180,7 @@ class RelatorioControllerTest {
                 1,
                 List.of()
         );
-        when(relatorioFacade.obterRelatorioMapas(List.of(2L))).thenReturn(List.of(dto));
+        when(relatorioService.obterRelatorioMapas(List.of(2L))).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/api/relatorios/mapas").param("codUnidade", "2"))
                 .andExpect(status().isOk())
@@ -201,7 +201,7 @@ class RelatorioControllerTest {
                         "attachment; filename=sgc-rel-unidades-sem-mapas-vigentes-%s.pdf".formatted(dataAtual)
                 ));
 
-        verify(relatorioFacade).gerarRelatorioUnidadesSemMapasVigentes(any());
+        verify(relatorioService).gerarRelatorioUnidadesSemMapasVigentes(any());
     }
 
     @Test
@@ -222,7 +222,7 @@ class RelatorioControllerTest {
                 "SECRETARIA",
                 List.of(unidadeFilha)
         );
-        when(relatorioFacade.obterRelatorioUnidadesSemMapasVigentes()).thenReturn(List.of(unidadePai));
+        when(relatorioService.obterRelatorioUnidadesSemMapasVigentes()).thenReturn(List.of(unidadePai));
 
         mockMvc.perform(get("/api/relatorios/unidades-sem-mapas-vigentes"))
                 .andExpect(status().isOk())

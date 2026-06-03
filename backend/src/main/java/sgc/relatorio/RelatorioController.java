@@ -20,7 +20,7 @@ import java.util.*;
 @PreAuthorize("isAuthenticated()")
 public class RelatorioController {
     private static final DateTimeFormatter FORMATADOR_DATA_ARQUIVO = DateTimeFormatter.ISO_LOCAL_DATE;
-    private final RelatorioFacade relatorioService;
+    private final RelatorioService relatorioService;
 
     @GetMapping("/andamento/{codProcesso}")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")

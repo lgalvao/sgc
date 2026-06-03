@@ -27,7 +27,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
 
         await expect(page.getByRole('heading', {name: TEXTOS.administracao.TITULO, exact: true})).toBeVisible();
 
-        const tabela = page.locator('main table');
+        const tabela = page.getByTestId('tbl-administradores');
         await expect(tabela).toBeVisible();
 
         await expect(tabela.locator('th', {hasText: TEXTOS.administracao.CAMPO_NOME})).toBeVisible();
@@ -62,7 +62,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await responsePromise;
 
         await expect(modal).toBeHidden();
-        const tabela = page.locator('main table');
+        const tabela = page.getByTestId('tbl-administradores');
         await expect(tabela.getByText(NOME_NOVO_ADMIN)).toBeVisible();
     });
 
@@ -74,7 +74,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
-        const tabela = page.locator('main table');
+        const tabela = page.getByTestId('tbl-administradores');
         const linhaNovoAdmin = tabela.locator('tr', {hasText: NOME_NOVO_ADMIN});
         await expect(linhaNovoAdmin).toBeVisible();
 
@@ -111,7 +111,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await respostaAdicionar;
         await expect(modalAdicionar).toBeHidden();
 
-        const tabela = page.locator('main table');
+        const tabela = page.getByTestId('tbl-administradores');
         const linhaAdminQuente = tabela.locator('tr').filter({hasText: TITULO_ADMIN_CACHE_QUENTE});
         await expect(linhaAdminQuente).toBeVisible();
 
@@ -156,7 +156,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await botaoConfirmar.click();
         await expect(page).toHaveURL(/\/administradores/);
         await expect(modal).toBeVisible();
-        await expect(page.locator('main table tbody tr')).not.toHaveCount(0);
+        await expect(page.getByTestId('tbl-administradores').locator('tbody tr')).not.toHaveCount(0);
     });
 
     test('Cenário 5: ADMIN tenta adicionar usuário que já é administrador e recebe erro de validação', async ({
@@ -193,7 +193,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
-        const tabela = page.locator('main table');
+        const tabela = page.getByTestId('tbl-administradores');
         // Encontra a linha do próprio usuário logado (ADMIN_1_PERFIL - 191919)
         const linhaProprioAdmin = tabela.locator('tr').filter({hasText: USUARIOS.ADMIN_1_PERFIL.titulo});
         await expect(linhaProprioAdmin).toBeVisible();
@@ -226,7 +226,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await page.getByTestId('btn-administradores').click();
         await expect(page).toHaveURL(/\/administradores/);
 
-        const tabela = page.locator('main table');
+        const tabela = page.getByTestId('tbl-administradores');
 
         // Remove o outro administrador (111111) para deixar apenas o logado (191919)
         const linhaOutroAdmin = tabela.locator('tr').filter({hasText: '111111'});

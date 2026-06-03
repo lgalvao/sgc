@@ -22,7 +22,7 @@ import java.util.*;
 @Tag(name = "Atividades", description = "Gerenciamento de atividades e seus conhecimentos")
 @PreAuthorize("isAuthenticated()")
 public class AtividadeController {
-    private final AtividadeFacade atividadeFacade;
+    private final AtividadeService atividadeService;
 
     /**
      * Busca e retorna uma atividade específica pelo seu código.
@@ -31,7 +31,7 @@ public class AtividadeController {
     @PreAuthorize("hasPermission(#codAtividade, 'Atividade', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Obtém uma atividade pelo código")
     public ResponseEntity<AtividadeDto> obterPorCodigo(@PathVariable Long codAtividade) {
-        return ResponseEntity.ok(atividadeFacade.obterAtividadePorCodigo(codAtividade));
+        return ResponseEntity.ok(atividadeService.obterAtividadePorCodigo(codAtividade));
     }
 
     /**
@@ -41,7 +41,7 @@ public class AtividadeController {
     @PreAuthorize("hasPermission(#codAtividade, 'Atividade', 'VISUALIZAR_SUBPROCESSO')")
     @Operation(summary = "Lista todos os conhecimentos de uma atividade")
     public ResponseEntity<List<ConhecimentoResumoDto>> listarConhecimentos(@PathVariable Long codAtividade) {
-        return ResponseEntity.ok(atividadeFacade.listarConhecimentosPorAtividade(codAtividade));
+        return ResponseEntity.ok(atividadeService.listarConhecimentosPorAtividade(codAtividade));
     }
 
     /**
@@ -51,7 +51,7 @@ public class AtividadeController {
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Cria uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> criar(@Valid @RequestBody CriarAtividadeRequest request) {
-        AtividadeOperacaoResponse resp = atividadeFacade.criarAtividade(request);
+        AtividadeOperacaoResponse resp = atividadeService.criarAtividade(request);
         AtividadeDto atividadeCriada = resp.atividade();
         if (atividadeCriada == null) {
             throw new IllegalStateException("Resposta de criação de atividade sem código gerado");
@@ -68,7 +68,7 @@ public class AtividadeController {
     @Operation(summary = "Atualiza atividade existente")
     public ResponseEntity<AtividadeOperacaoResponse> atualizar(@PathVariable Long codigo,
                                                                @RequestBody @Valid AtualizarAtividadeRequest request) {
-        AtividadeOperacaoResponse response = atividadeFacade.atualizarAtividade(codigo, request);
+        AtividadeOperacaoResponse response = atividadeService.atualizarAtividade(codigo, request);
         return ResponseEntity.ok(response);
     }
 
@@ -79,7 +79,7 @@ public class AtividadeController {
     @PreAuthorize("hasRole('CHEFE')")
     @Operation(summary = "Exclui uma atividade")
     public ResponseEntity<AtividadeOperacaoResponse> excluir(@PathVariable Long codAtividade) {
-        AtividadeOperacaoResponse response = atividadeFacade.excluirAtividade(codAtividade);
+        AtividadeOperacaoResponse response = atividadeService.excluirAtividade(codAtividade);
         return ResponseEntity.ok(response);
     }
 
@@ -93,7 +93,7 @@ public class AtividadeController {
             @PathVariable Long codAtividade,
             @Valid @RequestBody CriarConhecimentoRequest request) {
 
-        ResultadoOperacaoConhecimento resultado = atividadeFacade.criarConhecimento(codAtividade, request);
+        ResultadoOperacaoConhecimento resultado = atividadeService.criarConhecimento(codAtividade, request);
         URI uri = URI.create("/api/atividades/%d/conhecimentos/%d".formatted(codAtividade, resultado.novoConhecimentoCodigo()));
         return ResponseEntity.created(uri).body(resultado.response());
     }
@@ -109,7 +109,7 @@ public class AtividadeController {
             @PathVariable Long codConhecimento,
             @Valid @RequestBody AtualizarConhecimentoRequest request) {
 
-        AtividadeOperacaoResponse response = atividadeFacade.atualizarConhecimento(
+        AtividadeOperacaoResponse response = atividadeService.atualizarConhecimento(
                 codAtividade, codConhecimento, request
         );
         return ResponseEntity.ok(response);
@@ -125,7 +125,7 @@ public class AtividadeController {
             @PathVariable Long codAtividade,
             @PathVariable Long codConhecimento) {
 
-        AtividadeOperacaoResponse response = atividadeFacade.excluirConhecimento(codAtividade, codConhecimento);
+        AtividadeOperacaoResponse response = atividadeService.excluirConhecimento(codAtividade, codConhecimento);
         return ResponseEntity.ok(response);
     }
 }

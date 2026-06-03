@@ -8,7 +8,7 @@ const meta: Meta<typeof ProcessoUnidadesField> = {
     component: ProcessoUnidadesField,
     tags: ['autodocs'],
     argTypes: {
-        isLoading: {control: 'boolean'},
+        carregando: {control: 'boolean'},
     },
 };
 
@@ -93,7 +93,7 @@ export const Carregando: Story = {
     args: {
         modelValue: [],
         unidades: [],
-        isLoading: true,
+        carregando: true,
     },
     render: (args) => ({
         components: {ProcessoUnidadesField},

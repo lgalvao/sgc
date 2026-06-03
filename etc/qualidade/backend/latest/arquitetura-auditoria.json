@@ -1,0 +1,827 @@
+{
+  "geradoEm": "2026-06-01T01:29:10.090Z",
+  "limites": {
+    "linhas": {
+      "alerta": 400,
+      "critico": 700
+    },
+    "metodos": {
+      "alerta": 15,
+      "critico": 25
+    },
+    "dependencias": {
+      "alerta": 8,
+      "critico": 12
+    }
+  },
+  "resumo": {
+    "totalAnalisados": 57,
+    "criticos": 3,
+    "alertas": 6,
+    "ok": 48
+  },
+  "hotspots": [
+    {
+      "nomeArquivo": "ProcessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pacote": "sgc.processo.service",
+      "tipo": "service",
+      "linhas": 1290,
+      "metodos": 21,
+      "dependencias": 18,
+      "severidade": "critico",
+      "motivos": [
+        "1290 linhas (>=700)",
+        "21 métodos públicos (>=15)",
+        "18 dependências (>=12)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoTransicaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 592,
+      "metodos": 17,
+      "dependencias": 13,
+      "severidade": "critico",
+      "motivos": [
+        "592 linhas (>=400)",
+        "17 métodos públicos (>=15)",
+        "13 dependências (>=12)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/SubprocessoController.java",
+      "pacote": "sgc.subprocesso",
+      "tipo": "controller",
+      "linhas": 479,
+      "metodos": 54,
+      "dependencias": 8,
+      "severidade": "critico",
+      "motivos": [
+        "479 linhas (>=400)",
+        "54 métodos públicos (>=25)",
+        "8 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "RelatorioFacade.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/relatorio/RelatorioFacade.java",
+      "pacote": "sgc.relatorio",
+      "tipo": "facade",
+      "linhas": 801,
+      "metodos": 10,
+      "dependencias": 9,
+      "severidade": "alerta",
+      "motivos": [
+        "801 linhas (>=700)",
+        "9 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "E2eController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "pacote": "sgc.e2e",
+      "tipo": "controller",
+      "linhas": 641,
+      "metodos": 16,
+      "dependencias": 9,
+      "severidade": "alerta",
+      "motivos": [
+        "641 linhas (>=400)",
+        "16 métodos públicos (>=15)",
+        "9 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 470,
+      "metodos": 15,
+      "dependencias": 11,
+      "severidade": "alerta",
+      "motivos": [
+        "470 linhas (>=400)",
+        "15 métodos públicos (>=15)",
+        "11 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "CadastroFluxoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/CadastroFluxoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 356,
+      "metodos": 13,
+      "dependencias": 12,
+      "severidade": "alerta",
+      "motivos": [
+        "12 dependências (>=12)"
+      ]
+    },
+    {
+      "nomeArquivo": "MapaManutencaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/MapaManutencaoService.java",
+      "pacote": "sgc.mapa.service",
+      "tipo": "service",
+      "linhas": 297,
+      "metodos": 40,
+      "dependencias": 6,
+      "severidade": "alerta",
+      "motivos": [
+        "40 métodos públicos (>=25)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoConsultaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 219,
+      "metodos": 41,
+      "dependencias": 7,
+      "severidade": "alerta",
+      "motivos": [
+        "41 métodos públicos (>=25)"
+      ]
+    }
+  ],
+  "todos": [
+    {
+      "nomeArquivo": "ProcessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/service/ProcessoService.java",
+      "pacote": "sgc.processo.service",
+      "tipo": "service",
+      "linhas": 1290,
+      "metodos": 21,
+      "dependencias": 18,
+      "severidade": "critico",
+      "motivos": [
+        "1290 linhas (>=700)",
+        "21 métodos públicos (>=15)",
+        "18 dependências (>=12)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoTransicaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 592,
+      "metodos": 17,
+      "dependencias": 13,
+      "severidade": "critico",
+      "motivos": [
+        "592 linhas (>=400)",
+        "17 métodos públicos (>=15)",
+        "13 dependências (>=12)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/SubprocessoController.java",
+      "pacote": "sgc.subprocesso",
+      "tipo": "controller",
+      "linhas": 479,
+      "metodos": 54,
+      "dependencias": 8,
+      "severidade": "critico",
+      "motivos": [
+        "479 linhas (>=400)",
+        "54 métodos públicos (>=25)",
+        "8 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "RelatorioFacade.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/relatorio/RelatorioFacade.java",
+      "pacote": "sgc.relatorio",
+      "tipo": "facade",
+      "linhas": 801,
+      "metodos": 10,
+      "dependencias": 9,
+      "severidade": "alerta",
+      "motivos": [
+        "801 linhas (>=700)",
+        "9 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "E2eController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/e2e/E2eController.java",
+      "pacote": "sgc.e2e",
+      "tipo": "controller",
+      "linhas": 641,
+      "metodos": 16,
+      "dependencias": 9,
+      "severidade": "alerta",
+      "motivos": [
+        "641 linhas (>=400)",
+        "16 métodos públicos (>=15)",
+        "9 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 470,
+      "metodos": 15,
+      "dependencias": 11,
+      "severidade": "alerta",
+      "motivos": [
+        "470 linhas (>=400)",
+        "15 métodos públicos (>=15)",
+        "11 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "CadastroFluxoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/CadastroFluxoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 356,
+      "metodos": 13,
+      "dependencias": 12,
+      "severidade": "alerta",
+      "motivos": [
+        "12 dependências (>=12)"
+      ]
+    },
+    {
+      "nomeArquivo": "MapaManutencaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/MapaManutencaoService.java",
+      "pacote": "sgc.mapa.service",
+      "tipo": "service",
+      "linhas": 297,
+      "metodos": 40,
+      "dependencias": 6,
+      "severidade": "alerta",
+      "motivos": [
+        "40 métodos públicos (>=25)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoConsultaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoConsultaService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 219,
+      "metodos": 41,
+      "dependencias": 7,
+      "severidade": "alerta",
+      "motivos": [
+        "41 métodos públicos (>=25)"
+      ]
+    },
+    {
+      "nomeArquivo": "SubprocessoNotificacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoNotificacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 419,
+      "metodos": 8,
+      "dependencias": 7,
+      "severidade": "ok",
+      "motivos": [
+        "419 linhas (>=400)"
+      ]
+    },
+    {
+      "nomeArquivo": "ImpactoMapaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/ImpactoMapaService.java",
+      "pacote": "sgc.mapa.service",
+      "tipo": "service",
+      "linhas": 363,
+      "metodos": 3,
+      "dependencias": 7,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "ResponsavelUnidadeService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 323,
+      "metodos": 13,
+      "dependencias": 11,
+      "severidade": "ok",
+      "motivos": [
+        "11 dependências (>=8)"
+      ]
+    },
+    {
+      "nomeArquivo": "UnidadeHierarquiaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UnidadeHierarquiaService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 266,
+      "metodos": 13,
+      "dependencias": 4,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "AlertaFacade.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/AlertaFacade.java",
+      "pacote": "sgc.alerta",
+      "tipo": "facade",
+      "linhas": 247,
+      "metodos": 16,
+      "dependencias": 5,
+      "severidade": "ok",
+      "motivos": [
+        "16 métodos públicos (>=15)"
+      ]
+    },
+    {
+      "nomeArquivo": "PainelFacade.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/painel/PainelFacade.java",
+      "pacote": "sgc.processo.painel",
+      "tipo": "facade",
+      "linhas": 202,
+      "metodos": 4,
+      "dependencias": 4,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "SubprocessoAcessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoAcessoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 197,
+      "metodos": 1,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "SubprocessoValidacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoValidacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 197,
+      "metodos": 13,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "LoginController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/seguranca/login/LoginController.java",
+      "pacote": "sgc.seguranca.login",
+      "tipo": "controller",
+      "linhas": 193,
+      "metodos": 3,
+      "dependencias": 6,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "ProcessoController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/ProcessoController.java",
+      "pacote": "sgc.processo",
+      "tipo": "controller",
+      "linhas": 179,
+      "metodos": 15,
+      "dependencias": 3,
+      "severidade": "ok",
+      "motivos": [
+        "15 métodos públicos (>=15)"
+      ]
+    },
+    {
+      "nomeArquivo": "UsuarioFacade.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/UsuarioFacade.java",
+      "pacote": "sgc.organizacao",
+      "tipo": "facade",
+      "linhas": 160,
+      "metodos": 15,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": [
+        "15 métodos públicos (>=15)"
+      ]
+    },
+    {
+      "nomeArquivo": "MapaSalvamentoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/MapaSalvamentoService.java",
+      "pacote": "sgc.mapa.service",
+      "tipo": "service",
+      "linhas": 160,
+      "metodos": 1,
+      "dependencias": 4,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "FeedbackService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/feedback/FeedbackService.java",
+      "pacote": "sgc.feedback",
+      "tipo": "service",
+      "linhas": 155,
+      "metodos": 3,
+      "dependencias": 5,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "SubprocessoVisualizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoVisualizacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 143,
+      "metodos": 9,
+      "dependencias": 7,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "AtividadeFacade.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/AtividadeFacade.java",
+      "pacote": "sgc.mapa",
+      "tipo": "facade",
+      "linhas": 142,
+      "metodos": 8,
+      "dependencias": 4,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "UnidadeController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/UnidadeController.java",
+      "pacote": "sgc.organizacao",
+      "tipo": "controller",
+      "linhas": 134,
+      "metodos": 17,
+      "dependencias": 6,
+      "severidade": "ok",
+      "motivos": [
+        "17 métodos públicos (>=15)"
+      ]
+    },
+    {
+      "nomeArquivo": "NotificacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/NotificacaoService.java",
+      "pacote": "sgc.alerta",
+      "tipo": "service",
+      "linhas": 131,
+      "metodos": 10,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "CopiaMapaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/CopiaMapaService.java",
+      "pacote": "sgc.mapa.service",
+      "tipo": "service",
+      "linhas": 121,
+      "metodos": 2,
+      "dependencias": 4,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "UnidadeService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UnidadeService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 121,
+      "metodos": 18,
+      "dependencias": 3,
+      "severidade": "ok",
+      "motivos": [
+        "18 métodos públicos (>=15)"
+      ]
+    },
+    {
+      "nomeArquivo": "LoginFacade.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/seguranca/LoginFacade.java",
+      "pacote": "sgc.seguranca",
+      "tipo": "facade",
+      "linhas": 118,
+      "metodos": 4,
+      "dependencias": 5,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "UsuarioService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UsuarioService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 115,
+      "metodos": 16,
+      "dependencias": 5,
+      "severidade": "ok",
+      "motivos": [
+        "16 métodos públicos (>=15)"
+      ]
+    },
+    {
+      "nomeArquivo": "RelatorioController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/relatorio/RelatorioController.java",
+      "pacote": "sgc.relatorio",
+      "tipo": "controller",
+      "linhas": 107,
+      "metodos": 10,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "CacheViewsOrganizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/CacheViewsOrganizacaoService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 107,
+      "metodos": 8,
+      "dependencias": 7,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "EmailModelosService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/EmailModelosService.java",
+      "pacote": "sgc.alerta",
+      "tipo": "service",
+      "linhas": 99,
+      "metodos": 9,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "AtividadeController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/AtividadeController.java",
+      "pacote": "sgc.mapa",
+      "tipo": "controller",
+      "linhas": 99,
+      "metodos": 8,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "EmailService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/EmailService.java",
+      "pacote": "sgc.alerta",
+      "tipo": "service",
+      "linhas": 85,
+      "metodos": 2,
+      "dependencias": 3,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "AnaliseHistoricoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/AnaliseHistoricoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 85,
+      "metodos": 2,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "ProcessoExclusaoCompletaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/service/ProcessoExclusaoCompletaService.java",
+      "pacote": "sgc.processo.service",
+      "tipo": "service",
+      "linhas": 84,
+      "metodos": 1,
+      "dependencias": 4,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "FeedbackController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/feedback/FeedbackController.java",
+      "pacote": "sgc.feedback",
+      "tipo": "controller",
+      "linhas": 71,
+      "metodos": 3,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "ConfiguracaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/configuracoes/ConfiguracaoService.java",
+      "pacote": "sgc.configuracoes",
+      "tipo": "service",
+      "linhas": 64,
+      "metodos": 8,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "MapaController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/MapaController.java",
+      "pacote": "sgc.mapa",
+      "tipo": "controller",
+      "linhas": 63,
+      "metodos": 4,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "MapaVisualizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/mapa/service/MapaVisualizacaoService.java",
+      "pacote": "sgc.mapa.service",
+      "tipo": "service",
+      "linhas": 62,
+      "metodos": 1,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "AlertaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/AlertaService.java",
+      "pacote": "sgc.alerta",
+      "tipo": "service",
+      "linhas": 60,
+      "metodos": 9,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "SubprocessoContextoConsultaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoContextoConsultaService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 60,
+      "metodos": 1,
+      "dependencias": 4,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "LocalizacaoSubprocessoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/LocalizacaoSubprocessoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 59,
+      "metodos": 2,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "UsuarioController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/UsuarioController.java",
+      "pacote": "sgc.organizacao",
+      "tipo": "controller",
+      "linhas": 56,
+      "metodos": 5,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "PainelController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/painel/PainelController.java",
+      "pacote": "sgc.processo.painel",
+      "tipo": "controller",
+      "linhas": 54,
+      "metodos": 4,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "UsuarioPerfilCacheService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/UsuarioPerfilCacheService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 51,
+      "metodos": 1,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "SubprocessoSituacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/subprocesso/service/SubprocessoSituacaoService.java",
+      "pacote": "sgc.subprocesso.service",
+      "tipo": "service",
+      "linhas": 46,
+      "metodos": 2,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "ConfiguracaoController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/configuracoes/ConfiguracaoController.java",
+      "pacote": "sgc.configuracoes",
+      "tipo": "controller",
+      "linhas": 41,
+      "metodos": 2,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "NotificacaoAdminController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/NotificacaoAdminController.java",
+      "pacote": "sgc.alerta",
+      "tipo": "controller",
+      "linhas": 39,
+      "metodos": 3,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "HierarquiaService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/HierarquiaService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 39,
+      "metodos": 4,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "CacheOrganizacaoService.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/service/CacheOrganizacaoService.java",
+      "pacote": "sgc.organizacao.service",
+      "tipo": "service",
+      "linhas": 33,
+      "metodos": 2,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "AlertaController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/AlertaController.java",
+      "pacote": "sgc.alerta",
+      "tipo": "controller",
+      "linhas": 32,
+      "metodos": 2,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "NotificacaoController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/alerta/NotificacaoController.java",
+      "pacote": "sgc.alerta",
+      "tipo": "controller",
+      "linhas": 29,
+      "metodos": 1,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "ProcessoExclusaoController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/processo/ProcessoExclusaoController.java",
+      "pacote": "sgc.processo",
+      "tipo": "controller",
+      "linhas": 25,
+      "metodos": 1,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "CacheAdminController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/CacheAdminController.java",
+      "pacote": "sgc.organizacao",
+      "tipo": "controller",
+      "linhas": 22,
+      "metodos": 1,
+      "dependencias": 2,
+      "severidade": "ok",
+      "motivos": []
+    },
+    {
+      "nomeArquivo": "EventosController.java",
+      "caminhoRelativo": "backend/src/main/java/sgc/organizacao/EventosController.java",
+      "pacote": "sgc.organizacao",
+      "tipo": "controller",
+      "linhas": 19,
+      "metodos": 1,
+      "dependencias": 1,
+      "severidade": "ok",
+      "motivos": []
+    }
+  ]
+}

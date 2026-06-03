@@ -1,9 +1,6 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.model.*;
 
 import java.time.*;
 import java.util.*;
@@ -27,7 +24,7 @@ public class ProcessoDetalheDto {
     private Long codigo;
     private String descricao;
     private String tipo;
-    private SituacaoProcesso situacao;
+    private String situacao;
     private LocalDateTime dataLimite;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataFinalizacao;
@@ -47,7 +44,7 @@ public class ProcessoDetalheDto {
         @Builder.Default
         private final List<SubprocessoElegivelDto> unidades = new ArrayList<>();
         private String codigo;
-        private AcaoProcesso acao;
+        private String acao;
         private boolean mostrar;
         private boolean habilitar;
         private boolean requerDataLimite;
@@ -72,52 +69,10 @@ public class ProcessoDetalheDto {
         private String sigla;
         private Long codUnidade;
         private Long codUnidadeSuperior;
-        private SituacaoSubprocesso situacaoSubprocesso;
+        private String situacaoSubprocesso;
         private LocalDateTime dataLimite;
         private Long mapaCodigo;
         private Long codSubprocesso;
         private Long localizacaoAtualCodigo;
-
-        public static UnidadeParticipanteDto fromUnidade(Unidade unidade) {
-            Unidade superior = unidade.getUnidadeSuperior();
-            return criarBase(
-                    unidade.getNome(),
-                    unidade.getSigla(),
-                    unidade.getCodigo(),
-                    superior != null ? superior.getCodigo() : null
-            );
-        }
-
-        public static UnidadeParticipanteDto fromSnapshot(UnidadeProcesso snapshot) {
-            return criarBase(
-                    snapshot.getNome(),
-                    snapshot.getSigla(),
-                    snapshot.getUnidadeCodigoPersistido(),
-                    snapshot.getUnidadeSuperiorCodigo()
-            );
-        }
-
-        private static UnidadeParticipanteDto criarBase(
-                String nome,
-                String sigla,
-                Long codUnidade,
-                Long codUnidadeSuperior
-        ) {
-            return UnidadeParticipanteDto.builder()
-                    .nome(nome)
-                    .sigla(sigla)
-                    .codUnidade(Objects.requireNonNull(codUnidade, "Codigo da unidade participante obrigatorio"))
-                    .codUnidadeSuperior(codUnidadeSuperior)
-                    .filhos(new ArrayList<>())
-                    .build();
-        }
-
-        public void preencherComSubprocesso(Subprocesso subprocesso, Unidade localizacaoAtual) {
-            this.situacaoSubprocesso = subprocesso.getSituacao();
-            this.dataLimite = subprocesso.getDataLimiteEtapa1();
-            this.codSubprocesso = subprocesso.getCodigo();
-            this.mapaCodigo = subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null;
-            this.localizacaoAtualCodigo = localizacaoAtual.getCodigo();
-        }
     }
 }

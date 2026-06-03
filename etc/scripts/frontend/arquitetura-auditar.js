@@ -76,6 +76,9 @@ async function main() {
     escreverLinha(`Arquivos com mistura de camadas: ${snapshot.resumo.metricas.arquivosComMisturaCamadas}`);
     escreverLinha(`Arquivos com server state caseiro: ${snapshot.resumo.metricas.arquivosComServerStateCaseiro}`);
     escreverLinha(`Hubs centrais com sinais: ${snapshot.resumo.metricas.hubsCentraisComSinais}`);
+    escreverLinha(`Fachadas puras: ${snapshot.resumo.metricas.fachadasPuras}`);
+    escreverLinha(`Composables minúsculos: ${snapshot.resumo.metricas.composablesMinusculos}`);
+    escreverLinha(`Famílias pulverizadas: ${snapshot.resumo.metricas.familiasPulverizadas}`);
     escreverLinha("");
     escreverLinha(pc.bold("Top 5 hotspots:"));
     snapshot.hotspots.slice(0, 5).forEach((hotspot, indice) => {

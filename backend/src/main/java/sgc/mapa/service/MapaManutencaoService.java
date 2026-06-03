@@ -113,12 +113,12 @@ public class MapaManutencaoService {
 
     public Mapa mapaCompletoSubprocesso(Long subprocessoCodigo) {
         return mapaRepo.buscarCompletoPorSubprocesso(subprocessoCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
+                .orElseThrow();
     }
 
     public Mapa mapaComCompetenciasEAtividadesSubprocesso(Long subprocessoCodigo) {
         return mapaRepo.buscarComCompetenciasEAtividadesPorSubprocesso(subprocessoCodigo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Mapa", "S:" + subprocessoCodigo));
+                .orElseThrow();
     }
 
     public Mapa mapaCodigo(Long codigo) {

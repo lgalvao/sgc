@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-05-28T01:55:20.784Z",
+  "geradoEm": "2026-05-31T22:56:16.392Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -11,9 +11,9 @@
   },
   "resumo": {
     "arquivosFrontend": 475,
-    "arquivosProducao": 264,
-    "arquivosTeste": 211,
-    "scoreTotal": 438,
+    "arquivosProducao": 263,
+    "arquivosTeste": 212,
+    "scoreTotal": 440,
     "faixa": "critico"
   },
   "contagens": {
@@ -21,15 +21,15 @@
       "anyExplicito": 1,
       "checksNull": 18,
       "fallbacksDefensivos": 52,
-      "catchBlocks": 61,
+      "catchBlocks": 60,
       "castsDuplos": 1,
       "storageDireto": 0,
-      "exportsSuspeitos": 26,
+      "exportsSuspeitos": 27,
       "arquivosAcimaTarget": {},
       "arquivosAcimaHard": {}
     },
     "testes": {
-      "anyExplicito": 566,
+      "anyExplicito": 578,
       "checksNull": 2,
       "fallbacksDefensivos": 4,
       "catchBlocks": 3,
@@ -47,6 +47,11 @@
       "consumidoresTeste": 0
     },
     {
+      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts",
+      "exportNome": "CHAVE_QUERY_DIAGNOSTICO_ORGANIZACIONAL",
+      "consumidoresTeste": 0
+    },
+    {
       "arquivo": "frontend/src/composables/useFeedbacksAdminQuery.ts",
       "exportNome": "CHAVE_QUERY_FEEDBACKS_ADMIN",
       "consumidoresTeste": 0
@@ -59,12 +64,12 @@
     {
       "arquivo": "frontend/src/composables/useMapaQuery.ts",
       "exportNome": "criarChaveMapa",
-      "consumidoresTeste": 1
+      "consumidoresTeste": 2
     },
     {
       "arquivo": "frontend/src/composables/useMapaQuery.ts",
       "exportNome": "criarChaveImpactoMapa",
-      "consumidoresTeste": 1
+      "consumidoresTeste": 2
     },
     {
       "arquivo": "frontend/src/composables/useMapaQuery.ts",
@@ -208,7 +213,7 @@
     {
       "arquivo": "frontend/src/composables/useMapaQuery.ts",
       "camada": "composable",
-      "linhas": 136,
+      "linhas": 138,
       "score": 16,
       "contagens": {
         "anyExplicito": 0,
@@ -256,7 +261,7 @@
     {
       "arquivo": "frontend/src/composables/useConfiguracoes.ts",
       "camada": "composable",
-      "linhas": 106,
+      "linhas": 105,
       "score": 11,
       "contagens": {
         "anyExplicito": 0,
@@ -400,7 +405,7 @@
     {
       "arquivo": "frontend/src/composables/useAtribuicaoTemporariaTela.ts",
       "camada": "composable",
-      "linhas": 416,
+      "linhas": 413,
       "score": 8,
       "contagens": {
         "anyExplicito": 0,
@@ -432,7 +437,7 @@
     {
       "arquivo": "frontend/src/composables/useUnidadesQuery.ts",
       "camada": "composable",
-      "linhas": 23,
+      "linhas": 24,
       "score": 8,
       "contagens": {
         "anyExplicito": 0,
@@ -559,7 +564,7 @@
       "arquivo": "frontend/src/composables/useMapaQuery.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 136,
+      "linhas": 138,
       "imports": 5,
       "exports": 7,
       "exportsRuntime": [
@@ -691,7 +696,7 @@
       "arquivo": "frontend/src/composables/useConfiguracoes.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 106,
+      "linhas": 105,
       "imports": 5,
       "exports": 2,
       "exportsRuntime": [
@@ -857,7 +862,7 @@
       "arquivo": "frontend/src/composables/useAtribuicaoTemporariaTela.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 416,
+      "linhas": 413,
       "imports": 14,
       "exports": 1,
       "exportsRuntime": [
@@ -963,7 +968,7 @@
       "arquivo": "frontend/src/composables/useUnidadesQuery.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 23,
+      "linhas": 24,
       "imports": 4,
       "exports": 3,
       "exportsRuntime": [
@@ -1048,7 +1053,7 @@
       "arquivo": "frontend/src/stores/subprocesso/index.ts",
       "camada": "store",
       "categoriaArquivo": "producao",
-      "linhas": 163,
+      "linhas": 138,
       "imports": 7,
       "exports": 1,
       "exportsRuntime": [
@@ -1234,7 +1239,7 @@
       "arquivo": "frontend/src/composables/useRelatorioAndamentoTela.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 21,
+      "linhas": 22,
       "imports": 4,
       "exports": 1,
       "exportsRuntime": [
@@ -1358,8 +1363,8 @@
       "arquivo": "frontend/src/views/subprocessoAcoesAdministrativas.ts",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 167,
-      "imports": 8,
+      "linhas": 168,
+      "imports": 9,
       "exports": 1,
       "exportsRuntime": [
         "useSubprocessoAcoesAdministrativas"
@@ -1664,7 +1669,7 @@
       "arquivo": "frontend/src/composables/usePainelQuery.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 31,
+      "linhas": 32,
       "imports": 5,
       "exports": 3,
       "exportsRuntime": [
@@ -1689,10 +1694,38 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts",
+      "camada": "composable",
+      "categoriaArquivo": "producao",
+      "linhas": 30,
+      "imports": 4,
+      "exports": 3,
+      "exportsRuntime": [
+        "useDiagnosticoOrganizacionalQuery",
+        "useInvalidacaoDiagnosticoOrganizacional",
+        "CHAVE_QUERY_DIAGNOSTICO_ORGANIZACIONAL"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 1
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 4,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/composables/useProcessoQuery.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 26,
+      "linhas": 27,
       "imports": 5,
       "exports": 3,
       "exportsRuntime": [
@@ -1720,7 +1753,7 @@
       "arquivo": "frontend/src/composables/useHistoricoQuery.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 23,
+      "linhas": 24,
       "imports": 4,
       "exports": 3,
       "exportsRuntime": [
@@ -1748,7 +1781,7 @@
       "arquivo": "frontend/src/composables/useFeedbacksAdminQuery.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 16,
+      "linhas": 17,
       "imports": 3,
       "exports": 2,
       "exportsRuntime": [
@@ -1820,15 +1853,13 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/useSubprocessoTela.ts",
-      "camada": "composable",
+      "arquivo": "frontend/src/components/unidade/UnidadeTreeNode.vue",
+      "camada": "component",
       "categoriaArquivo": "producao",
-      "linhas": 207,
-      "imports": 15,
-      "exports": 1,
-      "exportsRuntime": [
-        "useSubprocessoTela"
-      ],
+      "linhas": 203,
+      "imports": 2,
+      "exports": 0,
+      "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
@@ -1846,13 +1877,15 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/components/unidade/UnidadeTreeNode.vue",
-      "camada": "component",
+      "arquivo": "frontend/src/composables/useSubprocessoTela.ts",
+      "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 203,
-      "imports": 2,
-      "exports": 0,
-      "exportsRuntime": [],
+      "linhas": 200,
+      "imports": 15,
+      "exports": 1,
+      "exportsRuntime": [
+        "useSubprocessoTela"
+      ],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
@@ -2199,7 +2232,7 @@
       "arquivo": "frontend/src/views/AdministradoresView.vue",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 161,
+      "linhas": 162,
       "imports": 10,
       "exports": 0,
       "exportsRuntime": [],
@@ -2301,11 +2334,37 @@
       "arquivo": "frontend/src/composables/useCadastroOrquestracao.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 138,
+      "linhas": 139,
       "imports": 6,
       "exports": 1,
       "exportsRuntime": [
         "useCadastroOrquestracao"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 1,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 2,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
+      "camada": "composable",
+      "categoriaArquivo": "producao",
+      "linhas": 138,
+      "imports": 6,
+      "exports": 1,
+      "exportsRuntime": [
+        "useMapaSugestoes"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2350,14 +2409,14 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
+      "arquivo": "frontend/src/composables/useFeedback.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
-      "linhas": 137,
-      "imports": 6,
+      "linhas": 116,
+      "imports": 7,
       "exports": 1,
       "exportsRuntime": [
-        "useMapaSugestoes"
+        "useFeedback"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2379,61 +2438,11 @@
       "arquivo": "frontend/src/views/subprocessoCarregamento.ts",
       "camada": "view",
       "categoriaArquivo": "producao",
-      "linhas": 132,
-      "imports": 1,
+      "linhas": 116,
+      "imports": 2,
       "exports": 1,
       "exportsRuntime": [
         "useSubprocessoCarregamento"
-      ],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 1,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 2,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/views/LimpezaProcessosView.vue",
-      "camada": "view",
-      "categoriaArquivo": "producao",
-      "linhas": 128,
-      "imports": 12,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 1,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 2,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/useFeedback.ts",
-      "camada": "composable",
-      "categoriaArquivo": "producao",
-      "linhas": 116,
-      "imports": 7,
-      "exports": 1,
-      "exportsRuntime": [
-        "useFeedback"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2488,32 +2497,6 @@
       "exports": 1,
       "exportsRuntime": [
         "useAcoesBlocoProcesso"
-      ],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 1,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 2,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/stores/organizacao.ts",
-      "camada": "store",
-      "categoriaArquivo": "producao",
-      "linhas": 91,
-      "imports": 5,
-      "exports": 1,
-      "exportsRuntime": [
-        "useOrganizacaoStore"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2616,6 +2599,32 @@
       "exports": 1,
       "exportsRuntime": [
         "useAsyncAction"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 1,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 2,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/useLimpezaProcessosTela.ts",
+      "camada": "composable",
+      "categoriaArquivo": "producao",
+      "linhas": 61,
+      "imports": 6,
+      "exports": 1,
+      "exportsRuntime": [
+        "useLimpezaProcessosTela"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -2849,7 +2858,7 @@
       "arquivo": "frontend/src/views/__tests__/AtividadesCadastroView.spec.ts",
       "camada": "view",
       "categoriaArquivo": "teste",
-      "linhas": 1209,
+      "linhas": 1203,
       "imports": 20,
       "exports": 0,
       "exportsRuntime": [],
@@ -2897,7 +2906,7 @@
       "arquivo": "frontend/src/views/__tests__/CadProcesso.spec.ts",
       "camada": "view",
       "categoriaArquivo": "teste",
-      "linhas": 1025,
+      "linhas": 1037,
       "imports": 12,
       "exports": 0,
       "exportsRuntime": [],
@@ -2921,7 +2930,7 @@
       "arquivo": "frontend/src/views/__tests__/SubprocessoView.spec.ts",
       "camada": "view",
       "categoriaArquivo": "teste",
-      "linhas": 715,
+      "linhas": 693,
       "imports": 9,
       "exports": 0,
       "exportsRuntime": [],
@@ -2945,7 +2954,7 @@
       "arquivo": "frontend/src/views/__tests__/UnidadesView.spec.ts",
       "camada": "view",
       "categoriaArquivo": "teste",
-      "linhas": 504,
+      "linhas": 520,
       "imports": 7,
       "exports": 0,
       "exportsRuntime": [],
@@ -3182,15 +3191,15 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/components/comum/TreeTable.vue",
-      "camada": "component",
-      "categoriaArquivo": "producao",
-      "linhas": 358,
-      "imports": 6,
+      "arquivo": "frontend/src/views/__tests__/MapaViewSomenteLeitura.spec.ts",
+      "camada": "view",
+      "categoriaArquivo": "teste",
+      "linhas": 364,
+      "imports": 10,
       "exports": 0,
       "exportsRuntime": [],
       "contagens": {
-        "anyExplicito": 0,
+        "anyExplicito": 7,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -3206,15 +3215,15 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/__tests__/MapaViewSomenteLeitura.spec.ts",
-      "camada": "view",
-      "categoriaArquivo": "teste",
-      "linhas": 353,
-      "imports": 10,
+      "arquivo": "frontend/src/components/comum/TreeTable.vue",
+      "camada": "component",
+      "categoriaArquivo": "producao",
+      "linhas": 358,
+      "imports": 6,
       "exports": 0,
       "exportsRuntime": [],
       "contagens": {
-        "anyExplicito": 7,
+        "anyExplicito": 0,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -3302,30 +3311,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/stores/__tests__/subprocesso.spec.ts",
-      "camada": "store",
-      "categoriaArquivo": "teste",
-      "linhas": 330,
-      "imports": 5,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 31,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/components/comum/EditorTextoRico.vue",
       "camada": "component",
       "categoriaArquivo": "producao",
@@ -3364,6 +3349,30 @@
         "catchBlocks": 0,
         "castsDuplos": 0,
         "storageDireto": 1,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/stores/__tests__/subprocesso.spec.ts",
+      "camada": "store",
+      "categoriaArquivo": "teste",
+      "linhas": 310,
+      "imports": 5,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 28,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
         "exportsSuspeitos": 0
       },
       "limites": {
@@ -3556,6 +3565,30 @@
         "catchBlocks": 0,
         "castsDuplos": 1,
         "storageDireto": 4,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/__tests__/useCadastroTela.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 274,
+      "imports": 8,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 8,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
         "exportsSuspeitos": 0
       },
       "limites": {
@@ -3911,7 +3944,7 @@
       "arquivo": "frontend/src/composables/__tests__/useCadastroOrquestracao.spec.ts",
       "camada": "composable",
       "categoriaArquivo": "teste",
-      "linhas": 223,
+      "linhas": 221,
       "imports": 7,
       "exports": 0,
       "exportsRuntime": [],
@@ -4037,6 +4070,30 @@
       "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/__tests__/useMapaQuery.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 208,
+      "imports": 7,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 13,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -4196,15 +4253,15 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/__tests__/useCacheSync.spec.ts",
-      "camada": "composable",
-      "categoriaArquivo": "teste",
-      "linhas": 197,
-      "imports": 7,
+      "arquivo": "frontend/src/views/ConfiguracaoView.vue",
+      "camada": "view",
+      "categoriaArquivo": "producao",
+      "linhas": 196,
+      "imports": 11,
       "exports": 0,
       "exportsRuntime": [],
       "contagens": {
-        "anyExplicito": 10,
+        "anyExplicito": 0,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -4220,15 +4277,15 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/ConfiguracaoView.vue",
-      "camada": "view",
-      "categoriaArquivo": "producao",
-      "linhas": 196,
-      "imports": 11,
+      "arquivo": "frontend/src/composables/__tests__/useCacheSync.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 193,
+      "imports": 6,
       "exports": 0,
       "exportsRuntime": [],
       "contagens": {
-        "anyExplicito": 0,
+        "anyExplicito": 9,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -4425,30 +4482,6 @@
       "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/stores/__tests__/organizacao.spec.ts",
-      "camada": "store",
-      "categoriaArquivo": "teste",
-      "linhas": 184,
-      "imports": 5,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 1,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -4852,6 +4885,30 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/composables/__tests__/useBuscadorUsuarios.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 161,
+      "imports": 6,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 9,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/services/__tests__/unidadeService.spec.ts",
       "camada": "service",
       "categoriaArquivo": "teste",
@@ -4996,30 +5053,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/__tests__/useBuscadorUsuarios.spec.ts",
-      "camada": "composable",
-      "categoriaArquivo": "teste",
-      "linhas": 158,
-      "imports": 6,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 9,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/components/cadastro/CadastroObservacaoModal.stories.ts",
       "camada": "component",
       "categoriaArquivo": "teste",
@@ -5140,32 +5173,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
-      "camada": "composable",
-      "categoriaArquivo": "producao",
-      "linhas": 151,
-      "imports": 4,
-      "exports": 1,
-      "exportsRuntime": [
-        "useDiagnosticoOrganizacionalAlert"
-      ],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/composables/useFluxoCadastroSubprocesso.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
@@ -5177,30 +5184,6 @@
       ],
       "contagens": {
         "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/stores/__tests__/perfil.spec.ts",
-      "camada": "store",
-      "categoriaArquivo": "teste",
-      "linhas": 146,
-      "imports": 7,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 13,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -5264,20 +5247,22 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/__tests__/useConfiguracoes.spec.ts",
+      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
       "camada": "composable",
-      "categoriaArquivo": "teste",
-      "linhas": 141,
-      "imports": 7,
-      "exports": 0,
-      "exportsRuntime": [],
+      "categoriaArquivo": "producao",
+      "linhas": 142,
+      "imports": 4,
+      "exports": 1,
+      "exportsRuntime": [
+        "useDiagnosticoOrganizacionalAlert"
+      ],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
         "castsDuplos": 0,
-        "storageDireto": 1,
+        "storageDireto": 0,
         "exportsSuspeitos": 0
       },
       "limites": {
@@ -5506,6 +5491,30 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/stores/__tests__/perfil.spec.ts",
+      "camada": "store",
+      "categoriaArquivo": "teste",
+      "linhas": 135,
+      "imports": 6,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 9,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/views/__tests__/ParametrosView.spec.ts",
       "camada": "view",
       "categoriaArquivo": "teste",
@@ -5602,6 +5611,30 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/views/__tests__/subprocessoCarregamento.spec.ts",
+      "camada": "view",
+      "categoriaArquivo": "teste",
+      "linhas": 133,
+      "imports": 4,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 1,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/composables/__tests__/usePerfil.spec.ts",
       "camada": "composable",
       "categoriaArquivo": "teste",
@@ -5664,6 +5697,30 @@
         "catchBlocks": 0,
         "castsDuplos": 0,
         "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/__tests__/useConfiguracoes.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 130,
+      "imports": 7,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 1,
         "exportsSuspeitos": 0
       },
       "limites": {
@@ -5892,30 +5949,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/views/__tests__/subprocessoCarregamento.spec.ts",
-      "camada": "view",
-      "categoriaArquivo": "teste",
-      "linhas": 127,
-      "imports": 4,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 1,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/__tests__/App.spec.ts",
       "camada": "outro",
       "categoriaArquivo": "teste",
@@ -5925,30 +5958,6 @@
       "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 4,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/__tests__/useInvalidacaoNavegacao.spec.ts",
-      "camada": "composable",
-      "categoriaArquivo": "teste",
-      "linhas": 126,
-      "imports": 6,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 0,
         "checksNull": 0,
         "fallbacksDefensivos": 0,
         "catchBlocks": 0,
@@ -6036,15 +6045,13 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/stores/perfil.ts",
-      "camada": "store",
+      "arquivo": "frontend/src/types/subprocesso-modelos.ts",
+      "camada": "outro",
       "categoriaArquivo": "producao",
       "linhas": 121,
-      "imports": 8,
-      "exports": 1,
-      "exportsRuntime": [
-        "usePerfilStore"
-      ],
+      "imports": 2,
+      "exports": 0,
+      "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
@@ -6062,13 +6069,39 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/types/subprocesso-modelos.ts",
-      "camada": "outro",
-      "categoriaArquivo": "producao",
-      "linhas": 121,
-      "imports": 2,
+      "arquivo": "frontend/src/composables/__tests__/useInvalidacaoNavegacao.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 120,
+      "imports": 5,
       "exports": 0,
       "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/stores/perfil.ts",
+      "camada": "store",
+      "categoriaArquivo": "producao",
+      "linhas": 120,
+      "imports": 7,
+      "exports": 1,
+      "exportsRuntime": [
+        "usePerfilStore"
+      ],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
@@ -6451,30 +6484,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/__tests__/useWebStorage.spec.ts",
-      "camada": "composable",
-      "categoriaArquivo": "teste",
-      "linhas": 110,
-      "imports": 5,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 6,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/components/processo/__tests__/SubprocessoModal.spec.ts",
       "camada": "component",
       "categoriaArquivo": "teste",
@@ -6489,6 +6498,30 @@
         "catchBlocks": 0,
         "castsDuplos": 0,
         "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/__tests__/useWebStorage.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 108,
+      "imports": 3,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 6,
         "exportsSuspeitos": 0
       },
       "limites": {
@@ -7168,6 +7201,30 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/composables/__tests__/useDiagnosticoOrganizacionalAlert.spec.ts",
+      "camada": "composable",
+      "categoriaArquivo": "teste",
+      "linhas": 95,
+      "imports": 4,
+      "exports": 0,
+      "exportsRuntime": [],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/components/comum/EditorTextoRico.stories.ts",
       "camada": "component",
       "categoriaArquivo": "teste",
@@ -7426,6 +7483,30 @@
         "buscarContextoCadastroAtividades",
         "buscarContextoCadastroAtividadesPorProcessoEUnidade"
       ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/views/LimpezaProcessosView.vue",
+      "camada": "view",
+      "categoriaArquivo": "producao",
+      "linhas": 89,
+      "imports": 8,
+      "exports": 0,
+      "exportsRuntime": [],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
@@ -9968,30 +10049,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/__tests__/useDiagnosticoOrganizacionalAlert.spec.ts",
-      "camada": "composable",
-      "categoriaArquivo": "teste",
-      "linhas": 45,
-      "imports": 5,
-      "exports": 0,
-      "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/types/mapa-requests.ts",
       "camada": "outro",
       "categoriaArquivo": "producao",
@@ -11545,6 +11602,32 @@
       "violacoes": []
     },
     {
+      "arquivo": "frontend/src/composables/useUnidadeAtual.ts",
+      "camada": "composable",
+      "categoriaArquivo": "producao",
+      "linhas": 20,
+      "imports": 4,
+      "exports": 1,
+      "exportsRuntime": [
+        "useUnidadeAtual"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 0,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 0,
+      "violacoes": []
+    },
+    {
       "arquivo": "frontend/src/test-utils/mockFactories.ts",
       "camada": "outro",
       "categoriaArquivo": "teste",
@@ -11569,14 +11652,14 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/useUnidadeAtual.ts",
+      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
       "camada": "composable",
       "categoriaArquivo": "producao",
       "linhas": 19,
-      "imports": 4,
+      "imports": 3,
       "exports": 1,
       "exportsRuntime": [
-        "useUnidadeAtual"
+        "useFluxoSubprocesso"
       ],
       "contagens": {
         "anyExplicito": 0,
@@ -11653,32 +11736,6 @@
       "imports": 3,
       "exports": 0,
       "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
-      "camada": "composable",
-      "categoriaArquivo": "producao",
-      "linhas": 18,
-      "imports": 3,
-      "exports": 1,
-      "exportsRuntime": [
-        "useFluxoSubprocesso"
-      ],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,
@@ -11977,58 +12034,6 @@
       "imports": 1,
       "exports": 0,
       "exportsRuntime": [],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/useLocalStorage.ts",
-      "camada": "composable",
-      "categoriaArquivo": "producao",
-      "linhas": 10,
-      "imports": 2,
-      "exports": 1,
-      "exportsRuntime": [
-        "useLocalStorage"
-      ],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 0,
-        "fallbacksDefensivos": 0,
-        "catchBlocks": 0,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 0,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/useSessionStorage.ts",
-      "camada": "composable",
-      "categoriaArquivo": "producao",
-      "linhas": 10,
-      "imports": 2,
-      "exports": 1,
-      "exportsRuntime": [
-        "useSessionStorage"
-      ],
       "contagens": {
         "anyExplicito": 0,
         "checksNull": 0,

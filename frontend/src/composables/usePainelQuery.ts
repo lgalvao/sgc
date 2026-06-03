@@ -1,3 +1,4 @@
+// @sgc-auditoria ignorar: arquivoMinusculo | padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 import {computed} from "vue";
 import {useQuery, useQueryCache} from "@pinia/colada";
 import {usePerfilStore} from "@/stores/perfil";

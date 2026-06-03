@@ -30,8 +30,8 @@ import java.util.*;
 @Slf4j
 @Tag(name = "Login", description = "Autenticação e autorização de usuários")
 public class LoginController {
-    private final LoginFacade loginFacade;
-    private final UsuarioFacade usuarioFacade;
+    private final LoginAplicacaoService loginAplicacaoService;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final LimitadorTentativasLogin limitadorTentativasLogin;
     private final GerenciadorJwt gerenciadorJwt;
     private final ListaNegraJwt listaNegraJwt;
@@ -54,23 +54,24 @@ public class LoginController {
         String ip = extrairIp(httpRequest);
         if (ip != null) limitadorTentativasLogin.verificar(ip);
 
-        boolean autenticado = loginFacade.autenticar(request.tituloEleitoral(), request.senha());
+        boolean autenticado = loginAplicacaoService.autenticar(request.tituloEleitoral(), request.senha());
         if (!autenticado) {
             throw new ErroAutenticacao("Título ou senha inválidos.");
         }
 
-        List<PerfilUnidadeDto> perfis = loginFacade.buscarAutorizacoesUsuario(request.tituloEleitoral());
+        List<PerfilUnidadeDto> perfis = loginAplicacaoService.buscarAutorizacoesUsuario(request.tituloEleitoral());
         if (perfis.isEmpty()) {
             throw new ErroConfiguracao("Usuário autenticado sem perfil no SGC. Verifique as views de autorização.");
         }
         if (perfis.size() == 1) {
             PerfilUnidadeDto perfilUnidade = perfis.getFirst();
             EntrarRequest entrarRequest = EntrarRequest.builder()
-                    .perfil(perfilUnidade.perfil().name())
+                    .perfil(perfilUnidade.perfil())
                     .unidadeCodigo(perfilUnidade.unidade().codigo())
                     .build();
-            String token = loginFacade.entrar(entrarRequest, request.tituloEleitoral(), perfis);
-            Usuario usuario = usuarioFacade.buscarPorLogin(request.tituloEleitoral());
+            String token = loginAplicacaoService.entrar(entrarRequest, request.tituloEleitoral(), perfis);
+            Usuario usuario = usuarioAplicacaoService.buscarPorLogin(request.tituloEleitoral());
+            Perfil perfilSelecionado = Perfil.valueOf(perfilUnidade.perfil());
 
             adicionarCookieJwt(httpResponse, token);
             limparCookiePreAuth(httpResponse);
@@ -78,9 +79,9 @@ public class LoginController {
             EntrarResponse sessao = EntrarResponse.builder()
                     .tituloEleitoral(request.tituloEleitoral())
                     .nome(usuario.getNome())
-                    .perfil(perfilUnidade.perfil())
+                    .perfil(perfilSelecionado.name())
                     .unidadeCodigo(perfilUnidade.unidade().codigo())
-                    .permissoes(construirPermissoesSessao(perfilUnidade.perfil()))
+                    .permissoes(construirPermissoesSessao(perfilSelecionado))
                     .build();
 
             return ResponseEntity.ok(FluxoLoginResponse.builder()
@@ -114,13 +115,13 @@ public class LoginController {
             HttpServletResponse httpResponse) {
 
         String tituloEleitoral = extrairTituloPreAuth(httpRequest);
-        String token = loginFacade.entrar(request, tituloEleitoral);
-        Usuario usuario = usuarioFacade.buscarPorLogin(tituloEleitoral);
+        String token = loginAplicacaoService.entrar(request, tituloEleitoral);
+        Usuario usuario = usuarioAplicacaoService.buscarPorLogin(tituloEleitoral);
 
         EntrarResponse response = EntrarResponse.builder()
                 .tituloEleitoral(tituloEleitoral)
                 .nome(usuario.getNome())
-                .perfil(Perfil.valueOf(request.perfil()))
+                .perfil(request.perfil())
                 .unidadeCodigo(request.unidadeCodigo())
                 .permissoes(construirPermissoesSessao(Perfil.valueOf(request.perfil())))
                 .build();

@@ -86,12 +86,12 @@ describe('mapaAnaliseFluxo.ts', () => {
         })
     })
 
-    describe('handleConfirmarDevolucao', () => {
+    describe('confirmarDevolucao', () => {
         it('deve falhar se a validação retornar false', async () => {
             const deps = criarDependencias()
             deps.validarSubmissao.mockReturnValue(false)
-            const {handleConfirmarDevolucao} = useMapaAnaliseFluxo(deps)
-            await handleConfirmarDevolucao()
+            const {confirmarDevolucao} = useMapaAnaliseFluxo(deps)
+            await confirmarDevolucao()
             expect(deps.focarPrimeiroErroInvalido).toHaveBeenCalled()
             expect(deps.devolverMapa).not.toHaveBeenCalled()
         })
@@ -99,8 +99,8 @@ describe('mapaAnaliseFluxo.ts', () => {
         it('deve confirmar devolução com sucesso', async () => {
             const deps = criarDependencias()
             deps.observacaoDevolucao.value = 'justificativa'
-            const {handleConfirmarDevolucao} = useMapaAnaliseFluxo(deps)
-            await handleConfirmarDevolucao()
+            const {confirmarDevolucao} = useMapaAnaliseFluxo(deps)
+            await confirmarDevolucao()
             expect(deps.devolverMapa).toHaveBeenCalledWith(123, {justificativa: 'justificativa'})
             expect(deps.concluirAcaoPainel).toHaveBeenCalledWith(TEXTOS_SUCESSO_SUBPROCESSO.DEVOLUCAO_REALIZADA, expect.any(Function))
         })
@@ -108,9 +108,9 @@ describe('mapaAnaliseFluxo.ts', () => {
         it('deve notificar erro se devolução falhar', async () => {
             const deps = criarDependencias()
             deps.devolverMapa.mockRejectedValue(new Error('Erro'))
-            const {handleConfirmarDevolucao} = useMapaAnaliseFluxo(deps)
+            const {confirmarDevolucao} = useMapaAnaliseFluxo(deps)
             deps.observacaoDevolucao.value = 'justificativa'
-            await handleConfirmarDevolucao()
+            await confirmarDevolucao()
             expect(deps.notify).toHaveBeenCalledWith(TEXTOS.mapa.ERRO_DEVOLVER, "danger")
         })
     })

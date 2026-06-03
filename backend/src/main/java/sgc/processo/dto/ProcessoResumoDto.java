@@ -1,7 +1,6 @@
 package sgc.processo.dto;
 
 import lombok.*;
-import sgc.processo.model.*;
 
 import java.time.*;
 
@@ -12,7 +11,7 @@ import java.time.*;
 public record ProcessoResumoDto(
         Long codigo,
         String descricao,
-        SituacaoProcesso situacao,
+        String situacao,
         String tipo,
         LocalDateTime dataLimite,
         LocalDateTime dataCriacao,
@@ -22,16 +21,4 @@ public record ProcessoResumoDto(
         String unidadesParticipantes,
         String linkDestino
 ) {
-    public static ProcessoResumoDto fromEntity(Processo processo) {
-        return ProcessoResumoDto.builder()
-                .codigo(processo.getCodigo())
-                .descricao(processo.getDescricao())
-                .situacao(processo.getSituacao())
-                .tipo(processo.getTipo().name())
-                .dataLimite(processo.getDataLimite())
-                .dataCriacao(processo.getDataCriacao())
-                .dataFinalizacao(processo.getDataFinalizacao())
-                .unidadesParticipantes(processo.getSiglasParticipantes())
-                .build();
-    }
 }

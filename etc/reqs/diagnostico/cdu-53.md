@@ -1,4 +1,4 @@
-# CDU-53 - Gerar relatório de situação de capacitação do diagnóstico
+# CDU-53 - Gerar relatório de situação de capacitação
 
 Ator: ADMIN, GESTOR
 

@@ -2,8 +2,10 @@ package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
+import sgc.subprocesso.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -12,6 +14,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("SubprocessoListagemDto")
 class SubprocessoListagemDtoTest {
+    private final SubprocessoDtoMapper mapper = new SubprocessoDtoMapper(new OrganizacaoDtoMapper());
+
 
     @Test
     @DisplayName("deve mapear subprocesso para listagem")
@@ -43,7 +47,7 @@ class SubprocessoListagemDtoTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_HOMOLOGADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.of(2025, 1, 10, 10, 0));
 
-        SubprocessoListagemDto dto = SubprocessoListagemDto.fromEntity(subprocesso);
+        SubprocessoListagemDto dto = mapper.paraListagem(subprocesso);
 
         assertThat(dto.codigo()).isEqualTo(20L);
         assertThat(dto.codProcesso()).isEqualTo(50L);
@@ -60,7 +64,7 @@ class SubprocessoListagemDtoTest {
     void deveFalharQuandoProcessoOuUnidadeEstiveremAusentes() {
         Subprocesso subprocesso = new Subprocesso();
 
-        assertThatThrownBy(() -> SubprocessoListagemDto.fromEntity(subprocesso))
+        assertThatThrownBy(() -> mapper.paraListagem(subprocesso))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Subprocesso deve possuir processo e unidade associados");
     }

@@ -8,7 +8,7 @@ export function usePerfil() {
     const perfilSelecionado = computed(() => perfilStore.perfilSelecionado);
 
     const unidadeSelecionada = computed(() => perfilStore.unidadeSelecionadaSigla);
-    const isAdmin = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN);
+    const ehAdmin = computed(() => perfilStore.perfilSelecionado === Perfil.ADMIN);
     const podeVerRelatorios = computed(() =>
         perfilStore.perfilSelecionado === Perfil.ADMIN ||
         perfilStore.perfilSelecionado === Perfil.GESTOR
@@ -24,7 +24,7 @@ export function usePerfil() {
     return {
         perfilSelecionado,
         unidadeSelecionada,
-        isAdmin,
+        ehAdmin,
         podeVerRelatorios,
         mostrarCriarProcesso,
         mostrarArvoreCompletaUnidades,

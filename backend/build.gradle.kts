@@ -1,9 +1,7 @@
 import org.gradle.api.tasks.testing.logging.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
-import java.net.URI
-import java.net.HttpURLConnection
-import java.util.concurrent.TimeUnit
+import java.net.*
 
 val argumentosJvmSemAvisoUnsafe = listOf(
     "--sun-misc-unsafe-memory-access=allow"
@@ -50,7 +48,7 @@ dependencies {
     implementation(libs.jjwt.api)
     implementation(libs.rhino)
     implementation(libs.caffeine)
-    implementation(libs.h2)
+    runtimeOnly(libs.h2)
     implementation(libs.springdoc.openapi)
 
     val envAmbiente = project.findProperty("ENV")?.toString()
@@ -129,10 +127,10 @@ tasks.named<BootRun>("bootRun") {
         arquivo.useLines { lines ->
             lines.filter { it.isNotBlank() && !it.trim().startsWith("#") }
                 .forEach { line ->
-                    val parts = line.split("=", limit = 2)
-                    if (parts.size == 2) {
-                        val chave = parts[0].trim()
-                        val valor = parts[1].trim()
+                    val partes = line.split("=", limit = 2)
+                    if (partes.size == 2) {
+                        val chave = partes[0].trim()
+                        val valor = partes[1].trim()
                         val jaDefinidoNoAmbiente = environment.containsKey(chave) || System.getenv().containsKey(chave)
                         if (sobrescreverExistente || !jaDefinidoNoAmbiente) {
                             environment(chave, valor)
@@ -175,6 +173,7 @@ tasks.withType<Test> {
     }
 
     val slowTests = mutableListOf<Pair<String, Long>>()
+    // Flag de depuração: mude para true localmente para exibir os 5 testes mais lentos após a execução.
     val showSlowTests = false
     addTestListener(object : TestListener {
         override fun beforeSuite(suite: TestDescriptor) {}
@@ -339,6 +338,9 @@ tasks.register("fuzz") {
             jarFile.absolutePath
         )
         
+        // Define o diretório de trabalho como o diretório do subprojeto 'backend' para resolver caminhos relativos corretamente
+        processoBuilder.directory(project.projectDir)
+        
         processoBuilder.redirectOutput(logFuzz)
         processoBuilder.redirectError(logFuzz)
         
@@ -351,16 +353,17 @@ tasks.register("fuzz") {
         
         while (System.currentTimeMillis() - startTime < timeoutMs) {
             try {
-                val url = URI("http://localhost:10000/actuator/health").toURL()
+                val url = URI("http://localhost:10000/swagger-ui.html").toURL()
                 val conexao = url.openConnection() as HttpURLConnection
                 conexao.connectTimeout = 1000
                 conexao.readTimeout = 1000
-                if (conexao.responseCode == 200) {
+                val responseCode = conexao.responseCode
+                if (responseCode in 100..599) {
                     conectado = true
                     break
                 }
             } catch (e: Exception) {
-                // Ignora e espera a porta subir
+                // Ignora e espera a porta subir (ex: Connection Refused)
             }
             Thread.sleep(1500)
         }
@@ -409,6 +412,7 @@ tasks.register("fuzz") {
         )
         
         try {
+            println("Tentando executar o WuppieFuzz nativo...")
             val processoFuzz = ProcessBuilder(comandoFuzzer)
                 .inheritIO()
                 .start()
@@ -416,9 +420,32 @@ tasks.register("fuzz") {
             val exitCode = processoFuzz.waitFor()
             println("WuppieFuzz finalizado com codigo de saida: $exitCode")
         } catch (e: Exception) {
-            println("\n[Aviso] Nao foi possivel executar o comando 'wuppiefuzz': ${e.message}")
-            println("Certifique-se de que a ferramenta 'wuppiefuzz' esta instalada e disponivel no PATH.")
-            println("Veja as instrucoes de instalacao no arquivo: ${project.rootDir}/etc/fuzzing/README.md")
+            println("\n[Aviso] Nao foi possivel executar o comando 'wuppiefuzz' nativo: ${e.message}")
+            println("Tentando executar o WuppieFuzz via Docker (imagem 'wuppiefuzz')...")
+            
+            // Se o WuppieFuzz não estiver nativo, tenta rodar o contêiner docker usando a rede host
+            val comandoDocker = listOf(
+                "docker", "run", "--rm",
+                "--network", "host",
+                "-v", "${pastaResultados.absolutePath}:/reports",
+                "wuppiefuzz",
+                "-o", "http://localhost:10000/api-docs",
+                "-h", "Authorization: Bearer $tokenJwt",
+                "-d", "/reports"
+            )
+            
+            try {
+                val processoDocker = ProcessBuilder(comandoDocker)
+                    .inheritIO()
+                    .start()
+                
+                val exitCode = processoDocker.waitFor()
+                println("WuppieFuzz (via Docker) finalizado com codigo de saida: $exitCode")
+            } catch (dockerEx: Exception) {
+                println("\n[Erro] Nao foi possivel executar o WuppieFuzz via Docker: ${dockerEx.message}")
+                println("Certifique-se de que o Docker esta ativo e que a imagem 'wuppiefuzz' foi criada localmente.")
+                println("Instrucoes completas de uso do Docker ou instalacao manual em: ${project.rootDir}/etc/fuzzing/README.md")
+            }
         } finally {
             println("-----------------------------------------------------------------")
             println("Finalizando o backend do SGC local...")

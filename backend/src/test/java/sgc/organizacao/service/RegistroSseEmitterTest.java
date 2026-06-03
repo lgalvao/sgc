@@ -3,8 +3,9 @@ package sgc.organizacao.service;
 import org.junit.jupiter.api.*;
 import org.springframework.web.servlet.mvc.method.annotation.*;
 
+import java.io.*;
+
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class RegistroSseEmitterTest {
 
@@ -21,6 +22,7 @@ class RegistroSseEmitterTest {
         SseEmitter emitter = registroSseEmitter.registrar();
 
         assertThat(emitter).isNotNull();
+        assertThat(registroSseEmitter.obterQuantidadeEmissores()).isEqualTo(1);
     }
 
     @Test
@@ -41,18 +43,20 @@ class RegistroSseEmitterTest {
 
     @Test
     @DisplayName("deve remover emissor quando ocorrer IOException no envio")
-    void deveRemoverEmissorQuandoOcorrerIOExceptionNoEnvio() throws Exception {
-        SseEmitter emitterComFalha = mock(SseEmitter.class);
-        java.lang.reflect.Field campo = RegistroSseEmitter.class.getDeclaredField("emissores");
-        campo.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        java.util.concurrent.CopyOnWriteArrayList<SseEmitter> emissores =
-                (java.util.concurrent.CopyOnWriteArrayList<SseEmitter>) campo.get(registroSseEmitter);
-        emissores.add(emitterComFalha);
-        doThrow(new java.io.IOException("falha")).when(emitterComFalha).send(any(SseEmitter.SseEventBuilder.class));
+    void deveRemoverEmissorQuandoOcorrerIOExceptionNoEnvio() {
+        // Usamos o construtor package-private para injetar um SseSender que lança IOException
+        RegistroSseEmitter.SseSender senderComFalha = (emitter, evento) -> {
+            throw new IOException("falha simulada no envio");
+        };
 
-        assertThatCode(() -> registroSseEmitter.transmitir("meu-evento")).doesNotThrowAnyException();
+        RegistroSseEmitter sseComFalha = new RegistroSseEmitter(senderComFalha);
+        sseComFalha.registrar();
 
-        assertThat(emissores).isEmpty();
+        assertThat(sseComFalha.obterQuantidadeEmissores()).isEqualTo(1);
+
+        assertThatCode(() -> sseComFalha.transmitir("meu-evento"))
+                .doesNotThrowAnyException();
+
+        assertThat(sseComFalha.obterQuantidadeEmissores()).isZero();
     }
 }

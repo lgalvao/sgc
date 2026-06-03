@@ -58,14 +58,14 @@ class AnaliseHistoricoServiceTest {
 
         assertThat(dto.dataHora()).isEqualTo(LocalDateTime.of(2025, 4, 10, 10, 0));
         assertThat(dto.observacoes()).isEqualTo("Tudo certo");
-        assertThat(dto.acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(dto.acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO.name());
         assertThat(dto.acaoDescricao()).isEqualTo("Aceite");
         assertThat(dto.unidadeSigla()).isEqualTo("UT");
         assertThat(dto.unidadeNome()).isEqualTo("Unidade Teste");
         assertThat(dto.analistaUsuarioTitulo()).isEqualTo("analista1");
         assertThat(dto.usuarioNome()).isEqualTo("Analista Um");
         assertThat(dto.motivo()).isEqualTo("Motivo A");
-        assertThat(dto.tipo()).isEqualTo(TipoAnalise.CADASTRO);
+        assertThat(dto.tipo()).isEqualTo(TipoAnalise.CADASTRO.name());
     }
 
     @Test
@@ -145,6 +145,7 @@ class AnaliseHistoricoServiceTest {
     void deveLidarComDuplicidadesDeConsultasDeUsuarios() {
         Analise analise = Analise.builder()
                 .unidadeCodigo(10L)
+                .tipo(TipoAnalise.CADASTRO)
                 .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                 .usuarioTitulo("analista1")
                 .build();

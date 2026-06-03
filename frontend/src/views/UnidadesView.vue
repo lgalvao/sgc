@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="isLoading"/>
+    <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
       <PageHeader :title="TEXTOS.unidades.TITULO">
@@ -122,7 +122,7 @@ const unidadesQuery = useUnidadesQuery();
 const {mostrarDiagnosticoOrganizacional} = usePerfil();
 const erroDispensado = ref(false);
 const unidades = computed(() => unidadesQuery.data.value ?? []);
-const isLoading = computed(() => unidadesQuery.isPending.value || unidadesQuery.isLoading.value);
+const carregando = computed(() => unidadesQuery.isPending.value || unidadesQuery.isLoading.value);
 const {
   carregandoDiagnosticoOrganizacional,
   gruposDiagnostico,

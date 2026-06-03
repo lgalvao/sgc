@@ -23,6 +23,7 @@ import java.net.*;
 @PreAuthorize("isAuthenticated()")
 public class MapaController {
     private final MapaManutencaoService mapaManutencaoService;
+    private final MapaDtoMapper mapaDtoMapper;
 
     /**
      * Retorna uma lista com todos os mapas de competências.
@@ -32,7 +33,7 @@ public class MapaController {
     @Operation(summary = "Lista todos os mapas de forma paginada")
     public org.springframework.data.domain.Page<MapaResumoDto> listar(org.springframework.data.domain.Pageable pageable) {
         return mapaManutencaoService.mapas(pageable)
-                .map(MapaResumoDto::fromEntity);
+                .map(mapaDtoMapper::paraMapaResumoDto);
     }
 
     /**
@@ -43,7 +44,7 @@ public class MapaController {
     @Operation(summary = "Obtém um mapa pelo código")
     public ResponseEntity<MapaResumoDto> obterPorCodigo(@PathVariable Long codigo) {
         var mapa = mapaManutencaoService.mapaCodigo(codigo);
-        return ResponseEntity.ok(MapaResumoDto.fromEntity(mapa));
+        return ResponseEntity.ok(mapaDtoMapper.paraMapaResumoDto(mapa));
     }
 
     @PostMapping
@@ -58,7 +59,7 @@ public class MapaController {
                 .buildAndExpand(codigo)
                 .toUri();
 
-        return ResponseEntity.created(uri).body(MapaResumoDto.fromEntity(salvo));
+        return ResponseEntity.created(uri).body(mapaDtoMapper.paraMapaResumoDto(salvo));
     }
 
     @PostMapping("/{codMapa}/atualizar")
@@ -66,7 +67,7 @@ public class MapaController {
     @Operation(summary = "Atualiza um mapa existente")
     public ResponseEntity<MapaResumoDto> atualizar(@PathVariable Long codMapa, @Valid @RequestBody AtualizarMapaRequest request) {
         var atualizado = mapaManutencaoService.atualizarEstadoMapa(codMapa, request.paraCommand());
-        return ResponseEntity.ok(MapaResumoDto.fromEntity(atualizado));
+        return ResponseEntity.ok(mapaDtoMapper.paraMapaResumoDto(atualizado));
     }
 
     @PostMapping("/{codMapa}/excluir")

@@ -1,4 +1,4 @@
-# CDU-42 - Criar ou editar avaliação de consenso
+# CDU-42 - Manter avaliação de consenso
 
 Ator: CHEFE
 
@@ -17,18 +17,15 @@ Base principal: Fluxo narrado e validado na reunião, complementado por resposta
 
 ## Fluxo principal
 
-1. Na tela `Diagnóstico da equipe`, o usuário escolhe um servidor elegível e aciona `Criar avaliação de consenso` ou
-   `Editar avaliação de consenso`.
+1. Na tela `Diagnóstico da equipe`, o usuário escolhe um servidor elegível e aciona `Criar avaliação de consenso` ou `Editar avaliação de consenso`.
 
 2. O sistema apresenta a tela `Avaliação de consenso`, com o mesmo formulário da autoavaliação.
 
-3. Para cada competência da unidade, o sistema preenche inicialmente `Importância` e `Domínio` com os valores atuais
-   do servidor:
+3. Para cada competência da unidade, o sistema preenche inicialmente `Importância` e `Domínio` com os valores atuais do servidor:
    - na primeira criação, os valores da autoavaliação;
    - em edições posteriores, os valores do consenso vigente.
 
-4. Se a situação anterior do servidor for `Consenso aprovado`, o sistema, antes de liberar a edição, mostra um modal
-   com:
+4. Se a situação anterior do servidor for `Consenso aprovado`, o sistema, antes de liberar a edição, mostra um modal com:
    - título `Reabrir consenso`;
    - campo obrigatório `Motivo da reabertura`;
    - botões `Cancelar` e `Reabrir`.

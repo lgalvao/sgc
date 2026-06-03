@@ -50,7 +50,7 @@ export function useProcessoCadastroTela({formFieldsRef, modalUnidadesComEquipePr
         }
     });
 
-    function handleApiErrors(error: unknown, titulo: string, mensagemPadrao: string) {
+    function tratarErrosApi(error: unknown, titulo: string, mensagemPadrao: string) {
         formulario.limparErros();
         clear();
 
@@ -114,7 +114,7 @@ export function useProcessoCadastroTela({formFieldsRef, modalUnidadesComEquipePr
         mostrarModalConfirmacao,
         mostrarModalRemocao,
         modalUnidadesComEquipePropriaRef,
-        handleApiErrors
+        tratarErrosApi
     });
 
     const anyLoading = computed(() => isSaving.value || isStarting.value || isRemoving.value);

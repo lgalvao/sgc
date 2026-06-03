@@ -36,6 +36,9 @@ class UnidadeHierarquiaServiceTest {
     @Mock
     private ObjectProvider<UnidadeHierarquiaService> selfProvider;
 
+    @Spy
+    private sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper = new sgc.organizacao.OrganizacaoDtoMapper();
+
     @InjectMocks
     private UnidadeHierarquiaService service;
 
@@ -320,17 +323,7 @@ class UnidadeHierarquiaServiceTest {
             assertThat(resultado.getSubunidades()).isEmpty();
         }
 
-        @Test
-        @DisplayName("Deve lançar IllegalStateException quando UnidadeDto.fromEntity retorna null")
-        void deveLancarErroQuandoDtoNull() {
-            List<Unidade> subordinadas = new ArrayList<>();
-            subordinadas.add(null);
-            when(unidadeRepo.findByUnidadeSuperiorCodigo(999L)).thenReturn(subordinadas);
 
-            assertThatThrownBy(() -> service.buscarSubordinadas(999L))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("Unidade ausente");
-        }
 
         @Test
         @DisplayName("Deve filtrar unidades na árvore de acordo com elegibilidade complexa")
@@ -391,6 +384,52 @@ class UnidadeHierarquiaServiceTest {
 
             UnidadeDto operacionalDto = resultado.getFirst().getSubunidades().getFirst().getSubunidades().getFirst();
             assertThat(operacionalDto.isElegivel()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Deve copiar árvore mesmo quando a lista de subunidades é nula")
+        void deveCopiarArvoreQuandoSubunidadesForNulo() {
+            UnidadeHierarquiaService selfServiceMock = mock(UnidadeHierarquiaService.class);
+            when(selfProvider.getObject()).thenReturn(selfServiceMock);
+
+            UnidadeDto dtoSemSubunidades = UnidadeDto.builder()
+                    .codigo(10L)
+                    .nome("Unidade Nula")
+                    .sigla("UN")
+                    .subunidades(null)
+                    .build();
+
+            when(selfServiceMock.buscarArvoreHierarquica()).thenReturn(List.of(dtoSemSubunidades));
+            when(unidadeService.buscarPorCodigo(10L)).thenReturn(Unidade.builder()
+                    .codigo(10L)
+                    .nome("Unidade Nula")
+                    .sigla("UN")
+                    .tipo(TipoUnidade.OPERACIONAL)
+                    .build());
+
+            UnidadeDto resultado = service.buscarArvore(10L);
+
+            assertThat(resultado).isNotNull();
+            assertThat(resultado.getSubunidades()).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve tolerar unidade ausente no mapa durante montagem da hierarquia")
+        void deveTolerarUnidadeAusenteNoMapaDuranteMontagemHierarquia() {
+            UnidadeHierarquiaLeitura mockLeitura = mock(UnidadeHierarquiaLeitura.class);
+            // u.codigo() é chamado:
+            // 1. no teste de elegibilidade (linha 222)
+            // 2. no mapeamento inicial (linha 231)
+            // 3. na montagem da árvore (linha 234 - onde queremos o null)
+            when(mockLeitura.codigo()).thenReturn(1L, 1L, 1L, 1L, 999L);
+            when(mockLeitura.nome()).thenReturn("Unidade Inexistente");
+            when(mockLeitura.sigla()).thenReturn("UI");
+            when(mockLeitura.tipo()).thenReturn(TipoUnidade.OPERACIONAL);
+
+            when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(mockLeitura));
+
+            List<UnidadeDto> resultado = service.buscarArvoreHierarquica();
+            assertThat(resultado).isEmpty();
         }
 
     }

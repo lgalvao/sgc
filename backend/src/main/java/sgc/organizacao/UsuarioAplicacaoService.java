@@ -1,0 +1,171 @@
+package sgc.organizacao;
+
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.*;
+import org.springframework.security.core.context.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.comum.util.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+
+import java.util.*;
+
+import static java.util.stream.Collectors.*;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class UsuarioAplicacaoService {
+    private final UsuarioService usuarioService;
+    private final ResponsavelUnidadeService responsavelUnidadeService;
+    private final OrganizacaoDtoMapper organizacaoDtoMapper;
+
+    @Transactional(readOnly = true)
+    public List<Usuario> buscarPorUnidadeLotacao(Long codUnidade) {
+        return usuarioService.buscarPorUnidadeLotacao(codUnidade);
+    }
+
+    @Transactional(readOnly = true)
+    public @Nullable Usuario carregarUsuarioParaAutenticacao(String titulo) {
+        Usuario usuario = usuarioService.buscarOpt(titulo).orElse(null);
+        if (usuario != null) {
+            carregarAtribuicoes(usuario);
+        }
+        return usuario;
+    }
+
+    @Transactional(readOnly = true)
+    public Usuario buscarPorLogin(String login) {
+        Usuario usuario = usuarioService.buscar(login);
+        carregarAtribuicoes(usuario);
+        return usuario;
+    }
+
+    @Transactional(readOnly = true)
+    public Usuario buscarUsuarioSemAtribuicoes(String titulo) {
+        return usuarioService.buscar(titulo);
+    }
+
+    @Transactional(readOnly = true)
+    public Usuario buscarUsuarioComUnidadeLotacao(String titulo) {
+        return usuarioService.buscarOptComUnidadeLotacao(titulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
+    }
+
+    @Transactional(readOnly = true)
+    public @Nullable Usuario carregarUsuarioSemAtribuicoesParaAutenticacao(String titulo) {
+        return usuarioService.buscarOpt(titulo).orElse(null);
+    }
+
+    private Optional<String> tituloUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            return Optional.empty();
+        }
+        return Optional.of(authentication.getName());
+    }
+
+    @Transactional(readOnly = true)
+    public Usuario usuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Usuario usuario) {
+            return usuario;
+        }
+        return tituloUsuarioAutenticado()
+                .map(login -> {
+                    Usuario usuario = usuarioService.buscar(login);
+                    carregarAtribuicoes(usuario);
+                    return usuario;
+                })
+                .orElseThrow(() -> new ErroAcessoNegado("Nenhum usuário autenticado no contexto"));
+    }
+
+    @Transactional(readOnly = true)
+    public ContextoUsuarioAutenticado contextoAutenticado() {
+        Usuario usuario = usuarioAutenticado();
+        return new ContextoUsuarioAutenticado(
+                usuario.getTituloEleitoral(),
+                usuario.getUnidadeAtivaCodigo(),
+                usuario.getPerfilAtivo()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public Usuario buscarResponsavelAtual(String sigla) {
+        return responsavelUnidadeService.buscarResponsavelAtual(sigla);
+    }
+
+    @Transactional(readOnly = true)
+    public @Nullable ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String sigla) {
+        return responsavelUnidadeService.buscarResponsabilidadeDetalhadaAtual(sigla);
+    }
+
+    @Transactional(readOnly = true)
+    public @Nullable ResponsavelDto buscarResponsabilidadeDetalhadaAtual(Long codigoUnidade) {
+        return responsavelUnidadeService.buscarResponsabilidadeDetalhadaAtual(codigoUnidade);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PerfilDto> buscarPerfisUsuario(String titulo) {
+        Usuario usuario = usuarioService.buscarOpt(titulo)
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Usuario %s ausente ao buscar perfis; isso indica inconsistencia interna do sistema".formatted(titulo)
+                ));
+        List<UsuarioPerfilAutorizacaoLeitura> atribuicoes = usuarioService.buscarAutorizacoesPerfil(usuario.getTituloEleitoral());
+        return atribuicoes.stream()
+                .filter(a -> a.unidadeSituacao() == SituacaoUnidade.ATIVA)
+                .map(organizacaoDtoMapper::paraPerfilDto)
+                .toList();
+    }
+
+    private void carregarAtribuicoes(Usuario usuario) {
+        Set<GrantedAuthority> authorities = usuarioService.buscarPerfisPorUsuarioTitulo(usuario.getTituloEleitoral()).stream()
+                .map(Perfil::toGrantedAuthority)
+                .collect(toSet());
+        usuario.setAuthorities(authorities);
+    }
+
+    public Map<String, Usuario> buscarUsuariosPorTitulos(List<String> titulos) {
+        return usuarioService.buscarPorTitulos(titulos).stream()
+                .collect(toMap(Usuario::getTituloEleitoral, u -> u, (u1, u2) -> u1));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdministradorDto> listarAdministradores() {
+        return usuarioService.buscarAdministradores().stream()
+                .map(Administrador::getUsuarioTitulo)
+                .filter(Objects::nonNull)
+                .flatMap(titulo -> usuarioService.buscarOptComUnidadeLotacao(titulo).stream())
+                .map(organizacaoDtoMapper::paraAdministradorDto)
+                .toList();
+    }
+
+    @Transactional
+    public AdministradorDto adicionarAdministrador(String usuarioTitulo) {
+        Usuario usuario = usuarioService.buscarOptComUnidadeLotacao(usuarioTitulo)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), usuarioTitulo));
+
+        usuarioService.adicionarAdministrador(usuarioTitulo);
+
+        log.info("Administrador {} adicionado", MascaraUtil.mascarar(usuarioTitulo));
+        return organizacaoDtoMapper.paraAdministradorDto(usuario);
+    }
+
+    @Transactional
+    public void removerAdministrador(String usuarioTitulo) {
+        String usuarioAtualTitulo = contextoAutenticado().usuarioTitulo();
+        if (usuarioTitulo.equals(usuarioAtualTitulo)) {
+            throw new ErroValidacao(Mensagens.NAO_REMOVER_A_SI_MESMO);
+        }
+
+        usuarioService.removerAdministrador(usuarioTitulo);
+        log.info("Administrador {} removido.", MascaraUtil.mascarar(usuarioTitulo));
+    }
+}

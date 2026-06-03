@@ -1,17 +1,20 @@
 package sgc.organizacao.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("UnidadeDto")
 class UnidadeDtoTest {
+    private final OrganizacaoDtoMapper mapper = new OrganizacaoDtoMapper();
+
 
     @Test
     @DisplayName("deve retornar nulo quando entidade for nula")
     void deveRetornarNuloQuandoEntidadeForNula() {
-        assertThat(UnidadeDto.fromEntity(null)).isNull();
+        assertThat(mapper.paraUnidadeDto(null)).isNull();
     }
 
     @Test
@@ -39,7 +42,7 @@ class UnidadeDtoTest {
         unidade.setTituloTitular("999");
         unidade.setResponsabilidade(responsabilidade);
 
-        UnidadeDto dto = UnidadeDto.fromEntity(unidade);
+        UnidadeDto dto = mapper.paraUnidadeDto(unidade);
 
         assertThat(dto).isNotNull();
         assertThat(dto.getCodigo()).isEqualTo(2L);
@@ -58,7 +61,7 @@ class UnidadeDtoTest {
         unidade.setSigla("UND");
         unidade.setTipo(TipoUnidade.OPERACIONAL);
 
-        UnidadeDto dto = UnidadeDto.fromEntityObrigatoria(unidade);
+        UnidadeDto dto = mapper.paraUnidadeDtoObrigatoria(unidade);
 
         assertThat(dto.getCodigo()).isEqualTo(2L);
         assertThat(dto.getSigla()).isEqualTo("UND");
@@ -75,7 +78,7 @@ class UnidadeDtoTest {
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         unidade.setTituloTitular("Titular");
 
-        UnidadeDto dto = UnidadeDto.fromEntityResumoObrigatoria(unidade);
+        UnidadeDto dto = mapper.paraUnidadeDtoResumoObrigatoria(unidade);
 
         assertThat(dto.getCodigo()).isEqualTo(2L);
         assertThat(dto.getNome()).isEqualTo("Unidade");
@@ -89,7 +92,7 @@ class UnidadeDtoTest {
     @Test
     @DisplayName("deve falhar ao mapear unidade resumida nula")
     void deveFalharAoMapearUnidadeResumidaNula() {
-        assertThatThrownBy(() -> UnidadeDto.fromEntityResumoObrigatoria(null))
+        assertThatThrownBy(() -> mapper.paraUnidadeDtoResumoObrigatoria(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Unidade obrigatoria para resumo");
     }

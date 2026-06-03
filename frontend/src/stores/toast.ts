@@ -1,22 +1,22 @@
 import {defineStore} from 'pinia';
 import {ref} from 'vue';
 
-export interface PendingToast {
-    body: string;
+export interface ToastPendente {
+    mensagem: string;
 }
 
 export const useToastStore = defineStore('toast', () => {
-    const pendingToast = ref<PendingToast | null>(null);
+    const toastPendente = ref<ToastPendente | null>(null);
 
-    function setPending(body: string) {
-        pendingToast.value = {body};
+    function setPending(mensagem: string) {
+        toastPendente.value = {mensagem};
     }
 
-    function consumePending(): PendingToast | null {
-        const toast = pendingToast.value;
-        pendingToast.value = null;
+    function consumePending(): ToastPendente | null {
+        const toast = toastPendente.value;
+        toastPendente.value = null;
         return toast;
     }
 
-    return {pendingToast, setPending, consumePending};
+    return {toastPendente, setPending, consumePending};
 });

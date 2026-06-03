@@ -8,6 +8,7 @@ import org.springframework.data.web.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.alerta.*;
 import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.*;
@@ -22,14 +23,15 @@ import java.util.*;
 @Tag(name = "Painel", description = "Endpoints para o painel de controle (dashboard)")
 @PreAuthorize("isAuthenticated()")
 public class PainelController {
-    private final PainelFacade painelFacade;
-    private final UsuarioFacade usuarioFacade;
+    private final PainelService painelService;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
+    private final AlertaDtoMapper alertaDtoMapper;
 
     @GetMapping("/bootstrap")
     @Operation(summary = "Obtém todos os dados iniciais do painel (processos e alertas) em uma única chamada")
     public ResponseEntity<PainelBootstrapDto> obterBootstrap() {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        return ResponseEntity.ok(painelFacade.obterBootstrap(contextoUsuario));
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
+        return ResponseEntity.ok(painelService.obterBootstrap(contextoUsuario));
     }
 
     /**
@@ -38,8 +40,8 @@ public class PainelController {
     @GetMapping("/processos")
     @Operation(summary = "Lista processos para o painel com base no contexto do Token JWT")
     public ResponseEntity<Page<ProcessoResumoDto>> listarProcessos(@PageableDefault(size = 20) Pageable pageable) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        Page<ProcessoResumoDto> page = painelFacade.listarProcessos(contextoUsuario, pageable);
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
+        Page<ProcessoResumoDto> page = painelService.listarProcessos(contextoUsuario, pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -50,9 +52,9 @@ public class PainelController {
     @GetMapping("/alertas")
     @Operation(summary = "Lista alertas para o painel com base no contexto do Token JWT")
     public ResponseEntity<Page<AlertaDto>> listarAlertas(@PageableDefault(size = 20) Pageable pageable) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        Page<Alerta> page = painelFacade.listarAlertas(contextoUsuario, pageable);
-        return ResponseEntity.ok(page.map(AlertaDto::fromEntity));
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
+        Page<Alerta> page = painelService.listarAlertas(contextoUsuario, pageable);
+        return ResponseEntity.ok(page.map(alertaDtoMapper::paraAlertaDto));
     }
 
     /**
@@ -62,8 +64,8 @@ public class PainelController {
     @PostMapping("/alertas/marcar-lidos")
     @Operation(summary = "Marca alertas como lidos para o usuário autenticado")
     public ResponseEntity<Void> marcarAlertasLidos(@RequestBody List<Long> codigos) {
-        ContextoUsuarioAutenticado contextoUsuario = usuarioFacade.contextoAutenticado();
-        painelFacade.marcarAlertasLidos(contextoUsuario, codigos);
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
+        painelService.marcarAlertasLidos(contextoUsuario, codigos);
         return ResponseEntity.noContent().build();
     }
 }

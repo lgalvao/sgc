@@ -132,7 +132,7 @@
           :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso"
           @disponibilizar="disponibilizarMapa"
           @confirmar-aceitacao="confirmarAceitacao"
-          @confirmar-devolucao="handleConfirmarDevolucao"
+          @confirmar-devolucao="confirmarDevolucao"
           @confirmar-exclusao-competencia="confirmarExclusaoCompetencia"
           @confirmar-sugestoes="confirmarSugestoes"
           @confirmar-validacao="confirmarValidacao"
@@ -252,7 +252,7 @@ const {
   removerAtividadeAssociada,
   disponibilizarMapa,
   confirmarAceitacao,
-  handleConfirmarDevolucao,
+  confirmarDevolucao,
   confirmarExclusaoCompetencia,
   confirmarSugestoes,
   confirmarValidacao,

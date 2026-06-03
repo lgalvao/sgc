@@ -2,7 +2,9 @@ package sgc.subprocesso.dto;
 
 import org.junit.jupiter.api.*;
 import sgc.mapa.dto.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.subprocesso.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -11,6 +13,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("SubprocessoCadastroDto")
 class SubprocessoCadastroDtoTest {
+    private final SubprocessoDtoMapper mapper = new SubprocessoDtoMapper(new OrganizacaoDtoMapper());
+
 
     @Test
     @DisplayName("deve mapear subprocesso com unidade resumida")
@@ -28,7 +32,7 @@ class SubprocessoCadastroDtoTest {
 
         List<AtividadeDto> atividades = List.of(AtividadeDto.builder().codigo(1L).descricao("A").conhecimentos(List.of()).build());
 
-        SubprocessoCadastroDto dto = SubprocessoCadastroDto.fromEntity(subprocesso, atividades);
+        SubprocessoCadastroDto dto = mapper.paraCadastro(subprocesso, atividades);
 
         assertThat(dto.codigo()).isEqualTo(20L);
         assertThat(dto.unidade()).isNotNull();
@@ -44,7 +48,7 @@ class SubprocessoCadastroDtoTest {
 
         List<AtividadeDto> atividades = List.of();
 
-        assertThatThrownBy(() -> SubprocessoCadastroDto.fromEntity(subprocesso, atividades))
+        assertThatThrownBy(() -> mapper.paraCadastro(subprocesso, atividades))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Subprocesso deve possuir unidade associada");
     }

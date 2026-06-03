@@ -172,7 +172,7 @@ describe("useCadastroOrquestracao", () => {
         expect(success).toBe(true);
         expect(codigoSubprocesso.value).toBe(123);
         expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(1, 1, "U");
-        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(2, 1, "U", {forcar: true});
+        expect(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).toHaveBeenNthCalledWith(2, 1, "U", {recarregar: true});
         expect(loggerSpy).not.toHaveBeenCalled();
     });
 

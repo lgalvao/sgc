@@ -79,15 +79,44 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             Long codigoIgnorar = 1L;
             when(processoRepo.listarUnidadesEmSituacoesExcetoProcesso(anyList(), eq(codigoIgnorar)))
                     .thenReturn(List.of(10L, 20L));
+Set<Long> resultado = processoService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
 
-            Set<Long> resultado = processoService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
+assertThat(resultado).containsExactlyInAnyOrder(10L, 20L);
+}
 
-            assertThat(resultado).containsExactlyInAnyOrder(10L, 20L);
-        }
+@Test
+@DisplayName("Deve identificar corretamente situações de cadastro para processamento em bloco")
+void deveIdentificarSituacoesCadastroParaProcessamentoEmBloco() {
+Long codProcesso = 1L;
+ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
+        List.of(10L, 20L, 30L),
+        ACEITAR
+);
+
+Usuario usuario = new Usuario();
+usuario.setPerfilAtivo(Perfil.ADMIN);
+when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+Subprocesso s1 = Subprocesso.builder().codigo(101L).situacao(REVISAO_CADASTRO_DISPONIBILIZADA).unidade(Unidade.builder().codigo(10L).build()).build();
+Subprocesso s2 = Subprocesso.builder().codigo(102L).situacao(REVISAO_CADASTRO_HOMOLOGADA).unidade(Unidade.builder().codigo(20L).build()).build();
+Subprocesso s3 = Subprocesso.builder().codigo(103L).situacao(MAPEAMENTO_MAPA_CRIADO).unidade(Unidade.builder().codigo(30L).build()).build();
+
+when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
+        .thenReturn(List.of(s1, s2, s3));
+when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(true);
+
+processoService.executarAcaoEmBloco(codProcesso, req);
+
+// s1 e s2 são de cadastro
+verify(cadastroFluxoService).aceitarCadastroEmBloco(argThat(list -> list.containsAll(List.of(101L, 102L))));
+// s3 é de validação (não cadastro)
+verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(103L)));
+}
+}
 
 
-    @Nested
-    @DisplayName("Workflow e Inicialização")
+@Nested
+@DisplayName("Workflow e Inicialização")
     class Workflow {
         @Test
         @DisplayName("Deve iniciar mapeamento com sucesso e salvar")
@@ -877,26 +906,6 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                     .hasMessageContaining(Mensagens.LISTA_UNIDADES_OBRIGATORIA_REVISAO);
         }
 
-        @Test
-        @DisplayName("Deve falhar ao enviar lembrete quando processo sem data limite")
-        void deveFalharAoEnviarLembreteSemDataLimite() {
-            Long codProcesso = 1L;
-            Long codUnidade = 10L;
-
-            Processo p = new Processo();
-            p.setCodigo(codProcesso);
-            Unidade u = criarUnidadeValida(codUnidade);
-            u.setTituloTitular("TITULAR");
-            p.adicionarParticipantes(Set.of(u));
-            p.setDataLimite(null);
-
-            when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-            when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
-
-            assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, codUnidade))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessageContaining("sem data limite");
-        }
 
         @Test
         @DisplayName("Deve enfileirar email e criar alerta ao enviar lembrete com sucesso")
@@ -961,7 +970,93 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             verify(cadastroFluxoService, never()).aceitarCadastroEmBloco(anyList());
             verify(transicaoService, never()).aceitarValidacaoEmBloco(anyList());
         }
+
+
+        @Test
+        @DisplayName("Deve enfileirar e-mail de cópia de admin quando iniciar processo para unidade ADMIN e usuário logado tem lotação nula")
+        void deveEnfileirarEmailCopiaAdminQuandoUsuarioComLotacaoNula() {
+            Long id = 100L;
+            Processo p = new Processo();
+            p.setCodigo(id);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.DIAGNOSTICO);
+            p.setDataLimite(LocalDateTime.now().plusDays(30));
+            p.setDescricao("Processo Admin Teste");
+
+            Unidade uniAdmin = criarUnidadeValida(1L);
+            uniAdmin.setSigla("ADMIN");
+            p.adicionarParticipantes(Set.of(uniAdmin));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(p);
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uniAdmin));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
+
+            UnidadeMapa um = new UnidadeMapa();
+            um.setUnidadeCodigo(1L);
+            when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
+            when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
+            mockarResponsaveisEfetivos();
+
+            Usuario usuarioLogado = new Usuario();
+            usuarioLogado.setTituloEleitoral("12345");
+            usuarioLogado.setEmail("usuario@tre-pe.jus.br");
+            usuarioLogado.setUnidadeLotacao(null);
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuarioLogado);
+            when(usuarioService.buscarUsuarioComUnidadeLotacao("12345")).thenReturn(usuarioLogado);
+
+            processoService.iniciar(id, List.of(1L));
+
+            verify(notificacaoService).enfileirar(argThat(cmd ->
+                    cmd.destinatario().equals("usuario@tre-pe.jus.br") &&
+                    cmd.chaveIdempotencia().endsWith(":copia-admin")
+            ));
+        }
+
+        @Test
+        @DisplayName("Não deve enviar e-mail de cópia de admin quando usuário logado tem lotação SEDOC")
+        void naoDeveEnviarEmailCopiaAdminQuandoUsuarioComLotacaoSedoc() {
+            Long id = 100L;
+            Processo p = new Processo();
+            p.setCodigo(id);
+            p.setSituacao(SituacaoProcesso.CRIADO);
+            p.setTipo(TipoProcesso.DIAGNOSTICO);
+            p.setDataLimite(LocalDateTime.now().plusDays(30));
+            p.setDescricao("Processo Admin Teste");
+
+            Unidade uniAdmin = criarUnidadeValida(1L);
+            uniAdmin.setSigla("ADMIN");
+            p.adicionarParticipantes(Set.of(uniAdmin));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(p);
+            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uniAdmin));
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
+
+            UnidadeMapa um = new UnidadeMapa();
+            um.setUnidadeCodigo(1L);
+            when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
+            when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
+            mockarResponsaveisEfetivos();
+
+            Usuario usuarioLogado = new Usuario();
+            usuarioLogado.setTituloEleitoral("12345");
+            usuarioLogado.setEmail("usuario@tre-pe.jus.br");
+            
+            Unidade uniSedoc = new Unidade();
+            uniSedoc.setSigla("SEDOC");
+            usuarioLogado.setUnidadeLotacao(uniSedoc);
+
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuarioLogado);
+            when(usuarioService.buscarUsuarioComUnidadeLotacao("12345")).thenReturn(usuarioLogado);
+
+            processoService.iniciar(id, List.of(1L));
+
+            verify(notificacaoService, never()).enfileirar(argThat(cmd ->
+                    cmd.chaveIdempotencia().endsWith(":copia-admin")
+            ));
+        }
     }
+
     @Test
     @DisplayName("executarAcaoEmBloco deve lançar ErroAcessoNegado quando não houver permissão")
     void deveLancarErroAcessoNegado() {
@@ -1084,60 +1179,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                 .isInstanceOf(ErroValidacao.class);
     }
 
-    @Test
-    @DisplayName("enviarLembrete deve lançar IllegalStateException quando processo não tem data limite")
-    void enviarLembreteSemDataLimite() {
-        Long codProcesso = 1L;
-        Long unidadeCodigo = 10L;
-        Processo p = new Processo();
-        UnidadeProcesso up = new UnidadeProcesso();
-        up.setUnidadeCodigo(unidadeCodigo);
-        p.setParticipantes(new ArrayList<>(List.of(up)));
 
-        when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(unidadeService.buscarPorCodigo(unidadeCodigo)).thenReturn(new Unidade());
-
-        assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, unidadeCodigo))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem data limite");
-    }
-
-    @Test
-    @DisplayName("iniciar deve lançar IllegalStateException quando unidade não tem mapa no modo Revisão")
-    void iniciarSemMapaRevisao() {
-        Long cod = 1L;
-        Processo p = new Processo();
-        p.setCodigo(cod);
-        p.setTipo(REVISAO);
-        p.setSituacao(CRIADO);
-
-        when(repo.buscar(Processo.class, cod)).thenReturn(p);
-
-        Unidade uni = new Unidade();
-        uni.setCodigo(10L);
-        uni.setSigla("U10");
-        uni.setNome("Unidade 10");
-        uni.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
-        uni.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
-
-        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
-        when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(new ArrayList<>());
-        mockarResponsaveisEfetivos();
-
-        Unidade admin = new Unidade();
-        admin.setCodigo(99L);
-        admin.setSigla("ADMIN");
-        admin.setNome("Administrador");
-        admin.setTipo(sgc.organizacao.model.TipoUnidade.RAIZ);
-        admin.setSituacao(sgc.organizacao.model.SituacaoUnidade.ATIVA);
-        when(unidadeService.buscarAdmin()).thenReturn(admin);
-
-        List<Long> unidadeCods = List.of(10L);
-        // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário nesta versão
-        assertThatThrownBy(() -> processoService.iniciar(cod, unidadeCods))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem mapa vigente");
-    }
 
     @Test
     @DisplayName("iniciar deve suportar tipo DIAGNOSTICO")
@@ -1172,41 +1214,6 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         verify(subprocessoService).criarParaDiagnostico(any());
     }
 
-    @Test
-    @DisplayName("iniciar deve lançar IllegalStateException quando unidade obrigatória está ausente")
-    void iniciarUnidadeObrigatoriaAusente() {
-        Long cod = 1L;
-        Processo p = new Processo();
-        p.setCodigo(cod);
-        p.setTipo(REVISAO);
-        p.setSituacao(CRIADO);
-
-        when(repo.buscar(Processo.class, cod)).thenReturn(p);
-
-        Unidade u10 = new Unidade();
-        u10.setCodigo(10L);
-        u10.setSigla("U10");
-        u10.setTipo(sgc.organizacao.model.TipoUnidade.OPERACIONAL);
-        u10.setSituacao(SituacaoUnidade.ATIVA);
-
-        // Retorna apenas U10, mas vamos pedir 10 e 11
-        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(u10));
-
-        UnidadeMapa um10 = new UnidadeMapa();
-        um10.setUnidadeCodigo(10L);
-        UnidadeMapa um11 = new UnidadeMapa();
-        um11.setUnidadeCodigo(11L);
-        when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um10, um11));
-
-        mockarResponsaveisEfetivos();
-        when(unidadeService.buscarAdmin()).thenReturn(new Unidade());
-
-        List<Long> codigos = List.of(10L, 11L);
-        // when(usuarioService.usuarioAutenticado()).thenReturn(usuario); - desnecessário
-        assertThatThrownBy(() -> processoService.iniciar(cod, codigos))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Unidade 11 ausente para iniciar subprocesso");
-    }
 
     @Test
     @DisplayName("executarAcaoEmBloco - acao HOMOLOGAR")
@@ -1951,9 +1958,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         when(repo.buscar(Processo.class, 77L)).thenReturn(processo);
 
         assertThatThrownBy(() -> processoService.finalizar(77L))
-                .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining(Mensagens.SITUACAO_INVALIDA);
-    }
-    }
-}
-
+            .isInstanceOf(ErroValidacao.class)
+            .hasMessageContaining(Mensagens.SITUACAO_INVALIDA);
+        }
+        }

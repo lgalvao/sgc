@@ -2,14 +2,13 @@ package sgc.subprocesso.dto;
 
 import lombok.*;
 import org.hibernate.validator.constraints.br.*;
-import sgc.subprocesso.model.*;
 
 import java.time.*;
 
 @Builder
 public record AnaliseHistoricoDto(
-        TipoAnalise tipo,
-        TipoAcaoAnalise acao,
+        String tipo,
+        String acao,
         String acaoDescricao,
 
         @TituloEleitoral

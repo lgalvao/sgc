@@ -125,7 +125,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         ContextoEdicaoResponse contexto = consultaService.obterContextoEdicao(subprocesso.getCodigo());
 
-        assertThat(contexto.detalhes().subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        assertThat(contexto.detalhes().subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO.name());
         assertThat(consultaService.buscarSubprocesso(subprocesso.getCodigo()).getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
     }
 
@@ -144,7 +144,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
         ContextoEdicaoResponse contexto = consultaService.obterContextoEdicao(subprocesso.getCodigo());
 
-        assertThat(contexto.detalhes().subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
+        assertThat(contexto.detalhes().subprocesso().situacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO.name());
         assertThat(consultaService.buscarSubprocesso(subprocesso.getCodigo()).getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
     }
 

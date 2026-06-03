@@ -43,7 +43,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private sgc.organizacao.model.UnidadeMapaRepo unidadeMapaRepo;
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @BeforeEach
     void setUp() {
@@ -128,7 +128,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
                 .build();
         unidadeMapaRepo.save(um);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
         subprocessoService.criarParaDiagnostico(
                 new sgc.subprocesso.service.SubprocessoService.CriarSubprocessoComMapaCommand(

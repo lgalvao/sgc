@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 class SubprocessoNotificacaoServiceTest {
 
     @Mock
-    private AlertaFacade alertaService;
+    private AlertaAplicacaoService alertaService;
     @Mock
     private NotificacaoService notificacaoService;
     @Mock
@@ -63,14 +63,14 @@ class SubprocessoNotificacaoServiceTest {
         subprocesso.setDataLimiteEtapa1(LocalDateTime.of(2026, 4, 10, 9, 0));
         subprocesso.setDataLimiteEtapa2(LocalDateTime.of(2026, 4, 20, 17, 0));
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(destino.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
                         .substitutoTitulo("substituto")
                         .substitutoNome("Substituto")
-                        .build());
+                        .build()));
         when(usuarioService.buscarOpt("substituto"))
                 .thenReturn(Optional.of(criarUsuario("substituto@tre-pe.jus.br")));
 
@@ -126,12 +126,12 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(destino.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
         when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(
                 new UnidadeResumoLeitura(20L, "Superior imediato", "SUP1", TipoUnidade.INTERMEDIARIA)
@@ -167,12 +167,12 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(destino.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
@@ -198,12 +198,12 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(destino.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
         when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(
                 new UnidadeResumoLeitura(20L, "Superior direto", "SUP", TipoUnidade.INTERMEDIARIA)
@@ -234,14 +234,14 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(destino.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
                         .substitutoTitulo("substituto")
                         .substitutoNome("Substituto")
-                        .build());
+                        .build()));
         when(usuarioService.buscarOpt("substituto"))
                 .thenReturn(Optional.of(criarUsuario("")));
 
@@ -257,33 +257,26 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("deve manter envio de email quando criacao de alerta falhar")
-    void deveManterEnvioDeEmailQuandoCriacaoDeAlertaFalhar() {
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
-
+    @DisplayName("deve falhar transacao e nao enviar email quando criacao de alerta falhar")
+    void deveFalharTransacaoENaoEnviarEmailQuandoCriacaoDeAlertaFalhar() {
         Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
         Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(destino.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build());
         doThrow(new IllegalStateException("falha alerta"))
                 .when(alertaService).criarAlertaTransicao(any(), anyString(), any(), any());
 
-        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+        assertThatThrownBy(() -> service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_DISPONIBILIZADO)
                 .unidadeOrigem(origem)
                 .unidadeDestino(destino)
-                .build());
+                .build()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("falha alerta");
 
-        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
-        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("dest@tre-pe.jus.br");
+        verify(notificacaoService, never()).enfileirar(any(EnfileirarNotificacaoCommand.class));
     }
 
     @Test
@@ -358,21 +351,20 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("notificarAlteracaoDataLimite deve enfileirar email mesmo com falha de alerta")
-    void notificarAlteracaoDataLimiteDeveEnfileirarEmailMesmoComFalhaDeAlerta() {
+    @DisplayName("notificarAlteracaoDataLimite deve falhar transacao e nao enfileirar email quando criacao de alerta falhar")
+    void notificarAlteracaoDataLimiteDeveFalharTransacaoENaoEnfileirarEmailQuandoAlertaFalhar() {
         Unidade unidade = criarUnidade(10L, "ORIG", "Unidade origem");
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
         doThrow(new IllegalStateException("falha alerta"))
                 .when(alertaService).criarAlertaAlteracaoDataLimite(processo, unidade, "25/04/2026", 1);
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>data</html>");
 
-        service.notificarAlteracaoDataLimite(subprocesso, "25/04/2026", 1);
+        assertThatThrownBy(() -> service.notificarAlteracaoDataLimite(subprocesso, "25/04/2026", 1))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("falha alerta");
 
-        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
-        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("orig@tre-pe.jus.br");
-        assertThat(notificacaoEmailCaptor.getValue().tipoNotificacao()).isEqualTo(TipoNotificacao.DATA_LIMITE_ALTERADA);
+        verify(notificacaoService, never()).enfileirar(any(EnfileirarNotificacaoCommand.class));
     }
 
     private Processo criarProcesso() {
@@ -419,12 +411,12 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(destino.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
         when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
         when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of());
 
@@ -490,12 +482,12 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(unidade.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
         when(unidadeHierarquiaService.buscarCodigoPai(unidade.getCodigo())).thenReturn(null);
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
@@ -520,12 +512,12 @@ class SubprocessoNotificacaoServiceTest {
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
         when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(unidade.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
 
         service.notificarHomologacaoMapa(subprocesso);
 
@@ -556,12 +548,12 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidade(destino.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(destino.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
@@ -586,12 +578,12 @@ class SubprocessoNotificacaoServiceTest {
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
         when(unidadeService.buscarAdmin()).thenReturn(criarUnidade(1L, "ADMIN", "Administracao"));
-        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(unidade.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
 
         service.notificarAceiteCadastroEmBloco(List.of(subprocesso));
 
@@ -623,12 +615,12 @@ class SubprocessoNotificacaoServiceTest {
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
         when(unidadeService.buscarAdmin()).thenReturn(criarUnidade(1L, "ADMIN", "Administracao"));
-        when(responsavelService.buscarResponsavelUnidade(unidade.getCodigo()))
-                .thenReturn(UnidadeResponsavelDto.builder()
+        when(responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
+                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
                         .unidadeCodigo(unidade.getCodigo())
                         .titularTitulo("titular")
                         .titularNome("Titular")
-                        .build());
+                        .build()));
 
         service.notificarAceiteCadastroEmBloco(List.of(subprocesso));
 
@@ -648,4 +640,67 @@ class SubprocessoNotificacaoServiceTest {
                 );
     }
 
+
+
+    @Test
+    @DisplayName("deve tolerar falha no envio de email e manter criacao de alerta")
+    void deveTolerarFalhaNoEnvioDeEmailEManterCriacaoDeAlerta() {
+        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
+        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        doThrow(new RuntimeException("Erro infraestrutura de e-mail"))
+                .when(responsavelService).buscarResponsavelUnidadeOpt(destino.getCodigo());
+
+        assertThatCode(() -> service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .build())).doesNotThrowAnyException();
+
+        verify(alertaService).criarAlertaTransicao(
+                eq(processo),
+                eq(TipoTransicao.CADASTRO_DISPONIBILIZADO.formatarAlerta("ORIG")),
+                eq(origem),
+                eq(destino));
+    }
+
+
+    @Test
+    @DisplayName("deve lancar IllegalStateException quando obter template obrigatorio com valor nulo ou em branco")
+    void deveLancarIllegalStateExceptionQuandoObterTemplateObrigatorioComValorInvalido() {
+        assertThatThrownBy(() -> service.obterTemplateObrigatorio(null, "contexto teste"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Template ausente para contexto teste");
+
+        assertThatThrownBy(() -> service.obterTemplateObrigatorio("   ", "contexto teste"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Template ausente para contexto teste");
+    }
+
+    @Test
+    @DisplayName("Deve retornar sem criar notificação superior quando não houver template superior")
+    void deveRetornarSemCriarNotificacaoSuperiorQuandoNaoHouverTemplate() {
+        Unidade origem = criarUnidade(10L, "ORIG", "Unidade origem");
+        Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(origem, processo);
+
+        // CADASTRO_HOMOLOGADO não possui template superior
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_HOMOLOGADO)
+                .unidadeOrigem(origem)
+                .unidadeDestino(destino)
+                .build());
+
+        // Verifica que não enfileirou nada (não tem template email normal nem superior)
+        verify(notificacaoService, never()).enfileirar(any());
+    }
+
+
+
 }
+

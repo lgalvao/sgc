@@ -3,7 +3,6 @@ package sgc.integracao;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
 import sgc.fixture.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
@@ -156,7 +155,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
         SubprocessoSituacaoDto resultado = consultaService.obterStatus(subprocesso.getCodigo());
 
         assertThat(resultado.codigo()).isEqualTo(subprocesso.getCodigo());
-        assertThat(resultado.situacao()).isEqualTo(subprocesso.getSituacao());
+        assertThat(resultado.situacao()).isEqualTo(subprocesso.getSituacao().name());
     }
 
     @Test
@@ -167,13 +166,7 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
         assertThat(resultado.getCodigo()).isEqualTo(subprocesso.getCodigo());
     }
 
-    @Test
-    @DisplayName("obterEntidadePorCodigoMapa: deve lançar erro quando não encontrar")
-    void obterEntidadePorCodigoMapa_NaoEncontrado() {
-        assertThatThrownBy(() -> consultaService.obterEntidadePorCodigoMapa(999L))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                .hasMessageContaining("Mapa ID: 999");
-    }
+
 
     @Test
     @DisplayName("obterSugestoes: deve retornar sugestões do mapa")

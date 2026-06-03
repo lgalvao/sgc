@@ -1,10 +1,10 @@
 {
-  "versaoSchema": "2.0.0",
-  "geradoEm": "2026-05-28T15:29:57.800Z",
+  "versaoSchema": "3.0.0",
+  "geradoEm": "2026-05-31T22:56:16.884Z",
   "resumo": {
-    "arquivosProducao": 265,
-    "scoreTotal": 35,
-    "faixa": "atencao",
+    "arquivosProducao": 263,
+    "scoreTotal": 0,
+    "faixa": "excelente",
     "metricas": {
       "viewsComVazamentoCache": 0,
       "viewsComServiceDireto": 0,
@@ -16,147 +16,340 @@
       "booleanosPosicionais": 0,
       "ocorrenciasStale": 0,
       "ocorrenciasSnapshot": 0,
+      "ocorrenciasForcar": 0,
       "arquivosComBolsaDependenciasLarga": 0,
-      "arquivosComSuperficieAmpla": 9,
+      "arquivosComSuperficieAmpla": 4,
       "arquivosComMisturaCamadas": 0,
       "arquivosComServerStateCaseiro": 0,
       "arquivosComAcoplamentoStoreAlto": 0,
       "arquivosComServiceDireto": 35,
       "chamadasEstrategiaCache": 0,
       "chamadasInvalidacao": 0,
-      "hubsCentraisComSinais": 0
+      "hubsCentraisComSinais": 0,
+      "composablesMinusculos": 0,
+      "fachadasPuras": 0,
+      "familiasPulverizadas": 4
     }
   },
-  "hotspots": [
+  "hotspots": [],
+  "familias": {
+    "Administradores": {
+      "arquivos": [
+        "frontend/src/composables/useAdministradoresTela.ts"
+      ],
+      "totalLinhas": 135
+    },
+    "Async": {
+      "arquivos": [
+        "frontend/src/composables/useAsyncAction.ts"
+      ],
+      "totalLinhas": 66
+    },
+    "Atividade": {
+      "arquivos": [
+        "frontend/src/composables/useAtividadeForm.ts"
+      ],
+      "totalLinhas": 34
+    },
+    "Atribuicao": {
+      "arquivos": [
+        "frontend/src/composables/useAtribuicaoTemporariaTela.ts"
+      ],
+      "totalLinhas": 413
+    },
+    "Breadcrumbs": {
+      "arquivos": [
+        "frontend/src/composables/useBreadcrumbs.ts"
+      ],
+      "totalLinhas": 164
+    },
+    "Buscador": {
+      "arquivos": [
+        "frontend/src/composables/useBuscadorUsuarios.ts"
+      ],
+      "totalLinhas": 124
+    },
+    "Cache": {
+      "arquivos": [
+        "frontend/src/composables/useCacheSync.ts"
+      ],
+      "totalLinhas": 60
+    },
+    "Cadastro": {
+      "arquivos": [
+        "frontend/src/composables/useCadastroAtividadesMutacoes.ts",
+        "frontend/src/composables/useCadastroOrquestracao.ts",
+        "frontend/src/composables/useCadastroRevisaoSemMudancas.ts",
+        "frontend/src/composables/useCadastroTela.ts"
+      ],
+      "totalLinhas": 909
+    },
+    "Configuracoes": {
+      "arquivos": [
+        "frontend/src/composables/useConfiguracoes.ts"
+      ],
+      "totalLinhas": 105
+    },
+    "Conhecimento": {
+      "arquivos": [
+        "frontend/src/composables/useConhecimentoMutacoes.ts"
+      ],
+      "totalLinhas": 37
+    },
+    "Diagnostico": {
+      "arquivos": [
+        "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
+        "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts"
+      ],
+      "totalLinhas": 172
+    },
+    "Error": {
+      "arquivos": [
+        "frontend/src/composables/useErrorHandler.ts"
+      ],
+      "totalLinhas": 47
+    },
+    "Feedback": {
+      "arquivos": [
+        "frontend/src/composables/useFeedback.ts"
+      ],
+      "totalLinhas": 116
+    },
+    "Feedbacks": {
+      "arquivos": [
+        "frontend/src/composables/useFeedbacksAdminQuery.ts"
+      ],
+      "totalLinhas": 17
+    },
+    "Fluxo": {
+      "arquivos": [
+        "frontend/src/composables/useFluxoAdministrativoSubprocesso.ts",
+        "frontend/src/composables/useFluxoCadastroSubprocesso.ts",
+        "frontend/src/composables/useFluxoMapa.ts",
+        "frontend/src/composables/useFluxoSubprocesso.ts",
+        "frontend/src/composables/useFluxoSubprocessoExecucao.ts"
+      ],
+      "totalLinhas": 424
+    },
+    "Form": {
+      "arquivos": [
+        "frontend/src/composables/useFormErrors.ts"
+      ],
+      "totalLinhas": 39
+    },
+    "Historico": {
+      "arquivos": [
+        "frontend/src/composables/useHistoricoQuery.ts"
+      ],
+      "totalLinhas": 24
+    },
+    "Impacto": {
+      "arquivos": [
+        "frontend/src/composables/useImpactoMapaModal.ts"
+      ],
+      "totalLinhas": 41
+    },
+    "Importar": {
+      "arquivos": [
+        "frontend/src/composables/useImportarAtividadesTela.ts"
+      ],
+      "totalLinhas": 197
+    },
+    "Invalidacao": {
+      "arquivos": [
+        "frontend/src/composables/useInvalidacaoNavegacao.ts"
+      ],
+      "totalLinhas": 100
+    },
+    "Limpeza": {
+      "arquivos": [
+        "frontend/src/composables/useLimpezaProcessosTela.ts"
+      ],
+      "totalLinhas": 61
+    },
+    "Mapa": {
+      "arquivos": [
+        "frontend/src/composables/useMapaCompetenciasMutacoes.ts",
+        "frontend/src/composables/useMapaOrquestracao.ts",
+        "frontend/src/composables/useMapaQuery.ts",
+        "frontend/src/composables/useMapaSugestoes.ts",
+        "frontend/src/composables/useMapaTela.ts"
+      ],
+      "totalLinhas": 954
+    },
+    "Mapas": {
+      "arquivos": [
+        "frontend/src/composables/useMapas.ts"
+      ],
+      "totalLinhas": 35
+    },
+    "Notificacoes": {
+      "arquivos": [
+        "frontend/src/composables/useNotificacoesAdminQuery.ts"
+      ],
+      "totalLinhas": 52
+    },
+    "Notification": {
+      "arquivos": [
+        "frontend/src/composables/useNotification.ts"
+      ],
+      "totalLinhas": 44
+    },
+    "Painel": {
+      "arquivos": [
+        "frontend/src/composables/usePainelQuery.ts",
+        "frontend/src/composables/usePainelTela.ts"
+      ],
+      "totalLinhas": 197
+    },
+    "Perfil": {
+      "arquivos": [
+        "frontend/src/composables/usePerfil.ts"
+      ],
+      "totalLinhas": 38
+    },
+    "Processo": {
+      "arquivos": [
+        "frontend/src/composables/useProcessoCadastroCarga.ts",
+        "frontend/src/composables/useProcessoCadastroTela.ts",
+        "frontend/src/composables/useProcessoForm.ts",
+        "frontend/src/composables/useProcessoMutacoes.ts",
+        "frontend/src/composables/useProcessoQuery.ts"
+      ],
+      "totalLinhas": 582
+    },
+    "Relatorio": {
+      "arquivos": [
+        "frontend/src/composables/useRelatorioAndamentoTela.ts",
+        "frontend/src/composables/useRelatorioMapasQuery.ts",
+        "frontend/src/composables/useRelatorioUnidadesSemMapasTela.ts"
+      ],
+      "totalLinhas": 236
+    },
+    "Subprocesso": {
+      "arquivos": [
+        "frontend/src/composables/useSubprocessoTela.ts"
+      ],
+      "totalLinhas": 200
+    },
+    "Tema": {
+      "arquivos": [
+        "frontend/src/composables/useTemaPreferencia.ts"
+      ],
+      "totalLinhas": 49
+    },
+    "Unidade": {
+      "arquivos": [
+        "frontend/src/composables/useUnidadeAtual.ts",
+        "frontend/src/composables/useUnidadeQuery.ts",
+        "frontend/src/composables/useUnidadeTela.ts"
+      ],
+      "totalLinhas": 331
+    },
+    "Unidades": {
+      "arquivos": [
+        "frontend/src/composables/useUnidadesQuery.ts"
+      ],
+      "totalLinhas": 24
+    },
+    "Validacao": {
+      "arquivos": [
+        "frontend/src/composables/useValidacaoFormulario.ts"
+      ],
+      "totalLinhas": 38
+    },
+    "Web": {
+      "arquivos": [
+        "frontend/src/composables/useWebStorage.ts"
+      ],
+      "totalLinhas": 36
+    }
+  },
+  "excecoesDocumentadas": [
     {
-      "arquivo": "frontend/src/stores/subprocesso/index.ts",
-      "camada": "store",
-      "linhas": 137,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 2,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 1,
-        "importacoesArquiteturais": 3
-      },
-      "sinaisAtivos": [
+      "arquivo": "frontend/src/composables/useBuscadorUsuarios.ts",
+      "sinais": [
         "superficieAmpla"
       ],
-      "hubCentral": false
+      "motivo": "Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue, extraído para testabilidade"
+    },
+    {
+      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useFeedbacksAdminQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
+      "sinais": [
+        "fachadaPura",
+        "arquivoMinusculo"
+      ],
+      "motivo": "Fachada de coordenação deliberada: injeta `execucao` como dependência em useFluxoCadastroSubprocesso e useFluxoAdministrativoSubprocesso, isolando os consumers desse detalhe"
+    },
+    {
+      "arquivo": "frontend/src/composables/useHistoricoQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
     },
     {
       "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
-      "camada": "composable",
-      "linhas": 137,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 2,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 2
-      },
-      "sinaisAtivos": [
+      "sinais": [
         "superficieAmpla"
       ],
-      "hubCentral": false
+      "motivo": "Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por useMapaTela"
     },
     {
-      "arquivo": "frontend/src/composables/useBuscadorUsuarios.ts",
-      "camada": "composable",
-      "linhas": 123,
-      "score": 9,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 0,
-        "chamadasServiceDiretas": 1,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 1,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 2
-      },
-      "sinaisAtivos": [
+      "arquivo": "frontend/src/composables/usePainelQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useProcessoQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useRelatorioAndamentoTela.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "Composable de tela simples — funcionalidade de relatório de andamento não tem complexidade que justifique mais código"
+    },
+    {
+      "arquivo": "frontend/src/composables/useUnidadeAtual.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "Abstração deliberada: fornece acesso reativo + setter para unidadeAtualDetalhes; dois consumidores (useBreadcrumbs, useUnidadeTela) tornam o inline inadequado"
+    },
+    {
+      "arquivo": "frontend/src/composables/useUnidadesQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/stores/subprocesso/index.ts",
+      "sinais": [
         "superficieAmpla"
       ],
-      "hubCentral": false
-    },
-    {
-      "arquivo": "frontend/src/App.vue",
-      "camada": "outro",
-      "linhas": 276,
-      "score": 8,
-      "sinaisLexicais": {
-        "acessoDiretoCache": 0,
-        "metodoEmCache": 0,
-        "invalidacaoExplicita": 0,
-        "booleanoPosicional": 0,
-        "palavraStale": 0,
-        "palavraSnapshot": 0
-      },
-      "metricasAst": {
-        "chamadasStore": 9,
-        "chamadasServiceDiretas": 0,
-        "chamadasEstrategiaCache": 0,
-        "chamadasInvalidacao": 0,
-        "chamadasColadaQuery": 0,
-        "chamadasColadaCache": 0,
-        "estadosAssincronosManuais": 0,
-        "coordenacaoServerStateCaseiro": 0,
-        "mapasPromessasDedupe": 0,
-        "bolsasDependenciasLargas": 0,
-        "superficieExportadaAmpla": 0,
-        "categoriasAcoplamento": 2,
-        "importacoesArquiteturais": 4
-      },
-      "sinaisAtivos": [],
-      "hubCentral": false
+      "motivo": "Store dual-context (edicao + cadastro) com três níveis de invalidação (limpar, invalidar, resetar); 14 exports são inerentes ao contrato mínimo de dois contextos independentes"
     }
   ]
 }

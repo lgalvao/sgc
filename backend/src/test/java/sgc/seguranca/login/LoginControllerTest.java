@@ -43,10 +43,10 @@ class LoginControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private LoginFacade loginFacade;
+    private LoginAplicacaoService loginAplicacaoService;
 
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;
@@ -69,15 +69,15 @@ class LoginControllerTest {
     void login_SessaoDiretaComSucesso() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
 
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
+        when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
@@ -102,11 +102,11 @@ class LoginControllerTest {
         AutenticarRequest req = criarRequestPadrao();
         UnidadeResumoDto unidadeUm = UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build();
         UnidadeResumoDto unidadeDois = UnidadeResumoDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build();
-        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE, unidadeUm);
-        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR, unidadeDois);
+        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE.name(), unidadeUm);
+        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR.name(), unidadeDois);
 
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(primeiro, segundo));
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(List.of(primeiro, segundo));
         when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 
         mockMvc.perform(post("/api/usuarios/login")
@@ -120,7 +120,7 @@ class LoginControllerTest {
                 .andExpect(jsonPath("$.perfisUnidades[0].perfil").value("CHEFE"))
                 .andExpect(cookie().value("SGC_PRE_AUTH", "token-pre-auth"));
 
-        verify(loginFacade, never()).entrar(any(EntrarRequest.class), anyString(), anyList());
+        verify(loginAplicacaoService, never()).entrar(any(EntrarRequest.class), anyString(), anyList());
     }
 
     @Test
@@ -128,7 +128,7 @@ class LoginControllerTest {
     @WithMockUser
     void login_CredenciaisInvalidas() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        when(loginFacade.autenticar("123", "senha")).thenReturn(false);
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(false);
 
         mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
@@ -144,15 +144,15 @@ class LoginControllerTest {
     @WithMockUser
     void login_IpRemoteAddr() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
+        when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
@@ -172,8 +172,8 @@ class LoginControllerTest {
     @WithMockUser
     void login_SemPerfis_DeveFalharComErroInterno() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
 
         mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
@@ -212,8 +212,8 @@ class LoginControllerTest {
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
 
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
+        when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth"))
                 .thenReturn(Optional.of(new GerenciadorJwt.JwtPreAuthClaims("123", "preauth-1", Instant.now().plusSeconds(60))));
 
@@ -311,8 +311,8 @@ class LoginControllerTest {
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
 
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"))).thenReturn("token-jwt");
+        when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
         when(gerenciadorJwt.validarTokenPreAuth("token-pre-auth"))
                 .thenReturn(Optional.of(new GerenciadorJwt.JwtPreAuthClaims("123", "preauth-2", Instant.now().plusSeconds(60))));
 
@@ -330,15 +330,15 @@ class LoginControllerTest {
     @WithMockUser
     void login_IpComQuebraDeLinha_DevePassarIpSanitizadoAoLimitador() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        when(loginFacade.buscarAutorizacoesUsuario("123"))
-                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123"))
+                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto)));
+        when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
@@ -358,15 +358,15 @@ class LoginControllerTest {
     @WithMockUser
     void login_IpNulo_DeveContinuarFluxoSemLimitador() throws Exception {
         AutenticarRequest req = criarRequestPadrao();
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        when(loginFacade.buscarAutorizacoesUsuario("123"))
-                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123"))
+                .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto)));
+        when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
 
         mockMvc.perform(post("/api/usuarios/login")
                         .with(csrf())
@@ -386,15 +386,15 @@ class LoginControllerTest {
     void loginDiretoDeveIgnorarLimitadorQuandoORequestNaoInformarIp() {
         AutenticarRequest req = criarRequestPadrao();
         UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto);
+        PerfilUnidadeDto perfilUnidade = new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto);
         Usuario usuario = new Usuario();
         usuario.setNome("Admin user");
         usuario.setTituloEleitoral("123");
 
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
-        when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
-        when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(List.of(perfilUnidade));
+        when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+        when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
 
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
@@ -412,13 +412,13 @@ class LoginControllerTest {
     @DisplayName("login direto deve exigir seleção quando houver múltiplos perfis")
     void loginDiretoDeveExigirSelecaoQuandoHouverMultiplosPerfis() {
         AutenticarRequest req = criarRequestPadrao();
-        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE,
+        PerfilUnidadeDto primeiro = new PerfilUnidadeDto(Perfil.CHEFE.name(),
                 UnidadeResumoDto.builder().codigo(1L).nome("Unidade 1").sigla("U1").build());
-        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR,
+        PerfilUnidadeDto segundo = new PerfilUnidadeDto(Perfil.GESTOR.name(),
                 UnidadeResumoDto.builder().codigo(2L).nome("Unidade 2").sigla("U2").build());
 
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of(primeiro, segundo));
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(List.of(primeiro, segundo));
         when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
@@ -442,14 +442,14 @@ class LoginControllerTest {
         void login_CookiesNaoDevemSerSecureQuandoDesabilitado() throws Exception {
             AutenticarRequest req = criarRequestPadrao();
             UnidadeResumoDto unidadeDto = UnidadeResumoDto.builder().codigo(1L).nome("Adm").sigla("ADM").build();
-            when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-            when(loginFacade.buscarAutorizacoesUsuario("123"))
-                    .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN, unidadeDto)));
-            when(loginFacade.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
+            when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+            when(loginAplicacaoService.buscarAutorizacoesUsuario("123"))
+                    .thenReturn(List.of(new PerfilUnidadeDto(Perfil.ADMIN.name(), unidadeDto)));
+            when(loginAplicacaoService.entrar(any(EntrarRequest.class), eq("123"), anyList())).thenReturn("token-jwt");
             Usuario usuario = new Usuario();
             usuario.setNome("Admin user");
             usuario.setTituloEleitoral("123");
-            when(usuarioFacade.buscarPorLogin("123")).thenReturn(usuario);
+            when(usuarioAplicacaoService.buscarPorLogin("123")).thenReturn(usuario);
 
             mockMvc.perform(post("/api/usuarios/login")
                             .with(csrf())
@@ -479,8 +479,8 @@ class LoginControllerTest {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         when(httpRequest.getRemoteAddr()).thenReturn("10.0.0.1");
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(List.of());
 
         assertThatThrownBy(() -> loginController.login(req, httpRequest, httpResponse))
                 .isInstanceOf(ErroConfiguracao.class)

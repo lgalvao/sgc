@@ -1,3 +1,4 @@
+// @sgc-auditoria ignorar: arquivoMinusculo | Abstração deliberada: fornece acesso reativo + setter para unidadeAtualDetalhes; dois consumidores (useBreadcrumbs, useUnidadeTela) tornam o inline inadequado
 import {storeToRefs} from 'pinia';
 import type {Ref} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';

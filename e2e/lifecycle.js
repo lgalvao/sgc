@@ -551,10 +551,6 @@ try {
     validarReutilizacaoExistente();
     if (modoE2e() || modoHomologacao()) {
         startSmtpServer();
-    } else {
-        lifecycleLogger.warn(
-            'Lifecycle iniciado em modo hom. Endpoints /e2e, seed.sql e rotinas de limpeza não devem estar ativos.'
-        );
     }
     await subirInfra();
     lifecycleLogger.info(
@@ -566,5 +562,6 @@ try {
     process.exit(1);
 }
 
-setInterval(() => {
-}, 1000);
+// Mantém o processo Node.js vivo enquanto a infraestrutura E2E está ativa.
+// Sem isso, o processo encerraria imediatamente após subirInfra() resolver.
+process.stdin.resume();

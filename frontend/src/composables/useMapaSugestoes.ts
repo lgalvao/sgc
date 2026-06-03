@@ -1,9 +1,10 @@
+// @sgc-auditoria ignorar: superficieAmpla | Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por useMapaTela
 import {ref, type Ref} from "vue";
-import {apresentarSugestoes, obterSugestoesMapa} from "@/services/subprocessoService";
 import logger from "@/utils/logger";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
 import type {VarianteAlerta} from "@/composables/useNotification";
+import {obterSugestoesMapa, apresentarSugestoes} from "@/services/subprocessoService";
 
 interface UseMapaSugestoesOptions {
     obterCodigoSubprocessoObrigatorio: () => number;

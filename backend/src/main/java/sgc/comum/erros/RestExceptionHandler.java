@@ -111,10 +111,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         log.warn("Erro de mensagem HTTP não legível: {}", ex.getMessage());
 
-        String error = "Requisição JSON malformada";
+        String erro = "Requisição JSON malformada";
         return buildResponseEntityObject(ErroApi.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message(error)
+                .message(erro)
                 .build());
     }
 
@@ -156,18 +156,18 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         log.warn("Erro de validação de argumento: {}", ex.getMessage());
 
-        String message = "A requisição contém dados de entrada inválidos.";
+        String mensagem = "A requisição contém dados de entrada inválidos.";
         var erros = ex.getBindingResult().getFieldErrors().stream().map(
-                        error -> new ErroSubApi(error.getObjectName(),
-                                error.getField(),
-                                sanitizar(error.getDefaultMessage())))
+                        erro -> new ErroSubApi(erro.getObjectName(),
+                                erro.getField(),
+                                sanitizar(erro.getDefaultMessage())))
                 .toList();
 
         erros.forEach(err -> log.info("Falha de validação: campo '{}' - {}", err.campo(), err.mensagem()));
 
         return buildResponseEntityObject(ErroApi.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message(message)
+                .message(mensagem)
                 .erros(erros)
                 .build());
     }
@@ -220,7 +220,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             ConstraintViolationException ex) {
         String traceId = gerarTraceId();
         log.error("[{}] Erro de constraint de banco de dados: {}", traceId, ex.getMessage(), ex);
-        String message = "A requisição contém dados inválidos.";
+        String mensagem = "A requisição contém dados inválidos.";
         var erros = ex.getConstraintViolations().stream().map(violation -> new ErroSubApi(
                         violation.getRootBeanClass().getSimpleName(),
                         violation.getPropertyPath().toString(),
@@ -229,7 +229,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ErroApi erroApi = ErroApi.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .message(message)
+                .message(mensagem)
                 .erros(erros)
                 .traceId(traceId)
                 .build();

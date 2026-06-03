@@ -33,7 +33,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
     private static final String JSON_TEXTO_OK = "{\"texto\": \"OK\"}";
 
     @Autowired
-    private UsuarioFacade usuarioService;
+    private UsuarioAplicacaoService usuarioService;
     @Autowired
     private AlertaRepo alertaRepo;
     @Autowired

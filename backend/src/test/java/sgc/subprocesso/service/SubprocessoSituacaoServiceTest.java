@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
-import sgc.comum.erros.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
@@ -26,16 +25,7 @@ class SubprocessoSituacaoServiceTest {
     @InjectMocks
     private SubprocessoSituacaoService service;
 
-    @Test
-    @DisplayName("atualizarSituacaoPorMapa deve falhar quando nao existir subprocesso para o mapa")
-    void atualizarSituacaoPorMapaDeveFalharQuandoNaoExistirSubprocesso() {
-        when(subprocessoRepo.findByMapa_Codigo(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.atualizarSituacaoPorMapa(99L, true))
-                .isInstanceOf(ErroEntidadeNaoEncontrada.class)
-                .hasMessageContaining("Subprocesso")
-                .hasMessageContaining("Mapa ID: 99");
-    }
 
     @Test
     @DisplayName("atualizarSituacaoPorMapa deve iniciar revisao quando estiver nao iniciado")

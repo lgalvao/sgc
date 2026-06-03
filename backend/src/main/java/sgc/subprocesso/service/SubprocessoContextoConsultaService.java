@@ -17,7 +17,7 @@ import java.util.*;
 public class SubprocessoContextoConsultaService {
 
     private final UnidadeService unidadeService;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final HierarquiaService hierarquiaService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
 
@@ -48,7 +48,7 @@ public class SubprocessoContextoConsultaService {
     }
 
     private ContextoUsuarioAutenticado obterContextoUsuarioAutenticado() {
-        return Objects.requireNonNull(usuarioFacade.contextoAutenticado(), "contexto autenticado obrigatorio");
+        return Objects.requireNonNull(usuarioAplicacaoService.contextoAutenticado(), "contexto autenticado obrigatorio");
     }
 
     private Unidade resolverLocalizacaoAtual(Subprocesso subprocesso, List<Movimentacao> movimentacoes) {

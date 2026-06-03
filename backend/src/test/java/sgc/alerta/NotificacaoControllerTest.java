@@ -3,6 +3,7 @@ package sgc.alerta;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
@@ -19,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NotificacaoController.class)
+@Import(AlertaDtoMapper.class)
 @DisplayName("NotificacaoController")
 @SuppressWarnings("NullAway.Init")
 class NotificacaoControllerTest {

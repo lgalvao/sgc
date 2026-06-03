@@ -162,4 +162,24 @@ class LimitadorTentativasLoginTest {
 
         assertThat(limitador.getCacheSize()).isZero();
     }
+
+    @Test
+    @DisplayName("deve cobrir branch com deque vazio na busca do IP mais antigo")
+    @SuppressWarnings("unchecked")
+    void deveCobrirBranchComDequeVazioNaBuscaDoIpMaisAntigo() {
+        int limiteTeste = 1;
+        LimitadorTentativasLogin limitadorTeste = new LimitadorTentativasLogin(environment, limiteTeste, clock);
+
+        java.util.Deque<LocalDateTime> dequeVazio = mock(java.util.Deque.class);
+        when(dequeVazio.isEmpty()).thenReturn(false, true);
+        when(dequeVazio.peekFirst()).thenReturn(null);
+
+        java.util.Deque<LocalDateTime> dequeValido = new java.util.concurrent.ConcurrentLinkedDeque<>();
+        dequeValido.add(LocalDateTime.now(clock));
+
+        limitadorTeste.getTentativasPorIp().put("IP_VAZIO", dequeVazio);
+        limitadorTeste.getTentativasPorIp().put("IP_VALIDO", dequeValido);
+
+        assertThatCode(() -> limitadorTeste.verificar("IP_NOVO")).doesNotThrowAnyException();
+    }
 }

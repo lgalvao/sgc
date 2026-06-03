@@ -106,12 +106,12 @@ function criarApresentacao(campos: EstadoCampos, atribuicoes: Ref<AtribuicaoTemp
     const atribuicaoVigente = computed(() => {
         if (atribuicoes.value.length === 0) return null;
         const agora = new Date();
-        const active = atribuicoes.value.find((atribuicao: AtribuicaoTemporaria) => {
+        const vigente = atribuicoes.value.find((atribuicao: AtribuicaoTemporaria) => {
             const dataInicioAtribuicao = new Date(atribuicao.dataInicio);
             const dataTerminoAtribuicao = new Date(atribuicao.dataTermino);
             return dataInicioAtribuicao <= agora && dataTerminoAtribuicao >= agora;
         });
-        return active ?? atribuicoes.value[0] ?? null;
+        return vigente ?? atribuicoes.value[0] ?? null;
     });
 
     const modoEdicao = computed(() => Boolean(atribuicaoVigente.value));
@@ -205,7 +205,7 @@ function criarFluxoMutacao({
     erroUsuario,
     formularioValido,
     invalidarDiagnostico,
-    isLoading,
+    carregando,
     modoEdicao,
     mostrarModalRemocao,
     notify,
@@ -223,7 +223,7 @@ function criarFluxoMutacao({
     erroUsuario: Ref<string>;
     formularioValido: Ref<boolean>;
     invalidarDiagnostico: () => void;
-    isLoading: Ref<boolean>;
+    carregando: Ref<boolean>;
     modoEdicao: Ref<boolean>;
     mostrarModalRemocao: Ref<boolean>;
     notify: (mensagem: string, variante?: VarianteAlerta, dispensavel?: boolean) => void;
@@ -263,7 +263,7 @@ function criarFluxoMutacao({
         };
         const estavaEmEdicao = modoEdicao.value;
 
-        isLoading.value = true;
+        carregando.value = true;
 
         try {
             if (atribuicaoVigente.value) {
@@ -284,7 +284,7 @@ function criarFluxoMutacao({
             logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
         } finally {
-            isLoading.value = false;
+            carregando.value = false;
         }
     }
 
@@ -296,7 +296,7 @@ function criarFluxoMutacao({
         }
 
         erroFormulario.value = "";
-        isLoading.value = true;
+        carregando.value = true;
 
         try {
             await removerAtribuicaoTemporaria(unidadeAtual.codigo, atribuicaoAtual.codigo);
@@ -309,7 +309,7 @@ function criarFluxoMutacao({
             logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
         } finally {
-            isLoading.value = false;
+            carregando.value = false;
         }
     }
 
@@ -325,7 +325,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
     const campos = criarEstadoCampos();
     const unidade = computed(() => unidadeQuery.data.value ?? null);
     const atribuicoes = ref<AtribuicaoTemporaria[]>([]);
-    const isLoading = ref(false);
+    const carregando = ref(false);
     const carregandoInicial = ref(true);
     const carregamentoInicialConcluido = ref(false);
     const mostrarModalRemocao = ref(false);
@@ -364,7 +364,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         erroUsuario,
         formularioValido,
         invalidarDiagnostico,
-        isLoading,
+        carregando,
         modoEdicao,
         mostrarModalRemocao,
         notify,
@@ -390,7 +390,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         erroFormulario,
         formularioValido,
         irParaUnidade,
-        isLoading,
+        carregando,
         justificativa: campos.justificativa,
         mensagemErroDataInicio,
         mensagemErroDataTermino,

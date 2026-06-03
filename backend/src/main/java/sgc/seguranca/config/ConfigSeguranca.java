@@ -32,8 +32,8 @@ import java.io.*;
 public class ConfigSeguranca {
 
     @Bean
-    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioFacade usuarioFacade, ListaNegraJwt listaNegraJwt) {
-        return new FiltroJwt(gerenciadorJwt, usuarioFacade, listaNegraJwt);
+    public FiltroJwt filtroJwt(GerenciadorJwt gerenciadorJwt, UsuarioAplicacaoService usuarioAplicacaoService, ListaNegraJwt listaNegraJwt) {
+        return new FiltroJwt(gerenciadorJwt, usuarioAplicacaoService, listaNegraJwt);
     }
 
     @Bean
@@ -104,20 +104,22 @@ public class ConfigSeguranca {
                                                 "frame-ancestors 'none'"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                         .xssProtection(HeadersConfigurer.XXssConfig::disable))
-                .addFilterAfter(new OncePerRequestFilter() {
-                    @Override
-                    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                                    @NonNull HttpServletResponse response,
-                                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
-                        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-                        if (csrfToken != null) {
-                            csrfToken.getToken();
-                        }
-                        filterChain.doFilter(request, response);
-                    }
-                }, CsrfFilter.class)
+                .addFilterAfter(new FiltroMaterializacaoCsrf(), CsrfFilter.class)
                 .addFilterBefore(filtroMonitoramentoHttp, SecurityContextHolderFilter.class)
                 .addFilterBefore(filtroJwt, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    static class FiltroMaterializacaoCsrf extends OncePerRequestFilter {
+        @Override
+        protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                        @NonNull HttpServletResponse response,
+                                        @NonNull FilterChain filterChain) throws ServletException, IOException {
+            CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+            if (csrfToken != null) {
+                csrfToken.getToken();
+            }
+            filterChain.doFilter(request, response);
+        }
     }
 }

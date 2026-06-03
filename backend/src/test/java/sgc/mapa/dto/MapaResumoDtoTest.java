@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.mapa.*;
 import sgc.mapa.model.*;
 import sgc.subprocesso.model.*;
 
@@ -10,6 +11,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("MapaResumoDto")
 class MapaResumoDtoTest {
+
+    private final MapaDtoMapper mapper = new MapaDtoMapper();
 
     @Test
     @DisplayName("deve mapear resumo do mapa")
@@ -25,7 +28,7 @@ class MapaResumoDtoTest {
         mapa.setSugestoes("Sugestões");
         mapa.setDataHoraHomologado(LocalDateTime.of(2025, 1, 3, 10, 0));
 
-        MapaResumoDto dto = MapaResumoDto.fromEntity(mapa);
+        MapaResumoDto dto = mapper.paraMapaResumoDto(mapa);
 
         assertThat(dto.codigo()).isEqualTo(88L);
         assertThat(dto.subprocessoCodigo()).isEqualTo(77L);

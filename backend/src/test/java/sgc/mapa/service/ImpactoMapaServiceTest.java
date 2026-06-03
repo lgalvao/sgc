@@ -35,7 +35,7 @@ class ImpactoMapaServiceTest {
     private SgcPermissionEvaluator permissionEvaluator;
 
     @Mock
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @InjectMocks
     private ImpactoMapaService impactoMapaService;
@@ -46,7 +46,7 @@ class ImpactoMapaServiceTest {
         Subprocesso subprocesso = criarSubprocessoPadrao();
         Usuario usuario = new Usuario();
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         doReturn(false).when(permissionEvaluator).verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS);
 
         assertThatThrownBy(() -> impactoMapaService.verificarImpactos(subprocesso)).isInstanceOf(sgc.comum.erros.ErroAcessoNegado.class);
@@ -71,7 +71,7 @@ class ImpactoMapaServiceTest {
     }
 
     private void mockUsuarioAutenticado(Usuario usuario) {
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
     }
 
     private Subprocesso criarSubprocessoParaImpacto(
@@ -97,7 +97,7 @@ class ImpactoMapaServiceTest {
     void semMapaVigente() {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         Unidade unidade = new Unidade();
@@ -119,7 +119,7 @@ class ImpactoMapaServiceTest {
     void deveDetectarInserida() {
         mockAcessoLivre();
         Usuario usuario = usuarioAdmin();
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
         subprocesso.setCodigo(10L);
@@ -159,7 +159,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.SERVIDOR);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
         Subprocesso subprocesso = criarSubprocessoPadrao();
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
@@ -176,7 +176,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.CHEFE);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoParaImpacto(SituacaoSubprocesso.NAO_INICIADO, 7L);
 
         when(mapaRepo.buscarMapaVigentePorUnidade(7L)).thenReturn(Optional.empty());
@@ -193,7 +193,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.GESTOR);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoParaImpacto(
                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                 8L
@@ -213,7 +213,7 @@ class ImpactoMapaServiceTest {
         mockAcessoLivre();
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.CHEFE);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         Subprocesso subprocesso = criarSubprocessoParaImpacto(
                 SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA,
                 9L
@@ -626,8 +626,8 @@ class ImpactoMapaServiceTest {
             assertThat(competenciaImpactada.atividadesAfetadas()).contains("Atividade removida: Atividade removida");
             assertThat(competenciaImpactada.atividadesAfetadas().stream()
                     .anyMatch(detalhe -> detalhe.contains("Atividade alterada"))).isTrue();
-            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA);
-            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA);
+            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_REMOVIDA.name());
+            assertThat(competenciaImpactada.tiposImpacto()).contains(TipoImpactoCompetencia.ATIVIDADE_ALTERADA.name());
             assertThat(competenciaImpactada.tiposImpacto().size()).isEqualTo(2);
         }
 
@@ -726,7 +726,7 @@ class ImpactoMapaServiceTest {
             AtividadeImpactadaDto alt = response.alteradas().getFirst();
             assertThat(alt.descricaoAnterior()).isEqualTo("Descrição Antiga");
             assertThat(alt.descricao()).isEqualTo("Descrição Nova");
-            assertThat(alt.tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA);
+            assertThat(alt.tipoImpacto()).isEqualTo(TipoImpactoAtividade.ALTERADA.name());
 
             // Verifica se a competência foi impactada pela alteração de nome
             assertThat(response.competenciasImpactadas().size()).isEqualTo(1);
@@ -800,7 +800,7 @@ class ImpactoMapaServiceTest {
     void verificarImpactosSemPermissao() {
         Usuario user = new Usuario();
         Subprocesso sp = criarSubprocessoPadrao();
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(false);
 
         assertThatThrownBy(() -> impactoMapaService.verificarImpactos(sp)).isInstanceOf(ErroAcessoNegado.class);
@@ -819,7 +819,7 @@ class ImpactoMapaServiceTest {
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.empty());
 
@@ -841,7 +841,7 @@ class ImpactoMapaServiceTest {
         sp.setUnidade(u);
         sp.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
 
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
         when(mapaRepo.buscarMapaVigentePorUnidade(1L)).thenReturn(Optional.of(new Mapa()));
         when(mapaRepo.buscarPorSubprocesso(100L)).thenReturn(Optional.empty());
@@ -874,7 +874,7 @@ class ImpactoMapaServiceTest {
         subprocesso.setProcesso(processo);
 
         assertThat(impactoMapaService.podeVisualizarImpactos(subprocesso)).isFalse();
-        verifyNoInteractions(usuarioFacade, permissionEvaluator);
+        verifyNoInteractions(usuarioAplicacaoService, permissionEvaluator);
     }
 
     @Test
@@ -884,7 +884,7 @@ class ImpactoMapaServiceTest {
         Processo processo = new Processo();
         processo.setTipo(TipoProcesso.MAPEAMENTO);
         subprocesso.setProcesso(processo);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuarioAdmin());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuarioAdmin());
 
         assertThatThrownBy(() -> impactoMapaService.verificarImpactos(subprocesso))
                 .isInstanceOf(ErroValidacao.class)
@@ -897,7 +897,7 @@ class ImpactoMapaServiceTest {
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.ADMIN);
         Subprocesso subprocesso = criarSubprocessoParaImpacto(SituacaoSubprocesso.NAO_INICIADO, 1L);
-        when(usuarioFacade.usuarioAutenticado()).thenReturn(usuario);
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         when(permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)).thenReturn(false);
 
         assertThat(impactoMapaService.podeVisualizarImpactos(subprocesso)).isFalse();
@@ -990,7 +990,7 @@ class ImpactoMapaServiceTest {
             sp.setSituacaoForcada(situacao);
 
             when(permissionEvaluator.verificarPermissao(user, sp, AcaoPermissao.VERIFICAR_IMPACTOS)).thenReturn(true);
-            when(usuarioFacade.usuarioAutenticado()).thenReturn(user);
+            when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(user);
 
             assertThat(impactoMapaService.podeVisualizarImpactos(sp)).isEqualTo(expected);
         }

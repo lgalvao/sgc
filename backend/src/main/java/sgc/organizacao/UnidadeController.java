@@ -30,6 +30,7 @@ public class UnidadeController {
     private final UsuarioService usuarioService;
     private final ProcessoService processoService;
     private final ValidadorDadosOrganizacionais validadorDadosOrganizacionais;
+    private final OrganizacaoDtoMapper organizacaoDtoMapper;
 
     @PostMapping("/{codUnidade}/atribuicoes-temporarias")
     @PreAuthorize("hasRole('ADMIN')")
@@ -120,7 +121,7 @@ public class UnidadeController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CHEFE')")
     public ResponseEntity<List<UsuarioConsultaDto>> buscarUsuariosPorUnidade(@PathVariable Long codUnidade) {
         List<UsuarioConsultaDto> usuarios = usuarioService.buscarConsultasPorUnidadeLotacao(codUnidade).stream()
-                .map(UsuarioConsultaDto::fromLeitura)
+                .map(organizacaoDtoMapper::paraUsuarioConsultaDto)
                 .toList();
         return ResponseEntity.ok(usuarios);
     }
@@ -129,13 +130,13 @@ public class UnidadeController {
     public ResponseEntity<UnidadeDto> buscarUnidadePorSigla(
             @PathVariable @Pattern(regexp = "^[a-zA-Z0-9_.-]+$") String siglaUnidade) {
         Unidade unidade = unidadeService.buscarPorSiglaComResponsavel(siglaUnidade);
-        return ResponseEntity.ok(UnidadeDto.fromEntityObrigatoria(unidade));
+        return ResponseEntity.ok(organizacaoDtoMapper.paraUnidadeDtoObrigatoria(unidade));
     }
 
     @GetMapping("/{codigo}")
     public ResponseEntity<UnidadeDto> buscarUnidadePorCodigo(@PathVariable Long codigo) {
         Unidade unidade = unidadeService.buscarPorCodigo(codigo);
-        return ResponseEntity.ok(UnidadeDto.fromEntityObrigatoria(unidade));
+        return ResponseEntity.ok(organizacaoDtoMapper.paraUnidadeDtoObrigatoria(unidade));
     }
 
     @GetMapping("/{codigo}/arvore")

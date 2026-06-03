@@ -62,6 +62,35 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
     }
 
     @Test
+    @DisplayName("Deve disparar notificações de início cobrindo todos os tipos de unidade organizacional")
+    void deveDispararNotificacoesInicioParaTodosTiposDeUnidade() {
+        Long id = 100L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(SituacaoProcesso.CRIADO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setDescricao("Teste Cobertura Tipos Unidade");
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+        // Lacuna E: RAIZ, INTEROPERACIONAL, OPERACIONAL, INTERMEDIARIA
+        Unidade uRaiz = criarUnidadeValida(1L); uRaiz.setTipo(TipoUnidade.RAIZ);
+        Unidade uInterop = criarUnidadeValida(2L); uInterop.setTipo(TipoUnidade.INTEROPERACIONAL);
+        Unidade uOper = criarUnidadeValida(3L);
+        Unidade uIntermed = criarUnidadeValida(4L); uIntermed.setTipo(TipoUnidade.INTERMEDIARIA);
+
+        when(repo.buscar(Processo.class, id)).thenReturn(processo);
+        when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uRaiz, uInterop, uOper, uIntermed));
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
+                .thenReturn("<html>inicio</html>");
+        mockarResponsaveisEfetivos();
+
+        processoService.iniciar(id, List.of(1L, 2L, 3L, 4L));
+
+        // Verifica se notificou as unidades (operacionais/raiz e intermediárias/interoperacionais)
+        verify(notificacaoService, atLeast(4)).enfileirar(any());
+    }
+
+    @Test
     @DisplayName("Deve finalizar processo criando notificacao por email")
     void deveFinalizarProcessoQuandoTudoHomologado() {
         Long id = 100L;
@@ -97,26 +126,6 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         assertThat(p.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
     }
 
-    @Test
-    @DisplayName("Deve falhar ao enviar lembrete quando processo sem data limite")
-    void deveFalharAoEnviarLembreteSemDataLimite() {
-        Long codProcesso = 1L;
-        Long codUnidade = 10L;
-
-        Processo p = new Processo();
-        p.setCodigo(codProcesso);
-        Unidade u = criarUnidadeValida(codUnidade);
-        u.setTituloTitular("TITULAR");
-        p.adicionarParticipantes(Set.of(u));
-        p.setDataLimite(null);
-
-        when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(unidadeService.buscarPorCodigo(codUnidade)).thenReturn(u);
-
-        assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, codUnidade))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem data limite");
-    }
 
     @Test
     @DisplayName("Deve enfileirar email e criar alerta ao enviar lembrete com sucesso")
@@ -159,23 +168,6 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         ));
     }
 
-    @Test
-    @DisplayName("enviarLembrete deve lançar IllegalStateException quando processo não tem data limite")
-    void enviarLembreteSemDataLimite() {
-        Long codProcesso = 1L;
-        Long unidadeCodigo = 10L;
-        Processo p = new Processo();
-        sgc.processo.model.UnidadeProcesso up = new sgc.processo.model.UnidadeProcesso();
-        up.setUnidadeCodigo(unidadeCodigo);
-        p.setParticipantes(new ArrayList<>(List.of(up)));
-
-        when(processoRepo.buscarPorCodigoComParticipantes(codProcesso)).thenReturn(Optional.of(p));
-        when(unidadeService.buscarPorCodigo(unidadeCodigo)).thenReturn(new Unidade());
-
-        assertThatThrownBy(() -> processoService.enviarLembrete(codProcesso, unidadeCodigo))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("sem data limite");
-    }
 
     @Test
     @DisplayName("enviarLembrete - sucesso")

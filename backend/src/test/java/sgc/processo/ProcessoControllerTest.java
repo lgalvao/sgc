@@ -14,11 +14,13 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
 import sgc.processo.service.*;
 import sgc.seguranca.*;
+import sgc.subprocesso.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
@@ -32,7 +34,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProcessoController.class)
-@Import({RestExceptionHandler.class, SgcPermissionEvaluator.class})
+@Import({
+        RestExceptionHandler.class,
+        SgcPermissionEvaluator.class,
+        ProcessoDtoMapper.class,
+        SubprocessoDtoMapper.class,
+        OrganizacaoDtoMapper.class
+})
 @EnableMethodSecurity
 @Tag("integration")
 @DisplayName("ProcessoController")
@@ -54,8 +62,10 @@ class ProcessoControllerTest {
 
     @MockitoBean
     private SubprocessoService subprocessoService;
+
     @MockitoBean
     private SubprocessoConsultaService consultaService;
+
     @MockitoBean
     private LocalizacaoSubprocessoService localizacaoSubprocessoService;
 
@@ -218,7 +228,7 @@ class ProcessoControllerTest {
                     .codigo(1L)
                     .descricao("Processo detalhado")
                     .tipo(TipoProcesso.MAPEAMENTO.name())
-                    .situacao(SituacaoProcesso.CRIADO)
+                    .situacao(SituacaoProcesso.CRIADO.name())
                     .dataCriacao(LocalDateTime.now())
                     .build();
 
@@ -616,7 +626,7 @@ class ProcessoControllerTest {
 
         @Test
         @WithMockUser(roles = "ADMIN")
-        @DisplayName("enviarLembrete deve chamar facade")
+        @DisplayName("enviarLembrete deve chamar service")
         void deveEnviarLembrete() throws Exception {
             EnviarLembreteRequest req = new EnviarLembreteRequest(10L);
             mockMvc.perform(post("/api/processos/1/enviar-lembrete")
@@ -692,7 +702,13 @@ class ProcessoControllerTest {
         @BeforeEach
         void setUp() {
             processoServiceMock = mock(ProcessoService.class);
-            controller = new ProcessoController(processoServiceMock, consultaService, localizacaoSubprocessoService);
+            controller = new ProcessoController(
+                    processoServiceMock,
+                    consultaService,
+                    localizacaoSubprocessoService,
+                    new sgc.processo.ProcessoDtoMapper(),
+                    new sgc.subprocesso.SubprocessoDtoMapper(new sgc.organizacao.OrganizacaoDtoMapper())
+            );
         }
 
         @Test
@@ -712,7 +728,7 @@ class ProcessoControllerTest {
         }
 
         @Test
-        @DisplayName("executarAcaoEmBloco chama facade e retorna 200")
+        @DisplayName("executarAcaoEmBloco chama service e retorna 200")
         void executarAcaoEmBloco_Sucesso() {
             Long codigo = 1L;
             AcaoEmBlocoRequest req = new AcaoEmBlocoRequest(List.of(10L), AcaoProcesso.ACEITAR, LocalDate.now());

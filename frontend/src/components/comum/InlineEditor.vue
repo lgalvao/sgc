@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex align-items-center w-100">
-    <template v-if="isEditing">
+    <template v-if="editando">
       <div class="me-2 flex-grow-1">
         <BFormInput
             ref="inputRef"
@@ -104,7 +104,7 @@ const emit = defineEmits<{
   (e: 'edit-end'): void;
 }>();
 
-const isEditing = ref(false);
+const editando = ref(false);
 const editValue = ref('');
 const inputRef = ref<InstanceType<typeof BFormInput> | null>(null);
 const {
@@ -128,7 +128,7 @@ function startEdit() {
 
   resetarValidacao();
   editValue.value = props.modelValue;
-  isEditing.value = true;
+  editando.value = true;
   emit('edit-start');
 
   nextTick(() => {
@@ -153,13 +153,13 @@ function save() {
     emit('save', trimmed);
   }
   resetarValidacao();
-  isEditing.value = false;
+  editando.value = false;
   emit('edit-end');
 }
 
 function cancel() {
   resetarValidacao();
-  isEditing.value = false;
+  editando.value = false;
   emit('cancel');
   emit('edit-end');
 }

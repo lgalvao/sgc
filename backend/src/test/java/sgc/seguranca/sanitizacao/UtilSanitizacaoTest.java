@@ -1,8 +1,11 @@
 package sgc.seguranca.sanitizacao;
 
 import org.junit.jupiter.api.*;
+import tools.jackson.core.*;
+import tools.jackson.databind.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class UtilSanitizacaoTest {
     @Test
@@ -41,5 +44,45 @@ class UtilSanitizacaoTest {
         String input = "<h1>Título</h1><p>Texto</p><script>alert('xss')</script>";
         String expected = "Título<p>Texto</p>";
         assertThat(UtilSanitizacao.sanitizarFormatado(input)).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("DeserializadorHtmlSanitizado - deve lidar com valores nulos, vazios ou normais")
+    void testDeserializadorHtmlSanitizado() throws java.io.IOException {
+        DeserializadorHtmlSanitizado deserializador = new DeserializadorHtmlSanitizado();
+        JsonParser parser = mock(JsonParser.class);
+        DeserializationContext ctxt = mock(DeserializationContext.class);
+
+        // Caso 1: Nulo
+        when(parser.getValueAsString()).thenReturn(null);
+        assertThat(deserializador.deserialize(parser, ctxt)).isNull();
+
+        // Caso 2: Em branco
+        when(parser.getValueAsString()).thenReturn("   ");
+        assertThat(deserializador.deserialize(parser, ctxt)).isEqualTo("   ");
+
+        // Caso 3: HTML
+        when(parser.getValueAsString()).thenReturn("<p>Texto</p>");
+        assertThat(deserializador.deserialize(parser, ctxt)).isEqualTo("Texto");
+    }
+
+    @Test
+    @DisplayName("DeserializadorHtmlFormatadoSanitizado - deve lidar com valores nulos, vazios ou normais")
+    void testDeserializadorHtmlFormatadoSanitizado() throws java.io.IOException {
+        DeserializadorHtmlFormatadoSanitizado deserializador = new DeserializadorHtmlFormatadoSanitizado();
+        JsonParser parser = mock(JsonParser.class);
+        DeserializationContext ctxt = mock(DeserializationContext.class);
+
+        // Caso 1: Nulo
+        when(parser.getValueAsString()).thenReturn(null);
+        assertThat(deserializador.deserialize(parser, ctxt)).isNull();
+
+        // Caso 2: Em branco
+        when(parser.getValueAsString()).thenReturn("   ");
+        assertThat(deserializador.deserialize(parser, ctxt)).isEqualTo("   ");
+
+        // Caso 3: HTML com formatação
+        when(parser.getValueAsString()).thenReturn("<p><strong>Texto</strong></p>");
+        assertThat(deserializador.deserialize(parser, ctxt)).isEqualTo("<p><strong>Texto</strong></p>");
     }
 }

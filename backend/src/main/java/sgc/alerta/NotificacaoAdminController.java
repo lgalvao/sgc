@@ -19,13 +19,14 @@ import java.util.*;
 public class NotificacaoAdminController {
     private final NotificacaoService notificacaoService;
     private final ConfigAplicacao configAplicacao;
+    private final AlertaDtoMapper alertaDtoMapper;
 
     @GetMapping("/listar")
     @Operation(summary = "Lista as notificações individuais registradas")
     public ResponseEntity<List<NotificacaoDto>> listar(@RequestParam(defaultValue = "50") int limite) {
         List<NotificacaoDto> dtos = notificacaoService.listarTodasAdmin(limite)
                 .stream()
-                .map(NotificacaoDto::fromEntity)
+                .map(alertaDtoMapper::paraNotificacaoDto)
                 .toList();
         return ResponseEntity.ok(dtos);
     }

@@ -2,6 +2,7 @@
 import path from "node:path";
 import {createRequire} from "node:module";
 import {pathToFileURL} from "node:url";
+import {realpathSync} from "node:fs";
 import pc from "picocolors";
 import {cruise} from "dependency-cruiser";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
@@ -68,8 +69,8 @@ function imprimirViolacoes(violacoes, diretorioBase) {
 }
 
 async function executarValidacaoArquiteturaFrontend(opcoes = {}) {
-    const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const diretorioFrontend = path.join(diretorioBase, "frontend");
+    const diretorioBase = realpathSync(path.resolve(opcoes.base ?? DIRETORIO_RAIZ));
+    const diretorioFrontend = realpathSync(path.join(diretorioBase, "frontend"));
     const caminhoSrc = "src";
     const caminhoConfiguracao = path.join(diretorioFrontend, ".dependency-cruiser.cjs");
     const regrasBase = carregarRegras(caminhoConfiguracao);

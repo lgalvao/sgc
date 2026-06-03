@@ -3,6 +3,7 @@ package sgc.alerta;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.security.test.context.support.*;
 import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NotificacaoAdminController.class)
+@Import(AlertaDtoMapper.class)
 @DisplayName("NotificacaoAdminController")
 @SuppressWarnings("NullAway.Init")
 class NotificacaoAdminControllerTest {
@@ -37,6 +39,7 @@ class NotificacaoAdminControllerTest {
                 .codigo(123L)
                 .assunto("Teste")
                 .destinatario("teste@teste.com")
+                .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
                 .situacao(SituacaoNotificacao.ENVIADO)
                 .dataHoraCriacao(LocalDateTime.now())
                 .build();

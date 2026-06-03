@@ -9,6 +9,7 @@ import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.comum.config.*;
 import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
@@ -40,7 +41,7 @@ class ResponsavelUnidadeServiceTest {
     private CacheOrganizacaoService cacheOrganizacaoService;
 
     @Mock
-    private AlertaFacade alertaFacade;
+    private AlertaAplicacaoService alertaAplicacaoService;
 
     @Mock
     private NotificacaoService notificacaoService;
@@ -50,6 +51,12 @@ class ResponsavelUnidadeServiceTest {
 
     @Mock
     private ConfigAplicacao configAplicacao;
+
+    @Mock
+    private ComumRepo repo;
+
+    @Spy
+    private sgc.organizacao.OrganizacaoDtoMapper organizacaoDtoMapper = new sgc.organizacao.OrganizacaoDtoMapper();
 
     @InjectMocks
     private ResponsavelUnidadeService service;
@@ -209,12 +216,12 @@ class ResponsavelUnidadeServiceTest {
             usuario.setNome("Usuario Teste");
             usuario.setEmail("usuario@tre-pe.jus.br");
 
-            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.findById("123456789012")).thenReturn(Optional.of(usuario));
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
             Alerta alerta = Alerta.builder().codigo(10L).usuarioDestinoTitulo(usuario.getTituloEleitoral()).build();
-            when(alertaFacade.criarAlertaPessoal(
+            when(alertaAplicacaoService.criarAlertaPessoal(
                     usuario.getTituloEleitoral(),
                     "Atribuição temporária para unidade UNIT"
             )).thenReturn(alerta);
@@ -276,11 +283,11 @@ class ResponsavelUnidadeServiceTest {
             usuario.setNome("Usuario Teste");
             usuario.setEmail("usuario@tre-pe.jus.br");
 
-            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+            when(alertaAplicacaoService.criarAlertaPessoal(eq("123"), anyString()))
                     .thenReturn(Alerta.builder().codigo(10L).build());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");
@@ -309,12 +316,12 @@ class ResponsavelUnidadeServiceTest {
             usuario.setNome("Usuario Teste");
             usuario.setEmail("usuario@tre-pe.jus.br");
 
-            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
             doThrow(new IllegalStateException("falha alerta"))
-                    .when(alertaFacade).criarAlertaPessoal(eq("123"), anyString());
+                    .when(alertaAplicacaoService).criarAlertaPessoal(eq("123"), anyString());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");
 
@@ -332,15 +339,15 @@ class ResponsavelUnidadeServiceTest {
             LocalDate dataTermino = LocalDate.of(2024, 2, 9);
             CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", dataInicio, dataTermino, "Justificativa");
 
-            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(new Unidade()));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario().setTituloEleitoral("123")));
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(new Unidade());
+            when(repo.buscar(Usuario.class, "123")).thenReturn(new Usuario().setTituloEleitoral("123"));
 
             assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
                     .isInstanceOf(ErroValidacao.class);
 
             verify(atribuicaoTemporariaRepo, never()).save(any());
             verifyNoInteractions(cacheOrganizacaoService);
-            verifyNoInteractions(alertaFacade);
+            verifyNoInteractions(alertaAplicacaoService);
             verifyNoInteractions(notificacaoService);
         }
 
@@ -359,8 +366,8 @@ class ResponsavelUnidadeServiceTest {
             unidade.setCodigo(codUnidade);
             Usuario usuario = new Usuario().setTituloEleitoral("123");
 
-            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.existeSobreposicaoPeriodo(
                     eq(codUnidade),
                     any(LocalDateTime.class),
@@ -392,11 +399,11 @@ class ResponsavelUnidadeServiceTest {
             usuario.setNome("Usuario Teste");
             usuario.setEmail("usuario@tre-pe.jus.br");
 
-            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+            when(alertaAplicacaoService.criarAlertaPessoal(eq("123"), anyString()))
                     .thenReturn(Alerta.builder().codigo(10L).build());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");
@@ -431,11 +438,11 @@ class ResponsavelUnidadeServiceTest {
             usuario.setNome("Usuario Teste");
             usuario.setEmail("usuario@tre-pe.jus.br");
 
-            when(unidadeRepo.findById(codUnidade)).thenReturn(Optional.of(unidade));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
-            when(alertaFacade.criarAlertaPessoal(eq("123"), anyString()))
+            when(alertaAplicacaoService.criarAlertaPessoal(eq("123"), anyString()))
                     .thenReturn(Alerta.builder().codigo(10L).build());
             when(emailModelosService.criarEmailAtribuicaoTemporaria(any()))
                     .thenReturn("<html>email</html>");
@@ -477,9 +484,9 @@ class ResponsavelUnidadeServiceTest {
                     "Atualizada"
             );
 
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-            when(atribuicaoTemporariaRepo.findById(9L)).thenReturn(Optional.of(atribuicao));
-            when(usuarioRepo.findById("123")).thenReturn(Optional.of(usuario));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(unidade);
+            when(repo.buscar(AtribuicaoTemporaria.class, 9L)).thenReturn(atribuicao);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
             when(atribuicaoTemporariaRepo.save(atribuicao)).thenReturn(atribuicao);
 
             service.atualizarAtribuicaoTemporaria(1L, 9L, request);
@@ -499,7 +506,7 @@ class ResponsavelUnidadeServiceTest {
             atribuicao.setCodigo(9L);
             atribuicao.setUnidade(unidade);
 
-            when(atribuicaoTemporariaRepo.findById(9L)).thenReturn(Optional.of(atribuicao));
+            when(repo.buscar(AtribuicaoTemporaria.class, 9L)).thenReturn(atribuicao);
 
             service.removerAtribuicaoTemporaria(1L, 9L);
 
@@ -527,8 +534,8 @@ class ResponsavelUnidadeServiceTest {
                     "Atualizada"
             );
 
-            when(unidadeRepo.findById(1L)).thenReturn(Optional.of(unidade));
-            when(atribuicaoTemporariaRepo.findById(9L)).thenReturn(Optional.of(atribuicao));
+            when(repo.buscar(Unidade.class, 1L)).thenReturn(unidade);
+            when(repo.buscar(AtribuicaoTemporaria.class, 9L)).thenReturn(atribuicao);
 
             assertThatThrownBy(() -> service.atualizarAtribuicaoTemporaria(1L, 9L, request))
                     .isInstanceOf(ErroValidacao.class)
@@ -563,7 +570,7 @@ class ResponsavelUnidadeServiceTest {
             when(unidadeRepo.buscarCodigoAtivoPorSigla(siglaUnidade)).thenReturn(Optional.of(1L));
             when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(1L))
                     .thenReturn(Optional.of(new ResponsabilidadeUnidadeLeitura(1L, "123456789012", null, null, null, null)));
-            when(usuarioRepo.findById("123456789012")).thenReturn(Optional.of(usuarioCompleto));
+            when(repo.buscar(Usuario.class, "123456789012")).thenReturn(usuarioCompleto);
 
             Usuario resultado = service.buscarResponsavelAtual(siglaUnidade);
 
@@ -731,7 +738,7 @@ class ResponsavelUnidadeServiceTest {
         ResponsabilidadeUnidadeLeitura leitura = mock(ResponsabilidadeUnidadeLeitura.class);
         when(leitura.usuarioTitulo()).thenReturn("123");
         when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(codigo)).thenReturn(Optional.of(leitura));
-        when(usuarioRepo.findById("123")).thenReturn(Optional.of(new Usuario()));
+        when(repo.buscar(Usuario.class, "123")).thenReturn(new Usuario());
 
         service.buscarResponsabilidadeDetalhadaAtual(sigla);
 
@@ -746,5 +753,199 @@ class ResponsavelUnidadeServiceTest {
 
         assertThatThrownBy(() -> service.buscarResponsavelUnidade(codigo))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelUnidadeOpt - deve retornar Optional.empty() quando não houver responsável")
+    void buscarResponsavelUnidadeOpt_NaoEncontrado() {
+        Long codigo = 10L;
+        when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(codigo))).thenReturn(List.of());
+
+        Optional<UnidadeResponsavelDto> result = service.buscarResponsavelUnidadeOpt(codigo);
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelUnidadeOpt - deve retornar o responsável com sucesso")
+    void buscarResponsavelUnidadeOpt_ComSucesso() {
+        Long codigo = 10L;
+        ResponsabilidadeUnidadeResumoLeitura resumo = new ResponsabilidadeUnidadeResumoLeitura(
+                codigo, "222", "Maria", "111", "João"
+        );
+        when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(codigo))).thenReturn(List.of(resumo));
+
+        Optional<UnidadeResponsavelDto> result = service.buscarResponsavelUnidadeOpt(codigo);
+        assertThat(result).isPresent();
+        assertThat(result.get().titularTitulo()).isEqualTo("111");
+        assertThat(result.get().substitutoTitulo()).isEqualTo("222");
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelAtual - deve retornar nulo quando não houver responsabilidade cadastrada")
+    void buscarResponsavelAtual_SemResponsabilidade() {
+        String sigla = "U1";
+        when(unidadeRepo.buscarCodigoAtivoPorSigla(sigla)).thenReturn(Optional.of(1L));
+        when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(1L)).thenReturn(Optional.empty());
+
+        Usuario result = service.buscarResponsavelAtual(sigla);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelAtual - deve lançar ErroEntidadeNaoEncontrada se usuário correspondente não existir")
+    void buscarResponsavelAtual_UsuarioNaoEncontrado() {
+        String sigla = "U1";
+        ResponsabilidadeUnidadeLeitura leitura = mock(ResponsabilidadeUnidadeLeitura.class);
+        when(leitura.usuarioTitulo()).thenReturn("123");
+        when(unidadeRepo.buscarCodigoAtivoPorSigla(sigla)).thenReturn(Optional.of(1L));
+        when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(1L)).thenReturn(Optional.of(leitura));
+        when(repo.buscar(Usuario.class, "123")).thenThrow(new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), "123"));
+
+        assertThatThrownBy(() -> service.buscarResponsavelAtual(sigla))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarResponsabilidadeDetalhadaAtual por sigla - deve retornar nulo quando unidade não for encontrada")
+    void buscarResponsabilidadeDetalhadaAtual_SiglaInexistente() {
+        String sigla = "U999";
+        when(unidadeRepo.buscarCodigoAtivoPorSigla(sigla)).thenReturn(Optional.empty());
+
+        ResponsavelDto result = service.buscarResponsabilidadeDetalhadaAtual(sigla);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("buscarResponsabilidadeDetalhadaAtual por código - deve retornar nulo quando não houver responsabilidade")
+    void buscarResponsabilidadeDetalhadaAtual_CodigoSemResponsabilidade() {
+        Long codigo = 1L;
+        when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(codigo)).thenReturn(Optional.empty());
+
+        ResponsavelDto result = service.buscarResponsabilidadeDetalhadaAtual(codigo);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("buscarResponsabilidadeDetalhadaAtual por código - deve lançar ErroEntidadeNaoEncontrada se usuário correspondente não existir")
+    void buscarResponsabilidadeDetalhadaAtual_CodigoUsuarioNaoEncontrado() {
+        Long codigo = 1L;
+        ResponsabilidadeUnidadeLeitura leitura = mock(ResponsabilidadeUnidadeLeitura.class);
+        when(leitura.usuarioTitulo()).thenReturn("123");
+        when(responsabilidadeRepo.buscarLeituraDetalhadaPorCodigoUnidade(codigo)).thenReturn(Optional.of(leitura));
+        when(repo.buscar(Usuario.class, "123")).thenThrow(new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), "123"));
+
+        assertThatThrownBy(() -> service.buscarResponsabilidadeDetalhadaAtual(codigo))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("criarAtribuicaoTemporaria - deve lançar ErroEntidadeNaoEncontrada se unidade não for encontrada")
+    void criarAtribuicaoTemporaria_UnidadeNaoEncontrada() {
+        Long codUnidade = 999L;
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
+        when(repo.buscar(Unidade.class, codUnidade)).thenThrow(new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
+
+        assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("criarAtribuicaoTemporaria - deve lançar ErroEntidadeNaoEncontrada se usuário não for encontrado")
+    void criarAtribuicaoTemporaria_UsuarioNaoEncontrado() {
+        Long codUnidade = 1L;
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
+        when(repo.buscar(Unidade.class, codUnidade)).thenReturn(new Unidade());
+        when(repo.buscar(Usuario.class, "123")).thenThrow(new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), "123"));
+
+        assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("atualizarAtribuicaoTemporaria - deve lançar ErroEntidadeNaoEncontrada se unidade não for encontrada")
+    void atualizarAtribuicaoTemporaria_UnidadeNaoEncontrada() {
+        Long codUnidade = 999L;
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
+        when(repo.buscar(Unidade.class, codUnidade)).thenThrow(new ErroEntidadeNaoEncontrada(Unidade.class.getSimpleName(), codUnidade));
+
+        assertThatThrownBy(() -> service.atualizarAtribuicaoTemporaria(codUnidade, 1L, request))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("atualizarAtribuicaoTemporaria - deve lançar ErroEntidadeNaoEncontrada se atribuição não for encontrada")
+    void atualizarAtribuicaoTemporaria_AtribuicaoNaoEncontrada() {
+        Long codUnidade = 1L;
+        Long codigoAtribuicao = 999L;
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
+        when(repo.buscar(Unidade.class, codUnidade)).thenReturn(new Unidade());
+        when(repo.buscar(AtribuicaoTemporaria.class, codigoAtribuicao)).thenThrow(new ErroEntidadeNaoEncontrada(AtribuicaoTemporaria.class.getSimpleName(), codigoAtribuicao));
+
+        assertThatThrownBy(() -> service.atualizarAtribuicaoTemporaria(codUnidade, codigoAtribuicao, request))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("atualizarAtribuicaoTemporaria - deve lançar ErroEntidadeNaoEncontrada se usuário não for encontrado")
+    void atualizarAtribuicaoTemporaria_UsuarioNaoEncontrado() {
+        Long codUnidade = 1L;
+        Long codigoAtribuicao = 2L;
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", LocalDate.now(), LocalDate.now().plusDays(1), "Justificativa");
+
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codUnidade);
+        AtribuicaoTemporaria atribuicao = new AtribuicaoTemporaria();
+        atribuicao.setCodigo(codigoAtribuicao);
+        atribuicao.setUnidade(unidade);
+
+        when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+        when(repo.buscar(AtribuicaoTemporaria.class, codigoAtribuicao)).thenReturn(atribuicao);
+        when(repo.buscar(Usuario.class, "123")).thenThrow(new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), "123"));
+
+        assertThatThrownBy(() -> service.atualizarAtribuicaoTemporaria(codUnidade, codigoAtribuicao, request))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("removerAtribuicaoTemporaria - deve lançar ErroEntidadeNaoEncontrada se atribuição não for encontrada")
+    void removerAtribuicaoTemporaria_AtribuicaoNaoEncontrada() {
+        Long codUnidade = 1L;
+        Long codigoAtribuicao = 999L;
+        when(repo.buscar(AtribuicaoTemporaria.class, codigoAtribuicao)).thenThrow(new ErroEntidadeNaoEncontrada(AtribuicaoTemporaria.class.getSimpleName(), codigoAtribuicao));
+
+        assertThatThrownBy(() -> service.removerAtribuicaoTemporaria(codUnidade, codigoAtribuicao))
+                .isInstanceOf(ErroEntidadeNaoEncontrada.class);
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelUnidade - deve lançar IllegalStateException se titular oficial estiver ausente")
+    void buscarResponsavelUnidade_TitularAusente() {
+        Long codigo = 10L;
+        ResponsabilidadeUnidadeResumoLeitura leitura = mock(ResponsabilidadeUnidadeResumoLeitura.class);
+        when(leitura.unidadeCodigo()).thenReturn(codigo);
+
+        when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(codigo))).thenReturn(List.of(leitura));
+
+        assertThatThrownBy(() -> service.buscarResponsavelUnidade(codigo))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Titular oficial ausente");
+    }
+
+    @Test
+    @DisplayName("buscarResponsavelUnidade - deve lançar IllegalStateException se nome do titular ou responsável estiver nulo")
+    void buscarResponsavelUnidade_NomeNulo() {
+        Long codigo = 10L;
+        ResponsabilidadeUnidadeResumoLeitura leitura = mock(ResponsabilidadeUnidadeResumoLeitura.class);
+        when(leitura.unidadeCodigo()).thenReturn(codigo);
+        when(leitura.titularTitulo()).thenReturn("123");
+
+        when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(codigo))).thenReturn(List.of(leitura));
+
+        assertThatThrownBy(() -> service.buscarResponsavelUnidade(codigo))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Responsável ou titular oficial ausente");
     }
 }

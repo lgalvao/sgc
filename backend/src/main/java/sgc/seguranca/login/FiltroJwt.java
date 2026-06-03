@@ -22,7 +22,7 @@ import java.util.*;
 @Slf4j
 public class FiltroJwt extends OncePerRequestFilter {
     private final GerenciadorJwt gerenciadorJwt;
-    private final UsuarioFacade usuarioService;
+    private final UsuarioAplicacaoService usuarioService;
     private final ListaNegraJwt listaNegraJwt;
 
     @Override

@@ -2,7 +2,6 @@ package sgc.processo.dto;
 
 import lombok.*;
 import org.jspecify.annotations.*;
-import sgc.subprocesso.model.*;
 
 import java.time.*;
 
@@ -14,7 +13,7 @@ public class SubprocessoElegivelDto {
     String unidadeNome;
     String unidadeSigla;
     Long localizacaoCodigo;
-    SituacaoSubprocesso situacao;
+    String situacao;
     boolean habilitarAceitarCadastroBloco;
     boolean habilitarAceitarMapaBloco;
     boolean habilitarHomologarCadastroBloco;

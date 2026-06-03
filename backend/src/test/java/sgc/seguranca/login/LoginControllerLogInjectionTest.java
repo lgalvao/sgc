@@ -34,10 +34,10 @@ class LoginControllerLogInjectionTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private LoginFacade loginFacade;
+    private LoginAplicacaoService loginAplicacaoService;
 
     @MockitoBean
-    private UsuarioFacade usuarioFacade;
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @MockitoBean
     private LimitadorTentativasLogin limitadorTentativasLogin;
@@ -67,10 +67,10 @@ class LoginControllerLogInjectionTest {
                 .senha("senha")
                 .build();
 
-        when(loginFacade.autenticar("123", "senha")).thenReturn(true);
-        when(loginFacade.buscarAutorizacoesUsuario("123")).thenReturn(java.util.List.of(
-                new PerfilUnidadeDto(Perfil.CHEFE, UnidadeResumoDto.builder().codigo(1L).sigla("U1").nome("Unidade 1").build()),
-                new PerfilUnidadeDto(Perfil.GESTOR, UnidadeResumoDto.builder().codigo(2L).sigla("U2").nome("Unidade 2").build())
+        when(loginAplicacaoService.autenticar("123", "senha")).thenReturn(true);
+        when(loginAplicacaoService.buscarAutorizacoesUsuario("123")).thenReturn(java.util.List.of(
+                new PerfilUnidadeDto(Perfil.CHEFE.name(), UnidadeResumoDto.builder().codigo(1L).sigla("U1").nome("Unidade 1").build()),
+                new PerfilUnidadeDto(Perfil.GESTOR.name(), UnidadeResumoDto.builder().codigo(2L).sigla("U2").nome("Unidade 2").build())
         ));
         when(gerenciadorJwt.gerarTokenPreAuth("123")).thenReturn("token-pre-auth");
 

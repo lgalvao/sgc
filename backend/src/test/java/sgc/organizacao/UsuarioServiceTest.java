@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 @Tag("integration")
 @SpringBootTest
 @Transactional
-@DisplayName("Testes do Serviço UsuarioFacade")
+@DisplayName("Testes do Serviço UsuarioAplicacaoService")
 class UsuarioServiceTest {
 
     private static final String TITULO_ADMIN = "111111111111";
@@ -30,7 +30,7 @@ class UsuarioServiceTest {
     private static final String TITULO_CHEFE_UNIT2 = "777"; // Chefe STIC Teste
 
     @Autowired
-    private UsuarioFacade usuarioService;
+    private UsuarioAplicacaoService usuarioService;
 
     @Autowired
     private UnidadeService unidadeService2;

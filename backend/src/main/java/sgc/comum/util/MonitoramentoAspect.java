@@ -30,8 +30,7 @@ public class MonitoramentoAspect {
     }
 
     @Around("execution(* sgc..*Service.*(..))" +
-            " || execution(* sgc..*Repo.*(..))" +
-            " || execution(* sgc..*Facade.*(..))"
+            " || execution(* sgc..*Repo.*(..))"
     )
 
     public Object monitorarExecucao(ProceedingJoinPoint joinPoint) throws Throwable {

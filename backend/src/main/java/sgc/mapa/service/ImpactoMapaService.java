@@ -28,11 +28,11 @@ public class ImpactoMapaService {
     private final CompetenciaRepo competenciaRepo;
     private final MapaManutencaoService mapaManutencaoService;
     private final SgcPermissionEvaluator permissionEvaluator;
-    private final UsuarioFacade usuarioFacade;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
 
     @Transactional(readOnly = true)
     public ImpactoMapaResponse verificarImpactos(Subprocesso subprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         validarPermissaoVisualizacaoImpacto(subprocesso, usuario);
 
         return calcularImpactos(subprocesso);
@@ -87,7 +87,7 @@ public class ImpactoMapaService {
         if (subprocesso.getProcesso().getTipo() == TipoProcesso.MAPEAMENTO) {
             return false;
         }
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         return permissionEvaluator.verificarPermissao(usuario, subprocesso, VERIFICAR_IMPACTOS)
                 && situacaoPermiteVisualizarImpactos(usuario.getPerfilAtivo(), subprocesso.getSituacao());
     }
@@ -138,7 +138,7 @@ public class ImpactoMapaService {
                 AtividadeImpactadaDto dto = AtividadeImpactadaDto.builder()
                         .codigo(atual.getCodigo())
                         .descricao(atual.getDescricao())
-                        .tipoImpacto(TipoImpactoAtividade.INSERIDA)
+                        .tipoImpacto(TipoImpactoAtividade.INSERIDA.name())
                         .descricaoAnterior(atual.getDescricao())
                         .conhecimentos(atual.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                         .conhecimentosAdicionados(List.of())
@@ -170,7 +170,7 @@ public class ImpactoMapaService {
                 AtividadeImpactadaDto dto = AtividadeImpactadaDto.builder()
                         .codigo(vigenteCodigo)
                         .descricao(vigente.getDescricao())
-                        .tipoImpacto(TipoImpactoAtividade.REMOVIDA)
+                        .tipoImpacto(TipoImpactoAtividade.REMOVIDA.name())
                         .descricaoAnterior(vigente.getDescricao())
                         .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                         .conhecimentosAdicionados(List.of())
@@ -213,7 +213,7 @@ public class ImpactoMapaService {
                     alteradas.add(AtividadeImpactadaDto.builder()
                             .codigo(atual.getCodigo())
                             .descricao(atual.getDescricao())
-                            .tipoImpacto(TipoImpactoAtividade.ALTERADA)
+                            .tipoImpacto(TipoImpactoAtividade.ALTERADA.name())
                             .descricaoAnterior(vigente.getDescricao())
                             .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                             .conhecimentosAdicionados(adicionados)
@@ -258,7 +258,7 @@ public class ImpactoMapaService {
                     alteradas.add(AtividadeImpactadaDto.builder()
                             .codigo(atual.getCodigo())
                             .descricao(atual.getDescricao())
-                            .tipoImpacto(TipoImpactoAtividade.ALTERADA)
+                            .tipoImpacto(TipoImpactoAtividade.ALTERADA.name())
                             .descricaoAnterior(vigente.getDescricao())
                             .conhecimentos(vigente.getConhecimentos().stream().map(Conhecimento::getDescricao).toList())
                             .conhecimentosAdicionados(adicionados)
@@ -397,7 +397,7 @@ public class ImpactoMapaService {
                 acc.codigo,
                 acc.descricao,
                 new ArrayList<>(acc.atividadesAfetadas),
-                acc.obterTiposImpacto());
+                acc.obterTiposImpacto().stream().map(Enum::name).toList());
     }
 
     private Map<Long, List<Competencia>> construirMapaAtividadeCompetencias(List<Competencia> competencias) {

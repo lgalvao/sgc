@@ -102,7 +102,7 @@ describe('PainelView', () => {
     it('deve carregar os dados e exibir toast pendente no onMounted', async () => {
         const options = createMountOptions();
         const toastStore = useToastStore(options.pinia);
-        toastStore.consumePending = vi.fn().mockReturnValue({body: 'Sucesso'});
+        toastStore.consumePending = vi.fn().mockReturnValue({mensagem: 'Sucesso'});
 
         mount(PainelView, options);
         await flushPromises();

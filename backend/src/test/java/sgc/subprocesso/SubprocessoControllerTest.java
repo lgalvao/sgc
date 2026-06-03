@@ -13,6 +13,7 @@ import sgc.comum.ComumDtos.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SubprocessoController.class)
-@Import(RestExceptionHandler.class)
+@Import({RestExceptionHandler.class, SubprocessoDtoMapper.class, OrganizacaoDtoMapper.class})
 @DisplayName("SubprocessoController")
 class SubprocessoControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
@@ -52,10 +53,12 @@ class SubprocessoControllerTest {
     private UnidadeService unidadeService;
 
     @MockitoBean
-    private sgc.organizacao.UsuarioFacade usuarioService;
+    private sgc.organizacao.UsuarioAplicacaoService usuarioService;
 
     @MockitoBean
     private SgcPermissionEvaluator permissionEvaluator;
+    @MockitoBean
+    private SubprocessoApresentacaoService subprocessoApresentacaoService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -110,7 +113,7 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter status do subprocesso")
         @WithMockUser(roles = "GESTOR")
         void deveObterStatus() throws Exception {
-            SubprocessoSituacaoDto dto = new SubprocessoSituacaoDto(1L, SituacaoSubprocesso.NAO_INICIADO);
+            SubprocessoSituacaoDto dto = new SubprocessoSituacaoDto(1L, SituacaoSubprocesso.NAO_INICIADO.name());
             when(consultaService.obterStatus(1L)).thenReturn(dto);
 
             mockMvc.perform(get("/api/subprocessos/1/status"))
@@ -141,13 +144,6 @@ class SubprocessoControllerTest {
         @DisplayName("deve buscar contexto edicao por processo e unidade")
         @WithMockUser
         void buscarContextoEdicaoPorProcessoEUnidade() throws Exception {
-            Subprocesso subprocesso = Subprocesso.builder().codigo(100L).build();
-            Usuario usuario = new Usuario();
-            when(unidadeService.buscarCodigoPorSigla("U1")).thenReturn(10L);
-            when(consultaService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).thenReturn(true);
-
             SubprocessoResumoDto spResumo = SubprocessoResumoDto.builder()
                     .codigo(100L)
                     .build();
@@ -157,7 +153,7 @@ class SubprocessoControllerTest {
             ContextoEdicaoResponse response = ContextoEdicaoResponse.builder()
                     .detalhes(spResponse)
                     .build();
-            when(consultaService.obterContextoEdicao(subprocesso)).thenReturn(response);
+            when(subprocessoApresentacaoService.obterContextoEdicaoPorProcessoEUnidade(1L, "U1")).thenReturn(response);
 
             mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")
                             .param("codProcesso", "1")
@@ -165,30 +161,22 @@ class SubprocessoControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.detalhes.subprocesso.codigo").value(100));
 
-            verify(unidadeService).buscarCodigoPorSigla("U1");
-            verify(consultaService).obterEntidadePorProcessoEUnidade(1L, 10L);
-            verify(permissionEvaluator).verificarPermissao(usuario, subprocesso, AcaoPermissao.VISUALIZAR_SUBPROCESSO);
-            verify(consultaService).obterContextoEdicao(subprocesso);
-            verify(consultaService, never()).obterContextoEdicao(100L);
+            verify(subprocessoApresentacaoService).obterContextoEdicaoPorProcessoEUnidade(1L, "U1");
         }
 
         @Test
         @DisplayName("deve negar contexto edicao por processo e unidade sem permissao")
         @WithMockUser
         void buscarContextoEdicaoPorProcessoEUnidadeSemPermissao() throws Exception {
-            Subprocesso subprocesso = Subprocesso.builder().codigo(100L).build();
-            Usuario usuario = new Usuario();
-            when(unidadeService.buscarCodigoPorSigla("U1")).thenReturn(10L);
-            when(consultaService.obterEntidadePorProcessoEUnidade(1L, 10L)).thenReturn(subprocesso);
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).thenReturn(false);
+            when(subprocessoApresentacaoService.obterContextoEdicaoPorProcessoEUnidade(1L, "U1"))
+                    .thenThrow(new org.springframework.security.access.AccessDeniedException("Acesso negado ao subprocesso"));
 
             mockMvc.perform(get("/api/subprocessos/contexto-edicao/buscar")
                             .param("codProcesso", "1")
                             .param("siglaUnidade", "U1"))
                     .andExpect(status().isForbidden());
 
-            verify(consultaService, never()).obterContextoEdicao(any(Subprocesso.class));
+            verify(subprocessoApresentacaoService).obterContextoEdicaoPorProcessoEUnidade(1L, "U1");
         }
 
         @Test
@@ -641,26 +629,16 @@ class SubprocessoControllerTest {
         @DisplayName("deve obter contexto de cadastro de atividades buscando processo e unidade")
         @WithMockUser
         void deveObterContextoCadastroAtividadesBusca() throws Exception {
-            when(unidadeService.buscarCodigoPorSigla("U10")).thenReturn(10L);
-
-            Subprocesso sp = new Subprocesso();
-            sp.setCodigo(1L);
-            Usuario usuario = new Usuario();
-            when(consultaService.obterEntidadePorProcessoEUnidade(5L, 10L)).thenReturn(sp);
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-            when(permissionEvaluator.verificarPermissao(usuario, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO)).thenReturn(true);
-
-            when(consultaService.obterContextoCadastroAtividades(1L)).thenReturn(
-                    new sgc.subprocesso.dto.ContextoCadastroAtividadesResponse(null, null, null, List.of(), "")
-            );
+            var response = new sgc.subprocesso.dto.ContextoCadastroAtividadesResponse(null, null, null, List.of(), "");
+            when(subprocessoApresentacaoService.obterContextoCadastroAtividadesPorProcessoEUnidade(5L, "U10"))
+                    .thenReturn(response);
 
             mockMvc.perform(get("/api/subprocessos/contexto-cadastro-atividades/buscar")
                             .param("codProcesso", "5")
                             .param("siglaUnidade", "U10"))
                     .andExpect(status().isOk());
 
-            verify(permissionEvaluator).verificarPermissao(usuario, sp, AcaoPermissao.VISUALIZAR_SUBPROCESSO);
-            verify(consultaService).obterContextoCadastroAtividades(1L);
+            verify(subprocessoApresentacaoService).obterContextoCadastroAtividadesPorProcessoEUnidade(5L, "U10");
         }
     }
 
@@ -869,8 +847,18 @@ class SubprocessoControllerTest {
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .build();
 
-            when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(transicaoService.criarAnalise(any(), any(), any())).thenReturn(new Analise());
+            when(subprocessoApresentacaoService.criarAnalise(eq(1L), any(), eq(TipoAnalise.CADASTRO)))
+                    .thenReturn(new AnaliseHistoricoDto(
+                            TipoAnalise.CADASTRO.name(),
+                            TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
+                            "Aceite",
+                            "123456789012",
+                            "Usuário Teste",
+                            "SIGLA",
+                            "Unidade",
+                            java.time.LocalDateTime.now(),
+                            "MOTIVO",
+                            "Obs"));
 
             mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
                             .with(csrf())
@@ -878,7 +866,7 @@ class SubprocessoControllerTest {
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isCreated());
 
-            verify(transicaoService).criarAnalise(any(), any(), any());
+            verify(subprocessoApresentacaoService).criarAnalise(eq(1L), any(), eq(TipoAnalise.CADASTRO));
         }
 
         @Test
@@ -891,12 +879,9 @@ class SubprocessoControllerTest {
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .build();
 
-            Analise analise = new Analise();
-            when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO))).thenReturn(analise);
-            when(analiseHistoricoService.converter(analise)).thenReturn(new AnaliseHistoricoDto(
-                    TipoAnalise.VALIDACAO,
-                    TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+            when(subprocessoApresentacaoService.criarAnalise(eq(1L), any(), eq(TipoAnalise.VALIDACAO))).thenReturn(new AnaliseHistoricoDto(
+                TipoAnalise.VALIDACAO.name(),
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
                     "Aceite",
                     "123456789012",
                     "Usuário Teste",
@@ -913,7 +898,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isCreated())
                     .andExpect(jsonPath("$.tipo").value("VALIDACAO"));
 
-            verify(transicaoService).criarAnalise(any(), any(), eq(TipoAnalise.VALIDACAO));
+            verify(subprocessoApresentacaoService).criarAnalise(eq(1L), any(), eq(TipoAnalise.VALIDACAO));
         }
 
         @Test
@@ -926,8 +911,7 @@ class SubprocessoControllerTest {
                     .acao(TipoAcaoAnalise.ACEITE_MAPEAMENTO)
                     .build();
 
-            when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-            when(transicaoService.criarAnalise(any(), any(), eq(TipoAnalise.CADASTRO)))
+            when(subprocessoApresentacaoService.criarAnalise(eq(1L), any(), eq(TipoAnalise.CADASTRO)))
                     .thenThrow(new ErroValidacao("Parecer inválido"));
 
             mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
@@ -937,7 +921,7 @@ class SubprocessoControllerTest {
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Parecer inválido"));
 
-            verify(transicaoService).criarAnalise(any(), any(), eq(TipoAnalise.CADASTRO));
+            verify(subprocessoApresentacaoService).criarAnalise(eq(1L), any(), eq(TipoAnalise.CADASTRO));
         }
 
         @Test
@@ -1090,12 +1074,9 @@ class SubprocessoControllerTest {
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseValidacaoOk() throws Exception {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-        when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-        Analise a = new Analise();
-        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO))).thenReturn(a);
-        when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
-                TipoAnalise.VALIDACAO,
-                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+        AnaliseHistoricoDto resposta = new AnaliseHistoricoDto(
+                TipoAnalise.VALIDACAO.name(),
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
                 "Aceite",
                 "123456789012",
                 "Usuário Teste",
@@ -1103,7 +1084,8 @@ class SubprocessoControllerTest {
                 "Unidade teste",
                 LocalDateTime.now(),
                 "mot",
-                "obs"));
+                "obs");
+        when(subprocessoApresentacaoService.criarAnalise(eq(1L), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO))).thenReturn(resposta);
 
         mockMvc.perform(post("/api/subprocessos/1/analises-validacao")
                         .with(csrf())
@@ -1112,10 +1094,7 @@ class SubprocessoControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("VALIDACAO"));
 
-        verify(consultaService).buscarSubprocesso(1L);
-        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO));
-        verify(analiseHistoricoService).converter(a);
-        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
+        verify(subprocessoApresentacaoService).criarAnalise(eq(1L), any(), eq(sgc.subprocesso.model.TipoAnalise.VALIDACAO));
     }
 
     @Test
@@ -1123,12 +1102,9 @@ class SubprocessoControllerTest {
     @WithMockUser(roles = {"GESTOR"})
     void criarAnaliseCadastroOk() throws Exception {
         CriarAnaliseRequest req = new CriarAnaliseRequest("obs", "mot", sgc.subprocesso.model.TipoAcaoAnalise.ACEITE_MAPEAMENTO);
-        when(consultaService.buscarSubprocesso(1L)).thenReturn(new Subprocesso());
-        Analise a = new Analise();
-        when(transicaoService.criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO))).thenReturn(a);
-        when(analiseHistoricoService.converter(a)).thenReturn(new AnaliseHistoricoDto(
-                TipoAnalise.CADASTRO,
-                TipoAcaoAnalise.ACEITE_MAPEAMENTO,
+        AnaliseHistoricoDto resposta = new AnaliseHistoricoDto(
+                TipoAnalise.CADASTRO.name(),
+                TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
                 "Aceite",
                 "123456789012",
                 "Usuário Teste",
@@ -1136,7 +1112,8 @@ class SubprocessoControllerTest {
                 "Unidade teste",
                 LocalDateTime.now(),
                 "mot",
-                "obs"));
+                "obs");
+        when(subprocessoApresentacaoService.criarAnalise(eq(1L), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO))).thenReturn(resposta);
 
         mockMvc.perform(post("/api/subprocessos/1/analises-cadastro")
                         .with(csrf())
@@ -1145,10 +1122,7 @@ class SubprocessoControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo").value("CADASTRO"));
 
-        verify(consultaService).buscarSubprocesso(1L);
-        verify(transicaoService).criarAnalise(any(), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO));
-        verify(analiseHistoricoService).converter(a);
-        verifyNoMoreInteractions(subprocessoService, transicaoService, unidadeService);
+        verify(subprocessoApresentacaoService).criarAnalise(eq(1L), any(), eq(sgc.subprocesso.model.TipoAnalise.CADASTRO));
     }
 
     @Test

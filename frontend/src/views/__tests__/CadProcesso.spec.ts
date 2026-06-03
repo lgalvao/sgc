@@ -114,10 +114,10 @@ const ArvoreUnidadesStub = {
 
 const ProcessoFormFieldsStub = {
     template: `<div>
-        <div v-if="isLoadingUnidades">{{ CARREGANDO_UNIDADES }}</div>
+        <div v-if="carregandoUnidades">{{ CARREGANDO_UNIDADES }}</div>
         <input data-testid="inp-processo-descricao" :value="modelValue.descricao" @input="$emit('update:modelValue', {...modelValue, descricao: $event.target.value})" />
     </div>`,
-    props: ['modelValue', 'fieldErrors', 'unidades', 'isLoadingUnidades', 'isEdit'],
+    props: ['modelValue', 'errosCampos', 'unidades', 'carregandoUnidades', 'modoEdicao'],
     emits: ['update:modelValue'],
     data: () => ({CARREGANDO_UNIDADES: TEXTOS.unidades.CARREGANDO}),
     methods: {
@@ -963,7 +963,7 @@ describe('ProcessoCadastroView.vue', () => {
                 descricao: ref(''),
                 dataLimite: ref(''),
                 unidadesSelecionadas: ref([]),
-                fieldErrors: ref({}),
+                errosCampos: ref({}),
                 isFormInvalid: ref(false),
                 setFromErroNormalizado: vi.fn(),
                 clearErrors: vi.fn(),
@@ -1008,7 +1008,7 @@ describe('ProcessoCadastroView.vue', () => {
                 descricao: ref(''),
                 dataLimite: ref(''),
                 unidadesSelecionadas: ref([]),
-                fieldErrors: ref({}),
+                errosCampos: ref({}),
                 isFormInvalid: ref(false),
                 setFromErroNormalizado: vi.fn(),
                 clearErrors: vi.fn(),

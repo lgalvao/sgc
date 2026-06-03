@@ -1,6 +1,5 @@
 package sgc.subprocesso.model;
 
-import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
@@ -27,59 +26,44 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 public class Subprocesso extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "processo_codigo", nullable = false)
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Processo processo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_codigo", nullable = false)
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Unidade unidade;
 
     @OneToOne(mappedBy = "subprocesso")
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     private Mapa mapa;
 
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_limite_etapa1", nullable = false)
     private LocalDateTime dataLimiteEtapa1;
 
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_fim_etapa1")
     private @Nullable LocalDateTime dataFimEtapa1;
 
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_limite_etapa2")
     private @Nullable LocalDateTime dataLimiteEtapa2;
 
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Column(name = "data_fim_etapa2")
     private @Nullable LocalDateTime dataFimEtapa2;
 
-    @JsonView({ComumViews.Publica.class, MapaViews.Publica.class})
     @Enumerated(EnumType.STRING)
     @Column(name = "situacao", length = 50, nullable = false)
     @lombok.Builder.Default
     private SituacaoSubprocesso situacao = SituacaoSubprocesso.NAO_INICIADO;
 
-    @JsonView({ComumViews.Publica.class, SubprocessoViews.Publica.class, MapaViews.Publica.class})
     public Set<Atividade> getAtividades() {
         return mapa != null ? mapa.getAtividades() : Collections.emptySet();
     }
 
-    @JsonView(ComumViews.Publica.class)
-    @JsonProperty("codProcesso")
     public @Nullable Long getCodProcesso() {
         return processo != null ? processo.getCodigo() : null;
     }
 
-    @JsonView(ComumViews.Publica.class)
-    @JsonProperty("codUnidade")
     public @Nullable Long getCodUnidade() {
         return unidade != null ? unidade.getCodigo() : null;
     }
 
-    @JsonView(ComumViews.Publica.class)
-    @JsonProperty("codMapa")
     public @Nullable Long getCodMapa() {
         return mapa != null ? mapa.getCodigo() : null;
     }

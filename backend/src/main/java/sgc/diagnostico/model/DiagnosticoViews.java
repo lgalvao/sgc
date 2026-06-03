@@ -1,7 +1,7 @@
 package sgc.diagnostico.model;
 
 
-public class DiagnosticoViews {
-    public interface Publica {}
-    public interface Detalhada extends Publica {}
+public interface DiagnosticoViews {
+    interface Publica {}
+    interface Detalhada extends Publica {}
 }

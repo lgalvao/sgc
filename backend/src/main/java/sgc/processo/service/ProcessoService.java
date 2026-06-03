@@ -58,8 +58,8 @@ public class ProcessoService {
     private final SubprocessoConsultaService consultaService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final SubprocessoValidacaoService validacaoService;
-    private final UsuarioFacade usuarioService;
-    private final AlertaFacade servicoAlertas;
+    private final UsuarioAplicacaoService usuarioService;
+    private final AlertaAplicacaoService servicoAlertas;
     private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final SgcPermissionEvaluator permissionEvaluator;
@@ -68,6 +68,7 @@ public class ProcessoService {
     private final ConfiguracaoService configuracaoService;
     private final MapaManutencaoService mapaManutencaoService;
     private final sgc.diagnostico.service.DiagnosticoNotificacaoService diagnosticoNotificacaoService;
+    private final sgc.processo.ProcessoDtoMapper processoDtoMapper;
 
 
     @Transactional(readOnly = true)
@@ -215,7 +216,6 @@ public class ProcessoService {
                 .toList();
     }
 
-
     public Processo criar(CriarProcessoRequest req) {
         List<Long> codigosUnidades = new ArrayList<>(req.unidades());
         Map<Long, Unidade> unidadesPorCodigo = carregarUnidadesPorCodigo(codigosUnidades);
@@ -347,7 +347,6 @@ public class ProcessoService {
         throw new ErroAcessoNegado("Usuário não possui permissão para executar esta ação em um ou mais subprocessos selecionados.");
     }
 
-
     @Transactional(readOnly = true)
     public ProcessoDetalheDto obterDetalhesCompleto(Long codProcesso, boolean incluirElegiveis) {
         Usuario usuario = usuarioService.usuarioAutenticado();
@@ -357,23 +356,16 @@ public class ProcessoService {
         Set<Long> unidadesAcesso = obterIdsUnidadesAcesso(processo, usuario);
         Perfil perfil = usuario.getPerfilAtivo();
 
-        ProcessoDetalheDto dto = ProcessoDetalheDto.builder()
-                .codigo(processo.getCodigo())
-                .descricao(processo.getDescricao())
-                .situacao(processo.getSituacao())
-                .tipo(processo.getTipo().name())
-                .dataCriacao(processo.getDataCriacao())
-                .dataFinalizacao(processo.getDataFinalizacao())
-                .dataLimite(processo.getDataLimite())
-                .podeFinalizar(permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)
-                        && validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido())
-                .podeHomologarCadastro(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
-                .podeHomologarMapa(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil))
-                .podeAceitarCadastroBloco(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
-                .podeAceitarMapaBloco(AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil))
-                .podeDisponibilizarMapaBloco(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil))
-                .unidades(new ArrayList<>())
-                .build();
+        ProcessoDetalheDto dto = processoDtoMapper.criarDetalheBase(
+                processo,
+                permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)
+                        && validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido(),
+                AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil),
+                AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+        );
 
         montarHierarquiaNoDto(dto, processo, subprocessos, unidadesAcesso, localizacoesPorSubprocesso);
         List<Subprocesso> subprocessosVisiveis = usuario.getPerfilAtivo() == Perfil.ADMIN
@@ -637,11 +629,15 @@ public class ProcessoService {
                 .filter(p -> acesso.contains(p.getUnidadeCodigoPersistido()))
                 .forEach(p -> {
                     Long codigoUnidadeParticipante = p.getUnidadeCodigoPersistido();
-                    UnidadeParticipanteDto uDto = UnidadeParticipanteDto.fromSnapshot(p);
+                    UnidadeParticipanteDto uDto = processoDtoMapper.paraUnidadeParticipante(p);
                     Subprocesso sp = mapSp.get(codigoUnidadeParticipante);
                     validarDadosBasicosParticipante(processo.getCodigo(), uDto);
                     if (sp != null) {
-                        uDto.preencherComSubprocesso(sp, obterLocalizacaoAtual(sp, localizacoesPorSubprocesso));
+                        processoDtoMapper.preencherParticipanteComSubprocesso(
+                                uDto,
+                                sp,
+                                obterLocalizacaoAtual(sp, localizacoesPorSubprocesso)
+                        );
                     }
                     mapDto.put(codigoUnidadeParticipante, uDto);
                 });
@@ -835,7 +831,7 @@ public class ProcessoService {
                 .unidadeNome(sp.getUnidade().getNome())
                 .unidadeSigla(sp.getUnidade().getSigla())
                 .localizacaoCodigo(localizacao.getCodigo())
-                .situacao(sp.getSituacao())
+                .situacao(sp.getSituacao().name())
                 .habilitarAceitarCadastroBloco(elegibilidade.habilitarAceitarCadastroBloco())
                 .habilitarAceitarMapaBloco(elegibilidade.habilitarAceitarMapaBloco())
                 .habilitarHomologarCadastroBloco(elegibilidade.habilitarHomologarCadastroBloco())
@@ -867,7 +863,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_ACEITE_CADASTRO_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("aceitar-mapa")
                         .acao(ACEITAR)
@@ -882,7 +877,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_ACEITE_MAPA_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("homologar-cadastro")
                         .acao(HOMOLOGAR)
@@ -897,7 +891,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_CADASTRO_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("homologar-mapa")
                         .acao(HOMOLOGAR)
@@ -912,7 +905,6 @@ public class ProcessoService {
                         .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_MAPA_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
-
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("disponibilizar-mapa")
                         .acao(DISPONIBILIZAR)
@@ -933,20 +925,20 @@ public class ProcessoService {
     private ProcessoDetalheDto.AcaoBlocoDto criarAcaoBloco(AcaoBlocoContexto contexto) {
         boolean temUnidades = !contexto.unidades().isEmpty();
         boolean habilitar = contexto.perfilPermite() && contexto.processoAtivo() && temUnidades;
-        return ProcessoDetalheDto.AcaoBlocoDto.builder()
-                .codigo(contexto.codigo())
-                .acao(contexto.acao())
-                .mostrar(contexto.perfilPermite())
-                .habilitar(habilitar)
-                .requerDataLimite(contexto.requerDataLimite())
-                .redirecionarPainel(contexto.redirecionarPainel())
-                .rotulo(contexto.rotulo())
-                .titulo(contexto.titulo())
-                .texto(contexto.texto())
-                .rotuloBotao(contexto.rotuloBotao())
-                .mensagemSucesso(contexto.mensagemSucesso())
-                .unidades(new ArrayList<>(contexto.unidades()))
-                .build();
+        return processoDtoMapper.criarAcaoBloco(
+                contexto.codigo(),
+                contexto.acao(),
+                contexto.perfilPermite(),
+                habilitar,
+                contexto.requerDataLimite(),
+                contexto.redirecionarPainel(),
+                contexto.rotulo(),
+                contexto.titulo(),
+                contexto.texto(),
+                contexto.rotuloBotao(),
+                contexto.mensagemSucesso(),
+                contexto.unidades()
+        );
     }
 
     private List<SubprocessoElegivelDto> filtrarElegiveis(
@@ -972,20 +964,13 @@ public class ProcessoService {
                 || situacao == REVISAO_MAPA_VALIDADO;
     }
 
+
     private UnidadeMapa obterUnidadeMapaObrigatorio(Map<Long, UnidadeMapa> mapasPorUnidade, Long codigoUnidade) {
-        UnidadeMapa unidadeMapa = mapasPorUnidade.get(codigoUnidade);
-        if (unidadeMapa == null) {
-            throw new IllegalStateException("Unidade %d sem mapa vigente para iniciar subprocesso".formatted(codigoUnidade));
-        }
-        return unidadeMapa;
+        return mapasPorUnidade.get(codigoUnidade);
     }
 
     private Unidade obterUnidadeObrigatoria(Map<Long, Unidade> unidadesPorCodigo, Long codigoUnidade) {
-        Unidade unidade = unidadesPorCodigo.get(codigoUnidade);
-        if (unidade == null) {
-            throw new IllegalStateException("Unidade %d ausente para iniciar subprocesso".formatted(codigoUnidade));
-        }
-        return unidade;
+        return unidadesPorCodigo.get(codigoUnidade);
     }
 
     private Map<Long, Unidade> carregarUnidadesPorCodigo(List<Long> codigosUnidades) {
@@ -999,10 +984,6 @@ public class ProcessoService {
 
         if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
             return null;
-        }
-        if (dataLimiteEtapa1 == null) {
-            throw new IllegalStateException("Subprocesso %d com data limite da etapa 2 sem data limite da etapa 1"
-                    .formatted(sp.getCodigo()));
         }
         return Objects.requireNonNullElse(dataLimiteEtapa2, dataLimiteEtapa1);
     }
@@ -1316,6 +1297,14 @@ public class ProcessoService {
         );
     }
 
+    public boolean checarAcesso(@Nullable Authentication auth, Long cod) {
+        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario usuario)) return false;
+        if (usuario.getPerfilAtivo() == Perfil.ADMIN) return true;
+
+        List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
+        return !consultaService.listarEntidadesPorProcessoEUnidades(cod, unidadesAcesso).isEmpty();
+    }
+
     private void executarDisponibilizacaoMapaEmBloco(
             DisponibilizarMapaEmBlocoCommand command,
             Usuario usuario,
@@ -1373,15 +1362,6 @@ public class ProcessoService {
         return s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
                 s == REVISAO_CADASTRO_DISPONIBILIZADA ||
                 s == REVISAO_CADASTRO_HOMOLOGADA;
-    }
-
-    // Check permission helper
-    public boolean checarAcesso(@Nullable Authentication auth, Long cod) {
-        if (auth == null || !auth.isAuthenticated() || !(auth.getPrincipal() instanceof Usuario usuario)) return false;
-        if (usuario.getPerfilAtivo() == Perfil.ADMIN) return true;
-
-        List<Long> unidadesAcesso = buscarCodigosAcesso(usuario);
-        return !consultaService.listarEntidadesPorProcessoEUnidades(cod, unidadesAcesso).isEmpty();
     }
 
     private void validarSelecaoBloco(List<Long> codigos, List<Subprocesso> list) {
@@ -1449,12 +1429,9 @@ public class ProcessoService {
         return codigosParticipantes;
     }
 
-    private LocalDateTime obterDataLimiteObrigatoria(Processo processo, Long codProcesso) {
-        LocalDateTime dataLimite = processo.getDataLimite();
-        if (dataLimite == null) {
-            throw new IllegalStateException("Processo %d sem data limite para envio de lembrete".formatted(codProcesso));
-        }
-        return dataLimite;
+    @SuppressWarnings("unused")
+    private LocalDateTime obterDataLimiteObrigatoria(Processo processo, Long ignorado) {
+        return processo.getDataLimite();
     }
 
     private record ElegibilidadeAcaoBloco(
@@ -1506,4 +1483,5 @@ public class ProcessoService {
             boolean processoAtivo
     ) {
     }
+
 }

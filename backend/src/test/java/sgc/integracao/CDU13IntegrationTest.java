@@ -387,12 +387,12 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(historico).hasSize(2);
 
         AnaliseHistoricoDto aceite = historico.getFirst();
-        assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(aceite.acao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO.name());
         assertThat(aceite.observacoes()).isEqualTo(obsAceite);
         assertThat(aceite.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
 
         AnaliseHistoricoDto devolucao = historico.get(1);
-        assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
+        assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO.name());
         assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
         assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
     }

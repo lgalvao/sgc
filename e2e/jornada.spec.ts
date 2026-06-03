@@ -320,6 +320,14 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await page.goto('/painel');
             await ProcessoHelpers.acessarDetalhesProcesso(page, descricaoMapeamento);
             await ProcessoHelpers.finalizarProcesso(page);
+
+            // Simula o usuário real ordenando a tabela no painel para localizar seu processo finalizado
+            // mesmo sob concorrência e paginação de múltiplos testes paralelos na suíte.
+            const cabecalhoSituacao = page.getByRole('columnheader', { name: 'Situação' }).first();
+            await expect(cabecalhoSituacao).toBeVisible();
+            await cabecalhoSituacao.click(); // Primeiro clique: ordena crescente (asc)
+            await cabecalhoSituacao.click(); // Segundo clique: ordena decrescente (desc) -> coloca 'Finalizado' no topo
+
             await ProcessoHelpers.verificarProcessoTabela(page, {
                 descricao: descricaoMapeamento,
                 situacao: 'Finalizado',

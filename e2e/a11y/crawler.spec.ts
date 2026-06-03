@@ -39,8 +39,8 @@ test.describe('Accessibility Crawler (Axe-core)', () => {
             
             await page.goto(route.path);
             
-            // Wait for some content to be visible to ensure vue has rendered
-            await page.waitForTimeout(1000); 
+            // Aguarda a renderização básica do Vue
+            await page.waitForLoadState('load');
 
             const accessibilityScanResults = await makeAxeBuilder().analyze();
             expect(accessibilityScanResults.violations).toEqual([]);

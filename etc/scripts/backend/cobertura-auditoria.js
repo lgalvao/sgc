@@ -10,16 +10,21 @@ const CAMINHO_PADRAO_OUTPUT = "backend-coverage-auditoria.md";
 
 function calcularScoreImpacto(classe) {
     // Fatores de risco: 
-    // 1. Complexidade total (mais lógica = mais risco)
-    // 2. Linhas não cobertas (lacuna direta)
-    // 3. Branches não cobertos (lógica condicional ignorada)
-    const pesoComplexidade = 2.0;
+    // Classes complexas com lacunas são os verdadeiros hotspots.
+    // Se não há lacunas (100% de cobertura), o score deve ser 0.
+    
+    if (classe.linhasPerdidas === 0 && classe.branchesPerdidos === 0) {
+        return 0;
+    }
+
     const pesoLinhas = 1.0;
     const pesoBranches = 1.5;
+    const fatorComplexidade = 1 + (classe.complexidade / 50); // Multiplicador baseado na complexidade
 
-    return (classe.complexidade * pesoComplexidade) +
-        (classe.linhasPerdidas * pesoLinhas) +
-        (classe.branchesPerdidos * pesoBranches);
+    const scoreLacunas = (classe.linhasPerdidas * pesoLinhas) +
+                         (classe.branchesPerdidos * pesoBranches);
+
+    return scoreLacunas * fatorComplexidade;
 }
 
 function obterPrioridade(score) {
@@ -43,9 +48,23 @@ async function gerarRelatorioMarkdown(dados, caminho) {
     md += `| Rank | Classe | Score | Complexidade | Linhas S/ Cobertura | Branches S/ Cobertura | Prioridade |\n`;
     md += `|------|--------|-------|--------------|---------------------|-----------------------|------------|\n`;
 
-    hotspots.forEach((h, i) => {
+    hotspots.slice(0, 10).forEach((h, i) => {
         const prioridade = h.scoreImpacto > 50 ? "P1" : (h.scoreImpacto > 20 ? "P2" : "P3");
         md += `| ${i + 1} | \`${h.nome}\` | ${h.scoreImpacto.toFixed(1)} | ${h.complexidade} | ${h.linhasPerdidas} | ${h.branchesPerdidos} | ${prioridade} |\n`;
+    });
+
+    md += `\n## Detalhamento das Lacunas dos Principais Hotspots\n\n`;
+    hotspots.slice(0, 10).forEach((h) => {
+        if (h.linhasPerdidas > 0 || h.branchesPerdidos > 0) {
+            md += `### \`${h.nome}\` (Risco: ${h.scoreImpacto.toFixed(1)})\n`;
+            if (h.linhasPerdidas > 0) {
+                md += `- **Linhas 100% descobertas:** ${h.linhasPerdidasLista.join(", ")}\n`;
+            }
+            if (h.branchesPerdidos > 0) {
+                md += `- **Branches sem cobertura total/parcial (linha(perdidos/total)):** ${h.branchesPerdidosLista.join(", ")}\n`;
+            }
+            md += `\n`;
+        }
     });
 
     md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;
@@ -103,7 +122,9 @@ async function main() {
                 nome: h.nome,
                 complexidade: h.complexidade,
                 linhasPerdidas: h.linhasPerdidas,
+                linhasPerdidasLista: h.linhasPerdidasLista,
                 branchesPerdidos: h.branchesPerdidos,
+                branchesPerdidosLista: h.branchesPerdidosLista,
                 scoreImpacto: h.scoreImpacto,
                 coberturaLinhas: h.linhasPercentual
             }))
@@ -125,6 +146,12 @@ async function main() {
             escreverLinha(`${i + 1}. ${pc.bold(h.nome)}`);
             escreverLinha(`   Impacto: ${pc.bold(h.scoreImpacto.toFixed(1))} | Prioridade: ${obterPrioridade(h.scoreImpacto)}`);
             escreverLinha(`   Lacunas: ${h.linhasPerdidas} linhas e ${h.branchesPerdidos} branches sem teste.`);
+            if (h.linhasPerdidas > 0) {
+                escreverLinha(`     ↳ Linhas sem cobertura: ${pc.dim(h.linhasPerdidasLista.join(", "))}`);
+            }
+            if (h.branchesPerdidos > 0) {
+                escreverLinha(`     ↳ Branches sem cobertura (linha(perdidos/total)): ${pc.dim(h.branchesPerdidosLista.join(", "))}`);
+            }
         });
 
         const caminhoRelatorio = resolverNaRaiz(outputArg);

@@ -52,14 +52,14 @@ public class AnaliseHistoricoService {
         return AnaliseHistoricoDto.builder()
                 .dataHora(analise.getDataHora())
                 .observacoes(analise.getObservacoes())
-                .acao(analise.getAcao())
+                .acao(analise.getAcao().name())
                 .acaoDescricao(formatarAcaoDescricao(analise.getAcao()))
                 .unidadeSigla(unidade.sigla())
                 .unidadeNome(unidade.nome())
                 .analistaUsuarioTitulo(usuarioTitulo)
                 .usuarioNome(usuarioNome)
                 .motivo(analise.getMotivo())
-                .tipo(analise.getTipo())
+                .tipo(analise.getTipo().name())
                 .build();
     }
 

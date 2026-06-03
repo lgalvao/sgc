@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import org.junit.jupiter.api.*;
+import sgc.processo.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 
@@ -11,6 +12,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("ProcessoResumoDto")
 class ProcessoResumoDtoTest {
+    private final ProcessoDtoMapper mapper = new ProcessoDtoMapper();
+
 
     @Test
     @DisplayName("deve mapear processo com participantes")
@@ -37,7 +40,7 @@ class ProcessoResumoDtoTest {
         processo.setCodigo(5L);
         processo.adicionarParticipantes(Set.of(unidade));
 
-        ProcessoResumoDto dto = ProcessoResumoDto.fromEntity(processo);
+        ProcessoResumoDto dto = mapper.paraResumo(processo);
 
         assertThat(dto.codigo()).isEqualTo(5L);
         assertThat(dto.tipo()).isEqualTo("MAPEAMENTO");

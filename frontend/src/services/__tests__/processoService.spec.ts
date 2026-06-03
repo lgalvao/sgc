@@ -42,13 +42,20 @@ describe('processoService', () => {
                 situacaoSubprocesso: 'ATIVO',
                 dataLimite: '2024-12-31',
                 mapaCodigo: 100,
-                localizacaoAtualCodigo: 1000
+                localizacaoAtualCodigo: 1000,
+                filhos: []
             },
             {
                 nome: 'Unidade 2',
                 sigla: 'U2',
                 codUnidade: 2,
-                codSubprocesso: 0,
+                codSubprocesso: null,
+                codUnidadeSuperior: null,
+                situacaoSubprocesso: null,
+                dataLimite: null,
+                mapaCodigo: null,
+                localizacaoAtualCodigo: null,
+                filhos: []
             }
         ];
 
@@ -67,7 +74,7 @@ describe('processoService', () => {
 
         expect(result[1].nome).toBe('Unidade 2');
         expect(result[1].sigla).toBe('U2');
-        expect(result[1].codSubprocesso).toBe(0);
+        expect(result[1].codSubprocesso).toBeNull();
         expect(result[1].dataLimite).toBeUndefined();
         expect(result[1].mapaCodigo).toBeUndefined();
         expect(result[1].localizacaoAtualCodigo).toBeUndefined();
