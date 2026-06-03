@@ -1,6 +1,6 @@
 import {computed, onActivated, onMounted, ref, type Ref} from "vue";
 import {useRouter} from "vue-router";
-import {useNotification} from "@/composables/useNotification";
+import {useNotification, type VarianteAlerta} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {TEXTOS} from "@/constants/textos";
 import {

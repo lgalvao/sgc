@@ -11,13 +11,12 @@ import {ehErroAxios, extrairErrosGenericos, normalizarErro, deveNotificarGlobalm
 import {logger} from "@/utils";
 import {listarUnidadesComEquipePropriaSelecionadas} from "@/views/processoCadastroUnidades";
 import type {Processo, Unidade} from "@/types/tipos";
-
-type FormFieldsRef = Record<string, unknown>;
-type ModalAcaoBlocoRef = Record<string, unknown>;
+import type {FormFieldsRef} from "@/composables/useProcessoCadastroCarga";
+import type {ModalUnidadesComEquipePropriaRef} from "@/composables/useProcessoMutacoes";
 
 interface TelaCadastroRefs {
-    formFieldsRef: Ref<FormFieldsRef>;
-    modalUnidadesComEquipePropriaRef: Ref<ModalAcaoBlocoRef | null>;
+    formFieldsRef: Ref<FormFieldsRef | null>;
+    modalUnidadesComEquipePropriaRef: Ref<ModalUnidadesComEquipePropriaRef | null>;
 }
 
 export function useProcessoCadastroTela({formFieldsRef, modalUnidadesComEquipePropriaRef}: TelaCadastroRefs) {

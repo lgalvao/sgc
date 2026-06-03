@@ -9,6 +9,13 @@ import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_PROCESSO} from "@/constants/textos-processo";
 import type {useProcessoForm} from "@/composables/useProcessoForm";
 
+export interface ModalUnidadesComEquipePropriaRef {
+    setErro: (erro: string | null) => void;
+    setProcessando: (processando: boolean) => void;
+    fechar: () => void;
+    abrir: () => void;
+}
+
 interface UseProcessoMutacoesParams {
     formulario: ReturnType<typeof useProcessoForm>;
     processoEditando: Ref<Processo | null>;
@@ -16,7 +23,7 @@ interface UseProcessoMutacoesParams {
     idsUnidadesComEquipePropriaSelecionadas: Ref<number[]>;
     mostrarModalConfirmacao: Ref<boolean>;
     mostrarModalRemocao: Ref<boolean>;
-    modalUnidadesComEquipePropriaRef: Ref<unknown>;
+    modalUnidadesComEquipePropriaRef: Ref<ModalUnidadesComEquipePropriaRef | null>;
     tratarErrosApi: (error: unknown, titulo: string, mensagemPadrao: string) => void;
 }
 

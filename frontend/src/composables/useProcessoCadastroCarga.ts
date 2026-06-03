@@ -8,16 +8,22 @@ import type {Processo, Unidade, TipoProcesso} from "@/types/tipos";
 import {SituacaoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {logger} from "@/utils";
+import {useNotification, type VarianteAlerta} from "@/composables/useNotification";
 import type {useProcessoForm} from "@/composables/useProcessoForm";
+
+export interface FormFieldsRef {
+    focarDescricao?: () => void;
+    focarPrimeiroErro?: () => void;
+}
 
 interface UseProcessoCargaParams {
     formulario: ReturnType<typeof useProcessoForm>;
-    formFieldsRef: Ref<unknown>;
+    formFieldsRef: Ref<FormFieldsRef | null>;
     unidades: Ref<Unidade[]>;
     isLoadingUnidades: Ref<boolean>;
     isLoadingData: Ref<boolean>;
     processoEditando: Ref<Processo | null>;
-    notify: (mensagem: string, variante?: unknown) => void;
+    notify: (mensagem: string, variante?: VarianteAlerta) => void;
 }
 
 export function useProcessoCadastroCarga({

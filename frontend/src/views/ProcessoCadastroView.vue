@@ -118,15 +118,11 @@ import AppAlert from "@/components/comum/AppAlert.vue";
 import {useProcessoCadastroTela} from "@/composables/useProcessoCadastroTela";
 import {TEXTOS} from "@/constants/textos";
 
-type ModalAcaoBlocoRef = {
-  abrir: () => void;
-  fechar: () => void;
-  setProcessando: (valor: boolean) => void;
-  setErro: (mensagem: string | null) => void;
-};
+import type {FormFieldsRef} from "@/composables/useProcessoCadastroCarga";
+import type {ModalUnidadesComEquipePropriaRef} from "@/composables/useProcessoMutacoes";
 
-const formFieldsRef = ref<InstanceType<typeof ProcessoFormFields> | null>(null);
-const modalUnidadesComEquipePropriaRef = ref<ModalAcaoBlocoRef | null>(null);
+const formFieldsRef = ref<FormFieldsRef | null>(null);
+const modalUnidadesComEquipePropriaRef = ref<ModalUnidadesComEquipePropriaRef | null>(null);
 const {
   anyLoading,
   buscarUnidadesParaProcesso,

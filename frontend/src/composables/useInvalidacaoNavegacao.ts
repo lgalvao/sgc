@@ -75,7 +75,15 @@ export function useInvalidacaoNavegacao() {
         subprocessoStore.limparContextoAtual();
     }
 
-
+    function resetarEstadoSessao(): void {
+        painelStore.resetar();
+        subprocessoStore.resetar();
+        void invalidarPainel();
+        void invalidarProcesso();
+        invalidarMapa();
+        void invalidarUnidade();
+        void invalidarDiagnostico();
+    }
 
     return {
         atualizarDadosOrganizacionais,
@@ -86,6 +94,6 @@ export function useInvalidacaoNavegacao() {
         atualizarFluxoSubprocessoEProcesso,
         atualizarFluxoSubprocessoEPainel,
         limparEstadoSubprocessoAtual,
-
+        resetarEstadoSessao,
     };
 }

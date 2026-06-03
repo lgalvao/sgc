@@ -42,7 +42,7 @@ export const usePerfilStore = defineStore("perfil", () => {
     function resetarEstadoAplicacao() {
         painelStore.resetar();
         subprocessoStore.resetar();
-        queryCache.clear();
+        queryCache.invalidateQueries();
     }
 
     const unidadeAtual = computed(() =>
