@@ -16,7 +16,9 @@ import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.alerta.model.*;
 import sgc.comum.erros.*;
+import sgc.feedback.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -27,6 +29,7 @@ import sgc.processo.service.*;
 import sgc.subprocesso.model.*;
 
 import javax.sql.*;
+import java.nio.file.*;
 import java.sql.*;
 import java.time.*;
 import java.util.*;
@@ -256,6 +259,97 @@ public class E2eController {
     @Transactional
     public ProcessoResumoDto criarProcessoRevisao(@RequestBody ProcessoFixtureRequest request) {
         return processoResumoFixture(executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.REVISAO)));
+    }
+
+    /**
+     * Cria um processo de diagnóstico via API para testes E2E.
+     */
+    @PostMapping("/fixtures/processo-diagnostico")
+    @Transactional
+    public ProcessoResumoDto criarProcessoDiagnostico(@RequestBody ProcessoFixtureRequest request) {
+        return processoResumoFixture(executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.DIAGNOSTICO)));
+    }
+
+    @PostMapping("/fixtures/notificacao-email")
+    @Transactional
+    public NotificacaoFixtureResponse criarNotificacaoEmailFixture(@RequestBody NotificacaoFixtureRequest request) {
+        Long codigo = consultarProximoCodigo("notificacao_email");
+        LocalDateTime agora = LocalDateTime.now();
+        String assunto = request.assunto() != null && !request.assunto().isBlank()
+                ? request.assunto()
+                : "SGC: Notificação fixture " + codigo;
+        String corpoHtml = request.corpoHtml() != null && !request.corpoHtml().isBlank()
+                ? request.corpoHtml()
+                : "<p>Conteúdo fixture " + codigo + "</p>";
+        String destinatario = request.destinatario() != null && !request.destinatario().isBlank()
+                ? request.destinatario()
+                : "fixture" + codigo + "@tre-pe.jus.br";
+        String situacao = request.situacao() != null ? request.situacao() : SituacaoNotificacao.ENVIADO.name();
+        String tipo = request.tipoNotificacao() != null ? request.tipoNotificacao() : TipoNotificacao.LEMBRETE_PRAZO.name();
+        String chaveIdempotencia = "e2e:notificacao:" + codigo + ":" + UUID.randomUUID();
+
+        jdbcTemplate.update("""
+                INSERT INTO sgc.notificacao_email (
+                    codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, unidade_destino_sigla,
+                    destinatario, assunto, corpo_html, situacao, tentativas, proxima_tentativa_em,
+                    data_hora_criacao, data_hora_envio, ultimo_erro, chave_idempotencia
+                ) VALUES (?, NULL, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                codigo,
+                tipo,
+                request.unidadeDestinoSigla(),
+                destinatario,
+                assunto,
+                corpoHtml,
+                situacao,
+                request.tentativas() != null ? request.tentativas() : 0,
+                SituacaoNotificacao.FALHA_TEMPORARIA.name().equals(situacao) ? agora.plusMinutes(10) : null,
+                agora.minusMinutes(5),
+                SituacaoNotificacao.ENVIADO.name().equals(situacao) ? agora.minusMinutes(1) : null,
+                request.ultimoErro(),
+                chaveIdempotencia
+        );
+
+        return new NotificacaoFixtureResponse(codigo, destinatario, assunto, tipo, situacao);
+    }
+
+    @PostMapping("/fixtures/feedback")
+    @Transactional
+    public FeedbackFixtureResponse criarFeedbackFixture(@RequestBody FeedbackFixtureRequest request) {
+        UUID codigo = UUID.randomUUID();
+        OffsetDateTime agora = OffsetDateTime.now();
+        String nota = request.nota() != null && !request.nota().isBlank()
+                ? request.nota()
+                : "<p>Feedback fixture " + codigo + "</p>";
+        String rota = request.rota() != null && !request.rota().isBlank()
+                ? request.rota()
+                : "/painel";
+        String metadataJson = request.metadataJson();
+        String caminhoScreenshot = null;
+
+        if (Boolean.TRUE.equals(request.comScreenshot())) {
+            caminhoScreenshot = criarScreenshotFixture(codigo);
+        }
+
+        jdbcTemplate.update("""
+                INSERT INTO sgc.feedback (
+                    id, tipo, nota, metadata_json, caminho_screenshot,
+                    usuario_id, usuario_nome, enviado_em, rota, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                codigo,
+                request.tipo() != null ? request.tipo() : FeedbackTipo.BUG.name(),
+                nota,
+                metadataJson,
+                caminhoScreenshot,
+                request.usuarioCodigo() != null ? request.usuarioCodigo() : "191919",
+                request.usuarioNome() != null ? request.usuarioNome() : "Administrador Fixture",
+                agora,
+                rota,
+                FeedbackStatus.NOVO.name()
+        );
+
+        return new FeedbackFixtureResponse(codigo.toString(), rota, caminhoScreenshot != null);
     }
 
     /**
@@ -744,6 +838,28 @@ public class E2eController {
         return codigo;
     }
 
+    private Long consultarProximoCodigo(String tabela) {
+        Long proximo = jdbcTemplate.queryForObject("SELECT COALESCE(MAX(codigo), 0) + 1 FROM sgc." + tabela, Long.class);
+        if (proximo == null) {
+            throw new IllegalStateException("Fixture E2E não encontrou próximo codigo para tabela: " + tabela);
+        }
+        return proximo;
+    }
+
+    private String criarScreenshotFixture(UUID codigo) {
+        try {
+            Path diretorio = Path.of("./build/e2e-feedback-screenshots").toAbsolutePath().normalize();
+            Files.createDirectories(diretorio);
+            Path arquivo = diretorio.resolve("fixture-" + codigo + ".png");
+            byte[] png = Base64.getDecoder().decode(
+                    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9p0MyoQAAAAASUVORK5CYII=");
+            Files.write(arquivo, png);
+            return arquivo.toString();
+        } catch (Exception e) {
+            throw new IllegalStateException("Falha ao criar screenshot fixture", e);
+        }
+    }
+
     private Unidade obterUnidadeSuperiorObrigatoria(Unidade unidade) {
         Unidade unidadeSuperior = unidade.getUnidadeSuperior();
         if (unidadeSuperior == null) {
@@ -780,5 +896,44 @@ public class E2eController {
         public int resolverDiasLimite() {
             return diasLimite != null ? diasLimite : 30;
         }
+    }
+
+    public record NotificacaoFixtureRequest(
+            String destinatario,
+            String assunto,
+            String corpoHtml,
+            String tipoNotificacao,
+            String situacao,
+            String unidadeDestinoSigla,
+            Integer tentativas,
+            String ultimoErro
+    ) {
+    }
+
+    public record NotificacaoFixtureResponse(
+            Long codigo,
+            String destinatario,
+            String assunto,
+            String tipoNotificacao,
+            String situacao
+    ) {
+    }
+
+    public record FeedbackFixtureRequest(
+            String tipo,
+            String nota,
+            String rota,
+            String metadataJson,
+            Boolean comScreenshot,
+            String usuarioCodigo,
+            String usuarioNome
+    ) {
+    }
+
+    public record FeedbackFixtureResponse(
+            String codigo,
+            String rota,
+            boolean screenshotDisponivel
+    ) {
     }
 }

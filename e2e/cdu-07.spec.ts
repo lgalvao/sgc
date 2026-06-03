@@ -374,7 +374,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(page.getByTestId('card-subprocesso-diagnostico')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-diagnostico')).toContainText('Autoavaliação');
         await expect(page.getByTestId('card-subprocesso-ocupacoes')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-ocupacoes')).toContainText('Ocupações críticas');
+        await expect(page.getByTestId('card-subprocesso-ocupacoes')).toContainText('Situação de capacitação');
         await expect(page.getByTestId('card-subprocesso-monitoramento')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-monitoramento')).toContainText('Monitoramento');
     });

@@ -9,6 +9,7 @@ import org.springframework.test.context.*;
 import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.setup.*;
 import org.springframework.web.context.*;
+import sgc.feedback.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 import tools.jackson.databind.*;
@@ -34,6 +35,8 @@ class E2eFixtureEndpointTest {
     private SubprocessoRepo subprocessoRepo;
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+    @Autowired
+    private FeedbackRepo feedbackRepo;
 
     private MockMvc mockMvc;
 
@@ -230,5 +233,75 @@ class E2eFixtureEndpointTest {
                 .get()
                 .extracting(Movimentacao::getDescricao)
                 .isEqualTo("Mapa homologado via fixture");
+    }
+
+    @Test
+    @DisplayName("Deve permitir criar processo de diagnóstico via fixture")
+    void devePermitirCriarProcessoDiagnosticoViaFixture() throws Exception {
+        E2eController.ProcessoFixtureRequest request =
+                new E2eController.ProcessoFixtureRequest(
+                        "Processo fixture diagnóstico", "ASSESSORIA_12", true, 30);
+
+        mockMvc.perform(post("/e2e/fixtures/processo-diagnostico")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("Processo fixture diagnóstico"))
+                .andExpect(jsonPath("$.tipo").value("DIAGNOSTICO"))
+                .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
+    }
+
+    @Test
+    @DisplayName("Deve permitir criar notificação fixture com falha definitiva")
+    void devePermitirCriarNotificacaoFixture() throws Exception {
+        E2eController.NotificacaoFixtureRequest request =
+                new E2eController.NotificacaoFixtureRequest(
+                        "falha@tre-pe.jus.br",
+                        "SGC: Notificação fixture",
+                        "<p>Preview</p>",
+                        "DIAGNOSTICO_CONSENSO_APROVADO",
+                        "FALHA_DEFINITIVA",
+                        "ASSESSORIA_12",
+                        3,
+                        "SMTP indisponível");
+
+        mockMvc.perform(post("/e2e/fixtures/notificacao-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.destinatario").value("falha@tre-pe.jus.br"))
+                .andExpect(jsonPath("$.tipoNotificacao").value("DIAGNOSTICO_CONSENSO_APROVADO"))
+                .andExpect(jsonPath("$.situacao").value("FALHA_DEFINITIVA"));
+    }
+
+    @Test
+    @DisplayName("Deve permitir criar feedback fixture com screenshot")
+    void devePermitirCriarFeedbackFixture() throws Exception {
+        E2eController.FeedbackFixtureRequest request =
+                new E2eController.FeedbackFixtureRequest(
+                        "SUGESTAO",
+                        "<p>Feedback fixture</p>",
+                        "/painel",
+                        "{\"rotaCaminho\":\"/painel\"}",
+                        true,
+                        "191919",
+                        "Administrador 1");
+
+        String conteudo = mockMvc.perform(post("/e2e/fixtures/feedback")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.rota").value("/painel"))
+                .andExpect(jsonPath("$.screenshotDisponivel").value(true))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String codigo = objectMapper.readTree(conteudo).get("codigo").asText();
+        assertThat(feedbackRepo.findById(java.util.UUID.fromString(codigo)))
+                .isPresent()
+                .get()
+                .extracting(FeedbackRegistro::getTipo)
+                .isEqualTo(FeedbackTipo.SUGESTAO);
     }
 }

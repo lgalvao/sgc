@@ -32,6 +32,7 @@
           v-else
           :fields="campos"
           :items="feedbacks"
+          data-testid="tbl-feedbacks"
           hover
           responsive
           small
@@ -106,6 +107,7 @@
               <button
                   aria-label="Ampliar captura de tela"
                   class="btn p-0 border-0 d-inline-block"
+                  data-testid="btn-feedback-ampliar-captura"
                   title="Clique para ampliar"
                   type="button"
                   @click="abrirImagemAmpliada(feedbackSelecionado.codigo)"
@@ -114,6 +116,7 @@
                     :src="obterUrlScreenshot(feedbackSelecionado.codigo)"
                     alt="Captura de tela do feedback"
                     class="img-fluid border rounded feedback-thumbnail shadow-sm"
+                    data-testid="img-feedback-captura"
                 />
               </button>
             </div>

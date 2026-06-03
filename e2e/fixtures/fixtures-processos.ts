@@ -70,7 +70,9 @@ export async function criarProcessoFixture(
     const tipo = options.tipo ?? 'MAPEAMENTO';
     const endpoint = tipo === 'MAPEAMENTO'
         ? '/e2e/fixtures/processo-mapeamento'
-        : '/e2e/fixtures/processo-revisao';
+        : tipo === 'REVISAO'
+            ? '/e2e/fixtures/processo-revisao'
+            : '/e2e/fixtures/processo-diagnostico';
 
     const response = await request.post(endpoint, {
         data: {
