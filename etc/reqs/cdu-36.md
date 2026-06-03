@@ -17,7 +17,7 @@ Permite a geração dos mapas de competências vigentes, incluindo Competências
    Exceção visual desta tela: unidades superiores não elegíveis (como unidades `INTERMEDIARIA`) permanecem em estado
    visual **indeterminado** sempre que houver ao menos uma filha selecionada, mesmo quando todas as filhas elegíveis
    daquela subárvore estiverem selecionadas. Esta variação vale apenas para o relatório e não altera o comportamento
-   padrão documentado em `design/arvore-unidades.md`.
+   padrão documentado em `design/arvoreunidades.md`.
 
 4. O usuário escolhe as unidades na árvore para as quais quer gerar o relatório e aciona o botão `Gerar`.
 
