@@ -90,6 +90,32 @@
             small
             striped
         >
+          <template #cell(descricao)="{ item }">
+            <div class="d-flex flex-column gap-2">
+              <span>{{ item.descricao }}</span>
+              <div v-if="item.atividades.length > 0" class="small">
+                <BButton
+                    :data-testid="`toggle-atividades-${item.competenciaCodigo}`"
+                    size="sm"
+                    variant="link"
+                    class="p-0 text-decoration-none"
+                    @click="alternarDetalhesCompetencia(item.competenciaCodigo)"
+                >
+                  {{ detalhesCompetenciaAbertos[item.competenciaCodigo] ? 'Ocultar' : 'Atividade e conhecimentos' }}
+                </BButton>
+                <div v-if="detalhesCompetenciaAbertos[item.competenciaCodigo]" class="mt-2">
+                  <ul class="mb-0 ps-3">
+                    <li v-for="atividade in item.atividades" :key="atividade.codigo" class="mb-1">
+                      <strong>{{ atividade.descricao }}</strong>
+                      <div class="text-muted">
+                        {{ formatarConhecimentos(atividade.conhecimentos) }}
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </template>
           <template #cell(importancia)="{ item }">
             <BFormSelect
                 v-if="podeEditar"
@@ -266,14 +292,14 @@ import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import {CHAVE_DIAGNOSTICO, useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
+import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {useEquipeDiagnostico} from '@/composables/useEquipeDiagnostico';
 import {impossibilitarAvaliacao} from '@/services/diagnosticoService';
-import {usePerfilStore} from '@/stores/perfil';
 import {TEXTOS} from '@/constants/textos';
+import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
 import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
-import {Perfil} from '@/types/tipos';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -281,10 +307,10 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const perfilStore = usePerfilStore();
 const cache = useQueryCache();
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
+const {queryContextoEdicao, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
 
 const {
   competenciasLocais,
@@ -306,12 +332,7 @@ const {
 
 const {itens: itensEquipe, pendentes} = useEquipeDiagnostico(props.codSubprocesso);
 
-const ehChefe = computed(
-  () =>
-    perfilStore.perfilSelecionado === Perfil.CHEFE ||
-    perfilStore.perfilSelecionado === Perfil.GESTOR ||
-    perfilStore.perfilSelecionado === Perfil.ADMIN,
-);
+const ehChefe = computed(() => podeCriarConsenso.value);
 
 const ehAutoavaliacaoConcluida = computed(() => situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA');
 const ehConsensoCriado = computed(() => situacaoServidor.value === 'CONSENSO_CRIADO');
@@ -328,6 +349,7 @@ const alertaSucesso = ref('');
 const modalConcluirAberto = ref(false);
 const modalAprovarAberto = ref(false);
 const modalImpossibilitarAberto = ref(false);
+const detalhesCompetenciaAbertos = ref<Record<number, boolean>>({});
 const servidorParaImpossibilitar = ref<ItemEquipeDiagnostico | null>(null);
 const justificativaImpossibilidade = ref('');
 const erroJustificativa = ref('');
@@ -410,6 +432,10 @@ function voltar() {
   void router.back();
 }
 
+function alternarDetalhesCompetencia(competenciaCodigo: number) {
+  detalhesCompetenciaAbertos.value[competenciaCodigo] = !detalhesCompetenciaAbertos.value[competenciaCodigo];
+}
+
 function podeImpossibilitar(situacao: SituacaoAvaliacaoServidor) {
   return (
     situacao === 'AUTOAVALIACAO_NAO_REALIZADA' ||
@@ -461,6 +487,13 @@ function formatarNota(valor: number | null): string {
   return String(valor);
 }
 
+function formatarConhecimentos(conhecimentos: Conhecimento[]): string {
+  if (conhecimentos.length === 0) {
+    return '-';
+  }
+  return conhecimentos.map((conhecimento) => conhecimento.descricao).join(', ');
+}
+
 const colunas = [
   {key: 'competenciaCodigo', label: 'Codigo'},
   {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
@@ -469,12 +502,16 @@ const colunas = [
 ];
 
 const competenciasComDescricao = computed(() => {
+  const mapaAtividades = new Map<number, Atividade[]>(
+    (queryContextoEdicao.data.value?.mapa.competencias ?? []).map((competencia) => [competencia.codigo, competencia.atividades ?? []]),
+  );
   const mapa = Object.fromEntries(
     (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
   );
   return competenciasLocais.value.map((c) => ({
     ...c,
     descricao: mapa[c.competenciaCodigo] ?? `Competencia ${c.competenciaCodigo}`,
+    atividades: mapaAtividades.get(c.competenciaCodigo) ?? [],
   }));
 });
 

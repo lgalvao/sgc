@@ -69,10 +69,10 @@ export function calcularAssinaturaCadastro(atividades: Atividade[]): string {
         const descricao = a.descricao ? a.descricao.trim() : "";
         const conhecimentos = (a.conhecimentos ? a.conhecimentos : [])
             .map((c) => c.descricao ? c.descricao.trim() : "")
-            .sort()
+            .toSorted()
             .join("\u0001");
         return descricao + "\u0002" + conhecimentos;
     })
-        .sort()
+        .toSorted()
         .join("\u0003");
 }

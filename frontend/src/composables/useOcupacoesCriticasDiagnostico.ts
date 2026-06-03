@@ -61,10 +61,10 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
     });
 
     // Autosave com debounce nativo
-    let _timer: ReturnType<typeof setTimeout> | null = null;
-    const _dispararSalvamento = () => {
-        if (_timer !== null) clearTimeout(_timer);
-        _timer = setTimeout(() => { mutacaoSalvar.mutate(ocupacoesLocais.value); }, 800);
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const dispararSalvamento = () => {
+        if (timer !== null) clearTimeout(timer);
+        timer = setTimeout(() => { mutacaoSalvar.mutate(ocupacoesLocais.value); }, 800);
     };
 
     function atualizarCapacitacao(
@@ -79,7 +79,7 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
         item.situacaoCapacitacao = situacao;
         salvandoAutomaticamente.value = true;
         autoguardado.value = false;
-        _dispararSalvamento();
+        dispararSalvamento();
     }
 
     const servidores = computed(() => query.data.value?.servidores ?? []);

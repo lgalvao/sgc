@@ -7,7 +7,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/AutoavaliacaoDiagnosticoView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codSubprocesso: Number(route.params.codSubprocesso),
-            siglaUnidade: route.params.siglaUnidade as string,
+            siglaUnidade: String(route.params.siglaUnidade),
         }),
         meta: {title: 'Autoavaliação - Diagnóstico'},
     },
@@ -17,7 +17,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/OcupacoesCriticasDiagnosticoView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codSubprocesso: Number(route.params.codSubprocesso),
-            siglaUnidade: route.params.siglaUnidade as string,
+            siglaUnidade: String(route.params.siglaUnidade),
         }),
         meta: {title: 'Situação de Capacitação - Diagnóstico'},
     },
@@ -27,7 +27,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/MonitoramentoDiagnosticoView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codSubprocesso: Number(route.params.codSubprocesso),
-            siglaUnidade: route.params.siglaUnidade as string,
+            siglaUnidade: String(route.params.siglaUnidade),
         }),
         meta: {title: 'Monitoramento - Diagnóstico'},
     },
@@ -37,8 +37,8 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/ConsensoDiagnosticoView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codSubprocesso: Number(route.params.codSubprocesso),
-            siglaUnidade: route.params.siglaUnidade as string,
-            servidorTitulo: route.params.servidorTitulo as string,
+            siglaUnidade: String(route.params.siglaUnidade),
+            servidorTitulo: String(route.params.servidorTitulo),
         }),
         meta: {title: 'Avaliação de Consenso - Diagnóstico'},
     },
@@ -48,7 +48,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/DiagnosticoUnidadeView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codSubprocesso: Number(route.params.codSubprocesso),
-            siglaUnidade: route.params.siglaUnidade as string,
+            siglaUnidade: String(route.params.siglaUnidade),
         }),
         meta: {title: 'Análise da Unidade - Diagnóstico'},
     },

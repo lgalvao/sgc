@@ -32,7 +32,7 @@
       />
 
       <!-- Badge de autosave -->
-      <div class="mb-3 text-muted small d-flex align-items-center gap-2">
+      <div v-if="ehChefe" class="mb-3 text-muted small d-flex align-items-center gap-2">
         <template v-if="salvandoAutomaticamente">
           <BSpinner small variant="secondary"/>
           {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
@@ -61,24 +61,23 @@
           <span class="text-muted small ms-2">{{ TEXTOS.diagnostico.ESCALA_HINT }}</span>
         </BCardHeader>
         <BTable
-            :fields="colunas"
+            v-if="ehChefe"
+            :fields="colunasChefia"
             :items="competenciasDetalhadasComDescricao"
             hover
             responsive
             small
             striped
         >
-          <!-- Colunas do servidor — somente leitura -->
           <template #cell(autoimportancia)="{ item }">
             <span>{{ formatarNota(item.autoimportancia) }}</span>
           </template>
           <template #cell(autodominio)="{ item }">
             <span>{{ formatarNota(item.autodominio) }}</span>
           </template>
-          <!-- Colunas da chefia — editáveis quando não aprovado -->
           <template #cell(chefiaImportancia)="{ item }">
             <BFormSelect
-                v-if="ehChefe && !ehConsensoAprovado"
+                v-if="!ehConsensoAprovado"
                 :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
                 :model-value="item.chefiaImportancia"
                 :options="opcoesNota"
@@ -89,7 +88,7 @@
           </template>
           <template #cell(chefiaDominio)="{ item }">
             <BFormSelect
-                v-if="ehChefe && !ehConsensoAprovado"
+                v-if="!ehConsensoAprovado"
                 :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
                 :model-value="item.chefiaDominio"
                 :options="opcoesNota"
@@ -98,10 +97,9 @@
             />
             <span v-else>{{ formatarNota(item.chefiaDominio) }}</span>
           </template>
-          <!-- Colunas de consenso — editáveis quando não aprovado -->
           <template #cell(consensoImportancia)="{ item }">
             <BFormSelect
-                v-if="ehChefe && !ehConsensoAprovado"
+                v-if="!ehConsensoAprovado"
                 :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
                 :model-value="item.consensoImportancia"
                 :options="opcoesNota"
@@ -112,7 +110,7 @@
           </template>
           <template #cell(consensoDominio)="{ item }">
             <BFormSelect
-                v-if="ehChefe && !ehConsensoAprovado"
+                v-if="!ehConsensoAprovado"
                 :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
                 :model-value="item.consensoDominio"
                 :options="opcoesNota"
@@ -120,6 +118,22 @@
                 @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'dominio', valor: v as number | null})"
             />
             <span v-else>{{ formatarNota(item.consensoDominio) }}</span>
+          </template>
+        </BTable>
+        <BTable
+            v-else
+            :fields="colunasServidor"
+            :items="competenciasSimplesComDescricao"
+            hover
+            responsive
+            small
+            striped
+        >
+          <template #cell(importancia)="{ item }">
+            <span>{{ formatarNota(item.importancia) }}</span>
+          </template>
+          <template #cell(dominio)="{ item }">
+            <span>{{ formatarNota(item.dominio) }}</span>
           </template>
         </BTable>
       </BCard>
@@ -157,9 +171,8 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
+import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
-import {usePerfilStore} from '@/stores/perfil';
-import {Perfil} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
 import type {SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
@@ -170,9 +183,9 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const perfilStore = usePerfilStore();
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
+const {podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
 const {
   competenciasLocais,
   competenciasDetalhadasLocais,
@@ -188,12 +201,7 @@ const {
 } = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
 
 // « Perfil »
-const ehChefe = computed(
-  () =>
-    perfilStore.perfilSelecionado === Perfil.CHEFE ||
-    perfilStore.perfilSelecionado === Perfil.GESTOR ||
-    perfilStore.perfilSelecionado === Perfil.ADMIN,
-);
+const ehChefe = computed(() => podeCriarConsenso.value);
 
 // « Alertas »
 const erroMensagem = ref('');
@@ -257,6 +265,16 @@ const competenciasDetalhadasComDescricao = computed(() => {
   }));
 });
 
+const competenciasSimplesComDescricao = computed(() => {
+  const mapaDesc = Object.fromEntries(
+    (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
+  );
+  return competenciasLocais.value.map((c) => ({
+    ...c,
+    descricao: mapaDesc[c.competenciaCodigo] ?? `Competência ${c.competenciaCodigo}`,
+  }));
+});
+
 const opcoesNota = [
   {value: 0, text: 'NA'},
   {value: 1, text: '1'},
@@ -267,7 +285,13 @@ const opcoesNota = [
   {value: 6, text: '6'},
 ];
 
-const colunas = [
+const colunasServidor = [
+  {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
+  {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
+  {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
+];
+
+const colunasChefia = [
   {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
   {key: 'autoimportancia', label: 'Servidor: Importância'},
   {key: 'autodominio', label: 'Servidor: Domínio'},

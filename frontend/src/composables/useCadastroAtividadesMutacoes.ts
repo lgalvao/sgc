@@ -78,9 +78,11 @@ export function useCadastroAtividadesMutacoes({
     } = useConhecimentoMutacoes(codigoSubprocesso, executarAtualizacao, prepararRemocao);
 
     async function adicionarAtividade(): Promise<boolean> {
-        if (!codMapa.value || !codigoSubprocesso.value) return false;
+        const codMapaVal = codMapa.value;
+        const codSubprocessoVal = codigoSubprocesso.value;
+        if (!codMapaVal || !codSubprocessoVal) return false;
         const resultado = await executarOperacaoAtividade(
-            () => adicionarAtividadeAction(codigoSubprocesso.value!, codMapa.value!),
+            () => adicionarAtividadeAction(codSubprocessoVal, codMapaVal),
             () => {
                 erroNovaAtividade.value = ultimoErro.value?.mensagem || TEXTOS.atividades.ERRO_ADICIONAR;
             },
@@ -97,10 +99,11 @@ export function useCadastroAtividadesMutacoes({
         loadingRemocao.value = true;
         try {
             const resultado = await executarOperacaoAtividade(async () => {
-                return tipo === "atividade"
-                    ? await atividadeService.excluirAtividade(atividadeCodigo)
-                    : await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo!);
-            }, (erro) => notify(ultimoErro.value?.mensagem || (erro as Error).message || TEXTOS.atividades.ERRO_REMOVER, "danger"));
+                if (tipo === "atividade") {
+                    return await atividadeService.excluirAtividade(atividadeCodigo);
+                }
+                return await atividadeService.excluirConhecimento(atividadeCodigo, conhecimentoCodigo ?? 0);
+            }, (erro) => notify(ultimoErro.value?.mensagem || (erro instanceof Error ? erro.message : String(erro)) || TEXTOS.atividades.ERRO_REMOVER, "danger"));
             if (resultado.sucesso && resultado.resultado) {
                 processarRespostaLocal(resultado.resultado);
                 dadosRemocao.value = null;

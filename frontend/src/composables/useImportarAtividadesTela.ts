@@ -137,9 +137,10 @@ export function useImportarAtividadesTela(params: {
         unidadeSelecionada.value = unidadePu;
         limparErroImportacao();
         atividadesParaImportar.value = [];
-        if (unidadePu && unidadePu.codSubprocesso !== null) {
+        const codSubprocesso = unidadePu?.codSubprocesso;
+        if (codSubprocesso) {
             await executarComTratamentoErro(
-                () => subprocessoService.listarAtividadesParaImportacao(unidadePu.codSubprocesso!),
+                () => subprocessoService.listarAtividadesParaImportacao(codSubprocesso),
                 (atividadesDaOutraUnidade) => { atividadesParaImportar.value = [...atividadesDaOutraUnidade]; },
             );
         }
@@ -152,15 +153,18 @@ export function useImportarAtividadesTela(params: {
         }
 
         limparErroImportacao();
-        if (!codSubprocessoDestino.value || !unidadeSelecionada.value || unidadeSelecionada.value.codSubprocesso === null) return;
+        const codSubDestino = codSubprocessoDestino.value;
+        const codSubOrigem = unidadeSelecionada.value?.codSubprocesso;
+
+        if (!codSubDestino || !codSubOrigem) return;
 
         const idsAtividades = atividadesSelecionadas.value.map((a) => a.codigo);
         importando.value = true;
         try {
             resultadoImportacao.value = await executarComTratamentoDeErros(
                 () => subprocessoService.importarAtividades(
-                    codSubprocessoDestino.value!,
-                    unidadeSelecionada.value!.codSubprocesso!,
+                    codSubDestino,
+                    codSubOrigem,
                     idsAtividades,
                 ),
                 (erro) => { registrarErroImportacao(erro.mensagem); },

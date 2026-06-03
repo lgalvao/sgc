@@ -91,7 +91,11 @@ export function useArvoreElegibilidadeQuery(
     const perfilStore = usePerfilStore();
     return useQuery<Unidade[], Error, Unidade[]>({
         key: () => [...CHAVE_QUERY_ARVORE_ELEGIBILIDADE, toValue(tipoProcesso) ?? "nenhuma", String(toValue(codProcesso) ?? "novo")],
-        query: () => buscarArvoreComElegibilidade(toValue(tipoProcesso)!, toValue(codProcesso)),
+        query: () => {
+            const tipo = toValue(tipoProcesso);
+            if (!tipo) return Promise.resolve([]);
+            return buscarArvoreComElegibilidade(tipo, toValue(codProcesso));
+        },
         enabled: () => !!toValue(tipoProcesso) && !!perfilStore.perfilSelecionado,
         initialData: () => [],
         staleTime: Infinity,

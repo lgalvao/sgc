@@ -78,12 +78,14 @@ async function aoPressionarTeclaUsuario(evento: KeyboardEvent) {
       evento.preventDefault();
       await destacarUsuario(calcularProximoIndice(-1));
       break;
-    case "Enter":
-      if (indiceUsuarioDestacado.value >= 0) {
+    case "Enter": {
+      const usuario = usuariosEncontrados.value[indiceUsuarioDestacado.value];
+      if (usuario) {
         evento.preventDefault();
-        selecionarUsuario(usuariosEncontrados.value[indiceUsuarioDestacado.value]!);
+        selecionarUsuario(usuario);
       }
       break;
+    }
     case "Escape":
       mostrarResultadosUsuarios.value = false;
       break;

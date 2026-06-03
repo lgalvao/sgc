@@ -8,7 +8,6 @@ import type {Processo, Unidade, TipoProcesso} from "@/types/tipos";
 import {SituacaoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {logger} from "@/utils";
-import {useNotification, type VarianteAlerta} from "@/composables/useNotification";
 import type {useProcessoForm} from "@/composables/useProcessoForm";
 
 export interface FormFieldsRef {

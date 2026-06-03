@@ -16,7 +16,6 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 declare global {
     var pinia: ReturnType<typeof createPinia>;
-    var __pinia__: ReturnType<typeof createPinia>;
 }
 
 const app = createApp(App);
@@ -40,7 +39,7 @@ app.config.errorHandler = (err) => {
     if (normalizado.tipo === 'naoAutorizado') return;
     if (TIPOS_SEM_SOLUCAO.has(normalizado.tipo)) {
         logger.error('[errorHandler]', normalizado.mensagem, err);
-        void router.push('/erro').catch(() => {/* navegação já em /erro */});
+        window.location.assign('/erro');
         return;
     }
     // Erro recuperável não tratado localmente — relança para não suprimir silenciosamente
@@ -63,5 +62,3 @@ if (import.meta.env.VITE_FEEDBACK_WIDGET === 'true') {
 }
 
 app.mount("#app");
-
-globalThis.__pinia__ = pinia;

@@ -229,8 +229,6 @@ const {
   mostrarModalCriarNovaCompetencia,
   mostrarModalExcluirCompetencia,
   competenciaParaExcluir,
-  existeCompetenciaSemAtividade,
-  aplicarErroNormalizado,
   abrirModalAceitar,
   abrirModalDevolucao,
   abrirModalDisponibilizar,

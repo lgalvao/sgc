@@ -290,6 +290,7 @@ import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
 import {useQueryCache} from '@pinia/colada';
+import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {impossibilitarAvaliacao} from '@/services/diagnosticoService';
 import {
   BBadge,
@@ -312,8 +313,6 @@ import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
-import {usePerfilStore} from '@/stores/perfil';
-import {Perfil} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
@@ -323,8 +322,13 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const perfilStore = usePerfilStore();
 const cache = useQueryCache();
+const {
+  podeCriarConsenso,
+  habilitarValidarDiagnostico,
+  habilitarDevolverDiagnostico,
+  habilitarHomologarDiagnostico,
+} = useDiagnosticoPermissoes(props.codSubprocesso);
 
 const {
   unidade,
@@ -365,28 +369,10 @@ const erroJustificativaImpossibilidade = ref('');
 const impossibilitando = ref(false);
 
 // « Perfil e permissões »
-const ehChefe = computed(
-  () =>
-    perfilStore.perfilSelecionado === Perfil.CHEFE ||
-    perfilStore.perfilSelecionado === Perfil.GESTOR ||
-    perfilStore.perfilSelecionado === Perfil.ADMIN,
-);
-
-const ehGestor = computed(
-  () =>
-    perfilStore.perfilSelecionado === Perfil.GESTOR ||
-    perfilStore.perfilSelecionado === Perfil.ADMIN,
-);
-
-const podeValidar = computed(
-  () => ehGestor.value && situacao.value === 'CONCLUIDO',
-);
-const podeDevolver = computed(
-  () => ehGestor.value && situacao.value === 'CONCLUIDO',
-);
-const podeHomologar = computed(
-  () => perfilStore.perfilSelecionado === Perfil.ADMIN && situacao.value === 'VALIDADO',
-);
+const ehChefe = computed(() => podeCriarConsenso.value);
+const podeValidar = computed(() => habilitarValidarDiagnostico.value);
+const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
+const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
 
 const totalServidores = computed(() => servidores.value.length);
 

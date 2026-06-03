@@ -3,7 +3,7 @@ export interface PayloadErroApi {
     status?: number;
     message?: string;
     code?: string;
-    details?: Record<string, unknown>;
+    details?: Record<string, string | number | boolean | object | null>;
     traceId?: string;
     stackTrace?: string;
     erros?: Array<{
@@ -27,11 +27,11 @@ export interface ErroNormalizado {
     mensagem: string;
     codigo?: string;
     status?: number;
-    detalhes?: Record<string, unknown>;
+    detalhes?: Record<string, string | number | boolean | object | null>;
     erros?: Array<{ mensagem?: string; campo?: string; }>;
     traceId?: string;
     stackTrace?: string;
-    erroOriginal?: unknown;
+    erroOriginal?: Error | object | string | null;
 }
 
 export type ErroSimples = {

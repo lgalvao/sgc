@@ -25,10 +25,9 @@ export function usePainelTela() {
   const asc = ref(true);
 
   const processosOrdenados = computed(() => {
-    const lista = [...(painelQuery.data.value?.processos ?? [])];
     const campo = criterio.value;
     const direcao = asc.value ? 1 : -1;
-    return lista.sort((a, b) => {
+    return (painelQuery.data.value?.processos ?? []).toSorted((a, b) => {
       const va = a[campo] ?? "";
       const vb = b[campo] ?? "";
       if (va < vb) return -1 * direcao;

@@ -979,7 +979,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
             Processo p = new Processo();
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
-            p.setTipo(TipoProcesso.DIAGNOSTICO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setDataLimite(LocalDateTime.now().plusDays(30));
             p.setDescricao("Processo Admin Teste");
 
@@ -989,11 +989,9 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uniAdmin));
-            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
 
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);
-            when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 
@@ -1020,7 +1018,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
             Processo p = new Processo();
             p.setCodigo(id);
             p.setSituacao(SituacaoProcesso.CRIADO);
-            p.setTipo(TipoProcesso.DIAGNOSTICO);
+            p.setTipo(TipoProcesso.MAPEAMENTO);
             p.setDataLimite(LocalDateTime.now().plusDays(30));
             p.setDescricao("Processo Admin Teste");
 
@@ -1030,11 +1028,9 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
 
             when(repo.buscar(Processo.class, id)).thenReturn(p);
             when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uniAdmin));
-            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(1L));
 
             UnidadeMapa um = new UnidadeMapa();
             um.setUnidadeCodigo(1L);
-            when(unidadeService.buscarMapasPorUnidades(anyList())).thenReturn(List.of(um));
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 

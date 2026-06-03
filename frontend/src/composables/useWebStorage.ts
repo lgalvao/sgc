@@ -16,7 +16,7 @@ export function useWebStorage<T>(
         try {
             return JSON.parse(item) as T;
         } catch {
-            const valorCru: unknown = item;
+            const valorCru = item as string | number | boolean | object | null;
             return valorCru as T;
         }
     };

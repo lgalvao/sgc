@@ -35,7 +35,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok(consultaService.obterAutoavaliacao(codSubprocesso));
     }
 
-    // CDU-40: autoavaliação com salvamento automático
+    // CDU-42: autoavaliação com salvamento automático
     @PostMapping("/subprocessos/{codSubprocesso}/autoavaliacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<Void> salvarAutoavaliacao(
@@ -52,7 +52,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    // CDU-42: criar/editar consenso
+    // CDU-44: criar/editar consenso
     @PostMapping("/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
     public ResponseEntity<Void> salvarConsenso(
@@ -63,7 +63,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    // CDU-43: consultar consenso do próprio servidor
+    // CDU-45: consultar consenso do próprio servidor
     @GetMapping("/subprocessos/{codSubprocesso}/consenso")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<ConsensoDto> obterConsenso(@PathVariable Long codSubprocesso) {
@@ -79,7 +79,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok(consultaService.obterConsenso(codSubprocesso, servidorTitulo));
     }
 
-    // CDU-44: aprovar consenso
+    // CDU-45: aprovar consenso
     @PostMapping("/subprocessos/{codSubprocesso}/consenso/aprovar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<Void> aprovarConsenso(@PathVariable Long codSubprocesso) {
@@ -98,7 +98,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    // CDU-45: ocupações críticas (salvamento automático)
+    // CDU-47: ocupações críticas (salvamento automático)
     @PostMapping("/subprocessos/{codSubprocesso}/ocupacoes-criticas")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
     public ResponseEntity<Void> salvarOcupacoesCriticas(
@@ -108,20 +108,21 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    // CDU-41: acompanhamento da equipe (lista de servidores e situações)
+    // CDU-43: acompanhamento da equipe (lista de servidores e situações)
     @GetMapping("/subprocessos/{codSubprocesso}/equipe")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<DiagnosticoEquipeDto> obterEquipe(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterEquipe(codSubprocesso));
     }
 
-    // CDU-49: análise do diagnóstico da unidade (GESTOR/ADMIN)
+    // CDU-49: análise do diagnóstico de unidades subordinadas (GESTOR/ADMIN)
     @GetMapping("/subprocessos/{codSubprocesso}/unidade")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<DiagnosticoUnidadeDto> obterDiagnosticoUnidade(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterDiagnosticoUnidade(codSubprocesso));
     }
 
+    // CDU-48: concluir diagnóstico da unidade
     @PostMapping("/subprocessos/{codSubprocesso}/concluir")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CONCLUIR_DIAGNOSTICO')")
     public ResponseEntity<Void> concluirDiagnostico(@PathVariable Long codSubprocesso) {
@@ -129,6 +130,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
+    // CDU-50: validar diagnóstico
     @PostMapping("/subprocessos/{codSubprocesso}/validar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VALIDAR_DIAGNOSTICO')")
     public ResponseEntity<Void> validarDiagnostico(
@@ -139,6 +141,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
+    // CDU-51: devolver diagnóstico
     @PostMapping("/subprocessos/{codSubprocesso}/devolver")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_DIAGNOSTICO')")
     public ResponseEntity<Void> devolverDiagnostico(
@@ -148,6 +151,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
+    // CDU-52: homologar diagnóstico
     @PostMapping("/subprocessos/{codSubprocesso}/homologar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_DIAGNOSTICO')")
     public ResponseEntity<Void> homologarDiagnostico(

@@ -61,9 +61,19 @@ function mapearPermissoesSessao(response: PermissoesSessaoDto): PermissoesSessao
     };
 }
 
+function converterParaPerfil(valor: string): Perfil {
+    const perfis: Record<string, Perfil> = {
+        ADMIN: Perfil.ADMIN,
+        GESTOR: Perfil.GESTOR,
+        CHEFE: Perfil.CHEFE,
+        SERVIDOR: Perfil.SERVIDOR
+    };
+    return perfis[valor] || Perfil.SERVIDOR;
+}
+
 function mapearPerfilUnidade(perfilUnidadeDto: PerfilUnidadeDto): PerfilUnidade {
     return {
-        perfil: perfilUnidadeDto.perfil as Perfil,
+        perfil: converterParaPerfil(perfilUnidadeDto.perfil),
         unidade: {
             codigo: perfilUnidadeDto.unidade.codigo,
             nome: perfilUnidadeDto.unidade.nome,
@@ -77,7 +87,7 @@ function mapearSessaoLogin(response: SessaoLoginDto): SessaoLogin {
     return {
         tituloEleitoral: response.tituloEleitoral,
         nome: response.nome,
-        perfil: response.perfil as Perfil,
+        perfil: converterParaPerfil(response.perfil),
         unidadeCodigo: response.unidadeCodigo,
         permissoes: mapearPermissoesSessao(response.permissoes),
     };

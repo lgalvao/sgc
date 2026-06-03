@@ -6,13 +6,17 @@ const CHAVES_PERMISSOES = [
     'podeHomologarCadastro', 'podeEditarMapa', 'podeDisponibilizarMapa', 'podeValidarMapa',
     'podeApresentarSugestoes', 'podeVerSugestoes', 'podeDevolverMapa', 'podeAceitarMapa',
     'podeHomologarMapa', 'podeVisualizarImpacto', 'podeAlterarDataLimite', 'podeReabrirCadastro',
-    'podeReabrirRevisao', 'podeEnviarLembrete', 'mesmaUnidade', 'habilitarAcessoCadastro',
-    'habilitarAcessoMapa', 'habilitarEditarCadastro', 'habilitarDisponibilizarCadastro',
+    'podeReabrirRevisao', 'podeEnviarLembrete', 'podePreencherAutoavaliacao', 'podeCriarConsenso',
+    'podeConcluirDiagnostico', 'podeValidarDiagnostico', 'podeDevolverDiagnostico', 'podeHomologarDiagnostico',
+    'mesmaUnidade', 'habilitarAcessoCadastro', 'habilitarAcessoMapa', 'habilitarAcessoDiagnostico',
+    'habilitarEditarCadastro', 'habilitarDisponibilizarCadastro',
     'habilitarDevolverCadastro', 'habilitarAceitarCadastro', 'habilitarHomologarCadastro',
     'habilitarEditarMapa', 'habilitarDisponibilizarMapa', 'habilitarValidarMapa',
     'habilitarApresentarSugestoes', 'habilitarDevolverMapa', 'habilitarAceitarMapa',
     'habilitarHomologarMapa', 'habilitarAlterarDataLimite', 'habilitarReabrirCadastro',
-    'habilitarReabrirRevisao', 'habilitarEnviarLembrete',
+    'habilitarReabrirRevisao', 'habilitarEnviarLembrete', 'habilitarPreencherAutoavaliacao',
+    'habilitarCriarConsenso', 'habilitarConcluirDiagnostico', 'habilitarValidarDiagnostico',
+    'habilitarDevolverDiagnostico', 'habilitarHomologarDiagnostico',
 ] as const satisfies readonly (keyof PermissoesSubprocesso)[];
 
 type ChavePermissao = (typeof CHAVES_PERMISSOES)[number];
@@ -20,8 +24,9 @@ type ChavePermissao = (typeof CHAVES_PERMISSOES)[number];
 export function criarAcessosPermissao(
     permissoes: ComputedRef<PermissoesSubprocesso>,
 ): Record<ChavePermissao, ComputedRef<boolean>> {
-    return CHAVES_PERMISSOES.reduce((acessos, chave) => {
-        acessos[chave] = computed(() => permissoes.value[chave]);
-        return acessos;
-    }, {} as Record<ChavePermissao, ComputedRef<boolean>>);
+    const acessos = {} as unknown as Record<ChavePermissao, ComputedRef<boolean>>;
+    CHAVES_PERMISSOES.forEach((chave) => {
+        acessos[chave] = computed(() => Boolean(permissoes.value[chave]));
+    });
+    return acessos;
 }

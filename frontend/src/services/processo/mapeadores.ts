@@ -1,6 +1,25 @@
 import {SituacaoSubprocesso, type UnidadeParticipante} from "@/types/tipos";
 import type {Processo, ProcessoDetalheResponseBackend, UnidadeImportacao, UnidadeParticipanteDto} from "./types";
 
+function converterParaSituacao(valor: string | null): SituacaoSubprocesso | null {
+    if (!valor) return null;
+    const situacoes: Record<string, SituacaoSubprocesso> = {
+        CRIADO: SituacaoSubprocesso.CRIADO,
+        DISPONIBILIZADO: SituacaoSubprocesso.DISPONIBILIZADO,
+        ACEITO: SituacaoSubprocesso.ACEITO,
+        VALIDADO: SituacaoSubprocesso.VALIDADO,
+        HOMOLOGADO: SituacaoSubprocesso.HOMOLOGADO,
+        DEVOLVIDO: SituacaoSubprocesso.DEVOLVIDO,
+        NAO_INICIADO: SituacaoSubprocesso.NAO_INICIADO,
+        EM_REVISAO: SituacaoSubprocesso.EM_REVISAO,
+        REVISADO: SituacaoSubprocesso.REVISADO,
+        AUTOAVALIACAO: SituacaoSubprocesso.AUTOAVALIACAO,
+        CONSENSO: SituacaoSubprocesso.CONSENSO,
+        CONCLUIDO: SituacaoSubprocesso.CONCLUIDO,
+    };
+    return situacoes[valor] || null;
+}
+
 function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {
     return {
         nome: dto.nome,
@@ -8,7 +27,7 @@ function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticip
         codUnidade: dto.codUnidade,
         codSubprocesso: dto.codSubprocesso ?? null,
         codUnidadeSuperior: dto.codUnidadeSuperior ?? undefined,
-        situacaoSubprocesso: dto.situacaoSubprocesso as SituacaoSubprocesso | null,
+        situacaoSubprocesso: converterParaSituacao(dto.situacaoSubprocesso),
         dataLimite: dto.dataLimite ?? "",
         mapaCodigo: dto.mapaCodigo ?? undefined,
         localizacaoAtualCodigo: dto.localizacaoAtualCodigo ?? undefined,
@@ -23,7 +42,7 @@ export function mapearUnidadeImportacao(dto: UnidadeParticipanteDto): UnidadeImp
         codUnidade: dto.codUnidade,
         codSubprocesso: dto.codSubprocesso ?? null,
         codUnidadeSuperior: dto.codUnidadeSuperior ?? undefined,
-        situacaoSubprocesso: (dto.situacaoSubprocesso as SituacaoSubprocesso | null) ?? undefined,
+        situacaoSubprocesso: converterParaSituacao(dto.situacaoSubprocesso) ?? undefined,
         dataLimite: dto.dataLimite ?? undefined,
         mapaCodigo: dto.mapaCodigo ?? undefined,
         localizacaoAtualCodigo: dto.localizacaoAtualCodigo ?? undefined,

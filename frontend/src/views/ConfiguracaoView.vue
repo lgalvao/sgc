@@ -92,6 +92,7 @@ import {type Parametro, useConfiguracoes} from '@/composables/useConfiguracoes';
 import {useNotification} from '@/composables/useNotification';
 import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
 import {TEXTOS} from '@/constants/textos';
+import {logger} from '@/utils';
 
 const {
   configuracoes,
@@ -155,9 +156,14 @@ async function salvar() {
   if (!pInativacao) ausentes.push('DIAS_INATIVACAO_PROCESSO');
   if (!pAlertaNovo) ausentes.push('DIAS_ALERTA_NOVO');
 
+  if (ausentes.length > 0) {
+    logger.error('Parâmetros de configuração ausentes', {ausentes});
+    return;
+  }
+
   const paramsToSave: Parametro[] = [
-    {...pInativacao!, valor: form.diasInativacao.toString()},
-    {...pAlertaNovo!, valor: form.diasAlertaNovo.toString()}
+    {...pInativacao, valor: form.diasInativacao.toString()},
+    {...pAlertaNovo, valor: form.diasAlertaNovo.toString()}
   ];
 
   const houveMudanca = paramsToSave.some(parametro => {

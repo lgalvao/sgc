@@ -77,6 +77,12 @@ Adicionalmente, o `checkPerfil` verifica se o perfil do usuário é compatível 
 | `DEVOLVER_MAPA`                   | ADMIN, GESTOR     | 20  |
 | `ACEITAR_MAPA`                    | GESTOR            | 20  |
 | `HOMOLOGAR_MAPA`                  | ADMIN             | 20  |
+| `PREENCHER_AUTOAVALIACAO`         | SERVIDOR, CHEFE   | 42  |
+| `CRIAR_CONSENSO`                  | CHEFE             | 44  |
+| `CONCLUIR_DIAGNOSTICO`            | CHEFE             | 48  |
+| `VALIDAR_DIAGNOSTICO`             | GESTOR            | 50  |
+| `DEVOLVER_DIAGNOSTICO`            | ADMIN, GESTOR     | 51  |
+| `HOMOLOGAR_DIAGNOSTICO`           | ADMIN             | 52  |
 
 ### 4.2 Ações administrativas (sem dependência de localização)
 
@@ -221,6 +227,21 @@ NAO_INICIADO → REVISAO_CADASTRO_EM_ANDAMENTO → REVISAO_CADASTRO_DISPONIBILIZ
 ```
 NAO_INICIADO → DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO → DIAGNOSTICO_MONITORAMENTO → DIAGNOSTICO_CONCLUIDO
 ```
+
+## 8.3.1 Ações de diagnóstico por etapa
+
+As permissões finas de diagnóstico dependem de perfil, localização atual do subprocesso e situação do subprocesso:
+
+- `PREENCHER_AUTOAVALIACAO`: SERVIDOR ou CHEFE, com subprocesso localizado na própria unidade.
+- `CRIAR_CONSENSO`: CHEFE, com subprocesso localizado na própria unidade.
+- `CONCLUIR_DIAGNOSTICO`: CHEFE, com subprocesso em `DIAGNOSTICO_MONITORAMENTO` e localizado na própria unidade.
+- `VALIDAR_DIAGNOSTICO`: GESTOR, com subprocesso em `DIAGNOSTICO_CONCLUIDO` e localizado na unidade ativa do gestor.
+- `DEVOLVER_DIAGNOSTICO`: ADMIN ou GESTOR, com subprocesso em `DIAGNOSTICO_CONCLUIDO` e localizado na unidade ativa do usuário.
+- `HOMOLOGAR_DIAGNOSTICO`: ADMIN, com subprocesso em `DIAGNOSTICO_CONCLUIDO` e localizado na unidade ativa do usuário.
+
+Observação:
+- Para diagnóstico, o `PermissionEvaluator` continua aplicando a regra geral de escrita por localização atual do subprocesso.
+- O serviço de apresentação (`SubprocessoAcessoService`) faz o controle adicional de habilitação por situação do fluxo para exibir ou desabilitar ações na UI.
 
 ### 8.4 Situações do Processo
 

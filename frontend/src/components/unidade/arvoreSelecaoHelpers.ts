@@ -58,5 +58,5 @@ export function ehAgrupadorVisual(unidade: Unidade): boolean {
 }
 
 export function ordenarCodigos(codigos: number[]): number[] {
-    return [...codigos].sort((a, b) => a - b);
+    return codigos.toSorted((a, b) => a - b);
 }

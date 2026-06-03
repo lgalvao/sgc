@@ -188,11 +188,13 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use((config: ConfiguracaoMonitorada) => {
     if (sessaoEmTransicao && !isRequisicaoPermitidaDuranteTransicao(config.url)) {
-        const error = new Error("Requisição cancelada por transição de sessão") as import('axios').AxiosError;
-        error.isAxiosError = true;
-        error.code = "ERR_CANCELED";
-        error.name = "CanceledError";
-        error.config = config;
+        const error = new Error("Requisição cancelada por transição de sessão");
+        Object.assign(error, {
+            isAxiosError: true,
+            code: "ERR_CANCELED",
+            name: "CanceledError",
+            config,
+        });
         return Promise.reject(error);
     }
 
@@ -237,7 +239,7 @@ function tratarErroNaoAutorizado() {
 }
 
 const tratarErroResposta = (error: import('axios').AxiosError) => {
-    const config = error?.config as ConfiguracaoMonitorada;
+    const config = error?.config as ConfiguracaoMonitorada | undefined;
     const metadados = config?.metadadosMonitoramento;
     limparControleCancelamento(config);
 

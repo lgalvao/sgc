@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import {computed, onBeforeUnmount, ref, useAttrs, watch} from "vue";
 import {Editor, EditorContent} from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
+import {StarterKit} from "@tiptap/starter-kit";
 import {
   LIMITE_PADRAO_TEXTO_FORMATADO,
   normalizarHtmlEditor,

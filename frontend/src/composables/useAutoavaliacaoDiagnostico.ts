@@ -72,10 +72,10 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     });
 
     // Autosave com debounce nativo
-    let _timer: ReturnType<typeof setTimeout> | null = null;
-    function _dispararSalvamento() {
-        if (_timer !== null) clearTimeout(_timer);
-        _timer = setTimeout(() => { mutacaoSalvar.mutate(competenciasLocais.value); }, 800);
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    function dispararSalvamento() {
+        if (timer !== null) clearTimeout(timer);
+        timer = setTimeout(() => { mutacaoSalvar.mutate(competenciasLocais.value); }, 800);
     }
 
     function atualizarNota(competenciaCodigo: number, campo: 'importancia' | 'dominio', valor: number | null) {
@@ -84,7 +84,7 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
         item[campo] = valor;
         salvandoAutomaticamente.value = true;
         autoguardado.value = false;
-        _dispararSalvamento();
+        dispararSalvamento();
     }
 
     const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_REALIZADA');

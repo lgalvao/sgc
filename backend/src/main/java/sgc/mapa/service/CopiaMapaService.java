@@ -87,6 +87,7 @@ public class CopiaMapaService {
 
         if (!novasAtividades.isEmpty()) {
             atividadeRepo.saveAll(novasAtividades);
+            mapaSalvo.getAtividades().addAll(novasAtividades);
 
             for (Atividade nova : novasAtividades) {
                 Long codAtividadeFonte = atividadeParaCodAtividadeFonte.get(nova);
@@ -138,6 +139,7 @@ public class CopiaMapaService {
         }
 
         competenciaRepo.saveAll(novasCompetencias);
+        mapaSalvo.getCompetencias().addAll(novasCompetencias);
     }
 
     private Set<String> obterDescExistentes(Long codMapaDestino) {

@@ -7,5 +7,5 @@ export function extrairErrosGenericos(error: ErroNormalizado): string[] {
     if (!error.erros) return [];
     return error.erros
         .filter(e => !e.campo && !!e.mensagem)
-        .map(e => e.mensagem as string);
+        .map(e => e.mensagem || '');
 }

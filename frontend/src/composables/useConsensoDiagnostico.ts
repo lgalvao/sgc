@@ -49,7 +49,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     // Estado de autosave
     const salvandoAutomaticamente = ref(false);
     const autoguardado = ref(false);
-    let _timer: ReturnType<typeof setTimeout> | null = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
     watch(
         () => query.data.value,
@@ -99,8 +99,8 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     function agendarAutosave() {
         if (ehConsensoAprovado.value || !servidorTitulo) return;
         autoguardado.value = false;
-        if (_timer) clearTimeout(_timer);
-        _timer = setTimeout(async () => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(async () => {
             salvandoAutomaticamente.value = true;
             try {
                 await mutacaoSalvar.mutateAsync(servidorTitulo);

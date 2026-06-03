@@ -48,11 +48,10 @@ const asc = ref(false);
 const diasInativacao = computed(() => obterDiasInativacaoProcesso());
 
 const processosOrdenados = computed(() => {
-  const lista = [...(historicoQuery.data.value ?? [])];
   const campo = criterio.value;
   const direcao = asc.value ? 1 : -1;
 
-  return lista.sort((a, b) => {
+  return (historicoQuery.data.value ?? []).toSorted((a, b) => {
     const valA = a[campo];
     const valB = b[campo];
 

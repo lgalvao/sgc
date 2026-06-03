@@ -109,7 +109,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     const addFallbackBreadcrumbs = (breadcrumbs: Breadcrumb[]) => {
         route.matched.forEach((routeRecord) => {
             const {meta, name} = routeRecord;
-            const metaBreadcrumb = meta as MetaBreadcrumb;
+            const metaBreadcrumb = meta as unknown as MetaBreadcrumb;
             const label = metaBreadcrumb.breadcrumb
                 ? typeof metaBreadcrumb.breadcrumb === "function"
                     ? metaBreadcrumb.breadcrumb(route)
@@ -119,7 +119,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
             if (label && (breadcrumbs.length === 0 || breadcrumbs.at(-1)?.label !== label)) {
                 breadcrumbs.push({
                     label,
-                    to: {name: name as string, params: route.params},
+                    to: {name: String(name || ""), params: route.params},
                 });
             }
         });
@@ -131,7 +131,7 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     };
 
     const crumbs = computed((): Breadcrumb[] => {
-        const routeName = route.name as string;
+        const routeName = String(route.name || "");
         const breadcrumbs: Breadcrumb[] = [{
             label: "Painel",
             to: routeName === "Painel" ? undefined : {name: "Painel"},

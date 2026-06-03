@@ -39,7 +39,7 @@ const processoRoutes: RouteRecordRaw[] = [
         }),
         meta: {
             title: "Processos da Unidade",
-            breadcrumb: (route: RouteLocationNormalized) => route.params.siglaUnidade as string,
+            breadcrumb: (route: RouteLocationNormalized) => String(route.params.siglaUnidade),
             keepAlive: true,
         },
     },

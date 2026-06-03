@@ -18,7 +18,7 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
     const cache = useQueryCache();
     const router = useRouter();
 
-    function _invalidarTudo() {
+    function invalidarTudo() {
         void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'contexto', codSubprocesso]});
         void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'equipe', codSubprocesso]});
         void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', codSubprocesso]});
@@ -27,7 +27,7 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
     const mutacaoConcluir = useMutation({
         mutation: () => concluirDiagnostico(codSubprocesso),
         onSuccess: () => {
-            _invalidarTudo();
+            invalidarTudo();
         },
     });
 
@@ -35,7 +35,7 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         mutation: (observacoes?: string) =>
             validarDiagnostico(codSubprocesso, observacoes ? {texto: observacoes} : undefined),
         onSuccess: () => {
-            _invalidarTudo();
+            invalidarTudo();
         },
     });
 
@@ -43,7 +43,7 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         mutation: (justificativa: string) =>
             devolverDiagnostico(codSubprocesso, {justificativa}),
         onSuccess: () => {
-            _invalidarTudo();
+            invalidarTudo();
         },
     });
 
@@ -51,7 +51,7 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         mutation: (observacoes?: string) =>
             homologarDiagnostico(codSubprocesso, observacoes ? {texto: observacoes} : undefined),
         onSuccess: () => {
-            _invalidarTudo();
+            invalidarTudo();
         },
     });
 

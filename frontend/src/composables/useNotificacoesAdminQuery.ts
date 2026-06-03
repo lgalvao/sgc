@@ -23,7 +23,7 @@ export function useNotificacoesAdminQuery() {
         staleTime: Infinity,
     });
 
-    const itensOrdenados = computed(() => [...(query.data.value ?? [])].sort(compararNotificacoes));
+    const itensOrdenados = computed(() => (query.data.value ?? []).toSorted(compararNotificacoes));
 
     return {
         ...query,

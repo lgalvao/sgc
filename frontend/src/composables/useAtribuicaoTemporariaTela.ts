@@ -253,8 +253,11 @@ function criarFluxoMutacao({
             return;
         }
 
+        const usuarioSelecionado = campos.usuarioSelecionado.value;
+        if (!usuarioSelecionado) return;
+
         const request = {
-            tituloEleitoralUsuario: campos.usuarioSelecionado.value!,
+            tituloEleitoralUsuario: usuarioSelecionado,
             dataInicio: campos.dataInicio.value,
             dataTermino: campos.dataTermino.value,
             justificativa: campos.justificativa.value

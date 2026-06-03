@@ -26,9 +26,16 @@ public record PermissoesSubprocessoDto(
         boolean podeReabrirCadastro,
         boolean podeReabrirRevisao,
         boolean podeEnviarLembrete,
+        boolean podePreencherAutoavaliacao,
+        boolean podeCriarConsenso,
+        boolean podeConcluirDiagnostico,
+        boolean podeValidarDiagnostico,
+        boolean podeDevolverDiagnostico,
+        boolean podeHomologarDiagnostico,
         boolean mesmaUnidade,
         boolean habilitarAcessoCadastro,
         boolean habilitarAcessoMapa,
+        boolean habilitarAcessoDiagnostico,
         boolean habilitarEditarCadastro,
         boolean habilitarDisponibilizarCadastro,
         boolean habilitarDevolverCadastro,
@@ -44,6 +51,12 @@ public record PermissoesSubprocessoDto(
         boolean habilitarAlterarDataLimite,
         boolean habilitarReabrirCadastro,
         boolean habilitarReabrirRevisao,
-        boolean habilitarEnviarLembrete
+        boolean habilitarEnviarLembrete,
+        boolean habilitarPreencherAutoavaliacao,
+        boolean habilitarCriarConsenso,
+        boolean habilitarConcluirDiagnostico,
+        boolean habilitarValidarDiagnostico,
+        boolean habilitarDevolverDiagnostico,
+        boolean habilitarHomologarDiagnostico
 ) {
 }

@@ -86,12 +86,15 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
             return;
         }
 
+        const codSubprocesso = dependencias.codigoSubprocesso.value;
+        if (!codSubprocesso) return;
+
         estado.loadingReabertura.value = true;
         try {
             const reabrir = estado.tipoReabertura.value === "revisao"
                 ? dependencias.reabrirRevisaoCadastro
                 : dependencias.reabrirCadastro;
-            const sucesso = await reabrir(dependencias.codigoSubprocesso.value!, justificativa);
+            const sucesso = await reabrir(codSubprocesso, justificativa);
             if (!sucesso) {
                 return;
             }
@@ -110,10 +113,13 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
             return;
         }
 
+        const codSubprocesso = dependencias.codigoSubprocesso.value;
+        if (!codSubprocesso) return;
+
         estado.loadingLembrete.value = true;
         try {
             await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
-            await subprocessoStore.obterContextoEdicao(dependencias.codigoSubprocesso.value!, {recarregar: true});
+            await subprocessoStore.obterContextoEdicao(codSubprocesso, {recarregar: true});
             estado.modalLembreteAberto.value = false;
             toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
             dependencias.exibirToastPendente();

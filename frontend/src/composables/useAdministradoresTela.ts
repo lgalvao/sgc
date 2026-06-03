@@ -1,4 +1,4 @@
-import {computed, onMounted, ref, type Ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {
     adicionarAdministrador,
     type AdministradorDto,
@@ -123,7 +123,7 @@ export function useAdministradoresTela() {
         erroAdicionarAdmin,
         erroRemoverAdmin,
         adicionandoAdmin,
-        inputTituloRef: inputTituloRef as Ref<InstanceType<typeof BuscadorUsuarios> | null>,
+        inputTituloRef,
         mensagemErroNovoAdmin,
         abrirModalAdicionarAdmin,
         fecharModalAdicionarAdmin,

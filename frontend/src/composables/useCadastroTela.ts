@@ -97,7 +97,7 @@ export function useCadastroTela(props: CadastroTelaProps) {
     const houveAlteracaoCadastro = computed(() => assinaturaCadastroAtual.value !== atividadesSnapshotInicial.value);
 
     const atividadesOrdenadas = computed(() => {
-        return [...atividades.value].sort((a, b) => (b.codigo || 0) - (a.codigo || 0));
+        return atividades.value.toSorted((a, b) => (b.codigo || 0) - (a.codigo || 0));
     });
 
     const situacaoAtual = computed(() => subprocesso.value?.situacao);
@@ -251,7 +251,7 @@ export function useCadastroTela(props: CadastroTelaProps) {
         if (loadingValidacao.value) return;
 
         limparErrosValidacao();
-        const validacaoLocal = _validarLocalmente({
+        const validacaoLocal = validarLocalmente({
             atividades,
             isRevisao,
             houveAlteracaoCadastro,
@@ -271,7 +271,9 @@ export function useCadastroTela(props: CadastroTelaProps) {
 
         loadingValidacao.value = true;
         try {
-            const resultado = await fluxoSubprocesso.validarCadastro(codigoSubprocesso.value!);
+            const codSubprocesso = codigoSubprocesso.value;
+            if (!codSubprocesso) return;
+            const resultado = await fluxoSubprocesso.validarCadastro(codSubprocesso);
             if (resultado.valido) {
                 mostrarModalConfirmacao.value = true;
                 return;
@@ -289,12 +291,15 @@ export function useCadastroTela(props: CadastroTelaProps) {
     async function confirmarDisponibilizacao() {
         if (loadingDisponibilizacao.value) return;
 
+        const codSubprocesso = codigoSubprocesso.value;
+        if (!codSubprocesso) return;
+
         loadingDisponibilizacao.value = true;
         try {
             if (isRevisao.value) {
-                await fluxoSubprocesso.disponibilizarRevisaoCadastro(codigoSubprocesso.value!);
+                await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso);
             } else {
-                await fluxoSubprocesso.disponibilizarCadastro(codigoSubprocesso.value!);
+                await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso);
             }
         } finally {
             loadingDisponibilizacao.value = false;
@@ -456,18 +461,18 @@ export function useCadastroTela(props: CadastroTelaProps) {
     };
 }
 
-type _ResultadoValidacaoLocal =
+type ResultadoValidacaoLocal =
     | {tipo: "pode-validar"}
     | {tipo: "erro-validacao"; erros: ErroValidacao[]}
     | {tipo: "acao-nao-permitida"; mensagem: string};
 
-function _validarLocalmente(params: {
+function validarLocalmente(params: {
     atividades: {value: Atividade[]};
     isRevisao: {value: boolean};
     houveAlteracaoCadastro: {value: boolean};
     disponibilizacaoSemMudancas: {value: boolean};
     situacaoAtual: {value: SituacaoSubprocesso | string | undefined};
-}): _ResultadoValidacaoLocal {
+}): ResultadoValidacaoLocal {
     const {atividades, isRevisao, houveAlteracaoCadastro, disponibilizacaoSemMudancas, situacaoAtual} = params;
     const cadastroIncompleto = atividades.value.length === 0
         || atividades.value.some((atividade) => !atividade.conhecimentos || atividade.conhecimentos.length === 0);

@@ -5,7 +5,7 @@ import type {ErroNormalizado} from "@/utils/apiError";
 import {gerarChave, gerarChaveProcessoUnidade, registrarErroIntegracao} from "./utils";
 
 type EstadoOrquestrador = {
-    carregamentos: Map<string, Promise<unknown>>;
+    carregamentos: Map<string, Promise<object | string | number | boolean | null>>;
     erroIntegracaoContexto: Ref<ErroNormalizado | null>;
     limparContextoAtual: () => void;
 };
@@ -17,17 +17,18 @@ function limparSeNecessario(limparAntes: boolean, limparContextoAtual: () => voi
 }
 
 async function executarComDedupe<T>(
-    carregamentos: Map<string, Promise<unknown>>,
+    carregamentos: Map<string, Promise<object | string | number | boolean | null>>,
     chave: string,
     acao: () => Promise<T>,
 ): Promise<T> {
     const existente = carregamentos.get(chave);
     if (existente) {
-        return existente as Promise<T>;
+        const resultado = existente as object | string | number | boolean | null;
+        return resultado as T;
     }
 
     const promessa = acao().finally(() => carregamentos.delete(chave));
-    carregamentos.set(chave, promessa);
+    carregamentos.set(chave, promessa as object as Promise<object | string | number | boolean | null>);
     return promessa;
 }
 
@@ -58,7 +59,7 @@ async function garantirContextoPorCodigo<T extends ContextoSubprocesso>(
             () => buscarComRegistro(() => config.buscarPorCodigo(codigoSubprocesso), config.registrar),
         );
     } catch (erro) {
-        return registrarErroIntegracao(erro, config.mensagemCodigo(codigoSubprocesso), estado.erroIntegracaoContexto);
+        return registrarErroIntegracao(erro as Error | object, config.mensagemCodigo(codigoSubprocesso), estado.erroIntegracaoContexto);
     }
 }
 
@@ -99,7 +100,7 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
         );
     } catch (erro) {
         return registrarErroIntegracao(
-            erro,
+            erro as Error | object,
             config.mensagemProcessoUnidade(codProcesso, siglaUnidade),
             estado.erroIntegracaoContexto,
         );
@@ -107,7 +108,7 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
 }
 
 export function usarOrquestradorContexto(
-    carregamentos: Map<string, Promise<unknown>>,
+    carregamentos: Map<string, Promise<object | string | number | boolean | null>>,
     erroIntegracaoContexto: Ref<ErroNormalizado | null>,
     limparContextoAtual: () => void
 ) {

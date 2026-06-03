@@ -256,18 +256,18 @@ INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATR
 VALUES ('987654321098', 'Maria Santos', 'maria.santos@tre-pe.jus.br', '8002', 2, '98765432');
 INSERT INTO SGC.VW_USUARIO (TITULO, NOME, EMAIL, RAMAL, unidade_lot_codigo, MATRICULA)
 VALUES ('111222333444', 'Pedro Oliveira', 'pedro.oliveira@tre-pe.jus.br', '8003', 2, '11122233');
-INSERT INTO SGC.VW_USUARIO (titulo, nome, unidade_lot_codigo, MATRICULA)
-VALUES ('50001', 'João da Silva', 8, '00050001');
-INSERT INTO SGC.VW_USUARIO (titulo, nome, unidade_lot_codigo, MATRICULA)
-VALUES ('50002', 'Maria Oliveira', 8, '00050002');
-INSERT INTO SGC.VW_USUARIO (titulo, nome, unidade_lot_codigo, MATRICULA)
-VALUES ('50003', 'Pedro Santos', 9, '00050003');
-INSERT INTO SGC.VW_USUARIO (titulo, nome, unidade_lot_codigo, MATRICULA)
-VALUES ('50004', 'Ana Costa', 9, '00050004');
-INSERT INTO SGC.VW_USUARIO (titulo, nome, unidade_lot_codigo, MATRICULA)
-VALUES ('50005', 'Carlos Pereira', 10, '00050005');
-INSERT INTO SGC.VW_USUARIO (titulo, nome, unidade_lot_codigo, MATRICULA)
-VALUES ('50006', 'Juliana Lima', 10, '00050006');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('50001', 'João da Silva', 'joao.silva50001@tre-pe.jus.br', '5001', 8, '00050001');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('50002', 'Maria Oliveira', 'maria.oliveira50002@tre-pe.jus.br', '5002', 8, '00050002');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('50003', 'Pedro Santos', 'pedro.santos50003@tre-pe.jus.br', '5003', 9, '00050003');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('50004', 'Ana Costa', 'ana.costa50004@tre-pe.jus.br', '5004', 9, '00050004');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('50005', 'Carlos Pereira', 'carlos.pereira50005@tre-pe.jus.br', '5005', 10, '00050005');
+INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
+VALUES ('50006', 'Juliana Lima', 'juliana.lima50006@tre-pe.jus.br', '5006', 10, '00050006');
 
 -- Usuários adicionais para testes com @WithMockChefe/@WithMockGestor
 INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)

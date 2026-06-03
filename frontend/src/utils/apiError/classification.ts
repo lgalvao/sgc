@@ -1,7 +1,7 @@
-import type {ErroSimples} from "./types";
-
-export function ehErroAxios(erro: unknown): erro is import('axios').AxiosError {
-    return (erro !== null &&
-        typeof erro === 'object' &&
-        'isAxiosError' in erro && (erro as ErroSimples).isAxiosError === true);
+export function ehErroAxios(erro: Error | object | null | undefined): erro is import('axios').AxiosError {
+    if (erro && typeof erro === 'object' && 'isAxiosError' in erro) {
+        const e = erro as { isAxiosError: boolean | string | number | undefined };
+        return e.isAxiosError === true;
+    }
+    return false;
 }

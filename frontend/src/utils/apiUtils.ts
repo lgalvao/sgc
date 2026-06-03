@@ -27,7 +27,7 @@ export async function apiGet<T>(url: string, params?: Record<string, unknown>): 
  * const processo = await apiPost<Processo, CriarProcessoRequest>('/processos', request);
  * await apiPost<void>(`/processos/${codigo}/finalizar`);
  */
-export async function apiPost<T = void, D = unknown>(url: string, data?: D): Promise<T> {
+export async function apiPost<T = void>(url: string, data?: unknown): Promise<T> {
     const response: AxiosResponse<T> = await apiClient.post(url, data);
     return response.data;
 }

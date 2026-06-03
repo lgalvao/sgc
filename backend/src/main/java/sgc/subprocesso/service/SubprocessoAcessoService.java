@@ -78,9 +78,16 @@ public class SubprocessoAcessoService {
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
+                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR || contexto.isChefe())
+                .podeCriarConsenso(contexto.isChefe())
+                .podeConcluirDiagnostico(contexto.isChefe())
+                .podeValidarDiagnostico(contexto.isGestor())
+                .podeDevolverDiagnostico(contexto.isGestorOuAdmin())
+                .podeHomologarDiagnostico(contexto.isAdmin())
                 .mesmaUnidade(mesmaUnidade)
                 .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(contexto))
                 .habilitarAcessoMapa(verificarAcessoMapaHabilitado(contexto))
+                .habilitarAcessoDiagnostico(verificarAcessoDiagnosticoHabilitado(contexto))
                 .habilitarAlterarDataLimite(contexto.isAdmin())
                 .habilitarEnviarLembrete(contexto.isAdmin());
 
@@ -99,6 +106,13 @@ public class SubprocessoAcessoService {
                 .habilitarDevolverMapa(verificarDevolverMapa(contexto) && mesmaUnidade)
                 .habilitarAceitarMapa(contexto.isGestor() && SITUACOES_GESTAO_MAPA.contains(situacao) && mesmaUnidade)
                 .habilitarHomologarMapa(verificarHomologarMapa(contexto) && mesmaUnidade);
+
+        builder.habilitarPreencherAutoavaliacao((contexto.perfil() == Perfil.SERVIDOR || contexto.isChefe()) && mesmaUnidade)
+                .habilitarCriarConsenso(contexto.isChefe() && mesmaUnidade)
+                .habilitarConcluirDiagnostico(contexto.isChefe() && situacao == DIAGNOSTICO_MONITORAMENTO && mesmaUnidade)
+                .habilitarValidarDiagnostico(contexto.isGestor() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)
+                .habilitarDevolverDiagnostico(contexto.isGestorOuAdmin() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)
+                .habilitarHomologarDiagnostico(contexto.isAdmin() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade);
 
         // Reaberturas
         builder.habilitarReabrirCadastro(contexto.isAdmin() && isSituacaoMapeamentoAPartirDe(situacao, MAPEAMENTO_MAPA_HOMOLOGADO))
@@ -127,9 +141,16 @@ public class SubprocessoAcessoService {
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
+                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR || contexto.isChefe())
+                .podeCriarConsenso(contexto.isChefe())
+                .podeConcluirDiagnostico(contexto.isChefe())
+                .podeValidarDiagnostico(contexto.isGestor())
+                .podeDevolverDiagnostico(contexto.isGestorOuAdmin())
+                .podeHomologarDiagnostico(contexto.isAdmin())
                 .mesmaUnidade(contexto.mesmaUnidade())
                 .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(contexto))
                 .habilitarAcessoMapa(verificarAcessoMapaHabilitado(contexto))
+                .habilitarAcessoDiagnostico(verificarAcessoDiagnosticoHabilitado(contexto))
                 .habilitarEditarCadastro(false)
                 .habilitarDisponibilizarCadastro(false)
                 .habilitarDevolverCadastro(false)
@@ -146,7 +167,24 @@ public class SubprocessoAcessoService {
                 .habilitarReabrirCadastro(false)
                 .habilitarReabrirRevisao(false)
                 .habilitarEnviarLembrete(false)
+                .habilitarPreencherAutoavaliacao(false)
+                .habilitarCriarConsenso(false)
+                .habilitarConcluirDiagnostico(false)
+                .habilitarValidarDiagnostico(false)
+                .habilitarDevolverDiagnostico(false)
+                .habilitarHomologarDiagnostico(false)
                 .build();
+    }
+
+    private boolean verificarAcessoDiagnosticoHabilitado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        if (!contexto.situacao().name().startsWith("DIAGNOSTICO")) {
+            return false;
+        }
+        return switch (contexto.perfil()) {
+            case ADMIN -> true;
+            case GESTOR -> contexto.isUnidadeAlvoNaHierarquiaUsuario();
+            case CHEFE, Perfil.SERVIDOR -> contexto.isMesmaUnidadeAlvo();
+        };
     }
 
     private boolean verificarAcessoCadastroHabilitado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {

@@ -104,6 +104,52 @@
       >
         <BCard
             class="h-100 card-actionable"
+            data-testid="card-subprocesso-consenso"
+            role="button"
+            tabindex="0"
+            @click="navegarParaCardConsenso"
+            @keydown="aoPressionarTeclaConsenso"
+        >
+          <div class="card-click-area">
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-person-lines-fill text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.CONSENSO_TITULO }}</span>
+            </BCardTitle>
+            <BCardText class="text-muted">
+              {{ TEXTOS.subprocesso.cards.CONSENSO_TEXTO }}
+            </BCardText>
+          </div>
+        </BCard>
+      </BCol>
+      <BCol
+          class="mb-3"
+          md="4"
+      >
+        <BCard
+            class="h-100 card-actionable"
+            data-testid="card-subprocesso-consenso"
+            role="button"
+            tabindex="0"
+            @click="navegarParaCardConsenso"
+            @keydown="aoPressionarTeclaConsenso"
+        >
+          <div class="card-click-area">
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-person-lines-fill text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.CONSENSO_TITULO }}</span>
+            </BCardTitle>
+            <BCardText class="text-muted">
+              {{ TEXTOS.subprocesso.cards.CONSENSO_TEXTO }}
+            </BCardText>
+          </div>
+        </BCard>
+      </BCol>
+      <BCol
+          class="mb-3"
+          md="4"
+      >
+        <BCard
+            class="h-100 card-actionable"
             data-testid="card-subprocesso-monitoramento"
             role="button"
             tabindex="0"
@@ -147,6 +193,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const subprocesso = computed(() => props.subprocesso ?? null);
+const permissoesDiagnostico = computed(() => subprocesso.value?.permissoes ?? null);
 
 const {habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
@@ -174,6 +221,29 @@ function navegarParaDiag(routeName: string) {
   });
 }
 
+function navegarParaConsenso() {
+  const servidorTitulo = subprocesso.value?.titular?.tituloEleitoral;
+  if (!servidorTitulo) {
+    return;
+  }
+  void router.push({
+    name: 'ConsensoDiagnostico',
+    params: {
+      codSubprocesso: props.codSubprocesso,
+      siglaUnidade: props.siglaUnidade,
+      servidorTitulo,
+    }
+  });
+}
+
+function navegarParaCardConsenso() {
+  if (permissoesDiagnostico.value?.podeCriarConsenso) {
+    navegarParaDiag('MonitoramentoDiagnostico');
+    return;
+  }
+  navegarParaConsenso();
+}
+
 function aoPressionarTecla(event: KeyboardEvent, routeName: string) {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
@@ -188,12 +258,23 @@ function aoPressionarTeclaDiagnostico(event: KeyboardEvent, routeName: string) {
   }
 }
 
+function aoPressionarTeclaConsenso(event: KeyboardEvent) {
+  if (event.key !== 'Enter' && event.key !== ' ') {
+    return;
+  }
+  event.preventDefault();
+  navegarParaCardConsenso();
+}
+
 defineExpose({
   TipoProcessoEnum,
   navegarPara,
   navegarParaDiag,
+  navegarParaConsenso,
+  navegarParaCardConsenso,
   aoPressionarTecla,
   aoPressionarTeclaDiagnostico,
+  aoPressionarTeclaConsenso,
 });
 </script>
 

@@ -50,7 +50,7 @@ router.beforeEach((to) => {
 
 router.afterEach((to) => {
     const meta = to.meta || {};
-    const titleBase = typeof meta.title === "string" ? meta.title : (to.name as string) || "SGC";
+    const titleBase = typeof meta.title === "string" ? meta.title : String(to.name || "SGC");
     document.title = `${titleBase} - SGC`;
 });
 
