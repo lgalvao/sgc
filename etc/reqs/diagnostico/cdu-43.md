@@ -23,10 +23,8 @@ Ator: CHEFE
      - `Avaliação de consenso criada`;
      - `Avaliação de consenso aprovada`;
      - `Avaliação impossibilitada`.
-   - `Ações`, com zero ou mais itens, que variam com a situação de cada servidor:
-     - `Criar avaliação de consenso`, quando a situação for `Autoavaliação concluída`;
-     - `Editar avaliação de consenso`, quando a situação for `Avaliação de consenso criado` ou `Avaliação de consenso aprovado`;
-     - `Indicar impossibilidade`, enquanto a avaliação individual ainda não estiver impossibilitada;
-     - `Visualizar consenso`, quando já existir avaliação de consenso criado para o servidor.
+   - `Ações`, com os itens abaixo: 
+     - `Manter avaliação de consenso` - sempre habilitado;
+     - `Indicar impossibilidade` - habilitado se o usuário não estiver ba situação `Avaliação impossibilitada`;
     
-5. O usuário pode analisar a situação do diagnóstico dos servidores e aciona as operações necessárias.
+5. O usuário pode analisar a situação do diagnóstico dos servidores e acionar as operações desejadas.

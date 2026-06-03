@@ -42,7 +42,7 @@ export function useUrlLeitorEmailTestesQuery() {
 }
 
 export function useReenvioNotificacaoMutation() {
-    return useMutation<ReenvioNotificacaoResponse, number, Error>({
+    return useMutation<ReenvioNotificacaoResponse, number>({
         mutation: (codigoNotificacao) => reenviarNotificacao(codigoNotificacao),
         onSuccess: () => {
             void useQueryCache().invalidateQueries({key: CHAVE_QUERY_NOTIFICACOES_ADMIN});

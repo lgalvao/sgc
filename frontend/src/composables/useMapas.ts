@@ -1,4 +1,4 @@
-import {computed, type MaybeRefOrGetter, ref, type Ref, toValue} from "vue";
+import {computed, type MaybeRefOrGetter, type Ref, toValue} from "vue";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import {useCacheMapa, useImpactoMapaQuery, useMapaQuery} from "@/composables/useMapaQuery";

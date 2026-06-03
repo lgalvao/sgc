@@ -111,7 +111,7 @@ onActivated(async () => {
   if (!montadoUmaVez) return;
   try {
     await historicoQuery.refresh();
-  } catch (e) {
+  } catch {
     // Erros em recarga de background no histórico são ignorados para manter a UI estável
   }
 });

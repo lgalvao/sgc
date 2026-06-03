@@ -138,7 +138,7 @@ export function useMapaTela(props: MapaTelaProps) {
         verSugestoes,
         fecharModalVerSugestoes,
         abrirModalSugestoes,
-        fecharModalSugestoes,
+
         confirmarSugestoes,
     } = useMapaSugestoes({
         obterCodigoSubprocessoObrigatorio,

@@ -12,7 +12,7 @@
     "build:hom": "vite build --mode hom",
     "build:e2e": "vite build --mode e2e",
     "build:prod": "vite build --mode production",
-    "lint:ox": "oxlint .",
+    "lint:ox": "oxlint --ignore-path .oxlintignore .",
     "lint": "npm run lint:ox && eslint . --ext .vue,.js,.mjs,.ts --fix",
     "deps:audit": "knip",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",

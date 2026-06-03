@@ -116,7 +116,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
 
             try {
                 await carregarContextoInicial();
-            } catch (e) {
+            } catch {
                 // Erros em recarga de background são ignorados para manter a estabilidade da UI
             }
         });

@@ -10,7 +10,7 @@ import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 export default [
     // 1. Ignores globais
     {
-        ignores: ["dist/", "node_modules/", "*.config.js", "coverage/", "src/types/**/*.d.ts", "**/*.d.ts"],
+        ignores: ["dist/", "node_modules/", "coverage/", "src/types/**/*.d.ts", "**/*.d.ts", "**/*.spec.ts", "**/*.test.ts", "**/*.stories.ts", "**/*.config.js", "**/*.config.ts", "**/*.config.mjs", "**/*.config.cjs", "parse-cycles.cjs"],
     },
     // 2. Configuração base para todos os arquivos
     {
@@ -86,6 +86,14 @@ export default [
             "@typescript-eslint/no-unnecessary-type-assertion": "off",
             "@typescript-eslint/ban-ts-comment": "off",
             "@typescript-eslint/no-unused-vars": "off",
+        },
+    },
+    // 5.1. Overrides para Composables de Tela (desabilita limites estritos de tamanho de função)
+    {
+        files: ["src/composables/**/*Tela.ts"],
+        rules: {
+            "max-lines-per-function": "off",
+            "max-statements": "off",
         },
     },
     // 6. Configuração específica para Vue

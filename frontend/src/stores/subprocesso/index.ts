@@ -40,17 +40,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         limparErroIntegracao();
     }
 
-    function invalidarContextoEdicao(codigoSubprocesso?: number): void {
-        carregamentos.clear();
-        if (contextoEdicao.value === null) {
-            return;
-        }
-        if (typeof codigoSubprocesso === "number" && contextoEdicao.value.detalhes.codigo !== codigoSubprocesso) {
-            return;
-        }
-        contextoEdicaoInvalido.value = true;
-        limparErroIntegracao();
-    }
+
 
     function resetar(): void {
         carregamentos.clear();

@@ -59,7 +59,7 @@ export function useDiagnosticoOrganizacionalAlert(
         && (
             carregandoDiagnosticoOrganizacional.value
             || !!erroDiagnosticoOrganizacional.value
-            || diagnosticoOrganizacional.value?.possuiViolacoes === true
+            || !!diagnosticoOrganizacional.value?.possuiViolacoes
         )
         && !alertaDiagnosticoDispensado.value
     );

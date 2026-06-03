@@ -64,19 +64,25 @@ export function useProcessoForm(initialData?: Processo) {
     });
 
     function construirCriarRequest(): CriarProcessoRequest {
+        if (!tipo.value) {
+            throw new Error("Tipo de processo é obrigatório");
+        }
         return {
             descricao: descricao.value,
-            tipo: tipo.value as TipoProcesso,
+            tipo: tipo.value,
             dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
             unidades: unidadesSelecionadas.value,
         };
     }
 
     function construirAtualizarRequest(codigo: number): AtualizarProcessoRequest {
+        if (!tipo.value) {
+            throw new Error("Tipo de processo é obrigatório");
+        }
         return {
             codigo,
             descricao: descricao.value,
-            tipo: tipo.value as TipoProcesso,
+            tipo: tipo.value,
             dataLimiteEtapa1: dataLimite.value ? `${dataLimite.value}T00:00:00` : null,
             unidades: unidadesSelecionadas.value,
         };

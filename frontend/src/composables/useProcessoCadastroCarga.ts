@@ -5,6 +5,7 @@ import {useArvoreElegibilidadeQuery} from "@/composables/useUnidadeQuery";
 import * as processoService from "@/services/processo";
 import {removerUnidadesSemEquipe, filtrarSelecionadasPorElegibilidade} from "@/views/processoCadastroUnidades";
 import type {Processo, Unidade, TipoProcesso} from "@/types/tipos";
+import {SituacaoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {logger} from "@/utils";
 import type {useProcessoForm} from "@/composables/useProcessoForm";
@@ -70,7 +71,7 @@ export function useProcessoCadastroCarga({
         inicializando.value = true;
         try {
             const processo = await processoService.obterDetalhesProcesso(codigoProcesso);
-            if (processo.situacao !== "CRIADO") {
+            if (processo.situacao !== SituacaoProcesso.CRIADO) {
                 await router.push(`/processo/${processo.codigo}`);
                 return;
             }

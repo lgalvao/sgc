@@ -3,7 +3,9 @@ import {computed, ref} from "vue";
 import type {FluxoLogin, PerfilUnidade, PermissoesSessao} from "@/types/autenticacao";
 import type {Perfil, Unidade} from "@/types/tipos";
 import {useWebStorage} from "@/composables/useWebStorage";
-import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {useQueryCache} from "@pinia/colada";
+import {usePainelStore} from "@/stores/painel";
+import {useSubprocessoStore} from "@/stores/subprocesso";
 import {concluirLoginPerfil, encerrarLoginPerfil, iniciarLoginPerfil, type DadosSessaoPerfil} from "@/stores/perfilAutenticacao";
 
 function obterUnidadeAtualSelecionada(
@@ -33,7 +35,15 @@ export const usePerfilStore = defineStore("perfil", () => {
     const versaoSessao = ref(0);
     const perfisUnidades = ref<PerfilUnidade[]>([]);
     const unidadeAtualDetalhes = ref<Unidade | null>(null);
-    const {resetarEstadoSessao} = useInvalidacaoNavegacao();
+    const queryCache = useQueryCache();
+    const painelStore = usePainelStore();
+    const subprocessoStore = useSubprocessoStore();
+
+    function resetarEstadoAplicacao() {
+        painelStore.resetar();
+        subprocessoStore.resetar();
+        queryCache.clear();
+    }
 
     const unidadeAtual = computed(() =>
         obterUnidadeAtualSelecionada(perfilSelecionado.value, unidadeSelecionada.value, perfisUnidades.value)
@@ -81,7 +91,7 @@ export const usePerfilStore = defineStore("perfil", () => {
             perfisUnidades.value = novosPerfisUnidades;
         },
         limparSessao: limparSessaoLocal,
-        resetarEstadoAplicacao: resetarEstadoSessao,
+        resetarEstadoAplicacao,
     };
 
     async function iniciarLogin(tituloEleitoral: string, senha: string): Promise<FluxoLogin> {

@@ -53,7 +53,7 @@ export function useMapaCompetenciasMutacoes({
     }
 
     function tratarErros(error: unknown) {
-        aplicarErroNormalizado(normalizarErro(error) as ErroNormalizado);
+        aplicarErroNormalizado(normalizarErro(error));
     }
 
     function abrirModalCriarNovaCompetencia(competenciaParaEditar: Competencia | null = null) {
@@ -108,13 +108,14 @@ export function useMapaCompetenciasMutacoes({
     }
 
     async function confirmarExclusaoCompetencia() {
-        if (!competenciaParaExcluir.value) return;
+        const comp = competenciaParaExcluir.value;
+        if (!comp) return;
 
         const codigo = obterCodigoSubprocessoObrigatorio();
         loadingExclusao.value = true;
         try {
             await executarOperacaoCompetencia(async () => {
-                sincronizarMapa(await fluxoMapa.removerCompetencia(codigo, competenciaParaExcluir.value!.codigo));
+                sincronizarMapa(await fluxoMapa.removerCompetencia(codigo, comp.codigo));
                 mostrarModalExcluirCompetencia.value = false;
             }, (error) => notify(normalizarErro(error).mensagem, "danger"));
         } finally {

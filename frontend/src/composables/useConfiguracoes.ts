@@ -29,17 +29,17 @@ export {criarChaveConfiguracoes};
 
 export function useConfiguracoes() {
     const perfilStore = usePerfilStore();
-    const chave = computed(() => criarChaveConfiguracoes(perfilStore.usuarioCodigo));
+    const chaveConfiguracoes = computed(() => criarChaveConfiguracoes(perfilStore.usuarioCodigo));
     const configuracoesQuery = useQuery<Parametro[], Error, Parametro[]>({
-        key: () => [...chave.value],
+        key: () => [...chaveConfiguracoes.value],
         query: () => serviceBuscarConfiguracoes(),
         enabled: false,
         staleTime: Infinity,
     });
-    const salvarConfiguracoesMutation = useMutation<Parametro[], Parametro[], Error>({
+    const salvarConfiguracoesMutation = useMutation<Parametro[], Parametro[]>({
         mutation: (novosParametros) => serviceSalvarConfiguracoes(novosParametros),
         onSuccess: (configuracoesAtualizadas) => {
-            useQueryCache().setQueryData(chave.value, configuracoesAtualizadas);
+            useQueryCache().setQueryData(chaveConfiguracoes.value, configuracoesAtualizadas);
         },
     });
     const configuracoes = computed(() => configuracoesQuery.data.value ?? []);

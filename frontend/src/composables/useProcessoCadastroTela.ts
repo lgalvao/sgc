@@ -1,7 +1,7 @@
 import {computed, ref, type Ref} from "vue";
 import {useDiagnosticoOrganizacionalAlert} from "@/composables/useDiagnosticoOrganizacionalAlert";
 import {useNotification} from "@/composables/useNotification";
-import type {VarianteAlerta} from "@/composables/useNotification";
+
 import {usePerfil} from "@/composables/usePerfil";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
@@ -80,7 +80,7 @@ export function useProcessoCadastroTela({formFieldsRef, modalUnidadesComEquipePr
     }
 
     // Compondo a Carga
-    const {carregamentoInicialConcluido, buscarUnidadesParaProcesso} = useProcessoCadastroCarga({
+    const {buscarUnidadesParaProcesso} = useProcessoCadastroCarga({
         formulario,
         formFieldsRef,
         unidades,

@@ -138,9 +138,9 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
             isHome: true
         }];
         const perfilUsuario = perfil.perfilSelecionado;
-        const codProcesso = route.params.codProcesso as string;
-        const siglaUnidade = route.params.siglaUnidade as string;
-        const codUnidade = route.params.codUnidade as string;
+        const codProcesso = route.params.codProcesso ? String(route.params.codProcesso) : "";
+        const siglaUnidade = route.params.siglaUnidade ? String(route.params.siglaUnidade) : "";
+        const codUnidade = route.params.codUnidade ? String(route.params.codUnidade) : "";
 
         const isProcessoRoute = routeName === "Processo";
         const isSubprocessoRoute = ["Subprocesso", "SubprocessoMapa", "SubprocessoCadastro"].includes(routeName);

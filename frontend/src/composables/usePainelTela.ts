@@ -92,7 +92,7 @@ export function usePainelTela() {
     exibirToastPendente();
     try {
       await painelQuery.refresh();
-    } catch (e) {
+    } catch {
       // Falhas em recarga de background no painel não devem interromper o fluxo do usuário
     }
   });
@@ -117,7 +117,9 @@ export function usePainelTela() {
       key: "dataHora",
       label: TEXTOS.painel.CAMPOS_ALERTAS.DATA_HORA,
       sortable: false,
-      formatter: ({value}: { value: unknown }) => formatarDataHoraBR(value as string | Date)
+      formatter: ({value}: { value: unknown }) => {
+        return (typeof value === "string" || value instanceof Date) ? formatarDataHoraBR(value) : "";
+      }
     },
     {key: "mensagem", label: TEXTOS.painel.CAMPOS_ALERTAS.DESCRICAO},
     {
