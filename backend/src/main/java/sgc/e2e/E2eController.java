@@ -283,6 +283,17 @@ public class E2eController {
         return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
     }
 
+    @PostMapping("/fixtures/processo-diagnostico-com-consenso-criado")
+    @Transactional
+    public ProcessoResumoDto criarProcessoDiagnosticoComConsensoCriado(
+            @RequestBody ProcessoDiagnosticoAutoavaliadoFixtureRequest request
+    ) {
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
+        concluirAutoavaliacaoFixture(processo.getCodigo(), request.unidadeSigla(), request.servidorTitulo());
+        criarConsensoFixture(processo.getCodigo(), request.unidadeSigla(), request.servidorTitulo());
+        return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
+    }
+
     @PostMapping("/fixtures/notificacao-email")
     @Transactional
     public NotificacaoFixtureResponse criarNotificacaoEmailFixture(@RequestBody NotificacaoFixtureRequest request) {
@@ -894,17 +905,7 @@ public class E2eController {
     }
 
     private void concluirAutoavaliacaoFixture(Long codProcesso, String unidadeSigla, String servidorTitulo) {
-        Long codUnidade = unidadeService.buscarCodigoPorSigla(unidadeSigla);
-        Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
-                .map(Subprocesso::getCodigo)
-                .orElseThrow();
-
-        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
-                .orElseThrow(() -> new IllegalStateException("Diagnóstico não encontrado para subprocesso " + codSubprocesso));
-
-        List<AvaliacaoServidor> avaliacoes = avaliacaoServidorRepo.buscarAvaliacoesDoServidor(
-                diagnostico.getCodigo(), servidorTitulo
-        );
+        List<AvaliacaoServidor> avaliacoes = buscarAvaliacoesDiagnostico(codProcesso, unidadeSigla, servidorTitulo);
         if (avaliacoes.isEmpty()) {
             throw new IllegalStateException("Nenhuma avaliação encontrada para o servidor " + servidorTitulo);
         }
@@ -919,6 +920,36 @@ public class E2eController {
         });
         avaliacaoServidorRepo.saveAllAndFlush(avaliacoes);
         limparCaches();
+    }
+
+    private void criarConsensoFixture(Long codProcesso, String unidadeSigla, String servidorTitulo) {
+        List<AvaliacaoServidor> avaliacoes = buscarAvaliacoesDiagnostico(codProcesso, unidadeSigla, servidorTitulo);
+        if (avaliacoes.isEmpty()) {
+            throw new IllegalStateException("Nenhuma avaliação encontrada para o servidor " + servidorTitulo);
+        }
+
+        avaliacoes.forEach(avaliacao -> {
+            avaliacao.setChefiaImportancia(4);
+            avaliacao.setChefiaDominio(4);
+            avaliacao.setImportancia(4);
+            avaliacao.setDominio(4);
+            avaliacao.calculaGap();
+            avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        });
+        avaliacaoServidorRepo.saveAllAndFlush(avaliacoes);
+        limparCaches();
+    }
+
+    private List<AvaliacaoServidor> buscarAvaliacoesDiagnostico(Long codProcesso, String unidadeSigla, String servidorTitulo) {
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(unidadeSigla);
+        Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
+                .map(Subprocesso::getCodigo)
+                .orElseThrow();
+
+        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
+                .orElseThrow(() -> new IllegalStateException("Diagnóstico não encontrado para subprocesso " + codSubprocesso));
+
+        return avaliacaoServidorRepo.buscarAvaliacoesDoServidor(diagnostico.getCodigo(), servidorTitulo);
     }
 
     /**

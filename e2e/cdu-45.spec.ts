@@ -1,6 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture} from './fixtures/index.js';
-import {abrirCardDiagnostico, preencherConsensoMinimo} from './helpers/helpers-diagnostico.js';
+import {criarProcessoDiagnosticoComConsensoCriadoFixture} from './fixtures/index.js';
 import {login} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
@@ -15,23 +14,20 @@ test.describe('CDU-45 - Aprovar avaliação de consenso', () => {
         request
     }) => {
         const descricao = `Diagnóstico CDU-45 ${Date.now()}`;
-        const processo = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(request, {
+        const processo = await criarProcessoDiagnosticoComConsensoCriadoFixture(request, {
             descricao,
             unidade: UNIDADE,
             iniciar: true,
             servidorTitulo: TITULO_SERVIDOR_ASSESSORIA_12
         });
 
-        await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
-        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/monitoramento/);
-        const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
-        await page.getByTestId(`btn-manter-consenso-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
-        await preencherConsensoMinimo(page, codSubprocesso, TITULO_SERVIDOR_ASSESSORIA_12);
-
         await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await abrirCardDiagnostico(page, 'card-subprocesso-consenso', new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
+        const cardConsensoServidor = page.getByTestId('card-subprocesso-consenso').nth(1);
+        await expect(cardConsensoServidor).toBeVisible();
+        await cardConsensoServidor.click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
+        const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
         await expect(page.getByTestId('btn-aprovar-consenso')).toBeVisible();
         await page.getByTestId('btn-aprovar-consenso').click();
         await expect(page.getByRole('dialog')).toContainText('Confirma a aprovação da avaliação de consenso definida pela chefia?');

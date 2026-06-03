@@ -32,7 +32,7 @@ test.describe('CDU-44 - Manter avaliação de consenso', () => {
         await preencherConsensoMinimo(page, codSubprocesso, TITULO_SERVIDOR_ASSESSORIA_12);
         await expect(page.getByText('Salvo automaticamente')).toBeVisible();
 
-        await page.getByRole('button', {name: /^Voltar$/i}).click();
+        await page.getByTestId('btn-nav-voltar').click();
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/monitoramento`));
     });
 });

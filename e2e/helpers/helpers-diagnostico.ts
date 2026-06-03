@@ -1,7 +1,7 @@
 import {expect, type Page} from '@playwright/test';
 
 export async function abrirCardDiagnostico(page: Page, testId: string, urlRegex: RegExp): Promise<void> {
-    const card = page.getByTestId(testId);
+    const card = page.getByTestId(testId).first();
     await expect(card).toBeVisible();
     await card.click();
     await expect(page).toHaveURL(urlRegex);
