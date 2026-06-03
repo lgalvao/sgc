@@ -3,8 +3,7 @@ import {computed} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade} from '@/services/diagnosticoService';
 import type {DiagnosticoUnidade, SituacaoDiagnostico} from '@/types/diagnostico-competencias';
-import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
-import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
+import {CHAVE_DIAGNOSTICO, useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 
 function chaveUnidade(codSubprocesso: number) {
     return [CHAVE_DIAGNOSTICO, 'unidade', codSubprocesso] as const;

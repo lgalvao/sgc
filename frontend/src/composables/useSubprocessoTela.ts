@@ -55,7 +55,7 @@ export function useSubprocessoTela(props: SubprocessoTelaProps) {
     function exibirToastPendente() {
         const pendente = toastStore.consumePending();
         if (pendente) {
-            toast.create({
+            void toast.create({
                 props: {
                     body: pendente.mensagem,
                     variant: 'success',

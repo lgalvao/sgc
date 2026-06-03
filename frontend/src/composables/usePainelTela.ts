@@ -67,7 +67,7 @@ export function usePainelTela() {
   function exibirToastPendente() {
     const pendente = toastStore.consumePending();
     if (pendente) {
-      toast.create({
+      void toast.create({
         props: {
           body: pendente.mensagem,
           variant: 'success',
@@ -108,7 +108,7 @@ export function usePainelTela() {
 
   function abrirDetalhesProcesso(processo: ProcessoResumo | undefined) {
     if (processo && processo.linkDestino) {
-      router.push(processo.linkDestino);
+      void router.push(processo.linkDestino);
     }
   }
 

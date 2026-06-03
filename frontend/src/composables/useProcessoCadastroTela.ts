@@ -12,8 +12,8 @@ import {logger} from "@/utils";
 import {listarUnidadesComEquipePropriaSelecionadas} from "@/views/processoCadastroUnidades";
 import type {Processo, Unidade} from "@/types/tipos";
 
-type FormFieldsRef = any;
-type ModalAcaoBlocoRef = any;
+type FormFieldsRef = Record<string, unknown>;
+type ModalAcaoBlocoRef = Record<string, unknown>;
 
 interface TelaCadastroRefs {
     formFieldsRef: Ref<FormFieldsRef>;

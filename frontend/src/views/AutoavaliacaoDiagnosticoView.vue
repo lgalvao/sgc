@@ -399,7 +399,7 @@ async function confirmarImpossibilitar() {
 
 // ── Navegação ────────────────────────────────────────────────────────────────
 function navegarParaConsenso(servidorTitulo: string) {
-  router.push({
+  void router.push({
     name: 'ConsensoDiagnostico',
     params: {
       codSubprocesso: props.codSubprocesso,
@@ -410,7 +410,7 @@ function navegarParaConsenso(servidorTitulo: string) {
 }
 
 function voltar() {
-  router.back();
+  void router.back();
 }
 
 function podeImpossibilitar(situacao: SituacaoAvaliacaoServidor) {

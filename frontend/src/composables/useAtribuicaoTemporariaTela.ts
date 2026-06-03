@@ -188,7 +188,7 @@ function criarFluxoCarga({
             await unidadeQuery.refresh();
             atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
             preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
-        } catch (e) {
+        } catch {
             // Ignorar erros de recarga em background
         }
     });
@@ -236,8 +236,8 @@ function criarFluxoMutacao({
     const {invalidarUnidade, invalidarDadosTelaUnidade} = useInvalidacaoUnidade();
 
     async function atualizarCachesPosMutacao() {
-        invalidarUnidade();
-        invalidarDadosTelaUnidade();
+        void invalidarUnidade();
+        void invalidarDadosTelaUnidade();
         await unidadeQuery.refetch();
         atribuicoes.value = await buscarAtribuicoesTemporariasPorUnidade(codigoUnidade);
         preencherFormularioComAtribuicaoVigente(atribuicaoVigente.value, campos, resetarValidacao);
@@ -319,7 +319,7 @@ function criarFluxoMutacao({
 export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
     const router = useRouter();
     const {notificacao, notify, clear} = useNotification();
-    const {mostrarDiagnosticoOrganizacional} = usePerfil();
+
     const unidadeQuery = useUnidadeQuery(codigoUnidade);
     const {invalidarDiagnostico} = useInvalidacaoDiagnosticoOrganizacional();
     const campos = criarEstadoCampos();

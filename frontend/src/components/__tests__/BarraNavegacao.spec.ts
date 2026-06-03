@@ -103,7 +103,7 @@ describe("BarraNavegacao.vue", () => {
         expect(items[1].text()).toBe("Detalhes do processo");
     });
 
-    it("deve chamar router.back() ao clicar no botão de voltar", async () => {
+    it("deve chamar void router.back() ao clicar no botão de voltar", async () => {
         const wrapper = montarComponente();
 
         await wrapper.find("button").trigger("click");

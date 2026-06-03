@@ -12,12 +12,13 @@ import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useErrorHandler} from "@/composables/useErrorHandler";
 import logger from "@/utils/logger";
 
-export function useImportarAtividadesTela(
-    mostrar: Ref<boolean>,
-    codSubprocessoDestino: Ref<number | null | undefined>,
-    onFechar: () => void,
-    onImportar: (resultado: AtividadeOperacaoResponse) => void,
-) {
+export function useImportarAtividadesTela(params: {
+    mostrar: Ref<boolean>;
+    codSubprocessoDestino: Ref<number | null | undefined>;
+    onFechar: () => void;
+    onImportar: (resultado: AtividadeOperacaoResponse) => void;
+}) {
+    const {mostrar, codSubprocessoDestino, onFechar, onImportar} = params;
     const {validarSubmissao, resetarValidacao, deveExibirErro, focarPrimeiroErroInvalido} = useValidacaoFormulario();
     const {executarComTratamentoDeErros} = useErrorHandler();
 
@@ -65,9 +66,9 @@ export function useImportarAtividadesTela(
     watch(unidadeSelecionadaId, (newId) => {
         if (newId) {
             const unidade = unidadesParticipantes.value.find((u) => u.codUnidade === Number(newId));
-            if (unidade) selecionarUnidade(unidade);
+            if (unidade) void selecionarUnidade(unidade);
         } else {
-            selecionarUnidade(null);
+            void selecionarUnidade(null);
         }
     });
 

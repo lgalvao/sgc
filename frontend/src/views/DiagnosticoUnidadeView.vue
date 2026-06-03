@@ -15,7 +15,7 @@
             <BBadge :variant="varianteSituacao" class="ms-2">{{ situacao }}</BBadge>
           </div>
         </div>
-        <BButton size="sm" variant="outline-secondary" @click="router.back()">
+        <BButton size="sm" variant="outline-secondary" @click="void router.back()">
           <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
           {{ TEXTOS.diagnostico.BTN_VOLTAR }}
         </BButton>

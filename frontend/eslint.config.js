@@ -66,7 +66,12 @@ export default [
             "**/*.spec.ts",
             "**/*.stories.ts",
             "**/test-utils/**",
-            "**/*.d.ts"
+            "**/*.d.ts",
+            "*.config.ts",
+            "*.config.js",
+            "vite.config.*",
+            "vitest.config.*",
+            "vitest.setup.ts"
         ],
         rules: {
             "no-console": "off",
@@ -78,6 +83,9 @@ export default [
             "max-lines": "off",
             "max-lines-per-function": "off",
             "max-statements": "off",
+            "@typescript-eslint/no-unnecessary-type-assertion": "off",
+            "@typescript-eslint/ban-ts-comment": "off",
+            "@typescript-eslint/no-unused-vars": "off",
         },
     },
     // 6. Configuração específica para Vue

@@ -99,7 +99,7 @@ describe("useMapaOrquestracao", () => {
             .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
 
         const wrapper = mount(criarComponenteTeste({codProcesso: 1, sigla: "TEST"}));
-        await wrapper.vm.carregarContextoInicial();
+        await wrapper.vm.void carregarContextoInicial();
         await flushPromises();
 
         subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockClear();
@@ -115,7 +115,7 @@ describe("useMapaOrquestracao", () => {
             .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
 
         const wrapper = mount(criarComponenteTeste({codProcesso: 1, sigla: "TEST"}));
-        await wrapper.vm.carregarContextoInicial();
+        await wrapper.vm.void carregarContextoInicial();
         await flushPromises();
 
         subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade.mockClear();

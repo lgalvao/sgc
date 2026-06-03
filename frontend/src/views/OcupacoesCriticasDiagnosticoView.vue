@@ -15,7 +15,7 @@
             <BBadge :variant="varianteSituacao" class="ms-2">{{ unidade.situacaoSubprocesso }}</BBadge>
           </div>
         </div>
-        <BButton size="sm" variant="outline-secondary" @click="router.back()">
+        <BButton size="sm" variant="outline-secondary" @click="void router.back()">
           <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
           {{ TEXTOS.diagnostico.BTN_VOLTAR }}
         </BButton>
@@ -178,7 +178,7 @@ async function confirmarConcluir() {
   try {
     await concluirDiagnostico();
     alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO;
-    router.back();
+    void router.back();
   } catch {
     erroMensagem.value = erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
   }

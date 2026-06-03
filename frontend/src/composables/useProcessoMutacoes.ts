@@ -16,7 +16,7 @@ interface UseProcessoMutacoesParams {
     idsUnidadesComEquipePropriaSelecionadas: Ref<number[]>;
     mostrarModalConfirmacao: Ref<boolean>;
     mostrarModalRemocao: Ref<boolean>;
-    modalUnidadesComEquipePropriaRef: Ref<any>;
+    modalUnidadesComEquipePropriaRef: Ref<unknown>;
     tratarErrosApi: (error: unknown, titulo: string, mensagemPadrao: string) => void;
 }
 

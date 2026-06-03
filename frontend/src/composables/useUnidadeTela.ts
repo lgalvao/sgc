@@ -51,11 +51,11 @@ export function useUnidadeTela(props: UnidadeTelaProps) {
   });
 
   function irParaCriarAtribuicao() {
-    router.push({path: `/unidade/${props.codUnidade}/atribuicao`});
+    void router.push({path: `/unidade/${props.codUnidade}/atribuicao`});
   }
 
   function navegarParaUnidadeSubordinada(row: TreeItem) {
-    router.push({path: `/unidade/${row.codigo}`});
+    void router.push({path: `/unidade/${row.codigo}`});
   }
 
   async function exportarMapaVigentePdf() {

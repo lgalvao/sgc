@@ -22,14 +22,14 @@ export function useInvalidacaoNavegacao() {
     const subprocessoStore = useSubprocessoStore();
 
     function atualizarFluxoProcesso(): void {
-        invalidarPainel();
-        invalidarProcesso();
+        void invalidarPainel();
+        void invalidarProcesso();
         painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa();
-        invalidarUnidade();
-        invalidarDadosTelaUnidade();
-        invalidarArvoreElegibilidade();
+        void invalidarUnidade();
+        void invalidarDadosTelaUnidade();
+        void invalidarArvoreElegibilidade();
     }
 
     function atualizarFluxoSubprocesso(): void {
@@ -37,38 +37,38 @@ export function useInvalidacaoNavegacao() {
     }
 
     function atualizarFluxoSubprocessoEPainel(): void {
-        invalidarPainel();
+        void invalidarPainel();
         painelStore.invalidar();
         subprocessoStore.invalidar();
     }
 
     function atualizarFluxoCadastro(codigoSubprocesso: number): void {
-        invalidarPainel();
+        void invalidarPainel();
         painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa(codigoSubprocesso);
     }
 
     function atualizarFluxoSubprocessoEProcesso(): void {
-        invalidarProcesso();
+        void invalidarProcesso();
         subprocessoStore.invalidar();
     }
 
     function atualizarFluxoMapa(codigoSubprocesso?: number): void {
-        invalidarPainel();
-        invalidarProcesso();
+        void invalidarPainel();
+        void invalidarProcesso();
         painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa(codigoSubprocesso);
     }
 
     function atualizarDadosOrganizacionais(): void {
-        invalidarDiagnostico();
+        void invalidarDiagnostico();
         painelStore.invalidar();
-        invalidarPainel();
-        invalidarUnidade();
-        invalidarDadosTelaUnidade();
-        invalidarArvoreElegibilidade();
+        void invalidarPainel();
+        void invalidarUnidade();
+        void invalidarDadosTelaUnidade();
+        void invalidarArvoreElegibilidade();
     }
 
     function limparEstadoSubprocessoAtual(): void {
@@ -79,10 +79,10 @@ export function useInvalidacaoNavegacao() {
         painelStore.resetar();
         subprocessoStore.resetar();
         invalidarMapa();
-        invalidarDiagnostico();
-        invalidarUnidade();
-        invalidarDadosTelaUnidade();
-        invalidarArvoreElegibilidade();
+        void invalidarDiagnostico();
+        void invalidarUnidade();
+        void invalidarDadosTelaUnidade();
+        void invalidarArvoreElegibilidade();
     }
 
     return {

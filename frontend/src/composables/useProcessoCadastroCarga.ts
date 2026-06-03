@@ -11,12 +11,12 @@ import type {useProcessoForm} from "@/composables/useProcessoForm";
 
 interface UseProcessoCargaParams {
     formulario: ReturnType<typeof useProcessoForm>;
-    formFieldsRef: Ref<any>;
+    formFieldsRef: Ref<unknown>;
     unidades: Ref<Unidade[]>;
     isLoadingUnidades: Ref<boolean>;
     isLoadingData: Ref<boolean>;
     processoEditando: Ref<Processo | null>;
-    notify: (mensagem: string, variante?: any) => void;
+    notify: (mensagem: string, variante?: unknown) => void;
 }
 
 export function useProcessoCadastroCarga({
@@ -56,7 +56,7 @@ export function useProcessoCadastroCarga({
             const unidadesSemSemEquipe = removerUnidadesSemEquipe(unidadesMapeadas);
             unidades.value = unidadesSemSemEquipe;
             sincronizarUnidadesSelecionadasElegiveis(unidadesSemSemEquipe);
-        } catch (error) {
+        } catch (error: unknown) {
             if (isErroCanceladoHttp(error)) return;
             logger.error("Erro ao buscar unidades:", error);
             notify(TEXTOS.processo.cadastro.ERRO_CARREGAR_UNIDADES, "danger");

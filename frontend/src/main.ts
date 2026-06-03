@@ -40,7 +40,7 @@ app.config.errorHandler = (err) => {
     if (normalizado.tipo === 'naoAutorizado') return;
     if (TIPOS_SEM_SOLUCAO.has(normalizado.tipo)) {
         logger.error('[errorHandler]', normalizado.mensagem, err);
-        router.push('/erro').catch(() => {/* navegação já em /erro */});
+        void router.push('/erro').catch(() => {/* navegação já em /erro */});
         return;
     }
     // Erro recuperável não tratado localmente — relança para não suprimir silenciosamente

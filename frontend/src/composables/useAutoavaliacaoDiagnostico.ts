@@ -66,8 +66,8 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     const mutacaoConcluir = useMutation({
         mutation: () => concluirAutoavaliacao(codSubprocesso),
         onSuccess: () => {
-            cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso)});
-            cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
         },
     });
 

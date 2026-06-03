@@ -143,7 +143,7 @@ function compactarResolucao(raw: Record<string, unknown>, filtrado: Record<strin
     return;
   }
 
-  filtrado["Resolução"] = `${larguraTela}x${alturaTela}`;
+  filtrado["Resolução"] = `${larguraTela as string}x${alturaTela as string}`;
   chavesIgnorar.add("larguraTela");
   chavesIgnorar.add("alturaTela");
 }

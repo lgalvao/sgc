@@ -56,7 +56,7 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
             setTimeout(() => {
                 autoguardado.value = false;
             }, 2000);
-            cache.invalidateQueries({key: chaveUnidade(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveUnidade(codSubprocesso)});
         },
     });
 

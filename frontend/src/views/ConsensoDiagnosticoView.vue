@@ -17,7 +17,7 @@
             </BBadge>
           </div>
         </div>
-        <BButton size="sm" variant="outline-secondary" @click="router.back()">
+        <BButton size="sm" variant="outline-secondary" @click="void router.back()">
           <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
           {{ TEXTOS.diagnostico.BTN_VOLTAR }}
         </BButton>
@@ -185,7 +185,7 @@ async function confirmarSalvarConsenso() {
   try {
     await salvarConsenso(props.servidorTitulo, motivoReabertura.value || undefined);
     alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_CONSENSO_SALVO;
-    router.back();
+    void router.back();
   } catch {
     erroMensagem.value = erroSalvar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
   }

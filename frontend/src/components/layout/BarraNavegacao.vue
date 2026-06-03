@@ -53,7 +53,7 @@ const router = useRouter();
 const {breadcrumbs: crumbs} = useBreadcrumbs(route);
 
 function goBack() {
-  router.back();
+  void router.back();
 }
 
 const shouldShowBackButton = computed(

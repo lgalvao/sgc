@@ -105,12 +105,12 @@ export function useCacheMapa() {
         const queryCache = useQueryCache();
         if (typeof codigoSubprocesso === "number") {
             queryCache.setQueryData(criarChaveMapa(codigoSubprocesso, obterContextoSessao()), null);
-            queryCache.invalidateQueries({key: criarChaveMapa(codigoSubprocesso, obterContextoSessao()), exact: true});
+            void queryCache.invalidateQueries({key: criarChaveMapa(codigoSubprocesso, obterContextoSessao()), exact: true});
             invalidarImpacto(codigoSubprocesso);
             return;
         }
 
-        queryCache.invalidateQueries({key: CHAVE_QUERY_MAPA});
+        void queryCache.invalidateQueries({key: CHAVE_QUERY_MAPA});
         invalidarImpacto();
     }
 
@@ -119,11 +119,11 @@ export function useCacheMapa() {
         const queryCache = useQueryCache();
         if (typeof codigoSubprocesso === "number") {
             queryCache.setQueryData(criarChaveImpactoMapa(codigoSubprocesso, obterContextoSessao()), null);
-            queryCache.invalidateQueries({key: criarChaveImpactoMapa(codigoSubprocesso, obterContextoSessao()), exact: true}, SEM_RECARREGAR_AUTOMATICO);
+            void queryCache.invalidateQueries({key: criarChaveImpactoMapa(codigoSubprocesso, obterContextoSessao()), exact: true}, SEM_RECARREGAR_AUTOMATICO);
             return;
         }
 
-        queryCache.invalidateQueries({key: CHAVE_QUERY_IMPACTO_MAPA}, SEM_RECARREGAR_AUTOMATICO);
+        void queryCache.invalidateQueries({key: CHAVE_QUERY_IMPACTO_MAPA}, SEM_RECARREGAR_AUTOMATICO);
     }
 
     return {

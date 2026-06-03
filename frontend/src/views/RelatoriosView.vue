@@ -9,9 +9,9 @@
             data-testid="card-relatorio-andamento"
             role="button"
             tabindex="0"
-            @click="router.push('/relatorios/andamento')"
-            @keydown.enter="router.push('/relatorios/andamento')"
-            @keydown.space.prevent="router.push('/relatorios/andamento')"
+            @click="void router.push('/relatorios/andamento')"
+            @keydown.enter="void router.push('/relatorios/andamento')"
+            @keydown.space.prevent="void router.push('/relatorios/andamento')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -31,9 +31,9 @@
             data-testid="card-relatorio-mapas"
             role="button"
             tabindex="0"
-            @click="router.push('/relatorios/mapas-vigentes')"
-            @keydown.enter="router.push('/relatorios/mapas-vigentes')"
-            @keydown.space.prevent="router.push('/relatorios/mapas-vigentes')"
+            @click="void router.push('/relatorios/mapas-vigentes')"
+            @keydown.enter="void router.push('/relatorios/mapas-vigentes')"
+            @keydown.space.prevent="void router.push('/relatorios/mapas-vigentes')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -53,9 +53,9 @@
             data-testid="card-relatorio-unidades-sem-mapas-vigentes"
             role="button"
             tabindex="0"
-            @click="router.push('/relatorios/unidades-sem-mapas-vigentes')"
-            @keydown.enter="router.push('/relatorios/unidades-sem-mapas-vigentes')"
-            @keydown.space.prevent="router.push('/relatorios/unidades-sem-mapas-vigentes')"
+            @click="void router.push('/relatorios/unidades-sem-mapas-vigentes')"
+            @keydown.enter="void router.push('/relatorios/unidades-sem-mapas-vigentes')"
+            @keydown.space.prevent="void router.push('/relatorios/unidades-sem-mapas-vigentes')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">

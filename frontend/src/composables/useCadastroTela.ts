@@ -251,13 +251,13 @@ export function useCadastroTela(props: CadastroTelaProps) {
         if (loadingValidacao.value) return;
 
         limparErrosValidacao();
-        const validacaoLocal = _validarLocalmente(
+        const validacaoLocal = _validarLocalmente({
             atividades,
             isRevisao,
             houveAlteracaoCadastro,
             disponibilizacaoSemMudancas,
             situacaoAtual,
-        );
+        });
 
         if (validacaoLocal.tipo === "erro-validacao") {
             aplicarErrosValidacao(validacaoLocal.erros);
@@ -372,7 +372,7 @@ export function useCadastroTela(props: CadastroTelaProps) {
 
     watch(() => atividades.value?.length, (newLen, oldLen) => {
         if (podeEditarCadastro.value && newLen === 0 && oldLen === undefined) {
-            nextTick(() => atividadeFormRef.value?.inputRef?.$el?.focus());
+            void nextTick(() => atividadeFormRef.value?.inputRef?.$el?.focus());
         }
     }, {immediate: true});
 
@@ -461,13 +461,14 @@ type _ResultadoValidacaoLocal =
     | {tipo: "erro-validacao"; erros: ErroValidacao[]}
     | {tipo: "acao-nao-permitida"; mensagem: string};
 
-function _validarLocalmente(
-    atividades: {value: Atividade[]},
-    isRevisao: {value: boolean},
-    houveAlteracaoCadastro: {value: boolean},
-    disponibilizacaoSemMudancas: {value: boolean},
-    situacaoAtual: {value: SituacaoSubprocesso | string | undefined}
-): _ResultadoValidacaoLocal {
+function _validarLocalmente(params: {
+    atividades: {value: Atividade[]};
+    isRevisao: {value: boolean};
+    houveAlteracaoCadastro: {value: boolean};
+    disponibilizacaoSemMudancas: {value: boolean};
+    situacaoAtual: {value: SituacaoSubprocesso | string | undefined};
+}): _ResultadoValidacaoLocal {
+    const {atividades, isRevisao, houveAlteracaoCadastro, disponibilizacaoSemMudancas, situacaoAtual} = params;
     const cadastroIncompleto = atividades.value.length === 0
         || atividades.value.some((atividade) => !atividade.conhecimentos || atividade.conhecimentos.length === 0);
 

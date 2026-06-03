@@ -77,7 +77,7 @@ function ordenarPor(campo: keyof ProcessoResumo) {
 function verDetalhes(proc: ProcessoResumo | undefined) {
   if (proc) {
     const path = proc.linkDestino || `/processo/${proc.codigo}`;
-    router.push(path);
+    void router.push(path);
   }
 }
 
@@ -89,7 +89,7 @@ let montadoUmaVez = false;
 async function carregarDadosTela(deveRecarregarHistorico: boolean) {
   const promessas = [];
   if (deveRecarregarHistorico) {
-    promessas.push(historicoQuery.refetch());
+    promessas.push(void historicoQuery.refetch());
   }
   if (podeCarregarConfiguracoes.value) {
     promessas.push(carregarConfiguracoes());

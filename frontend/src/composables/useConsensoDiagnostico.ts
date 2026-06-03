@@ -64,17 +64,17 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
                 motivoReabertura: motivo || undefined,
             }),
         onSuccess: () => {
-            cache.invalidateQueries({key: chaveConsenso(codSubprocesso, servidorTitulo)});
-            cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, servidorTitulo)});
+            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
         },
     });
 
     const mutacaoAprovar = useMutation({
         mutation: () => aprovarConsenso(codSubprocesso),
         onSuccess: () => {
-            cache.invalidateQueries({key: chaveConsenso(codSubprocesso, servidorTitulo)});
-            cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
-            cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, servidorTitulo)});
+            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso)});
         },
     });
 
@@ -82,7 +82,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         mutation: ({servidorTitulo, justificativa}: {servidorTitulo: string; justificativa: string}) =>
             impossibilitarAvaliacao(codSubprocesso, servidorTitulo, {justificativa}),
         onSuccess: () => {
-            cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
         },
     });
 

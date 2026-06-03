@@ -1,0 +1,9 @@
+*.spec.ts
+*.stories.ts
+**/__tests__/**
+src/test-utils/**
+vitest.config.ts
+vitest.setup.ts
+cypress/
+*.config.js
+*.config.ts

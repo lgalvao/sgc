@@ -29,6 +29,6 @@ export function useInvalidacaoDiagnosticoContexto() {
     const cache = useQueryCache();
     return {
         invalidarContexto: (codSubprocesso: number) =>
-            cache.invalidateQueries({key: chaveContexto(codSubprocesso)}),
+            void cache.invalidateQueries({key: chaveContexto(codSubprocesso)}),
     };
 }

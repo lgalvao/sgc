@@ -19,9 +19,9 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
     const router = useRouter();
 
     function _invalidarTudo() {
-        cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'contexto', codSubprocesso]});
-        cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'equipe', codSubprocesso]});
-        cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', codSubprocesso]});
+        void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'contexto', codSubprocesso]});
+        void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'equipe', codSubprocesso]});
+        void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', codSubprocesso]});
     }
 
     const mutacaoConcluir = useMutation({
@@ -57,7 +57,7 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
 
     /** Volta para a tela do subprocesso após ação de fluxo concluída. */
     function voltarParaSubprocesso(codProcesso: number, siglaUnidade: string) {
-        router.push({
+        void router.push({
             name: 'Subprocesso',
             params: {codProcesso, siglaUnidade},
         });

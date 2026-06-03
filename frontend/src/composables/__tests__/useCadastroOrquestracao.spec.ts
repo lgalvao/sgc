@@ -185,7 +185,7 @@ describe("useCadastroOrquestracao", () => {
         } as any);
 
         const wrapper = mount(criarComponenteTeste());
-        await wrapper.vm.carregarContextoInicial();
+        await wrapper.vm.void carregarContextoInicial();
         await flushPromises();
 
         storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade.mockClear();
@@ -206,7 +206,7 @@ describe("useCadastroOrquestracao", () => {
         } as any);
 
         const wrapper = mount(criarComponenteTeste());
-        await wrapper.vm.carregarContextoInicial();
+        await wrapper.vm.void carregarContextoInicial();
         await flushPromises();
 
         storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade.mockClear();

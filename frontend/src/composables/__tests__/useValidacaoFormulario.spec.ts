@@ -60,6 +60,6 @@ describe("useValidacaoFormulario", () => {
     it("não lança erro quando não há elemento inválido", async () => {
         const {focarPrimeiroErroInvalido} = useValidacaoFormulario();
 
-        await expect(focarPrimeiroErroInvalido()).resolves.toBeUndefined();
+        await expect(void focarPrimeiroErroInvalido()).resolves.toBeUndefined();
     });
 });

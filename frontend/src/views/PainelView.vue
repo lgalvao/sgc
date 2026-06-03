@@ -25,7 +25,7 @@
             :processos="processosOrdenados"
             @ordenar="ordenarPor"
             @selecionar-processo="abrirDetalhesProcesso"
-            @cta-vazio="router.push({ name: 'CadProcesso' })"
+            @cta-vazio="void router.push({ name: 'CadProcesso' })"
         />
       </div>
 

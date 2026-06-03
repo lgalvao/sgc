@@ -45,7 +45,7 @@ export function useReenvioNotificacaoMutation() {
     return useMutation<ReenvioNotificacaoResponse, number, Error>({
         mutation: (codigoNotificacao) => reenviarNotificacao(codigoNotificacao),
         onSuccess: () => {
-            useQueryCache().invalidateQueries({key: CHAVE_QUERY_NOTIFICACOES_ADMIN});
+            void useQueryCache().invalidateQueries({key: CHAVE_QUERY_NOTIFICACOES_ADMIN});
         },
     });
 }

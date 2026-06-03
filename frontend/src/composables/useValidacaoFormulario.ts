@@ -22,7 +22,7 @@ export function useValidacaoFormulario() {
 
     async function focarPrimeiroErroInvalido(): Promise<void> {
         await nextTick();
-        const primeiroInvalido = document.querySelector('.is-invalid') as HTMLElement | null;
+        const primeiroInvalido = document.querySelector<HTMLElement>('.is-invalid');
         primeiroInvalido?.focus();
     }
 
