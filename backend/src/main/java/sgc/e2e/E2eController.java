@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.alerta.model.*;
 import sgc.comum.erros.*;
+import sgc.diagnostico.model.*;
 import sgc.feedback.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -53,6 +54,8 @@ public class E2eController {
     private final ProcessoDtoMapper processoDtoMapper;
     private final SubprocessoRepo subprocessoRepo;
     private final MapaRepo mapaRepo;
+    private final DiagnosticoRepo diagnosticoRepo;
+    private final AvaliacaoServidorRepo avaliacaoServidorRepo;
     private final UnidadeService unidadeService;
     private final ResourceLoader resourceLoader;
     private final CacheManager cacheManager;
@@ -268,6 +271,16 @@ public class E2eController {
     @Transactional
     public ProcessoResumoDto criarProcessoDiagnostico(@RequestBody ProcessoFixtureRequest request) {
         return processoResumoFixture(executeAsAdmin(() -> criarProcessoFixture(request, TipoProcesso.DIAGNOSTICO)));
+    }
+
+    @PostMapping("/fixtures/processo-diagnostico-com-autoavaliacao-concluida")
+    @Transactional
+    public ProcessoResumoDto criarProcessoDiagnosticoComAutoavaliacaoConcluida(
+            @RequestBody ProcessoDiagnosticoAutoavaliadoFixtureRequest request
+    ) {
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
+        concluirAutoavaliacaoFixture(processo.getCodigo(), request.unidadeSigla(), request.servidorTitulo());
+        return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
     }
 
     @PostMapping("/fixtures/notificacao-email")
@@ -880,6 +893,34 @@ public class E2eController {
         subprocessoRepo.saveAndFlush(s);
     }
 
+    private void concluirAutoavaliacaoFixture(Long codProcesso, String unidadeSigla, String servidorTitulo) {
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(unidadeSigla);
+        Long codSubprocesso = subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
+                .map(Subprocesso::getCodigo)
+                .orElseThrow();
+
+        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
+                .orElseThrow(() -> new IllegalStateException("Diagnóstico não encontrado para subprocesso " + codSubprocesso));
+
+        List<AvaliacaoServidor> avaliacoes = avaliacaoServidorRepo.buscarAvaliacoesDoServidor(
+                diagnostico.getCodigo(), servidorTitulo
+        );
+        if (avaliacoes.isEmpty()) {
+            throw new IllegalStateException("Nenhuma avaliação encontrada para o servidor " + servidorTitulo);
+        }
+
+        avaliacoes.forEach(avaliacao -> {
+            avaliacao.setAutoimportancia(3);
+            avaliacao.setAutodominio(4);
+            avaliacao.setImportancia(3);
+            avaliacao.setDominio(4);
+            avaliacao.calculaGap();
+            avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        });
+        avaliacaoServidorRepo.saveAllAndFlush(avaliacoes);
+        limparCaches();
+    }
+
     /**
      * DTO para requisição de criação de processo fixture.
      */
@@ -895,6 +936,18 @@ public class E2eController {
 
         public int resolverDiasLimite() {
             return diasLimite != null ? diasLimite : 30;
+        }
+    }
+
+    public record ProcessoDiagnosticoAutoavaliadoFixtureRequest(
+            String descricao,
+            String unidadeSigla,
+            Boolean iniciar,
+            Integer diasLimite,
+            String servidorTitulo
+    ) {
+        ProcessoFixtureRequest paraProcessoFixtureRequest() {
+            return new ProcessoFixtureRequest(descricao, unidadeSigla, iniciar, diasLimite);
         }
     }
 

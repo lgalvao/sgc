@@ -39,8 +39,8 @@ test.describe('CDU-42 - Realizar autoavaliação', () => {
             page.getByTestId('btn-confirmar-concluir').click()
         ]);
 
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
-        await expect(page.locator('.orchestrator-container .toast').first()).toContainText('Autoavaliação concluída');
+        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/autoavaliacao`));
+        await expect(page.getByTestId('app-alert')).toContainText('Autoavaliação concluída');
 
         await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {

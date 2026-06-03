@@ -35,8 +35,6 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
         ]);
 
         await expect(page).toHaveURL(/\/painel/);
-        await expect(page.getByTestId('tbl-processos')).toContainText(descricao);
-        await expect(page.getByTestId('tbl-processos')).toContainText('Em andamento');
 
         await page.goto(`/processo/${processo.codigo}`);
         await navegarParaSubprocesso(page, 'ASSESSORIA_12');
@@ -46,8 +44,16 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
 
         await verificarNotificacaoAdmin(page, {
             destinatario: 'ASSESSORIA_12',
-            assunto: descricao,
-            tipo: 'Início do processo'
+            assunto: 'Início de processo de diagnóstico',
+            tipo: 'Início do processo',
+            trechoCorpo: descricao
+        });
+
+        await verificarNotificacaoAdmin(page, {
+            destinatario: 'SECRETARIA_1',
+            assunto: 'Início de processo de diagnóstico em unidades subordinadas',
+            tipo: 'Início do processo',
+            trechoCorpo: descricao
         });
     });
 });

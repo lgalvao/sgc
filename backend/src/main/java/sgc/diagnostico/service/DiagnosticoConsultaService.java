@@ -180,7 +180,7 @@ public class DiagnosticoConsultaService {
                 .map(o -> OcupacaoCriticaDto.builder()
                         .competenciaCodigo(o.getCompetencia().getCodigo())
                         .servidorTitulo(o.getServidor().getTituloEleitoral())
-                        .situacaoCapacitacao(o.getSituacaoCapacitacao().name())
+                        .situacaoCapacitacao(o.getSituacaoCapacitacao() != null ? o.getSituacaoCapacitacao().name() : null)
                         .build())
                 .toList();
 

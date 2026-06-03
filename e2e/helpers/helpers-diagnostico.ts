@@ -13,6 +13,7 @@ export async function preencherAutoavaliacaoCompleta(page: Page, codSubprocesso:
     await expect(selectImportancia.first()).toBeVisible();
 
     for (let i = 0; i < total; i++) {
+        if ((await selectImportancia.nth(i).inputValue()) === '3') continue;
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao`) && res.request().method() === 'POST' && res.ok()
@@ -23,6 +24,7 @@ export async function preencherAutoavaliacaoCompleta(page: Page, codSubprocesso:
 
     const selectDominio = page.locator('[data-testid^="autoavaliacao-dominio-"]');
     for (let i = 0; i < total; i++) {
+        if ((await selectDominio.nth(i).inputValue()) === '4') continue;
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao`) && res.request().method() === 'POST' && res.ok()
@@ -30,6 +32,15 @@ export async function preencherAutoavaliacaoCompleta(page: Page, codSubprocesso:
             selectDominio.nth(i).selectOption('4')
         ]);
     }
+
+    await expect.poll(async () => await page.evaluate(async (codigo) => {
+        const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/autoavaliacao`, {credentials: 'include'});
+        if (!resposta.ok) return false;
+        const dados = await resposta.json();
+        return dados.competencias.every((item: {importancia: number | null; dominio: number | null}) =>
+            item.importancia === 3 && item.dominio === 4
+        );
+    }, codSubprocesso)).toBe(true);
 }
 
 export async function preencherConsensoMinimo(
@@ -49,6 +60,7 @@ export async function preencherConsensoMinimo(
         const total = await itens.count();
         await expect(itens.first()).toBeVisible();
         for (let i = 0; i < total; i++) {
+            if ((await itens.nth(i).inputValue()) === '4') continue;
             await Promise.all([
                 page.waitForResponse(res =>
                     res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/${servidorTitulo}`)
@@ -59,6 +71,24 @@ export async function preencherConsensoMinimo(
             ]);
         }
     }
+
+    await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
+        const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
+        if (!resposta.ok) return false;
+        const dados = await resposta.json();
+        const itens = dados.competenciasDetalhadas ?? [];
+        return itens.length > 0 && itens.every((item: {
+            chefiaImportancia: number | null;
+            chefiaDominio: number | null;
+            consensoImportancia: number | null;
+            consensoDominio: number | null;
+        }) =>
+            item.chefiaImportancia === 4
+            && item.chefiaDominio === 4
+            && item.consensoImportancia === 4
+            && item.consensoDominio === 4
+        );
+    }, {codigo: codSubprocesso, titulo: servidorTitulo})).toBe(true);
 }
 
 export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
@@ -72,4 +102,6 @@ export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubpro
         ),
         select.selectOption(valor)
     ]);
+
+    await expect(page.getByText('Salvo automaticamente')).toBeVisible();
 }

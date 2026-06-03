@@ -93,6 +93,30 @@ export async function criarProcessoFixture(
     return await response.json();
 }
 
+export async function criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions & {servidorTitulo: string}
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico-com-autoavaliacao-concluida', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E DIAGNOSTICO AUTOAVALIADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30,
+            servidorTitulo: options.servidorTitulo
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo diagnóstico com autoavaliação concluída: ` +
+            `${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
 /**
  * Cria um processo de mapeamento via API E2E que já nasce finalizado e com atividades,
  * ignorando validações, perfeito para testes de importação.

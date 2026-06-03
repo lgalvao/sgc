@@ -175,7 +175,9 @@ public class DiagnosticoAvaliacaoService {
             if (registro == null) {
                 continue;
             }
-            registro.setSituacaoCapacitacao(SituacaoCapacitacao.valueOf(item.situacaoCapacitacao()));
+            registro.setSituacaoCapacitacao(
+                    item.situacaoCapacitacao() == null ? null : SituacaoCapacitacao.valueOf(item.situacaoCapacitacao())
+            );
         }
         ocupacaoRepo.saveAll(existentes);
     }
