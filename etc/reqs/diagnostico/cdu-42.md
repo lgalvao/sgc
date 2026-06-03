@@ -1,79 +1,55 @@
-# CDU-42 - Manter avaliação de consenso
+# CDU-42 - Realizar autoavaliação de diagnóstico
 
-Ator: CHEFE
-
-Maturidade: Média
-
-Base principal: Fluxo narrado e validado na reunião, complementado por respostas do usuário sobre reabertura e consenso.
+Ator: SERVIDOR
 
 ## Pré-condições
 
-- Login realizado com perfil CHEFE
-- Processo de diagnóstico em andamento
-- Existência de servidor da unidade com situação:
-  - `Autoavaliação concluída`; ou
-  - `Consenso criado`; ou
-  - `Consenso aprovado`
+- Login realizado com perfil SERVIDOR
+- Processo de diagnóstico em andamento com participação da unidade do servidor
 
 ## Fluxo principal
 
-1. Na tela `Diagnóstico da equipe`, o usuário escolhe um servidor elegível e aciona `Criar avaliação de consenso` ou `Editar avaliação de consenso`.
+1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O sistema apresenta a tela `Avaliação de consenso`, com o mesmo formulário da autoavaliação.
+2. O sistema mostra a tela `Detalhes do subprocesso` da unidade do servidor.
 
-3. Para cada competência da unidade, o sistema preenche inicialmente `Importância` e `Domínio` com os valores atuais do servidor:
-   - na primeira criação, os valores da autoavaliação;
-   - em edições posteriores, os valores do consenso vigente.
+3. O usuário clica no card `Autoavaliação`.
 
-4. Se a situação anterior do servidor for `Consenso aprovado`, o sistema, antes de liberar a edição, mostra um modal com:
-   - título `Reabrir consenso`;
-   - campo obrigatório `Motivo da reabertura`;
-   - botões `Cancelar` e `Reabrir`.
+4. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e, para cada competência:
+   - descrição da competência;
+   - botão `Atividade e conhecimentos`, que permite mostrar as atividades e conhecimentos associados à competência;
+   - campo `Importância`, com opções `NA` e os números de `1` a `6`;
+   - campo `Domínio`, com opções `NA` e os números de `1` a `6`.
 
-5. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e volta para a tela `Diagnóstico da equipe`.
+6. O usuário escolhe os valores desejados para cada uma das competências.
 
-6. Caso o usuário confirme a reabertura, o sistema registra o motivo da reabertura, altera a situação da avaliação
-   individual para `Consenso criado` e libera a edição.
+7. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
 
-7. O usuário ajusta os valores desejados de `Importância` e `Domínio`.
+8. O usuário clica em `Concluir autoavaliação`.
 
-8. O sistema salva automaticamente cada alteração realizada.
+9. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos. 
+      
+   9.1. caso exista competência com valores sem preencher o sistema mostra a mensagem `Preencha importância e domínio para todas as competências.` e interrompe a conclusão da autoavaliação. 
+      
+   9.2. Caso tudo estiver preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?", com botões `Confirmar` e `Cancelar`; uma vez confirmado, altera a situação da avaliação individual do servidor para 'Autoavaliação concluída'.
 
-9. O usuário clica em `Disponibilizar consenso`, na primeira criação, ou `Atualizar consenso`, quando já existir
-   consenso.
-
-10. O sistema verifica se todas as competências tiveram `Importância` e `Domínio` preenchidos.
-
-11. Caso positivo, o sistema altera ou mantém a situação da avaliação individual como `Consenso criado`.
-
-12. O sistema envia notificação por e-mail para o servidor:
+10. O sistema envia uma notificação por e-mail para o responsável pela unidade, com este modelo:
 
     ```text
-    Assunto: SGC: Avaliação de consenso de [NOME_SERVIDOR] disponível para validação
+    Assunto: SGC: Autoavaliação de [NOME_SERVIDOR] submetida para análise
 
-    Prezado(a) [NOME_SERVIDOR],
+    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
 
-    A chefia da unidade [SIGLA_UNIDADE_SUBPROCESSO] registrou a avaliação de consenso do processo [DESCRICAO_PROCESSO].
+    O servidor [NOME_SERVIDOR] concluiu a autoavaliação no processo [DESCRICAO_PROCESSO].
 
-    O consenso já pode ser consultado e validado no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-13. O sistema cria internamente um alerta com:
-    - `Descrição`: "Avaliação de consenso de [NOME_SERVIDOR] disponível para validação"
+11. O sistema cria internamente um alerta com:
+    - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-14. O sistema mostra a mensagem `Consenso disponibilizado`.
-
-## Observação
-
-PENDÊNCIA DE REFINAMENTO: esta primeira versão assume que o consenso reutiliza exatamente o mesmo formulário da
-autoavaliação e acrescenta apenas `Motivo da reabertura` quando houver edição após aprovação. Confirmar se haverá
-campos adicionais, como observações gerais ou justificativas por competência.
-
-## Fluxo alternativo
-
-1. No passo 10, caso exista competência sem `Importância` ou `Domínio` preenchidos, o sistema mostra a mensagem
-   `Preencha importância e domínio para todas as competências.` e interrompe a disponibilização do consenso.
+12. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Autoavaliação concluída`.

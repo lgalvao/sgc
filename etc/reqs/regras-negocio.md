@@ -223,7 +223,7 @@ ser selecionada. Mensagens de validação:
 
 **RN-04.16** — A árvore de seleção de unidades na criação/edição de processo deve respeitar comportamento hierárquico:
 
-- Selecionar unidade intermediária seleciona automaticamente toda subárvore.
+- Selecionar unidade intermediária seleciona automaticamente toda a subárvore.
 - Nó raiz de subárvore fica selecionado quando todos os descendentes estiverem selecionados.
 - Nó raiz fica em estado intermediário quando houver seleção parcial.
 - Nó raiz perde seleção quando todos os descendentes forem desmarcados.
