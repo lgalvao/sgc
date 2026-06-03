@@ -55,12 +55,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use existing users and units from data.sql
-        // Hierarchy: unit 100 (ADMIN) → unit 6 (GESTOR - COSIS) → unit 9 (CHEFE -
-        // SEDIA)
-        // Users: 111111111111 (ADMIN), 666666666666 (GESTOR), 333333333333 (CHEFE on
-        // unit 9)
-
         admin = usuarioService.buscarPorLogin("111111111111");
         admin.setPerfilAtivo(Perfil.ADMIN);
         admin.setUnidadeAtivaCodigo(100L);
@@ -77,8 +71,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         chefe.setAuthorities(Set.of(Perfil.CHEFE.toGrantedAuthority()));
 
         unidadeChefe = unidadeRepo.findById(9L).orElseThrow();
-        // Unit 9 already has mapa 1002 in data.sql, so use it
-        // Add test data to mapa 1002 if needed
+
         Mapa mapaVigente = mapaRepo.findById(1002L).orElseGet(() -> {
             Processo processoVigente = ProcessoFixture.processoPadrao();
             processoVigente.setCodigo(null);
@@ -382,8 +375,11 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             Atividade atividadeExistente = atividadeRepo.findByMapa_Codigo(sp.getMapa().getCodigo()).stream()
                     .findFirst()
                     .orElseThrow();
+            sp.getMapa().getAtividades().remove(atividadeExistente);
+            atividadeExistente.getCompetencias().forEach(comp -> comp.getAtividades().remove(atividadeExistente));
             atividadeRepo.delete(atividadeExistente);
             entityManager.flush();
+            entityManager.clear();
 
             mockMvc.perform(
                             get("/api/subprocessos/{codigo}/impactos-mapa", subprocessoId)
@@ -431,10 +427,6 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
         void naoPodeHomologarEmEstadoInvalido() throws Exception {
             Long subprocessoId = criarEComecarProcessoDeRevisao();
 
-            // AccessControlService
-            // Retorna 403 (Forbidden) em vez de 422 (Unprocessable entity)
-            // Isso é mais correto do ponto de vista de segurança: verificar permissões
-            // antes de validações de negócio
             mockMvc.perform(
                             post(API_SUBPROCESSOS_ID_HOMOLOGAR, subprocessoId)
                                     .with(csrf())
