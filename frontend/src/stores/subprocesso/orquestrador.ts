@@ -108,11 +108,15 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
 }
 
 export function usarOrquestradorContexto(
-    carregamentos: Map<string, Promise<object | string | number | boolean | null>>,
+    carregamentos: Map<string, Promise<unknown>>,
     erroIntegracaoContexto: Ref<ErroNormalizado | null>,
     limparContextoAtual: () => void
 ) {
-    const estado = {carregamentos, erroIntegracaoContexto, limparContextoAtual};
+    const estado = {
+        carregamentos: carregamentos as Map<string, Promise<object | string | number | boolean | null>>,
+        erroIntegracaoContexto,
+        limparContextoAtual
+    };
     return {
         garantirContextoPorCodigo: <T extends ContextoSubprocesso>(codigoSubprocesso: number, limparAntes: boolean, config: ConfiguracaoContexto<T>) =>
             garantirContextoPorCodigo(estado, codigoSubprocesso, {limparAntes, config}),

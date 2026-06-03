@@ -121,7 +121,7 @@ export function finalizarTransicaoSessao() {
     sessaoEmTransicao = false;
 }
 
-export function isErroCanceladoHttp(error: Error | object | string | null | undefined): boolean {
+export function isErroCanceladoHttp(error: unknown): boolean {
     if (typeof error !== "object" || !error) {
         return false;
     }

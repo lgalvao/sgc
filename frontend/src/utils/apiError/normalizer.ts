@@ -70,7 +70,7 @@ function normalizarErroComResposta(erro: AxiosError): ErroNormalizado {
         mensagem: payload.message || `Erro ${status}: O servidor não retornou uma mensagem detalhada.`,
         codigo: payload.code,
         status,
-        detalhes: payload.detalhes,
+        detalhes: payload.details,
         erros: payload.erros,
         traceId: payload.traceId,
         stackTrace: payload.stackTrace || obterStack(erro),
@@ -89,9 +89,9 @@ function normalizarErroAxios(erro: AxiosError): ErroNormalizado {
     return normalizarErroComResposta(erro);
 }
 
-export function normalizarErro(erro: Error | AxiosError | object | string | null | undefined): ErroNormalizado {
+export function normalizarErro(erro: unknown): ErroNormalizado {
     if (ehErroAxios(erro)) {
-        return normalizarErroAxios(erro);
+        return normalizarErroAxios(erro as import('axios').AxiosError);
     }
 
     if (erro instanceof Error) {
@@ -103,11 +103,11 @@ export function normalizarErro(erro: Error | AxiosError | object | string | null
     }
 
     logger.error("[normalizarErro] Erro não mapeado:", erro);
-    const erroConvertido = erro && typeof erro === 'object' ? (erro as object) : (typeof erro === 'string' ? erro : null);
-    return criarErroNormalizado(erroConvertido, {
+    const erroConvertido = erro && typeof erro === 'object' ? (erro as object) : (typeof erro === 'string' ? erro : (typeof erro === 'number' || typeof erro === 'boolean' ? String(erro) : null));
+    return criarErroNormalizado(erroConvertido as Error | object | string | null, {
         tipo: TIPO_INESPERADO,
         mensagem: 'Erro desconhecido ou não mapeado pela aplicação.',
-        stackTrace: obterStack(erroConvertido) || (typeof erro === 'string' ? erro : JSON.stringify(erro)),
+        stackTrace: obterStack(erroConvertido as Error | object | string | null) || (typeof erro === 'string' ? erro : JSON.stringify(erro)),
     });
 }
 

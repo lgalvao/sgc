@@ -9,6 +9,7 @@ import {SituacaoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {logger} from "@/utils";
 import type {useProcessoForm} from "@/composables/useProcessoForm";
+import type {VarianteAlerta} from "@/composables/useNotification";
 
 export interface FormFieldsRef {
     focarDescricao?: () => void;

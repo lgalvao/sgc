@@ -3,21 +3,7 @@ import type {Processo, ProcessoDetalheResponseBackend, UnidadeImportacao, Unidad
 
 function converterParaSituacao(valor: string | null): SituacaoSubprocesso | null {
     if (!valor) return null;
-    const situacoes: Record<string, SituacaoSubprocesso> = {
-        CRIADO: SituacaoSubprocesso.CRIADO,
-        DISPONIBILIZADO: SituacaoSubprocesso.DISPONIBILIZADO,
-        ACEITO: SituacaoSubprocesso.ACEITO,
-        VALIDADO: SituacaoSubprocesso.VALIDADO,
-        HOMOLOGADO: SituacaoSubprocesso.HOMOLOGADO,
-        DEVOLVIDO: SituacaoSubprocesso.DEVOLVIDO,
-        NAO_INICIADO: SituacaoSubprocesso.NAO_INICIADO,
-        EM_REVISAO: SituacaoSubprocesso.EM_REVISAO,
-        REVISADO: SituacaoSubprocesso.REVISADO,
-        AUTOAVALIACAO: SituacaoSubprocesso.AUTOAVALIACAO,
-        CONSENSO: SituacaoSubprocesso.CONSENSO,
-        CONCLUIDO: SituacaoSubprocesso.CONCLUIDO,
-    };
-    return situacoes[valor] || null;
+    return valor as SituacaoSubprocesso;
 }
 
 function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {

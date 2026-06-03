@@ -152,12 +152,11 @@ async function salvar() {
   const pInativacao = findParametro('DIAS_INATIVACAO_PROCESSO');
   const pAlertaNovo = findParametro('DIAS_ALERTA_NOVO');
 
-  const ausentes = [];
-  if (!pInativacao) ausentes.push('DIAS_INATIVACAO_PROCESSO');
-  if (!pAlertaNovo) ausentes.push('DIAS_ALERTA_NOVO');
-
-  if (ausentes.length > 0) {
-    logger.error('Parâmetros de configuração ausentes', {ausentes});
+  if (!pInativacao || !pAlertaNovo) {
+    logger.error('Parâmetros de configuração ausentes', {
+      inativacao: !!pInativacao,
+      alertaNovo: !!pAlertaNovo
+    });
     return;
   }
 
