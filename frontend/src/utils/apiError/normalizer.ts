@@ -9,8 +9,8 @@ const TIPO_INESPERADO: TipoErro = "inesperado";
 function obterStack(e: Error | ErroSimples | object | string | null | undefined): string | undefined {
     if (e instanceof Error) return e.stack;
     if (e && typeof e === "object" && "stack" in e) {
-        const stack = (e as ErroSimples).stack;
-        return typeof stack === "string" ? stack : undefined;
+        const candidate = (e as Record<string, string | object | null | undefined>).stack;
+        return typeof candidate === "string" ? candidate : undefined;
     }
     return undefined;
 }
@@ -103,7 +103,7 @@ export function normalizarErro(erro: Error | AxiosError | object | string | null
     }
 
     logger.error("[normalizarErro] Erro não mapeado:", erro);
-    const erroConvertido = erro as Error | object | string | null;
+    const erroConvertido = erro && typeof erro === 'object' ? (erro as object) : (typeof erro === 'string' ? erro : null);
     return criarErroNormalizado(erroConvertido, {
         tipo: TIPO_INESPERADO,
         mensagem: 'Erro desconhecido ou não mapeado pela aplicação.',
