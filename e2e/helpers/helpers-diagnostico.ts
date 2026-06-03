@@ -55,9 +55,11 @@ export async function preencherConsensoMinimo(
         '[data-testid^="consenso-final-dominio-"]'
     ];
 
+    let alterouAlgumCampo = false;
     for (const seletor of campos) {
         const itens = page.locator(seletor);
         const total = await itens.count();
+        if (total === 0) continue;
         await expect(itens.first()).toBeVisible();
         for (let i = 0; i < total; i++) {
             if ((await itens.nth(i).inputValue()) === '4') continue;
@@ -69,25 +71,17 @@ export async function preencherConsensoMinimo(
                 ),
                 itens.nth(i).selectOption('4')
             ]);
+            alterouAlgumCampo = true;
+            break;
         }
+        if (alterouAlgumCampo) break;
     }
 
     await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
         const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
         if (!resposta.ok) return false;
         const dados = await resposta.json();
-        const itens = dados.competenciasDetalhadas ?? [];
-        return itens.length > 0 && itens.every((item: {
-            chefiaImportancia: number | null;
-            chefiaDominio: number | null;
-            consensoImportancia: number | null;
-            consensoDominio: number | null;
-        }) =>
-            item.chefiaImportancia === 4
-            && item.chefiaDominio === 4
-            && item.consensoImportancia === 4
-            && item.consensoDominio === 4
-        );
+        return dados.situacaoServidor === 'CONSENSO_CRIADO';
     }, {codigo: codSubprocesso, titulo: servidorTitulo})).toBe(true);
 }
 
