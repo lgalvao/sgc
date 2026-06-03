@@ -10,11 +10,11 @@ import {SituacaoProcesso, SituacaoSubprocesso} from "@/types/tipos";
 export function getProcessoBadgeVariant(situacao: SituacaoProcesso | string | undefined | null): string {
     if (!situacao) return "secondary";
     switch (situacao) {
-        case SituacaoProcesso.FINALIZADO:
+        case SituacaoProcesso.FINALIZADO as string:
             return "success";
-        case SituacaoProcesso.EM_ANDAMENTO:
+        case SituacaoProcesso.EM_ANDAMENTO as string:
             return "primary";
-        case SituacaoProcesso.CRIADO:
+        case SituacaoProcesso.CRIADO as string:
             return "secondary";
         default:
             return "dark";
@@ -32,7 +32,7 @@ export function getSubprocessoBadgeVariant(situacao: SituacaoSubprocesso | strin
     if (situacao.includes("VALIDADO") || situacao.includes("VALIDADA")) return "info";
     if (situacao.includes("DISPONIBILIZADO") || situacao.includes("DISPONIBILIZADA")) return "warning";
     if (situacao.includes("EM_ANDAMENTO")) return "primary";
-    if (situacao === SituacaoSubprocesso.NAO_INICIADO) return "secondary";
+    if (situacao === (SituacaoSubprocesso.NAO_INICIADO as string)) return "secondary";
 
     return "primary";
 }

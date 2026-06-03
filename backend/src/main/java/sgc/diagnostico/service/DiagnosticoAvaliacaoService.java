@@ -10,6 +10,7 @@ import sgc.diagnostico.model.*;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,6 +46,8 @@ public class DiagnosticoAvaliacaoService {
             if (avaliacao == null) {
                 continue;
             }
+            avaliacao.setAutoimportancia(item.importancia());
+            avaliacao.setAutodominio(item.dominio());
             avaliacao.setImportancia(item.importancia());
             avaliacao.setDominio(item.dominio());
             gapService.recalcularGap(avaliacao);
@@ -74,7 +77,8 @@ public class DiagnosticoAvaliacaoService {
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
-        validarCompetenciasEsperadas(avaliacoes, request.competencias());
+        List<AvaliacaoCompetenciaDto> competenciasConsenso = extrairCompetenciasConsenso(request);
+        validarCompetenciasEsperadas(avaliacoes, competenciasConsenso);
 
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()
                 .collect(java.util.stream.Collectors.toMap(
@@ -88,12 +92,26 @@ public class DiagnosticoAvaliacaoService {
             avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
         }
 
-        for (AvaliacaoCompetenciaDto item : request.competencias()) {
-            AvaliacaoServidor avaliacao = porCompetencia.get(item.competenciaCodigo());
-            if (avaliacao == null) continue;
-            avaliacao.setImportancia(item.importancia());
-            avaliacao.setDominio(item.dominio());
-            gapService.recalcularGap(avaliacao);
+        if (request.competenciasDetalhadas() != null && !request.competenciasDetalhadas().isEmpty()) {
+            for (ConsensoCompetenciaDto item : request.competenciasDetalhadas()) {
+                AvaliacaoServidor avaliacao = porCompetencia.get(item.competenciaCodigo());
+                if (avaliacao == null) continue;
+                avaliacao.setChefiaImportancia(item.chefiaImportancia());
+                avaliacao.setChefiaDominio(item.chefiaDominio());
+                avaliacao.setImportancia(item.consensoImportancia());
+                avaliacao.setDominio(item.consensoDominio());
+                gapService.recalcularGap(avaliacao);
+            }
+        } else {
+            for (AvaliacaoCompetenciaDto item : competenciasConsenso) {
+                AvaliacaoServidor avaliacao = porCompetencia.get(item.competenciaCodigo());
+                if (avaliacao == null) continue;
+                avaliacao.setChefiaImportancia(item.importancia());
+                avaliacao.setChefiaDominio(item.dominio());
+                avaliacao.setImportancia(item.importancia());
+                avaliacao.setDominio(item.dominio());
+                gapService.recalcularGap(avaliacao);
+            }
         }
 
         avaliacaoRepo.saveAll(avaliacoes);
@@ -101,6 +119,20 @@ public class DiagnosticoAvaliacaoService {
                 subprocessoConsultaService.buscarSubprocesso(codSubprocesso),
                 servidorTitulo);
     }
+
+    private List<AvaliacaoCompetenciaDto> extrairCompetenciasConsenso(ConsensoRequest request) {
+        if (request.competenciasDetalhadas() != null && !request.competenciasDetalhadas().isEmpty()) {
+            return request.competenciasDetalhadas().stream()
+                    .map(item -> AvaliacaoCompetenciaDto.builder()
+                            .competenciaCodigo(item.competenciaCodigo())
+                            .importancia(item.consensoImportancia())
+                            .dominio(item.consensoDominio())
+                            .build())
+                    .toList();
+        }
+        return request.competencias();
+    }
+
     public void aprovarConsenso(Long codSubprocesso) {
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)

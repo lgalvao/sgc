@@ -8,7 +8,7 @@ import {
     obterConsensoServidor,
     salvarConsenso,
 } from '@/services/diagnosticoService';
-import type {AvaliacaoCompetencia, Consenso} from '@/types/diagnostico-competencias';
+import type {AvaliacaoCompetencia, Consenso, ConsensoCompetenciaDetalhada} from '@/types/diagnostico-competencias';
 import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
 
 function chaveConsenso(codSubprocesso: number, servidorTitulo?: string) {
@@ -45,13 +45,15 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
 
     // Estado local editável pela chefia
     const competenciasLocais = ref<AvaliacaoCompetencia[]>([]);
+    const competenciasDetalhadasLocais = ref<ConsensoCompetenciaDetalhada[]>([]);
     const motivoReabertura = ref('');
 
     watch(
-        () => query.data.value?.competencias,
-        (novas) => {
-            if (novas) {
-                competenciasLocais.value = novas.map((c) => ({...c}));
+        () => query.data.value,
+        (novoConsenso) => {
+            if (novoConsenso) {
+                competenciasLocais.value = novoConsenso.competencias.map((c) => ({...c}));
+                competenciasDetalhadasLocais.value = (novoConsenso.competenciasDetalhadas ?? []).map((c) => ({...c}));
             }
         },
         {immediate: true},
@@ -60,7 +62,16 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const mutacaoSalvar = useMutation({
         mutation: ({servidorTitulo, motivo}: {servidorTitulo: string; motivo?: string}) =>
             salvarConsenso(codSubprocesso, servidorTitulo, {
-                competencias: competenciasLocais.value,
+                competencias: competenciasDetalhadasLocais.value.length > 0
+                    ? competenciasDetalhadasLocais.value.map((item) => ({
+                        competenciaCodigo: item.competenciaCodigo,
+                        importancia: item.consensoImportancia,
+                        dominio: item.consensoDominio,
+                    }))
+                    : competenciasLocais.value,
+                competenciasDetalhadas: competenciasDetalhadasLocais.value.length > 0
+                    ? competenciasDetalhadasLocais.value
+                    : undefined,
                 motivoReabertura: motivo || undefined,
             }),
         onSuccess: () => {
@@ -91,6 +102,39 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         if (item) item[campo] = valor;
     }
 
+    function atualizarNotaDetalhada(
+        competenciaCodigo: number,
+        atualizacao: {
+            origem: 'chefia' | 'consenso';
+            campo: 'importancia' | 'dominio';
+            valor: number | null;
+        },
+    ) {
+        const item = competenciasDetalhadasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
+        if (!item) return;
+
+        if (atualizacao.origem === 'chefia') {
+            if (atualizacao.campo === 'importancia') item.chefiaImportancia = atualizacao.valor;
+            if (atualizacao.campo === 'dominio') item.chefiaDominio = atualizacao.valor;
+
+            const chefiaImportancia = atualizacao.campo === 'importancia' ? atualizacao.valor : item.chefiaImportancia;
+            const chefiaDominio = atualizacao.campo === 'dominio' ? atualizacao.valor : item.chefiaDominio;
+            if (item.autoimportancia === chefiaImportancia && item.autodominio === chefiaDominio) {
+                item.consensoImportancia = chefiaImportancia;
+                item.consensoDominio = chefiaDominio;
+            }
+        } else {
+            if (atualizacao.campo === 'importancia') item.consensoImportancia = atualizacao.valor;
+            if (atualizacao.campo === 'dominio') item.consensoDominio = atualizacao.valor;
+        }
+
+        const simples = competenciasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
+        if (simples) {
+            simples.importancia = item.consensoImportancia;
+            simples.dominio = item.consensoDominio;
+        }
+    }
+
     const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_REALIZADA');
     const carregando = computed(() => query.status.value === 'pending');
     const salvando = computed(() => mutacaoSalvar.isLoading.value);
@@ -100,6 +144,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     return {
         query,
         competenciasLocais,
+        competenciasDetalhadasLocais,
         motivoReabertura,
         situacaoServidor,
         carregando,
@@ -110,6 +155,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         erroAprovar: computed(() => mutacaoAprovar.error.value),
         erroImpossibilitar: computed(() => mutacaoImpossibilitar.error.value),
         atualizarNota,
+        atualizarNotaDetalhada,
         salvarConsenso: (servidorTitulo: string, motivo?: string) =>
             mutacaoSalvar.mutateAsync({servidorTitulo, motivo}),
         aprovarConsenso: () => mutacaoAprovar.mutateAsync(),

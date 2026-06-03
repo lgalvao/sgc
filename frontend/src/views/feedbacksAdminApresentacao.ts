@@ -139,11 +139,15 @@ function compactarAcesso(raw: Record<string, unknown>, filtrado: Record<string, 
 function compactarResolucao(raw: Record<string, unknown>, filtrado: Record<string, unknown>, chavesIgnorar: Set<string>) {
   const larguraTela = raw.larguraTela;
   const alturaTela = raw.alturaTela;
-  if (!larguraTela || !alturaTela) {
+  if (larguraTela === undefined || larguraTela === null || alturaTela === undefined || alturaTela === null) {
     return;
   }
 
-  filtrado["Resolução"] = `${larguraTela as string}x${alturaTela as string}`;
+  const larg = typeof larguraTela === "string" || typeof larguraTela === "number" ? String(larguraTela) : "";
+  const alt = typeof alturaTela === "string" || typeof alturaTela === "number" ? String(alturaTela) : "";
+  if (larg && alt) {
+    filtrado["Resolução"] = `${larg}x${alt}`;
+  }
   chavesIgnorar.add("larguraTela");
   chavesIgnorar.add("alturaTela");
 }

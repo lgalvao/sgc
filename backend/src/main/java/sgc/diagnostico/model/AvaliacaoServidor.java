@@ -24,9 +24,24 @@ public class AvaliacaoServidor extends EntidadeBase {
     @JoinColumn(name = "servidor_titulo", referencedColumnName = "titulo", nullable = false)
     private Usuario servidor;
 
+    @Column(name = "servidor_nome_snapshot")
+    private String servidorNomeSnapshot;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "competencia_codigo", nullable = false)
     private Competencia competencia;
+
+    @Column(name = "autoimportancia")
+    private Integer autoimportancia;
+
+    @Column(name = "autodominio")
+    private Integer autodominio;
+
+    @Column(name = "chefia_importancia")
+    private Integer chefiaImportancia;
+
+    @Column(name = "chefia_dominio")
+    private Integer chefiaDominio;
 
     @Column(name ="importancia")
     private Integer importancia;
@@ -50,5 +65,20 @@ public class AvaliacaoServidor extends EntidadeBase {
             return;
         }
         gap = importancia - dominio;
+    }
+
+    public String getServidorNomeDiagnostico() {
+        if (servidorNomeSnapshot != null && !servidorNomeSnapshot.isBlank()) {
+            return servidorNomeSnapshot;
+        }
+        return servidor != null ? servidor.getNome() : null;
+    }
+
+    public Integer getConsensoImportancia() {
+        return importancia;
+    }
+
+    public Integer getConsensoDominio() {
+        return dominio;
     }
 }

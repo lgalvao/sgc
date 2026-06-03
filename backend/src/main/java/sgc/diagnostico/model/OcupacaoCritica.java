@@ -25,12 +25,30 @@ public class OcupacaoCritica extends EntidadeBase {
     @JoinColumn(name = "servidor_titulo", referencedColumnName = "titulo", nullable = false)
     private Usuario servidor;
 
+    @Column(name = "servidor_nome_snapshot")
+    private String servidorNomeSnapshot;
+
+    @Column(name = "unidade_codigo_snapshot")
+    private Long unidadeCodigoSnapshot;
+
+    @Column(name = "unidade_sigla_snapshot", length = 20)
+    private String unidadeSiglaSnapshot;
+
+    @Column(name = "unidade_nome_snapshot")
+    private String unidadeNomeSnapshot;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "competencia_codigo", nullable = false)
     private Competencia competencia;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "situacao_capacitacao", length = 10, nullable = false)
+    @Column(name = "situacao_capacitacao", length = 10)
     private SituacaoCapacitacao situacaoCapacitacao;
 
+    public String getServidorNomeDiagnostico() {
+        if (servidorNomeSnapshot != null && !servidorNomeSnapshot.isBlank()) {
+            return servidorNomeSnapshot;
+        }
+        return servidor != null ? servidor.getNome() : null;
+    }
 }

@@ -121,11 +121,11 @@ describe("useMapas", () => {
                 // Marca como stale: limpa o dado atual
                 mapaQueryState.data.value = null;
                 mapaQueryState.status.value = "idle";
-                cacheMapaMock.void invalidarImpacto(codigo);
+                cacheMapaMock.invalidarImpacto(codigo);
             } else {
                 mapaQueryState.data.value = null;
                 mapaQueryState.status.value = "idle";
-                cacheMapaMock.void invalidarImpacto();
+                cacheMapaMock.invalidarImpacto();
             }
         });
         cacheMapaMock.invalidarImpacto.mockImplementation(() => {
@@ -134,7 +134,7 @@ describe("useMapas", () => {
         cacheMapaMock.sincronizarMapa.mockImplementation((_codigo: number, mapa: MapaCompleto | null) => {
             mapaQueryState.data.value = mapa;
             mapaQueryState.status.value = "success";
-            cacheMapaMock.void invalidarImpacto();
+            cacheMapaMock.invalidarImpacto();
         });
     });
 

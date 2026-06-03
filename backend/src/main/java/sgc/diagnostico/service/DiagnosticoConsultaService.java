@@ -7,6 +7,7 @@ import sgc.comum.model.ComumRepo;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.subprocesso.SubprocessoDtoMapper;
 import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Subprocesso;
@@ -30,6 +31,7 @@ public class DiagnosticoConsultaService {
     public DiagnosticoContextoDto obterContexto(Long codSubprocesso) {
         Subprocesso sp = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
+        UnidadeProcesso unidadeSnapshot = resolverUnidadeSnapshot(sp);
         List<CompetenciaResumoDto> competencias = sp.getMapa().getCompetencias().stream()
                 .map(c -> CompetenciaResumoDto.builder()
                         .competenciaCodigo(c.getCodigo())
@@ -39,9 +41,9 @@ public class DiagnosticoConsultaService {
         return DiagnosticoContextoDto.builder()
                 .processoCodigo(sp.getProcesso().getCodigo())
                 .subprocessoCodigo(sp.getCodigo())
-                .unidadeCodigo(sp.getUnidade().getCodigo())
-                .unidadeSigla(sp.getUnidade().getSigla())
-                .unidadeNome(sp.getUnidade().getNome())
+                .unidadeCodigo(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : sp.getUnidade().getCodigo())
+                .unidadeSigla(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : sp.getUnidade().getSigla())
+                .unidadeNome(unidadeSnapshot != null ? unidadeSnapshot.getNome() : sp.getUnidade().getNome())
                 .situacaoSubprocesso(sp.getSituacao().name())
                 .situacaoDiagnostico(diagnostico.getSituacao().name())
                 .competencias(competencias)
@@ -56,8 +58,8 @@ public class DiagnosticoConsultaService {
         List<AvaliacaoCompetenciaDto> competencias = avaliacoes.stream()
                 .map(a -> AvaliacaoCompetenciaDto.builder()
                         .competenciaCodigo(a.getCompetencia().getCodigo())
-                        .importancia(a.getImportancia())
-                        .dominio(a.getDominio())
+                        .importancia(a.getAutoimportancia())
+                        .dominio(a.getAutodominio())
                         .build())
                 .toList();
         String situacaoServidor = avaliacoes.stream()
@@ -82,8 +84,19 @@ public class DiagnosticoConsultaService {
         List<AvaliacaoCompetenciaDto> competencias = avaliacoes.stream()
                 .map(a -> AvaliacaoCompetenciaDto.builder()
                         .competenciaCodigo(a.getCompetencia().getCodigo())
-                        .importancia(a.getImportancia())
-                        .dominio(a.getDominio())
+                        .importancia(a.getConsensoImportancia())
+                        .dominio(a.getConsensoDominio())
+                        .build())
+                .toList();
+        List<ConsensoCompetenciaDto> competenciasDetalhadas = avaliacoes.stream()
+                .map(a -> ConsensoCompetenciaDto.builder()
+                        .competenciaCodigo(a.getCompetencia().getCodigo())
+                        .autoimportancia(a.getAutoimportancia())
+                        .autodominio(a.getAutodominio())
+                        .chefiaImportancia(a.getChefiaImportancia())
+                        .chefiaDominio(a.getChefiaDominio())
+                        .consensoImportancia(a.getConsensoImportancia())
+                        .consensoDominio(a.getConsensoDominio())
                         .build())
                 .toList();
         String situacaoServidor = avaliacoes.stream()
@@ -92,6 +105,7 @@ public class DiagnosticoConsultaService {
                 .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA.name());
         return ConsensoDto.builder()
                 .competencias(competencias)
+                .competenciasDetalhadas(competenciasDetalhadas)
                 .situacaoServidor(situacaoServidor)
                 .build();
     }
@@ -105,7 +119,7 @@ public class DiagnosticoConsultaService {
         for (AvaliacaoServidor a : avaliacoes) {
             String titulo = a.getServidor().getTituloEleitoral();
             situacoes.put(titulo, a.getSituacaoServidor());
-            nomes.put(titulo, a.getServidor().getNome());
+            nomes.put(titulo, a.getServidorNomeDiagnostico());
         }
 
         List<DiagnosticoEquipeDto.Item> itens = situacoes.entrySet().stream()
@@ -127,11 +141,12 @@ public class DiagnosticoConsultaService {
         var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
         var ocupacoes = ocupacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
         var movimentacoes = subprocessoConsultaService.listarMovimentacoes(subprocesso);
+        UnidadeProcesso unidadeSnapshot = resolverUnidadeSnapshot(subprocesso);
 
         UnidadeResumoDto unidade = UnidadeResumoDto.builder()
-                .unidadeCodigo(subprocesso.getUnidade().getCodigo())
-                .unidadeSigla(subprocesso.getUnidade().getSigla())
-                .unidadeNome(subprocesso.getUnidade().getNome())
+                .unidadeCodigo(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : subprocesso.getUnidade().getCodigo())
+                .unidadeSigla(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : subprocesso.getUnidade().getSigla())
+                .unidadeNome(unidadeSnapshot != null ? unidadeSnapshot.getNome() : subprocesso.getUnidade().getNome())
                 .situacaoSubprocesso(subprocesso.getSituacao().name())
                 .build();
 
@@ -148,13 +163,13 @@ public class DiagnosticoConsultaService {
                     List<AvaliacaoCompetenciaDto> consenso = lista.stream()
                             .map(a -> AvaliacaoCompetenciaDto.builder()
                                     .competenciaCodigo(a.getCompetencia().getCodigo())
-                                    .importancia(a.getImportancia())
-                                    .dominio(a.getDominio())
+                                    .importancia(a.getConsensoImportancia())
+                                    .dominio(a.getConsensoDominio())
                                     .build())
                             .toList();
                     return ServidorDiagnosticoDto.builder()
                             .servidorTitulo(primeiro.getServidor().getTituloEleitoral())
-                            .servidorNome(primeiro.getServidor().getNome())
+                            .servidorNome(primeiro.getServidorNomeDiagnostico())
                             .situacaoServidor(primeiro.getSituacaoServidor().name())
                             .consenso(consenso)
                             .build();
@@ -180,6 +195,12 @@ public class DiagnosticoConsultaService {
                 .ocupacoesCriticas(ocupacoesCriticas)
                 .movimentacoes(movimentacoesDto)
                 .build();
+    }
+
+    private UnidadeProcesso resolverUnidadeSnapshot(Subprocesso subprocesso) {
+        return subprocesso.getProcesso()
+                .buscarParticipante(subprocesso.getUnidade().getCodigo())
+                .orElse(null);
     }
 
 }

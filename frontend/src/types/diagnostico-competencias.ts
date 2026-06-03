@@ -29,6 +29,16 @@ export interface AvaliacaoCompetencia {
     dominio: number | null;
 }
 
+export interface ConsensoCompetenciaDetalhada {
+    competenciaCodigo: number;
+    autoimportancia: number | null;
+    autodominio: number | null;
+    chefiaImportancia: number | null;
+    chefiaDominio: number | null;
+    consensoImportancia: number | null;
+    consensoDominio: number | null;
+}
+
 /** Contexto do subprocesso de diagnóstico retornado pelo endpoint /contexto. */
 export interface DiagnosticoContexto {
     processoCodigo: number;
@@ -50,6 +60,7 @@ export interface Autoavaliacao {
 /** Consenso da chefia para o servidor logado. */
 export interface Consenso {
     competencias: AvaliacaoCompetencia[];
+    competenciasDetalhadas?: ConsensoCompetenciaDetalhada[];
     situacaoServidor: SituacaoAvaliacaoServidor;
 }
 
@@ -116,6 +127,7 @@ export interface AutoavaliacaoRequest {
 
 export interface ConsensoRequest {
     competencias: AvaliacaoCompetencia[];
+    competenciasDetalhadas?: ConsensoCompetenciaDetalhada[];
     motivoReabertura?: string;
 }
 

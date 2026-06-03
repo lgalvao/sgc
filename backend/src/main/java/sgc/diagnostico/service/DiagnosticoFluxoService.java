@@ -15,6 +15,7 @@ import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
+import sgc.processo.model.UnidadeProcesso;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.model.Movimentacao;
@@ -63,23 +64,39 @@ public class DiagnosticoFluxoService {
 
         List<Usuario> servidores = usuarioService.buscarPorUnidadeLotacao(subprocesso.getUnidade().getCodigo());
         List<AvaliacaoServidor> avaliacoes = new ArrayList<>();
+        List<sgc.diagnostico.model.OcupacaoCritica> ocupacoesCriticas = new ArrayList<>();
 
         Mapa mapa = subprocesso.getMapa();
         if (mapa != null && mapa.getCompetencias() != null) {
+            UnidadeProcesso unidadeSnapshot = subprocesso.getProcesso()
+                    .buscarParticipante(subprocesso.getUnidade().getCodigo())
+                    .orElse(null);
             for (Usuario servidor : servidores) {
                 for (Competencia competencia : mapa.getCompetencias()) {
                     AvaliacaoServidor avaliacao = AvaliacaoServidor.builder()
                             .diagnostico(diagnostico)
                             .servidor(servidor)
+                            .servidorNomeSnapshot(servidor.getNome())
                             .competencia(competencia)
                             .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA)
                             .build();
                     avaliacoes.add(avaliacao);
+
+                    ocupacoesCriticas.add(sgc.diagnostico.model.OcupacaoCritica.builder()
+                            .diagnostico(diagnostico)
+                            .servidor(servidor)
+                            .servidorNomeSnapshot(servidor.getNome())
+                            .unidadeCodigoSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : subprocesso.getUnidade().getCodigo())
+                            .unidadeSiglaSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : subprocesso.getUnidade().getSigla())
+                            .unidadeNomeSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getNome() : subprocesso.getUnidade().getNome())
+                            .competencia(competencia)
+                            .build());
                 }
             }
         }
 
         diagnostico.setAvaliacaoServidores(avaliacoes);
+        diagnostico.setOcupacaoCriticas(ocupacoesCriticas);
         diagnosticoRepo.save(diagnostico);
     }
 

@@ -106,7 +106,7 @@
                 class="form-select-sm w-auto"
                 @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'importancia', v as number | null)"
             />
-            <span v-else>{{ item.importancia ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}</span>
+            <span v-else>{{ formatarNota(item.importancia) }}</span>
           </template>
 
           <template #cell(dominio)="{ item }">
@@ -119,7 +119,7 @@
                 class="form-select-sm w-auto"
                 @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'dominio', v as number | null)"
             />
-            <span v-else>{{ item.dominio ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}</span>
+            <span v-else>{{ formatarNota(item.dominio) }}</span>
           </template>
         </BTable>
       </BCard>
@@ -459,6 +459,12 @@ function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
   return mapa[situacao] ?? situacao;
 }
 
+function formatarNota(valor: number | null): string {
+  if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+  if (valor === 0) return TEXTOS.diagnostico.NOTA_NA;
+  return String(valor);
+}
+
 // ── Colunas da tabela ────────────────────────────────────────────────────────
 const colunas = [
   {key: 'competenciaCodigo', label: 'Código'},
@@ -478,13 +484,14 @@ const competenciasComDescricao = computed(() => {
   }));
 });
 
-// Opções de nota para os selects (1-5 + opção vazia)
+// Opções de nota para os selects (NA + 1-6). `0` representa "Não se aplica".
 const opcoesNota = [
-  {value: null, text: '—'},
+  {value: 0, text: 'NA'},
   {value: 1, text: '1'},
   {value: 2, text: '2'},
   {value: 3, text: '3'},
   {value: 4, text: '4'},
   {value: 5, text: '5'},
+  {value: 6, text: '6'},
 ];
 </script>

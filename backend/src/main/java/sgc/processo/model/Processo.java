@@ -93,4 +93,10 @@ public class Processo extends EntidadeBase {
                 .sorted()
                 .collect(Collectors.joining(", "));
     }
+
+    public Optional<UnidadeProcesso> buscarParticipante(Long unidadeCodigo) {
+        return participantes.stream()
+                .filter(participante -> Objects.equals(participante.getUnidadeCodigo(), unidadeCodigo))
+                .findFirst();
+    }
 }

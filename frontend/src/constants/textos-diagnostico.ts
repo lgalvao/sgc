@@ -95,7 +95,8 @@ export const TEXTOS_DIAGNOSTICO = {
     VAZIO_UNIDADES_TEXTO: 'Nenhuma unidade participante encontrada.',
 
     // ── Escala de notas ──────────────────────────────────────────────────────
-    ESCALA_HINT: 'Notas de 1 a 5',
+    ESCALA_HINT: 'Escala: NA, 1, 2, 3, 4, 5 e 6',
+    NOTA_NA: 'NA',
     NOTA_NAO_INFORMADA: '—',
 
     // ── Erros ────────────────────────────────────────────────────────────────

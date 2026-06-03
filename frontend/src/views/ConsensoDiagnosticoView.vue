@@ -56,33 +56,61 @@
         </BCardHeader>
         <BTable
             :fields="colunas"
-            :items="competenciasComDescricao"
+            :items="competenciasDetalhadasComDescricao"
             hover
             responsive
             small
             striped
         >
-          <template #cell(importancia)="{ item }">
-            <BFormSelect
-                v-if="ehChefe && !ehConsensoAprovado"
-                :data-testid="`consenso-importancia-${item.competenciaCodigo}`"
-                :model-value="item.importancia"
-                :options="opcoesNota"
-                class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'importancia', v as number | null)"
-            />
-            <span v-else>{{ item.importancia ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}</span>
+          <template #cell(autoimportancia)="{ item }">
+            <span>{{ formatarNota(item.autoimportancia) }}</span>
           </template>
-          <template #cell(dominio)="{ item }">
+          <template #cell(autodominio)="{ item }">
+            <span>{{ formatarNota(item.autodominio) }}</span>
+          </template>
+          <template #cell(chefiaImportancia)="{ item }">
             <BFormSelect
                 v-if="ehChefe && !ehConsensoAprovado"
-                :data-testid="`consenso-dominio-${item.competenciaCodigo}`"
-                :model-value="item.dominio"
+                :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
+                :model-value="item.chefiaImportancia"
                 :options="opcoesNota"
                 class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'dominio', v as number | null)"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'importancia', valor: v as number | null})"
             />
-            <span v-else>{{ item.dominio ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}</span>
+            <span v-else>{{ formatarNota(item.chefiaImportancia) }}</span>
+          </template>
+          <template #cell(chefiaDominio)="{ item }">
+            <BFormSelect
+                v-if="ehChefe && !ehConsensoAprovado"
+                :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
+                :model-value="item.chefiaDominio"
+                :options="opcoesNota"
+                class="form-select-sm w-auto"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'dominio', valor: v as number | null})"
+            />
+            <span v-else>{{ formatarNota(item.chefiaDominio) }}</span>
+          </template>
+          <template #cell(consensoImportancia)="{ item }">
+            <BFormSelect
+                v-if="ehChefe && !ehConsensoAprovado"
+                :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
+                :model-value="item.consensoImportancia"
+                :options="opcoesNota"
+                class="form-select-sm w-auto"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: v as number | null})"
+            />
+            <span v-else>{{ formatarNota(item.consensoImportancia) }}</span>
+          </template>
+          <template #cell(consensoDominio)="{ item }">
+            <BFormSelect
+                v-if="ehChefe && !ehConsensoAprovado"
+                :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
+                :model-value="item.consensoDominio"
+                :options="opcoesNota"
+                class="form-select-sm w-auto"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'dominio', valor: v as number | null})"
+            />
+            <span v-else>{{ formatarNota(item.consensoDominio) }}</span>
           </template>
         </BTable>
       </BCard>
@@ -157,12 +185,13 @@ const perfilStore = usePerfilStore();
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {
   competenciasLocais,
+  competenciasDetalhadasLocais,
   motivoReabertura,
   situacaoServidor,
   carregando,
   salvando,
   erroSalvar,
-  atualizarNota,
+  atualizarNotaDetalhada,
   salvarConsenso,
 } = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
 
@@ -214,28 +243,50 @@ function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
   return mapa[situacao] ?? situacao;
 }
 
-const competenciasComDescricao = computed(() => {
+function formatarNota(valor: number | null): string {
+  if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+  if (valor === 0) return TEXTOS.diagnostico.NOTA_NA;
+  return String(valor);
+}
+
+const competenciasDetalhadasComDescricao = computed(() => {
   const mapaDesc = Object.fromEntries(
     (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
   );
-  return competenciasLocais.value.map((c) => ({
+  const origem = competenciasDetalhadasLocais.value.length > 0
+    ? competenciasDetalhadasLocais.value
+    : competenciasLocais.value.map((c) => ({
+      competenciaCodigo: c.competenciaCodigo,
+      autoimportancia: c.importancia,
+      autodominio: c.dominio,
+      chefiaImportancia: c.importancia,
+      chefiaDominio: c.dominio,
+      consensoImportancia: c.importancia,
+      consensoDominio: c.dominio,
+    }));
+  return origem.map((c) => ({
     ...c,
     descricao: mapaDesc[c.competenciaCodigo] ?? `Competência ${c.competenciaCodigo}`,
   }));
 });
 
 const opcoesNota = [
-  {value: null, text: '—'},
+  {value: 0, text: 'NA'},
   {value: 1, text: '1'},
   {value: 2, text: '2'},
   {value: 3, text: '3'},
   {value: 4, text: '4'},
   {value: 5, text: '5'},
+  {value: 6, text: '6'},
 ];
 
 const colunas = [
   {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-  {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
-  {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
+  {key: 'autoimportancia', label: 'Servidor: Importância'},
+  {key: 'autodominio', label: 'Servidor: Domínio'},
+  {key: 'chefiaImportancia', label: 'Chefia: Importância'},
+  {key: 'chefiaDominio', label: 'Chefia: Domínio'},
+  {key: 'consensoImportancia', label: 'Consenso: Importância'},
+  {key: 'consensoDominio', label: 'Consenso: Domínio'},
 ];
 </script>

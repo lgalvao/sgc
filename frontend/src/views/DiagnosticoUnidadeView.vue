@@ -95,15 +95,19 @@
                   small
               >
                 <template #cell(importancia)="{ item }">
-                  {{ item.importancia ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}
+                  {{ formatarNota(item.importancia) }}
                 </template>
                 <template #cell(dominio)="{ item }">
-                  {{ item.dominio ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}
+                  {{ formatarNota(item.dominio) }}
                 </template>
                 <template #cell(gap)="{ item }">
-                  <span :class="calcularGap(item) > 0 ? 'text-danger fw-bold' : 'text-success'">
-                    {{ calcularGap(item) > 0 ? `+${calcularGap(item)}` : calcularGap(item) }}
+                  <span
+                    v-if="calcularGap(item) !== null"
+                    :class="calcularGap(item)! > 0 ? 'text-danger fw-bold' : 'text-success'"
+                  >
+                    {{ calcularGap(item)! > 0 ? `+${calcularGap(item)}` : calcularGap(item) }}
                   </span>
+                  <span v-else>{{ TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}</span>
                 </template>
               </BTable>
             </BAccordionItem>
@@ -399,8 +403,14 @@ function formatarCapacitacao(s: SituacaoCapacitacao): string {
   }[s] ?? s;
 }
 
-function calcularGap(item: AvaliacaoCompetencia): number {
-  if (item.importancia === null || item.dominio === null) return 0;
+function formatarNota(valor: number | null): string {
+  if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+  if (valor === 0) return TEXTOS.diagnostico.NOTA_NA;
+  return String(valor);
+}
+
+function calcularGap(item: AvaliacaoCompetencia): number | null {
+  if (item.importancia === null || item.dominio === null || item.importancia === 0 || item.dominio === 0) return null;
   return item.importancia - item.dominio;
 }
 
