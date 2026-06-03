@@ -8,8 +8,8 @@ const TIPO_INESPERADO: TipoErro = "inesperado";
 
 function obterStack(e: Error | ErroSimples | object | string | null | undefined): string | undefined {
     if (e instanceof Error) return e.stack;
-    if (e && typeof e === "object" && "stack" in e) {
-        const candidate = (e as Record<string, string | object | null | undefined>).stack;
+    if (e && typeof e === "object") {
+        const candidate = Reflect.get(e, 'stack');
         return typeof candidate === "string" ? candidate : undefined;
     }
     return undefined;
@@ -63,7 +63,7 @@ function normalizarErroComResposta(erro: AxiosError): ErroNormalizado {
     if (!response) return normalizarErroSemResposta(erro);
     
     const {status, data} = response;
-    const payload = comoPayload(data as PayloadErroApi);
+    const payload = comoPayload(data && typeof data === 'object' ? data : null);
 
     return criarErroNormalizado(erro, {
         tipo: mapearStatusParaTipo(status),
@@ -91,7 +91,7 @@ function normalizarErroAxios(erro: AxiosError): ErroNormalizado {
 
 export function normalizarErro(erro: unknown): ErroNormalizado {
     if (ehErroAxios(erro)) {
-        return normalizarErroAxios(erro as import('axios').AxiosError);
+        return normalizarErroAxios(erro);
     }
 
     if (erro instanceof Error) {
@@ -103,11 +103,11 @@ export function normalizarErro(erro: unknown): ErroNormalizado {
     }
 
     logger.error("[normalizarErro] Erro não mapeado:", erro);
-    const erroConvertido = erro && typeof erro === 'object' ? (erro as object) : (typeof erro === 'string' ? erro : (typeof erro === 'number' || typeof erro === 'boolean' ? String(erro) : null));
-    return criarErroNormalizado(erroConvertido as Error | object | string | null, {
+    const erroConvertido = erro && typeof erro === 'object' ? erro : (typeof erro === 'string' ? erro : (typeof erro === 'number' || typeof erro === 'boolean' ? String(erro) : null));
+    return criarErroNormalizado(erroConvertido, {
         tipo: TIPO_INESPERADO,
         mensagem: 'Erro desconhecido ou não mapeado pela aplicação.',
-        stackTrace: obterStack(erroConvertido as Error | object | string | null) || (typeof erro === 'string' ? erro : JSON.stringify(erro)),
+        stackTrace: obterStack(erroConvertido) || (typeof erro === 'string' ? erro : JSON.stringify(erro)),
     });
 }
 

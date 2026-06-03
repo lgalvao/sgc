@@ -257,5 +257,12 @@ const {
   fecharModalImpacto,
   fecharModalVerSugestoes,
   adicionarCompetenciaEFecharModal,
+  existeCompetenciaSemAtividade,
+  aplicarErroNormalizado,
 } = useMapaTela(props);
+
+defineExpose({
+  existeCompetenciaSemAtividade,
+  aplicarErroNormalizado,
+});
 </script>

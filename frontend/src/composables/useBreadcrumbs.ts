@@ -10,9 +10,11 @@ export interface Breadcrumb {
     isHome?: boolean;
 }
 
-interface MetaBreadcrumb {
-    breadcrumb?: string | ((route: RouteLocationNormalizedLoaded) => string);
-    title?: string;
+declare module 'vue-router' {
+    interface RouteMeta {
+        breadcrumb?: string | ((route: RouteLocationNormalizedLoaded) => string);
+        title?: string;
+    }
 }
 
 const TITULOS_PAGINA_SUBPROCESSO: Record<string, string> = {
@@ -109,12 +111,11 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     const addFallbackBreadcrumbs = (breadcrumbs: Breadcrumb[]) => {
         route.matched.forEach((routeRecord) => {
             const {meta, name} = routeRecord;
-            const metaBreadcrumb = meta as unknown as MetaBreadcrumb;
-            const label = metaBreadcrumb.breadcrumb
-                ? typeof metaBreadcrumb.breadcrumb === "function"
-                    ? metaBreadcrumb.breadcrumb(route)
-                    : metaBreadcrumb.breadcrumb
-                : metaBreadcrumb.title;
+            const label = meta.breadcrumb
+                ? typeof meta.breadcrumb === "function"
+                    ? meta.breadcrumb(route)
+                    : meta.breadcrumb
+                : meta.title;
 
             if (label && (breadcrumbs.length === 0 || breadcrumbs.at(-1)?.label !== label)) {
                 breadcrumbs.push({

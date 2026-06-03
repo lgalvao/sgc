@@ -3,7 +3,8 @@ import type {Processo, ProcessoDetalheResponseBackend, UnidadeImportacao, Unidad
 
 function converterParaSituacao(valor: string | null): SituacaoSubprocesso | null {
     if (!valor) return null;
-    return valor as SituacaoSubprocesso;
+    const encontrado = Object.values(SituacaoSubprocesso).find((v) => String(v) === valor);
+    return encontrado ?? null;
 }
 
 function mapearUnidadeParticipante(dto: UnidadeParticipanteDto): UnidadeParticipante {

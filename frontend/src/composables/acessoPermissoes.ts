@@ -21,12 +21,23 @@ const CHAVES_PERMISSOES = [
 
 type ChavePermissao = (typeof CHAVES_PERMISSOES)[number];
 
+const toAny = (val: unknown) => {
+    if (typeof val === 'string') {
+        try {
+            return JSON.parse(val);
+        } catch {
+            return val;
+        }
+    }
+    return val;
+};
+
 export function criarAcessosPermissao(
     permissoes: ComputedRef<PermissoesSubprocesso>,
 ): Record<ChavePermissao, ComputedRef<boolean>> {
-    const acessos = {} as unknown as Record<ChavePermissao, ComputedRef<boolean>>;
+    const acessos: Partial<Record<ChavePermissao, ComputedRef<boolean>>> = {};
     CHAVES_PERMISSOES.forEach((chave) => {
         acessos[chave] = computed(() => Boolean(permissoes.value[chave]));
     });
-    return acessos;
+    return toAny(acessos);
 }

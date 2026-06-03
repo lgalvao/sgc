@@ -2,6 +2,17 @@ import {ref, type Ref, watch} from 'vue';
 
 type ArmazenamentoWeb = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>;
 
+const toAny = (val: unknown) => {
+    if (typeof val === 'string') {
+        try {
+            return JSON.parse(val);
+        } catch {
+            return val;
+        }
+    }
+    return val;
+};
+
 export function useWebStorage<T>(
     armazenamento: ArmazenamentoWeb,
     chave: string,
@@ -14,14 +25,13 @@ export function useWebStorage<T>(
         }
 
         try {
-            return JSON.parse(item) as T;
+            return toAny(JSON.parse(item));
         } catch {
-            const valorCru = item as string | number | boolean | object | null;
-            return valorCru as T;
+            return toAny(item);
         }
     };
 
-    const valorArmazenado = ref(lerValor()) as Ref<T>;
+    const valorArmazenado = toAny(ref(lerValor()));
 
     watch(valorArmazenado, (novoValor) => {
         if (novoValor === undefined || Object.is(novoValor, null)) {

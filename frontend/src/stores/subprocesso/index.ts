@@ -18,7 +18,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoEdicaoInvalido = ref(false);
     const contextoCadastroInvalido = ref(false);
     const erroIntegracaoContexto = ref<ErroNormalizado | null>(null);
-    const carregamentos = new Map<string, Promise<unknown>>();
+    const carregamentos = new Map<string, Promise<object | string | number | boolean | null>>();
     const codigosEdicaoPorProcessoUnidade = new Map<string, number>();
     const codigosCadastroPorProcessoUnidade = new Map<string, number>();
 

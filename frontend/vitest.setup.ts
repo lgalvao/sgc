@@ -78,3 +78,17 @@ Object.defineProperty(globalThis, "location", {
 
 window.scrollTo = vi.fn();
 Element.prototype.scrollIntoView = vi.fn();
+
+const originalWarn = console.warn;
+console.warn = (...args) => {
+    const msg = args.join(' ');
+    if (msg.includes('[Vue warn]') || msg.includes('BootstrapVueNext')) return;
+    originalWarn(...args);
+};
+
+const originalError = console.error;
+console.error = (...args) => {
+    const msg = args.join(' ');
+    if (msg.includes('[Vue warn]') || msg.includes('BootstrapVueNext')) return;
+    originalError(...args);
+};

@@ -105,12 +105,12 @@ function mapearFluxoLogin(response: FluxoLoginResponseDto): FluxoLogin {
 export async function login(
     request: AutenticacaoRequest,
 ): Promise<FluxoLogin> {
-    const response = await apiPost<FluxoLoginResponseDto, AutenticacaoRequest>("/usuarios/login", request);
+    const response = await apiPost<FluxoLoginResponseDto>("/usuarios/login", request);
     return mapearFluxoLogin(response);
 }
 
 export async function entrar(request: EntrarRequest): Promise<SessaoLogin> {
-    const response = await apiPost<SessaoLoginDto, EntrarRequest>("/usuarios/entrar", request);
+    const response = await apiPost<SessaoLoginDto>("/usuarios/entrar", request);
     return mapearSessaoLogin(response);
 }
 
