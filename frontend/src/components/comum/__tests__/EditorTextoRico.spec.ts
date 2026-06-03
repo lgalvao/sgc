@@ -48,17 +48,17 @@ function obterOnUpdateMock() {
     return opcoes!.onUpdate!;
 }
 
-vi.mock('@tiptap/vue-3', async () => {
-    const actual = await vi.importActual('@tiptap/vue-3') as any;
-    return {
-        ...actual,
-        Editor: vi.fn().mockImplementation(function() { return mockEditorInstance }),
-        EditorContent: { template: '<div><slot /></div>' }
-    };
-});
+vi.mock('@tiptap/vue-3', () => ({
+    Editor: vi.fn().mockImplementation(function() { return mockEditorInstance }),
+    EditorContent: {
+        name: 'EditorContent',
+        template: '<div><slot /></div>',
+        props: ['editor']
+    }
+}));
 
 vi.mock('@tiptap/starter-kit', () => ({
-    default: {
+    StarterKit: {
         configure: vi.fn().mockReturnThis(),
     }
 }));
