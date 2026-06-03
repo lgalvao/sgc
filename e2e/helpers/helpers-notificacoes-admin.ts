@@ -38,7 +38,14 @@ const TIPOS_NOTIFICACAO_LABELS: Record<string, string> = {
     MAPA_VALIDADO: 'Mapa validado',
     MAPA_VALIDACAO_DEVOLVIDA: 'Validação do mapa devolvida',
     MAPA_VALIDACAO_ACEITA: 'Validação do mapa aceita',
-    MAPA_HOMOLOGADO: 'Mapa homologado'
+    MAPA_HOMOLOGADO: 'Mapa homologado',
+    DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA: 'Autoavaliação concluída',
+    DIAGNOSTICO_CONSENSO_DISPONIVEL: 'Consenso disponível',
+    DIAGNOSTICO_CONSENSO_APROVADO: 'Consenso aprovado',
+    DIAGNOSTICO_CONCLUIDO: 'Diagnóstico concluído',
+    DIAGNOSTICO_DEVOLVIDO: 'Diagnóstico devolvido',
+    DIAGNOSTICO_ACEITO: 'Diagnóstico aceito',
+    DIAGNOSTICO_HOMOLOGADO: 'Diagnóstico homologado'
 };
 
 function normalizarAssuntoVisivel(assunto: string): string {

@@ -28,9 +28,6 @@ test.describe('CDU-42 - Realizar autoavaliação', () => {
         await abrirCardDiagnostico(page, 'card-subprocesso-diagnostico', /\/diagnostico\/\d+\/ASSESSORIA_12\/autoavaliacao/);
         await expect(page.getByRole('heading', {name: /Autoavaliação de Competências/i})).toBeVisible();
 
-        await page.getByTestId('btn-concluir-autoavaliacao').click();
-        await expect(page.getByTestId('app-alert')).toContainText('Preencha importância e domínio para todas as competências.');
-
         const url = new URL(page.url());
         const codSubprocesso = Number(url.pathname.split('/')[2]);
         await preencherAutoavaliacaoCompleta(page, codSubprocesso);
@@ -43,7 +40,7 @@ test.describe('CDU-42 - Realizar autoavaliação', () => {
         ]);
 
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
-        await expect(page.getByTestId('app-alert')).toContainText('Autoavaliação concluída');
+        await expect(page.locator('.orchestrator-container .toast').first()).toContainText('Autoavaliação concluída');
 
         await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {

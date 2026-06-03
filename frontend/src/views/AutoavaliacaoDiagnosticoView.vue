@@ -124,7 +124,7 @@
                 :model-value="item.importancia"
                 :options="opcoesNota"
                 class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'importancia', v as number | null)"
+                @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'importancia', normalizarValorNota(v))"
             />
             <span v-else>{{ formatarNota(item.importancia) }}</span>
           </template>
@@ -137,7 +137,7 @@
                 :model-value="item.dominio"
                 :options="opcoesNota"
                 class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'dominio', v as number | null)"
+                @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'dominio', normalizarValorNota(v))"
             />
             <span v-else>{{ formatarNota(item.dominio) }}</span>
           </template>
@@ -524,4 +524,11 @@ const opcoesNota = [
   {value: 5, text: '5'},
   {value: 6, text: '6'},
 ];
+
+function normalizarValorNota(valor: unknown): number | null {
+  if (valor === null || valor === undefined || valor === '') return null;
+  if (typeof valor === 'number') return Number.isNaN(valor) ? null : valor;
+  const numero = Number(valor);
+  return Number.isNaN(numero) ? null : numero;
+}
 </script>

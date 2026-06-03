@@ -13,7 +13,7 @@ test.describe('CDU-38 - Acompanhar notificações por e-mail', () => {
                 destinatario: 'falha.definitiva@tre-pe.jus.br',
                 assunto: 'SGC: Falha definitiva fixture',
                 corpoHtml: '<p>Corpo fixture com <strong>preview</strong>.</p>',
-                tipoNotificacao: 'DIAGNOSTICO_CONSENSO_APROVADO',
+                tipoNotificacao: 'LEMBRETE_PRAZO',
                 situacao: 'FALHA_DEFINITIVA',
                 unidadeDestinoSigla: 'ASSESSORIA_12',
                 tentativas: 3,
@@ -37,7 +37,7 @@ test.describe('CDU-38 - Acompanhar notificações por e-mail', () => {
         const tabela = await abrirNotificacoesAdmin(page);
         await expect(tabela).toContainText('falha.definitiva@tre-pe.jus.br');
         await expect(tabela).toContainText('Falha definitiva');
-        await expect(tabela).toContainText('DIAGNOSTICO_CONSENSO_APROVADO');
+        await expect(tabela).toContainText('Lembrete de prazo');
         await expect(page.getByTestId('btn-notificacoes-atualizar')).toBeVisible();
         await expect(page.getByTestId('link-leitor-email-testes')).toBeVisible();
 

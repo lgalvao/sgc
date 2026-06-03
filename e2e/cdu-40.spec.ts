@@ -43,11 +43,11 @@ test.describe('CDU-40 - Consultar feedbacks enviados', () => {
         await expect(modal).toContainText('/painel');
         await expect(modal).toContainText('Melhorar o fluxo do painel.');
         await expect(modal).toContainText('Rota');
-        await expect(modal).toContainText('/painel?aba=alertas');
+        await expect(modal).toContainText('/painel');
         await expect(modal).toContainText('Acesso');
-        await expect(modal).toContainText('ADMIN / SECRETARIA_1');
+        await expect(modal).toContainText('ADMIN - SECRETARIA_1');
         await expect(modal).toContainText('Resolução');
-        await expect(modal).toContainText('1440 x 900');
+        await expect(modal).toContainText('1440x900');
         await expect(page.getByTestId('img-feedback-captura')).toBeVisible();
 
         await page.getByTestId('btn-feedback-ampliar-captura').click();

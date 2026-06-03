@@ -82,7 +82,7 @@
                 :model-value="item.chefiaImportancia"
                 :options="opcoesNota"
                 class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'importancia', valor: v as number | null})"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'importancia', valor: normalizarValorNota(v)})"
             />
             <span v-else>{{ formatarNota(item.chefiaImportancia) }}</span>
           </template>
@@ -93,7 +93,7 @@
                 :model-value="item.chefiaDominio"
                 :options="opcoesNota"
                 class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'dominio', valor: v as number | null})"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'dominio', valor: normalizarValorNota(v)})"
             />
             <span v-else>{{ formatarNota(item.chefiaDominio) }}</span>
           </template>
@@ -104,7 +104,7 @@
                 :model-value="item.consensoImportancia"
                 :options="opcoesNota"
                 class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: v as number | null})"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: normalizarValorNota(v)})"
             />
             <span v-else>{{ formatarNota(item.consensoImportancia) }}</span>
           </template>
@@ -115,7 +115,7 @@
                 :model-value="item.consensoDominio"
                 :options="opcoesNota"
                 class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'dominio', valor: v as number | null})"
+                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'dominio', valor: normalizarValorNota(v)})"
             />
             <span v-else>{{ formatarNota(item.consensoDominio) }}</span>
           </template>
@@ -284,6 +284,13 @@ const opcoesNota = [
   {value: 5, text: '5'},
   {value: 6, text: '6'},
 ];
+
+function normalizarValorNota(valor: unknown): number | null {
+  if (valor === null || valor === undefined || valor === '') return null;
+  if (typeof valor === 'number') return Number.isNaN(valor) ? null : valor;
+  const numero = Number(valor);
+  return Number.isNaN(numero) ? null : numero;
+}
 
 const colunasServidor = [
   {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},

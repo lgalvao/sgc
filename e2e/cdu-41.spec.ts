@@ -1,7 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
-import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
@@ -20,7 +19,7 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
             diasLimite: 30
         });
 
-        await acessarDetalhesProcesso(page, processo.descricao);
+        await page.goto(`/processo/cadastro?codProcesso=${processo.codigo}`);
         await expect(page.getByTestId('btn-processo-iniciar-rodape')).toBeVisible();
 
         await page.getByTestId('btn-processo-iniciar-rodape').click();
@@ -39,7 +38,7 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
         await expect(page.getByTestId('tbl-processos')).toContainText(descricao);
         await expect(page.getByTestId('tbl-processos')).toContainText('Em andamento');
 
-        await acessarDetalhesProcesso(page, descricao);
+        await page.goto(`/processo/${processo.codigo}`);
         await navegarParaSubprocesso(page, 'ASSESSORIA_12');
         await expect(page.getByTestId('card-subprocesso-diagnostico')).toBeVisible();
         await expect(page.getByTestId('card-subprocesso-monitoramento')).toBeVisible();
