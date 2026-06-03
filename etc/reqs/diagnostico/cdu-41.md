@@ -22,7 +22,7 @@ Ator: ADMIN
 
 6. O usuário clica em `Iniciar`, dentro da tela de confirmação.
    
-7. O sistema armazena internamente uma cópia (snapshot) da árvore de unidades participantes, incluindo todos os servidores lotados em cada unidade participante no momento, e a vincula com o processo.
+7. O sistema armazena internamente uma cópia (snapshot) da árvore de unidades participantes, incluindo todos os servidores lotados em cada unidade participante, e a vincula com o processo.
 
 8. O sistema muda a situação do processo para 'Em andamento'.
 

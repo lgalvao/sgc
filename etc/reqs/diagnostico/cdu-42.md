@@ -13,14 +13,15 @@ Ator: SERVIDOR
 
 2. O sistema mostra a tela `Detalhes do subprocesso` da unidade do servidor.
 
-3. O usuário clica no card `Autoavaliação`.
+3. O usuário clica no card `Avaliações`.
 
 4. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e, para cada competência:
    - descrição da competência;
-   - botão `Atividade e conhecimentos`, que permite mostrar as atividades e conhecimentos associados à competência;
+   - controle `Atividade e conhecimentos`, que permite mostrar as atividades e conhecimentos associados à competência;
    - campo `Importância`, com opções `NA` e os números de `1` a `6`;
    - campo `Domínio`, com opções `NA` e os números de `1` a `6`.
-
+   - Botã `Concluir autoavaliação`
+    
 6. O usuário escolhe os valores desejados para cada uma das competências.
 
 7. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
