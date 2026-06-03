@@ -8,6 +8,7 @@ import java.util.List;
 @Builder
 public record DiagnosticoUnidadeDto(
         UnidadeResumoDto unidade,
+        String situacaoDiagnostico,
         List<ServidorDiagnosticoDto> servidores,
         List<OcupacaoCriticaDto> ocupacoesCriticas,
         List<MovimentacaoDto> movimentacoes

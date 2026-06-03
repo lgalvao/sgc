@@ -7,11 +7,12 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
-import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,15 +25,16 @@ public class DiagnosticoAvaliacaoService {
     private final DiagnosticoValidacaoService validacaoService;
     private final DiagnosticoNotificacaoService notificacaoService;
     private final SubprocessoConsultaService subprocessoConsultaService;
-    private final UsuarioFacade usuarioFacade;
+    private final DiagnosticoUsuarioContextoService usuarioContextoService;
 
     public void salvarAutoavaliacao(Long codSubprocesso, AutoavaliacaoRequest request) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
+        validarCompetenciasEsperadas(avaliacoes, request.competencias());
 
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()
                 .collect(java.util.stream.Collectors.toMap(
@@ -51,7 +53,7 @@ public class DiagnosticoAvaliacaoService {
         avaliacaoRepo.saveAll(avaliacoes);
     }
     public void concluirAutoavaliacao(Long codSubprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
 
@@ -72,6 +74,7 @@ public class DiagnosticoAvaliacaoService {
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
+        validarCompetenciasEsperadas(avaliacoes, request.competencias());
 
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()
                 .collect(java.util.stream.Collectors.toMap(
@@ -99,7 +102,7 @@ public class DiagnosticoAvaliacaoService {
                 servidorTitulo);
     }
     public void aprovarConsenso(Long codSubprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
 
@@ -124,6 +127,7 @@ public class DiagnosticoAvaliacaoService {
             a.setImportancia(null);
             a.setDominio(null);
             a.setGap(null);
+            a.setObservacao(justificativa);
         });
         avaliacaoRepo.saveAll(avaliacoes);
     }
@@ -146,5 +150,21 @@ public class DiagnosticoAvaliacaoService {
             registro.setSituacaoCapacitacao(SituacaoCapacitacao.valueOf(item.situacaoCapacitacao()));
         }
         ocupacaoRepo.saveAll(existentes);
+    }
+
+    private void validarCompetenciasEsperadas(
+            java.util.List<AvaliacaoServidor> avaliacoes,
+            java.util.List<AvaliacaoCompetenciaDto> competenciasInformadas
+    ) {
+        Set<Long> competenciasEsperadas = avaliacoes.stream()
+                .map(a -> a.getCompetencia().getCodigo())
+                .collect(Collectors.toSet());
+        Set<Long> competenciasRecebidas = competenciasInformadas.stream()
+                .map(AvaliacaoCompetenciaDto::competenciaCodigo)
+                .collect(Collectors.toSet());
+        if (competenciasEsperadas.size() != competenciasInformadas.size()
+                || !competenciasEsperadas.equals(competenciasRecebidas)) {
+            throw new ErroValidacao("A requisição deve informar exatamente as competências esperadas para a avaliação.");
+        }
     }
 }

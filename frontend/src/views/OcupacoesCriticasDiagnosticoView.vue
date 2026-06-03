@@ -11,8 +11,8 @@
             {{ TEXTOS.diagnostico.TITULO_OCUPACOES_CRITICAS }}
           </h1>
           <div v-if="unidade" class="text-muted small">
-            <strong>{{ unidade.sigla }}</strong> — {{ unidade.nome }}
-            <BBadge :variant="varianteSituacao" class="ms-2">{{ unidade.situacao }}</BBadge>
+            <strong>{{ unidade.unidadeSigla }}</strong> — {{ unidade.unidadeNome }}
+            <BBadge :variant="varianteSituacao" class="ms-2">{{ unidade.situacaoSubprocesso }}</BBadge>
           </div>
         </div>
         <BButton size="sm" variant="outline-secondary" @click="router.back()">
@@ -186,7 +186,7 @@ async function confirmarConcluir() {
 
 // ── Formatação ────────────────────────────────────────────────────────────────
 const varianteSituacao = computed(() => {
-  switch (unidade.value?.situacao) {
+  switch (unidade.value?.situacaoSubprocesso) {
     case 'DIAGNOSTICO_CONCLUIDO':
       return 'success';
     case 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO':
@@ -199,7 +199,7 @@ const varianteSituacao = computed(() => {
 // Adiciona descrição das competências e nomes dos servidores
 const ocupacoesComDescricao = computed(() => {
   const mapaCompetencia = Object.fromEntries(
-    (contexto.value?.competencias ?? []).map((c) => [c.codigo, c.descricao]),
+    (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
   );
   return ocupacoesLocais.value.map((o) => ({
     ...o,

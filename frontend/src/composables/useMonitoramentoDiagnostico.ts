@@ -2,8 +2,9 @@ import {useQuery} from '@pinia/colada';
 import {computed} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade} from '@/services/diagnosticoService';
-import type {DiagnosticoUnidade} from '@/types/diagnostico-competencias';
+import type {DiagnosticoUnidade, SituacaoDiagnostico} from '@/types/diagnostico-competencias';
 import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
+import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 
 function chaveUnidade(codSubprocesso: number) {
     return [CHAVE_DIAGNOSTICO, 'unidade', codSubprocesso] as const;
@@ -16,6 +17,7 @@ function chaveUnidade(codSubprocesso: number) {
  */
 export function useMonitoramentoDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
+    const {data: contexto} = useDiagnosticoContexto(codSubprocesso);
 
     const query = useQuery<DiagnosticoUnidade>({
         key: () => chaveUnidade(codSubprocesso),
@@ -30,7 +32,10 @@ export function useMonitoramentoDiagnostico(codSubprocesso: number) {
     const movimentacoes = computed(() => query.data.value?.movimentacoes ?? []);
     const carregando = computed(() => query.status.value === 'pending');
     const erro = computed(() => query.error.value);
-    const situacao = computed(() => unidade.value?.situacao ?? '');
+    const situacaoSubprocesso = computed(() => unidade.value?.situacaoSubprocesso ?? '');
+    const situacao = computed<SituacaoDiagnostico>(
+        () => query.data.value?.situacaoDiagnostico ?? contexto.value?.situacaoDiagnostico ?? 'EM_ANDAMENTO',
+    );
     const totalPendentes = computed(
         () =>
             servidores.value.filter(
@@ -48,6 +53,7 @@ export function useMonitoramentoDiagnostico(codSubprocesso: number) {
         movimentacoes,
         carregando,
         erro,
+        situacaoSubprocesso,
         situacao,
         totalPendentes,
     };

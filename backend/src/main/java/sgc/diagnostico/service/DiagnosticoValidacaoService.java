@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
+import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.OcupacaoCriticaRepo;
+import sgc.diagnostico.model.SituacaoDiagnostico;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,12 @@ public class DiagnosticoValidacaoService {
 
         if (avaliacoesPendentes || ocupacoesPendentes) {
             throw new ErroValidacao("Ainda existem avaliações ou ocupações críticas pendentes.");
+        }
+    }
+
+    public void validarSituacaoDiagnostico(Diagnostico diagnostico, SituacaoDiagnostico situacaoEsperada) {
+        if (diagnostico.getSituacao() != situacaoEsperada) {
+            throw new ErroValidacao("Diagnóstico fora da situação esperada para esta ação.");
         }
     }
 }

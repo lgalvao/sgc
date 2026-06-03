@@ -39,6 +39,14 @@ export async function obterConsenso(codSubprocesso: number): Promise<Consenso> {
     return apiGet(`${BASE}/${codSubprocesso}/consenso`);
 }
 
+/** GET /diagnosticos/subprocessos/{id}/consenso/{servidorTitulo} */
+export async function obterConsensoServidor(
+    codSubprocesso: number,
+    servidorTitulo: string,
+): Promise<Consenso> {
+    return apiGet(`${BASE}/${codSubprocesso}/consenso/${encodeURIComponent(servidorTitulo)}`);
+}
+
 /** POST /diagnosticos/subprocessos/{id}/consenso/{servidorTitulo} */
 export async function salvarConsenso(
     codSubprocesso: number,

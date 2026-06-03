@@ -164,7 +164,7 @@ const {
   erroSalvar,
   atualizarNota,
   salvarConsenso,
-} = useConsensoDiagnostico(props.codSubprocesso);
+} = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
 
 // ── Perfil ───────────────────────────────────────────────────────────────────
 const ehChefe = computed(
@@ -216,7 +216,7 @@ function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
 
 const competenciasComDescricao = computed(() => {
   const mapaDesc = Object.fromEntries(
-    (contexto.value?.competencias ?? []).map((c) => [c.codigo, c.descricao]),
+    (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
   );
   return competenciasLocais.value.map((c) => ({
     ...c,

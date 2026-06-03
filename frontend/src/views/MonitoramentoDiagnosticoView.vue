@@ -11,8 +11,8 @@
             {{ TEXTOS.diagnostico.TITULO_MONITORAMENTO }}
           </h1>
           <div v-if="unidade" class="text-muted small">
-            <strong>{{ unidade.sigla }}</strong> — {{ unidade.nome }}
-            <BBadge :variant="varianteSituacao" class="ms-2">{{ unidade.situacao }}</BBadge>
+            <strong>{{ unidade.unidadeSigla }}</strong> — {{ unidade.unidadeNome }}
+            <BBadge :variant="varianteSituacao" class="ms-2">{{ situacao }}</BBadge>
           </div>
         </div>
         <BButton size="sm" variant="outline-secondary" @click="router.back()">
@@ -310,13 +310,13 @@ const ehGestor = computed(
 );
 
 const podeValidar = computed(
-  () => ehGestor.value && situacao.value === 'DIAGNOSTICO_CONCLUIDO',
+  () => ehGestor.value && situacao.value === 'CONCLUIDO',
 );
 const podeDevolver = computed(
-  () => ehGestor.value && situacao.value === 'DIAGNOSTICO_CONCLUIDO',
+  () => ehGestor.value && situacao.value === 'CONCLUIDO',
 );
 const podeHomologar = computed(
-  () => perfilStore.perfilSelecionado === Perfil.ADMIN && situacao.value === 'DIAGNOSTICO_CONCLUIDO',
+  () => perfilStore.perfilSelecionado === Perfil.ADMIN && situacao.value === 'VALIDADO',
 );
 
 const totalServidores = computed(() => servidores.value.length);
@@ -385,12 +385,16 @@ function navegarParaDetalhes() {
 // ── Formatação ────────────────────────────────────────────────────────────────
 const varianteSituacao = computed(() => {
   switch (situacao.value) {
-    case 'DIAGNOSTICO_CONCLUIDO':
+    case 'CONCLUIDO':
       return 'success';
-    case 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO':
+    case 'VALIDADO':
+      return 'info';
+    case 'HOMOLOGADO':
+      return 'primary';
+    case 'EM_ANDAMENTO':
       return 'warning';
     default:
-      return 'secondary';
+      return 'info';
   }
 });
 
@@ -421,8 +425,8 @@ function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): 
 }
 
 const colunasServidores = [
-  {key: 'nome', label: TEXTOS.diagnostico.COLUNA_SERVIDOR},
-  {key: 'titulo', label: 'Título'},
+  {key: 'servidorNome', label: TEXTOS.diagnostico.COLUNA_SERVIDOR},
+  {key: 'servidorTitulo', label: 'Título'},
   {key: 'situacaoServidor', label: TEXTOS.diagnostico.COLUNA_SITUACAO},
 ];
 </script>

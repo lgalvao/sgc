@@ -24,7 +24,7 @@ export function useEquipeDiagnostico(codSubprocesso: number) {
         staleTime: 30_000,
     });
 
-    const itens = computed(() => query.data.value?.itens ?? []);
+    const itens = computed(() => query.data.value?.servidores ?? []);
     const carregando = computed(() => query.status.value === 'pending');
     const totalServidores = computed(() => itens.value.length);
     const pendentes = computed(

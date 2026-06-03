@@ -13,7 +13,7 @@
           <div v-if="contexto" class="text-muted small">
             <strong>{{ contexto.unidadeSigla }}</strong> — {{ contexto.unidadeNome }}
             <BBadge :variant="varianteSituacao" class="ms-2">
-              {{ contexto.situacaoSubprocesso }}
+              {{ contexto.situacaoDiagnostico }}
             </BBadge>
           </div>
         </div>
@@ -161,12 +161,12 @@
         <BListGroup flush>
           <BListGroupItem
               v-for="membro in itensEquipe"
-              :key="membro.titulo"
+              :key="membro.servidorTitulo"
               class="d-flex align-items-center justify-content-between"
           >
             <div>
-              <strong>{{ membro.nome }}</strong>
-              <small class="text-muted ms-2">{{ membro.titulo }}</small>
+              <strong>{{ membro.servidorNome }}</strong>
+              <small class="text-muted ms-2">{{ membro.servidorTitulo }}</small>
             </div>
             <div class="d-flex align-items-center gap-2">
               <BBadge :variant="varianteSituacaoServidor(membro.situacaoServidor)">
@@ -174,19 +174,19 @@
               </BBadge>
               <BButton
                   v-if="membro.situacaoServidor === 'AUTOAVALIACAO_CONCLUIDA'"
-                  :data-testid="`btn-consenso-${membro.titulo}`"
+                  :data-testid="`btn-consenso-${membro.servidorTitulo}`"
                   size="sm"
                   variant="outline-primary"
-                  @click="navegarParaConsenso(membro.titulo)"
+                  @click="navegarParaConsenso(membro.servidorTitulo)"
               >
                 Registrar consenso
               </BButton>
               <BButton
                   v-if="podeImpossibilitar(membro.situacaoServidor)"
-                  :data-testid="`btn-impossibilitar-${membro.titulo}`"
+                  :data-testid="`btn-impossibilitar-${membro.servidorTitulo}`"
                   size="sm"
                   variant="outline-danger"
-                  @click="abrirModalImpossibilitar(membro.titulo)"
+                  @click="abrirModalImpossibilitar(membro.servidorTitulo)"
               >
                 Impossibilitar
               </BButton>
@@ -470,7 +470,7 @@ const colunas = [
 // Adiciona descricao a partir do contexto
 const competenciasComDescricao = computed(() => {
   const mapa = Object.fromEntries(
-    (contexto.value?.competencias ?? []).map((c) => [c.codigo, c.descricao]),
+    (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
   );
   return competenciasLocais.value.map((c) => ({
     ...c,

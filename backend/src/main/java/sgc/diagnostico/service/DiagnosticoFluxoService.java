@@ -15,7 +15,6 @@ import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
-import sgc.organizacao.UsuarioFacade;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
 import sgc.subprocesso.model.Movimentacao;
@@ -53,7 +52,7 @@ public class DiagnosticoFluxoService {
     private final UnidadeService unidadeService;
     private final UnidadeHierarquiaService unidadeHierarquiaService;
     private final HierarquiaService hierarquiaService;
-    private final UsuarioFacade usuarioFacade;
+    private final DiagnosticoUsuarioContextoService usuarioContextoService;
     private final UsuarioService usuarioService;
 
     public void inicializarDiagnostico(Subprocesso subprocesso) {
@@ -98,7 +97,7 @@ public class DiagnosticoFluxoService {
         subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setDataFimEtapa1(LocalDateTime.now());
 
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Unidade unidadeOrigem = subprocesso.getUnidade();
         Unidade unidadeDestino = buscarSuperiorImediato(unidadeOrigem.getCodigo());
         if (unidadeDestino == null) {
@@ -141,7 +140,7 @@ public class DiagnosticoFluxoService {
             diagnostico.setJustificativaConclusao(null);
         }
 
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(novaSituacao)
@@ -156,7 +155,7 @@ public class DiagnosticoFluxoService {
                 .observacoes(observacao)
                 .build());
 
-        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao);
+        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, observacao);
     }
 
     public void validarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
@@ -172,7 +171,7 @@ public class DiagnosticoFluxoService {
 
         diagnostico.setSituacao(SituacaoDiagnostico.VALIDADO);
 
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO)
@@ -194,10 +193,11 @@ public class DiagnosticoFluxoService {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        validacaoService.validarSituacaoDiagnostico(diagnostico, SituacaoDiagnostico.VALIDADO);
 
         diagnostico.setSituacao(SituacaoDiagnostico.HOMOLOGADO);
 
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Unidade admin = unidadeService.buscarAdmin();
         transicaoService.registrarTransicaoSemEmail(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)

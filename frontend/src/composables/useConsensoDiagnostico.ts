@@ -5,13 +5,14 @@ import {
     aprovarConsenso,
     impossibilitarAvaliacao,
     obterConsenso,
+    obterConsensoServidor,
     salvarConsenso,
 } from '@/services/diagnosticoService';
 import type {AvaliacaoCompetencia, Consenso} from '@/types/diagnostico-competencias';
 import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
 
-function chaveConsenso(codSubprocesso: number) {
-    return [CHAVE_DIAGNOSTICO, 'consenso', codSubprocesso] as const;
+function chaveConsenso(codSubprocesso: number, servidorTitulo?: string) {
+    return [CHAVE_DIAGNOSTICO, 'consenso', codSubprocesso, servidorTitulo ?? 'usuario-logado'] as const;
 }
 
 function chaveEquipe(codSubprocesso: number) {
@@ -29,13 +30,15 @@ function chaveAutoavaliacao(codSubprocesso: number) {
  * - Mutation de aprovar consenso (para o servidor logado).
  * - Mutation de impossibilitar avaliação (para chefia).
  */
-export function useConsensoDiagnostico(codSubprocesso: number) {
+export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: string) {
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
 
     const query = useQuery<Consenso>({
-        key: () => chaveConsenso(codSubprocesso),
-        query: () => obterConsenso(codSubprocesso),
+        key: () => chaveConsenso(codSubprocesso, servidorTitulo),
+        query: () => servidorTitulo
+            ? obterConsensoServidor(codSubprocesso, servidorTitulo)
+            : obterConsenso(codSubprocesso),
         enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
         staleTime: Infinity,
     });
@@ -61,7 +64,7 @@ export function useConsensoDiagnostico(codSubprocesso: number) {
                 motivoReabertura: motivo || undefined,
             }),
         onSuccess: () => {
-            cache.invalidateQueries({key: chaveConsenso(codSubprocesso)});
+            cache.invalidateQueries({key: chaveConsenso(codSubprocesso, servidorTitulo)});
             cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
         },
     });
@@ -69,7 +72,7 @@ export function useConsensoDiagnostico(codSubprocesso: number) {
     const mutacaoAprovar = useMutation({
         mutation: () => aprovarConsenso(codSubprocesso),
         onSuccess: () => {
-            cache.invalidateQueries({key: chaveConsenso(codSubprocesso)});
+            cache.invalidateQueries({key: chaveConsenso(codSubprocesso, servidorTitulo)});
             cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
             cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso)});
         },

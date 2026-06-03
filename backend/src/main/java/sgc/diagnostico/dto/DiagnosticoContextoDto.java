@@ -11,6 +11,7 @@ public record DiagnosticoContextoDto(
         String unidadeSigla,
         String unidadeNome,
         String situacaoSubprocesso,
+        String situacaoDiagnostico,
         List<CompetenciaResumoDto> competencias
 ) {
 }

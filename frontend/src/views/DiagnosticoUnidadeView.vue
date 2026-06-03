@@ -11,8 +11,8 @@
             {{ TEXTOS.diagnostico.TITULO_UNIDADE }}
           </h1>
           <div v-if="unidade" class="text-muted small">
-            <strong>{{ unidade.sigla }}</strong> — {{ unidade.nome }}
-            <BBadge :variant="varianteSituacao" class="ms-2">{{ unidade.situacao }}</BBadge>
+            <strong>{{ unidade.unidadeSigla }}</strong> — {{ unidade.unidadeNome }}
+            <BBadge :variant="varianteSituacao" class="ms-2">{{ situacao }}</BBadge>
           </div>
         </div>
         <BButton size="sm" variant="outline-secondary" @click="router.back()">
@@ -74,13 +74,13 @@
         />
 
         <template v-else>
-          <BAccordion v-for="servidor in servidores" :key="servidor.titulo" class="mb-1">
+          <BAccordion v-for="servidor in servidores" :key="servidor.servidorTitulo" class="mb-1">
             <BAccordionItem>
               <template #title>
                 <div class="d-flex align-items-center gap-2 w-100 justify-content-between pe-3">
                   <span>
-                    <strong>{{ servidor.nome }}</strong>
-                    <small class="text-muted ms-2">{{ servidor.titulo }}</small>
+                    <strong>{{ servidor.servidorNome }}</strong>
+                    <small class="text-muted ms-2">{{ servidor.servidorTitulo }}</small>
                   </span>
                   <BBadge :variant="varianteSituacaoServidor(servidor.situacaoServidor)">
                     {{ formatarSituacaoServidor(servidor.situacaoServidor) }}
@@ -89,7 +89,7 @@
               </template>
               <BTable
                   :fields="colunasCompetencias"
-                  :items="servidor.competencias"
+                  :items="servidor.consenso"
                   bordered
                   responsive
                   small
@@ -304,10 +304,10 @@ const ehGestor = computed(
     perfilStore.perfilSelecionado === Perfil.GESTOR ||
     perfilStore.perfilSelecionado === Perfil.ADMIN,
 );
-const podeValidar = computed(() => ehGestor.value && situacao.value === 'DIAGNOSTICO_CONCLUIDO');
-const podeDevolver = computed(() => ehGestor.value && situacao.value === 'DIAGNOSTICO_CONCLUIDO');
+const podeValidar = computed(() => ehGestor.value && situacao.value === 'CONCLUIDO');
+const podeDevolver = computed(() => ehGestor.value && situacao.value === 'CONCLUIDO');
 const podeHomologar = computed(
-  () => perfilStore.perfilSelecionado === Perfil.ADMIN && situacao.value === 'DIAGNOSTICO_VALIDADO',
+  () => perfilStore.perfilSelecionado === Perfil.ADMIN && situacao.value === 'VALIDADO',
 );
 
 // ── Modais ────────────────────────────────────────────────────────────────────
@@ -356,9 +356,9 @@ async function confirmarHomologar() {
 // ── Formatação ────────────────────────────────────────────────────────────────
 const varianteSituacao = computed(() => {
   switch (situacao.value) {
-    case 'DIAGNOSTICO_CONCLUIDO': return 'success';
-    case 'DIAGNOSTICO_VALIDADO': return 'info';
-    case 'DIAGNOSTICO_HOMOLOGADO': return 'primary';
+    case 'CONCLUIDO': return 'success';
+    case 'VALIDADO': return 'info';
+    case 'HOMOLOGADO': return 'primary';
     default: return 'warning';
   }
 });
@@ -405,7 +405,7 @@ function calcularGap(item: AvaliacaoCompetencia): number {
 }
 
 const mapaDescricaoCompetencia = computed(() =>
-  Object.fromEntries((contexto.value?.competencias ?? []).map((c) => [c.codigo, c.descricao])),
+  Object.fromEntries((contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao])),
 );
 
 const ocupacoesComDescricao = computed(() =>

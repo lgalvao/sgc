@@ -70,6 +70,15 @@ public class DiagnosticoController {
         return ResponseEntity.ok(consultaService.obterConsenso(codSubprocesso));
     }
 
+    @GetMapping("/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
+    public ResponseEntity<ConsensoDto> obterConsensoServidor(
+            @PathVariable Long codSubprocesso,
+            @PathVariable String servidorTitulo
+    ) {
+        return ResponseEntity.ok(consultaService.obterConsenso(codSubprocesso, servidorTitulo));
+    }
+
     // CDU-44: aprovar consenso
     @PostMapping("/subprocessos/{codSubprocesso}/consenso/aprovar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")

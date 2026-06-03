@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
-import sgc.alerta.AlertaFacade;
 import sgc.alerta.EnfileirarNotificacaoCommand;
 import sgc.alerta.NotificacaoService;
 import sgc.alerta.model.TipoNotificacao;
@@ -25,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class DiagnosticoNotificacaoService {
-    private final AlertaFacade alertaFacade;
+    private final DiagnosticoAlertaService alertaService;
     private final NotificacaoService notificacaoService;
     private final ResponsavelUnidadeService responsavelService;
     private final UsuarioService usuarioService;
@@ -58,7 +57,7 @@ public class DiagnosticoNotificacaoService {
                 corpo,
                 "diagnostico:%d:inicio:servidor:%s".formatted(sp.getCodigo(), servidor.getTituloEleitoral()));
 
-        alertaFacade.criarAlertaPessoal(
+        alertaService.criarAlertaPessoal(
                 servidor.getTituloEleitoral(),
                 "Sua autoavaliação de diagnóstico no processo %s está disponível. Prazo: %s".formatted(nomeProcesso, dataLimite)
         );
@@ -80,7 +79,7 @@ public class DiagnosticoNotificacaoService {
         enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA, assunto, corpo,
                 "diagnostico:%d:autoavaliacao:%s".formatted(sp.getCodigo(), servidorTitulo));
 
-        alertaFacade.criarAlertaTransicao(
+        alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
                 "Autoavaliação de %s submetida para análise".formatted(nomeServidor),
                 unidade,
@@ -112,7 +111,7 @@ public class DiagnosticoNotificacaoService {
                 corpo,
                 "diagnostico:%d:consenso-disponivel:%s".formatted(sp.getCodigo(), servidorTitulo));
 
-        alertaFacade.criarAlertaTransicao(
+        alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
                 "Avaliação de consenso de %s disponível para validação".formatted(servidor.getNome()),
                 unidade,
@@ -136,7 +135,7 @@ public class DiagnosticoNotificacaoService {
         enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_CONSENSO_APROVADO, assunto, corpo,
                 "diagnostico:%d:consenso-aprovado:%s".formatted(sp.getCodigo(), servidorTitulo));
 
-        alertaFacade.criarAlertaTransicao(
+        alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
                 "Avaliação de consenso de %s aprovada".formatted(nomeServidor),
                 unidade,
@@ -157,7 +156,7 @@ public class DiagnosticoNotificacaoService {
         enfileirarNotificacao(sp, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_CONCLUIDO, assunto, corpo,
                 "diagnostico:%d:concluido:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
 
-        alertaFacade.criarAlertaTransicao(
+        alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
                 "Diagnóstico da unidade %s concluído".formatted(unidadeSubprocesso.getSigla()),
                 unidadeSubprocesso,
@@ -165,7 +164,12 @@ public class DiagnosticoNotificacaoService {
         );
     }
 
-    public void notificarDiagnosticoDevolvido(Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeDevolucao) {
+    public void notificarDiagnosticoDevolvido(
+            Subprocesso sp,
+            Unidade unidadeAnalise,
+            Unidade unidadeDevolucao,
+            @Nullable String observacao
+    ) {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeDevolucao);
         String assunto = "SGC: Diagnóstico da unidade %s devolvido para ajustes".formatted(unidadeSubprocesso.getSigla());
@@ -173,13 +177,13 @@ public class DiagnosticoNotificacaoService {
                 unidadeDevolucao.getSigla(),
                 unidadeSubprocesso.getSigla(),
                 sp.getProcesso().getDescricao(),
-                null // Buscar observações da movimentação se necessário
+                observacao
         );
 
         enfileirarNotificacao(sp, unidadeDevolucao, destinatario, TipoNotificacao.DIAGNOSTICO_DEVOLVIDO, assunto, corpo,
                 "diagnostico:%d:devolvido:destino:%d".formatted(sp.getCodigo(), unidadeDevolucao.getCodigo()));
 
-        alertaFacade.criarAlertaTransicao(
+        alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
                 "Diagnóstico da unidade %s devolvido para ajustes".formatted(unidadeSubprocesso.getSigla()),
                 unidadeAnalise,
@@ -200,7 +204,7 @@ public class DiagnosticoNotificacaoService {
         enfileirarNotificacao(sp, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_ACEITO, assunto, corpo,
                 "diagnostico:%d:aceito:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
 
-        alertaFacade.criarAlertaTransicao(
+        alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
                 "Diagnóstico da unidade %s submetido para análise".formatted(unidadeSubprocesso.getSigla()),
                 unidadeAnalise,
@@ -222,7 +226,7 @@ public class DiagnosticoNotificacaoService {
         enfileirarNotificacao(sp, unidadeSubprocesso, destinatario, TipoNotificacao.DIAGNOSTICO_HOMOLOGADO, assunto, corpo,
                 "diagnostico:%d:homologado".formatted(sp.getCodigo()));
 
-        alertaFacade.criarAlertaTransicao(
+        alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
                 "Diagnóstico da unidade %s homologado".formatted(unidadeSubprocesso.getSigla()),
                 admin,

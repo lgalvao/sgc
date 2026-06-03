@@ -6,9 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.model.ComumRepo;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
-import sgc.organizacao.UsuarioFacade;
 import sgc.organizacao.model.Usuario;
-
+import sgc.subprocesso.SubprocessoDtoMapper;
 import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
@@ -25,10 +24,12 @@ public class DiagnosticoConsultaService {
     private final AvaliacaoServidorRepo avaliacaoRepo;
     private final OcupacaoCriticaRepo ocupacaoRepo;
     private final SubprocessoConsultaService subprocessoConsultaService;
-    private final UsuarioFacade usuarioFacade;
+    private final SubprocessoDtoMapper subprocessoDtoMapper;
+    private final DiagnosticoUsuarioContextoService usuarioContextoService;
 
     public DiagnosticoContextoDto obterContexto(Long codSubprocesso) {
         Subprocesso sp = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         List<CompetenciaResumoDto> competencias = sp.getMapa().getCompetencias().stream()
                 .map(c -> CompetenciaResumoDto.builder()
                         .competenciaCodigo(c.getCodigo())
@@ -42,12 +43,13 @@ public class DiagnosticoConsultaService {
                 .unidadeSigla(sp.getUnidade().getSigla())
                 .unidadeNome(sp.getUnidade().getNome())
                 .situacaoSubprocesso(sp.getSituacao().name())
+                .situacaoDiagnostico(diagnostico.getSituacao().name())
                 .competencias(competencias)
                 .build();
     }
 
     public AutoavaliacaoDto obterAutoavaliacao(Long codSubprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
@@ -69,10 +71,14 @@ public class DiagnosticoConsultaService {
     }
 
     public ConsensoDto obterConsenso(Long codSubprocesso) {
-        Usuario usuario = usuarioFacade.usuarioAutenticado();
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
+        return obterConsenso(codSubprocesso, usuario.getTituloEleitoral());
+    }
+
+    public ConsensoDto obterConsenso(Long codSubprocesso, String servidorTitulo) {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
-                diagnostico.getCodigo(), usuario.getTituloEleitoral());
+                diagnostico.getCodigo(), servidorTitulo);
         List<AvaliacaoCompetenciaDto> competencias = avaliacoes.stream()
                 .map(a -> AvaliacaoCompetenciaDto.builder()
                         .competenciaCodigo(a.getCompetencia().getCodigo())
@@ -164,11 +170,12 @@ public class DiagnosticoConsultaService {
                 .toList();
 
         List<MovimentacaoDto> movimentacoesDto = movimentacoes.stream()
-                .map(MovimentacaoDto::from)
+                .map(subprocessoDtoMapper::paraMovimentacao)
                 .toList();
 
         return DiagnosticoUnidadeDto.builder()
                 .unidade(unidade)
+                .situacaoDiagnostico(diagnostico.getSituacao().name())
                 .servidores(servidores)
                 .ocupacoesCriticas(ocupacoesCriticas)
                 .movimentacoes(movimentacoesDto)

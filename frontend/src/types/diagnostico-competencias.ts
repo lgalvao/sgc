@@ -18,7 +18,7 @@ export type SituacaoDiagnostico = 'EM_ANDAMENTO' | 'CONCLUIDO' | 'VALIDADO' | 'H
 // ──────────────────────────────────────────────────────────────────────────────
 
 export interface CompetenciaResumoDiag {
-    codigo: number;
+    competenciaCodigo: number;
     descricao: string;
 }
 
@@ -37,6 +37,7 @@ export interface DiagnosticoContexto {
     unidadeSigla: string;
     unidadeNome: string;
     situacaoSubprocesso: string;
+    situacaoDiagnostico: SituacaoDiagnostico;
     competencias: CompetenciaResumoDiag[];
 }
 
@@ -54,22 +55,22 @@ export interface Consenso {
 
 /** Item da lista de servidores da equipe no diagnóstico. */
 export interface ItemEquipeDiagnostico {
-    titulo: string;
-    nome: string;
+    servidorTitulo: string;
+    servidorNome: string;
     situacaoServidor: SituacaoAvaliacaoServidor;
 }
 
 /** Lista de servidores e suas situações na equipe. */
 export interface DiagnosticoEquipe {
-    itens: ItemEquipeDiagnostico[];
+    servidores: ItemEquipeDiagnostico[];
 }
 
 /** Dados de um servidor no diagnóstico da unidade (visão da chefia/gestor). */
 export interface ServidorDiagnostico {
-    titulo: string;
-    nome: string;
+    servidorTitulo: string;
+    servidorNome: string;
     situacaoServidor: SituacaoAvaliacaoServidor;
-    competencias: AvaliacaoCompetencia[];
+    consenso: AvaliacaoCompetencia[];
 }
 
 /** Ocupação crítica registrada para servidor/competência. */
@@ -81,15 +82,16 @@ export interface OcupacaoCriticaItem {
 
 /** Resumo da unidade no diagnóstico. */
 export interface UnidadeResumoDiag {
-    codigo: number;
-    sigla: string;
-    nome: string;
-    situacao: string;
+    unidadeCodigo: number;
+    unidadeSigla: string;
+    unidadeNome: string;
+    situacaoSubprocesso: string;
 }
 
 /** Diagnóstico completo de uma unidade (servidores, ocupações, histórico). */
 export interface DiagnosticoUnidade {
     unidade: UnidadeResumoDiag;
+    situacaoDiagnostico: SituacaoDiagnostico;
     servidores: ServidorDiagnostico[];
     ocupacoesCriticas: OcupacaoCriticaItem[];
     movimentacoes: MovimentacaoDiag[];
