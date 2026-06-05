@@ -271,7 +271,6 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {useQueryCache} from '@pinia/colada';
 import {
   BAlert,
   BBadge,
@@ -291,7 +290,8 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
-import {CHAVE_DIAGNOSTICO, useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
+import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
+import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
@@ -307,7 +307,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const cache = useQueryCache();
+const cacheDiagnostico = useCacheDiagnostico();
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {queryContextoEdicao, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
@@ -408,8 +408,8 @@ async function confirmarImpossibilitar() {
     );
     fecharModalImpossibilitar();
     alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
-    void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'equipe', props.codSubprocesso]});
-    void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', props.codSubprocesso]});
+    cacheDiagnostico.invalidarEquipe(props.codSubprocesso);
+    cacheDiagnostico.invalidarUnidade(props.codSubprocesso);
   } catch {
     erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
   } finally {

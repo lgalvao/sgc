@@ -7,15 +7,11 @@ import {
     salvarAutoavaliacao,
 } from '@/services/diagnosticoService';
 import type {AvaliacaoCompetencia, Autoavaliacao} from '@/types/diagnostico-competencias';
-import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
-
-function chaveAutoavaliacao(codSubprocesso: number) {
-    return [CHAVE_DIAGNOSTICO, 'autoavaliacao', codSubprocesso] as const;
-}
-
-function chaveEquipe(codSubprocesso: number) {
-    return [CHAVE_DIAGNOSTICO, 'equipe', codSubprocesso] as const;
-}
+import {
+    chaveAutoavaliacao,
+    chaveEquipe,
+    criarContextoSessaoDiagnostico,
+} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de autoavaliação do servidor logado.
@@ -26,9 +22,10 @@ function chaveEquipe(codSubprocesso: number) {
 export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
+    const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
 
     const query = useQuery<Autoavaliacao>({
-        key: () => chaveAutoavaliacao(codSubprocesso),
+        key: () => chaveAutoavaliacao(codSubprocesso, contextoSessao),
         query: () => obterAutoavaliacao(codSubprocesso),
         enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
         staleTime: Infinity,
@@ -66,8 +63,8 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     const mutacaoConcluir = useMutation({
         mutation: () => concluirAutoavaliacao(codSubprocesso),
         onSuccess: () => {
-            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso)});
-            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso, contextoSessao), exact: true});
+            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso, contextoSessao), exact: true});
         },
     });
 

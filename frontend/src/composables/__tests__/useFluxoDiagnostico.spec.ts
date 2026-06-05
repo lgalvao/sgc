@@ -42,6 +42,14 @@ vi.mock('vue-router', () => ({
     }),
 }));
 
+vi.mock('@/stores/perfil', () => ({
+    usePerfilStore: () => ({
+        usuarioCodigo: '151515',
+        perfilSelecionado: 'CHEFE',
+        unidadeSelecionada: 12,
+    }),
+}));
+
 vi.mock('@/services/diagnosticoService', () => ({
     concluirDiagnostico: vi.fn(),
     validarDiagnostico: vi.fn(),
@@ -61,9 +69,18 @@ describe('useFluxoDiagnostico', () => {
         await composable.concluirDiagnostico();
 
         expect(diagnosticoService.concluirDiagnostico).toHaveBeenCalledWith(41);
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'contexto', 41]});
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'equipe', 41]});
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'unidade', 41]});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'contexto', '151515', 'CHEFE', '12', 41],
+            exact: true,
+        });
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'equipe', '151515', 'CHEFE', '12', 41],
+            exact: true,
+        });
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'unidade', '151515', 'CHEFE', '12', 41],
+            exact: true,
+        });
     });
 
     it('deve enviar payload correto ao validar, devolver e homologar', async () => {

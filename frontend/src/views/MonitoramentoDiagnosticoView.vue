@@ -288,9 +288,8 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
-import {useQueryCache} from '@pinia/colada';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
+import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
 import {impossibilitarAvaliacao} from '@/services/diagnosticoService';
 import {
   BBadge,
@@ -322,7 +321,7 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const cache = useQueryCache();
+const cacheDiagnostico = useCacheDiagnostico();
 const {
   podeCriarConsenso,
   habilitarValidarDiagnostico,
@@ -411,7 +410,7 @@ async function confirmarImpossibilitar() {
     );
     modalImpossibilitarAberto.value = false;
     alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
-    void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', props.codSubprocesso]});
+    cacheDiagnostico.invalidarUnidade(props.codSubprocesso);
   } catch {
     erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
   } finally {

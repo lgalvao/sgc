@@ -3,11 +3,7 @@ import {computed} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterEquipe} from '@/services/diagnosticoService';
 import type {DiagnosticoEquipe} from '@/types/diagnostico-competencias';
-import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
-
-export function chaveEquipeDiagnostico(codSubprocesso: number) {
-    return [CHAVE_DIAGNOSTICO, 'equipe', codSubprocesso] as const;
-}
+import {chaveEquipe, criarContextoSessaoDiagnostico} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de acompanhamento da equipe no diagnóstico.
@@ -16,9 +12,10 @@ export function chaveEquipeDiagnostico(codSubprocesso: number) {
  */
 export function useEquipeDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
+    const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
 
     const query = useQuery<DiagnosticoEquipe>({
-        key: () => chaveEquipeDiagnostico(codSubprocesso),
+        key: () => chaveEquipe(codSubprocesso, contextoSessao),
         query: () => obterEquipe(codSubprocesso),
         enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
         staleTime: 30_000,

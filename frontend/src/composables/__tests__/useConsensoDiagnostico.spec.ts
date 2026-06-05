@@ -186,9 +186,18 @@ describe('useConsensoDiagnostico', () => {
         await composable!.aprovarConsenso();
 
         expect(diagnosticoService.aprovarConsenso).toHaveBeenCalledWith(59);
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'consenso', 59, '242426']});
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'equipe', 59]});
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'autoavaliacao', 59]});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'consenso', '242426', 'sem-perfil', 'sem-unidade', 59, '242426'],
+            exact: true,
+        });
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'equipe', '242426', 'sem-perfil', 'sem-unidade', 59],
+            exact: true,
+        });
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'autoavaliacao', '242426', 'sem-perfil', 'sem-unidade', 59],
+            exact: true,
+        });
 
         scope.stop();
     });

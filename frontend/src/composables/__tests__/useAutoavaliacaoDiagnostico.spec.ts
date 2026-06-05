@@ -137,8 +137,14 @@ describe('useAutoavaliacaoDiagnostico', () => {
         await composable!.concluirAutoavaliacao();
 
         expect(diagnosticoService.concluirAutoavaliacao).toHaveBeenCalledWith(77);
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'autoavaliacao', 77]});
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'equipe', 77]});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'autoavaliacao', '242426', 'sem-perfil', 'sem-unidade', 77],
+            exact: true,
+        });
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'equipe', '242426', 'sem-perfil', 'sem-unidade', 77],
+            exact: true,
+        });
 
         scope.stop();
     });

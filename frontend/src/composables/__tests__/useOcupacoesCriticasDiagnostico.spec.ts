@@ -115,7 +115,10 @@ describe('useOcupacoesCriticasDiagnostico', () => {
                 {servidorTitulo: '242427', competenciaCodigo: 20, situacaoCapacitacao: 'AC'},
             ],
         });
-        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-competencias', 'unidade', 71]});
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'unidade', '151515', 'sem-perfil', 'sem-unidade', 71],
+            exact: true,
+        });
         expect(composable!.salvandoAutomaticamente.value).toBe(false);
         expect(composable!.autoguardado.value).toBe(true);
 

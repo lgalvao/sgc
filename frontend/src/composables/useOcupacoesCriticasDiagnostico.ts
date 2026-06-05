@@ -3,11 +3,7 @@ import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade, salvarOcupacoesCriticas} from '@/services/diagnosticoService';
 import type {DiagnosticoUnidade, OcupacaoCriticaItem, SituacaoCapacitacao} from '@/types/diagnostico-competencias';
-import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
-
-function chaveUnidade(codSubprocesso: number) {
-    return [CHAVE_DIAGNOSTICO, 'unidade', codSubprocesso] as const;
-}
+import {chaveUnidade, criarContextoSessaoDiagnostico} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de ocupações críticas do diagnóstico da unidade.
@@ -17,9 +13,10 @@ function chaveUnidade(codSubprocesso: number) {
 export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
+    const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
 
     const query = useQuery<DiagnosticoUnidade>({
-        key: () => chaveUnidade(codSubprocesso),
+        key: () => chaveUnidade(codSubprocesso, contextoSessao),
         query: () => obterDiagnosticoUnidade(codSubprocesso),
         enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
         staleTime: Infinity,
@@ -56,7 +53,7 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
             setTimeout(() => {
                 autoguardado.value = false;
             }, 2000);
-            void cache.invalidateQueries({key: chaveUnidade(codSubprocesso)});
+            void cache.invalidateQueries({key: chaveUnidade(codSubprocesso, contextoSessao), exact: true});
         },
     });
 

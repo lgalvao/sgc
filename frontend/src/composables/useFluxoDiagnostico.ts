@@ -1,4 +1,4 @@
-import {useMutation, useQueryCache} from '@pinia/colada';
+import {useMutation} from '@pinia/colada';
 import {computed} from 'vue';
 import {useRouter} from 'vue-router';
 import {
@@ -7,7 +7,7 @@ import {
     homologarDiagnostico,
     validarDiagnostico,
 } from '@/services/diagnosticoService';
-import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
+import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
 
 /**
  * Composable de fluxo do diagnóstico.
@@ -15,13 +15,11 @@ import {CHAVE_DIAGNOSTICO} from '@/composables/useDiagnosticoContexto';
  * Após cada ação bem-sucedida, invalida o contexto e opcionalmente redireciona.
  */
 export function useFluxoDiagnostico(codSubprocesso: number) {
-    const cache = useQueryCache();
     const router = useRouter();
+    const cacheDiagnostico = useCacheDiagnostico();
 
     function invalidarTudo() {
-        void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'contexto', codSubprocesso]});
-        void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'equipe', codSubprocesso]});
-        void cache.invalidateQueries({key: [CHAVE_DIAGNOSTICO, 'unidade', codSubprocesso]});
+        cacheDiagnostico.invalidarFluxoCompleto(codSubprocesso);
     }
 
     const mutacaoConcluir = useMutation({
