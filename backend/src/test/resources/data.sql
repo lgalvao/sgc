@@ -277,6 +277,11 @@ VALUES ('111122223333', 'Chefe Teste CDU11', 'chefe.cdu11@test.com', '1111', 8, 
 INSERT INTO SGC.VW_USUARIO (titulo, nome, email, ramal, unidade_lot_codigo, MATRICULA)
 VALUES ('202020202020', 'Gestor Teste CDU13', 'gestor.cdu13@test.com', '2020', 2, '00202020');
 
+-- Garantia de contrato para notificações e fluxos de diagnóstico.
+UPDATE SGC.VW_USUARIO
+SET EMAIL = 'usuario.' || TITULO || '@tre-pe.jus.br'
+WHERE EMAIL IS NULL OR TRIM(EMAIL) = '';
+
 -- -------------------------------------------------------------------------------------------------
 -- PERFIS DE USUÁRIO (VW_USUARIO_PERFIL_UNIDADE - sem ID autoincrementado)
 -- -------------------------------------------------------------------------------------------------

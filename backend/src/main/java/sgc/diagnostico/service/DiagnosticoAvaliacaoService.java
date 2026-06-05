@@ -8,6 +8,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
 import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 
 import java.util.List;
@@ -74,11 +75,11 @@ public class DiagnosticoAvaliacaoService {
     public void salvarConsenso(Long codSubprocesso, ConsensoRequest request, String servidorTitulo) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
         List<AvaliacaoCompetenciaDto> competenciasConsenso = extrairCompetenciasConsenso(request);
-        validarCompetenciasEsperadas(avaliacoes, competenciasConsenso);
 
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()
                 .collect(java.util.stream.Collectors.toMap(
@@ -111,9 +112,7 @@ public class DiagnosticoAvaliacaoService {
         }
 
         avaliacaoRepo.saveAll(avaliacoes);
-        notificacaoService.notificarConsensoDisponivel(
-                subprocessoConsultaService.buscarSubprocesso(codSubprocesso),
-                servidorTitulo);
+        notificacaoService.notificarConsensoDisponivel(subprocesso, servidorTitulo);
     }
 
     private List<AvaliacaoCompetenciaDto> extrairCompetenciasConsenso(ConsensoRequest request) {
@@ -197,4 +196,5 @@ public class DiagnosticoAvaliacaoService {
             throw new ErroValidacao("A requisição deve informar exatamente as competências esperadas para a avaliação.");
         }
     }
+
 }

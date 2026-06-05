@@ -253,6 +253,20 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("obterPermissoesUI: ADMIN não deve ver autoavaliação no diagnóstico")
+    void obterPermissoesUI_AdminNaoDeveVerAutoavaliacaoNoDiagnostico() {
+        processo.setTipo(TipoProcesso.DIAGNOSTICO);
+        processoRepo.saveAndFlush(processo);
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+
+        PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
+
+        assertThat(permissoes.podePreencherAutoavaliacao()).isFalse();
+        assertThat(permissoes.habilitarPreencherAutoavaliacao()).isFalse();
+    }
+
+    @Test
     @DisplayName("obterPermissoesUI: Deve permitir reabrir cadastro quando em MAPA_HOMOLOGADO")
     void obterPermissoesUI_AdminPodeReabrirNoEstadoCorreto() {
         admin.setPerfilAtivo(Perfil.ADMIN);

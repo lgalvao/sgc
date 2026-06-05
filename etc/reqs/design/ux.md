@@ -19,6 +19,7 @@ específicos que funcionam melhor com tratamento próprio.
 - Tooltip pode complementar o motivo, mas não deve ser o único canal quando a informação for essencial.
 - Erro corrigível de formulário não deve deixar a ação principal muda; a tentativa deve exibir validação inline ou contextual.
 - **Exceção (cadastro de atividades / mapa):** quando o perfil CHEFE (cadastro) ou ADMIN (mapa) possui capacidade estrutural de edição, mas a situação do subprocesso impede a edição naquele momento, os controles de edição **devem ser ocultados** (não apenas desabilitados).
+- Quando houver mais de uma ação contextual para o mesmo item, preferir `BDropdown`/`BDropdownItemButton` no padrão já adotado no sistema, com rótulo textual como `Ações` e o triângulo nativo do componente. Não usar ícone customizado no gatilho quando o padrão equivalente do sistema usar o caret padrão.
 
 
 ## Canais de feedback

@@ -30,7 +30,7 @@
       />
 
       <SubprocessoCards
-          v-if="codigoSubprocesso"
+          v-if="codigoSubprocesso && !ehDiagnostico"
           :cod-processo="props.codProcesso"
           :cod-subprocesso="codigoSubprocesso"
           :mapa="null"
@@ -40,7 +40,15 @@
           :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       />
 
-      <SubprocessoMovimentacoes :movimentacoes="movimentacoes"/>
+      <DiagnosticoEquipePainel
+          v-if="ehDiagnostico && codigoSubprocesso"
+          :cod-subprocesso="codigoSubprocesso"
+          :exibir-botao-voltar="false"
+          :exibir-cabecalho="false"
+          :sigla-unidade="props.siglaUnidade"
+      />
+
+      <SubprocessoMovimentacoes v-if="!ehDiagnostico" :movimentacoes="movimentacoes"/>
     </div>
     <div v-else-if="erroIntegracaoContexto" class="py-2">
       <BAlert
@@ -92,6 +100,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
+import DiagnosticoEquipePainel from "@/components/diagnostico/DiagnosticoEquipePainel.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoFluxoModais from "@/components/processo/SubprocessoFluxoModais.vue";
 import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimentacoes.vue";
@@ -99,6 +108,7 @@ import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHead
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useSubprocessoTela} from "@/composables/useSubprocessoTela";
+import {computed} from "vue";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
@@ -147,6 +157,8 @@ const {
   confirmarReabertura,
   fecharModalAlterarDataLimite,
 } = tela;
+
+const ehDiagnostico = computed(() => subprocesso?.value?.tipoProcesso === TipoProcesso.DIAGNOSTICO);
 
 defineExpose({
   mostrarModalAlterarDataLimite: tela.mostrarModalAlterarDataLimite,

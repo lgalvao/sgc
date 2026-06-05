@@ -102,7 +102,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(salvo.getAvaliacaoServidores())
                 .allSatisfy(avaliacao -> {
                     assertThat(avaliacao.getDiagnostico()).isSameAs(salvo);
-                    assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA);
+                    assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
                     assertThat(avaliacao.getServidorNomeDiagnostico()).isNotBlank();
                 });
         assertThat(salvo.getOcupacaoCriticas())

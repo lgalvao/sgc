@@ -59,6 +59,10 @@ const SubprocessoCardsStub = {
     template: '<div data-testid="subprocesso-cards"></div>',
     props: ['situacao', 'tipoProcesso', 'subprocesso']
 };
+const DiagnosticoEquipePainelStub = {
+    template: '<div data-testid="diagnostico-equipe-painel"></div>',
+    props: ['codSubprocesso', 'siglaUnidade', 'exibirCabecalho', 'exibirBotaoVoltar']
+};
 const SubprocessoModalStub = {
     template: '<div data-testid="subprocesso-modal"></div>',
     props: ['mostrarModal'],
@@ -147,6 +151,7 @@ describe('SubprocessoView.vue', () => {
 
     const additionalStubs = {
         SubprocessoCards: SubprocessoCardsStub,
+        DiagnosticoEquipePainel: DiagnosticoEquipePainelStub,
         SubprocessoModal: SubprocessoModalStub,
         ModalConfirmacao: {
             name: 'ModalConfirmacao',
@@ -688,5 +693,16 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
         const cards = wrapper.findComponent(SubprocessoCardsStub);
         expect(cards.props('tipoProcesso')).toBe(TipoProcesso.MAPEAMENTO);
+    });
+
+    it('incorpora o painel de diagnóstico no detalhe do subprocesso e oculta cards e movimentações', async () => {
+        const {wrapper} = mountComponent({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="diagnostico-equipe-painel"]').exists()).toBe(true);
+        expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(false);
+        expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(false);
     });
 });

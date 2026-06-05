@@ -373,14 +373,14 @@ function varianteSituacaoServidor(s: SituacaoAvaliacaoServidor): ColorVariant {
     AVALIACAO_IMPOSSIBILITADA: 'secondary',
     CONSENSO_CRIADO: 'warning',
     AUTOAVALIACAO_CONCLUIDA: 'info',
-    AUTOAVALIACAO_NAO_REALIZADA: 'light',
+    AUTOAVALIACAO_NAO_INICIADA: 'light',
   };
   return mapa[s] ?? 'light';
 }
 
 function formatarSituacaoServidor(s: SituacaoAvaliacaoServidor): string {
   return {
-    AUTOAVALIACAO_NAO_REALIZADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
+    AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
     AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
     CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
     CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,

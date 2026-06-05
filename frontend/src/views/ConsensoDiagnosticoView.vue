@@ -7,14 +7,10 @@
       <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <div>
           <h1 class="h4 mb-1">
-            <i aria-hidden="true" class="bi bi-person-lines-fill text-primary me-2"/>
             {{ TEXTOS.diagnostico.TITULO_CONSENSO }}
           </h1>
           <div class="text-muted small">
-            Servidor: <strong>{{ servidorTitulo }}</strong>
-            <BBadge :variant="varianteSituacao" class="ms-2">
-              {{ formatarSituacaoServidor(situacaoServidor) }}
-            </BBadge>
+            <strong>{{ nomeServidorSubtitulo }}</strong>
           </div>
         </div>
         <BButton size="sm" variant="outline-secondary" @click="void router.back()">
@@ -56,70 +52,96 @@
 
       <!-- Tabela de competências com consenso (CDU-44) -->
       <BCard class="mb-4">
-        <BCardHeader>
-          <strong>{{ TEXTOS.diagnostico.TITULO_CONSENSO }}</strong>
-          <span class="text-muted small ms-2">{{ TEXTOS.diagnostico.ESCALA_HINT }}</span>
-        </BCardHeader>
-        <BTable
+        <div
             v-if="ehChefe"
-            :fields="colunasChefia"
-            :items="competenciasDetalhadasComDescricao"
-            hover
-            responsive
-            small
-            striped
+            class="table-responsive"
         >
-          <template #cell(autoimportancia)="{ item }">
-            <span>{{ formatarNota(item.autoimportancia) }}</span>
-          </template>
-          <template #cell(autodominio)="{ item }">
-            <span>{{ formatarNota(item.autodominio) }}</span>
-          </template>
-          <template #cell(chefiaImportancia)="{ item }">
-            <BFormSelect
-                v-if="!ehConsensoAprovado"
-                :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
-                :model-value="item.chefiaImportancia"
-                :options="opcoesNota"
-                class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'importancia', valor: normalizarValorNota(v)})"
-            />
-            <span v-else>{{ formatarNota(item.chefiaImportancia) }}</span>
-          </template>
-          <template #cell(chefiaDominio)="{ item }">
-            <BFormSelect
-                v-if="!ehConsensoAprovado"
-                :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
-                :model-value="item.chefiaDominio"
-                :options="opcoesNota"
-                class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'dominio', valor: normalizarValorNota(v)})"
-            />
-            <span v-else>{{ formatarNota(item.chefiaDominio) }}</span>
-          </template>
-          <template #cell(consensoImportancia)="{ item }">
-            <BFormSelect
-                v-if="!ehConsensoAprovado"
-                :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
-                :model-value="item.consensoImportancia"
-                :options="opcoesNota"
-                class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: normalizarValorNota(v)})"
-            />
-            <span v-else>{{ formatarNota(item.consensoImportancia) }}</span>
-          </template>
-          <template #cell(consensoDominio)="{ item }">
-            <BFormSelect
-                v-if="!ehConsensoAprovado"
-                :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
-                :model-value="item.consensoDominio"
-                :options="opcoesNota"
-                class="form-select-sm w-auto"
-                @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'dominio', valor: normalizarValorNota(v)})"
-            />
-            <span v-else>{{ formatarNota(item.consensoDominio) }}</span>
-          </template>
-        </BTable>
+          <table class="table table-sm table-hover align-middle mb-0 tabela-consenso">
+            <colgroup>
+              <col class="coluna-competencia"/>
+              <col class="coluna-nota"/>
+              <col class="coluna-nota"/>
+              <col class="coluna-nota"/>
+              <col class="coluna-nota"/>
+              <col class="coluna-nota"/>
+              <col class="coluna-nota"/>
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="coluna-competencia" rowspan="2">{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
+              <th class="text-center grupo grupo-servidor divisor-grupo" colspan="2">Servidor</th>
+              <th class="text-center grupo grupo-chefia divisor-grupo" colspan="2">Chefia</th>
+              <th class="text-center grupo grupo-consenso divisor-grupo" colspan="2">Consenso</th>
+            </tr>
+            <tr>
+              <th class="text-center subcoluna grupo-servidor divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
+              <th class="text-center subcoluna grupo-servidor">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
+              <th class="text-center subcoluna grupo-chefia divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
+              <th class="text-center subcoluna grupo-chefia">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
+              <th class="text-center subcoluna grupo-consenso divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
+              <th class="text-center subcoluna grupo-consenso">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr
+                v-for="item in competenciasDetalhadasComDescricao"
+                :key="item.competenciaCodigo"
+            >
+              <td class="celula-competencia">{{ item.descricao }}</td>
+              <td class="text-center grupo-servidor divisor-grupo coluna-nota">
+                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.autoimportancia) }}</span>
+              </td>
+              <td class="text-center grupo-servidor coluna-nota">
+                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.autodominio) }}</span>
+              </td>
+              <td class="text-center grupo-chefia divisor-grupo coluna-nota">
+                <BFormSelect
+                    v-if="!ehConsensoAprovado"
+                    :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
+                    :model-value="item.chefiaImportancia"
+                    :options="opcoesNota"
+                    class="form-select-sm seletor-nota"
+                    @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'importancia', valor: normalizarValorNota(v)})"
+                />
+                <span v-else class="valor-estatico">{{ formatarNota(item.chefiaImportancia) }}</span>
+              </td>
+              <td class="text-center grupo-chefia coluna-nota">
+                <BFormSelect
+                    v-if="!ehConsensoAprovado"
+                    :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
+                    :model-value="item.chefiaDominio"
+                    :options="opcoesNota"
+                    class="form-select-sm seletor-nota"
+                    @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'dominio', valor: normalizarValorNota(v)})"
+                />
+                <span v-else class="valor-estatico">{{ formatarNota(item.chefiaDominio) }}</span>
+              </td>
+              <td class="text-center grupo-consenso divisor-grupo celula-consenso coluna-nota">
+                <BFormSelect
+                    v-if="!ehConsensoAprovado"
+                    :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
+                    :model-value="item.consensoImportancia"
+                    :options="opcoesNota"
+                    class="form-select-sm seletor-nota seletor-consenso"
+                    @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: normalizarValorNota(v)})"
+                />
+                <span v-else class="valor-estatico valor-consenso">{{ formatarNota(item.consensoImportancia) }}</span>
+              </td>
+              <td class="text-center grupo-consenso celula-consenso coluna-nota">
+                <BFormSelect
+                    v-if="!ehConsensoAprovado"
+                    :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
+                    :model-value="item.consensoDominio"
+                    :options="opcoesNota"
+                    class="form-select-sm seletor-nota seletor-consenso"
+                    @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'dominio', valor: normalizarValorNota(v)})"
+                />
+                <span v-else class="valor-estatico valor-consenso">{{ formatarNota(item.consensoDominio) }}</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
         <BTable
             v-else
             :fields="colunasServidor"
@@ -127,7 +149,6 @@
             hover
             responsive
             small
-            striped
         >
           <template #cell(importancia)="{ item }">
             <span>{{ formatarNota(item.importancia) }}</span>
@@ -159,10 +180,8 @@ import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {
   BAlert,
-  BBadge,
   BButton,
   BCard,
-  BCardHeader,
   BFormSelect,
   BSpinner,
   BTable,
@@ -207,6 +226,11 @@ const {
 
 // « Perfil »
 const ehChefe = computed(() => podeCriarConsenso.value);
+const nomeServidorSubtitulo = computed(() =>
+  servidorTituloConsulta.value == null || String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? '')
+    ? (perfilStore.usuarioNome ?? props.servidorTitulo)
+    : props.servidorTitulo,
+);
 
 // « Alertas »
 const erroMensagem = ref('');
@@ -220,21 +244,9 @@ async function confirmarAprovarConsenso() {
   }
 }
 
-// « Formatação »
-const varianteSituacao = computed(() => {
-  switch (situacaoServidor.value) {
-    case 'CONSENSO_APROVADO':
-      return 'success';
-    case 'CONSENSO_CRIADO':
-      return 'warning';
-    default:
-      return 'secondary';
-  }
-});
-
 function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
   const mapa: Record<SituacaoAvaliacaoServidor, string> = {
-    AUTOAVALIACAO_NAO_REALIZADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
+    AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
     AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
     CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
     CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
@@ -281,6 +293,7 @@ const competenciasSimplesComDescricao = computed(() => {
 });
 
 const opcoesNota = [
+  {value: null, text: '-'},
   {value: 0, text: 'NA'},
   {value: 1, text: '1'},
   {value: 2, text: '2'},
@@ -303,13 +316,69 @@ const colunasServidor = [
   {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
 ];
 
-const colunasChefia = [
-  {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-  {key: 'autoimportancia', label: 'Servidor: Importância'},
-  {key: 'autodominio', label: 'Servidor: Domínio'},
-  {key: 'chefiaImportancia', label: 'Chefia: Importância'},
-  {key: 'chefiaDominio', label: 'Chefia: Domínio'},
-  {key: 'consensoImportancia', label: 'Consenso: Importância'},
-  {key: 'consensoDominio', label: 'Consenso: Domínio'},
-];
 </script>
+
+<style scoped>
+.tabela-consenso {
+  width: 100%;
+  min-width: 60rem;
+}
+
+.tabela-consenso col.coluna-competencia {
+  width: 32%;
+}
+
+.tabela-consenso th,
+.tabela-consenso td {
+  vertical-align: middle;
+  padding: 0.6rem 0.5rem;
+}
+
+.coluna-nota {
+  width: 5.66rem;
+  min-width: 5.66rem;
+}
+
+.celula-competencia {
+  white-space: normal;
+}
+
+.grupo {
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.divisor-grupo {
+  border-left: 2px solid var(--bs-border-color, #dee2e6);
+}
+
+.seletor-nota {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.valor-estatico {
+  font-weight: 600;
+}
+
+.valor-estatico-bloco {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(1.5em + 0.5rem + 2px);
+  font-weight: 600;
+}
+
+.valor-consenso {
+  color: var(--bs-success-text-emphasis, #146c43);
+}
+
+.grupo-consenso,
+.celula-consenso {
+  font-weight: 600;
+}
+</style>

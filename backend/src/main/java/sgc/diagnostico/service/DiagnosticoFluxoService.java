@@ -78,7 +78,7 @@ public class DiagnosticoFluxoService {
                             .servidor(servidor)
                             .servidorNomeSnapshot(servidor.getNome())
                             .competencia(competencia)
-                            .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA)
+                            .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
                             .build();
                     avaliacoes.add(avaliacao);
 

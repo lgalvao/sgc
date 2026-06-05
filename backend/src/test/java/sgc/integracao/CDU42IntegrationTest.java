@@ -36,7 +36,7 @@ class CDU42IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         mockMvc.perform(get("/api/diagnosticos/subprocessos/{codSubprocesso}/autoavaliacao", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.competencias.length()").value(2))
-                .andExpect(jsonPath("$.situacaoServidor").value("AUTOAVALIACAO_NAO_REALIZADA"));
+                .andExpect(jsonPath("$.situacaoServidor").value("AUTOAVALIACAO_NAO_INICIADA"));
 
         AutoavaliacaoRequest request = new AutoavaliacaoRequest(List.of(
                 AvaliacaoCompetenciaDto.builder()

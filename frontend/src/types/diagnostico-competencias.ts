@@ -3,7 +3,7 @@
 // ──────────────────────────────────────────────────────────────────────────────
 
 export type SituacaoAvaliacaoServidor =
-    | 'AUTOAVALIACAO_NAO_REALIZADA'
+    | 'AUTOAVALIACAO_NAO_INICIADA'
     | 'AUTOAVALIACAO_CONCLUIDA'
     | 'CONSENSO_CRIADO'
     | 'CONSENSO_APROVADO'

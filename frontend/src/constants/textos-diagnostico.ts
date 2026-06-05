@@ -20,7 +20,7 @@ export const TEXTOS_DIAGNOSTICO = {
     COLUNA_ACOES: 'Ações',
 
     // « Situações de avaliação do servidor »
-    SITUACAO_NAO_REALIZADA: 'Não realizada',
+    SITUACAO_NAO_REALIZADA: 'Autoavaliação não iniciada',
     SITUACAO_AUTOAVALIACAO_CONCLUIDA: 'Autoavaliação concluída',
     SITUACAO_CONSENSO_CRIADO: 'Avaliação de consenso criada',
     SITUACAO_CONSENSO_APROVADO: 'Avaliação de consenso aprovada',

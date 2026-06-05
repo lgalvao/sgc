@@ -65,7 +65,7 @@ public class DiagnosticoConsultaService {
         String situacaoServidor = avaliacoes.stream()
                 .findFirst()
                 .map(a -> a.getSituacaoServidor().name())
-                .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA.name());
+                .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA.name());
         return AutoavaliacaoDto.builder()
                 .competencias(competencias)
                 .situacaoServidor(situacaoServidor)
@@ -102,7 +102,7 @@ public class DiagnosticoConsultaService {
         String situacaoServidor = avaliacoes.stream()
                 .findFirst()
                 .map(a -> a.getSituacaoServidor().name())
-                .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA.name());
+                .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA.name());
         return ConsensoDto.builder()
                 .competencias(competencias)
                 .competenciasDetalhadas(competenciasDetalhadas)

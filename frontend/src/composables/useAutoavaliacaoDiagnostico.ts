@@ -84,7 +84,7 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
         dispararSalvamento();
     }
 
-    const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_REALIZADA');
+    const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_INICIADA');
     const carregando = computed(() => query.status.value === 'pending');
     const erro = computed(() => query.error.value);
     const concluindo = computed(() => mutacaoConcluir.isLoading.value);

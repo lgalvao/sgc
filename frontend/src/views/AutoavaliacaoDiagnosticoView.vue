@@ -339,7 +339,7 @@ const ehConsensoCriado = computed(() => situacaoServidor.value === 'CONSENSO_CRI
 const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
 const podeEditar = computed(
   () =>
-    situacaoServidor.value === 'AUTOAVALIACAO_NAO_REALIZADA' ||
+    situacaoServidor.value === 'AUTOAVALIACAO_NAO_INICIADA' ||
     situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA',
 );
 
@@ -438,7 +438,7 @@ function alternarDetalhesCompetencia(competenciaCodigo: number) {
 
 function podeImpossibilitar(situacao: SituacaoAvaliacaoServidor) {
   return (
-    situacao === 'AUTOAVALIACAO_NAO_REALIZADA' ||
+    situacao === 'AUTOAVALIACAO_NAO_INICIADA' ||
     situacao === 'AUTOAVALIACAO_CONCLUIDA' ||
     situacao === 'CONSENSO_CRIADO'
   );
@@ -472,7 +472,7 @@ function varianteSituacaoServidor(situacao: SituacaoAvaliacaoServidor) {
 
 function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
   const mapa: Record<SituacaoAvaliacaoServidor, string> = {
-    AUTOAVALIACAO_NAO_REALIZADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
+    AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
     AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
     CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
     CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,

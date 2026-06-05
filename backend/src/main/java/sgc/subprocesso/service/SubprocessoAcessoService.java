@@ -78,7 +78,7 @@ public class SubprocessoAcessoService {
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
-                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR || contexto.isChefe())
+                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR)
                 .podeCriarConsenso(contexto.isChefe())
                 .podeConcluirDiagnostico(contexto.isChefe())
                 .podeValidarDiagnostico(contexto.isGestor())
@@ -107,7 +107,7 @@ public class SubprocessoAcessoService {
                 .habilitarAceitarMapa(contexto.isGestor() && SITUACOES_GESTAO_MAPA.contains(situacao) && mesmaUnidade)
                 .habilitarHomologarMapa(verificarHomologarMapa(contexto) && mesmaUnidade);
 
-        builder.habilitarPreencherAutoavaliacao((contexto.perfil() == Perfil.SERVIDOR || contexto.isChefe()) && mesmaUnidade)
+        builder.habilitarPreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR && mesmaUnidade)
                 .habilitarCriarConsenso(contexto.isChefe() && mesmaUnidade)
                 .habilitarConcluirDiagnostico(contexto.isChefe() && situacao == DIAGNOSTICO_MONITORAMENTO && mesmaUnidade)
                 .habilitarValidarDiagnostico(contexto.isGestor() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)
@@ -141,7 +141,7 @@ public class SubprocessoAcessoService {
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
-                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR || contexto.isChefe())
+                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR)
                 .podeCriarConsenso(contexto.isChefe())
                 .podeConcluirDiagnostico(contexto.isChefe())
                 .podeValidarDiagnostico(contexto.isGestor())

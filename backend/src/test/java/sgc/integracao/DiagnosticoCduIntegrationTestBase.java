@@ -218,7 +218,7 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
                 .servidor(usuario)
                 .servidorNomeSnapshot(usuario.getNome())
                 .competencia(competencia)
-                .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_REALIZADA)
+                .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
                 .build();
     }
 

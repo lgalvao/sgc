@@ -85,6 +85,13 @@ export async function preencherConsensoMinimo(
     }, {codigo: codSubprocesso, titulo: servidorTitulo})).toBe(true);
 }
 
+export async function abrirAcaoConsensoDiagnostico(page: Page, servidorTitulo: string): Promise<void> {
+    const dropdownAcoes = page.getByTestId(`dropdown-acoes-${servidorTitulo}`);
+    await expect(dropdownAcoes).toBeVisible();
+    await dropdownAcoes.getByRole('button', {name: 'Ações'}).click();
+    await page.getByTestId(`btn-manter-consenso-${servidorTitulo}`).click();
+}
+
 export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
     const select = page.locator('[data-testid^="ocupacao-"]').first();
     await expect(select).toBeVisible();

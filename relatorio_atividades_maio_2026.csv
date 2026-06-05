@@ -1,0 +1,124 @@
+Data,Hora,Atividade,Duracao
+07/05/2026,08:00,Configuração do servidor mock de e-mails (Mailpit),01:00
+07/05/2026,09:00,Mapeamento de portas e infraestrutura ambiente local,00:30
+07/05/2026,09:30,Ajustes em componentes de login e árvore de unidades,01:00
+07/05/2026,10:30,Padronização de transições de carregamento e UX de relatórios,01:00
+07/05/2026,11:30,Desenvolvimento de DDL para views otimizadas de banco,01:00
+07/05/2026,12:30,Centralização do fallback de erros no frontend,00:30
+07/05/2026,13:00,Refatoração de componentes para modelo fail-fast,01:00
+07/05/2026,14:00,Remoção de verificações defensivas redundantes frontend,01:00
+08/05/2026,08:00,Refatoração de testes de ProcessoService (AssertJ),01:30
+08/05/2026,09:30,Remoção de acoplamento via reflexão em testes de backend,01:00
+08/05/2026,10:30,Atualização de READMEs com documentação arquitetural,01:00
+08/05/2026,11:30,Ajustes em breadcrumbs e links de navegação global,00:30
+08/05/2026,12:00,Otimização do Dockerfile e remoção de daemons,00:30
+08/05/2026,12:30,Refatoração da política de cache do frontend,01:00
+08/05/2026,13:30,Implementação de views unitárias e correções de test-id,01:00
+08/05/2026,14:30,Redução de fragmentação em fluxos de erro,00:30
+09/05/2026,10:29,Limpeza e migração de dependências JS obsoletas,03:00
+09/05/2026,13:29,Padronização de scripts npm e processos de build,02:00
+09/05/2026,15:29,Implementação do seletor de modo escuro (Dark Mode),01:00
+09/05/2026,16:29,Refatoração de componentes para acessibilidade,02:00
+09/05/2026,18:29,Desenvolvimento do teste E2E de fluxo semântico completo,03:00
+10/05/2026,12:08,Implementação de ferramentas de auditoria A11y,02:00
+10/05/2026,14:08,Criação de cenários de regressão para persistência de cache,02:00
+10/05/2026,16:08,Padronização de helpers de navegação para suíte E2E,01:30
+10/05/2026,17:38,Ajustes visuais em componentes de interface e tabelas,01:30
+10/05/2026,19:08,Extração de scripts de manutenção para checkup-full.sh,01:00
+11/05/2026,08:00,Ajuste no filtro de notificações e permissões de acesso,01:00
+11/05/2026,09:00,Limpezas de imports e variáveis não utilizadas frontend,01:00
+11/05/2026,10:00,Melhorias no processo de build e linting de scripts,01:30
+11/05/2026,11:30,Fortalecimento de asserções em testes de componentes,01:30
+11/05/2026,13:00,Consolidação de especificações de teste duplicadas,01:00
+11/05/2026,14:00,Correção de alertas de importação no build,01:00
+12/05/2026,08:00,Integração do componente TipTap em campos de observação,01:30
+12/05/2026,09:30,Aplicação de texto formatado em justificativas e sugestões,01:30
+12/05/2026,11:00,Implementação do utilitário de mascaramento de títulos,01:00
+12/05/2026,12:00,Resolução de bugs de reatividade no cache do cadastro,01:00
+12/05/2026,13:00,Refinamento dos filtros da árvore organizacional,01:00
+12/05/2026,14:00,Ajustes em testes unitários para incluir movimentações,01:00
+13/05/2026,08:00,Implementação do CRUD de Atividades Temporárias (ATs),01:30
+13/05/2026,09:30,Revisão dos requisitos e validação de datas limites,01:00
+13/05/2026,10:30,Padronização de mensagens de erro e movimentação,01:00
+13/05/2026,11:30,Estabilização de modais e remoção de redundâncias de UI,01:00
+13/05/2026,12:30,Correção de seletores frágeis em capturas de tela,01:00
+13/05/2026,13:30,Ajustes de tipagem no editor de texto rico,01:00
+14/05/2026,08:00,Otimização de hotspots críticos para cobertura branches,01:50
+14/05/2026,09:50,Simplificação estrutural de composables de frontend,01:00
+14/05/2026,10:50,Ajuste na visão de titular/responsável em processos,01:00
+14/05/2026,11:50,Validação de limites de caracteres em campos formatados,01:00
+14/05/2026,12:50,Atualização de testes E2E novas regras de prazo,01:30
+14/05/2026,14:20,Limpeza de scripts de automação backend,00:40
+15/05/2026,08:00,Corte massivo de anotações @Nullable obsoletas,01:30
+15/05/2026,09:30,Remoção de testes de integração de baixo valor,01:00
+15/05/2026,10:30,Reorganização do sistema de parâmetros e configurações,01:30
+15/05/2026,12:00,Resolução de warnings de lint e typecheck frontend,01:30
+15/05/2026,13:30,Ajustes finais de conformidade para merge da sprint,01:30
+16/05/2026,12:54,Especificação dos casos de uso de Notificações,01:30
+16/05/2026,14:24,Implementação de restrição ADMIN em relatórios,01:00
+16/05/2026,15:24,Reorganização e limpeza da documentação técnica,01:30
+16/05/2026,16:54,Esclarecimentos em regras de acesso de componentes,01:30
+16/05/2026,18:24,Revisão de requisitos e reorg de documentos,01:30
+17/05/2026,14:55,Definição de requisitos para módulo de diagnóstico,01:00
+18/05/2026,08:00,Efeito real das configurações no Painel/Alertas,01:30
+18/05/2026,09:30,Ajuste na persistência de configurações por usuário,01:00
+18/05/2026,10:30,Lógica de busca unidades sem mapas vigentes,01:30
+18/05/2026,12:00,Expansão de suítes de teste para CDU-37,01:00
+18/05/2026,13:00,Atualização de tipos globais e dependências dev,01:00
+18/05/2026,14:00,Refinamento de capturas visuais de relatórios,01:00
+19/05/2026,08:00,Preparação técnica e geração da Release 1.1.0,01:00
+19/05/2026,09:00,Evolução da lógica de mapas vigentes no backend,01:30
+19/05/2026,10:30,Limpeza de geração de PDFs de mapas,01:30
+19/05/2026,12:00,Consolidação dos testes de integração SubprocessoService,02:00
+19/05/2026,14:00,Otimização da engine de execução de diagnósticos,01:00
+20/05/2026,08:00,Mapeamento e documentação endpoints em HTML,02:00
+20/05/2026,10:00,Separação da lógica de seleção da árvore,01:00
+20/05/2026,11:00,Ajustes de consistência nomenclatura (ID p/ Código),01:00
+20/05/2026,12:00,Padronização termos técnicos português/inglês,01:00
+20/05/2026,13:00,Estabilização do ambiente Playwright,01:00
+20/05/2026,14:00,Auditoria de qualidade final componentes frontend,01:00
+21/05/2026,08:00,Aumento da cobertura de branches em serviços core,01:30
+21/05/2026,09:30,Alinhamento lembretes prazo e requisitos negócio,01:00
+21/05/2026,10:30,Implementação de notificações e ações em bloco,01:30
+21/05/2026,12:00,Remoção de processos e notificações legadas,01:00
+21/05/2026,13:00,Expansão de cobertura de testes comportamentais,01:00
+21/05/2026,14:00,Resolução de inconsistências em requisitos/testes,01:00
+22/05/2026,08:00,Implementação de testes p/ cobertura de 99.4%,02:00
+22/05/2026,10:00,Inclusão de auditor de comunicações (emails),01:30
+22/05/2026,11:30,Centralização de assuntos e templates de notificação,01:00
+22/05/2026,12:30,Fortalecimento testes E2E reabertura processos,01:30
+22/05/2026,14:00,Refino da cobertura textual de comunicações,01:00
+23/05/2026,12:01,Testes de integração Controllers (Alerta/Subproc),01:30
+23/05/2026,13:31,Simplificação de Stores e utilitários frontend,01:30
+24/05/2026,10:52,Testes unitários views complexas (EditorTextoRico),03:00
+24/05/2026,13:52,Simplificação fluxos disponibilidade e árvore,02:00
+24/05/2026,15:52,Relatório de débito técnico (Snapshots cruft),01:00
+25/05/2026,08:00,Adoção do Pinia Colada em domínios de leitura,02:00
+25/05/2026,10:00,Remoção de orquestração manual de cache frontend,01:50
+25/05/2026,11:50,Simplificação orquestração processos/subprocessos,01:10
+25/05/2026,13:00,Limpeza de logs e sanitização HTML fluxos críticos,01:00
+25/05/2026,14:00,Revisão da estabilidade do serviço Mailpit,01:00
+26/05/2026,08:00,Migração domínios Unidade/Admin p/ Pinia Colada,01:30
+26/05/2026,09:30,Extração workflows view p/ composables reutilizáveis,01:30
+26/05/2026,11:00,Endurecimento auditoria arquitetural frontend,01:30
+26/05/2026,12:30,Implementação métricas monitoramento de estado,01:00
+26/05/2026,13:30,Aperto de contratos domínios Mapas/Unidades,01:30
+27/05/2026,08:00,Limpeza agressiva de hotspots arquiteturais,01:30
+27/05/2026,09:30,Colapso hierarquia invalidação de navegação,01:30
+27/05/2026,11:00,Ajustes reatividade em queries assíncronas,01:30
+27/05/2026,12:30,Desenvolvimento composables p/ telas cadastro,01:30
+27/05/2026,14:00,Correção de ordem de componentes na Navbar,01:00
+28/05/2026,08:00,Migração store Organização p/ Pinia Colada,01:30
+28/05/2026,09:30,Implementação de scripts de automação JWT,01:00
+28/05/2026,10:30,Configuração de Fuzzing segurança (WuppieFuzz),01:50
+28/05/2026,12:20,Simplificação store subprocesso e contexto,01:20
+28/05/2026,13:40,Refatoração manipulação sugestões do mapa,01:20
+29/05/2026,08:00,Racionalização débitos técnicos (score 27 p/ 11),02:00
+29/05/2026,10:00,Auditoria final composables e reduções complexidade,01:30
+29/05/2026,11:30,Limpeza documentação legada e snapshots cruft,01:00
+29/05/2026,12:30,Correção de imports ausentes em testes unitários,01:30
+29/05/2026,14:00,Ajustes finais racionalização frontend,01:00
+30/05/2026,01:56,Geração e validação da Release 1.2.0,04:00
+30/05/2026,05:56,Rodada final cobertura testes unitários e E2E,06:00
+30/05/2026,11:56,Estabilização ambiente e suítes de qualidade,04:00
+31/05/2026,09:13,Auditoria qualidade final e limpezas gerais,01:00

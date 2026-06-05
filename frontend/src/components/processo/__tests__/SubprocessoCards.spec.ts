@@ -40,6 +40,12 @@ describe("SubprocessoCards.vue", () => {
             podeReabrirCadastro: false,
             podeReabrirRevisao: false,
             podeEnviarLembrete: false,
+            podePreencherAutoavaliacao: false,
+            podeCriarConsenso: false,
+            podeConcluirDiagnostico: false,
+            podeValidarDiagnostico: false,
+            podeDevolverDiagnostico: false,
+            podeHomologarDiagnostico: false,
             mesmaUnidade: false,
             habilitarAcessoCadastro: false,
             habilitarAcessoMapa: false,
@@ -59,6 +65,12 @@ describe("SubprocessoCards.vue", () => {
             habilitarReabrirCadastro: false,
             habilitarReabrirRevisao: false,
             habilitarEnviarLembrete: false,
+            habilitarPreencherAutoavaliacao: false,
+            habilitarCriarConsenso: false,
+            habilitarConcluirDiagnostico: false,
+            habilitarValidarDiagnostico: false,
+            habilitarDevolverDiagnostico: false,
+            habilitarHomologarDiagnostico: false,
             ...parciais,
         };
     }
@@ -106,11 +118,11 @@ describe("SubprocessoCards.vue", () => {
             global: {
                 plugins: [pinia],
                 stubs: {
-                    BCard: {template: '<div @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>'},
-                    BCardTitle: {template: '<div><slot /></div>'},
-                    BCardText: {template: '<div><slot /></div>'},
-                    BRow: {template: '<div><slot /></div>'},
-                    BCol: {template: '<div><slot /></div>'},
+                    BCard: {template: '<div v-bind="$attrs" @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>'},
+                    BCardTitle: {template: '<div v-bind="$attrs"><slot /></div>'},
+                    BCardText: {template: '<div v-bind="$attrs"><slot /></div>'},
+                    BRow: {template: '<div v-bind="$attrs"><slot /></div>'},
+                    BCol: {template: '<div v-bind="$attrs"><slot /></div>'},
                 }
             },
             props
@@ -196,11 +208,11 @@ describe("SubprocessoCards.vue", () => {
                     }
                 })],
                 stubs: {
-                    BCard: {template: '<div @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>'},
-                    BCardTitle: {template: '<div><slot /></div>'},
-                    BCardText: {template: '<div><slot /></div>'},
-                    BRow: {template: '<div><slot /></div>'},
-                    BCol: {template: '<div><slot /></div>'},
+                    BCard: {template: '<div v-bind="$attrs" @click="$emit(\'click\')" @keydown="$emit(\'keydown\', $event)"><slot /></div>'},
+                    BCardTitle: {template: '<div v-bind="$attrs"><slot /></div>'},
+                    BCardText: {template: '<div v-bind="$attrs"><slot /></div>'},
+                    BRow: {template: '<div v-bind="$attrs"><slot /></div>'},
+                    BCol: {template: '<div v-bind="$attrs"><slot /></div>'},
                 }
             },
             props: {
@@ -281,13 +293,24 @@ describe("SubprocessoCards.vue", () => {
             mapa: null,
             codSubprocesso: 1,
             codProcesso: 1,
-            siglaUnidade: "U1"
+            siglaUnidade: "U1",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes({
+                    podePreencherAutoavaliacao: true,
+                }),
+            }),
         });
 
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(true);
         expect(wrapper.findAll('[data-testid="card-subprocesso-consenso"]')).toHaveLength(1);
+
+        const cards = wrapper.findAll('[data-testid]').map((card) => card.attributes('data-testid'));
+        expect(cards).toContain('card-subprocesso-diagnostico');
+        expect(cards.indexOf('card-subprocesso-monitoramento')).toBeLessThan(cards.indexOf('card-subprocesso-consenso'));
+        expect(cards.indexOf('card-subprocesso-consenso')).toBeLessThan(cards.indexOf('card-subprocesso-ocupacoes'));
     });
 
     it("navega para diagnóstico", async () => {
@@ -296,7 +319,13 @@ describe("SubprocessoCards.vue", () => {
             mapa: null,
             codSubprocesso: 1,
             codProcesso: 1,
-            siglaUnidade: "U1"
+            siglaUnidade: "U1",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes({
+                    podePreencherAutoavaliacao: true,
+                }),
+            }),
         });
 
         await wrapper.find('[data-testid="card-subprocesso-diagnostico"]').trigger("click");
@@ -309,7 +338,13 @@ describe("SubprocessoCards.vue", () => {
             mapa: null,
             codSubprocesso: 1,
             codProcesso: 1,
-            siglaUnidade: "U1"
+            siglaUnidade: "U1",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes({
+                    podePreencherAutoavaliacao: true,
+                }),
+            }),
         });
 
         const cardDiagnostico = wrapper.find('[data-testid="card-subprocesso-diagnostico"]');
@@ -320,6 +355,24 @@ describe("SubprocessoCards.vue", () => {
         pushMock.mockClear();
         await cardDiagnostico.trigger("keydown", {key: " "});
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({name: "AutoavaliacaoDiagnostico"}));
+    });
+
+    it("não renderiza card de autoavaliação sem permissão", () => {
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "U1",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes({
+                    podePreencherAutoavaliacao: false,
+                }),
+            }),
+        });
+
+        expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
     });
 
     it("abre monitoramento ao clicar no card de consenso quando a chefia pode criar consenso", async () => {

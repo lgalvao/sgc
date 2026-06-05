@@ -84,4 +84,65 @@ class CDU44IntegrationTest extends DiagnosticoCduIntegrationTestBase {
             assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
         });
     }
+
+    @Test
+    @WithMockChefe("333333333333")
+    @DisplayName("Deve permitir salvar o consenso em etapas com subconjunto de competências")
+    void deveSalvarConsensoEmEtapas() throws Exception {
+        int autoimportanciaPrimeira = 5;
+        int autodominioPrimeira = 3;
+        int chefiaImportanciaPrimeira = 6;
+        int chefiaDominioPrimeira = 4;
+        int autoimportanciaSegunda = 4;
+        int autodominioSegunda = 2;
+
+        ConsensoRequest request = new ConsensoRequest(
+                List.of(
+                        AvaliacaoCompetenciaDto.builder()
+                                .competenciaCodigo(competencia1.getCodigo())
+                                .importancia(chefiaImportanciaPrimeira)
+                                .dominio(chefiaDominioPrimeira)
+                                .build()
+                ),
+                List.of(
+                        ConsensoCompetenciaDto.builder()
+                                .competenciaCodigo(competencia1.getCodigo())
+                                .autoimportancia(autoimportanciaPrimeira)
+                                .autodominio(autodominioPrimeira)
+                                .chefiaImportancia(chefiaImportanciaPrimeira)
+                                .chefiaDominio(chefiaDominioPrimeira)
+                                .consensoImportancia(chefiaImportanciaPrimeira)
+                                .consensoDominio(chefiaDominioPrimeira)
+                                .build()
+                )
+        );
+
+        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}",
+                        subprocesso.getCodigo(), "50003")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        List<AvaliacaoServidor> avaliacoes = buscarAvaliacoes("50003");
+        AvaliacaoServidor avaliacao1 = avaliacoes.stream()
+                .filter(avaliacao -> avaliacao.getCompetencia().getCodigo().equals(competencia1.getCodigo()))
+                .findFirst()
+                .orElseThrow();
+        AvaliacaoServidor avaliacao2 = avaliacoes.stream()
+                .filter(avaliacao -> avaliacao.getCompetencia().getCodigo().equals(competencia2.getCodigo()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(avaliacao1.getChefiaImportancia()).isEqualTo(chefiaImportanciaPrimeira);
+        assertThat(avaliacao1.getChefiaDominio()).isEqualTo(chefiaDominioPrimeira);
+        assertThat(avaliacao1.getImportancia()).isEqualTo(chefiaImportanciaPrimeira);
+        assertThat(avaliacao1.getDominio()).isEqualTo(chefiaDominioPrimeira);
+        assertThat(avaliacao2.getChefiaImportancia()).isNull();
+        assertThat(avaliacao2.getChefiaDominio()).isNull();
+        assertThat(avaliacao2.getImportancia()).isEqualTo(autoimportanciaSegunda);
+        assertThat(avaliacao2.getDominio()).isEqualTo(autodominioSegunda);
+        assertThat(avaliacoes).allSatisfy(avaliacao ->
+                assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
+    }
 }

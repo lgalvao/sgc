@@ -59,7 +59,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         {immediate: true},
     );
 
-    const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_REALIZADA');
+    const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_INICIADA');
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
 
     const mutacaoSalvar = useMutation({
@@ -76,10 +76,32 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
                     ? competenciasDetalhadasLocais.value
                     : undefined,
             }),
+        onSettled: () => {
+            salvandoAutomaticamente.value = false;
+        },
         onSuccess: () => {
+            cache.setQueryData(
+                chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
+                {
+                    competencias: competenciasDetalhadasLocais.value.length > 0
+                        ? competenciasDetalhadasLocais.value.map((item) => ({
+                            competenciaCodigo: item.competenciaCodigo,
+                            importancia: item.consensoImportancia,
+                            dominio: item.consensoDominio,
+                        }))
+                        : competenciasLocais.value.map((item) => ({...item})),
+                    competenciasDetalhadas: competenciasDetalhadasLocais.value.length > 0
+                        ? competenciasDetalhadasLocais.value.map((item) => ({...item}))
+                        : undefined,
+                    situacaoServidor: 'CONSENSO_CRIADO',
+                } satisfies Consenso,
+            );
             void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo), exact: true});
             void cache.invalidateQueries({key: chaveEquipe(codSubprocesso, contextoSessao), exact: true});
             autoguardado.value = true;
+            setTimeout(() => {
+                autoguardado.value = false;
+            }, 2000);
         },
     });
 
@@ -94,16 +116,12 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
 
     /** Dispara autosave com debounce. Só salva se não estiver aprovado. */
     function agendarAutosave() {
-        if (ehConsensoAprovado.value || !servidorTitulo) return;
+        if (ehConsensoAprovado.value) return;
+        salvandoAutomaticamente.value = true;
         autoguardado.value = false;
         if (timer) clearTimeout(timer);
-        timer = setTimeout(async () => {
-            salvandoAutomaticamente.value = true;
-            try {
-                await mutacaoSalvar.mutateAsync(servidorTitulo);
-            } finally {
-                salvandoAutomaticamente.value = false;
-            }
+        timer = setTimeout(() => {
+            mutacaoSalvar.mutate(servidorTitulo!);
         }, 800);
     }
 

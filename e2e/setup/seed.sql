@@ -260,6 +260,11 @@ VALUES ('999998', '00999998', 'David Gilmour', 'david.gilmour@tre-pe.jus.br', '2
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('999998', 'SERVIDOR', 14);
 
+-- Garantia de contrato para notificações e fluxos de diagnóstico.
+UPDATE sgc.VW_USUARIO
+SET email = 'usuario.' || titulo || '@tre-pe.jus.br'
+WHERE email IS NULL OR TRIM(email) = '';
+
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('131314', '00131314', 'Keith Richards', 'keith.richards@tre-pe.jus.br', '2177', 17, 17);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)

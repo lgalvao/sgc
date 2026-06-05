@@ -52,6 +52,7 @@
 
     <template v-else-if="tipoProcesso === TipoProcessoEnum.DIAGNOSTICO">
       <BCol
+          v-if="permissoesDiagnostico?.podePreencherAutoavaliacao"
           class="mb-3"
           md="4"
       >
@@ -81,19 +82,19 @@
       >
         <BCard
             class="h-100 card-actionable"
-            data-testid="card-subprocesso-ocupacoes"
+            data-testid="card-subprocesso-monitoramento"
             role="button"
             tabindex="0"
-            @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
-            @keydown="aoPressionarTeclaDiagnostico($event, 'OcupacoesCriticasDiagnostico')"
+            @click="navegarParaDiag('MonitoramentoDiagnostico')"
+            @keydown="aoPressionarTeclaDiagnostico($event, 'MonitoramentoDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
-              <i aria-hidden="true" class="bi bi-people text-primary flex-shrink-0 mt-1"></i>
-              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.OCUPACOES_TITULO }}</span>
+              <i aria-hidden="true" class="bi bi-activity text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.MONITORAMENTO_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.OCUPACOES_TEXTO }}
+              {{ TEXTOS.subprocesso.cards.MONITORAMENTO_TEXTO }}
             </BCardText>
           </div>
         </BCard>
@@ -127,19 +128,19 @@
       >
         <BCard
             class="h-100 card-actionable"
-            data-testid="card-subprocesso-monitoramento"
+            data-testid="card-subprocesso-ocupacoes"
             role="button"
             tabindex="0"
-            @click="navegarParaDiag('MonitoramentoDiagnostico')"
-            @keydown="aoPressionarTeclaDiagnostico($event, 'MonitoramentoDiagnostico')"
+            @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
+            @keydown="aoPressionarTeclaDiagnostico($event, 'OcupacoesCriticasDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
-              <i aria-hidden="true" class="bi bi-activity text-primary flex-shrink-0 mt-1"></i>
-              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.MONITORAMENTO_TITULO }}</span>
+              <i aria-hidden="true" class="bi bi-people text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.OCUPACOES_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.MONITORAMENTO_TEXTO }}
+              {{ TEXTOS.subprocesso.cards.OCUPACOES_TEXTO }}
             </BCardText>
           </div>
         </BCard>

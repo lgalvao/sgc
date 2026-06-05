@@ -15,15 +15,15 @@ Ator: CHEFE
 
 2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade do usuário.
 
-3. O usuário aciona o card `Avaliações de consenso`.
+3. O usuário aciona o card `Avaliação de consenso`.
 
-4. O sistema mostra a tela `Avaliações de consenso`, contendo uma tabela dos servidores da unidade, com o nome do servidor e situação da avaliação individual.
-
-5. O usuário aciona uma linha da tabela referente a um servidor.
-
-6. O sistema mostra a tela `Avaliação de consenso de servidor` com:
+4. O sistema mostra a tela `Avaliação de consenso`, contendo uma tabela dos servidores da unidade, com o nome do servidor e situação da avaliação individual de cada um e ações por linha.
+   
+5. O usuário escolhe a ação `Mannter avaliação de consenso` para um servidor.
+   
+6. O sistema mostra a tela `Avaliação de consenso` para o servidor, com:
     - título "Avaliação de consenso"
-    - subtítulo com o nome do servidor
+    - subtítulo com o nome e título do servidor
     - grade de competências da unidade com estrutura abaixo:
 
 |                     | Importância |       |          | Domínio  |       |          |
@@ -50,4 +50,4 @@ Ator: CHEFE
 
 9. O usuário aciona o botão `Voltar` para mostrar a lista de servidores.
 
-10. O sistema volta a mostrar a tela `Avaliações de consenso`, onde o usuário poderá proceder ao prenchimento de consenso dos outros servidores.
+10. O sistema volta a mostrar a tela `Avaliação de consenso`, onde o usuário poderá proceder ao prenchimento de consenso dos outros servidores.

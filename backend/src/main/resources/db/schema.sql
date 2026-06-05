@@ -603,7 +603,7 @@ create table if not exists sgc.avaliacao_servidor
     dominio            int check (dominio between 0 and 6),
     gap                int,
     observacoes        text,
-    situacao_servidor  varchar(50) not null check (situacao_servidor in ('AUTOAVALIACAO_NAO_REALIZADA', 'AUTOAVALIACAO_CONCLUIDA', 'CONSENSO_CRIADO', 'CONSENSO_APROVADO', 'AVALIACAO_IMPOSSIBILITADA')),
+    situacao_servidor  varchar(50) not null check (situacao_servidor in ('AUTOAVALIACAO_NAO_INICIADA', 'AUTOAVALIACAO_CONCLUIDA', 'CONSENSO_CRIADO', 'CONSENSO_APROVADO', 'AVALIACAO_IMPOSSIBILITADA')),
     constraint pk_avaliacao_servidor primary key (codigo),
     constraint fk_avaliacao_diagnostico foreign key (diagnostico_codigo) references sgc.diagnostico,
     constraint fk_avaliacao_servidor foreign key (servidor_titulo) references sgc.vw_usuario,

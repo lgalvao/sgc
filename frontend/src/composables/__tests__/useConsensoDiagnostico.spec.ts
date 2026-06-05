@@ -4,6 +4,7 @@ import * as diagnosticoService from '@/services/diagnosticoService';
 import {useConsensoDiagnostico} from '../useConsensoDiagnostico';
 
 const invalidateQueriesMock = vi.fn();
+const setQueryDataMock = vi.fn();
 const mockQueryData = ref<any>(null);
 const mockQueryStatus = ref<'pending' | 'success'>('success');
 const mockQueryError = ref<Error | null>(null);
@@ -13,6 +14,7 @@ vi.mock('@pinia/colada', () => ({
     useQuery: (...args: unknown[]) => useQueryMock(...args),
     useQueryCache: () => ({
         invalidateQueries: invalidateQueriesMock,
+        setQueryData: setQueryDataMock,
     }),
     useMutation: vi.fn((options: any) => {
         const isLoading = ref(false);
@@ -60,6 +62,7 @@ vi.mock('@/services/diagnosticoService', () => ({
 describe('useConsensoDiagnostico', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        setQueryDataMock.mockReset();
         vi.useFakeTimers();
         useQueryMock.mockImplementation((options: any) => ({
             data: mockQueryData,
@@ -146,6 +149,49 @@ describe('useConsensoDiagnostico', () => {
                 consensoDominio: 3,
             })],
         }));
+
+        scope.stop();
+    });
+
+    it('deve disparar autosave ao editar o consenso final e exibir autoguardado', async () => {
+        vi.mocked(diagnosticoService.salvarConsenso).mockResolvedValue();
+        const scope = effectScope();
+        let composable: ReturnType<typeof useConsensoDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useConsensoDiagnostico(60, '242427');
+        });
+        await nextTick();
+
+        composable!.atualizarNotaDetalhada(10, {origem: 'consenso', campo: 'dominio', valor: 5});
+
+        expect(composable!.salvandoAutomaticamente.value).toBe(true);
+        expect(composable!.autoguardado.value).toBe(false);
+
+        await vi.advanceTimersByTimeAsync(800);
+        await Promise.resolve();
+
+        expect(diagnosticoService.salvarConsenso).toHaveBeenCalledWith(60, '242427', expect.objectContaining({
+            competenciasDetalhadas: [expect.objectContaining({
+                competenciaCodigo: 10,
+                consensoDominio: 5,
+            })],
+        }));
+        expect(setQueryDataMock).toHaveBeenCalledWith(
+            ['diagnostico-competencias', 'consenso', '242426', 'sem-perfil', 'sem-unidade', 60, '242427'],
+            expect.objectContaining({
+                situacaoServidor: 'CONSENSO_CRIADO',
+                competenciasDetalhadas: [expect.objectContaining({
+                    competenciaCodigo: 10,
+                    consensoDominio: 5,
+                })],
+            }),
+        );
+        expect(composable!.salvandoAutomaticamente.value).toBe(false);
+        expect(composable!.autoguardado.value).toBe(true);
+
+        await vi.advanceTimersByTimeAsync(2000);
+        expect(composable!.autoguardado.value).toBe(false);
 
         scope.stop();
     });

@@ -77,7 +77,7 @@ Adicionalmente, o `checkPerfil` verifica se o perfil do usuário é compatível 
 | `DEVOLVER_MAPA`                   | ADMIN, GESTOR     | 20  |
 | `ACEITAR_MAPA`                    | GESTOR            | 20  |
 | `HOMOLOGAR_MAPA`                  | ADMIN             | 20  |
-| `PREENCHER_AUTOAVALIACAO`         | SERVIDOR, CHEFE   | 42  |
+| `PREENCHER_AUTOAVALIACAO`         | SERVIDOR          | 42  |
 | `CRIAR_CONSENSO`                  | CHEFE             | 44  |
 | `CONCLUIR_DIAGNOSTICO`            | CHEFE             | 48  |
 | `VALIDAR_DIAGNOSTICO`             | GESTOR            | 50  |
@@ -232,7 +232,7 @@ NAO_INICIADO → DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO → DIAGNOSTICO_MONITORA
 
 As permissões finas de diagnóstico dependem de perfil, localização atual do subprocesso e situação do subprocesso:
 
-- `PREENCHER_AUTOAVALIACAO`: SERVIDOR ou CHEFE, com subprocesso localizado na própria unidade.
+- `PREENCHER_AUTOAVALIACAO`: apenas SERVIDOR, com subprocesso localizado na própria unidade.
 - `CRIAR_CONSENSO`: CHEFE, com subprocesso localizado na própria unidade.
 - `CONCLUIR_DIAGNOSTICO`: CHEFE, com subprocesso em `DIAGNOSTICO_MONITORAMENTO` e localizado na própria unidade.
 - `VALIDAR_DIAGNOSTICO`: GESTOR, com subprocesso em `DIAGNOSTICO_CONCLUIDO` e localizado na unidade ativa do gestor.
@@ -242,6 +242,7 @@ As permissões finas de diagnóstico dependem de perfil, localização atual do 
 Observação:
 - Para diagnóstico, o `PermissionEvaluator` continua aplicando a regra geral de escrita por localização atual do subprocesso.
 - O serviço de apresentação (`SubprocessoAcessoService`) faz o controle adicional de habilitação por situação do fluxo para exibir ou desabilitar ações na UI.
+- Na UI, o card de Autoavaliação deve ser ocultado quando `podePreencherAutoavaliacao` for falso. Não é uma ação “sempre visível”; ela depende do perfil ativo ser `SERVIDOR`.
 
 ### 8.4 Situações do Processo
 

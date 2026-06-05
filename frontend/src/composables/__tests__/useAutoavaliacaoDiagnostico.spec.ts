@@ -66,7 +66,7 @@ describe('useAutoavaliacaoDiagnostico', () => {
         mockQueryStatus.value = 'success';
         mockQueryError.value = null;
         mockQueryData.value = {
-            situacaoServidor: 'AUTOAVALIACAO_NAO_REALIZADA',
+            situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA',
             competencias: [
                 {competenciaCodigo: 10, importancia: 1, dominio: 2},
                 {competenciaCodigo: 20, importancia: 3, dominio: 4},

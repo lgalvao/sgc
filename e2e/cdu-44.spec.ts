@@ -1,14 +1,15 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture} from './fixtures/index.js';
-import {abrirCardDiagnostico, preencherConsensoMinimo} from './helpers/helpers-diagnostico.js';
+import {abrirAcaoConsensoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
 const TITULO_CHEFE_ASSESSORIA_12 = '151515';
 const UNIDADE = 'ASSESSORIA_12';
+const VALOR_CONSENSO_IMPORTANCIA = '4';
 
 test.describe('CDU-44 - Manter avaliação de consenso', () => {
-    test('CHEFE abre a avaliação de consenso, preenche e volta para a lista', async ({
+    test('CHEFE mantém consenso por autosave e reencontra o valor salvo ao reabrir a avaliação', async ({
         _resetAutomatico,
         page,
         request
@@ -23,16 +24,41 @@ test.describe('CDU-44 - Manter avaliação de consenso', () => {
 
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/monitoramento/);
+        await expect(page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+
+        await abrirAcaoConsensoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
+        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
+
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
-        await page.getByTestId(`btn-manter-consenso-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
-        await expect(page.getByRole('heading', {name: /Avaliação de Consenso/i})).toBeVisible();
+        const seletorConsensoImportancia = page.locator('[data-testid^="consenso-final-importancia-"]').first();
+        await expect(seletorConsensoImportancia).toBeVisible();
 
-        await preencherConsensoMinimo(page, codSubprocesso, TITULO_SERVIDOR_ASSESSORIA_12);
+        await Promise.all([
+            page.waitForResponse(res =>
+                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
+                && res.request().method() === 'POST'
+                && res.ok()
+            ),
+            seletorConsensoImportancia.selectOption(VALOR_CONSENSO_IMPORTANCIA)
+        ]);
+
         await expect(page.getByText('Salvo automaticamente')).toBeVisible();
+        await expect.poll(async () => await page.evaluate(async ({codigo, titulo, valor}) => {
+            const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
+            if (!resposta.ok) return null;
+            const dados = await resposta.json();
+            return String(dados.competenciasDetalhadas[0]?.consensoImportancia ?? '');
+        }, {
+            codigo: codSubprocesso,
+            titulo: TITULO_SERVIDOR_ASSESSORIA_12,
+            valor: VALOR_CONSENSO_IMPORTANCIA
+        })).toBe(VALOR_CONSENSO_IMPORTANCIA);
 
-        await page.getByTestId('btn-nav-voltar').click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/monitoramento`));
+        await page.goBack();
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
+
+        await abrirAcaoConsensoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
+        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
+        await expect(seletorConsensoImportancia).toHaveValue(VALOR_CONSENSO_IMPORTANCIA);
     });
 });
