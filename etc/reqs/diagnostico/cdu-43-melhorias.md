@@ -14,4 +14,4 @@ Ator: CHEFE
 2. Palavras iniciando com letra maiuscula ex: `Equipe e Situações` → `Equipe e situações`. 
 3. Deve tirar o zebrado da tabela.
 4. Deve retirar a coluna `Ações` da tabela, e `Ações` deve ser um botão dropdow contendo `Manter avaliação de consenso` e `Indicar impossibilidade`.
-5. Atualmente ela tem uma tabela chamada `Movimentações` faria sentido ter ela? Se sim o dados mostrados estão inconsistente.
+5. Atualmente ela tem uma tabela chamada `Movimentações` faria sentido ter ela? Se sim o dados mostrados estão inconsistentes.
