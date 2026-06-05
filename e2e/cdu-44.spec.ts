@@ -43,15 +43,14 @@ test.describe('CDU-44 - Manter avaliação de consenso', () => {
         ]);
 
         await expect(page.getByText('Salvo automaticamente')).toBeVisible();
-        await expect.poll(async () => await page.evaluate(async ({codigo, titulo, valor}) => {
+        await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
             const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
             if (!resposta.ok) return null;
             const dados = await resposta.json();
             return String(dados.competenciasDetalhadas[0]?.consensoImportancia ?? '');
         }, {
             codigo: codSubprocesso,
-            titulo: TITULO_SERVIDOR_ASSESSORIA_12,
-            valor: VALOR_CONSENSO_IMPORTANCIA
+            titulo: TITULO_SERVIDOR_ASSESSORIA_12
         })).toBe(VALOR_CONSENSO_IMPORTANCIA);
 
         await page.goBack();
