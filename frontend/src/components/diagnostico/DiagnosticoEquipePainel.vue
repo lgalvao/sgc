@@ -92,6 +92,16 @@
 
     <div class="d-flex gap-2 flex-wrap mb-4">
       <BButton
+          v-if="podeConcluir"
+          :disabled="concluindo"
+          data-testid="btn-concluir-diagnostico"
+          variant="success"
+          @click="abrirModalConcluir"
+      >
+        <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
+        {{ TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO }}
+      </BButton>
+      <BButton
           v-if="podeValidar"
           :disabled="validando"
           data-testid="btn-validar-diagnostico"
@@ -150,6 +160,26 @@
         >
           <BSpinner v-if="impossibilitando" aria-hidden="true" class="me-1" small/>
           Indicar impossibilidade
+        </BButton>
+      </template>
+    </BModal>
+
+    <BModal
+        v-model="modalConcluirAberto"
+        :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
+        centered
+    >
+      <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
+      <template #footer>
+        <BButton class="text-secondary" variant="link" @click="modalConcluirAberto = false">Cancelar</BButton>
+        <BButton
+            :disabled="concluindo"
+            data-testid="btn-confirmar-concluir-diagnostico"
+            variant="success"
+            @click="confirmarConcluir"
+        >
+          <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
+          Concluir
         </BButton>
       </template>
     </BModal>
@@ -253,6 +283,7 @@ import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
+import {normalizarErro} from '@/utils/apiError/normalizer';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
@@ -270,18 +301,22 @@ const router = useRouter();
 const cacheDiagnostico = useCacheDiagnostico();
 const {
   podeCriarConsenso,
+  habilitarConcluirDiagnostico,
   habilitarValidarDiagnostico,
   habilitarDevolverDiagnostico,
   habilitarHomologarDiagnostico,
 } = useDiagnosticoPermissoes(props.codSubprocesso);
 const {unidade, servidores} = useMonitoramentoDiagnostico(props.codSubprocesso);
 const {
+  concluindo,
   validando,
   devolvendo,
   homologando,
+  erroConcluir,
   erroValidar,
   erroDevolver,
   erroHomologar,
+  concluirDiagnostico,
   validarDiagnostico,
   devolverDiagnostico,
   homologarDiagnostico,
@@ -289,6 +324,7 @@ const {
 
 const erroMensagem = ref('');
 const alertaSucesso = ref('');
+const modalConcluirAberto = ref(false);
 const modalValidarAberto = ref(false);
 const modalDevolverAberto = ref(false);
 const modalHomologarAberto = ref(false);
@@ -303,6 +339,7 @@ const erroJustificativaImpossibilidade = ref('');
 const impossibilitando = ref(false);
 
 const ehChefe = computed(() => podeCriarConsenso.value);
+const podeConcluir = computed(() => habilitarConcluirDiagnostico.value);
 const podeValidar = computed(() => habilitarValidarDiagnostico.value);
 const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
 const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
@@ -366,6 +403,10 @@ function abrirModalValidar() {
   modalValidarAberto.value = true;
 }
 
+function abrirModalConcluir() {
+  modalConcluirAberto.value = true;
+}
+
 function abrirModalDevolver() {
   justificativaDevolver.value = '';
   erroJustificativaDevolver.value = '';
@@ -375,6 +416,18 @@ function abrirModalDevolver() {
 function abrirModalHomologar() {
   observacoesHomologar.value = '';
   modalHomologarAberto.value = true;
+}
+
+async function confirmarConcluir() {
+  try {
+    await concluirDiagnostico();
+    modalConcluirAberto.value = false;
+    await router.push({name: 'Painel'});
+  } catch (erro) {
+    erroMensagem.value = normalizarErro(erro).mensagem
+      ?? erroConcluir.value?.message
+      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
 }
 
 async function confirmarValidar() {

@@ -14,8 +14,7 @@ Ator: GESTOR, ADMIN
 2. O sistema mostra a tela `Detalhes do processo` com uma tabela hierárquica contendo as unidades participantes do processo. Para cada unidade, mostra:
    - sigla da unidade 
    - nome de unidade;
-   - situação atual do subprocesso da unidade;
-   - localização atual do subprocesso da unidade.
+   - situação atual do subprocesso da unidade.
 
    3.1. Para o perfil GESTOR, a tabela hierarquica deve se limitar à própria unidade do usuário e às unidades subordinadas a ela, recursivamente.
    
@@ -25,6 +24,4 @@ Ator: GESTOR, ADMIN
    
 5. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada.
    
-6. O usuário clica no card `Monitoramento`.
-   
-7. O sistema mostra a tela `Monitoramento de diagnóstico`, com detalhes sobre as situações de cada servidor.
+6. O sistema exibe inline, na própria tela `Detalhes do subprocesso`, o monitoramento de diagnóstico com detalhes sobre as situações de cada servidor.

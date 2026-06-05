@@ -515,7 +515,6 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, codigoProcessoDiagnostico, siglaUnidadeDiagnostico);
             await page.goto(`/diagnostico/${codSubprocesso}/${siglaUnidadeDiagnostico}/situacao-capacitacao`);
             await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
-            await expect(page.getByText('Salvo automaticamente')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };

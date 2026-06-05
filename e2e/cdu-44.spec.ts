@@ -42,7 +42,6 @@ test.describe('CDU-44 - Manter avaliação de consenso', () => {
             seletorConsensoImportancia.selectOption(VALOR_CONSENSO_IMPORTANCIA)
         ]);
 
-        await expect(page.getByText('Salvo automaticamente')).toBeVisible();
         await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
             const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
             if (!resposta.ok) return null;

@@ -43,7 +43,6 @@ vi.mock('@/composables/useConsensoDiagnostico', () => ({
         ehConsensoAprovado: computed(() => false),
         carregando: computed(() => false),
         salvandoAutomaticamente: ref(false),
-        autoguardado: ref(false),
         aprovando: computed(() => false),
         erroAprovar: ref(null),
         atualizarNotaDetalhada: vi.fn(),

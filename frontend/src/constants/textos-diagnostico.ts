@@ -81,7 +81,6 @@ export const TEXTOS_DIAGNOSTICO = {
     LABEL_SITUACAO_SUBPROCESSO: 'Situação',
     LABEL_OBSERVACOES: 'Observações (opcional)',
     LABEL_JUSTIFICATIVA: 'Justificativa',
-    LABEL_AUTOGUARDADO: 'Salvo automaticamente',
     LABEL_SALVANDO: 'Salvando...',
 
     // « Estados vazios »

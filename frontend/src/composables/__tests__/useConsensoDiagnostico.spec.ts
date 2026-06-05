@@ -153,7 +153,7 @@ describe('useConsensoDiagnostico', () => {
         scope.stop();
     });
 
-    it('deve disparar autosave ao editar o consenso final e exibir autoguardado', async () => {
+    it('deve disparar autosave ao editar o consenso final', async () => {
         vi.mocked(diagnosticoService.salvarConsenso).mockResolvedValue();
         const scope = effectScope();
         let composable: ReturnType<typeof useConsensoDiagnostico> | undefined;
@@ -166,8 +166,6 @@ describe('useConsensoDiagnostico', () => {
         composable!.atualizarNotaDetalhada(10, {origem: 'consenso', campo: 'dominio', valor: 5});
 
         expect(composable!.salvandoAutomaticamente.value).toBe(true);
-        expect(composable!.autoguardado.value).toBe(false);
-
         await vi.advanceTimersByTimeAsync(800);
         await Promise.resolve();
 
@@ -188,11 +186,6 @@ describe('useConsensoDiagnostico', () => {
             }),
         );
         expect(composable!.salvandoAutomaticamente.value).toBe(false);
-        expect(composable!.autoguardado.value).toBe(true);
-
-        await vi.advanceTimersByTimeAsync(2000);
-        expect(composable!.autoguardado.value).toBe(false);
-
         scope.stop();
     });
 

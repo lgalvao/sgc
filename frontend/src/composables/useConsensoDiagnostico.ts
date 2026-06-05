@@ -45,7 +45,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
 
     // Estado de autosave
     const salvandoAutomaticamente = ref(false);
-    const autoguardado = ref(false);
     let timer: ReturnType<typeof setTimeout> | null = null;
 
     watch(
@@ -98,10 +97,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             );
             void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo), exact: true});
             void cache.invalidateQueries({key: chaveEquipe(codSubprocesso, contextoSessao), exact: true});
-            autoguardado.value = true;
-            setTimeout(() => {
-                autoguardado.value = false;
-            }, 2000);
         },
     });
 
@@ -118,7 +113,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     function agendarAutosave() {
         if (ehConsensoAprovado.value) return;
         salvandoAutomaticamente.value = true;
-        autoguardado.value = false;
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
             mutacaoSalvar.mutate(servidorTitulo!);
@@ -181,7 +175,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         ehConsensoAprovado,
         carregando,
         salvandoAutomaticamente,
-        autoguardado,
         aprovando,
         erroAprovar: computed(() => mutacaoAprovar.error.value),
         atualizarNota,

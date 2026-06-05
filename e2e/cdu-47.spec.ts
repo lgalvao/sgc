@@ -43,7 +43,6 @@ test.describe('CDU-47 - Preencher situação de capacitação', () => {
             seletorCapacitacao.selectOption(VALOR_CAPACITACAO)
         ]);
 
-        await expect(page.getByText('Salvo automaticamente')).toBeVisible();
         await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
             const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/unidade`, {credentials: 'include'});
             if (!resposta.ok) return null;

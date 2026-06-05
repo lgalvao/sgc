@@ -109,7 +109,9 @@ public class SubprocessoAcessoService {
 
         builder.habilitarPreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR && mesmaUnidade)
                 .habilitarCriarConsenso(contexto.isChefe() && mesmaUnidade)
-                .habilitarConcluirDiagnostico(contexto.isChefe() && situacao == DIAGNOSTICO_MONITORAMENTO && mesmaUnidade)
+                .habilitarConcluirDiagnostico(contexto.isChefe()
+                        && situacao == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO
+                        && mesmaUnidade)
                 .habilitarValidarDiagnostico(contexto.isGestor() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)
                 .habilitarDevolverDiagnostico(contexto.isGestorOuAdmin() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)
                 .habilitarHomologarDiagnostico(contexto.isAdmin() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade);

@@ -40,7 +40,6 @@ vi.mock('@/composables/useOcupacoesCriticasDiagnostico', () => ({
         ]),
         carregando: computed(() => false),
         salvandoAutomaticamente: ref(false),
-        autoguardado: ref(false),
         pendentes: computed(() => 1),
         atualizarCapacitacao: vi.fn(),
     }),

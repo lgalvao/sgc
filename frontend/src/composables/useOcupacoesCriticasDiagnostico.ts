@@ -24,7 +24,6 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
 
     const ocupacoesLocais = ref<OcupacaoCriticaItem[]>([]);
     const salvandoAutomaticamente = ref(false);
-    const autoguardado = ref(false);
 
     watch(
         () => query.data.value?.ocupacoesCriticas,
@@ -49,10 +48,6 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
             salvandoAutomaticamente.value = false;
         },
         onSuccess: () => {
-            autoguardado.value = true;
-            setTimeout(() => {
-                autoguardado.value = false;
-            }, 2000);
             void cache.invalidateQueries({key: chaveUnidade(codSubprocesso, contextoSessao), exact: true});
         },
     });
@@ -75,7 +70,6 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
         if (!item) return;
         item.situacaoCapacitacao = situacao;
         salvandoAutomaticamente.value = true;
-        autoguardado.value = false;
         dispararSalvamento();
     }
 
@@ -97,7 +91,6 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
         carregando,
         erro,
         salvandoAutomaticamente,
-        autoguardado,
         pendentes,
         atualizarCapacitacao,
     };

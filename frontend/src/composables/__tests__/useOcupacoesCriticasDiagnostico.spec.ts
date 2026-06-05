@@ -103,7 +103,6 @@ describe('useOcupacoesCriticasDiagnostico', () => {
         composable!.atualizarCapacitacao('242426', 10, 'EC');
 
         expect(composable!.salvandoAutomaticamente.value).toBe(true);
-        expect(composable!.autoguardado.value).toBe(false);
         expect(composable!.pendentes.value).toBe(0);
 
         await vi.advanceTimersByTimeAsync(800);
@@ -120,8 +119,6 @@ describe('useOcupacoesCriticasDiagnostico', () => {
             exact: true,
         });
         expect(composable!.salvandoAutomaticamente.value).toBe(false);
-        expect(composable!.autoguardado.value).toBe(true);
-
         scope.stop();
     });
 

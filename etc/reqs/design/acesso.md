@@ -225,7 +225,7 @@ NAO_INICIADO → REVISAO_CADASTRO_EM_ANDAMENTO → REVISAO_CADASTRO_DISPONIBILIZ
 ### 8.3 Diagnóstico
 
 ```
-NAO_INICIADO → DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO → DIAGNOSTICO_MONITORAMENTO → DIAGNOSTICO_CONCLUIDO
+NAO_INICIADO → DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO → DIAGNOSTICO_CONCLUIDO
 ```
 
 ## 8.3.1 Ações de diagnóstico por etapa
@@ -234,7 +234,7 @@ As permissões finas de diagnóstico dependem de perfil, localização atual do 
 
 - `PREENCHER_AUTOAVALIACAO`: apenas SERVIDOR, com subprocesso localizado na própria unidade.
 - `CRIAR_CONSENSO`: CHEFE, com subprocesso localizado na própria unidade.
-- `CONCLUIR_DIAGNOSTICO`: CHEFE, com subprocesso em `DIAGNOSTICO_MONITORAMENTO` e localizado na própria unidade.
+- `CONCLUIR_DIAGNOSTICO`: CHEFE, com subprocesso em `DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO` e localizado na própria unidade.
 - `VALIDAR_DIAGNOSTICO`: GESTOR, com subprocesso em `DIAGNOSTICO_CONCLUIDO` e localizado na unidade ativa do gestor.
 - `DEVOLVER_DIAGNOSTICO`: ADMIN ou GESTOR, com subprocesso em `DIAGNOSTICO_CONCLUIDO` e localizado na unidade ativa do usuário.
 - `HOMOLOGAR_DIAGNOSTICO`: ADMIN, com subprocesso em `DIAGNOSTICO_CONCLUIDO` e localizado na unidade ativa do usuário.

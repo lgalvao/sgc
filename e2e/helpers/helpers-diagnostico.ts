@@ -139,6 +139,30 @@ export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubpro
         ),
         select.selectOption(valor)
     ]);
+}
 
-    await expect(page.getByText('Salvo automaticamente')).toBeVisible();
+export async function preencherTodasSituacoesCapacitacao(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
+    const selects = page.locator('[data-testid^="ocupacao-"]');
+    const total = await selects.count();
+    let houveAlteracao = false;
+    await expect(selects.first()).toBeVisible();
+
+    for (let i = 0; i < total; i++) {
+        if ((await selects.nth(i).inputValue()) === valor) {
+            continue;
+        }
+        houveAlteracao = true;
+        await Promise.all([
+            page.waitForResponse(res =>
+                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/ocupacoes-criticas`)
+                && res.request().method() === 'POST'
+                && res.ok()
+            ),
+            selects.nth(i).selectOption(valor)
+        ]);
+    }
+
+    if (houveAlteracao) {
+        await page.waitForLoadState('networkidle');
+    }
 }

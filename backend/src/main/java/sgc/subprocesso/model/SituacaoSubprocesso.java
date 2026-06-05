@@ -27,7 +27,6 @@ public enum SituacaoSubprocesso {
     REVISAO_MAPA_HOMOLOGADO("Mapa homologado"),
 
     DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO("Autoavaliação em andamento"),
-    DIAGNOSTICO_MONITORAMENTO("Monitoramento"),
     DIAGNOSTICO_CONCLUIDO("Concluído");
 
     private static final String PREFIXO_MAPEAMENTO = "MAPEAMENTO";
@@ -114,9 +113,7 @@ public enum SituacaoSubprocesso {
 
     private boolean transicaoDiagnostico(SituacaoSubprocesso nova) {
         return switch (this) {
-            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO ->
-                    nova == DIAGNOSTICO_MONITORAMENTO || nova == DIAGNOSTICO_CONCLUIDO;
-            case DIAGNOSTICO_MONITORAMENTO -> nova == DIAGNOSTICO_CONCLUIDO;
+            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO -> nova == DIAGNOSTICO_CONCLUIDO;
             case DIAGNOSTICO_CONCLUIDO -> nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
             default -> false;
         };

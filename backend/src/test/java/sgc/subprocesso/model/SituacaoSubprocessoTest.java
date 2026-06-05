@@ -58,9 +58,7 @@ class SituacaoSubprocessoTest {
             "REVISAO_MAPA_HOMOLOGADO, REVISAO_MAPA_VALIDADO, false, REVISAO",
             "REVISAO_MAPA_HOMOLOGADO, REVISAO_CADASTRO_EM_ANDAMENTO, true, REVISAO",
 
-            "DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_MONITORAMENTO, true, DIAGNOSTICO",
-            "DIAGNOSTICO_MONITORAMENTO, DIAGNOSTICO_CONCLUIDO, true, DIAGNOSTICO",
-            "DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO_MONITORAMENTO, false, DIAGNOSTICO",
+            "DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_CONCLUIDO, true, DIAGNOSTICO",
 
             // Transições inválidas (Misturando tipos)
             "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, false, MAPEAMENTO",
@@ -101,7 +99,7 @@ class SituacaoSubprocessoTest {
     @DisplayName("Deve testar ramos da verificação de prefixo (DIAGNOSTICO)")
     void testRamosPrefixoDiagnostico() {
         assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
-        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_MONITORAMENTO, TipoProcesso.DIAGNOSTICO)).isTrue();
+        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_CONCLUIDO, TipoProcesso.DIAGNOSTICO)).isTrue();
     }
     // Testes mesclados de SituacaoSubprocessoCoverageTest
 
@@ -134,7 +132,6 @@ class SituacaoSubprocessoTest {
             "REVISAO_MAPA_VALIDADO, REVISAO_MAPA_AJUSTADO, REVISAO, false",
 
             "DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO, true",
-            "DIAGNOSTICO_MONITORAMENTO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, false",
 
             // Transição para NAO_INICIADO
             "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, MAPEAMENTO, false",

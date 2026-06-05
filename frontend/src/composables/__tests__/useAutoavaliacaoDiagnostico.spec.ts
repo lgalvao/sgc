@@ -91,7 +91,7 @@ describe('useAutoavaliacaoDiagnostico', () => {
         scope.stop();
     });
 
-    it('deve fazer autosave com debounce e exibir autoguardado', async () => {
+    it('deve fazer autosave com debounce', async () => {
         vi.mocked(diagnosticoService.salvarAutoavaliacao).mockResolvedValue();
         const scope = effectScope();
         let composable: ReturnType<typeof useAutoavaliacaoDiagnostico> | undefined;
@@ -104,8 +104,6 @@ describe('useAutoavaliacaoDiagnostico', () => {
         composable!.atualizarNota(10, 'importancia', 5);
 
         expect(composable!.salvandoAutomaticamente.value).toBe(true);
-        expect(composable!.autoguardado.value).toBe(false);
-
         await vi.advanceTimersByTimeAsync(800);
         await Promise.resolve();
 
@@ -116,11 +114,6 @@ describe('useAutoavaliacaoDiagnostico', () => {
             ],
         });
         expect(composable!.salvandoAutomaticamente.value).toBe(false);
-        expect(composable!.autoguardado.value).toBe(true);
-
-        await vi.advanceTimersByTimeAsync(2000);
-        expect(composable!.autoguardado.value).toBe(false);
-
         scope.stop();
     });
 

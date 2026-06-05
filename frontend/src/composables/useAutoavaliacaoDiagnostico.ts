@@ -34,7 +34,6 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     // Estado local de edição para evitar chamadas de rede a cada keypress
     const competenciasLocais = ref<AvaliacaoCompetencia[]>([]);
     const salvandoAutomaticamente = ref(false);
-    const autoguardado = ref(false);
 
     watch(
         () => query.data.value?.competencias,
@@ -51,12 +50,6 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
             salvarAutoavaliacao(codSubprocesso, {competencias}),
         onSettled: () => {
             salvandoAutomaticamente.value = false;
-        },
-        onSuccess: () => {
-            autoguardado.value = true;
-            setTimeout(() => {
-                autoguardado.value = false;
-            }, 2000);
         },
     });
 
@@ -80,7 +73,6 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
         if (!item) return;
         item[campo] = valor;
         salvandoAutomaticamente.value = true;
-        autoguardado.value = false;
         dispararSalvamento();
     }
 
@@ -97,7 +89,6 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
         carregando,
         erro,
         salvandoAutomaticamente,
-        autoguardado,
         concluindo,
         erroConcluir,
         atualizarNota,

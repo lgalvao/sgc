@@ -41,10 +41,6 @@
           <BSpinner small variant="secondary"/>
           {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
         </template>
-        <template v-else-if="autoguardado">
-          <i aria-hidden="true" class="bi bi-check-circle text-success"/>
-          {{ TEXTOS.diagnostico.LABEL_AUTOGUARDADO }}
-        </template>
       </div>
 
       <BAlert
@@ -317,7 +313,6 @@ const {
   situacaoServidor,
   carregando,
   salvandoAutomaticamente,
-  autoguardado,
   concluindo,
   erroConcluir,
   atualizarNota,

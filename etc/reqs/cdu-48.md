@@ -14,37 +14,33 @@ Ator: CHEFE
 
 1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade.
+2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, com o monitoramento do diagnóstico exibido inline, incluindo a situação de cada servidor da unidade e o botão `Concluir diagnóstico`, quando aplicável.
 
-3. O usuário clica no card `Monitoramento`.
+3. O usuário clica em `Concluir diagnóstico`.
    
-4. O sistema mostra a tela `Monitoramento de diagnóstico`, com detalhes sobre a situação de cada servidor da unidade e botão `Concluir diagnóstico`.
+4. O sistema verifica se todas as avaliações individuais estão em `Consenso aprovado` ou `Avaliação impossibilitada`, e se as situações de capacitação foram integralmente preenchidas.
 
-5. O usuário clica em `Concluir diagnóstico`.
-   
-6. O sistema verifica se todas as avaliações individuais estão em `Consenso aprovado` ou `Avaliação impossibilitada`, e se as situações de capacitação foram integralmente preenchidas.
-
-   6.1. Caso positivo, o sistema mostra modal de confirmação com:
+   4.1. Caso positivo, o sistema mostra modal de confirmação com:
       - título `Conclusão de diagnóstico`;
       - texto `Confirma a conclusão do diagnóstico da unidade?`;
       - botões `Cancelar` e `Concluir`.
    
-   6.3. Caso exista pendência, o sistema mostra a mensagem "Ainda existem avaliações ou ocupações críticas
+   4.2. Caso exista pendência, o sistema mostra a mensagem "Ainda existem avaliações ou ocupações críticas
    pendentes." e interrompe a operação.
    
-   6.2. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
+   4.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
 
-7. O usuário confirma.
+5. O usuário confirma.
 
-8. O sistema altera a situação do subprocesso para 'Concluído'.
+6. O sistema altera a situação do subprocesso para 'Concluído'.
 
-9. O sistema registra uma movimentação para o subprocesso com:
+7. O sistema registra uma movimentação para o subprocesso com:
    - `Data/hora`: [Data/hora atual];
    - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO];
    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
    - `Descrição`: 'Diagnóstico concluído'.
 
-10. O sistema envia notificação por e-mail para a unidade superior:
+8. O sistema envia notificação por e-mail para a unidade superior:
 
     ```text
     Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
@@ -54,11 +50,11 @@ Ator: CHEFE
     O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi concluído e submetido à análise das unidades superiores.
     ```
 
-11. O sistema cria internamente um alerta com:
+9. O sistema cria internamente um alerta com:
     - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-12. O sistema redireciona para o `Painel` e mostra a mensagem `Diagnóstico concluído`.
+10. O sistema redireciona para o `Painel` e mostra a mensagem `Diagnóstico concluído`. 

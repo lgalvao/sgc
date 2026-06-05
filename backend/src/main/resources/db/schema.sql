@@ -221,7 +221,6 @@ create table if not exists sgc.subprocesso
          'REVISAO_MAPA_VALIDADO',
          'REVISAO_MAPA_HOMOLOGADO',
          'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
-         'DIAGNOSTICO_MONITORAMENTO',
          'DIAGNOSTICO_CONCLUIDO'
             ))                not null,
     primary key

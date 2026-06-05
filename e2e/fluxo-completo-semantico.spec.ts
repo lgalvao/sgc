@@ -763,7 +763,6 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, codigoProcessoDiagnosticoMonitoramento, SIGLA_UNIDADE_DIAGNOSTICO);
             await page.goto(`/diagnostico/${codSubprocesso}/${SIGLA_UNIDADE_DIAGNOSTICO}/situacao-capacitacao`);
             await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
-            await expect(page.getByText('Salvo automaticamente')).toBeVisible();
         });
     });
 });
