@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
-import {abrirCardDiagnostico} from './helpers/helpers-diagnostico.js';
+import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 
 const TITULO_CHEFE_ASSESSORIA_12 = '151515';
@@ -23,7 +23,8 @@ test.describe('CDU-46 - Indicar impossibilidade de avaliação', () => {
 
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/monitoramento/);
+        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE);
+        await page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`).getByRole('button', {name: 'Ações'}).click();
 
         await page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
         const modal = page.getByRole('dialog');
@@ -34,7 +35,7 @@ test.describe('CDU-46 - Indicar impossibilidade de avaliação', () => {
         await expect(modal).toContainText('A justificativa é obrigatória.');
 
         await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante todo o período da avaliação.');
-        const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/avaliacoes/${TITULO_SERVIDOR_ASSESSORIA_12}/impossibilitar`)

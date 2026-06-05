@@ -30,7 +30,12 @@ import {
     excluirCompetenciaConfirmando,
     navegarParaMapa
 } from './helpers/helpers-mapas.js';
-import {abrirCardDiagnostico, preencherConsensoMinimo, preencherPrimeiraSituacaoCapacitacao} from './helpers/helpers-diagnostico.js';
+import {
+    abrirAcaoConsensoDiagnostico,
+    buscarCodSubprocessoDiagnostico,
+    preencherConsensoMinimo,
+    preencherPrimeiraSituacaoCapacitacao
+} from './helpers/helpers-diagnostico.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -2059,7 +2064,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tags: ['diagnostico', 'dashboard', 'servidor']
             });
 
-            await abrirCardDiagnostico(page, 'card-subprocesso-diagnostico', /\/diagnostico\/\d+\/ASSESSORIA_12\/autoavaliacao/);
+            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
+            await page.goto(`/diagnostico/${codSubprocesso}/${unidadeAlvo}/autoavaliacao`);
             await capturarTela(page, 'diagnostico', 'autoavaliacao-servidor', {
                 fullPage: true,
                 tags: ['diagnostico', 'autoavaliacao', 'servidor']
@@ -2079,14 +2085,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
             await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/diagnostico\/\d+\/ASSESSORIA_12\/monitoramento/);
-            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
             await capturarTela(page, 'diagnostico', 'monitoramento-chefia', {
                 fullPage: true,
                 tags: ['diagnostico', 'monitoramento', 'chefia']
             });
 
-            await page.getByTestId(`btn-manter-consenso-${servidorTitulo}`).click();
+            await abrirAcaoConsensoDiagnostico(page, servidorTitulo);
             await capturarTela(page, 'diagnostico', 'consenso-chefia', {
                 fullPage: true,
                 tags: ['diagnostico', 'consenso', 'chefia']
@@ -2111,18 +2116,17 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             );
 
             await login(page, '242426', 'senha');
-            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await page.getByTestId('card-subprocesso-consenso').click();
-            await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${unidadeAlvo}/consenso/${servidorTitulo}`));
+            const codSubprocessoServidor = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
+            await page.goto(`/diagnostico/${codSubprocessoServidor}/${unidadeAlvo}/consenso/${servidorTitulo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocessoServidor}/${unidadeAlvo}/consenso/${servidorTitulo}`));
             await capturarTela(page, 'diagnostico', 'consenso-servidor', {
                 fullPage: true,
                 tags: ['diagnostico', 'consenso', 'servidor']
             });
 
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
-            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await abrirCardDiagnostico(page, 'card-subprocesso-ocupacoes', /\/diagnostico\/\d+\/ASSESSORIA_12\/situacao-capacitacao/);
-            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
+            await page.goto(`/diagnostico/${codSubprocesso}/${unidadeAlvo}/situacao-capacitacao`);
             await capturarTela(page, 'diagnostico', 'situacao-capacitacao-chefia', {
                 fullPage: true,
                 tags: ['diagnostico', 'capacitacao', 'chefia']

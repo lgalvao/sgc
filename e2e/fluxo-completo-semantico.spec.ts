@@ -47,7 +47,11 @@ import {
     navegarParaMapa,
     verificarCompetenciaNoMapa
 } from './helpers/helpers-mapas.js';
-import {abrirCardDiagnostico, preencherPrimeiraSituacaoCapacitacao} from './helpers/helpers-diagnostico.js';
+import {
+    abrirAcaoConsensoDiagnostico,
+    buscarCodSubprocessoDiagnostico,
+    preencherPrimeiraSituacaoCapacitacao
+} from './helpers/helpers-diagnostico.js';
 
 test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
     const SIT_PROCESSO = {
@@ -727,20 +731,20 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await login(page, ADMIN.titulo, ADMIN.senha);
             await acessarDetalhesProcesso(page, `${descricaoProcessoDiagnostico} Monitoramento`);
             await navegarParaSubprocesso(page, SIGLA_UNIDADE_DIAGNOSTICO);
-            await expect(page.getByTestId('card-subprocesso-diagnostico')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-monitoramento')).toBeVisible();
-            await expect(page.getByTestId('card-subprocesso-ocupacoes')).toBeVisible();
+            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(SIGLA_UNIDADE_DIAGNOSTICO);
+            await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
+            await expect(page.getByText('Duff McKagan')).toBeVisible();
 
             await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
             await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);
-            await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/diagnostico\/\d+\/ASSESSORIA_12\/monitoramento/);
-            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, codigoProcessoDiagnosticoMonitoramento, SIGLA_UNIDADE_DIAGNOSTICO);
             await expect(page.getByText('Autoavaliação concluída')).toBeVisible();
-            await page.getByTestId(`btn-manter-consenso-${SERVIDOR_DIAGNOSTICO.titulo}`).click();
+            await abrirAcaoConsensoDiagnostico(page, SERVIDOR_DIAGNOSTICO.titulo);
             await expect(page.getByRole('heading', {name: /Avaliação de Consenso/i})).toBeVisible();
             await page.getByTestId('btn-nav-voltar').click();
-            await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${SIGLA_UNIDADE_DIAGNOSTICO}/monitoramento`));
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}(?:\\?.*)?$`));
 
+            await page.getByTestId(`dropdown-acoes-${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}`).getByRole('button', {name: 'Ações'}).click();
             await page.getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}`).click();
             await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante a rodada do diagnóstico.');
             await Promise.all([
@@ -756,10 +760,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await test.step('CHEFE registra situação de capacitação no mesmo subprocesso de diagnóstico', async () => {
             await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
             await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);
-            const cardConsenso = page.getByTestId('card-subprocesso-consenso');
-            await expect(cardConsenso).toBeVisible();
-            await abrirCardDiagnostico(page, 'card-subprocesso-ocupacoes', /\/diagnostico\/\d+\/ASSESSORIA_12\/situacao-capacitacao/);
-            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, codigoProcessoDiagnosticoMonitoramento, SIGLA_UNIDADE_DIAGNOSTICO);
+            await page.goto(`/diagnostico/${codSubprocesso}/${SIGLA_UNIDADE_DIAGNOSTICO}/situacao-capacitacao`);
             await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
             await expect(page.getByText('Salvo automaticamente')).toBeVisible();
         });

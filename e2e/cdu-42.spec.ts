@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
-import {abrirCardDiagnostico, preencherAutoavaliacaoCompleta} from './helpers/helpers-diagnostico.js';
+import {buscarCodSubprocessoDiagnostico, preencherAutoavaliacaoCompleta} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
@@ -23,13 +23,10 @@ test.describe('CDU-42 - Realizar autoavaliação', () => {
         });
 
         await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
-        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-
-        await abrirCardDiagnostico(page, 'card-subprocesso-diagnostico', /\/diagnostico\/\d+\/ASSESSORIA_12\/autoavaliacao/);
+        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
+        await page.goto(`/diagnostico/${codSubprocesso}/${UNIDADE}/autoavaliacao`);
         await expect(page.getByRole('heading', {name: /Autoavaliação de Competências/i})).toBeVisible();
 
-        const url = new URL(page.url());
-        const codSubprocesso = Number(url.pathname.split('/')[2]);
         await preencherAutoavaliacaoCompleta(page, codSubprocesso);
 
         await page.getByTestId('btn-concluir-autoavaliacao').click();

@@ -7,6 +7,35 @@ export async function abrirCardDiagnostico(page: Page, testId: string, urlRegex:
     await expect(page).toHaveURL(urlRegex);
 }
 
+export async function buscarCodSubprocessoDiagnostico(
+    page: Page,
+    codProcesso: number,
+    siglaUnidade: string
+): Promise<number> {
+    const codigo = await page.evaluate(async ({codProcessoAtual, siglaUnidadeAtual}) => {
+        const url = new URL('/api/subprocessos/contexto-edicao/buscar', window.location.origin);
+        url.searchParams.set('codProcesso', String(codProcessoAtual));
+        url.searchParams.set('siglaUnidade', siglaUnidadeAtual);
+        const resposta = await fetch(url.toString(), {credentials: 'include'});
+        if (!resposta.ok) {
+            return null;
+        }
+        const contexto = await resposta.json() as {
+            detalhes?: {
+                subprocesso?: {
+                    codigo?: number;
+                };
+            };
+        };
+        return contexto.detalhes?.subprocesso?.codigo ?? null;
+    }, {
+        codProcessoAtual: codProcesso,
+        siglaUnidadeAtual: siglaUnidade,
+    });
+    expect(codigo).toBeTruthy();
+    return Number(codigo);
+}
+
 export async function preencherAutoavaliacaoCompleta(page: Page, codSubprocesso: number): Promise<void> {
     const selectImportancia = page.locator('[data-testid^="autoavaliacao-importancia-"]');
     const total = await selectImportancia.count();

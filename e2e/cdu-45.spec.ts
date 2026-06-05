@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoDiagnosticoComConsensoCriadoFixture} from './fixtures/index.js';
+import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
@@ -21,19 +22,15 @@ test.describe('CDU-45 - Aprovar avaliação de consenso', () => {
         });
 
         await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
-        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        const cardConsensoServidor = page.getByTestId('card-subprocesso-consenso');
-        await expect(cardConsensoServidor).toBeVisible();
-        await cardConsensoServidor.click();
-        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
-        const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
+        await page.goto(`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`);
         await expect(page.getByTestId('btn-aprovar-consenso')).toBeVisible();
         await Promise.all([
             page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/aprovar`) && res.ok()),
             page.getByTestId('btn-aprovar-consenso').click()
         ]);
 
-        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
+        await expect(page).toHaveURL(/\/painel/);
 
         await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {
