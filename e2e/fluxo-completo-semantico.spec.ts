@@ -1,4 +1,4 @@
-import type {Page} from '@playwright/test';
+import type {APIRequestContext, Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     login,
@@ -47,6 +47,7 @@ import {
     navegarParaMapa,
     verificarCompetenciaNoMapa
 } from './helpers/helpers-mapas.js';
+import {abrirCardDiagnostico, preencherPrimeiraSituacaoCapacitacao} from './helpers/helpers-diagnostico.js';
 
 test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
     const SIT_PROCESSO = {
@@ -73,19 +74,40 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
     const CHEFE_SECAO = USUARIOS.CHEFE_SECAO_111;
     const GESTOR_COORDENADORIA = USUARIOS.GESTOR_COORD;
     const GESTOR_SECRETARIA = USUARIOS.GESTOR_SECRETARIA_1;
+    const CHEFE_DIAGNOSTICO = USUARIOS.CHEFE_ASSESSORIA_12;
+    const SERVIDOR_DIAGNOSTICO = {titulo: '242426', senha: 'senha'};
+    const SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO = {titulo: '242427', senha: 'senha'};
 
     const timestamp = Date.now();
     const descProcesso = `Jornada Geral Mapeamento ${timestamp}`;
     const descricaoProcessoRevisao = `Jornada Geral Revisao ${timestamp}`;
+    const descricaoProcessoDiagnostico = `Jornada Geral Diagnostico ${timestamp}`;
     const DESC_ATIVIDADE = 'Atividade 1';
     const DESC_CONHECIMENTO = 'Conhecimento 1.1';
     const DESC_COMPETENCIA_INICIAL = `Competência técnica base ${timestamp}`;
     const DESC_ATIVIDADE_REVISAO = `Atividade revisão ${timestamp}`;
     const DESC_CONHECIMENTO_REVISAO = 'Conhecimento revisão 1';
+    const SIGLA_UNIDADE_DIAGNOSTICO = 'ASSESSORIA_12';
+    let codigoProcessoDiagnosticoMonitoramento = 0;
 
     test.beforeAll(async ({request}) => {
         await resetDatabase(request);
     });
+
+    const criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture = async (request: APIRequestContext) => {
+        const response = await request.post('/e2e/fixtures/processo-diagnostico-com-autoavaliacao-concluida', {
+            data: {
+                descricao: `${descricaoProcessoDiagnostico} Monitoramento`,
+                unidadeSigla: SIGLA_UNIDADE_DIAGNOSTICO,
+                iniciar: true,
+                diasLimite: 30,
+                servidorTitulo: SERVIDOR_DIAGNOSTICO.titulo
+            }
+        });
+        expect(response.ok()).toBeTruthy();
+        const processo = await response.json() as {codigo: number};
+        return processo.codigo;
+    };
 
     const reabrirSubprocessoSemLimparSpa = async (page: Page, options: {
         usuario: Usuario;
@@ -697,5 +719,49 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         });
 
         await expect(page.getByText(DESC_COMPETENCIA_INICIAL, {exact: true}).first()).toBeVisible();
+    });
+
+    test('Fase 8 - ADMIN inicia processo de diagnóstico e os perfis executam o fluxo funcional novo', async ({page, request}) => {
+        await test.step('CHEFE acompanha o diagnóstico concluído pelo servidor e registra impossibilidade', async () => {
+            codigoProcessoDiagnosticoMonitoramento = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture(request);
+            await login(page, ADMIN.titulo, ADMIN.senha);
+            await acessarDetalhesProcesso(page, `${descricaoProcessoDiagnostico} Monitoramento`);
+            await navegarParaSubprocesso(page, SIGLA_UNIDADE_DIAGNOSTICO);
+            await expect(page.getByTestId('card-subprocesso-diagnostico')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-monitoramento')).toBeVisible();
+            await expect(page.getByTestId('card-subprocesso-ocupacoes')).toBeVisible();
+
+            await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
+            await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);
+            await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/diagnostico\/\d+\/ASSESSORIA_12\/monitoramento/);
+            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            await expect(page.getByText('Autoavaliação concluída')).toBeVisible();
+            await page.getByTestId(`btn-manter-consenso-${SERVIDOR_DIAGNOSTICO.titulo}`).click();
+            await expect(page.getByRole('heading', {name: /Avaliação de Consenso/i})).toBeVisible();
+            await page.getByTestId('btn-nav-voltar').click();
+            await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${SIGLA_UNIDADE_DIAGNOSTICO}/monitoramento`));
+
+            await page.getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}`).click();
+            await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante a rodada do diagnóstico.');
+            await Promise.all([
+                page.waitForResponse(res =>
+                    res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/avaliacoes/${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}/impossibilitar`)
+                    && res.ok()
+                ),
+                page.getByTestId('btn-confirmar-impossibilitar').click()
+            ]);
+            await expect(page.getByText('Avaliação impossibilitada')).toBeVisible();
+        });
+
+        await test.step('CHEFE registra situação de capacitação no mesmo subprocesso de diagnóstico', async () => {
+            await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
+            await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);
+            const cardConsenso = page.getByTestId('card-subprocesso-consenso');
+            await expect(cardConsenso).toBeVisible();
+            await abrirCardDiagnostico(page, 'card-subprocesso-ocupacoes', /\/diagnostico\/\d+\/ASSESSORIA_12\/situacao-capacitacao/);
+            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
+            await expect(page.getByText('Salvo automaticamente')).toBeVisible();
+        });
     });
 });

@@ -30,6 +30,7 @@ import {
     excluirCompetenciaConfirmando,
     navegarParaMapa
 } from './helpers/helpers-mapas.js';
+import {abrirCardDiagnostico, preencherConsensoMinimo, preencherPrimeiraSituacaoCapacitacao} from './helpers/helpers-diagnostico.js';
 import {resetDatabase, useProcessoCleanup} from './hooks/hooks-limpeza.js';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -473,6 +474,79 @@ async function criarProcessoMapeamentoComMapaComSugestoesPorFixture(
 
     if (!response.ok()) {
         throw new Error(`Falha ao criar fixture de mapa com sugestões: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
+async function criarProcessoDiagnosticoPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de diagnóstico: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
+async function criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string,
+    servidorTitulo: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico-com-autoavaliacao-concluida', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30,
+            servidorTitulo
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de diagnóstico com autoavaliação: ${response.status()} ${await response.text()}`);
+    }
+    const processo = await response.json() as { codigo: number };
+    cleanup.registrar(processo.codigo);
+    return processo.codigo;
+}
+
+async function criarProcessoDiagnosticoComConsensoCriadoPorFixture(
+    request: APIRequestContext,
+    cleanup: ReturnType<typeof useProcessoCleanup>,
+    descricao: string,
+    unidadeSigla: string,
+    servidorTitulo: string
+): Promise<number> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico-com-consenso-criado', {
+        data: {
+            descricao,
+            unidadeSigla,
+            iniciar: true,
+            diasLimite: 30,
+            servidorTitulo
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(`Falha ao criar fixture de diagnóstico com consenso: ${response.status()} ${await response.text()}`);
     }
     const processo = await response.json() as { codigo: number };
     cleanup.registrar(processo.codigo);
@@ -1966,6 +2040,99 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 });
                 await page.keyboard.press('Escape');
             }
+        });
+    });
+
+    test.describe('15 - Diagnóstico de Competências', () => {
+        test('Captura dashboard do subprocesso de diagnóstico e autoavaliação do servidor', async ({page, request}) => {
+            await resetDatabase(request);
+            const unidadeAlvo = 'ASSESSORIA_12';
+            const servidorTitulo = '242426';
+            const descricao = `Proc diagnostico captura ${Date.now()}`;
+            const processoCodigo = await criarProcessoDiagnosticoPorFixture(request, cleanup, descricao, unidadeAlvo);
+
+            await login(page, servidorTitulo, 'senha');
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
+            await capturarTela(page, 'diagnostico', 'subprocesso-servidor', {
+                fullPage: true,
+                tags: ['diagnostico', 'dashboard', 'servidor']
+            });
+
+            await abrirCardDiagnostico(page, 'card-subprocesso-diagnostico', /\/diagnostico\/\d+\/ASSESSORIA_12\/autoavaliacao/);
+            await capturarTela(page, 'diagnostico', 'autoavaliacao-servidor', {
+                fullPage: true,
+                tags: ['diagnostico', 'autoavaliacao', 'servidor']
+            });
+
+            await cleanup.limpar(request);
+        });
+
+        test('Captura monitoramento e consenso pela chefia', async ({page, request}) => {
+            await resetDatabase(request);
+            const unidadeAlvo = 'ASSESSORIA_12';
+            const servidorTitulo = '242426';
+            const descricao = `Proc diagnostico monitoramento ${Date.now()}`;
+            const processoCodigo = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture(
+                request, cleanup, descricao, unidadeAlvo, servidorTitulo
+            );
+
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/diagnostico\/\d+\/ASSESSORIA_12\/monitoramento/);
+            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            await capturarTela(page, 'diagnostico', 'monitoramento-chefia', {
+                fullPage: true,
+                tags: ['diagnostico', 'monitoramento', 'chefia']
+            });
+
+            await page.getByTestId(`btn-manter-consenso-${servidorTitulo}`).click();
+            await capturarTela(page, 'diagnostico', 'consenso-chefia', {
+                fullPage: true,
+                tags: ['diagnostico', 'consenso', 'chefia']
+            });
+
+            await preencherConsensoMinimo(page, codSubprocesso, servidorTitulo);
+            await capturarTela(page, 'diagnostico', 'consenso-chefia-preenchido', {
+                fullPage: true,
+                tags: ['diagnostico', 'consenso', 'autosave']
+            });
+
+            await cleanup.limpar(request);
+        });
+
+        test('Captura consenso do servidor e situação de capacitação', async ({page, request}) => {
+            await resetDatabase(request);
+            const unidadeAlvo = 'ASSESSORIA_12';
+            const servidorTitulo = '242426';
+            const descricao = `Proc diagnostico consenso ${Date.now()}`;
+            const processoCodigo = await criarProcessoDiagnosticoComConsensoCriadoPorFixture(
+                request, cleanup, descricao, unidadeAlvo, servidorTitulo
+            );
+
+            await login(page, '242426', 'senha');
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await page.getByTestId('card-subprocesso-consenso').click();
+            await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${unidadeAlvo}/consenso/${servidorTitulo}`));
+            await capturarTela(page, 'diagnostico', 'consenso-servidor', {
+                fullPage: true,
+                tags: ['diagnostico', 'consenso', 'servidor']
+            });
+
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
+            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
+            await abrirCardDiagnostico(page, 'card-subprocesso-ocupacoes', /\/diagnostico\/\d+\/ASSESSORIA_12\/situacao-capacitacao/);
+            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            await capturarTela(page, 'diagnostico', 'situacao-capacitacao-chefia', {
+                fullPage: true,
+                tags: ['diagnostico', 'capacitacao', 'chefia']
+            });
+
+            await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
+            await capturarTela(page, 'diagnostico', 'situacao-capacitacao-preenchida', {
+                fullPage: true,
+                tags: ['diagnostico', 'capacitacao', 'autosave']
+            });
         });
     });
 });

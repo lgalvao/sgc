@@ -5,7 +5,8 @@ import * as ProcessoHelpers from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
-import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
+import {abrirCardDiagnostico, preencherAutoavaliacaoCompleta, preencherPrimeiraSituacaoCapacitacao} from './helpers/helpers-diagnostico.js';
+import {limparNotificacoes, navegarParaSubprocesso, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
@@ -43,14 +44,25 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         await homologarRevisaoAdmin(page);
     });
 
+    test('Fase 4: Diagnóstico de Competências', async ({page, request}) => {
+        await prepararDiagnosticoComAutoavaliacaoConcluida(request);
+        await consolidarDiagnosticoPelaChefia(page);
+    });
+
     const timestamp = Date.now();
     const descricaoMapeamento = `Mapeamento Ciclo Completo ${timestamp}`;
     const descricaoRevisao = `Revisão Ciclo Completo ${timestamp}`;
+    const descricaoDiagnostico = `Diagnóstico Ciclo Completo ${timestamp}`;
     const siglaUnidade = 'ASSESSORIA_11'; // Unidade alvo
+    const siglaUnidadeDiagnostico = 'ASSESSORIA_12';
+    let codigoProcessoDiagnostico = 0;
 
     const ADMIN = AuthHelpers.USUARIOS.ADMIN_1_PERFIL;
     const CHEFE = AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_11;
     const GESTOR = AuthHelpers.USUARIOS.GESTOR_SECRETARIA_1;
+    const CHEFE_DIAGNOSTICO = AuthHelpers.USUARIOS.CHEFE_ASSESSORIA_12;
+    const SERVIDOR_DIAGNOSTICO = {titulo: '242426', senha: 'senha'};
+    const SERVIDOR_IMPOSSIBILITADO = {titulo: '242427', senha: 'senha'};
 
     const validarAcessoRestritoNotificacoes = async (page: Page) => {
         await AuthHelpers.executarComo(page, CHEFE, async () => {
@@ -446,6 +458,59 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             const cardMapaHabilitado = page.getByTestId('card-subprocesso-mapa');
             const cardMapaDesabilitado = page.getByTestId('card-subprocesso-mapa-desabilitado');
             await expect(cardMapaHabilitado.or(cardMapaDesabilitado)).toBeVisible();
+        });
+        await expect(page).toHaveURL(/\/login/);
+    };
+
+    const prepararDiagnosticoComAutoavaliacaoConcluida = async (request: any) => {
+        const response = await request.post('/e2e/fixtures/processo-diagnostico-com-autoavaliacao-concluida', {
+            data: {
+                descricao: descricaoDiagnostico,
+                unidadeSigla: siglaUnidadeDiagnostico,
+                iniciar: true,
+                diasLimite: 30,
+                servidorTitulo: SERVIDOR_DIAGNOSTICO.titulo
+            }
+        });
+        expect(response.ok()).toBeTruthy();
+        const processo = await response.json() as {codigo: number};
+        codigoProcessoDiagnostico = processo.codigo;
+    };
+
+    const consolidarDiagnosticoPelaChefia = async (page: Page) => {
+        await AuthHelpers.executarComo(page, CHEFE_DIAGNOSTICO, async () => {
+            await page.goto(`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}(?:\\?.*)?$`));
+
+            await abrirCardDiagnostico(page, 'card-subprocesso-monitoramento', /\/diagnostico\/\d+\/ASSESSORIA_12\/monitoramento/);
+            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            await expect(page.getByText('Autoavaliação concluída')).toBeVisible();
+
+            await page.getByTestId(`btn-manter-consenso-${SERVIDOR_DIAGNOSTICO.titulo}`).click();
+            await expect(page.getByRole('heading', {name: /Avaliação de Consenso/i})).toBeVisible();
+            await page.getByTestId('btn-nav-voltar').click();
+            await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${siglaUnidadeDiagnostico}/monitoramento`));
+
+            await page.getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO.titulo}`).click();
+            await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante o período da rodada.');
+            await Promise.all([
+                page.waitForResponse(res =>
+                    res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/avaliacoes/${SERVIDOR_IMPOSSIBILITADO.titulo}/impossibilitar`)
+                    && res.ok()
+                ),
+                page.getByTestId('btn-confirmar-impossibilitar').click()
+            ]);
+            await expect(page.getByTestId('app-alert')).toContainText('Impossibilidade registrada');
+        });
+        await expect(page).toHaveURL(/\/login/);
+
+        await AuthHelpers.executarComo(page, CHEFE_DIAGNOSTICO, async () => {
+            await page.goto(`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}(?:\\?.*)?$`));
+            await abrirCardDiagnostico(page, 'card-subprocesso-ocupacoes', /\/diagnostico\/\d+\/ASSESSORIA_12\/situacao-capacitacao/);
+            const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+            await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
+            await expect(page.getByTestId('btn-concluir-diagnostico')).toBeVisible();
         });
         await expect(page).toHaveURL(/\/login/);
     };
