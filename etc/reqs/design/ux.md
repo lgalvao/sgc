@@ -59,6 +59,9 @@ específicos que funcionam melhor com tratamento próprio.
 - **Quebras automáticas**: Containers devem ser preparados para acomodar textos longos sem quebra de layout, utilizando `overflow-wrap: anywhere` e `word-break: break-word`.
 - **Layout flexível**: Priorizar o uso de larguras flexíveis e expansão vertical. Cards e blocos de conteúdo devem crescer conforme o volume de dados de domínio.
 - **Componentes BVN**: Sempre utilizar componentes da biblioteca `BootstrapVueNext` (ex: `BCard`, `BListGroup`, `BButton`) antes de recorrer a estilos manuais, garantindo que o comportamento responsivo e acessível da biblioteca seja preservado.
+- **Matrizes com muitos participantes**: Em grades do tipo `Competência x Servidor`, a primeira coluna deve privilegiar a leitura das competências e as colunas de participantes podem usar largura fixa e rolagem horizontal.
+- **Cabeçalhos abreviados em matriz**: Quando nomes completos de participantes forem longos demais para cabeçalhos de coluna, o cabeçalho pode usar nome abreviado. O nome completo deve permanecer acessível por tooltip ou mecanismo equivalente.
+- **Desambiguação secundária**: Quando a abreviação do nome não for suficiente para distinguir participantes, o identificador secundário do domínio pode aparecer em linha menor ou subtítulo discreto no cabeçalho, sem substituir o nome como referência principal.
 
 ## Backend e contratos
 

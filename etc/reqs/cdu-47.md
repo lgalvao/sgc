@@ -15,30 +15,31 @@ Ator: CHEFE
 
 3. O usuário clica no card `Situação de capacitação`.
 
-4. O sistema apresenta uma tabela contendo, para cada servidor participante da unidade e para cada
-   competência vigente da unidade, um campo editável `Situação de capacitação`, que admite os seguintes valores:
+4. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
+   - uma linha para cada competência vigente da unidade;
+   - uma coluna para cada servidor participante da unidade;
+   - uma célula editável (dropdown) `Situação de capacitação` para cada combinação competência/servidor.
+  4.1 Cada célula `Situação de capacitação` admite os seguintes valores:
    - `NA` (Não se aplica);
    - `AC` (A capacitar);
    - `EC` (Em capacitação);
    - `C`  (Capacitado);
    - `I`  (Instrutor).
+   4.2. Regras de apresentação:
+   - A primeira coluna da matriz deve identificar claramente a competência.
+   - As colunas de servidores devem usar nomes abreviados, por limitação de espaço horizontal.
+   - O nome completo do servidor deve continuar acessível na interface, por exemplo via 'tooltip' no cabeçalho.
+   - Quando necessário para evitar ambiguidade, o título eleitoral pode aparecer como informação secundária no cabeçalho do servidor.
+   - Exemplo de matriz, depois de preenchida com situações:
 
-- Exemplo de tabela, depois de preenchida com situações:
-
-     | Nome          | Competência | Situação de capacitação |
-     |:--------------| :---- | :---- |
-     | BOB MARLEY    | Desc. Competência 1 | NA \- Não se aplica |
-     |               | Desc. Competência 2 | I \- Instrutor |
-     |               | Desc. Competência 3 | Em capacitação |
-     | DAVID BOWIE   | Desc. Competência 1 | NA \- Não se aplica |
-     |               | Desc. Competência 2 | C \- Capacitado |
-     |               | Desc. Competência 3 | Em capacitação |
-     | ELVIS PRESLEY | Desc. Competência 1 | I \- Instrutor |
-     |               | Desc. Competência 2 | C \- Capacitado  |
-     |               | Desc. Competência 3 | Em capacitação |
+     | Competência           | BOB MARLEY        | DAVID BOWIE       | ELVIS PRESLEY     |
+     |:----------------------|:------------------|:------------------|:------------------|
+     | Desc. Competência 1   | NA \- Não se aplica | NA \- Não se aplica | I \- Instrutor    |
+     | Desc. Competência 2   | I \- Instrutor    | C \- Capacitado   | C \- Capacitado   |
+     | Desc. Competência 3   | EC \- Em capacitação | EC \- Em capacitação | EC \- Em capacitação |
    
-5. O usuário informa os valores para cada para competência/servidor.
+6. O usuário informa os valores para cada célula necessária da matriz.
 
-6. O sistema salva automaticamente cada alteração realizada.
+7. O sistema salva automaticamente cada alteração realizada.
 
-7. O usuário não precisa confirmar o cadastro de situações de capacitação de uma vez só, podendo retornar a esta tela em outro momento para finalizar. 
+8. O usuário não precisa confirmar o cadastro de situações de capacitação de uma vez só, podendo retornar a esta tela em outro momento para finalizar.

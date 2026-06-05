@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 public record OcupacaoCriticaDto(
         @NotNull Long competenciaCodigo,
         @NotBlank String servidorTitulo,
+        @Nullable String servidorNome,
         @Nullable String situacaoCapacitacao
 ) {
 }

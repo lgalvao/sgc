@@ -88,6 +88,7 @@ export interface ServidorDiagnostico {
 export interface OcupacaoCriticaItem {
     competenciaCodigo: number;
     servidorTitulo: string;
+    servidorNome?: string;
     situacaoCapacitacao: SituacaoCapacitacao | null;
 }
 
