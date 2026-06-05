@@ -86,8 +86,14 @@ describe("SubprocessoCards.vue", () => {
         };
     }
 
-    function createWrapper(props: InstanceType<typeof SubprocessoCards>["$props"], access: Partial<PermissoesSubprocesso> = {}) {
-        const pinia = createTestingPinia();
+    function createWrapper(
+        props: InstanceType<typeof SubprocessoCards>["$props"],
+        access: Partial<PermissoesSubprocesso> = {},
+        estadoInicial: Record<string, unknown> = {}
+    ) {
+        const pinia = createTestingPinia({
+            initialState: estadoInicial,
+        });
 
         vi.spyOn(useAcessoModule, 'useAcesso').mockReturnValue({
             podeEditarCadastro: ref(access.podeEditarCadastro ?? false),
@@ -281,6 +287,7 @@ describe("SubprocessoCards.vue", () => {
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(true);
+        expect(wrapper.findAll('[data-testid="card-subprocesso-consenso"]')).toHaveLength(1);
     });
 
     it("navega para diagnóstico", async () => {
@@ -313,6 +320,62 @@ describe("SubprocessoCards.vue", () => {
         pushMock.mockClear();
         await cardDiagnostico.trigger("keydown", {key: " "});
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({name: "AutoavaliacaoDiagnostico"}));
+    });
+
+    it("abre monitoramento ao clicar no card de consenso quando a chefia pode criar consenso", async () => {
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "ASSESSORIA_12",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: {
+                    ...criarPermissoes(),
+                    podeCriarConsenso: true,
+                } as any,
+            }),
+        });
+
+        await wrapper.find('[data-testid="card-subprocesso-consenso"]').trigger("click");
+
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
+            name: "MonitoramentoDiagnostico",
+            params: {codSubprocesso: 1, siglaUnidade: "ASSESSORIA_12"},
+        }));
+    });
+
+    it("abre consenso do servidor logado quando o usuário não pode criar consenso", async () => {
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "ASSESSORIA_12",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: {
+                    ...criarPermissoes(),
+                    podeCriarConsenso: false,
+                } as any,
+            }),
+        }, {}, {
+            perfil: {
+                usuarioCodigo: '242426',
+            }
+        });
+
+        await wrapper.find('[data-testid="card-subprocesso-consenso"]').trigger("click");
+
+        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
+            name: "ConsensoDiagnostico",
+            params: expect.objectContaining({
+                codSubprocesso: 1,
+                siglaUnidade: "ASSESSORIA_12",
+                servidorTitulo: '242426',
+            }),
+        }));
     });
 
     it("trata tecla Enter/Space nos cards", async () => {
