@@ -204,8 +204,8 @@ const props = defineProps<{
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const servidorTituloConsulta = computed(() =>
-  String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? '') ? undefined : props.servidorTitulo,
+const servidorEhUsuarioLogado = computed(() =>
+  String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? ''),
 );
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
@@ -222,12 +222,12 @@ const {
   erroAprovar,
   atualizarNotaDetalhada,
   aprovarConsenso,
-} = useConsensoDiagnostico(props.codSubprocesso, servidorTituloConsulta.value);
+} = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
 
 // « Perfil »
 const ehChefe = computed(() => podeCriarConsenso.value);
 const nomeServidorSubtitulo = computed(() =>
-  servidorTituloConsulta.value == null || String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? '')
+  servidorEhUsuarioLogado.value
     ? (perfilStore.usuarioNome ?? props.servidorTitulo)
     : props.servidorTitulo,
 );
