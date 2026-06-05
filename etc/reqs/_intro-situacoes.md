@@ -34,11 +34,9 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 
 ### Situações de subprocessos de Revisão
 
-- **Não iniciado**: Unidade foi notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de
-  atividades.
+- **Não iniciado**: Unidade foi notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de atividades.
 - **Revisão do cadastro em andamento**: Foi iniciada a revisão do cadastro de atividades da unidade.
-- **Revisão do cadastro disponibilizada**: Foi concluída a revisão do cadastro de atividades da unidade, aguardando
-  validação.
+- **Revisão do cadastro disponibilizada**: Foi concluída a revisão do cadastro de atividades da unidade, aguardando validação.
 - **Revisão do cadastro homologada**: Foi concluída a validação da revisão do cadastro de atividades da unidade.
 - **Mapa ajustado**: Perfil ADMIN criou o mapa ajustado para a unidade, mas ainda não o disponibilizou.
 - **Mapa disponibilizado**: Perfil ADMIN disponibilizou o mapa ajustado para validação.
@@ -57,12 +55,11 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 
 ### Situações de avaliações individuais de diagnóstico
 
-- **Autoavaliação não iniciada**: O servidor ainda não concluiu a sua autoavaliação.
-- **Autoavaliação concluída**: O servidor concluiu a autoavaliação e a chefia já pode elaborar o consenso.
-- **Consenso criado**: A chefia registrou uma avaliação de consenso para o servidor, que ainda aguarda aprovação final.
-- **Consenso aprovado**: O servidor aprovou a avaliação de consenso vigente.
-- **Avaliação impossibilitada**: A chefia registrou impossibilidade de realização da avaliação daquele servidor no ciclo
-  atual.
+- **Autoavaliação não iniciada**: Servidor ainda não concluiu sua autoavaliação.
+- **Autoavaliação concluída**: Servidor concluiu a autoavaliação e chefe já pode elaborar o consenso.
+- **Avaliação de consenso criada**: Chefe registrou uma avaliação de consenso para o servidor, a qual ainda aguarda aprovação final.
+- **Avaliação de consenso aprovada**: O servidor aprovou a avaliação de consenso vigente.
+- **Avaliação impossibilitada**: Chefe registrou impossibilidade de realização da avaliação daquele servidor no ciclo atual.
 
 ```mermaid
 ---

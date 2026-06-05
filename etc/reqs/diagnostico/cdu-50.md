@@ -2,42 +2,48 @@
 
 Ator: GESTOR, ADMIN
 
-Maturidade: Média
-
-Base principal: Fluxo narrado e validado na reunião, complementado por paralelismo com os fluxos hierárquicos já existentes.
-
 ## Pré-condições
 
-- Login realizado com perfil GESTOR ou ADMIN
-- Processo de diagnóstico em andamento
-- Subprocesso com situação 'Concluído' e localização atual na unidade do usuário; ou
-- Subprocesso com situação 'Homologado', para fins de consulta histórica do diagnóstico
+- Usuário logado com perfil GESTOR ou ADMIN
+- Processo de diagnóstico em andamento em uma unidade acessível ao usuário
+- Subprocesso com situação 'Concluído' e localização atual na unidade do usuário
 
 ## Fluxo principal
 
-1. Na tela `Detalhes do processo`, o usuário clica em uma unidade elegível.
+1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O sistema mostra a tela `Diagnóstico da unidade`.
+2. O sistema mostra a tela `Detalhes do processo` com uma tabela hierárquica contendo as unidades participantes do processo. Para cada unidade, mostra:
+   - sigla da unidade
+   - nome de unidade;
+   - situação atual do subprocesso da unidade;
+   - localização atual do subprocesso da unidade.
 
-3. O sistema apresenta:
+   3.1. Para o perfil GESTOR, a tabela hierarquica deve se limitar à própria unidade do usuário e às unidades subordinadas a ela, recursivamente.
+
+   3.2. Para o perfil ADMIN, a árvore exibida deve incluir todas as unidades participantes do processo.
+
+4. O usuário clica em uma unidade na tabela
+
+[PENDENCIA: a visão vai ser igual à do chefe, ou seria uma visão de resumo especial para facilita a analise?]
+5. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, com:
    - dados gerais da unidade;
-   - histórico de movimentações do subprocesso;
    - lista dos servidores da unidade e suas situações individuais;
    - avaliação de consenso vigente de cada servidor;
    - informações de ocupações críticas.
+   - histórico de movimentações do subprocesso;
 
-4. Para perfis superiores na hierarquia, o sistema apresenta apenas os dados do consenso vigente de cada servidor, e não os valores brutos da autoavaliação original.
+6. Para perfis superiores na hierarquia, o sistema apresenta apenas os dados do consenso vigente de cada servidor, e não os valores brutos da autoavaliação original.
 
-5. O sistema exibe os botões:
+7. O sistema exibe os botões:
    - `Histórico de análise`;
    - `Devolver para ajustes`;
    - `Registrar aceite`, para o perfil GESTOR;
    - `Homologar`, para o perfil ADMIN.
 
-6. Se o usuário clicar em `Histórico de análise`, o sistema mostra, em modal, os registros prévios de análise do
+8. Se o usuário clicar em `Histórico de análise`, o sistema mostra, em modal, os registros prévios de análise do
    subprocesso, contendo data/hora, unidade, resultado e observação.
 
-7. Se o usuário optar por `Devolver para ajustes`:
+9. Se o usuário optar por `Devolver para ajustes`:
 
    7.1. O sistema abre modal com:
    - título `Devolver diagnóstico`;
