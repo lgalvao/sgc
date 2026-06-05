@@ -5,8 +5,8 @@ import * as ProcessoHelpers from './helpers/helpers-processos.js';
 import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
-import {abrirCardDiagnostico, preencherAutoavaliacaoCompleta, preencherPrimeiraSituacaoCapacitacao} from './helpers/helpers-diagnostico.js';
-import {limparNotificacoes, navegarParaSubprocesso, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
+import {abrirCardDiagnostico, preencherPrimeiraSituacaoCapacitacao} from './helpers/helpers-diagnostico.js';
+import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {

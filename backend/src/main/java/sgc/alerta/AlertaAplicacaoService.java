@@ -177,7 +177,6 @@ public class AlertaAplicacaoService {
         }
 
         for (Long cod : codsIntermediarias) {
-            if (codsOperacionais.contains(cod)) continue;
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
             if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && "ADMIN".equalsIgnoreCase(unidadeDestino.getSigla())) continue;
             alertasCriados.add(criarAlertaEntidade(processo, unidadeRaiz(),
