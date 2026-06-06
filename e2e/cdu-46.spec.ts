@@ -45,7 +45,7 @@ test.describe('CDU-46 - Indicar impossibilidade de avaliação', () => {
         ]);
 
         await expect(page.getByTestId('app-alert')).toContainText('Impossibilidade registrada');
-        await expect(page.getByText('Avaliação impossibilitada')).toBeVisible();
+        await expect(page.getByText('Avaliação impossibilitada', {exact: true})).toBeVisible();
         await expect(page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeDisabled();
     });
 });

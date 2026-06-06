@@ -371,12 +371,12 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await esperarPaginaDetalhesProcesso(page);
         await navegarParaSubprocesso(page, 'ASSESSORIA_12');
 
-        await expect(page.getByTestId('card-subprocesso-diagnostico')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-diagnostico')).toContainText('Autoavaliação');
-        await expect(page.getByTestId('card-subprocesso-ocupacoes')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-ocupacoes')).toContainText('Situação de capacitação');
-        await expect(page.getByTestId('card-subprocesso-monitoramento')).toBeVisible();
-        await expect(page.getByTestId('card-subprocesso-monitoramento')).toContainText('Monitoramento');
+        await expect(page.getByTestId('card-subprocesso-diagnostico')).toHaveCount(0);
+        await expect(page.getByTestId('card-subprocesso-ocupacoes')).toHaveCount(0);
+        await expect(page.getByTestId('card-subprocesso-monitoramento')).toHaveCount(0);
+        await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
+        await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
+        await expect(page.getByRole('columnheader', {name: 'Ações'})).toHaveCount(0);
     });
 
     test('Regressão - cache de sessão no subprocesso: deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA', async ({

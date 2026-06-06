@@ -754,7 +754,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
                 ),
                 page.getByTestId('btn-confirmar-impossibilitar').click()
             ]);
-            await expect(page.getByText('Avaliação impossibilitada')).toBeVisible();
+            await expect(page.getByText('Avaliação impossibilitada', {exact: true})).toBeVisible();
         });
 
         await test.step('CHEFE registra situação de capacitação no mesmo subprocesso de diagnóstico', async () => {
