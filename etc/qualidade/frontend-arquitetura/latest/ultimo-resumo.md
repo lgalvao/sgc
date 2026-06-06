@@ -1,50 +1,85 @@
 # Auditoria Arquitetural do Frontend
 
-- Score total: **0** (excelente)
-- Arquivos de producao: **263**
+- Score total: **58** (critico)
+- Arquivos de producao: **282**
 - Views com vazamento de estrategia de cache: **0**
 - Views com chamadas diretas a service: **0**
 - Views com server state caseiro: **0**
-- Views com fan-out arquitetural alto: **0**
+- Views com fan-out arquitetural alto: **1**
 - Acessos diretos a cache de store: **0**
 - Chamadas com booleano posicional: **0**
 - Bolsas de dependencias/estado largas: **0**
-- Superficies exportadas amplas: **4**
+- Superficies exportadas amplas: **8**
 - Arquivos com mistura de camadas arquiteturais: **0**
 - Arquivos com server state caseiro: **0**
 - Hubs centrais com sinais: **0**
 - Fachadas puras (composables sem lógica): **0**
-- Composables minúsculos (< 30L): **0**
-- Famílias pulverizadas (>= 4 membros): **4**
+- Composables minúsculos (< 30L): **1**
+- Famílias pulverizadas (>= 4 membros): **5**
 
 ## Hotspots
 
-Nenhum hotspot arquitetural detectado.
+1. `frontend/src/composables/useFluxoDiagnostico.ts` [composable]
+   - score: 15
+   - sinais: invalidacaoExplicita
+   - fan-out: 2 categorias / 2 imports arquiteturais
+2. `frontend/src/composables/useConsensoDiagnostico.ts` [composable]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 3 categorias / 3 imports arquiteturais
+3. `frontend/src/composables/useAutoavaliacaoDiagnostico.ts` [composable]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 3 categorias / 3 imports arquiteturais
+4. `frontend/src/composables/useOcupacoesCriticasDiagnostico.ts` [composable]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 3 categorias / 3 imports arquiteturais
+5. `frontend/src/composables/useMonitoramentoDiagnostico.ts` [composable]
+   - score: 9
+   - sinais: superficieAmpla
+   - fan-out: 3 categorias / 3 imports arquiteturais
+6. `frontend/src/views/AutoavaliacaoDiagnosticoView.vue` [view]
+   - score: 6
+   - sinais: fanoutAlto
+   - fan-out: 1 categorias / 6 imports arquiteturais
+7. `frontend/src/composables/useDiagnosticoPermissoes.ts` [composable]
+   - score: 1
+   - sinais: arquivoMinusculo
+   - fan-out: 2 categorias / 2 imports arquiteturais
 
 ## Famílias de composables pulverizadas
 
-### Fluxo (5 arquivos, 424 linhas)
+### Fluxo (6 arquivos, 518 linhas)
 - `frontend/src/composables/useFluxoAdministrativoSubprocesso.ts`
 - `frontend/src/composables/useFluxoCadastroSubprocesso.ts`
+- `frontend/src/composables/useFluxoDiagnostico.ts`
 - `frontend/src/composables/useFluxoMapa.ts`
 - `frontend/src/composables/useFluxoSubprocesso.ts`
 - `frontend/src/composables/useFluxoSubprocessoExecucao.ts`
 
-### Mapa (5 arquivos, 954 linhas)
+### Diagnostico (5 arquivos, 320 linhas)
+- `frontend/src/composables/useDiagnosticoCache.ts`
+- `frontend/src/composables/useDiagnosticoContexto.ts`
+- `frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts`
+- `frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts`
+- `frontend/src/composables/useDiagnosticoPermissoes.ts`
+
+### Mapa (5 arquivos, 955 linhas)
 - `frontend/src/composables/useMapaCompetenciasMutacoes.ts`
 - `frontend/src/composables/useMapaOrquestracao.ts`
 - `frontend/src/composables/useMapaQuery.ts`
 - `frontend/src/composables/useMapaSugestoes.ts`
 - `frontend/src/composables/useMapaTela.ts`
 
-### Processo (5 arquivos, 582 linhas)
+### Processo (5 arquivos, 601 linhas)
 - `frontend/src/composables/useProcessoCadastroCarga.ts`
 - `frontend/src/composables/useProcessoCadastroTela.ts`
 - `frontend/src/composables/useProcessoForm.ts`
 - `frontend/src/composables/useProcessoMutacoes.ts`
 - `frontend/src/composables/useProcessoQuery.ts`
 
-### Cadastro (4 arquivos, 909 linhas)
+### Cadastro (4 arquivos, 918 linhas)
 - `frontend/src/composables/useCadastroAtividadesMutacoes.ts`
 - `frontend/src/composables/useCadastroOrquestracao.ts`
 - `frontend/src/composables/useCadastroRevisaoSemMudancas.ts`

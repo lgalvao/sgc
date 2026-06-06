@@ -265,8 +265,6 @@
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
-import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
-import {impossibilitarAvaliacao} from '@/services/diagnosticoService';
 import {
   BBadge,
   BButton,
@@ -298,7 +296,6 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
-const cacheDiagnostico = useCacheDiagnostico();
 const {
   podeCriarConsenso,
   habilitarConcluirDiagnostico,
@@ -312,6 +309,7 @@ const {
   validando,
   devolvendo,
   homologando,
+  impossibilitando,
   erroConcluir,
   erroValidar,
   erroDevolver,
@@ -320,6 +318,7 @@ const {
   validarDiagnostico,
   devolverDiagnostico,
   homologarDiagnostico,
+  impossibilitarAvaliacao,
 } = useFluxoDiagnostico(props.codSubprocesso);
 
 const erroMensagem = ref('');
@@ -336,7 +335,6 @@ const observacoesHomologar = ref('');
 const servidorSelecionado = ref<ServidorDiagnostico | null>(null);
 const justificativaImpossibilidade = ref('');
 const erroJustificativaImpossibilidade = ref('');
-const impossibilitando = ref(false);
 
 const ehChefe = computed(() => podeCriarConsenso.value);
 const podeConcluir = computed(() => habilitarConcluirDiagnostico.value);
@@ -382,19 +380,14 @@ async function confirmarImpossibilitar() {
   }
   if (!servidorSelecionado.value) return;
   try {
-    impossibilitando.value = true;
     await impossibilitarAvaliacao(
-      props.codSubprocesso,
       servidorSelecionado.value.servidorTitulo,
-      {justificativa: justificativaImpossibilidade.value},
+      justificativaImpossibilidade.value,
     );
     modalImpossibilitarAberto.value = false;
     alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
-    cacheDiagnostico.invalidarUnidade(props.codSubprocesso);
   } catch {
     erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
-  } finally {
-    impossibilitando.value = false;
   }
 }
 

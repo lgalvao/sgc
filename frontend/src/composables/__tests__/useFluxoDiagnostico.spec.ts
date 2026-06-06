@@ -55,6 +55,7 @@ vi.mock('@/services/diagnosticoService', () => ({
     validarDiagnostico: vi.fn(),
     devolverDiagnostico: vi.fn(),
     homologarDiagnostico: vi.fn(),
+    impossibilitarAvaliacao: vi.fn(),
 }));
 
 describe('useFluxoDiagnostico', () => {
@@ -96,6 +97,25 @@ describe('useFluxoDiagnostico', () => {
         expect(diagnosticoService.validarDiagnostico).toHaveBeenCalledWith(42, {texto: 'Observação'});
         expect(diagnosticoService.devolverDiagnostico).toHaveBeenCalledWith(42, {justificativa: 'Justificativa'});
         expect(diagnosticoService.homologarDiagnostico).toHaveBeenCalledWith(42, {texto: 'Homologado'});
+    });
+
+    it('deve impossibilitar avaliação e invalidar equipe e unidade', async () => {
+        vi.mocked(diagnosticoService.impossibilitarAvaliacao).mockResolvedValue();
+        const composable = useFluxoDiagnostico(44);
+
+        await composable.impossibilitarAvaliacao('242426', 'Servidor afastado.');
+
+        expect(diagnosticoService.impossibilitarAvaliacao).toHaveBeenCalledWith(44, '242426', {
+            justificativa: 'Servidor afastado.',
+        });
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'equipe', '151515', 'CHEFE', '12', 44],
+            exact: true,
+        });
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({
+            key: ['diagnostico-competencias', 'unidade', '151515', 'CHEFE', '12', 44],
+            exact: true,
+        });
     });
 
     it('deve navegar de volta para o subprocesso', () => {

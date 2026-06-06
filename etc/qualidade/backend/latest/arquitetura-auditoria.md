@@ -1,13 +1,13 @@
 # Auditoria de arquitetura do backend
 
-Gerado em: 2026-06-01T01:29:10.090Z
+Gerado em: 2026-06-06T12:15:24.522Z
 
 ## Resumo
 
-- Analisados: 57
-- Críticos: 3
+- Analisados: 67
+- Críticos: 5
 - Alertas: 6
-- OK: 48
+- OK: 56
 
 ## Limites
 
@@ -21,15 +21,17 @@ Gerado em: 2026-06-01T01:29:10.090Z
 
 | Arquivo | Tipo | Linhas | Métodos | Dependências | Severidade | Motivos |
 |---------|------|--------|---------|--------------|-----------|---------|
-| `ProcessoService.java` | service | 1290 | 21 | 18 | 🔴 crítico | 1290 linhas (>=700); 21 métodos públicos (>=15); 18 dependências (>=12) |
+| `ProcessoService.java` | service | 1301 | 21 | 20 | 🔴 crítico | 1301 linhas (>=700); 21 métodos públicos (>=15); 20 dependências (>=12) |
+| `E2eController.java` | controller | 843 | 22 | 12 | 🔴 crítico | 843 linhas (>=700); 22 métodos públicos (>=15); 12 dependências (>=12) |
 | `SubprocessoTransicaoService.java` | service | 592 | 17 | 13 | 🔴 crítico | 592 linhas (>=400); 17 métodos públicos (>=15); 13 dependências (>=12) |
-| `SubprocessoController.java` | controller | 479 | 54 | 8 | 🔴 crítico | 479 linhas (>=400); 54 métodos públicos (>=25); 8 dependências (>=8) |
-| `RelatorioFacade.java` | facade | 801 | 10 | 9 | 🟡 alerta | 801 linhas (>=700); 9 dependências (>=8) |
-| `E2eController.java` | controller | 641 | 16 | 9 | 🟡 alerta | 641 linhas (>=400); 16 métodos públicos (>=15); 9 dependências (>=8) |
-| `SubprocessoService.java` | service | 470 | 15 | 11 | 🟡 alerta | 470 linhas (>=400); 15 métodos públicos (>=15); 11 dependências (>=8) |
+| `SubprocessoService.java` | service | 473 | 15 | 12 | 🔴 crítico | 473 linhas (>=400); 15 métodos públicos (>=15); 12 dependências (>=12) |
+| `SubprocessoController.java` | controller | 438 | 54 | 10 | 🔴 crítico | 438 linhas (>=400); 54 métodos públicos (>=25); 10 dependências (>=8) |
+| `RelatorioService.java` | service | 803 | 10 | 9 | 🟡 alerta | 803 linhas (>=700); 9 dependências (>=8) |
 | `CadastroFluxoService.java` | service | 356 | 13 | 12 | 🟡 alerta | 12 dependências (>=12) |
+| `ResponsavelUnidadeService.java` | service | 316 | 13 | 12 | 🟡 alerta | 12 dependências (>=12) |
 | `MapaManutencaoService.java` | service | 297 | 40 | 6 | 🟡 alerta | 40 métodos públicos (>=25) |
-| `SubprocessoConsultaService.java` | service | 219 | 41 | 7 | 🟡 alerta | 41 métodos públicos (>=25) |
+| `SubprocessoConsultaService.java` | service | 224 | 42 | 9 | 🟡 alerta | 42 métodos públicos (>=25); 9 dependências (>=8) |
+| `DiagnosticoFluxoService.java` | service | 215 | 5 | 13 | 🟡 alerta | 13 dependências (>=12) |
 
 ## Por que isso importa
 
@@ -41,5 +43,5 @@ Classes com muitas linhas, métodos e dependências são hubs de complexidade:
 
 ## Primeiro corte sugerido
 
-Começar por `ProcessoService.java` (1290 linhas (>=700), 21 métodos públicos (>=15), 18 dependências (>=12)).
+Começar por `ProcessoService.java` (1301 linhas (>=700), 21 métodos públicos (>=15), 20 dependências (>=12)).
 Identificar os casos de uso reais e separar por responsabilidade concreta (consulta, mutação, workflow, notificação).

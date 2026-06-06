@@ -287,12 +287,11 @@ import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
-import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {useEquipeDiagnostico} from '@/composables/useEquipeDiagnostico';
-import {impossibilitarAvaliacao} from '@/services/diagnosticoService';
+import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
 import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
@@ -303,7 +302,6 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const cacheDiagnostico = useCacheDiagnostico();
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {queryContextoEdicao, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
@@ -324,6 +322,7 @@ const {
   erroAprovar,
   aprovarConsenso,
 } = useConsensoDiagnostico(props.codSubprocesso);
+const {impossibilitando, impossibilitarAvaliacao} = useFluxoDiagnostico(props.codSubprocesso);
 
 const {itens: itensEquipe, pendentes} = useEquipeDiagnostico(props.codSubprocesso);
 
@@ -348,7 +347,6 @@ const detalhesCompetenciaAbertos = ref<Record<number, boolean>>({});
 const servidorParaImpossibilitar = ref<ItemEquipeDiagnostico | null>(null);
 const justificativaImpossibilidade = ref('');
 const erroJustificativa = ref('');
-const impossibilitando = ref(false);
 
 function abrirModalConcluir() {
   modalConcluirAberto.value = true;
@@ -395,20 +393,14 @@ async function confirmarImpossibilitar() {
   if (!servidorParaImpossibilitar.value) return;
 
   try {
-    impossibilitando.value = true;
     await impossibilitarAvaliacao(
-      props.codSubprocesso,
       servidorParaImpossibilitar.value.servidorTitulo,
-      {justificativa: justificativaImpossibilidade.value},
+      justificativaImpossibilidade.value,
     );
     fecharModalImpossibilitar();
     alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
-    cacheDiagnostico.invalidarEquipe(props.codSubprocesso);
-    cacheDiagnostico.invalidarUnidade(props.codSubprocesso);
   } catch {
     erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
-  } finally {
-    impossibilitando.value = false;
   }
 }
 
