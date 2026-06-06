@@ -27,7 +27,6 @@ config.global.stubs["b-modal"] = {
     props: ["modelValue"],
     template: `
     <div v-if="modelValue">
-      <button data-testid="btn-fechar-modal" @click="$emit('update:modelValue', false)">X</button>
       <slot />
       <slot name="footer" />
     </div>

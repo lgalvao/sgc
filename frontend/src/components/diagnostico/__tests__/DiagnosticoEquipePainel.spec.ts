@@ -39,7 +39,7 @@ vi.mock('vue-router', () => ({
     }),
 }));
 
-vi.mock('@/utils/apiError', () => ({
+vi.mock('@/utils/apiError/normalizer', () => ({
     normalizarErro: vi.fn((err) => {
         if (err && typeof err === 'object' && 'response' in err && (err.response as any)?.data?.message) {
             return { mensagem: (err.response as any).data.message };
@@ -141,14 +141,15 @@ describe('DiagnosticoEquipePainel', () => {
                         emits: ['update:modelValue'],
                         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                     },
-                    BModal: {
+                    'b-modal': {
                         props: ['modelValue'],
                         emits: ['update:modelValue'],
                         template: `
-                          <div v-if="modelValue">
-                            <button data-testid="btn-fechar-modal" @click="$emit('update:modelValue', false)">X</button>
-                            <slot />
-                            <slot name="footer" />
+                          <div class="b-modal-stub">
+                            <template v-if="modelValue">
+                              <slot />
+                              <slot name="footer" />
+                            </template>
                           </div>
                         `,
                     },
@@ -342,7 +343,7 @@ describe('DiagnosticoEquipePainel', () => {
         // 1. Concluir sem mensagem de erro
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-concluir-diagnostico"]').trigger('click');
-        expect(wrapper.text()).toContain('Erro desconhecido ou não mapeado pela aplicação.');
+        expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
 
         // 2. Validar com observacoes vazias e erro sem mensagem
         await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
@@ -411,18 +412,18 @@ describe('DiagnosticoEquipePainel', () => {
 
     it('cobre o fechamento dos modais de fluxo pelo evento update:modelValue', async () => {
         const wrapper = montar();
+        const modals = wrapper.findAllComponents('.b-modal-stub');
 
         // 1. Modal Impossibilitar
         await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
         await nextTick();
-        expect(wrapper.find('[data-testid="btn-fechar-modal"]').exists()).toBe(true);
-        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await modals[0].vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 2. Modal Concluir
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
         await nextTick();
-        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await modals[1].vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 3. Modal Validar
@@ -430,7 +431,7 @@ describe('DiagnosticoEquipePainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
         await nextTick();
-        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await modals[2].vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 4. Modal Devolver
@@ -438,7 +439,7 @@ describe('DiagnosticoEquipePainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         await nextTick();
-        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await modals[3].vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 5. Modal Homologar
@@ -446,7 +447,7 @@ describe('DiagnosticoEquipePainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await nextTick();
-        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await modals[4].vm.$emit('update:modelValue', false);
         await nextTick();
     });
 
@@ -527,8 +528,8 @@ describe('DiagnosticoEquipePainel', () => {
     it('exercita o retorno antecipado de confirmarImpossibilitar quando servidorSelecionado for null', async () => {
         const wrapper = montar();
 
-        // Encontra o stub do modal pelo nome de registro (b-modal)
-        const modals = wrapper.findAllComponents({ name: 'b-modal' });
+        // Encontra o stub do modal pelo class selector .b-modal-stub
+        const modals = wrapper.findAllComponents('.b-modal-stub');
         const modalImpossibilitar = modals[0];
         await modalImpossibilitar.vm.$emit('update:modelValue', true);
         await nextTick();

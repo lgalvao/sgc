@@ -270,4 +270,102 @@ describe("useCadastroTela", () => {
         });
     });
 
+    describe("Casos Adicionais para Cobertura de Branches e Funções", () => {
+        it("exercita computed properties e hooks auxiliares da tela de cadastro", async () => {
+            perfilState.perfilSelecionado = "CHEFE";
+            subprocessoState.contextoCadastro = {
+                detalhes: {
+                    tipoProcesso: TipoProcesso.MAPEAMENTO,
+                    situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO,
+                    permissoes: {
+                        podeEditarCadastro: true,
+                        habilitarEditarCadastro: false,
+                        podeAceitarCadastro: true,
+                        habilitarAceitarCadastro: true,
+                    },
+                },
+            } as any;
+
+            const [tela, app] = withSetup(() => useCadastroTela(defaultProps));
+
+            // 1. Esconder edicao para chefe
+            expect(tela.esconderEdicaoCadastroParaChefe.value).toBe(true);
+
+            // 2. Ordenação de atividades
+            tela.atividades.value = [
+                { codigo: 1, conhecimentos: [] },
+                { codigo: 3, conhecimentos: [] },
+                { codigo: 2, conhecimentos: [] },
+            ] as any;
+            expect(tela.atividadesOrdenadas.value[0].codigo).toBe(3);
+            expect(tela.atividadesOrdenadas.value[1].codigo).toBe(2);
+            expect(tela.atividadesOrdenadas.value[2].codigo).toBe(1);
+
+            // 3. mapaErros computed, obterErroParaAtividade e limparErrosValidacao
+            tela.errosValidacao.value = [
+                { atividadeCodigo: 1, mensagem: "Erro Atividade 1" },
+                { atividadeCodigo: 2, mensagem: "Erro Atividade 2" },
+            ];
+            expect(tela.obterErroParaAtividade(1)).toBe("Erro Atividade 1");
+
+            // 4. Watches e reset de erroNovaAtividade
+            tela.novaAtividade.value = "Nova Atividade";
+            tela.erroNovaAtividade.value = new Error("Erro");
+            tela.novaAtividade.value = "Atividade Editada"; // Dispara watch
+            await nextTick();
+            expect(tela.erroNovaAtividade.value).toBeNull();
+
+            // Modifica assinatura para limpar erros
+            tela.atividades.value = [{ codigo: 1, conhecimentos: [{}] }] as any;
+            await nextTick();
+            expect(tela.errosValidacao.value).toHaveLength(0);
+
+            // 5. Importação de atividades
+            await tela.aoImportarAtividades({ aviso: true } as any);
+            expect(tela.mostrarModalImportar.value).toBe(false);
+
+            await tela.aoImportarAtividades({ aviso: false } as any);
+            expect(tela.mostrarModalImportar.value).toBe(false);
+
+            // 6. adicionarNovaAtividade
+            await tela.adicionarNovaAtividade();
+
+            // 7. setAtividadeRef e scrollParaPrimeiroErro
+            const dummyEl = document.createElement("div");
+            tela.setAtividadeRef(1, dummyEl);
+            tela.errosValidacao.value = [{ atividadeCodigo: 1, mensagem: "Erro Scroll" }];
+            tela.scrollParaPrimeiroErro();
+
+            // 8. erroGlobalFormatado e erroFluxoCadastro com erro de validação
+            fluxoSubprocessoMock.ultimoErro.value = {
+                tipo: "validacao",
+                mensagem: "Erro validação fluxo",
+                erros: [{ campo: "justificativa", mensagem: "Erro justificativa" }]
+            } as any;
+            expect(tela.erroFluxoCadastro.value).toBeUndefined();
+            expect(tela.mensagemErroObservacaoDevolucao.value).toBe("Erro justificativa");
+
+            // erroFluxoCadastro sem ser erro de validação
+            fluxoSubprocessoMock.ultimoErro.value = {
+                tipo: "outro",
+                mensagem: "Erro genérico",
+            } as any;
+            expect(tela.erroFluxoCadastro.value).toBe("Erro genérico");
+
+            // erroGlobalFormatado
+            tela.erroGlobal.value = "Erro Global";
+            expect(tela.erroGlobalFormatado.value).toEqual({ mensagem: "Erro Global" });
+
+            // 9. ValidarLocalmente com revisão e sem alteração
+            subprocessoState.contextoCadastro.detalhes.tipoProcesso = TipoProcesso.REVISAO;
+            subprocessoState.contextoCadastro.detalhes.situacao = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
+            orquestracaoMock.atividadesSnapshotInicial.value = "ASSINATURA_MOCK";
+            tela.atividades.value = [];
+            await nextTick();
+            await tela.disponibilizarCadastro();
+            expect(tela.errosValidacao.value[0].mensagem).toContain("incompleto");
+
+            app.unmount();
+        });
+    });
 });
