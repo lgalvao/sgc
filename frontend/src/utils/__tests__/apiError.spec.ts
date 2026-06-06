@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {deveNotificarGlobalmente, ehErroAxios, normalizarErro} from '@/utils/apiError';
+import {extrairErrosGenericos} from '@/utils/apiError/helpers';
 import logger from '@/utils/logger';
 
 describe('apiError utils', () => {
@@ -136,5 +137,50 @@ describe('apiError utils', () => {
         expect(deveNotificarGlobalmente({tipo: 'validacao'} as any)).toBe(false);
         expect(deveNotificarGlobalmente({tipo: 'rede'} as any)).toBe(true);
         expect(deveNotificarGlobalmente({tipo: 'proibido'} as any)).toBe(false);
+    });
+
+    describe('extrairErrosGenericos', () => {
+        it('deve retornar vazio se não houver erros', () => {
+            expect(extrairErrosGenericos({} as any)).toEqual([]);
+        });
+
+        it('deve retornar apenas erros globais e sem campo especifico', () => {
+            const err = {
+                erros: [
+                    {campo: 'nome', mensagem: 'Invalido'},
+                    {mensagem: 'Erro global'},
+                    {campo: null, mensagem: 'Outro erro'},
+                    {campo: undefined, mensagem: ''}
+                ]
+            } as any;
+            expect(extrairErrosGenericos(err)).toEqual(['Erro global', 'Outro erro']);
+        });
+    });
+
+    describe('branches restantes no normalizer', () => {
+        it('deve normalizar Error sem message', () => {
+            const err = new Error();
+            err.message = ''; // simular sem message
+            const normalized = normalizarErro(err);
+            expect(normalized.mensagem).toBe('Erro inesperado.');
+        });
+
+        it('deve normalizar Erro com data null', () => {
+            const err = {
+                isAxiosError: true,
+                response: {
+                    status: 400,
+                    data: null,
+                }
+            };
+            const normalized = normalizarErro(err);
+            expect(normalized.tipo).toBe('validacao');
+            expect(normalized.mensagem).toBe('Erro 400: O servidor não retornou uma mensagem detalhada.');
+        });
+        
+        it('deve testar typeof erro === number', () => {
+            const normalized = normalizarErro(123);
+            expect(normalized.mensagem).toBe('Erro desconhecido ou não mapeado pela aplicação.');
+        });
     });
 });

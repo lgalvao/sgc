@@ -34,5 +34,27 @@ describe('logger', () => {
             // Como estamos rodando em VITEST, ele deve retornar 1 (test)
             expect(getLogLevel()).toBe(1);
         });
+
+        it('deve cair nos fallbacks do process.env e development quando import.meta não possuir MODE', () => {
+            const importMetaComEnv = import.meta as any;
+            const originalMode = importMetaComEnv.env?.MODE;
+            if (importMetaComEnv.env) {
+                importMetaComEnv.env.MODE = '';
+            }
+
+            // Fallback 1: process.env.VITEST
+            expect(getLogLevel()).toBe(1);
+
+            // Fallback 2: "development"
+            const originalVitest = process.env.VITEST;
+            delete process.env.VITEST;
+            expect(getLogLevel()).toBe(4);
+
+            // Restaura
+            if (importMetaComEnv.env) {
+                importMetaComEnv.env.MODE = originalMode;
+            }
+            process.env.VITEST = originalVitest;
+        });
     });
 });

@@ -126,6 +126,18 @@ describe("subprocesso store (cache e dedupe)", () => {
             await store.obterContextoCadastroAtividadesPorProcessoEUnidade(1, "UNIDADE");
             expect(subprocessoService.buscarContextoCadastroAtividades).toHaveBeenCalledWith(10);
         });
+
+        it("deve limpar contexto atual caso recarregar (limparAntes) seja true", async () => {
+            const store = useSubprocessoStore();
+            store.contextoEdicao = {detalhes: {codigo: 11, situacao: "ANTIGO"}} as any;
+            const mockMapa = {detalhes: {codigo: 10, situacao: "NOVO"}, mapa: {}};
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(mockMapa as any);
+
+            // Passando `true` como segundo argumento (recarregar)
+            await store.obterContextoEdicao(10, true);
+
+            expect(store.contextoEdicao).toEqual(mockMapa);
+        });
     });
 
     describe("atualização de status", () => {
@@ -234,6 +246,15 @@ describe("subprocesso store (cache e dedupe)", () => {
             await store.obterContextoEdicao(10);
 
             expect(store.erroIntegracaoContexto?.mensagem).toBe("Erro genérico");
+        });
+
+        it("deve fazer parse de erro string caso seja JSON invalido e retornar a propria string", async () => {
+            const store = useSubprocessoStore();
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockRejectedValue("Erro texto puro sem json");
+
+            await store.obterContextoEdicao(10);
+
+            expect(store.erroIntegracaoContexto?.mensagem).toBe("Erro desconhecido ou não mapeado pela aplicação.");
         });
 
         it("deve limpar erro de integração", () => {
