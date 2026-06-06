@@ -253,4 +253,47 @@ describe('DiagnosticoEquipePainel', () => {
         expect(homologarDiagnosticoMock).toHaveBeenCalledWith('Homologado');
         expect(wrapper.text()).toContain('Diagnóstico homologado');
     });
+
+    it('oculta ações e ajusta colunas se não for chefe', () => {
+        podeCriarConsenso.value = false;
+        const wrapper = montar();
+
+        expect(wrapper.find('[data-testid="dropdown-acoes-242426"]').exists()).toBe(false);
+    });
+
+    it('exibe erro caso as ações falhem', async () => {
+        habilitarConcluirDiagnostico.value = false;
+        habilitarValidarDiagnostico.value = true;
+        habilitarDevolverDiagnostico.value = true;
+        habilitarHomologarDiagnostico.value = true;
+
+        impossibilitarAvaliacaoMock.mockRejectedValue(new Error('Erro de rede'));
+        validarDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
+        devolverDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
+        homologarDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
+
+        const wrapper = montar();
+
+        // 1. Falha ao impossibilitar
+        await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
+        await wrapper.get('textarea').setValue('Servidor afastado.');
+        await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
+        expect(wrapper.text()).toContain('Não foi possível salvar.');
+
+        // 2. Falha ao validar
+        await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-validar"]').trigger('click');
+        expect(wrapper.text()).toContain('Não foi possível salvar.');
+
+        // 3. Falha ao devolver
+        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await wrapper.get('textarea').setValue('Justificativa');
+        await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
+        expect(wrapper.text()).toContain('Não foi possível salvar.');
+
+        // 4. Falha ao homologar
+        await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
+        expect(wrapper.text()).toContain('Não foi possível salvar.');
+    });
 });

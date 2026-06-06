@@ -37,24 +37,27 @@ vi.mock('@/composables/useDiagnosticoContexto', () => ({
     }),
 }));
 
+const unidadeVal = ref<any>({
+    unidadeSigla: 'ASSESSORIA_12',
+    unidadeNome: 'Assessoria 12',
+    situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
+});
+const servidoresVal = ref<any[]>([
+    {
+        servidorTitulo: '242426',
+        servidorNome: 'Duff McKagan',
+        situacaoServidor: 'CONSENSO_APROVADO',
+        consenso: [
+            {competenciaCodigo: 10, importancia: 4, dominio: 2},
+            {competenciaCodigo: 11, importancia: null, dominio: null},
+        ],
+    },
+]);
+
 vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
     useMonitoramentoDiagnostico: () => ({
-        unidade: ref({
-            unidadeSigla: 'ASSESSORIA_12',
-            unidadeNome: 'Assessoria 12',
-            situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
-        }),
-        servidores: ref([
-            {
-                servidorTitulo: '242426',
-                servidorNome: 'Duff McKagan',
-                situacaoServidor: 'CONSENSO_APROVADO',
-                consenso: [
-                    {competenciaCodigo: 10, importancia: 4, dominio: 2},
-                    {competenciaCodigo: 11, importancia: null, dominio: null},
-                ],
-            },
-        ]),
+        unidade: unidadeVal,
+        servidores: servidoresVal,
         ocupacoesCriticas: ref([
             {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
         ]),
@@ -89,6 +92,22 @@ describe('DiagnosticoUnidadeView', () => {
         erroValidar.value = null;
         erroDevolver.value = null;
         erroHomologar.value = null;
+        unidadeVal.value = {
+            unidadeSigla: 'ASSESSORIA_12',
+            unidadeNome: 'Assessoria 12',
+            situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
+        };
+        servidoresVal.value = [
+            {
+                servidorTitulo: '242426',
+                servidorNome: 'Duff McKagan',
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [
+                    {competenciaCodigo: 10, importancia: 4, dominio: 2},
+                    {competenciaCodigo: 11, importancia: null, dominio: null},
+                ],
+            },
+        ];
     });
 
     function montar() {
@@ -204,5 +223,38 @@ describe('DiagnosticoUnidadeView', () => {
         await wrapper.get('[data-testid="btn-confirmar-validar-unidade"]').trigger('click');
 
         expect(wrapper.text()).toContain('Falha ao validar');
+    });
+
+    it('exibe erro quando devolver falha', async () => {
+        erroDevolver.value = new Error('Falha ao devolver');
+        devolverDiagnosticoMock.mockRejectedValue(erroDevolver.value);
+
+        const wrapper = montar();
+        await wrapper.get('[data-testid="btn-devolver-diagnostico-unidade"]').trigger('click');
+        await wrapper.get('textarea').setValue('Justificativa');
+        await wrapper.get('[data-testid="btn-confirmar-devolver-unidade"]').trigger('click');
+
+        expect(wrapper.text()).toContain('Falha ao devolver');
+    });
+
+    it('exibe erro quando homologar falha', async () => {
+        perfilSelecionado.value = Perfil.ADMIN;
+        situacaoDiagnostico.value = 'VALIDADO';
+        erroHomologar.value = new Error('Falha ao homologar');
+        homologarDiagnosticoMock.mockRejectedValue(erroHomologar.value);
+
+        const wrapper = montar();
+        await wrapper.get('[data-testid="btn-homologar-diagnostico-unidade"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-homologar-unidade"]').trigger('click');
+
+        expect(wrapper.text()).toContain('Falha ao homologar');
+    });
+
+    it('cobre ramos default de variantes em DiagnosticoUnidadeView', () => {
+        situacaoDiagnostico.value = 'OUTRO_STATUS' as any;
+        servidoresVal.value[0].situacaoServidor = 'OUTRO_STATUS' as any;
+
+        const wrapper = montar();
+        expect(wrapper.text()).toContain('ASSESSORIA_12');
     });
 });
