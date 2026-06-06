@@ -2,183 +2,103 @@
 
 Ator: GESTOR, ADMIN
 
+Maturidade: Média
+
+Base principal: fluxo negocial acordado no PDF e revisão temática da reunião de diagnóstico.
+
 ## Pré-condições
 
 - Usuário logado com perfil GESTOR ou ADMIN
-- Processo de diagnóstico em andamento em uma unidade acessível ao usuário
-- Subprocesso com situação 'Concluído' e localização atual na unidade do usuário
+- Existência de processo de diagnóstico em andamento
+- Existência de unidade acessível ao usuário com diagnóstico concluído e pendente de análise hierárquica ou homologação
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
+1. No `Painel`, o usuário clica em um processo de diagnóstico na situação `Em andamento`.
 
-2. O sistema mostra a tela `Detalhes do processo` com uma tabela hierárquica contendo as unidades participantes do processo. Para cada unidade, mostra:
-   - sigla da unidade
-   - nome de unidade;
-   - situação atual do subprocesso da unidade;
-   - localização atual do subprocesso da unidade.
+2. O sistema mostra a tela `Detalhes do processo` com uma árvore das unidades participantes. Para cada unidade, mostra:
+   - sigla da unidade;
+   - nome da unidade;
+   - situação atual do diagnóstico da unidade.
 
-   3.1. Para o perfil GESTOR, a tabela hierarquica deve se limitar à própria unidade do usuário e às unidades subordinadas a ela, recursivamente.
+3. Para o perfil GESTOR, a árvore exibida se limita à própria unidade do usuário e às unidades subordinadas a ela, recursivamente.
 
-   3.2. Para o perfil ADMIN, a árvore exibida deve incluir todas as unidades participantes do processo.
+4. Para o perfil ADMIN, a árvore exibida inclui todas as unidades participantes do processo.
 
-4. O usuário clica em uma unidade na tabela
+5. O usuário seleciona uma unidade com diagnóstico concluído.
 
-[PENDENCIA: a visão vai ser igual à do chefe, ou seria uma visão de resumo especial para facilita a analise?]
-5. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, com:
+6. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, contendo:
    - dados gerais da unidade;
+   - situação atual do diagnóstico da unidade;
    - lista dos servidores da unidade e suas situações individuais;
    - avaliação de consenso vigente de cada servidor;
-   - informações de ocupações críticas.
-   - histórico de movimentações do subprocesso;
+   - situação de capacitação registrada por competência;
+   - histórico de movimentações e análises do subprocesso.
 
-6. Para perfis superiores na hierarquia, o sistema apresenta apenas os dados do consenso vigente de cada servidor, e não os valores brutos da autoavaliação original.
+7. O sistema respeita as regras de visibilidade aplicáveis ao perfil do usuário.
 
-7. O sistema exibe os botões:
+   7.1. O servidor consulta apenas a própria avaliação de consenso.
+
+   7.2. A chefia da unidade consulta as informações necessárias para manter o consenso e concluir o diagnóstico da própria unidade.
+
+   7.3. Perfis superiores consultam, no sistema, as informações necessárias para analisar ou homologar o diagnóstico das unidades sob seu escopo.
+
+   7.4. Relatórios oficiais exportáveis não devem ser confundidos com essa consulta operacional: relatórios institucionais devem ser agregados e sem identificação nominal de servidores.
+
+8. O sistema exibe as ações disponíveis conforme o perfil e a situação do subprocesso:
    - `Histórico de análise`;
    - `Devolver para ajustes`;
-   - `Registrar aceite`, para o perfil GESTOR;
-   - `Homologar`, para o perfil ADMIN.
+   - `Registrar aceite`, para GESTOR;
+   - `Homologar`, para ADMIN.
 
-8. Se o usuário clicar em `Histórico de análise`, o sistema mostra, em modal, os registros prévios de análise do
-   subprocesso, contendo data/hora, unidade, resultado e observação.
+9. Se o usuário clicar em `Histórico de análise`, o sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e observação.
 
-9. Se o usuário optar por `Devolver para ajustes`:
+10. Se o usuário optar por `Devolver para ajustes`:
 
-   7.1. O sistema abre modal com:
-   - título `Devolver diagnóstico`;
-   - pergunta `Confirma a devolução do diagnóstico para ajustes?`;
-   - campo opcional `Observação`;
-   - botões `Cancelar` e `Devolver`.
+    10.1. O sistema solicita confirmação e permite informar observação.
 
-   7.2. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação.
+    10.2. Caso o usuário cancele, o sistema interrompe a operação.
 
-   7.3. O usuário opcionalmente informa a observação e escolhe `Devolver`.
+    10.3. Caso o usuário confirme, o sistema registra análise com resultado `Devolução para ajustes`.
 
-   7.4. O sistema registra uma análise com:
-   - `Data/hora`: [Data/hora atual];
-   - `Unidade`: [SIGLA_UNIDADE_ANALISE];
-   - `Resultado`: 'Devolução para ajustes';
-   - `Observação`: observação informada, se houver.
+    10.4. O sistema devolve o diagnóstico à unidade responsável pela retificação.
 
-   7.5. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do
-   subprocesso.
+    10.5. O CHEFE da unidade passa a poder realizar os ajustes necessários, atuar novamente junto aos SERVIDORES para nova aprovação de consenso quando necessário e concluir novamente o diagnóstico.
 
-   7.6. O sistema registra uma movimentação com:
-   - `Descrição`: 'Diagnóstico devolvido para ajustes';
-   - `Data/hora`: [Data/hora atual];
-   - `Unidade origem`: [SIGLA_UNIDADE_ANALISE];
-   - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO].
+    10.6. O sistema notifica a unidade responsável pela retificação.
 
-   7.7. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso para
-   'Em andamento' e apaga a data/hora de conclusão da etapa atual.
+    10.7. O sistema mostra a mensagem `Devolução realizada`.
 
-   PENDÊNCIA DE REFINAMENTO: esta especificação trata a devolução como devolução do subprocesso inteiro, sem invalidar automaticamente todos os consensos aprovados da unidade. Confirmar se a área de negócio deseja manter essa  reabertura ampla com ajuste seletivo pela chefia, ou se a devolução deverá forçar reinício mais abrangente.
+11. Se o usuário optar por `Registrar aceite`:
 
-   7.8. O sistema envia notificação por e-mail para a unidade de devolução:
+    11.1. O sistema solicita confirmação e permite informar observação.
 
-   ```text
-   Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes
+    11.2. Caso o usuário cancele, o sistema interrompe a operação.
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
+    11.3. Caso o usuário confirme, o sistema registra análise com resultado `Aceite`.
 
-   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi devolvido para ajustes.
+    11.4. O sistema encaminha o subprocesso para análise da unidade hierarquicamente superior.
 
-   Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
-   ```
+    11.5. O sistema notifica a unidade superior.
 
-   7.9. O sistema cria internamente um alerta com:
-   - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
-   - `Processo`: [DESCRICAO_PROCESSO]
-   - `Data/hora`: [Data/hora atual]
-   - `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
-   - `Unidade de destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+    11.6. O sistema mostra a mensagem `Aceite registrado`.
 
-   7.10. O sistema redireciona para o `Painel` e mostra a mensagem `Devolução realizada`.
+12. Se o usuário optar por `Homologar`:
 
-8. Se o usuário optar por `Registrar aceite` (perfil GESTOR):
+    12.1. O sistema solicita confirmação.
 
-   8.1. O sistema abre modal com:
-   - título `Registrar aceite do diagnóstico`;
-   - texto `Confirma o aceite do diagnóstico da unidade?`;
-   - campo opcional `Observação`;
-   - botões `Cancelar` e `Confirmar`.
+    12.2. Caso o usuário cancele, o sistema interrompe a operação.
 
-   8.2. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação.
+    12.3. Caso o usuário confirme, o sistema altera a situação do subprocesso para `Homologado`.
 
-   8.3. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
+    12.4. O sistema registra movimentação e análise de homologação.
 
-   8.4. O sistema registra uma análise com:
-   - `Data/hora`: [Data/hora atual];
-   - `Unidade`: [SIGLA_UNIDADE_ANALISE];
-   - `Resultado`: 'Aceite';
-   - `Observação`: observação informada, se houver.
+    12.5. O sistema notifica a unidade do subprocesso.
 
-   8.5. O sistema registra uma movimentação com:
-   - `Data/hora`: [Data/hora atual];
-   - `Unidade origem`: [SIGLA_UNIDADE_ANALISE];
-   - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
-   - `Descrição`: 'Diagnóstico aceito'.
-
-   8.6. O sistema envia notificação por e-mail para a unidade superior:
-
-   ```text
-   Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
-
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-
-   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi aceito e submetido para análise por essa unidade.
-
-   A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
-   ```
-
-   8.7. O sistema cria internamente um alerta com:
-   - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
-   - `Processo`: [DESCRICAO_PROCESSO]
-   - `Data/hora`: [Data/hora atual]
-   - `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
-   - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
-
-   8.8. O sistema redireciona para o `Painel` e mostra a mensagem `Aceite registrado`.
-
-9. Se o usuário optar por `Homologar` (perfil ADMIN):
-
-   9.1. O sistema mostra diálogo de confirmação com o título `Homologar diagnóstico`, a pergunta `Confirma a
-   homologação do diagnóstico da unidade?` e os botões `Cancelar` e `Homologar`.
-
-   9.2. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação.
-
-   9.3. O usuário confirma.
-
-   9.4. O sistema altera a situação do subprocesso para 'Homologado'.
-
-   9.5. O sistema registra uma movimentação com:
-   - `Data/hora`: [Data/hora atual];
-   - `Unidade origem`: 'ADMIN';
-   - `Unidade destino`: 'ADMIN';
-   - `Descrição`: 'Diagnóstico homologado'.
-
-   9.6. O sistema envia notificação por e-mail para a unidade do subprocesso:
-
-   ```text
-   Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado
-
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
-
-   O diagnóstico da sua unidade no processo [DESCRICAO_PROCESSO] foi homologado.
-
-   Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
-   ```
-
-   9.7. O sistema cria internamente um alerta com:
-   - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
-   - `Processo`: [DESCRICAO_PROCESSO]
-   - `Data/hora`: [Data/hora atual]
-   - `Unidade de origem`: ADMIN
-   - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-
-   9.8. O sistema redireciona para o `Painel` e mostra a mensagem `Diagnóstico homologado`.
+    12.6. O sistema mostra a mensagem `Diagnóstico homologado`.
 
 ## Observação
 
-PENDÊNCIA DE REFINAMENTO: a granularidade exata da análise hierárquica ainda pode evoluir. A versão atual assume que o bjeto formal de validação/devolução é o subprocesso da unidade, e não servidores individuais isolados.
+- A análise formal continua tendo como objeto o diagnóstico da unidade, não servidores isolados.
+- O efeito exato da devolução sobre consensos já aprovados precisa ser mantido explícito na implementação: nova edição de consenso exige nova aprovação do servidor.
+- A regra de visibilidade detalhada precisa ser validada como decisão de produto, porque a reunião registrou tensão entre privacidade, transparência e necessidade de análise hierárquica.
