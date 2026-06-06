@@ -116,10 +116,25 @@ describe('processo.routes.ts', () => {
         }
     });
 
-    it('deve carregar componentes sob demanda (lazy load)', async () => {
-        const cadProcesso = processoRoutes.find(r => r.name === 'CadProcesso');
-        // @ts-expect-error - testing internal property
-        const component = await cadProcesso?.component();
-        expect(component.default).toBeDefined();
+    it('deve avaliar breadcrumb se for uma função', () => {
+        const route = processoRoutes.find(r => r.name === 'Subprocesso');
+        if (route && typeof route.meta?.breadcrumb === 'function') {
+            const result = route.meta.breadcrumb({
+                params: {siglaUnidade: 'TESTE-BREADCRUMB'}
+            } as any);
+            expect(result).toBe('TESTE-BREADCRUMB');
+        } else {
+            throw new Error('Breadcrumb deve ser uma função');
+        }
+    });
+
+    it('deve carregar componentes sob demanda (lazy load) para todas as rotas', async () => {
+        for (const route of processoRoutes) {
+            if (typeof route.component === 'function') {
+                // @ts-expect-error - testing internal property
+                const component = await route.component();
+                expect(component).toBeDefined();
+            }
+        }
     }, 30000);
 });

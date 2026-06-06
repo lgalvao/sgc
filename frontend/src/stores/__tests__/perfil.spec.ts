@@ -130,5 +130,46 @@ describe("usePerfilStore", () => {
         store.unidadeSelecionada = null as any;
         store.perfisUnidades = [{perfil: Perfil.GESTOR, unidade: {codigo: 60}}] as any;
         expect(store.unidadeAtual).toBe(60);
+
+        store.perfilSelecionado = null;
+        expect(store.unidadeAtual).toBeNull();
+    });
+
+    it("deve cancelar fluxo de login limpando perfis e unidades", () => {
+        const store = usePerfilStore();
+        store.perfisUnidades = [{perfil: Perfil.GESTOR, unidade: {codigo: 1, sigla: "U1"}} as any];
+        store.cancelarFluxoLogin();
+        expect(store.perfisUnidades).toEqual([]);
+    });
+
+    it("nao deve aplicar sessao se houver multiplos perfis durante iniciarLogin", async () => {
+        const store = usePerfilStore();
+        const mockFluxo = {
+            autenticado: true,
+            requerSelecaoPerfil: true,
+            perfisUnidades: [
+                {perfil: Perfil.GESTOR, unidade: {codigo: 1, sigla: "U1"}},
+                {perfil: Perfil.SERVIDOR, unidade: {codigo: 2, sigla: "U2"}}
+            ],
+            sessao: null
+        };
+        vi.mocked(usuarioService.login).mockResolvedValue(mockFluxo as any);
+
+        const res = await store.iniciarLogin("123", "senha");
+
+        expect(res).toEqual(mockFluxo);
+        expect(store.perfilSelecionado).toBeNull();
+        expect(store.perfisUnidades).toHaveLength(2);
+    });
+
+    it("deve tratar erro no logout silenciosamente limpando a sessao local", async () => {
+        const store = usePerfilStore();
+        store.usuarioCodigo = "123" as any;
+        vi.mocked(usuarioService.logout).mockRejectedValue(new Error("Erro no servidor"));
+
+        await store.logout();
+
+        expect(store.usuarioCodigo).toBeNull();
+        expect(usuarioService.logout).toHaveBeenCalled();
     });
 });
