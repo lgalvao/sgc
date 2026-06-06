@@ -87,6 +87,7 @@ const chaveSessao = computed(() =>
       class="visually-hidden-focusable p-3 bg-white text-primary position-absolute start-0 top-0"
       href="#main-content"
       style="z-index: 2050;"
+      data-testid="skip-link"
   >
     {{ TEXTOS.comum.PULAR_CONTEUDO }}
   </a>
@@ -112,7 +113,7 @@ const chaveSessao = computed(() =>
       </div>
     </div>
 
-    <main id="main-content" class="flex-grow-1 pb-3">
+    <main id="main-content" class="flex-grow-1 pb-3" data-testid="main-content">
       <router-view v-slot="{ Component, route: currentRoute }">
         <KeepAlive :max="maximoRotasEmCache">
           <component
@@ -132,9 +133,10 @@ const chaveSessao = computed(() =>
     <footer
         v-if="route.path !== '/login' && route.path !== '/erro'"
         class="footer-app bg-body-tertiary text-body-secondary border-top mt-auto"
+        data-testid="app-footer"
     >
       <div class="container-fluid footer-app__conteudo small d-flex justify-content-between align-items-center">
-        <span>{{ TEXTOS.comum.VERSAO }} {{ version }}</span>
+        <span data-testid="app-version">{{ TEXTOS.comum.VERSAO }} {{ version }}</span>
         <span>{{ TEXTOS.comum.RODAPE }}</span>
       </div>
     </footer>

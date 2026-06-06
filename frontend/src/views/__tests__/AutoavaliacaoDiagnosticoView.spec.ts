@@ -188,7 +188,18 @@ describe('AutoavaliacaoDiagnosticoView', () => {
                         emits: ['update:modelValue', 'hide'],
                         template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
                     },
-                    BTable: {template: '<div><slot name="cell(descricao)" :item="{ competenciaCodigo: 10, descricao: \'Competência A\', atividades: [{ codigo: 100, descricao: \'Atividade A\', conhecimentos: [{ codigo: 1, descricao: \'Conhecimento A\' }] }] }" /><slot name="cell(importancia)" :item="{ competenciaCodigo: 10, importancia: 2 }" /><slot name="cell(dominio)" :item="{ competenciaCodigo: 10, dominio: 1 }" /></div>'},
+                    BTable: {
+                        props: ['items'],
+                        template: `
+                          <div>
+                            <div v-for="item in items" :key="item.competenciaCodigo">
+                              <slot name="cell(descricao)" :item="item" />
+                              <slot name="cell(importancia)" :item="item" />
+                              <slot name="cell(dominio)" :item="item" />
+                            </div>
+                          </div>
+                        `,
+                    },
                 },
             },
         });
@@ -304,8 +315,59 @@ describe('AutoavaliacaoDiagnosticoView', () => {
 
     it('exercita normalizarValorNota com ramificacoes em AutoavaliacaoDiagnosticoView', async () => {
         const wrapper = montar();
-        const input = wrapper.find('[data-testid="autoavaliacao-importancia-10"]');
-        await input.setValue('abc');
-        expect(atualizarNotaMock).toHaveBeenCalled();
+        const select = wrapper.findComponent('[data-testid="autoavaliacao-importancia-10"]');
+        
+        // Emite null
+        await select.vm.$emit('update:modelValue', null);
+        expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', null);
+
+        // Emite undefined
+        await select.vm.$emit('update:modelValue', undefined);
+        expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', null);
+
+        // Emite string vazia
+        await select.vm.$emit('update:modelValue', '');
+        expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', null);
+
+        // Emite numero valido
+        await select.vm.$emit('update:modelValue', 4);
+        expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', 4);
+
+        // Emite NaN
+        await select.vm.$emit('update:modelValue', Number.NaN);
+        expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', null);
+    });
+
+    it('exercita tratamento de erros sem mensagem explícita e outros branches de normalizarNota', async () => {
+        erroConcluir.value = {};
+        concluirAutoavaliacaoMock.mockRejectedValue(erroConcluir.value);
+        const wrapper = montar();
+
+        await wrapper.get('[data-testid="btn-concluir-autoavaliacao"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-concluir"]').trigger('click');
+        expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
+    });
+
+    it('exercita erro de consenso sem mensagem explicita', async () => {
+        situacaoServidor.value = 'CONSENSO_CRIADO';
+        erroAprovar.value = {};
+        aprovarConsensoMock.mockRejectedValue(erroAprovar.value);
+        const wrapper = montar();
+
+        await wrapper.get('[data-testid="btn-aprovar-consenso"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-aprovar"]').trigger('click');
+        expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
+    });
+
+    it('exercita fallbacks de normalizacao e formatacao de notas e situacao de servidor', () => {
+        podeCriarConsenso.value = true;
+        itensEquipe.value = [
+            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA'},
+            {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
+        ];
+        
+        const wrapper = montar();
+        expect(wrapper.text()).toContain('Autoavaliação não iniciada');
+        expect(wrapper.text()).toContain('Avaliação impossibilitada');
     });
 });

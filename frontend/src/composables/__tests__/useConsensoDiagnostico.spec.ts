@@ -240,4 +240,56 @@ describe('useConsensoDiagnostico', () => {
 
         scope.stop();
     });
+
+    it('deve exercitar as opções do useQuery para chave, query e enabled', async () => {
+        const scope = effectScope();
+        scope.run(() => {
+            useConsensoDiagnostico(80, '242426');
+        });
+        await nextTick();
+
+        const chamada = useQueryMock.mock.calls[0][0];
+
+        // 1. key()
+        expect(chamada.key()).toEqual(['diagnostico-competencias', 'consenso', '242426', 'sem-perfil', 'sem-unidade', 80, '242426']);
+
+        // 2. enabled()
+        expect(chamada.enabled()).toBe(true);
+
+        scope.stop();
+    });
+
+    it('deve disparar autosave e cobrir onSuccess quando competenciasDetalhadasLocais for vazio', async () => {
+        mockQueryData.value.competenciasDetalhadas = [];
+        mockQueryData.value.competencias = [{competenciaCodigo: 12, importancia: 3, dominio: 2}];
+        vi.mocked(diagnosticoService.salvarConsenso).mockResolvedValue();
+
+        const scope = effectScope();
+        let composable: ReturnType<typeof useConsensoDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useConsensoDiagnostico(61, '242426');
+        });
+        await nextTick();
+
+        composable!.atualizarNota(12, 'importancia', 4);
+
+        expect(composable!.salvandoAutomaticamente.value).toBe(true);
+        await vi.advanceTimersByTimeAsync(800);
+        await Promise.resolve();
+
+        expect(diagnosticoService.salvarConsenso).toHaveBeenCalledWith(61, '242426', expect.objectContaining({
+            competencias: [{competenciaCodigo: 12, importancia: 4, dominio: 2}],
+            competenciasDetalhadas: undefined,
+        }));
+        expect(setQueryDataMock).toHaveBeenCalledWith(
+            ['diagnostico-competencias', 'consenso', '242426', 'sem-perfil', 'sem-unidade', 61, '242426'],
+            expect.objectContaining({
+                competencias: [{competenciaCodigo: 12, importancia: 4, dominio: 2}],
+                competenciasDetalhadas: undefined,
+            }),
+        );
+
+        scope.stop();
+    });
 });

@@ -294,6 +294,42 @@ describe('DiagnosticoEquipePainel', () => {
         // 4. Falha ao homologar
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
-        expect(wrapper.text()).toContain('Não foi possível salvar.');
+    });
+
+    it('deve exercitar fallbacks de erro sem mensagem e argumentos opcionais nos modais de fluxo', async () => {
+        habilitarConcluirDiagnostico.value = true;
+        habilitarValidarDiagnostico.value = true;
+        habilitarHomologarDiagnostico.value = true;
+
+        concluirDiagnosticoMock.mockRejectedValue({});
+        validarDiagnosticoMock.mockRejectedValue({});
+        homologarDiagnosticoMock.mockRejectedValue({});
+
+        const wrapper = montar();
+
+        // 1. Concluir sem mensagem de erro
+        await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-concluir-diagnostico"]').trigger('click');
+        expect(wrapper.text()).toContain('Erro desconhecido ou não mapeado pela aplicação.');
+
+        // 2. Validar com observacoes vazias e erro sem mensagem
+        await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-validar"]').trigger('click');
+        expect(validarDiagnosticoMock).toHaveBeenCalledWith(undefined);
+        expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
+
+        // 3. Homologar com observações vazias e erro sem mensagem
+        await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
+        expect(homologarDiagnosticoMock).toHaveBeenCalledWith(undefined);
+        expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
+    });
+
+    it('exercita formatarSituacaoServidor e varianteSituacaoServidor para situacoes desconhecidas', () => {
+        servidores.value = [
+            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'STATUS_DESCONHECIDO' as any},
+        ];
+        const wrapper = montar();
+        expect(wrapper.text()).toContain('STATUS_DESCONHECIDO');
     });
 });

@@ -6,6 +6,7 @@ import {
     useArvoreElegibilidadeQuery,
     useDadosTelaUnidadeQuery,
     useInvalidacaoUnidade,
+    useUnidadeQuery,
 } from "../useUnidadeQuery";
 import * as unidadeService from "@/services/unidadeService";
 
@@ -15,11 +16,15 @@ vi.mock("@/services/unidadeService", () => ({
     buscarReferenciaMapaVigente: vi.fn(),
 }));
 
+const mockUsuarioCodigo = ref<string | undefined>("123");
+const mockPerfilSelecionado = ref<string | undefined>("SERVIDOR");
+const mockUnidadeSelecionada = ref<number | undefined>(10);
+
 vi.mock("@/stores/perfil", () => ({
     usePerfilStore: () => ({
-        usuarioCodigo: "123",
-        perfilSelecionado: "SERVIDOR",
-        unidadeSelecionada: 10,
+        get usuarioCodigo() { return mockUsuarioCodigo.value; },
+        get perfilSelecionado() { return mockPerfilSelecionado.value; },
+        get unidadeSelecionada() { return mockUnidadeSelecionada.value; },
     }),
 }));
 
@@ -80,6 +85,37 @@ describe("useUnidadeQuery", () => {
         expect(invalidadores.invalidarUnidade).toBeTypeOf("function");
         expect(invalidadores.invalidarDadosTelaUnidade).toBeTypeOf("function");
         expect(invalidadores.invalidarArvoreElegibilidade).toBeTypeOf("function");
+        app.unmount();
+    });
+
+    it("useUnidadeQuery deve buscar dados da unidade e respeitar o enabled", async () => {
+        const mockUnidade = {codigo: 5, nome: "U5", sigla: "U5", filhas: []};
+        vi.mocked(unidadeService.buscarArvoreUnidade).mockResolvedValue(mockUnidade as any);
+
+        const [query, app] = withSetup(() => useUnidadeQuery(5));
+        const res = await query.refetch();
+        expect(res.data).toEqual(mockUnidade);
+        expect(unidadeService.buscarArvoreUnidade).toHaveBeenCalledWith(5);
+
+        app.unmount();
+    });
+
+    it("deve exercitar fallbacks do contexto de sessao e enabled com valores nulos", async () => {
+        mockUsuarioCodigo.value = undefined;
+        mockPerfilSelecionado.value = undefined;
+        mockUnidadeSelecionada.value = undefined;
+
+        const [query, app] = withSetup(() => useUnidadeQuery(0));
+        expect(unidadeService.buscarArvoreUnidade).not.toHaveBeenCalled();
+
+        app.unmount();
+    });
+
+    it("useArvoreElegibilidadeQuery deve cobrir os fallbacks quando tipoProcesso ou codProcesso forem nulos", async () => {
+        const [query, app] = withSetup(() => useArvoreElegibilidadeQuery(null, undefined));
+        const res = await query.refetch();
+        expect(res.data).toEqual([]);
+
         app.unmount();
     });
 });

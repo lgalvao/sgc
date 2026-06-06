@@ -115,7 +115,9 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         salvandoAutomaticamente.value = true;
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
-            mutacaoSalvar.mutate(servidorTitulo!);
+            if (servidorTitulo) {
+                mutacaoSalvar.mutate(servidorTitulo);
+            }
         }, 800);
     }
 

@@ -8,12 +8,16 @@ const mockQueryData = ref<any>(null);
 const mockQueryStatus = ref<'pending' | 'success'>('success');
 const mockQueryError = ref<Error | null>(null);
 
+let queryOptions: any = null;
 vi.mock('@pinia/colada', () => ({
-    useQuery: vi.fn(() => ({
-        data: mockQueryData,
-        status: mockQueryStatus,
-        error: mockQueryError,
-    })),
+    useQuery: vi.fn((options: any) => {
+        queryOptions = options;
+        return {
+            data: mockQueryData,
+            status: mockQueryStatus,
+            error: mockQueryError,
+        };
+    }),
     useQueryCache: () => ({
         invalidateQueries: invalidateQueriesMock,
     }),
@@ -136,6 +140,29 @@ describe('useOcupacoesCriticasDiagnostico', () => {
         await vi.advanceTimersByTimeAsync(900);
 
         expect(diagnosticoService.salvarOcupacoesCriticas).not.toHaveBeenCalled();
+
+        scope.stop();
+    });
+
+    it('deve exercitar as opções do useQuery para chave, query e enabled', async () => {
+        const scope = effectScope();
+        scope.run(() => {
+            useOcupacoesCriticasDiagnostico(80);
+        });
+        await nextTick();
+
+        expect(queryOptions).toBeDefined();
+
+        // 1. key()
+        expect(queryOptions.key()).toEqual(['diagnostico-competencias', 'unidade', '151515', 'sem-perfil', 'sem-unidade', 80]);
+
+        // 2. query()
+        vi.mocked(diagnosticoService.obterDiagnosticoUnidade).mockResolvedValue({} as any);
+        await queryOptions.query();
+        expect(diagnosticoService.obterDiagnosticoUnidade).toHaveBeenCalledWith(80);
+
+        // 3. enabled()
+        expect(queryOptions.enabled()).toBe(true);
 
         scope.stop();
     });

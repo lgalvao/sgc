@@ -288,4 +288,222 @@ describe('ConsensoDiagnosticoView', () => {
             valor: null,
         });
     });
+
+    it('deve exibir o alerta de consenso aprovado e notas estáticas quando ehConsensoAprovado for verdadeiro', () => {
+        ehConsensoAprovadoVal.value = true;
+        podeCriarConsensoVal.value = true;
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div class="alert-consenso"><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {template: '<select />'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        expect(wrapper.find('.alert-consenso').exists()).toBe(true);
+        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação de consenso deste servidor já foi aprovada');
+        expect(wrapper.find('select').exists()).toBe(false);
+    });
+
+    it('deve usar o servidorTitulo como subtítulo quando o servidor não for o usuário logado', () => {
+        const outroServidor = '999999';
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: outroServidor,
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {template: '<select />'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        expect(wrapper.text()).toContain(outroServidor);
+        expect(wrapper.text()).not.toContain('Servidor Exemplo');
+    });
+
+    it('deve utilizar competenciasLocais caso competenciasDetalhadasLocais esteja vazio', () => {
+        competenciasDetalhadasLocais.value = [];
+        competenciasLocais.value = [
+            { competenciaCodigo: 15, importancia: 5, dominio: 2 },
+        ];
+        podeCriarConsensoVal.value = true;
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {template: '<select />'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+        expect(wrapper.text()).toContain('Competência 15');
+    });
+
+    it('deve exibir erro padrão de salvamento se erroAprovar não contiver mensagem', async () => {
+        podeCriarConsensoVal.value = false;
+        competenciasLocais.value = [
+            {competenciaCodigo: 10, importancia: 3, dominio: 4}
+        ];
+        erroAprovarVal.value = {};
+        aprovarConsensoMock.mockRejectedValue(new Error('Erro interno genérico'));
+
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {
+                        props: ['mensagem'],
+                        template: '<div class="app-alert">{{ mensagem }}</div>',
+                    },
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BSpinner: {template: '<span />'},
+                    BTable: {template: '<div />'},
+                },
+            },
+        });
+
+        const btnAprovar = wrapper.get('[data-testid="btn-aprovar-consenso"]');
+        await btnAprovar.trigger('click');
+        expect(wrapper.find('.app-alert').text()).toContain('Não foi possível salvar. Tente novamente.');
+    });
+
+    it('deve exercitar as notas de chefiaDominio, consensoImportancia, consensoDominio e botões de voltar', async () => {
+        podeCriarConsensoVal.value = true;
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {
+                        props: ['modelValue'],
+                        emits: ['update:modelValue'],
+                        template: '<input type="text" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+                    },
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        // 1. Chefia Dominio
+        const inputChefiaDominio = wrapper.find('[data-testid="consenso-chefia-dominio-10"]');
+        await inputChefiaDominio.setValue(4);
+        expect(atualizarNotaDetalhadaMock).toHaveBeenLastCalledWith(10, {
+            origem: 'chefia',
+            campo: 'dominio',
+            valor: 4,
+        });
+
+        // 2. Consenso Importancia
+        const inputConsensoImportancia = wrapper.find('[data-testid="consenso-final-importancia-10"]');
+        await inputConsensoImportancia.setValue(3);
+        expect(atualizarNotaDetalhadaMock).toHaveBeenLastCalledWith(10, {
+            origem: 'consenso',
+            campo: 'importancia',
+            valor: 3,
+        });
+
+        // 3. Consenso Dominio
+        const inputConsensoDominio = wrapper.find('[data-testid="consenso-final-dominio-10"]');
+        await inputConsensoDominio.setValue(2);
+        expect(atualizarNotaDetalhadaMock).toHaveBeenLastCalledWith(10, {
+            origem: 'consenso',
+            campo: 'dominio',
+            valor: 2,
+        });
+
+        // 4. Botão de voltar
+        const btnVoltar = wrapper.find('button[variant="outline-secondary"]');
+        await btnVoltar.trigger('click');
+        expect(backMock).toHaveBeenCalled();
+    });
+
+    it('deve limpar erroMensagem ao dispensar o alerta', async () => {
+        podeCriarConsensoVal.value = false;
+        competenciasLocais.value = [
+            {competenciaCodigo: 10, importancia: 3, dominio: 4}
+        ];
+        erroAprovarVal.value = new Error('Erro de teste');
+        aprovarConsensoMock.mockRejectedValue(erroAprovarVal.value);
+
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {
+                        props: ['mensagem'],
+                        emits: ['dismissed'],
+                        template: '<div class="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
+                    },
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BSpinner: {template: '<span />'},
+                    BTable: {template: '<div />'},
+                },
+            },
+        });
+
+        const btnAprovar = wrapper.get('[data-testid="btn-aprovar-consenso"]');
+        await btnAprovar.trigger('click');
+        expect(wrapper.find('.app-alert').exists()).toBe(true);
+
+        await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
+        expect(wrapper.find('.app-alert').exists()).toBe(false);
+    });
 });
+

@@ -190,7 +190,6 @@ import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import {usePerfilStore} from '@/stores/perfil';
-import type {SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -209,7 +208,6 @@ const {podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
 const {
   competenciasLocais,
   competenciasDetalhadasLocais,
-  situacaoServidor,
   ehConsensoAprovado,
   carregando,
   salvandoAutomaticamente,
@@ -239,16 +237,6 @@ async function confirmarAprovarConsenso() {
   }
 }
 
-function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
-  const mapa: Record<SituacaoAvaliacaoServidor, string> = {
-    AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
-    AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
-    CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
-    CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
-    AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
-  };
-  return mapa[situacao] ?? situacao;
-}
 
 function formatarNota(valor: number | null): string {
   if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;

@@ -8,12 +8,16 @@ const mockQueryData = ref<any>(null);
 const mockQueryStatus = ref<'pending' | 'success'>('success');
 const mockQueryError = ref<Error | null>(null);
 
+let queryOptions: any = null;
 vi.mock('@pinia/colada', () => ({
-    useQuery: vi.fn(() => ({
-        data: mockQueryData,
-        status: mockQueryStatus,
-        error: mockQueryError,
-    })),
+    useQuery: vi.fn((options: any) => {
+        queryOptions = options;
+        return {
+            data: mockQueryData,
+            status: mockQueryStatus,
+            error: mockQueryError,
+        };
+    }),
     useQueryCache: () => ({
         invalidateQueries: invalidateQueriesMock,
     }),
@@ -138,6 +142,29 @@ describe('useAutoavaliacaoDiagnostico', () => {
             key: ['diagnostico-competencias', 'equipe', '242426', 'sem-perfil', 'sem-unidade', 77],
             exact: true,
         });
+
+        scope.stop();
+    });
+
+    it('deve exercitar as opções do useQuery para chave, query e enabled', async () => {
+        const scope = effectScope();
+        scope.run(() => {
+            useAutoavaliacaoDiagnostico(80);
+        });
+        await nextTick();
+
+        expect(queryOptions).toBeDefined();
+
+        // 1. key()
+        expect(queryOptions.key()).toEqual(['diagnostico-competencias', 'autoavaliacao', '242426', 'sem-perfil', 'sem-unidade', 80]);
+
+        // 2. query()
+        vi.mocked(diagnosticoService.obterAutoavaliacao).mockResolvedValue({} as any);
+        await queryOptions.query();
+        expect(diagnosticoService.obterAutoavaliacao).toHaveBeenCalledWith(80);
+
+        // 3. enabled()
+        expect(queryOptions.enabled()).toBe(true);
 
         scope.stop();
     });
