@@ -27,41 +27,45 @@ vi.mock('vue-router', () => ({
     }),
 }));
 
+const contextData = ref<any>({
+    unidadeSigla: 'ASSESSORIA_12',
+    unidadeNome: 'Assessoria 12',
+    situacaoDiagnostico: 'EM_ANDAMENTO',
+    situacaoSubprocesso: 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
+    competencias: [
+        {competenciaCodigo: 10, descricao: 'Competência A'},
+    ],
+});
+
 vi.mock('@/composables/useDiagnosticoContexto', () => ({
     useDiagnosticoContexto: () => ({
-        data: ref({
-            unidadeSigla: 'ASSESSORIA_12',
-            unidadeNome: 'Assessoria 12',
-            situacaoDiagnostico: 'EM_ANDAMENTO',
-            situacaoSubprocesso: 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
-            competencias: [
-                {competenciaCodigo: 10, descricao: 'Competência A'},
-            ],
-        }),
+        data: contextData,
     }),
 }));
+
+const queryContextoEdicaoDataVal = ref<any>({
+    mapa: {
+        competencias: [
+            {
+                codigo: 10,
+                atividades: [
+                    {
+                        codigo: 100,
+                        descricao: 'Atividade A',
+                        conhecimentos: [
+                            {codigo: 1, descricao: 'Conhecimento A'},
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+});
 
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     useDiagnosticoPermissoes: () => ({
         queryContextoEdicao: {
-            data: ref({
-                mapa: {
-                    competencias: [
-                        {
-                            codigo: 10,
-                            atividades: [
-                                {
-                                    codigo: 100,
-                                    descricao: 'Atividade A',
-                                    conhecimentos: [
-                                        {codigo: 1, descricao: 'Conhecimento A'},
-                                    ],
-                                },
-                            ],
-                        },
-                    ],
-                },
-            }),
+            data: queryContextoEdicaoDataVal,
         },
         podeCriarConsenso: computed(() => podeCriarConsenso.value),
     }),
@@ -112,6 +116,33 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         salvandoAutomaticamente.value = false;
         erroConcluir.value = null;
         erroAprovar.value = null;
+        contextData.value = {
+            unidadeSigla: 'ASSESSORIA_12',
+            unidadeNome: 'Assessoria 12',
+            situacaoDiagnostico: 'EM_ANDAMENTO',
+            situacaoSubprocesso: 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
+            competencias: [
+                {competenciaCodigo: 10, descricao: 'Competência A'},
+            ],
+        };
+        queryContextoEdicaoDataVal.value = {
+            mapa: {
+                competencias: [
+                    {
+                        codigo: 10,
+                        atividades: [
+                            {
+                                codigo: 100,
+                                descricao: 'Atividade A',
+                                conhecimentos: [
+                                    {codigo: 1, descricao: 'Conhecimento A'},
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
     });
 
     function montar() {
@@ -244,5 +275,37 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
         expect(impossibilitarAvaliacaoMock).toHaveBeenCalledWith('242427', 'Servidor afastado.');
         expect(wrapper.text()).toContain('Impossibilidade registrada');
+    });
+
+    it('exibe erro caso a impossibilidade falhe', async () => {
+        podeCriarConsenso.value = true;
+        situacaoServidor.value = 'CONSENSO_APROVADO';
+        impossibilitarAvaliacaoMock.mockRejectedValue(new Error('Erro ao salvar no BD'));
+        const wrapper = montar();
+
+        await wrapper.get('[data-testid="btn-impossibilitar-242427"]').trigger('click');
+        await wrapper.get('textarea').setValue('Servidor afastado.');
+        await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
+        expect(wrapper.text()).toContain('Não foi possível salvar.');
+    });
+
+    it('exercita ramos padrao de variantes e formatacao de conhecimentos vazios', async () => {
+        contextData.value.situacaoSubprocesso = 'DIAGNOSTICO_FECHADO';
+        itensEquipe.value = [
+            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'OUTRO_STATUS' as any},
+        ];
+        queryContextoEdicaoDataVal.value.mapa.competencias[0].atividades[0].conhecimentos = [];
+        podeCriarConsenso.value = true;
+        const wrapper = montar();
+
+        await wrapper.get('[data-testid="toggle-atividades-10"]').trigger('click');
+        expect(wrapper.text()).toContain('-');
+    });
+
+    it('exercita normalizarValorNota com ramificacoes em AutoavaliacaoDiagnosticoView', async () => {
+        const wrapper = montar();
+        const input = wrapper.find('[data-testid="autoavaliacao-importancia-10"]');
+        await input.setValue('abc');
+        expect(atualizarNotaMock).toHaveBeenCalled();
     });
 });
