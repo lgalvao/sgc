@@ -342,9 +342,9 @@ describe('DiagnosticoUnidadeView', () => {
     });
 
     it('exercita tratamento de erros sem mensagem nos modais de DiagnosticoUnidadeView', async () => {
-        erroValidar.value = {};
-        erroDevolver.value = {};
-        erroHomologar.value = {};
+        erroValidar.value = {} as any;
+        erroDevolver.value = {} as any;
+        erroHomologar.value = {} as any;
         validarDiagnosticoMock.mockRejectedValue(erroValidar.value);
         devolverDiagnosticoMock.mockRejectedValue(erroDevolver.value);
         homologarDiagnosticoMock.mockRejectedValue(erroHomologar.value);

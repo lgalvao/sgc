@@ -25,12 +25,15 @@ type MapaViewVm = {
 };
 
 // Ref controlável que simula codigoSubprocesso exposto por useMapaOrquestracao
+const carregandoInicialRef = ref(false);
 const codigoSubprocessoRef = ref<number | null>(null);
+const unidadeRef = ref<any>(null);
+
 vi.mock('@/composables/useMapaOrquestracao', () => ({
     useMapaOrquestracao: () => ({
-        carregandoInicial: ref(false),
+        carregandoInicial: carregandoInicialRef,
         codigoSubprocesso: codigoSubprocessoRef,
-        unidade: ref(null),
+        unidade: unidadeRef,
         carregarContextoInicial: vi.fn().mockResolvedValue(true),
         sincronizarEstadoInicialContexto: vi.fn(),
     }),
@@ -124,7 +127,9 @@ describe('MapaView', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        carregandoInicialRef.value = false;
         codigoSubprocessoRef.value = null;
+        unidadeRef.value = null;
         mapasMockState.mapaCompleto.value = null;
         mapasMockState.impactoMapa.value = null;
         mapasMockState.carregando.value = false;
@@ -472,7 +477,65 @@ describe('MapaView', () => {
         const wrapper = mount(MapaView, { global: { plugins: [pinia], stubs: commonStubs }, props: { codProcesso: 1, sigla: "TESTE" } });
         const vm = wrapper.vm as any;
         vm.dispensarErroMapa();
-        // Since useMapas.erro is a ref from composable, we check if it is cleared
-        // This actually tests the interaction with useMapaDisponibilizacao's limparErroMapa
+    });
+
+    it('renderiza o template completo com unidade e competencias em modo edicao', async () => {
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
+        
+        // Configura permissões para habilitar edição no modo de acesso
+        subprocessoStoreMock.contextoEdicao = {
+            detalhes: {
+                tipoProcesso: 'CADASTRO',
+                permissoes: {
+                    podeEditarMapa: true,
+                    habilitarEditarMapa: true,
+                },
+            },
+        } as any;
+
+        unidadeRef.value = { codigo: 10, nome: 'Unidade 10', sigla: 'U10' };
+        codigoSubprocessoRef.value = 123;
+        mapasMockState.mapaCompleto.value = {
+            competencias: [{ codigo: 1, descricao: 'Competência 1', atividades: [{ codigo: 10 }] }],
+            atividades: [{ codigo: 10, descricao: 'Atividade 10' }],
+        };
+        
+        const wrapper = mount(MapaView, {
+            global: {
+                plugins: [pinia],
+                stubs: {
+                    ...commonStubs,
+                    CompetenciaCard: { template: '<div class="competencia-card" />' },
+                }
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
+            }
+        });
+        
+        expect(wrapper.find('.competencia-card').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-abrir-criar-competencia"]').exists()).toBe(true);
+    });
+
+    it('renderiza tela de carregamento inicial', () => {
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
+        carregandoInicialRef.value = true;
+        
+        const wrapper = mount(MapaView, {
+            global: {
+                plugins: [pinia],
+                stubs: {
+                    ...commonStubs,
+                    CarregamentoPagina: { template: '<div class="loading-page" />' },
+                }
+            },
+            props: {
+                codProcesso: 1,
+                sigla: "TESTE"
+            }
+        });
+        
+        expect(wrapper.find('.loading-page').exists()).toBe(true);
     });
 });

@@ -315,7 +315,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
 
     it('exercita normalizarValorNota com ramificacoes em AutoavaliacaoDiagnosticoView', async () => {
         const wrapper = montar();
-        const select = wrapper.findComponent('[data-testid="autoavaliacao-importancia-10"]');
+        const select = wrapper.findComponent('[data-testid="autoavaliacao-importancia-10"]') as any;
         
         // Emite null
         await select.vm.$emit('update:modelValue', null);
@@ -339,7 +339,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
     });
 
     it('exercita tratamento de erros sem mensagem explícita e outros branches de normalizarNota', async () => {
-        erroConcluir.value = {};
+        erroConcluir.value = {} as any;
         concluirAutoavaliacaoMock.mockRejectedValue(erroConcluir.value);
         const wrapper = montar();
 
@@ -350,7 +350,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
 
     it('exercita erro de consenso sem mensagem explicita', async () => {
         situacaoServidor.value = 'CONSENSO_CRIADO';
-        erroAprovar.value = {};
+        erroAprovar.value = {} as any;
         aprovarConsensoMock.mockRejectedValue(erroAprovar.value);
         const wrapper = montar();
 
@@ -369,5 +369,26 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         const wrapper = montar();
         expect(wrapper.text()).toContain('Autoavaliação não iniciada');
         expect(wrapper.text()).toContain('Avaliação impossibilitada');
+    });
+
+    it('exercita situacoes de diagnostico concluido, consenso aprovado e conhecimentos preenchidos', async () => {
+        contextData.value.situacaoSubprocesso = 'DIAGNOSTICO_CONCLUIDO';
+        itensEquipe.value = [
+            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'CONSENSO_APROVADO'},
+        ];
+        queryContextoEdicaoDataVal.value.mapa.competencias[0].atividades[0].conhecimentos = [
+            {codigo: 10, descricao: 'React'},
+            {codigo: 11, descricao: 'Vue'},
+        ];
+        podeCriarConsenso.value = true;
+        
+        const wrapper = montar();
+        
+        // Simular que o toggle de detalhes da competência está aberto para renderizar a lista
+        const vm = wrapper.vm as any;
+        vm.detalhesCompetenciaAbertos[10] = true;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.text()).toContain('React, Vue');
     });
 });

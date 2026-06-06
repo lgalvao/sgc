@@ -1,12 +1,22 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {createPinia} from "pinia";
-import {createApp, ref} from "vue";
-import {PiniaColada} from "@pinia/colada";
+import {ref} from "vue";
 import {useUnidadesQuery, useInvalidacaoUnidades, CHAVE_QUERY_UNIDADES} from "../useUnidadesQuery";
 import * as unidadeService from "@/services/unidadeService";
 
-vi.mock("@/services/unidadeService", () => ({
-    buscarTodasUnidades: vi.fn(),
+let queryOptions: any = null;
+const invalidateQueriesMock = vi.fn();
+
+vi.mock("@pinia/colada", () => ({
+    useQuery: vi.fn((options: any) => {
+        queryOptions = options;
+        return {
+            data: ref([]),
+            status: ref("success"),
+        };
+    }),
+    useQueryCache: () => ({
+        invalidateQueries: invalidateQueriesMock,
+    }),
 }));
 
 const mockPerfilSelecionado = ref<string | undefined>("SERVIDOR");
@@ -17,69 +27,46 @@ vi.mock("@/stores/perfil", () => ({
     }),
 }));
 
-function withSetup<T>(composable: () => T) {
-    let result: T;
-    const app = createApp({
-        setup() {
-            result = composable();
-            return () => {};
-        },
-    });
-    const pinia = createPinia();
-    app.use(pinia);
-    app.use(PiniaColada);
-    app.mount(document.createElement("div"));
-    return [result!, app] as const;
-}
+vi.mock("@/services/unidadeService", () => ({
+    buscarTodasUnidades: vi.fn(),
+}));
 
 describe("useUnidadesQuery", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        queryOptions = null;
         mockPerfilSelecionado.value = "SERVIDOR";
     });
 
-    it("deve buscar todas as unidades quando perfil selecionado estiver presente", async () => {
-        const mockUnidades = [{codigo: 1, nome: "Unidade 1", sigla: "U1"}];
-        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue(mockUnidades as any);
+    it("deve inicializar useQuery com as opções corretas", async () => {
+        useUnidadesQuery();
 
-        const [query, app] = withSetup(() => useUnidadesQuery());
+        expect(queryOptions).toBeDefined();
 
-        // Para exercitar o enabled()
-        const enabledCallback = (query as any).enabled;
-        const isEnabled = typeof enabledCallback === "function" ? enabledCallback() : enabledCallback;
-        expect(isEnabled).toBe(true);
+        // 1. key
+        expect(queryOptions.key).toEqual(CHAVE_QUERY_UNIDADES);
 
-        // Para exercitar o key()
-        const keyCallback = (query as any).key;
-        const key = typeof keyCallback === "function" ? keyCallback() : keyCallback;
-        expect(key).toEqual(CHAVE_QUERY_UNIDADES);
-
-        const res = await query.refetch();
-        expect(res.data).toEqual(mockUnidades);
+        // 2. query
+        vi.mocked(unidadeService.buscarTodasUnidades).mockResolvedValue([{codigo: 1, nome: "U1"}] as any);
+        const res = await queryOptions.query();
+        expect(res).toEqual([{codigo: 1, nome: "U1"}]);
         expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
 
-        app.unmount();
+        // 3. enabled
+        expect(queryOptions.enabled()).toBe(true);
     });
 
-    it("não deve buscar quando perfil selecionado estiver ausente", async () => {
+    it("deve retornar enabled false se perfilSelecionado for ausente", () => {
         mockPerfilSelecionado.value = undefined;
+        useUnidadesQuery();
 
-        const [query, app] = withSetup(() => useUnidadesQuery());
-
-        const enabledCallback = (query as any).enabled;
-        const isEnabled = typeof enabledCallback === "function" ? enabledCallback() : enabledCallback;
-        expect(isEnabled).toBe(false);
-
-        app.unmount();
+        expect(queryOptions.enabled()).toBe(false);
     });
 
-    it("useInvalidacaoUnidades deve expor métodos de invalidação válidos", () => {
-        const [invalidadores, app] = withSetup(() => useInvalidacaoUnidades());
-        expect(invalidadores.invalidarUnidades).toBeTypeOf("function");
-        
-        // Chamar o método para cobertura completa
-        invalidadores.invalidarUnidades();
-        
-        app.unmount();
+    it("useInvalidacaoUnidades deve chamar invalidateQueries corretamente", () => {
+        const {invalidarUnidades} = useInvalidacaoUnidades();
+        invalidarUnidades();
+
+        expect(invalidateQueriesMock).toHaveBeenCalledWith({key: CHAVE_QUERY_UNIDADES});
     });
 });

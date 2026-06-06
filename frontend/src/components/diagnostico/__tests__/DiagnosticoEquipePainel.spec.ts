@@ -1,7 +1,7 @@
 import {AxiosError} from 'axios';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
-import {computed, ref} from 'vue';
+import {computed, nextTick, ref} from 'vue';
 import DiagnosticoEquipePainel from '../DiagnosticoEquipePainel.vue';
 
 const pushMock = vi.fn();
@@ -17,6 +17,11 @@ const habilitarConcluirDiagnostico = ref(true);
 const habilitarValidarDiagnostico = ref(false);
 const habilitarDevolverDiagnostico = ref(false);
 const habilitarHomologarDiagnostico = ref(false);
+const concluindo = ref(false);
+const validando = ref(false);
+const devolvendo = ref(false);
+const homologando = ref(false);
+const impossibilitando = ref(false);
 const servidores = ref<any[]>([
     {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
     {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
@@ -32,6 +37,18 @@ vi.mock('vue-router', () => ({
         push: pushMock,
         back: backMock,
     }),
+}));
+
+vi.mock('@/utils/apiError', () => ({
+    normalizarErro: vi.fn((err) => {
+        if (err && typeof err === 'object' && 'response' in err && (err.response as any)?.data?.message) {
+            return { mensagem: (err.response as any).data.message };
+        }
+        if (err instanceof Error) {
+            return { mensagem: err.message };
+        }
+        return { mensagem: undefined };
+    })
 }));
 
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
@@ -53,11 +70,11 @@ vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
 
 vi.mock('@/composables/useFluxoDiagnostico', () => ({
     useFluxoDiagnostico: () => ({
-        concluindo: ref(false),
-        validando: ref(false),
-        devolvendo: ref(false),
-        homologando: ref(false),
-        impossibilitando: ref(false),
+        concluindo,
+        validando,
+        devolvendo,
+        homologando,
+        impossibilitando,
         erroConcluir,
         erroValidar,
         erroDevolver,
@@ -74,6 +91,11 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
 describe('DiagnosticoEquipePainel', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        concluindo.value = false;
+        validando.value = false;
+        devolvendo.value = false;
+        homologando.value = false;
+        impossibilitando.value = false;
         podeCriarConsenso.value = true;
         habilitarConcluirDiagnostico.value = true;
         habilitarValidarDiagnostico.value = false;
@@ -100,10 +122,14 @@ describe('DiagnosticoEquipePainel', () => {
                 stubs: {
                     AppAlert: {
                         props: ['mensagem'],
-                        template: '<div class="app-alert">{{ mensagem }}</div>',
+                        emits: ['dismissed'],
+                        template: '<div class="app-alert">{{ mensagem }} <button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">X</button></div>',
                     },
                     EmptyState: {template: '<div data-testid="empty-state" />'},
-                    BBadge: {template: '<span><slot /></span>'},
+                    BBadge: {
+                        props: ['variant'],
+                        template: '<span :class="variant ? `badge-${variant}` : \'\'"><slot /></span>',
+                    },
                     BCard: {template: '<section><slot /></section>'},
                     BSpinner: {template: '<span />'},
                     BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
@@ -118,7 +144,13 @@ describe('DiagnosticoEquipePainel', () => {
                     BModal: {
                         props: ['modelValue'],
                         emits: ['update:modelValue'],
-                        template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
+                        template: `
+                          <div v-if="modelValue">
+                            <button data-testid="btn-fechar-modal" @click="$emit('update:modelValue', false)">X</button>
+                            <slot />
+                            <slot name="footer" />
+                          </div>
+                        `,
                     },
                     BTable: {
                         props: ['items'],
@@ -331,5 +363,196 @@ describe('DiagnosticoEquipePainel', () => {
         ];
         const wrapper = montar();
         expect(wrapper.text()).toContain('STATUS_DESCONHECIDO');
+    });
+
+    it('exercita todas as variantes de situacaoServidor e suas classes de badge correspondentes', () => {
+        servidores.value = [
+            {servidorTitulo: '1', servidorNome: 'Servidor 1', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA'},
+            {servidorTitulo: '2', servidorNome: 'Servidor 2', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
+            {servidorTitulo: '3', servidorNome: 'Servidor 3', situacaoServidor: 'CONSENSO_CRIADO'},
+            {servidorTitulo: '4', servidorNome: 'Servidor 4', situacaoServidor: 'CONSENSO_APROVADO'},
+            {servidorTitulo: '5', servidorNome: 'Servidor 5', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
+        ];
+
+        const wrapper = montar();
+
+        const badge1 = wrapper.find('span.badge-light');
+        const badge2 = wrapper.find('span.badge-info');
+        const badge3 = wrapper.find('span.badge-warning');
+        const badge4 = wrapper.find('span.badge-success');
+        const badge5 = wrapper.find('span.badge-secondary');
+
+        expect(badge1.exists()).toBe(true);
+        expect(badge2.exists()).toBe(true);
+        expect(badge3.exists()).toBe(true);
+        expect(badge4.exists()).toBe(true);
+        expect(badge5.exists()).toBe(true);
+
+        expect(badge1.text()).toBe('Autoavaliação não iniciada');
+        expect(badge2.text()).toBe('Autoavaliação concluída');
+        expect(badge3.text()).toBe('Avaliação de consenso criada');
+        expect(badge4.text()).toBe('Avaliação de consenso aprovada');
+        expect(badge5.text()).toBe('Avaliação impossibilitada');
+    });
+
+    it('exibe a mensagem de erro customizada do backend na falha ao devolver', async () => {
+        habilitarDevolverDiagnostico.value = true;
+        devolverDiagnosticoMock.mockRejectedValue(new Error('Justificativa inválida do backend'));
+        erroDevolver.value = new Error('Erro: justificativa precisa de mais caracteres');
+
+        const wrapper = montar();
+
+        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await wrapper.get('textarea').setValue('Ajuste solicitado');
+        await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
+
+        expect(wrapper.text()).toContain('Erro: justificativa precisa de mais caracteres');
+    });
+
+    it('cobre o fechamento dos modais de fluxo pelo evento update:modelValue', async () => {
+        const wrapper = montar();
+
+        // 1. Modal Impossibilitar
+        await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
+        await nextTick();
+        expect(wrapper.find('[data-testid="btn-fechar-modal"]').exists()).toBe(true);
+        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await nextTick();
+
+        // 2. Modal Concluir
+        await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
+        await nextTick();
+        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await nextTick();
+
+        // 3. Modal Validar
+        habilitarValidarDiagnostico.value = true;
+        await nextTick();
+        await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
+        await nextTick();
+        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await nextTick();
+
+        // 4. Modal Devolver
+        habilitarDevolverDiagnostico.value = true;
+        await nextTick();
+        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await nextTick();
+        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await nextTick();
+
+        // 5. Modal Homologar
+        habilitarHomologarDiagnostico.value = true;
+        await nextTick();
+        await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
+        await nextTick();
+        await wrapper.get('[data-testid="btn-fechar-modal"]').trigger('click');
+        await nextTick();
+    });
+
+    it('navega de volta e fecha os alertas de erro e sucesso', async () => {
+        const wrapper = montar({exibirBotaoVoltar: true});
+
+        // Testar botão voltar
+        const botaoVoltar = wrapper.findAll('button').find(b => b.text().includes('Voltar'));
+        await botaoVoltar?.trigger('click');
+        expect(backMock).toHaveBeenCalled();
+
+        // Testar dismiss do alerta de erro
+        devolverDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
+        habilitarDevolverDiagnostico.value = true;
+        await nextTick();
+        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await wrapper.get('textarea').setValue('Justificativa');
+        await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
+        await nextTick();
+
+        expect(wrapper.text()).toContain('Não foi possível salvar.');
+        await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
+        await nextTick();
+        expect(wrapper.text()).not.toContain('Não foi possível salvar.');
+
+        // Testar dismiss do alerta de sucesso
+        devolverDiagnosticoMock.mockResolvedValue(undefined);
+        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await wrapper.get('textarea').setValue('Justificativa');
+        await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
+        await nextTick();
+
+        expect(wrapper.text()).toContain('Diagnóstico devolvido para ajustes');
+        await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
+        await nextTick();
+        expect(wrapper.text()).not.toContain('Diagnóstico devolvido para ajustes');
+    });
+
+    it('renderiza spinners de loading quando as operacoes estao em andamento', async () => {
+        // Inicializa com loading desativado para permitir cliques e aberturas de modal
+        concluindo.value = false;
+        validando.value = false;
+        devolvendo.value = false;
+        homologando.value = false;
+        impossibilitando.value = false;
+
+        habilitarConcluirDiagnostico.value = true;
+        habilitarValidarDiagnostico.value = true;
+        habilitarDevolverDiagnostico.value = true;
+        habilitarHomologarDiagnostico.value = true;
+
+        const wrapper = montar();
+
+        // Abre os modais primeiro
+        await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
+        await nextTick();
+
+        // Ativa os estados de loading
+        concluindo.value = true;
+        validando.value = true;
+        devolvendo.value = true;
+        homologando.value = true;
+        impossibilitando.value = true;
+        await nextTick();
+
+        // Verifica a presença de spinners no HTML compilado (BSpinner stubbed -> span)
+        expect(wrapper.find('[data-testid="btn-confirmar-concluir-diagnostico"] span').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-confirmar-validar"] span').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-confirmar-devolver"] span').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-confirmar-homologar"] span').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-confirmar-impossibilitar"] span').exists()).toBe(true);
+    });
+
+    it('exercita o retorno antecipado de confirmarImpossibilitar quando servidorSelecionado for null', async () => {
+        const wrapper = montar();
+
+        // Encontra o stub do modal pelo nome de registro (b-modal)
+        const modals = wrapper.findAllComponents({ name: 'b-modal' });
+        const modalImpossibilitar = modals[0];
+        await modalImpossibilitar.vm.$emit('update:modelValue', true);
+        await nextTick();
+
+        // Digita justificativa para passar no check de string vazia
+        await wrapper.get('[data-testid="textarea-justificativa-impossibilidade"]').setValue('Justificativa de teste');
+        // Clica no botão de confirmar impossibilidade
+        await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
+
+        // Como servidorSelecionado é null, o método retorna de imediato e impossibilitarAvaliacaoMock não deve ser chamado
+        expect(impossibilitarAvaliacaoMock).not.toHaveBeenCalled();
+    });
+
+    it('exercita o fallback de erroConcluir.value?.message na falha ao concluir', async () => {
+        habilitarConcluirDiagnostico.value = true;
+        concluirDiagnosticoMock.mockRejectedValue({}); // Rejeita com objeto vazio sem propriedade .mensagem
+        erroConcluir.value = new Error('Mensagem customizada do erroConcluir ref');
+
+        const wrapper = montar();
+
+        await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-concluir-diagnostico"]').trigger('click');
+        await nextTick();
+
+        expect(wrapper.text()).toContain('Mensagem customizada do erroConcluir ref');
     });
 });

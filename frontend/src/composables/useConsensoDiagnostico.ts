@@ -61,16 +61,10 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_INICIADA');
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
 
-    const mutacaoSalvar = useMutation({
+        const mutacaoSalvar = useMutation({
         mutation: (titulo: string) =>
             salvarConsenso(codSubprocesso, titulo, {
-                competencias: competenciasDetalhadasLocais.value.length > 0
-                    ? competenciasDetalhadasLocais.value.map((item) => ({
-                        competenciaCodigo: item.competenciaCodigo,
-                        importancia: item.consensoImportancia,
-                        dominio: item.consensoDominio,
-                    }))
-                    : competenciasLocais.value,
+                competencias: obterCompetenciasPayload(competenciasDetalhadasLocais.value, competenciasLocais.value),
                 competenciasDetalhadas: competenciasDetalhadasLocais.value.length > 0
                     ? competenciasDetalhadasLocais.value
                     : undefined,
@@ -82,30 +76,19 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             cache.setQueryData(
                 chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
                 {
-                    competencias: competenciasDetalhadasLocais.value.length > 0
-                        ? competenciasDetalhadasLocais.value.map((item) => ({
-                            competenciaCodigo: item.competenciaCodigo,
-                            importancia: item.consensoImportancia,
-                            dominio: item.consensoDominio,
-                        }))
-                        : competenciasLocais.value.map((item) => ({...item})),
-                    competenciasDetalhadas: competenciasDetalhadasLocais.value.length > 0
-                        ? competenciasDetalhadasLocais.value.map((item) => ({...item}))
-                        : undefined,
+                    competencias: obterCompetenciasPayload(competenciasDetalhadasLocais.value, competenciasLocais.value),
+                    competenciasDetalhadas: obterDetalhadasCopia(competenciasDetalhadasLocais.value),
                     situacaoServidor: 'CONSENSO_CRIADO',
                 } satisfies Consenso,
             );
-            void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo), exact: true});
-            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso, contextoSessao), exact: true});
+            invalidarQueriesConsenso({cache, codSubprocesso, contextoSessao, servidorTitulo});
         },
     });
 
     const mutacaoAprovar = useMutation({
         mutation: () => aprovarConsenso(codSubprocesso),
         onSuccess: () => {
-            void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo), exact: true});
-            void cache.invalidateQueries({key: chaveEquipe(codSubprocesso, contextoSessao), exact: true});
-            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso, contextoSessao), exact: true});
+            invalidarQueriesAprovar({cache, codSubprocesso, contextoSessao, servidorTitulo});
         },
     });
 
@@ -183,4 +166,39 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         atualizarNotaDetalhada,
         aprovarConsenso: () => mutacaoAprovar.mutateAsync(),
     };
+}
+
+function obterCompetenciasPayload(
+    detalhadas: ConsensoCompetenciaDetalhada[],
+    simples: AvaliacaoCompetencia[],
+): AvaliacaoCompetencia[] {
+    return detalhadas.length > 0
+        ? detalhadas.map((item) => ({
+            competenciaCodigo: item.competenciaCodigo,
+            importancia: item.consensoImportancia,
+            dominio: item.consensoDominio,
+        }))
+        : simples.map((item) => ({...item}));
+}
+
+function obterDetalhadasCopia(detalhadas: ConsensoCompetenciaDetalhada[]): ConsensoCompetenciaDetalhada[] | undefined {
+    return detalhadas.length > 0 ? detalhadas.map((item) => ({...item})) : undefined;
+}
+
+interface InvalidaQueriesContext {
+    cache: ReturnType<typeof useQueryCache>;
+    codSubprocesso: number;
+    contextoSessao: ReturnType<typeof criarContextoSessaoDiagnostico>;
+    servidorTitulo?: string;
+}
+
+function invalidarQueriesConsenso(ctx: InvalidaQueriesContext) {
+    void ctx.cache.invalidateQueries({key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.servidorTitulo), exact: true});
+    void ctx.cache.invalidateQueries({key: chaveEquipe(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
+}
+
+function invalidarQueriesAprovar(ctx: InvalidaQueriesContext) {
+    void ctx.cache.invalidateQueries({key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.servidorTitulo), exact: true});
+    void ctx.cache.invalidateQueries({key: chaveEquipe(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
+    void ctx.cache.invalidateQueries({key: chaveAutoavaliacao(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
 }
