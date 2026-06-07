@@ -23,7 +23,7 @@ type ConfiguracaoMonitorada = InternalAxiosRequestConfig & {
 type ErroCanceladoHttp = {
     code?: string;
     name?: string;
-    __sgcErroGlobalRegistrado?: boolean;
+    sgcErroGlobalRegistrado?: boolean;
 };
 
 const controladoresPendentes = new Set<AbortController>();
@@ -135,14 +135,14 @@ export function isErroGlobalRegistrado(error: unknown): boolean {
     if (typeof error !== "object" || !error) {
         return false;
     }
-    return Boolean((error as ErroCanceladoHttp).__sgcErroGlobalRegistrado);
+    return Boolean((error as ErroCanceladoHttp).sgcErroGlobalRegistrado);
 }
 
 function marcarErroGlobalRegistrado(error: unknown) {
     if (typeof error !== "object" || !error) {
         return;
     }
-    (error as ErroCanceladoHttp).__sgcErroGlobalRegistrado = true;
+    (error as ErroCanceladoHttp).sgcErroGlobalRegistrado = true;
 }
 
 function marcarErroComoCancelado(error: import('axios').AxiosError, motivo: string) {

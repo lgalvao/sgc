@@ -1,5 +1,5 @@
 import {describe, expect, it, vi} from 'vitest';
-import {computed, ref} from 'vue';
+import {ref} from 'vue';
 import {mount} from '@vue/test-utils';
 import OcupacoesCriticasDiagnosticoView from '../OcupacoesCriticasDiagnosticoView.vue';
 
@@ -174,14 +174,6 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
         const select = wrapperSelect.find('select');
         await select.setValue('AC');
         expect(atualizarCapacitacaoMock).toHaveBeenCalledWith('1', 10, 'AC');
-        
-        // Testa dismiss do alert
-        // Mas a ref interna de erroMensagem só é populada localmente. 
-        // Em vez de simular, vamos encontrar o AppAlert se for forçado a exibir
-        // Como não há mock de erro para atualizarCapacitacao (que é void/nao lida com erro internamente na view),
-        // o `erroMensagem` seria populado se houvesse um catch na view. Wait, na view há erroMensagem?
-        // Sim, `erroMensagem.value = ''` ao `@dismissed`. Podemos emitir `dismissed` no componente
-        // se pudermos forçá-lo a renderizar. Vamos colocar na próxima execução.
     });
 
     it('exercita unidade null', () => {

@@ -1,6 +1,6 @@
 # Auditoria de cruft do frontend
 
-Gerado em: 2026-06-07T21:04:29.181Z
+Gerado em: 2026-06-07T21:15:14.299Z
 Score total: 566 (critico)
 
 ## Resumo
@@ -31,7 +31,7 @@ Score total: 566 (critico)
 | frontend/src/composables/useCadastroTela.ts | composable | 503 | 15 | checksNull: 1, fallbacksDefensivos: 3, catchBlocks: 2 |
 | frontend/src/composables/useMapaTela.ts | composable | 433 | 15 | checksNull: 1, fallbacksDefensivos: 3, catchBlocks: 2 |
 | frontend/src/views/ConsensoDiagnosticoView.vue | view | 368 | 15 | checksNull: 2, fallbacksDefensivos: 3, catchBlocks: 1 |
-| frontend/src/composables/usePainelTela.ts | composable | 169 | 14 | fallbacksDefensivos: 4, catchBlocks: 1 |
+| frontend/src/composables/usePainelTela.ts | composable | 168 | 14 | fallbacksDefensivos: 4, catchBlocks: 1 |
 | frontend/src/views/feedbacksAdminApresentacao.ts | view | 177 | 13 | checksNull: 2, fallbacksDefensivos: 1, catchBlocks: 3 |
 | frontend/src/composables/useMonitoramentoDiagnostico.ts | composable | 57 | 12 | fallbacksDefensivos: 4 |
 | frontend/src/composables/useConfiguracoes.ts | composable | 105 | 11 | fallbacksDefensivos: 1, catchBlocks: 2, exportsSuspeitos: 1 |

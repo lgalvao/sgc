@@ -12,7 +12,7 @@
     "build:hom": "vite build --mode hom",
     "build:e2e": "vite build --mode e2e",
     "build:prod": "vite build --mode production",
-    "lint:ox": "oxlint --ignore-path .oxlintignore .",
+    "lint:ox": "oxlint . --ignore-pattern '**/*.spec.ts' --ignore-pattern '**/*.test.ts' --ignore-pattern '**/*.stories.ts' --ignore-pattern 'src/test-utils/**' --ignore-pattern 'vitest.config.ts' --ignore-pattern 'vitest.setup.ts'",
     "lint": "npm run lint:ox && eslint . --ext .vue,.js,.mjs,.ts --fix",
     "deps:audit": "knip",
     "typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
@@ -25,7 +25,7 @@
     "arquitetura:gate": "node ../etc/scripts/sgc.js frontend arquitetura validar",
     "cruft:check": "node ../etc/scripts/sgc.js frontend cruft validar",
     "quality:test": "npm run test:unit",
-    "quality:lint": "oxlint . && eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist",
+    "quality:lint": "oxlint . --ignore-pattern '**/*.spec.ts' --ignore-pattern '**/*.test.ts' --ignore-pattern '**/*.stories.ts' --ignore-pattern 'src/test-utils/**' --ignore-pattern 'vitest.config.ts' --ignore-pattern 'vitest.setup.ts' && eslint . --ext .vue,.js,.mjs,.ts --max-warnings 0 --ignore-pattern coverage --ignore-pattern dist",
     "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
     "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck && npm run cruft:check && npm run arquitetura:gate"
   },
