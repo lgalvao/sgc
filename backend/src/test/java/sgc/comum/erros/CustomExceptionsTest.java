@@ -47,11 +47,15 @@ class CustomExceptionsTest {
         ErroNegocioBase erro2 = new ErroNegocioBase("msg", "CODE", HttpStatus.BAD_REQUEST, new HashMap<>()) {
         };
         assertThat(erro2.getDetails()).isEmpty();
+    }
 
-        RuntimeException cause = new RuntimeException("causa");
-        ErroNegocioBase erro3 = new ErroNegocioBase(cause) {
-        };
-        assertThat(erro3.getCause()).isEqualTo(cause);
-        assertThat(erro3.getDetails()).isEmpty();
+    @Test
+    @DisplayName("Deve instanciar ErroAutenticacao como erro de negócio 401")
+    void testErroAutenticacao() {
+        ErroAutenticacao erro = new ErroAutenticacao("Sessão expirada");
+
+        assertThat(erro.getMessage()).isEqualTo("Sessão expirada");
+        assertThat(erro.getCode()).isEqualTo("NAO_AUTORIZADO");
+        assertThat(erro.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }

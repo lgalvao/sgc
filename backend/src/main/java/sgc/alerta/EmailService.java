@@ -64,7 +64,7 @@ public class EmailService {
             helper.setText(corpo, html);
             enviadorEmail.send(mensagem);
         } catch (MessagingException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new ErroEnvioEmail(destinatario, e);
         }
     }
 

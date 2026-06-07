@@ -85,7 +85,7 @@ public class ResponsavelUnidadeService {
 
     private AtribuicaoDto toAtribuicaoTemporariaDto(AtribuicaoTemporaria atribuicao, Map<String, Usuario> usuariosPorTitulo) {
         Usuario usuario = Optional.ofNullable(usuariosPorTitulo.get(atribuicao.getUsuarioTitulo()))
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
                         "Usuário ausente para atribuição temporária %d".formatted(atribuicao.getCodigo())));
 
         return organizacaoDtoMapper.paraAtribuicaoDto(atribuicao, usuario);
@@ -327,7 +327,7 @@ public class ResponsavelUnidadeService {
     private String obterTituloTitularObrigatorio(ResponsabilidadeUnidadeResumoLeitura responsabilidade) {
         String tituloTitular = responsabilidade.titularTitulo();
         if (tituloTitular == null || tituloTitular.isBlank()) {
-            throw new IllegalStateException("Titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
+            throw new ErroInconsistenciaInterna("Titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
         }
         return tituloTitular;
     }
@@ -336,7 +336,7 @@ public class ResponsavelUnidadeService {
     private UnidadeResponsavelDto montarResponsavelDto(ResponsabilidadeUnidadeResumoLeitura responsabilidade) {
         String titularTitulo = obterTituloTitularObrigatorio(responsabilidade);
         if (responsabilidade.responsavelNome() == null || responsabilidade.titularNome() == null) {
-            throw new IllegalStateException("Responsável ou titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
+            throw new ErroInconsistenciaInterna("Responsável ou titular oficial ausente para unidade %d".formatted(responsabilidade.unidadeCodigo()));
         }
 
         if (responsabilidade.responsavelTitulo().equals(titularTitulo)) {

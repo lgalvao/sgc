@@ -38,7 +38,7 @@
       </div>
 
       <BAlert
-          v-if="erroGlobalFormatado"
+          v-if="erroGlobal"
           :key="erroTick"
           :model-value="true"
           data-testid="alerta-erro-global"
@@ -48,7 +48,7 @@
           variant="danger"
           @dismissed="erroGlobal = null"
       >
-        {{ erroGlobalFormatado.mensagem }}
+        {{ erroGlobal }}
       </BAlert>
 
       <AppAlert
@@ -169,7 +169,6 @@ const {
   disponibilizacaoSemMudancas,
   checkboxSemMudancasDesabilitado,
   loadingInicioRevisao,
-  erroGlobalFormatado,
   erroTick,
   erroGlobal,
   notificacao,

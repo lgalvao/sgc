@@ -123,7 +123,7 @@
           <dd class="col-sm-8">{{ itemParaDetalhes.tentativas }}</dd>
 
           <dt class="col-sm-4">Último erro</dt>
-          <dd class="col-sm-8 text-break">{{ itemParaDetalhes.ultimoErro || "-" }}</dd>
+          <dd class="col-sm-8 text-break">{{ formatarTextoOuHifen(itemParaDetalhes.ultimoErro) }}</dd>
         </dl>
       </div>
     </ModalPadrao>
@@ -184,11 +184,19 @@ const mostrarPreview = ref(false);
 const mostrarDetalhes = ref(false);
 
 const carregando = computed(() => notificacoesQuery.isPending.value || notificacoesQuery.isLoading.value);
-const erro = computed(() => notificacoesQuery.error.value?.message || null);
+const erro = computed(() => notificacoesQuery.error.value?.message ?? null);
 const itensOrdenados = notificacoesQuery.itensOrdenados;
 const reenviando = computed(() => reenvioMutation.isLoading.value);
 const urlLeitorEmailTestes = computed(() => leitorEmailTestesQuery.data.value ?? undefined);
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
+
+function obterMensagemErro(error: unknown, mensagemPadrao: string) {
+  return normalizarErro(error).mensagem || mensagemPadrao;
+}
+
+function formatarTextoOuHifen(valor?: string | null): string {
+  return valor?.trim() || "-";
+}
 
 function formatarDataOuHifen(valor?: string | null): string {
   if (!valor) return "-";
@@ -198,7 +206,7 @@ function formatarDataOuHifen(valor?: string | null): string {
 
 function formatarTipoNotificacao(tipo?: string): string {
   if (!tipo) return "-";
-  return TIPOS_NOTIFICACAO_LABELS[tipo] || tipo;
+  return TIPOS_NOTIFICACAO_LABELS[tipo] ?? tipo;
 }
 
 function montarPreviewHtml(corpoHtml?: string): string {
@@ -242,7 +250,7 @@ async function carregar() {
   try {
     await notificacoesQuery.refetch();
   } catch (error) {
-    notify(normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR, "danger");
+    notify(obterMensagemErro(error, TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR), "danger");
   }
 }
 
@@ -269,7 +277,7 @@ async function reenviar() {
     mostrarModalReenvio.value = false;
     itemSelecionado.value = null;
   } catch (error) {
-    notify(normalizarErro(error).mensagem || TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO, "danger");
+    notify(obterMensagemErro(error, TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO), "danger");
   }
 }
 </script>

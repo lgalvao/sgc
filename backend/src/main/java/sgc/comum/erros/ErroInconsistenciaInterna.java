@@ -7,4 +7,8 @@ public class ErroInconsistenciaInterna extends ErroInterno {
     public ErroInconsistenciaInterna(String message) {
         super(message);
     }
+
+    public ErroInconsistenciaInterna(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

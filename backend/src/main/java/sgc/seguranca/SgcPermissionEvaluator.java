@@ -6,6 +6,7 @@ import org.jspecify.annotations.*;
 import org.springframework.security.access.*;
 import org.springframework.security.core.*;
 import org.springframework.stereotype.*;
+import sgc.comum.erros.*;
 import sgc.comum.util.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -231,7 +232,11 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         try {
             return AcaoPermissao.valueOf(permissao);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Ação de permissão desconhecida: '%s'. Verifique se o valor está registrado em AcaoPermissao.".formatted(permissao), e);
+            throw new ErroInconsistenciaInterna(
+                    "Ação de permissão desconhecida: '%s'. Verifique se o valor está registrado em AcaoPermissao."
+                            .formatted(permissao),
+                    e
+            );
         }
     }
 }

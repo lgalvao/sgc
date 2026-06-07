@@ -75,14 +75,14 @@ class RestExceptionHandlerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve tratar IllegalArgumentException (400) para tipo de processo inválido")
+    @DisplayName("Deve tratar IllegalArgumentException remanescente como erro interno (500)")
     @WithMockChefe
     void tratarIllegalArgumentException() throws Exception {
         mockMvc.perform(get("/api/unidades/arvore-com-elegibilidade")
                         .param("tipoProcesso", "TIPO_INVALIDO"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Dados inválidos fornecidos na requisição."))
-                .andExpect(jsonPath("$.code").value("ARGUMENTO_INVALIDO"));
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Erro inesperado."))
+                .andExpect(jsonPath("$.code").value("ERRO_INTERNO"));
     }
 
     @Test

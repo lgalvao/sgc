@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
@@ -21,7 +22,8 @@ public class SubprocessoSituacaoService {
     @Transactional
     public void atualizarSituacaoPorMapa(Long mapaCodigo, boolean temAtividades) {
         Subprocesso subprocesso = subprocessoRepo.findByMapa_Codigo(mapaCodigo)
-                .orElseThrow();
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Subprocesso não encontrado para mapa %s".formatted(mapaCodigo)));
 
         reconciliarSituacao(subprocesso, temAtividades);
     }

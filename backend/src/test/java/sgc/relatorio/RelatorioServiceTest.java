@@ -546,7 +546,7 @@ class RelatorioServiceTest {
 
         OutputStream out = new ByteArrayOutputStream();
         assertThatThrownBy(() -> relatorioService.gerarRelatorioUnidadesSemMapasVigentes(out))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Erro ao gerar PDF");
     }
 
@@ -1194,8 +1194,8 @@ class RelatorioServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lancar IllegalStateException quando falha escrita de PDF")
-    void deveLancarIllegalStateExceptionQuandoFalhaEscritaDePdf() throws Exception {
+    @DisplayName("Deve lancar ErroInconsistenciaInterna quando falha escrita de PDF")
+    void deveLancarErroInconsistenciaInternaQuandoFalhaEscritaDePdf() throws Exception {
         RelatorioService spyRelatorioService = spy(relatorioService);
         when(pdfFactory.createDocument()).thenReturn(document);
 
@@ -1216,7 +1216,7 @@ class RelatorioServiceTest {
         OutputStream out = new ByteArrayOutputStream();
 
         assertThatThrownBy(() -> spyRelatorioService.gerarRelatorioUnidadesSemMapasVigentes(out))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Erro ao gerar PDF")
                 .hasCauseInstanceOf(DocumentException.class);
     }
@@ -1493,7 +1493,7 @@ class RelatorioServiceTest {
             when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(1L));
             doThrow(new IOException("Erro de IO")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
             assertThatThrownBy(() -> spyService.gerarRelatorioUnidadesSemMapasVigentes(new ByteArrayOutputStream()))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Erro ao gerar PDF")
                 .hasCauseInstanceOf(IOException.class);
 
@@ -1502,7 +1502,7 @@ class RelatorioServiceTest {
             when(processoService.buscarPorCodigo(1L)).thenReturn(p);
             doThrow(new DocumentException("Erro PDF")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
             assertThatThrownBy(() -> spyService.gerarRelatorioAndamento(1L, new ByteArrayOutputStream()))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasCauseInstanceOf(DocumentException.class);
         }
 
@@ -1516,7 +1516,7 @@ class RelatorioServiceTest {
             doThrow(new IOException("Erro de IO")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
 
             assertThatThrownBy(() -> spyService.gerarRelatorioAndamento(1L, new ByteArrayOutputStream()))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Erro ao gerar PDF")
                 .hasCauseInstanceOf(IOException.class);
         }
@@ -1531,7 +1531,7 @@ class RelatorioServiceTest {
             doThrow(new IOException("Erro de IO")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
 
             assertThatThrownBy(() -> spyService.gerarRelatorioMapas(List.of(1L), new ByteArrayOutputStream()))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Erro ao gerar PDF")
                 .hasCauseInstanceOf(IOException.class);
         }

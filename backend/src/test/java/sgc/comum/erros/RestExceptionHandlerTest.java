@@ -102,16 +102,17 @@ class RestExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("Deve tratar IllegalStateException (409)")
-    void deveTratarIllegalStateException() throws Exception {
+    @DisplayName("Deve tratar IllegalStateException remanescente como erro interno (500)")
+    void deveTratarIllegalStateExceptionComoErroInterno() throws Exception {
         Mockito.doThrow(new IllegalStateException("Estado inválido"))
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("Operação inválida para o estado atual."));
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Erro inesperado."))
+                .andExpect(jsonPath("$.code").value("ERRO_INTERNO"));
     }
 
     @Test
@@ -130,16 +131,17 @@ class RestExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("Deve tratar IllegalArgumentException (400)")
-    void deveTratarIllegalArgumentException() throws Exception {
+    @DisplayName("Deve tratar IllegalArgumentException remanescente como erro interno (500)")
+    void deveTratarIllegalArgumentExceptionComoErroInterno() throws Exception {
         Mockito.doThrow(new IllegalArgumentException("Argumento inválido"))
                 .when(controller).teste(any());
 
         mockMvc.perform(post("/test/validacao")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSON_VALIDO_TESTE))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Dados inválidos fornecidos na requisição."));
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("Erro inesperado."))
+                .andExpect(jsonPath("$.code").value("ERRO_INTERNO"));
     }
 
     @Test

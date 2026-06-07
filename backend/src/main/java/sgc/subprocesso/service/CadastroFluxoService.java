@@ -321,7 +321,7 @@ public class CadastroFluxoService {
         return switch (sp.getProcesso().getTipo()) {
             case REVISAO -> FluxoCadastroContexto.revisao();
             case MAPEAMENTO -> FluxoCadastroContexto.mapeamento();
-            default -> throw new IllegalStateException(
+            default -> throw new sgc.comum.erros.ErroInconsistenciaInterna(
                     "Tipo %s sem fluxo de cadastro definido".formatted(sp.getProcesso().getTipo()));
         };
     }

@@ -4,7 +4,7 @@ import {createBootstrap, vBTooltip} from "bootstrap-vue-next"; // Importar creat
 import {PiniaColada} from "@pinia/colada";
 import {createPinia} from "pinia";
 import {createApp} from "vue";
-import {isErroCanceladoHttp, setRouter} from "@/axios-setup";
+import {isErroCanceladoHttp, isErroGlobalRegistrado, setRouter} from "@/axios-setup";
 import {normalizarErro} from "@/utils/apiError";
 import logger from "@/utils/logger";
 import App from "./App.vue";
@@ -38,7 +38,9 @@ app.config.errorHandler = (err) => {
     const normalizado = normalizarErro(err);
     if (normalizado.tipo === 'naoAutorizado') return;
     if (TIPOS_SEM_SOLUCAO.has(normalizado.tipo)) {
-        logger.error('[errorHandler]', normalizado.mensagem, err);
+        if (!isErroGlobalRegistrado(err)) {
+            logger.error('[errorHandler]', normalizado.mensagem, err);
+        }
         window.location.assign('/erro');
         return;
     }

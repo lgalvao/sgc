@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
 import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -225,7 +226,7 @@ public class PainelService {
         }
 
         if (siglaUnidadeUsuario == null || siglaUnidadeUsuario.isBlank()) {
-            throw new IllegalStateException("Sigla da unidade do usuário ausente");
+            throw new ErroInconsistenciaInterna("Sigla da unidade do usuário ausente");
         }
         return String.format("/processo/%s/%s", processo.getCodigo(), siglaUnidadeUsuario);
     }

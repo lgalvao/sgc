@@ -113,12 +113,14 @@ public class MapaManutencaoService {
 
     public Mapa mapaCompletoSubprocesso(Long subprocessoCodigo) {
         return mapaRepo.buscarCompletoPorSubprocesso(subprocessoCodigo)
-                .orElseThrow();
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Mapa completo não encontrado para subprocesso %s".formatted(subprocessoCodigo)));
     }
 
     public Mapa mapaComCompetenciasEAtividadesSubprocesso(Long subprocessoCodigo) {
         return mapaRepo.buscarComCompetenciasEAtividadesPorSubprocesso(subprocessoCodigo)
-                .orElseThrow();
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Mapa com competências e atividades não encontrado para subprocesso %s".formatted(subprocessoCodigo)));
     }
 
     public Mapa mapaCodigo(Long codigo) {

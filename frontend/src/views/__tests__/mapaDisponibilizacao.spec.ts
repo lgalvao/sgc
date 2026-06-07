@@ -3,6 +3,7 @@ import {ref} from 'vue'
 import {useMapaDisponibilizacao} from '../mapaDisponibilizacao'
 import {TEXTOS} from "@/constants/textos"
 import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa"
+import type {ErroNormalizado} from '@/utils/apiError'
 
 describe('mapaDisponibilizacao.ts', () => {
     const criarDependencias = () => ({
@@ -111,7 +112,7 @@ describe('mapaDisponibilizacao.ts', () => {
     it('deve limpar erros do mapa', () => {
         const deps = criarDependencias()
         const {limparErroMapa, erroValidacaoMapa, erroValidacaoMapaTick} = useMapaDisponibilizacao(deps as any)
-        const erroMapa = ref<string | null>('erro')
+        const erroMapa = ref<ErroNormalizado | null>({tipo: 'inesperado', mensagem: 'erro'})
         erroValidacaoMapa.value = 'erro local'
 
         limparErroMapa(erroMapa)

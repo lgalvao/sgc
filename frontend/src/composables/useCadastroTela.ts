@@ -121,6 +121,7 @@ export function useCadastroTela(props: CadastroTelaProps) {
     const errosValidacao = ref<ErroValidacao[]>([]);
     const erroGlobal = ref<string | null>(null);
     const erroTick = ref(0);
+    const erroAtualFluxo = computed(() => fluxoSubprocesso.ultimoErro.value);
 
     const mapaErros = computed(() => {
         const mapa = new Map<number, string>();
@@ -142,6 +143,14 @@ export function useCadastroTela(props: CadastroTelaProps) {
     function definirErroGlobal(mensagem: string) {
         limparErrosValidacao();
         erroGlobal.value = mensagem;
+    }
+
+    function definirErroGlobalDoErro(error: unknown) {
+        definirErroGlobal(normalizarErro(error).mensagem);
+    }
+
+    function obterErroCampoFluxo(campos: string[]) {
+        return erroAtualFluxo.value?.erros?.find((erro) => erro.campo != null && campos.includes(erro.campo))?.mensagem ?? "";
     }
 
     function aplicarErrosValidacao(erros: ErroValidacao[]) {
@@ -282,7 +291,7 @@ export function useCadastroTela(props: CadastroTelaProps) {
             await nextTick();
             scrollParaPrimeiroErro();
         } catch (error) {
-            definirErroGlobal(normalizarErro(error).mensagem);
+            definirErroGlobalDoErro(error);
         } finally {
             loadingValidacao.value = false;
         }
@@ -301,36 +310,31 @@ export function useCadastroTela(props: CadastroTelaProps) {
             } else {
                 await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso);
             }
+        } catch (error) {
+            definirErroGlobalDoErro(error);
+            return;
         } finally {
             loadingDisponibilizacao.value = false;
         }
         mostrarModalConfirmacao.value = false;
     }
 
-    const erroGlobalFormatado = computed(() =>
-        erroGlobal.value ? {mensagem: erroGlobal.value} : null
-    );
-
-    const erroCampoObservacaoDevolucao = computed(() => {
-        const erros = fluxoSubprocesso.ultimoErro.value?.erros;
-        if (!erros) return "";
-        return erros.find((erro) =>
-            ["justificativa", "texto", "observacoes"].includes(erro.campo || "")
-        )?.mensagem || "";
-    });
+    const erroCampoObservacaoDevolucao = computed(() => obterErroCampoFluxo(["justificativa", "texto", "observacoes"]));
 
     const erroFluxoCadastro = computed(() =>
-        fluxoSubprocesso.ultimoErro.value?.tipo === "validacao"
+        erroAtualFluxo.value?.tipo === "validacao"
             ? undefined
-            : fluxoSubprocesso.ultimoErro.value?.mensagem
+            : erroAtualFluxo.value?.mensagem
     );
 
-    const mensagemErroObservacaoDevolucao = computed(() =>
-        erroCampoObservacaoDevolucao.value
-            || (deveExibirErro(!extrairTextoPlanoHtml(observacaoDevolucao.value))
-                ? TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA
-                : "")
-    );
+    const mensagemErroObservacaoDevolucao = computed(() => {
+        if (erroCampoObservacaoDevolucao.value) {
+            return erroCampoObservacaoDevolucao.value;
+        }
+        return deveExibirErro(!extrairTextoPlanoHtml(observacaoDevolucao.value))
+            ? TEXTOS.atividades.ERRO_DEVOLUCAO_JUSTIFICATIVA
+            : "";
+    });
 
     const {
         historicoAnalises,
@@ -393,7 +397,6 @@ export function useCadastroTela(props: CadastroTelaProps) {
         disponibilizacaoSemMudancas,
         checkboxSemMudancasDesabilitado,
         loadingInicioRevisao,
-        erroGlobalFormatado,
         erroTick,
         erroGlobal,
         notificacao,

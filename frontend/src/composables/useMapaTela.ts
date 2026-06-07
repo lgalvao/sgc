@@ -34,7 +34,7 @@ interface MapaTelaProps {
 export function useMapaTela(props: MapaTelaProps) {
     const router = useRouter();
     const fluxoMapa = useFluxoMapa();
-    const carregandoFluxoMapa = computed(() => unref(fluxoMapa.carregando) ?? false);
+    const carregandoFluxoMapa = computed(() => unref(fluxoMapa.carregando));
     const {notify} = useNotification();
     const toastStore = useToastStore();
     const subprocessoStore = useSubprocessoStore();
@@ -75,7 +75,8 @@ export function useMapaTela(props: MapaTelaProps) {
     const modoSomenteLeitura = computed(() => !podeEditarMapa.value || esconderEdicaoMapaParaAdmin.value);
     const mostrarAcaoPrincipalMapa = computed(() => Boolean(acaoPrincipalMapa.value?.mostrar));
     const habilitarAcaoPrincipalMapa = computed(() => !!acaoPrincipalMapa.value?.habilitar);
-    const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao || TEXTOS.mapa.LABEL_HOMOLOGAR);
+    const rotuloAcaoPrincipalMapa = computed(() => acaoPrincipalMapa.value?.rotuloBotao ?? TEXTOS.mapa.LABEL_HOMOLOGAR);
+    const mapaAtual = computed(() => mapasStore.mapaCompleto.value);
 
     const {
         carregandoInicial,
@@ -91,9 +92,9 @@ export function useMapaTela(props: MapaTelaProps) {
     const mapasStore = useMapas(codigoSubprocesso);
     const {impactoMapa: impactos, erro: erroMapa} = mapasStore;
 
-    const atividades = computed(() => mapasStore.mapaCompleto.value?.atividades ?? []);
-    const competencias = computed(() => mapasStore.mapaCompleto.value?.competencias ?? []);
-    const mapaSomenteLeitura = computed(() => mapasStore.mapaCompleto.value);
+    const atividades = computed(() => mapaAtual.value?.atividades ?? []);
+    const competencias = computed(() => mapaAtual.value?.competencias ?? []);
+    const mapaSomenteLeitura = mapaAtual;
 
     const estadoModais = reactive({
         mostrarModalAceitar: false,
@@ -124,7 +125,8 @@ export function useMapaTela(props: MapaTelaProps) {
     async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
         fecharModal();
         toastStore.setPending(mensagem);
-        atualizarFluxoMapa(codigoSubprocesso.value ?? undefined);
+        const codigoAtual = codigoSubprocesso.value;
+        atualizarFluxoMapa(codigoAtual === null ? undefined : codigoAtual);
         await router.push({name: "Painel"});
     }
 
@@ -198,6 +200,11 @@ export function useMapaTela(props: MapaTelaProps) {
         const codSubp = codigoSubprocesso.value;
         if (!codSubp) throw new Error("Invariante violada: codigoSubprocesso não carregado");
         return codSubp;
+    }
+
+    function obterMensagemErroIntegracaoContexto() {
+        return subprocessoStore.erroIntegracaoContexto?.mensagem
+            ?? "Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.";
     }
 
     async function exportarMapaAtualPdf() {
@@ -315,7 +322,7 @@ export function useMapaTela(props: MapaTelaProps) {
         aplicarErroNormalizado,
     });
 
-    const erroMapaExibido = computed(() => erroValidacaoMapa.value || erroMapa.value);
+    const erroMapaExibido = computed(() => erroValidacaoMapa.value || erroMapa.value?.mensagem || "");
 
     function dispensarErroMapa() {
         limparErroMapa(erroMapa);
@@ -324,11 +331,7 @@ export function useMapaTela(props: MapaTelaProps) {
     onMounted(async () => {
         const sucesso = await carregarContextoInicial();
         if (!sucesso) {
-            if (subprocessoStore.erroIntegracaoContexto) {
-                notify(subprocessoStore.erroIntegracaoContexto.mensagem, 'danger');
-            } else {
-                notify('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
-            }
+            notify(obterMensagemErroIntegracaoContexto(), 'danger');
         }
     });
 
@@ -362,7 +365,6 @@ export function useMapaTela(props: MapaTelaProps) {
         loadingExportacaoPdf,
         loadingExportacaoCsv,
         impactos,
-        erroMapa,
         atividades,
         competencias,
         mapaSomenteLeitura,

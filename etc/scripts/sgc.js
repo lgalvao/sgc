@@ -35,6 +35,7 @@ program
 const backend = program.command("backend").description("Ferramentas do backend.");
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
 criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "etc/scripts/backend/cobertura-auditoria.js");
+criarComandoScript(backendCobertura, "branches", "Lista classes com lacunas de branches no backend.", "etc/scripts/backend/cobertura-branches.js");
 criarComandoScript(backendCobertura, "jornada", "Executa a jornada consolidada de cobertura do backend.", "etc/scripts/backend/cobertura-jornada.js");
 criarComandoScript(backendCobertura, "cruzada", "Auditoria de cobertura cruzada e independente (Backend).", "etc/scripts/backend/cobertura-cruzada.js");
 
@@ -60,6 +61,8 @@ criarComandoScript(backendJava, "instalar-certificados", "Importa certificados l
 const frontend = program.command("frontend").description("Ferramentas do frontend.");
 const frontendCobertura = frontend.command("cobertura").description("Cobertura e diagnosticos do frontend.");
 criarComandoScript(frontendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Frontend).", "etc/scripts/frontend/cobertura-auditoria.js");
+criarComandoScript(frontendCobertura, "branches", "Lista arquivos com lacunas de branches no frontend.", "etc/scripts/frontend/cobertura-branches.js");
+criarComandoScript(frontendCobertura, "branches-erros", "Cruza lacunas de branches com sinais de tratamento de erro suspeito no frontend.", "etc/scripts/frontend/cobertura-branches-erros.js");
 
 const frontendMensagens = frontend.command("mensagens").description("Analise de mensagens e strings do frontend.");
 criarComandoScript(frontendMensagens, "extrair", "Extrai mensagens do projeto.", "etc/scripts/frontend/mensagens-extrair.js");

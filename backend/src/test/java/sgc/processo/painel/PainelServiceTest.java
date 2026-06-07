@@ -402,7 +402,7 @@ class PainelServiceTest {
         doReturn(null).when(unidadeService).buscarSiglaPorCodigo(10L);
 
         assertThatThrownBy(() -> painelService.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessage("Sigla da unidade do usuário ausente");
     }
 
@@ -418,7 +418,7 @@ class PainelServiceTest {
         when(unidadeService.buscarSiglaPorCodigo(10L)).thenReturn("  ");
 
         assertThatThrownBy(() -> painelService.listarProcessos(contextoChefe, PageRequest.of(0, 10)))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessage("Sigla da unidade do usuário ausente");
     }
 

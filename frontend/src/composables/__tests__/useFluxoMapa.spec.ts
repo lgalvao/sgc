@@ -179,7 +179,7 @@ describe("useFluxoMapa", () => {
 
             const dados = {competencias: []};
             await expect(fluxoMapa.salvarMapa(10, dados)).rejects.toThrow("Erro grave");
-            expect(fluxoMapa.erro.value).toBe("Erro grave");
+            expect(fluxoMapa.erro.value?.mensagem).toBe("Erro grave");
         });
     });
 });

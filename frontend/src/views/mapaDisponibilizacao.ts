@@ -3,7 +3,7 @@ import type {Competencia, DisponibilizarMapaRequest, MapaCompleto} from "@/types
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
 import logger from "@/utils/logger";
-import {normalizarErro} from "@/utils/apiError";
+import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 
 const {mapa: TEXTOS_MAPA} = TEXTOS;
 
@@ -41,7 +41,7 @@ function criarEstado() {
     };
 }
 
-function limparErroValidacaoMapa(estado: EstadoMapaDisponibilizacao, erroMapa?: Ref<string | null>) {
+function limparErroValidacaoMapa(estado: EstadoMapaDisponibilizacao, erroMapa?: Ref<ErroNormalizado | null>) {
     estado.erroValidacaoMapa.value = "";
     estado.erroValidacaoMapaTick.value += 1;
     if (erroMapa) {
@@ -115,7 +115,7 @@ export function useMapaDisponibilizacao(dependencias: DependenciasMapaDisponibil
             dependencias.limparErros();
         },
         disponibilizarMapa,
-        limparErroMapa: (erroMapa?: Ref<string | null>) => limparErroValidacaoMapa({
+        limparErroMapa: (erroMapa?: Ref<ErroNormalizado | null>) => limparErroValidacaoMapa({
             notificacaoDisponibilizacao,
             erroValidacaoMapa,
             erroValidacaoMapaTick,

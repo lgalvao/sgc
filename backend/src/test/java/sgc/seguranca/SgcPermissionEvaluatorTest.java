@@ -243,7 +243,7 @@ class SgcPermissionEvaluatorTest {
 
         assertThatThrownBy(() ->
                 evaluator.hasPermission(authentication, 1L, "Subprocesso", "ACAO_INEXISTENTE"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class);
     }
 
     @Test
@@ -438,4 +438,3 @@ class SgcPermissionEvaluatorTest {
         verify(localizacaoSubprocessoService).obterLocalizacaoAtual(sp);
     }
 }
-

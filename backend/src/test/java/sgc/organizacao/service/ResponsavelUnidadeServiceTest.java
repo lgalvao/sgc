@@ -648,7 +648,7 @@ class ResponsavelUnidadeServiceTest {
                     .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", null, "TITULAR", "Titular")));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
-                    .isInstanceOf(IllegalStateException.class)
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                     .hasMessageContaining("Responsável ou titular oficial ausente");
         }
 
@@ -660,7 +660,7 @@ class ResponsavelUnidadeServiceTest {
                     .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", "Responsavel", "TITULAR", null)));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
-                    .isInstanceOf(IllegalStateException.class)
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                     .hasMessageContaining("Responsável ou titular oficial ausente");
         }
 
@@ -686,7 +686,7 @@ class ResponsavelUnidadeServiceTest {
                     .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", "Responsavel", null, null)));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
-                    .isInstanceOf(IllegalStateException.class)
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                     .hasMessageContaining("Titular oficial ausente");
         }
 
@@ -698,7 +698,7 @@ class ResponsavelUnidadeServiceTest {
                     .thenReturn(List.of(new ResponsabilidadeUnidadeResumoLeitura(codUnidade, "RESP", "Responsavel", "   ", null)));
 
             assertThatThrownBy(() -> service.buscarResponsaveisUnidades(List.of(codUnidade)))
-                    .isInstanceOf(IllegalStateException.class)
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                     .hasMessageContaining("Titular oficial ausente");
         }
     }
@@ -724,7 +724,7 @@ class ResponsavelUnidadeServiceTest {
         when(usuarioRepo.listarPorTitulosComUnidadeLotacao(anyList())).thenReturn(List.of());
 
         assertThatThrownBy(() -> service.buscarTodasAtribuicoes())
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Usuário ausente");
     }
 
@@ -930,7 +930,7 @@ class ResponsavelUnidadeServiceTest {
         when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(codigo))).thenReturn(List.of(leitura));
 
         assertThatThrownBy(() -> service.buscarResponsavelUnidade(codigo))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Titular oficial ausente");
     }
 
@@ -945,7 +945,7 @@ class ResponsavelUnidadeServiceTest {
         when(responsabilidadeRepo.listarResumosPorCodigosUnidade(List.of(codigo))).thenReturn(List.of(leitura));
 
         assertThatThrownBy(() -> service.buscarResponsavelUnidade(codigo))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Responsável ou titular oficial ausente");
     }
 }

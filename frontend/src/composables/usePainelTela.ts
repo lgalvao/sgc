@@ -10,6 +10,7 @@ import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import * as painelService from "@/services/painelService";
 import {TEXTOS} from "@/constants/textos";
 import {formatarDataHoraBR} from "@/utils";
+import {logger} from "@/utils";
 
 export function usePainelTela() {
   const perfilStore = usePerfilStore();
@@ -56,7 +57,9 @@ export function usePainelTela() {
           .map((a: Alerta) => a.codigo);
       if (codigosNaoLidos.length > 0) {
         painelStore.registrarLeitura(codigosNaoLidos);
-        painelService.marcarAlertasLidos(codigosNaoLidos).catch(() => {});
+        void painelService.marcarAlertasLidos(codigosNaoLidos).catch((error: unknown) => {
+          logger.warn("Falha ao marcar alertas como lidos em background:", error);
+        });
       }
     } finally {
       carregandoPainel.value = false;

@@ -11,6 +11,13 @@ O tratamento de erros do SGC cresceu organicamente ao longo do tempo e acumula
 quatro problemas estruturais distintos, todos relacionados pelo mesmo diagnóstico
 de raiz: **ausência de uma política explícita de "o que fazer com este erro".**
 
+Para estados impossíveis, a política desejada deve ser ainda mais simples:
+**não tentar recuperar nem variar a reação local**. O objetivo é falhar rápido,
+com semântica consistente, observabilidade adequada e saída HTTP padronizada.
+Em outras palavras: o sistema não deve "tratar" bugs como se houvesse solução
+de negócio; deve apenas classificá-los corretamente e deixá-los morrer como
+erro interno.
+
 1. **Backend** usa exceções Java padrão (`IllegalStateException`,
    `IllegalArgumentException`, `RuntimeException`) com contexto perdido — a regra
    é que **nenhuma exceção Java padrão deve ser lançada no código de domínio**;
@@ -40,7 +47,7 @@ O projeto já tem a hierarquia correta. O problema é que ela não está sendo
 aplicada de forma consistente — desenvolvendo o hábito de alcançar a classe
 Java mais próxima em vez de usar a classe de domínio adequada.
 
-**Inventário completo de exceções Java padrão em código de produção
+**Inventário inicial de exceções Java padrão em código de produção
 (excluindo `e2e/` e testes):**
 
 | Tipo | Arquivo | Linha | Contexto |
@@ -52,6 +59,10 @@ Java mais próxima em vez de usar a classe de domínio adequada.
 | `IllegalStateException` | `ProcessoService` | 659 | Invariante de negócio |
 | `IllegalStateException` | `CadastroFluxoService` | 324 | `default` em switch de situação |
 | `IllegalStateException` | `RelatorioService` | 102, 209, 397 | Falha ao gerar PDF |
+| `IllegalStateException` | `AnaliseHistoricoService` | 43, 49 | Unidade/usuário ausente em dado persistido |
+| `IllegalStateException` | `SubprocessoService` | 454 | Mapa sem código associado |
+| `IllegalStateException` | `SubprocessoNotificacaoService` | 443 | Template obrigatório ausente |
+| `IllegalStateException` | `UnidadeMapa` | 27 | Snapshot sem unidade persistida |
 | `IllegalStateException` | `AtividadeController` | 57 | Resposta sem código gerado |
 | `IllegalStateException` | `E2eController` | 950 | Diagnóstico não encontrado |
 | `IllegalArgumentException` | `UnidadeProcesso` | 67 | Tipo de unidade não suportado em snapshot |
@@ -105,6 +116,9 @@ throw new ErroInconsistenciaInterna(
 - [ ] Substituir cada linha da tabela acima pela exceção de domínio adequada.
   Para cada uma, decidir: **bug/inconsistência** → `ErroInconsistenciaInterna`;
   **dado inválido fornecido externamente** → `ErroValidacao`.
+- [ ] Formalizar a regra arquitetural: para estados impossíveis, não usar
+  `IllegalStateException`, `IllegalArgumentException` ou variantes locais
+  heterogêneas; usar uma única família semântica de erro interno irrecoverável.
 - [ ] Adicionar `checkstyle` ou ArchUnit proibindo `throw new IllegalStateException`,
   `throw new IllegalArgumentException` e `throw new RuntimeException` fora de
   `e2e/` e testes — enforcement automático da regra.
@@ -129,7 +143,7 @@ RuntimeException
 
 **O que acontece na prática:**
 
-`IllegalStateException` é lançada em 15+ pontos do código para sinalizar
+`IllegalStateException` é lançada em múltiplos pontos do código para sinalizar
 invariantes quebradas de domínio (bugs). O `RestExceptionHandler` a captura
 e retorna **HTTP 409 Conflict** com `code: "ESTADO_ILEGAL"` — um status
 completamente errado para um bug de runtime.
@@ -158,7 +172,10 @@ Exemplos adicionais usando `IllegalStateException` onde se esperaria
 | `ProcessoService` | 659 | Invariante de negócio quebrada |
 | `CadastroFluxoService` | 324 | `default` em switch de situação |
 | `RelatorioService` | 102–104, 209–211, 397–399 | `DocumentException`/`IOException` ao gerar PDF |
-| `MapaManutencaoService` | 116, 121 | `orElseThrow()` sem mensagem (NPE silencioso) |
+| `AnaliseHistoricoService` | 43, 49 | Unidade/usuário ausente em dado persistido |
+| `SubprocessoService` | 454 | Mapa sem código associado |
+| `SubprocessoNotificacaoService` | 443 | Template obrigatório ausente |
+| `UnidadeMapa` | 27 | Snapshot sem unidade persistida |
 | `AtividadeController` | 57 | Resposta de criação sem código gerado |
 
 Além disso, `RuntimeException` crua é usada em dois pontos:
@@ -198,6 +215,9 @@ pode facilmente quebrar o comportamento.
   devolve 500).
 - [ ] Mover `ErroAutenticacao` para estender `ErroNegocioBase` e eliminar o
   handler separado.
+- [ ] Deixar explícito no handler e na documentação que erros internos não são
+  "tratados" para continuidade do fluxo; eles são apenas classificados,
+  logados com `traceId` e convertidos para uma resposta 500 uniforme.
 
 ---
 
@@ -220,8 +240,9 @@ throw new ErroValidacao(
 
 ```java
 // Subprocesso.java:73
-// Transição de situação inválida: o código de transição de estados do próprio
-// domínio lançando ErroValidacao quando deveria ser ErroInconsistenciaInterna
+// Aqui há ambiguidade real: pode ser proteção legítima de regra de negócio
+// se a chamada vier de um fluxo normal; só é bug se o método for exclusivo
+// de transições internas impossíveis para o usuário.
 throw new ErroValidacao(Mensagens.TRANSICAO_INVALIDA.formatted(...));
 ```
 
@@ -238,7 +259,7 @@ throw new ErroValidacao(Mensagens.TRANSICAO_INVALIDA.formatted(...));
 
 ```java
 // MapaManutencaoService.java:116, 121
-// orElseThrow() sem lambda → NPE nua sem mensagem nem traceId
+// orElseThrow() sem lambda → NoSuchElementException sem contexto de domínio
 return mapaRepo.buscarCompletoPorSubprocesso(subprocessoCodigo)
         .orElseThrow();
 ```
@@ -269,10 +290,10 @@ padrão estabelecido, então os desenvolvedores escolhem qualquer coisa.
   encontrada, indicando corrupção de dados ou bug."*
 - [ ] Substituir `orElseThrow()` sem lambda por
   `orElseThrow(() -> new ErroInconsistenciaInterna("Mapa não encontrado para subprocesso " + subprocessoCodigo))`.
-- [ ] Rever `LocalizacaoSubprocessoService:69` e `Subprocesso:73` — se são
-  transições inválidas que *nunca* deveriam ocorrer, usar
-  `ErroInconsistenciaInterna`; se são erros recuperáveis pelo usuário, manter
-  `ErroValidacao` com mensagem mais clara.
+- [ ] Rever `LocalizacaoSubprocessoService:69` e `Subprocesso:73` separadamente.
+  `LocalizacaoSubprocessoService:69` tem forte sinal de inconsistência interna;
+  `Subprocesso:73` só deve migrar para `ErroInconsistenciaInterna` se ficar
+  comprovado que o método não protege chamadas legítimas de fluxo.
 - [ ] Unificar os dois catches idênticos em `RelatorioService` e usar
   `ErroInconsistenciaInterna` (ou uma nova `ErroGeracaoPdf extends ErroInterno`).
 - [ ] Eliminar o código opaco `"SGC-MSG-100230"` — substituir pela mensagem
@@ -306,7 +327,7 @@ desenvolvimento. Se usado em produção, retornaria ao usuário
 
 ## Parte 2 — Frontend
 
-### P-4 · Quatro mecanismos de notificação sem política de escolha
+### P-4 · Quatro mecanismos de tratamento no frontend sem política única
 
 O frontend tem os seguintes canais de comunicação de erros ao usuário:
 
@@ -315,9 +336,10 @@ O frontend tem os seguintes canais de comunicação de erros ao usuário:
 | `useNotification()` → `notify()` | Maioria dos composables de tela | Exibido na própria view |
 | `useAsyncAction()` → `erro` ref | `useFluxoMapa`, `useMapas`, `useAdministradoresTela` | Varia — às vezes ignorado |
 | `useErrorHandler()` → `ultimoErro` | `useCadastroTela`, `useFluxoSubprocessoExecucao` | Exibido na própria view |
-| `app.config.errorHandler` → `/erro` | Erros não capturados bubblando até o Vue | Redireciona para página de erro |
+| `app.config.errorHandler` → `/erro` | Erros não tratados em render/ciclo de vida do Vue | Redireciona para página de erro |
 
-**O problema:** não há uma regra documentada de *quando usar qual*. Resultado:
+**O problema:** não há uma regra documentada de *quando usar qual* nem um
+contrato explícito de centralização. Resultado:
 
 - Em `useFluxoMapa`, erros são capturados em `useAsyncAction().erro` (uma
   `ref<string|null>`) — mas quem usa `useFluxoMapa` às vezes ignora esta ref
@@ -328,6 +350,10 @@ O frontend tem os seguintes canais de comunicação de erros ao usuário:
 - `useAsyncAction` captura o erro mas só preserva `error.message` — jogando
   fora o tipo, o código HTTP, os detalhes e o traceId estruturados que o
   backend envia.
+- O `app.config.errorHandler` **não é um ponto central suficiente para erros
+  assíncronos de negócio/rede**. Muitos fluxos já capturam ou relançam Promises
+  dentro de composables; depender dele como único concentrador quebraria UX e
+  cobertura de observabilidade em partes do sistema.
 
 ```typescript
 // useAsyncAction.ts:27-33
@@ -342,20 +368,23 @@ function obterMensagemErro(error: unknown, mensagemPadrao: string): string {
 **Passos acionáveis:**
 
 - [ ] Definir e documentar explicitamente em `README.md` do frontend uma
-  política de dois níveis:
-  - **Erros locais** (422/validação, 404 recuperável): tratados pelo composable
-    via `useNotification().notify()` ou via `useFormErrors`.
-  - **Erros globais** (rede, 500, 403): propagados para cima e capturados
-    pelo `app.config.errorHandler` → `/erro`.
-- [ ] Considerar deprecar `useAsyncAction` em favor de `useErrorHandler` (que
-  preserva o `ErroNormalizado` estruturado) ou pelo menos fazer `useAsyncAction`
-  armazenar o `ErroNormalizado` completo em vez de só a string da mensagem.
-- [ ] Auditar `useFluxoMapa`: escolher explicitamente entre `erro` ref ou
-  `notify()` — nunca os dois para o mesmo fluxo de erro.
+  política de centralização em **três camadas complementares**:
+  - **Camada 1: normalização única**. Todo erro técnico deve passar por
+    `normalizarErro()`.
+  - **Camada 2: estado local padronizado**. Composables e stores assíncronas
+    devem expor `ErroNormalizado` consistente para a tela.
+  - **Camada 3: saída global restrita**. `app.config.errorHandler` fica
+    reservado para falhas não tratadas do Vue e erros realmente sem recuperação.
+- [ ] Evoluir `useAsyncAction` para armazenar `ErroNormalizado` completo, ou
+  convergir gradualmente para `useErrorHandler`, evitando refs de erro só com
+  `string`.
+- [ ] Auditar `useFluxoMapa`, `useMapas` e telas relacionadas para escolher um
+  único canal por fluxo: ou estado local renderizado, ou `notify()`, mas não
+  ambos simultaneamente.
 
 ---
 
-### P-5 · Axios interceptor notifica globalmente para `naoAutorizado` mas depois relança — duplicação silenciosa
+### P-5 · Interceptor Axios e saída global estão parcialmente duplicados
 
 ```typescript
 // axios-setup.ts:258-266
@@ -386,17 +415,23 @@ app.config.errorHandler = (err) => {
 };
 ```
 
-Resultado: um erro de rede faz `logger.error` no interceptor *e* novamente no
-`errorHandler` — dois logs para o mesmo evento. Para `naoAutorizado`, o
-interceptor redireciona para `/login` *e* relança, mas o `errorHandler` suprime
-— funciona, mas por coincidência.
+Resultado: um erro de rede pode gerar `logger.error` no interceptor *e* novo
+registro quando a falha alcança outro ponto de saída. Para `naoAutorizado`, o
+interceptor redireciona para `/login` e o `errorHandler` suprime — o fluxo
+funciona, mas a separação de responsabilidades não está explícita.
 
-**Passo acionável:**
+**Passos acionáveis:**
 
-- [ ] Centralizar a notificação de erros globais **somente** no
-  `app.config.errorHandler`. O interceptor deve apenas (1) redirecionar para
-  `/login` em `naoAutorizado` e (2) marcar como cancelado quando adequado —
-  sem logar. Isso elimina a duplicação e garante um único ponto de registro.
+- [ ] Centralizar o **registro técnico global de falhas HTTP** em um único lugar.
+  Hoje o candidato mais robusto é o interceptor Axios, porque ele enxerga todas
+  as respostas assíncronas HTTP; o `app.config.errorHandler` não enxerga isso de
+  forma confiável.
+- [ ] Manter o interceptor responsável apenas por infraestrutura transversal:
+  `naoAutorizado`, cancelamento, correlação/telemetria e logging global
+  deduplicado.
+- [ ] Manter `app.config.errorHandler` como rede de segurança para erros não
+  tratados do Vue, sem assumir que ele substituirá a captura assíncrona de
+  requests.
 
 ---
 
@@ -442,12 +477,12 @@ async function confirmarDisponibilizacao() {
 
 | # | Problema | Impacto | Esforço | Prioridade |
 |---|---|---|---|---|
-| **P-0** | **Exceções Java padrão em código de domínio (13 ocorrências)** | **Crítico (contexto perdido, status errado)** | **Médio** | **🔴 Crítica** |
+| **P-0** | **Exceções Java padrão em código de domínio (inventário inicial; o relatório original não cobria todos os pontos)** | **Crítico (contexto perdido, status errado)** | **Médio** | **🔴 Crítica** |
 | P-2 | Invariantes de domínio reportadas como erro do usuário | Alto (diagnóstico errado em produção) | Médio | **Alta** |
 | P-1 | `IllegalStateException` → 409 (handler errado) | Alto (status enganoso) | Baixo | **Alta** |
 | P-3 | Construtor `ErroNegocioBase(Throwable)` com "msg"/"CODE" | Alto se usado | Muito baixo | **Alta** |
 | P-4 | Quatro canais de notificação sem política | Médio (comportamento inconsistente) | Médio | Média |
-| P-5 | Log duplicado no interceptor e errorHandler | Baixo (ruído) | Baixo | Média |
+| P-5 | Responsabilidade difusa entre interceptor e saída global | Médio (ruído, acoplamento e lacunas de cobertura) | Baixo | Média |
 | P-1b | `ErroAutenticacao` fora da hierarquia | Baixo (funciona por acidente) | Baixo | Baixa |
 | P-6 | `confirmarDisponibilizacao()` sem catch | Baixo (raro, mas péssima UX) | Baixo | Baixa |
 
@@ -473,6 +508,16 @@ async function confirmarDisponibilizacao() {
 > situações causadas por dados fornecidos pelo usuário ou por fluxos legítimos
 > de negócio.
 
-> **P-C — Um único ponto de saída por categoria.**
-> Erros de rede/inesperados → `app.config.errorHandler` → `/erro`.
-> Erros de validação/negócio → composable local → `notify()`. Nunca os dois.
+> **P-B2 — Estado impossível tem resposta única.**
+> Situações que "nunca deveriam acontecer" não devem gerar árvores de decisão
+> locais (`IllegalArgumentException`, `IllegalStateException`, `ErroValidacao`,
+> `ErroInterno` genérico, etc.). A política deve ser única: classificar como
+> falha interna irrecoverável, registrar com contexto técnico e encerrar o
+> fluxo com 500 padronizado.
+
+> **P-C — Centralização máxima por camada, não por ilusão de um único gancho.**
+> Backend centraliza semântica no tipo de exceção e no `RestExceptionHandler`.
+> Frontend centraliza normalização em `normalizarErro()`, tratamento HTTP
+> transversal no interceptor e decisão de UX no composable/tela. O
+> `app.config.errorHandler` fica como última linha de defesa do Vue, não como
+> concentrador universal de qualquer erro assíncrono.

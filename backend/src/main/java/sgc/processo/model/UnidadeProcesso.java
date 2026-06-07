@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.jspecify.annotations.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 
 import java.io.*;
@@ -64,8 +65,9 @@ public class UnidadeProcesso implements Serializable {
      */
     public static UnidadeProcesso criarSnapshot(Processo processo, Unidade unidade) {
         if (!TIPOS_SNAPSHOT_SUPORTADOS.contains(unidade.getTipo())) {
-            throw new IllegalArgumentException(
-                    "Tipo de unidade nao suportado em snapshot de processo: " + unidade.getTipo());
+            throw new ErroInconsistenciaInterna(
+                    "Tipo de unidade %s não suportado em snapshot do processo %s"
+                            .formatted(unidade.getTipo(), processo.getCodigo()));
         }
         UnidadeProcesso snapshot = new UnidadeProcesso();
         snapshot.setProcesso(processo);
@@ -94,7 +96,7 @@ public class UnidadeProcesso implements Serializable {
     public Long getUnidadeCodigoPersistido() {
         Long unidadeCodigo = getUnidadeCodigo();
         if (unidadeCodigo == null) {
-            throw new IllegalStateException("Snapshot de unidade sem codigo persistido");
+            throw new ErroInconsistenciaInterna("Snapshot de unidade sem codigo persistido");
         }
         return unidadeCodigo;
     }

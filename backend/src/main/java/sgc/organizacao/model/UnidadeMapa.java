@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
 import org.jspecify.annotations.*;
+import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 
 @Entity
@@ -24,7 +25,7 @@ public class UnidadeMapa {
 
     public Long getUnidadeCodigoPersistido() {
         if (unidadeCodigo == null) {
-            throw new IllegalStateException("UnidadeMapa sem unidadeCodigo persistido");
+            throw new ErroInconsistenciaInterna("UnidadeMapa sem unidadeCodigo persistido");
         }
         return unidadeCodigo;
     }

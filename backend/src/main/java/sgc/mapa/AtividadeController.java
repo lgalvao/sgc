@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
+import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.subprocesso.dto.*;
 
@@ -54,7 +55,7 @@ public class AtividadeController {
         AtividadeOperacaoResponse resp = atividadeService.criarAtividade(request);
         AtividadeDto atividadeCriada = resp.atividade();
         if (atividadeCriada == null) {
-            throw new IllegalStateException("Resposta de criação de atividade sem código gerado");
+            throw new ErroInconsistenciaInterna("Resposta de criação de atividade sem código gerado");
         }
         URI uri = URI.create("/api/atividades/%d".formatted(atividadeCriada.codigo()));
         return ResponseEntity.created(uri).body(resp);

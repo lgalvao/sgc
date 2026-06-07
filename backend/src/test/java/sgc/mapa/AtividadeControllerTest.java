@@ -129,7 +129,7 @@ class AtividadeControllerTest {
                             .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content("{\"mapaCodigo\": 1, \"descricao\": \"Teste\"}"))
-                    .andExpect(status().isConflict());
+                    .andExpect(status().isInternalServerError());
         }
 
         @Test

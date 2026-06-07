@@ -449,16 +449,16 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("obterTemplateObrigatorio deve lancar IllegalStateException quando template for nulo ou em branco")
+    @DisplayName("obterTemplateObrigatorio deve lancar ErroInconsistenciaInterna quando template for nulo ou em branco")
     void obterTemplateObrigatorio_DeveLancarErroQuandoNuloOuEmBranco() {
         // Caso 1: Nulo
         assertThatThrownBy(() -> service.obterTemplateObrigatorio(null, "contexto nulo"))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Template ausente para contexto nulo");
 
         // Caso 2: Em branco
         assertThatThrownBy(() -> service.obterTemplateObrigatorio("   ", "contexto vazio"))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Template ausente para contexto vazio");
     }
 
@@ -669,14 +669,14 @@ class SubprocessoNotificacaoServiceTest {
 
 
     @Test
-    @DisplayName("deve lancar IllegalStateException quando obter template obrigatorio com valor nulo ou em branco")
-    void deveLancarIllegalStateExceptionQuandoObterTemplateObrigatorioComValorInvalido() {
+    @DisplayName("deve lancar ErroInconsistenciaInterna quando obter template obrigatorio com valor nulo ou em branco")
+    void deveLancarErroInconsistenciaInternaQuandoObterTemplateObrigatorioComValorInvalido() {
         assertThatThrownBy(() -> service.obterTemplateObrigatorio(null, "contexto teste"))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Template ausente para contexto teste");
 
         assertThatThrownBy(() -> service.obterTemplateObrigatorio("   ", "contexto teste"))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Template ausente para contexto teste");
     }
 
@@ -703,4 +703,3 @@ class SubprocessoNotificacaoServiceTest {
 
 
 }
-

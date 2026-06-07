@@ -65,7 +65,7 @@ class SubprocessoListagemDtoTest {
         Subprocesso subprocesso = new Subprocesso();
 
         assertThatThrownBy(() -> mapper.paraListagem(subprocesso))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessage("Subprocesso deve possuir processo e unidade associados");
     }
 }

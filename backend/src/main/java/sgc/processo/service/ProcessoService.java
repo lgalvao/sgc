@@ -656,7 +656,7 @@ public class ProcessoService {
 
     private void validarDadosBasicosParticipante(Long codigoProcesso, UnidadeParticipanteDto unidadeDto) {
         if (unidadeDto.getNome().isBlank() || unidadeDto.getSigla().isBlank()) {
-            throw new IllegalStateException(
+            throw new ErroInconsistenciaInterna(
                     "Snapshot inconsistente de unidade participante no processo %d para unidade %d"
                             .formatted(codigoProcesso, unidadeDto.getCodUnidade()));
         }

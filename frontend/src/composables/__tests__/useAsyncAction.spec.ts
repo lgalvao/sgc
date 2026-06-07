@@ -20,7 +20,7 @@ describe("useAsyncAction", () => {
         await expect(executar(acao)).rejects.toThrow("falha");
 
         expect(carregando.value).toBe(false);
-        expect(erro.value).toBe("falha");
+        expect(erro.value?.mensagem).toBe("falha");
     });
 
     it("deve usar mensagem padrao se erro nao tiver mensagem", async () => {
@@ -29,7 +29,7 @@ describe("useAsyncAction", () => {
 
         await expect(executar(acao, "erro custom")).rejects.toEqual({});
 
-        expect(erro.value).toBe("erro custom");
+        expect(erro.value?.mensagem).toBe("erro custom");
     });
 
     it("deve executar sem relançar erro com sucesso", async () => {
@@ -50,7 +50,7 @@ describe("useAsyncAction", () => {
 
         expect(resultado).toBeUndefined();
         expect(carregando.value).toBe(false);
-        expect(erro.value).toBe("silencio");
+        expect(erro.value?.mensagem).toBe("silencio");
     });
 
     it("deve usar mensagem padrao quando não relança", async () => {
@@ -59,6 +59,6 @@ describe("useAsyncAction", () => {
 
         await executar(acao, "padrao", {relancarErro: false});
 
-        expect(erro.value).toBe("padrao");
+        expect(erro.value?.mensagem).toBe("padrao");
     });
 });

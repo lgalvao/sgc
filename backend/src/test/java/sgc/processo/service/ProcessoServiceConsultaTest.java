@@ -746,7 +746,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
 
         assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Snapshot inconsistente");
     }
 
@@ -769,7 +769,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
 
         assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Snapshot inconsistente");
     }
 

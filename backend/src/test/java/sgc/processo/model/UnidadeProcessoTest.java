@@ -50,7 +50,7 @@ class UnidadeProcessoTest {
         UnidadeProcesso snapshot = new UnidadeProcesso();
 
         assertThatThrownBy(snapshot::getUnidadeCodigoPersistido)
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessage("Snapshot de unidade sem codigo persistido");
     }
 
@@ -76,8 +76,8 @@ class UnidadeProcessoTest {
         processo.setCodigo(10L);
 
         assertThatThrownBy(() -> UnidadeProcesso.criarSnapshot(processo, unidade))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Tipo de unidade nao suportado");
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                .hasMessageContaining("não suportado em snapshot");
     }
 
     @Test

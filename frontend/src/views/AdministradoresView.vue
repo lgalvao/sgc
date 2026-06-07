@@ -21,7 +21,7 @@
       </PageHeader>
 
       <BAlert v-if="erroAdmins" :model-value="true" dismissible variant="danger">
-        {{ erroAdmins }}
+        {{ erroAdmins.mensagem }}
       </BAlert>
 
       <div v-else-if="administradores.length === 0">

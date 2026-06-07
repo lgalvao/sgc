@@ -657,7 +657,7 @@ class SubprocessoServiceTest {
         when(permissionEvaluator.verificarPermissao(any(), any(), any())).thenReturn(true);
 
         assertThatThrownBy(() -> service.importarAtividades(codDestino, codOrigem, itens))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("com mapa sem código associado");
     }
 }

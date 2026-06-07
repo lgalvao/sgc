@@ -246,17 +246,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(erroApi);
     }
 
-    @ExceptionHandler(ErroAutenticacao.class)
-    protected ResponseEntity<@NonNull ErroApi> handleErroAutenticacao(ErroAutenticacao ex) {
-        log.warn("Erro de autenticação: {}", ex.getMessage());
-        return buildResponseEntity(ErroApi.builder()
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .message(sanitizar(ex.getMessage()))
-                .code("NAO_AUTORIZADO")
-                .traceId(gerarTraceId())
-                .build());
-    }
-
     /**
      * Trata erros internos do sistema que indicam bugs ou problemas de
      * configuração.
@@ -273,32 +262,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message("Erro interno do sistema.")
                 .code("ERRO_INTERNO")
-                .traceId(traceId)
-                .build();
-        return buildResponseEntity(erroApi);
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    protected ResponseEntity<@NonNull ErroApi> handleIllegalStateException(IllegalStateException ex) {
-        String traceId = gerarTraceId();
-        log.warn("[{}] Estado ilegal da aplicação: {}", traceId, ex.getMessage());
-        ErroApi erroApi = ErroApi.builder()
-                .status(HttpStatus.CONFLICT.value())
-                .message("Operação inválida para o estado atual.")
-                .code("ESTADO_ILEGAL")
-                .traceId(traceId)
-                .build();
-        return buildResponseEntity(erroApi);
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    protected ResponseEntity<@NonNull ErroApi> handleIllegalArgumentException(IllegalArgumentException ex) {
-        String traceId = gerarTraceId();
-        log.error("[{}] Argumento ilegal fornecido: {}", traceId, ex.getMessage(), ex);
-        ErroApi erroApi = ErroApi.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message("Dados inválidos fornecidos na requisição.")
-                .code("ARGUMENTO_INVALIDO")
                 .traceId(traceId)
                 .build();
         return buildResponseEntity(erroApi);

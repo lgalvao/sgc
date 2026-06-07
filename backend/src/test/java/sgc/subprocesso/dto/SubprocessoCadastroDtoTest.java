@@ -49,7 +49,7 @@ class SubprocessoCadastroDtoTest {
         List<AtividadeDto> atividades = List.of();
 
         assertThatThrownBy(() -> mapper.paraCadastro(subprocesso, atividades))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessage("Subprocesso deve possuir unidade associada");
     }
 }

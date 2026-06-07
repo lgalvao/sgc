@@ -26,14 +26,14 @@
           v-if="erroMensagem"
           :mensagem="erroMensagem"
           variante="danger"
-          @dismissed="erroMensagem = ''"
+          @dismissed="limparErroMensagem"
       />
 
       <AppAlert
           v-if="alertaSucesso"
           :mensagem="alertaSucesso"
           variante="success"
-          @dismissed="alertaSucesso = ''"
+          @dismissed="limparAlertaSucesso"
       />
 
       <div class="mb-3 text-muted small d-flex align-items-center gap-2">
@@ -367,21 +367,44 @@ function fecharModalImpossibilitar() {
   modalImpossibilitarAberto.value = false;
 }
 
+function limparAlertas() {
+  erroMensagem.value = '';
+  alertaSucesso.value = '';
+}
+
+function limparErroMensagem() {
+  erroMensagem.value = '';
+}
+
+function limparAlertaSucesso() {
+  alertaSucesso.value = '';
+}
+
+function registrarSucesso(mensagem: string) {
+  limparAlertas();
+  alertaSucesso.value = mensagem;
+}
+
+function registrarErro(mensagem?: string | null) {
+  alertaSucesso.value = '';
+  erroMensagem.value = mensagem?.trim() || TEXTOS.diagnostico.ERRO_SALVAR;
+}
+
 async function confirmarConcluir() {
   try {
     await concluirAutoavaliacao();
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA;
+    registrarSucesso(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
   } catch {
-    erroMensagem.value = erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroConcluir.value?.message);
   }
 }
 
 async function confirmarAprovar() {
   try {
     await aprovarConsenso();
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO;
+    registrarSucesso(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
   } catch {
-    erroMensagem.value = erroAprovar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroAprovar.value?.message);
   }
 }
 
@@ -398,9 +421,9 @@ async function confirmarImpossibilitar() {
       justificativaImpossibilidade.value,
     );
     fecharModalImpossibilitar();
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
+    registrarSucesso(TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO);
   } catch {
-    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro();
   }
 }
 
@@ -465,7 +488,7 @@ function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
     CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
     AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
   };
-  return mapa[situacao] ?? situacao;
+  return mapa[situacao];
 }
 
 function formatarNota(valor: number | null): string {

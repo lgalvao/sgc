@@ -451,7 +451,7 @@ public class SubprocessoService {
 
     private Long obterCodigoMapaObrigatorio(Subprocesso subprocesso) {
         return Optional.ofNullable(obterMapaObrigatorio(subprocesso).getCodigo())
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
                         "Subprocesso %s com mapa sem código associado".formatted(subprocesso.getCodigo())));
     }
 

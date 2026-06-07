@@ -475,7 +475,7 @@ class CadastroFluxoServiceTest {
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 
         assertThatThrownBy(() -> service.homologar(1L, "Obs"))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("sem fluxo de cadastro definido");
     }
 

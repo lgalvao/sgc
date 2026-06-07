@@ -23,6 +23,7 @@ type ConfiguracaoMonitorada = InternalAxiosRequestConfig & {
 type ErroCanceladoHttp = {
     code?: string;
     name?: string;
+    __sgcErroGlobalRegistrado?: boolean;
 };
 
 const controladoresPendentes = new Set<AbortController>();
@@ -128,6 +129,20 @@ export function isErroCanceladoHttp(error: unknown): boolean {
 
     const erroCancelado = error as ErroCanceladoHttp;
     return erroCancelado.code === "ERR_CANCELED" || erroCancelado.name === "CanceledError";
+}
+
+export function isErroGlobalRegistrado(error: unknown): boolean {
+    if (typeof error !== "object" || !error) {
+        return false;
+    }
+    return Boolean((error as ErroCanceladoHttp).__sgcErroGlobalRegistrado);
+}
+
+function marcarErroGlobalRegistrado(error: unknown) {
+    if (typeof error !== "object" || !error) {
+        return;
+    }
+    (error as ErroCanceladoHttp).__sgcErroGlobalRegistrado = true;
 }
 
 function marcarErroComoCancelado(error: import('axios').AxiosError, motivo: string) {
@@ -261,6 +276,7 @@ const tratarErroResposta = (error: import('axios').AxiosError) => {
         tratarErroNaoAutorizado();
     } else if (deveNotificarGlobalmente(normalized)) {
         logger.error("[axios] Erro global:", normalized.mensagem);
+        marcarErroGlobalRegistrado(error);
     }
 
     return Promise.reject(error);

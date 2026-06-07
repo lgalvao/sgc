@@ -82,7 +82,8 @@ public class SubprocessoConsultaService {
 
     public Subprocesso obterEntidadePorCodigoMapa(Long codMapa) {
         return subprocessoRepo.findByMapa_Codigo(codMapa)
-                .orElseThrow();
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Subprocesso não encontrado para mapa %s".formatted(codMapa)));
     }
 
     public List<Subprocesso> listarTodos() {

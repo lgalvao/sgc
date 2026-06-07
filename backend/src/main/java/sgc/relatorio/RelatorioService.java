@@ -98,10 +98,8 @@ public class RelatorioService {
             ));
 
             adicionarCartoesAndamento(document, relatorios);
-        } catch (DocumentException e) {
-            throw new IllegalStateException("Erro ao gerar PDF", e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Erro ao gerar PDF", e);
+        } catch (DocumentException | IOException e) {
+            throw new ErroInconsistenciaInterna("Erro ao gerar PDF de andamento", e);
         }
     }
 
@@ -205,10 +203,8 @@ public class RelatorioService {
             }
 
             processarUnidadesNoPdf(document, resultado.arvoreOrganizada());
-        } catch (DocumentException e) {
-            throw new IllegalStateException("Erro ao gerar PDF", e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Erro ao gerar PDF", e);
+        } catch (DocumentException | IOException e) {
+            throw new ErroInconsistenciaInterna("Erro ao gerar PDF de unidades sem mapa", e);
         }
     }
 
@@ -393,10 +389,8 @@ public class RelatorioService {
             for (RelatorioMapaDto relatorio : relatorios) {
                 secaoConsumer.accept(document, relatorio);
             }
-        } catch (DocumentException e) {
-            throw new IllegalStateException("Erro ao gerar PDF", e);
-        } catch (IOException e) {
-            throw new IllegalStateException("Erro ao gerar PDF", e);
+        } catch (DocumentException | IOException e) {
+            throw new ErroInconsistenciaInterna("Erro ao gerar PDF de mapas", e);
         }
     }
 

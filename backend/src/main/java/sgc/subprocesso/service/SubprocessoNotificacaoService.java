@@ -8,6 +8,7 @@ import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
@@ -440,7 +441,7 @@ public class SubprocessoNotificacaoService {
 
     String obterTemplateObrigatorio(@Nullable String template, String contexto) {
         if (template == null || template.isBlank()) {
-            throw new IllegalStateException("Template ausente para %s".formatted(contexto));
+            throw new ErroInconsistenciaInterna("Template ausente para %s".formatted(contexto));
         }
         return template;
     }

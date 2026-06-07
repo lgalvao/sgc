@@ -1,4 +1,5 @@
 import {ref} from "vue";
+import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 
 /**
  * Composable que encapsula o padrão try/catch/loading/erro
@@ -18,18 +19,28 @@ import {ref} from "vue";
  */
 export function useAsyncAction() {
     const carregando = ref(false);
-    const erro = ref<string | null>(null);
+    const erro = ref<ErroNormalizado | null>(null);
 
     type OpcoesExecucao = {
         relancarErro?: boolean;
     };
 
-    function obterMensagemErro(error: unknown, mensagemPadrao: string): string {
-        if (error instanceof Error && error.message) {
-            return error.message;
-        }
+    function normalizarErroComFallback(error: unknown, mensagemPadrao: string): ErroNormalizado {
+        const normalizado = normalizarErro(error);
+        const manterMensagemPadrao = !(error instanceof Error)
+            && normalizado.mensagem === 'Erro desconhecido ou não mapeado pela aplicação.';
 
-        return mensagemPadrao;
+        if (normalizado.mensagem?.trim() && !manterMensagemPadrao) {
+            return normalizado;
+        }
+        return {
+            ...normalizado,
+            mensagem: mensagemPadrao,
+        };
+    }
+
+    function limparErro() {
+        erro.value = null;
     }
 
     async function executar<T>(
@@ -47,11 +58,11 @@ export function useAsyncAction() {
         opcoes: OpcoesExecucao = {}
     ): Promise<T | undefined> {
         carregando.value = true;
-        erro.value = null;
+        limparErro();
         try {
             return await acao();
         } catch (error: unknown) {
-            erro.value = obterMensagemErro(error, mensagemErro);
+            erro.value = normalizarErroComFallback(error, mensagemErro);
             if (opcoes.relancarErro === false) {
                 return undefined;
             }
@@ -61,5 +72,5 @@ export function useAsyncAction() {
         }
     }
 
-    return {carregando, erro, executar};
+    return {carregando, erro, limparErro, executar};
 }

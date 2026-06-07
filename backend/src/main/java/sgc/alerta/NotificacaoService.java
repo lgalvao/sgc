@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.*;
 import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.alerta.model.SituacaoNotificacao;
+import sgc.comum.erros.*;
 
 import java.time.*;
 import java.util.*;
@@ -27,7 +28,8 @@ public class NotificacaoService {
     public NotificacaoEmail enfileirar(EnfileirarNotificacaoCommand cmd) {
         if (notificacaoEmailRepo.existsByChaveIdempotencia(cmd.chaveIdempotencia())) {
             return notificacaoEmailRepo.findByChaveIdempotencia(cmd.chaveIdempotencia())
-                    .orElseThrow();
+                    .orElseThrow(() -> new ErroInconsistenciaInterna(
+                            "Notificação idempotente ausente para chave %s".formatted(cmd.chaveIdempotencia())));
         }
 
         NotificacaoEmail notificacao = NotificacaoEmail.builder()

@@ -336,7 +336,7 @@ describe("useCadastroTela", () => {
             tela.errosValidacao.value = [{ tipo: "DADOS_INCORRETOS", atividadeCodigo: 1, mensagem: "Erro Scroll" }];
             tela.scrollParaPrimeiroErro();
 
-            // 8. erroGlobalFormatado e erroFluxoCadastro com erro de validação
+            // 8. erroFluxoCadastro com erro de validação
             fluxoSubprocessoMock.ultimoErro.value = {
                 tipo: "validacao",
                 mensagem: "Erro validação fluxo",
@@ -352,9 +352,9 @@ describe("useCadastroTela", () => {
             } as any;
             expect(tela.erroFluxoCadastro.value).toBe("Erro genérico");
 
-            // erroGlobalFormatado
+            // erroGlobal
             tela.erroGlobal.value = "Erro Global";
-            expect(tela.erroGlobalFormatado.value).toEqual({ mensagem: "Erro Global" });
+            expect(tela.erroGlobal.value).toBe("Erro Global");
 
             // 9. ValidarLocalmente com revisão e sem alteração
             subprocessoState.contextoCadastro.detalhes.tipoProcesso = TipoProcesso.REVISAO;

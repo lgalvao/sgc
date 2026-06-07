@@ -12,4 +12,8 @@ public abstract class ErroInterno extends RuntimeException {
     protected ErroInterno(String message) {
         super(message);
     }
+
+    protected ErroInterno(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

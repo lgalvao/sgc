@@ -22,7 +22,7 @@ class UnidadeMapaTest {
         UnidadeMapa unidadeMapa = new UnidadeMapa();
 
         assertThatThrownBy(unidadeMapa::getUnidadeCodigoPersistido)
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessage("UnidadeMapa sem unidadeCodigo persistido");
     }
 }

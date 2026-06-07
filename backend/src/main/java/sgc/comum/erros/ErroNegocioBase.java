@@ -24,11 +24,4 @@ public abstract class ErroNegocioBase extends RuntimeException implements ErroNe
         this.status = status;
         this.details = details;
     }
-
-    protected ErroNegocioBase(Throwable cause) {
-        super("msg", cause);
-        this.code = "CODE";
-        this.status = HttpStatus.BAD_REQUEST;
-        this.details = new HashMap<>();
-    }
 }

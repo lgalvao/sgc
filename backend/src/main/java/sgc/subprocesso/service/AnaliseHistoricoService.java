@@ -3,6 +3,7 @@ package sgc.subprocesso.service;
 import lombok.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.subprocesso.dto.*;
@@ -40,13 +41,13 @@ public class AnaliseHistoricoService {
             Map<String, String> nomesUsuariosPorTitulo
     ) {
         UnidadeResumoLeitura unidade = Optional.ofNullable(unidadesPorCodigo.get(analise.getUnidadeCodigo()))
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
                         "Unidade %d ausente no histórico de análises".formatted(analise.getUnidadeCodigo())));
         String usuarioTitulo = analise.getUsuarioTitulo();
         String usuarioNome = Optional.ofNullable(usuarioTitulo)
                 .map(nomesUsuariosPorTitulo::get)
                 .filter(nome -> !nome.isBlank())
-                .orElseThrow(() -> new IllegalStateException(
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
                         "Usuário %s ausente ou sem nome no histórico de análises".formatted(usuarioTitulo)));
 
         return AnaliseHistoricoDto.builder()

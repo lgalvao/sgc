@@ -26,13 +26,13 @@
           v-if="erroMensagem"
           :mensagem="erroMensagem"
           variante="danger"
-          @dismissed="erroMensagem = ''"
+          @dismissed="limparErroMensagem"
       />
       <AppAlert
           v-if="alertaSucesso"
           :mensagem="alertaSucesso"
           variante="success"
-          @dismissed="alertaSucesso = ''"
+          @dismissed="limparAlertaSucesso"
       />
 
       <!-- Cards de métricas -->
@@ -315,21 +315,55 @@ const podeHomologar = computed(
 );
 
 // ── Modais ────────────────────────────────────────────────────────────────────
-function abrirModalValidar() { observacoesValidar.value = ''; modalValidarAberto.value = true; }
+function abrirModalValidar() {
+  observacoesValidar.value = '';
+  modalValidarAberto.value = true;
+}
 function abrirModalDevolver() {
   justificativaDevolver.value = '';
   erroJustificativaDevolver.value = '';
   modalDevolverAberto.value = true;
 }
-function abrirModalHomologar() { observacoesHomologar.value = ''; modalHomologarAberto.value = true; }
+function abrirModalHomologar() {
+  observacoesHomologar.value = '';
+  modalHomologarAberto.value = true;
+}
+
+function limparAlertas() {
+  erroMensagem.value = '';
+  alertaSucesso.value = '';
+}
+
+function limparErroMensagem() {
+  erroMensagem.value = '';
+}
+
+function limparAlertaSucesso() {
+  alertaSucesso.value = '';
+}
+
+function registrarSucesso(mensagem: string) {
+  limparAlertas();
+  alertaSucesso.value = mensagem;
+}
+
+function registrarErro(mensagem?: string | null) {
+  alertaSucesso.value = '';
+  erroMensagem.value = mensagem?.trim() || TEXTOS.diagnostico.ERRO_SALVAR;
+}
+
+function normalizarTextoOpcional(texto: string) {
+  const textoLimpo = texto.trim();
+  return textoLimpo.length > 0 ? textoLimpo : undefined;
+}
 
 async function confirmarValidar() {
   try {
-    await validarDiagnostico(observacoesValidar.value || undefined);
+    await validarDiagnostico(normalizarTextoOpcional(observacoesValidar.value));
     modalValidarAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO;
+    registrarSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO);
   } catch {
-    erroMensagem.value = erroValidar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroValidar.value?.message);
   }
 }
 
@@ -341,19 +375,19 @@ async function confirmarDevolver() {
   try {
     await devolverDiagnostico(justificativaDevolver.value);
     modalDevolverAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO;
+    registrarSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO);
   } catch {
-    erroMensagem.value = erroDevolver.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroDevolver.value?.message);
   }
 }
 
 async function confirmarHomologar() {
   try {
-    await homologarDiagnostico(observacoesHomologar.value || undefined);
+    await homologarDiagnostico(normalizarTextoOpcional(observacoesHomologar.value));
     modalHomologarAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO;
+    registrarSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO);
   } catch {
-    erroMensagem.value = erroHomologar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroHomologar.value?.message);
   }
 }
 
@@ -375,7 +409,7 @@ function varianteSituacaoServidor(s: SituacaoAvaliacaoServidor): ColorVariant {
     AUTOAVALIACAO_CONCLUIDA: 'info',
     AUTOAVALIACAO_NAO_INICIADA: 'light',
   };
-  return mapa[s] ?? 'light';
+  return mapa[s];
 }
 
 function formatarSituacaoServidor(s: SituacaoAvaliacaoServidor): string {
@@ -385,13 +419,13 @@ function formatarSituacaoServidor(s: SituacaoAvaliacaoServidor): string {
     CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
     CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
     AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
-  }[s] ?? s;
+  }[s];
 }
 
 function varianteCapacitacao(s: SituacaoCapacitacao | null): ColorVariant {
   if (s === null) return 'light';
   const mapa: Record<SituacaoCapacitacao, ColorVariant> = {NA: 'secondary', AC: 'danger', EC: 'warning', C: 'success', I: 'primary'};
-  return mapa[s] ?? 'light';
+  return mapa[s];
 }
 
 function formatarCapacitacao(s: SituacaoCapacitacao | null): string {
@@ -402,7 +436,7 @@ function formatarCapacitacao(s: SituacaoCapacitacao | null): string {
     EC: TEXTOS.diagnostico.CAPACITACAO_EC,
     C: TEXTOS.diagnostico.CAPACITACAO_C,
     I: TEXTOS.diagnostico.CAPACITACAO_I,
-  }[s] ?? s;
+  }[s];
 }
 
 function formatarNota(valor: number | null): string {

@@ -1,6 +1,7 @@
 package sgc.subprocesso;
 
 import org.springframework.stereotype.*;
+import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.*;
 import sgc.organizacao.dto.*;
@@ -23,7 +24,7 @@ public class SubprocessoDtoMapper {
     public SubprocessoResumoDto paraResumo(Subprocesso subprocesso) {
         Processo processo = subprocesso.getProcesso();
         if (processo == null || subprocesso.getUnidade() == null) {
-            throw new IllegalStateException("Subprocesso deve possuir processo e unidade associados");
+            throw new ErroInconsistenciaInterna("Subprocesso deve possuir processo e unidade associados");
         }
 
         LocalDateTime dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
@@ -75,7 +76,7 @@ public class SubprocessoDtoMapper {
 
     public SubprocessoCadastroDto paraCadastro(Subprocesso subprocesso, List<AtividadeDto> atividades) {
         if (subprocesso.getUnidade() == null) {
-            throw new IllegalStateException("Subprocesso deve possuir unidade associada");
+            throw new ErroInconsistenciaInterna("Subprocesso deve possuir unidade associada");
         }
 
         return SubprocessoCadastroDto.builder()

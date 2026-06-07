@@ -117,7 +117,7 @@ class AnaliseHistoricoServiceTest {
         when(unidadeService.buscarResumosPorCodigos(List.of(99L))).thenReturn(List.of());
 
         assertThatThrownBy(() -> analiseHistoricoService.converter(analise))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessage("Unidade 99 ausente no histórico de análises");
     }
 
@@ -136,7 +136,7 @@ class AnaliseHistoricoServiceTest {
                 .thenReturn(List.of(new UsuarioConsultaLeitura("analista1", "mat1", "   ", "email", "ramal", 10L, "UT", "UT", TipoUnidade.OPERACIONAL, "tit1", 10L)));
 
         assertThatThrownBy(() -> analiseHistoricoService.converter(analise))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Usuário analista1 ausente ou sem nome no histórico de análises");
     }
 

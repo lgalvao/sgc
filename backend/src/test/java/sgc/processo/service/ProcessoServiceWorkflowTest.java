@@ -1477,7 +1477,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
 
         assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Snapshot inconsistente");
     }
 
@@ -1500,7 +1500,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of());
 
         assertThatThrownBy(() -> processoService.obterDetalhesCompleto(codProcesso, false))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Snapshot inconsistente");
     }
 
