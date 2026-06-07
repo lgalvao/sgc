@@ -134,7 +134,7 @@ describe("subprocesso store (cache e dedupe)", () => {
             vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue(mockMapa as any);
 
             // Passando `true` como segundo argumento (recarregar)
-            await store.obterContextoEdicao(10, true);
+            await store.obterContextoEdicao(10, { recarregar: true });
 
             expect(store.contextoEdicao).toEqual(mockMapa);
         });

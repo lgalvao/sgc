@@ -19,13 +19,6 @@
         </BButton>
       </div>
 
-      <!-- Alertas -->
-      <AppAlert
-          v-if="erroMensagem"
-          :mensagem="erroMensagem"
-          variante="danger"
-          @dismissed="erroMensagem = ''"
-      />
 
       <!-- Badge de autosave -->
       <div class="mb-3 text-muted small d-flex align-items-center gap-2">
@@ -98,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
+import {computed} from 'vue';
 import {useRouter} from 'vue-router';
 import {
   BButton,
@@ -108,7 +101,6 @@ import {
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
-import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useOcupacoesCriticasDiagnostico} from '@/composables/useOcupacoesCriticasDiagnostico';
@@ -132,8 +124,6 @@ const {
   atualizarCapacitacao,
 } = useOcupacoesCriticasDiagnostico(props.codSubprocesso);
 
-// « Alertas »
-const erroMensagem = ref('');
 
 const servidoresCabecalho = computed(() => {
   const nomesAbreviados = new Map<string, number>();

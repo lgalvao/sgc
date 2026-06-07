@@ -505,5 +505,144 @@ describe('ConsensoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
         expect(wrapper.find('.app-alert').exists()).toBe(false);
     });
+
+    it('exercita carregando, salvandoAutomaticamente e aprovando', () => {
+        carregandoVal.value = true;
+        salvandoAutomaticamenteVal.value = true;
+        aprovandoVal.value = true;
+        podeCriarConsensoVal.value = true;
+        ehConsensoAprovadoVal.value = false;
+        
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div class="carregando">Carregando...</div>'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {template: '<select v-bind="$attrs" />'},
+                    BSpinner: {template: '<span class="spinner"/>'},
+                },
+            },
+        });
+        
+        expect(wrapper.find('.carregando').exists()).toBe(true);
+        // Os spinners de salvando não renderizam se tiver carregando=true pois o template v-else oculta
+    });
+
+    it('exercita fallback da descricao e spinner aprovando', async () => {
+        podeCriarConsensoVal.value = false;
+        // competenciaCodigo 999 não está no mock de contexto
+        competenciasLocais.value = [
+            {competenciaCodigo: 999, importancia: 3, dominio: 4}
+        ];
+        aprovandoVal.value = true;
+
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BSpinner: {template: '<span class="spinner"/>'},
+                    BTable: {
+                        props: ['items'],
+                        template: `
+                          <table data-testid="tbl-servidor">
+                            <tr v-for="item in items" :key="item.competenciaCodigo">
+                              <td>{{ item.descricao }}</td>
+                            </tr>
+                          </table>
+                        `,
+                    },
+                },
+            },
+        });
+
+        // Test fallback for unknown competencia
+        expect(wrapper.text()).toContain('Competência 999');
+        // Test spinner in aprovando
+        expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').find('.spinner').exists()).toBe(true);
+    });
+
+    it('exercita valores numericos NaN no select', async () => {
+        podeCriarConsensoVal.value = true;
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {
+                        template: '<select />',
+                    },
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        // Trigger the update:modelValue directly on the select stub with NaN number
+        const select = wrapper.findComponent('[data-testid="consenso-chefia-importancia-10"]');
+        (select as any).vm.$emit('update:modelValue', NaN);
+        
+        expect(atualizarNotaDetalhadaMock).toHaveBeenLastCalledWith(10, {
+            origem: 'chefia',
+            campo: 'importancia',
+            valor: null,
+        });
+        
+        (wrapper.findComponent('[data-testid="consenso-chefia-importancia-10"]') as any).vm.$emit('update:modelValue', '');
+    });
+
+    it('exercita salvandoAutomaticamente renderizado', () => {
+        carregandoVal.value = false;
+        salvandoAutomaticamenteVal.value = true;
+        podeCriarConsensoVal.value = true;
+        
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {template: '<select v-bind="$attrs" />'},
+                    BSpinner: {template: '<span class="spinner"/>'},
+                },
+            },
+        });
+        
+        expect(wrapper.find('.spinner').exists()).toBe(true);
+    });
 });
 

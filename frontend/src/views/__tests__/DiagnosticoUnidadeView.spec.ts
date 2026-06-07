@@ -251,12 +251,33 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('Falha ao homologar');
     });
 
-    it('cobre ramos default de variantes em DiagnosticoUnidadeView', () => {
+    it('cobre ramos default e todos os status de variantes em DiagnosticoUnidadeView', () => {
         situacaoDiagnostico.value = 'OUTRO_STATUS' as any;
         servidoresVal.value[0].situacaoServidor = 'OUTRO_STATUS' as any;
-
         const wrapper = montar();
         expect(wrapper.text()).toContain('ASSESSORIA_12');
+
+        // Outros status de situacao do diagnostico
+        situacaoDiagnostico.value = 'HOMOLOGADO';
+        const wrapperHomologado = montar();
+        expect(wrapperHomologado.text()).toContain('HOMOLOGADO');
+
+        situacaoDiagnostico.value = 'VALIDADO';
+        const wrapperValidado = montar();
+        expect(wrapperValidado.text()).toContain('VALIDADO');
+
+        // Status de servidores
+        servidoresVal.value = [
+            { servidorTitulo: '1', servidorNome: 'A', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA', consenso: [] },
+            { servidorTitulo: '2', servidorNome: 'B', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', consenso: [] },
+            { servidorTitulo: '3', servidorNome: 'C', situacaoServidor: 'CONSENSO_CRIADO', consenso: [] },
+            { servidorTitulo: '4', servidorNome: 'D', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', consenso: [] },
+        ];
+        const wrapperServidores = montar();
+        expect(wrapperServidores.text()).toContain('Autoavaliação não iniciada');
+        expect(wrapperServidores.text()).toContain('Autoavaliação concluída');
+        expect(wrapperServidores.text()).toContain('Avaliação de consenso criada');
+        expect(wrapperServidores.text()).toContain('Avaliação impossibilitada');
     });
 
     it('exercita todas as variantes de capacitacao, gap e formatacao de notas', () => {

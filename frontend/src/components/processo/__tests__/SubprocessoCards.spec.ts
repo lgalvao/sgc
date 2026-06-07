@@ -455,4 +455,56 @@ describe("SubprocessoCards.vue", () => {
         expect(pushMock).not.toHaveBeenCalled();
     });
 
+    it("trata tecla Enter/Space e ignora outras no card de consenso", async () => {
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "ASSESSORIA_12",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes(),
+            }),
+        });
+
+        const card = wrapper.find('[data-testid="card-subprocesso-consenso"]');
+        
+        await card.trigger("keydown", {key: "Escape"});
+        expect(pushMock).not.toHaveBeenCalled();
+
+        await card.trigger("keydown", {key: "Enter"});
+        expect(pushMock).toHaveBeenCalled();
+        
+        pushMock.mockClear();
+        await card.trigger("keydown", {key: " "});
+        expect(pushMock).toHaveBeenCalled();
+    });
+
+    it("não navega para consenso se titulo do servidor não for encontrado", async () => {
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "ASSESSORIA_12",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: {
+                    ...criarPermissoes(),
+                    podeCriarConsenso: false,
+                } as any,
+                titular: null,
+            }),
+        }, {}, {
+            perfil: {
+                usuarioCodigo: null,
+            }
+        });
+
+        await wrapper.find('[data-testid="card-subprocesso-consenso"]').trigger("click");
+
+        expect(pushMock).not.toHaveBeenCalled();
+    });
+
 });

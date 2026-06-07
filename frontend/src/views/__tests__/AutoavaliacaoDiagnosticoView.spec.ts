@@ -19,6 +19,9 @@ const itensEquipe = ref([
     {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
     {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'CONSENSO_CRIADO'},
 ]);
+const competenciasLocaisVal = ref<any>([
+    {competenciaCodigo: 10, importancia: 2, dominio: 1},
+]);
 
 vi.mock('vue-router', () => ({
     useRouter: () => ({
@@ -73,9 +76,7 @@ vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
 
 vi.mock('@/composables/useAutoavaliacaoDiagnostico', () => ({
     useAutoavaliacaoDiagnostico: () => ({
-        competenciasLocais: ref([
-            {competenciaCodigo: 10, importancia: 2, dominio: 1},
-        ]),
+        competenciasLocais: competenciasLocaisVal,
         situacaoServidor,
         carregando: ref(false),
         salvandoAutomaticamente,
@@ -143,6 +144,9 @@ describe('AutoavaliacaoDiagnosticoView', () => {
                 ],
             },
         };
+        competenciasLocaisVal.value = [
+            {competenciaCodigo: 10, importancia: 2, dominio: 1},
+        ];
     });
 
     function montar() {
@@ -333,9 +337,34 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         await select.vm.$emit('update:modelValue', 4);
         expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', 4);
 
-        // Emite NaN
+        // Emite NaN literal e via string
         await select.vm.$emit('update:modelValue', Number.NaN);
         expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', null);
+        
+        // Emite string de numero valido
+        await select.vm.$emit('update:modelValue', '5');
+        expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', 5);
+
+        // Emite string invalida
+        await select.vm.$emit('update:modelValue', 'abc');
+        expect(atualizarNotaMock).toHaveBeenLastCalledWith(10, 'importancia', null);
+    });
+
+    it('exercita formatacao de notas quando readonly', async () => {
+        situacaoServidor.value = 'CONSENSO_APROVADO'; // Nao pode editar
+        competenciasLocaisVal.value = [
+            {competenciaCodigo: 10, importancia: 0, dominio: 5},
+            {competenciaCodigo: 11, importancia: null, dominio: null},
+        ];
+        contextData.value.competencias = [
+            {competenciaCodigo: 10, descricao: 'Comp 10'},
+            {competenciaCodigo: 11, descricao: 'Comp 11'},
+        ];
+
+        const wrapper = montar();
+        expect(wrapper.text()).toContain('NA');
+        expect(wrapper.text()).toContain('-');
+        expect(wrapper.text()).toContain('5');
     });
 
     it('exercita tratamento de erros sem mensagem explícita e outros branches de normalizarNota', async () => {

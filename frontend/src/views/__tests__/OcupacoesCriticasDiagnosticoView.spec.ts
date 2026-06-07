@@ -19,29 +19,33 @@ vi.mock('@/composables/useDiagnosticoContexto', () => ({
     }),
 }));
 
+const ocupacoesLocaisVal = ref<any[]>([
+    {servidorTitulo: '242426', servidorNome: 'Duff McKagan', competenciaCodigo: 10, situacaoCapacitacao: null},
+    {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
+]);
+
+const servidoresVal = ref<any[]>([
+    {servidorTitulo: '242426', servidorNome: 'Duff McKagan'},
+    {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin'},
+]);
+
+const carregandoVal = ref(false);
+const salvandoAutomaticamenteVal = ref(false);
+const atualizarCapacitacaoMock = vi.fn();
+
+const unidadeVal = ref<any>({
+    unidadeSigla: 'ASSESSORIA_12',
+    unidadeNome: 'Assessoria 12',
+});
+
 vi.mock('@/composables/useOcupacoesCriticasDiagnostico', () => ({
     useOcupacoesCriticasDiagnostico: () => ({
-        ocupacoesLocais: ref([
-            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', competenciaCodigo: 10, situacaoCapacitacao: null},
-            {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
-        ]),
-        unidade: computed(() => ({
-            unidadeSigla: 'ASSESSORIA_12',
-            unidadeNome: 'Assessoria 12',
-            situacaoSubprocesso: 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
-            servidores: [
-                {servidorTitulo: '242426', servidorNome: 'Duff McKagan'},
-                {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin'},
-            ],
-        })),
-        servidores: computed(() => [
-            {servidorTitulo: '242426', servidorNome: 'Duff McKagan'},
-            {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin'},
-        ]),
-        carregando: computed(() => false),
-        salvandoAutomaticamente: ref(false),
-        pendentes: computed(() => 1),
-        atualizarCapacitacao: vi.fn(),
+        ocupacoesLocais: ocupacoesLocaisVal,
+        unidade: unidadeVal,
+        servidores: servidoresVal,
+        carregando: carregandoVal,
+        salvandoAutomaticamente: salvandoAutomaticamenteVal,
+        atualizarCapacitacao: atualizarCapacitacaoMock,
     }),
 }));
 
@@ -80,5 +84,126 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
         expect(wrapper.find('[data-testid="ocupacao-242426-10"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="ocupacao-242427-10"]').exists()).toBe(true);
         expect(wrapper.text()).not.toContain('Concluir diagnóstico');
+    });
+
+    it('exercita casos especiais de abreviarNomeServidor e exibirTituloSecundario', () => {
+        servidoresVal.value = [
+            {servidorTitulo: '1', servidorNome: 'Axl'}, // Uma palavra só
+            {servidorTitulo: '2', servidorNome: 'Slash'}, // Outra
+            {servidorTitulo: '3', servidorNome: 'ChristopherR Wallace'}, // >= 10 letras no 1 nome + segundo nome
+            {servidorTitulo: '4', servidorNome: 'Steven Adler'},
+            {servidorTitulo: '5', servidorNome: 'Steven Adler'}, // Mesmo abreviado "Steven A.", forca exibirTituloSecundario
+        ];
+
+        const wrapper = mount(OcupacoesCriticasDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    EmptyState: {template: '<div />'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section><slot /></section>'},
+                    BFormSelect: {template: '<select v-bind="$attrs"></select>'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+        
+        expect(wrapper.text()).toContain('Axl');
+        expect(wrapper.text()).toContain('ChristopherR');
+        expect(wrapper.text()).toContain('Steven A.');
+        expect(wrapper.find('small.cabecalho-servidor-titulo').exists()).toBe(true);
+    });
+
+    it('exercita empty state e update capacitacao', async () => {
+        ocupacoesLocaisVal.value = [];
+        const wrapperEmpty = mount(OcupacoesCriticasDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    EmptyState: {template: '<div class="empty-state">Vazio</div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section><slot /></section>'},
+                    BFormSelect: {template: '<select v-bind="$attrs"></select>'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+        expect(wrapperEmpty.find('.empty-state').exists()).toBe(true);
+
+        ocupacoesLocaisVal.value = [
+            {servidorTitulo: '1', servidorNome: 'Axl', competenciaCodigo: 10, situacaoCapacitacao: null},
+        ];
+        servidoresVal.value = [
+            {servidorTitulo: '1', servidorNome: 'Axl'},
+        ];
+        const wrapperSelect = mount(OcupacoesCriticasDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    EmptyState: {template: '<div />'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section><slot /></section>'},
+                    BFormSelect: {
+                        props: ['modelValue', 'options'],
+                        emits: ['update:modelValue'],
+                        template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.text }}</option></select>'
+                    },
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        const select = wrapperSelect.find('select');
+        await select.setValue('AC');
+        expect(atualizarCapacitacaoMock).toHaveBeenCalledWith('1', 10, 'AC');
+        
+        // Testa dismiss do alert
+        // Mas a ref interna de erroMensagem só é populada localmente. 
+        // Em vez de simular, vamos encontrar o AppAlert se for forçado a exibir
+        // Como não há mock de erro para atualizarCapacitacao (que é void/nao lida com erro internamente na view),
+        // o `erroMensagem` seria populado se houvesse um catch na view. Wait, na view há erroMensagem?
+        // Sim, `erroMensagem.value = ''` ao `@dismissed`. Podemos emitir `dismissed` no componente
+        // se pudermos forçá-lo a renderizar. Vamos colocar na próxima execução.
+    });
+
+    it('exercita unidade null', () => {
+        unidadeVal.value = null; // Para forçar unidade = null pelo mock
+        const wrapper = mount(OcupacoesCriticasDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    EmptyState: {template: '<div />'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section><slot /></section>'},
+                    BFormSelect: {template: '<select v-bind="$attrs"></select>'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+        expect(wrapper.text()).not.toContain('ASSESSORIA_12');
     });
 });

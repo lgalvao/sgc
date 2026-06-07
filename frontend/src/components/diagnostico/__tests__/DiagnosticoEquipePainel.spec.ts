@@ -417,13 +417,13 @@ describe('DiagnosticoEquipePainel', () => {
         // 1. Modal Impossibilitar
         await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
         await nextTick();
-        await modals[0].vm.$emit('update:modelValue', false);
+        await (modals[0] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 2. Modal Concluir
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
         await nextTick();
-        await modals[1].vm.$emit('update:modelValue', false);
+        await (modals[1] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 3. Modal Validar
@@ -431,7 +431,7 @@ describe('DiagnosticoEquipePainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
         await nextTick();
-        await modals[2].vm.$emit('update:modelValue', false);
+        await (modals[2] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 4. Modal Devolver
@@ -439,7 +439,7 @@ describe('DiagnosticoEquipePainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         await nextTick();
-        await modals[3].vm.$emit('update:modelValue', false);
+        await (modals[3] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 5. Modal Homologar
@@ -447,7 +447,7 @@ describe('DiagnosticoEquipePainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await nextTick();
-        await modals[4].vm.$emit('update:modelValue', false);
+        await (modals[4] as any).vm.$emit('update:modelValue', false);
         await nextTick();
     });
 
@@ -531,7 +531,7 @@ describe('DiagnosticoEquipePainel', () => {
         // Encontra o stub do modal pelo class selector .b-modal-stub
         const modals = wrapper.findAllComponents('.b-modal-stub');
         const modalImpossibilitar = modals[0];
-        await modalImpossibilitar.vm.$emit('update:modelValue', true);
+        await (modalImpossibilitar as any).vm.$emit('update:modelValue', true);
         await nextTick();
 
         // Digita justificativa para passar no check de string vazia

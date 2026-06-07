@@ -93,36 +93,45 @@ describe('LimpezaProcessosView', () => {
         expect(vm.mostrarConfirmacao).toBe(true);
     });
 
-    it('handles exclusion success', async () => {
+    it('handles exclusion success using template events', async () => {
         vi.mocked(excluirProcessoCompleto).mockResolvedValue({} as any);
         const wrapper = mountComponent();
-        const vm = wrapper.vm as any;
+        
+        // Define o valor pelo DOM para cobrir v-model e events
+        const input = wrapper.find('[data-testid="input-codigo-processo"]');
+        await input.setValue('123'); // trigger update:modelValue
+        await input.trigger('input'); // if setValue is not enough for custom stub
 
-        vm.codigoProcesso = '123';
-        vm.mostrarConfirmacao = true;
-        await vm.confirmarExclusao();
+        // Clica em abrir confirmacao
+        await wrapper.find('[data-testid="btn-excluir-processo-completo"]').trigger('click');
+        await flushPromises();
+
+        // O modal deve estar visível, clicar confirmar
+        const modalBtn = wrapper.find('.modal-stub button');
+        await modalBtn.trigger('click'); // aciona @confirmar
         await flushPromises();
 
         expect(excluirProcessoCompleto).toHaveBeenCalledWith(123);
         expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'success');
-        expect(vm.codigoProcesso).toBe('');
-        expect(vm.mostrarConfirmacao).toBe(false);
+        expect((wrapper.vm as any).codigoProcesso).toBe('');
+        expect((wrapper.vm as any).mostrarConfirmacao).toBe(false);
     });
 
     it('handles exclusion error', async () => {
         vi.mocked(excluirProcessoCompleto).mockRejectedValue(new Error('Erro feio'));
         const wrapper = mountComponent();
-        const vm = wrapper.vm as any;
-
-        vm.codigoProcesso = '123';
-        vm.mostrarConfirmacao = true;
-        await vm.confirmarExclusao();
+        
+        await wrapper.find('[data-testid="input-codigo-processo"]').setValue('123');
+        await wrapper.find('[data-testid="btn-excluir-processo-completo"]').trigger('click');
+        await flushPromises();
+        
+        await wrapper.find('.modal-stub button').trigger('click');
         await flushPromises();
 
         expect(mockNotify).toHaveBeenCalledWith('Erro feio', 'danger');
     });
 
-    it('skips exclusion if code is null', async () => {
+    it('skips exclusion if code is null via vm (fallback)', async () => {
         const wrapper = mountComponent();
         const vm = wrapper.vm as any;
         vm.codigoProcesso = '';

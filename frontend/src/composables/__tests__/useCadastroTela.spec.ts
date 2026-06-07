@@ -303,14 +303,14 @@ describe("useCadastroTela", () => {
 
             // 3. mapaErros computed, obterErroParaAtividade e limparErrosValidacao
             tela.errosValidacao.value = [
-                { atividadeCodigo: 1, mensagem: "Erro Atividade 1" },
-                { atividadeCodigo: 2, mensagem: "Erro Atividade 2" },
+                { tipo: "DADOS_INCORRETOS", atividadeCodigo: 1, mensagem: "Erro Atividade 1" },
+                { tipo: "DADOS_INCORRETOS", atividadeCodigo: 2, mensagem: "Erro Atividade 2" },
             ];
             expect(tela.obterErroParaAtividade(1)).toBe("Erro Atividade 1");
 
             // 4. Watches e reset de erroNovaAtividade
             tela.novaAtividade.value = "Nova Atividade";
-            tela.erroNovaAtividade.value = new Error("Erro");
+            tela.erroNovaAtividade.value = "Erro";
             tela.novaAtividade.value = "Atividade Editada"; // Dispara watch
             await nextTick();
             expect(tela.erroNovaAtividade.value).toBeNull();
@@ -333,7 +333,7 @@ describe("useCadastroTela", () => {
             // 7. setAtividadeRef e scrollParaPrimeiroErro
             const dummyEl = document.createElement("div");
             tela.setAtividadeRef(1, dummyEl);
-            tela.errosValidacao.value = [{ atividadeCodigo: 1, mensagem: "Erro Scroll" }];
+            tela.errosValidacao.value = [{ tipo: "DADOS_INCORRETOS", atividadeCodigo: 1, mensagem: "Erro Scroll" }];
             tela.scrollParaPrimeiroErro();
 
             // 8. erroGlobalFormatado e erroFluxoCadastro com erro de validação
