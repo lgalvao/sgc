@@ -61,51 +61,25 @@ A regra central do projeto passa a ser:
 
 ---
 
-## O Que Ainda Falta Fazer
+## Monitoramento Contínuo
 
-### P-1 · Fechar o hotspot principal do frontend
+O plano estrutural pode ser considerado concluído. O trabalho remanescente deixa
+de ser um backlog de correção arquitetural e passa a ser disciplina contínua:
 
-**Arquivo-alvo:** `frontend/src/composables/useCadastroTela.ts`
-
-Pendências:
-
-- reduzir mais o acúmulo de branches de validação e erro local;
-- separar ainda melhor validação local, erro de fluxo e notificação de importação;
-- diminuir a superfície pública exposta para a view quando houver acoplamento acidental.
-
-### P-2 · Limpar fluxos secundários ainda com branches suspeitos
-
-Arquivos prioritários:
-
-- `frontend/src/composables/usePainelTela.ts`
-- `frontend/src/composables/useMapaTela.ts`
-- `frontend/src/views/NotificacoesAdminView.vue`
-
-Pendências:
-
-- revisar `catch` de background e fallback de mensagem;
-- confirmar se todos os branches restantes são reais ou apenas defensividade sobrando;
-- remover tratamento redundante quando a infraestrutura já cobre o caso.
-
-### P-3 · Ratchet por cobertura de branches de erro
-
+- manter a regra de **zero exceções Java padrão lançadas explicitamente**;
 - continuar usando cobertura de branches como detector de tratamento morto ou redundante;
-- priorizar branches de erro não cobertos em composables/views antes de expandir para refactors cosméticos;
-- quando um branch de erro for legítimo, adicionar teste;
-- quando for impossível ou redundante, remover ou consolidar.
-
-### P-4 · Smoke de comportamento geral após refatorações grandes
-
-- rodar captura E2E ou suíte equivalente sempre que houver rodada estrutural grande em tratamento de erro;
-- verificar não só quebra funcional, mas também se estão aparecendo alertas, toasts, warnings ou erros inesperados em fluxo nominal.
+- quando surgir branch de erro legítimo, adicionar teste;
+- quando surgir branch redundante, consolidar ou remover imediatamente;
+- continuar rodando captura E2E ou smoke equivalente após rodadas grandes, para
+  verificar se o fluxo nominal permanece sem “pipoco” de erro, toast ou warning.
 
 ---
 
 ## Critério de Encerramento
 
-O plano pode ser considerado maduro quando:
+O plano é considerado concluído quando:
 
 - backend estiver protegido por regra automática contra regressão para exceções Java padrão;
-- hotspots restantes do frontend estiverem reduzidos a branches justificáveis e cobertos;
+- hotspots restantes do frontend estiverem reduzidos a branches justificáveis;
 - o fluxo nominal do sistema não apresentar “pipoco” de erro/warning após rodadas grandes;
 - o relatório deixar de ser inventário de débito e passar a ser apenas política arquitetural curta.

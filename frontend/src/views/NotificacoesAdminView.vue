@@ -209,6 +209,11 @@ function formatarTipoNotificacao(tipo?: string): string {
   return TIPOS_NOTIFICACAO_LABELS[tipo] ?? tipo;
 }
 
+function fecharReenvio() {
+  mostrarModalReenvio.value = false;
+  itemSelecionado.value = null;
+}
+
 function montarPreviewHtml(corpoHtml?: string): string {
   const conteudo = limparHtmlPreview(corpoHtml?.trim() || "<p>Conteúdo indisponível.</p>");
   return `<!DOCTYPE html>
@@ -274,8 +279,7 @@ async function reenviar() {
   try {
     await reenvioMutation.mutateAsync(itemSelecionado.value.codigo);
     notify(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO, "success");
-    mostrarModalReenvio.value = false;
-    itemSelecionado.value = null;
+    fecharReenvio();
   } catch (error) {
     notify(obterMensagemErro(error, TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO), "danger");
   }

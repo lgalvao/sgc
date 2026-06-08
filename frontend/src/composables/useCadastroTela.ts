@@ -214,11 +214,10 @@ export function useCadastroTela(props: CadastroTelaProps) {
         clear();
         await nextTick();
         processarRespostaLocal(resultado);
-        if (resultado.aviso) {
-            notify(TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS, 'warning');
-        } else {
-            notify(TEXTOS.atividades.SUCESSO_IMPORTACAO, 'success');
-        }
+        notify(
+            resultado.aviso ? TEXTOS.atividades.AVISO_IMPORTACAO_DUPLICATAS : TEXTOS.atividades.SUCESSO_IMPORTACAO,
+            resultado.aviso ? 'warning' : 'success',
+        );
     }
 
     function setAtividadeRef(atividadeCodigo: number, el: unknown) {

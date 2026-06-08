@@ -40,6 +40,16 @@ export function usePainelTela() {
   const alertas = computed(() => painelQuery.data.value?.alertas ?? []);
   const carregamentoInicialConcluido = ref(false);
 
+  function registrarFalhaBackground(contexto: string, error: unknown) {
+    logger.warn(contexto, normalizarErro(error).mensagem);
+  }
+
+  function executarEmBackground<T>(acao: () => Promise<T>, contextoFalha: string) {
+    void acao().catch((error: unknown) => {
+      registrarFalhaBackground(contextoFalha, error);
+    });
+  }
+
   async function carregarDados() {
     const unidadeCodigo = perfilStore.unidadeSelecionada;
     if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
@@ -57,9 +67,10 @@ export function usePainelTela() {
           .map((a: Alerta) => a.codigo);
       if (codigosNaoLidos.length > 0) {
         painelStore.registrarLeitura(codigosNaoLidos);
-        void painelService.marcarAlertasLidos(codigosNaoLidos).catch((error: unknown) => {
-          logger.warn("Falha ao marcar alertas como lidos em background:", error);
-        });
+        executarEmBackground(
+          () => painelService.marcarAlertasLidos(codigosNaoLidos),
+          "Falha ao marcar alertas como lidos em background:",
+        );
       }
     } finally {
       carregandoPainel.value = false;
@@ -92,9 +103,10 @@ export function usePainelTela() {
   onActivated(async () => {
     if (!carregamentoInicialConcluido.value) return;
     exibirToastPendente();
-    await painelQuery.refresh().catch((error: unknown) => {
-      logger.warn("Falha na recarga em background do painel:", normalizarErro(error).mensagem);
-    });
+    executarEmBackground(
+      () => painelQuery.refresh(),
+      "Falha na recarga em background do painel:",
+    );
   });
 
   function ordenarPor(campo: keyof ProcessoResumo) {

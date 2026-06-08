@@ -215,6 +215,10 @@ export function useMapaTela(props: MapaTelaProps) {
         return erroNormalizado.mensagem || mensagemPadrao;
     }
 
+    function notificarErro(error: unknown, mensagemPadrao: string) {
+        notify(obterMensagemErroExportacao(error, mensagemPadrao), "danger");
+    }
+
     async function executarExportacao({
         estadoLoading,
         mensagemPadrao,
@@ -231,7 +235,7 @@ export function useMapaTela(props: MapaTelaProps) {
             await acao();
         } catch (error) {
             logger.error(descricaoLog, error);
-            notify(obterMensagemErroExportacao(error, mensagemPadrao), "danger");
+            notificarErro(error, mensagemPadrao);
         } finally {
             estadoLoading.value = false;
         }
@@ -355,7 +359,10 @@ export function useMapaTela(props: MapaTelaProps) {
     onMounted(async () => {
         const sucesso = await carregarContextoInicial();
         if (!sucesso) {
-            notify(obterMensagemErroIntegracaoContexto(), 'danger');
+            notificarErro(
+                new Error(obterMensagemErroIntegracaoContexto()),
+                "Falha ao carregar o contexto do mapa.",
+            );
         }
     });
 
