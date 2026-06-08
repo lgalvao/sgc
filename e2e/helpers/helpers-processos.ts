@@ -406,25 +406,23 @@ export async function finalizarProcesso(page: Page) {
     await expect(botaoFinalizar).toBeEnabled();
     await botaoFinalizar.click();
 
-    // 1. Instanciar promessa para o POST de finalização
+    // 1. Instanciar promessas para os requests
     const postFinalizarPromise = page.waitForResponse(r =>
         r.url().match(/\/api\/processos\/\d+\/finalizar/) !== null &&
         r.request().method() === 'POST' &&
         r.ok()
     );
 
+    const bootstrapPromise = page.waitForResponse(
+        r => r.url().includes('/api/painel/bootstrap') && r.ok(),
+        {timeout: 10000}
+    );
+
     // 2. Clicar no botão e aguardar o POST concluir
     await page.getByTestId('btn-finalizar-processo-confirmar').click();
     await postFinalizarPromise;
 
-    const bootstrapPromise = page.waitForResponse(
-        r => r.url().includes('/api/painel/bootstrap') && r.ok(),
-        {timeout: 3000}
-    ).catch(async () => {
-        // Fallback: se o Vue não disparou o refresh() no onActivated, forçamos o reload.
-        await page.reload();
-    });
-
+    // 3. Aguardar a navegação e a recarga dos dados do painel
     await page.waitForURL(/\/painel(?:\?.*)?$/);
     await bootstrapPromise;
 }

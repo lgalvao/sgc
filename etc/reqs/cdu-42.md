@@ -11,19 +11,26 @@ Ator: SERVIDOR
 
 1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` da unidade do servidor.
+2. O sistema mostra a tela `Detalhes do subprocesso` da unidade do servidor, com, esses elementos:  
+  - dados gerais do subprocesso: desc. subprocesso, desc. processo pai, localização atual, situação do subprocesso
+  - dados gerais da unidade: sigla, nome da unidade, responsável
+  - card `Autoavaliação`, sempre habilitado.
+  - card `Aprovação de consenso`, habilitado apenas quando a autoavaliação estiver concluída e o responsável pela unidade tiver criado a avaliação de consenso (ou seja, quando  o situação individual do servidor for 'Avaliação de consenso criada') 
+  - **Não serão mostrados**:
+    - a lista de servidores da unidade
+    - dados de movimentações.
 
-3. O usuário clica no card `Autoavaliação`.
+3. O usuário aciona o card `Autoavaliação`.
 
 4. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e, para cada competência:
    - descrição da competência;
-   - um controle de 'toggle' `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos associados à competência;
+   - um controle de _toggle_ `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos associados à competência;
    - campo `Importância`, com opções `NA` e os números de `1` a `6`;
    - campo `Domínio`, com opções `NA` e os números de `1` a `6`.
-   - Botão `Concluir autoavaliação`
+   - botão `Concluir autoavaliação`
     
-6. O usuário escolhe os valores desejados para cada uma das competências.
-
+6. O usuário atribui um valor de domínio e de importância para cada uma das competências.
+   
 7. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
 
 8. O usuário clica em `Concluir autoavaliação`.

@@ -11,7 +11,7 @@ Ator: CHEFE
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` da unidade.
+2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, com detalhes do subprocesso, os cards e a grade de servidores.
 
 3. O usuário clica no card `Situação de capacitação`.
 
@@ -25,12 +25,12 @@ Ator: CHEFE
    - `EC` (Em capacitação);
    - `C`  (Capacitado);
    - `I`  (Instrutor).
-   4.2. Regras de apresentação:
-   - A primeira coluna da matriz deve identificar claramente a competência.
+   4.2. Regras de apresentação da matriz:
+   - A primeira coluna da matriz deve identificar a competência.
    - As colunas de servidores devem usar nomes abreviados, por limitação de espaço horizontal.
    - O nome completo do servidor deve continuar acessível na interface, por exemplo via 'tooltip' no cabeçalho.
-   - Quando necessário para evitar ambiguidade, o título eleitoral pode aparecer como informação secundária no cabeçalho do servidor.
-   - Exemplo de matriz, depois de preenchida com situações:
+   - Quando necessário, para evitar ambiguidade, o título eleitoral pode aparecer como informação secundária no cabeçalho do servidor.
+   - Exemplo de matriz, depois de preenchida com situações de capacitação:
 
      | Competência           | BOB MARLEY        | DAVID BOWIE       | ELVIS PRESLEY     |
      |:----------------------|:------------------|:------------------|:------------------|
@@ -38,8 +38,7 @@ Ator: CHEFE
      | Desc. Competência 2   | I \- Instrutor    | C \- Capacitado   | C \- Capacitado   |
      | Desc. Competência 3   | EC \- Em capacitação | EC \- Em capacitação | EC \- Em capacitação |
    
-6. O usuário informa os valores para cada célula necessária da matriz.
+6. O usuário informa os valores para cada célula da matriz.
 
-7. O sistema salva automaticamente cada alteração realizada.
-
-8. O usuário não precisa confirmar o cadastro de situações de capacitação de uma vez só, podendo retornar a esta tela em outro momento para finalizar.
+7. O sistema salva automaticamente cada alteração realizada. 
+    *NOTA*: O usuário não precisa confirmar o cadastro de situações de capacitação de uma vez só, podendo retornar a esta tela em outro momento para finalizar.

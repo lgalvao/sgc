@@ -14,24 +14,23 @@ Ator: CHEFE
 
 2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade.
 
-3. O usuário clica no card `Monitoramento`.
-
-4. O sistema apresenta a tela `Monitoramento de diagnóstico`, com a situação dos servidores lotados na unidade do usuário. Para cada servidor, são mostrados:
+4. O sistema apresenta uma grade com a situação dos servidores lotados na unidade do usuário. Para cada servidor, são mostrados:
    - `Nome` : nome completo do servidor
    - `Situação`: situação atual da avaliação individual
+   - `Ações`
    
-5. Na coluna de ações, o usuário escolhe a opção `Indicar impossibilidade
+5. Ao lado do servidor impossibilitado, o usuário escolhe a ação `Indicar impossibilidade`.
 
-6. O sistema abre um modal com:
+6. O sistema abre um modal:
    - título `Indicar impossibilidade de avaliação`;
    - texto `Confirma a impossibilidade de avaliação para [NOME_SERVIDOR]?`;
-   - campo obrigatório `Justificativa`;
+   - campo `Justificativa` (obrigatório)
    - botões `Cancelar` e `Indicar impossibilidade`.
 
-3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
-
-4. O usuário informa a justificativa e clica em `Indicar impossibilidade`.
+   6.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
    
-5. O sistema altera a situação da avaliação individual do servidor para `Avaliação impossibilitada`. e passa  a desconsiderar, para fins de conclusão da unidade, quaisquer dados parciais anteriormente registrados para aquela avaliação individual.
+7. O usuário informa a justificativa e aciona `Indicar impossibilidade`.
+   
+8. O sistema altera a situação individual do servidor para `Avaliação impossibilitada`. 
 
-7. O sistema mostra a mensagem `Impossibilidade registrada`.
+9. Sistema mostra a mensagem `Impossibilidade registrada`.

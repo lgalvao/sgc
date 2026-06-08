@@ -2,10 +2,6 @@
 
 Ator: ADMIN, GESTOR
 
-Maturidade: Média
-
-Base principal: fluxo negocial acordado no PDF e discussão da reunião sobre uso agregado dos dados de capacitação.
-
 ## Pré-condições
 
 - Login realizado com perfil ADMIN ou GESTOR

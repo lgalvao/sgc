@@ -14,23 +14,21 @@ Ator: CHEFE
 
 1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, com o monitoramento do diagnóstico exibido inline, incluindo a situação de cada servidor da unidade e o botão `Concluir diagnóstico`, quando aplicável.
+2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, com a grade de servidores e o botão `Concluir diagnóstico`, que deverá estar habilitado.
 
 3. O usuário clica em `Concluir diagnóstico`.
    
-4. O sistema verifica se todas as avaliações individuais estão em `Consenso aprovado` ou `Avaliação impossibilitada`, e se as situações de capacitação foram integralmente preenchidas.
+4. O sistema verifica se todas as avaliações individuais estão com a situação `Avbaliação de consenso aprovada` ou `Avaliação impossibilitada`; também verifica se as situações de capacitação foram preenchidas para todas as competências.
 
-   4.1. Caso positivo, o sistema mostra modal de confirmação com:
-      - título `Conclusão de diagnóstico`;
-      - texto `Confirma a conclusão do diagnóstico da unidade?`;
-      - botões `Cancelar` e `Concluir`.
-   
-   4.2. Caso exista pendência, o sistema mostra a mensagem "Ainda existem avaliações ou ocupações críticas
-   pendentes." e interrompe a operação.
-   
-   4.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
+   4.1. Caso existirem campos não preenchidos, o sistema mostra a mensagem "Ainda existem avaliações e situações de capacitações não preenchidas.", e interrompe a operação, continuando na tela `Detalhes do subprocesso`.
 
-5. O usuário confirma.
+   4.2. Caso a verificação confirmar que está tudo preenchido, sistema mostra modal de confirmação com:
+      - título "Conclusão de diagnóstico";
+      - texto: "Confirma a conclusão do diagnóstico da unidade?";
+      - botões: `Cancelar` e `Concluir`.
+    4.1.1. Se o usuário escolher `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
+
+5. O usuário aciona `Concluir`.
 
 6. O sistema altera a situação do subprocesso para 'Concluído'.
 
@@ -40,7 +38,7 @@ Ator: CHEFE
    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
    - `Descrição`: 'Diagnóstico concluído'.
 
-8. O sistema envia notificação por e-mail para a unidade superior:
+8. O sistema envia uma notificação por e-mail para a unidade superior:
 
     ```text
     Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
@@ -48,7 +46,9 @@ Ator: CHEFE
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
 
     O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi concluído e submetido à análise das unidades superiores.
-    ```
+   
+    Realize a análise acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
+   ```
 
 9. O sistema cria internamente um alerta com:
     - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"

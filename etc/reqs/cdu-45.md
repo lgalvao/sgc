@@ -15,7 +15,7 @@ Ator: SERVIDOR
    
 3. O usuário aciona o card `Avaliação de consenso`.
    
-4. O sistema mostra uma grade com as descrições das competências e o valores da avaliação de consenso, com os valores importância e domínio para cada competência, como o seguinte exemplo:
+4. O sistema mostra a tela `Avaliação de consenso`, com uma grade contendo as descrições das competências e o valores da avaliação de consenso, com os valores importância e domínio para cada competência; como o seguinte exemplo:
 
    | Competência | Importância | Domínio |
    | :---- | :---: | :---: |
@@ -23,13 +23,13 @@ Ator: SERVIDOR
    | Desc. competência 2 | NA | NA |
    | Desc. competência 2 | 3 | 2 |
 
- Ao final, o sistema mostra o botão `Aprovar consenso`.
+ Abaixo da grade, o sistema mostra o botão `Aprovar consenso`.
    
 5. O usuário aciona `Aprovar consenso`.
 
-3. O sistema altera a situação da avaliação do servidor para 'Avaliação de consenso aprovada'.
+3. O sistema altera a situação individual do servidor para 'Avaliação de consenso aprovada'.
 
-4. O sistema envia notificação por e-mail para o responsável pela unidade:
+4. O sistema envia uma notificação por e-mail para o responsável pela unidade:
 
     ```text
     Assunto: SGC: Avaliação de consenso de [NOME_SERVIDOR] aprovada

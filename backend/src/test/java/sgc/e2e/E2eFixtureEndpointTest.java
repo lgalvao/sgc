@@ -297,7 +297,7 @@ class E2eFixtureEndpointTest {
                 .getResponse()
                 .getContentAsString();
 
-        String codigo = objectMapper.readTree(conteudo).get("codigo").asText();
+        String codigo = objectMapper.readTree(conteudo).get("codigo").asString();
         assertThat(feedbackRepo.findById(java.util.UUID.fromString(codigo)))
                 .isPresent()
                 .get()
