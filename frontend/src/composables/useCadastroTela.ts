@@ -12,6 +12,7 @@ import {useCadastroAtividadesMutacoes} from "@/composables/useCadastroAtividades
 import {useCadastroRevisaoSemMudancas} from "@/composables/useCadastroRevisaoSemMudancas";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useCadastroOrquestracao} from "@/composables/useCadastroOrquestracao";
+import {useCadastroErros} from "@/composables/useCadastroErros";
 import {useCadastroAnaliseFluxo} from "@/views/cadastroAnaliseFluxo";
 import CadAtividadeForm from "@/components/atividades/CadAtividadeForm.vue";
 import {
@@ -25,7 +26,6 @@ import {
 } from "@/types/tipos";
 import {calcularAssinaturaCadastro, formatSituacaoSubprocesso} from "@/utils/formatters";
 import {normalizarPermissoesSubprocesso} from "@/utils/permissoesSubprocesso";
-import {normalizarErro} from "@/utils/apiError";
 import {listarAnalisesCadastro} from "@/services/analiseService";
 import {TEXTOS} from "@/constants/textos";
 import {extrairTextoPlanoHtml} from "@/utils/textoFormatado";
@@ -118,40 +118,22 @@ export function useCadastroTela(props: CadastroTelaProps) {
 
     const loadingValidacao = ref(false);
     const loadingDisponibilizacao = ref(false);
-    const errosValidacao = ref<ErroValidacao[]>([]);
-    const erroGlobal = ref<string | null>(null);
-    const erroTick = ref(0);
     const erroAtualFluxo = computed(() => fluxoSubprocesso.ultimoErro.value);
-
-    const mapaErros = computed(() => {
-        const mapa = new Map<number, string>();
-        for (const erro of errosValidacao.value) {
-            if (!erro.atividadeCodigo) continue;
-            const atividade = atividades.value.find((item) => item.codigo === erro.atividadeCodigo);
-            if (!atividade?.conhecimentos || atividade.conhecimentos.length === 0) {
-                mapa.set(erro.atividadeCodigo, erro.mensagem);
-            }
-        }
-        return mapa;
+    const {
+        errosValidacao,
+        erroGlobal,
+        erroTick,
+        limparErrosValidacao,
+        definirErroGlobal,
+        definirErroGlobalDoErro,
+        aplicarErrosValidacao,
+        obterErroParaAtividade,
+        obterErroCampoFluxo,
+        erroFluxoCadastro,
+    } = useCadastroErros({
+        atividades,
+        erroAtualFluxo,
     });
-
-    function limparErrosValidacao() {
-        errosValidacao.value = [];
-        erroGlobal.value = null;
-    }
-
-    function definirErroGlobal(mensagem: string) {
-        limparErrosValidacao();
-        erroGlobal.value = mensagem;
-    }
-
-    function obterMensagemErroGlobal(error: unknown) {
-        return normalizarErro(error).mensagem || "Não foi possível concluir a operação do cadastro.";
-    }
-
-    function definirErroGlobalDoErro(error: unknown) {
-        definirErroGlobal(obterMensagemErroGlobal(error));
-    }
 
     async function executarAcaoComErroGlobal<T>(acao: () => Promise<T>): Promise<{sucesso: true; resultado: T} | {sucesso: false}> {
         try {
@@ -163,21 +145,6 @@ export function useCadastroTela(props: CadastroTelaProps) {
             definirErroGlobalDoErro(error);
             return {sucesso: false};
         }
-    }
-
-    function obterErroCampoFluxo(campos: string[]) {
-        return erroAtualFluxo.value?.erros?.find((erro) => erro.campo != null && campos.includes(erro.campo))?.mensagem ?? "";
-    }
-
-    function aplicarErrosValidacao(erros: ErroValidacao[]) {
-        limparErrosValidacao();
-        erroTick.value++;
-        errosValidacao.value = erros;
-        erroGlobal.value = erros.find((erro) => !erro.atividadeCodigo)?.mensagem ?? null;
-    }
-
-    function obterErroParaAtividade(atividadeCodigo: number) {
-        return mapaErros.value.get(atividadeCodigo);
     }
 
     const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();
@@ -336,12 +303,6 @@ export function useCadastroTela(props: CadastroTelaProps) {
     }
 
     const erroCampoObservacaoDevolucao = computed(() => obterErroCampoFluxo(["justificativa", "texto", "observacoes"]));
-
-    const erroFluxoCadastro = computed(() =>
-        erroAtualFluxo.value?.tipo === "validacao"
-            ? undefined
-            : erroAtualFluxo.value?.mensagem
-    );
 
     const mensagemErroObservacaoDevolucao = computed(() => {
         if (erroCampoObservacaoDevolucao.value) {

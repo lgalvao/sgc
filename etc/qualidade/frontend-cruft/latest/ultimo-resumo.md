@@ -1,11 +1,11 @@
 # Auditoria de cruft do frontend
 
-Gerado em: 2026-06-08T02:48:26.462Z
+Gerado em: 2026-06-08T03:01:06.876Z
 Score total: 556 (critico)
 
 ## Resumo
 
-- Arquivos de producao: 284
+- Arquivos de producao: 285
 - Arquivos de teste/story: 233
 - any explicito em producao: 0
 - checks de null em producao: 31
@@ -29,7 +29,6 @@ Score total: 556 (critico)
 | frontend/src/views/useDiagnosticoUnidadeView.ts | view | 301 | 17 | checksNull: 6, fallbacksDefensivos: 1, catchBlocks: 1 |
 | frontend/src/composables/useMapaQuery.ts | composable | 138 | 16 | exportsSuspeitos: 4 |
 | frontend/src/views/ConsensoDiagnosticoView.vue | view | 368 | 15 | checksNull: 2, fallbacksDefensivos: 3, catchBlocks: 1 |
-| frontend/src/composables/useCadastroTela.ts | composable | 519 | 13 | checksNull: 1, fallbacksDefensivos: 3, catchBlocks: 1 |
 | frontend/src/composables/useMapaTela.ts | composable | 457 | 13 | checksNull: 1, fallbacksDefensivos: 3, catchBlocks: 1 |
 | frontend/src/views/feedbacksAdminApresentacao.ts | view | 177 | 13 | checksNull: 2, fallbacksDefensivos: 1, catchBlocks: 3 |
 | frontend/src/composables/useMonitoramentoDiagnostico.ts | composable | 57 | 12 | fallbacksDefensivos: 4 |
@@ -44,3 +43,4 @@ Score total: 556 (critico)
 | frontend/src/views/OcupacoesCriticasDiagnosticoView.vue | view | 231 | 9 | fallbacksDefensivos: 3 |
 | frontend/src/components/comum/ModalConfirmacao.vue | component | 144 | 8 | castsDuplos: 1 |
 | frontend/src/composables/useAtribuicaoTemporariaTela.ts | composable | 414 | 8 | catchBlocks: 4 |
+| frontend/src/composables/useCadastroTela.ts | composable | 480 | 8 | fallbacksDefensivos: 2, catchBlocks: 1 |

@@ -1,6 +1,6 @@
 {
   "versaoSchema": "1.0.0",
-  "geradoEm": "2026-06-08T02:48:26.462Z",
+  "geradoEm": "2026-06-08T03:01:06.876Z",
   "base": "/Users/leonardo/sgc",
   "budget": {
     "versaoSchema": "1.0.0",
@@ -10,8 +10,8 @@
     }
   },
   "resumo": {
-    "arquivosFrontend": 517,
-    "arquivosProducao": 284,
+    "arquivosFrontend": 518,
+    "arquivosProducao": 285,
     "arquivosTeste": 233,
     "scoreTotal": 556,
     "faixa": "critico"
@@ -269,22 +269,6 @@
       "violacoes": []
     },
     {
-      "arquivo": "frontend/src/composables/useCadastroTela.ts",
-      "camada": "composable",
-      "linhas": 519,
-      "score": 13,
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 1,
-        "fallbacksDefensivos": 3,
-        "catchBlocks": 1,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "violacoes": []
-    },
-    {
       "arquivo": "frontend/src/composables/useMapaTela.ts",
       "camada": "composable",
       "linhas": 457,
@@ -507,6 +491,22 @@
         "exportsSuspeitos": 0
       },
       "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/useCadastroTela.ts",
+      "camada": "composable",
+      "linhas": 480,
+      "score": 8,
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 2,
+        "catchBlocks": 1,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "violacoes": []
     }
   ],
   "arquivos": [
@@ -650,32 +650,6 @@
         "hard": null
       },
       "score": 15,
-      "violacoes": []
-    },
-    {
-      "arquivo": "frontend/src/composables/useCadastroTela.ts",
-      "camada": "composable",
-      "categoriaArquivo": "producao",
-      "linhas": 519,
-      "imports": 23,
-      "exports": 1,
-      "exportsRuntime": [
-        "useCadastroTela"
-      ],
-      "contagens": {
-        "anyExplicito": 0,
-        "checksNull": 1,
-        "fallbacksDefensivos": 3,
-        "catchBlocks": 1,
-        "castsDuplos": 0,
-        "storageDireto": 0,
-        "exportsSuspeitos": 0
-      },
-      "limites": {
-        "target": null,
-        "hard": null
-      },
-      "score": 13,
       "violacoes": []
     },
     {
@@ -990,6 +964,32 @@
         "hard": null
       },
       "score": 9,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/useCadastroTela.ts",
+      "camada": "composable",
+      "categoriaArquivo": "producao",
+      "linhas": 480,
+      "imports": 23,
+      "exports": 1,
+      "exportsRuntime": [
+        "useCadastroTela"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 0,
+        "fallbacksDefensivos": 2,
+        "catchBlocks": 1,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 8,
       "violacoes": []
     },
     {
@@ -1516,6 +1516,32 @@
       "exports": 1,
       "exportsRuntime": [
         "useRelatorioUnidadesComMapaQuery"
+      ],
+      "contagens": {
+        "anyExplicito": 0,
+        "checksNull": 1,
+        "fallbacksDefensivos": 1,
+        "catchBlocks": 0,
+        "castsDuplos": 0,
+        "storageDireto": 0,
+        "exportsSuspeitos": 0
+      },
+      "limites": {
+        "target": null,
+        "hard": null
+      },
+      "score": 5,
+      "violacoes": []
+    },
+    {
+      "arquivo": "frontend/src/composables/useCadastroErros.ts",
+      "camada": "composable",
+      "categoriaArquivo": "producao",
+      "linhas": 79,
+      "imports": 3,
+      "exports": 1,
+      "exportsRuntime": [
+        "useCadastroErros"
       ],
       "contagens": {
         "anyExplicito": 0,
