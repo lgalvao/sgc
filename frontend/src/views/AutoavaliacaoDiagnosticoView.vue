@@ -23,17 +23,10 @@
       </div>
 
       <AppAlert
-          v-if="erroMensagem"
-          :mensagem="erroMensagem"
-          variante="danger"
-          @dismissed="limparErroMensagem"
-      />
-
-      <AppAlert
-          v-if="alertaSucesso"
-          :mensagem="alertaSucesso"
-          variante="success"
-          @dismissed="limparAlertaSucesso"
+          v-if="retornoFluxo"
+          :mensagem="retornoFluxo.mensagem"
+          :variante="retornoFluxo.variante"
+          @dismissed="limparRetornoFluxo"
       />
 
       <div class="mb-3 text-muted small d-flex align-items-center gap-2">
@@ -245,8 +238,8 @@
           data-testid="textarea-justificativa-impossibilidade"
           rows="3"
       />
-      <BFormText v-if="erroJustificativa" class="text-danger">
-        {{ erroJustificativa }}
+      <BFormText v-if="mensagemErroJustificativa" class="text-danger">
+        {{ mensagemErroJustificativa }}
       </BFormText>
       <template #footer>
         <BButton class="text-secondary" variant="link" @click="fecharModalImpossibilitar">Cancelar</BButton>
@@ -265,8 +258,6 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
-import {useRouter} from 'vue-router';
 import {
   BAlert,
   BBadge,
@@ -286,259 +277,56 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
-import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
-import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
-import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
-import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
-import {useEquipeDiagnostico} from '@/composables/useEquipeDiagnostico';
-import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
-import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
-import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
+import {useAutoavaliacaoDiagnosticoView} from '@/views/useAutoavaliacaoDiagnosticoView';
 
 const props = defineProps<{
   codSubprocesso: number;
   siglaUnidade: string;
 }>();
-
-const router = useRouter();
-
-const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
-const {queryContextoEdicao, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
-
 const {
-  competenciasLocais,
-  situacaoServidor,
+  contexto,
   carregando,
+  retornoFluxo,
+  limparRetornoFluxo,
   salvandoAutomaticamente,
-  concluindo,
-  erroConcluir,
+  ehAutoavaliacaoConcluida,
+  ehConsensoCriado,
+  ehConsensoAprovado,
+  ehChefe,
+  podeEditar,
+  colunas,
+  competenciasComDescricao,
+  detalhesCompetenciaAbertos,
+  alternarDetalhesCompetencia,
+  formatarConhecimentos,
+  opcoesNota,
   atualizarNota,
-  concluirAutoavaliacao,
-} = useAutoavaliacaoDiagnostico(props.codSubprocesso);
-
-const {
+  normalizarValorNota,
+  confirmarConcluir,
+  modalConcluirAberto,
+  abrirModalConcluir,
+  concluindo,
+  modalAprovarAberto,
+  abrirModalAprovar,
+  confirmarAprovar,
   aprovando,
-  erroAprovar,
-  aprovarConsenso,
-} = useConsensoDiagnostico(props.codSubprocesso);
-const {impossibilitando, impossibilitarAvaliacao} = useFluxoDiagnostico(props.codSubprocesso);
-
-const {itens: itensEquipe, pendentes} = useEquipeDiagnostico(props.codSubprocesso);
-
-const ehChefe = computed(() => podeCriarConsenso.value);
-
-const ehAutoavaliacaoConcluida = computed(() => situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA');
-const ehConsensoCriado = computed(() => situacaoServidor.value === 'CONSENSO_CRIADO');
-const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
-const podeEditar = computed(
-  () =>
-    situacaoServidor.value === 'AUTOAVALIACAO_NAO_INICIADA' ||
-    situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA',
-);
-
-const erroMensagem = ref('');
-const alertaSucesso = ref('');
-
-const modalConcluirAberto = ref(false);
-const modalAprovarAberto = ref(false);
-const modalImpossibilitarAberto = ref(false);
-const detalhesCompetenciaAbertos = ref<Record<number, boolean>>({});
-const servidorParaImpossibilitar = ref<ItemEquipeDiagnostico | null>(null);
-const justificativaImpossibilidade = ref('');
-const erroJustificativa = ref('');
-
-function abrirModalConcluir() {
-  modalConcluirAberto.value = true;
-}
-
-function abrirModalAprovar() {
-  modalAprovarAberto.value = true;
-}
-
-function abrirModalImpossibilitar(servidor: ItemEquipeDiagnostico) {
-  servidorParaImpossibilitar.value = servidor;
-  justificativaImpossibilidade.value = '';
-  erroJustificativa.value = '';
-  modalImpossibilitarAberto.value = true;
-}
-
-function fecharModalImpossibilitar() {
-  modalImpossibilitarAberto.value = false;
-}
-
-function limparAlertas() {
-  erroMensagem.value = '';
-  alertaSucesso.value = '';
-}
-
-function limparErroMensagem() {
-  erroMensagem.value = '';
-}
-
-function limparAlertaSucesso() {
-  alertaSucesso.value = '';
-}
-
-function registrarSucesso(mensagem: string) {
-  limparAlertas();
-  alertaSucesso.value = mensagem;
-}
-
-function registrarErro(mensagem?: string | null) {
-  alertaSucesso.value = '';
-  erroMensagem.value = mensagem?.trim() || TEXTOS.diagnostico.ERRO_SALVAR;
-}
-
-async function confirmarConcluir() {
-  try {
-    await concluirAutoavaliacao();
-    registrarSucesso(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
-  } catch {
-    registrarErro(erroConcluir.value?.message);
-  }
-}
-
-async function confirmarAprovar() {
-  try {
-    await aprovarConsenso();
-    registrarSucesso(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
-  } catch {
-    registrarErro(erroAprovar.value?.message);
-  }
-}
-
-async function confirmarImpossibilitar() {
-  if (!justificativaImpossibilidade.value.trim()) {
-    erroJustificativa.value = TEXTOS.diagnostico.ERRO_JUSTIFICATIVA_OBRIGATORIA;
-    return;
-  }
-  if (!servidorParaImpossibilitar.value) return;
-
-  try {
-    await impossibilitarAvaliacao(
-      servidorParaImpossibilitar.value.servidorTitulo,
-      justificativaImpossibilidade.value,
-    );
-    fecharModalImpossibilitar();
-    registrarSucesso(TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO);
-  } catch {
-    registrarErro();
-  }
-}
-
-function navegarParaConsenso(servidorTitulo: string) {
-  void router.push({
-    name: 'ConsensoDiagnostico',
-    params: {
-      codSubprocesso: props.codSubprocesso,
-      siglaUnidade: props.siglaUnidade,
-      servidorTitulo,
-    },
-  });
-}
-
-function voltar() {
-  void router.back();
-}
-
-function alternarDetalhesCompetencia(competenciaCodigo: number) {
-  detalhesCompetenciaAbertos.value[competenciaCodigo] = !detalhesCompetenciaAbertos.value[competenciaCodigo];
-}
-
-function podeImpossibilitar(situacao: SituacaoAvaliacaoServidor) {
-  return (
-    situacao === 'AUTOAVALIACAO_NAO_INICIADA' ||
-    situacao === 'AUTOAVALIACAO_CONCLUIDA' ||
-    situacao === 'CONSENSO_CRIADO'
-  );
-}
-
-const varianteSituacao = computed(() => {
-  switch (contexto.value?.situacaoSubprocesso) {
-    case 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO':
-      return 'warning';
-    case 'DIAGNOSTICO_CONCLUIDO':
-      return 'success';
-    default:
-      return 'secondary';
-  }
-});
-
-function varianteSituacaoServidor(situacao: SituacaoAvaliacaoServidor) {
-  switch (situacao) {
-    case 'CONSENSO_APROVADO':
-      return 'success';
-    case 'AVALIACAO_IMPOSSIBILITADA':
-      return 'secondary';
-    case 'CONSENSO_CRIADO':
-      return 'warning';
-    case 'AUTOAVALIACAO_CONCLUIDA':
-      return 'info';
-    default:
-      return 'light';
-  }
-}
-
-function formatarSituacaoServidor(situacao: SituacaoAvaliacaoServidor): string {
-  const mapa: Record<SituacaoAvaliacaoServidor, string> = {
-    AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
-    AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
-    CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
-    CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
-    AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
-  };
-  return mapa[situacao];
-}
-
-function formatarNota(valor: number | null): string {
-  if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
-  if (valor === 0) return TEXTOS.diagnostico.NOTA_NA;
-  return String(valor);
-}
-
-function formatarConhecimentos(conhecimentos: Conhecimento[]): string {
-  if (conhecimentos.length === 0) {
-    return '-';
-  }
-  return conhecimentos.map((conhecimento) => conhecimento.descricao).join(', ');
-}
-
-const colunas = [
-  {key: 'competenciaCodigo', label: 'Codigo'},
-  {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-  {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
-  {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
-];
-
-const competenciasComDescricao = computed(() => {
-  const mapaAtividades = new Map<number, Atividade[]>(
-    (queryContextoEdicao.data.value?.mapa.competencias ?? []).map((competencia) => [competencia.codigo, competencia.atividades ?? []]),
-  );
-  const mapa = Object.fromEntries(
-    (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
-  );
-  return competenciasLocais.value.map((c) => ({
-    ...c,
-    descricao: mapa[c.competenciaCodigo] ?? `Competencia ${c.competenciaCodigo}`,
-    atividades: mapaAtividades.get(c.competenciaCodigo) ?? [],
-  }));
-});
-
-const opcoesNota = [
-  {value: 0, text: 'NA'},
-  {value: 1, text: '1'},
-  {value: 2, text: '2'},
-  {value: 3, text: '3'},
-  {value: 4, text: '4'},
-  {value: 5, text: '5'},
-  {value: 6, text: '6'},
-];
-
-function normalizarValorNota(valor: unknown): number | null {
-  if (valor === null || valor === undefined || valor === '') return null;
-  if (typeof valor === 'number') return Number.isNaN(valor) ? null : valor;
-  const numero = Number(valor);
-  return Number.isNaN(numero) ? null : numero;
-}
+  itensEquipe,
+  pendentes,
+  varianteSituacaoServidor,
+  formatarSituacaoServidor,
+  navegarParaConsenso,
+  podeImpossibilitar,
+  abrirModalImpossibilitar,
+  modalImpossibilitarAberto,
+  fecharModalImpossibilitar,
+  servidorParaImpossibilitar,
+  justificativaImpossibilidade,
+  mensagemErroJustificativa,
+  confirmarImpossibilitar,
+  impossibilitando,
+  voltar,
+  varianteSituacao,
+  formatarNota,
+} = useAutoavaliacaoDiagnosticoView(props);
 </script>

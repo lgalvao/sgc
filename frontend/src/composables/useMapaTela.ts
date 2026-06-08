@@ -207,28 +207,52 @@ export function useMapaTela(props: MapaTelaProps) {
             ?? "Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.";
     }
 
-    async function exportarMapaAtualPdf() {
-        loadingExportacaoPdf.value = true;
+    function obterMensagemErroExportacao(error: unknown, mensagemPadrao: string) {
+        const erroNormalizado = normalizarErro(error);
+        if (erroNormalizado.tipo === "inesperado" && !erroNormalizado.status) {
+            return mensagemPadrao;
+        }
+        return erroNormalizado.mensagem || mensagemPadrao;
+    }
+
+    async function executarExportacao({
+        estadoLoading,
+        mensagemPadrao,
+        descricaoLog,
+        acao,
+    }: {
+        estadoLoading: {value: boolean};
+        mensagemPadrao: string;
+        descricaoLog: string;
+        acao: () => Promise<void>;
+    }) {
+        estadoLoading.value = true;
         try {
-            await relatoriosService.downloadRelatorioMapaAtualPdf(obterCodigoSubprocessoObrigatorio());
+            await acao();
         } catch (error) {
-            logger.error("Erro ao exportar PDF do mapa atual:", error);
-            notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
+            logger.error(descricaoLog, error);
+            notify(obterMensagemErroExportacao(error, mensagemPadrao), "danger");
         } finally {
-            loadingExportacaoPdf.value = false;
+            estadoLoading.value = false;
         }
     }
 
+    async function exportarMapaAtualPdf() {
+        await executarExportacao({
+            estadoLoading: loadingExportacaoPdf,
+            mensagemPadrao: TEXTOS_RELATORIOS.ERRO_EXPORTAR,
+            descricaoLog: "Erro ao exportar PDF do mapa atual:",
+            acao: () => relatoriosService.downloadRelatorioMapaAtualPdf(obterCodigoSubprocessoObrigatorio()),
+        });
+    }
+
     async function exportarMapaAtualCsv() {
-        loadingExportacaoCsv.value = true;
-        try {
-            await relatoriosService.downloadRelatorioMapaAtualCsv(obterCodigoSubprocessoObrigatorio());
-        } catch (error) {
-            logger.error("Erro ao exportar CSV do mapa atual:", error);
-            notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
-        } finally {
-            loadingExportacaoCsv.value = false;
-        }
+        await executarExportacao({
+            estadoLoading: loadingExportacaoCsv,
+            mensagemPadrao: TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV,
+            descricaoLog: "Erro ao exportar CSV do mapa atual:",
+            acao: () => relatoriosService.downloadRelatorioMapaAtualCsv(obterCodigoSubprocessoObrigatorio()),
+        });
     }
 
     const contextoEdicaoAtual = computed(() => subprocessoStore.contextoEdicao);

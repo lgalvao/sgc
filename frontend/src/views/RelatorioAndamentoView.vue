@@ -42,6 +42,7 @@ import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useRelatorioAndamentoTela} from "@/composables/useRelatorioAndamentoTela";
 import {useNotification} from "@/composables/useNotification";
 import {formatarDataBR, formatarDataHoraBR} from "@/utils/date";
+import {normalizarErro} from "@/utils/apiError";
 
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
@@ -76,20 +77,36 @@ const opcoesProcessos = computed(() => [
   ...processosDisponiveis.value.map(p => ({value: p.codigo, text: p.descricao}))
 ]);
 
+function obterMensagemErroRelatorio(error: unknown, mensagemPadrao: string) {
+  const erroNormalizado = normalizarErro(error);
+  if (erroNormalizado.tipo === 'inesperado' && !erroNormalizado.status) {
+    return mensagemPadrao;
+  }
+  return erroNormalizado.mensagem || mensagemPadrao;
+}
+
 async function gerarRelatorio() {
   if (!codProcessoSelecionado.value) return;
   carregando.value = true;
-  await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value)
-      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"))
-      .finally(() => { carregando.value = false; });
+  try {
+    await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value);
+  } catch (error) {
+    notify(obterMensagemErroRelatorio(error, TEXTOS_RELATORIOS.ERRO_BUSCA), "danger");
+  } finally {
+    carregando.value = false;
+  }
 }
 
 async function exportarPdf() {
   if (!codProcessoSelecionado.value) return;
   carregando.value = true;
-  await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value)
-      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger"))
-      .finally(() => { carregando.value = false; });
+  try {
+    await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value);
+  } catch (error) {
+    notify(obterMensagemErroRelatorio(error, TEXTOS_RELATORIOS.ERRO_EXPORTAR), "danger");
+  } finally {
+    carregando.value = false;
+  }
 }
 
 onMounted(() => {

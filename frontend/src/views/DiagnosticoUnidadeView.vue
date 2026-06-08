@@ -23,16 +23,10 @@
 
       <!-- Alertas -->
       <AppAlert
-          v-if="erroMensagem"
-          :mensagem="erroMensagem"
-          variante="danger"
-          @dismissed="limparErroMensagem"
-      />
-      <AppAlert
-          v-if="alertaSucesso"
-          :mensagem="alertaSucesso"
-          variante="success"
-          @dismissed="limparAlertaSucesso"
+          v-if="retornoFluxo"
+          :mensagem="retornoFluxo.mensagem"
+          :variante="retornoFluxo.variante"
+          @dismissed="limparRetornoFluxo"
       />
 
       <!-- Cards de métricas -->
@@ -102,10 +96,10 @@
                 </template>
                 <template #cell(gap)="{ item }">
                   <span
-                    v-if="calcularGap(item) !== null"
-                    :class="calcularGap(item)! > 0 ? 'text-danger fw-bold' : 'text-success'"
+                    v-if="obterGapInfo(item)"
+                    :class="obterGapInfo(item)?.variante"
                   >
-                    {{ calcularGap(item)! > 0 ? `+${calcularGap(item)}` : calcularGap(item) }}
+                    {{ obterGapInfo(item)?.texto }}
                   </span>
                   <span v-else>{{ TEXTOS.diagnostico.NOTA_NAO_INFORMADA }}</span>
                 </template>
@@ -203,7 +197,7 @@
     <!-- Modal: Devolver -->
     <BModal v-model="modalDevolverAberto" :title="TEXTOS.diagnostico.MODAL_DEVOLVER_TITULO" centered>
       <BFormTextarea v-model="justificativaDevolver" :placeholder="TEXTOS.diagnostico.MODAL_DEVOLVER_PLACEHOLDER" rows="3"/>
-      <BFormText v-if="erroJustificativaDevolver" class="text-danger">{{ erroJustificativaDevolver }}</BFormText>
+      <BFormText v-if="mensagemErroJustificativaDevolver" class="text-danger">{{ mensagemErroJustificativaDevolver }}</BFormText>
       <template #footer>
         <BButton class="text-secondary" variant="link" @click="modalDevolverAberto = false">Cancelar</BButton>
         <BButton :disabled="devolvendo" data-testid="btn-confirmar-devolver-unidade" variant="warning" @click="confirmarDevolver">
@@ -228,8 +222,6 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
-import {useRouter} from 'vue-router';
 import {
   BAccordion,
   BAccordionItem,
@@ -251,25 +243,15 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
-import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
-import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
-import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
-import {usePerfilStore} from '@/stores/perfil';
-import {Perfil} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
-import type {AvaliacaoCompetencia, SituacaoAvaliacaoServidor, SituacaoCapacitacao} from '@/types/diagnostico-competencias';
-import type {ColorVariant} from 'bootstrap-vue-next';
+import {useDiagnosticoUnidadeView} from '@/views/useDiagnosticoUnidadeView';
 
 const props = defineProps<{
   codSubprocesso: number;
   siglaUnidade: string;
 }>();
-
-const router = useRouter();
-const perfilStore = usePerfilStore();
-const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
-
 const {
+  router,
   unidade,
   servidores,
   ocupacoesCriticas,
@@ -277,200 +259,36 @@ const {
   carregando,
   situacao,
   totalPendentes,
-} = useMonitoramentoDiagnostico(props.codSubprocesso);
-
-const {
+  retornoFluxo,
+  limparRetornoFluxo,
+  modalValidarAberto,
+  modalDevolverAberto,
+  modalHomologarAberto,
+  observacoesValidar,
+  justificativaDevolver,
+  observacoesHomologar,
+  mensagemErroJustificativaDevolver,
+  podeValidar,
+  podeDevolver,
+  podeHomologar,
+  abrirModalValidar,
+  abrirModalDevolver,
+  abrirModalHomologar,
+  confirmarValidar,
+  confirmarDevolver,
+  confirmarHomologar,
   validando,
   devolvendo,
   homologando,
-  erroValidar,
-  erroDevolver,
-  erroHomologar,
-  validarDiagnostico,
-  devolverDiagnostico,
-  homologarDiagnostico,
-} = useFluxoDiagnostico(props.codSubprocesso);
-
-// ── Estado local ──────────────────────────────────────────────────────────────
-const erroMensagem = ref('');
-const alertaSucesso = ref('');
-const modalValidarAberto = ref(false);
-const modalDevolverAberto = ref(false);
-const modalHomologarAberto = ref(false);
-const observacoesValidar = ref('');
-const justificativaDevolver = ref('');
-const erroJustificativaDevolver = ref('');
-const observacoesHomologar = ref('');
-
-// ── Permissões ────────────────────────────────────────────────────────────────
-const ehGestor = computed(
-  () =>
-    perfilStore.perfilSelecionado === Perfil.GESTOR ||
-    perfilStore.perfilSelecionado === Perfil.ADMIN,
-);
-const podeValidar = computed(() => ehGestor.value && situacao.value === 'CONCLUIDO');
-const podeDevolver = computed(() => ehGestor.value && situacao.value === 'CONCLUIDO');
-const podeHomologar = computed(
-  () => perfilStore.perfilSelecionado === Perfil.ADMIN && situacao.value === 'VALIDADO',
-);
-
-// ── Modais ────────────────────────────────────────────────────────────────────
-function abrirModalValidar() {
-  observacoesValidar.value = '';
-  modalValidarAberto.value = true;
-}
-function abrirModalDevolver() {
-  justificativaDevolver.value = '';
-  erroJustificativaDevolver.value = '';
-  modalDevolverAberto.value = true;
-}
-function abrirModalHomologar() {
-  observacoesHomologar.value = '';
-  modalHomologarAberto.value = true;
-}
-
-function limparAlertas() {
-  erroMensagem.value = '';
-  alertaSucesso.value = '';
-}
-
-function limparErroMensagem() {
-  erroMensagem.value = '';
-}
-
-function limparAlertaSucesso() {
-  alertaSucesso.value = '';
-}
-
-function registrarSucesso(mensagem: string) {
-  limparAlertas();
-  alertaSucesso.value = mensagem;
-}
-
-function registrarErro(mensagem?: string | null) {
-  alertaSucesso.value = '';
-  erroMensagem.value = mensagem?.trim() || TEXTOS.diagnostico.ERRO_SALVAR;
-}
-
-function normalizarTextoOpcional(texto: string) {
-  const textoLimpo = texto.trim();
-  return textoLimpo.length > 0 ? textoLimpo : undefined;
-}
-
-async function confirmarValidar() {
-  try {
-    await validarDiagnostico(normalizarTextoOpcional(observacoesValidar.value));
-    modalValidarAberto.value = false;
-    registrarSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO);
-  } catch {
-    registrarErro(erroValidar.value?.message);
-  }
-}
-
-async function confirmarDevolver() {
-  if (!justificativaDevolver.value.trim()) {
-    erroJustificativaDevolver.value = TEXTOS.diagnostico.ERRO_JUSTIFICATIVA_OBRIGATORIA;
-    return;
-  }
-  try {
-    await devolverDiagnostico(justificativaDevolver.value);
-    modalDevolverAberto.value = false;
-    registrarSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO);
-  } catch {
-    registrarErro(erroDevolver.value?.message);
-  }
-}
-
-async function confirmarHomologar() {
-  try {
-    await homologarDiagnostico(normalizarTextoOpcional(observacoesHomologar.value));
-    modalHomologarAberto.value = false;
-    registrarSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO);
-  } catch {
-    registrarErro(erroHomologar.value?.message);
-  }
-}
-
-// ── Formatação ────────────────────────────────────────────────────────────────
-const varianteSituacao = computed(() => {
-  switch (situacao.value) {
-    case 'CONCLUIDO': return 'success';
-    case 'VALIDADO': return 'info';
-    case 'HOMOLOGADO': return 'primary';
-    default: return 'warning';
-  }
-});
-
-function varianteSituacaoServidor(s: SituacaoAvaliacaoServidor): ColorVariant {
-  const mapa: Record<SituacaoAvaliacaoServidor, ColorVariant> = {
-    CONSENSO_APROVADO: 'success',
-    AVALIACAO_IMPOSSIBILITADA: 'secondary',
-    CONSENSO_CRIADO: 'warning',
-    AUTOAVALIACAO_CONCLUIDA: 'info',
-    AUTOAVALIACAO_NAO_INICIADA: 'light',
-  };
-  return mapa[s];
-}
-
-function formatarSituacaoServidor(s: SituacaoAvaliacaoServidor): string {
-  return {
-    AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
-    AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
-    CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
-    CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
-    AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
-  }[s];
-}
-
-function varianteCapacitacao(s: SituacaoCapacitacao | null): ColorVariant {
-  if (s === null) return 'light';
-  const mapa: Record<SituacaoCapacitacao, ColorVariant> = {NA: 'secondary', AC: 'danger', EC: 'warning', C: 'success', I: 'primary'};
-  return mapa[s];
-}
-
-function formatarCapacitacao(s: SituacaoCapacitacao | null): string {
-  if (s === null) return '-';
-  return {
-    NA: TEXTOS.diagnostico.CAPACITACAO_NA,
-    AC: TEXTOS.diagnostico.CAPACITACAO_AC,
-    EC: TEXTOS.diagnostico.CAPACITACAO_EC,
-    C: TEXTOS.diagnostico.CAPACITACAO_C,
-    I: TEXTOS.diagnostico.CAPACITACAO_I,
-  }[s];
-}
-
-function formatarNota(valor: number | null): string {
-  if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
-  if (valor === 0) return TEXTOS.diagnostico.NOTA_NA;
-  return String(valor);
-}
-
-function calcularGap(item: AvaliacaoCompetencia): number | null {
-  if (item.importancia === null || item.dominio === null || item.importancia === 0 || item.dominio === 0) return null;
-  return item.importancia - item.dominio;
-}
-
-const mapaDescricaoCompetencia = computed(() =>
-  Object.fromEntries((contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao])),
-);
-
-const ocupacoesComDescricao = computed(() =>
-  ocupacoesCriticas.value.map((o) => ({
-    ...o,
-    nomeCompetencia: mapaDescricaoCompetencia.value[o.competenciaCodigo] ?? `Competência ${o.competenciaCodigo}`,
-  })),
-);
-
-const colunasCompetencias = [
-  {key: 'competenciaCodigo', label: 'Código'},
-  {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
-  {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
-  {key: 'gap', label: TEXTOS.diagnostico.COLUNA_GAP},
-];
-
-const colunasOcupacoes = [
-  {key: 'servidorTitulo', label: TEXTOS.diagnostico.COLUNA_SERVIDOR},
-  {key: 'nomeCompetencia', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-  {key: 'situacaoCapacitacao', label: TEXTOS.diagnostico.COLUNA_CAPACITACAO},
-];
+  varianteSituacao,
+  varianteSituacaoServidor,
+  formatarSituacaoServidor,
+  varianteCapacitacao,
+  formatarCapacitacao,
+  formatarNota,
+  obterGapInfo,
+  ocupacoesComDescricao,
+  colunasCompetencias,
+  colunasOcupacoes,
+} = useDiagnosticoUnidadeView(props);
 </script>

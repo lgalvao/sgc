@@ -4,6 +4,7 @@ import {pesquisarUsuarios} from '@/services/usuarioService';
 import type {UsuarioPesquisa} from '@/types/tipos';
 import {logger} from '@/utils';
 import {useNotification} from '@/composables/useNotification';
+import {normalizarErro} from '@/utils/apiError';
 
 export function useBuscadorUsuarios(
     termo: Ref<string>,
@@ -59,8 +60,9 @@ export function useBuscadorUsuarios(
             atualizarUsuarioSelecionadoPorNome(termo.value);
         } catch (error) {
             limparResultados();
+            const erroNormalizado = normalizarErro(error);
             logger.error("Erro ao pesquisar usuários:", error);
-            notify("Erro ao pesquisar usuários", 'danger');
+            notify(erroNormalizado.mensagem || "Erro ao pesquisar usuários", 'danger');
         } finally {
             pesquisandoUsuarios.value = false;
         }

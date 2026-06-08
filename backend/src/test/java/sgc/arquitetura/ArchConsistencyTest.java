@@ -495,6 +495,34 @@ public class ArchConsistencyTest {
             .beFreeOfCycles()
             .allowEmptyShould(true);
 
+    @ArchTest
+    static final ArchRule production_code_should_not_instantiate_standard_java_runtime_exceptions = noClasses()
+            .that()
+            .resideOutsideOfPackage("sgc.e2e..")
+            .should(new ArchCondition<>("instanciar exceções Java padrão de runtime explicitamente") {
+                private static final Set<String> EXCECOES_PROIBIDAS = Set.of(
+                        IllegalStateException.class.getName(),
+                        IllegalArgumentException.class.getName(),
+                        RuntimeException.class.getName()
+                );
+
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    for (JavaConstructorCall call : item.getConstructorCallsFromSelf()) {
+                        JavaClass alvo = call.getTarget().getOwner();
+                        if (EXCECOES_PROIBIDAS.contains(alvo.getFullName())) {
+                            String mensagem = String.format(
+                                    "Classe %s instancia %s em %s; use uma Erro* semântica do domínio/aplicação",
+                                    item.getName(),
+                                    alvo.getSimpleName(),
+                                    call.getDescription());
+                            events.add(SimpleConditionEvent.violated(call, mensagem));
+                        }
+                    }
+                }
+            })
+            .because("Estados impossíveis e falhas internas devem usar erros semânticos do projeto, evitando regressão para IllegalStateException/IllegalArgumentException/RuntimeException");
+
     private static boolean contemEntidadeJpa(Type tipo) {
         if (tipo instanceof Class<?> classe) {
             return classe.isAnnotationPresent(Entity.class);

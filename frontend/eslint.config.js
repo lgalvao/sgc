@@ -96,6 +96,16 @@ export default [
             "max-statements": "off",
         },
     },
+    {
+        files: [
+            "src/views/useDiagnosticoUnidadeView.ts",
+            "src/views/useAutoavaliacaoDiagnosticoView.ts",
+        ],
+        rules: {
+            "max-lines-per-function": "off",
+            "max-statements": "off",
+        },
+    },
     // 6. Configuração específica para Vue
     ...pluginVue.configs["flat/recommended"],
     ...pluginVueA11y.configs["flat/recommended"],

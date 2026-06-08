@@ -10,6 +10,7 @@ import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import * as painelService from "@/services/painelService";
 import {TEXTOS} from "@/constants/textos";
 import {formatarDataHoraBR, logger} from "@/utils";
+import {normalizarErro} from "@/utils/apiError";
 
 export function usePainelTela() {
   const perfilStore = usePerfilStore();
@@ -91,11 +92,9 @@ export function usePainelTela() {
   onActivated(async () => {
     if (!carregamentoInicialConcluido.value) return;
     exibirToastPendente();
-    try {
-      await painelQuery.refresh();
-    } catch {
-      // Falhas em recarga de background no painel não devem interromper o fluxo do usuário
-    }
+    await painelQuery.refresh().catch((error: unknown) => {
+      logger.warn("Falha na recarga em background do painel:", normalizarErro(error).mensagem);
+    });
   });
 
   function ordenarPor(campo: keyof ProcessoResumo) {

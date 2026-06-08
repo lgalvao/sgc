@@ -145,8 +145,24 @@ export function useCadastroTela(props: CadastroTelaProps) {
         erroGlobal.value = mensagem;
     }
 
+    function obterMensagemErroGlobal(error: unknown) {
+        return normalizarErro(error).mensagem || "Não foi possível concluir a operação do cadastro.";
+    }
+
     function definirErroGlobalDoErro(error: unknown) {
-        definirErroGlobal(normalizarErro(error).mensagem);
+        definirErroGlobal(obterMensagemErroGlobal(error));
+    }
+
+    async function executarAcaoComErroGlobal<T>(acao: () => Promise<T>): Promise<{sucesso: true; resultado: T} | {sucesso: false}> {
+        try {
+            return {
+                sucesso: true,
+                resultado: await acao(),
+            };
+        } catch (error) {
+            definirErroGlobalDoErro(error);
+            return {sucesso: false};
+        }
     }
 
     function obterErroCampoFluxo(campos: string[]) {
@@ -280,9 +296,13 @@ export function useCadastroTela(props: CadastroTelaProps) {
 
         loadingValidacao.value = true;
         try {
-            const codSubprocesso = codigoSubprocesso.value;
-            if (!codSubprocesso) return;
-            const resultado = await fluxoSubprocesso.validarCadastro(codSubprocesso);
+            const execucao = await executarAcaoComErroGlobal(async () => {
+                const codSubprocesso = codigoSubprocesso.value;
+                if (!codSubprocesso) return null;
+                return fluxoSubprocesso.validarCadastro(codSubprocesso);
+            });
+            if (!execucao.sucesso || !execucao.resultado) return;
+            const resultado = execucao.resultado;
             if (resultado.valido) {
                 mostrarModalConfirmacao.value = true;
                 return;
@@ -290,8 +310,6 @@ export function useCadastroTela(props: CadastroTelaProps) {
             aplicarErrosValidacao(resultado.erros);
             await nextTick();
             scrollParaPrimeiroErro();
-        } catch (error) {
-            definirErroGlobalDoErro(error);
         } finally {
             loadingValidacao.value = false;
         }
@@ -305,18 +323,16 @@ export function useCadastroTela(props: CadastroTelaProps) {
 
         loadingDisponibilizacao.value = true;
         try {
-            if (isRevisao.value) {
-                await fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso);
-            } else {
-                await fluxoSubprocesso.disponibilizarCadastro(codSubprocesso);
-            }
-        } catch (error) {
-            definirErroGlobalDoErro(error);
-            return;
+            const execucao = await executarAcaoComErroGlobal(() =>
+                isRevisao.value
+                    ? fluxoSubprocesso.disponibilizarRevisaoCadastro(codSubprocesso)
+                    : fluxoSubprocesso.disponibilizarCadastro(codSubprocesso)
+            );
+            if (!execucao.sucesso) return;
+            mostrarModalConfirmacao.value = false;
         } finally {
             loadingDisponibilizacao.value = false;
         }
-        mostrarModalConfirmacao.value = false;
     }
 
     const erroCampoObservacaoDevolucao = computed(() => obterErroCampoFluxo(["justificativa", "texto", "observacoes"]));
