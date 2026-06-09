@@ -28,10 +28,8 @@ Ator: CHEFE
     - campo `Justificativa` (obrigatório)
     - botões `Cancelar` e `Indicar impossibilidade`.
 
-   6.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
-
 7. O usuário informa a justificativa e aciona `Indicar impossibilidade`.
 
 8. O sistema altera a situação individual do servidor para `Avaliação impossibilitada`.
 
-9. Sistema mostra a mensagem `Impossibilidade registrada`.
+9. O sistema mostra a mensagem `Impossibilidade registrada`.

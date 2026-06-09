@@ -6,7 +6,7 @@ Ator: CHEFE
 
 - Login realizado com perfil CHEFE
 - Processo de diagnóstico em andamento com participação da unidade do usuário
-- Subprocesso da unidade com localização atual na própria unidade
+- Subprocesso da unidade com localização atual na unidade do usuário
 
 ## Fluxo principal
 
@@ -20,17 +20,16 @@ Ator: CHEFE
    - uma linha para cada competência vigente da unidade;
    - uma coluna para cada servidor participante da unidade;
    - uma célula editável (dropdown) `Situação de capacitação` para cada combinação competência/servidor.
-   
-  4.1 Cada célula `Situação de capacitação` admite os seguintes valores:
+   - cada célula `Situação de capacitação` admite os seguintes valores:
    - `NA` (Não se aplica);
    - `AC` (A capacitar);
    - `EC` (Em capacitação);
    - `C`  (Capacitado);
    - `I`  (Instrutor).
 
-  4.2. Regras de apresentação da matriz:
-   - A primeira coluna da matriz identifica a competência.
-   - As colunas de servidores devem usar nomes abreviados, por limitação de espaço horizontal.
+  *Regras de apresentação da matriz*:
+   - A primeira coluna da matriz identifica a competência;
+   - As colunas de servidores devem usar nomes abreviados, por limitação de espaço horizontal;
    - O nome completo do servidor deve continuar acessível na interface, por exemplo via 'tooltip' no cabeçalho.
 
    Exemplo de matriz, depois de preenchida com situações de capacitação:

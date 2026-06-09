@@ -170,4 +170,40 @@ describe('RelatorioAndamentoView', () => {
 
         expect(vm.carregando).toBe(false);
     });
+
+    it('exibe prazo ajustado quando data limite da etapa 2 é diferente da etapa 1', async () => {
+        relatorioAndamento.value = [{
+            dataLimiteEtapa1: '2026-04-15T10:00:00',
+            dataLimiteEtapa2: '2026-04-20T10:00:00',
+        }];
+        const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
+        await flushPromises();
+        expect(wrapper.text()).toContain('20/04/2026');
+    });
+
+    it('lida com campos de data e localizacao nulos', async () => {
+        relatorioAndamento.value = [{
+            dataLimiteEtapa1: null,
+            dataLimiteEtapa2: null,
+            dataFimEtapa1: null,
+            dataFimEtapa2: null,
+            dataUltimaMovimentacao: null,
+            localizacao: null,
+        }];
+        const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
+        await flushPromises();
+        const card = wrapper.find('[data-testid="card-resultado-andamento"]');
+        expect(card.text()).toContain('-');
+    });
+
+    it('obterMensagemErroRelatorio deve retornar mensagem padrao para erro inesperado sem status', async () => {
+        const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
+        const vm = wrapper.vm as any;
+        vm.codProcessoSelecionado = 1;
+        
+        buscarRelatorioAndamento.mockRejectedValueOnce(new Error('Network Error'));
+        await vm.gerarRelatorio();
+        
+        expect(notify).toHaveBeenCalledWith(TEXTOS_RELATORIOS.ERRO_BUSCA, 'danger');
+    });
 });

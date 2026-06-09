@@ -82,6 +82,8 @@ describe("axios-setup", () => {
     let cancelarRequisicoesPendentes: () => void;
     let iniciarTransicaoSessao: () => void;
     let finalizarTransicaoSessao: () => void;
+    let isErroGlobalRegistrado: (error: unknown) => boolean;
+    let isErroCanceladoHttp: (error: unknown) => boolean;
 
     beforeAll(async () => {
         const modulo = await import("../axios-setup"); // Use dynamic import
@@ -89,6 +91,8 @@ describe("axios-setup", () => {
         cancelarRequisicoesPendentes = modulo.cancelarRequisicoesPendentes;
         iniciarTransicaoSessao = modulo.iniciarTransicaoSessao;
         finalizarTransicaoSessao = modulo.finalizarTransicaoSessao;
+        isErroGlobalRegistrado = modulo.isErroGlobalRegistrado;
+        isErroCanceladoHttp = modulo.isErroCanceladoHttp;
         setRouter(router as any);
 
         const requestUseCalls = mockInstance.interceptors.request.use.mock.calls;
@@ -269,5 +273,49 @@ describe("axios-setup", () => {
 
         expect(config.url).toBe('/usuarios/login');
         expect(config.signal).toBeDefined();
+    });
+
+    it("gerarCorrelacaoId deve usar fallback quando crypto.randomUUID nao existir", () => {
+        vi.stubGlobal('crypto', undefined);
+        const config = requestInterceptor({method: 'get', url: '/test', headers: {}});
+        expect(config.headers['X-Correlacao-Id']).toMatch(/^corr-\d+-/);
+    });
+
+    it("registrarControleCancelamento nao deve sobrescrever signal se ja existir", () => {
+        const existingSignal = new AbortController().signal;
+        const config = {method: 'get', url: '/test', headers: {}, signal: existingSignal};
+        requestInterceptor(config);
+        expect(config.signal).toBe(existingSignal);
+    });
+
+    it("tratarErroResposta deve marcar erro como cancelado se a pagina estiver em descarte e nao houver resposta", async () => {
+        window.dispatchEvent(new Event('beforeunload'));
+        const error = {config: {}, response: null};
+        await expect(responseErrorInterceptor(error)).rejects.toMatchObject({
+            code: 'ERR_CANCELED',
+            name: 'CanceledError'
+        });
+        window.dispatchEvent(new Event('pageshow'));
+    });
+
+    it("tratarErroNaoAutorizado deve logar erro se router.push falhar", async () => {
+        (router.currentRoute.value as any).path = '/not-login';
+        vi.mocked(router.push).mockRejectedValueOnce(new Error('Push failed'));
+        const error = {isAxiosError: true, response: {status: 401, data: {}}};
+        
+        await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
+        expect(logger.error).toHaveBeenCalledWith("Erro ao redirecionar:", expect.any(Error));
+    });
+
+    it("isErroGlobalRegistrado deve retornar false para erros invalidos", () => {
+        expect(isErroGlobalRegistrado(null)).toBe(false);
+        expect(isErroGlobalRegistrado(undefined)).toBe(false);
+        expect(isErroGlobalRegistrado("string")).toBe(false);
+    });
+
+    it("isErroCanceladoHttp deve retornar false para erros invalidos", () => {
+        expect(isErroCanceladoHttp(null)).toBe(false);
+        expect(isErroCanceladoHttp(undefined)).toBe(false);
+        expect(isErroCanceladoHttp("string")).toBe(false);
     });
 });

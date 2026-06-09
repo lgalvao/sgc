@@ -23,7 +23,7 @@ Ator: SERVIDOR
    | Desc. competência 2 | NA | NA |
    | Desc. competência 2 | 3 | 2 |
 
- Abaixo da grade, o sistema mostra o botão `Aprovar consenso`.
+ Abaixo da grade de competências, o sistema mostra o botão `Aprovar consenso`.
    
 5. O usuário aciona `Aprovar consenso`.
 

@@ -6,8 +6,8 @@ Ator: CHEFE
 
 - Usuário logado com perfil CHEFE
 - Existência de processo de diagnóstico em andamento envolvendo a unidade do usuário
-- Subprocesso da unidade com localização atual na própria unidade
-- Todos os servidores da unidade com avaliação individual em `Avaliação de consenso aprovada` ou `Avaliação impossibilitada`
+- Subprocesso da unidade com localização atual na unidade do usuário
+- Todos os servidores da unidade com avaliação individual com a situação 'Avaliação de consenso aprovada' ou 'Avaliação impossibilitada'
 - Informações de situação de capacitação preenchidas para todos os servidores e competências da unidade
 
 ## Fluxo principal
@@ -22,7 +22,7 @@ Ator: CHEFE
 
    4.1. Caso existirem campos não preenchidos, o sistema mostra a mensagem "Ainda existem avaliações e situações de capacitações não preenchidas.", e interrompe a operação, continuando na tela `Detalhes do subprocesso`.
 
-   4.2. Caso a verificação confirmar que está tudo preenchido, sistema mostra modal de confirmação com:
+   4.2. Caso a verificação confirme que está tudo preenchido, sistema mostra modal de confirmação com:
       - título "Conclusão de diagnóstico";
       - texto: "Confirma a conclusão do diagnóstico da unidade?";
       - botões: `Cancelar` e `Concluir`.

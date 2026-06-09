@@ -6,21 +6,23 @@ Ator: CHEFE
 
 - Login realizado com perfil CHEFE
 - Existencia de processo de diagnóstico em andamento
-- Existência de servidor da unidade com situação `Autoavaliação concluída`, `Avaliação de consenso criada` ou
-  `Avaliação de consenso aprovada`
+- Existência de servidor da unidade com umas das situações:
+  - 'Autoavaliação concluída', 
+  - 'Avaliação de consenso criada'
+  - 'Avaliação de consenso aprovada'
 
 ## Fluxo principal
 
 1. No `Painel`, o usuario escolhe um processo de diagnostico em andamento.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade do usuário, contendo a grade de servidores da unidade.
+2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade, contendo detalhes do processo/subprocesso, cards acionáveis e a grade de servidores da unidade.
    
-3. O usuário escolhe a ação `Manter avaliação de consenso` para um servidor.
+3. O usuário escolhe a ação `Avaliação de consenso` para um servidor.
    
 4. O sistema mostra a tela `Avaliação de consenso` para o servidor, com:
     - título: "Avaliação de consenso"
     - subtítulo: nome e título do servidor
-    - grade de competências da unidade com estrutura abaixo:
+    - grade de competências da unidade com estrutura como no exemplo abaixo:
 
 |                     | Importância |       |          | Domínio  |       |          |
 |:--------------------|-------------|-------|----------|----------|-------|----------|
@@ -38,7 +40,7 @@ Ator: CHEFE
 
     **IMPORTANTE**: Se o servidor já tiver aprovado a avaliação de consenso (ou seja, estiver na situacao `Avaliação de consenso aprovada`), o sistema permitirá apenas visualização dos dados acima.
 
-7. O usuário preenche, ao lado servidor, o valor de consenso para cada competência.
+7. O usuário preenche, com a presença física do servidor, o valor de consenso para cada competência.
 
 8. O sistema salva automaticamente cada alteração realizada. Não é necessária nenhuma ação para concluir o preenchimento (a validação será feita na conclusão do diagnóstico).
    
