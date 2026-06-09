@@ -1,58 +1,61 @@
-# CDU-43 - Visualizar detalhes do subprocesso de diagnóstico
+# CDU-42 - Realizar autoavaliação
 
-Atores: SERVIDOR, CHEFE, GESTOR, ADMIN
+Ator: SERVIDOR
 
 ## Pré-condições
 
-- Usuário logado.
-- Existência de processo de diagnóstico em andamento.
-- Existência de subprocesso de diagnóstico acessível ao perfil logado.
+- Login realizado com perfil SERVIDOR
+- Processo de diagnóstico em andamento com participação da unidade do servidor
 
 ## Fluxo principal
 
-1. O usuário acessa um processo de diagnóstico em andamento.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
+   `Detalhes do subprocesso`, conforme o caso de uso `CDU-43 - Visualizar detalhes do subprocesso de diagnóstico`.
 
-2. Se o perfil for SERVIDOR ou CHEFE, o sistema mostra a tela `Detalhes do subprocesso` da unidade do usuário.
+2. O usuário aciona o card `Autoavaliação`.
 
-3. Se o perfil for GESTOR ou ADMIN:
+3. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e,
+   para cada competência:
+   - descrição da competência;
+   - um controle de _toggle_ `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos
+     associados à competência;
+   - campo `Importância`, com opções `NA` e os números de `1` a `6`;
+   - campo `Domínio`, com opções `NA` e os números de `1` a `6`;
+   - botão `Concluir autoavaliação`.
 
-   3.1. O sistema mostra a tela `Detalhes do processo`, com uma tabela hierárquica contendo as unidades participantes e
-   a situação atual do subprocesso de cada unidade.
+4. O usuário atribui um valor de domínio e de importância para cada uma das competências.
 
-   3.2. Para o perfil GESTOR, a tabela se limita à unidade do usuário e às suas subordinadas, recursivamente.
+5. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de
+   salvamento.
 
-   3.3. Para o perfil ADMIN, a tabela mostra todas as unidades participantes.
+6. O usuário clica em `Concluir autoavaliação`.
 
-   3.4. O usuário aciona uma unidade na tabela.
+7. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos.
 
-   3.5. O sistema mostra a tela `Detalhes do subprocesso` da unidade selecionada.
+   7.1. Caso exista competência com valores sem preencher, o sistema mostra a mensagem
+   `Preencha importância e domínio para todas as competências.` e interrompe a conclusão.
 
-4. A tela `Detalhes do subprocesso` apresenta, para todos os perfis, dados gerais do subprocesso e dados gerais da
-   unidade. O cabeçalho dessa página é idêntico ao mostrado para os outros tipos de processos; veja detalhes no caso de
-   uso [CDU-07 - Detalhar subprocesso de mapeamento ou revisão])
+   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: `Confirma a conclusão da autoavaliação?`,
+   com botões `Concluir` e `Cancelar`, e, uma vez confirmado, altera a situação da avaliação do servidor para
+   `Autoavaliação concluída`.
 
-5. Para o perfil SERVIDOR, a tela apresenta:
-    - card `Autoavaliação`, sempre habilitado;
-    - card `Avaliação de consenso`, habilitado apenas quando a situação do servidor for 'Avaliação de consenso criada'.
+8. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
 
-   Pra este perfil, **não serão mostrados**:
-    - a grade de servidores da unidade;
-    - o histórico de movimentações;
+   ```text
+   Assunto: SGC: Autoavaliação de [NOME_SERVIDOR] submetida para análise
 
-6. Para o perfil CHEFE, a tela apresenta:
-    - grade de servidores da unidade, contendo `Nome` e `Situação` individual de cada servidor;
-    - controle de `Ações` para cada servidor que dá acesso às ações:
-        - `Avaliação de consenso`;
-        - `Impossibilidade`, habilitado quando a situação individual não for 'Avaliação impossibilitada';
-    - card `Situação de capacitação`;
-    - botão `Concluir diagnóstico`.
-   - histórico de movimentações do subprocesso;
+   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
 
-7. Para os perfis GESTOR e ADMIN, a tela apresenta:
-    - lista dos servidores participantes da unidade, *exceto o responsável pela unidade*;
-    - botão `Ações` no cabeçalho, que dá acesso a estas ações:
-        - `Devolver para ajustes` para GESTOR e ADMIN;
-        - `Registrar aceite`, apenas para GESTOR;
-        - `Homologar`, apenas para ADMIN.
-   - botão `Histórico de análise`, sempre habilitado;
-   - histórico de movimentações do subprocesso;
+   O servidor [NOME_SERVIDOR] concluiu a autoavaliação no processo [DESCRICAO_PROCESSO].
+
+   A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
+   ```
+
+9. O sistema cria internamente um alerta com:
+   - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
+   - `Processo`: [DESCRICAO_PROCESSO]
+   - `Data/hora`: [Data/hora atual]
+   - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+   - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+
+10. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Autoavaliação concluída`.

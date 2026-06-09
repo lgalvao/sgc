@@ -14,7 +14,7 @@ Ator: CHEFE
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso `CDU-43 - Visualizar detalhes do subprocesso de diagnóstico`.
+   `Detalhes do subprocesso`, conforme o caso de uso `CDU-42 - Visualizar detalhes do subprocesso de diagnóstico`.
 
 2. O usuário escolhe a ação `Avaliação de consenso` para um servidor.
 
