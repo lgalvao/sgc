@@ -66,7 +66,7 @@ export const TEXTOS_DIAGNOSTICO = {
     MODAL_CONCLUIR_DIAG_MENSAGEM:
         'Confirma a conclusão do diagnóstico desta unidade? Todos os servidores devem ter consenso aprovado ou avaliação impossibilitada.',
     MODAL_APROVAR_TITULO: 'Aprovar avaliação de consenso',
-    MODAL_APROVAR_MENSAGEM: 'Confirma a aprovação da avaliação de consenso definida pela chefia?',
+    MODAL_APROVAR_MENSAGEM: 'Confirma a aprovação da avaliação de consenso definida pelo responsavel da unidade?',
     MODAL_VALIDAR_TITULO: 'Validar diagnóstico',
     MODAL_DEVOLVER_TITULO: 'Devolver diagnóstico',
     MODAL_DEVOLVER_PLACEHOLDER: 'Informe a justificativa para devolução...',

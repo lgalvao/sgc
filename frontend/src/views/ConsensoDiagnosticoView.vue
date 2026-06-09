@@ -66,7 +66,7 @@
             <tr>
               <th class="coluna-competencia" rowspan="2">{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
               <th class="text-center grupo grupo-servidor divisor-grupo" colspan="2">Servidor</th>
-              <th class="text-center grupo grupo-chefia divisor-grupo" colspan="2">Chefia</th>
+              <th class="text-center grupo grupo-chefia divisor-grupo" colspan="2">Chefe</th>
               <th class="text-center grupo grupo-consenso divisor-grupo" colspan="2">Consenso</th>
             </tr>
             <tr>

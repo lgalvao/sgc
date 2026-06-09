@@ -77,6 +77,7 @@
       </BCol>
 
       <BCol
+          v-if="permissoesDiagnostico?.podeCriarConsenso"
           class="mb-3"
           md="4"
       >
@@ -100,6 +101,7 @@
         </BCard>
       </BCol>
       <BCol
+          v-if="permissoesDiagnostico?.podePreencherAutoavaliacao && !permissoesDiagnostico?.podeCriarConsenso"
           class="mb-3"
           md="4"
       >
@@ -123,6 +125,7 @@
         </BCard>
       </BCol>
       <BCol
+          v-if="permissoesDiagnostico?.podeCriarConsenso"
           class="mb-3"
           md="4"
       >

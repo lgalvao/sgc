@@ -30,7 +30,7 @@
       />
 
       <SubprocessoCards
-          v-if="codigoSubprocesso && !ehDiagnostico"
+          v-if="codigoSubprocesso && (!ehDiagnostico || (subprocesso.permissoes?.podePreencherAutoavaliacao && !subprocesso.permissoes?.podeCriarConsenso))"
           :cod-processo="props.codProcesso"
           :cod-subprocesso="codigoSubprocesso"
           :mapa="null"
@@ -41,7 +41,7 @@
       />
 
       <DiagnosticoEquipePainel
-          v-if="ehDiagnostico && codigoSubprocesso"
+          v-if="ehDiagnostico && codigoSubprocesso && !(subprocesso.permissoes?.podePreencherAutoavaliacao && !subprocesso.permissoes?.podeCriarConsenso)"
           :cod-subprocesso="codigoSubprocesso"
           :exibir-botao-voltar="false"
           :exibir-cabecalho="false"
