@@ -9,6 +9,7 @@ import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
 import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
+import {useToastStore} from '@/stores/toast';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
 
@@ -19,6 +20,7 @@ interface AutoavaliacaoDiagnosticoViewProps {
 
 export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoViewProps) {
     const router = useRouter();
+    const toastStore = useToastStore();
 
     const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
     const {queryContextoEdicao, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
@@ -126,11 +128,27 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     }
 
     async function confirmarConcluir() {
-        await executarAcaoFluxo(
-            () => concluirAutoavaliacao(),
-            TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA,
-            erroConcluir.value?.message,
-        );
+        try {
+            await concluirAutoavaliacao();
+            modalConcluirAberto.value = false;
+            toastStore.setPending(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
+            if (contexto.value?.processoCodigo) {
+                await router.push({
+                    name: 'Subprocesso',
+                    params: {
+                        codProcesso: contexto.value.processoCodigo,
+                        siglaUnidade: props.siglaUnidade,
+                    },
+                    query: {
+                        codSubprocesso: String(props.codSubprocesso),
+                    },
+                });
+                return;
+            }
+            registrarSucesso(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
+        } catch {
+            registrarErro(erroConcluir.value?.message);
+        }
     }
 
     async function confirmarAprovar() {

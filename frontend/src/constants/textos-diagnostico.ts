@@ -48,7 +48,7 @@ export const TEXTOS_DIAGNOSTICO = {
 
     // « Mensagens de sucesso »
     SUCESSO_AUTOAVALIACAO_SALVA: 'Autoavaliação salva',
-    SUCESSO_AUTOAVALIACAO_CONCLUIDA: 'Autoavaliação concluída com sucesso',
+    SUCESSO_AUTOAVALIACAO_CONCLUIDA: 'Autoavaliação concluída',
     SUCESSO_CONSENSO_SALVO: 'Avaliação de consenso salva automaticamente',
     SUCESSO_CONSENSO_APROVADO: 'Avaliação de consenso aprovada',
     SUCESSO_CAPACITACAO_SALVA: 'Situação de capacitação salva',
@@ -60,8 +60,7 @@ export const TEXTOS_DIAGNOSTICO = {
 
     // « Modais de confirmação »
     MODAL_CONCLUIR_TITULO: 'Concluir autoavaliação',
-    MODAL_CONCLUIR_MENSAGEM:
-        'Confirma a conclusão da autoavaliação? Você não poderá alterar os valores após confirmar.',
+    MODAL_CONCLUIR_MENSAGEM: 'Confirma a conclusão da autoavaliação?',
     MODAL_CONCLUIR_DIAG_TITULO: 'Concluir diagnóstico da unidade',
     MODAL_CONCLUIR_DIAG_MENSAGEM:
         'Confirma a conclusão do diagnóstico desta unidade? Todos os servidores devem ter consenso aprovado ou avaliação impossibilitada.',

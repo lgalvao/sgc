@@ -5,47 +5,47 @@ Ator: SERVIDOR
 ## Pré-condições
 
 - Login realizado com perfil SERVIDOR
-- Existência de avaliação de consenso criada para o servidor, para todas as competências 
+- Existência de avaliação de consenso criada para o servidor, para todas as competências
 
 ## Fluxo principal
 
-1. No `Painel`o usuário acessa um processo de diagnóstico em andamento da sua unidade.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
+   `Detalhes do subprocesso`, conforme o caso de uso `CDU-43 - Visualizar detalhes do subprocesso de diagnóstico`.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` para a unidade. 
-   
-3. O usuário aciona o card `Avaliação de consenso`.
-   
-4. O sistema mostra a tela `Avaliação de consenso`, com uma grade contendo as descrições das competências e o valores da avaliação de consenso, com os valores importância e domínio para cada competência; como o seguinte exemplo:
+2. O usuário aciona o card `Avaliação de consenso`.
+
+3. O sistema mostra a tela `Avaliação de consenso`, com uma grade contendo as descrições das competências e os valores da
+   avaliação de consenso, com os valores de importância e domínio para cada competência, como no exemplo:
 
    | Competência | Importância | Domínio |
    | :---- | :---: | :---: |
    | Desc. competência 1 | 4 | 1 |
    | Desc. competência 2 | NA | NA |
-   | Desc. competência 2 | 3 | 2 |
+   | Desc. competência 3 | 3 | 2 |
 
- Abaixo da grade de competências, o sistema mostra o botão `Aprovar consenso`.
-   
-5. O usuário aciona `Aprovar consenso`.
+   Abaixo da grade de competências, o sistema mostra o botão `Aprovar consenso`.
 
-3. O sistema altera a situação individual do servidor para 'Avaliação de consenso aprovada'.
+4. O usuário aciona `Aprovar consenso`.
 
-4. O sistema envia uma notificação por e-mail para o responsável pela unidade:
+5. O sistema altera a situação individual do servidor para `Avaliação de consenso aprovada`.
 
-    ```text
-    Assunto: SGC: Avaliação de consenso de [NOME_SERVIDOR] aprovada
+6. O sistema envia uma notificação por e-mail para o responsável pela unidade:
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+   ```text
+   Assunto: SGC: Avaliação de consenso de [NOME_SERVIDOR] aprovada
 
-    O servidor [NOME_SERVIDOR] aprovou a avaliação de consenso do processo [DESCRICAO_PROCESSO].
+   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
 
-    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
-    ```
+   O servidor [NOME_SERVIDOR] aprovou a avaliação de consenso do processo [DESCRICAO_PROCESSO].
 
-5. O sistema cria internamente um alerta com:
-    - `Descrição`: "Avaliação de consenso aprovada: [NOME_SERVIDOR] "
-    - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+   Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+   ```
 
-6. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem "Avaliação de consenso aprovada".
+7. O sistema cria internamente um alerta com:
+   - `Descrição`: "Avaliação de consenso aprovada: [NOME_SERVIDOR]"
+   - `Processo`: [DESCRICAO_PROCESSO]
+   - `Data/hora`: [Data/hora atual]
+   - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+   - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+
+8. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Avaliação de consenso aprovada`.

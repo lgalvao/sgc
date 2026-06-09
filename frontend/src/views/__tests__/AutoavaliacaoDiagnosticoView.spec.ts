@@ -9,6 +9,7 @@ const concluirAutoavaliacaoMock = vi.fn();
 const aprovarConsensoMock = vi.fn();
 const impossibilitarAvaliacaoMock = vi.fn();
 const atualizarNotaMock = vi.fn();
+const setPendingMock = vi.fn();
 
 const podeCriarConsenso = ref(false);
 const situacaoServidor = ref<'AUTOAVALIACAO_NAO_INICIADA' | 'AUTOAVALIACAO_CONCLUIDA' | 'CONSENSO_CRIADO' | 'CONSENSO_APROVADO'>('AUTOAVALIACAO_NAO_INICIADA');
@@ -31,6 +32,7 @@ vi.mock('vue-router', () => ({
 }));
 
 const contextData = ref<any>({
+    processoCodigo: 400,
     unidadeSigla: 'ASSESSORIA_12',
     unidadeNome: 'Assessoria 12',
     situacaoDiagnostico: 'EM_ANDAMENTO',
@@ -109,6 +111,12 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
     }),
 }));
 
+vi.mock('@/stores/toast', () => ({
+    useToastStore: () => ({
+        setPending: setPendingMock,
+    }),
+}));
+
 describe('AutoavaliacaoDiagnosticoView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -118,6 +126,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         erroConcluir.value = null;
         erroAprovar.value = null;
         contextData.value = {
+            processoCodigo: 400,
             unidadeSigla: 'ASSESSORIA_12',
             unidadeNome: 'Assessoria 12',
             situacaoDiagnostico: 'EM_ANDAMENTO',
@@ -221,7 +230,17 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-concluir-autoavaliacao"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-concluir"]').trigger('click');
         expect(concluirAutoavaliacaoMock).toHaveBeenCalledTimes(1);
-        expect(wrapper.text()).toContain('Autoavaliação concluída');
+        expect(setPendingMock).toHaveBeenCalledWith('Autoavaliação concluída');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'Subprocesso',
+            params: {
+                codProcesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            query: {
+                codSubprocesso: '400',
+            },
+        });
     });
 
     it('renderiza aprovação de consenso para servidor e mostra erro ao falhar', async () => {

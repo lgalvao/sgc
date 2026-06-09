@@ -11,8 +11,8 @@ Fluxo principal:
 
 1. O sistema mostra a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade do perfil.
 
-2. A tela será composta por três seções, que serão referenciadas aqui como `Dados da unidade`, `Movimentações do processo` e
-   `Elementos do subprocesso`.
+2. A tela será composta por três seções, que serão referenciadas aqui como `Dados do subprocesso`, `Dados da unidade`,
+   `Movimentações do processo` e `Elementos do subprocesso`.
 
    2.1. Na seção `Dados da unidade` (sem título) serão apresentadas as informações:
 
@@ -26,11 +26,13 @@ Fluxo principal:
    2.1.3. Responsável:
     - [Nome do responsável]
     - [Tipo da responsabilidade]: com estes valores possíveis:
-        - "Titular"
-        - "Substituição (até [DATA_TERMINO_SUBST])"
-        - "Atrib. temporária (até [DATA_TERMINO_ATRIB])"
+        - "Titular"; ou
+        - "Substituição (até [DATA_TERMINO_SUBST])"; ou
+        - "Atrib. temporária (até [DATA_TERMINO_ATRIB])".
     - Ramal: [Ramal do responsável, no SGRH]
     - E-mail: [Endereço de e-mail do responsável, no SGRH]
+
+   2.2. Na seção `Dados do subprocesso`  (sem título) serão apresentadas as informações:
 
    2.1.4. `Situação`: Descrição da situação do subprocesso da unidade (ver [_intro_situacoes.md])
 
@@ -39,21 +41,22 @@ Fluxo principal:
    2.1.6. `Prazo para conclusão (etapa atual)`: Data limite da última etapa do subprocesso ainda não concluída na
    unidade.
 
-   2.2. Na seção `Movimentações do processo`, com título "Movimentações", é apresentada uma tabela com as movimentações
+   2.3. Na seção `Movimentações do processo`, com título "Movimentações", é apresentada uma tabela com as movimentações
    pelas quais o subprocesso passou, com os campos: `Data/hora`, `Origem`, `Destino` e `Descrição`. Essas informações
    deverão ser apresentadas em ordem decrescente de data/hora.
 
-   2.3. Na seção `Elementos do subprocesso` (sem título) serão apresentados cards acionáveis com informação variável em
-   função do tipo do subprocesso, os quais darão acesso às telas específicas. As regras de exibição e habilitação dos cards
-   são definidas em função do tipo do processo e do perfil ativo, além da situação do subprocesso, como a seguir:
+   2.4. Na seção `Elementos do subprocesso` (sem título) serão apresentados cards acionáveis com informação variável em
+   função do tipo do subprocesso, os quais darão acesso às telas específicas. As regras de exibição e habilitação dos
+   cards são definidas em função do tipo do processo e do perfil ativo, além da situação do subprocesso, como a seguir:
 
-   2.3.1. A seção apresentará cards para acesso ao cadastro de atividades e conhecimentos (descrição "Cadastro de
+   2.4.1. A seção apresentará cards para acesso ao cadastro de atividades e conhecimentos (descrição "Cadastro de
    atividades e conhecimentos da unidade") e ao Mapa de competências (descrição "Mapa de competências da unidade").
 
     - O card `Atividades e conhecimentos` estará sempre habilitado para usuários com o perfil CHEFE, inclusive com
       opções para alteração do cadastro (se a situação do subprocesso permitir -- ver caso de uso "Manter cadastro de
       atividades e conhecimentos"). Para os demais perfis, a habilitação acontecerá apenas após a disponibilização do
       cadastro pelo CHEFE.
+
     - O card `Mapa de competências` será habilitado inicialmente apenas para o perfil ADMIN e somente após a homologação
       do cadastro, ou homologação da revisão do cadastro. Posteriormente, com a disponibilização do mapa, este card será
       habilitado para os demais perfis, em modo somente leitura.

@@ -9,55 +9,53 @@ Ator: SERVIDOR
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
+   `Detalhes do subprocesso`, conforme o caso de uso `CDU-43 - Visualizar detalhes do subprocesso de diagnóstico`.
 
-2. O sistema mostra a tela `Detalhes do subprocesso` da unidade do servidor, com, esses elementos:  
-  - dados gerais do subprocesso: desc. subprocesso, desc. processo pai, localização atual, situação do subprocesso
-  - dados gerais da unidade: sigla, nome da unidade, responsável
-  - card `Autoavaliação`, sempre habilitado.
-  - card `Aprovação de consenso`, habilitado apenas quando a autoavaliação estiver concluída e o responsável pela unidade tiver criado a avaliação de consenso (ou seja, quando  o situação individual do servidor for 'Avaliação de consenso criada') 
-  - **Não serão mostrados**:
-    - a lista de servidores da unidade
-    - dados de movimentações.
+2. O usuário aciona o card `Autoavaliação`.
 
-3. O usuário aciona o card `Autoavaliação`.
-
-4. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e, para cada competência:
+3. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e,
+   para cada competência:
    - descrição da competência;
-   - um controle de _toggle_ `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos associados à competência;
+   - um controle de _toggle_ `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos
+     associados à competência;
    - campo `Importância`, com opções `NA` e os números de `1` a `6`;
-   - campo `Domínio`, com opções `NA` e os números de `1` a `6`.
-   - botão `Concluir autoavaliação`
-    
-6. O usuário atribui um valor de domínio e de importância para cada uma das competências.
-   
-7. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de salvamento.
+   - campo `Domínio`, com opções `NA` e os números de `1` a `6`;
+   - botão `Concluir autoavaliação`.
 
-8. O usuário clica em `Concluir autoavaliação`.
+4. O usuário atribui um valor de domínio e de importância para cada uma das competências.
 
-9. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos. 
-      
-   9.1. caso exista competência com valores sem preencher o sistema mostra a mensagem `Preencha importância e domínio para todas as competências.` e interrompe a conclusão. 
-      
-   9.2. Caso tudo estiver preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?", com botões `Concluir` e `Cancelar`, e uma vez confirmado, altera a situação da avaliação do servidor para 'Autoavaliação concluída'.
+5. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de
+   salvamento.
 
-10. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
+6. O usuário clica em `Concluir autoavaliação`.
 
-    ```text
-    Assunto: SGC: Autoavaliação de [NOME_SERVIDOR] submetida para análise
+7. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos.
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+   7.1. Caso exista competência com valores sem preencher, o sistema mostra a mensagem
+   `Preencha importância e domínio para todas as competências.` e interrompe a conclusão.
 
-    O servidor [NOME_SERVIDOR] concluiu a autoavaliação no processo [DESCRICAO_PROCESSO].
+   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: `Confirma a conclusão da autoavaliação?`,
+   com botões `Concluir` e `Cancelar`, e, uma vez confirmado, altera a situação da avaliação do servidor para
+   `Autoavaliação concluída`.
 
-    A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
-    ```
+8. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
 
-11. O sistema cria internamente um alerta com:
-    - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
-    - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+   ```text
+   Assunto: SGC: Autoavaliação de [NOME_SERVIDOR] submetida para análise
 
-12. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Autoavaliação concluída`.
+   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+
+   O servidor [NOME_SERVIDOR] concluiu a autoavaliação no processo [DESCRICAO_PROCESSO].
+
+   A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
+   ```
+
+9. O sistema cria internamente um alerta com:
+   - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
+   - `Processo`: [DESCRICAO_PROCESSO]
+   - `Data/hora`: [Data/hora atual]
+   - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+   - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+
+10. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Autoavaliação concluída`.
