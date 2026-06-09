@@ -165,7 +165,7 @@ public class SubprocessoService {
                 .unidadeMapa(command.unidadeMapa())
                 .unidadeOrigem(command.unidadeOrigem())
                 .usuario(usuario)
-                .situacaoInicial(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO)
+                .situacaoInicial(NAO_INICIADO)
                 .descMovimentacao("Processo de diagnóstico iniciado")
                 .build());
         diagnosticoFluxoService.inicializarDiagnostico(subprocessoSalvo);

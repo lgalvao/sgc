@@ -11,7 +11,10 @@ import sgc.processo.model.UnidadeProcesso;
 import sgc.subprocesso.SubprocessoDtoMapper;
 import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.TipoAcaoAnalise;
+import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.service.SubprocessoConsultaService;
+import sgc.subprocesso.service.SubprocessoVisualizacaoService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,10 +30,11 @@ public class DiagnosticoConsultaService {
     private final SubprocessoConsultaService subprocessoConsultaService;
     private final SubprocessoDtoMapper subprocessoDtoMapper;
     private final DiagnosticoUsuarioContextoService usuarioContextoService;
+    private final SubprocessoVisualizacaoService subprocessoVisualizacaoService;
 
     public DiagnosticoContextoDto obterContexto(Long codSubprocesso) {
         Subprocesso sp = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
-        Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
+        repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         UnidadeProcesso unidadeSnapshot = resolverUnidadeSnapshot(sp);
         List<CompetenciaResumoDto> competencias = sp.getMapa().getCompetencias().stream()
                 .map(c -> CompetenciaResumoDto.builder()
@@ -45,7 +49,7 @@ public class DiagnosticoConsultaService {
                 .unidadeSigla(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : sp.getUnidade().getSigla())
                 .unidadeNome(unidadeSnapshot != null ? unidadeSnapshot.getNome() : sp.getUnidade().getNome())
                 .situacaoSubprocesso(sp.getSituacao().name())
-                .situacaoDiagnostico(diagnostico.getSituacao().name())
+                .situacaoDiagnostico(resolverSituacaoDiagnostico(sp))
                 .competencias(competencias)
                 .build();
     }
@@ -191,11 +195,24 @@ public class DiagnosticoConsultaService {
 
         return DiagnosticoUnidadeDto.builder()
                 .unidade(unidade)
-                .situacaoDiagnostico(diagnostico.getSituacao().name())
+                .situacaoDiagnostico(resolverSituacaoDiagnostico(subprocesso))
                 .servidores(servidores)
                 .ocupacoesCriticas(ocupacoesCriticas)
                 .movimentacoes(movimentacoesDto)
                 .build();
+    }
+
+    private String resolverSituacaoDiagnostico(Subprocesso subprocesso) {
+        return switch (subprocesso.getSituacao()) {
+            case DIAGNOSTICO_CONCLUIDO -> subprocessoVisualizacaoService.possuiAnalise(
+                    subprocesso.getCodigo(),
+                    TipoAnalise.DIAGNOSTICO,
+                    TipoAcaoAnalise.ACEITE_DIAGNOSTICO
+            ) ? "VALIDADO" : "CONCLUIDO";
+            case DIAGNOSTICO_HOMOLOGADO -> "HOMOLOGADO";
+            case NAO_INICIADO, DIAGNOSTICO_EM_ANDAMENTO -> "EM_ANDAMENTO";
+            default -> throw new IllegalStateException("Situação de subprocesso incompatível com diagnóstico: " + subprocesso.getSituacao());
+        };
     }
 
     private UnidadeProcesso resolverUnidadeSnapshot(Subprocesso subprocesso) {

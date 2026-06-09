@@ -15,10 +15,10 @@ class SituacaoSubprocessoTest {
     @CsvSource({
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, true, MAPEAMENTO",
             "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, true, REVISAO",
-            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, true, DIAGNOSTICO",
+            "NAO_INICIADO, DIAGNOSTICO_EM_ANDAMENTO, true, DIAGNOSTICO",
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, false, REVISAO",
             "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, false, MAPEAMENTO",
-            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, false, MAPEAMENTO",
+            "NAO_INICIADO, DIAGNOSTICO_EM_ANDAMENTO, false, MAPEAMENTO",
             "NAO_INICIADO, NAO_INICIADO, true, MAPEAMENTO",
 
             "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, true, MAPEAMENTO",
@@ -58,12 +58,14 @@ class SituacaoSubprocessoTest {
             "REVISAO_MAPA_HOMOLOGADO, REVISAO_MAPA_VALIDADO, false, REVISAO",
             "REVISAO_MAPA_HOMOLOGADO, REVISAO_CADASTRO_EM_ANDAMENTO, true, REVISAO",
 
-            "DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_CONCLUIDO, true, DIAGNOSTICO",
+            "DIAGNOSTICO_EM_ANDAMENTO, DIAGNOSTICO_CONCLUIDO, true, DIAGNOSTICO",
+            "DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO_EM_ANDAMENTO, true, DIAGNOSTICO",
+            "DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO_HOMOLOGADO, true, DIAGNOSTICO",
 
             // Transições inválidas (Misturando tipos)
             "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO_CADASTRO_EM_ANDAMENTO, false, MAPEAMENTO",
             "REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, false, REVISAO",
-            "DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, false, DIAGNOSTICO",
+            "DIAGNOSTICO_EM_ANDAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, false, DIAGNOSTICO",
             "NAO_INICIADO, MAPEAMENTO_MAPA_HOMOLOGADO, false, MAPEAMENTO",
             "MAPEAMENTO_MAPA_CRIADO, MAPEAMENTO_MAPA_VALIDADO, false, MAPEAMENTO"
     })
@@ -98,8 +100,8 @@ class SituacaoSubprocessoTest {
     @Test
     @DisplayName("Deve testar ramos da verificação de prefixo (DIAGNOSTICO)")
     void testRamosPrefixoDiagnostico() {
-        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
-        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_CONCLUIDO, TipoProcesso.DIAGNOSTICO)).isTrue();
+        assertThat(DIAGNOSTICO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
+        assertThat(DIAGNOSTICO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_CONCLUIDO, TipoProcesso.DIAGNOSTICO)).isTrue();
     }
     // Testes mesclados de SituacaoSubprocessoCoverageTest
 
@@ -108,8 +110,8 @@ class SituacaoSubprocessoTest {
     void testMisturaTipos() {
         assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(REVISAO_CADASTRO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
         assertThat(REVISAO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
-        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
-        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
+        assertThat(DIAGNOSTICO_EM_ANDAMENTO.podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
+        assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO.podeTransicionarPara(DIAGNOSTICO_EM_ANDAMENTO, TipoProcesso.MAPEAMENTO)).isFalse();
     }
 
     @ParameterizedTest(name = "De {0} para {1} (Tipo {2}) deve ser {3}")
@@ -131,7 +133,9 @@ class SituacaoSubprocessoTest {
             "REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_VALIDADO, REVISAO, false",
             "REVISAO_MAPA_VALIDADO, REVISAO_MAPA_AJUSTADO, REVISAO, false",
 
-            "DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO, true",
+            "DIAGNOSTICO_EM_ANDAMENTO, DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO, true",
+            "DIAGNOSTICO_EM_ANDAMENTO, DIAGNOSTICO_HOMOLOGADO, DIAGNOSTICO, false",
+            "DIAGNOSTICO_HOMOLOGADO, DIAGNOSTICO_CONCLUIDO, DIAGNOSTICO, false",
 
             // Transição para NAO_INICIADO
             "MAPEAMENTO_CADASTRO_EM_ANDAMENTO, NAO_INICIADO, MAPEAMENTO, false",
@@ -140,7 +144,7 @@ class SituacaoSubprocessoTest {
             // Casos para podeIniciar - cobrir combinações de falha
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
             "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false",
-            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, MAPEAMENTO, false"
+            "NAO_INICIADO, DIAGNOSTICO_EM_ANDAMENTO, MAPEAMENTO, false"
     })
     @DisplayName("Transições inválidas adicionais")
     void testTransicoesInvalidasAdicionais(SituacaoSubprocesso de, SituacaoSubprocesso para, TipoProcesso tipo, boolean esperado) {
@@ -160,7 +164,7 @@ class SituacaoSubprocessoTest {
     @CsvSource({
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, true",
             "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, REVISAO, true",
-            "NAO_INICIADO, DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO, DIAGNOSTICO, true",
+            "NAO_INICIADO, DIAGNOSTICO_EM_ANDAMENTO, DIAGNOSTICO, true",
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, REVISAO, false",
             "NAO_INICIADO, REVISAO_CADASTRO_EM_ANDAMENTO, MAPEAMENTO, false",
             "NAO_INICIADO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, DIAGNOSTICO, false"
@@ -179,7 +183,7 @@ class SituacaoSubprocessoTest {
         assertThat(REVISAO_CADASTRO_EM_ANDAMENTO
                 .podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.REVISAO)).isFalse();
 
-        assertThat(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO
+        assertThat(DIAGNOSTICO_EM_ANDAMENTO
                 .podeTransicionarPara(MAPEAMENTO_CADASTRO_EM_ANDAMENTO, TipoProcesso.DIAGNOSTICO)).isFalse();
 
         assertThat(MAPEAMENTO_CADASTRO_EM_ANDAMENTO

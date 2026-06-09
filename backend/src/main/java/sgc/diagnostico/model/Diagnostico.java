@@ -22,10 +22,6 @@ public class Diagnostico extends EntidadeBase {
     @JoinColumn(name = "subprocesso_codigo", nullable = false, unique = true)
     private Subprocesso subprocesso;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "situacao", length = 50, nullable = false)
-    private SituacaoDiagnostico situacao;
-
     @Column(name = "data_conclusao")
     private LocalDateTime dataConclusao;
 

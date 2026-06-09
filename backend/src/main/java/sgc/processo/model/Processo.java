@@ -52,6 +52,10 @@ public class Processo extends EntidadeBase {
     @Builder.Default
     private List<UnidadeProcesso> participantes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ServidorProcesso> servidoresParticipantes = new ArrayList<>();
+
     /**
      * Adiciona unidades participantes criando snapshots do estado atual.
      */
@@ -80,6 +84,29 @@ public class Processo extends EntidadeBase {
         adicionarParticipantes(novasUnidades);
     }
 
+    public void sincronizarServidoresParticipantes(Map<Long, List<Usuario>> usuariosPorUnidade) {
+        Set<String> chavesNovas = usuariosPorUnidade.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(usuario -> chaveServidorParticipante(entry.getKey(), usuario.getTituloEleitoral())))
+                .collect(Collectors.toSet());
+
+        servidoresParticipantes.removeIf(snapshot ->
+                !chavesNovas.contains(chaveServidorParticipante(snapshot.getUnidadeCodigo(), snapshot.getUsuarioTitulo())));
+
+        usuariosPorUnidade.forEach((unidadeCodigo, usuarios) ->
+                usuarios.forEach(usuario -> adicionarServidorParticipante(unidadeCodigo, usuario)));
+    }
+
+    public List<ServidorProcesso> buscarServidoresParticipantes(Long unidadeCodigo) {
+        return servidoresParticipantes.stream()
+                .filter(snapshot -> Objects.equals(snapshot.getUnidadeCodigo(), unidadeCodigo))
+                .toList();
+    }
+
+    public void adicionarServidoresParticipantes(List<ServidorProcesso> snapshots) {
+        servidoresParticipantes.addAll(snapshots);
+    }
+
     public List<Long> getCodigosParticipantes() {
         return participantes.stream()
                 .map(UnidadeProcesso::getUnidadeCodigoPersistido)
@@ -98,5 +125,18 @@ public class Processo extends EntidadeBase {
         return participantes.stream()
                 .filter(participante -> Objects.equals(participante.getUnidadeCodigo(), unidadeCodigo))
                 .findFirst();
+    }
+
+    private void adicionarServidorParticipante(Long unidadeCodigo, Usuario usuario) {
+        boolean jaParticipa = servidoresParticipantes.stream()
+                .anyMatch(snapshot -> Objects.equals(snapshot.getUnidadeCodigo(), unidadeCodigo)
+                        && Objects.equals(snapshot.getUsuarioTitulo(), usuario.getTituloEleitoral()));
+        if (!jaParticipa) {
+            servidoresParticipantes.add(ServidorProcesso.criarSnapshot(this, unidadeCodigo, usuario));
+        }
+    }
+
+    private String chaveServidorParticipante(Long unidadeCodigo, String usuarioTitulo) {
+        return unidadeCodigo + ":" + usuarioTitulo;
     }
 }

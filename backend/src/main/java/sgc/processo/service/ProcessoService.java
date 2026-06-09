@@ -1379,9 +1379,19 @@ public class ProcessoService {
                 : validarCodigosParticipantes(codsUnidadesParam);
 
         Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
-        processo.sincronizarParticipantes(carregarArvoreUnidades(unidadesParaProcessar));
+        Set<Unidade> arvoreUnidades = carregarArvoreUnidades(unidadesParaProcessar);
+        processo.sincronizarParticipantes(arvoreUnidades);
+        processo.sincronizarServidoresParticipantes(mapearServidoresPorUnidade(arvoreUnidades));
 
         return new ContextoInicioProcesso(tipo, codigosUnidades, unidadesParaProcessar);
+    }
+
+    private Map<Long, List<Usuario>> mapearServidoresPorUnidade(Set<Unidade> unidades) {
+        return unidades.stream()
+                .collect(Collectors.toMap(
+                        Unidade::getCodigo,
+                        unidade -> usuarioService.buscarPorUnidadeLotacao(unidade.getCodigo())
+                ));
     }
 
     private List<Long> validarCodigosRevisao(List<Long> codsUnidadesParam) {

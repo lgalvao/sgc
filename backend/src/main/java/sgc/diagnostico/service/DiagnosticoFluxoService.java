@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.model.ComumRepo;
 import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.DiagnosticoRepo;
-import sgc.diagnostico.model.SituacaoDiagnostico;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.Unidade;
@@ -15,6 +14,7 @@ import sgc.organizacao.service.HierarquiaService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
+import sgc.processo.model.ServidorProcesso;
 import sgc.processo.model.UnidadeProcesso;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
@@ -35,6 +35,7 @@ import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,10 +60,11 @@ public class DiagnosticoFluxoService {
     public void inicializarDiagnostico(Subprocesso subprocesso) {
         Diagnostico diagnostico = Diagnostico.builder()
                 .subprocesso(subprocesso)
-                .situacao(SituacaoDiagnostico.EM_ANDAMENTO)
                 .build();
 
-        List<Usuario> servidores = usuarioService.buscarPorUnidadeLotacao(subprocesso.getUnidade().getCodigo());
+        List<ServidorProcesso> servidoresSnapshot = subprocesso.getProcesso()
+                .buscarServidoresParticipantes(subprocesso.getUnidade().getCodigo());
+        List<Usuario> servidores = carregarServidoresSnapshot(servidoresSnapshot);
         List<AvaliacaoServidor> avaliacoes = new ArrayList<>();
         List<sgc.diagnostico.model.OcupacaoCritica> ocupacoesCriticas = new ArrayList<>();
 
@@ -72,11 +74,12 @@ public class DiagnosticoFluxoService {
                     .buscarParticipante(subprocesso.getUnidade().getCodigo())
                     .orElse(null);
             for (Usuario servidor : servidores) {
+                ServidorProcesso servidorSnapshot = localizarSnapshotObrigatorio(servidoresSnapshot, servidor.getTituloEleitoral());
                 for (Competencia competencia : mapa.getCompetencias()) {
                     AvaliacaoServidor avaliacao = AvaliacaoServidor.builder()
                             .diagnostico(diagnostico)
                             .servidor(servidor)
-                            .servidorNomeSnapshot(servidor.getNome())
+                            .servidorNomeSnapshot(servidorSnapshot.getNome())
                             .competencia(competencia)
                             .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
                             .build();
@@ -85,7 +88,7 @@ public class DiagnosticoFluxoService {
                     ocupacoesCriticas.add(sgc.diagnostico.model.OcupacaoCritica.builder()
                             .diagnostico(diagnostico)
                             .servidor(servidor)
-                            .servidorNomeSnapshot(servidor.getNome())
+                            .servidorNomeSnapshot(servidorSnapshot.getNome())
                             .unidadeCodigoSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : subprocesso.getUnidade().getCodigo())
                             .unidadeSiglaSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : subprocesso.getUnidade().getSigla())
                             .unidadeNomeSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getNome() : subprocesso.getUnidade().getNome())
@@ -100,14 +103,45 @@ public class DiagnosticoFluxoService {
         diagnosticoRepo.save(diagnostico);
     }
 
+    private List<Usuario> carregarServidoresSnapshot(List<ServidorProcesso> servidoresSnapshot) {
+        List<String> titulos = servidoresSnapshot.stream()
+                .map(ServidorProcesso::getUsuarioTitulo)
+                .distinct()
+                .toList();
+        if (titulos.isEmpty()) {
+            return List.of();
+        }
+        var usuariosPorTitulo = new HashMap<String, Usuario>();
+        usuarioService.buscarPorTitulos(titulos).forEach(usuario -> usuariosPorTitulo.put(usuario.getTituloEleitoral(), usuario));
+        return titulos.stream()
+                .map(titulo -> {
+                    Usuario usuario = usuariosPorTitulo.get(titulo);
+                    if (usuario == null) {
+                        throw new sgc.comum.erros.ErroInconsistenciaInterna(
+                                "Servidor %s do snapshot do processo não foi encontrado para inicializar o diagnóstico".formatted(titulo)
+                        );
+                    }
+                    return usuario;
+                })
+                .toList();
+    }
+
+    private ServidorProcesso localizarSnapshotObrigatorio(List<ServidorProcesso> snapshots, String tituloEleitoral) {
+        return snapshots.stream()
+                .filter(snapshot -> Objects.equals(snapshot.getUsuarioTitulo(), tituloEleitoral))
+                .findFirst()
+                .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
+                        "Servidor %s não encontrado no snapshot do processo".formatted(tituloEleitoral)
+                ));
+    }
+
     public void concluirDiagnosticoUnidade(Long codSubprocesso) {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         validacaoService.validarConclusaoUnidade(diagnostico.getCodigo());
 
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
-        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
 
-        diagnostico.setSituacao(SituacaoDiagnostico.CONCLUIDO);
         diagnostico.setDataConclusao(LocalDateTime.now());
         diagnostico.setJustificativaConclusao(null);
 
@@ -150,9 +184,8 @@ public class DiagnosticoFluxoService {
 
         SituacaoSubprocesso novaSituacao = SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO;
         if (Objects.equals(unidadeDevolucao.getCodigo(), subprocesso.getUnidade().getCodigo())) {
-            novaSituacao = SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
+            novaSituacao = SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO;
             subprocesso.setDataFimEtapa1(null);
-            diagnostico.setSituacao(SituacaoDiagnostico.EM_ANDAMENTO);
             diagnostico.setDataConclusao(null);
             diagnostico.setJustificativaConclusao(null);
         }
@@ -186,8 +219,6 @@ public class DiagnosticoFluxoService {
             return;
         }
 
-        diagnostico.setSituacao(SituacaoDiagnostico.VALIDADO);
-
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
                 .sp(subprocesso)
@@ -210,9 +241,9 @@ public class DiagnosticoFluxoService {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
-        validacaoService.validarSituacaoDiagnostico(diagnostico, SituacaoDiagnostico.VALIDADO);
+        validacaoService.validarDiagnosticoHomologavel(codSubprocesso);
 
-        diagnostico.setSituacao(SituacaoDiagnostico.HOMOLOGADO);
+        subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Unidade admin = unidadeService.buscarAdmin();

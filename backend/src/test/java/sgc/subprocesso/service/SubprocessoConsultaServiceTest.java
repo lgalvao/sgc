@@ -881,7 +881,7 @@ class SubprocessoConsultaServiceTest {
             @DisplayName("obterPermissoesUI situacao DIAGNOSTICO")
             void obterPermissoesUI_Diagnostico() {
                 Subprocesso sp = criarSubprocessoComMapa(1L);
-                sp.setSituacaoForcada(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+                sp.setSituacaoForcada(DIAGNOSTICO_EM_ANDAMENTO);
                 Unidade u = new Unidade();
                 u.setCodigo(10L);
                 sp.setUnidade(u);

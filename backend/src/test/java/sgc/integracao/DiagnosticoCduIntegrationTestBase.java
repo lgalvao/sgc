@@ -10,7 +10,6 @@ import sgc.diagnostico.model.OcupacaoCritica;
 import sgc.diagnostico.model.OcupacaoCriticaRepo;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoCapacitacao;
-import sgc.diagnostico.model.SituacaoDiagnostico;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.mapa.model.Competencia;
@@ -72,7 +71,7 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
         processo = processoRepo.saveAndFlush(processo);
 
         subprocesso = SubprocessoFixture.novoSubprocesso(processo, unidade);
-        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(15));
         subprocesso = subprocessoRepo.saveAndFlush(subprocesso);
 
@@ -91,7 +90,6 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
 
         diagnostico = Diagnostico.builder()
                 .subprocesso(subprocesso)
-                .situacao(SituacaoDiagnostico.EM_ANDAMENTO)
                 .avaliacaoServidores(List.of(
                         novaAvaliacao(servidor, competencia1),
                         novaAvaliacao(servidor, competencia2),

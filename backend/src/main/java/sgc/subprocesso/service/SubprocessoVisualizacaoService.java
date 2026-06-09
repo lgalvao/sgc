@@ -100,6 +100,10 @@ public class SubprocessoVisualizacaoService {
         return listarHistoricoPorTipo(codSubprocesso, TipoAnalise.VALIDACAO);
     }
 
+    public boolean possuiAnalise(Long codSubprocesso, TipoAnalise tipo, TipoAcaoAnalise acao) {
+        return analiseRepo.existsBySubprocessoCodigoAndTipoAndAcao(codSubprocesso, tipo, acao);
+    }
+
     public MapaAjusteDto obterMapaParaAjuste(Subprocesso sp) {
         Long codMapa = sp.getMapa().getCodigo();
 

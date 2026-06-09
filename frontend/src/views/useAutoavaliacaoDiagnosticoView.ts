@@ -190,10 +190,12 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
 
     const varianteSituacao = computed(() => {
         switch (contexto.value?.situacaoSubprocesso) {
-            case 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO':
+            case 'DIAGNOSTICO_EM_ANDAMENTO':
                 return 'warning';
             case 'DIAGNOSTICO_CONCLUIDO':
                 return 'success';
+            case 'DIAGNOSTICO_HOMOLOGADO':
+                return 'primary';
             default:
                 return 'secondary';
         }

@@ -11,6 +11,7 @@ public enum SituacaoSubprocesso {
     MAPEAMENTO_CADASTRO_EM_ANDAMENTO("Cadastro em andamento"),
     MAPEAMENTO_CADASTRO_DISPONIBILIZADO("Cadastro disponibilizado"),
     MAPEAMENTO_CADASTRO_HOMOLOGADO("Cadastro homologado"),
+
     MAPEAMENTO_MAPA_CRIADO("Mapa criado"),
     MAPEAMENTO_MAPA_DISPONIBILIZADO("Mapa disponibilizado"),
     MAPEAMENTO_MAPA_COM_SUGESTOES("Mapa com sugestões"),
@@ -20,14 +21,16 @@ public enum SituacaoSubprocesso {
     REVISAO_CADASTRO_EM_ANDAMENTO("Revisão do cadastro em andamento"),
     REVISAO_CADASTRO_DISPONIBILIZADA("Revisão do cadastro disponibilizada"),
     REVISAO_CADASTRO_HOMOLOGADA("Revisão do cadastro homologada"),
+
     REVISAO_MAPA_AJUSTADO("Mapa ajustado"),
     REVISAO_MAPA_DISPONIBILIZADO("Mapa disponibilizado"),
     REVISAO_MAPA_COM_SUGESTOES("Mapa com sugestões"),
     REVISAO_MAPA_VALIDADO("Mapa validado"),
     REVISAO_MAPA_HOMOLOGADO("Mapa homologado"),
 
-    DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO("Autoavaliação em andamento"),
-    DIAGNOSTICO_CONCLUIDO("Concluído");
+    DIAGNOSTICO_EM_ANDAMENTO("Em andamento"),
+    DIAGNOSTICO_CONCLUIDO("Concluído"),
+    DIAGNOSTICO_HOMOLOGADO("Homologado");
 
     private static final String PREFIXO_MAPEAMENTO = "MAPEAMENTO";
     private static final String PREFIXO_REVISAO = "REVISAO";
@@ -68,7 +71,7 @@ public enum SituacaoSubprocesso {
     private boolean podeIniciar(SituacaoSubprocesso nova, TipoProcesso tipo) {
         return (tipo == TipoProcesso.MAPEAMENTO && nova == MAPEAMENTO_CADASTRO_EM_ANDAMENTO) ||
                 (tipo == TipoProcesso.REVISAO && nova == REVISAO_CADASTRO_EM_ANDAMENTO) ||
-                (tipo == TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+                (tipo == TipoProcesso.DIAGNOSTICO && nova == DIAGNOSTICO_EM_ANDAMENTO);
     }
 
     private boolean transicaoMapeamento(SituacaoSubprocesso nova) {
@@ -113,8 +116,8 @@ public enum SituacaoSubprocesso {
 
     private boolean transicaoDiagnostico(SituacaoSubprocesso nova) {
         return switch (this) {
-            case DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO -> nova == DIAGNOSTICO_CONCLUIDO;
-            case DIAGNOSTICO_CONCLUIDO -> nova == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO;
+            case DIAGNOSTICO_EM_ANDAMENTO -> nova == DIAGNOSTICO_CONCLUIDO;
+            case DIAGNOSTICO_CONCLUIDO -> nova == DIAGNOSTICO_EM_ANDAMENTO || nova == DIAGNOSTICO_HOMOLOGADO;
             default -> false;
         };
     }

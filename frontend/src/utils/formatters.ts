@@ -59,6 +59,9 @@ export function formatSituacaoSubprocesso(situacao: SituacaoSubprocesso | string
         [SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES]: 'Mapa com sugestões',
         [SituacaoSubprocesso.REVISAO_MAPA_VALIDADO]: 'Mapa validado',
         [SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO]: 'Mapa homologado',
+        [SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO]: 'Em andamento',
+        [SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO]: 'Concluído',
+        [SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO]: 'Homologado',
     };
     return labels[situacao] || situacao;
 }

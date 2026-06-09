@@ -344,7 +344,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
 
             List<Subprocesso> subs = subprocessoRepo.listarPorProcessoComUnidade(processo.getCodigo());
             assertThat(subs).isNotEmpty();
-            assertThat(subs.getFirst().getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+            assertThat(subs.getFirst().getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         }
 
         @Test

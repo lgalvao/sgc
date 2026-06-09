@@ -44,7 +44,7 @@ public class SubprocessoAcessoService {
             REVISAO_CADASTRO_HOMOLOGADA,
             REVISAO_MAPA_AJUSTADO,
             REVISAO_MAPA_COM_SUGESTOES,
-            DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+            DIAGNOSTICO_EM_ANDAMENTO);
 
     private final ImpactoMapaService impactoMapaService;
 
@@ -110,7 +110,7 @@ public class SubprocessoAcessoService {
         builder.habilitarPreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR && mesmaUnidade)
                 .habilitarCriarConsenso(contexto.isChefe() && mesmaUnidade)
                 .habilitarConcluirDiagnostico(contexto.isChefe()
-                        && situacao == DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO
+                && situacao == DIAGNOSTICO_EM_ANDAMENTO
                         && mesmaUnidade)
                 .habilitarValidarDiagnostico(contexto.isGestor() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)
                 .habilitarDevolverDiagnostico(contexto.isGestorOuAdmin() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)

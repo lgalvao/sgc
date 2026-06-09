@@ -140,7 +140,7 @@ class SubprocessoServiceSalvarIntegrationTest extends BaseIntegrationTest {
 
         List<Subprocesso> lista = subprocessoRepo.findAll();
         assertThat(lista).anyMatch(sp -> sp.getProcesso().getCodigo().equals(procDiag.getCodigo())
-                && sp.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+                && sp.getSituacao() == SituacaoSubprocesso.NAO_INICIADO);
     }
 
     @Test

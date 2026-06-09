@@ -80,6 +80,7 @@ class ProcessoTest {
             SituacaoProcesso situacao = SituacaoProcesso.EM_ANDAMENTO;
             TipoProcesso tipo = TipoProcesso.MAPEAMENTO;
             List<UnidadeProcesso> participantes = new ArrayList<>();
+            List<ServidorProcesso> servidoresParticipantes = new ArrayList<>();
 
             Processo novoProcesso = Processo.builder()
                     .dataCriacao(dataCriacao)
@@ -89,6 +90,7 @@ class ProcessoTest {
                     .situacao(situacao)
                     .tipo(tipo)
                     .participantes(participantes)
+                    .servidoresParticipantes(servidoresParticipantes)
                     .build();
 
             assertThat(novoProcesso.getDataCriacao()).isEqualTo(dataCriacao);
@@ -98,6 +100,7 @@ class ProcessoTest {
             assertThat(novoProcesso.getSituacao()).isEqualTo(situacao);
             assertThat(novoProcesso.getTipo()).isEqualTo(tipo);
             assertThat(novoProcesso.getParticipantes()).isEqualTo(participantes);
+            assertThat(novoProcesso.getServidoresParticipantes()).isEqualTo(servidoresParticipantes);
         }
     }
 
@@ -167,6 +170,27 @@ class ProcessoTest {
         }
 
         @Test
+        @DisplayName("Deve sincronizar snapshot de servidores participantes")
+        void deveSincronizarServidoresParticipantes() {
+            Usuario servidor1 = usuario(1L, "111", "Servidor 1");
+            Usuario servidor2 = usuario(1L, "222", "Servidor 2");
+            Usuario servidor3 = usuario(3L, "333", "Servidor 3");
+
+            processo.sincronizarServidoresParticipantes(Map.of(
+                    10L, List.of(servidor1, servidor2),
+                    20L, List.of(servidor3)
+            ));
+            processo.sincronizarServidoresParticipantes(Map.of(
+                    10L, List.of(servidor2),
+                    30L, List.of(servidor3)
+            ));
+
+            assertThat(processo.getServidoresParticipantes())
+                    .extracting(ServidorProcesso::getUnidadeCodigo, ServidorProcesso::getUsuarioTitulo)
+                    .containsExactlyInAnyOrder(tuple(10L, "222"), tuple(30L, "333"));
+        }
+
+        @Test
         @DisplayName("Deve adicionar unidades participantes (criando snapshots)")
         void deveAdicionarUnidadesParticipantes() {
 
@@ -188,6 +212,18 @@ class ProcessoTest {
             assertThat(processo.getParticipantes())
                     .extracting(UnidadeProcesso::getNome)
                     .containsExactlyInAnyOrder("Unidade 1", "Unidade 2");
+        }
+
+        private Usuario usuario(Long unidadeCodigo, String titulo, String nome) {
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(unidadeCodigo);
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral(titulo);
+            usuario.setMatricula("0000000" + titulo.charAt(0));
+            usuario.setNome(nome);
+            usuario.setEmail(nome.replace(' ', '.').toLowerCase(Locale.ROOT) + "@teste");
+            usuario.setUnidadeLotacao(unidade);
+            return usuario;
         }
 
         @Test

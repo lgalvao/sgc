@@ -258,7 +258,7 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         processo.setTipo(TipoProcesso.DIAGNOSTICO);
         processoRepo.saveAndFlush(processo);
         admin.setPerfilAtivo(Perfil.ADMIN);
-        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
 
         PermissoesSubprocessoDto permissoes = consultaService.obterPermissoesUI(subprocesso);
 

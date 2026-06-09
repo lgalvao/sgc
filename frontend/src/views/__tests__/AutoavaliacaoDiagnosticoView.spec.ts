@@ -34,7 +34,7 @@ const contextData = ref<any>({
     unidadeSigla: 'ASSESSORIA_12',
     unidadeNome: 'Assessoria 12',
     situacaoDiagnostico: 'EM_ANDAMENTO',
-    situacaoSubprocesso: 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
+    situacaoSubprocesso: 'DIAGNOSTICO_EM_ANDAMENTO',
     competencias: [
         {competenciaCodigo: 10, descricao: 'Competência A'},
     ],
@@ -121,7 +121,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
             unidadeSigla: 'ASSESSORIA_12',
             unidadeNome: 'Assessoria 12',
             situacaoDiagnostico: 'EM_ANDAMENTO',
-            situacaoSubprocesso: 'DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO',
+            situacaoSubprocesso: 'DIAGNOSTICO_EM_ANDAMENTO',
             competencias: [
                 {competenciaCodigo: 10, descricao: 'Competência A'},
             ],

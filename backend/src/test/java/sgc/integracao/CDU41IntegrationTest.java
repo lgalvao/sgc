@@ -68,11 +68,16 @@ class CDU41IntegrationTest extends BaseIntegrationTest {
         List<Subprocesso> subprocessos = subprocessoRepo.listarPorProcessoComUnidade(codigoProcesso);
         assertThat(subprocessos).hasSize(1);
         Subprocesso subprocesso = subprocessos.getFirst();
-        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.NAO_INICIADO);
         assertThat(subprocesso.getMapa()).isNotNull();
 
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(subprocesso.getCodigo()).orElseThrow();
-        assertThat(diagnostico.getSituacao().name()).isEqualTo("EM_ANDAMENTO");
+        assertThat(entityManager.createQuery(
+                "select count(sp) from ServidorProcesso sp where sp.processo.codigo = :codigoProcesso and sp.unidadeCodigo = :codigoUnidade",
+                Long.class
+        ).setParameter("codigoProcesso", codigoProcesso)
+                .setParameter("codigoUnidade", subprocesso.getUnidade().getCodigo())
+                .getSingleResult()).isGreaterThan(0);
         assertThat(entityManager.createQuery(
                 "select count(a) from AvaliacaoServidor a where a.diagnostico.codigo = :codigoDiagnostico",
                 Long.class

@@ -10,4 +10,6 @@ public interface AnaliseRepo extends JpaRepository<Analise, Long> {
     List<Analise> findBySubprocessoCodigoOrderByDataHoraDesc(Long codSubprocesso);
 
     List<Analise> findBySubprocessoCodigo(Long codSubprocesso);
+
+    boolean existsBySubprocessoCodigoAndTipoAndAcao(Long codSubprocesso, TipoAnalise tipo, TipoAcaoAnalise acao);
 }

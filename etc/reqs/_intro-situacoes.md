@@ -46,7 +46,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 
 ### Situações de subprocessos de Diagnóstico
 
-- **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhuma avaliação individual foi
+- **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhuma autoavaliação foi
   concluída e nenhuma informação de capacitação foi registrada.
 - **Em andamento**: Há autoavaliações, consensos, ocupações críticas ou ajustes do diagnóstico em elaboração na
   unidade.

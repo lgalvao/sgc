@@ -9,6 +9,9 @@ import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
 import sgc.mapa.model.Competencia;
 import sgc.organizacao.model.Usuario;
+import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 
@@ -79,10 +82,16 @@ class DiagnosticoAvaliacaoServiceTest {
 
         Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
         AvaliacaoServidor avaliacao = avaliacaoVazia(100L);
+        Subprocesso subprocesso = new Subprocesso();
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.DIAGNOSTICO);
+        subprocesso.setProcesso(processo);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.NAO_INICIADO);
 
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
         when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
         when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, titulo)).thenReturn(List.of(avaliacao));
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
         var request = new AutoavaliacaoRequest(List.of(
                 AvaliacaoCompetenciaDto.builder()
@@ -98,6 +107,7 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThat(avaliacao.getAutodominio()).isEqualTo(2);
         assertThat(avaliacao.getImportancia()).isEqualTo(4);
         assertThat(avaliacao.getDominio()).isEqualTo(2);
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         verify(avaliacaoRepo).saveAll(anyList());
     }
 

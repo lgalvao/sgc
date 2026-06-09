@@ -174,7 +174,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         processo.setTipo(TipoProcesso.DIAGNOSTICO);
         processoRepo.save(processo);
 
-        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
         subprocessoRepo.save(subprocesso);
 
         mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())

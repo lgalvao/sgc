@@ -259,7 +259,7 @@ class SubprocessoAcessoServiceTest {
     @Test
     void devePermitirConcluirDiagnosticoParaChefeEmAndamentoNaPropriaUnidade() {
         Subprocesso subprocesso = new Subprocesso();
-        subprocesso.setSituacaoForcada(DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        subprocesso.setSituacaoForcada(DIAGNOSTICO_EM_ANDAMENTO);
 
         assertThat(resolverPermissoes(subprocesso, Perfil.CHEFE, true, true, false, false).habilitarConcluirDiagnostico()).isTrue();
         assertThat(resolverPermissoes(subprocesso, Perfil.GESTOR, true, true, false, false).habilitarConcluirDiagnostico()).isFalse();

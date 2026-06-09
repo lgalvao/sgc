@@ -9,12 +9,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.OcupacaoCritica;
 import sgc.diagnostico.model.OcupacaoCriticaRepo;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoCapacitacao;
-import sgc.diagnostico.model.SituacaoDiagnostico;
+import sgc.subprocesso.model.TipoAcaoAnalise;
+import sgc.subprocesso.model.TipoAnalise;
+import sgc.subprocesso.service.SubprocessoVisualizacaoService;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ class DiagnosticoValidacaoServiceTest {
 
     @Mock AvaliacaoServidorRepo avaliacaoRepo;
     @Mock OcupacaoCriticaRepo ocupacaoRepo;
+    @Mock SubprocessoVisualizacaoService subprocessoVisualizacaoService;
 
     @InjectMocks
     DiagnosticoValidacaoService service;
@@ -111,12 +113,16 @@ class DiagnosticoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarSituacaoDiagnostico deve falhar quando a situação atual divergir da esperada")
-    void validarSituacaoDiagnostico_deveFalharQuandoDivergente() {
-        Diagnostico diagnostico = new Diagnostico();
-        diagnostico.setSituacao(SituacaoDiagnostico.EM_ANDAMENTO);
+    @DisplayName("validarDiagnosticoHomologavel deve falhar sem aceite prévio")
+    void validarDiagnosticoHomologavel_deveFalharSemAceitePrevio() {
+        Long codSubprocesso = 99L;
+        when(subprocessoVisualizacaoService.possuiAnalise(
+                codSubprocesso,
+                TipoAnalise.DIAGNOSTICO,
+                TipoAcaoAnalise.ACEITE_DIAGNOSTICO
+        )).thenReturn(false);
 
-        assertThatThrownBy(() -> service.validarSituacaoDiagnostico(diagnostico, SituacaoDiagnostico.VALIDADO))
+        assertThatThrownBy(() -> service.validarDiagnosticoHomologavel(codSubprocesso))
                 .isInstanceOf(ErroValidacao.class)
                 .hasMessage("Diagnóstico fora da situação esperada para esta ação.");
     }

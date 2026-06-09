@@ -76,13 +76,11 @@ Ator: ADMIN
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
-    13.2. Para cada unidade intermediária imediatamente superior à unidade participante, será criado um alerta com:
+    13.2. Para a unidade intermediária imediatamente superior à unidade participante, será criado um alerta com:
     - `Descrição`: "Início do processo em unidade(s) subordinada(s)"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
-
-    [PENDENCIA: Como fica a agregação das unidades? Confirmar com outros CDUs paralelos.] 
 
   13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade intermediária, como especificado acima.

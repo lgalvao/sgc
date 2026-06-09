@@ -208,7 +208,7 @@ public class SubprocessoValidacaoService {
                 List.of(
                         SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
                         SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
-                        SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO
+                        SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO
                 )
         );
 

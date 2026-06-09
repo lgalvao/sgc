@@ -12,7 +12,6 @@ import sgc.comum.model.ComumRepo;
 import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.DiagnosticoRepo;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.diagnostico.model.SituacaoDiagnostico;
 import sgc.mapa.model.Competencia;
 import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.SituacaoUnidade;
@@ -24,6 +23,7 @@ import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
 import sgc.processo.model.Processo;
+import sgc.processo.model.ServidorProcesso;
 import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
@@ -82,12 +82,18 @@ class DiagnosticoFluxoServiceTest {
     @Test
     @DisplayName("inicializarDiagnostico deve criar avaliações e ocupações com snapshot da unidade")
     void inicializarDiagnostico_deveCriarEstruturaCompleta() {
-        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+        Processo processo = subprocesso.getProcesso();
         subprocesso.setMapa(mapa(101L, competencia(1L, "Competência 1"), competencia(2L, "Competência 2")));
 
         Usuario servidor1 = usuario("242426", "Duff McKagan");
         Usuario servidor2 = usuario("242427", "Izzy Stradlin");
-        when(usuarioService.buscarPorUnidadeLotacao(unidadeOrigem.getCodigo())).thenReturn(List.of(servidor1, servidor2));
+        processo.adicionarServidoresParticipantes(List.of(
+                servidorSnapshot(processo, unidadeOrigem.getCodigo(), servidor1),
+                servidorSnapshot(processo, unidadeOrigem.getCodigo(), servidor2)
+        ));
+        when(usuarioService.buscarPorTitulos(List.of(servidor1.getTituloEleitoral(), servidor2.getTituloEleitoral())))
+                .thenReturn(List.of(servidor1, servidor2));
 
         ArgumentCaptor<Diagnostico> captor = ArgumentCaptor.forClass(Diagnostico.class);
 
@@ -96,7 +102,6 @@ class DiagnosticoFluxoServiceTest {
         verify(diagnosticoRepo).save(captor.capture());
         Diagnostico salvo = captor.getValue();
 
-        assertThat(salvo.getSituacao()).isEqualTo(SituacaoDiagnostico.EM_ANDAMENTO);
         assertThat(salvo.getAvaliacaoServidores()).hasSize(4);
         assertThat(salvo.getOcupacaoCriticas()).hasSize(4);
         assertThat(salvo.getAvaliacaoServidores())
@@ -120,9 +125,7 @@ class DiagnosticoFluxoServiceTest {
         Long codSubprocesso = 90L;
         Diagnostico diagnostico = new Diagnostico();
         diagnostico.setCodigo(700L);
-        diagnostico.setSituacao(SituacaoDiagnostico.EM_ANDAMENTO);
-
-        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         subprocesso.setCodigo(codSubprocesso);
 
         when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
@@ -132,11 +135,10 @@ class DiagnosticoFluxoServiceTest {
         when(unidadeService.buscarPorCodigo(unidadeSuperior.getCodigo())).thenReturn(unidadeSuperior);
         doNothing().when(validacaoService).validarConclusaoUnidade(diagnostico.getCodigo());
         doNothing().when(subprocessoValidacaoService)
-                .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+                .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
 
         service.concluirDiagnosticoUnidade(codSubprocesso);
 
-        assertThat(diagnostico.getSituacao()).isEqualTo(SituacaoDiagnostico.CONCLUIDO);
         assertThat(diagnostico.getDataConclusao()).isNotNull();
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         assertThat(subprocesso.getDataFimEtapa1()).isNotNull();
@@ -151,7 +153,6 @@ class DiagnosticoFluxoServiceTest {
         Long codSubprocesso = 91L;
         String observacao = "Ajustar consenso pendente";
         Diagnostico diagnostico = new Diagnostico();
-        diagnostico.setSituacao(SituacaoDiagnostico.CONCLUIDO);
         diagnostico.setDataConclusao(LocalDateTime.now());
 
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -173,13 +174,12 @@ class DiagnosticoFluxoServiceTest {
 
         service.devolverDiagnostico(codSubprocesso, observacao);
 
-        assertThat(diagnostico.getSituacao()).isEqualTo(SituacaoDiagnostico.EM_ANDAMENTO);
         assertThat(diagnostico.getDataConclusao()).isNull();
         assertThat(subprocesso.getDataFimEtapa1()).isNull();
 
         ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
         verify(transicaoService).registrarAnaliseSemEmail(captor.capture());
-        assertThat(captor.getValue().novaSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_AUTOAVALIACAO_EM_ANDAMENTO);
+        assertThat(captor.getValue().novaSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_DIAGNOSTICO);
         assertThat(captor.getValue().unidadeDestinoTransicao()).isEqualTo(unidadeOrigem);
         verify(notificacaoService).notificarDiagnosticoDevolvido(subprocesso, unidadeSuperior, unidadeOrigem, observacao);
@@ -190,8 +190,6 @@ class DiagnosticoFluxoServiceTest {
     void validarDiagnostico_deveMarcarComoValidado() {
         Long codSubprocesso = 92L;
         Diagnostico diagnostico = new Diagnostico();
-        diagnostico.setSituacao(SituacaoDiagnostico.CONCLUIDO);
-
         Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
         Unidade unidadeDestino = unidade(2L, "SECRETARIA_1", "Secretaria 1", TipoUnidade.INTEROPERACIONAL);
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -208,7 +206,6 @@ class DiagnosticoFluxoServiceTest {
 
         service.validarDiagnostico(codSubprocesso, "Pode seguir");
 
-        assertThat(diagnostico.getSituacao()).isEqualTo(SituacaoDiagnostico.VALIDADO);
         ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
         verify(transicaoService).registrarAnaliseSemEmail(captor.capture());
         assertThat(captor.getValue().tipoAnalise()).isEqualTo(TipoAnalise.DIAGNOSTICO);
@@ -223,8 +220,6 @@ class DiagnosticoFluxoServiceTest {
     void homologarDiagnostico_deveHomologar() {
         Long codSubprocesso = 93L;
         Diagnostico diagnostico = new Diagnostico();
-        diagnostico.setSituacao(SituacaoDiagnostico.VALIDADO);
-
         Unidade admin = unidade(1L, "ADMIN", "Administração", TipoUnidade.RAIZ);
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setCodigo(codSubprocesso);
@@ -235,11 +230,11 @@ class DiagnosticoFluxoServiceTest {
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
-        doNothing().when(validacaoService).validarSituacaoDiagnostico(diagnostico, SituacaoDiagnostico.VALIDADO);
+        doNothing().when(validacaoService).validarDiagnosticoHomologavel(codSubprocesso);
 
         service.homologarDiagnostico(codSubprocesso, "Homologado");
 
-        assertThat(diagnostico.getSituacao()).isEqualTo(SituacaoDiagnostico.HOMOLOGADO);
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
         ArgumentCaptor<RegistrarTransicaoCommand> captor = ArgumentCaptor.forClass(RegistrarTransicaoCommand.class);
         verify(transicaoService).registrarTransicaoSemEmail(captor.capture());
         assertThat(captor.getValue().tipo()).isEqualTo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO);
@@ -291,5 +286,9 @@ class DiagnosticoFluxoServiceTest {
         subprocesso.setUnidade(unidade);
         subprocesso.setSituacaoForcada(situacao);
         return subprocesso;
+    }
+
+    private ServidorProcesso servidorSnapshot(Processo processo, Long unidadeCodigo, Usuario usuario) {
+        return ServidorProcesso.criarSnapshot(processo, unidadeCodigo, usuario);
     }
 }

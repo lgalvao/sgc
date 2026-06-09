@@ -8,6 +8,7 @@ import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
 import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 
@@ -33,6 +34,7 @@ public class DiagnosticoAvaliacaoService {
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
@@ -55,6 +57,9 @@ public class DiagnosticoAvaliacaoService {
         }
 
         avaliacaoRepo.saveAll(avaliacoes);
+        if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+        }
     }
     public void concluirAutoavaliacao(Long codSubprocesso) {
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
