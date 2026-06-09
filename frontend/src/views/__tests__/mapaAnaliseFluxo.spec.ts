@@ -39,6 +39,33 @@ describe('mapaAnaliseFluxo.ts', () => {
         expect(deps.mostrarModalAceitar.value).toBe(false)
     })
 
+    it('deve abrir e fechar o modal de validar', () => {
+        const deps = criarDependencias()
+        const {abrirModalValidar, fecharModalValidar} = useMapaAnaliseFluxo(deps)
+        abrirModalValidar()
+        expect(deps.mostrarModalValidar.value).toBe(true)
+        fecharModalValidar()
+        expect(deps.mostrarModalValidar.value).toBe(false)
+    })
+
+    it('deve abrir modal de devolucao e resetar validacao', () => {
+        const deps = criarDependencias()
+        const {abrirModalDevolucao} = useMapaAnaliseFluxo(deps)
+        abrirModalDevolucao()
+        expect(deps.resetarValidacao).toHaveBeenCalled()
+        expect(deps.mostrarModalDevolucao.value).toBe(true)
+    })
+
+    it('deve fechar modal de devolucao e limpar observacao', () => {
+        const deps = criarDependencias()
+        const {fecharModalDevolucao} = useMapaAnaliseFluxo(deps)
+        deps.mostrarModalDevolucao.value = true
+        deps.observacaoDevolucao.value = 'teste'
+        fecharModalDevolucao()
+        expect(deps.mostrarModalDevolucao.value).toBe(false)
+        expect(deps.observacaoDevolucao.value).toBe('')
+    })
+
     it('deve confirmar validação com sucesso', async () => {
         const deps = criarDependencias()
         const {confirmarValidacao} = useMapaAnaliseFluxo(deps)

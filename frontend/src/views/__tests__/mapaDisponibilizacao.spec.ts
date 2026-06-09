@@ -83,12 +83,23 @@ describe('mapaDisponibilizacao.ts', () => {
 
     it('deve tratar erro na disponibilização', async () => {
         const deps = criarDependencias()
-        deps.disponibilizarMapaFluxo.mockRejectedValue(new Error('Erro'))
+        const erroInstancia = new Error('Erro');
+        deps.disponibilizarMapaFluxo.mockRejectedValue(erroInstancia)
         const {disponibilizarMapa} = useMapaDisponibilizacao(deps as any)
 
         await disponibilizarMapa({dataLimite: '2026-12-31', observacoes: ''})
 
         expect(deps.aplicarErroNormalizado).toHaveBeenCalled()
+    })
+
+    it('não deve iniciar nova disponibilização se loading for true', async () => {
+        const deps = criarDependencias()
+        const {disponibilizarMapa, loadingDisponibilizacao} = useMapaDisponibilizacao(deps as any)
+        
+        loadingDisponibilizacao.value = true;
+        await disponibilizarMapa({dataLimite: '2026-12-31', observacoes: 'teste'})
+        
+        expect(deps.disponibilizarMapaFluxo).not.toHaveBeenCalled()
     })
 
     it('deve sincronizar o mapa no contexto', () => {

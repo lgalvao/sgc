@@ -94,6 +94,54 @@ describe('useOcupacoesCriticasDiagnostico', () => {
         scope.stop();
     });
 
+    it('não deve alterar ocupacoesLocais se novas for undefined', async () => {
+        mockQueryData.value = { ocupacoesCriticas: undefined };
+        const scope = effectScope();
+        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useOcupacoesCriticasDiagnostico(70);
+        });
+        await nextTick();
+
+        expect(composable!.ocupacoesLocais.value).toEqual([]);
+        scope.stop();
+    });
+
+    it('deve usar valores default para as props da query (servidores e movimentacoes)', async () => {
+        mockQueryData.value = { servidores: undefined, movimentacoes: undefined, unidade: undefined };
+        const scope = effectScope();
+        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useOcupacoesCriticasDiagnostico(70);
+        });
+        await nextTick();
+
+        expect(composable!.servidores.value).toEqual([]);
+        expect(composable!.movimentacoes.value).toEqual([]);
+        expect(composable!.unidade.value).toBeUndefined();
+        scope.stop();
+    });
+
+    it('deve calcular 0 pendentes se não houver ocupações ou todas estiverem preenchidas', async () => {
+        mockQueryData.value = {
+            ocupacoesCriticas: [
+                {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
+            ],
+        };
+        const scope = effectScope();
+        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useOcupacoesCriticasDiagnostico(70);
+        });
+        await nextTick();
+
+        expect(composable!.pendentes.value).toBe(0);
+        scope.stop();
+    });
+
     it('deve fazer autosave com debounce e invalidar a unidade', async () => {
         vi.mocked(diagnosticoService.salvarOcupacoesCriticas).mockResolvedValue();
         const scope = effectScope();
@@ -104,7 +152,9 @@ describe('useOcupacoesCriticasDiagnostico', () => {
         });
         await nextTick();
 
+        // Duas chamadas para cobrir a limpeza do timer
         composable!.atualizarCapacitacao('242426', 10, 'EC');
+        composable!.atualizarCapacitacao('242426', 10, 'AC');
 
         expect(composable!.salvandoAutomaticamente.value).toBe(true);
         expect(composable!.pendentes.value).toBe(0);
@@ -114,7 +164,7 @@ describe('useOcupacoesCriticasDiagnostico', () => {
 
         expect(diagnosticoService.salvarOcupacoesCriticas).toHaveBeenCalledWith(71, {
             ocupacoes: [
-                {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
+                {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
                 {servidorTitulo: '242427', competenciaCodigo: 20, situacaoCapacitacao: 'AC'},
             ],
         });

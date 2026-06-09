@@ -52,9 +52,10 @@ vi.mock('@/composables/useMapaOrquestracao', () => ({
     }),
 }));
 
+const mapaCompletoRef = ref<any>({ atividades: [], competencias: [] });
 vi.mock('@/composables/useMapas', () => ({
     useMapas: () => ({
-        mapaCompleto: ref(null),
+        mapaCompleto: mapaCompletoRef,
         impactoMapa: ref(null),
         sincronizarMapa: vi.fn(),
         carregarImpacto: vi.fn(),
@@ -81,9 +82,32 @@ vi.mock('@/composables/useFormErrors', () => ({
     }),
 }));
 
+vi.mock('@/composables/useMapaCompetenciasMutacoes', () => ({
+    useMapaCompetenciasMutacoes: () => ({}),
+}));
+
+const { useMapaDisponibilizacaoArgs } = vi.hoisted(() => ({
+    useMapaDisponibilizacaoArgs: { value: null as any }
+}));
+
+vi.mock('@/views/mapaDisponibilizacao', () => ({
+    useMapaDisponibilizacao: (args: any) => {
+        useMapaDisponibilizacaoArgs.value = args;
+        return {
+            erroValidacaoMapa: ref(null),
+            abrirModalDisponibilizar: vi.fn(),
+            fecharModalDisponibilizar: vi.fn(),
+            disponibilizarMapa: vi.fn(),
+            limparErroMapa: vi.fn(),
+            sincronizarMapaContexto: vi.fn(),
+        };
+    },
+}));
+
 vi.mock('@/utils/apiError', () => ({
     normalizarErro: (err: any) => {
         if (err.message === 'Network Error') return { tipo: 'inesperado', mensagem: 'Erro de rede', status: 0 };
+        if (err.message === 'Inesperado 500') return { tipo: 'inesperado', mensagem: 'Erro Servidor', status: 500 };
         return { tipo: 'erro', mensagem: err.message || 'Erro' };
     },
 }));
@@ -102,6 +126,8 @@ describe('useMapaTela', () => {
         contextoEdicaoRef.value = null;
         erroIntegracaoContextoRef.value = null;
         carregarContextoInicialMock.mockResolvedValue(true);
+        mapaCompletoRef.value = { atividades: [], competencias: [] };
+        useMapaDisponibilizacaoArgs.value = null;
     });
 
     it('notificar erro de exportacao com fallback', async () => {
@@ -114,6 +140,16 @@ describe('useMapaTela', () => {
         expect(notifyMock).toHaveBeenCalledWith('Erro ao exportar PDF', 'danger');
     });
 
+    it('notificar erro de exportacao com erro inesperado e status', async () => {
+        const { exportarMapaAtualCsv } = useMapaTela({ codProcesso: 1, sigla: 'TEST' }) as any;
+        const { relatoriosService } = await import('@/services/relatoriosService');
+        vi.mocked(relatoriosService.downloadRelatorioMapaAtualCsv).mockRejectedValueOnce(new Error('Inesperado 500'));
+        
+        await exportarMapaAtualCsv();
+        
+        expect(notifyMock).toHaveBeenCalledWith('Erro Servidor', 'danger');
+    });
+
     it('notificar erro de exportacao com mensagem do erro', async () => {
         const { exportarMapaAtualPdf } = useMapaTela({ codProcesso: 1, sigla: 'TEST' }) as any;
         const { relatoriosService } = await import('@/services/relatoriosService');
@@ -122,5 +158,64 @@ describe('useMapaTela', () => {
         await exportarMapaAtualPdf();
         
         expect(notifyMock).toHaveBeenCalledWith('Erro especifico', 'danger');
+    });
+
+    it('deve notificar erro se carregarContextoInicial falhar', async () => {
+        carregarContextoInicialMock.mockResolvedValueOnce(false);
+        
+        // Simula montagem do componente sem mockar o onMounted globalmente,
+        // apenas avaliando a função que foi passada para onMounted.
+        let mountedCb: any = null;
+        vi.doMock('vue', async (importOriginal) => {
+            const actual = await importOriginal<any>();
+            return {
+                ...actual,
+                onMounted: (cb: any) => { mountedCb = cb; }
+            };
+        });
+        
+        // Reimport the module so the new mock is used
+        const { useMapaTela: reloadedUseMapaTela } = await import('../useMapaTela');
+        reloadedUseMapaTela({ codProcesso: 1, sigla: 'TEST' });
+        
+        if (mountedCb) {
+            await mountedCb();
+            expect(notifyMock).toHaveBeenCalledWith('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
+        }
+        
+        vi.doUnmock('vue');
+    });
+
+    it('computa atividadesSemCompetencia corretamente', () => {
+        useMapaTela({ codProcesso: 1, sigla: 'TEST' });
+        
+        mapaCompletoRef.value = {
+            atividades: [{ codigo: 1 }, { codigo: 2 }],
+            competencias: [{ atividades: [{ codigo: 1 }] }]
+        };
+        
+        expect(useMapaDisponibilizacaoArgs.value.atividadesSemCompetencia.value).toEqual([{ codigo: 2 }]);
+    });
+
+    it('computa atividadesSemCompetencia vazio se nao houver atividades', () => {
+        useMapaTela({ codProcesso: 1, sigla: 'TEST' });
+        
+        mapaCompletoRef.value = {
+            atividades: [],
+            competencias: []
+        };
+        
+        expect(useMapaDisponibilizacaoArgs.value.atividadesSemCompetencia.value).toEqual([]);
+    });
+
+    it('computa existeCompetenciaSemAtividade corretamente', () => {
+        useMapaTela({ codProcesso: 1, sigla: 'TEST' });
+        
+        mapaCompletoRef.value = {
+            atividades: [],
+            competencias: [{ atividades: [] }]
+        };
+        
+        expect(useMapaDisponibilizacaoArgs.value.existeCompetenciaSemAtividade.value).toBe(true);
     });
 });

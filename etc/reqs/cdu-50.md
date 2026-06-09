@@ -36,23 +36,58 @@ Ator: GESTOR, ADMIN
 
 9. Se o usuário clicar em `Histórico de análise`, o sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e observação.
 
-10. Se o usuário optar por `Devolver para ajustes`:
-    10.1. O sistema solicita confirmação e permite informar observação.
-    10.2. Caso o usuário confirme, o sistema registra análise com resultado `Devolução para ajustes`.
-    10.3. O sistema devolve o diagnóstico à unidade imediatamente inferior.
-    10.4. O sistema notifica a unidade responsável pela retificação.
-    10.5. O sistema mostra a mensagem `Devolução realizada`.
+---
 
-11. Se o usuário optar por `Registrar aceite`:
-    11.1. O sistema solicita confirmação e permite informar observação.
-    11.2. Caso o usuário confirme, o sistema registra análise com resultado `Aceite`.
-    11.3. O sistema encaminha o subprocesso para análise da unidade hierarquicamente superior.
-    11.4. O sistema notifica a unidade superior.
-    11.5. O sistema mostra a mensagem `Aceite registrado`.
+Se o usuário optar por `Devolver para ajustes`:
 
-12. Se o usuário optar por `Homologar`:
-    12.1. O sistema solicita confirmação.
-    12.2. Caso o usuário confirme, o sistema altera a situação do subprocesso para `Homologado`.
-    12.3. O sistema registra movimentação e análise de homologação.
-    12.4. O sistema notifica a unidade do subprocesso.
-    12.5. O sistema mostra a mensagem `Diagnóstico homologado`.
+10. O sistema solicita confirmação em um modal, com um campo `Justificativa`, de preenchimento obrigatório.
+
+11. Caso o usuário confirme, o sistema:
+    - registra análise com resultado `Devolução para ajustes`;
+    - e muda a localização do subprocesso para a unidade imediatamente inferior.
+
+12. O sistema envia uma notificação por e-mail para a unidade inferior que foi a origem da última movimentação.
+    
+13. O sistema cria internamente um alerta com estes campos:
+
+    Descrição: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
+    Processo: [DESCRICAO_PROCESSO]
+    Data/hora: [Data/hora atual]
+    Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+    Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO]
+
+14. O Sistema mostra a mensagem `Devolução realizada`
+
+---
+
+Se o usuário optar por `Registrar aceite`:
+
+15. O sistema solicita confirmação em um modal, com campo `Observação` opcional.
+
+16. Caso o usuário confirme, o sistema registra análise com resultado `Aceite`.
+
+17. O sistema muda a localização do subprocesso para a unidade imediatamente superior.
+
+18. O sistema cria internamente um alerta com estes campos:
+
+    Descrição: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito"
+    Processo: [DESCRICAO_PROCESSO]
+    Data/hora: [Data/hora atual]
+    Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+    Unidade de destino: [SIGLA_UNIDADE_SUPERIOR]
+
+19. O sistema envia uma notificação por e-mail para a unidade imediatamente superior.
+
+20. O sistema mostra a mensagem `Aceite registrado`.
+
+---
+
+Se o usuário optar por `Homologar`:
+
+21. O sistema solicita confirmação em um modal, com texto simples, sem campo adicional.
+
+22. Caso o usuário confirme, o sistema altera a situação do subprocesso para `Homologado`.
+
+23. O sistema registra movimentação e análise de homologação.
+
+24. O sistema mostra a mensagem `Diagnóstico homologado`.

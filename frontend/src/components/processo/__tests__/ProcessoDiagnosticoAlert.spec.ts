@@ -10,7 +10,7 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
       props: ['modelValue', 'variant', 'dismissible']
     },
     BSpinner: { template: '<div class="spinner" />' },
-    RouterLink: { template: '<a><slot /></a>', props: ['to'] }
+    RouterLink: { template: '<a :href="to"><slot /></a>', props: ['to'] }
   };
 
   it("não renderiza nada se exibir for false", () => {

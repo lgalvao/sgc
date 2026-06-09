@@ -12,13 +12,13 @@ Ator: ADMIN
 
 1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Em andamento'.
 
-2. O sistema mostra a tela `Detalhes do processo`, com uma tabela hierárquica com todas as unidades participantes e a situação atual de cada diagnóstico.
+2. O sistema mostra a tela `Detalhes do processo`, com uma tabela hierárquica contendo todas as unidades participantes e a situação atual de cada unidade.
 
 3. O usuário clica em `Finalizar`.
 
 4. O sistema verifica se todos os subprocessos das unidades participantes estão na situação `Homologado`.
-
-5. Caso exista unidade ainda não homologada, o sistema mostra a mensagem "Não é possível finalizar o processo enquanto houver unidades com diagnóstico ainda não homologado" e interrompe a operação.
+   
+5. Caso exista unidade ainda não homologada, o sistema mostra a mensagem "Não é possível finalizar o processo enquanto houver unidades ainda não homologadas." e interrompe a operação.
 
 6. Caso todas as unidades estejam homologadas, o sistema solicita confirmação de finalização.
    

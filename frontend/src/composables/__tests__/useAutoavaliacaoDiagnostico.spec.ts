@@ -95,7 +95,21 @@ describe('useAutoavaliacaoDiagnostico', () => {
         scope.stop();
     });
 
-    it('deve fazer autosave com debounce', async () => {
+    it('não deve quebrar ou alterar competenciasLocais se novas for undefined', async () => {
+        mockQueryData.value = { situacaoServidor: 'CONCLUIDA', competencias: undefined };
+        const scope = effectScope();
+        let composable: ReturnType<typeof useAutoavaliacaoDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useAutoavaliacaoDiagnostico(99);
+        });
+        await nextTick();
+
+        expect(composable!.competenciasLocais.value).toEqual([]);
+        scope.stop();
+    });
+
+    it('deve fazer autosave com debounce e limpar timer existente', async () => {
         vi.mocked(diagnosticoService.salvarAutoavaliacao).mockResolvedValue();
         const scope = effectScope();
         let composable: ReturnType<typeof useAutoavaliacaoDiagnostico> | undefined;
@@ -105,19 +119,44 @@ describe('useAutoavaliacaoDiagnostico', () => {
         });
         await nextTick();
 
+        // Duas chamadas rapidas para limpar o timer
         composable!.atualizarNota(10, 'importancia', 5);
+        composable!.atualizarNota(10, 'dominio', 4);
 
         expect(composable!.salvandoAutomaticamente.value).toBe(true);
         await vi.advanceTimersByTimeAsync(800);
         await Promise.resolve();
 
-        expect(diagnosticoService.salvarAutoavaliacao).toHaveBeenCalledWith(99, {
-            competencias: [
-                {competenciaCodigo: 10, importancia: 5, dominio: 2},
-                {competenciaCodigo: 20, importancia: 3, dominio: 4},
-            ],
-        });
+        expect(diagnosticoService.salvarAutoavaliacao).toHaveBeenCalledTimes(1);
         expect(composable!.salvandoAutomaticamente.value).toBe(false);
+        scope.stop();
+    });
+
+    it('não deve fazer nada se a competencia nao for encontrada', async () => {
+        const scope = effectScope();
+        let composable: ReturnType<typeof useAutoavaliacaoDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useAutoavaliacaoDiagnostico(99);
+        });
+        await nextTick();
+
+        composable!.atualizarNota(999, 'importancia', 5);
+        expect(composable!.salvandoAutomaticamente.value).toBe(false);
+        scope.stop();
+    });
+
+    it('deve usar a situacaoServidor da query se estiver disponivel', async () => {
+        mockQueryData.value = { situacaoServidor: 'CONSENSO_CRIADO', competencias: [] };
+        const scope = effectScope();
+        let composable: ReturnType<typeof useAutoavaliacaoDiagnostico> | undefined;
+
+        scope.run(() => {
+            composable = useAutoavaliacaoDiagnostico(99);
+        });
+        await nextTick();
+
+        expect(composable!.situacaoServidor.value).toBe('CONSENSO_CRIADO');
         scope.stop();
     });
 

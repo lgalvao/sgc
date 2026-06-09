@@ -128,4 +128,18 @@ describe('useFluxoDiagnostico', () => {
             params: {codProcesso: 100, siglaUnidade: 'ASSESSORIA_12'},
         });
     });
+
+    it('deve avaliar propriedades computadas de estado', () => {
+        const composable = useFluxoDiagnostico(41);
+        expect(composable.concluindo.value).toBe(false);
+        expect(composable.validando.value).toBe(false);
+        expect(composable.devolvendo.value).toBe(false);
+        expect(composable.homologando.value).toBe(false);
+        expect(composable.impossibilitando.value).toBe(false);
+        expect(composable.erroConcluir.value).toBeNull();
+        expect(composable.erroValidar.value).toBeNull();
+        expect(composable.erroDevolver.value).toBeNull();
+        expect(composable.erroHomologar.value).toBeNull();
+        expect(composable.erroImpossibilitar.value).toBeNull();
+    });
 });

@@ -287,7 +287,7 @@ describe("SubprocessoCards.vue", () => {
         }));
     });
 
-    it("renderiza cards de Diagnóstico", () => {
+    it("renderiza cards de Diagnóstico (Autoavaliacao e Consenso)", () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -298,19 +298,37 @@ describe("SubprocessoCards.vue", () => {
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
                 permissoes: criarPermissoes({
                     podePreencherAutoavaliacao: true,
+                    podeCriarConsenso: false,
                 }),
             }),
         });
 
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-consenso"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(false);
+    });
+
+    it("renderiza cards de Diagnóstico (Monitoramento e Ocupacoes)", () => {
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "U1",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes({
+                    podePreencherAutoavaliacao: false,
+                    podeCriarConsenso: true,
+                }),
+            }),
+        });
+
+        expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="card-subprocesso-consenso"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(true);
-        expect(wrapper.findAll('[data-testid="card-subprocesso-consenso"]')).toHaveLength(1);
-
-        const cards = wrapper.findAll('[data-testid]').map((card) => card.attributes('data-testid'));
-        expect(cards).toContain('card-subprocesso-diagnostico');
-        expect(cards.indexOf('card-subprocesso-monitoramento')).toBeLessThan(cards.indexOf('card-subprocesso-consenso'));
-        expect(cards.indexOf('card-subprocesso-consenso')).toBeLessThan(cards.indexOf('card-subprocesso-ocupacoes'));
     });
 
     it("navega para diagnóstico", async () => {
@@ -375,7 +393,7 @@ describe("SubprocessoCards.vue", () => {
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
     });
 
-    it("abre monitoramento ao clicar no card de consenso quando a chefia pode criar consenso", async () => {
+    it("abre monitoramento ao clicar no card de monitoramento quando a chefia pode criar consenso", async () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -386,12 +404,13 @@ describe("SubprocessoCards.vue", () => {
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
                 permissoes: {
                     ...criarPermissoes(),
+                    podePreencherAutoavaliacao: false,
                     podeCriarConsenso: true,
                 } as any,
             }),
         });
 
-        await wrapper.find('[data-testid="card-subprocesso-consenso"]').trigger("click");
+        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
             name: "MonitoramentoDiagnostico",
@@ -410,6 +429,7 @@ describe("SubprocessoCards.vue", () => {
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
                 permissoes: {
                     ...criarPermissoes(),
+                    podePreencherAutoavaliacao: true,
                     podeCriarConsenso: false,
                 } as any,
             }),
@@ -464,7 +484,11 @@ describe("SubprocessoCards.vue", () => {
             siglaUnidade: "ASSESSORIA_12",
             subprocesso: criarSubprocesso({
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
-                permissoes: criarPermissoes(),
+                permissoes: {
+                    ...criarPermissoes(),
+                    podePreencherAutoavaliacao: true,
+                    podeCriarConsenso: false,
+                } as any,
             }),
         });
 
@@ -492,6 +516,7 @@ describe("SubprocessoCards.vue", () => {
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
                 permissoes: {
                     ...criarPermissoes(),
+                    podePreencherAutoavaliacao: true,
                     podeCriarConsenso: false,
                 } as any,
                 titular: null,

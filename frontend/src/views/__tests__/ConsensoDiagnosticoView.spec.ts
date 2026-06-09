@@ -144,7 +144,7 @@ describe('ConsensoDiagnosticoView', () => {
         expect(cabecalhosGrupo.map((coluna) => coluna.text())).toEqual([
             'Competência',
             'Servidor',
-            'Chefia',
+            'Chefe',
             'Consenso',
         ]);
 

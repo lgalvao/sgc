@@ -9,22 +9,23 @@ vi.mock('html2canvas', () => ({
     }),
 }))
 
-vi.mock('vue-router', () => ({
-    useRoute: () => ({
-        name: 'painel',
+const {mockPerfilStore, mockPost, mockRoute} = vi.hoisted(() => ({
+    mockPerfilStore: {
+        usuarioCodigo: '12345' as string | null,
+        usuarioNome: 'João Testador' as string | null,
+        perfilSelecionado: 'CHEFE' as string | null,
+        unidadeSelecionadaSigla: 'SENIC' as string | null,
+    },
+    mockRoute: {
+        name: 'painel' as string | null,
         fullPath: '/painel',
         query: {},
-    }),
-}))
-
-const {mockPerfilStore, mockPost} = vi.hoisted(() => ({
-    mockPerfilStore: {
-        usuarioCodigo: '12345',
-        usuarioNome: 'João Testador',
-        perfilSelecionado: 'CHEFE',
-        unidadeSelecionadaSigla: 'SENIC',
     },
     mockPost: vi.fn().mockResolvedValue({data: {id: 'uuid-123'}})
+}))
+
+vi.mock('vue-router', () => ({
+    useRoute: () => mockRoute,
 }))
 
 vi.mock('@/stores/perfil', () => ({
@@ -40,6 +41,15 @@ describe('useFeedback', () => {
         setActivePinia(createPinia())
         vi.clearAllMocks()
         mockPost.mockResolvedValue({data: {id: 'uuid-123'}})
+        
+        mockPerfilStore.usuarioCodigo = '12345';
+        mockPerfilStore.usuarioNome = 'João Testador';
+        mockPerfilStore.perfilSelecionado = 'CHEFE';
+        mockPerfilStore.unidadeSelecionadaSigla = 'SENIC';
+        
+        mockRoute.name = 'painel';
+        mockRoute.fullPath = '/painel';
+        mockRoute.query = {};
     })
 
     it('deve montar metadados com dados do perfil e da rota', async () => {
@@ -57,6 +67,29 @@ describe('useFeedback', () => {
         expect(payload.metadados.usuarioCodigo).toBe('12345')
         expect(payload.metadados.rotaCaminho).toBe('/painel')
         expect(payload.metadados.perfilAtivo).toBe('CHEFE')
+    })
+
+    it('deve montar metadados com valores default quando perfil e rota não têm as informações', async () => {
+        mockPerfilStore.usuarioCodigo = null;
+        mockPerfilStore.usuarioNome = null;
+        mockPerfilStore.perfilSelecionado = null;
+        mockPerfilStore.unidadeSelecionadaSigla = null;
+        mockRoute.name = null;
+        
+        const {enviarFeedback} = useFeedback()
+
+        await enviarFeedback('sugestao', 'Sugestao anonima')
+
+        expect(mockPost).toHaveBeenCalled()
+        const formData: FormData = mockPost.mock.calls[0][1] as FormData
+        const dataJson = formData.get('data') as string
+        const payload = JSON.parse(dataJson)
+
+        expect(payload.metadados.usuarioCodigo).toBe('')
+        expect(payload.metadados.usuarioNome).toBe('')
+        expect(payload.metadados.rotaNome).toBe('')
+        expect(payload.metadados.perfilAtivo).toBeNull()
+        expect(payload.metadados.unidadeAtiva).toBeNull()
     })
 
     it('deve incluir screenshot no FormData quando captura estiver disponível', async () => {
