@@ -26,7 +26,7 @@ Ator: GESTOR, ADMIN
    - dados gerais da unidade: sigla, nome, responsável
    - histórico de movimentações
      *NOTA*: Os dados acima são exatamente análogos aos mostrados em subprocessos de mapeamento e de revisão
-   - logo abaixo dos dados gerais do subprocesso/unidade, é mostrada uma lista com todos os servidores lotados na unidade do subprocesso -- exceto o responsável pela unidade. 
+   - logo abaixo dos dados gerais do subprocesso/unidade: uma lista com todos os servidores lotados na unidade do subprocesso -- exceto o responsável pela unidade. 
    Um botão `Histórico de análise`
    Um botão 'dropdown' `Ações` que abre subitens:
    - `Devolver para ajustes`;
@@ -38,24 +38,21 @@ Ator: GESTOR, ADMIN
 
 10. Se o usuário optar por `Devolver para ajustes`:
     10.1. O sistema solicita confirmação e permite informar observação.
-    10.2. Caso o usuário cancele, o sistema interrompe a operação.
-    10.3. Caso o usuário confirme, o sistema registra análise com resultado `Devolução para ajustes`.
-    10.4. O sistema devolve o diagnóstico à unidade imediatamente inferior.
-    10.6. O sistema notifica a unidade responsável pela retificação.
-    10.7. O sistema mostra a mensagem `Devolução realizada`.
+    10.2. Caso o usuário confirme, o sistema registra análise com resultado `Devolução para ajustes`.
+    10.3. O sistema devolve o diagnóstico à unidade imediatamente inferior.
+    10.4. O sistema notifica a unidade responsável pela retificação.
+    10.5. O sistema mostra a mensagem `Devolução realizada`.
 
 11. Se o usuário optar por `Registrar aceite`:
     11.1. O sistema solicita confirmação e permite informar observação.
-    11.2. Caso o usuário cancele, o sistema interrompe a operação.
-    11.3. Caso o usuário confirme, o sistema registra análise com resultado `Aceite`.
-    11.4. O sistema encaminha o subprocesso para análise da unidade hierarquicamente superior.
-    11.5. O sistema notifica a unidade superior.
-    11.6. O sistema mostra a mensagem `Aceite registrado`.
+    11.2. Caso o usuário confirme, o sistema registra análise com resultado `Aceite`.
+    11.3. O sistema encaminha o subprocesso para análise da unidade hierarquicamente superior.
+    11.4. O sistema notifica a unidade superior.
+    11.5. O sistema mostra a mensagem `Aceite registrado`.
 
 12. Se o usuário optar por `Homologar`:
     12.1. O sistema solicita confirmação.
-    12.2. Caso o usuário cancele, o sistema interrompe a operação.
-    12.3. Caso o usuário confirme, o sistema altera a situação do subprocesso para `Homologado`.
-    12.4. O sistema registra movimentação e análise de homologação.
-    12.5. O sistema notifica a unidade do subprocesso.
-    12.6. O sistema mostra a mensagem `Diagnóstico homologado`.
+    12.2. Caso o usuário confirme, o sistema altera a situação do subprocesso para `Homologado`.
+    12.3. O sistema registra movimentação e análise de homologação.
+    12.4. O sistema notifica a unidade do subprocesso.
+    12.5. O sistema mostra a mensagem `Diagnóstico homologado`.

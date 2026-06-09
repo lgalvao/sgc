@@ -34,11 +34,12 @@ Ator: CHEFE
       - Os campos `Importância` e `Domínio` do _servidor_ devem ser nao-editáveis, vindo preenchidos com os valores fornecidos na autoavaliação correspondente;
       - Os campos `Importância` e `Domínio` do _chefe_ devem estar abertos para preenchimento;
       - Os dois campos de `Consenso` devem estar abertos para preenchimento;
-      - Se os valores `Importância` e `Domínio` forem iguais, o sistema deve preencher automaticamente o valor de `Consenso` com o valor.
+      - Se os valores `Importância` e `Domínio` forem iguais, o sistema deve preencher automaticamente o valor de `Consenso` com o valor repetido.
+
     **IMPORTANTE**: Se o servidor já tiver aprovado a avaliação de consenso (ou seja, estiver na situacao `Avaliação de consenso aprovada`), o sistema permitirá apenas visualização dos dados acima.
 
-7. Com a presença do servidor, o usuário preenche o valor de consenso para cada competência.
+7. O usuário preenche, ao lado servidor, o valor de consenso para cada competência.
 
 8. O sistema salva automaticamente cada alteração realizada. Não é necessária nenhuma ação para concluir o preenchimento (a validação será feita na conclusão do diagnóstico).
-
+   
 9. O usuário continua o trabalho de avaliação de consenso para outros servidores: aciona o botão `Voltar` para mostrar a lista de servidores e realiza as ações desejadas para os demais servidores.

@@ -16,6 +16,6 @@ Ator: CHEFE
    - `Situação`: situação individual do servidor
    - `Ações`, com os itens abaixo: 
      - `Avaliação de consenso` - sempre habilitado;
-     - `Indicar impossibilidade` - habilitado se o usuário já não estiver ba situação `Avaliação impossibilitada`;
+     - `Indicar impossibilidade` - habilitado se o usuário já não estiver ba situação 'Avaliação impossibilitada';
     
 3. O usuário pode analisar a situação do diagnóstico dos servidores e acionar as operações desejadas.
