@@ -240,7 +240,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         situacaoServidor.value = 'AUTOAVALIACAO_CONCLUIDA';
         const wrapper = montar();
 
-        expect(wrapper.text()).toContain('Sua autoavaliação foi concluída.');
+        expect(wrapper.find('[data-testid="btn-concluir-autoavaliacao"]').exists()).toBe(true);
         await wrapper.get('select').setValue('2');
         expect(atualizarNotaMock).toHaveBeenCalled();
         const botaoVoltar = wrapper.findAll('button').find((botao) => botao.text().includes('Voltar'));

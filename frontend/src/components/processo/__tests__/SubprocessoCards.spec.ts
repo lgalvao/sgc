@@ -15,6 +15,18 @@ vi.mock("vue-router", () => ({
     }),
 }));
 
+vi.mock("@/composables/useAutoavaliacaoDiagnostico", () => ({
+    useAutoavaliacaoDiagnostico: () => ({
+        situacaoServidor: ref('AUTOAVALIACAO_NAO_INICIADA'),
+    }),
+}));
+
+vi.mock("@/stores/perfil", () => ({
+    usePerfilStore: () => ({
+        usuarioCodigo: '242426',
+    }),
+}));
+
 describe("SubprocessoCards.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -427,6 +439,7 @@ describe("SubprocessoCards.vue", () => {
             siglaUnidade: "ASSESSORIA_12",
             subprocesso: criarSubprocesso({
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                titular: {tituloEleitoral: "242426", nome: "Duff"} as any,
                 permissoes: {
                     ...criarPermissoes(),
                     podePreencherAutoavaliacao: true,
@@ -484,12 +497,17 @@ describe("SubprocessoCards.vue", () => {
             siglaUnidade: "ASSESSORIA_12",
             subprocesso: criarSubprocesso({
                 tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                titular: {tituloEleitoral: "242426", nome: "Duff"} as any,
                 permissoes: {
                     ...criarPermissoes(),
                     podePreencherAutoavaliacao: true,
                     podeCriarConsenso: false,
                 } as any,
             }),
+        }, {}, {
+            perfil: {
+                usuarioCodigo: '242426',
+            }
         });
 
         const card = wrapper.find('[data-testid="card-subprocesso-consenso"]');
