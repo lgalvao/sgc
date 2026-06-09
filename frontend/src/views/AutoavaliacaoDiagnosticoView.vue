@@ -37,16 +37,6 @@
       </div>
 
       <BAlert
-          v-if="ehAutoavaliacaoConcluida && !ehChefe"
-          :model-value="true"
-          class="mb-4"
-          variant="info"
-      >
-        <i aria-hidden="true" class="bi bi-info-circle me-2"/>
-        Sua autoavaliação foi concluída. Aguarde a avaliação de consenso da chefia.
-      </BAlert>
-
-      <BAlert
           v-if="ehConsensoCriado && !ehChefe"
           :model-value="true"
           class="mb-4"
@@ -137,7 +127,7 @@
         <BButton
             :disabled="concluindo"
             data-testid="btn-concluir-autoavaliacao"
-            variant="primary"
+            variant="outline-success"
             @click="abrirModalConcluir"
         >
           <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
@@ -208,6 +198,7 @@
         :mensagem="TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM"
         :titulo="TEXTOS.diagnostico.MODAL_CONCLUIR_TITULO"
         ok-title="Concluir"
+        variant="success"
         test-id-confirmar="btn-confirmar-concluir"
         @confirmar="confirmarConcluir"
     />

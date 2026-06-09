@@ -106,12 +106,12 @@
           md="4"
       >
         <BCard
-            class="h-100 card-actionable"
+            :class="['h-100', habilitarCardConsenso ? 'card-actionable' : 'card-disabled']"
             data-testid="card-subprocesso-consenso"
-            role="button"
-            tabindex="0"
-            @click="navegarParaCardConsenso"
-            @keydown="aoPressionarTeclaConsenso"
+            :role="habilitarCardConsenso ? 'button' : undefined"
+            :tabindex="habilitarCardConsenso ? 0 : undefined"
+            @click="habilitarCardConsenso && navegarParaCardConsenso()"
+            @keydown="habilitarCardConsenso && aoPressionarTeclaConsenso($event)"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -158,6 +158,7 @@ import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/acesso";
 import {usePerfilStore} from "@/stores/perfil";
+import {useAutoavaliacaoDiagnostico} from "@/composables/useAutoavaliacaoDiagnostico";
 import {type Mapa, type MapaCompleto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -180,6 +181,11 @@ const permissoesDiagnostico = computed(() => subprocesso.value?.permissoes ?? nu
 
 const {habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
+
+const { situacaoServidor } = useAutoavaliacaoDiagnostico(props.codSubprocesso);
+const habilitarCardConsenso = computed(() => {
+  return situacaoServidor.value === 'CONSENSO_CRIADO' || situacaoServidor.value === 'CONSENSO_APROVADO';
+});
 
 function navegarPara(routeName: string) {
   void router.push({
