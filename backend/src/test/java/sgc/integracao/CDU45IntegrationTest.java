@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.NotificacaoEmail;
+import sgc.alerta.model.NotificacaoEmailRepo;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.integracao.mocks.WithMockCustomUser;
@@ -24,6 +26,9 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
     @Autowired
     private AlertaRepo alertaRepo;
+
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     @BeforeEach
     void setUp() {
@@ -54,14 +59,14 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
             assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(unidade.getCodigo());
         });
 
-        // Validar o enfileiramento e conteudo do e-mail enviado ao responsavel da unidade via GreenMail nativo
-        processarEmailsPendentes();
-        aguardarEmail(1);
-
-        String assuntoEsperado = "Avaliação de consenso de " + servidor.getNome() + " aprovada";
-        assertThat(algumEmailComAssunto(assuntoEsperado)).isTrue();
-        assertThat(algumEmailContem("Prezado(a) responsável pela " + unidade.getSigla())).isTrue();
-        assertThat(algumEmailContem("O servidor " + servidor.getNome() + " aprovou a avaliação de consenso do processo")).isTrue();
-        assertThat(algumEmailContem("Acompanhe o processo no Sistema de Gestão de Competências")).isTrue();
+        // Validar o enfileiramento e conteudo do e-mail de notificacao no banco de dados
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll();
+        assertThat(notificacoes).anySatisfy(notificacao -> {
+            assertThat(notificacao.getAssunto()).contains("Avaliação de consenso de " + servidor.getNome() + " aprovada");
+            assertThat(notificacao.getDestinatario()).isEqualTo("chefe.teste@tre-pe.jus.br");
+            assertThat(notificacao.getCorpoHtml()).contains("Prezado(a) responsável pela <strong>" + unidade.getSigla() + "</strong>");
+            assertThat(notificacao.getCorpoHtml()).contains("O servidor <strong>" + servidor.getNome() + "</strong> aprovou a avaliação de consenso do processo");
+            assertThat(notificacao.getCorpoHtml()).contains("Acompanhe o processo no Sistema de Gestão de Competências");
+        });
     }
 }
