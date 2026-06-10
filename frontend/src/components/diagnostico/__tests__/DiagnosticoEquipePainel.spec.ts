@@ -25,6 +25,7 @@ const impossibilitando = ref(false);
 const servidores = ref<any[]>([
     {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
     {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
+    {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO'},
 ]);
 
 const erroConcluir = ref<Error | null>(null);
@@ -104,6 +105,7 @@ describe('DiagnosticoEquipePainel', () => {
         servidores.value = [
             {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
             {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
+            {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO'},
         ];
         erroConcluir.value = null;
         erroValidar.value = null;
@@ -207,6 +209,7 @@ describe('DiagnosticoEquipePainel', () => {
         });
 
         expect(wrapper.get('[data-testid="btn-impossibilitar-242427"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.get('[data-testid="btn-impossibilitar-242428"]').attributes('disabled')).toBeDefined();
     });
 
     it('valida justificativa obrigatória e registra impossibilidade com sucesso', async () => {

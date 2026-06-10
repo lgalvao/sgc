@@ -80,7 +80,7 @@
             </BDropdownItemButton>
             <BDropdownItemButton
                 :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
-                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
+                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA' || item.situacaoServidor === 'CONSENSO_APROVADO'"
                 @click="abrirModalImpossibilitar(item)"
             >
               {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
