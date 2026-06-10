@@ -154,7 +154,7 @@ public abstract class BaseIntegrationTest {
                 .build());
     }
 
-    private String extrairHtmlDaMensagem(Part part) throws Exception {
+    protected String extrairHtmlDaMensagem(Part part) throws Exception {
         if ((part.isMimeType("text/html") || part.isMimeType("text/plain")) && part.getContent() instanceof String s) {
             return s;
         }

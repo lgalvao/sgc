@@ -27,18 +27,16 @@ Ator: GESTOR ou ADMIN
 4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, conforme o caso de
    uso [CDU-42.md](cdu-42.md)`.
 
-5. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
-    - uma linha para cada competência vigente da unidade;
+5. O sistema apresenta uma matriz `Competência x Servidor`, somente-leitura, contendo:
+    - uma linha para cada competência do mapa vigente da unidade;
     - um grupo de três colunas para cada servidor participante da unidade, com valores para:
         - `I` (Importância);
         - `D` (Domínio);
-        - `C` (Capacitação).
+        - `C` (Situação de Capacitação).
 
    | Competência         | João |   |   | Maria |   |   |
-      | :------------------ | :--: |:-:|:-:| :---: |:-:|:-:|
+   | :------------------ | :--: |:-:|:-:| :---: |:-:|:-:|
    |                     | **I** | **D** | **C** | **I** | **D** | **C** |
    | Desc. competência 1 | 1    | 2 | EC | 4     | 3 | EC |
    | Desc. competência 2 | NA   | NA | C | 5     | 4 | C |
    | Desc. competência 3 | 3    | 5 | I  | 2     | 5 | I |
-
-6. O usuário pode visualizar os valores da matriz, mas não pode fazer edições.

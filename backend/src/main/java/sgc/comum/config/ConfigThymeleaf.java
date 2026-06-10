@@ -12,16 +12,9 @@ import org.thymeleaf.templateresolver.*;
 public class ConfigThymeleaf {
 
     @Bean
-    public SpringTemplateEngine springTemplateEngine(ConfigAplicacao configAplicacao) {
+    public SpringTemplateEngine springTemplateEngine() {
         SpringTemplateEngine springTemplateEngine = new SpringTemplateEngine();
         springTemplateEngine.addTemplateResolver(templateResolver());
-
-        String url = configAplicacao.isAmbienteTestes()
-                ? configAplicacao.getUrlAcessoHom()
-                : configAplicacao.getUrlAcessoProd();
-        String urlSistema = url == null || url.isBlank() ? "http://localhost:5173" : url;
-
-        springTemplateEngine.setStaticVariables(java.util.Map.of("urlSistema", urlSistema));
         return springTemplateEngine;
     }
 

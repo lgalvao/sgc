@@ -4,19 +4,22 @@ import {mount} from '@vue/test-utils';
 import ConsensoDiagnosticoView from '../ConsensoDiagnosticoView.vue';
 
 const backMock = vi.fn();
+const pushMock = vi.fn();
 vi.mock('vue-router', () => ({
     useRouter: () => ({
         back: backMock,
+        push: pushMock,
     }),
 }));
 
+const contextoData = ref<any>({
+    competencias: [
+        {competenciaCodigo: 10, descricao: 'Competência A'},
+    ],
+});
 vi.mock('@/composables/useDiagnosticoContexto', () => ({
     useDiagnosticoContexto: () => ({
-        data: ref({
-            competencias: [
-                {competenciaCodigo: 10, descricao: 'Competência A'},
-            ],
-        }),
+        data: contextoData,
     }),
 }));
 
@@ -68,9 +71,21 @@ vi.mock('@/stores/perfil', () => ({
     }),
 }));
 
+const setPendingMock = vi.fn();
+vi.mock('@/stores/toast', () => ({
+    useToastStore: () => ({
+        setPending: setPendingMock,
+    }),
+}));
+
 describe('ConsensoDiagnosticoView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        contextoData.value = {
+            competencias: [
+                {competenciaCodigo: 10, descricao: 'Competência A'},
+            ],
+        };
         podeCriarConsensoVal.value = true;
         competenciasLocais.value = [
             {
@@ -647,5 +662,63 @@ describe('ConsensoDiagnosticoView', () => {
         });
         
         expect(wrapper.find('.spinner').exists()).toBe(true);
+    });
+
+    it('deve redirecionar para a tela de subprocesso ao aprovar consenso se processoCodigo estiver presente', async () => {
+        podeCriarConsensoVal.value = false;
+        competenciasLocais.value = [
+            {
+                competenciaCodigo: 10,
+                autoimportancia: 3,
+                autodominio: 4,
+                chefiaImportancia: null,
+                chefiaDominio: null,
+                consensoImportancia: null,
+                consensoDominio: null,
+            }
+        ];
+
+        contextoData.value = {
+            processoCodigo: 99,
+            competencias: [
+                {competenciaCodigo: 10, descricao: 'Competência A'},
+            ],
+        };
+
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+                servidorNome: 'Servidor Exemplo',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        const btnAprovar = wrapper.get('[data-testid="btn-aprovar-consenso"]');
+        aprovarConsensoMock.mockResolvedValue(undefined);
+        await btnAprovar.trigger('click');
+        expect(aprovarConsensoMock).toHaveBeenCalled();
+        expect(setPendingMock).toHaveBeenCalledWith('Avaliação de consenso aprovada');
+        expect(pushMock).toHaveBeenCalledWith({
+            name: 'Subprocesso',
+            params: {
+                codProcesso: '99',
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            query: {
+                codSubprocesso: '400',
+            },
+        });
     });
 });

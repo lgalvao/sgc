@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.integracao.mocks.WithMockCustomUser;
@@ -18,6 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("CDU-45: Aprovar avaliação de consenso")
 class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
+
+    @Autowired
+    private AlertaRepo alertaRepo;
 
     @BeforeEach
     void setUp() {
@@ -38,5 +44,24 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         assertThat(avaliacoes).hasSize(2);
         assertThat(avaliacoes).allSatisfy(avaliacao ->
                 assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_APROVADO));
+
+        // Validar que o alerta de transicao foi criado conforme especificado no CDU-45
+        List<Alerta> alertas = alertaRepo.findAll();
+        assertThat(alertas).anySatisfy(alerta -> {
+            assertThat(alerta.getDescricao()).isEqualTo("Avaliação de consenso aprovada: " + servidor.getNome());
+            assertThat(alerta.getProcesso().getCodigo()).isEqualTo(processo.getCodigo());
+            assertThat(alerta.getUnidadeOrigem().getCodigo()).isEqualTo(unidade.getCodigo());
+            assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(unidade.getCodigo());
+        });
+
+        // Validar o enfileiramento e conteudo do e-mail enviado ao responsavel da unidade via GreenMail nativo
+        processarEmailsPendentes();
+        aguardarEmail(1);
+
+        String assuntoEsperado = "Avaliação de consenso de " + servidor.getNome() + " aprovada";
+        assertThat(algumEmailComAssunto(assuntoEsperado)).isTrue();
+        assertThat(algumEmailContem("Prezado(a) responsável pela " + unidade.getSigla())).isTrue();
+        assertThat(algumEmailContem("O servidor " + servidor.getNome() + " aprovou a avaliação de consenso do processo")).isTrue();
+        assertThat(algumEmailContem("Acompanhe o processo no Sistema de Gestão de Competências")).isTrue();
     }
 }

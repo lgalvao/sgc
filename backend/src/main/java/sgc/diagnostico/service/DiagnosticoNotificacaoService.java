@@ -129,7 +129,8 @@ public class DiagnosticoNotificacaoService {
         String corpo = emailModelosService.criarEmailDiagnosticoConsensoAprovado(
                 unidade.getSigla(),
                 nomeServidor,
-                sp.getProcesso().getDescricao()
+                sp.getProcesso().getDescricao(),
+                urlSistema()
         );
 
         enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_CONSENSO_APROVADO, assunto, corpo,
