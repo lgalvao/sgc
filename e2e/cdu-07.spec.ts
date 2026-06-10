@@ -372,7 +372,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await navegarParaSubprocesso(page, 'ASSESSORIA_12');
 
         await expect(page.getByTestId('card-subprocesso-diagnostico')).toHaveCount(0);
-        await expect(page.getByTestId('card-subprocesso-ocupacoes')).toHaveCount(0);
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toHaveCount(0);
         await expect(page.getByTestId('card-subprocesso-monitoramento')).toHaveCount(0);
         await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();

@@ -129,11 +129,11 @@ export async function abrirAcaoCapacitacaoDiagnostico(page: Page, servidorTitulo
 }
 
 export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
-    const select = page.locator('[data-testid^="ocupacao-"]').first();
+    const select = page.locator('[data-testid^="situacao-"]').first();
     await expect(select).toBeVisible();
     await Promise.all([
         page.waitForResponse(res =>
-            res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/ocupacoes-criticas`)
+            res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/situacoes-capacitacao`)
             && res.request().method() === 'POST'
             && res.ok()
         ),
@@ -142,7 +142,7 @@ export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubpro
 }
 
 export async function preencherTodasSituacoesCapacitacao(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
-    const selects = page.locator('[data-testid^="ocupacao-"]');
+    const selects = page.locator('[data-testid^="situacao-"]');
     const total = await selects.count();
     let houveAlteracao = false;
     await expect(selects.first()).toBeVisible();
@@ -154,7 +154,7 @@ export async function preencherTodasSituacoesCapacitacao(page: Page, codSubproce
         houveAlteracao = true;
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/ocupacoes-criticas`)
+                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/situacoes-capacitacao`)
                 && res.request().method() === 'POST'
                 && res.ok()
             ),

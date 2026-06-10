@@ -38,15 +38,15 @@ async function impossibilitarAvaliacoesPendentes(page: import('@playwright/test'
     }
 }
 
-async function preencherOcupacoesPendentesPorApi(page: import('@playwright/test').Page, codSubprocesso: number): Promise<void> {
+async function preencherSituacoesCapacitacaoPendentesPorApi(page: import('@playwright/test').Page, codSubprocesso: number): Promise<void> {
     await page.evaluate(async (codigo) => {
         const respostaAtual = await fetch(`/api/diagnosticos/subprocessos/${codigo}/unidade`, {credentials: 'include'});
         if (!respostaAtual.ok) {
-            throw new Error(`Falha ao carregar ocupações críticas do subprocesso ${codigo}.`);
+            throw new Error(`Falha ao carregar situações de capacitação do subprocesso ${codigo}.`);
         }
 
         const dados = await respostaAtual.json();
-        const ocupacoes = dados.ocupacoesCriticas.map((item: {
+        const situacoes = dados.situacoesCapacitacao.map((item: {
             servidorTitulo: string;
             competenciaCodigo: number;
             situacaoCapacitacao: string | null;
@@ -56,15 +56,15 @@ async function preencherOcupacoesPendentesPorApi(page: import('@playwright/test'
             situacaoCapacitacao: item.situacaoCapacitacao ?? 'EC',
         }));
 
-        const respostaSalvar = await fetch(`/api/diagnosticos/subprocessos/${codigo}/ocupacoes-criticas`, {
+        const respostaSalvar = await fetch(`/api/diagnosticos/subprocessos/${codigo}/situacoes-capacitacao`, {
             method: 'POST',
             credentials: 'include',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ocupacoes}),
+            body: JSON.stringify({situacoes}),
         });
 
         if (!respostaSalvar.ok) {
-            throw new Error(`Falha ao preencher ocupações críticas do subprocesso ${codigo}.`);
+            throw new Error(`Falha ao preencher situações de capacitação do subprocesso ${codigo}.`);
         }
     }, codSubprocesso);
 }
@@ -125,14 +125,14 @@ test.describe('CDU-48 - Concluir diagnóstico da unidade', () => {
         await impossibilitarAvaliacoesPendentes(page, codSubprocesso);
         await expect(page.getByText('Autoavaliação não iniciada')).toHaveCount(0);
 
-        await preencherOcupacoesPendentesPorApi(page, codSubprocesso);
+        await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso);
         await expect.poll(async () => await page.evaluate(async (codigo) => {
             const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/unidade`, {credentials: 'include'});
             if (!resposta.ok) {
                 return false;
             }
             const dados = await resposta.json();
-            return dados.ocupacoesCriticas.every((item: {situacaoCapacitacao: string | null}) => item.situacaoCapacitacao !== null);
+            return dados.situacoesCapacitacao.every((item: {situacaoCapacitacao: string | null}) => item.situacaoCapacitacao !== null);
         }, codSubprocesso)).toBe(true);
 
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);

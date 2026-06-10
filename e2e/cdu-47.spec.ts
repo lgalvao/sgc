@@ -30,13 +30,13 @@ test.describe('CDU-47 - Preencher situação de capacitação', () => {
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/situacao-capacitacao`));
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
-        const seletorCapacitacao = page.locator(`[data-testid^="ocupacao-${TITULO_SERVIDOR_ASSESSORIA_12}-"]`).first();
+        const seletorCapacitacao = page.locator(`[data-testid^="situacao-${TITULO_SERVIDOR_ASSESSORIA_12}-"]`).first();
         const testIdCapacitacao = await seletorCapacitacao.getAttribute('data-testid');
         await expect(seletorCapacitacao).toBeVisible();
 
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/ocupacoes-criticas`)
+                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/situacoes-capacitacao`)
                 && res.request().method() === 'POST'
                 && res.ok()
             ),
@@ -47,7 +47,7 @@ test.describe('CDU-47 - Preencher situação de capacitação', () => {
             const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/unidade`, {credentials: 'include'});
             if (!resposta.ok) return null;
             const dados = await resposta.json();
-            return dados.ocupacoesCriticas.find((item: {servidorTitulo: string; situacaoCapacitacao: string | null}) =>
+            return dados.situacoesCapacitacao.find((item: {servidorTitulo: string; situacaoCapacitacao: string | null}) =>
                 item.servidorTitulo === titulo && item.situacaoCapacitacao === 'EC'
             )?.situacaoCapacitacao ?? null;
         }, {
