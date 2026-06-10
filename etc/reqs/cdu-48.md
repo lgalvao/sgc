@@ -15,7 +15,7 @@ Ator: CHEFE
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento
 
-2. O sistema mostra a tela  `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
 
 2. O usuário clica em `Concluir diagnóstico`.
 
@@ -23,18 +23,17 @@ Ator: CHEFE
    `Avaliação impossibilitada`; também verifica se as situações de capacitação foram preenchidas para todas as
    competências.
 
-   3.1. Caso existam campos não preenchidos, o sistema mostra a mensagem
-   `Ainda existem avaliações e situações de capacitações não preenchidas.`, interrompe a operação e permanece na tela
-   `Detalhes do subprocesso`.
+   3.1. Caso existam campos não preenchidos, o sistema mostra a mensagem   "Ainda existem avaliações e situações de
+   capacitações não preenchidas.", interrompe a operação e permanece na tela `Detalhes do subprocesso`.
 
    3.2. Caso a verificação confirme que está tudo preenchido, o sistema mostra um modal de confirmação com:
-    - título `Conclusão de diagnóstico`;
-    - texto `Confirma a conclusão do diagnóstico da unidade?`;
-    - botões `Cancelar` e `Concluir`.
+    - título: "Conclusão de diagnóstico";
+    - texto: "Confirma a conclusão do diagnóstico da unidade?";
+    - botões `Cancelar` e `Concluir diagnóstico`.
 
-   Se o usuário escolher `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
+   Se o usuário acionar `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
 
-4. O usuário aciona `Concluir`.
+4. O usuário aciona `Concluir diagnóstico`.
 
 5. O sistema altera a situação do subprocesso para `Concluído`.
 
@@ -42,7 +41,7 @@ Ator: CHEFE
     - `Data/hora`: [Data/hora atual];
     - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO];
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
-    - `Descrição`: `Diagnóstico concluído`.
+    - `Descrição`: "Diagnóstico concluído da unidade [SIGLA_UNIDADE_SUBPROCESSO] ".
 
 7. O sistema envia uma notificação por e-mail para a unidade superior:
 
