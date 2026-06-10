@@ -5,15 +5,12 @@
     <template v-else>
       <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
         <div>
-          <h1 class="h4 mb-1">
-            <i aria-hidden="true" class="bi bi-clipboard-check text-primary me-2"/>
+          <h1 class="h3 mb-1">
+            <i aria-hidden="true" class="bi text-primary me-2"/>
             {{ TEXTOS.diagnostico.TITULO_AUTOAVALIACAO }}
           </h1>
           <div v-if="contexto" class="text-muted small">
             <strong>{{ contexto.unidadeSigla }}</strong> - {{ contexto.unidadeNome }}
-            <BBadge :variant="varianteSituacao" class="ms-2">
-              {{ contexto.situacaoDiagnostico }}
-            </BBadge>
           </div>
         </div>
         <BButton size="sm" variant="outline-secondary" @click="voltar">
@@ -43,7 +40,7 @@
           variant="warning"
       >
         <i aria-hidden="true" class="bi bi-exclamation-triangle me-2"/>
-        A chefia registrou a avaliação de consenso. Revise e aprove para finalizar.
+        O responsavel pela unidade registrou a avaliação de consenso. Revise e aprove para finalizar.
       </BAlert>
 
       <BAlert
@@ -56,18 +53,13 @@
         Avaliação de consenso aprovada. Fluxo finalizado.
       </BAlert>
 
-      <BCard class="mb-4">
-        <BCardHeader>
-          <strong>{{ TEXTOS.diagnostico.TITULO_AUTOAVALIACAO }}</strong>
-          <span class="text-muted small ms-2">{{ TEXTOS.diagnostico.ESCALA_HINT }}</span>
-        </BCardHeader>
+      <BCard class="mb-4" style="max-width: 750px;">
         <BTable
             :fields="colunas"
             :items="competenciasComDescricao"
             hover
             responsive
             small
-            striped
         >
           <template #cell(descricao)="{ item }">
             <div class="d-flex flex-column gap-2">
@@ -76,22 +68,28 @@
                 <BButton
                     :data-testid="`toggle-atividades-${item.competenciaCodigo}`"
                     size="sm"
-                    variant="link"
-                    class="p-0 text-decoration-none"
+                    variant="link-dark"
+                    class="p-0 text-decoration-none d-flex align-items-center"
                     @click="alternarDetalhesCompetencia(item.competenciaCodigo)"
                 >
-                  {{ detalhesCompetenciaAbertos[item.competenciaCodigo] ? 'Ocultar' : 'Atividade e conhecimentos' }}
+                  <i
+                      :class="['bi me-1', detalhesCompetenciaAbertos[item.competenciaCodigo] ? 'bi-chevron-down' : 'bi-chevron-right']"
+                      aria-hidden="true"
+                  />
+                  Atividade
                 </BButton>
-                <div v-if="detalhesCompetenciaAbertos[item.competenciaCodigo]" class="mt-2">
-                  <ul class="mb-0 ps-3">
-                    <li v-for="atividade in item.atividades" :key="atividade.codigo" class="mb-1">
-                      <strong>{{ atividade.descricao }}</strong>
-                      <div class="text-muted">
-                        {{ formatarConhecimentos(atividade.conhecimentos) }}
-                      </div>
-                    </li>
-                  </ul>
-                </div>
+                <BCollapse :id="`collapse-atividades-${item.competenciaCodigo}`" :model-value="detalhesCompetenciaAbertos[item.competenciaCodigo]">
+                  <div class="mt-2">
+                    <ul class="mb-0 ps-3">
+                      <li v-for="atividade in item.atividades" :key="atividade.codigo" class="mb-1">
+                        <strong>{{ atividade.descricao }}</strong>
+                        <div class="text-muted">
+                          {{ formatarConhecimentos(atividade.conhecimentos) }}
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </BCollapse>
               </div>
             </div>
           </template>
@@ -102,7 +100,7 @@
                 :disabled="!podeEditar"
                 :model-value="item.importancia"
                 :options="opcoesNota"
-                class="form-select-sm w-auto"
+                class="form-select-sm w-auto mx-auto"
                 @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'importancia', normalizarValorNota(v))"
             />
             <span v-else>{{ formatarNota(item.importancia) }}</span>
@@ -115,7 +113,7 @@
                 :disabled="!podeEditar"
                 :model-value="item.dominio"
                 :options="opcoesNota"
-                class="form-select-sm w-auto"
+                class="form-select-sm w-auto mx-auto"
                 @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'dominio', normalizarValorNota(v))"
             />
             <span v-else>{{ formatarNota(item.dominio) }}</span>
@@ -123,11 +121,11 @@
         </BTable>
       </BCard>
 
-      <div v-if="!ehChefe && podeEditar" class="d-flex gap-2 mb-4">
+      <div v-if="!ehChefe && (podeEditar || ehAutoavaliacaoConcluida)" class="d-flex gap-2 mb-4">
         <BButton
-            :disabled="concluindo"
+            :disabled="concluindo || ehAutoavaliacaoConcluida"
             data-testid="btn-concluir-autoavaliacao"
-            variant="outline-success"
+            variant="success"
             @click="abrirModalConcluir"
         >
           <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
@@ -172,7 +170,7 @@
                   v-if="membro.situacaoServidor === 'AUTOAVALIACAO_CONCLUIDA'"
                   :data-testid="`btn-consenso-${membro.servidorTitulo}`"
                   size="sm"
-                  variant="outline-primary"
+                  variant="primary"
                   @click="navegarParaConsenso(membro.servidorTitulo)"
               >
                 Registrar consenso
@@ -181,7 +179,7 @@
                   v-if="podeImpossibilitar(membro.situacaoServidor)"
                   :data-testid="`btn-impossibilitar-${membro.servidorTitulo}`"
                   size="sm"
-                  variant="outline-danger"
+                  variant="danger"
                   @click="abrirModalImpossibilitar(membro)"
               >
                 {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
@@ -255,6 +253,7 @@ import {
   BButton,
   BCard,
   BCardHeader,
+  BCollapse,
   BFormSelect,
   BFormText,
   BFormTextarea,

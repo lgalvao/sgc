@@ -1,5 +1,5 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
-import {computed, ref, watch} from 'vue';
+import {computed, onUnmounted, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {useSubprocessoStore} from '@/stores/subprocesso';
 import {
@@ -53,6 +53,9 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     const mutacaoSalvar = useMutation({
         mutation: (competencias: AvaliacaoCompetencia[]) =>
             salvarAutoavaliacao(codSubprocesso, {competencias}),
+        onSuccess: () => {
+            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso, contextoSessao), exact: true});
+        },
         onSettled: () => {
             salvandoAutomaticamente.value = false;
         },
@@ -70,8 +73,18 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     let timer: ReturnType<typeof setTimeout> | null = null;
     function dispararSalvamento() {
         if (timer !== null) clearTimeout(timer);
-        timer = setTimeout(() => { mutacaoSalvar.mutate(competenciasLocais.value); }, 800);
+        timer = setTimeout(() => {
+            timer = null;
+            mutacaoSalvar.mutate(competenciasLocais.value);
+        }, 800);
     }
+
+    onUnmounted(() => {
+        if (timer !== null) {
+            clearTimeout(timer);
+            mutacaoSalvar.mutate(competenciasLocais.value);
+        }
+    });
 
     function atualizarNota(competenciaCodigo: number, campo: 'importancia' | 'dominio', valor: number | null) {
         const item = competenciasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);

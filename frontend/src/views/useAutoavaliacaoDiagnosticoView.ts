@@ -51,9 +51,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     const ehConsensoCriado = computed(() => situacaoServidor.value === 'CONSENSO_CRIADO');
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
     const podeEditar = computed(
-        () =>
-            situacaoServidor.value === 'AUTOAVALIACAO_NAO_INICIADA' ||
-            situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA',
+        () => situacaoServidor.value === 'AUTOAVALIACAO_NAO_INICIADA',
     );
 
     const retornoFluxo = ref<RetornoFluxo | null>(null);
@@ -257,10 +255,26 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     }
 
     const colunas = [
-        {key: 'competenciaCodigo', label: 'Codigo'},
-        {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-        {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
-        {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
+        {
+            key: 'descricao',
+            label: TEXTOS.diagnostico.COLUNA_COMPETENCIA,
+            tdClass: 'align-top',
+            thStyle: {width: '400px'},
+        },
+        {
+            key: 'importancia',
+            label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA,
+            thClass: 'text-center',
+            tdClass: 'align-top text-center',
+            thStyle: {width: '120px'},
+        },
+        {
+            key: 'dominio',
+            label: TEXTOS.diagnostico.COLUNA_DOMINIO,
+            thClass: 'text-center',
+            tdClass: 'align-top text-center',
+            thStyle: {width: '120px'},
+        },
     ];
 
     const competenciasComDescricao = computed(() => {
