@@ -38,6 +38,7 @@ public class DiagnosticoAvaliacaoService {
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
+
         validarCompetenciasEsperadas(avaliacoes, request.competencias());
 
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()
@@ -71,6 +72,7 @@ public class DiagnosticoAvaliacaoService {
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
+
         avaliacoes.forEach(a -> a.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA));
         avaliacaoRepo.saveAll(avaliacoes);
 
