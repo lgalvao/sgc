@@ -39,10 +39,6 @@ public class DiagnosticoAvaliacaoService {
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
 
-        if (!avaliacoes.isEmpty() && avaliacoes.get(0).getSituacaoServidor() != SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA) {
-            throw new ErroValidacao("A autoavaliação não pode ser alterada pois já foi concluída.");
-        }
-
         validarCompetenciasEsperadas(avaliacoes, request.competencias());
 
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()

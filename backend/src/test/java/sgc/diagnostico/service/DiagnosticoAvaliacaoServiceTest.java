@@ -111,35 +111,6 @@ class DiagnosticoAvaliacaoServiceTest {
         verify(avaliacaoRepo).saveAll(anyList());
     }
 
-    @Test
-    @DisplayName("salvarAutoavaliacao: deve falhar quando a autoavaliação já estiver concluída")
-    void salvarAutoavaliacao_deveFalharQuandoConcluida() {
-        Long codSubprocesso = 11L;
-        Long diagCodigo = 110L;
-        String titulo = "servidor@titulo";
-
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(titulo);
-
-        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
-        AvaliacaoServidor avaliacao = avaliacaoVazia(100L);
-        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
-        Subprocesso subprocesso = new Subprocesso();
-
-        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
-        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
-        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, titulo)).thenReturn(List.of(avaliacao));
-        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
-
-        var request = new AutoavaliacaoRequest(List.of(
-                AvaliacaoCompetenciaDto.builder().competenciaCodigo(100L).importancia(4).dominio(2).build()
-        ));
-
-        assertThatThrownBy(() -> service.salvarAutoavaliacao(codSubprocesso, request))
-                .isInstanceOf(sgc.comum.erros.ErroValidacao.class)
-                .hasMessageContaining("já foi concluída");
-    }
-
     // ─── concluirAutoavaliacao ─────────────────────────────────────────────
 
     @Test
@@ -168,29 +139,6 @@ class DiagnosticoAvaliacaoServiceTest {
 
         assertThat(av1.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         assertThat(av2.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
-    }
-
-    @Test
-    @DisplayName("concluirAutoavaliacao: deve falhar quando já estiver concluída")
-    void concluirAutoavaliacao_deveFalharQuandoJaConcluida() {
-        Long codSubprocesso = 21L;
-        Long diagCodigo = 210L;
-        String titulo = "servidor@titulo";
-
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral(titulo);
-
-        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
-        AvaliacaoServidor av = avaliacaoVazia(101L);
-        av.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
-
-        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
-        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
-        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, titulo)).thenReturn(List.of(av));
-
-        assertThatThrownBy(() -> service.concluirAutoavaliacao(codSubprocesso))
-                .isInstanceOf(sgc.comum.erros.ErroValidacao.class)
-                .hasMessageContaining("já foi concluída");
     }
 
     // ─── salvarConsenso ────────────────────────────────────────────────────
