@@ -6,16 +6,17 @@ Ator: CHEFE
 
 - Login realizado com perfil CHEFE
 - Processo de diagnóstico em andamento com participação da unidade do usuário
-- Subprocesso da unidade com localização atual na unidade do usuário
+- Subprocesso com localização atual na unidade do usuário
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O usuário clica no card `Situação de capacitação`.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
 
-3. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
+3O usuário clica no card `Situação de capacitação`.
+
+4O sistema apresenta uma grade com a matriz `Competência x Servidor`, contendo:
    - uma linha para cada competência vigente da unidade;
    - uma coluna para cada servidor participante da unidade;
    - uma célula editável (dropdown) `Situação de capacitação` para cada combinação competência/servidor;

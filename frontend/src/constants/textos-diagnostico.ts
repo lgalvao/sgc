@@ -10,6 +10,8 @@ export const TEXTOS_DIAGNOSTICO = {
     COLUNA_COMPETENCIA: 'Competência',
     COLUNA_IMPORTANCIA: 'Importância',
     COLUNA_DOMINIO: 'Domínio',
+    COLUNA_CHEFE: 'Chefe',
+    COLUNA_CONSENSO: 'Consenso',
     COLUNA_GAP: 'Gap',
     COLUNA_SERVIDOR: 'Servidor',
     COLUNA_SITUACAO: 'Situação',

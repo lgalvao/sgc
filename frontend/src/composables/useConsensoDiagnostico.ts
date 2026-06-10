@@ -40,8 +40,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     });
 
     // Estado local editável pela chefia
-    const competenciasLocais = ref<AvaliacaoCompetencia[]>([]);
-    const competenciasDetalhadasLocais = ref<ConsensoCompetenciaDetalhada[]>([]);
+    const competenciasLocais = ref<ConsensoCompetenciaDetalhada[]>([]);
 
     // Estado de autosave
     const salvandoAutomaticamente = ref(false);
@@ -52,7 +51,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         (novoConsenso) => {
             if (novoConsenso) {
                 competenciasLocais.value = novoConsenso.competencias.map((c) => ({...c}));
-                competenciasDetalhadasLocais.value = (novoConsenso.competenciasDetalhadas ?? []).map((c) => ({...c}));
             }
         },
         {immediate: true},
@@ -61,13 +59,10 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_INICIADA');
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
 
-        const mutacaoSalvar = useMutation({
+    const mutacaoSalvar = useMutation({
         mutation: (titulo: string) =>
             salvarConsenso(codSubprocesso, titulo, {
-                competencias: obterCompetenciasPayload(competenciasDetalhadasLocais.value, competenciasLocais.value),
-                competenciasDetalhadas: competenciasDetalhadasLocais.value.length > 0
-                    ? competenciasDetalhadasLocais.value
-                    : undefined,
+                competencias: competenciasLocais.value.map((c) => ({...c})),
             }),
         onSettled: () => {
             salvandoAutomaticamente.value = false;
@@ -76,8 +71,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             cache.setQueryData(
                 chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
                 {
-                    competencias: obterCompetenciasPayload(competenciasDetalhadasLocais.value, competenciasLocais.value),
-                    competenciasDetalhadas: obterDetalhadasCopia(competenciasDetalhadasLocais.value),
+                    competencias: competenciasLocais.value.map((c) => ({...c})),
                     situacaoServidor: 'CONSENSO_CRIADO',
                 } satisfies Consenso,
             );
@@ -104,14 +98,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         }, 800);
     }
 
-    function atualizarNota(competenciaCodigo: number, campo: 'importancia' | 'dominio', valor: number | null) {
-        const item = competenciasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
-        if (item) {
-            item[campo] = valor;
-            agendarAutosave();
-        }
-    }
-
     function atualizarNotaDetalhada(
         competenciaCodigo: number,
         atualizacao: {
@@ -120,7 +106,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             valor: number | null;
         },
     ) {
-        const item = competenciasDetalhadasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
+        const item = competenciasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
         if (!item) return;
 
         if (atualizacao.origem === 'chefia') {
@@ -139,13 +125,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             if (atualizacao.campo === 'dominio') item.consensoDominio = atualizacao.valor;
         }
 
-        // Sincroniza lista simples com o consenso final
-        const simples = competenciasLocais.value.find((c) => c.competenciaCodigo === competenciaCodigo);
-        if (simples) {
-            simples.importancia = item.consensoImportancia;
-            simples.dominio = item.consensoDominio;
-        }
-
         agendarAutosave();
     }
 
@@ -155,34 +134,15 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     return {
         query,
         competenciasLocais,
-        competenciasDetalhadasLocais,
         situacaoServidor,
         ehConsensoAprovado,
         carregando,
         salvandoAutomaticamente,
         aprovando,
         erroAprovar: computed(() => mutacaoAprovar.error.value),
-        atualizarNota,
         atualizarNotaDetalhada,
         aprovarConsenso: () => mutacaoAprovar.mutateAsync(),
     };
-}
-
-function obterCompetenciasPayload(
-    detalhadas: ConsensoCompetenciaDetalhada[],
-    simples: AvaliacaoCompetencia[],
-): AvaliacaoCompetencia[] {
-    return detalhadas.length > 0
-        ? detalhadas.map((item) => ({
-            competenciaCodigo: item.competenciaCodigo,
-            importancia: item.consensoImportancia,
-            dominio: item.consensoDominio,
-        }))
-        : simples.map((item) => ({...item}));
-}
-
-function obterDetalhadasCopia(detalhadas: ConsensoCompetenciaDetalhada[]): ConsensoCompetenciaDetalhada[] | undefined {
-    return detalhadas.length > 0 ? detalhadas.map((item) => ({...item})) : undefined;
 }
 
 interface InvalidaQueriesContext {

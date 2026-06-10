@@ -189,6 +189,9 @@ describe('DiagnosticoEquipePainel', () => {
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: '242426',
             },
+            query: {
+                servidorNome: 'Duff McKagan',
+            },
         });
 
         await wrapper.get('[data-testid="btn-manter-capacitacao-242426"]').trigger('click');

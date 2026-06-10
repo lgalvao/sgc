@@ -8,6 +8,7 @@ import {ref} from "vue";
 import * as useAcessoModule from "@/composables/acesso";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
+const situacaoServidorMock = ref('AUTOAVALIACAO_NAO_INICIADA');
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({
@@ -17,7 +18,7 @@ vi.mock("vue-router", () => ({
 
 vi.mock("@/composables/useAutoavaliacaoDiagnostico", () => ({
     useAutoavaliacaoDiagnostico: () => ({
-        situacaoServidor: ref('AUTOAVALIACAO_NAO_INICIADA'),
+        situacaoServidor: situacaoServidorMock,
     }),
 }));
 
@@ -30,6 +31,7 @@ vi.mock("@/stores/perfil", () => ({
 describe("SubprocessoCards.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        situacaoServidorMock.value = 'AUTOAVALIACAO_NAO_INICIADA';
     });
 
     function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
@@ -449,8 +451,10 @@ describe("SubprocessoCards.vue", () => {
         }, {}, {
             perfil: {
                 usuarioCodigo: '242426',
+                usuarioNome: 'Duff',
             }
         });
+        situacaoServidorMock.value = 'CONSENSO_CRIADO';
 
         await wrapper.find('[data-testid="card-subprocesso-consenso"]').trigger("click");
 
@@ -461,6 +465,9 @@ describe("SubprocessoCards.vue", () => {
                 siglaUnidade: "ASSESSORIA_12",
                 servidorTitulo: '242426',
             }),
+            query: {
+                servidorNome: 'Duff',
+            },
         }));
     });
 
@@ -507,8 +514,10 @@ describe("SubprocessoCards.vue", () => {
         }, {}, {
             perfil: {
                 usuarioCodigo: '242426',
+                usuarioNome: 'Duff',
             }
         });
+        situacaoServidorMock.value = 'CONSENSO_CRIADO';
 
         const card = wrapper.find('[data-testid="card-subprocesso-consenso"]');
         

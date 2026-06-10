@@ -37,10 +37,6 @@ class CDU44IntegrationTest extends DiagnosticoCduIntegrationTestBase {
     void deveSalvarConsenso() throws Exception {
         ConsensoRequest request = new ConsensoRequest(
                 List.of(
-                        AvaliacaoCompetenciaDto.builder().competenciaCodigo(competencia1.getCodigo()).importancia(6).dominio(4).build(),
-                        AvaliacaoCompetenciaDto.builder().competenciaCodigo(competencia2.getCodigo()).importancia(5).dominio(3).build()
-                ),
-                List.of(
                         ConsensoCompetenciaDto.builder()
                                 .competenciaCodigo(competencia1.getCodigo())
                                 .autoimportancia(5)
@@ -73,7 +69,7 @@ class CDU44IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                         subprocesso.getCodigo(), "50003"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.situacaoServidor").value("CONSENSO_CRIADO"))
-                .andExpect(jsonPath("$.competenciasDetalhadas.length()").value(2));
+                .andExpect(jsonPath("$.competencias.length()").value(2));
 
         List<AvaliacaoServidor> avaliacoes = buscarAvaliacoes("50003");
         assertThat(avaliacoes).allSatisfy(avaliacao -> {
@@ -97,13 +93,6 @@ class CDU44IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         int autodominioSegunda = 2;
 
         ConsensoRequest request = new ConsensoRequest(
-                List.of(
-                        AvaliacaoCompetenciaDto.builder()
-                                .competenciaCodigo(competencia1.getCodigo())
-                                .importancia(chefiaImportanciaPrimeira)
-                                .dominio(chefiaDominioPrimeira)
-                                .build()
-                ),
                 List.of(
                         ConsensoCompetenciaDto.builder()
                                 .competenciaCodigo(competencia1.getCodigo())

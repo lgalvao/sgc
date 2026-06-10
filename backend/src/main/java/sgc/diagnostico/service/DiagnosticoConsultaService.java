@@ -85,14 +85,7 @@ public class DiagnosticoConsultaService {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
-        List<AvaliacaoCompetenciaDto> competencias = avaliacoes.stream()
-                .map(a -> AvaliacaoCompetenciaDto.builder()
-                        .competenciaCodigo(a.getCompetencia().getCodigo())
-                        .importancia(a.getConsensoImportancia())
-                        .dominio(a.getConsensoDominio())
-                        .build())
-                .toList();
-        List<ConsensoCompetenciaDto> competenciasDetalhadas = avaliacoes.stream()
+        List<ConsensoCompetenciaDto> competencias = avaliacoes.stream()
                 .map(a -> ConsensoCompetenciaDto.builder()
                         .competenciaCodigo(a.getCompetencia().getCodigo())
                         .autoimportancia(a.getAutoimportancia())
@@ -109,7 +102,6 @@ public class DiagnosticoConsultaService {
                 .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA.name());
         return ConsensoDto.builder()
                 .competencias(competencias)
-                .competenciasDetalhadas(competenciasDetalhadas)
                 .situacaoServidor(situacaoServidor)
                 .build();
     }

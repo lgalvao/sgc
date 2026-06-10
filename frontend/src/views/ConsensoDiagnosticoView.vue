@@ -10,7 +10,7 @@
             {{ TEXTOS.diagnostico.TITULO_CONSENSO }}
           </h1>
           <div class="text-muted small">
-            <strong>{{ nomeServidorSubtitulo }}</strong>
+            <strong>{{ subtituloServidor }}</strong>
           </div>
         </div>
         <BButton size="sm" variant="outline-secondary" @click="void router.back()">
@@ -48,10 +48,7 @@
 
       <!-- Tabela de competências com consenso (CDU-44) -->
       <BCard class="mb-4">
-        <div
-            v-if="ehChefe"
-            class="table-responsive"
-        >
+        <div class="table-responsive">
           <table class="table table-sm table-hover align-middle mb-0 tabela-consenso">
             <colgroup>
               <col class="coluna-competencia"/>
@@ -65,17 +62,16 @@
             <thead>
             <tr>
               <th class="coluna-competencia" rowspan="2">{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
-              <th class="text-center grupo grupo-servidor divisor-grupo" colspan="2">Servidor</th>
-              <th class="text-center grupo grupo-chefia divisor-grupo" colspan="2">Chefe</th>
-              <th class="text-center grupo grupo-consenso divisor-grupo" colspan="2">Consenso</th>
+              <th class="text-center grupo grupo-servidor divisor-grupo" colspan="3">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
+              <th class="text-center grupo grupo-chefia divisor-grupo" colspan="3">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
             </tr>
             <tr>
               <th class="text-center subcoluna grupo-servidor divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
-              <th class="text-center subcoluna grupo-servidor">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
-              <th class="text-center subcoluna grupo-chefia divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
-              <th class="text-center subcoluna grupo-chefia">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
-              <th class="text-center subcoluna grupo-consenso divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
-              <th class="text-center subcoluna grupo-consenso">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
+              <th class="text-center subcoluna grupo-servidor">{{ TEXTOS.diagnostico.COLUNA_CHEFE }}</th>
+              <th class="text-center subcoluna grupo-servidor">{{ TEXTOS.diagnostico.COLUNA_CONSENSO }}</th>
+              <th class="text-center subcoluna grupo-chefia divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_SERVIDOR }}</th>
+              <th class="text-center subcoluna grupo-chefia">{{ TEXTOS.diagnostico.COLUNA_CHEFE }}</th>
+              <th class="text-center subcoluna grupo-chefia">{{ TEXTOS.diagnostico.COLUNA_CONSENSO }}</th>
             </tr>
             </thead>
             <tbody>
@@ -92,7 +88,7 @@
               </td>
               <td class="text-center grupo-chefia divisor-grupo coluna-nota">
                 <BFormSelect
-                    v-if="!ehConsensoAprovado"
+                    v-if="ehChefe && !ehConsensoAprovado"
                     :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
                     :model-value="item.chefiaImportancia"
                     :options="opcoesNota"
@@ -103,7 +99,7 @@
               </td>
               <td class="text-center grupo-chefia coluna-nota">
                 <BFormSelect
-                    v-if="!ehConsensoAprovado"
+                    v-if="ehChefe && !ehConsensoAprovado"
                     :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
                     :model-value="item.chefiaDominio"
                     :options="opcoesNota"
@@ -114,7 +110,7 @@
               </td>
               <td class="text-center grupo-consenso divisor-grupo celula-consenso coluna-nota">
                 <BFormSelect
-                    v-if="!ehConsensoAprovado"
+                    v-if="ehChefe && !ehConsensoAprovado"
                     :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
                     :model-value="item.consensoImportancia"
                     :options="opcoesNota"
@@ -125,7 +121,7 @@
               </td>
               <td class="text-center grupo-consenso celula-consenso coluna-nota">
                 <BFormSelect
-                    v-if="!ehConsensoAprovado"
+                    v-if="ehChefe && !ehConsensoAprovado"
                     :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
                     :model-value="item.consensoDominio"
                     :options="opcoesNota"
@@ -138,21 +134,6 @@
             </tbody>
           </table>
         </div>
-        <BTable
-            v-else
-            :fields="colunasServidor"
-            :items="competenciasSimplesComDescricao"
-            hover
-            responsive
-            small
-        >
-          <template #cell(importancia)="{ item }">
-            <span>{{ formatarNota(item.importancia) }}</span>
-          </template>
-          <template #cell(dominio)="{ item }">
-            <span>{{ formatarNota(item.dominio) }}</span>
-          </template>
-        </BTable>
       </BCard>
 
       <!-- Ação: Aprovar consenso (servidor logado, CDU-45) -->
@@ -195,6 +176,7 @@ const props = defineProps<{
   codSubprocesso: number;
   siglaUnidade: string;
   servidorTitulo: string;
+  servidorNome?: string;
 }>();
 
 const router = useRouter();
@@ -207,7 +189,6 @@ const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
 const {
   competenciasLocais,
-  competenciasDetalhadasLocais,
   ehConsensoAprovado,
   carregando,
   salvandoAutomaticamente,
@@ -221,9 +202,10 @@ const {
 const ehChefe = computed(() => podeCriarConsenso.value);
 const nomeServidorSubtitulo = computed(() =>
   servidorEhUsuarioLogado.value
-    ? (perfilStore.usuarioNome ?? props.servidorTitulo)
-    : props.servidorTitulo,
+    ? (perfilStore.usuarioNome ?? props.servidorNome ?? props.servidorTitulo)
+    : (props.servidorNome ?? props.servidorTitulo),
 );
+const subtituloServidor = computed(() => `${nomeServidorSubtitulo.value} - ${props.servidorTitulo}`);
 
 // « Alertas »
 const erroMensagem = ref('');
@@ -245,27 +227,6 @@ function formatarNota(valor: number | null): string {
 }
 
 const competenciasDetalhadasComDescricao = computed(() => {
-  const mapaDesc = Object.fromEntries(
-    (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
-  );
-  const origem = competenciasDetalhadasLocais.value.length > 0
-    ? competenciasDetalhadasLocais.value
-    : competenciasLocais.value.map((c) => ({
-      competenciaCodigo: c.competenciaCodigo,
-      autoimportancia: c.importancia,
-      autodominio: c.dominio,
-      chefiaImportancia: c.importancia,
-      chefiaDominio: c.dominio,
-      consensoImportancia: c.importancia,
-      consensoDominio: c.dominio,
-    }));
-  return origem.map((c) => ({
-    ...c,
-    descricao: mapaDesc[c.competenciaCodigo] ?? `Competência ${c.competenciaCodigo}`,
-  }));
-});
-
-const competenciasSimplesComDescricao = computed(() => {
   const mapaDesc = Object.fromEntries(
     (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
   );
@@ -292,12 +253,6 @@ function normalizarValorNota(valor: unknown): number | null {
   const numero = Number(valor);
   return Number.isNaN(numero) ? null : numero;
 }
-
-const colunasServidor = [
-  {key: 'descricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-  {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
-  {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
-];
 
 </script>
 

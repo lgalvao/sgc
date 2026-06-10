@@ -59,8 +59,7 @@ export interface Autoavaliacao {
 
 /** Consenso da chefia para o servidor logado. */
 export interface Consenso {
-    competencias: AvaliacaoCompetencia[];
-    competenciasDetalhadas?: ConsensoCompetenciaDetalhada[];
+    competencias: ConsensoCompetenciaDetalhada[];
     situacaoServidor: SituacaoAvaliacaoServidor;
 }
 
@@ -127,8 +126,7 @@ export interface AutoavaliacaoRequest {
 }
 
 export interface ConsensoRequest {
-    competencias: AvaliacaoCompetencia[];
-    competenciasDetalhadas?: ConsensoCompetenciaDetalhada[];
+    competencias: ConsensoCompetenciaDetalhada[];
 }
 
 export interface OcupacaoCriticaRequest {

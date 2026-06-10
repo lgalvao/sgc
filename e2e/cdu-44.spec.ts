@@ -46,7 +46,7 @@ test.describe('CDU-44 - Manter avaliação de consenso', () => {
             const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
             if (!resposta.ok) return null;
             const dados = await resposta.json();
-            return String(dados.competenciasDetalhadas[0]?.consensoImportancia ?? '');
+            return String(dados.competencias[0]?.consensoImportancia ?? '');
         }, {
             codigo: codSubprocesso,
             titulo: TITULO_SERVIDOR_ASSESSORIA_12

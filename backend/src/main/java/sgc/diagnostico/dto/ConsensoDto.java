@@ -5,8 +5,7 @@ import java.util.List;
 
 @Builder
 public record ConsensoDto(
-        List<AvaliacaoCompetenciaDto> competencias,
-        List<ConsensoCompetenciaDto> competenciasDetalhadas,
+        List<ConsensoCompetenciaDto> competencias,
         String situacaoServidor
 ) {
 }

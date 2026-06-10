@@ -161,7 +161,6 @@ class DiagnosticoAvaliacaoServiceTest {
 
         var detalhada = new ConsensoCompetenciaDto(200L, 2, 2, 4, 3, 4, 3);
         var request = new ConsensoRequest(
-                List.of(AvaliacaoCompetenciaDto.builder().competenciaCodigo(200L).importancia(4).dominio(3).build()),
                 List.of(detalhada)
         );
 
@@ -190,10 +189,14 @@ class DiagnosticoAvaliacaoServiceTest {
         when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
-        var request = new ConsensoRequest(
-                List.of(AvaliacaoCompetenciaDto.builder().competenciaCodigo(201L).importancia(5).dominio(3).build()),
-                null
-        );
+        var detalhada = ConsensoCompetenciaDto.builder()
+                .competenciaCodigo(201L)
+                .consensoImportancia(5)
+                .consensoDominio(3)
+                .chefiaImportancia(5)
+                .chefiaDominio(3)
+                .build();
+        var request = new ConsensoRequest(List.of(detalhada));
 
         service.salvarConsenso(codSubprocesso, request, servidorTitulo);
 
@@ -229,11 +232,6 @@ class DiagnosticoAvaliacaoServiceTest {
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
         var request = new ConsensoRequest(
-                List.of(AvaliacaoCompetenciaDto.builder()
-                        .competenciaCodigo(competenciaPrimeira)
-                        .importancia(chefiaImportanciaPrimeira)
-                        .dominio(chefiaDominioPrimeira)
-                        .build()),
                 List.of(ConsensoCompetenciaDto.builder()
                         .competenciaCodigo(competenciaPrimeira)
                         .autoimportancia(autoimportanciaPrimeira)
@@ -323,7 +321,7 @@ class DiagnosticoAvaliacaoServiceTest {
     void salvarConsenso_diagnosticoInexistente_deveLancarErro() {
         when(diagnosticoRepo.findBySubprocessoCodigo(anyLong())).thenReturn(Optional.empty());
 
-        var request = new ConsensoRequest(List.of(), null);
+        var request = new ConsensoRequest(List.of());
 
         assertThatThrownBy(() -> service.salvarConsenso(99L, request, "titulo"))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);

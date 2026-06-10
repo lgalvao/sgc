@@ -41,7 +41,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.aceitarCadastro).mockResolvedValue({} as any);
         const { aceitarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await aceitarCadastro(1, { contextoAcao: 'TESTE' }, { mensagemSucesso: 'Custom Aceite' });
+        await aceitarCadastro(1, { observacoes: 'TESTE' }, { mensagemSucesso: 'Custom Aceite' });
         expect(cadastroService.aceitarCadastro).toHaveBeenCalled();
     });
 
@@ -49,7 +49,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.aceitarCadastro).mockResolvedValue({} as any);
         const { aceitarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await aceitarCadastro(1, { contextoAcao: 'TESTE' });
+        await aceitarCadastro(1, { observacoes: 'TESTE' });
         expect(cadastroService.aceitarCadastro).toHaveBeenCalled();
     });
 
@@ -57,7 +57,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.aceitarRevisaoCadastro).mockResolvedValue({} as any);
         const { aceitarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await aceitarRevisaoCadastro(1, { contextoAcao: 'TESTE' }, { mensagemSucesso: 'Custom Aceite Revisao' });
+        await aceitarRevisaoCadastro(1, { observacoes: 'TESTE' }, { mensagemSucesso: 'Custom Aceite Revisao' });
         expect(cadastroService.aceitarRevisaoCadastro).toHaveBeenCalled();
     });
 
@@ -65,7 +65,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.aceitarRevisaoCadastro).mockResolvedValue({} as any);
         const { aceitarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await aceitarRevisaoCadastro(1, { contextoAcao: 'TESTE' });
+        await aceitarRevisaoCadastro(1, { observacoes: 'TESTE' });
         expect(cadastroService.aceitarRevisaoCadastro).toHaveBeenCalled();
     });
 
@@ -73,7 +73,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.homologarCadastro).mockResolvedValue({} as any);
         const { homologarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await homologarCadastro(1, { validacoesObrigatoriasAtendidas: true, atividades: [] }, { mensagemSucesso: 'Custom Homologacao' });
+        await homologarCadastro(1, { observacoes: '' }, { mensagemSucesso: 'Custom Homologacao' });
         expect(cadastroService.homologarCadastro).toHaveBeenCalled();
     });
 
@@ -81,7 +81,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.homologarCadastro).mockResolvedValue({} as any);
         const { homologarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await homologarCadastro(1, { validacoesObrigatoriasAtendidas: true, atividades: [] });
+        await homologarCadastro(1, { observacoes: '' });
         expect(cadastroService.homologarCadastro).toHaveBeenCalled();
     });
     
@@ -89,7 +89,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.homologarRevisaoCadastro).mockResolvedValue({} as any);
         const { homologarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await homologarRevisaoCadastro(1, { validacoesObrigatoriasAtendidas: true, atividades: [] }, { mensagemSucesso: 'Custom Homologacao Revisao' });
+        await homologarRevisaoCadastro(1, { observacoes: '' }, { mensagemSucesso: 'Custom Homologacao Revisao' });
         expect(cadastroService.homologarRevisaoCadastro).toHaveBeenCalled();
     });
 
@@ -97,7 +97,7 @@ describe('useFluxoCadastroSubprocesso', () => {
         vi.mocked(cadastroService.homologarRevisaoCadastro).mockResolvedValue({} as any);
         const { homologarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
         
-        await homologarRevisaoCadastro(1, { validacoesObrigatoriasAtendidas: true, atividades: [] });
+        await homologarRevisaoCadastro(1, { observacoes: '' });
         expect(cadastroService.homologarRevisaoCadastro).toHaveBeenCalled();
     });
 });

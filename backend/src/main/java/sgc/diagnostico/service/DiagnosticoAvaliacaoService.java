@@ -84,7 +84,6 @@ public class DiagnosticoAvaliacaoService {
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
-        List<AvaliacaoCompetenciaDto> competenciasConsenso = extrairCompetenciasConsenso(request);
 
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()
                 .collect(java.util.stream.Collectors.toMap(
@@ -94,43 +93,18 @@ public class DiagnosticoAvaliacaoService {
             avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
         }
 
-        if (request.competenciasDetalhadas() != null && !request.competenciasDetalhadas().isEmpty()) {
-            for (ConsensoCompetenciaDto item : request.competenciasDetalhadas()) {
-                AvaliacaoServidor avaliacao = porCompetencia.get(item.competenciaCodigo());
-                if (avaliacao == null) continue;
-                avaliacao.setChefiaImportancia(item.chefiaImportancia());
-                avaliacao.setChefiaDominio(item.chefiaDominio());
-                avaliacao.setImportancia(item.consensoImportancia());
-                avaliacao.setDominio(item.consensoDominio());
-                gapService.recalcularGap(avaliacao);
-            }
-        } else {
-            for (AvaliacaoCompetenciaDto item : competenciasConsenso) {
-                AvaliacaoServidor avaliacao = porCompetencia.get(item.competenciaCodigo());
-                if (avaliacao == null) continue;
-                avaliacao.setChefiaImportancia(item.importancia());
-                avaliacao.setChefiaDominio(item.dominio());
-                avaliacao.setImportancia(item.importancia());
-                avaliacao.setDominio(item.dominio());
-                gapService.recalcularGap(avaliacao);
-            }
+        for (ConsensoCompetenciaDto item : request.competencias()) {
+            AvaliacaoServidor avaliacao = porCompetencia.get(item.competenciaCodigo());
+            if (avaliacao == null) continue;
+            avaliacao.setChefiaImportancia(item.chefiaImportancia());
+            avaliacao.setChefiaDominio(item.chefiaDominio());
+            avaliacao.setImportancia(item.consensoImportancia());
+            avaliacao.setDominio(item.consensoDominio());
+            gapService.recalcularGap(avaliacao);
         }
 
         avaliacaoRepo.saveAll(avaliacoes);
         notificacaoService.notificarConsensoDisponivel(subprocesso, servidorTitulo);
-    }
-
-    private List<AvaliacaoCompetenciaDto> extrairCompetenciasConsenso(ConsensoRequest request) {
-        if (request.competenciasDetalhadas() != null && !request.competenciasDetalhadas().isEmpty()) {
-            return request.competenciasDetalhadas().stream()
-                    .map(item -> AvaliacaoCompetenciaDto.builder()
-                            .competenciaCodigo(item.competenciaCodigo())
-                            .importancia(item.consensoImportancia())
-                            .dominio(item.consensoDominio())
-                            .build())
-                    .toList();
-        }
-        return request.competencias();
     }
 
     public void aprovarConsenso(Long codSubprocesso) {

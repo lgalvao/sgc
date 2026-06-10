@@ -27,8 +27,7 @@ vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     }),
 }));
 
-const competenciasLocais = ref<any[]>([]);
-const competenciasDetalhadasLocais = ref<any[]>([
+const competenciasLocais = ref<any[]>([
     {
         competenciaCodigo: 10,
         autoimportancia: 3,
@@ -51,7 +50,6 @@ const aprovarConsensoMock = vi.fn();
 vi.mock('@/composables/useConsensoDiagnostico', () => ({
     useConsensoDiagnostico: () => ({
         competenciasLocais,
-        competenciasDetalhadasLocais,
         situacaoServidor: situacaoServidorVal,
         ehConsensoAprovado: computed(() => ehConsensoAprovadoVal.value),
         carregando: computed(() => carregandoVal.value),
@@ -74,8 +72,7 @@ describe('ConsensoDiagnosticoView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         podeCriarConsensoVal.value = true;
-        competenciasLocais.value = [];
-        competenciasDetalhadasLocais.value = [
+        competenciasLocais.value = [
             {
                 competenciaCodigo: 10,
                 autoimportancia: 3,
@@ -100,6 +97,7 @@ describe('ConsensoDiagnosticoView', () => {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: '242426',
+                servidorNome: 'Servidor Exemplo',
             },
             global: {
                 stubs: {
@@ -124,17 +122,13 @@ describe('ConsensoDiagnosticoView', () => {
                         `,
                     },
                     BSpinner: {template: '<span />'},
-                    BTable: {
-                        template: '<table data-testid="tbl-consenso"><slot name="cell(autoimportancia)" :item="{ autoimportancia: 3 }" /><slot name="cell(autodominio)" :item="{ autodominio: 4 }" /><slot name="cell(chefiaImportancia)" :item="{ competenciaCodigo: 10, chefiaImportancia: 3 }" /><slot name="cell(chefiaDominio)" :item="{ competenciaCodigo: 10, chefiaDominio: 4 }" /><slot name="cell(consensoImportancia)" :item="{ competenciaCodigo: 10, consensoImportancia: 3 }" /><slot name="cell(consensoDominio)" :item="{ competenciaCodigo: 10, consensoDominio: 4 }" /></table>',
-                    },
+
                 },
             },
         });
 
         expect(wrapper.text()).toContain('Avaliação de Consenso');
-        expect(wrapper.text()).toContain('Servidor Exemplo');
-        expect(wrapper.text()).not.toContain('Servidor:');
-        expect(wrapper.text()).not.toContain('Escala:');
+        expect(wrapper.text()).toContain('Servidor Exemplo - 242426');
         expect(wrapper.find('.bi-person-lines-fill').exists()).toBe(false);
         expect(wrapper.findAll('thead tr')).toHaveLength(2);
         expect(wrapper.find('th[rowspan="2"]').text()).toBe('Competência');
@@ -143,6 +137,15 @@ describe('ConsensoDiagnosticoView', () => {
         const cabecalhosGrupo = wrapper.findAll('thead tr').at(0)?.findAll('th') ?? [];
         expect(cabecalhosGrupo.map((coluna) => coluna.text())).toEqual([
             'Competência',
+            'Importância',
+            'Domínio',
+        ]);
+
+        const cabecalhosSubgrupo = wrapper.findAll('thead tr').at(1)?.findAll('th') ?? [];
+        expect(cabecalhosSubgrupo.map((coluna) => coluna.text())).toEqual([
+            'Importância',
+            'Chefe',
+            'Consenso',
             'Servidor',
             'Chefe',
             'Consenso',
@@ -156,7 +159,15 @@ describe('ConsensoDiagnosticoView', () => {
     it('renderiza como servidor, exibe BTable e aprova com sucesso', async () => {
         podeCriarConsensoVal.value = false;
         competenciasLocais.value = [
-            {competenciaCodigo: 10, importancia: 3, dominio: 4}
+            {
+                competenciaCodigo: 10,
+                autoimportancia: 3,
+                autodominio: 4,
+                chefiaImportancia: null,
+                chefiaDominio: null,
+                consensoImportancia: null,
+                consensoDominio: null,
+            }
         ];
 
         const wrapper = mount(ConsensoDiagnosticoView, {
@@ -164,6 +175,7 @@ describe('ConsensoDiagnosticoView', () => {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: '242426',
+                servidorNome: 'Servidor Exemplo',
             },
             global: {
                 stubs: {
@@ -177,23 +189,12 @@ describe('ConsensoDiagnosticoView', () => {
                     BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
                     BSpinner: {template: '<span />'},
-                    BTable: {
-                        props: ['items'],
-                        template: `
-                          <table data-testid="tbl-servidor">
-                            <tr v-for="item in items" :key="item.competenciaCodigo">
-                              <td>{{ item.descricao }}</td>
-                              <td><slot name="cell(importancia)" :item="item" /></td>
-                              <td><slot name="cell(dominio)" :item="item" /></td>
-                            </tr>
-                          </table>
-                        `,
-                    },
+
                 },
             },
         });
 
-        expect(wrapper.find('[data-testid="tbl-servidor"]').exists()).toBe(true);
+        expect(wrapper.find('table.tabela-consenso').exists()).toBe(true);
         expect(wrapper.text()).toContain('Competência A');
 
         const btnAprovar = wrapper.get('[data-testid="btn-aprovar-consenso"]');
@@ -217,6 +218,7 @@ describe('ConsensoDiagnosticoView', () => {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: '242426',
+                servidorNome: 'Servidor Exemplo',
             },
             global: {
                 stubs: {
@@ -317,13 +319,14 @@ describe('ConsensoDiagnosticoView', () => {
         expect(wrapper.find('select').exists()).toBe(false);
     });
 
-    it('deve usar o servidorTitulo como subtítulo quando o servidor não for o usuário logado', () => {
+    it('deve usar nome e título no subtítulo quando o servidor não for o usuário logado', () => {
         const outroServidor = '999999';
         const wrapper = mount(ConsensoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: outroServidor,
+                servidorNome: 'Outro Servidor',
             },
             global: {
                 stubs: {
@@ -339,14 +342,13 @@ describe('ConsensoDiagnosticoView', () => {
             },
         });
 
-        expect(wrapper.text()).toContain(outroServidor);
-        expect(wrapper.text()).not.toContain('Servidor Exemplo');
+        expect(wrapper.text()).toContain('Outro Servidor - 999999');
+        expect(wrapper.text()).not.toContain('Servidor Exemplo - 999999');
     });
 
-    it('deve utilizar competenciasLocais caso competenciasDetalhadasLocais esteja vazio', () => {
-        competenciasDetalhadasLocais.value = [];
+    it('deve exibir tabela padrao se não houver chefia importancias', () => {
         competenciasLocais.value = [
-            { competenciaCodigo: 15, importancia: 5, dominio: 2 },
+            { competenciaCodigo: 15, autoimportancia: 5, autodominio: 2 },
         ];
         podeCriarConsensoVal.value = true;
         const wrapper = mount(ConsensoDiagnosticoView, {
@@ -354,6 +356,7 @@ describe('ConsensoDiagnosticoView', () => {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: '242426',
+                servidorNome: 'Servidor Exemplo',
             },
             global: {
                 stubs: {
@@ -384,6 +387,7 @@ describe('ConsensoDiagnosticoView', () => {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: '242426',
+                servidorNome: 'Servidor Exemplo',
             },
             global: {
                 stubs: {
@@ -645,4 +649,3 @@ describe('ConsensoDiagnosticoView', () => {
         expect(wrapper.find('.spinner').exists()).toBe(true);
     });
 });
-
