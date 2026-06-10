@@ -53,7 +53,7 @@ export const TEXTOS_SUBPROCESSO = {
         MAPA_TITULO: "Mapa de competências",
         MAPA_TEXTO: "Mapa de competências técnicas da unidade",
         AUTOAVALIACAO_TITULO: "Autoavaliação",
-        AUTOAVALIACAO_TEXTO: "Realize sua autoavaliação de competências",
+        AUTOAVALIACAO_TEXTO: "Realize sua autoavaliação",
         CONSENSO_TITULO: "Avaliação de consenso",
         CONSENSO_TEXTO: "Consulte, aprove ou mantenha as avaliações de consenso",
         SITUACAO_CAPACITACAO_TITULO: "Situação de capacitação",

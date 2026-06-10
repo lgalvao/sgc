@@ -1,7 +1,7 @@
 export const TEXTOS_DIAGNOSTICO = {
     // « Títulos de página »
-    TITULO_AUTOAVALIACAO: 'Autoavaliação de Competências',
-    TITULO_CONSENSO: 'Avaliação de Consenso',
+    TITULO_AUTOAVALIACAO: 'Autoavaliação',
+    TITULO_CONSENSO: 'Avaliação de consenso',
     TITULO_SITUACAO_CAPACITACAO: 'Situação de Capacitação',
     TITULO_MONITORAMENTO: 'Monitoramento do Diagnóstico',
     TITULO_UNIDADE: 'Análise do Diagnóstico da Unidade',
@@ -63,9 +63,8 @@ export const TEXTOS_DIAGNOSTICO = {
     // « Modais de confirmação »
     MODAL_CONCLUIR_TITULO: 'Concluir autoavaliação',
     MODAL_CONCLUIR_MENSAGEM: 'Confirma a conclusão da autoavaliação?',
-    MODAL_CONCLUIR_DIAG_TITULO: 'Concluir diagnóstico da unidade',
-    MODAL_CONCLUIR_DIAG_MENSAGEM:
-        'Confirma a conclusão do diagnóstico desta unidade? Todos os servidores devem ter consenso aprovado ou avaliação impossibilitada.',
+    MODAL_CONCLUIR_DIAG_TITULO: 'Conclusão de diagnóstico',
+    MODAL_CONCLUIR_DIAG_MENSAGEM: 'Confirma a conclusão do diagnóstico da unidade?',
     MODAL_APROVAR_TITULO: 'Aprovar avaliação de consenso',
     MODAL_APROVAR_MENSAGEM: 'Confirma a aprovação da avaliação de consenso definida pelo responsavel da unidade?',
     MODAL_VALIDAR_TITULO: 'Validar diagnóstico',
@@ -101,4 +100,5 @@ export const TEXTOS_DIAGNOSTICO = {
     ERRO_CARREGAR_CONTEXTO: 'Não foi possível carregar as informações do diagnóstico.',
     ERRO_SALVAR: 'Não foi possível salvar. Tente novamente.',
     ERRO_JUSTIFICATIVA_OBRIGATORIA: 'A justificativa é obrigatória.',
+    ERRO_PENDENCIAS_CONCLUSAO: 'Ainda existem avaliações e situações de capacitações não preenchidas.',
 } as const;

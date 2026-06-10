@@ -1,7 +1,6 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, onUnmounted, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
-import {useSubprocessoStore} from '@/stores/subprocesso';
 import {
     concluirAutoavaliacao,
     obterAutoavaliacao,
@@ -22,28 +21,26 @@ import {
  */
 export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
-    const subprocessoStore = useSubprocessoStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
 
     const query = useQuery<Autoavaliacao>({
         key: () => chaveAutoavaliacao(codSubprocesso, contextoSessao),
         query: () => obterAutoavaliacao(codSubprocesso),
-        enabled: () =>
-            !!perfilStore.usuarioCodigo &&
-            codSubprocesso > 0 &&
-            Boolean(subprocessoStore.contextoEdicao?.permissoes?.podePreencherAutoavaliacao),
+        enabled: () => codSubprocesso > 0,
         staleTime: Infinity,
     });
 
     // Estado local de edição para evitar chamadas de rede a cada keypress
     const competenciasLocais = ref<AvaliacaoCompetencia[]>([]);
     const salvandoAutomaticamente = ref(false);
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
     watch(
         () => query.data.value?.competencias,
         (novas) => {
-            if (novas) {
+            // Só sobrescreve se não houver salvamento em curso ou agendado (debounce)
+            if (novas && !salvandoAutomaticamente.value && timer === null) {
                 competenciasLocais.value = novas.map((c) => ({...c}));
             }
         },
@@ -70,7 +67,6 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     });
 
     // Autosave com debounce nativo
-    let timer: ReturnType<typeof setTimeout> | null = null;
     function dispararSalvamento() {
         if (timer !== null) clearTimeout(timer);
         timer = setTimeout(() => {

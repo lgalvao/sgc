@@ -41,7 +41,7 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
             servidorTitulo: String(route.params.servidorTitulo),
             servidorNome: route.query && typeof route.query.servidorNome === 'string' ? route.query.servidorNome : undefined,
         }),
-        meta: {title: 'Avaliação de Consenso - Diagnóstico'},
+        meta: {title: 'Avaliação de consenso - Diagnóstico'},
     },
     {
         path: '/diagnostico/:codSubprocesso/:siglaUnidade/unidade',

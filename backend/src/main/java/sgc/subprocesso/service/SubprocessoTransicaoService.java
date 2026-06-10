@@ -88,11 +88,15 @@ public class SubprocessoTransicaoService {
 
     private void persistirTransicao(RegistrarTransicaoCommand cmd) {
         Subprocesso sp = cmd.sp();
+        String desc = cmd.tipo().getDescMovimentacao();
+        if (desc.contains("%s")) {
+            desc = desc.formatted(sp.getUnidade().getSigla());
+        }
         Movimentacao movimentacao = Movimentacao.builder()
                 .subprocesso(sp)
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
-                .descricao(cmd.tipo().getDescMovimentacao())
+                .descricao(desc)
                 .usuario(cmd.usuario())
                 .build();
         movimentacaoRepo.save(movimentacao);

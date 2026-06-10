@@ -6,6 +6,7 @@ import {
 } from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
 const TITULO_CHEFE_ASSESSORIA_12 = '151515';
@@ -19,7 +20,7 @@ async function impossibilitarAvaliacoesPendentes(page: import('@playwright/test'
     for (let i = 0; i < total; i++) {
         const linha = linhas.nth(i);
         const texto = await linha.textContent();
-        if (!texto?.includes('Autoavaliação não iniciada')) {
+        if (!texto?.includes(TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA)) {
             continue;
         }
 
@@ -89,6 +90,7 @@ test.describe('CDU-48 - Concluir diagnóstico da unidade', () => {
 
         await abrirAcaoConsensoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
         const seletorConsensoImportancia = page.locator('[data-testid^="consenso-final-importancia-"]').first();
+        await expect(seletorConsensoImportancia).toBeVisible();
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
@@ -98,8 +100,15 @@ test.describe('CDU-48 - Concluir diagnóstico da unidade', () => {
             seletorConsensoImportancia.selectOption('4')
         ]);
 
+
         await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
-        await page.goto(`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`);
+        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
+        const cardConsenso = page.getByTestId('card-subprocesso-consenso');
+        await expect(cardConsenso).toBeVisible();
+        await expect(cardConsenso).not.toHaveClass(/card-disabled/);
+        await cardConsenso.click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
+        await expect(page.getByTestId('btn-aprovar-consenso')).toBeVisible();
         await Promise.all([
             page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/aprovar`) && res.ok()),
             page.getByTestId('btn-aprovar-consenso').click()
@@ -110,7 +119,7 @@ test.describe('CDU-48 - Concluir diagnóstico da unidade', () => {
         await expect(page.getByTestId('btn-concluir-diagnostico')).toBeVisible();
         await page.getByTestId('btn-concluir-diagnostico').click();
         const modalConcluir = page.getByRole('dialog');
-        await expect(modalConcluir).toContainText('Confirma a conclusão do diagnóstico desta unidade?');
+        await expect(modalConcluir).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM);
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/concluir`)
@@ -119,11 +128,11 @@ test.describe('CDU-48 - Concluir diagnóstico da unidade', () => {
             ),
             page.getByTestId('btn-confirmar-concluir-diagnostico').click()
         ]);
-        await expect(page.getByTestId('app-alert')).toContainText('Ainda existem avaliações ou ocupações críticas pendentes.');
+        await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.diagnostico.ERRO_PENDENCIAS_CONCLUSAO);
         await page.getByRole('dialog').getByRole('button', {name: 'Cancelar'}).click();
 
         await impossibilitarAvaliacoesPendentes(page, codSubprocesso);
-        await expect(page.getByText('Autoavaliação não iniciada')).toHaveCount(0);
+        await expect(page.getByText(TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA)).toHaveCount(0);
 
         await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso);
         await expect.poll(async () => await page.evaluate(async (codigo) => {
@@ -137,7 +146,7 @@ test.describe('CDU-48 - Concluir diagnóstico da unidade', () => {
 
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
         await page.getByTestId('btn-concluir-diagnostico').click();
-        await expect(page.getByRole('dialog')).toContainText('Confirma a conclusão do diagnóstico desta unidade?');
+        await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM);
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/concluir`)
@@ -152,7 +161,7 @@ test.describe('CDU-48 - Concluir diagnóstico da unidade', () => {
         await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECRETARIA_1',
-            assunto: 'Diagnóstico da unidade ASSESSORIA_12 concluído',
+            assunto: `Diagnóstico da unidade ${UNIDADE} submetido para análise`,
             tipo: 'Diagnóstico concluído',
             trechoCorpo: descricao
         });

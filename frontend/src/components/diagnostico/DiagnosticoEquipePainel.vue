@@ -179,7 +179,7 @@
             @click="confirmarConcluir"
         >
           <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
-          Concluir
+          Concluir diagnóstico
         </BButton>
       </template>
     </BModal>
@@ -281,6 +281,7 @@ import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
+import {useToastStore} from '@/stores/toast';
 import {normalizarErro} from '@/utils/apiError/normalizer';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
@@ -296,6 +297,7 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
+const toastStore = useToastStore();
 const {
   podeCriarConsenso,
   habilitarConcluirDiagnostico,
@@ -417,6 +419,7 @@ async function confirmarConcluir() {
   try {
     await concluirDiagnostico();
     modalConcluirAberto.value = false;
+    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
     await router.push({name: 'Painel'});
   } catch (erro) {
     erroMensagem.value = normalizarErro(erro).mensagem

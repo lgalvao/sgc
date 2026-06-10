@@ -919,6 +919,13 @@ public class E2eController {
             avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         });
         avaliacaoServidorRepo.saveAllAndFlush(avaliacoes);
+
+        Subprocesso subprocesso = avaliacoes.get(0).getDiagnostico().getSubprocesso();
+        if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
+            subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+            subprocessoRepo.saveAndFlush(subprocesso);
+        }
+
         limparCaches();
     }
 

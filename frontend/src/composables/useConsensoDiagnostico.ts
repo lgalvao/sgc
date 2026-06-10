@@ -1,7 +1,6 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
-import {useSubprocessoStore} from '@/stores/subprocesso';
 import {
     aprovarConsenso,
     obterConsenso,
@@ -25,7 +24,6 @@ import {
  */
 export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: string) {
     const perfilStore = usePerfilStore();
-    const subprocessoStore = useSubprocessoStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
     const consensoDoServidorLogado = computed(() =>
@@ -37,11 +35,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         query: () => servidorTitulo && !consensoDoServidorLogado.value
             ? obterConsensoServidor(codSubprocesso, servidorTitulo)
             : obterConsenso(codSubprocesso),
-        enabled: () =>
-            !!perfilStore.usuarioCodigo &&
-            codSubprocesso > 0 &&
-            (Boolean(subprocessoStore.contextoEdicao?.permissoes?.podePreencherAutoavaliacao) ||
-                (servidorTitulo && !consensoDoServidorLogado.value && Boolean(subprocessoStore.contextoEdicao?.permissoes?.podeCriarConsenso))),
+        enabled: () => codSubprocesso > 0,
         staleTime: Infinity,
     });
 

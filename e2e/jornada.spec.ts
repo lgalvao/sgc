@@ -491,7 +491,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByText('Autoavaliação concluída')).toBeVisible();
 
             await abrirAcaoConsensoDiagnostico(page, SERVIDOR_DIAGNOSTICO.titulo);
-            await expect(page.getByRole('heading', {name: /Avaliação de Consenso/i})).toBeVisible();
+            await expect(page.getByRole('heading', {name: /Avaliação de consenso/i})).toBeVisible();
             await page.getByTestId('btn-nav-voltar').click();
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}(?:\\?.*)?$`));
 

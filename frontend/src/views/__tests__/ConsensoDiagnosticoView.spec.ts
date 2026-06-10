@@ -142,7 +142,7 @@ describe('ConsensoDiagnosticoView', () => {
             },
         });
 
-        expect(wrapper.text()).toContain('Avaliação de Consenso');
+        expect(wrapper.text()).toContain('Avaliação de consenso');
         expect(wrapper.text()).toContain('Servidor Exemplo - 242426');
         expect(wrapper.find('.bi-person-lines-fill').exists()).toBe(false);
         expect(wrapper.findAll('thead tr')).toHaveLength(2);

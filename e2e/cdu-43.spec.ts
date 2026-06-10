@@ -29,6 +29,6 @@ test.describe('CDU-43 - Acompanhar diagnóstico da unidade', () => {
         await expect(page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
         await abrirAcaoConsensoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
-        await expect(page.getByRole('heading', {name: /Avaliação de Consenso/i})).toBeVisible();
+        await expect(page.getByRole('heading', {name: /Avaliação de consenso/i})).toBeVisible();
     });
 });
