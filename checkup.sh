@@ -32,24 +32,6 @@ function invoke_passo() {
     fi
 }
 
-function atualizar_dependencias_npm() {
-    local prefixo="$1"
-    local label="$2"
-
-    imprimir_passo "$label"
-    set +e
-    if [ -n "$prefixo" ]; then
-        npm --prefix "$prefixo" update
-    else
-        npm update
-    fi
-    local exit_code=$?
-    set -e
-    if [ "$exit_code" -ne 0 ]; then
-        falhar_passo "$label" "$exit_code"
-    fi
-}
-
 GRADLE_CMD="./gradlew"
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || -n "${WINDIR:-}" ]]; then
     if [[ -f "./gradlew.bat" ]]; then
@@ -61,12 +43,13 @@ if [ -t 1 ]; then
     clear
 fi
 
-invoke_passo 'Atualizar branch local' git pull --ff-only
-invoke_passo 'Lint raiz' npm run lint:ox
-invoke_passo 'Lint etc/scripts' npm --prefix etc/scripts run lint
-invoke_passo 'Testes etc/scripts' npm --prefix etc/scripts run test
-invoke_passo 'Qualidade frontend + backend' "$GRADLE_CMD" backend:qualityCheckFast
-invoke_passo 'Testes e2e mínimos' npx playwright test --project=chromium e2e/captura.spec.ts e2e/jornada.spec.ts
+invoke_passo 'Atualizar branch local' git pull
+invoke_passo 'npm install' npm install --prefix etc/scripts --silent && npm install --silent && npm install --prefix frontend --silent 
+invoke_passo 'Lint raiz' npm run lint
+invoke_passo 'Typecheck raiz' npm run typecheck
+invoke_passo 'Testes scripts' npm --prefix etc/scripts run test
+invoke_passo 'Testes frontend' npm --prefix frontend run test
+invoke_passo 'Testes backend' "$GRADLE_CMD" backend:test
+invoke_passo 'Testes e2e' npx playwright test --project=chromium
 
 echo -e "\n${GREEN}Tudo certo!${NC}"
-
