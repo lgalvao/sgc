@@ -13,9 +13,9 @@ Ator: GESTOR, ADMIN
 
 2. O sistema mostra a tela `Detalhes do processo` com uma tabela hierárquica contendo as unidades participantes; mostra
    para cada unidade:
-   - sigla da unidade;
-   - nome da unidade;
-   - situação atual do diagnóstico da unidade.
+    - sigla da unidade;
+    - nome da unidade;
+    - situação atual do diagnóstico da unidade.
 
    2.1. Para o perfil GESTOR, o conteúdo da tabela se limita à unidade e suas unidades subordinadas a ela,
    recursivamente.
@@ -24,8 +24,8 @@ Ator: GESTOR, ADMIN
 
 3. O usuário aciona uma unidade com diagnóstico concluído.
 
-4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, conforme o caso de uso
-   `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
+4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, conforme o caso de
+   uso [CDU-42.md](cdu-42.md)`.
 
 5. Se o usuário clicar em `Histórico de análise`, o sistema mostra os registros prévios de análise do subprocesso,
    contendo data/hora, unidade, resultado e observação.
@@ -37,8 +37,8 @@ Se o usuário optar por `Devolver para ajustes`:
 6. O sistema solicita confirmação em um modal, com um campo `Justificativa`, de preenchimento obrigatório.
 
 7. Caso o usuário confirme, o sistema:
-   - registra análise com resultado `Devolução para ajustes`;
-   - muda a localização do subprocesso para a unidade imediatamente inferior.
+    - registra análise com resultado `Devolução para ajustes`;
+    - muda a localização do subprocesso para a unidade imediatamente inferior.
 
 8. O sistema envia uma notificação por e-mail para a unidade inferior que foi a origem da última movimentação.
 
@@ -64,11 +64,11 @@ Se o usuário optar por `Registrar aceite`:
 
 14. O sistema cria internamente um alerta com estes campos:
 
-   Descrição: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito"
-   Processo: [DESCRICAO_PROCESSO]
-   Data/hora: [Data/hora atual]
-   Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-   Unidade de destino: [SIGLA_UNIDADE_SUPERIOR]
+Descrição: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito"
+Processo: [DESCRICAO_PROCESSO]
+Data/hora: [Data/hora atual]
+Unidade de origem: [SIGLA_UNIDADE_ANALISE]
+Unidade de destino: [SIGLA_UNIDADE_SUPERIOR]
 
 15. O sistema envia uma notificação por e-mail para a unidade imediatamente superior.
 

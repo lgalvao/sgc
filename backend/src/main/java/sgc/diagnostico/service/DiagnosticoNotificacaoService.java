@@ -137,7 +137,7 @@ public class DiagnosticoNotificacaoService {
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
-                "Avaliação de consenso de %s aprovada".formatted(nomeServidor),
+                "Avaliação de consenso aprovada: %s".formatted(nomeServidor),
                 unidade,
                 unidade
         );

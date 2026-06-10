@@ -3,6 +3,7 @@ import {criarProcessoDiagnosticoComConsensoCriadoFixture} from './fixtures/index
 import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
+import {verificarToast} from './helpers/helpers-navegacao.js';
 
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
 const UNIDADE = 'ASSESSORIA_12';
@@ -30,7 +31,8 @@ test.describe('CDU-45 - Aprovar avaliação de consenso', () => {
             page.getByTestId('btn-aprovar-consenso').click()
         ]);
 
-        await expect(page).toHaveURL(/\/painel/);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}`));
+        await verificarToast(page, 'Avaliação de consenso aprovada');
 
         await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {

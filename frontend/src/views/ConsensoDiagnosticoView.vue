@@ -171,6 +171,7 @@ import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import {usePerfilStore} from '@/stores/perfil';
+import {useToastStore} from '@/stores/toast';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -213,6 +214,21 @@ const erroMensagem = ref('');
 async function confirmarAprovarConsenso() {
   try {
     await aprovarConsenso();
+    const toastStore = useToastStore();
+    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
+    if (contexto.value?.processoCodigo) {
+      await router.push({
+        name: 'Subprocesso',
+        params: {
+          codProcesso: String(contexto.value.processoCodigo),
+          siglaUnidade: props.siglaUnidade,
+        },
+        query: {
+          codSubprocesso: String(props.codSubprocesso),
+        },
+      });
+      return;
+    }
     void router.back();
   } catch {
     erroMensagem.value = erroAprovar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;

@@ -13,8 +13,7 @@ Ator: CHEFE
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso
-   `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md).`.
 
 2. Ao lado do nome do servidor desejado, o usuário escolhe a ação `Indicar impossibilidade`.
 
@@ -26,4 +25,5 @@ Ator: CHEFE
 
 4. O usuário informa a justificativa e aciona `Indicar impossibilidade`.
 
-5. O sistema altera a situação individual do servidor para `Avaliação impossibilitada` e mostra a mensagem `Impossibilidade registrada`.
+5. O sistema altera a situação individual do servidor para `Avaliação impossibilitada` e mostra a mensagem
+   `Impossibilidade registrada`.
