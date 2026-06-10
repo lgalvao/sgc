@@ -7,7 +7,7 @@ Ator: CHEFE
 - Login realizado com perfil CHEFE
 - Subprocesso da unidade com localização atual na própria unidade
 - Existência de servidor da unidade cuja avaliação individual ainda não tenha chegado à situação
-  `Avaliação de consenso aprovada`
+  'Avaliação de consenso aprovada'
 
 ## Fluxo principal
 
