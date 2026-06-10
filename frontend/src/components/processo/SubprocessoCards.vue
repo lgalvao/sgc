@@ -182,7 +182,9 @@ const permissoesDiagnostico = computed(() => subprocesso.value?.permissoes ?? nu
 const {habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 
-const { situacaoServidor } = useAutoavaliacaoDiagnostico(props.codSubprocesso);
+const { situacaoServidor } = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO 
+  ? useAutoavaliacaoDiagnostico(props.codSubprocesso)
+  : { situacaoServidor: computed(() => 'AUTOAVALIACAO_NAO_INICIADA') };
 const habilitarCardConsenso = computed(() => {
   return situacaoServidor.value === 'CONSENSO_CRIADO' || situacaoServidor.value === 'CONSENSO_APROVADO';
 });

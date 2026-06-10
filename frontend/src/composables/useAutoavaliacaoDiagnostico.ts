@@ -1,6 +1,7 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
+import {useSubprocessoStore} from '@/stores/subprocesso';
 import {
     concluirAutoavaliacao,
     obterAutoavaliacao,
@@ -21,13 +22,17 @@ import {
  */
 export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
+    const subprocessoStore = useSubprocessoStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
 
     const query = useQuery<Autoavaliacao>({
         key: () => chaveAutoavaliacao(codSubprocesso, contextoSessao),
         query: () => obterAutoavaliacao(codSubprocesso),
-        enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
+        enabled: () =>
+            !!perfilStore.usuarioCodigo &&
+            codSubprocesso > 0 &&
+            Boolean(subprocessoStore.contextoEdicao?.permissoes?.podePreencherAutoavaliacao),
         staleTime: Infinity,
     });
 
