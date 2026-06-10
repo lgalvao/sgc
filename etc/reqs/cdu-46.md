@@ -12,7 +12,7 @@ Ator: CHEFE
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso `CDU-42 - Visualizar detalhes do subprocesso de diagnóstico`.
+   `Detalhes do subprocesso`, conforme o caso de uso `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
 
 2. Ao lado do servidor desejado, o usuário escolhe a ação `Indicar impossibilidade`.
 

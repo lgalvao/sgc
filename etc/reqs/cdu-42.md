@@ -1,4 +1,4 @@
-# CDU-43 - Visualizar detalhes do subprocesso de diagnóstico
+# CDU-42 - Visualizar detalhes de subprocesso de diagnóstico
 
 Atores: SERVIDOR, CHEFE, GESTOR, ADMIN
 

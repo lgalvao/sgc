@@ -1,4 +1,4 @@
-# CDU-42 - Realizar autoavaliação
+# CDU-43 - Realizar autoavaliação
 
 Ator: SERVIDOR
 
@@ -10,7 +10,7 @@ Ator: SERVIDOR
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso `CDU-42 - Visualizar detalhes do subprocesso de diagnóstico`.
+   `Detalhes do subprocesso`, conforme o caso de uso `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
 
 2. O usuário aciona o card `Autoavaliação`.
 
@@ -35,7 +35,7 @@ Ator: SERVIDOR
    7.1. Caso exista competência com valores sem preencher, o sistema mostra a mensagem
    `Preencha importância e domínio para todas as competências.` e interrompe a conclusão.
 
-   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: `Confirma a conclusão da autoavaliação?`,
+   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?",
    com botões `Concluir` e `Cancelar`, e, uma vez confirmado, altera a situação da avaliação do servidor para
    `Autoavaliação concluída`.
 

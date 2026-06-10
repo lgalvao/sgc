@@ -25,7 +25,7 @@ Ator: GESTOR, ADMIN
 3. O usuário aciona uma unidade com diagnóstico concluído.
 
 4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, conforme o caso de uso
-   `CDU-42 - Visualizar detalhes do subprocesso de diagnóstico`.
+   `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
 
 5. Se o usuário clicar em `Histórico de análise`, o sistema mostra os registros prévios de análise do subprocesso,
    contendo data/hora, unidade, resultado e observação.

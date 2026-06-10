@@ -25,7 +25,7 @@ Ator: GESTOR ou ADMIN
 3. O usuário clica em uma unidade na tabela.
 
 4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, conforme o caso de uso
-   `CDU-42 - Visualizar detalhes do subprocesso de diagnóstico`.
+   `CDU-42 - Visualizar detalhes de subprocesso de diagnóstico`.
 
 5. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
    - uma linha para cada competência vigente da unidade;
