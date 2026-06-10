@@ -65,7 +65,7 @@ class ProcessoExclusaoCompletaServiceTest {
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.alerta_usuario"), eq(10L));
         inOrder.verify(jdbcTemplate).update(eq("DELETE FROM sgc.alerta WHERE processo_codigo = ?"), eq(10L));
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.avaliacao_servidor"), eq(10L), eq(10L));
-        inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.ocupacao_critica"), eq(10L), eq(10L));
+        inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.situacao_capacitacao"), eq(10L), eq(10L));
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.diagnostico"), eq(10L));
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.mapa"), eq(10L));
         inOrder.verify(jdbcTemplate).update(eq("DELETE FROM sgc.processo WHERE codigo = ?"), eq(10L));
@@ -80,13 +80,13 @@ class ProcessoExclusaoCompletaServiceTest {
         when(comumRepo.buscar(Processo.class, 10L)).thenReturn(new Processo());
         when(cacheManager.getCacheNames()).thenReturn(Set.of());
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("AVALIACAO_SERVIDOR"))).thenReturn(0);
-        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("OCUPACAO_CRITICA"))).thenReturn(0);
+        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("SITUACAO_CAPACITACAO"))).thenReturn(0);
         when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("DIAGNOSTICO"))).thenReturn(0);
 
         service.excluirCompleto(10L);
 
         verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.avaliacao_servidor"), anyLong(), anyLong());
-        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.ocupacao_critica"), anyLong(), anyLong());
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.situacao_capacitacao"), anyLong(), anyLong());
         verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.diagnostico"), anyLong());
         verify(jdbcTemplate).update(eq("DELETE FROM sgc.processo WHERE codigo = ?"), eq(10L));
     }
@@ -116,7 +116,7 @@ class ProcessoExclusaoCompletaServiceTest {
         service.excluirCompleto(10L);
 
         verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.avaliacao_servidor"), anyLong(), anyLong());
-        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.ocupacao_critica"), anyLong(), anyLong());
+        verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.situacao_capacitacao"), anyLong(), anyLong());
         verify(jdbcTemplate, never()).update(contains("DELETE FROM sgc.diagnostico"), anyLong());
         verify(jdbcTemplate).update(eq("DELETE FROM sgc.processo WHERE codigo = ?"), eq(10L));
     }

@@ -83,7 +83,7 @@ class CDU41IntegrationTest extends BaseIntegrationTest {
                 Long.class
         ).setParameter("codigoDiagnostico", diagnostico.getCodigo()).getSingleResult()).isGreaterThan(0);
         assertThat(entityManager.createQuery(
-                "select count(o) from OcupacaoCritica o where o.diagnostico.codigo = :codigoDiagnostico",
+                "select count(o) from SituacaoCapacitacao o where o.diagnostico.codigo = :codigoDiagnostico",
                 Long.class
         ).setParameter("codigoDiagnostico", diagnostico.getCodigo()).getSingleResult()).isGreaterThan(0);
     }

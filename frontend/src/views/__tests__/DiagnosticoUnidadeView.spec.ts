@@ -53,7 +53,7 @@ const servidoresVal = ref<any[]>([
         ],
     },
 ]);
-const ocupacoesCriticasVal = ref<any[]>([
+const situacoesCapacitacaoVal = ref<any[]>([
     {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
 ]);
 
@@ -61,7 +61,7 @@ vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
     useMonitoramentoDiagnostico: () => ({
         unidade: unidadeVal,
         servidores: servidoresVal,
-        ocupacoesCriticas: ocupacoesCriticasVal,
+        situacoesCapacitacao: situacoesCapacitacaoVal,
         movimentacoes: ref([
             {descricao: 'Diagnóstico concluído', unidadeOrigem: 'A', unidadeDestino: 'B', dataHora: '2026-06-06 09:00'},
         ]),
@@ -166,14 +166,14 @@ describe('DiagnosticoUnidadeView', () => {
         });
     }
 
-    it('renderiza métricas, gaps, ocupações e histórico do diagnóstico', () => {
+    it('renderiza métricas, gaps, situações de capacitação e histórico do diagnóstico', () => {
         const wrapper = montar();
 
         expect(wrapper.text()).toContain('ASSESSORIA_12');
         expect(wrapper.text()).toContain('Assessoria 12');
         expect(wrapper.text()).toContain('Servidores');
         expect(wrapper.text()).toContain('Pendentes');
-        expect(wrapper.text()).toContain('Ocupações Críticas');
+        expect(wrapper.text()).toContain('Situações de Capacitação');
         expect(wrapper.text()).toContain('+2');
         expect(wrapper.text()).toContain('---');
         expect(wrapper.text()).toContain('Em capacitação');
@@ -299,7 +299,7 @@ describe('DiagnosticoUnidadeView', () => {
                 ],
             },
         ];
-        ocupacoesCriticasVal.value = [
+        situacoesCapacitacaoVal.value = [
             {servidorTitulo: '1', competenciaCodigo: 10, situacaoCapacitacao: 'NA'},
             {servidorTitulo: '2', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
             {servidorTitulo: '3', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},

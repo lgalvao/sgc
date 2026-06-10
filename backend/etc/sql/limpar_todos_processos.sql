@@ -19,10 +19,10 @@ BEGIN
         EXECUTE IMMEDIATE 'DELETE FROM sgc.avaliacao_servidor';
     END IF;
 
-    -- Ocupação Crítica
-    SELECT count(*) INTO v_count FROM user_tables WHERE table_name = 'OCUPACAO_CRITICA';
+    -- Situação de Capacitação
+    SELECT count(*) INTO v_count FROM user_tables WHERE table_name = 'SITUACAO_CAPACITACAO';
     IF v_count > 0 THEN
-        EXECUTE IMMEDIATE 'DELETE FROM sgc.ocupacao_critica';
+        EXECUTE IMMEDIATE 'DELETE FROM sgc.situacao_capacitacao';
     END IF;
 
     -- Diagnóstico

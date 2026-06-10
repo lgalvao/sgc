@@ -33,7 +33,7 @@ class CDU49IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                 .andExpect(jsonPath("$.situacaoDiagnostico").value("EM_ANDAMENTO"))
                 .andExpect(jsonPath("$.servidores.length()").value(2))
                 .andExpect(jsonPath("$.servidores[0].servidorTitulo").exists())
-                .andExpect(jsonPath("$.ocupacoesCriticas.length()").value(4));
+                .andExpect(jsonPath("$.situacoesCapacitacao.length()").value(4));
     }
 
     @Test
@@ -46,7 +46,7 @@ class CDU49IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                 .andExpect(jsonPath("$.unidade.situacaoSubprocesso").value("DIAGNOSTICO_EM_ANDAMENTO"))
                 .andExpect(jsonPath("$.situacaoDiagnostico").value("EM_ANDAMENTO"))
                 .andExpect(jsonPath("$.servidores.length()").value(2))
-                .andExpect(jsonPath("$.ocupacoesCriticas.length()").value(4))
+                .andExpect(jsonPath("$.situacoesCapacitacao.length()").value(4))
                 .andExpect(jsonPath("$.movimentacoes").isArray());
     }
 }

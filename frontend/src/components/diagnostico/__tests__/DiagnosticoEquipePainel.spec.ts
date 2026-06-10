@@ -198,7 +198,7 @@ describe('DiagnosticoEquipePainel', () => {
 
         await wrapper.get('[data-testid="btn-manter-capacitacao-242426"]').trigger('click');
         expect(pushMock).toHaveBeenCalledWith({
-            name: 'OcupacoesCriticasDiagnostico',
+            name: 'SituacaoCapacitacaoDiagnostico',
             params: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',

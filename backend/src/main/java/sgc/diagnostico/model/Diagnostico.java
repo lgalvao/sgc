@@ -34,5 +34,5 @@ public class Diagnostico extends EntidadeBase {
 
     @OneToMany(mappedBy = "diagnostico", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<OcupacaoCritica> ocupacaoCriticas = new ArrayList<>();
+    private List<SituacaoCapacitacao> situacaoCapacitacoes = new ArrayList<>();
 }

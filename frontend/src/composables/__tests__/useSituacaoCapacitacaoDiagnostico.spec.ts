@@ -1,7 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {effectScope, nextTick, ref} from 'vue';
 import * as diagnosticoService from '@/services/diagnosticoService';
-import {useOcupacoesCriticasDiagnostico} from '../useOcupacoesCriticasDiagnostico';
+import {useSituacaoCapacitacaoDiagnostico} from '../useSituacaoCapacitacaoDiagnostico';
 
 const invalidateQueriesMock = vi.fn();
 const mockQueryData = ref<any>(null);
@@ -59,10 +59,10 @@ vi.mock('@/stores/perfil', () => ({
 
 vi.mock('@/services/diagnosticoService', () => ({
     obterDiagnosticoUnidade: vi.fn(),
-    salvarOcupacoesCriticas: vi.fn(),
+    salvarSituacoesCapacitacao: vi.fn(),
 }));
 
-describe('useOcupacoesCriticasDiagnostico', () => {
+describe('useSituacaoCapacitacaoDiagnostico', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.useFakeTimers();
@@ -72,49 +72,49 @@ describe('useOcupacoesCriticasDiagnostico', () => {
             unidade: {unidadeSigla: 'ASSESSORIA_12'},
             servidores: [{servidorTitulo: '242426'}],
             movimentacoes: [],
-            ocupacoesCriticas: [
+            situacoesCapacitacao: [
                 {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: null},
                 {servidorTitulo: '242427', competenciaCodigo: 20, situacaoCapacitacao: 'AC'},
             ],
         };
     });
 
-    it('deve hidratar ocupações locais e calcular pendentes', async () => {
+    it('deve hidratar situações locais e calcular pendentes', async () => {
         const scope = effectScope();
-        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+        let composable: ReturnType<typeof useSituacaoCapacitacaoDiagnostico> | undefined;
 
         scope.run(() => {
-            composable = useOcupacoesCriticasDiagnostico(70);
+            composable = useSituacaoCapacitacaoDiagnostico(70);
         });
         await nextTick();
 
-        expect(composable!.ocupacoesLocais.value).toEqual(mockQueryData.value.ocupacoesCriticas);
+        expect(composable!.situacoesLocais.value).toEqual(mockQueryData.value.situacoesCapacitacao);
         expect(composable!.pendentes.value).toBe(1);
 
         scope.stop();
     });
 
-    it('não deve alterar ocupacoesLocais se novas for undefined', async () => {
-        mockQueryData.value = { ocupacoesCriticas: undefined };
+    it('não deve alterar situacoesLocais se novas for undefined', async () => {
+        mockQueryData.value = { situacoesCapacitacao: undefined };
         const scope = effectScope();
-        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+        let composable: ReturnType<typeof useSituacaoCapacitacaoDiagnostico> | undefined;
 
         scope.run(() => {
-            composable = useOcupacoesCriticasDiagnostico(70);
+            composable = useSituacaoCapacitacaoDiagnostico(70);
         });
         await nextTick();
 
-        expect(composable!.ocupacoesLocais.value).toEqual([]);
+        expect(composable!.situacoesLocais.value).toEqual([]);
         scope.stop();
     });
 
     it('deve usar valores default para as props da query (servidores e movimentacoes)', async () => {
         mockQueryData.value = { servidores: undefined, movimentacoes: undefined, unidade: undefined };
         const scope = effectScope();
-        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+        let composable: ReturnType<typeof useSituacaoCapacitacaoDiagnostico> | undefined;
 
         scope.run(() => {
-            composable = useOcupacoesCriticasDiagnostico(70);
+            composable = useSituacaoCapacitacaoDiagnostico(70);
         });
         await nextTick();
 
@@ -124,17 +124,17 @@ describe('useOcupacoesCriticasDiagnostico', () => {
         scope.stop();
     });
 
-    it('deve calcular 0 pendentes se não houver ocupações ou todas estiverem preenchidas', async () => {
+    it('deve calcular 0 pendentes se não houver situações ou todas estiverem preenchidas', async () => {
         mockQueryData.value = {
-            ocupacoesCriticas: [
+            situacoesCapacitacao: [
                 {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
             ],
         };
         const scope = effectScope();
-        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+        let composable: ReturnType<typeof useSituacaoCapacitacaoDiagnostico> | undefined;
 
         scope.run(() => {
-            composable = useOcupacoesCriticasDiagnostico(70);
+            composable = useSituacaoCapacitacaoDiagnostico(70);
         });
         await nextTick();
 
@@ -143,12 +143,12 @@ describe('useOcupacoesCriticasDiagnostico', () => {
     });
 
     it('deve fazer autosave com debounce e invalidar a unidade', async () => {
-        vi.mocked(diagnosticoService.salvarOcupacoesCriticas).mockResolvedValue();
+        vi.mocked(diagnosticoService.salvarSituacoesCapacitacao).mockResolvedValue();
         const scope = effectScope();
-        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+        let composable: ReturnType<typeof useSituacaoCapacitacaoDiagnostico> | undefined;
 
         scope.run(() => {
-            composable = useOcupacoesCriticasDiagnostico(71);
+            composable = useSituacaoCapacitacaoDiagnostico(71);
         });
         await nextTick();
 
@@ -162,8 +162,8 @@ describe('useOcupacoesCriticasDiagnostico', () => {
         await vi.advanceTimersByTimeAsync(800);
         await Promise.resolve();
 
-        expect(diagnosticoService.salvarOcupacoesCriticas).toHaveBeenCalledWith(71, {
-            ocupacoes: [
+        expect(diagnosticoService.salvarSituacoesCapacitacao).toHaveBeenCalledWith(71, {
+            situacoes: [
                 {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
                 {servidorTitulo: '242427', competenciaCodigo: 20, situacaoCapacitacao: 'AC'},
             ],
@@ -176,20 +176,20 @@ describe('useOcupacoesCriticasDiagnostico', () => {
         scope.stop();
     });
 
-    it('deve ignorar atualização para ocupação inexistente', async () => {
-        vi.mocked(diagnosticoService.salvarOcupacoesCriticas).mockResolvedValue();
+    it('deve ignorar atualização para situação inexistente', async () => {
+        vi.mocked(diagnosticoService.salvarSituacoesCapacitacao).mockResolvedValue();
         const scope = effectScope();
-        let composable: ReturnType<typeof useOcupacoesCriticasDiagnostico> | undefined;
+        let composable: ReturnType<typeof useSituacaoCapacitacaoDiagnostico> | undefined;
 
         scope.run(() => {
-            composable = useOcupacoesCriticasDiagnostico(72);
+            composable = useSituacaoCapacitacaoDiagnostico(72);
         });
         await nextTick();
 
         composable!.atualizarCapacitacao('999999', 999, 'I');
         await vi.advanceTimersByTimeAsync(900);
 
-        expect(diagnosticoService.salvarOcupacoesCriticas).not.toHaveBeenCalled();
+        expect(diagnosticoService.salvarSituacoesCapacitacao).not.toHaveBeenCalled();
 
         scope.stop();
     });
@@ -197,7 +197,7 @@ describe('useOcupacoesCriticasDiagnostico', () => {
     it('deve exercitar as opções do useQuery para chave, query e enabled', async () => {
         const scope = effectScope();
         scope.run(() => {
-            useOcupacoesCriticasDiagnostico(80);
+            useSituacaoCapacitacaoDiagnostico(80);
         });
         await nextTick();
 

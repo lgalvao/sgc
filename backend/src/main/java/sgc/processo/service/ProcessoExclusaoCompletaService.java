@@ -67,9 +67,9 @@ public class ProcessoExclusaoCompletaService {
                     " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigoProcesso, codigoProcesso);
         }
 
-        if (tabelaExiste("OCUPACAO_CRITICA")) {
+        if (tabelaExiste("SITUACAO_CAPACITACAO")) {
             jdbcTemplate.update("""
-                    DELETE FROM sgc.ocupacao_critica
+                    DELETE FROM sgc.situacao_capacitacao
                     WHERE diagnostico_codigo IN""" + SUBQUERY_DIAGNOSTICOS +
                     " OR competencia_codigo IN " + SUBQUERY_COMPETENCIAS, codigoProcesso, codigoProcesso);
         }

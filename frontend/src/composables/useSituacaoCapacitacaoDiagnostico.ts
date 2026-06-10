@@ -1,16 +1,16 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
-import {obterDiagnosticoUnidade, salvarOcupacoesCriticas} from '@/services/diagnosticoService';
-import type {DiagnosticoUnidade, OcupacaoCriticaItem, SituacaoCapacitacao} from '@/types/diagnostico-competencias';
+import {obterDiagnosticoUnidade, salvarSituacoesCapacitacao} from '@/services/diagnosticoService';
+import type {DiagnosticoUnidade, SituacaoCapacitacaoItem, ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
 import {chaveUnidade, criarContextoSessaoDiagnostico} from '@/composables/useDiagnosticoContexto';
 
 /**
- * Composable de ocupações críticas do diagnóstico da unidade.
- * - Query: carrega dados completos da unidade (servidores + ocupações + movimentações).
+ * Composable de situação de capacitação do diagnóstico da unidade.
+ * - Query: carrega dados completos da unidade (servidores + situações + movimentações).
  * - Mutation de salvar: autosave com debounce de 800ms.
  */
-export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
+export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
@@ -22,23 +22,23 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
         staleTime: Infinity,
     });
 
-    const ocupacoesLocais = ref<OcupacaoCriticaItem[]>([]);
+    const situacoesLocais = ref<SituacaoCapacitacaoItem[]>([]);
     const salvandoAutomaticamente = ref(false);
 
     watch(
-        () => query.data.value?.ocupacoesCriticas,
+        () => query.data.value?.situacoesCapacitacao,
         (novas) => {
             if (novas) {
-                ocupacoesLocais.value = novas.map((o) => ({...o}));
+                situacoesLocais.value = novas.map((o) => ({...o}));
             }
         },
         {immediate: true},
     );
 
     const mutacaoSalvar = useMutation({
-        mutation: (ocupacoes: OcupacaoCriticaItem[]) =>
-            salvarOcupacoesCriticas(codSubprocesso, {
-                ocupacoes: ocupacoes.map((o) => ({
+        mutation: (situacoes: SituacaoCapacitacaoItem[]) =>
+            salvarSituacoesCapacitacao(codSubprocesso, {
+                situacoes: situacoes.map((o) => ({
                     servidorTitulo: o.servidorTitulo,
                     competenciaCodigo: o.competenciaCodigo,
                     situacaoCapacitacao: o.situacaoCapacitacao,
@@ -56,15 +56,15 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const dispararSalvamento = () => {
         if (timer !== null) clearTimeout(timer);
-        timer = setTimeout(() => { mutacaoSalvar.mutate(ocupacoesLocais.value); }, 800);
+        timer = setTimeout(() => { mutacaoSalvar.mutate(situacoesLocais.value); }, 800);
     };
 
     function atualizarCapacitacao(
         servidorTitulo: string,
         competenciaCodigo: number,
-        situacao: SituacaoCapacitacao,
+        situacao: ValorSituacaoCapacitacao,
     ) {
-        const item = ocupacoesLocais.value.find(
+        const item = situacoesLocais.value.find(
             (o) => o.servidorTitulo === servidorTitulo && o.competenciaCodigo === competenciaCodigo,
         );
         if (!item) return;
@@ -79,12 +79,12 @@ export function useOcupacoesCriticasDiagnostico(codSubprocesso: number) {
     const carregando = computed(() => query.status.value === 'pending');
     const erro = computed(() => query.error.value);
     const pendentes = computed(
-        () => ocupacoesLocais.value.filter((o) => !o.situacaoCapacitacao).length,
+        () => situacoesLocais.value.filter((o) => !o.situacaoCapacitacao).length,
     );
 
     return {
         query,
-        ocupacoesLocais,
+        situacoesLocais,
         servidores,
         unidade,
         movimentacoes,

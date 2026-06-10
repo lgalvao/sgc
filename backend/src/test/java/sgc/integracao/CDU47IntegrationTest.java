@@ -5,10 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import sgc.diagnostico.dto.OcupacaoCriticaDto;
-import sgc.diagnostico.dto.OcupacoesCriticasRequest;
-import sgc.diagnostico.model.OcupacaoCritica;
+import sgc.diagnostico.dto.SituacaoCapacitacaoDto;
+import sgc.diagnostico.dto.SituacoesCapacitacaoRequest;
 import sgc.diagnostico.model.SituacaoCapacitacao;
+import sgc.diagnostico.model.ValorSituacaoCapacitacao;
 import sgc.integracao.mocks.WithMockChefe;
 
 import java.util.List;
@@ -31,35 +31,35 @@ class CDU47IntegrationTest extends DiagnosticoCduIntegrationTestBase {
     @WithMockChefe("333333333333")
     @DisplayName("Deve salvar a situação de capacitação das ocupações críticas")
     void deveSalvarSituacaoCapacitacao() throws Exception {
-        OcupacoesCriticasRequest request = new OcupacoesCriticasRequest(List.of(
-                OcupacaoCriticaDto.builder()
+        SituacoesCapacitacaoRequest request = new SituacoesCapacitacaoRequest(List.of(
+                SituacaoCapacitacaoDto.builder()
                         .competenciaCodigo(competencia1.getCodigo())
                         .servidorTitulo("50003")
-                        .situacaoCapacitacao(SituacaoCapacitacao.AC.name())
+                        .situacaoCapacitacao(ValorSituacaoCapacitacao.AC.name())
                         .build(),
-                OcupacaoCriticaDto.builder()
+                SituacaoCapacitacaoDto.builder()
                         .competenciaCodigo(competencia2.getCodigo())
                         .servidorTitulo("50003")
-                        .situacaoCapacitacao(SituacaoCapacitacao.C.name())
+                        .situacaoCapacitacao(ValorSituacaoCapacitacao.C.name())
                         .build()
         ));
 
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/ocupacoes-criticas", subprocesso.getCodigo())
+        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/situacoes-capacitacao", subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        List<OcupacaoCritica> ocupacoes = buscarOcupacoes("50003");
+        List<SituacaoCapacitacao> ocupacoes = buscarSituacoesCapacitacao("50003");
         assertThat(ocupacoes).hasSize(2);
         assertThat(ocupacoes).anySatisfy(ocupacao -> {
             if (ocupacao.getCompetencia().getCodigo().equals(competencia1.getCodigo())) {
-                assertThat(ocupacao.getSituacaoCapacitacao()).isEqualTo(SituacaoCapacitacao.AC);
+                assertThat(ocupacao.getSituacaoCapacitacao()).isEqualTo(ValorSituacaoCapacitacao.AC);
             }
         });
         assertThat(ocupacoes).anySatisfy(ocupacao -> {
             if (ocupacao.getCompetencia().getCodigo().equals(competencia2.getCodigo())) {
-                assertThat(ocupacao.getSituacaoCapacitacao()).isEqualTo(SituacaoCapacitacao.C);
+                assertThat(ocupacao.getSituacaoCapacitacao()).isEqualTo(ValorSituacaoCapacitacao.C);
             }
         });
     }

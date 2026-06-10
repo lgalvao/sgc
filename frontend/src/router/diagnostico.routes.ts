@@ -13,8 +13,8 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
     },
     {
         path: '/diagnostico/:codSubprocesso/:siglaUnidade/situacao-capacitacao',
-        name: 'OcupacoesCriticasDiagnostico',
-        component: () => import('@/views/OcupacoesCriticasDiagnosticoView.vue'),
+        name: 'SituacaoCapacitacaoDiagnostico',
+        component: () => import('@/views/SituacaoCapacitacaoDiagnosticoView.vue'),
         props: (route: RouteLocationNormalized) => ({
             codSubprocesso: Number(route.params.codSubprocesso),
             siglaUnidade: String(route.params.siglaUnidade),

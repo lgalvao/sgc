@@ -319,11 +319,11 @@ describe("SubprocessoCards.vue", () => {
 
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-consenso"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(false);
     });
 
-    it("renderiza cards de Diagnóstico (Monitoramento e Ocupacoes)", () => {
+    it("renderiza cards de Diagnóstico (Monitoramento e Situações de Capacitação)", () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -341,7 +341,7 @@ describe("SubprocessoCards.vue", () => {
 
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="card-subprocesso-consenso"]').exists()).toBe(false);
-        expect(wrapper.find('[data-testid="card-subprocesso-ocupacoes"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(true);
     });
 

@@ -27,7 +27,7 @@ class DiagnosticoAvaliacaoServiceTest {
 
     @Mock DiagnosticoRepo diagnosticoRepo;
     @Mock AvaliacaoServidorRepo avaliacaoRepo;
-    @Mock OcupacaoCriticaRepo ocupacaoRepo;
+    @Mock SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     @Mock DiagnosticoGapService gapService;
     @Mock DiagnosticoValidacaoService validacaoService;
     @Mock DiagnosticoNotificacaoService notificacaoService;

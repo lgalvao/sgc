@@ -26,7 +26,7 @@ import java.util.Map;
 public class DiagnosticoConsultaService {
     private final ComumRepo repo;
     private final AvaliacaoServidorRepo avaliacaoRepo;
-    private final OcupacaoCriticaRepo ocupacaoRepo;
+    private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     private final SubprocessoConsultaService subprocessoConsultaService;
     private final SubprocessoDtoMapper subprocessoDtoMapper;
     private final DiagnosticoUsuarioContextoService usuarioContextoService;
@@ -135,7 +135,7 @@ public class DiagnosticoConsultaService {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
-        var ocupacoes = ocupacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
+        var situacoes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
         var movimentacoes = subprocessoConsultaService.listarMovimentacoes(subprocesso);
         UnidadeProcesso unidadeSnapshot = resolverUnidadeSnapshot(subprocesso);
 
@@ -172,8 +172,8 @@ public class DiagnosticoConsultaService {
                 })
                 .toList();
 
-        List<OcupacaoCriticaDto> ocupacoesCriticas = ocupacoes.stream()
-                .map(o -> OcupacaoCriticaDto.builder()
+        List<SituacaoCapacitacaoDto> situacoesCapacitacao = situacoes.stream()
+                .map(o -> SituacaoCapacitacaoDto.builder()
                         .competenciaCodigo(o.getCompetencia().getCodigo())
                         .servidorTitulo(o.getServidor().getTituloEleitoral())
                         .servidorNome(o.getServidorNomeDiagnostico())
@@ -189,7 +189,7 @@ public class DiagnosticoConsultaService {
                 .unidade(unidade)
                 .situacaoDiagnostico(resolverSituacaoDiagnostico(subprocesso))
                 .servidores(servidores)
-                .ocupacoesCriticas(ocupacoesCriticas)
+                .situacoesCapacitacao(situacoesCapacitacao)
                 .movimentacoes(movimentacoesDto)
                 .build();
     }
@@ -212,5 +212,4 @@ public class DiagnosticoConsultaService {
                 .buscarParticipante(subprocesso.getUnidade().getCodigo())
                 .orElse(null);
     }
-
 }

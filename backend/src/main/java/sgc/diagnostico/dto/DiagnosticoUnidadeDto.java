@@ -10,7 +10,7 @@ public record DiagnosticoUnidadeDto(
         UnidadeResumoDto unidade,
         String situacaoDiagnostico,
         List<ServidorDiagnosticoDto> servidores,
-        List<OcupacaoCriticaDto> ocupacoesCriticas,
+        List<SituacaoCapacitacaoDto> situacoesCapacitacao,
         List<MovimentacaoDto> movimentacoes
 ) {
 }

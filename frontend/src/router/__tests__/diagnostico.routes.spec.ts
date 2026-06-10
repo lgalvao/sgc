@@ -2,7 +2,7 @@ import {describe, expect, it, vi} from 'vitest';
 import diagnosticoRoutes from '../diagnostico.routes';
 
 vi.mock('@/views/AutoavaliacaoDiagnosticoView.vue', () => ({ default: {} }));
-vi.mock('@/views/OcupacoesCriticasDiagnosticoView.vue', () => ({ default: {} }));
+vi.mock('@/views/SituacaoCapacitacaoDiagnosticoView.vue', () => ({ default: {} }));
 vi.mock('@/views/MonitoramentoDiagnosticoView.vue', () => ({ default: {} }));
 vi.mock('@/views/ConsensoDiagnosticoView.vue', () => ({ default: {} }));
 vi.mock('@/views/DiagnosticoUnidadeView.vue', () => ({ default: {} }));
@@ -21,15 +21,15 @@ describe('diagnostico.routes', () => {
         });
         await expect((autoavaliacao.component as any)()).resolves.toBeDefined();
 
-        const ocupacoes = diagnosticoRoutes[1];
-        expect(ocupacoes.name).toBe('OcupacoesCriticasDiagnostico');
-        expect((ocupacoes.props as any)({
+        const situacoesCapacitacao = diagnosticoRoutes[1];
+        expect(situacoesCapacitacao.name).toBe('SituacaoCapacitacaoDiagnostico');
+        expect((situacoesCapacitacao.props as any)({
             params: {codSubprocesso: '42', siglaUnidade: 'ASSESSORIA_13'},
         } as any)).toEqual({
             codSubprocesso: 42,
             siglaUnidade: 'ASSESSORIA_13',
         });
-        await expect((ocupacoes.component as any)()).resolves.toBeDefined();
+        await expect((situacoesCapacitacao.component as any)()).resolves.toBeDefined();
 
         const monitoramento = diagnosticoRoutes[2];
         expect(monitoramento.name).toBe('MonitoramentoDiagnostico');

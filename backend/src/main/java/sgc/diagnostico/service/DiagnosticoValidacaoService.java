@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.OcupacaoCriticaRepo;
+import sgc.diagnostico.model.SituacaoCapacitacaoRepo;
 import sgc.subprocesso.model.TipoAcaoAnalise;
 import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.service.SubprocessoVisualizacaoService;
@@ -13,7 +13,7 @@ import sgc.subprocesso.service.SubprocessoVisualizacaoService;
 @RequiredArgsConstructor
 public class DiagnosticoValidacaoService {
     private final AvaliacaoServidorRepo avaliacaoRepo;
-    private final OcupacaoCriticaRepo ocupacaoRepo;
+    private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     private final SubprocessoVisualizacaoService subprocessoVisualizacaoService;
 
     public void validarAutoavaliacaoCompleta(Long diagnosticoCodigo, String servidorTitulo) {
@@ -32,12 +32,12 @@ public class DiagnosticoValidacaoService {
                 a.getSituacaoServidor() != sgc.diagnostico.model.SituacaoAvaliacaoServidor.CONSENSO_APROVADO
                         && a.getSituacaoServidor() != sgc.diagnostico.model.SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
 
-        var ocupacoes = ocupacaoRepo.listarPorDiagnostico(diagnosticoCodigo);
-        boolean ocupacoesPendentes = ocupacoes.isEmpty()
-                || ocupacoes.stream().anyMatch(o -> o.getSituacaoCapacitacao() == null);
+        var situacoes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnosticoCodigo);
+        boolean situacoesPendentes = situacoes.isEmpty()
+                || situacoes.stream().anyMatch(o -> o.getSituacaoCapacitacao() == null);
 
-        if (avaliacoesPendentes || ocupacoesPendentes) {
-            throw new ErroValidacao("Ainda existem avaliações ou ocupações críticas pendentes.");
+        if (avaliacoesPendentes || situacoesPendentes) {
+            throw new ErroValidacao("Ainda existem avaliações ou situações de capacitação pendentes.");
         }
     }
 

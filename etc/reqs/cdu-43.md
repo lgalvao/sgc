@@ -16,12 +16,15 @@ Ator: SERVIDOR
 
 3. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e,
    para cada competência:
-   - descrição da competência;
-   - um controle de _toggle_ `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos
-     associados à competência;
-   - campo `Importância`, com opções `NA` e os números de `1` a `6`;
-   - campo `Domínio`, com opções `NA` e os números de `1` a `6`;
-   - botão `Concluir autoavaliação`.
+    - descrição da competência;
+    - um controle de _toggle_ `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos
+      associados à competência;
+    - campo `Importância`, com opções `NA` e os números de `1` a `6`;
+    - campo `Domínio`, com opções `NA` e os números de `1` a `6`;
+    - botão `Concluir autoavaliação`.
+
+   **IMPORTANTE**: Se o servidor já tiver concluído a autoavaliação, o sistema mostra os dados acima apenas em modo
+   somente-leitura e desabilita o botão  `Concluir autoavaliação`, não se aplicando os passos a seguir.
 
 4. O usuário atribui um valor de domínio e de importância para cada uma das competências.
 
@@ -52,10 +55,10 @@ Ator: SERVIDOR
    ```
 
 9. O sistema cria internamente um alerta com:
-   - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
-   - `Processo`: [DESCRICAO_PROCESSO]
-   - `Data/hora`: [Data/hora atual]
-   - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-   - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
+    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
 10. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Autoavaliação concluída`.

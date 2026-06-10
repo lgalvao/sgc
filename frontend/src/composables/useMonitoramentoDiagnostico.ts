@@ -7,7 +7,7 @@ import {chaveUnidade, criarContextoSessaoDiagnostico, useDiagnosticoContexto} fr
 
 /**
  * Composable de monitoramento do diagnóstico da unidade.
- * Carrega dados completos: servidores, consenso, ocupações e movimentações.
+ * Carrega dados completos: servidores, consenso, situações de capacitação e movimentações.
  * Usado pelas views de monitoramento e análise da unidade pelo gestor/admin.
  */
 export function useMonitoramentoDiagnostico(codSubprocesso: number) {
@@ -24,7 +24,7 @@ export function useMonitoramentoDiagnostico(codSubprocesso: number) {
 
     const unidade = computed(() => query.data.value?.unidade);
     const servidores = computed(() => query.data.value?.servidores ?? []);
-    const ocupacoesCriticas = computed(() => query.data.value?.ocupacoesCriticas ?? []);
+    const situacoesCapacitacao = computed(() => query.data.value?.situacoesCapacitacao ?? []);
     const movimentacoes = computed(() => query.data.value?.movimentacoes ?? []);
     const carregando = computed(() => query.status.value === 'pending');
     const erro = computed(() => query.error.value);
@@ -45,7 +45,7 @@ export function useMonitoramentoDiagnostico(codSubprocesso: number) {
         query,
         unidade,
         servidores,
-        ocupacoesCriticas,
+        situacoesCapacitacao,
         movimentacoes,
         carregando,
         erro,

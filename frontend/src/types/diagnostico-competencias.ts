@@ -9,7 +9,7 @@ export type SituacaoAvaliacaoServidor =
     | 'CONSENSO_APROVADO'
     | 'AVALIACAO_IMPOSSIBILITADA';
 
-export type SituacaoCapacitacao = 'NA' | 'AC' | 'EC' | 'C' | 'I';
+export type ValorSituacaoCapacitacao = 'NA' | 'AC' | 'EC' | 'C' | 'I';
 
 export type SituacaoDiagnostico = 'EM_ANDAMENTO' | 'CONCLUIDO' | 'VALIDADO' | 'HOMOLOGADO';
 
@@ -83,12 +83,12 @@ export interface ServidorDiagnostico {
     consenso: AvaliacaoCompetencia[];
 }
 
-/** Ocupação crítica registrada para servidor/competência. */
-export interface OcupacaoCriticaItem {
+/** Situação de capacitação registrada para servidor/competência. */
+export interface SituacaoCapacitacaoItem {
     competenciaCodigo: number;
     servidorTitulo: string;
     servidorNome?: string;
-    situacaoCapacitacao: SituacaoCapacitacao | null;
+    situacaoCapacitacao: ValorSituacaoCapacitacao | null;
 }
 
 /** Resumo da unidade no diagnóstico. */
@@ -99,12 +99,12 @@ export interface UnidadeResumoDiag {
     situacaoSubprocesso: string;
 }
 
-/** Diagnóstico completo de uma unidade (servidores, ocupações, histórico). */
+/** Diagnóstico completo de uma unidade (servidores, situações de capacitação, histórico). */
 export interface DiagnosticoUnidade {
     unidade: UnidadeResumoDiag;
     situacaoDiagnostico: SituacaoDiagnostico;
     servidores: ServidorDiagnostico[];
-    ocupacoesCriticas: OcupacaoCriticaItem[];
+    situacoesCapacitacao: SituacaoCapacitacaoItem[];
     movimentacoes: MovimentacaoDiag[];
 }
 
@@ -129,14 +129,14 @@ export interface ConsensoRequest {
     competencias: ConsensoCompetenciaDetalhada[];
 }
 
-export interface OcupacaoCriticaRequest {
+export interface SituacaoCapacitacaoRequest {
     servidorTitulo: string;
     competenciaCodigo: number;
-    situacaoCapacitacao: SituacaoCapacitacao | null;
+    situacaoCapacitacao: ValorSituacaoCapacitacao | null;
 }
 
-export interface OcupacoesCriticasRequest {
-    ocupacoes: OcupacaoCriticaRequest[];
+export interface SituacoesCapacitacaoRequest {
+    situacoes: SituacaoCapacitacaoRequest[];
 }
 
 export interface JustificativaRequest {

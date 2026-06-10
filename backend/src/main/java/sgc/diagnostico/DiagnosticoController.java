@@ -98,13 +98,13 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    // CDU-47: ocupações críticas (salvamento automático)
-    @PostMapping("/subprocessos/{codSubprocesso}/ocupacoes-criticas")
+    // CDU-47: situação de capacitação (salvamento automático)
+    @PostMapping("/subprocessos/{codSubprocesso}/situacoes-capacitacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
-    public ResponseEntity<Void> salvarOcupacoesCriticas(
+    public ResponseEntity<Void> salvarSituacoesCapacitacao(
             @PathVariable Long codSubprocesso,
-            @Valid @RequestBody OcupacoesCriticasRequest request) {
-        avaliacaoService.salvarOcupacoesCriticas(codSubprocesso, request);
+            @Valid @RequestBody SituacoesCapacitacaoRequest request) {
+        avaliacaoService.salvarSituacoesCapacitacao(codSubprocesso, request);
         return ResponseEntity.ok().build();
     }
 

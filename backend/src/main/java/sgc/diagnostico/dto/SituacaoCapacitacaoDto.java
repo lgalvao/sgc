@@ -6,7 +6,7 @@ import lombok.Builder;
 import org.jspecify.annotations.Nullable;
 
 @Builder
-public record OcupacaoCriticaDto(
+public record SituacaoCapacitacaoDto(
         @NotNull Long competenciaCodigo,
         @NotBlank String servidorTitulo,
         @Nullable String servidorNome,

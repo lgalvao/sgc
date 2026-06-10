@@ -16,7 +16,7 @@ Ator: CHEFE
 
 3. O usuário aciona o card `Situação de capacitação`.
 
-4. O sistema apresenta uma grade com a matriz `Competência x Servidor`, contendo:
+4. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
     - uma linha para cada competência vigente da unidade;
     - uma coluna para cada servidor participante da unidade;
     - uma célula editável (dropdown) `Situação de capacitação` para cada combinação competência/servidor;
@@ -40,7 +40,7 @@ Ator: CHEFE
    | Desc. Competência 2 | I - Instrutor        | C - Capacitado      | C - Capacitado      |
    | Desc. Competência 3 | EC - Em capacitação  | EC - Em capacitação | EC - Em capacitação |
 
-5. O usuário informa os valores de situação de capacitação para cada par competência/servidor.
+5. O usuário informa os valores de situação de capacitação para cada cruzamento competência/servidor.
 
 6. O sistema salva automaticamente cada alteração realizada.
 

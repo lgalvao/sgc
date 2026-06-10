@@ -32,6 +32,7 @@ import sgc.mapa.model.Mapa;
 import sgc.mapa.model.Competencia;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
+import sgc.diagnostico.model.SituacaoCapacitacao;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class DiagnosticoFluxoService {
                 .buscarServidoresParticipantes(subprocesso.getUnidade().getCodigo());
         List<Usuario> servidores = carregarServidoresSnapshot(servidoresSnapshot);
         List<AvaliacaoServidor> avaliacoes = new ArrayList<>();
-        List<sgc.diagnostico.model.OcupacaoCritica> ocupacoesCriticas = new ArrayList<>();
+        List<SituacaoCapacitacao> situacaoCapacitacoes = new ArrayList<>();
 
         Mapa mapa = subprocesso.getMapa();
         if (mapa != null && mapa.getCompetencias() != null) {
@@ -85,7 +86,7 @@ public class DiagnosticoFluxoService {
                             .build();
                     avaliacoes.add(avaliacao);
 
-                    ocupacoesCriticas.add(sgc.diagnostico.model.OcupacaoCritica.builder()
+                    situacaoCapacitacoes.add(SituacaoCapacitacao.builder()
                             .diagnostico(diagnostico)
                             .servidor(servidor)
                             .servidorNomeSnapshot(servidorSnapshot.getNome())
@@ -99,7 +100,7 @@ public class DiagnosticoFluxoService {
         }
 
         diagnostico.setAvaliacaoServidores(avaliacoes);
-        diagnostico.setOcupacaoCriticas(ocupacoesCriticas);
+        diagnostico.setSituacaoCapacitacoes(situacaoCapacitacoes);
         diagnosticoRepo.save(diagnostico);
     }
 

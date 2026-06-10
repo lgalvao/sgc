@@ -131,19 +131,19 @@
       >
         <BCard
             class="h-100 card-actionable"
-            data-testid="card-subprocesso-ocupacoes"
+            data-testid="card-subprocesso-situacoes-capacitacao"
             role="button"
             tabindex="0"
-            @click="navegarParaDiag('OcupacoesCriticasDiagnostico')"
-            @keydown="aoPressionarTeclaDiagnostico($event, 'OcupacoesCriticasDiagnostico')"
+            @click="navegarParaDiag('SituacaoCapacitacaoDiagnostico')"
+            @keydown="aoPressionarTeclaDiagnostico($event, 'SituacaoCapacitacaoDiagnostico')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
               <i aria-hidden="true" class="bi bi-people text-primary flex-shrink-0 mt-1"></i>
-              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.OCUPACOES_TITULO }}</span>
+              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.SITUACAO_CAPACITACAO_TITULO }}</span>
             </BCardTitle>
             <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.OCUPACOES_TEXTO }}
+              {{ TEXTOS.subprocesso.cards.SITUACAO_CAPACITACAO_TEXTO }}
             </BCardText>
           </div>
         </BCard>

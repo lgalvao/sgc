@@ -47,8 +47,8 @@
         </BCol>
         <BCol md="4">
           <BCard class="text-center h-100">
-            <div class="display-6 fw-bold text-info">{{ ocupacoesCriticas.length }}</div>
-            <div class="text-muted small mt-1">Ocupações Críticas</div>
+            <div class="display-6 fw-bold text-info">{{ situacoesCapacitacao.length }}</div>
+            <div class="text-muted small mt-1">Situações de Capacitação</div>
           </BCard>
         </BCol>
       </BRow>
@@ -109,12 +109,12 @@
         </template>
       </BCard>
 
-      <!-- Ocupações críticas -->
-      <BCard v-if="ocupacoesCriticas.length > 0" class="mb-4">
-        <BCardHeader><strong>Ocupações Críticas</strong></BCardHeader>
+      <!-- Situações de capacitação -->
+      <BCard v-if="situacoesCapacitacao.length > 0" class="mb-4">
+        <BCardHeader><strong>Situações de Capacitação</strong></BCardHeader>
         <BTable
-            :fields="colunasOcupacoes"
-            :items="ocupacoesComDescricao"
+            :fields="colunasSituacoes"
+            :items="situacoesComDescricao"
             bordered
             responsive
             small
@@ -254,7 +254,7 @@ const {
   router,
   unidade,
   servidores,
-  ocupacoesCriticas,
+  situacoesCapacitacao,
   movimentacoes,
   carregando,
   situacao,
@@ -287,8 +287,8 @@ const {
   formatarCapacitacao,
   formatarNota,
   obterGapInfo,
-  ocupacoesComDescricao,
+  situacoesComDescricao,
   colunasCompetencias,
-  colunasOcupacoes,
+  colunasSituacoes,
 } = useDiagnosticoUnidadeView(props);
 </script>

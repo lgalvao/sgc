@@ -7,7 +7,7 @@ import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {usePerfilStore} from '@/stores/perfil';
 import {Perfil} from '@/types/tipos';
 import {TEXTOS} from '@/constants/textos';
-import type {AvaliacaoCompetencia, SituacaoAvaliacaoServidor, SituacaoCapacitacao} from '@/types/diagnostico-competencias';
+import type {AvaliacaoCompetencia, SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
 
@@ -24,7 +24,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const {
         unidade,
         servidores,
-        ocupacoesCriticas,
+        situacoesCapacitacao,
         movimentacoes,
         carregando,
         situacao,
@@ -195,13 +195,13 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         }[situacaoServidor];
     }
 
-    function varianteCapacitacao(situacaoCapacitacao: SituacaoCapacitacao | null): ColorVariant {
+    function varianteCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): ColorVariant {
         if (situacaoCapacitacao === null) return 'light';
-        const mapa: Record<SituacaoCapacitacao, ColorVariant> = {NA: 'secondary', AC: 'danger', EC: 'warning', C: 'success', I: 'primary'};
+        const mapa: Record<ValorSituacaoCapacitacao, ColorVariant> = {NA: 'secondary', AC: 'danger', EC: 'warning', C: 'success', I: 'primary'};
         return mapa[situacaoCapacitacao];
     }
 
-    function formatarCapacitacao(situacaoCapacitacao: SituacaoCapacitacao | null): string {
+    function formatarCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
         if (situacaoCapacitacao === null) return '-';
         return {
             NA: TEXTOS.diagnostico.CAPACITACAO_NA,
@@ -236,10 +236,10 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         Object.fromEntries((contexto.value?.competencias ?? []).map((competencia) => [competencia.competenciaCodigo, competencia.descricao])),
     );
 
-    const ocupacoesComDescricao = computed(() =>
-        ocupacoesCriticas.value.map((ocupacao) => ({
-            ...ocupacao,
-            nomeCompetencia: mapaDescricaoCompetencia.value[ocupacao.competenciaCodigo] ?? `Competência ${ocupacao.competenciaCodigo}`,
+    const situacoesComDescricao = computed(() =>
+        situacoesCapacitacao.value.map((situacaoItem) => ({
+            ...situacaoItem,
+            nomeCompetencia: mapaDescricaoCompetencia.value[situacaoItem.competenciaCodigo] ?? `Competência ${situacaoItem.competenciaCodigo}`,
         })),
     );
 
@@ -250,7 +250,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         {key: 'gap', label: TEXTOS.diagnostico.COLUNA_GAP},
     ];
 
-    const colunasOcupacoes = [
+    const colunasSituacoes = [
         {key: 'servidorTitulo', label: TEXTOS.diagnostico.COLUNA_SERVIDOR},
         {key: 'nomeCompetencia', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
         {key: 'situacaoCapacitacao', label: TEXTOS.diagnostico.COLUNA_CAPACITACAO},
@@ -260,7 +260,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         router,
         unidade,
         servidores,
-        ocupacoesCriticas,
+        situacoesCapacitacao,
         movimentacoes,
         carregando,
         situacao,
@@ -293,8 +293,8 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         formatarCapacitacao,
         formatarNota,
         obterGapInfo,
-        ocupacoesComDescricao,
+        situacoesComDescricao,
         colunasCompetencias,
-        colunasOcupacoes,
+        colunasSituacoes,
     };
 }

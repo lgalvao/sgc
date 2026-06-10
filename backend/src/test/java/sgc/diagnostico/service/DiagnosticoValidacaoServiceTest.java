@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.OcupacaoCritica;
-import sgc.diagnostico.model.OcupacaoCriticaRepo;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoCapacitacao;
+import sgc.diagnostico.model.SituacaoCapacitacaoRepo;
+import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
+import sgc.diagnostico.model.ValorSituacaoCapacitacao;
 import sgc.subprocesso.model.TipoAcaoAnalise;
 import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.service.SubprocessoVisualizacaoService;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 class DiagnosticoValidacaoServiceTest {
 
     @Mock AvaliacaoServidorRepo avaliacaoRepo;
-    @Mock OcupacaoCriticaRepo ocupacaoRepo;
+    @Mock SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     @Mock SubprocessoVisualizacaoService subprocessoVisualizacaoService;
 
     @InjectMocks
@@ -66,32 +66,32 @@ class DiagnosticoValidacaoServiceTest {
         AvaliacaoServidor avaliacao = new AvaliacaoServidor();
         avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
 
-        OcupacaoCritica ocupacao = new OcupacaoCritica();
-        ocupacao.setSituacaoCapacitacao(SituacaoCapacitacao.EC);
+        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
+        situacao.setSituacaoCapacitacao(ValorSituacaoCapacitacao.EC);
 
         when(avaliacaoRepo.listarPorDiagnostico(20L)).thenReturn(List.of(avaliacao));
-        when(ocupacaoRepo.listarPorDiagnostico(20L)).thenReturn(List.of(ocupacao));
+        when(situacaoCapacitacaoRepo.listarPorDiagnostico(20L)).thenReturn(List.of(situacao));
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(20L))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Ainda existem avaliações ou ocupações críticas pendentes.");
+                .hasMessage("Ainda existem avaliações ou situações de capacitação pendentes.");
     }
 
     @Test
-    @DisplayName("validarConclusaoUnidade deve falhar quando houver ocupação crítica sem situação")
+    @DisplayName("validarConclusaoUnidade deve falhar quando houver situação de capacitação sem valor")
     void validarConclusaoUnidade_deveFalharQuandoOcupacaoPendente() {
         AvaliacaoServidor avaliacao = new AvaliacaoServidor();
         avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
 
-        OcupacaoCritica ocupacao = new OcupacaoCritica();
-        ocupacao.setSituacaoCapacitacao(null);
+        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
+        situacao.setSituacaoCapacitacao(null);
 
         when(avaliacaoRepo.listarPorDiagnostico(21L)).thenReturn(List.of(avaliacao));
-        when(ocupacaoRepo.listarPorDiagnostico(21L)).thenReturn(List.of(ocupacao));
+        when(situacaoCapacitacaoRepo.listarPorDiagnostico(21L)).thenReturn(List.of(situacao));
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(21L))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Ainda existem avaliações ou ocupações críticas pendentes.");
+                .hasMessage("Ainda existem avaliações ou situações de capacitação pendentes.");
     }
 
     @Test
@@ -102,11 +102,11 @@ class DiagnosticoValidacaoServiceTest {
         AvaliacaoServidor impossibilitada = new AvaliacaoServidor();
         impossibilitada.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
 
-        OcupacaoCritica ocupacao = new OcupacaoCritica();
-        ocupacao.setSituacaoCapacitacao(SituacaoCapacitacao.AC);
+        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
+        situacao.setSituacaoCapacitacao(ValorSituacaoCapacitacao.AC);
 
         when(avaliacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(aprovada, impossibilitada));
-        when(ocupacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(ocupacao));
+        when(situacaoCapacitacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(situacao));
 
         assertThatCode(() -> service.validarConclusaoUnidade(22L))
                 .doesNotThrowAnyException();

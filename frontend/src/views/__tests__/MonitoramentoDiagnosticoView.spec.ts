@@ -38,7 +38,7 @@ vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
         servidores: ref([
             {servidorTitulo: '242426', servidorNome: 'Servidor 1', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA'},
         ]),
-        ocupacoesCriticas: ref([{cargoNome: 'Cargo crítico'}]),
+        situacoesCapacitacao: ref([{cargoNome: 'Cargo crítico'}]),
         movimentacoes: ref([
             {descricao: 'Movimentação teste', unidadeOrigem: 'A', unidadeDestino: 'B', dataHora: '2026-06-05 10:00'},
         ]),

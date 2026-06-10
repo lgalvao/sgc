@@ -357,7 +357,7 @@ function navegarParaConsenso(servidorTitulo: string) {
 
 function navegarParaCapacitacao(servidorTitulo: string) {
   void router.push({
-    name: 'OcupacoesCriticasDiagnostico',
+    name: 'SituacaoCapacitacaoDiagnostico',
     params: {
       codSubprocesso: props.codSubprocesso,
       siglaUnidade: props.siglaUnidade,

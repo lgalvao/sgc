@@ -103,14 +103,14 @@ class DiagnosticoFluxoServiceTest {
         Diagnostico salvo = captor.getValue();
 
         assertThat(salvo.getAvaliacaoServidores()).hasSize(4);
-        assertThat(salvo.getOcupacaoCriticas()).hasSize(4);
+        assertThat(salvo.getSituacaoCapacitacoes()).hasSize(4);
         assertThat(salvo.getAvaliacaoServidores())
                 .allSatisfy(avaliacao -> {
                     assertThat(avaliacao.getDiagnostico()).isSameAs(salvo);
                     assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
                     assertThat(avaliacao.getServidorNomeDiagnostico()).isNotBlank();
                 });
-        assertThat(salvo.getOcupacaoCriticas())
+        assertThat(salvo.getSituacaoCapacitacoes())
                 .allSatisfy(ocupacao -> {
                     assertThat(ocupacao.getDiagnostico()).isSameAs(salvo);
                     assertThat(ocupacao.getUnidadeCodigoSnapshot()).isEqualTo(unidadeOrigem.getCodigo());

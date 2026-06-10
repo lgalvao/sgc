@@ -8,7 +8,7 @@ import type {
     DiagnosticoEquipe,
     DiagnosticoUnidade,
     JustificativaRequest,
-    OcupacoesCriticasRequest,
+    SituacoesCapacitacaoRequest,
     TextoOpcionalRequest,
 } from '@/types/diagnostico-competencias';
 
@@ -78,12 +78,12 @@ export async function obterEquipe(codSubprocesso: number): Promise<DiagnosticoEq
     return apiGet(`${BASE}/${codSubprocesso}/equipe`);
 }
 
-/** POST /diagnosticos/subprocessos/{id}/ocupacoes-criticas — salvamento automático */
-export async function salvarOcupacoesCriticas(
+/** POST /diagnosticos/subprocessos/{id}/situacoes-capacitacao — salvamento automático */
+export async function salvarSituacoesCapacitacao(
     codSubprocesso: number,
-    request: OcupacoesCriticasRequest,
+    request: SituacoesCapacitacaoRequest,
 ): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/ocupacoes-criticas`, request);
+    return apiPost(`${BASE}/${codSubprocesso}/situacoes-capacitacao`, request);
 }
 
 /** GET /diagnosticos/subprocessos/{id}/unidade */

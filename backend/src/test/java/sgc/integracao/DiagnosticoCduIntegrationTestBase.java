@@ -6,10 +6,10 @@ import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
 import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.DiagnosticoRepo;
-import sgc.diagnostico.model.OcupacaoCritica;
-import sgc.diagnostico.model.OcupacaoCriticaRepo;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoCapacitacao;
+import sgc.diagnostico.model.SituacaoCapacitacaoRepo;
+import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
+import sgc.diagnostico.model.ValorSituacaoCapacitacao;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.mapa.model.Competencia;
@@ -39,7 +39,7 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
     protected AvaliacaoServidorRepo avaliacaoServidorRepo;
 
     @Autowired
-    protected OcupacaoCriticaRepo ocupacaoCriticaRepo;
+    protected SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
 
     @Autowired
     protected CompetenciaRepo competenciaRepo;
@@ -96,16 +96,16 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
                         novaAvaliacao(outroServidor, competencia1),
                         novaAvaliacao(outroServidor, competencia2)
                 ))
-                .ocupacaoCriticas(List.of(
-                        novaOcupacaoCritica(servidor, competencia1),
-                        novaOcupacaoCritica(servidor, competencia2),
-                        novaOcupacaoCritica(outroServidor, competencia1),
-                        novaOcupacaoCritica(outroServidor, competencia2)
+                .situacaoCapacitacoes(List.of(
+                        novaSituacaoCapacitacao(servidor, competencia1),
+                        novaSituacaoCapacitacao(servidor, competencia2),
+                        novaSituacaoCapacitacao(outroServidor, competencia1),
+                        novaSituacaoCapacitacao(outroServidor, competencia2)
                 ))
                 .build();
 
         diagnostico.getAvaliacaoServidores().forEach(avaliacao -> avaliacao.setDiagnostico(diagnostico));
-        diagnostico.getOcupacaoCriticas().forEach(ocupacao -> ocupacao.setDiagnostico(diagnostico));
+        diagnostico.getSituacaoCapacitacoes().forEach(ocupacao -> ocupacao.setDiagnostico(diagnostico));
         diagnostico = diagnosticoRepo.saveAndFlush(diagnostico);
 
         registrarMovimentacaoInicial(subprocesso);
@@ -174,16 +174,16 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
         recarregarContexto();
     }
 
-    protected void preencherOcupacoesCriticas(String tituloServidor, SituacaoCapacitacao situacao1, SituacaoCapacitacao situacao2) {
-        List<OcupacaoCritica> ocupacoes = ocupacaoCriticaRepo.listarPorDiagnostico(diagnostico.getCodigo()).stream()
+    protected void preencherSituacoesCapacitacao(String tituloServidor, ValorSituacaoCapacitacao situacao1, ValorSituacaoCapacitacao situacao2) {
+        List<SituacaoCapacitacao> ocupacoes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnostico.getCodigo()).stream()
                 .filter(ocupacao -> ocupacao.getServidor().getTituloEleitoral().equals(tituloServidor))
                 .toList();
-        for (OcupacaoCritica ocupacao : ocupacoes) {
+        for (SituacaoCapacitacao ocupacao : ocupacoes) {
             ocupacao.setSituacaoCapacitacao(ocupacao.getCompetencia().getCodigo().equals(competencia1.getCodigo())
                     ? situacao1
                     : situacao2);
         }
-        ocupacaoCriticaRepo.saveAllAndFlush(ocupacoes);
+        situacaoCapacitacaoRepo.saveAllAndFlush(ocupacoes);
         recarregarContexto();
     }
 
@@ -191,8 +191,8 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
         return avaliacaoServidorRepo.buscarAvaliacoesDoServidor(diagnostico.getCodigo(), tituloServidor);
     }
 
-    protected List<OcupacaoCritica> buscarOcupacoes(String tituloServidor) {
-        return ocupacaoCriticaRepo.listarPorDiagnostico(diagnostico.getCodigo()).stream()
+    protected List<SituacaoCapacitacao> buscarSituacoesCapacitacao(String tituloServidor) {
+        return situacaoCapacitacaoRepo.listarPorDiagnostico(diagnostico.getCodigo()).stream()
                 .filter(ocupacao -> ocupacao.getServidor().getTituloEleitoral().equals(tituloServidor))
                 .toList();
     }
@@ -220,8 +220,8 @@ abstract class DiagnosticoCduIntegrationTestBase extends BaseIntegrationTest {
                 .build();
     }
 
-    private OcupacaoCritica novaOcupacaoCritica(Usuario usuario, Competencia competencia) {
-        return OcupacaoCritica.builder()
+    private SituacaoCapacitacao novaSituacaoCapacitacao(Usuario usuario, Competencia competencia) {
+        return SituacaoCapacitacao.builder()
                 .diagnostico(diagnostico)
                 .servidor(usuario)
                 .servidorNomeSnapshot(usuario.getNome())

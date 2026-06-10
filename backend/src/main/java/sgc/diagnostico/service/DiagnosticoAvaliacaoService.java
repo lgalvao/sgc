@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class DiagnosticoAvaliacaoService {
     private final DiagnosticoRepo diagnosticoRepo;
     private final AvaliacaoServidorRepo avaliacaoRepo;
-    private final OcupacaoCriticaRepo ocupacaoRepo;
+    private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     private final DiagnosticoGapService gapService;
     private final DiagnosticoValidacaoService validacaoService;
     private final DiagnosticoNotificacaoService notificacaoService;
@@ -61,6 +61,7 @@ public class DiagnosticoAvaliacaoService {
             subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         }
     }
+
     public void concluirAutoavaliacao(Long codSubprocesso) {
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
@@ -77,6 +78,7 @@ public class DiagnosticoAvaliacaoService {
                 subprocessoConsultaService.buscarSubprocesso(codSubprocesso),
                 usuario.getTituloEleitoral());
     }
+
     public void salvarConsenso(Long codSubprocesso, ConsensoRequest request, String servidorTitulo) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
@@ -138,26 +140,26 @@ public class DiagnosticoAvaliacaoService {
         avaliacaoRepo.saveAll(avaliacoes);
     }
 
-    public void salvarOcupacoesCriticas(Long codSubprocesso, OcupacoesCriticasRequest request) {
+    public void salvarSituacoesCapacitacao(Long codSubprocesso, SituacoesCapacitacaoRequest request) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
 
-        var existentes = ocupacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
-        Map<String, OcupacaoCritica> porChave = existentes.stream()
+        var existentes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
+        Map<String, SituacaoCapacitacao> porChave = existentes.stream()
                 .collect(java.util.stream.Collectors.toMap(
                         o -> o.getServidor().getTituloEleitoral() + ":" + o.getCompetencia().getCodigo(), o -> o));
 
-        for (OcupacaoCriticaDto item : request.ocupacoes()) {
+        for (SituacaoCapacitacaoDto item : request.situacoes()) {
             String chave = item.servidorTitulo() + ":" + item.competenciaCodigo();
-            OcupacaoCritica registro = porChave.get(chave);
+            SituacaoCapacitacao registro = porChave.get(chave);
             if (registro == null) {
                 continue;
             }
             registro.setSituacaoCapacitacao(
-                    item.situacaoCapacitacao() == null ? null : SituacaoCapacitacao.valueOf(item.situacaoCapacitacao())
+                    item.situacaoCapacitacao() == null ? null : ValorSituacaoCapacitacao.valueOf(item.situacaoCapacitacao())
             );
         }
-        ocupacaoRepo.saveAll(existentes);
+        situacaoCapacitacaoRepo.saveAll(existentes);
     }
 
     private void validarCompetenciasEsperadas(
@@ -175,5 +177,4 @@ public class DiagnosticoAvaliacaoService {
             throw new ErroValidacao("A requisição deve informar exatamente as competências esperadas para a avaliação.");
         }
     }
-
 }

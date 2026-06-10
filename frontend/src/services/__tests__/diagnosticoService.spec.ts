@@ -14,7 +14,7 @@ import {
     obterEquipe,
     salvarAutoavaliacao,
     salvarConsenso,
-    salvarOcupacoesCriticas,
+    salvarSituacoesCapacitacao,
     validarDiagnostico,
 } from '../diagnosticoService';
 
@@ -65,11 +65,11 @@ describe('diagnosticoService', () => {
         expect(apiPostMock).toHaveBeenNthCalledWith(4, '/diagnosticos/subprocessos/23/consenso/aprovar');
     });
 
-    it('deve chamar endpoints POST de impossibilidade, ocupações e fluxo da unidade', async () => {
+    it('deve chamar endpoints POST de impossibilidade, situações e fluxo da unidade', async () => {
         apiPostMock.mockResolvedValue(undefined);
 
         await impossibilitarAvaliacao(30, '242426', {justificativa: 'Servidor afastado'});
-        await salvarOcupacoesCriticas(31, {ocupacoes: []} as any);
+        await salvarSituacoesCapacitacao(31, {situacoes: []} as any);
         await concluirDiagnostico(32);
         await validarDiagnostico(33, {texto: 'Observações'});
         await devolverDiagnostico(34, {justificativa: 'Ajustes'});
@@ -80,7 +80,7 @@ describe('diagnosticoService', () => {
             '/diagnosticos/subprocessos/30/avaliacoes/242426/impossibilitar',
             {justificativa: 'Servidor afastado'},
         );
-        expect(apiPostMock).toHaveBeenNthCalledWith(2, '/diagnosticos/subprocessos/31/ocupacoes-criticas', {ocupacoes: []});
+        expect(apiPostMock).toHaveBeenNthCalledWith(2, '/diagnosticos/subprocessos/31/situacoes-capacitacao', {situacoes: []});
         expect(apiPostMock).toHaveBeenNthCalledWith(3, '/diagnosticos/subprocessos/32/concluir');
         expect(apiPostMock).toHaveBeenNthCalledWith(4, '/diagnosticos/subprocessos/33/validar', {texto: 'Observações'});
         expect(apiPostMock).toHaveBeenNthCalledWith(5, '/diagnosticos/subprocessos/34/devolver', {justificativa: 'Ajustes'});

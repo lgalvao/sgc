@@ -31,7 +31,7 @@
       <!-- Tabela de situação de capacitação -->
       <BCard class="mb-4">
         <EmptyState
-            v-if="ocupacoesLocais.length === 0"
+            v-if="situacoesLocais.length === 0"
             :description="TEXTOS.diagnostico.VAZIO_CAPACITACAO_TEXTO"
             :title="TEXTOS.diagnostico.VAZIO_CAPACITACAO_TITULO"
             icon="bi-award"
@@ -74,11 +74,11 @@
                   class="text-center coluna-servidor"
               >
                 <BFormSelect
-                    :data-testid="`ocupacao-${celula.servidorTitulo}-${linha.competenciaCodigo}`"
+                    :data-testid="`situacao-${celula.servidorTitulo}-${linha.competenciaCodigo}`"
                     :model-value="celula.situacaoCapacitacao"
                     :options="opcoesCapacitacao"
                     class="form-select-sm seletor-capacitacao"
-                    @update:model-value="(v: unknown) => atualizarCapacitacao(celula.servidorTitulo, linha.competenciaCodigo, v as SituacaoCapacitacao)"
+                    @update:model-value="(v: unknown) => atualizarCapacitacao(celula.servidorTitulo, linha.competenciaCodigo, v as ValorSituacaoCapacitacao)"
                 />
               </td>
             </tr>
@@ -103,9 +103,9 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
-import {useOcupacoesCriticasDiagnostico} from '@/composables/useOcupacoesCriticasDiagnostico';
+import {useSituacaoCapacitacaoDiagnostico} from '@/composables/useSituacaoCapacitacaoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
-import type {SituacaoCapacitacao} from '@/types/diagnostico-competencias';
+import type {ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -116,13 +116,13 @@ const router = useRouter();
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 
 const {
-  ocupacoesLocais,
+  situacoesLocais,
   unidade,
   servidores,
   carregando,
   salvandoAutomaticamente,
   atualizarCapacitacao,
-} = useOcupacoesCriticasDiagnostico(props.codSubprocesso);
+} = useSituacaoCapacitacaoDiagnostico(props.codSubprocesso);
 
 
 const servidoresCabecalho = computed(() => {
@@ -144,8 +144,8 @@ const servidoresCabecalho = computed(() => {
 });
 
 const matrizCapacitacao = computed(() => {
-  const ocupacoesPorChave = new Map(
-    ocupacoesLocais.value.map((ocupacao) => [`${ocupacao.competenciaCodigo}-${ocupacao.servidorTitulo}`, ocupacao]),
+  const situacoesPorChave = new Map(
+    situacoesLocais.value.map((o) => [`${o.competenciaCodigo}-${o.servidorTitulo}`, o]),
   );
 
   return (contexto.value?.competencias ?? []).map((competencia) => ({
@@ -154,7 +154,7 @@ const matrizCapacitacao = computed(() => {
     celulas: servidoresCabecalho.value.map((servidor) => ({
       servidorTitulo: servidor.servidorTitulo,
       servidorNome: servidor.servidorNome,
-      situacaoCapacitacao: ocupacoesPorChave.get(`${competencia.competenciaCodigo}-${servidor.servidorTitulo}`)?.situacaoCapacitacao ?? null,
+      situacaoCapacitacao: situacoesPorChave.get(`${competencia.competenciaCodigo}-${servidor.servidorTitulo}`)?.situacaoCapacitacao ?? null,
     })),
   }));
 });

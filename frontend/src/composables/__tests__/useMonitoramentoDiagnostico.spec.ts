@@ -55,7 +55,7 @@ describe('useMonitoramentoDiagnostico', () => {
                 {servidorTitulo: '242427', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
                 {servidorTitulo: '242428', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
             ],
-            ocupacoesCriticas: [{competenciaCodigo: 10}],
+            situacoesCapacitacao: [{competenciaCodigo: 10}],
             movimentacoes: [{descricao: 'Teste'}],
         };
     });
@@ -72,7 +72,7 @@ describe('useMonitoramentoDiagnostico', () => {
         expect(composable!.unidade.value?.unidadeSigla).toBe('ASSESSORIA_12');
         expect(composable!.situacao.value).toBe('CONCLUIDO');
         expect(composable!.situacaoSubprocesso.value).toBe('DIAGNOSTICO_CONCLUIDO');
-        expect(composable!.ocupacoesCriticas.value).toHaveLength(1);
+        expect(composable!.situacoesCapacitacao.value).toHaveLength(1);
         expect(composable!.movimentacoes.value).toHaveLength(1);
         expect(composable!.totalPendentes.value).toBe(1);
 
@@ -87,7 +87,7 @@ describe('useMonitoramentoDiagnostico', () => {
         mockQueryData.value = {
             unidade: null,
             servidores: [],
-            ocupacoesCriticas: [],
+            situacoesCapacitacao: [],
             movimentacoes: [],
             situacaoDiagnostico: null,
         };

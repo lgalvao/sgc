@@ -1,7 +1,7 @@
 import {describe, expect, it, vi} from 'vitest';
 import {ref} from 'vue';
 import {mount} from '@vue/test-utils';
-import OcupacoesCriticasDiagnosticoView from '../OcupacoesCriticasDiagnosticoView.vue';
+import SituacaoCapacitacaoDiagnosticoView from '../SituacaoCapacitacaoDiagnosticoView.vue';
 
 vi.mock('vue-router', () => ({
     useRouter: () => ({
@@ -19,7 +19,7 @@ vi.mock('@/composables/useDiagnosticoContexto', () => ({
     }),
 }));
 
-const ocupacoesLocaisVal = ref<any[]>([
+const situacoesLocaisVal = ref<any[]>([
     {servidorTitulo: '242426', servidorNome: 'Duff McKagan', competenciaCodigo: 10, situacaoCapacitacao: null},
     {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
 ]);
@@ -38,9 +38,9 @@ const unidadeVal = ref<any>({
     unidadeNome: 'Assessoria 12',
 });
 
-vi.mock('@/composables/useOcupacoesCriticasDiagnostico', () => ({
-    useOcupacoesCriticasDiagnostico: () => ({
-        ocupacoesLocais: ocupacoesLocaisVal,
+vi.mock('@/composables/useSituacaoCapacitacaoDiagnostico', () => ({
+    useSituacaoCapacitacaoDiagnostico: () => ({
+        situacoesLocais: situacoesLocaisVal,
         unidade: unidadeVal,
         servidores: servidoresVal,
         carregando: carregandoVal,
@@ -49,9 +49,9 @@ vi.mock('@/composables/useOcupacoesCriticasDiagnostico', () => ({
     }),
 }));
 
-describe('OcupacoesCriticasDiagnosticoView', () => {
+describe('SituacaoCapacitacaoDiagnosticoView', () => {
     it('simplifica o cabeçalho e apresenta a matriz competência x servidor', () => {
-        const wrapper = mount(OcupacoesCriticasDiagnosticoView, {
+        const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
@@ -81,8 +81,8 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
         expect(wrapper.find('.bi-award').exists()).toBe(false);
         expect(wrapper.find('th[title="Duff McKagan"]').exists()).toBe(true);
         expect(wrapper.find('th[title="Izzy Stradlin"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="ocupacao-242426-10"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="ocupacao-242427-10"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="situacao-242426-10"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="situacao-242427-10"]').exists()).toBe(true);
         expect(wrapper.text()).not.toContain('Concluir diagnóstico');
     });
 
@@ -95,7 +95,7 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
             {servidorTitulo: '5', servidorNome: 'Steven Adler'}, // Mesmo abreviado "Steven A.", forca exibirTituloSecundario
         ];
 
-        const wrapper = mount(OcupacoesCriticasDiagnosticoView, {
+        const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
@@ -113,7 +113,7 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
                 },
             },
         });
-        
+
         expect(wrapper.text()).toContain('Axl');
         expect(wrapper.text()).toContain('ChristopherR');
         expect(wrapper.text()).toContain('Steven A.');
@@ -121,8 +121,8 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
     });
 
     it('exercita empty state e update capacitacao', async () => {
-        ocupacoesLocaisVal.value = [];
-        const wrapperEmpty = mount(OcupacoesCriticasDiagnosticoView, {
+        situacoesLocaisVal.value = [];
+        const wrapperEmpty = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
@@ -142,13 +142,13 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
         });
         expect(wrapperEmpty.find('.empty-state').exists()).toBe(true);
 
-        ocupacoesLocaisVal.value = [
+        situacoesLocaisVal.value = [
             {servidorTitulo: '1', servidorNome: 'Axl', competenciaCodigo: 10, situacaoCapacitacao: null},
         ];
         servidoresVal.value = [
             {servidorTitulo: '1', servidorNome: 'Axl'},
         ];
-        const wrapperSelect = mount(OcupacoesCriticasDiagnosticoView, {
+        const wrapperSelect = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
@@ -178,7 +178,7 @@ describe('OcupacoesCriticasDiagnosticoView', () => {
 
     it('exercita unidade null', () => {
         unidadeVal.value = null; // Para forçar unidade = null pelo mock
-        const wrapper = mount(OcupacoesCriticasDiagnosticoView, {
+        const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
