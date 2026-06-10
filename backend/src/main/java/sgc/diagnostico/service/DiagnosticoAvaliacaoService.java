@@ -72,10 +72,6 @@ public class DiagnosticoAvaliacaoService {
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
 
-        if (!avaliacoes.isEmpty() && avaliacoes.get(0).getSituacaoServidor() != SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA) {
-            throw new ErroValidacao("A autoavaliação já foi concluída.");
-        }
-
         avaliacoes.forEach(a -> a.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA));
         avaliacaoRepo.saveAll(avaliacoes);
 
