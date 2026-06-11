@@ -51,10 +51,10 @@ Ator: CHEFE
 
 12. O sistema registra uma movimentação para o subprocesso com os campos:
 
+    - `Descrição`: 'Disponibilização do cadastro'
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: 'Disponibilização do cadastro'
 
 13. O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 

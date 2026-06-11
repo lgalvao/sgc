@@ -14,9 +14,9 @@ Ator: CHEFE
 
 2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
 
-2. O usuário aciona o botão `Concluir diagnóstico`.
+3. usuário aciona o botão `Concluir diagnóstico`.
    
-3. O sistema verifica se todas os servidores estão com a situação 'Avaliação de consenso aprovada' ou
+4O sistema verifica se todas os servidores estão com a situação 'Avaliação de consenso aprovada' ou
    'Avaliação impossibilitada'; e se as situações de capacitação foram preenchidas para todas as competências.
 
    3.1. Caso haja campos não preenchidos ou situações dos servidores fora das especificadas acima, o sistema mostra a
@@ -25,15 +25,15 @@ Ator: CHEFE
    3.2. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação com título "Conclusão de diagnóstico",
    texto "Confirma a conclusão do diagnóstico da unidade?", e botões `Cancelar` e `Concluir`.
 
-4. O sistema altera a situação do subprocesso para `Concluído`.
+5. sistema altera a situação do subprocesso para `Concluído`.
 
-5. O sistema registra uma movimentação para o subprocesso com:
+6. O sistema registra uma movimentação para o subprocesso com:
     - `Descrição`: "Conclusão de diagnóstico".
     - `Data/hora`: [Data/hora atual];
     - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO];
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
 
-6. O sistema envia uma notificação por e-mail para a unidade imediatamente superior:
+7. O sistema envia uma notificação por e-mail para a unidade imediatamente superior:
    ```text
    Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
 
@@ -45,11 +45,11 @@ Ator: CHEFE
    Realize a análise acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
    ```
 
-7. O sistema cria internamente um alerta:
+8. O sistema cria internamente um alerta:
     - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-8. O sistema redireciona para o `Painel` e mostra a mensagem "Diagnóstico concluído".
+9. O sistema redireciona para o `Painel` e mostra a mensagem "Diagnóstico concluído".
