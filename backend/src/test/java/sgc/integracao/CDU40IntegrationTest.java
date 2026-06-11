@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.test.context.*;
 import sgc.feedback.*;
 import sgc.integracao.mocks.*;
-import sgc.integracao.mocks.WithMockUsuario;
+import sgc.integracao.mocks.WithMockServidor;
 
 import java.time.*;
 
@@ -59,7 +59,7 @@ class CDU40IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Não deve permitir listagem por usuário comum")
-    @WithMockUsuario
+    @WithMockServidor
     void naoDevePermitirListagemPorUsuarioComum() throws Exception {
         mockMvc.perform(get("/api/feedback/listar"))
                 .andExpect(status().isForbidden());

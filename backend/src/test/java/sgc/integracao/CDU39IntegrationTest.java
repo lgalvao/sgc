@@ -8,7 +8,7 @@ import org.springframework.mock.web.*;
 import org.springframework.test.context.*;
 import sgc.feedback.*;
 import sgc.integracao.mocks.*;
-import sgc.integracao.mocks.WithMockUsuario;
+import sgc.integracao.mocks.WithMockServidor;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -32,7 +32,7 @@ class CDU39IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve enviar feedback com sucesso (sem screenshot)")
-    @WithMockUsuario
+    @WithMockServidor
     void deveEnviarFeedbackComSucessoSemScreenshot() throws Exception {
         String jsonPayload = """
                 {
@@ -70,7 +70,7 @@ class CDU39IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve enviar feedback com sucesso (com screenshot)")
-    @WithMockUsuario
+    @WithMockServidor
     void deveEnviarFeedbackComSucessoComScreenshot() throws Exception {
         String jsonPayload = """
                 {
@@ -108,7 +108,7 @@ class CDU39IntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Deve validar tamanho mínimo da descrição (nota)")
-    @WithMockUsuario
+    @WithMockServidor
     void deveValidarTamanhoMinimoDescricao() throws Exception {
         String jsonPayload = """
                 {
