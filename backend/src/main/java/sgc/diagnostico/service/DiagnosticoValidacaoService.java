@@ -37,7 +37,7 @@ public class DiagnosticoValidacaoService {
                 || situacoes.stream().anyMatch(o -> o.getSituacaoCapacitacao() == null);
 
         if (avaliacoesPendentes || situacoesPendentes) {
-            throw new ErroValidacao("Ainda existem avaliações e situações de capacitações não preenchidas.");
+            throw new ErroValidacao(Mensagens.DIAGNOSTICO_PENDENTE);
         }
     }
 

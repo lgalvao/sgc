@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.comum.Mensagens;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
@@ -74,7 +75,7 @@ class DiagnosticoValidacaoServiceTest {
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(20L))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Ainda existem avaliações e situações de capacitações não preenchidas.");
+                .hasMessage(Mensagens.DIAGNOSTICO_PENDENTE);
     }
 
     @Test
@@ -91,7 +92,7 @@ class DiagnosticoValidacaoServiceTest {
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(21L))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Ainda existem avaliações e situações de capacitações não preenchidas.");
+                .hasMessage(Mensagens.DIAGNOSTICO_PENDENTE);
     }
 
     @Test
