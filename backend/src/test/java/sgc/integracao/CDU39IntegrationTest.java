@@ -2,6 +2,7 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.*;
 import org.springframework.test.context.*;
@@ -49,7 +50,7 @@ class CDU39IntegrationTest extends BaseIntegrationTest {
         MockMultipartFile data = new MockMultipartFile(
                 "data",
                 "",
-                org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
                 jsonPayload.getBytes()
         );
 
@@ -84,7 +85,7 @@ class CDU39IntegrationTest extends BaseIntegrationTest {
         MockMultipartFile data = new MockMultipartFile(
                 "data",
                 "",
-                org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
                 jsonPayload.getBytes()
         );
 
@@ -120,14 +121,14 @@ class CDU39IntegrationTest extends BaseIntegrationTest {
         MockMultipartFile data = new MockMultipartFile(
                 "data",
                 "",
-                org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
                 jsonPayload.getBytes()
         );
 
         mockMvc.perform(multipart("/api/feedback")
                         .file(data))
-                .andExpect(status().isUnprocessableEntity())
-                .andExpect(jsonPath("$.codigo").value("ERRO_VALIDACAO"));
+                .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()))
+                .andExpect(jsonPath("$.code").value("ERRO_VALIDACAO"));
     }
 
     @Test

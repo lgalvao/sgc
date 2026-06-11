@@ -39,7 +39,7 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
         await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM);
         
         await Promise.all([
-            page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao/concluir`) && res.status() === 400),
+            page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao/concluir`) && res.status() === 422),
             page.getByTestId('btn-confirmar-concluir').click()
         ]);
 

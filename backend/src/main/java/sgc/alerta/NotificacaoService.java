@@ -76,7 +76,7 @@ public class NotificacaoService {
     @Transactional(readOnly = true)
     public List<NotificacaoEmail> listarTodasAdmin(int limite) {
         int tamanho = Math.clamp(limite, 1, LIMITE_CONSULTA_MAXIMO);
-        return notificacaoEmailRepo.findAllByOrderByDataHoraCriacaoDesc(PageRequest.of(0, tamanho));
+        return notificacaoEmailRepo.listarTodasOrdenadas(PageRequest.of(0, tamanho));
     }
 
     @Transactional(readOnly = true)

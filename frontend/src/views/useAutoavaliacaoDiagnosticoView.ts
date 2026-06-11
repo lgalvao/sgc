@@ -10,6 +10,7 @@ import {TEXTOS} from '@/constants/textos';
 import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
 import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 import {useToastStore} from '@/stores/toast';
+import {normalizarErro} from '@/utils/apiError';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
 
@@ -145,7 +146,8 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
             }
             registrarSucesso(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
         } catch {
-            registrarErro(erroConcluir.value?.message);
+            const erroNorm = normalizarErro(erroConcluir.value);
+            registrarErro(erroNorm.mensagem);
         }
     }
 
@@ -153,7 +155,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         await executarAcaoFluxo(
             () => aprovarConsenso(),
             TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO,
-            erroAprovar.value?.message,
+            normalizarErro(erroAprovar.value).mensagem,
         );
     }
 
@@ -170,7 +172,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         await executarAcaoFluxo(
             () => impossibilitarAvaliacao(servidor.servidorTitulo, justificativa),
             TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO,
-            erroImpossibilitar?.value?.message,
+            normalizarErro(erroImpossibilitar?.value).mensagem,
         );
         if (retornoFluxo.value?.variante === 'success') {
             fecharModalImpossibilitar();

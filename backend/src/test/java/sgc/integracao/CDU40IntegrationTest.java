@@ -51,9 +51,9 @@ class CDU40IntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(get("/api/feedback/listar"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].tipo").value("SUGESTAO"))
+                .andExpect(jsonPath("$[0].tipo").value("sugestao"))
                 .andExpect(jsonPath("$[0].usuarioNome").value("Beltrano"))
-                .andExpect(jsonPath("$[1].tipo").value("BUG"))
+                .andExpect(jsonPath("$[1].tipo").value("bug"))
                 .andExpect(jsonPath("$[1].usuarioNome").value("Fulano"));
     }
 
