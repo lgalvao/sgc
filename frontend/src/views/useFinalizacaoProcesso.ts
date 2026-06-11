@@ -26,7 +26,7 @@ export function useFinalizacaoProcesso(dependencias: DependenciasProcessoAcoes) 
             dependencias.limparErro();
             await processoService.finalizarProcesso(dependencias.codProcesso);
             toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
-            atualizarFluxoProcesso();
+            await atualizarFluxoProcesso();
             dependencias.processo.value = null;
             await useQueryCache().invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true});
             await router.push("/painel");

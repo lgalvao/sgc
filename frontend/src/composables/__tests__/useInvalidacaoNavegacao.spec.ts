@@ -20,14 +20,14 @@ describe("useInvalidacaoNavegacao", () => {
         invalidateQueriesMock.mockReset();
     });
 
-    it("deve atualizar o fluxo completo de processo", () => {
+    it("deve atualizar o fluxo completo de processo", async () => {
         const painel = usePainelStore();
         const subprocesso = useSubprocessoStore();
         vi.spyOn(painel, 'invalidar');
         vi.spyOn(subprocesso, 'invalidar');
 
         const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
-        atualizarFluxoProcesso();
+        await atualizarFluxoProcesso();
 
         expect(painel.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
@@ -39,7 +39,7 @@ describe("useInvalidacaoNavegacao", () => {
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["unidade", "arvore-elegibilidade"]});
     });
 
-    it("deve atualizar subprocesso e painel sem mexer em processo nem mapas", () => {
+    it("deve atualizar subprocesso e painel sem mexer em processo nem mapas", async () => {
         const painel = usePainelStore();
         const subprocesso = useSubprocessoStore();
 
@@ -48,7 +48,7 @@ describe("useInvalidacaoNavegacao", () => {
 
         const {atualizarFluxoSubprocessoEPainel} = useInvalidacaoNavegacao();
 
-        atualizarFluxoSubprocessoEPainel();
+        await atualizarFluxoSubprocessoEPainel();
 
         expect(painel.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
@@ -57,7 +57,7 @@ describe("useInvalidacaoNavegacao", () => {
         expect(invalidateQueriesMock).not.toHaveBeenCalledWith({key: ["mapa"]});
     });
 
-    it("deve atualizar o fluxo de mapa com subprocesso específico", () => {
+    it("deve atualizar o fluxo de mapa com subprocesso específico", async () => {
         const painel = usePainelStore();
         const subprocesso = useSubprocessoStore();
 
@@ -65,7 +65,7 @@ describe("useInvalidacaoNavegacao", () => {
         vi.spyOn(subprocesso, "invalidar");
 
         const {atualizarFluxoMapa} = useInvalidacaoNavegacao();
-        atualizarFluxoMapa(321);
+        await atualizarFluxoMapa(321);
 
         expect(painel.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
@@ -74,12 +74,12 @@ describe("useInvalidacaoNavegacao", () => {
         expect(subprocesso.invalidar).toHaveBeenCalled();
     });
 
-    it("deve atualizar dados organizacionais invalidando diagnóstico e unidades", () => {
+    it("deve atualizar dados organizacionais invalidando diagnóstico e unidades", async () => {
         const painel = usePainelStore();
         vi.spyOn(painel, "invalidar");
 
         const {atualizarDadosOrganizacionais} = useInvalidacaoNavegacao();
-        atualizarDadosOrganizacionais();
+        await atualizarDadosOrganizacionais();
 
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["diagnostico-organizacional"]});
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["unidade"]});
@@ -99,14 +99,14 @@ describe("useInvalidacaoNavegacao", () => {
         expect(subprocesso.limparContextoAtual).toHaveBeenCalled();
     });
 
-    it("deve resetar estado da sessão ao fazer logout", () => {
+    it("deve resetar estado da sessão ao fazer logout", async () => {
         const painel = usePainelStore();
         const subprocesso = useSubprocessoStore();
         vi.spyOn(painel, "resetar");
         vi.spyOn(subprocesso, "resetar");
 
         const {resetarEstadoSessao} = useInvalidacaoNavegacao();
-        resetarEstadoSessao();
+        await resetarEstadoSessao();
 
         expect(painel.resetar).toHaveBeenCalled();
         expect(subprocesso.resetar).toHaveBeenCalled();

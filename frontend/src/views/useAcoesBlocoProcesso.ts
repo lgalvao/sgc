@@ -22,14 +22,14 @@ export function useAcoesBlocoProcesso(dependencias: DependenciasProcessoAcoes) {
 
         if (acao.redirecionarPainel) {
             toastStore.setPending(acao.mensagemSucesso);
-            atualizarFluxoProcesso();
+            await atualizarFluxoProcesso();
             dependencias.processo.value = null;
             await router.push("/painel");
             return;
         }
 
         dependencias.notify(acao.mensagemSucesso, "success");
-        atualizarFluxoSubprocessoEProcesso();
+        await atualizarFluxoSubprocessoEProcesso();
         await dependencias.carregarContextoCompleto();
     }
 

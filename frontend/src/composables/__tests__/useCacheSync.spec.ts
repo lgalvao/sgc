@@ -98,10 +98,11 @@ describe('useCacheSync', () => {
         expect(lastInstance?.url).toBe('/api/eventos');
     });
 
-    it('deve invalidar apenas os caches organizacionais quando receber o evento org-cache-refreshed', () => {
+    it('deve invalidar apenas os caches organizacionais quando receber o evento org-cache-refreshed', async () => {
         fechamentosPendentes.push(useCacheSync());
 
         lastInstance?.emit('org-cache-refreshed', {});
+        await new Promise(r => setTimeout(r, 0));
 
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ['diagnostico-organizacional']});
         expect(painelStore.invalidar).toHaveBeenCalled();
@@ -109,12 +110,13 @@ describe('useCacheSync', () => {
         expect(subprocessoStore.invalidar).not.toHaveBeenCalled();
     });
 
-    it('deve preservar caches críticos e limpar marcações locais do painel ao invalidar por SSE organizacional', () => {
+    it('deve preservar caches críticos e limpar marcações locais do painel ao invalidar por SSE organizacional', async () => {
         subprocessoStore.contextoEdicao = {detalhes: {codigo: 200, situacao: 'MAPA'}} as any;
         painelStore.registrarLeitura([2]);
 
         fechamentosPendentes.push(useCacheSync());
         lastInstance?.emit('org-cache-refreshed', {});
+        await new Promise(r => setTimeout(r, 0));
 
         expect(painelStore.isMarcadoComoLido(2)).toBe(false);
         expect(subprocessoStore.contextoEdicao).toEqual(expect.objectContaining({

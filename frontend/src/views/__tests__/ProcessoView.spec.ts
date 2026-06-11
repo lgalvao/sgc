@@ -562,6 +562,7 @@ describe("Processo.vue", () => {
         // Simular confirmação do modal com ID 101 (Mapeamento cadastro disponibilizado)
         const dadosConfirmacao = {ids: [101]};
         await modal.vm.$emit("confirmar", dadosConfirmacao);
+        await flushPromises();
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [101],
@@ -585,6 +586,7 @@ describe("Processo.vue", () => {
 
         // ID 101 -> Cadastro disponibilizado
         await modal.vm.$emit("confirmar", {ids: [101]});
+        await flushPromises();
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [101],
@@ -607,6 +609,7 @@ describe("Processo.vue", () => {
 
         // ID 103 -> Mapa validado
         await modal.vm.$emit("confirmar", {ids: [103]});
+        await flushPromises();
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [103],
@@ -676,6 +679,7 @@ describe("Processo.vue", () => {
 
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [103]});
+        await flushPromises();
         expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.MAPAS_HOMOLOGADOS_EM_BLOCO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
@@ -691,16 +695,20 @@ describe("Processo.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await wrapper.find('#btn-disponibilizar-bloco').trigger("click"); // Abrir modal 'disponibilizar'
 
+        expect(wrapper.find('#btn-disponibilizar-bloco').text()).toContain(TEXTOS.acaoBloco.disponibilizar.ROTULO);
+        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.disponibilizar.TITULO);
+
         // ID 104 -> Mapa criado
         await modal.vm.$emit("confirmar", {ids: [104], dataLimite: '2024-12-31'});
+        await flushPromises();
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalledWith(1, {
             unidadeCodigos: [104],
             acao: 'DISPONIBILIZAR',
             dataLimite: '2024-12-31',
         });
-        expect(wrapper.find('#btn-disponibilizar-bloco').text()).toContain(TEXTOS.acaoBloco.disponibilizar.ROTULO);
-        expect(modal.props("titulo")).toBe(TEXTOS.acaoBloco.disponibilizar.TITULO);
+        expect(wrapper.vm.processo).toBeNull();
+        expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
     it("deve lidar com erro na execução da ação em bloco", async () => {
@@ -719,6 +727,7 @@ describe("Processo.vue", () => {
         await wrapper.find('#btn-aceitar-bloco').trigger("click"); // Abrir modal
 
         await modal.vm.$emit("confirmar", {ids: [101]});
+        await flushPromises();
 
         expect(processoService.executarAcaoEmBloco).toHaveBeenCalled();
         expect(modalSpies.setErro).toHaveBeenCalledWith(errorMsg);
@@ -742,6 +751,7 @@ describe("Processo.vue", () => {
 
         // ID inexistente
         await modal.vm.$emit("confirmar", {ids: [9999]});
+        await flushPromises();
 
         expect(modalSpies.setErro).toHaveBeenCalledWith(errorMsg);
     });

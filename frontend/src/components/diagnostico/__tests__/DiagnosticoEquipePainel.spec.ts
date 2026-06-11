@@ -2,6 +2,7 @@ import {AxiosError} from 'axios';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {computed, nextTick, ref} from 'vue';
+import {createPinia, setActivePinia} from 'pinia';
 import DiagnosticoEquipePainel from '../DiagnosticoEquipePainel.vue';
 
 const pushMock = vi.fn();
@@ -91,6 +92,7 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
 
 describe('DiagnosticoEquipePainel', () => {
     beforeEach(() => {
+        setActivePinia(createPinia());
         vi.clearAllMocks();
         concluindo.value = false;
         validando.value = false;

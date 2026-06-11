@@ -249,26 +249,34 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         aprovarConsensoMock.mockRejectedValue(erroAprovar.value);
         const wrapper = montar();
 
-        expect(wrapper.text()).toContain('A chefia registrou a avaliação de consenso.');
+        expect(wrapper.text()).toContain('O responsavel pela unidade registrou a avaliação de consenso.');
         await wrapper.get('[data-testid="btn-aprovar-consenso"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-aprovar"]').trigger('click');
         expect(wrapper.text()).toContain('Falha ao aprovar');
     });
 
     it('exibe alertas por situação do servidor, atualiza nota e volta pela navegação', async () => {
-        situacaoServidor.value = 'AUTOAVALIACAO_CONCLUIDA';
+        situacaoServidor.value = 'AUTOAVALIACAO_NAO_INICIADA';
         const wrapper = montar();
 
-        expect(wrapper.find('[data-testid="btn-concluir-autoavaliacao"]').exists()).toBe(true);
+        // 1. Em AUTOAVALIACAO_NAO_INICIADA, pode editar notas
         await wrapper.get('select').setValue('2');
         expect(atualizarNotaMock).toHaveBeenCalled();
+
+        // Testar botão voltar
         const botaoVoltar = wrapper.findAll('button').find((botao) => botao.text().includes('Voltar'));
         await botaoVoltar!.trigger('click');
         expect(backMock).toHaveBeenCalled();
 
+        // 2. Em AUTOAVALIACAO_CONCLUIDA, exibe o botão concluir-autoavaliacao (desabilitado)
+        situacaoServidor.value = 'AUTOAVALIACAO_CONCLUIDA';
+        await nextTick();
+        expect(wrapper.find('[data-testid="btn-concluir-autoavaliacao"]').exists()).toBe(true);
+
+        // 3. Em CONSENSO_APROVADO, exibe a mensagem de fluxo finalizado
         situacaoServidor.value = 'CONSENSO_APROVADO';
-        const wrapperAprovado = montar();
-        expect(wrapperAprovado.text()).toContain('Avaliação de consenso aprovada. Fluxo finalizado.');
+        await nextTick();
+        expect(wrapper.text()).toContain('Avaliação de consenso aprovada. Fluxo finalizado.');
     });
 
     it('mostra erro ao falhar conclusão da autoavaliação', async () => {

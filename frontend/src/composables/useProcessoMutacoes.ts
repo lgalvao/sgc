@@ -58,7 +58,7 @@ export function useProcessoMutacoes({
                 await processoService.criarProcesso(request);
                 toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_CRIADO);
             }
-            atualizarFluxoProcesso();
+            await atualizarFluxoProcesso();
             await router.push("/painel");
             formulario.limpar();
         } catch (error) {
@@ -100,7 +100,7 @@ export function useProcessoMutacoes({
             await processoService.iniciarProcesso(codigoProcesso, formulario.tipo.value, codigosDiretos);
 
             toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
-            atualizarFluxoProcesso();
+            await atualizarFluxoProcesso();
             await router.push("/painel");
             mostrarModalConfirmacao.value = false;
             modalUnidadesComEquipePropriaRef.value?.fechar();
@@ -142,7 +142,7 @@ export function useProcessoMutacoes({
         try {
             await processoService.excluirProcesso(processoEditando.value.codigo);
             toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_REMOVIDO(descricaoRemovida));
-            atualizarFluxoProcesso();
+            await atualizarFluxoProcesso();
             await router.push("/painel");
             formulario.limpar();
             mostrarModalRemocao.value = false;

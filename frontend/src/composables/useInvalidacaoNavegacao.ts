@@ -21,70 +21,78 @@ export function useInvalidacaoNavegacao() {
     const painelStore = usePainelStore();
     const subprocessoStore = useSubprocessoStore();
 
-    function atualizarFluxoProcesso(): void {
-        void invalidarPainel();
-        void invalidarProcesso();
+    async function atualizarFluxoProcesso(): Promise<void> {
+        await Promise.all([
+            invalidarPainel(),
+            invalidarProcesso(),
+            invalidarUnidade(),
+            invalidarDadosTelaUnidade(),
+            invalidarArvoreElegibilidade(),
+        ]);
         painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa();
-        void invalidarUnidade();
-        void invalidarDadosTelaUnidade();
-        void invalidarArvoreElegibilidade();
     }
 
     function atualizarFluxoSubprocesso(): void {
         subprocessoStore.invalidar();
     }
 
-    function atualizarFluxoSubprocessoEPainel(): void {
-        void invalidarPainel();
+    async function atualizarFluxoSubprocessoEPainel(): Promise<void> {
+        await invalidarPainel();
         painelStore.invalidar();
         subprocessoStore.invalidar();
     }
 
-    function atualizarFluxoCadastro(codigoSubprocesso: number): void {
-        void invalidarPainel();
-        painelStore.invalidar();
-        subprocessoStore.invalidar();
-        invalidarMapa(codigoSubprocesso);
-    }
-
-    function atualizarFluxoSubprocessoEProcesso(): void {
-        void invalidarProcesso();
-        subprocessoStore.invalidar();
-    }
-
-    function atualizarFluxoMapa(codigoSubprocesso?: number): void {
-        void invalidarPainel();
-        void invalidarProcesso();
+    async function atualizarFluxoCadastro(codigoSubprocesso: number): Promise<void> {
+        await invalidarPainel();
         painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa(codigoSubprocesso);
     }
 
-    function atualizarDadosOrganizacionais(): void {
-        void invalidarDiagnostico();
+    async function atualizarFluxoSubprocessoEProcesso(): Promise<void> {
+        await invalidarProcesso();
+        subprocessoStore.invalidar();
+    }
+
+    async function atualizarFluxoMapa(codigoSubprocesso?: number): Promise<void> {
+        await Promise.all([
+            invalidarPainel(),
+            invalidarProcesso(),
+        ]);
         painelStore.invalidar();
-        void invalidarPainel();
-        void invalidarUnidade();
-        void invalidarDadosTelaUnidade();
-        void invalidarArvoreElegibilidade();
+        subprocessoStore.invalidar();
+        invalidarMapa(codigoSubprocesso);
+    }
+
+    async function atualizarDadosOrganizacionais(): Promise<void> {
+        await Promise.all([
+            invalidarDiagnostico(),
+            invalidarPainel(),
+            invalidarUnidade(),
+            invalidarDadosTelaUnidade(),
+            invalidarArvoreElegibilidade(),
+        ]);
+        painelStore.invalidar();
     }
 
     function limparEstadoSubprocessoAtual(): void {
         subprocessoStore.limparContextoAtual();
     }
 
-    function resetarEstadoSessao(): void {
+    async function resetarEstadoSessao(): Promise<void> {
         painelStore.resetar();
         subprocessoStore.resetar();
-        void invalidarPainel();
-        void invalidarProcesso();
+        await Promise.all([
+            invalidarPainel(),
+            invalidarProcesso(),
+            invalidarUnidade(),
+            invalidarDadosTelaUnidade(),
+            invalidarArvoreElegibilidade(),
+            invalidarDiagnostico(),
+        ]);
         invalidarMapa();
-        void invalidarUnidade();
-        void invalidarDadosTelaUnidade();
-        void invalidarArvoreElegibilidade();
-        void invalidarDiagnostico();
     }
 
     return {

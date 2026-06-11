@@ -69,7 +69,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
             await dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             estado.mostrarModalAlterarDataLimite.value = false;
             toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
-            atualizarFluxoSubprocessoEPainel();
+            await atualizarFluxoSubprocessoEPainel();
             await dependencias.atualizarSubprocessoAtual();
         } catch (error) {
             logger.error(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, error);
