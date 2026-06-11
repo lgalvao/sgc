@@ -1,4 +1,4 @@
-# CDU-48 - Concluir diagnóstico de uma unidade
+# CDU-49 - Concluir diagnóstico de uma unidade
 
 Ator: CHEFE
 
@@ -19,15 +19,11 @@ Ator: CHEFE
 3. O sistema verifica se todas os servidores estão com a situação 'Avaliação de consenso aprovada' ou
    'Avaliação impossibilitada'; e se as situações de capacitação foram preenchidas para todas as competências.
 
-3.1. Caso haja campos não preenchidos ou situações dos servidores fora das especificadas acima, o sistema mostra a
-mensagem "Ainda existem avaliações e situações de capacitações não preenchidas.", interrompe a operação e permanece na
-tela `Detalhes do subprocesso`.
-
-3.2. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação:
-
-- título: "Conclusão de diagnóstico";
-- texto: "Confirma a conclusão do diagnóstico da unidade?";
-- botões `Cancelar` e `Concluir diagnóstico`.
+   3.1. Caso haja campos não preenchidos ou situações dos servidores fora das especificadas acima, o sistema mostra a
+   mensagem "Ainda existem avaliações e situações de capacitações não preenchidas.", interrompe a operação.
+   
+   3.2. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação com título "Conclusão de diagnóstico",
+   texto "Confirma a conclusão do diagnóstico da unidade?", e botões `Cancelar` e `Concluir diagnóstico`.
 
 4. O usuário aciona `Concluir diagnóstico`.
 
@@ -40,13 +36,13 @@ tela `Detalhes do subprocesso`.
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
 
 7. O sistema envia uma notificação por e-mail para a unidade imediatamente superior:
-
    ```text
    Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
 
    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
 
-   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi concluído e submetido à análise das unidades superiores.
+   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] 
+   foi concluído e submetido à análise das unidades superiores.
 
    Realize a análise acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
    ```

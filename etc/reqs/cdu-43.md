@@ -1,4 +1,4 @@
-# CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: GESTOR e ADMIN
+# CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GESTOR e ADMIN
 
 Ator:  GESTOR ou ADMIN
 

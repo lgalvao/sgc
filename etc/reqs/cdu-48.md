@@ -1,4 +1,4 @@
-# CDU-47 - Preencher situações de capacitação
+# CDU-48 - Preencher situações de capacitação
 
 Ator: CHEFE
 
