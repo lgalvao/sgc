@@ -404,6 +404,14 @@ public class E2eController {
         jdbcTemplate.update("INSERT INTO sgc.conhecimento (atividade_codigo, descricao) SELECT codigo, ? FROM sgc.atividade WHERE mapa_codigo = ? AND descricao = ?",
                 "Conhecimento B - " + codProcesso, codMapa, "Atividade origem B - " + codProcesso);
 
+        // Competências com atividades associadas
+        jdbcTemplate.update("INSERT INTO sgc.competencia (mapa_codigo, descricao) VALUES (?, ?)", codMapa, "Competência fixture - " + codProcesso);
+        Long codCompetencia = consultarCodigoGerado(
+                "SELECT codigo FROM sgc.competencia WHERE mapa_codigo = ? AND descricao = ?",
+                codMapa, "Competência fixture - " + codProcesso);
+        jdbcTemplate.update("INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo) " +
+                "SELECT codigo, ? FROM sgc.atividade WHERE mapa_codigo = ?", codCompetencia, codMapa);
+
         // Atualizar status para simular finalização
         setSituacaoSubprocesso(codSubprocesso, SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
         setSituacaoProcesso(codProcesso);

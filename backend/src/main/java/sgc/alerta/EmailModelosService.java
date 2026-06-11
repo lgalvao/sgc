@@ -159,12 +159,13 @@ public class EmailModelosService {
         return templateEngine.process("diagnostico-consenso-aprovado", ctx);
     }
 
-    public String criarEmailDiagnosticoConcluido(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso) {
+    public String criarEmailDiagnosticoConcluido(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso, String urlSistema) {
         Context ctx = new Context();
         ctx.setVariable(VAR_TITULO, "Diagnóstico concluído");
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
         ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        ctx.setVariable("urlSistema", urlSistema);
         return templateEngine.process("diagnostico-concluido", ctx);
     }
 

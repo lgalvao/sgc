@@ -9,8 +9,14 @@
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}">UNIDADE</strong>,</p>
 
         <p>
-            O diagnóstico da sua unidade foi concluído no processo
-            <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+            O diagnóstico da unidade <strong th:text="${siglaUnidadeSubordinada}">UNIDADE SUBORDINADA</strong>
+            no processo <strong th:text="${nomeProcesso}">PROCESSO</strong>
+            foi concluído e submetido à análise da sua unidade.
+        </p>
+
+        <p>
+            Realize a análise acessando o Sistema de Gestão de Competências (SGC):
+            <a th:href="${urlSistema}" th:text="${urlSistema}">URL</a>.
         </p>
     </th:block>
 </th:block>

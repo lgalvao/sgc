@@ -54,7 +54,7 @@ export const TEXTOS_DIAGNOSTICO = {
     SUCESSO_CONSENSO_SALVO: 'Avaliação de consenso salva automaticamente',
     SUCESSO_CONSENSO_APROVADO: 'Avaliação de consenso aprovada',
     SUCESSO_CAPACITACAO_SALVA: 'Situação de capacitação salva',
-    SUCESSO_DIAGNOSTICO_CONCLUIDO: 'Diagnóstico da unidade concluído',
+    SUCESSO_DIAGNOSTICO_CONCLUIDO: 'Diagnóstico concluído',
     SUCESSO_DIAGNOSTICO_VALIDADO: 'Diagnóstico validado',
     SUCESSO_DIAGNOSTICO_DEVOLVIDO: 'Diagnóstico devolvido para ajustes',
     SUCESSO_DIAGNOSTICO_HOMOLOGADO: 'Diagnóstico homologado',

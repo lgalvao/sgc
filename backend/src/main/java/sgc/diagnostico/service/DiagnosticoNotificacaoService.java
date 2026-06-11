@@ -151,7 +151,8 @@ public class DiagnosticoNotificacaoService {
         String corpo = emailModelosService.criarEmailDiagnosticoConcluido(
                 unidadeSuperior.getSigla(),
                 unidadeSubprocesso.getSigla(),
-                sp.getProcesso().getDescricao()
+                sp.getProcesso().getDescricao(),
+                urlSistema()
         );
 
         enfileirarNotificacao(sp, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_CONCLUIDO, assunto, corpo,
