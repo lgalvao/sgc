@@ -31,18 +31,15 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         carregando,
         salvandoAutomaticamente,
         concluindo,
-        erroConcluir,
         atualizarNota,
         concluirAutoavaliacao,
     } = useAutoavaliacaoDiagnostico(props.codSubprocesso);
     const {
         aprovando,
-        erroAprovar,
         aprovarConsenso,
     } = useConsensoDiagnostico(props.codSubprocesso);
     const {
         impossibilitando,
-        erroImpossibilitar,
         impossibilitarAvaliacao,
     } = useFluxoDiagnostico(props.codSubprocesso);
     const {itens: itensEquipe, pendentes} = useEquipeDiagnostico(props.codSubprocesso);
@@ -116,13 +113,12 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     async function executarAcaoFluxo(
         acao: () => Promise<void>,
         mensagemSucesso: string,
-        mensagemErro?: string | null,
     ) {
         try {
             await acao();
             registrarSucesso(mensagemSucesso);
-        } catch {
-            registrarErro(mensagemErro);
+        } catch (err) {
+            registrarErro(normalizarErro(err).mensagem);
         }
     }
 
@@ -145,9 +141,8 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
                 return;
             }
             registrarSucesso(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
-        } catch {
-            const erroNorm = normalizarErro(erroConcluir.value);
-            registrarErro(erroNorm.mensagem);
+        } catch (err) {
+            registrarErro(normalizarErro(err).mensagem);
         }
     }
 
@@ -155,7 +150,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         await executarAcaoFluxo(
             () => aprovarConsenso(),
             TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO,
-            normalizarErro(erroAprovar.value).mensagem,
         );
     }
 
@@ -172,7 +166,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         await executarAcaoFluxo(
             () => impossibilitarAvaliacao(servidor.servidorTitulo, justificativa),
             TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO,
-            normalizarErro(erroImpossibilitar?.value).mensagem,
         );
         if (retornoFluxo.value?.variante === 'success') {
             fecharModalImpossibilitar();
@@ -206,18 +199,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         );
     }
 
-    const varianteSituacao = computed(() => {
-        switch (contexto.value?.situacaoSubprocesso) {
-            case 'DIAGNOSTICO_EM_ANDAMENTO':
-                return 'warning';
-            case 'DIAGNOSTICO_CONCLUIDO':
-                return 'success';
-            case 'DIAGNOSTICO_HOMOLOGADO':
-                return 'primary';
-            default:
-                return 'secondary';
-        }
-    });
+
 
     function varianteSituacaoServidor(situacao: SituacaoAvaliacaoServidor) {
         switch (situacao) {
@@ -346,7 +328,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         confirmarImpossibilitar,
         impossibilitando,
         voltar,
-        varianteSituacao,
         formatarNota,
     };
 }

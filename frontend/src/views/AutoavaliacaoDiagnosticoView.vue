@@ -316,7 +316,6 @@ const {
   confirmarImpossibilitar,
   impossibilitando,
   voltar,
-  varianteSituacao,
   formatarNota,
 } = useAutoavaliacaoDiagnosticoView(props);
 </script>

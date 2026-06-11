@@ -328,7 +328,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-impossibilitar-242427"]').trigger('click');
         await wrapper.get('textarea').setValue('Servidor afastado.');
         await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
-        expect(wrapper.text()).toContain('Não foi possível salvar.');
+        expect(wrapper.text()).toContain('Erro ao salvar no BD');
     });
 
     it('exercita ramos padrao de variantes e formatacao de conhecimentos vazios', async () => {
@@ -401,7 +401,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
 
         await wrapper.get('[data-testid="btn-concluir-autoavaliacao"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-concluir"]').trigger('click');
-        expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
+        expect(wrapper.text()).toContain('Erro desconhecido ou não mapeado pela aplicação.');
     });
 
     it('exercita erro de consenso sem mensagem explicita', async () => {
@@ -412,7 +412,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
 
         await wrapper.get('[data-testid="btn-aprovar-consenso"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-aprovar"]').trigger('click');
-        expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
+        expect(wrapper.text()).toContain('Erro desconhecido ou não mapeado pela aplicação.');
     });
 
     it('exercita fallbacks de normalizacao e formatacao de notas e situacao de servidor', () => {
