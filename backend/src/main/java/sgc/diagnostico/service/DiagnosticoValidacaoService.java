@@ -2,6 +2,7 @@ package sgc.diagnostico.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import sgc.comum.Mensagens;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
 import sgc.diagnostico.model.SituacaoCapacitacaoRepo;

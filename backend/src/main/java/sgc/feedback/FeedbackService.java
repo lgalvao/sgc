@@ -7,6 +7,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.multipart.*;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.feedback.dto.*;
@@ -131,10 +132,10 @@ public class FeedbackService {
 
     private void validarNota(@Nullable String nota) {
         if (nota == null || nota.isBlank()) {
-            throw new ErroValidacao("nota não pode estar em branco");
+            throw new ErroValidacao(Mensagens.FEEDBACK_NOTA_MIN);
         }
-        if (nota.length() > 2000) {
-            throw new ErroValidacao("nota não pode exceder 2000 caracteres");
+        if (nota.length() > 500) {
+            throw new ErroValidacao(Mensagens.FEEDBACK_NOTA_MAX);
         }
     }
 
@@ -143,7 +144,7 @@ public class FeedbackService {
             return;
         }
         if (screenshot.getSize() > propriedades.maxScreenshotSizeBytes()) {
-            throw new ErroValidacao("screenshot excede o tamanho máximo permitido de %d bytes".formatted(propriedades.maxScreenshotSizeBytes()));
+            throw new ErroValidacao(Mensagens.FEEDBACK_SCREENSHOT_MAX);
         }
     }
 

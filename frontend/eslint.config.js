@@ -8,9 +8,27 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import pluginVueA11y from "eslint-plugin-vuejs-accessibility";
 
 export default [
-    // 1. Ignores globais
+    // 1. Ignores globais (devem vir primeiro na flat config)
     {
-        ignores: ["dist/", "node_modules/", "coverage/", "src/types/**/*.d.ts", "**/*.d.ts", "**/*.spec.ts", "**/*.test.ts", "**/*.stories.ts", "**/*.config.js", "**/*.config.ts", "**/*.config.mjs", "**/*.config.cjs", "parse-cycles.cjs"],
+        ignores: [
+            "dist/", 
+            "node_modules/", 
+            "coverage/", 
+            "build/",
+            "public/",
+            "src/types/**/*.d.ts", 
+            "**/*.d.ts", 
+            "**/*.spec.ts", 
+            "**/*.test.ts", 
+            "**/__tests__/**",
+            "**/*.stories.ts", 
+            "**/*.config.js", 
+            "**/*.config.ts", 
+            "**/*.config.mjs", 
+            "**/*.config.cjs", 
+            "parse-cycles.cjs",
+            ".storybook/"
+        ],
     },
     // 2. Configuração base para todos os arquivos
     {
@@ -58,7 +76,7 @@ export default [
             "max-statements": ["warn", 28],
         },
     },
-    // 5. Overrides para Testes, Stories e Tipagens (Desabilita regras estritas de complexidade/any)
+    // 5. Overrides para Testes, Stories e Tipagens
     {
         files: [
             "**/__tests__/**",
@@ -86,9 +104,11 @@ export default [
             "@typescript-eslint/no-unnecessary-type-assertion": "off",
             "@typescript-eslint/ban-ts-comment": "off",
             "@typescript-eslint/no-unused-vars": "off",
+            "vue/multi-word-component-names": "off",
+            "vuejs-accessibility/label-has-for": "off"
         },
     },
-    // 5.1. Overrides para Composables de Tela (desabilita limites estritos de tamanho de função)
+    // 5.1. Overrides para Composables de Tela
     {
         files: ["src/composables/**/*Tela.ts"],
         rules: {

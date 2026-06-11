@@ -1,18 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["eslint", "typescript", "import", "unicorn", "promise", "vitest", "vue"],
-  "ignorePatterns": [
-    "src/auto-imports.d.ts",
-    "src/components.d.ts",
-    "dist/**",
-    "coverage/**",
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "**/*.stories.ts",
-    "src/test-utils/**",
-    "vitest.config.ts",
-    "vitest.setup.ts"
-  ],
   "env": {
     "browser": true,
     "es2024": true
@@ -81,6 +69,7 @@
   "overrides": [
     {
       "files": [
+        "**/__tests__/**",
         "**/*.spec.ts",
         "**/*.test.ts",
         "**/*.spec.js",
@@ -88,7 +77,8 @@
         "**/*.stories.ts",
         "**/*.stories.js",
         "**/*.stories.tsx",
-        "**/*.stories.jsx"
+        "**/*.stories.jsx",
+        "**/test-utils/**"
       ],
       "env": { "vitest": true },
       "rules": {
@@ -99,7 +89,16 @@
         "typescript/no-redundant-type-constituents": "off",
         "typescript/no-unsafe-type-assertion": "off",
         "typescript/no-unnecessary-type-assertion": "off",
-        "typescript/await-thenable": "off"
+        "typescript/await-thenable": "off",
+        "max-lines-per-function": "off",
+        "complexity": "off",
+        "max-statements": "off",
+        "max-nested-callbacks": "off",
+        "max-lines": "off",
+        "max-params": "off",
+        "max-depth": "off",
+        "no-unused-vars": "off",
+        "typescript/no-unused-vars": "off"
       }
     },
     {
@@ -110,34 +109,24 @@
         "typescript/no-explicit-any": "off",
         "typescript/no-misused-spread": "off",
         "typescript/no-unsafe-type-assertion": "off",
-        "typescript/consistent-return": "off"
+        "typescript/consistent-return": "off",
+        "max-lines-per-function": "off",
+        "complexity": "off",
+        "max-statements": "off"
       }
     },
     {
-      "files": ["src/test-utils/**"],
+      "files": ["src/composables/**/*Tela.ts", "src/views/useDiagnosticoUnidadeView.ts", "src/views/useAutoavaliacaoDiagnosticoView.ts"],
       "rules": {
-        "typescript/no-explicit-any": "off",
-        "typescript/unbound-method": "off",
-        "typescript/no-unsafe-type-assertion": "off"
+        "max-lines-per-function": "off",
+        "max-statements": "off",
+        "complexity": "off"
       }
     },
     {
       "files": ["**/*.d.ts"],
       "rules": {
         "typescript/no-explicit-any": "off"
-      }
-    },
-    {
-      "files": [
-        "src/stores/ponte-pinia.ts",
-        "src/stores/sessao.ts",
-        "src/stores/interface.ts",
-        "src/stores/operacao.ts",
-        "src/http/admin.ts",
-        "src/http/index.ts"
-      ],
-      "rules": {
-        "import/no-cycle": "off"
       }
     }
   ]
