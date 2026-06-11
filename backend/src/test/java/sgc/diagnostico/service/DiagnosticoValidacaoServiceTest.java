@@ -74,7 +74,7 @@ class DiagnosticoValidacaoServiceTest {
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(20L))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Ainda existem avaliações ou situações de capacitação pendentes.");
+                .hasMessage("Ainda existem avaliações e situações de capacitações não preenchidas.");
     }
 
     @Test
@@ -91,7 +91,7 @@ class DiagnosticoValidacaoServiceTest {
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(21L))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessage("Ainda existem avaliações ou situações de capacitação pendentes.");
+                .hasMessage("Ainda existem avaliações e situações de capacitações não preenchidas.");
     }
 
     @Test

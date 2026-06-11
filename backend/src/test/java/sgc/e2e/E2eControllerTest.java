@@ -710,6 +710,7 @@ class E2eControllerTest {
             when(mapaRepo.buscarPorSubprocesso(200L)).thenReturn(Optional.of(mapa));
 
             when(processoRepo.findById(100L)).thenReturn(Optional.of(new Processo()));
+            when(jdbcTemplate.queryForObject(anyString(), eq(Long.class), any(Object[].class))).thenReturn(400L);
 
             ProcessoResumoDto result = controller.criarProcessoFinalizadoComAtividades(req);
 

@@ -181,11 +181,11 @@ class NotificacaoServiceTest {
     @Test
     @DisplayName("listarTodasAdmin deve buscar todas as notificações registradas")
     void listarTodasAdminDeveBuscarTodasAsNotificacoesRegistradas() {
-        when(notificacaoEmailRepo.findAllByOrderByDataHoraCriacaoDesc(any())).thenReturn(List.of());
+        when(notificacaoEmailRepo.listarTodasOrdenadas(any())).thenReturn(List.of());
 
         service.listarTodasAdmin(50);
 
-        verify(notificacaoEmailRepo).findAllByOrderByDataHoraCriacaoDesc(argThat(pageable ->
+        verify(notificacaoEmailRepo).listarTodasOrdenadas(argThat(pageable ->
                 pageable.getPageNumber() == 0 && pageable.getPageSize() == 50
         ));
     }
