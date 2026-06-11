@@ -1,52 +1,51 @@
-# CDU-45 - Aprovar avaliação de consenso
+# CDU-44 - Manter avaliação de consenso
 
-Ator: SERVIDOR
+Ator: CHEFE
 
 ## Pré-condições
 
-- Login realizado com perfil SERVIDOR
-- Existência de avaliação de consenso criada para o usuário, para todas as competências da unidade.
+- Login realizado com perfil CHEFE
+- Existência de processo de diagnóstico em andamento
+- Existência de servidor da unidade com uma das situações:
+    - 'Autoavaliação concluída'
+    - 'Avaliação de consenso criada'
+    - 'Avaliação de consenso aprovada'
 
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md).`.
+   `Detalhes do subprocesso`, conforme o caso de uso [CDU-42a.md](cdu-42a.md)`.
 
-2. O usuário aciona o card `Avaliação de consenso`.
+2. Na grade de servidores da unidade, o usuário escolhe a ação `Avaliação de consenso` para um servidor.
 
-3. O sistema mostra a tela `Avaliação de consenso`, com uma grade contendo as descrições das competências da unidade
-   (mapa vigente) e os valores de consenso, importância e domínio, para cada competência. Todo os valores são
-   somente-leitura. Abaixo um exemplo de grade:
+3. O sistema mostra a tela `Avaliação de consenso` para o servidor selecionado, com:
+    - título: "Avaliação de consenso";
+    - subtítulo: [nome e título do servidor];
+    - grade de competências da unidade, com estrutura como no exemplo abaixo:
 
-   | Competência | Importância | Domínio |
-         | :---- | :---: | :---: |
-   | Desc. competência 1 | 4 | 1 |
-   | Desc. competência 2 | NA | NA |
-   | Desc. competência 3 | 3 | 2 |
+|                     | Importância |       |          | Domínio  |       |          |
+|:--------------------|-------------|-------|----------|----------|-------|----------|
+| Competência         | Servidor    | Chefe | Consenso | Servidor | Chefe | Consenso |
+| Desc. competência 1 | 1           | 5     | 3        | 2        | 2     | 2        |
+| Desc. competência 2 | NA          | 2     | 2        | 2        | 3     | 2        |
+| Desc. competência 3 | 3           | 2     | 3        | 3        | 1     | 2        |
 
-Abaixo da grade de competências, o sistema mostra o botão `Aprovar consenso`.
+Regras de apresentação, para cada competência:
 
-4. O usuário aciona `Aprovar consenso`.
+- os campos `Importância` e `Domínio` do servidor devem ser **não editáveis**, sendo preenchidos com os valores
+  fornecidos na autoavaliação correspondente;
+- os campos `Importância` e `Domínio` do chefe devem ser **editáveis**;
+- os dois campos de `Consenso` devem ser **editáveis**;
+- se os valores `Importância` e `Domínio` forem iguais, o sistema deve preencher automaticamente o valor de `Consenso`
+  com o valor repetido.
 
-5. O sistema altera a situação individual do servidor para 'Avaliação de consenso aprovada'.
+**IMPORTANTE**: Se a situação do servidor for 'Avaliação de consenso aprovada', ou o subprocesso não estiver localizado
+na unidade do usuário, o sistema permitirá apenas **visualização** de todos os itens acima.
 
-7. O sistema envia uma notificação por e-mail para o responsável pela unidade:
+4. O usuário preenche (com a presença física do servidor) o valor de consenso para cada competência.
 
-   ```text
-   Assunto: SGC: Avaliação de consenso de [NOME_SERVIDOR] aprovada
+5. O sistema salva automaticamente cada alteração realizada. Não é necessária nenhuma ação para concluir a operação (a
+   validação dos dados será feita na conclusão do diagnóstico, como um todo).
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
-
-   O servidor [NOME_SERVIDOR] aprovou a avaliação de consenso do processo [DESCRICAO_PROCESSO].
-
-   Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
-   ```
-   
-7. O sistema cria internamente um alerta:
-    - `Descrição`: "Avaliação de consenso aprovada: [NOME_SERVIDOR]"
-    - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-
-8. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem "Avaliação de consenso aprovada".
+6. O usuário continua o trabalho de avaliação de consenso para outros servidores; para isso, aciona o botão `Voltar`
+   para ver a lista de servidores e realiza as ações desejadas para cada um dos demais.

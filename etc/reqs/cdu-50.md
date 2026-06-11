@@ -9,79 +9,153 @@ Ator: GESTOR, ADMIN
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário clica em um processo de diagnóstico na situação `Em andamento`.
+1. No `Painel`, o usuário clica em um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do processo` com uma tabela hierárquica contendo as unidades participantes; mostra
-   para cada unidade:
-    - sigla da unidade;
-    - nome da unidade;
-    - situação atual do diagnóstico da unidade.
+2. O sistema mostra a tela `Detalhes do processo` com uma tabela hierárquica contendo as unidades participantes do
+   processo.
+    - Para o perfil GESTOR, a tabela deve se limitar à própria unidade do usuário e às unidades subordinadas a ela,
+      recursivamente.
+    - Para o perfil ADMIN, a árvore exibida deve incluir todas as unidades participantes do processo.
 
-   2.1. Para o perfil GESTOR, o conteúdo da tabela se limita à unidade e suas unidades subordinadas a ela,
-   recursivamente.
+3. O usuário aciona uma unidade na tabela.
 
-   2.2. Para o perfil ADMIN, a tabela mostra todas as unidades participantes.
+4. O sistema mostra a tela `Detalhes do subprocesso` da unidade selecionada. Os elementos da tela serão:
 
-3. O usuário aciona uma unidade com diagnóstico concluído.
+- cabeçalho com dados gerais do subprocesso e da unidade, como detalhado em [CDU-07](cdu-07.md),
+- botão `Histórico de análise`; sempre habilitado;
+- controle 'drop-down' `Ações`, que dá acesso a estas ações (habilitadas apenas se localização do subprocesso for a
+  unidade do usuárioo)
+    - `Devolver para ajustes` para GESTOR e ADMIN;
+    - `Registrar aceite`, apenas para GESTOR;
+    - `Homologar`, apenas para ADMIN;
+- lista dos servidores participantes da unidade, *exceto o responsável pela unidade* (mesmo com perfil SERVIDOR);
+- seção de movimentações do subprocesso;
+- grade `Competência x Servidor`, somente-leitura, contendo:
+    - uma linha para cada competência do mapa vigente da unidade;
+    - um grupo de três colunas para cada servidor participante da unidade, com valores para:
+        - `I` (Importância);
+        - `D` (Domínio);
+        - `C` (Situação de Capacitação).
+    - exemplo de grade (os nomes dos servidores devem ocupar células 'mescladas', acima das respectivas colunas I,D,C)
 
-4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, conforme o caso de
-   uso [CDU-42.md](cdu-42.md)`.
-
-5. Se o usuário clicar em `Histórico de análise`, o sistema mostra os registros prévios de análise do subprocesso,
-   contendo data/hora, unidade, resultado e observação.
+  | Competência         | João |   |   | Maria |   |   |
+  | :------------------ | :--: |:-:|:-:| :---: |:-:|:-:|
+  |                     | **I** | **D** | **C** | **I** | **D** | **C** |
+  | Desc. competência 1 | 1    | 2 | EC | 4     | 3 | EC |
+  | Desc. competência 2 | NA   | NA | C | 5     | 4 | C |
+  | Desc. competência 3 | 3    | 5 | I  | 2     | 5 | I |
 
 ---
+Se o usuário clicar em `Histórico de análise`:
 
+5. O sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e observação.
+
+---
 Se o usuário optar por `Devolver para ajustes`:
 
-6. O sistema solicita confirmação em um modal, com um campo `Justificativa`, de preenchimento obrigatório.
+6. O sistema abre um modal (título "Aceitar diagnóstico") com o texto "Confirma a devolução do diagnóstico da
+   unidade [SIGLA_UNIDADE_SUBPROCESSO]?", um campo `Justificativa` obrigatório e os botões `Devolver` e `Cancelar`.
 
 7. Caso o usuário confirme, o sistema:
-    - registra análise com resultado `Devolução para ajustes`;
-    - muda a localização do subprocesso para a unidade imediatamente inferior.
+    - registra uma análise de validação para o subprocesso com:
+        - `Data/hora`: [Data/hora atual]
+        - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+        - `Resultado`: 'Devolução para ajustes'
+        - `Observação`
+    - muda a localização do subprocesso para a unidade de origem da última movimentação do subprocesso.
+    - muda a situação de todos os servidores da unidade para 'Avaliação de consenso criada' (isso faz com o sistema
+      habilite a edição das avaliações de consenso - ver [CDU-44](cdu-45.md))
 
-8. O sistema envia uma notificação por e-mail para a unidade inferior que foi a origem da última movimentação.
+8. O sistema envia uma notificação por e-mail para a unidade de origem da última movimentação do subprocesso:
+
+```text
+Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes
+
+Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+
+O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] devolvido para ajustes.
+
+Realize as mudanças solicitadas, acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
+```
 
 9. O sistema cria internamente um alerta com estes campos:
 
-   Descrição: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
-   Processo: [DESCRICAO_PROCESSO]
-   Data/hora: [Data/hora atual]
-   Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-   Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO]
+- `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
+- `Processo`: [DESCRICAO_PROCESSO]
+- `Data/hora`: [Data/hora atual]
+- `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
+- `Unidade de destino`: [SIGLA_UNIDADE_DEVOLUCAO]
 
-10. O sistema mostra a mensagem `Devolução realizada`.
+10. O sistema cria uma movimentação para o subprocesso:
+
+- `Descrição`: 'Devolução para ajustes'
+- `Data/hora`: Data/hora atual
+- `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+- `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+
+11. O sistema mostra a mensagem `Devolução realizada`.
 
 ---
 
 Se o usuário optar por `Registrar aceite`:
 
-11. O sistema solicita confirmação em um modal, com campo `Observação` opcional.
+12. O sistema abre um modal (título "Aceitar diagnóstico") com o texto "Confirma o aceite do diagnóstico da
+    unidade [SIGLA_UNIDADE_SUBPROCESSO]?", um campo`Observação` opcional e os botões `Aceitar` e `Cancelar`.
 
-12. Caso o usuário confirme, o sistema registra análise com resultado `Aceite`.
-
-13. O sistema muda a localização do subprocesso para a unidade imediatamente superior.
+14. O sistema muda a localização do subprocesso para a unidade imediatamente superior e criar registra uma análise de
+    validação para o subprocesso com:
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+    - `Resultado`: 'Aceite'
+    - `Observação`
 
 14. O sistema cria internamente um alerta com estes campos:
 
-Descrição: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito"
-Processo: [DESCRICAO_PROCESSO]
-Data/hora: [Data/hora atual]
-Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-Unidade de destino: [SIGLA_UNIDADE_SUPERIOR]
+- `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito"
+- `Processo`: [DESCRICAO_PROCESSO]
+- `Data/hora`: [Data/hora atual]
+- `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
+- `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-15. O sistema envia uma notificação por e-mail para a unidade imediatamente superior.
+15. O sistema envia uma notificação por e-mail para a unidade imediatamente superior:
 
-16. O sistema mostra a mensagem `Aceite registrado`.
+   ```text
+   Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito
+
+   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+
+   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi submetido para análise.
+
+   Realize a análise acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
+   ```
+
+16. O sistema cria uma movimentação para o subprocesso:
+
+- `Descrição`: 'Devolução de diagnóstico unidade [SIGLA_UNIDADE_SUBPROCESSO] para ajustes'
+- `Data/hora`: Data/hora atual
+- `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+- `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+
+17. O sistema mostra a mensagem `Aceite registrado`.
 
 ---
 
-Se o usuário optar por `Homologar`:
+Se o usuário optar por `Homologar` (apenas perfil ADMIN):
 
-17. O sistema solicita confirmação em um modal, com texto simples, sem campo adicional.
+18. O sistema abre um modal (título "Homologar diagnóstico") com o texto "Confirma a homologação diagnóstico da
+    unidade [SIGLA_UNIDADE_SUBPROCESSO]?", um campo`Observação` opcional e os botões `Homologar` e `Cancelar`.
 
-18. Caso o usuário confirme, o sistema altera a situação do subprocesso para `Homologado`.
+19. O sistema registra uma análise de validação para o subprocesso com:
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+    - `Resultado`: 'Homologação'
+    - `Observação`
 
-19. O sistema registra movimentação e análise de homologação.
+20. O sistema cria uma movimentação para o subprocesso:
 
-20. O sistema mostra a mensagem `Diagnóstico homologado`.
+- `Descrição`: 'Homologação de diagnóstico'
+- `Data/hora`: Data/hora atual
+- `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+- `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+
+21. O sistema mostra a mensagem `Diagnóstico homologado`.

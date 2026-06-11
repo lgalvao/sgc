@@ -1,63 +1,49 @@
-# CDU-48 - Concluir diagnóstico da unidade
+# CDU-47 - Preencher situações de capacitação
 
 Ator: CHEFE
 
 ## Pré-condições
 
-- Usuário logado com perfil CHEFE
-- Existência de processo de diagnóstico em andamento envolvendo a unidade do usuário
-- Subprocesso da unidade localizado na unidade do usuário
-- Todos os servidores da unidade com situação individual 'Avaliação de consenso aprovada' ou 'Avaliação impossibilitada'
-- Situação de capacitação preenchida para todos os servidores/competências da unidade
+- Login realizado com perfil CHEFE
+- Processo de diagnóstico em andamento com participação da unidade do usuário
+- Subprocesso localizado na unidade do usuário
+- Existência de servidores da unidade com avaliação individual na situação 'Avaliação de consenso aprovada'
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42a.md](cdu-42a.md)`.
 
-2. O usuário aciona o botão `Concluir diagnóstico`.
+3. O usuário aciona o card `Situação de capacitação`.
 
-3. O sistema verifica se todas os servidores estão com a situação 'Avaliação de consenso aprovada' ou
-   'Avaliação impossibilitada'; e se as situações de capacitação foram preenchidas para todas as competências.
+4. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
+    - uma linha para cada competência vigente da unidade;
+    - uma coluna para cada servidor participante da unidade;
+    - uma célula editável (dropdown) `Situação de capacitação` para cada combinação competência/servidor;
+    - cada célula `Situação de capacitação` admite os seguintes valores:
+        - `NA` (Não se aplica);
+        - `AC` (A capacitar);
+        - `EC` (Em capacitação);
+        - `C` (Capacitado);
+        - `I` (Instrutor).
 
-  3.1. Caso haja campos não preenchidos, o sistema mostra a mensagem "Ainda existem avaliações e situações de
-   capacitações não preenchidas.", interrompe a operação e permanece na tela `Detalhes do subprocesso`.
+   **Regras de apresentação da matriz**:
+    - a primeira coluna da matriz identifica a competência;
+    - as colunas de servidores devem usar nomes abreviados, por limitação de espaço horizontal;
+    - o nome completo do servidor deve continuar acessível na interface, por exemplo via `tooltip` no cabeçalho.
 
-  3.2. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação:
-    - título: "Conclusão de diagnóstico";
-    - texto: "Confirma a conclusão do diagnóstico da unidade?";
-    - botões `Cancelar` e `Concluir diagnóstico`.
+   Exemplo de matriz, depois de preenchida com situações de capacitação:
 
-  3.2.1. Se o usuário acionar `Cancelar`, o sistema interrompe a operação e permanece na mesma tela.
+   | Competência         | BOB MARLEY           | DAVID BOWIE         | ELVIS PRESLEY       |
+      |:--------------------|:---------------------|:--------------------|:--------------------|
+   | Desc. Competência 1 | NA - Não se aplica   | NA - Não se aplica  | I - Instrutor       |
+   | Desc. Competência 2 | I - Instrutor        | C - Capacitado      | C - Capacitado      |
+   | Desc. Competência 3 | EC - Em capacitação  | EC - Em capacitação | EC - Em capacitação |
 
-4. O usuário aciona `Concluir diagnóstico`.
+5. O usuário informa os valores de situação de capacitação para cada célula.
 
-5. O sistema altera a situação do subprocesso para `Concluído`.
+6. O sistema salva automaticamente cada alteração realizada.
 
-6. O sistema registra uma movimentação para o subprocesso com:
-    - `Data/hora`: [Data/hora atual];
-    - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO];
-    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
-    - `Descrição`: "Diagnóstico concluído para a unidade [SIGLA_UNIDADE_SUBPROCESSO] ".
-
-7. O sistema envia uma notificação por e-mail para a unidade superior:
-
-   ```text
-   Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
-
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-
-   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi concluído e submetido à análise das unidades superiores.
-
-   Realize a análise acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
-   ```
-
-8. O sistema cria internamente um alerta:
-    - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
-    - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
-
-9. O sistema redireciona para o `Painel` e mostra a mensagem `Diagnóstico concluído`.
+7. O usuário preenche os valores totalmente ou parcialmente, podendo retornar a esta tela em outro momento para
+   finalizar (ou seja, o sistema permite sair da tela sem completar o preenchimento de todos os campos).

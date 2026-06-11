@@ -1,48 +1,29 @@
-# CDU-47 - Preencher situação de capacitação
+# CDU-46 - Indicar impossibilidade de avaliação
 
 Ator: CHEFE
 
 ## Pré-condições
 
 - Login realizado com perfil CHEFE
-- Processo de diagnóstico em andamento com participação da unidade do usuário
-- Subprocesso com localização atual na unidade do usuário
+- Subprocesso localizado na unidade do usuário
+- Existência de servidor da unidade cuja avaliação individual ainda não tenha chegado à situação 'Avaliação de consenso
+  aprovada'
 
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42a.md](cdu-42a.md).`.
 
-3. O usuário aciona o card `Situação de capacitação`.
+2. Ao lado do nome do servidor desejado, o usuário escolhe a ação `Indicar impossibilidade`.
 
-4. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
-    - uma linha para cada competência vigente da unidade;
-    - uma coluna para cada servidor participante da unidade;
-    - uma célula editável (dropdown) `Situação de capacitação` para cada combinação competência/servidor;
-    - cada célula `Situação de capacitação` admite os seguintes valores:
-        - `NA` (Não se aplica);
-        - `AC` (A capacitar);
-        - `EC` (Em capacitação);
-        - `C` (Capacitado);
-        - `I` (Instrutor).
+3. O sistema abre um modal::
+    - título: "Indicar impossibilidade de avaliação";
+    - texto "Confirma a impossibilidade de avaliação para [NOME_SERVIDOR]?";
+    - campo `Justificativa` (obrigatório);
+    - botões `Cancelar` e `Indicar impossibilidade`.
 
-   *Regras de apresentação da matriz*:
-    - a primeira coluna da matriz identifica a competência;
-    - as colunas de servidores devem usar nomes abreviados, por limitação de espaço horizontal;
-    - o nome completo do servidor deve continuar acessível na interface, por exemplo via `tooltip` no cabeçalho.
+4. O usuário informa a justificativa e aciona `Indicar impossibilidade`.
 
-   Exemplo de matriz, depois de preenchida com situações de capacitação:
-
-   | Competência         | BOB MARLEY           | DAVID BOWIE         | ELVIS PRESLEY       |
-      |:--------------------|:---------------------|:--------------------|:--------------------|
-   | Desc. Competência 1 | NA - Não se aplica   | NA - Não se aplica  | I - Instrutor       |
-   | Desc. Competência 2 | I - Instrutor        | C - Capacitado      | C - Capacitado      |
-   | Desc. Competência 3 | EC - Em capacitação  | EC - Em capacitação | EC - Em capacitação |
-
-5. O usuário informa os valores de situação de capacitação para cada cruzamento competência/servidor.
-
-6. O sistema salva automaticamente cada alteração realizada.
-
-7. O usuário preenche os valores totalmente ou parcialmente, podendo retornar a esta tela em outro momento para
-   finalizar (ou seja, o sistema permite sair da tela sem completar todos os campos).
+5. O sistema altera a situação individual do servidor para `Avaliação impossibilitada` e mostra a mensagem
+   `Impossibilidade registrada`.

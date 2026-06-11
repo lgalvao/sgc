@@ -1,43 +1,61 @@
-# CDU-49 - Acompanhar diagnóstico de unidades subordinadas
+# CDU-48 - Concluir diagnóstico de uma unidade
 
-Ator: GESTOR ou ADMIN
+Ator: CHEFE
 
 ## Pré-condições
 
-- Login realizado com perfil GESTOR ou ADMIN
-- Existência de processo de diagnóstico em andamento
+- Usuário logado com perfil CHEFE
+- Existência de processo de diagnóstico em andamento envolvendo a unidade do usuário
+- Subprocesso da unidade localizado na unidade do usuário
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário clica em um processo de diagnóstico em andamento.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento
 
-2. O sistema mostra a tela `Detalhes do processo` com uma tabela hierárquica contendo as unidades participantes do
-   processo. Para cada unidade, são mostrados:
-    - sigla da unidade;
-    - nome da unidade;
-    - situação atual do subprocesso da unidade.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42a.md](cdu-42a.md)`.
 
-   2.1. Para o perfil GESTOR, a tabela deve se limitar à própria unidade do usuário e às unidades subordinadas a ela,
-   recursivamente.
+2. O usuário aciona o botão `Concluir diagnóstico`.
 
-   2.2. Para o perfil ADMIN, a árvore exibida deve incluir todas as unidades participantes do processo.
+3. O sistema verifica se todas os servidores estão com a situação 'Avaliação de consenso aprovada' ou
+   'Avaliação impossibilitada'; e se as situações de capacitação foram preenchidas para todas as competências.
 
-3. O usuário clica em uma unidade na tabela.
+3.1. Caso haja campos não preenchidos ou situações dos servidores fora das especificadas acima, o sistema mostra a
+mensagem "Ainda existem avaliações e situações de capacitações não preenchidas.", interrompe a operação e permanece na
+tela `Detalhes do subprocesso`.
 
-4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada, conforme o caso de
-   uso [CDU-42.md](cdu-42.md)`.
+3.2. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação:
 
-5. O sistema apresenta uma grade `Competência x Servidor`, somente-leitura, contendo:
-    - uma linha para cada competência do mapa vigente da unidade;
-    - um grupo de três colunas para cada servidor participante da unidade, com valores para:
-        - `I` (Importância);
-        - `D` (Domínio);
-        - `C` (Situação de Capacitação).
-    - Exemplo de grade (os nomes dos servidores devem ocupar células 'mescladas', acima das respectivas colunas I,D,C)
+- título: "Conclusão de diagnóstico";
+- texto: "Confirma a conclusão do diagnóstico da unidade?";
+- botões `Cancelar` e `Concluir diagnóstico`.
 
-   | Competência         | João |   |   | Maria |   |   |
-      | :------------------ | :--: |:-:|:-:| :---: |:-:|:-:|
-   |                     | **I** | **D** | **C** | **I** | **D** | **C** |
-   | Desc. competência 1 | 1    | 2 | EC | 4     | 3 | EC |
-   | Desc. competência 2 | NA   | NA | C | 5     | 4 | C |
-   | Desc. competência 3 | 3    | 5 | I  | 2     | 5 | I |
+4. O usuário aciona `Concluir diagnóstico`.
+
+5. O sistema altera a situação do subprocesso para `Concluído`.
+
+6. O sistema registra uma movimentação para o subprocesso com:
+    - `Descrição`: "Diagnóstico concluído para a unidade [SIGLA_UNIDADE_SUBPROCESSO] ".
+    - `Data/hora`: [Data/hora atual];
+    - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO];
+    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR];
+
+7. O sistema envia uma notificação por e-mail para a unidade imediatamente superior:
+
+   ```text
+   Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
+
+   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+
+   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi concluído e submetido à análise das unidades superiores.
+
+   Realize a análise acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
+   ```
+
+8. O sistema cria internamente um alerta:
+    - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
+    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+
+9. O sistema redireciona para o `Painel` e mostra a mensagem "Diagnóstico concluído".
