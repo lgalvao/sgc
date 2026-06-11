@@ -13,7 +13,7 @@ Ator: CHEFE
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42a.md](cdu-42a.md)`.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
 
 3. O usuário aciona o card `Situação de capacitação`.
 

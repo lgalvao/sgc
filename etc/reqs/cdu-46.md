@@ -11,7 +11,7 @@ Ator: SERVIDOR
 ## Fluxo principal
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso [CDU-42a.md](cdu-42a.md).`.
+   `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md).`.
 
 2. O usuário aciona o card `Avaliação de consenso`.
 

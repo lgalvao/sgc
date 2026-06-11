@@ -1,64 +1,33 @@
-# CDU-43 - Realizar autoavaliação
+# CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: GESTOR e ADMIN
 
-Ator: SERVIDOR
+Ator:  GESTOR ou ADMIN
 
 ## Pré-condições
 
-- Login realizado com perfil SERVIDOR
-- Processo de diagnóstico em andamento com participação da unidade do servidor
+- Usuário logado com perfil GESTOR ou ADMIN.
+- Existência de processo de diagnóstico em andamento.
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso [CDU-42a.md](cdu-42a.md)`.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O usuário aciona o card `Autoavaliação`.
+2. O sistema mostra a tela `Detalhes do processo`, com uma tabela hierárquica contendo as unidades participantes e a
+   situação atual do subprocesso de cada unidade, de acordo com estas restrições:
 
-3. O sistema apresenta a tela `Autoavaliação de diagnóstico`, contendo a lista das competências vigentes da unidade e,
-   para cada competência:
-    - descrição da competência;
-    - um controle de _toggle_ `Atividade e conhecimentos`, que permite mostrar/esconder as atividades e conhecimentos
-      associados à competência;
-    - campo `Importância`, com opções `NA` e os números de `1` a `6`;
-    - campo `Domínio`, com opções `NA` e os números de `1` a `6`;
-    - botão `Concluir autoavaliação`.
+    - Para o perfil GESTOR, a tabela se limita à unidade do usuário e às suas subordinadas, recursivamente.
+    - Para o perfil ADMIN, a tabela mostra todas as unidades participantes.
 
-   **IMPORTANTE**: Se o servidor já tiver concluído a autoavaliação, o sistema mostra os dados acima apenas em modo
-   somente-leitura e desabilita o botão  `Concluir autoavaliação`, não se aplicando os passos a seguir.
+3. O usuário aciona uma unidade na tabela.
 
-4. O usuário atribui um valor de domínio e de importância para cada uma das competências.
+4. O sistema mostra a tela `Detalhes do subprocesso` da unidade selecionada. Os elementos da tela serão:
 
-5. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de
-   salvamento.
-
-6. O usuário clica em `Concluir autoavaliação`.
-
-7. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos.
-
-   7.1. Caso exista competência com valores sem preencher, o sistema mostra a mensagem
-   `Preencha importância e domínio para todas as competências.` e interrompe a conclusão.
-
-   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?",
-   com botões `Concluir` e `Cancelar`, e, uma vez confirmado, altera a situação da avaliação do servidor para
-   `Autoavaliação concluída`.
-
-8. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
-
-   ```text
-   Assunto: SGC: Autoavaliação de [NOME_SERVIDOR] submetida para análise
-
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
-
-   O servidor [NOME_SERVIDOR] concluiu a autoavaliação no processo [DESCRICAO_PROCESSO].
-
-   A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
-   ```
-
-9. O sistema cria internamente um alerta com:
-    - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] submetida para análise"
-    - `Processo`: [DESCRICAO_PROCESSO]
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-
-10. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra a mensagem `Autoavaliação concluída`.
+- cabeçalho com dados gerais do subprocesso e da unidade, como detalhado em [CDU-07](cdu-07.md),
+- botão `Histórico de análise`; sempre habilitado;
+- controle 'drop-down' `Ações`, que dá acesso a estas ações (habilitadas apenas se localização do subprocesso for a
+  unidade do usuárioo)
+    - `Devolver para ajustes` para GESTOR e ADMIN;
+    - `Registrar aceite`, apenas para GESTOR;
+    - `Homologar`, apenas para ADMIN;
+    
+- lista dos servidores participantes da unidade, **exceto o responsável pela unidade**;
+- seção de movimentações do subprocesso;

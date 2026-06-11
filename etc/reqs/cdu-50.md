@@ -28,8 +28,7 @@ Ator: GESTOR, ADMIN
     - `Devolver para ajustes` para GESTOR e ADMIN;
     - `Registrar aceite`, apenas para GESTOR;
     - `Homologar`, apenas para ADMIN;
-- lista dos servidores participantes da unidade, *exceto o responsável pela unidade* (mesmo com perfil SERVIDOR);
-- seção de movimentações do subprocesso;
+- lista dos servidores participantes da unidade, *exceto o responsável pela unidade*;
 - grade `Competência x Servidor`, somente-leitura, contendo:
     - uma linha para cada competência do mapa vigente da unidade;
     - um grupo de três colunas para cada servidor participante da unidade, com valores para:
@@ -44,6 +43,8 @@ Ator: GESTOR, ADMIN
   | Desc. competência 1 | 1    | 2 | EC | 4     | 3 | EC |
   | Desc. competência 2 | NA   | NA | C | 5     | 4 | C |
   | Desc. competência 3 | 3    | 5 | I  | 2     | 5 | I |
+
+- seção de movimentações do subprocesso;
 
 ---
 Se o usuário clicar em `Histórico de análise`:
@@ -102,7 +103,7 @@ Se o usuário optar por `Registrar aceite`:
 12. O sistema abre um modal (título "Aceitar diagnóstico") com o texto "Confirma o aceite do diagnóstico da
     unidade [SIGLA_UNIDADE_SUBPROCESSO]?", um campo`Observação` opcional e os botões `Aceitar` e `Cancelar`.
 
-14. O sistema muda a localização do subprocesso para a unidade imediatamente superior e criar registra uma análise de
+13. O sistema muda a localização do subprocesso para a unidade imediatamente superior e criar registra uma análise de
     validação para o subprocesso com:
     - `Data/hora`: [Data/hora atual]
     - `Unidade`: [SIGLA_UNIDADE_ANALISE]
