@@ -3,9 +3,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 import java.net.*
 
-val argumentosJvmSemAvisoUnsafe = listOf(
-    "--sun-misc-unsafe-memory-access=allow"
-)
+val argumentosJvmSemAvisoUnsafe = emptyList<String>()
 
 plugins {
     java

@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.springframework.data.domain.*;
 import org.springframework.mock.web.*;
+import sgc.comum.Mensagens;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.feedback.dto.*;
@@ -150,7 +151,7 @@ class FeedbackServiceTest {
 
         assertThatThrownBy(() -> service.registrar(payload, null))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("nota");
+                .hasMessage(Mensagens.FEEDBACK_NOTA_MIN);
     }
 
     @Test
@@ -161,7 +162,7 @@ class FeedbackServiceTest {
 
         assertThatThrownBy(() -> service.registrar(payload, null))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("2000");
+                .hasMessage(Mensagens.FEEDBACK_NOTA_MAX);
     }
 
     @Test
@@ -171,7 +172,7 @@ class FeedbackServiceTest {
 
         assertThatThrownBy(() -> service.registrar(payload, null))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("nota");
+                .hasMessage(Mensagens.FEEDBACK_NOTA_MIN);
     }
 
     @Test
@@ -183,7 +184,7 @@ class FeedbackServiceTest {
 
         assertThatThrownBy(() -> service.registrar(payload, screenshot))
                 .isInstanceOf(ErroValidacao.class)
-                .hasMessageContaining("tamanho máximo");
+                .hasMessage(Mensagens.FEEDBACK_SCREENSHOT_MAX);
     }
 
     @Test
