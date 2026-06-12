@@ -42,7 +42,8 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
         await expect(page.getByText('ASSESSORIA_12', {exact: true})).toBeVisible();
         await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
         await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
-        await expect(page.getByText('Duff McKagan')).toBeVisible();
+        await expect(page.getByRole('listitem').filter({hasText: 'Duff McKagan'})).toBeVisible();
+        await expect(page.getByRole('button', {name: /Duff McKagan242426/i})).toBeVisible();
 
         await verificarNotificacaoAdmin(page, {
             destinatario: 'ASSESSORIA_12',
