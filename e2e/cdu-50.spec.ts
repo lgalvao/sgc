@@ -72,18 +72,14 @@ async function impossibilitarAvaliacoesPendentes(page: Page, codSubprocesso: num
 
     const linhas = tabela.locator('tbody tr');
     const total = await linhas.count();
-    console.log(`[DEBUG] total de servidores na tabela: ${total}`);
 
     for (let i = 0; i < total; i++) {
         const linha = linhas.nth(i);
         const texto = await linha.textContent();
-        console.log(`[DEBUG] servidor ${i} texto: ${texto}`);
         if (!texto?.includes(TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA)) {
-            console.log(`[DEBUG] pulando servidor ${i} pois não está pendente`);
             continue;
         }
 
-        console.log(`[DEBUG] impossibilitando servidor ${i}...`);
         await linha.getByRole('button', {name: TEXTO_BOTAO_ACOES}).click();
         await page.locator('[data-testid^="btn-impossibilitar-"]:visible').click();
         await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante a rodada.');
@@ -98,7 +94,6 @@ async function impossibilitarAvaliacoesPendentes(page: Page, codSubprocesso: num
         ]);
         // Aguarda o fechamento do modal esperando o textarea sumir
         await expect(page.getByTestId('textarea-justificativa-impossibilidade')).toBeHidden();
-        console.log(`[DEBUG] impossibilitado com sucesso`);
     }
 }
 
