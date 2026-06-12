@@ -13,12 +13,7 @@ import {expect, type Locator, type Page} from '@playwright/test';
  */
 export async function limparNotificacoes(page: Page): Promise<void> {
     try {
-        // BOrchestrator renderiza toasts como role="alert" ou .toast
-        // Procuramos botões de fechar (X) em toasts, alertas ou no orchestrator
         const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close, .alert .btn-close, button[aria-label="Close"]');
-
-        // Os toasts podem desaparecer ou reordenar durante a iteração.
-        // Reconsultamos sempre o primeiro botão para evitar índices obsoletos.
         while (await closeButtons.count() > 0) {
             const btn = closeButtons.first();
             if (!(await btn.isVisible())) {
@@ -26,7 +21,7 @@ export async function limparNotificacoes(page: Page): Promise<void> {
             }
 
             try {
-                await btn.click({timeout: 500});
+                await btn.click();
             } catch (e: any) {
                 const mensagem = (e.message ?? '').toLowerCase();
                 if (
@@ -110,7 +105,7 @@ export async function fazerLogout(page: Page): Promise<void> {
         }
 
         if (!botaoLogout) {
-            await page.waitForURL(/\/login(?:\?.*)?$/, {timeout: 2_000}).catch(() => null);
+            await page.waitForURL(/\/login(?:\?.*)?$/).catch(() => null);
             if (/\/login(?:\?.*)?$/.test(page.url())) {
                 return;
             }
@@ -120,7 +115,7 @@ export async function fazerLogout(page: Page): Promise<void> {
         await botaoLogout.scrollIntoViewIfNeeded();
 
         try {
-            await botaoLogout.click({timeout: 2_000});
+            await botaoLogout.click();
         } catch (e: any) {
             const mensagem = (e.message ?? '').toLowerCase();
             if (

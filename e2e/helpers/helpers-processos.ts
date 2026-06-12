@@ -149,9 +149,9 @@ export async function verificarProcessoTabela(page: Page, options: {
 
     // Localizar a linha que contém a descrição do processo
     const linhaProcesso = tabela.locator('tr').filter({hasText: options.descricao}).first();
-    await expect(linhaProcesso).toBeVisible({timeout: 15000});
-    await expect(linhaProcesso.getByText(new RegExp(options.situacao, 'i'))).toBeVisible({timeout: 15000});
-    await expect(linhaProcesso.getByText(new RegExp(`^${options.tipo}$`, 'i'))).toBeVisible({timeout: 15000});
+    await expect(linhaProcesso).toBeVisible();
+    await expect(linhaProcesso.getByText(new RegExp(options.situacao, 'i'))).toBeVisible();
+    await expect(linhaProcesso.getByText(new RegExp(`^${options.tipo}$`, 'i'))).toBeVisible();
 
     if (options.unidadesParticipantes) {
         for (const unidade of options.unidadesParticipantes) {
@@ -167,7 +167,7 @@ export async function aguardarProcessoNoPainel(page: Page, options: {
     unidadesParticipantes?: string[];
 }): Promise<void> {
     await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
-    await expect(page.getByTestId('painel-carregando')).toBeHidden({timeout: 15000});
+    await expect(page.getByTestId('painel-carregando')).toBeHidden();
     await verificarProcessoTabela(page, {
         descricao: options.descricao,
         situacao: options.situacao,
@@ -231,7 +231,7 @@ async function confirmarSelecaoComplementarUnidadesComEquipePropria(
     siglasConfirmadas?: string[]
 ): Promise<void> {
     const modal = page.locator('#modal-unidades-com-equipe-propria');
-    const abriuModal = await modal.waitFor({state: 'visible', timeout: 1500})
+    const abriuModal = await modal.waitFor({state: 'visible'})
         .then(() => true)
         .catch(() => false);
     if (!abriuModal) {
