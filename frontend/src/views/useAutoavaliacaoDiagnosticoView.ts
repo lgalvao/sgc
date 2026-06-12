@@ -61,7 +61,18 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     const justificativaImpossibilidade = ref('');
     const tentouImpossibilitarSemJustificativa = ref(false);
 
+    function validarPreenchimento(): boolean {
+        return competenciasLocais.value.every(
+            (c) => c.importancia !== null && c.dominio !== null,
+        );
+    }
+
     function abrirModalConcluir() {
+        if (!validarPreenchimento()) {
+            registrarErro(TEXTOS.diagnostico.ERRO_PREENCHIMENTO_INCOMPLETO);
+            return;
+        }
+        limparRetornoFluxo();
         modalConcluirAberto.value = true;
     }
 

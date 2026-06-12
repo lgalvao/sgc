@@ -75,6 +75,16 @@ export async function impossibilitarAvaliacao(
     );
 }
 
+/** POST /subprocessos/{id}/diagnostico/avaliacoes/{servidorTitulo}/reverter-impossibilidade */
+export async function permitirAvaliacao(
+    codSubprocesso: number,
+    servidorTitulo: string,
+): Promise<void> {
+    return apiPost(
+        caminhoDiagnostico(codSubprocesso, `/avaliacoes/${encodeURIComponent(servidorTitulo)}/reverter-impossibilidade`),
+    );
+}
+
 /** GET /subprocessos/{id}/diagnostico/equipe */
 export async function obterEquipe(codSubprocesso: number): Promise<DiagnosticoEquipe> {
     return apiGet(caminhoDiagnostico(codSubprocesso, '/equipe'));

@@ -66,7 +66,7 @@
               <th class="text-center grupo grupo-chefia divisor-grupo" colspan="3">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
             </tr>
             <tr>
-              <th class="text-center subcoluna grupo-servidor divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
+              <th class="text-center subcoluna grupo-servidor divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_SERVIDOR }}</th>
               <th class="text-center subcoluna grupo-servidor">{{ TEXTOS.diagnostico.COLUNA_CHEFE }}</th>
               <th class="text-center subcoluna grupo-servidor">{{ TEXTOS.diagnostico.COLUNA_CONSENSO }}</th>
               <th class="text-center subcoluna grupo-chefia divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_SERVIDOR }}</th>
@@ -84,9 +84,6 @@
                 <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.autoimportancia) }}</span>
               </td>
               <td class="text-center grupo-servidor coluna-nota">
-                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.autodominio) }}</span>
-              </td>
-              <td class="text-center grupo-chefia divisor-grupo coluna-nota">
                 <BFormSelect
                     v-if="ehChefe && !ehConsensoAprovado"
                     :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
@@ -96,6 +93,20 @@
                     @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'importancia', valor: normalizarValorNota(v)})"
                 />
                 <span v-else class="valor-estatico">{{ formatarNota(item.chefiaImportancia) }}</span>
+              </td>
+              <td class="text-center grupo-consenso celula-consenso coluna-nota">
+                <BFormSelect
+                    v-if="ehChefe && !ehConsensoAprovado"
+                    :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
+                    :model-value="item.consensoImportancia"
+                    :options="opcoesNota"
+                    class="form-select-sm seletor-nota seletor-consenso"
+                    @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: normalizarValorNota(v)})"
+                />
+                <span v-else class="valor-estatico valor-consenso">{{ formatarNota(item.consensoImportancia) }}</span>
+              </td>
+              <td class="text-center grupo-chefia divisor-grupo coluna-nota">
+                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.autodominio) }}</span>
               </td>
               <td class="text-center grupo-chefia coluna-nota">
                 <BFormSelect
@@ -107,17 +118,6 @@
                     @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'chefia', campo: 'dominio', valor: normalizarValorNota(v)})"
                 />
                 <span v-else class="valor-estatico">{{ formatarNota(item.chefiaDominio) }}</span>
-              </td>
-              <td class="text-center grupo-consenso divisor-grupo celula-consenso coluna-nota">
-                <BFormSelect
-                    v-if="ehChefe && !ehConsensoAprovado"
-                    :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
-                    :model-value="item.consensoImportancia"
-                    :options="opcoesNota"
-                    class="form-select-sm seletor-nota seletor-consenso"
-                    @update:model-value="(v: unknown) => atualizarNotaDetalhada(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: normalizarValorNota(v)})"
-                />
-                <span v-else class="valor-estatico valor-consenso">{{ formatarNota(item.consensoImportancia) }}</span>
               </td>
               <td class="text-center grupo-consenso celula-consenso coluna-nota">
                 <BFormSelect
@@ -141,7 +141,7 @@
         <BButton
             :disabled="aprovando"
             data-testid="btn-aprovar-consenso"
-            variant="primary"
+            variant="success"
             @click="confirmarAprovarConsenso"
         >
           <BSpinner v-if="aprovando" aria-hidden="true" class="me-1" small/>
@@ -161,7 +161,6 @@ import {
   BCard,
   BFormSelect,
   BSpinner,
-  BTable,
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';

@@ -68,22 +68,24 @@
           >
             <BDropdownItemButton
                 :data-testid="`btn-manter-consenso-${item.servidorTitulo}`"
+                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
                 @click="navegarParaConsenso(item.servidorTitulo)"
             >
               {{ TEXTOS.diagnostico.BTN_MANTER_CONSENSO }}
             </BDropdownItemButton>
             <BDropdownItemButton
-                :data-testid="`btn-manter-capacitacao-${item.servidorTitulo}`"
-                @click="navegarParaCapacitacao(item.servidorTitulo)"
-            >
-              Manter situação de capacitação
-            </BDropdownItemButton>
-            <BDropdownItemButton
                 :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
-                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA' || item.situacaoServidor === 'CONSENSO_APROVADO'"
+                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
                 @click="abrirModalImpossibilitar(item)"
             >
               {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
+            </BDropdownItemButton>
+            <BDropdownItemButton
+                :data-testid="`btn-permitir-avaliacao-${item.servidorTitulo}`"
+                :disabled="item.situacaoServidor !== 'AVALIACAO_IMPOSSIBILITADA'"
+                @click="abrirModalPermitirAvaliacao(item)"
+            >
+              {{ TEXTOS.diagnostico.BTN_PERMITIR_AVALIACAO }}
             </BDropdownItemButton>
           </BDropdown>
         </template>
@@ -160,6 +162,28 @@
         >
           <BSpinner v-if="impossibilitando" aria-hidden="true" class="me-1" small/>
           Indicar impossibilidade
+        </BButton>
+      </template>
+    </BModal>
+
+    <BModal
+        v-model="modalPermitirAvaliacaoAberto"
+        :title="TEXTOS.diagnostico.MODAL_PERMITIR_AVALIACAO_TITULO"
+        centered
+    >
+      <p v-if="servidorSelecionado" class="mb-0">
+        {{ TEXTOS.diagnostico.MODAL_PERMITIR_AVALIACAO_MENSAGEM(servidorSelecionado.servidorNome) }}
+      </p>
+      <template #footer>
+        <BButton class="text-secondary" variant="link" @click="modalPermitirAvaliacaoAberto = false">Cancelar</BButton>
+        <BButton
+            :disabled="permitindo"
+            data-testid="btn-confirmar-permitir-avaliacao"
+            variant="success"
+            @click="confirmarPermitirAvaliacao"
+        >
+          <BSpinner v-if="permitindo" aria-hidden="true" class="me-1" small/>
+          Confirmar
         </BButton>
       </template>
     </BModal>
@@ -300,6 +324,7 @@ const router = useRouter();
 const toastStore = useToastStore();
 const {
   podeCriarConsenso,
+  podeConcluirDiagnostico,
   habilitarConcluirDiagnostico,
   habilitarValidarDiagnostico,
   habilitarDevolverDiagnostico,
@@ -312,6 +337,7 @@ const {
   devolvendo,
   homologando,
   impossibilitando,
+  permitindo,
   erroConcluir,
   erroValidar,
   erroDevolver,
@@ -321,6 +347,7 @@ const {
   devolverDiagnostico,
   homologarDiagnostico,
   impossibilitarAvaliacao,
+  permitirAvaliacao,
 } = useFluxoDiagnostico(props.codSubprocesso);
 
 const erroMensagem = ref('');
@@ -330,6 +357,7 @@ const modalValidarAberto = ref(false);
 const modalDevolverAberto = ref(false);
 const modalHomologarAberto = ref(false);
 const modalImpossibilitarAberto = ref(false);
+const modalPermitirAvaliacaoAberto = ref(false);
 const observacoesValidar = ref('');
 const justificativaDevolver = ref('');
 const erroJustificativaDevolver = ref('');
@@ -339,7 +367,7 @@ const justificativaImpossibilidade = ref('');
 const erroJustificativaImpossibilidade = ref('');
 
 const ehChefe = computed(() => podeCriarConsenso.value);
-const podeConcluir = computed(() => habilitarConcluirDiagnostico.value);
+const podeConcluir = computed(() => podeConcluirDiagnostico.value);
 const podeValidar = computed(() => habilitarValidarDiagnostico.value);
 const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
 const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
@@ -357,24 +385,29 @@ function navegarParaConsenso(servidorTitulo: string) {
   });
 }
 
-function navegarParaCapacitacao(servidorTitulo: string) {
-  void router.push({
-    name: 'SituacaoCapacitacaoDiagnostico',
-    params: {
-      codSubprocesso: props.codSubprocesso,
-      siglaUnidade: props.siglaUnidade,
-    },
-    query: {
-      servidorTitulo,
-    },
-  });
-}
+
 
 function abrirModalImpossibilitar(servidor: ServidorDiagnostico) {
   servidorSelecionado.value = servidor;
   justificativaImpossibilidade.value = '';
   erroJustificativaImpossibilidade.value = '';
   modalImpossibilitarAberto.value = true;
+}
+
+function abrirModalPermitirAvaliacao(servidor: ServidorDiagnostico) {
+  servidorSelecionado.value = servidor;
+  modalPermitirAvaliacaoAberto.value = true;
+}
+
+async function confirmarPermitirAvaliacao() {
+  if (!servidorSelecionado.value) return;
+  try {
+    await permitirAvaliacao(servidorSelecionado.value.servidorTitulo);
+    modalPermitirAvaliacaoAberto.value = false;
+    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILIDADE_REVERTIDA;
+  } catch {
+    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+  }
 }
 
 async function confirmarImpossibilitar() {
@@ -416,9 +449,9 @@ function abrirModalHomologar() {
 }
 
 async function confirmarConcluir() {
+  modalConcluirAberto.value = false;
   try {
     await concluirDiagnostico();
-    modalConcluirAberto.value = false;
     toastStore.setPending(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
     await router.push({name: 'Painel'});
   } catch (erro) {

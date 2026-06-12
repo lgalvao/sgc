@@ -6,6 +6,7 @@ import {
     devolverDiagnostico,
     homologarDiagnostico,
     impossibilitarAvaliacao,
+    permitirAvaliacao,
     validarDiagnostico,
 } from '@/services/diagnosticoService';
 import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
@@ -63,6 +64,15 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         },
     });
 
+    const mutacaoPermitirAvaliacao = useMutation({
+        mutation: (servidorTitulo: string) =>
+            permitirAvaliacao(codSubprocesso, servidorTitulo),
+        onSuccess: () => {
+            cacheDiagnostico.invalidarEquipe(codSubprocesso);
+            cacheDiagnostico.invalidarUnidade(codSubprocesso);
+        },
+    });
+
     /** Volta para a tela do subprocesso após ação de fluxo concluída. */
     function voltarParaSubprocesso(codProcesso: number, siglaUnidade: string) {
         void router.push({
@@ -77,17 +87,21 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         devolvendo: computed(() => mutacaoDevolver.isLoading.value),
         homologando: computed(() => mutacaoHomologar.isLoading.value),
         impossibilitando: computed(() => mutacaoImpossibilitar.isLoading.value),
+        permitindo: computed(() => mutacaoPermitirAvaliacao.isLoading.value),
         erroConcluir: computed(() => mutacaoConcluir.error.value),
         erroValidar: computed(() => mutacaoValidar.error.value),
         erroDevolver: computed(() => mutacaoDevolver.error.value),
         erroHomologar: computed(() => mutacaoHomologar.error.value),
         erroImpossibilitar: computed(() => mutacaoImpossibilitar.error.value),
+        erroPermitir: computed(() => mutacaoPermitirAvaliacao.error.value),
         concluirDiagnostico: () => mutacaoConcluir.mutateAsync(),
         validarDiagnostico: (observacoes?: string) => mutacaoValidar.mutateAsync(observacoes),
         devolverDiagnostico: (justificativa: string) => mutacaoDevolver.mutateAsync(justificativa),
         homologarDiagnostico: (observacoes?: string) => mutacaoHomologar.mutateAsync(observacoes),
         impossibilitarAvaliacao: (servidorTitulo: string, justificativa: string) =>
             mutacaoImpossibilitar.mutateAsync({servidorTitulo, justificativa}),
+        permitirAvaliacao: (servidorTitulo: string) =>
+            mutacaoPermitirAvaliacao.mutateAsync(servidorTitulo),
         voltarParaSubprocesso,
     };
 }
