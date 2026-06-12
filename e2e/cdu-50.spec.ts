@@ -153,7 +153,7 @@ async function prepararDiagnosticoConcluido(
 }
 
 async function abrirAcoesAnaliseUnidade(page: Page): Promise<void> {
-    await page.getByRole('button', {name: TEXTO_BOTAO_ACOES}).first().click();
+    await page.getByRole('button', {name: TEXTO_BOTAO_ACOES, exact: true}).first().click();
 }
 
 async function verificarTelaAnaliseDiagnostico(page: Page): Promise<void> {
@@ -337,7 +337,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
 
         await login(page, TITULO_CHEFE, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
-        await expect(page.getByText('Avaliação de consenso criada')).toBeVisible();
+        await expect(page.getByText('Avaliação de consenso criada').first()).toBeVisible();
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await verificarNotificacaoAdmin(page, {
@@ -387,12 +387,12 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await page.getByTestId('btn-historico-analise-unidade').click();
         const modalHistorico = page.getByTestId('mdl-historico-analise');
         await expect(modalHistorico).toBeVisible();
-        await expect(modalHistorico.getByTestId('cell-unidade-0')).toHaveText('ADMIN');
-        await expect(modalHistorico.getByTestId('cell-resultado-0')).toContainText('Diagnóstico homologado');
+        await expect(modalHistorico.getByTestId('cell-unidade-0')).toHaveText(UNIDADE_GESTOR);
+        await expect(modalHistorico.getByTestId('cell-resultado-0')).toContainText('Aceite');
         await modalHistorico.getByTestId('btn-modal-fechar').click();
         await expect(modalHistorico).toBeHidden();
 
-        await expect(page.getByText('Diagnóstico homologado', {exact: true})).toBeVisible();
+        await expect(page.getByText('Diagnóstico homologado', {exact: true}).first()).toBeVisible();
 
         await verificarNotificacaoAdmin(page, {
             destinatario: UNIDADE_SUBORDINADA,
