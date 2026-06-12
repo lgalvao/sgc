@@ -66,7 +66,11 @@ async function preencherSituacoesCapacitacaoPendentesPorApi(page: Page, codSubpr
 }
 
 async function impossibilitarAvaliacoesPendentes(page: Page, codSubprocesso: number): Promise<void> {
-    const linhas = page.locator('tbody tr');
+    const tabela = page.getByTestId('tbl-servidores-diagnostico');
+    await expect(tabela).toBeVisible();
+    await tabela.locator('tbody tr').first().waitFor({state: 'visible'});
+
+    const linhas = tabela.locator('tbody tr');
     const total = await linhas.count();
     console.log(`[DEBUG] total de servidores na tabela: ${total}`);
 
@@ -92,9 +96,9 @@ async function impossibilitarAvaliacoesPendentes(page: Page, codSubprocesso: num
             ),
             page.getByTestId('btn-confirmar-impossibilitar').click(),
         ]);
-        await expect(page.getByTestId('app-alert')).toBeVisible();
-        console.log(`[DEBUG] impossibilitado com sucesso, fechando alerta`);
-        await page.getByTestId('app-alert').locator('.btn-close').click().catch(() => {});
+        // Aguarda o fechamento do modal esperando o textarea sumir
+        await expect(page.getByTestId('textarea-justificativa-impossibilidade')).toBeHidden();
+        console.log(`[DEBUG] impossibilitado com sucesso`);
     }
 }
 
