@@ -34,7 +34,7 @@ test.describe('CDU-45 - Aprovar avaliação de consenso', () => {
 
         await expect(page.getByTestId('btn-aprovar-consenso')).toBeVisible();
         await Promise.all([
-            page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/aprovar`) && res.ok()),
+            page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/aprovar`) && res.ok()),
             page.getByTestId('btn-aprovar-consenso').click()
         ]);
 

@@ -1,5 +1,9 @@
 import {expect, type Page} from '@playwright/test';
 
+function caminhoDiagnosticoApi(codSubprocesso: number, sufixo: string): string {
+    return `/api/subprocessos/${codSubprocesso}/diagnostico${sufixo}`;
+}
+
 export async function abrirCardDiagnostico(page: Page, testId: string, urlRegex: RegExp): Promise<void> {
     const card = page.getByTestId(testId).first();
     await expect(card).toBeVisible();
@@ -45,7 +49,7 @@ export async function preencherAutoavaliacaoCompleta(page: Page, codSubprocesso:
         if ((await selectImportancia.nth(i).inputValue()) === '3') continue;
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao`) && res.request().method() === 'POST' && res.ok()
+                res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/autoavaliacao')) && res.request().method() === 'POST' && res.ok()
             ),
             selectImportancia.nth(i).selectOption('3')
         ]);
@@ -56,14 +60,14 @@ export async function preencherAutoavaliacaoCompleta(page: Page, codSubprocesso:
         if ((await selectDominio.nth(i).inputValue()) === '4') continue;
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao`) && res.request().method() === 'POST' && res.ok()
+                res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/autoavaliacao')) && res.request().method() === 'POST' && res.ok()
             ),
             selectDominio.nth(i).selectOption('4')
         ]);
     }
 
     await expect.poll(async () => await page.evaluate(async (codigo) => {
-        const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/autoavaliacao`, {credentials: 'include'});
+        const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/autoavaliacao`, {credentials: 'include'});
         if (!resposta.ok) return false;
         const dados = await resposta.json();
         return dados.competencias.every((item: {importancia: number | null; dominio: number | null}) =>
@@ -94,7 +98,7 @@ export async function preencherConsensoMinimo(
             if ((await itens.nth(i).inputValue()) === '4') continue;
             await Promise.all([
                 page.waitForResponse(res =>
-                    res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/${servidorTitulo}`)
+                    res.url().includes(caminhoDiagnosticoApi(codSubprocesso, `/consenso/${servidorTitulo}`))
                     && res.request().method() === 'POST'
                     && res.ok()
                 ),
@@ -107,7 +111,7 @@ export async function preencherConsensoMinimo(
     }
 
     await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
-        const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
+        const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/consenso/${titulo}`, {credentials: 'include'});
         if (!resposta.ok) return false;
         const dados = await resposta.json();
         return dados.situacaoServidor === 'CONSENSO_CRIADO';
@@ -133,7 +137,7 @@ export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubpro
     await expect(select).toBeVisible();
     await Promise.all([
         page.waitForResponse(res =>
-            res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/situacoes-capacitacao`)
+            res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/situacoes-capacitacao'))
             && res.request().method() === 'POST'
             && res.ok()
         ),
@@ -154,7 +158,7 @@ export async function preencherTodasSituacoesCapacitacao(page: Page, codSubproce
         houveAlteracao = true;
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/situacoes-capacitacao`)
+                res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/situacoes-capacitacao'))
                 && res.request().method() === 'POST'
                 && res.ok()
             ),

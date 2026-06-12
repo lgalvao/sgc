@@ -35,7 +35,7 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
 
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
                 && res.request().method() === 'POST'
                 && res.ok()
             ),
@@ -43,7 +43,7 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         ]);
 
         await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
-            const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/consenso/${titulo}`, {credentials: 'include'});
+            const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/consenso/${titulo}`, {credentials: 'include'});
             if (!resposta.ok) return null;
             const dados = await resposta.json();
             return String(dados.competencias[0]?.consensoImportancia ?? '');

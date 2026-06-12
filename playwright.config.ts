@@ -12,7 +12,7 @@ export default defineConfig({
     testDir: './e2e',
     timeout: 20_000,
     workers: 1,
-    reporter: 'list',
+    reporter: 'dot',
     use: {
         baseURL: `http://localhost:${frontendPort}`,
         trace: 'off',

@@ -19,7 +19,7 @@ import {
     verificarProcessoTabela
 } from './helpers/helpers-processos.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {navegarParaDiagnosticoUnidade, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {
     abrirHistoricoAnalise,
     aceitarCadastroMapeamento,
@@ -730,7 +730,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             codigoProcessoDiagnosticoMonitoramento = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture(request);
             await login(page, ADMIN.titulo, ADMIN.senha);
             await acessarDetalhesProcesso(page, `${descricaoProcessoDiagnostico} Monitoramento`);
-            await navegarParaSubprocesso(page, SIGLA_UNIDADE_DIAGNOSTICO);
+            await navegarParaDiagnosticoUnidade(page, SIGLA_UNIDADE_DIAGNOSTICO);
             await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(SIGLA_UNIDADE_DIAGNOSTICO);
             await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
             await expect(page.getByText('Duff McKagan')).toBeVisible();
@@ -749,7 +749,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante a rodada do diagnóstico.');
             await Promise.all([
                 page.waitForResponse(res =>
-                    res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/avaliacoes/${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}/impossibilitar`)
+                    res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}/impossibilitar`)
                     && res.ok()
                 ),
                 page.getByTestId('btn-confirmar-impossibilitar').click()

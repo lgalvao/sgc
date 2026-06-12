@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
@@ -37,7 +37,7 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
         await expect(page).toHaveURL(/\/painel/);
 
         await page.goto(`/processo/${processo.codigo}`);
-        await navegarParaSubprocesso(page, 'ASSESSORIA_12');
+        await navegarParaDiagnosticoUnidade(page, 'ASSESSORIA_12');
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText('ASSESSORIA_12');
         await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();

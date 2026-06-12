@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {USUARIOS, login, loginComPerfil} from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso, criarProcesso} from './helpers/helpers-processos.js';
-import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 
 const UNIDADE_SUBORDINADA = 'ASSESSORIA_12';
 
@@ -41,7 +41,7 @@ test.describe.serial('CDU-49 - Acompanhar diagnóstico de unidades subordinadas'
         await expect(tabelaArvore.getByText('SECRETARIA_1 - Secretaria 1').first()).toBeVisible();
         await expect(tabelaArvore.getByRole('row', {name: /^ASSESSORIA_12\b/i}).first()).toBeVisible();
 
-        await navegarParaSubprocesso(page, UNIDADE_SUBORDINADA);
+        await navegarParaDiagnosticoUnidade(page, UNIDADE_SUBORDINADA);
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_SUBORDINADA);
         await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
@@ -59,7 +59,7 @@ test.describe.serial('CDU-49 - Acompanhar diagnóstico de unidades subordinadas'
         await expect(tabelaArvore).toBeVisible();
         await expect(tabelaArvore.getByRole('row', {name: /^ASSESSORIA_12\b/i}).first()).toBeVisible();
 
-        await navegarParaSubprocesso(page, UNIDADE_SUBORDINADA);
+        await navegarParaDiagnosticoUnidade(page, UNIDADE_SUBORDINADA);
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_SUBORDINADA);
         await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
         await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();

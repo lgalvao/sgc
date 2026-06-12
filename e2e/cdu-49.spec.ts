@@ -29,7 +29,7 @@ async function impossibilitarAvaliacoesPendentes(page: import('@playwright/test'
         await page.getByTestId('textarea-justificativa-impossibilidade').fill(JUSTIFICATIVA_IMPOSSIBILIDADE);
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/avaliacoes/`)
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/`)
                 && res.url().includes('/impossibilitar')
                 && res.request().method() === 'POST'
                 && res.ok()
@@ -41,7 +41,7 @@ async function impossibilitarAvaliacoesPendentes(page: import('@playwright/test'
 
 async function preencherSituacoesCapacitacaoPendentesPorApi(page: import('@playwright/test').Page, codSubprocesso: number): Promise<void> {
     await page.evaluate(async (codigo) => {
-        const respostaAtual = await fetch(`/api/diagnosticos/subprocessos/${codigo}/unidade`, {credentials: 'include'});
+        const respostaAtual = await fetch(`/api/subprocessos/${codigo}/diagnostico/unidade`, {credentials: 'include'});
         if (!respostaAtual.ok) {
             throw new Error(`Falha ao carregar situações de capacitação do subprocesso ${codigo}.`);
         }
@@ -57,7 +57,7 @@ async function preencherSituacoesCapacitacaoPendentesPorApi(page: import('@playw
             situacaoCapacitacao: item.situacaoCapacitacao ?? 'EC',
         }));
 
-        const respostaSalvar = await fetch(`/api/diagnosticos/subprocessos/${codigo}/situacoes-capacitacao`, {
+        const respostaSalvar = await fetch(`/api/subprocessos/${codigo}/diagnostico/situacoes-capacitacao`, {
             method: 'POST',
             credentials: 'include',
             headers: {'Content-Type': 'application/json'},
@@ -93,7 +93,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
         await expect(seletorConsensoImportancia).toBeVisible();
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
                 && res.request().method() === 'POST'
                 && res.ok()
             ),
@@ -110,7 +110,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
         await expect(page.getByTestId('btn-aprovar-consenso')).toBeVisible();
         await Promise.all([
-            page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/consenso/aprovar`) && res.ok()),
+            page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/aprovar`) && res.ok()),
             page.getByTestId('btn-aprovar-consenso').click()
         ]);
 
@@ -122,7 +122,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
         await expect(modalConcluir).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM);
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/concluir`)
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/concluir`)
                 && res.request().method() === 'POST'
                 && res.status() >= 400
             ),
@@ -136,7 +136,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
 
         await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso);
         await expect.poll(async () => await page.evaluate(async (codigo) => {
-            const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/unidade`, {credentials: 'include'});
+            const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/unidade`, {credentials: 'include'});
             if (!resposta.ok) {
                 return false;
             }
@@ -149,7 +149,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
         await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM);
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/concluir`)
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/concluir`)
                 && res.request().method() === 'POST'
                 && res.ok()
             ),

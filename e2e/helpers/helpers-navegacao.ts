@@ -188,6 +188,13 @@ export async function esperarPaginaSubprocesso(page: Page, siglaUnidade?: string
     await page.waitForURL(regex);
 }
 
+export async function esperarPaginaDiagnosticoUnidade(page: Page, siglaUnidade?: string): Promise<void> {
+    const regex = siglaUnidade
+        ? new RegExp(String.raw`\/diagnostico\/\d+\/${siglaUnidade}\/unidade(?:\?.*)?$`)
+        : /\/diagnostico\/\d+\/[A-Z0-9_]+\/unidade(?:\?.*)?$/;
+    await page.waitForURL(regex);
+}
+
 /**
  * Navega para um subprocesso a partir da tela de detalhes do processo.
  * Suporta tanto a árvore de subprocessos quanto a tabela simples exibida em alguns perfis/fluxos.
@@ -200,8 +207,8 @@ export async function navegarParaSubprocesso(
     // Aguardar qualquer transição de rota antes de checar a URL
     await page.waitForURL(/\/processo\/\d+/);
 
-    const urlSubprocesso = new RegExp(String.raw`/processo/\d+/${siglaUnidade}(?:\?.*)?$`);
-    if (urlSubprocesso.test(page.url())) return;
+    const urlDestino = new RegExp(String.raw`/processo/\d+/${siglaUnidade}(?:\?.*)?$`);
+    if (urlDestino.test(page.url())) return;
 
     const info = page.getByTestId('processo-info');
     await expect(info).toBeVisible();
@@ -212,7 +219,7 @@ export async function navegarParaSubprocesso(
         const linhaArvore = tabelaArvore.getByRole('row', {name: padraoUnidade}).first();
         await expect(linhaArvore).toBeVisible();
         await Promise.all([
-            page.waitForURL(urlSubprocesso),
+            page.waitForURL(urlDestino),
             linhaArvore.click()
         ]);
         return;
@@ -223,7 +230,7 @@ export async function navegarParaSubprocesso(
         const linhaProcesso = tabelaProcessos.locator('tr').filter({hasText: padraoUnidade}).first();
         await expect(linhaProcesso).toBeVisible();
         await Promise.all([
-            page.waitForURL(urlSubprocesso),
+            page.waitForURL(urlDestino),
             linhaProcesso.click()
         ]);
         return;
@@ -232,7 +239,7 @@ export async function navegarParaSubprocesso(
     const linhaGenerica = page.locator('main table tr').filter({hasText: padraoUnidade}).first();
     await expect(linhaGenerica).toBeVisible();
     await Promise.all([
-        page.waitForURL(urlSubprocesso),
+        page.waitForURL(urlDestino),
         linhaGenerica.click()
     ]);
 }
@@ -245,4 +252,47 @@ export async function obterAcaoCabecalhoSubprocesso(page: Page, testIdAcao: stri
     const acao = page.locator(`[data-testid="${testIdAcao}"]:visible`).first();
     await expect(acao).toBeVisible();
     return acao;
+}
+
+export async function navegarParaDiagnosticoUnidade(
+    page: Page,
+    siglaUnidade: string
+): Promise<void> {
+    await page.waitForURL(/\/processo\/\d+/);
+
+    const urlDestino = new RegExp(String.raw`/diagnostico/\d+/${siglaUnidade}/unidade(?:\?.*)?$`);
+    if (urlDestino.test(page.url())) return;
+
+    const info = page.getByTestId('processo-info');
+    await expect(info).toBeVisible();
+
+    const padraoUnidade = new RegExp(String.raw`^${siglaUnidade}\b`, 'i');
+    const tabelaArvore = page.getByTestId('tbl-tree');
+    if (await tabelaArvore.count() > 0 && await tabelaArvore.isVisible()) {
+        const linhaArvore = tabelaArvore.getByRole('row', {name: padraoUnidade}).first();
+        await expect(linhaArvore).toBeVisible();
+        await Promise.all([
+            page.waitForURL(urlDestino),
+            linhaArvore.click()
+        ]);
+        return;
+    }
+
+    const tabelaProcessos = page.getByTestId('tbl-processos');
+    if (await tabelaProcessos.count() > 0 && await tabelaProcessos.isVisible()) {
+        const linhaProcesso = tabelaProcessos.locator('tr').filter({hasText: padraoUnidade}).first();
+        await expect(linhaProcesso).toBeVisible();
+        await Promise.all([
+            page.waitForURL(urlDestino),
+            linhaProcesso.click()
+        ]);
+        return;
+    }
+
+    const linhaGenerica = page.locator('main table tr').filter({hasText: padraoUnidade}).first();
+    await expect(linhaGenerica).toBeVisible();
+    await Promise.all([
+        page.waitForURL(urlDestino),
+        linhaGenerica.click()
+    ]);
 }

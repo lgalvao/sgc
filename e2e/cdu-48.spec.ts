@@ -36,7 +36,7 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
 
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/situacoes-capacitacao`)
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/situacoes-capacitacao`)
                 && res.request().method() === 'POST'
                 && res.ok()
             ),
@@ -44,7 +44,7 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
         ]);
 
         await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
-            const resposta = await fetch(`/api/diagnosticos/subprocessos/${codigo}/unidade`, {credentials: 'include'});
+            const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/unidade`, {credentials: 'include'});
             if (!resposta.ok) return null;
             const dados = await resposta.json();
             return dados.situacoesCapacitacao.find((item: {servidorTitulo: string; situacaoCapacitacao: string | null}) =>

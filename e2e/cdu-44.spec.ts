@@ -39,7 +39,7 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
         await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM);
         
         await Promise.all([
-            page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao/concluir`) && res.status() === 422),
+            page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/autoavaliacao/concluir`) && res.status() === 422),
             page.getByTestId('btn-confirmar-concluir').click()
         ]);
 
@@ -55,13 +55,13 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
         for (let i = 0; i < total; i++) {
             if ((await selectImportancia.nth(i).inputValue()) !== '3') {
                 await Promise.all([
-                    page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao`) && res.request().method() === 'POST' && res.ok()),
+                    page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/autoavaliacao`) && res.request().method() === 'POST' && res.ok()),
                     selectImportancia.nth(i).selectOption('3')
                 ]);
             }
             if ((await selectDominio.nth(i).inputValue()) !== '4') {
                 await Promise.all([
-                    page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao`) && res.request().method() === 'POST' && res.ok()),
+                    page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/autoavaliacao`) && res.request().method() === 'POST' && res.ok()),
                     selectDominio.nth(i).selectOption('4')
                 ]);
             }
@@ -71,7 +71,7 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
         await page.getByTestId('btn-concluir-autoavaliacao').click();
         await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM);
         await Promise.all([
-            page.waitForResponse(res => res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/autoavaliacao/concluir`) && res.ok()),
+            page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/autoavaliacao/concluir`) && res.ok()),
             page.getByTestId('btn-confirmar-concluir').click()
         ]);
 

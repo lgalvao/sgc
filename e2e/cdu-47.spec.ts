@@ -38,7 +38,7 @@ test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
         const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
         await Promise.all([
             page.waitForResponse(res =>
-                res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/avaliacoes/${TITULO_SERVIDOR_ASSESSORIA_12}/impossibilitar`)
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/${TITULO_SERVIDOR_ASSESSORIA_12}/impossibilitar`)
                 && res.ok()
             ),
             page.getByTestId('btn-confirmar-impossibilitar').click()

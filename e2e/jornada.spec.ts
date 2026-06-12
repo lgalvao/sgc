@@ -500,7 +500,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante o período da rodada.');
             await Promise.all([
                 page.waitForResponse(res =>
-                    res.url().includes(`/api/diagnosticos/subprocessos/${codSubprocesso}/avaliacoes/${SERVIDOR_IMPOSSIBILITADO.titulo}/impossibilitar`)
+                    res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/${SERVIDOR_IMPOSSIBILITADO.titulo}/impossibilitar`)
                     && res.ok()
                 ),
                 page.getByTestId('btn-confirmar-impossibilitar').click()
