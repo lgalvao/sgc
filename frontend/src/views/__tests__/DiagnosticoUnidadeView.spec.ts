@@ -8,6 +8,12 @@ const backMock = vi.fn();
 const validarDiagnosticoMock = vi.fn();
 const devolverDiagnosticoMock = vi.fn();
 const homologarDiagnosticoMock = vi.fn();
+const COD_SUBPROCESSO = 400;
+const SIGLA_UNIDADE = 'ASSESSORIA_12';
+const NOME_UNIDADE = 'Assessoria 12';
+const TITULO_SERVIDOR = '242426';
+const NOME_SERVIDOR = 'Duff McKagan';
+const CODIGO_COMPETENCIA_BASE = 10;
 
 const perfilSelecionado = ref<Perfil>(Perfil.GESTOR);
 const situacaoDiagnostico = ref<'EM_ANDAMENTO' | 'CONCLUIDO' | 'VALIDADO' | 'HOMOLOGADO'>('CONCLUIDO');
@@ -27,34 +33,36 @@ vi.mock('@/stores/perfil', () => ({
     }),
 }));
 
+const contextoVal = ref<any>({
+    competencias: [
+        {competenciaCodigo: CODIGO_COMPETENCIA_BASE, descricao: 'Competência A'},
+    ],
+});
+
 vi.mock('@/composables/useDiagnosticoContexto', () => ({
     useDiagnosticoContexto: () => ({
-        data: ref({
-            competencias: [
-                {competenciaCodigo: 10, descricao: 'Competência A'},
-            ],
-        }),
+        data: contextoVal,
     }),
 }));
 
 const unidadeVal = ref<any>({
-    unidadeSigla: 'ASSESSORIA_12',
-    unidadeNome: 'Assessoria 12',
+    unidadeSigla: SIGLA_UNIDADE,
+    unidadeNome: NOME_UNIDADE,
     situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
 });
 const servidoresVal = ref<any[]>([
     {
-        servidorTitulo: '242426',
-        servidorNome: 'Duff McKagan',
+        servidorTitulo: TITULO_SERVIDOR,
+        servidorNome: NOME_SERVIDOR,
         situacaoServidor: 'CONSENSO_APROVADO',
         consenso: [
-            {competenciaCodigo: 10, importancia: 4, dominio: 2},
-            {competenciaCodigo: 11, importancia: null, dominio: null},
+            {competenciaCodigo: CODIGO_COMPETENCIA_BASE, importancia: 4, dominio: 2},
+            {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1, importancia: null, dominio: null},
         ],
     },
 ]);
 const situacoesCapacitacaoVal = ref<any[]>([
-    {servidorTitulo: '242426', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
+    {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'EC'},
 ]);
 
 vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
@@ -102,18 +110,23 @@ describe('DiagnosticoUnidadeView', () => {
         erroDevolver.value = null;
         erroHomologar.value = null;
         unidadeVal.value = {
-            unidadeSigla: 'ASSESSORIA_12',
-            unidadeNome: 'Assessoria 12',
+            unidadeSigla: SIGLA_UNIDADE,
+            unidadeNome: NOME_UNIDADE,
             situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
+        };
+        contextoVal.value = {
+            competencias: [
+                {competenciaCodigo: CODIGO_COMPETENCIA_BASE, descricao: 'Competência A'},
+            ],
         };
         servidoresVal.value = [
             {
-                servidorTitulo: '242426',
-                servidorNome: 'Duff McKagan',
+                servidorTitulo: TITULO_SERVIDOR,
+                servidorNome: NOME_SERVIDOR,
                 situacaoServidor: 'CONSENSO_APROVADO',
                 consenso: [
-                    {competenciaCodigo: 10, importancia: 4, dominio: 2},
-                    {competenciaCodigo: 11, importancia: null, dominio: null},
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE, importancia: 4, dominio: 2},
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1, importancia: null, dominio: null},
                 ],
             },
         ];
@@ -122,8 +135,8 @@ describe('DiagnosticoUnidadeView', () => {
     function montar() {
         return mount(DiagnosticoUnidadeView, {
             props: {
-                codSubprocesso: 400,
-                siglaUnidade: 'ASSESSORIA_12',
+                codSubprocesso: COD_SUBPROCESSO,
+                siglaUnidade: SIGLA_UNIDADE,
             },
             global: {
                 stubs: {
@@ -183,8 +196,8 @@ describe('DiagnosticoUnidadeView', () => {
     it('renderiza métricas, gaps, situações de capacitação e histórico do diagnóstico', () => {
         const wrapper = montar();
 
-        expect(wrapper.text()).toContain('ASSESSORIA_12');
-        expect(wrapper.text()).toContain('Assessoria 12');
+        expect(wrapper.text()).toContain(SIGLA_UNIDADE);
+        expect(wrapper.text()).toContain(NOME_UNIDADE);
         expect(wrapper.text()).toContain('Servidores');
         expect(wrapper.text()).toContain('Pendentes');
         expect(wrapper.text()).toContain('Situações de Capacitação');
@@ -301,37 +314,45 @@ describe('DiagnosticoUnidadeView', () => {
 
     it('exercita todas as variantes de capacitacao, gap e formatacao de notas', () => {
         unidadeVal.value = {
-            unidadeSigla: 'ASSESSORIA_12',
-            unidadeNome: 'Assessoria 12',
+            unidadeSigla: SIGLA_UNIDADE,
+            unidadeNome: NOME_UNIDADE,
             situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
+        };
+        contextoVal.value = {
+            competencias: [
+                {competenciaCodigo: CODIGO_COMPETENCIA_BASE, descricao: 'Competência A'},
+                {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1, descricao: 'Competência B'},
+                {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 2, descricao: 'Competência C'},
+                {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 3, descricao: 'Competência D'},
+                {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 4, descricao: 'Competência E'},
+            ],
         };
         servidoresVal.value = [
             {
-                servidorTitulo: '242426',
-                servidorNome: 'Duff McKagan',
+                servidorTitulo: TITULO_SERVIDOR,
+                servidorNome: NOME_SERVIDOR,
                 situacaoServidor: 'CONSENSO_APROVADO',
                 consenso: [
-                    {competenciaCodigo: 10, importancia: 3, dominio: 3},
-                    {competenciaCodigo: 11, importancia: 2, dominio: 4},
-                    {competenciaCodigo: 12, importancia: 0, dominio: 2},
-                    {competenciaCodigo: 13, importancia: 4, dominio: 0},
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE, importancia: 3, dominio: 3},
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1, importancia: 2, dominio: 4},
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 2, importancia: 0, dominio: 2},
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 3, importancia: 4, dominio: 0},
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 4, importancia: 5, dominio: 1},
                 ],
             },
         ];
         situacoesCapacitacaoVal.value = [
-            {servidorTitulo: '1', competenciaCodigo: 10, situacaoCapacitacao: 'NA'},
-            {servidorTitulo: '2', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
-            {servidorTitulo: '3', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
-            {servidorTitulo: '4', competenciaCodigo: 10, situacaoCapacitacao: 'C'},
-            {servidorTitulo: '5', competenciaCodigo: 10, situacaoCapacitacao: 'I'},
-            {servidorTitulo: '6', competenciaCodigo: 10, situacaoCapacitacao: null},
-            {servidorTitulo: '7', competenciaCodigo: 10, situacaoCapacitacao: 'OUTRO_VALOR' as any},
+            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'NA'},
+            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1, situacaoCapacitacao: 'AC'},
+            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 2, situacaoCapacitacao: 'EC'},
+            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 3, situacaoCapacitacao: 'C'},
+            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 4, situacaoCapacitacao: 'I'},
         ];
 
         const wrapper = mount(DiagnosticoUnidadeView, {
             props: {
-                codSubprocesso: 400,
-                siglaUnidade: 'ASSESSORIA_12',
+                codSubprocesso: COD_SUBPROCESSO,
+                siglaUnidade: SIGLA_UNIDADE,
             },
             global: {
                 stubs: {

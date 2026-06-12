@@ -12,110 +12,112 @@ import type {
     TextoOpcionalRequest,
 } from '@/types/diagnostico-competencias';
 
-const BASE = '/diagnosticos/subprocessos';
+const BASE = '/subprocessos';
+const caminhoDiagnostico = (codSubprocesso: number, sufixo = ''): string =>
+    `${BASE}/${codSubprocesso}/diagnostico${sufixo}`;
 
-/** GET /diagnosticos/subprocessos/{id}/contexto */
+/** GET /subprocessos/{id}/diagnostico/contexto */
 export async function obterContextoDiagnostico(codSubprocesso: number): Promise<DiagnosticoContexto> {
-    return apiGet(`${BASE}/${codSubprocesso}/contexto`);
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/contexto'));
 }
 
-/** GET /diagnosticos/subprocessos/{id}/autoavaliacao */
+/** GET /subprocessos/{id}/diagnostico/autoavaliacao */
 export async function obterAutoavaliacao(codSubprocesso: number): Promise<Autoavaliacao> {
-    return apiGet(`${BASE}/${codSubprocesso}/autoavaliacao`);
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/autoavaliacao'));
 }
 
-/** POST /diagnosticos/subprocessos/{id}/autoavaliacao — salvamento automático */
+/** POST /subprocessos/{id}/diagnostico/autoavaliacao — salvamento automático */
 export async function salvarAutoavaliacao(codSubprocesso: number, request: AutoavaliacaoRequest): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/autoavaliacao`, request);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/autoavaliacao'), request);
 }
 
-/** POST /diagnosticos/subprocessos/{id}/autoavaliacao/concluir */
+/** POST /subprocessos/{id}/diagnostico/autoavaliacao/concluir */
 export async function concluirAutoavaliacao(codSubprocesso: number): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/autoavaliacao/concluir`);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/autoavaliacao/concluir'));
 }
 
-/** GET /diagnosticos/subprocessos/{id}/consenso — consenso do servidor logado */
+/** GET /subprocessos/{id}/diagnostico/consenso — consenso do servidor logado */
 export async function obterConsenso(codSubprocesso: number): Promise<Consenso> {
-    return apiGet(`${BASE}/${codSubprocesso}/consenso`);
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/consenso'));
 }
 
-/** GET /diagnosticos/subprocessos/{id}/consenso/{servidorTitulo} */
+/** GET /subprocessos/{id}/diagnostico/consenso/{servidorTitulo} */
 export async function obterConsensoServidor(
     codSubprocesso: number,
     servidorTitulo: string,
 ): Promise<Consenso> {
-    return apiGet(`${BASE}/${codSubprocesso}/consenso/${encodeURIComponent(servidorTitulo)}`);
+    return apiGet(caminhoDiagnostico(codSubprocesso, `/consenso/${encodeURIComponent(servidorTitulo)}`));
 }
 
-/** POST /diagnosticos/subprocessos/{id}/consenso/{servidorTitulo} */
+/** POST /subprocessos/{id}/diagnostico/consenso/{servidorTitulo} */
 export async function salvarConsenso(
     codSubprocesso: number,
     servidorTitulo: string,
     request: ConsensoRequest,
 ): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/consenso/${encodeURIComponent(servidorTitulo)}`, request);
+    return apiPost(caminhoDiagnostico(codSubprocesso, `/consenso/${encodeURIComponent(servidorTitulo)}`), request);
 }
 
-/** POST /diagnosticos/subprocessos/{id}/consenso/aprovar */
+/** POST /subprocessos/{id}/diagnostico/consenso/aprovar */
 export async function aprovarConsenso(codSubprocesso: number): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/consenso/aprovar`);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/consenso/aprovar'));
 }
 
-/** POST /diagnosticos/subprocessos/{id}/avaliacoes/{servidorTitulo}/impossibilitar */
+/** POST /subprocessos/{id}/diagnostico/avaliacoes/{servidorTitulo}/impossibilitar */
 export async function impossibilitarAvaliacao(
     codSubprocesso: number,
     servidorTitulo: string,
     request: JustificativaRequest,
 ): Promise<void> {
     return apiPost(
-        `${BASE}/${codSubprocesso}/avaliacoes/${encodeURIComponent(servidorTitulo)}/impossibilitar`,
+        caminhoDiagnostico(codSubprocesso, `/avaliacoes/${encodeURIComponent(servidorTitulo)}/impossibilitar`),
         request,
     );
 }
 
-/** GET /diagnosticos/subprocessos/{id}/equipe */
+/** GET /subprocessos/{id}/diagnostico/equipe */
 export async function obterEquipe(codSubprocesso: number): Promise<DiagnosticoEquipe> {
-    return apiGet(`${BASE}/${codSubprocesso}/equipe`);
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/equipe'));
 }
 
-/** POST /diagnosticos/subprocessos/{id}/situacoes-capacitacao — salvamento automático */
+/** POST /subprocessos/{id}/diagnostico/situacoes-capacitacao — salvamento automático */
 export async function salvarSituacoesCapacitacao(
     codSubprocesso: number,
     request: SituacoesCapacitacaoRequest,
 ): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/situacoes-capacitacao`, request);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/situacoes-capacitacao'), request);
 }
 
-/** GET /diagnosticos/subprocessos/{id}/unidade */
+/** GET /subprocessos/{id}/diagnostico/unidade */
 export async function obterDiagnosticoUnidade(codSubprocesso: number): Promise<DiagnosticoUnidade> {
-    return apiGet(`${BASE}/${codSubprocesso}/unidade`);
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/unidade'));
 }
 
-/** POST /diagnosticos/subprocessos/{id}/concluir */
+/** POST /subprocessos/{id}/diagnostico/concluir */
 export async function concluirDiagnostico(codSubprocesso: number): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/concluir`);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/concluir'));
 }
 
-/** POST /diagnosticos/subprocessos/{id}/validar */
+/** POST /subprocessos/{id}/diagnostico/validar */
 export async function validarDiagnostico(
     codSubprocesso: number,
     request?: TextoOpcionalRequest,
 ): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/validar`, request);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/validar'), request);
 }
 
-/** POST /diagnosticos/subprocessos/{id}/devolver */
+/** POST /subprocessos/{id}/diagnostico/devolver */
 export async function devolverDiagnostico(
     codSubprocesso: number,
     request: JustificativaRequest,
 ): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/devolver`, request);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/devolver'), request);
 }
 
-/** POST /diagnosticos/subprocessos/{id}/homologar */
+/** POST /subprocessos/{id}/diagnostico/homologar */
 export async function homologarDiagnostico(
     codSubprocesso: number,
     request?: TextoOpcionalRequest,
 ): Promise<void> {
-    return apiPost(`${BASE}/${codSubprocesso}/homologar`, request);
+    return apiPost(caminhoDiagnostico(codSubprocesso, '/homologar'), request);
 }

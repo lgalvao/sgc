@@ -16,6 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("CDU-46: Aprovar avaliação de consenso")
 class CDU46IntegrationTest extends DiagnosticoCduIntegrationTestBase {
+    private static final String API_DIAGNOSTICO = "/api/subprocessos/{codSubprocesso}/diagnostico";
+
     @Autowired
     private AlertaRepo alertaRepo;
 
@@ -33,7 +35,7 @@ class CDU46IntegrationTest extends DiagnosticoCduIntegrationTestBase {
     @WithMockCustomUser(tituloEleitoral = "50003", unidadeId = 9L, perfis = {"SERVIDOR"})
     @DisplayName("Deve aprovar a avaliação de consenso do próprio servidor")
     void deveAprovarConsenso() throws Exception {
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/consenso/aprovar", subprocesso.getCodigo())
+        mockMvc.perform(post(API_DIAGNOSTICO + "/consenso/aprovar", subprocesso.getCodigo())
                         .with(csrf()))
                 .andExpect(status().isOk());
 

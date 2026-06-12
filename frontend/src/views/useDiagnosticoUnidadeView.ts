@@ -277,23 +277,30 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         ),
     );
 
+    function criarAvaliacaoMatriz(
+        competenciaCodigo: number,
+        servidorItem: typeof servidoresExibidos.value[number],
+    ) {
+        const avaliacao = servidorItem.consenso.find(
+            (item) => item.competenciaCodigo === competenciaCodigo,
+        );
+        return {
+            servidorTitulo: servidorItem.servidorTitulo,
+            importancia: avaliacao?.importancia ?? null,
+            dominio: avaliacao?.dominio ?? null,
+            situacaoCapacitacao: mapaSituacaoCapacitacao.value[
+                `${servidorItem.servidorTitulo}:${competenciaCodigo}`
+            ] ?? null,
+        };
+    }
+
     const matrizCompetencias = computed<MatrizCompetenciaServidor[]>(() =>
         (contexto.value?.competencias ?? []).map((competencia) => ({
             competenciaCodigo: competencia.competenciaCodigo,
             competenciaDescricao: competencia.descricao,
-            avaliacoesPorServidor: servidoresExibidos.value.map((servidorItem) => {
-                const avaliacao = servidorItem.consenso.find(
-                    (item) => item.competenciaCodigo === competencia.competenciaCodigo,
-                );
-                return {
-                    servidorTitulo: servidorItem.servidorTitulo,
-                    importancia: avaliacao?.importancia ?? null,
-                    dominio: avaliacao?.dominio ?? null,
-                    situacaoCapacitacao: mapaSituacaoCapacitacao.value[
-                        `${servidorItem.servidorTitulo}:${competencia.competenciaCodigo}`
-                    ] ?? null,
-                };
-            }),
+            avaliacoesPorServidor: servidoresExibidos.value.map((servidorItem) =>
+                criarAvaliacaoMatriz(competencia.competenciaCodigo, servidorItem),
+            ),
         })),
     );
 

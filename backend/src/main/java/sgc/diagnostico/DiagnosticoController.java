@@ -16,7 +16,7 @@ import sgc.subprocesso.dto.AnaliseHistoricoDto;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/diagnosticos")
+@RequestMapping("/api/subprocessos")
 @RequiredArgsConstructor
 @Tag(name = "Diagnóstico", description = "Endpoints do fluxo de diagnóstico de competências")
 @PreAuthorize("isAuthenticated()")
@@ -25,19 +25,19 @@ public class DiagnosticoController {
     private final DiagnosticoAvaliacaoService avaliacaoService;
     private final DiagnosticoFluxoService fluxoService;
 
-    @GetMapping("/subprocessos/{codSubprocesso}/contexto")
+    @GetMapping("/{codSubprocesso}/diagnostico/contexto")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<DiagnosticoContextoDto> obterContexto(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterContexto(codSubprocesso));
     }
 
-    @GetMapping("/subprocessos/{codSubprocesso}/autoavaliacao")
+    @GetMapping("/{codSubprocesso}/diagnostico/autoavaliacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<AutoavaliacaoDto> obterAutoavaliacao(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterAutoavaliacao(codSubprocesso));
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/autoavaliacao")
+    @PostMapping("/{codSubprocesso}/diagnostico/autoavaliacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<Void> salvarAutoavaliacao(
             @PathVariable Long codSubprocesso,
@@ -46,14 +46,14 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/autoavaliacao/concluir")
+    @PostMapping("/{codSubprocesso}/diagnostico/autoavaliacao/concluir")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<Void> concluirAutoavaliacao(@PathVariable Long codSubprocesso) {
         avaliacaoService.concluirAutoavaliacao(codSubprocesso);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}")
+    @PostMapping("/{codSubprocesso}/diagnostico/consenso/{servidorTitulo}")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
     public ResponseEntity<Void> salvarConsenso(
             @PathVariable Long codSubprocesso,
@@ -63,13 +63,13 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/subprocessos/{codSubprocesso}/consenso")
+    @GetMapping("/{codSubprocesso}/diagnostico/consenso")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<ConsensoDto> obterConsenso(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterConsenso(codSubprocesso));
     }
 
-    @GetMapping("/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}")
+    @GetMapping("/{codSubprocesso}/diagnostico/consenso/{servidorTitulo}")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
     public ResponseEntity<ConsensoDto> obterConsensoServidor(
             @PathVariable Long codSubprocesso,
@@ -78,14 +78,14 @@ public class DiagnosticoController {
         return ResponseEntity.ok(consultaService.obterConsenso(codSubprocesso, servidorTitulo));
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/consenso/aprovar")
+    @PostMapping("/{codSubprocesso}/diagnostico/consenso/aprovar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<Void> aprovarConsenso(@PathVariable Long codSubprocesso) {
         avaliacaoService.aprovarConsenso(codSubprocesso);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/avaliacoes/{servidorTitulo}/impossibilitar")
+    @PostMapping("/{codSubprocesso}/diagnostico/avaliacoes/{servidorTitulo}/impossibilitar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
     public ResponseEntity<Void> impossibilitarAvaliacao(
             @PathVariable Long codSubprocesso,
@@ -95,7 +95,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/situacoes-capacitacao")
+    @PostMapping("/{codSubprocesso}/diagnostico/situacoes-capacitacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
     public ResponseEntity<Void> salvarSituacoesCapacitacao(
             @PathVariable Long codSubprocesso,
@@ -104,32 +104,32 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/subprocessos/{codSubprocesso}/equipe")
+    @GetMapping("/{codSubprocesso}/diagnostico/equipe")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<DiagnosticoEquipeDto> obterEquipe(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterEquipe(codSubprocesso));
     }
 
-    @GetMapping("/subprocessos/{codSubprocesso}/unidade")
+    @GetMapping("/{codSubprocesso}/diagnostico/unidade")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<DiagnosticoUnidadeDto> obterDiagnosticoUnidade(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterDiagnosticoUnidade(codSubprocesso));
     }
 
-    @GetMapping("/subprocessos/{codSubprocesso}/historico")
+    @GetMapping("/{codSubprocesso}/diagnostico/historico")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<List<AnaliseHistoricoDto>> listarHistoricoDiagnostico(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.listarHistoricoDiagnostico(codSubprocesso));
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/concluir")
+    @PostMapping("/{codSubprocesso}/diagnostico/concluir")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CONCLUIR_DIAGNOSTICO')")
     public ResponseEntity<Void> concluirDiagnostico(@PathVariable Long codSubprocesso) {
         fluxoService.concluirDiagnosticoUnidade(codSubprocesso);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/validar")
+    @PostMapping("/{codSubprocesso}/diagnostico/validar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VALIDAR_DIAGNOSTICO')")
     public ResponseEntity<Void> validarDiagnostico(
             @PathVariable Long codSubprocesso,
@@ -139,7 +139,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/devolver")
+    @PostMapping("/{codSubprocesso}/diagnostico/devolver")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_DIAGNOSTICO')")
     public ResponseEntity<Void> devolverDiagnostico(
             @PathVariable Long codSubprocesso,
@@ -148,7 +148,7 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/subprocessos/{codSubprocesso}/homologar")
+    @PostMapping("/{codSubprocesso}/diagnostico/homologar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_DIAGNOSTICO')")
     public ResponseEntity<Void> homologarDiagnostico(
             @PathVariable Long codSubprocesso,

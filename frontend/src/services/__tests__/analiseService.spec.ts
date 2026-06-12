@@ -31,7 +31,7 @@ describe("analiseService", () => {
 
         const result = await service.listarAnalisesDiagnostico(123);
 
-        expect(mockApi.get).toHaveBeenCalledWith("/diagnosticos/subprocessos/123/historico");
+        expect(mockApi.get).toHaveBeenCalledWith("/subprocessos/123/diagnostico/historico");
         expect(result).toEqual(dtoList);
     });
 

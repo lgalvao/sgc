@@ -132,6 +132,21 @@ const mockElegiveis = [
     }
 ];
 
+const CODIGO_UNIDADE_CLICAVEL = 101;
+const CODIGO_SUBPROCESSO_CLICAVEL = 201;
+const SIGLA_UNIDADE_CLICAVEL = "UNI1";
+const DESCRICAO_UNIDADE_CLICAVEL = "UNI1 - Unidade 1";
+
+function criarLinhaUnidadeClicavel() {
+    return {
+        codigo: CODIGO_UNIDADE_CLICAVEL,
+        codSubprocesso: CODIGO_SUBPROCESSO_CLICAVEL,
+        unidadeAtual: DESCRICAO_UNIDADE_CLICAVEL,
+        sigla: SIGLA_UNIDADE_CLICAVEL,
+        clickable: true,
+    };
+}
+
 function criarAcoesBloco(elegiveis: any[]) {
     const filtrar = (campo: string) => elegiveis.filter((item) => item[campo]);
     const criarAcao = (params: {
@@ -907,13 +922,7 @@ describe("Processo.vue", () => {
 
         const treeTable = wrapper.findComponent(TreeTableStub);
 
-        const rowItem = {
-            codigo: 101,
-            codSubprocesso: 201,
-            unidadeAtual: "UNI1 - Unidade 1",
-            sigla: "UNI1",
-            clickable: true
-        };
+        const rowItem = criarLinhaUnidadeClicavel();
 
         await treeTable.vm.$emit("row-click", rowItem);
 
@@ -921,10 +930,10 @@ describe("Processo.vue", () => {
             name: "Subprocesso",
             params: {
                 codProcesso: "1",
-                siglaUnidade: "UNI1"
+                siglaUnidade: SIGLA_UNIDADE_CLICAVEL
             },
             query: {
-                codSubprocesso: "201"
+                codSubprocesso: String(CODIGO_SUBPROCESSO_CLICAVEL)
             },
         });
     });
@@ -942,21 +951,15 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const rowItem = {
-            codigo: 101,
-            codSubprocesso: 201,
-            unidadeAtual: "UNI1 - Unidade 1",
-            sigla: "UNI1",
-            clickable: true
-        };
+        const rowItem = criarLinhaUnidadeClicavel();
 
         await treeTable.vm.$emit("row-click", rowItem);
 
         expect(mocks.push).toHaveBeenCalledWith({
             name: "DiagnosticoUnidade",
             params: {
-                codSubprocesso: "201",
-                siglaUnidade: "UNI1"
+                codSubprocesso: String(CODIGO_SUBPROCESSO_CLICAVEL),
+                siglaUnidade: SIGLA_UNIDADE_CLICAVEL
             },
         });
     });
@@ -977,13 +980,7 @@ describe("Processo.vue", () => {
         await flushPromises();
 
         const treeTable = wrapper.findComponent(TreeTableStub);
-        const rowItem = {
-            codigo: 101,
-            codSubprocesso: 201,
-            unidadeAtual: "UNI1 - Unidade 1",
-            sigla: "UNI1",
-            clickable: true
-        };
+        const rowItem = criarLinhaUnidadeClicavel();
 
         await treeTable.vm.$emit("row-click", rowItem);
 
@@ -991,10 +988,10 @@ describe("Processo.vue", () => {
             name: "Subprocesso",
             params: {
                 codProcesso: "1",
-                siglaUnidade: "UNI1"
+                siglaUnidade: SIGLA_UNIDADE_CLICAVEL
             },
             query: {
-                codSubprocesso: "201"
+                codSubprocesso: String(CODIGO_SUBPROCESSO_CLICAVEL)
             },
         });
     });

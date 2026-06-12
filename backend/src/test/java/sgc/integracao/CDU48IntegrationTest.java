@@ -21,6 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("CDU-48: Preencher situações de capacitação")
 class CDU48IntegrationTest extends DiagnosticoCduIntegrationTestBase {
+    private static final String API_DIAGNOSTICO = "/api/subprocessos/{codSubprocesso}/diagnostico";
+
     @BeforeEach
     void setUp() {
         criarCenarioDiagnosticoBase(9L, "50003", "50004");
@@ -43,7 +45,7 @@ class CDU48IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                         .build()
         ));
 
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/situacoes-capacitacao", subprocesso.getCodigo())
+        mockMvc.perform(post(API_DIAGNOSTICO + "/situacoes-capacitacao", subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))

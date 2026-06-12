@@ -29,6 +29,10 @@ vi.mock('@/utils/apiUtils', () => ({
 }));
 
 describe('diagnosticoService', () => {
+    const BASE = '/subprocessos';
+    const caminhoDiagnostico = (codSubprocesso: number, sufixo = '') =>
+        `${BASE}/${codSubprocesso}/diagnostico${sufixo}`;
+
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -43,12 +47,12 @@ describe('diagnosticoService', () => {
         await obterEquipe(14);
         await obterDiagnosticoUnidade(15);
 
-        expect(apiGetMock).toHaveBeenNthCalledWith(1, '/diagnosticos/subprocessos/10/contexto');
-        expect(apiGetMock).toHaveBeenNthCalledWith(2, '/diagnosticos/subprocessos/11/autoavaliacao');
-        expect(apiGetMock).toHaveBeenNthCalledWith(3, '/diagnosticos/subprocessos/12/consenso');
-        expect(apiGetMock).toHaveBeenNthCalledWith(4, '/diagnosticos/subprocessos/13/consenso/242426');
-        expect(apiGetMock).toHaveBeenNthCalledWith(5, '/diagnosticos/subprocessos/14/equipe');
-        expect(apiGetMock).toHaveBeenNthCalledWith(6, '/diagnosticos/subprocessos/15/unidade');
+        expect(apiGetMock).toHaveBeenNthCalledWith(1, caminhoDiagnostico(10, '/contexto'));
+        expect(apiGetMock).toHaveBeenNthCalledWith(2, caminhoDiagnostico(11, '/autoavaliacao'));
+        expect(apiGetMock).toHaveBeenNthCalledWith(3, caminhoDiagnostico(12, '/consenso'));
+        expect(apiGetMock).toHaveBeenNthCalledWith(4, caminhoDiagnostico(13, '/consenso/242426'));
+        expect(apiGetMock).toHaveBeenNthCalledWith(5, caminhoDiagnostico(14, '/equipe'));
+        expect(apiGetMock).toHaveBeenNthCalledWith(6, caminhoDiagnostico(15, '/unidade'));
     });
 
     it('deve chamar endpoints POST de autoavaliação e consenso', async () => {
@@ -59,10 +63,10 @@ describe('diagnosticoService', () => {
         await salvarConsenso(22, '242426', {competencias: []});
         await aprovarConsenso(23);
 
-        expect(apiPostMock).toHaveBeenNthCalledWith(1, '/diagnosticos/subprocessos/20/autoavaliacao', {competencias: []});
-        expect(apiPostMock).toHaveBeenNthCalledWith(2, '/diagnosticos/subprocessos/21/autoavaliacao/concluir');
-        expect(apiPostMock).toHaveBeenNthCalledWith(3, '/diagnosticos/subprocessos/22/consenso/242426', {competencias: []});
-        expect(apiPostMock).toHaveBeenNthCalledWith(4, '/diagnosticos/subprocessos/23/consenso/aprovar');
+        expect(apiPostMock).toHaveBeenNthCalledWith(1, caminhoDiagnostico(20, '/autoavaliacao'), {competencias: []});
+        expect(apiPostMock).toHaveBeenNthCalledWith(2, caminhoDiagnostico(21, '/autoavaliacao/concluir'));
+        expect(apiPostMock).toHaveBeenNthCalledWith(3, caminhoDiagnostico(22, '/consenso/242426'), {competencias: []});
+        expect(apiPostMock).toHaveBeenNthCalledWith(4, caminhoDiagnostico(23, '/consenso/aprovar'));
     });
 
     it('deve chamar endpoints POST de impossibilidade, situações e fluxo da unidade', async () => {
@@ -77,14 +81,14 @@ describe('diagnosticoService', () => {
 
         expect(apiPostMock).toHaveBeenNthCalledWith(
             1,
-            '/diagnosticos/subprocessos/30/avaliacoes/242426/impossibilitar',
+            caminhoDiagnostico(30, '/avaliacoes/242426/impossibilitar'),
             {justificativa: 'Servidor afastado'},
         );
-        expect(apiPostMock).toHaveBeenNthCalledWith(2, '/diagnosticos/subprocessos/31/situacoes-capacitacao', {situacoes: []});
-        expect(apiPostMock).toHaveBeenNthCalledWith(3, '/diagnosticos/subprocessos/32/concluir');
-        expect(apiPostMock).toHaveBeenNthCalledWith(4, '/diagnosticos/subprocessos/33/validar', {texto: 'Observações'});
-        expect(apiPostMock).toHaveBeenNthCalledWith(5, '/diagnosticos/subprocessos/34/devolver', {justificativa: 'Ajustes'});
-        expect(apiPostMock).toHaveBeenNthCalledWith(6, '/diagnosticos/subprocessos/35/homologar', {texto: 'Homologado'});
+        expect(apiPostMock).toHaveBeenNthCalledWith(2, caminhoDiagnostico(31, '/situacoes-capacitacao'), {situacoes: []});
+        expect(apiPostMock).toHaveBeenNthCalledWith(3, caminhoDiagnostico(32, '/concluir'));
+        expect(apiPostMock).toHaveBeenNthCalledWith(4, caminhoDiagnostico(33, '/validar'), {texto: 'Observações'});
+        expect(apiPostMock).toHaveBeenNthCalledWith(5, caminhoDiagnostico(34, '/devolver'), {justificativa: 'Ajustes'});
+        expect(apiPostMock).toHaveBeenNthCalledWith(6, caminhoDiagnostico(35, '/homologar'), {texto: 'Homologado'});
     });
 
     it('deve aceitar payload opcional ausente em validar e homologar', async () => {
@@ -93,7 +97,7 @@ describe('diagnosticoService', () => {
         await validarDiagnostico(40);
         await homologarDiagnostico(41);
 
-        expect(apiPostMock).toHaveBeenNthCalledWith(1, '/diagnosticos/subprocessos/40/validar', undefined);
-        expect(apiPostMock).toHaveBeenNthCalledWith(2, '/diagnosticos/subprocessos/41/homologar', undefined);
+        expect(apiPostMock).toHaveBeenNthCalledWith(1, caminhoDiagnostico(40, '/validar'), undefined);
+        expect(apiPostMock).toHaveBeenNthCalledWith(2, caminhoDiagnostico(41, '/homologar'), undefined);
     });
 });

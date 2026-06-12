@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("CDU-44: Realizar autoavaliação")
 class CDU44IntegrationTest extends DiagnosticoCduIntegrationTestBase {
+    private static final String API_DIAGNOSTICO = "/api/subprocessos/{codSubprocesso}/diagnostico";
 
     @BeforeEach
     void setUp() {
@@ -33,7 +34,7 @@ class CDU44IntegrationTest extends DiagnosticoCduIntegrationTestBase {
     @WithMockCustomUser(tituloEleitoral = "50003", unidadeId = 9L, perfis = {"SERVIDOR"})
     @DisplayName("Deve salvar e concluir a autoavaliação do servidor")
     void deveSalvarEConcluirAutoavaliacao() throws Exception {
-        mockMvc.perform(get("/api/diagnosticos/subprocessos/{codSubprocesso}/autoavaliacao", subprocesso.getCodigo()))
+        mockMvc.perform(get(API_DIAGNOSTICO + "/autoavaliacao", subprocesso.getCodigo()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.competencias.length()").value(2))
                 .andExpect(jsonPath("$.situacaoServidor").value("AUTOAVALIACAO_NAO_INICIADA"));
@@ -51,13 +52,13 @@ class CDU44IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                         .build()
         ));
 
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/autoavaliacao", subprocesso.getCodigo())
+        mockMvc.perform(post(API_DIAGNOSTICO + "/autoavaliacao", subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/autoavaliacao/concluir", subprocesso.getCodigo())
+        mockMvc.perform(post(API_DIAGNOSTICO + "/autoavaliacao/concluir", subprocesso.getCodigo())
                         .with(csrf()))
                 .andExpect(status().isOk());
 

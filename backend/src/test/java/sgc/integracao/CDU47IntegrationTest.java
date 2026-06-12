@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("CDU-47: Indicar impossibilidade de avaliação")
 class CDU47IntegrationTest extends DiagnosticoCduIntegrationTestBase {
+    private static final String API_DIAGNOSTICO = "/api/subprocessos/{codSubprocesso}/diagnostico";
+
 
     @BeforeEach
     void setUp() {
@@ -33,7 +35,7 @@ class CDU47IntegrationTest extends DiagnosticoCduIntegrationTestBase {
     void deveImpossibilitarAvaliacao() throws Exception {
         ComumDtos.JustificativaRequest request = new ComumDtos.JustificativaRequest("Servidor afastado");
 
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/avaliacoes/{servidorTitulo}/impossibilitar",
+        mockMvc.perform(post(API_DIAGNOSTICO + "/avaliacoes/{servidorTitulo}/impossibilitar",
                         subprocesso.getCodigo(), "50003")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)

@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Tag("integration")
 @DisplayName("CDU-45: Manter avaliação de consenso")
 class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
+    private static final String API_DIAGNOSTICO = "/api/subprocessos/{codSubprocesso}/diagnostico";
 
     @BeforeEach
     void setUp() {
@@ -50,14 +51,14 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                 )
         );
 
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}",
+        mockMvc.perform(post(API_DIAGNOSTICO + "/consenso/{servidorTitulo}",
                         subprocesso.getCodigo(), "50003")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/diagnosticos/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}",
+        mockMvc.perform(get(API_DIAGNOSTICO + "/consenso/{servidorTitulo}",
                         subprocesso.getCodigo(), "50003"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.situacaoServidor").value("CONSENSO_CRIADO"))
@@ -98,7 +99,7 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                 )
         );
 
-        mockMvc.perform(post("/api/diagnosticos/subprocessos/{codSubprocesso}/consenso/{servidorTitulo}",
+        mockMvc.perform(post(API_DIAGNOSTICO + "/consenso/{servidorTitulo}",
                         subprocesso.getCodigo(), "50003")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
