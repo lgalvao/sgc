@@ -95,6 +95,15 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{codSubprocesso}/diagnostico/avaliacoes/{servidorTitulo}/reverter-impossibilidade")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
+    public ResponseEntity<Void> reverterImpossibilidade(
+            @PathVariable Long codSubprocesso,
+            @PathVariable String servidorTitulo) {
+        avaliacaoService.reverterImpossibilidade(codSubprocesso, servidorTitulo);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{codSubprocesso}/diagnostico/situacoes-capacitacao")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
     public ResponseEntity<Void> salvarSituacoesCapacitacao(

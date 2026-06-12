@@ -41,14 +41,14 @@
       />
 
       <DiagnosticoEquipePainel
-          v-if="ehDiagnostico && codigoSubprocesso && !(subprocesso.permissoes?.podePreencherAutoavaliacao && !subprocesso.permissoes?.podeCriarConsenso)"
+          v-if="ehDiagnostico && codigoSubprocesso && !ehServidorPuro"
           :cod-subprocesso="codigoSubprocesso"
           :exibir-botao-voltar="false"
           :exibir-cabecalho="false"
           :sigla-unidade="props.siglaUnidade"
       />
 
-      <SubprocessoMovimentacoes v-if="!ehDiagnostico" :movimentacoes="movimentacoes"/>
+      <SubprocessoMovimentacoes v-if="!ehDiagnostico || !ehServidorPuro" :movimentacoes="movimentacoes"/>
     </div>
     <div v-else-if="erroIntegracaoContexto" class="py-2">
       <BAlert
@@ -159,6 +159,7 @@ const {
 } = tela;
 
 const ehDiagnostico = computed(() => subprocesso?.value?.tipoProcesso === TipoProcesso.DIAGNOSTICO);
+const ehServidorPuro = computed(() => !!subprocesso.value?.permissoes?.podePreencherAutoavaliacao && !subprocesso.value?.permissoes?.podeCriarConsenso);
 
 defineExpose({
   mostrarModalAlterarDataLimite: tela.mostrarModalAlterarDataLimite,

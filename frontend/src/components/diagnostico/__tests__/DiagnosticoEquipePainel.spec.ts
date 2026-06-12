@@ -13,8 +13,10 @@ const validarDiagnosticoMock = vi.fn();
 const devolverDiagnosticoMock = vi.fn();
 const homologarDiagnosticoMock = vi.fn();
 const impossibilitarAvaliacaoMock = vi.fn();
+const permitirAvaliacaoMock = vi.fn();
 
 const podeCriarConsenso = ref(true);
+const podeConcluirDiagnostico = ref(true);
 const habilitarConcluirDiagnostico = ref(true);
 const habilitarValidarDiagnostico = ref(false);
 const habilitarDevolverDiagnostico = ref(false);
@@ -60,6 +62,7 @@ vi.mock('@/utils/apiError/normalizer', () => ({
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     useDiagnosticoPermissoes: () => ({
         podeCriarConsenso: computed(() => podeCriarConsenso.value),
+        podeConcluirDiagnostico: computed(() => podeConcluirDiagnostico.value),
         habilitarConcluirDiagnostico: computed(() => habilitarConcluirDiagnostico.value),
         habilitarValidarDiagnostico: computed(() => habilitarValidarDiagnostico.value),
         habilitarDevolverDiagnostico: computed(() => habilitarDevolverDiagnostico.value),
@@ -74,6 +77,8 @@ vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
     }),
 }));
 
+const permitindo = ref(false);
+
 vi.mock('@/composables/useFluxoDiagnostico', () => ({
     useFluxoDiagnostico: () => ({
         concluindo,
@@ -81,16 +86,19 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
         devolvendo,
         homologando,
         impossibilitando,
+        permitindo,
         erroConcluir,
         erroValidar,
         erroDevolver,
         erroHomologar,
         erroImpossibilitar: ref(null),
+        erroPermitir: ref(null),
         concluirDiagnostico: concluirDiagnosticoMock,
         validarDiagnostico: validarDiagnosticoMock,
         devolverDiagnostico: devolverDiagnosticoMock,
         homologarDiagnostico: homologarDiagnosticoMock,
         impossibilitarAvaliacao: impossibilitarAvaliacaoMock,
+        permitirAvaliacao: permitirAvaliacaoMock,
     }),
 }));
 
@@ -103,6 +111,7 @@ describe('DiagnosticoEquipePainel', () => {
         devolvendo.value = false;
         homologando.value = false;
         impossibilitando.value = false;
+        permitindo.value = false;
         podeCriarConsenso.value = true;
         habilitarConcluirDiagnostico.value = true;
         habilitarValidarDiagnostico.value = false;
@@ -186,7 +195,7 @@ describe('DiagnosticoEquipePainel', () => {
         expect(wrapper.text()).not.toContain('Voltar');
     });
 
-    it('navega para consenso e situação de capacitação pelas ações da chefia', async () => {
+    it('navega para consenso e exibe ações correspondentes à situação', async () => {
         const wrapper = montar();
 
         await wrapper.get('[data-testid="btn-manter-consenso-242426"]').trigger('click');
@@ -202,20 +211,15 @@ describe('DiagnosticoEquipePainel', () => {
             },
         });
 
-        await wrapper.get('[data-testid="btn-manter-capacitacao-242426"]').trigger('click');
-        expect(pushMock).toHaveBeenCalledWith({
-            name: 'SituacaoCapacitacaoDiagnostico',
-            params: {
-                codSubprocesso: 400,
-                siglaUnidade: 'ASSESSORIA_12',
-            },
-            query: {
-                servidorTitulo: '242426',
-            },
-        });
-
+        // Servidor 242427 está impossibilitado
+        expect(wrapper.get('[data-testid="btn-manter-consenso-242427"]').attributes('disabled')).toBeDefined();
         expect(wrapper.get('[data-testid="btn-impossibilitar-242427"]').attributes('disabled')).toBeDefined();
-        expect(wrapper.get('[data-testid="btn-impossibilitar-242428"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]').attributes('disabled')).toBeUndefined();
+
+        // Servidor 242426 não está impossibilitado
+        expect(wrapper.get('[data-testid="btn-manter-consenso-242426"]').attributes('disabled')).toBeUndefined();
+        expect(wrapper.get('[data-testid="btn-impossibilitar-242426"]').attributes('disabled')).toBeUndefined();
+        expect(wrapper.get('[data-testid="btn-permitir-avaliacao-242426"]').attributes('disabled')).toBeDefined();
     });
 
     it('valida justificativa obrigatória e registra impossibilidade com sucesso', async () => {
@@ -422,6 +426,20 @@ describe('DiagnosticoEquipePainel', () => {
         expect(wrapper.text()).toContain('Erro: justificativa precisa de mais caracteres');
     });
 
+    it('deve reverter a impossibilidade de avaliação com sucesso', async () => {
+        permitirAvaliacaoMock.mockResolvedValue(undefined);
+        const wrapper = montar();
+
+        const btnPermitir = wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]');
+        await btnPermitir.trigger('click');
+
+        const btnConfirmar = wrapper.get('[data-testid="btn-confirmar-permitir-avaliacao"]');
+        await btnConfirmar.trigger('click');
+
+        expect(permitirAvaliacaoMock).toHaveBeenCalledWith('242427');
+        expect(wrapper.text()).toContain('Permissão de avaliação registrada com sucesso');
+    });
+
     it('cobre o fechamento dos modais de fluxo pelo evento update:modelValue', async () => {
         const wrapper = montar();
         const modals = wrapper.findAllComponents('.b-modal-stub');
@@ -432,34 +450,40 @@ describe('DiagnosticoEquipePainel', () => {
         await (modals[0] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
-        // 2. Modal Concluir
-        await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
+        // 2. Modal Permitir Avaliacao (novo)
+        await wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]').trigger('click');
         await nextTick();
         await (modals[1] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
-        // 3. Modal Validar
-        habilitarValidarDiagnostico.value = true;
-        await nextTick();
-        await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
+        // 3. Modal Concluir
+        await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
         await nextTick();
         await (modals[2] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
-        // 4. Modal Devolver
-        habilitarDevolverDiagnostico.value = true;
+        // 4. Modal Validar
+        habilitarValidarDiagnostico.value = true;
         await nextTick();
-        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
         await nextTick();
         await (modals[3] as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
-        // 5. Modal Homologar
+        // 5. Modal Devolver
+        habilitarDevolverDiagnostico.value = true;
+        await nextTick();
+        await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        await nextTick();
+        await (modals[4] as any).vm.$emit('update:modelValue', false);
+        await nextTick();
+
+        // 6. Modal Homologar
         habilitarHomologarDiagnostico.value = true;
         await nextTick();
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await nextTick();
-        await (modals[4] as any).vm.$emit('update:modelValue', false);
+        await (modals[5] as any).vm.$emit('update:modelValue', false);
         await nextTick();
     });
 
@@ -505,6 +529,7 @@ describe('DiagnosticoEquipePainel', () => {
         devolvendo.value = false;
         homologando.value = false;
         impossibilitando.value = false;
+        permitindo.value = false;
 
         habilitarConcluirDiagnostico.value = true;
         habilitarValidarDiagnostico.value = true;
@@ -519,6 +544,7 @@ describe('DiagnosticoEquipePainel', () => {
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
+        await wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]').trigger('click');
         await nextTick();
 
         // Ativa os estados de loading
@@ -527,6 +553,7 @@ describe('DiagnosticoEquipePainel', () => {
         devolvendo.value = true;
         homologando.value = true;
         impossibilitando.value = true;
+        permitindo.value = true;
         await nextTick();
 
         // Verifica a presença de spinners no HTML compilado (BSpinner stubbed -> span)
@@ -535,6 +562,7 @@ describe('DiagnosticoEquipePainel', () => {
         expect(wrapper.find('[data-testid="btn-confirmar-devolver"] span').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-confirmar-homologar"] span').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-confirmar-impossibilitar"] span').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="btn-confirmar-permitir-avaliacao"] span').exists()).toBe(true);
     });
 
     it('exercita o retorno antecipado de confirmarImpossibilitar quando servidorSelecionado for null', async () => {

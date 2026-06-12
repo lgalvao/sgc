@@ -186,7 +186,7 @@ const { situacaoServidor } = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
   ? useAutoavaliacaoDiagnostico(props.codSubprocesso)
   : { situacaoServidor: computed(() => 'AUTOAVALIACAO_NAO_INICIADA') };
 const habilitarCardConsenso = computed(() => {
-  return situacaoServidor.value === 'CONSENSO_CRIADO' || situacaoServidor.value === 'CONSENSO_APROVADO';
+  return situacaoServidor.value === 'CONSENSO_CRIADO';
 });
 
 function navegarPara(routeName: string) {

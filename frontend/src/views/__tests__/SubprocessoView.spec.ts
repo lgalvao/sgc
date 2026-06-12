@@ -695,7 +695,7 @@ describe('SubprocessoView.vue', () => {
         expect(cards.props('tipoProcesso')).toBe(TipoProcesso.MAPEAMENTO);
     });
 
-    it('incorpora o painel de diagnóstico no detalhe do subprocesso e oculta cards e movimentações', async () => {
+    it('incorpora o painel de diagnóstico no detalhe do subprocesso, exibe as movimentações e oculta cards', async () => {
         const {wrapper} = mountComponent({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
         });
@@ -703,6 +703,6 @@ describe('SubprocessoView.vue', () => {
 
         expect(wrapper.find('[data-testid="diagnostico-equipe-painel"]').exists()).toBe(true);
         expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(false);
-        expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(true);
     });
 });

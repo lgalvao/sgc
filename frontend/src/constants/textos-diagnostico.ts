@@ -45,6 +45,7 @@ export const TEXTOS_DIAGNOSTICO = {
     BTN_DEVOLVER: 'Devolver',
     BTN_HOMOLOGAR: 'Homologar',
     BTN_IMPOSSIBILITAR: 'Indicar impossibilidade',
+    BTN_PERMITIR_AVALIACAO: 'Permitir avaliação',
     BTN_VER_DETALHES: 'Ver detalhes',
     BTN_VOLTAR: 'Voltar',
     BTN_HISTORICO_ANALISE: 'Histórico de análise',
@@ -60,6 +61,7 @@ export const TEXTOS_DIAGNOSTICO = {
     SUCESSO_DIAGNOSTICO_DEVOLVIDO: 'Devolução realizada',
     SUCESSO_DIAGNOSTICO_HOMOLOGADO: 'Diagnóstico homologado',
     SUCESSO_IMPOSSIBILITADO: 'Impossibilidade registrada',
+    SUCESSO_IMPOSSIBILIDADE_REVERTIDA: 'Permissão de avaliação registrada com sucesso',
 
     // « Modais de confirmação »
     MODAL_CONCLUIR_TITULO: 'Concluir autoavaliação',
@@ -77,6 +79,9 @@ export const TEXTOS_DIAGNOSTICO = {
     MODAL_IMPOSSIBILITAR_MENSAGEM: (nomeServidor: string) =>
         `Confirma a impossibilidade de avaliação para ${nomeServidor}?`,
     MODAL_IMPOSSIBILITAR_PLACEHOLDER: 'Justificativa obrigatória...',
+    MODAL_PERMITIR_AVALIACAO_TITULO: 'Permitir avaliação de diagnóstico',
+    MODAL_PERMITIR_AVALIACAO_MENSAGEM: (nomeServidor: string) =>
+        `Confirma a permissão de avaliação para ${nomeServidor}?`,
 
     // « Labels de campos »
     LABEL_UNIDADE: 'Unidade',
@@ -102,5 +107,6 @@ export const TEXTOS_DIAGNOSTICO = {
     ERRO_CARREGAR_CONTEXTO: 'Não foi possível carregar as informações do diagnóstico.',
     ERRO_SALVAR: 'Não foi possível salvar. Tente novamente.',
     ERRO_JUSTIFICATIVA_OBRIGATORIA: 'A justificativa é obrigatória.',
+    ERRO_PREENCHIMENTO_INCOMPLETO: 'Preencha importância e domínio para todas as competências.',
     ERRO_PENDENCIAS_CONCLUSAO: 'Ainda existem avaliações e situações de capacitações não preenchidas.',
 } as const;

@@ -158,7 +158,7 @@ describe('ConsensoDiagnosticoView', () => {
 
         const cabecalhosSubgrupo = wrapper.findAll('thead tr').at(1)?.findAll('th') ?? [];
         expect(cabecalhosSubgrupo.map((coluna) => coluna.text())).toEqual([
-            'Importância',
+            'Servidor',
             'Chefe',
             'Consenso',
             'Servidor',

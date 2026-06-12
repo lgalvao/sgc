@@ -142,6 +142,55 @@ public class DiagnosticoAvaliacaoService {
         avaliacaoRepo.saveAll(avaliacoes);
     }
 
+    public void reverterImpossibilidade(Long codSubprocesso, String servidorTitulo) {
+        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+
+        var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
+                diagnostico.getCodigo(), servidorTitulo);
+
+        if (avaliacoes.isEmpty()) {
+            throw new ErroEntidadeNaoEncontrada("AvaliacaoServidor", servidorTitulo);
+        }
+
+        boolean temAutoavaliacaoNula = avaliacoes.stream()
+                .anyMatch(a -> a.getAutoimportancia() == null || a.getAutodominio() == null);
+
+        SituacaoAvaliacaoServidor situacaoRetorno;
+        if (temAutoavaliacaoNula) {
+            situacaoRetorno = SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA;
+        } else {
+            boolean temChefiaPreenchida = avaliacoes.stream()
+                    .anyMatch(a -> a.getChefiaImportancia() != null || a.getChefiaDominio() != null);
+            if (temChefiaPreenchida) {
+                situacaoRetorno = SituacaoAvaliacaoServidor.CONSENSO_CRIADO;
+            } else {
+                situacaoRetorno = SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA;
+            }
+        }
+
+        avaliacoes.forEach(a -> {
+            a.setSituacaoServidor(situacaoRetorno);
+            a.setObservacao(null);
+
+            if (situacaoRetorno == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA) {
+                a.setImportancia(null);
+                a.setDominio(null);
+                a.setGap(null);
+            } else if (situacaoRetorno == SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA) {
+                a.setImportancia(a.getAutoimportancia());
+                a.setDominio(a.getAutodominio());
+                a.calculaGap();
+            } else if (situacaoRetorno == SituacaoAvaliacaoServidor.CONSENSO_CRIADO) {
+                a.setImportancia(a.getChefiaImportancia() != null ? a.getChefiaImportancia() : a.getAutoimportancia());
+                a.setDominio(a.getChefiaDominio() != null ? a.getChefiaDominio() : a.getAutodominio());
+                a.calculaGap();
+            }
+        });
+
+        avaliacaoRepo.saveAll(avaliacoes);
+    }
+
     public void salvarSituacoesCapacitacao(Long codSubprocesso, SituacoesCapacitacaoRequest request) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
