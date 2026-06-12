@@ -1,5 +1,6 @@
 package sgc.e2e;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.*;
 import org.springframework.http.*;
@@ -65,7 +66,10 @@ public class E2eSecurityConfig {
     public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http,
                                                       FiltroJwt filtroJwt,
                                                       FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
-        http.authorizeHttpRequests(auth ->         auth.requestMatchers(
+        http.authorizeHttpRequests(auth ->         auth.dispatcherTypeMatchers(
+                DispatcherType.ASYNC)
+                        .permitAll()
+                        .requestMatchers(
                 "/api/usuarios/login",
                 "/api/usuarios/entrar",
                 "/api/usuarios/logout",

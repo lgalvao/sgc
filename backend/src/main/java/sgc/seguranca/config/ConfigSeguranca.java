@@ -1,5 +1,6 @@
 package sgc.seguranca.config;
 
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.*;
@@ -66,7 +67,10 @@ public class ConfigSeguranca {
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    FiltroJwt filtroJwt,
                                                    FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
-        http.authorizeHttpRequests(auth ->         auth.requestMatchers(
+        http.authorizeHttpRequests(auth ->         auth.dispatcherTypeMatchers(
+                DispatcherType.ASYNC)
+                        .permitAll()
+                        .requestMatchers(
                 "/api/usuarios/login",
                 "/api/usuarios/entrar",
                 "/api/usuarios/logout")                        .permitAll()
