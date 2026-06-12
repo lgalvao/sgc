@@ -8,7 +8,10 @@ import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.UnidadeProcesso;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
+import sgc.organizacao.service.ResponsavelUnidadeService;
 import sgc.subprocesso.SubprocessoDtoMapper;
+import sgc.subprocesso.dto.AnaliseHistoricoDto;
 import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.model.TipoAcaoAnalise;
@@ -31,6 +34,7 @@ public class DiagnosticoConsultaService {
     private final SubprocessoDtoMapper subprocessoDtoMapper;
     private final DiagnosticoUsuarioContextoService usuarioContextoService;
     private final SubprocessoVisualizacaoService subprocessoVisualizacaoService;
+    private final ResponsavelUnidadeService responsavelUnidadeService;
 
     public DiagnosticoContextoDto obterContexto(Long codSubprocesso) {
         Subprocesso sp = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
@@ -139,11 +143,13 @@ public class DiagnosticoConsultaService {
         var movimentacoes = subprocessoConsultaService.listarMovimentacoes(subprocesso);
         UnidadeProcesso unidadeSnapshot = resolverUnidadeSnapshot(subprocesso);
 
+        String responsavelTitulo = buscarResponsavelTitulo(subprocesso.getUnidade().getCodigo());
         UnidadeResumoDto unidade = UnidadeResumoDto.builder()
                 .unidadeCodigo(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : subprocesso.getUnidade().getCodigo())
                 .unidadeSigla(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : subprocesso.getUnidade().getSigla())
                 .unidadeNome(unidadeSnapshot != null ? unidadeSnapshot.getNome() : subprocesso.getUnidade().getNome())
                 .situacaoSubprocesso(subprocesso.getSituacao().name())
+                .responsavelTitulo(responsavelTitulo)
                 .build();
 
         Map<String, List<AvaliacaoServidor>> porServidor = avaliacoes.stream()
@@ -194,6 +200,10 @@ public class DiagnosticoConsultaService {
                 .build();
     }
 
+    public List<AnaliseHistoricoDto> listarHistoricoDiagnostico(Long codSubprocesso) {
+        return subprocessoVisualizacaoService.listarHistoricoDiagnostico(codSubprocesso);
+    }
+
     private String resolverSituacaoDiagnostico(Subprocesso subprocesso) {
         return switch (subprocesso.getSituacao()) {
             case DIAGNOSTICO_CONCLUIDO -> subprocessoVisualizacaoService.possuiAnalise(
@@ -211,5 +221,16 @@ public class DiagnosticoConsultaService {
         return subprocesso.getProcesso()
                 .buscarParticipante(subprocesso.getUnidade().getCodigo())
                 .orElse(null);
+    }
+
+    private String buscarResponsavelTitulo(Long unidadeCodigo) {
+        UnidadeResponsavelDto responsavel = responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeCodigo)
+                .orElse(null);
+        if (responsavel == null) {
+            return null;
+        }
+        return responsavel.substitutoTitulo() != null && !responsavel.substitutoTitulo().isBlank()
+                ? responsavel.substitutoTitulo()
+                : responsavel.titularTitulo();
     }
 }

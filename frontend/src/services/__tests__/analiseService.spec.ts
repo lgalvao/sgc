@@ -25,6 +25,16 @@ describe("analiseService", () => {
         expect(result).toEqual(dtoList);
     });
 
+    it("listarAnalisesDiagnostico deve buscar histórico de diagnóstico", async () => {
+        const dtoList = [{codigo: 3, observacoes: "Diagnóstico aceito"}];
+        mockApi.get.mockResolvedValue({data: dtoList});
+
+        const result = await service.listarAnalisesDiagnostico(123);
+
+        expect(mockApi.get).toHaveBeenCalledWith("/diagnosticos/subprocessos/123/historico");
+        expect(result).toEqual(dtoList);
+    });
+
     describe("Tratamento de erros", () => {
         testErrorHandling(() => service.listarAnalisesCadastro(123));
     });

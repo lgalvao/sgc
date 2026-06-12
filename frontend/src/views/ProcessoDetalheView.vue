@@ -162,6 +162,17 @@ async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
     return;
   }
 
+  if (processo.value?.tipo === "DIAGNOSTICO" && typeof row.codSubprocesso === "number") {
+    await router.push({
+      name: "DiagnosticoUnidade",
+      params: {
+        codSubprocesso: String(row.codSubprocesso),
+        siglaUnidade: row.sigla
+      },
+    });
+    return;
+  }
+
   await router.push({
     name: "Subprocesso",
     params: {

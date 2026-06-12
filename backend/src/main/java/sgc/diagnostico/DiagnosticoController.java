@@ -11,6 +11,9 @@ import sgc.comum.*;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.service.*;
 import sgc.seguranca.sanitizacao.*;
+import sgc.subprocesso.dto.AnaliseHistoricoDto;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/diagnosticos")
@@ -111,6 +114,12 @@ public class DiagnosticoController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<DiagnosticoUnidadeDto> obterDiagnosticoUnidade(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterDiagnosticoUnidade(codSubprocesso));
+    }
+
+    @GetMapping("/subprocessos/{codSubprocesso}/historico")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
+    public ResponseEntity<List<AnaliseHistoricoDto>> listarHistoricoDiagnostico(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(consultaService.listarHistoricoDiagnostico(codSubprocesso));
     }
 
     @PostMapping("/subprocessos/{codSubprocesso}/concluir")

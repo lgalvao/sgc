@@ -47,6 +47,7 @@ export const TEXTOS_DIAGNOSTICO = {
     BTN_IMPOSSIBILITAR: 'Indicar impossibilidade',
     BTN_VER_DETALHES: 'Ver detalhes',
     BTN_VOLTAR: 'Voltar',
+    BTN_HISTORICO_ANALISE: 'Histórico de análise',
 
     // « Mensagens de sucesso »
     SUCESSO_AUTOAVALIACAO_SALVA: 'Autoavaliação salva',
@@ -55,8 +56,8 @@ export const TEXTOS_DIAGNOSTICO = {
     SUCESSO_CONSENSO_APROVADO: 'Avaliação de consenso aprovada',
     SUCESSO_CAPACITACAO_SALVA: 'Situação de capacitação salva',
     SUCESSO_DIAGNOSTICO_CONCLUIDO: 'Diagnóstico concluído',
-    SUCESSO_DIAGNOSTICO_VALIDADO: 'Diagnóstico validado',
-    SUCESSO_DIAGNOSTICO_DEVOLVIDO: 'Diagnóstico devolvido para ajustes',
+    SUCESSO_DIAGNOSTICO_VALIDADO: 'Aceite registrado',
+    SUCESSO_DIAGNOSTICO_DEVOLVIDO: 'Devolução realizada',
     SUCESSO_DIAGNOSTICO_HOMOLOGADO: 'Diagnóstico homologado',
     SUCESSO_IMPOSSIBILITADO: 'Impossibilidade registrada',
 
@@ -67,10 +68,11 @@ export const TEXTOS_DIAGNOSTICO = {
     MODAL_CONCLUIR_DIAG_MENSAGEM: 'Confirma a conclusão do diagnóstico da unidade?',
     MODAL_APROVAR_TITULO: 'Aprovar avaliação de consenso',
     MODAL_APROVAR_MENSAGEM: 'Confirma a aprovação da avaliação de consenso definida pelo responsavel da unidade?',
-    MODAL_VALIDAR_TITULO: 'Validar diagnóstico',
+    MODAL_VALIDAR_TITULO: 'Aceitar diagnóstico',
     MODAL_DEVOLVER_TITULO: 'Devolver diagnóstico',
     MODAL_DEVOLVER_PLACEHOLDER: 'Informe a justificativa para devolução...',
     MODAL_HOMOLOGAR_TITULO: 'Homologar diagnóstico',
+    MODAL_HISTORICO_TITULO: 'Histórico de análise',
     MODAL_IMPOSSIBILITAR_TITULO: 'Indicar impossibilidade de avaliação',
     MODAL_IMPOSSIBILITAR_MENSAGEM: (nomeServidor: string) =>
         `Confirma a impossibilidade de avaliação para ${nomeServidor}?`,

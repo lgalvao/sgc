@@ -53,6 +53,100 @@
         </BCol>
       </BRow>
 
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <BButton
+            data-testid="btn-historico-analise-unidade"
+            variant="outline-secondary"
+            @click="abrirHistoricoAnalise"
+        >
+          {{ TEXTOS.diagnostico.BTN_HISTORICO_ANALISE }}
+        </BButton>
+
+        <BDropdown
+            v-if="podeValidar || podeDevolver || podeHomologar"
+            text="Ações"
+            variant="outline-primary"
+        >
+          <BDropdownItemButton
+              v-if="podeDevolver"
+              :disabled="devolvendo"
+              data-testid="btn-devolver-diagnostico-unidade"
+              @click="abrirModalDevolver"
+          >
+            {{ TEXTOS.diagnostico.BTN_DEVOLVER }}
+          </BDropdownItemButton>
+          <BDropdownItemButton
+              v-if="podeValidar"
+              :disabled="validando"
+              data-testid="btn-validar-diagnostico-unidade"
+              @click="abrirModalValidar"
+          >
+            Registrar aceite
+          </BDropdownItemButton>
+          <BDropdownItemButton
+              v-if="podeHomologar"
+              :disabled="homologando"
+              data-testid="btn-homologar-diagnostico-unidade"
+              @click="abrirModalHomologar"
+          >
+            {{ TEXTOS.diagnostico.BTN_HOMOLOGAR }}
+          </BDropdownItemButton>
+        </BDropdown>
+      </div>
+
+      <BCard class="mb-4">
+        <BCardHeader><strong>Servidores participantes</strong></BCardHeader>
+        <EmptyState
+            v-if="servidoresExibidos.length === 0"
+            :description="TEXTOS.diagnostico.VAZIO_EQUIPE_TEXTO"
+            :title="TEXTOS.diagnostico.VAZIO_EQUIPE_TITULO"
+            icon="bi-people"
+        />
+        <ul v-else class="mb-0">
+          <li v-for="servidor in servidoresExibidos" :key="servidor.servidorTitulo">
+            {{ servidor.servidorNome }}
+          </li>
+        </ul>
+      </BCard>
+
+      <BCard class="mb-4">
+        <BCardHeader><strong>Competência x Servidor</strong></BCardHeader>
+        <div class="table-responsive" data-testid="matriz-diagnostico-unidade">
+          <table class="table table-bordered table-sm align-middle mb-0">
+            <thead>
+            <tr>
+              <th rowspan="2">Competência</th>
+              <th
+                  v-for="servidor in servidoresExibidos"
+                  :key="`servidor-${servidor.servidorTitulo}`"
+                  class="text-center"
+                  colspan="3"
+              >
+                {{ servidor.servidorNome }}
+              </th>
+            </tr>
+            <tr>
+              <template v-for="servidor in servidoresExibidos" :key="`colunas-${servidor.servidorTitulo}`">
+                <th class="text-center">I</th>
+                <th class="text-center">D</th>
+                <th class="text-center">C</th>
+              </template>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="linha in matrizCompetencias" :key="linha.competenciaCodigo">
+              <td>{{ linha.competenciaDescricao }}</td>
+              <template v-for="avaliacao in linha.avaliacoesPorServidor" :key="`${linha.competenciaCodigo}-${avaliacao.servidorTitulo}`">
+                <td class="text-center">{{ formatarNota(avaliacao.importancia) }}</td>
+                <td class="text-center">{{ formatarNota(avaliacao.dominio) }}</td>
+                <td class="text-center">{{ formatarSituacaoCapacitacaoResumida(avaliacao.situacaoCapacitacao) }}</td>
+              </template>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </BCard>
+
       <!-- Tabela de servidores com detalhamento do consenso -->
       <BCard class="mb-4">
         <BCardHeader class="d-flex justify-content-between align-items-center">
@@ -61,14 +155,14 @@
         </BCardHeader>
 
         <EmptyState
-            v-if="servidores.length === 0"
+            v-if="servidoresExibidos.length === 0"
             :description="TEXTOS.diagnostico.VAZIO_EQUIPE_TEXTO"
             :title="TEXTOS.diagnostico.VAZIO_EQUIPE_TITULO"
             icon="bi-people"
         />
 
         <template v-else>
-          <BAccordion v-for="servidor in servidores" :key="servidor.servidorTitulo" class="mb-1">
+          <BAccordion v-for="servidor in servidoresExibidos" :key="servidor.servidorTitulo" class="mb-1">
             <BAccordionItem>
               <template #title>
                 <div class="d-flex align-items-center gap-2 w-100 justify-content-between pe-3">
@@ -109,60 +203,6 @@
         </template>
       </BCard>
 
-      <!-- Situações de capacitação -->
-      <BCard v-if="situacoesCapacitacao.length > 0" class="mb-4">
-        <BCardHeader><strong>Situações de Capacitação</strong></BCardHeader>
-        <BTable
-            :fields="colunasSituacoes"
-            :items="situacoesComDescricao"
-            bordered
-            responsive
-            small
-        >
-          <template #cell(situacaoCapacitacao)="{ item }">
-            <BBadge :variant="varianteCapacitacao(item.situacaoCapacitacao)">
-              {{ formatarCapacitacao(item.situacaoCapacitacao) }}
-            </BBadge>
-          </template>
-        </BTable>
-      </BCard>
-
-      <!-- Ações do gestor/admin -->
-      <div class="d-flex gap-2 flex-wrap mb-4">
-        <BButton
-            v-if="podeValidar"
-            :disabled="validando"
-            data-testid="btn-validar-diagnostico-unidade"
-            variant="success"
-            @click="abrirModalValidar"
-        >
-          <BSpinner v-if="validando" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_VALIDAR }}
-        </BButton>
-
-        <BButton
-            v-if="podeDevolver"
-            :disabled="devolvendo"
-            data-testid="btn-devolver-diagnostico-unidade"
-            variant="warning"
-            @click="abrirModalDevolver"
-        >
-          <BSpinner v-if="devolvendo" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_DEVOLVER }}
-        </BButton>
-
-        <BButton
-            v-if="podeHomologar"
-            :disabled="homologando"
-            data-testid="btn-homologar-diagnostico-unidade"
-            variant="primary"
-            @click="abrirModalHomologar"
-        >
-          <BSpinner v-if="homologando" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_HOMOLOGAR }}
-        </BButton>
-      </div>
-
       <!-- Histórico de movimentações -->
       <BCard v-if="movimentacoes.length > 0" class="mb-4">
         <BCardHeader><strong>Histórico de Movimentações</strong></BCardHeader>
@@ -189,7 +229,7 @@
         <BButton class="text-secondary" variant="link" @click="modalValidarAberto = false">Cancelar</BButton>
         <BButton :disabled="validando" data-testid="btn-confirmar-validar-unidade" variant="success" @click="confirmarValidar">
           <BSpinner v-if="validando" aria-hidden="true" class="me-1" small/>
-          Validar
+          Aceitar
         </BButton>
       </template>
     </BModal>
@@ -218,6 +258,13 @@
         </BButton>
       </template>
     </BModal>
+
+    <HistoricoAnaliseModal
+        :historico="historicoAnalises"
+        :loading="carregandoHistorico"
+        :mostrar="modalHistoricoAberto"
+        @fechar="modalHistoricoAberto = false"
+    />
   </LayoutPadrao>
 </template>
 
@@ -230,6 +277,8 @@ import {
   BCard,
   BCardHeader,
   BCol,
+  BDropdown,
+  BDropdownItemButton,
   BFormText,
   BFormTextarea,
   BListGroup,
@@ -243,6 +292,7 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
+import HistoricoAnaliseModal from '@/components/processo/HistoricoAnaliseModal.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useDiagnosticoUnidadeView} from '@/views/useDiagnosticoUnidadeView';
 
@@ -261,6 +311,9 @@ const {
   totalPendentes,
   retornoFluxo,
   limparRetornoFluxo,
+  modalHistoricoAberto,
+  carregandoHistorico,
+  historicoAnalises,
   modalValidarAberto,
   modalDevolverAberto,
   modalHomologarAberto,
@@ -271,6 +324,7 @@ const {
   podeValidar,
   podeDevolver,
   podeHomologar,
+  abrirHistoricoAnalise,
   abrirModalValidar,
   abrirModalDevolver,
   abrirModalHomologar,
@@ -283,12 +337,11 @@ const {
   varianteSituacao,
   varianteSituacaoServidor,
   formatarSituacaoServidor,
-  varianteCapacitacao,
-  formatarCapacitacao,
+  formatarSituacaoCapacitacaoResumida,
   formatarNota,
   obterGapInfo,
-  situacoesComDescricao,
+  servidoresExibidos,
+  matrizCompetencias,
   colunasCompetencias,
-  colunasSituacoes,
 } = useDiagnosticoUnidadeView(props);
 </script>

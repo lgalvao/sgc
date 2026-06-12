@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.comum.model.ComumRepo;
 import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.DiagnosticoRepo;
@@ -154,6 +155,11 @@ class DiagnosticoFluxoServiceTest {
         String observacao = "Ajustar consenso pendente";
         Diagnostico diagnostico = new Diagnostico();
         diagnostico.setDataConclusao(LocalDateTime.now());
+        AvaliacaoServidor avaliacaoAprovada = new AvaliacaoServidor();
+        avaliacaoAprovada.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+        AvaliacaoServidor avaliacaoImpossibilitada = new AvaliacaoServidor();
+        avaliacaoImpossibilitada.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        diagnostico.setAvaliacaoServidores(List.of(avaliacaoAprovada, avaliacaoImpossibilitada));
 
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setCodigo(codSubprocesso);
@@ -176,6 +182,9 @@ class DiagnosticoFluxoServiceTest {
 
         assertThat(diagnostico.getDataConclusao()).isNull();
         assertThat(subprocesso.getDataFimEtapa1()).isNull();
+        assertThat(diagnostico.getAvaliacaoServidores())
+                .extracting(AvaliacaoServidor::getSituacaoServidor)
+                .containsOnly(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
 
         ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
         verify(transicaoService).registrarAnaliseSemEmail(captor.capture());

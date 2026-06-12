@@ -189,6 +189,8 @@ public class DiagnosticoFluxoService {
             subprocesso.setDataFimEtapa1(null);
             diagnostico.setDataConclusao(null);
             diagnostico.setJustificativaConclusao(null);
+            diagnostico.getAvaliacaoServidores()
+                    .forEach(avaliacao -> avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
         }
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();

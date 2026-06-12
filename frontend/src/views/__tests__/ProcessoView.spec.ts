@@ -929,6 +929,38 @@ describe("Processo.vue", () => {
         });
     });
 
+    it("deve redirecionar para a análise da unidade quando o processo for de diagnóstico", async () => {
+        mocks.push.mockClear();
+        vi.mocked(processoService.buscarContextoCompleto).mockResolvedValueOnce({
+            ...mockProcesso,
+            tipo: TipoProcesso.DIAGNOSTICO,
+        } as any);
+
+        wrapper = createWrapper();
+
+        await nextTick();
+        await flushPromises();
+
+        const treeTable = wrapper.findComponent(TreeTableStub);
+        const rowItem = {
+            codigo: 101,
+            codSubprocesso: 201,
+            unidadeAtual: "UNI1 - Unidade 1",
+            sigla: "UNI1",
+            clickable: true
+        };
+
+        await treeTable.vm.$emit("row-click", rowItem);
+
+        expect(mocks.push).toHaveBeenCalledWith({
+            name: "DiagnosticoUnidade",
+            params: {
+                codSubprocesso: "201",
+                siglaUnidade: "UNI1"
+            },
+        });
+    });
+
     it("deve redirecionar para detalhes da unidade mesmo como Servidor (controle é no backend)", async () => {
         mocks.push.mockClear(); // Limpa chamadas anteriores
 

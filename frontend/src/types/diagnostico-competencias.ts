@@ -97,6 +97,7 @@ export interface UnidadeResumoDiag {
     unidadeSigla: string;
     unidadeNome: string;
     situacaoSubprocesso: string;
+    responsavelTitulo?: string | null;
 }
 
 /** Diagnóstico completo de uma unidade (servidores, situações de capacitação, histórico). */

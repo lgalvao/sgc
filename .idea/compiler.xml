@@ -20,7 +20,7 @@
         <module name="sgc.backend.test" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="25" />
+    <bytecodeTargetLevel target="21" />
   </component>
   <component name="JavacSettings">
     <option name="GENERATE_NO_WARNINGS" value="true" />

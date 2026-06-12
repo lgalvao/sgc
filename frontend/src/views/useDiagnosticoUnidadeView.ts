@@ -2,11 +2,12 @@ import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import type {ColorVariant} from 'bootstrap-vue-next';
 import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
+import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
-import {usePerfilStore} from '@/stores/perfil';
-import {Perfil} from '@/types/tipos';
+import {listarAnalisesDiagnostico} from '@/services/analiseService';
 import {TEXTOS} from '@/constants/textos';
+import type {Analise} from '@/types/tipos';
 import type {AvaliacaoCompetencia, SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
@@ -16,10 +17,25 @@ interface DiagnosticoUnidadeViewProps {
     siglaUnidade: string;
 }
 
+interface MatrizCompetenciaServidor {
+    competenciaCodigo: number;
+    competenciaDescricao: string;
+    avaliacoesPorServidor: Array<{
+        servidorTitulo: string;
+        importancia: number | null;
+        dominio: number | null;
+        situacaoCapacitacao: ValorSituacaoCapacitacao | null;
+    }>;
+}
+
 export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const router = useRouter();
-    const perfilStore = usePerfilStore();
     const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
+    const {
+        habilitarValidarDiagnostico,
+        habilitarDevolverDiagnostico,
+        habilitarHomologarDiagnostico,
+    } = useDiagnosticoPermissoes(props.codSubprocesso);
 
     const {
         unidade,
@@ -51,17 +67,13 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const justificativaDevolver = ref('');
     const observacoesHomologar = ref('');
     const tentouDevolverSemJustificativa = ref(false);
+    const modalHistoricoAberto = ref(false);
+    const carregandoHistorico = ref(false);
+    const historicoAnalises = ref<Analise[]>([]);
 
-    const ehGestor = computed(
-        () =>
-            perfilStore.perfilSelecionado === Perfil.GESTOR ||
-            perfilStore.perfilSelecionado === Perfil.ADMIN,
-    );
-    const podeValidar = computed(() => ehGestor.value && situacao.value === 'CONCLUIDO');
-    const podeDevolver = computed(() => ehGestor.value && situacao.value === 'CONCLUIDO');
-    const podeHomologar = computed(
-        () => perfilStore.perfilSelecionado === Perfil.ADMIN && situacao.value === 'VALIDADO',
-    );
+    const podeValidar = computed(() => habilitarValidarDiagnostico.value);
+    const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
+    const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
 
     function abrirModalValidar() {
         observacoesValidar.value = '';
@@ -81,6 +93,18 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
 
     function limparRetornoFluxo() {
         retornoFluxo.value = null;
+    }
+
+    async function abrirHistoricoAnalise() {
+        carregandoHistorico.value = true;
+        modalHistoricoAberto.value = true;
+        try {
+            historicoAnalises.value = await listarAnalisesDiagnostico(props.codSubprocesso);
+        } catch {
+            registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
+        } finally {
+            carregandoHistorico.value = false;
+        }
     }
 
     function registrarRetornoFluxo(variante: RetornoFluxo['variante'], mensagem?: string | null) {
@@ -236,12 +260,53 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         Object.fromEntries((contexto.value?.competencias ?? []).map((competencia) => [competencia.competenciaCodigo, competencia.descricao])),
     );
 
+    const servidoresExibidos = computed(() => {
+        const responsavelTitulo = unidade.value?.responsavelTitulo;
+        if (!responsavelTitulo) {
+            return servidores.value;
+        }
+        return servidores.value.filter((item) => item.servidorTitulo !== responsavelTitulo);
+    });
+
+    const mapaSituacaoCapacitacao = computed(() =>
+        Object.fromEntries(
+            situacoesCapacitacao.value.map((item) => [
+                `${item.servidorTitulo}:${item.competenciaCodigo}`,
+                item.situacaoCapacitacao ?? null,
+            ]),
+        ),
+    );
+
+    const matrizCompetencias = computed<MatrizCompetenciaServidor[]>(() =>
+        (contexto.value?.competencias ?? []).map((competencia) => ({
+            competenciaCodigo: competencia.competenciaCodigo,
+            competenciaDescricao: competencia.descricao,
+            avaliacoesPorServidor: servidoresExibidos.value.map((servidorItem) => {
+                const avaliacao = servidorItem.consenso.find(
+                    (item) => item.competenciaCodigo === competencia.competenciaCodigo,
+                );
+                return {
+                    servidorTitulo: servidorItem.servidorTitulo,
+                    importancia: avaliacao?.importancia ?? null,
+                    dominio: avaliacao?.dominio ?? null,
+                    situacaoCapacitacao: mapaSituacaoCapacitacao.value[
+                        `${servidorItem.servidorTitulo}:${competencia.competenciaCodigo}`
+                    ] ?? null,
+                };
+            }),
+        })),
+    );
+
     const situacoesComDescricao = computed(() =>
         situacoesCapacitacao.value.map((situacaoItem) => ({
             ...situacaoItem,
             nomeCompetencia: mapaDescricaoCompetencia.value[situacaoItem.competenciaCodigo] ?? `Competência ${situacaoItem.competenciaCodigo}`,
         })),
     );
+
+    function formatarSituacaoCapacitacaoResumida(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
+        return situacaoCapacitacao ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+    }
 
     const colunasCompetencias = [
         {key: 'competenciaCodigo', label: 'Código'},
@@ -267,6 +332,9 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         totalPendentes,
         retornoFluxo,
         limparRetornoFluxo,
+        modalHistoricoAberto,
+        carregandoHistorico,
+        historicoAnalises,
         modalValidarAberto,
         modalDevolverAberto,
         modalHomologarAberto,
@@ -277,6 +345,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         podeValidar,
         podeDevolver,
         podeHomologar,
+        abrirHistoricoAnalise,
         abrirModalValidar,
         abrirModalDevolver,
         abrirModalHomologar,
@@ -291,8 +360,11 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         formatarSituacaoServidor,
         varianteCapacitacao,
         formatarCapacitacao,
+        formatarSituacaoCapacitacaoResumida,
         formatarNota,
         obterGapInfo,
+        servidoresExibidos,
+        matrizCompetencias,
         situacoesComDescricao,
         colunasCompetencias,
         colunasSituacoes,

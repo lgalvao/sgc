@@ -100,6 +100,10 @@ public class SubprocessoVisualizacaoService {
         return listarHistoricoPorTipo(codSubprocesso, TipoAnalise.VALIDACAO);
     }
 
+    public List<AnaliseHistoricoDto> listarHistoricoDiagnostico(Long codSubprocesso) {
+        return listarHistoricoPorTipo(codSubprocesso, TipoAnalise.DIAGNOSTICO);
+    }
+
     public boolean possuiAnalise(Long codSubprocesso, TipoAnalise tipo, TipoAcaoAnalise acao) {
         return analiseRepo.existsBySubprocessoCodigoAndTipoAndAcao(codSubprocesso, tipo, acao);
     }

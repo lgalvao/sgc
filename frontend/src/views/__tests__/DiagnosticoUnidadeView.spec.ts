@@ -85,6 +85,14 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
     }),
 }));
 
+vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
+    useDiagnosticoPermissoes: () => ({
+        habilitarValidarDiagnostico: computed(() => situacaoDiagnostico.value === 'CONCLUIDO'),
+        habilitarDevolverDiagnostico: computed(() => situacaoDiagnostico.value === 'CONCLUIDO'),
+        habilitarHomologarDiagnostico: computed(() => perfilSelecionado.value === Perfil.ADMIN && situacaoDiagnostico.value === 'VALIDADO'),
+    }),
+}));
+
 describe('DiagnosticoUnidadeView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -130,6 +138,8 @@ describe('DiagnosticoUnidadeView', () => {
                     BBadge: {template: '<span><slot /></span>'},
                     BCard: {template: '<section><slot /></section>'},
                     BCardHeader: {template: '<header><slot /></header>'},
+                    BDropdown: {template: '<div><slot /></div>'},
+                    BDropdownItemButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BRow: {template: '<div><slot /></div>'},
                     BCol: {template: '<div><slot /></div>'},
                     BAccordion: {template: '<div><slot /></div>'},
@@ -147,6 +157,10 @@ describe('DiagnosticoUnidadeView', () => {
                         props: ['modelValue'],
                         emits: ['update:modelValue'],
                         template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
+                    },
+                    HistoricoAnaliseModal: {
+                        props: ['mostrar'],
+                        template: '<div v-if="mostrar" data-testid="modal-historico-analise" />',
                     },
                     BTable: {
                         props: ['items'],
@@ -176,8 +190,13 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('Situações de Capacitação');
         expect(wrapper.text()).toContain('+2');
         expect(wrapper.text()).toContain('---');
-        expect(wrapper.text()).toContain('Em capacitação');
+        expect(wrapper.text()).toContain('EC');
         expect(wrapper.text()).toContain('Diagnóstico concluído');
+        expect(wrapper.find('[data-testid="btn-historico-analise-unidade"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="matriz-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.text()).toContain('I');
+        expect(wrapper.text()).toContain('D');
+        expect(wrapper.text()).toContain('C');
         expect(wrapper.find('[data-testid="btn-validar-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-devolver-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-homologar-diagnostico-unidade"]').exists()).toBe(false);
@@ -324,6 +343,8 @@ describe('DiagnosticoUnidadeView', () => {
                     BBadge: {template: '<span><slot /></span>'},
                     BCard: {template: '<section><slot /></section>'},
                     BCardHeader: {template: '<header><slot /></header>'},
+                    BDropdown: {template: '<div><slot /></div>'},
+                    BDropdownItemButton: {template: '<button><slot /></button>'},
                     BRow: {template: '<div><slot /></div>'},
                     BCol: {template: '<div><slot /></div>'},
                     BAccordion: {template: '<div><slot /></div>'},
@@ -334,6 +355,7 @@ describe('DiagnosticoUnidadeView', () => {
                     BFormText: {template: '<small><slot /></small>'},
                     BFormTextarea: {template: '<textarea />'},
                     BModal: {template: '<div />'},
+                    HistoricoAnaliseModal: {template: '<div />'},
                     BTable: {
                         props: ['items', 'fields'],
                         template: `
@@ -355,11 +377,11 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).not.toContain('+0');
         expect(wrapper.text()).toContain('-2');
         expect(wrapper.text()).toContain('-');
-        expect(wrapper.text()).toContain('Em capacitação');
-        expect(wrapper.text()).toContain('Não se aplica');
-        expect(wrapper.text()).toContain('A capacitar');
-        expect(wrapper.text()).toContain('Capacitado');
-        expect(wrapper.text()).toContain('Instrutor');
+        expect(wrapper.text()).toContain('NA');
+        expect(wrapper.text()).toContain('AC');
+        expect(wrapper.text()).toContain('EC');
+        expect(wrapper.text()).toContain('C');
+        expect(wrapper.text()).toContain('I');
     });
 
     it('exercita tratamento de erros sem mensagem nos modais de DiagnosticoUnidadeView', async () => {
