@@ -4,6 +4,7 @@ import {mount} from '@vue/test-utils';
 import {computed, nextTick, ref} from 'vue';
 import {createPinia, setActivePinia} from 'pinia';
 import DiagnosticoEquipePainel from '../DiagnosticoEquipePainel.vue';
+import {TEXTOS} from '@/constants/textos';
 
 const pushMock = vi.fn();
 const backMock = vi.fn();
@@ -33,6 +34,9 @@ const erroConcluir = ref<Error | null>(null);
 const erroValidar = ref<Error | null>(null);
 const erroDevolver = ref<Error | null>(null);
 const erroHomologar = ref<Error | null>(null);
+const TEXTO_DIAGNOSTICO_VALIDADO = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO;
+const TEXTO_DIAGNOSTICO_DEVOLVIDO = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO;
+const TEXTO_DIAGNOSTICO_HOMOLOGADO = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO;
 
 vi.mock('vue-router', () => ({
     useRouter: () => ({
@@ -277,7 +281,7 @@ describe('DiagnosticoEquipePainel', () => {
         await wrapper.get('textarea').setValue('Observações');
         await wrapper.get('[data-testid="btn-confirmar-validar"]').trigger('click');
         expect(validarDiagnosticoMock).toHaveBeenCalledWith('Observações');
-        expect(wrapper.text()).toContain('Diagnóstico validado');
+        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_VALIDADO);
 
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
@@ -286,13 +290,13 @@ describe('DiagnosticoEquipePainel', () => {
         await wrapper.get('textarea').setValue('Ajustes');
         await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
         expect(devolverDiagnosticoMock).toHaveBeenCalledWith('Ajustes');
-        expect(wrapper.text()).toContain('Diagnóstico devolvido para ajustes');
+        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
 
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await wrapper.get('textarea').setValue('Homologado');
         await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
         expect(homologarDiagnosticoMock).toHaveBeenCalledWith('Homologado');
-        expect(wrapper.text()).toContain('Diagnóstico homologado');
+        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_HOMOLOGADO);
     });
 
     it('oculta ações e ajusta colunas se não for chefe', () => {
@@ -488,10 +492,10 @@ describe('DiagnosticoEquipePainel', () => {
         await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
         await nextTick();
 
-        expect(wrapper.text()).toContain('Diagnóstico devolvido para ajustes');
+        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
         await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
         await nextTick();
-        expect(wrapper.text()).not.toContain('Diagnóstico devolvido para ajustes');
+        expect(wrapper.text()).not.toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
     });
 
     it('renderiza spinners de loading quando as operacoes estao em andamento', async () => {
