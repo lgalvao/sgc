@@ -40,6 +40,7 @@ export const TEXTOS_DIAGNOSTICO = {
     BTN_CONCLUIR_AUTOAVALIACAO: 'Concluir autoavaliação',
     BTN_APROVAR_CONSENSO: 'Aprovar consenso',
     BTN_MANTER_CONSENSO: 'Manter avaliação de consenso',
+    BTN_MANTER_CAPACITACAO: 'Situação de capacitação',
     BTN_CONCLUIR_DIAGNOSTICO: 'Concluir diagnóstico',
     BTN_VALIDAR: 'Validar',
     BTN_DEVOLVER: 'Devolver',

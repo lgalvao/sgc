@@ -231,7 +231,7 @@ async function confirmarSelecaoComplementarUnidadesComEquipePropria(
     siglasConfirmadas?: string[]
 ): Promise<void> {
     const modal = page.locator('#modal-unidades-com-equipe-propria');
-    const abriuModal = await modal.waitFor({state: 'visible'})
+    const abriuModal = await modal.waitFor({state: 'visible', timeout: 2000})
         .then(() => true)
         .catch(() => false);
     if (!abriuModal) {

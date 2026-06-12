@@ -47,6 +47,7 @@
           v-else
           :fields="colunasServidores"
           :items="servidores"
+          data-testid="tbl-servidores-diagnostico"
           hover
           responsive
           small
@@ -72,6 +73,13 @@
                 @click="navegarParaConsenso(item.servidorTitulo)"
             >
               {{ TEXTOS.diagnostico.BTN_MANTER_CONSENSO }}
+            </BDropdownItemButton>
+            <BDropdownItemButton
+                :data-testid="`btn-manter-capacitacao-${item.servidorTitulo}`"
+                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
+                @click="navegarParaCapacitacao(item.servidorTitulo)"
+            >
+              {{ TEXTOS.diagnostico.BTN_MANTER_CAPACITACAO }}
             </BDropdownItemButton>
             <BDropdownItemButton
                 :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
@@ -193,6 +201,11 @@
         :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
         centered
     >
+      <AppAlert
+          v-if="erroConcluirModal"
+          :mensagem="erroConcluirModal"
+          @dismissed="erroConcluirModal = ''"
+      />
       <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
       <template #footer>
         <BButton class="text-secondary" variant="link" @click="modalConcluirAberto = false">Cancelar</BButton>
@@ -351,6 +364,7 @@ const {
 } = useFluxoDiagnostico(props.codSubprocesso);
 
 const erroMensagem = ref('');
+const erroConcluirModal = ref('');
 const alertaSucesso = ref('');
 const modalConcluirAberto = ref(false);
 const modalValidarAberto = ref(false);
@@ -382,6 +396,17 @@ function navegarParaConsenso(servidorTitulo: string) {
       servidorTitulo,
     },
     query: servidor?.servidorNome ? {servidorNome: servidor.servidorNome} : undefined,
+  });
+}
+
+function navegarParaCapacitacao(servidorTitulo: string) {
+  void router.push({
+    name: 'SituacaoCapacitacaoDiagnostico',
+    params: {
+      codSubprocesso: props.codSubprocesso,
+      siglaUnidade: props.siglaUnidade,
+    },
+    query: {servidorTitulo},
   });
 }
 
@@ -434,6 +459,7 @@ function abrirModalValidar() {
 }
 
 function abrirModalConcluir() {
+  erroConcluirModal.value = '';
   modalConcluirAberto.value = true;
 }
 
@@ -449,13 +475,13 @@ function abrirModalHomologar() {
 }
 
 async function confirmarConcluir() {
-  modalConcluirAberto.value = false;
   try {
     await concluirDiagnostico();
+    modalConcluirAberto.value = false;
     toastStore.setPending(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
     await router.push({name: 'Painel'});
   } catch (erro) {
-    erroMensagem.value = normalizarErro(erro).mensagem
+    erroConcluirModal.value = normalizarErro(erro).mensagem
       ?? erroConcluir.value?.message
       ?? TEXTOS.diagnostico.ERRO_SALVAR;
   }

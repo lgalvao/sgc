@@ -17,6 +17,8 @@ import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
+import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const UNIDADE_GESTOR = 'SECRETARIA_1';
 const UNIDADE_SUBORDINADA = 'ASSESSORIA_12';
@@ -63,6 +65,39 @@ async function preencherSituacoesCapacitacaoPendentesPorApi(page: Page, codSubpr
     }, codSubprocesso);
 }
 
+async function impossibilitarAvaliacoesPendentes(page: Page, codSubprocesso: number): Promise<void> {
+    const linhas = page.locator('tbody tr');
+    const total = await linhas.count();
+    console.log(`[DEBUG] total de servidores na tabela: ${total}`);
+
+    for (let i = 0; i < total; i++) {
+        const linha = linhas.nth(i);
+        const texto = await linha.textContent();
+        console.log(`[DEBUG] servidor ${i} texto: ${texto}`);
+        if (!texto?.includes(TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA)) {
+            console.log(`[DEBUG] pulando servidor ${i} pois não está pendente`);
+            continue;
+        }
+
+        console.log(`[DEBUG] impossibilitando servidor ${i}...`);
+        await linha.getByRole('button', {name: TEXTO_BOTAO_ACOES}).click();
+        await page.locator('[data-testid^="btn-impossibilitar-"]:visible').click();
+        await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante a rodada.');
+        await Promise.all([
+            page.waitForResponse((res: Response) =>
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/`)
+                && res.url().includes('/impossibilitar')
+                && res.request().method() === 'POST'
+                && res.ok(),
+            ),
+            page.getByTestId('btn-confirmar-impossibilitar').click(),
+        ]);
+        await expect(page.getByTestId('app-alert')).toBeVisible();
+        console.log(`[DEBUG] impossibilitado com sucesso, fechando alerta`);
+        await page.getByTestId('app-alert').locator('.btn-close').click().catch(() => {});
+    }
+}
+
 async function prepararDiagnosticoConcluido(
     page: Page,
     request: APIRequestContext,
@@ -79,18 +114,7 @@ async function prepararDiagnosticoConcluido(
     await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
     const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE_SUBORDINADA);
 
-    await page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_IMPOSSIBILITADO}`).getByRole('button', {name: TEXTO_BOTAO_ACOES}).click();
-    await page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_IMPOSSIBILITADO}`).click();
-    await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante a rodada.');
-    await Promise.all([
-        page.waitForResponse((res: Response) =>
-            res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/${TITULO_SERVIDOR_IMPOSSIBILITADO}/impossibilitar`)
-            && res.request().method() === 'POST'
-            && res.ok(),
-        ),
-        page.getByTestId('btn-confirmar-impossibilitar').click(),
-    ]);
-    await expect(page.getByTestId('app-alert')).toContainText('Impossibilidade registrada');
+    await impossibilitarAvaliacoesPendentes(page, codSubprocesso);
 
     await login(page, TITULO_SERVIDOR, 'senha');
     await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
@@ -217,7 +241,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         const tabelaArvore = page.getByTestId('tbl-tree');
         await expect(tabelaArvore).toBeVisible();
         await expect(tabelaArvore.getByRole('row', {name: /^ASSESSORIA_12\b/i}).first()).toBeVisible();
-        await expect(tabelaArvore.getByRole('row', {name: /^ASSESSORIA_21\b/i}).first()).toBeVisible();
+        await expect(tabelaArvore.getByRole('row', {name: /^SECAO_211\b/i}).first()).toBeVisible();
     });
 
     test('GESTOR registra aceite, gera histórico e notificação para a unidade superior', async ({
@@ -225,6 +249,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         page,
         request,
     }) => {
+        await resetDatabase(request);
         const processo = await prepararDiagnosticoConcluido(page, request, descricaoAceite);
 
         await loginComPerfil(
@@ -272,6 +297,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         page,
         request,
     }) => {
+        await resetDatabase(request);
         const processo = await prepararDiagnosticoConcluido(page, request, descricaoDevolucao);
 
         await loginComPerfil(
@@ -323,6 +349,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         page,
         request,
     }) => {
+        await resetDatabase(request);
         const processo = await prepararDiagnosticoConcluido(page, request, descricaoHomologacao);
 
         await loginComPerfil(

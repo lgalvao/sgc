@@ -68,10 +68,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     }
 
     function abrirModalConcluir() {
-        if (!validarPreenchimento()) {
-            registrarErro(TEXTOS.diagnostico.ERRO_PREENCHIMENTO_INCOMPLETO);
-            return;
-        }
         limparRetornoFluxo();
         modalConcluirAberto.value = true;
     }
@@ -153,6 +149,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
             }
             registrarSucesso(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
         } catch (err) {
+            modalConcluirAberto.value = false;
             registrarErro(normalizarErro(err).mensagem);
         }
     }

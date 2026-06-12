@@ -26,7 +26,7 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
 
         // CHEFE deve ver a grade de servidores (tabela)
-        await expect(page.locator('table')).toBeVisible();
+        await expect(page.getByTestId('tbl-servidores-diagnostico')).toBeVisible();
         await expect(page.getByText(NOME_SERVIDOR_ASSESSORIA_12)).toBeVisible();
 
         // CHEFE deve ver o dropdown de ações para os servidores da equipe
@@ -43,7 +43,7 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
         await expect(page.getByTestId('card-subprocesso-diagnostico')).toBeVisible();
 
         // SERVIDOR NÃO deve ver a grade de servidores (tabela) nem botão de Concluir diagnóstico
-        await expect(page.locator('table')).not.toBeVisible();
+        await expect(page.getByTestId('tbl-servidores-diagnostico')).not.toBeVisible();
         await expect(page.getByTestId('btn-concluir-diagnostico')).not.toBeVisible();
         await expect(page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`)).not.toBeVisible();
     });
