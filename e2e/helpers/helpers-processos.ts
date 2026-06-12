@@ -167,6 +167,7 @@ export async function aguardarProcessoNoPainel(page: Page, options: {
     unidadesParticipantes?: string[];
 }): Promise<void> {
     await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
+    await expect(page.getByTestId('painel-carregando')).toBeHidden({timeout: 15000});
     await verificarProcessoTabela(page, {
         descricao: options.descricao,
         situacao: options.situacao,
@@ -230,7 +231,7 @@ async function confirmarSelecaoComplementarUnidadesComEquipePropria(
     siglasConfirmadas?: string[]
 ): Promise<void> {
     const modal = page.locator('#modal-unidades-com-equipe-propria');
-    const abriuModal = await modal.waitFor({state: 'visible'})
+    const abriuModal = await modal.waitFor({state: 'visible', timeout: 1500})
         .then(() => true)
         .catch(() => false);
     if (!abriuModal) {

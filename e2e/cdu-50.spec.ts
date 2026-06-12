@@ -42,9 +42,10 @@ test.describe.serial('CDU-49 - Acompanhar diagnóstico de unidades subordinadas'
         await expect(tabelaArvore.getByRole('row', {name: /^ASSESSORIA_12\b/i}).first()).toBeVisible();
 
         await navegarParaDiagnosticoUnidade(page, UNIDADE_SUBORDINADA);
-        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_SUBORDINADA);
-        await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
-        await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
+        await expect(page.getByText(UNIDADE_SUBORDINADA, {exact: true})).toBeVisible();
+        await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
+        await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
     });
 
     test('ADMIN acompanha o mesmo subprocesso pela árvore e acessa o monitoramento inline', async ({
@@ -60,8 +61,9 @@ test.describe.serial('CDU-49 - Acompanhar diagnóstico de unidades subordinadas'
         await expect(tabelaArvore.getByRole('row', {name: /^ASSESSORIA_12\b/i}).first()).toBeVisible();
 
         await navegarParaDiagnosticoUnidade(page, UNIDADE_SUBORDINADA);
-        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_SUBORDINADA);
-        await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
-        await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
+        await expect(page.getByText(UNIDADE_SUBORDINADA, {exact: true})).toBeVisible();
+        await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
+        await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
     });
 });
