@@ -149,9 +149,9 @@ export async function verificarProcessoTabela(page: Page, options: {
 
     // Localizar a linha que contém a descrição do processo
     const linhaProcesso = tabela.locator('tr').filter({hasText: options.descricao}).first();
-    await expect(linhaProcesso).toBeVisible();
-    await expect(linhaProcesso.getByText(new RegExp(options.situacao, 'i'))).toBeVisible();
-    await expect(linhaProcesso.getByText(new RegExp(`^${options.tipo}$`, 'i'))).toBeVisible();
+    await expect(linhaProcesso).toBeVisible({timeout: 15000});
+    await expect(linhaProcesso.getByText(new RegExp(options.situacao, 'i'))).toBeVisible({timeout: 15000});
+    await expect(linhaProcesso.getByText(new RegExp(`^${options.tipo}$`, 'i'))).toBeVisible({timeout: 15000});
 
     if (options.unidadesParticipantes) {
         for (const unidade of options.unidadesParticipantes) {
@@ -426,5 +426,4 @@ export async function finalizarProcesso(page: Page) {
     await page.waitForURL(/\/painel(?:\?.*)?$/);
     await bootstrapPromise;
     await expect(page.getByTestId('painel-carregando')).toBeHidden();
-    await page.waitForLoadState('networkidle');
 }

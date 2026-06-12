@@ -8,9 +8,11 @@ import {
 } from './fixtures/index.js';
 import {login, reloginSemLimparSpa, USUARIOS} from './helpers/helpers-auth.js';
 import {
+    esperarPaginaDiagnosticoUnidade,
     esperarPaginaDetalhesProcesso,
     esperarPaginaSubprocesso,
     fazerLogout,
+    navegarParaDiagnosticoUnidade,
     navegarParaSubprocesso
 } from './helpers/helpers-navegacao.js';
 import {
@@ -369,14 +371,16 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
 
         await acessarDetalhesProcesso(page, descricao);
         await esperarPaginaDetalhesProcesso(page);
-        await navegarParaSubprocesso(page, 'ASSESSORIA_12');
+        await navegarParaDiagnosticoUnidade(page, 'ASSESSORIA_12');
+        await esperarPaginaDiagnosticoUnidade(page, 'ASSESSORIA_12');
 
         await expect(page.getByTestId('card-subprocesso-diagnostico')).toHaveCount(0);
         await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toHaveCount(0);
         await expect(page.getByTestId('card-subprocesso-monitoramento')).toHaveCount(0);
-        await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
-        await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
-        await expect(page.getByRole('columnheader', {name: 'Ações'})).toHaveCount(0);
+        await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
+        await expect(page.getByText('Servidores participantes', {exact: true})).toBeVisible();
+        await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
+        await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
     });
 
     test('Regressão - cache de sessão no subprocesso: deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA', async ({

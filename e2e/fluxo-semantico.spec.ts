@@ -731,9 +731,11 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await login(page, ADMIN.titulo, ADMIN.senha);
             await acessarDetalhesProcesso(page, `${descricaoProcessoDiagnostico} Monitoramento`);
             await navegarParaDiagnosticoUnidade(page, SIGLA_UNIDADE_DIAGNOSTICO);
-            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(SIGLA_UNIDADE_DIAGNOSTICO);
-            await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
-            await expect(page.getByText('Duff McKagan')).toBeVisible();
+            await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
+            await expect(page.getByText(SIGLA_UNIDADE_DIAGNOSTICO, {exact: true})).toBeVisible();
+            await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
+            await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
+            await expect(page.getByRole('listitem').filter({hasText: 'Duff McKagan'})).toBeVisible();
 
             await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
             await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);
@@ -754,7 +756,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
                 ),
                 page.getByTestId('btn-confirmar-impossibilitar').click()
             ]);
-            await expect(page.getByText('Avaliação impossibilitada', {exact: true})).toBeVisible();
+            await expect(page.getByTestId('app-alert')).toContainText('Avaliação impossibilitada');
         });
 
         await test.step('CHEFE registra situação de capacitação no mesmo subprocesso de diagnóstico', async () => {
