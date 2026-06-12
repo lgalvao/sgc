@@ -38,9 +38,10 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
 
         await page.goto(`/processo/${processo.codigo}`);
         await navegarParaDiagnosticoUnidade(page, 'ASSESSORIA_12');
-        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText('ASSESSORIA_12');
-        await expect(page.getByRole('columnheader', {name: 'Servidor'})).toBeVisible();
-        await expect(page.getByRole('columnheader', {name: 'Situação'})).toBeVisible();
+        await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
+        await expect(page.getByText('ASSESSORIA_12', {exact: true})).toBeVisible();
+        await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
+        await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
         await expect(page.getByText('Duff McKagan')).toBeVisible();
 
         await verificarNotificacaoAdmin(page, {
