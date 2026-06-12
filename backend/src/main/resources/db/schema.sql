@@ -283,7 +283,7 @@ create table if not exists sgc.analise
     data_hora
                        timestamp(6) not null,
     subprocesso_codigo bigint       not null,
-    acao               varchar(20)  not null check
+    acao               varchar(25)  not null check
         (
         acao
             in
@@ -291,7 +291,9 @@ create table if not exists sgc.analise
          'ACEITE_MAPEAMENTO',
          'DEVOLUCAO_MAPEAMENTO',
          'ACEITE_REVISAO',
-         'DEVOLUCAO_REVISAO'
+         'DEVOLUCAO_REVISAO',
+         'ACEITE_DIAGNOSTICO',
+         'DEVOLUCAO_DIAGNOSTICO'
             )),
     tipo               varchar(20)  not null check
         (
@@ -299,7 +301,8 @@ create table if not exists sgc.analise
             in
         (
          'CADASTRO',
-         'VALIDACAO'
+         'VALIDACAO',
+         'DIAGNOSTICO'
             )),
     unidade_codigo     bigint       not null,
     usuario_titulo     varchar(12)  not null,
