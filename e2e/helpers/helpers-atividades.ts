@@ -193,7 +193,7 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
     const modal = page.getByRole('dialog');
     const alert = page.getByTestId('app-alert');
 
-    await modal.waitFor({state: 'visible', timeout: 1000}).catch(() => {
+    await modal.waitFor({state: 'visible'}).catch(() => {
     });
 
     if (!(await modal.isVisible()) && await alert.isVisible()) {

@@ -1126,7 +1126,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
     test.describe('05 - Mapa de Competências', () => {
         test('Captura análise de cadastro antes do mapa', async ({page, request}) => {
-            test.setTimeout(30000);
             const descricao = `Proc mapa cadastro ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
             const codProcesso = await criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
@@ -1162,7 +1161,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura edição inicial do mapa de competências', async ({page, request}) => {
-            test.setTimeout(30000);
             const descricao = `Proc mapa ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
             const codProcesso = await criarProcessoMapeamentoComCadastroHomologadoPorFixture(
@@ -1198,7 +1196,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura criação e disponibilização do mapa de competências', async ({page, request}) => {
-            test.setTimeout(30000);
             const descricao = `Proc mapa criacao ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
             const codProcesso = await criarProcessoMapeamentoComCadastroHomologadoPorFixture(
@@ -1248,7 +1245,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura mapa disponibilizado e validação do chefe', async ({page, request}) => {
-            test.setTimeout(30000);
             const descricao = `Proc mapa disponibilizado ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
             const codProcesso = await criarProcessoMapeamentoComMapaDisponibilizadoPorFixture(

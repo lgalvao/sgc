@@ -129,7 +129,7 @@ export async function fazerLogout(page: Page): Promise<void> {
                 || mensagem.includes('timeout')
             ) {
                 await limparNotificacoes(page);
-                await botaoLogout.click({force: true, timeout: 2_000});
+                await botaoLogout.click({force: true});
             } else {
                 throw e;
             }

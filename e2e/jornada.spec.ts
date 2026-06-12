@@ -14,8 +14,6 @@ import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/h
 import {TEXTOS} from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
-    test.setTimeout(120_000);
-
     test.beforeAll(async ({request}) => {
         // Reset do banco de dados UMA VEZ para iniciar a jornada
         const response = await request.post('/e2e/reset-database');
