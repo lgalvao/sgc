@@ -50,7 +50,7 @@ export function useFluxoSubprocessoExecucao() {
                 }
 
                 if (typeof workflow.atualizarFluxoMapa === "number") {
-                    atualizarFluxoMapa(workflow.atualizarFluxoMapa);
+                    void atualizarFluxoMapa(workflow.atualizarFluxoMapa);
                 }
 
                 if (workflow.redirecionarParaPainel) {

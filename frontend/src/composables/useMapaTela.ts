@@ -126,7 +126,7 @@ export function useMapaTela(props: MapaTelaProps) {
         fecharModal();
         toastStore.setPending(mensagem);
         const codigoAtual = codigoSubprocesso.value;
-        atualizarFluxoMapa(codigoAtual === null ? undefined : codigoAtual);
+        void atualizarFluxoMapa(codigoAtual === null ? undefined : codigoAtual);
         await router.push({name: "Painel"});
     }
 

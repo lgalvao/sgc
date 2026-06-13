@@ -131,7 +131,7 @@ export function useCadastroOrquestracao(props: CadastroOrquestracaoProps, ativid
         carregarContextoInicial,
         processarRespostaLocal: (response: RespostaLocalCadastro) => {
             aplicarRespostaLocal(response);
-            atualizarFluxoCadastro(response.subprocesso.codigo);
+            void atualizarFluxoCadastro(response.subprocesso.codigo);
         },
         sincronizarEstadoInicialContexto: sincronizarEstadoInicial,
     };
