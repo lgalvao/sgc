@@ -138,6 +138,13 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{codSubprocesso}/diagnostico/concluir/validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CONCLUIR_DIAGNOSTICO')")
+    public ResponseEntity<Void> validarConclusaoDiagnostico(@PathVariable Long codSubprocesso) {
+        fluxoService.validarConclusaoDiagnosticoUnidade(codSubprocesso);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{codSubprocesso}/diagnostico/validar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VALIDAR_DIAGNOSTICO')")
     public ResponseEntity<Void> validarDiagnostico(
@@ -145,6 +152,13 @@ public class DiagnosticoController {
             @RequestBody(required = false) ComumDtos.TextoOpcionalRequest request) {
         String observacoes = sanitizarTextoOpcional(request);
         fluxoService.validarDiagnostico(codSubprocesso, observacoes);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{codSubprocesso}/diagnostico/validar/validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VALIDAR_DIAGNOSTICO')")
+    public ResponseEntity<Void> validarAcaoValidarDiagnostico(@PathVariable Long codSubprocesso) {
+        fluxoService.validarAceiteDiagnostico(codSubprocesso);
         return ResponseEntity.ok().build();
     }
 
@@ -157,6 +171,13 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{codSubprocesso}/diagnostico/devolver/validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_DIAGNOSTICO')")
+    public ResponseEntity<Void> validarAcaoDevolverDiagnostico(@PathVariable Long codSubprocesso) {
+        fluxoService.validarDevolucaoDiagnostico(codSubprocesso);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{codSubprocesso}/diagnostico/homologar")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_DIAGNOSTICO')")
     public ResponseEntity<Void> homologarDiagnostico(
@@ -164,6 +185,13 @@ public class DiagnosticoController {
             @RequestBody(required = false) ComumDtos.TextoOpcionalRequest request) {
         String observacoes = sanitizarTextoOpcional(request);
         fluxoService.homologarDiagnostico(codSubprocesso, observacoes);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{codSubprocesso}/diagnostico/homologar/validacao")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_DIAGNOSTICO')")
+    public ResponseEntity<Void> validarAcaoHomologarDiagnostico(@PathVariable Long codSubprocesso) {
+        fluxoService.validarHomologacaoDiagnostico(codSubprocesso);
         return ResponseEntity.ok().build();
     }
 

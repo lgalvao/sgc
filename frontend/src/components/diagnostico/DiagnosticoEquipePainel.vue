@@ -298,9 +298,11 @@
   </div>
 </template>
 
+<!-- eslint-disable max-lines -->
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
+import {normalizarErro} from '@/utils/apiError/normalizer';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {
   BBadge,
@@ -319,7 +321,6 @@ import EmptyState from '@/components/comum/EmptyState.vue';
 import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {useToastStore} from '@/stores/toast';
-import {normalizarErro} from '@/utils/apiError/normalizer';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
@@ -338,7 +339,6 @@ const toastStore = useToastStore();
 const {
   podeCriarConsenso,
   podeConcluirDiagnostico,
-  habilitarConcluirDiagnostico,
   habilitarValidarDiagnostico,
   habilitarDevolverDiagnostico,
   habilitarHomologarDiagnostico,
@@ -352,9 +352,17 @@ const {
   impossibilitando,
   permitindo,
   erroConcluir,
+  erroValidacaoConcluir,
   erroValidar,
+  erroValidacaoValidar,
   erroDevolver,
+  erroValidacaoDevolver,
   erroHomologar,
+  erroValidacaoHomologar,
+  validarConclusaoDiagnostico,
+  validarAcaoValidarDiagnostico,
+  validarAcaoDevolverDiagnostico,
+  validarAcaoHomologarDiagnostico,
   concluirDiagnostico,
   validarDiagnostico,
   devolverDiagnostico,
@@ -453,25 +461,53 @@ async function confirmarImpossibilitar() {
   }
 }
 
-function abrirModalValidar() {
+async function abrirModalValidar() {
   observacoesValidar.value = '';
-  modalValidarAberto.value = true;
+  try {
+    await validarAcaoValidarDiagnostico();
+    modalValidarAberto.value = true;
+  } catch (erro) {
+    erroMensagem.value = normalizarErro(erro).mensagem
+      ?? erroValidacaoValidar.value?.message
+      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
 }
 
-function abrirModalConcluir() {
+async function abrirModalConcluir() {
   erroConcluirModal.value = '';
-  modalConcluirAberto.value = true;
+  try {
+    await validarConclusaoDiagnostico();
+    modalConcluirAberto.value = true;
+  } catch (erro) {
+    erroMensagem.value = normalizarErro(erro).mensagem
+      ?? erroValidacaoConcluir.value?.message
+      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
 }
 
-function abrirModalDevolver() {
+async function abrirModalDevolver() {
   justificativaDevolver.value = '';
   erroJustificativaDevolver.value = '';
-  modalDevolverAberto.value = true;
+  try {
+    await validarAcaoDevolverDiagnostico();
+    modalDevolverAberto.value = true;
+  } catch (erro) {
+    erroMensagem.value = normalizarErro(erro).mensagem
+      ?? erroValidacaoDevolver.value?.message
+      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
 }
 
-function abrirModalHomologar() {
+async function abrirModalHomologar() {
   observacoesHomologar.value = '';
-  modalHomologarAberto.value = true;
+  try {
+    await validarAcaoHomologarDiagnostico();
+    modalHomologarAberto.value = true;
+  } catch (erro) {
+    erroMensagem.value = normalizarErro(erro).mensagem
+      ?? erroValidacaoHomologar.value?.message
+      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
 }
 
 async function confirmarConcluir() {

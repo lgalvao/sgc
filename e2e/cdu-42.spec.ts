@@ -28,9 +28,16 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
         // CHEFE deve ver a grade de servidores (tabela)
         await expect(page.getByTestId('tbl-servidores-diagnostico')).toBeVisible();
         await expect(page.getByText(NOME_SERVIDOR_ASSESSORIA_12)).toBeVisible();
+        await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
 
         // CHEFE deve ver o dropdown de ações para os servidores da equipe
-        await expect(page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+        const dropdownAcoes = page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`);
+        await expect(dropdownAcoes).toBeVisible();
+        await dropdownAcoes.getByRole('button', {name: 'Ações'}).click();
+        await expect(page.getByTestId(`btn-manter-consenso-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+        await expect(page.getByTestId(`btn-manter-capacitacao-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+        await expect(page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+        await expect(page.getByTestId(`btn-permitir-avaliacao-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeDisabled();
 
         // CHEFE deve ver o botão para Concluir diagnóstico
         await expect(page.getByTestId('btn-concluir-diagnostico')).toBeVisible();
@@ -41,6 +48,7 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
 
         // SERVIDOR deve ver o card de Autoavaliação
         await expect(page.getByTestId('card-subprocesso-diagnostico')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-consenso')).toHaveClass(/card-disabled/);
 
         // SERVIDOR NÃO deve ver a grade de servidores (tabela) nem botão de Concluir diagnóstico
         await expect(page.getByTestId('tbl-servidores-diagnostico')).not.toBeVisible();

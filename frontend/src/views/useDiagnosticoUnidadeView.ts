@@ -1,6 +1,7 @@
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import type {ColorVariant} from 'bootstrap-vue-next';
+import {normalizarErro} from '@/utils/apiError/normalizer';
 import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
@@ -52,8 +53,14 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         devolvendo,
         homologando,
         erroValidar,
+        erroValidacaoValidar,
         erroDevolver,
+        erroValidacaoDevolver,
         erroHomologar,
+        erroValidacaoHomologar,
+        validarAcaoValidarDiagnostico,
+        validarAcaoDevolverDiagnostico,
+        validarAcaoHomologarDiagnostico,
         validarDiagnostico,
         devolverDiagnostico,
         homologarDiagnostico,
@@ -75,20 +82,35 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
     const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
 
-    function abrirModalValidar() {
+    async function abrirModalValidar() {
         observacoesValidar.value = '';
-        modalValidarAberto.value = true;
+        try {
+            await validarAcaoValidarDiagnostico();
+            modalValidarAberto.value = true;
+        } catch (erro) {
+            registrarErro(normalizarErro(erro).mensagem ?? erroValidacaoValidar.value?.message);
+        }
     }
 
-    function abrirModalDevolver() {
+    async function abrirModalDevolver() {
         justificativaDevolver.value = '';
         tentouDevolverSemJustificativa.value = false;
-        modalDevolverAberto.value = true;
+        try {
+            await validarAcaoDevolverDiagnostico();
+            modalDevolverAberto.value = true;
+        } catch (erro) {
+            registrarErro(normalizarErro(erro).mensagem ?? erroValidacaoDevolver.value?.message);
+        }
     }
 
-    function abrirModalHomologar() {
+    async function abrirModalHomologar() {
         observacoesHomologar.value = '';
-        modalHomologarAberto.value = true;
+        try {
+            await validarAcaoHomologarDiagnostico();
+            modalHomologarAberto.value = true;
+        } catch (erro) {
+            registrarErro(normalizarErro(erro).mensagem ?? erroValidacaoHomologar.value?.message);
+        }
     }
 
     function limparRetornoFluxo() {

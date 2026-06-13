@@ -12,6 +12,10 @@ const concluirDiagnosticoMock = vi.fn();
 const validarDiagnosticoMock = vi.fn();
 const devolverDiagnosticoMock = vi.fn();
 const homologarDiagnosticoMock = vi.fn();
+const validarConclusaoDiagnosticoMock = vi.fn();
+const validarAcaoValidarDiagnosticoMock = vi.fn();
+const validarAcaoDevolverDiagnosticoMock = vi.fn();
+const validarAcaoHomologarDiagnosticoMock = vi.fn();
 const impossibilitarAvaliacaoMock = vi.fn();
 const permitirAvaliacaoMock = vi.fn();
 
@@ -33,9 +37,13 @@ const servidores = ref<any[]>([
 ]);
 
 const erroConcluir = ref<Error | null>(null);
+const erroValidacaoConcluir = ref<Error | null>(null);
 const erroValidar = ref<Error | null>(null);
+const erroValidacaoValidar = ref<Error | null>(null);
 const erroDevolver = ref<Error | null>(null);
+const erroValidacaoDevolver = ref<Error | null>(null);
 const erroHomologar = ref<Error | null>(null);
+const erroValidacaoHomologar = ref<Error | null>(null);
 const TEXTO_DIAGNOSTICO_VALIDADO = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO;
 const TEXTO_DIAGNOSTICO_DEVOLVIDO = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO;
 const TEXTO_DIAGNOSTICO_HOMOLOGADO = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO;
@@ -87,15 +95,23 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
         homologando,
         impossibilitando,
         permitindo,
+        erroValidacaoConcluir,
         erroConcluir,
+        erroValidacaoValidar,
         erroValidar,
+        erroValidacaoDevolver,
         erroDevolver,
+        erroValidacaoHomologar,
         erroHomologar,
         erroImpossibilitar: ref(null),
         erroPermitir: ref(null),
+        validarConclusaoDiagnostico: validarConclusaoDiagnosticoMock,
         concluirDiagnostico: concluirDiagnosticoMock,
+        validarAcaoValidarDiagnostico: validarAcaoValidarDiagnosticoMock,
         validarDiagnostico: validarDiagnosticoMock,
+        validarAcaoDevolverDiagnostico: validarAcaoDevolverDiagnosticoMock,
         devolverDiagnostico: devolverDiagnosticoMock,
+        validarAcaoHomologarDiagnostico: validarAcaoHomologarDiagnosticoMock,
         homologarDiagnostico: homologarDiagnosticoMock,
         impossibilitarAvaliacao: impossibilitarAvaliacaoMock,
         permitirAvaliacao: permitirAvaliacaoMock,
@@ -112,11 +128,19 @@ describe('DiagnosticoEquipePainel', () => {
         homologando.value = false;
         impossibilitando.value = false;
         permitindo.value = false;
+        erroValidacaoConcluir.value = null;
         podeCriarConsenso.value = true;
         habilitarConcluirDiagnostico.value = true;
         habilitarValidarDiagnostico.value = false;
         habilitarDevolverDiagnostico.value = false;
         habilitarHomologarDiagnostico.value = false;
+        erroValidacaoValidar.value = null;
+        erroValidacaoDevolver.value = null;
+        erroValidacaoHomologar.value = null;
+        validarConclusaoDiagnosticoMock.mockResolvedValue(undefined);
+        validarAcaoValidarDiagnosticoMock.mockResolvedValue(undefined);
+        validarAcaoDevolverDiagnosticoMock.mockResolvedValue(undefined);
+        validarAcaoHomologarDiagnosticoMock.mockResolvedValue(undefined);
         servidores.value = [
             {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
             {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
@@ -242,6 +266,7 @@ describe('DiagnosticoEquipePainel', () => {
         const wrapper = montar();
 
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
+        expect(validarConclusaoDiagnosticoMock).toHaveBeenCalled();
         await wrapper.get('[data-testid="btn-confirmar-concluir-diagnostico"]').trigger('click');
 
         expect(concluirDiagnosticoMock).toHaveBeenCalled();
@@ -249,7 +274,7 @@ describe('DiagnosticoEquipePainel', () => {
     });
 
     it('exibe erro retornado ao falhar conclusão', async () => {
-        concluirDiagnosticoMock.mockRejectedValue(new AxiosError(
+        validarConclusaoDiagnosticoMock.mockRejectedValue(new AxiosError(
             'Request failed with status code 422',
             'ERR_BAD_REQUEST',
             undefined,
@@ -265,7 +290,6 @@ describe('DiagnosticoEquipePainel', () => {
 
         const wrapper = montar();
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-concluir-diagnostico"]').trigger('click');
 
         expect(wrapper.text()).toContain('Ainda existem avaliações ou ocupações críticas pendentes.');
     });
@@ -282,12 +306,14 @@ describe('DiagnosticoEquipePainel', () => {
         const wrapper = montar();
 
         await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
+        expect(validarAcaoValidarDiagnosticoMock).toHaveBeenCalled();
         await wrapper.get('textarea').setValue('Observações');
         await wrapper.get('[data-testid="btn-confirmar-validar"]').trigger('click');
         expect(validarDiagnosticoMock).toHaveBeenCalledWith('Observações');
         expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_VALIDADO);
 
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
+        expect(validarAcaoDevolverDiagnosticoMock).toHaveBeenCalled();
         await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
         expect(wrapper.text()).toContain('A justificativa é obrigatória.');
 
@@ -297,6 +323,7 @@ describe('DiagnosticoEquipePainel', () => {
         expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
 
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
+        expect(validarAcaoHomologarDiagnosticoMock).toHaveBeenCalled();
         await wrapper.get('textarea').setValue('Homologado');
         await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
         expect(homologarDiagnosticoMock).toHaveBeenCalledWith('Homologado');
@@ -317,9 +344,9 @@ describe('DiagnosticoEquipePainel', () => {
         habilitarHomologarDiagnostico.value = true;
 
         impossibilitarAvaliacaoMock.mockRejectedValue(new Error('Erro de rede'));
-        validarDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
-        devolverDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
-        homologarDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
+        validarAcaoValidarDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
+        validarAcaoDevolverDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
+        validarAcaoHomologarDiagnosticoMock.mockRejectedValue(new Error('Erro de rede'));
 
         const wrapper = montar();
 
@@ -331,18 +358,15 @@ describe('DiagnosticoEquipePainel', () => {
 
         // 2. Falha ao validar
         await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-validar"]').trigger('click');
-        expect(wrapper.text()).toContain('Não foi possível salvar.');
+        expect(wrapper.text()).toContain('Erro de rede');
 
         // 3. Falha ao devolver
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
-        await wrapper.get('textarea').setValue('Justificativa');
-        await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
-        expect(wrapper.text()).toContain('Não foi possível salvar.');
+        expect(wrapper.text()).toContain('Erro de rede');
 
         // 4. Falha ao homologar
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
+        expect(wrapper.text()).toContain('Erro de rede');
     });
 
     it('deve exercitar fallbacks de erro sem mensagem e argumentos opcionais nos modais de fluxo', async () => {
@@ -350,27 +374,22 @@ describe('DiagnosticoEquipePainel', () => {
         habilitarValidarDiagnostico.value = true;
         habilitarHomologarDiagnostico.value = true;
 
-        concluirDiagnosticoMock.mockRejectedValue({});
-        validarDiagnosticoMock.mockRejectedValue({});
-        homologarDiagnosticoMock.mockRejectedValue({});
+        validarConclusaoDiagnosticoMock.mockRejectedValue({});
+        validarAcaoValidarDiagnosticoMock.mockRejectedValue({});
+        validarAcaoHomologarDiagnosticoMock.mockRejectedValue({});
 
         const wrapper = montar();
 
         // 1. Concluir sem mensagem de erro
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-concluir-diagnostico"]').trigger('click');
         expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
 
         // 2. Validar com observacoes vazias e erro sem mensagem
         await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-validar"]').trigger('click');
-        expect(validarDiagnosticoMock).toHaveBeenCalledWith(undefined);
         expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
 
         // 3. Homologar com observações vazias e erro sem mensagem
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
-        expect(homologarDiagnosticoMock).toHaveBeenCalledWith(undefined);
         expect(wrapper.text()).toContain('Não foi possível salvar. Tente novamente.');
     });
 

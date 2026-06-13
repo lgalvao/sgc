@@ -61,12 +61,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     const justificativaImpossibilidade = ref('');
     const tentouImpossibilitarSemJustificativa = ref(false);
 
-    function validarPreenchimento(): boolean {
-        return competenciasLocais.value.every(
-            (c) => c.importancia !== null && c.dominio !== null,
-        );
-    }
-
     function abrirModalConcluir() {
         limparRetornoFluxo();
         modalConcluirAberto.value = true;

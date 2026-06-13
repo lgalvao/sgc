@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoFixture} from './fixtures/index.js';
+import {criarProcessoDiagnosticoComConsensoCriadoFixture} from './fixtures/index.js';
 import {abrirAcaoCapacitacaoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 
@@ -15,11 +15,11 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
         request
     }) => {
         const descricao = `Diagnóstico CDU-48 ${Date.now()}`;
-        const processo = await criarProcessoFixture(request, {
+        const processo = await criarProcessoDiagnosticoComConsensoCriadoFixture(request, {
             descricao,
-            tipo: 'DIAGNOSTICO',
             unidade: UNIDADE,
-            iniciar: true
+            iniciar: true,
+            servidorTitulo: TITULO_SERVIDOR_ASSESSORIA_12
         });
 
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
@@ -28,6 +28,7 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
 
         await abrirAcaoCapacitacaoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/situacao-capacitacao`));
+        await expect(page.getByRole('heading', {name: /Situação de capacitação/i})).toBeVisible();
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
         const seletorCapacitacao = page.locator(`[data-testid^="situacao-${TITULO_SERVIDOR_ASSESSORIA_12}-"]`).first();

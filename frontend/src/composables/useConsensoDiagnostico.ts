@@ -7,7 +7,7 @@ import {
     obterConsensoServidor,
     salvarConsenso,
 } from '@/services/diagnosticoService';
-import type {AvaliacaoCompetencia, Consenso, ConsensoCompetenciaDetalhada} from '@/types/diagnostico-competencias';
+import type {Consenso, ConsensoCompetenciaDetalhada} from '@/types/diagnostico-competencias';
 import {
     chaveAutoavaliacao,
     chaveConsenso,

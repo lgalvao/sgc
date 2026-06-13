@@ -7,13 +7,13 @@ import {verificarToast} from './helpers/helpers-navegacao.js';
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
 const UNIDADE = 'ASSESSORIA_12';
 
-test.describe('CDU-45 - Aprovar avaliação de consenso', () => {
+test.describe('CDU-46 - Aprovar avaliação de consenso', () => {
     test('SERVIDOR aprova o consenso criado pela chefia', async ({
         _resetAutomatico,
         page,
         request
     }) => {
-        const descricao = `Diagnóstico CDU-45 ${Date.now()}`;
+        const descricao = `Diagnóstico CDU-46 ${Date.now()}`;
         const processo = await criarProcessoDiagnosticoComConsensoCriadoFixture(request, {
             descricao,
             unidade: UNIDADE,
@@ -29,6 +29,8 @@ test.describe('CDU-45 - Aprovar avaliação de consenso', () => {
         await expect(cardConsenso).not.toHaveClass(/card-disabled/);
         await cardConsenso.click();
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
+        await expect(page.locator('[data-testid^="consenso-chefia-importancia-"]')).toHaveCount(0);
+        await expect(page.locator('[data-testid^="consenso-final-importancia-"]')).toHaveCount(0);
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
 
@@ -40,6 +42,10 @@ test.describe('CDU-45 - Aprovar avaliação de consenso', () => {
 
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}`));
         await verificarToast(page, 'Avaliação de consenso aprovada');
+
+        await page.goto(`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`);
+        await expect(page.getByText('A avaliação de consenso deste servidor já foi aprovada. Apenas visualização.')).toBeVisible();
+        await expect(page.getByTestId('btn-aprovar-consenso')).toHaveCount(0);
 
         await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {

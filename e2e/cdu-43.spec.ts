@@ -62,11 +62,16 @@ test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GEST
 
         // Verifica a exibição da tela de análise do diagnóstico da unidade
         await expect(page.getByRole('heading', {name: TEXTOS.diagnostico.TITULO_UNIDADE})).toBeVisible();
+        await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
         
         // Deve mostrar a tabela de Servidores e Consenso
+        await expect(page.getByText('Servidores participantes', {exact: true})).toBeVisible();
         await expect(page.getByText('Servidores e Consenso')).toBeVisible();
         await expect(page.getByRole('listitem').filter({hasText: NOME_SERVIDOR_SECAO_111})).toBeVisible();
         await expect(page.getByRole('button', {name: new RegExp(`${NOME_SERVIDOR_SECAO_111}${TITULO_SERVIDOR_SECAO_111}`)})).toBeVisible();
+        await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
+        await expect(page.getByTestId('matriz-diagnostico-unidade')).toContainText(NOME_SERVIDOR_SECAO_111);
+        await expect(page.getByText('Histórico de Movimentações', {exact: true})).toBeVisible();
 
         // Testar o botão Voltar (especificamente o do painel de conteúdo principal)
         const botaoVoltar = page.getByTestId('main-content').getByRole('button', {name: TEXTOS.diagnostico.BTN_VOLTAR});

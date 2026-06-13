@@ -13,7 +13,7 @@ test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
         page,
         request
     }) => {
-        const descricao = `Diagnóstico CDU-46 ${Date.now()}`;
+        const descricao = `Diagnóstico CDU-47 ${Date.now()}`;
         const processo = await criarProcessoFixture(request, {
             descricao,
             tipo: 'DIAGNOSTICO',
@@ -47,5 +47,6 @@ test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
         await expect(page.getByTestId('app-alert')).toContainText('Impossibilidade registrada');
         await expect(page.getByText('Avaliação impossibilitada', {exact: true})).toBeVisible();
         await expect(page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeDisabled();
+        await expect(page.getByTestId(`btn-permitir-avaliacao-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeEnabled();
     });
 });

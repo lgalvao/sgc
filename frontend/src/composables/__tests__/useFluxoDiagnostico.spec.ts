@@ -52,9 +52,13 @@ vi.mock('@/stores/perfil', () => ({
 
 vi.mock('@/services/diagnosticoService', () => ({
     concluirDiagnostico: vi.fn(),
+    validarConclusaoDiagnostico: vi.fn(),
     validarDiagnostico: vi.fn(),
+    validarAcaoValidarDiagnostico: vi.fn(),
     devolverDiagnostico: vi.fn(),
+    validarAcaoDevolverDiagnostico: vi.fn(),
     homologarDiagnostico: vi.fn(),
+    validarAcaoHomologarDiagnostico: vi.fn(),
     impossibilitarAvaliacao: vi.fn(),
 }));
 
@@ -85,17 +89,26 @@ describe('useFluxoDiagnostico', () => {
     });
 
     it('deve enviar payload correto ao validar, devolver e homologar', async () => {
+        vi.mocked(diagnosticoService.validarAcaoValidarDiagnostico).mockResolvedValue();
         vi.mocked(diagnosticoService.validarDiagnostico).mockResolvedValue();
+        vi.mocked(diagnosticoService.validarAcaoDevolverDiagnostico).mockResolvedValue();
         vi.mocked(diagnosticoService.devolverDiagnostico).mockResolvedValue();
+        vi.mocked(diagnosticoService.validarAcaoHomologarDiagnostico).mockResolvedValue();
         vi.mocked(diagnosticoService.homologarDiagnostico).mockResolvedValue();
         const composable = useFluxoDiagnostico(42);
 
+        await composable.validarAcaoValidarDiagnostico();
         await composable.validarDiagnostico('Observação');
+        await composable.validarAcaoDevolverDiagnostico();
         await composable.devolverDiagnostico('Justificativa');
+        await composable.validarAcaoHomologarDiagnostico();
         await composable.homologarDiagnostico('Homologado');
 
+        expect(diagnosticoService.validarAcaoValidarDiagnostico).toHaveBeenCalledWith(42);
         expect(diagnosticoService.validarDiagnostico).toHaveBeenCalledWith(42, {texto: 'Observação'});
+        expect(diagnosticoService.validarAcaoDevolverDiagnostico).toHaveBeenCalledWith(42);
         expect(diagnosticoService.devolverDiagnostico).toHaveBeenCalledWith(42, {justificativa: 'Justificativa'});
+        expect(diagnosticoService.validarAcaoHomologarDiagnostico).toHaveBeenCalledWith(42);
         expect(diagnosticoService.homologarDiagnostico).toHaveBeenCalledWith(42, {texto: 'Homologado'});
     });
 
@@ -137,9 +150,13 @@ describe('useFluxoDiagnostico', () => {
         expect(composable.homologando.value).toBe(false);
         expect(composable.impossibilitando.value).toBe(false);
         expect(composable.erroConcluir.value).toBeNull();
+        expect(composable.erroValidacaoConcluir.value).toBeNull();
         expect(composable.erroValidar.value).toBeNull();
+        expect(composable.erroValidacaoValidar.value).toBeNull();
         expect(composable.erroDevolver.value).toBeNull();
+        expect(composable.erroValidacaoDevolver.value).toBeNull();
         expect(composable.erroHomologar.value).toBeNull();
+        expect(composable.erroValidacaoHomologar.value).toBeNull();
         expect(composable.erroImpossibilitar.value).toBeNull();
     });
 });

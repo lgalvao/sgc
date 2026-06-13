@@ -31,6 +31,8 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
         await page.getByTestId('card-subprocesso-diagnostico').click();
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/autoavaliacao`));
         await expect(page.getByRole('heading', {name: TEXTOS.diagnostico.TITULO_AUTOAVALIACAO})).toBeVisible();
+        await page.getByTestId(/^toggle-atividades-/).first().click();
+        await expect(page.getByText(/Conhecimento/i).first()).toBeVisible();
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
 
@@ -79,7 +81,14 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}`));
         await verificarToast(page, TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
 
-        // 5. Verificar e-mail/notificação no admin
+        // 5. Ao reabrir a autoavaliação, os campos ficam somente leitura
+        await page.getByTestId('card-subprocesso-diagnostico').click();
+        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/autoavaliacao`));
+        await expect(page.locator('[data-testid^="autoavaliacao-importancia-"]')).toHaveCount(0);
+        await expect(page.locator('[data-testid^="autoavaliacao-dominio-"]')).toHaveCount(0);
+        await expect(page.getByTestId('btn-concluir-autoavaliacao')).toBeDisabled();
+
+        // 6. Verificar e-mail/notificação no admin
         await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {
             destinatario: UNIDADE,

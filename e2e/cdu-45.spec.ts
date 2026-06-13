@@ -30,8 +30,13 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+        await expect(page.getByText(`Duff McKagan - ${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+        await expect(page.locator('[data-testid^="consenso-chefia-importancia-"]').first()).toBeVisible();
+        await expect(page.locator('[data-testid^="consenso-chefia-dominio-"]').first()).toBeVisible();
         const seletorConsensoImportancia = page.locator('[data-testid^="consenso-final-importancia-"]').first();
         await expect(seletorConsensoImportancia).toBeVisible();
+        await expect(page.locator('[data-testid^="consenso-final-dominio-"]').first()).toBeVisible();
+        await expect(page.getByTestId('btn-aprovar-consenso')).toHaveCount(0);
 
         await Promise.all([
             page.waitForResponse(res =>
@@ -58,5 +63,6 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         await abrirAcaoConsensoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
         await expect(seletorConsensoImportancia).toHaveValue(VALOR_CONSENSO_IMPORTANCIA);
+        await expect(page.locator('tbody tr').first().locator('span.valor-estatico').first()).toBeVisible();
     });
 });

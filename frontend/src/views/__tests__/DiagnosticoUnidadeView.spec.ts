@@ -8,6 +8,9 @@ const backMock = vi.fn();
 const validarDiagnosticoMock = vi.fn();
 const devolverDiagnosticoMock = vi.fn();
 const homologarDiagnosticoMock = vi.fn();
+const validarAcaoValidarDiagnosticoMock = vi.fn();
+const validarAcaoDevolverDiagnosticoMock = vi.fn();
+const validarAcaoHomologarDiagnosticoMock = vi.fn();
 const COD_SUBPROCESSO = 400;
 const SIGLA_UNIDADE = 'ASSESSORIA_12';
 const NOME_UNIDADE = 'Assessoria 12';
@@ -20,6 +23,9 @@ const situacaoDiagnostico = ref<'EM_ANDAMENTO' | 'CONCLUIDO' | 'VALIDADO' | 'HOM
 const erroValidar = ref<Error | null>(null);
 const erroDevolver = ref<Error | null>(null);
 const erroHomologar = ref<Error | null>(null);
+const erroValidacaoValidar = ref<Error | null>(null);
+const erroValidacaoDevolver = ref<Error | null>(null);
+const erroValidacaoHomologar = ref<Error | null>(null);
 
 vi.mock('vue-router', () => ({
     useRouter: () => ({
@@ -84,9 +90,15 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
         validando: ref(false),
         devolvendo: ref(false),
         homologando: ref(false),
+        erroValidacaoValidar,
         erroValidar,
+        erroValidacaoDevolver,
         erroDevolver,
+        erroValidacaoHomologar,
         erroHomologar,
+        validarAcaoValidarDiagnostico: validarAcaoValidarDiagnosticoMock,
+        validarAcaoDevolverDiagnostico: validarAcaoDevolverDiagnosticoMock,
+        validarAcaoHomologarDiagnostico: validarAcaoHomologarDiagnosticoMock,
         validarDiagnostico: validarDiagnosticoMock,
         devolverDiagnostico: devolverDiagnosticoMock,
         homologarDiagnostico: homologarDiagnosticoMock,
@@ -109,6 +121,12 @@ describe('DiagnosticoUnidadeView', () => {
         erroValidar.value = null;
         erroDevolver.value = null;
         erroHomologar.value = null;
+        erroValidacaoValidar.value = null;
+        erroValidacaoDevolver.value = null;
+        erroValidacaoHomologar.value = null;
+        validarAcaoValidarDiagnosticoMock.mockResolvedValue(undefined);
+        validarAcaoDevolverDiagnosticoMock.mockResolvedValue(undefined);
+        validarAcaoHomologarDiagnosticoMock.mockResolvedValue(undefined);
         unidadeVal.value = {
             unidadeSigla: SIGLA_UNIDADE,
             unidadeNome: NOME_UNIDADE,
@@ -248,24 +266,21 @@ describe('DiagnosticoUnidadeView', () => {
     });
 
     it('exibe erro quando validar falha', async () => {
-        erroValidar.value = new Error('Falha ao validar');
-        validarDiagnosticoMock.mockRejectedValue(erroValidar.value);
+        erroValidacaoValidar.value = new Error('Falha ao validar');
+        validarAcaoValidarDiagnosticoMock.mockRejectedValue(erroValidacaoValidar.value);
 
         const wrapper = montar();
         await wrapper.get('[data-testid="btn-validar-diagnostico-unidade"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-validar-unidade"]').trigger('click');
 
         expect(wrapper.text()).toContain('Falha ao validar');
     });
 
     it('exibe erro quando devolver falha', async () => {
-        erroDevolver.value = new Error('Falha ao devolver');
-        devolverDiagnosticoMock.mockRejectedValue(erroDevolver.value);
+        erroValidacaoDevolver.value = new Error('Falha ao devolver');
+        validarAcaoDevolverDiagnosticoMock.mockRejectedValue(erroValidacaoDevolver.value);
 
         const wrapper = montar();
         await wrapper.get('[data-testid="btn-devolver-diagnostico-unidade"]').trigger('click');
-        await wrapper.get('textarea').setValue('Justificativa');
-        await wrapper.get('[data-testid="btn-confirmar-devolver-unidade"]').trigger('click');
 
         expect(wrapper.text()).toContain('Falha ao devolver');
     });
@@ -273,12 +288,11 @@ describe('DiagnosticoUnidadeView', () => {
     it('exibe erro quando homologar falha', async () => {
         perfilSelecionado.value = Perfil.ADMIN;
         situacaoDiagnostico.value = 'VALIDADO';
-        erroHomologar.value = new Error('Falha ao homologar');
-        homologarDiagnosticoMock.mockRejectedValue(erroHomologar.value);
+        erroValidacaoHomologar.value = new Error('Falha ao homologar');
+        validarAcaoHomologarDiagnosticoMock.mockRejectedValue(erroValidacaoHomologar.value);
 
         const wrapper = montar();
         await wrapper.get('[data-testid="btn-homologar-diagnostico-unidade"]').trigger('click');
-        await wrapper.get('[data-testid="btn-confirmar-homologar-unidade"]').trigger('click');
 
         expect(wrapper.text()).toContain('Falha ao homologar');
     });

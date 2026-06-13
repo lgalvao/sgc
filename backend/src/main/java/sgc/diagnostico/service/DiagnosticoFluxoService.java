@@ -171,6 +171,13 @@ public class DiagnosticoFluxoService {
         }
     }
 
+    public void validarConclusaoDiagnosticoUnidade(Long codSubprocesso) {
+        Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
+        validacaoService.validarConclusaoUnidade(diagnostico.getCodigo());
+        var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
+        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+    }
+
     public void devolverDiagnostico(Long codSubprocesso, @Nullable String observacao) {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
@@ -211,6 +218,18 @@ public class DiagnosticoFluxoService {
         notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, observacao);
     }
 
+    public void validarDevolucaoDiagnostico(Long codSubprocesso) {
+        var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
+        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+
+        Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
+        obterUnidadeDevolucao(subprocesso, unidadeAnalise)
+                .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
+                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
+                                .formatted(subprocesso.getCodigo(), unidadeAnalise.getCodigo())
+                ));
+    }
+
     public void validarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
@@ -240,6 +259,11 @@ public class DiagnosticoFluxoService {
         notificacaoService.notificarDiagnosticoAceito(subprocesso, unidadeAnalise, unidadeSuperior);
     }
 
+    public void validarAceiteDiagnostico(Long codSubprocesso) {
+        var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
+        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+    }
+
     public void homologarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
@@ -260,6 +284,12 @@ public class DiagnosticoFluxoService {
                 .build());
 
         notificacaoService.notificarDiagnosticoHomologado(subprocesso);
+    }
+
+    public void validarHomologacaoDiagnostico(Long codSubprocesso) {
+        var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
+        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        validacaoService.validarDiagnosticoHomologavel(codSubprocesso);
     }
 
     private Optional<Unidade> obterUnidadeDevolucao(sgc.subprocesso.model.Subprocesso subprocesso, Unidade unidadeAnalise) {

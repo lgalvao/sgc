@@ -31,7 +31,7 @@ public class Analise extends EntidadeBase {
     private Subprocesso subprocesso;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "acao", length = 20, nullable = false)
+    @Column(name = "acao", length = 25, nullable = false)
     private TipoAcaoAnalise acao;
 
     @Column(name = "data_hora", nullable = false)

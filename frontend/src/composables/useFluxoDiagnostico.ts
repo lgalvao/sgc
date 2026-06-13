@@ -7,6 +7,10 @@ import {
     homologarDiagnostico,
     impossibilitarAvaliacao,
     permitirAvaliacao,
+    validarAcaoDevolverDiagnostico,
+    validarAcaoHomologarDiagnostico,
+    validarAcaoValidarDiagnostico,
+    validarConclusaoDiagnostico,
     validarDiagnostico,
 } from '@/services/diagnosticoService';
 import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
@@ -31,12 +35,20 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         },
     });
 
+    const mutacaoValidacaoConcluir = useMutation({
+        mutation: () => validarConclusaoDiagnostico(codSubprocesso),
+    });
+
     const mutacaoValidar = useMutation({
         mutation: (observacoes?: string) =>
             validarDiagnostico(codSubprocesso, observacoes ? {texto: observacoes} : undefined),
         onSuccess: () => {
             invalidarTudo();
         },
+    });
+
+    const mutacaoValidacaoValidar = useMutation({
+        mutation: () => validarAcaoValidarDiagnostico(codSubprocesso),
     });
 
     const mutacaoDevolver = useMutation({
@@ -47,12 +59,20 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         },
     });
 
+    const mutacaoValidacaoDevolver = useMutation({
+        mutation: () => validarAcaoDevolverDiagnostico(codSubprocesso),
+    });
+
     const mutacaoHomologar = useMutation({
         mutation: (observacoes?: string) =>
             homologarDiagnostico(codSubprocesso, observacoes ? {texto: observacoes} : undefined),
         onSuccess: () => {
             invalidarTudo();
         },
+    });
+
+    const mutacaoValidacaoHomologar = useMutation({
+        mutation: () => validarAcaoHomologarDiagnostico(codSubprocesso),
     });
 
     const mutacaoImpossibilitar = useMutation({
@@ -89,14 +109,22 @@ export function useFluxoDiagnostico(codSubprocesso: number) {
         impossibilitando: computed(() => mutacaoImpossibilitar.isLoading.value),
         permitindo: computed(() => mutacaoPermitirAvaliacao.isLoading.value),
         erroConcluir: computed(() => mutacaoConcluir.error.value),
+        erroValidacaoConcluir: computed(() => mutacaoValidacaoConcluir.error.value),
         erroValidar: computed(() => mutacaoValidar.error.value),
+        erroValidacaoValidar: computed(() => mutacaoValidacaoValidar.error.value),
         erroDevolver: computed(() => mutacaoDevolver.error.value),
+        erroValidacaoDevolver: computed(() => mutacaoValidacaoDevolver.error.value),
         erroHomologar: computed(() => mutacaoHomologar.error.value),
+        erroValidacaoHomologar: computed(() => mutacaoValidacaoHomologar.error.value),
         erroImpossibilitar: computed(() => mutacaoImpossibilitar.error.value),
         erroPermitir: computed(() => mutacaoPermitirAvaliacao.error.value),
+        validarConclusaoDiagnostico: () => mutacaoValidacaoConcluir.mutateAsync(),
         concluirDiagnostico: () => mutacaoConcluir.mutateAsync(),
+        validarAcaoValidarDiagnostico: () => mutacaoValidacaoValidar.mutateAsync(),
         validarDiagnostico: (observacoes?: string) => mutacaoValidar.mutateAsync(observacoes),
+        validarAcaoDevolverDiagnostico: () => mutacaoValidacaoDevolver.mutateAsync(),
         devolverDiagnostico: (justificativa: string) => mutacaoDevolver.mutateAsync(justificativa),
+        validarAcaoHomologarDiagnostico: () => mutacaoValidacaoHomologar.mutateAsync(),
         homologarDiagnostico: (observacoes?: string) => mutacaoHomologar.mutateAsync(observacoes),
         impossibilitarAvaliacao: (servidorTitulo: string, justificativa: string) =>
             mutacaoImpossibilitar.mutateAsync({servidorTitulo, justificativa}),

@@ -40,8 +40,10 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
         await navegarParaDiagnosticoUnidade(page, 'ASSESSORIA_12');
         await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
         await expect(page.getByText('ASSESSORIA_12', {exact: true})).toBeVisible();
+        await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
         await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
         await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
+        await expect(page.getByText('Histórico de Movimentações', {exact: true})).toBeVisible();
         await expect(page.getByRole('listitem').filter({hasText: 'Duff McKagan'})).toBeVisible();
         await expect(page.getByRole('button', {name: /Duff McKagan242426/i})).toBeVisible();
 

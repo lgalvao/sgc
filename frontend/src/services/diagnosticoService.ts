@@ -108,12 +108,22 @@ export async function concluirDiagnostico(codSubprocesso: number): Promise<void>
     return apiPost(caminhoDiagnostico(codSubprocesso, '/concluir'));
 }
 
+/** GET /subprocessos/{id}/diagnostico/concluir/validacao */
+export async function validarConclusaoDiagnostico(codSubprocesso: number): Promise<void> {
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/concluir/validacao'));
+}
+
 /** POST /subprocessos/{id}/diagnostico/validar */
 export async function validarDiagnostico(
     codSubprocesso: number,
     request?: TextoOpcionalRequest,
 ): Promise<void> {
     return apiPost(caminhoDiagnostico(codSubprocesso, '/validar'), request);
+}
+
+/** GET /subprocessos/{id}/diagnostico/validar/validacao */
+export async function validarAcaoValidarDiagnostico(codSubprocesso: number): Promise<void> {
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/validar/validacao'));
 }
 
 /** POST /subprocessos/{id}/diagnostico/devolver */
@@ -124,10 +134,20 @@ export async function devolverDiagnostico(
     return apiPost(caminhoDiagnostico(codSubprocesso, '/devolver'), request);
 }
 
+/** GET /subprocessos/{id}/diagnostico/devolver/validacao */
+export async function validarAcaoDevolverDiagnostico(codSubprocesso: number): Promise<void> {
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/devolver/validacao'));
+}
+
 /** POST /subprocessos/{id}/diagnostico/homologar */
 export async function homologarDiagnostico(
     codSubprocesso: number,
     request?: TextoOpcionalRequest,
 ): Promise<void> {
     return apiPost(caminhoDiagnostico(codSubprocesso, '/homologar'), request);
+}
+
+/** GET /subprocessos/{id}/diagnostico/homologar/validacao */
+export async function validarAcaoHomologarDiagnostico(codSubprocesso: number): Promise<void> {
+    return apiGet(caminhoDiagnostico(codSubprocesso, '/homologar/validacao'));
 }
