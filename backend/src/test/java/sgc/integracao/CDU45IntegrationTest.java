@@ -62,7 +62,8 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                         subprocesso.getCodigo(), "50003"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.situacaoServidor").value("CONSENSO_CRIADO"))
-                .andExpect(jsonPath("$.competencias.length()").value(2));
+                .andExpect(jsonPath("$.competencias.length()").value(2))
+                .andExpect(jsonPath("$.competencias[0].competenciaDescricao").isNotEmpty());
 
         List<AvaliacaoServidor> avaliacoes = buscarAvaliacoes("50003");
         assertThat(avaliacoes).allSatisfy(avaliacao -> {

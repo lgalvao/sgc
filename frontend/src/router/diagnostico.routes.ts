@@ -22,16 +22,6 @@ const diagnosticoRoutes: RouteRecordRaw[] = [
         meta: {title: 'Situação de Capacitação - Diagnóstico'},
     },
     {
-        path: '/diagnostico/:codSubprocesso/:siglaUnidade/monitoramento',
-        name: 'MonitoramentoDiagnostico',
-        component: () => import('@/views/MonitoramentoDiagnosticoView.vue'),
-        props: (route: RouteLocationNormalized) => ({
-            codSubprocesso: Number(route.params.codSubprocesso),
-            siglaUnidade: String(route.params.siglaUnidade),
-        }),
-        meta: {title: 'Monitoramento - Diagnóstico'},
-    },
-    {
         path: '/diagnostico/:codSubprocesso/:siglaUnidade/consenso/:servidorTitulo',
         name: 'ConsensoDiagnostico',
         component: () => import('@/views/ConsensoDiagnosticoView.vue'),

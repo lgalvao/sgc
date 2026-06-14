@@ -21,6 +21,7 @@ Ator: SERVIDOR ou CHEFE
 - controle de `Ações` para cada servidor, que dá acesso às ações:
     - `Avaliação de consenso`, com a descrição "Manter avaliações de consenso das competências'
     - `Impossibilidade`, habilitado quando a situação individual não for 'Avaliação impossibilitada';
+    - `Permitir avaliação`, habilitado quando a situação individual for 'Avaliação impossibilitada';
 - card `Situação de capacitação`, sempre habilitado;
 - botão `Concluir diagnóstico`;
 - seção de movimentações do subprocesso (como em [CDU-07 seção 2.3](cdu-07.md);

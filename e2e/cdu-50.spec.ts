@@ -24,11 +24,10 @@ const UNIDADE_GESTOR = 'SECRETARIA_1';
 const UNIDADE_SUBORDINADA = 'ASSESSORIA_12';
 const UNIDADE_FORA_HIERARQUIA = 'SECAO_211';
 const TITULO_CHEFE = '151515';
-const NOME_CHEFE = 'Axl Rose';
+const NOME_CHEFE = 'Ana Beatriz de Albuquerque e Souza';
 const TITULO_SERVIDOR = '242426';
-const NOME_SERVIDOR = 'Duff McKagan';
-const TITULO_SERVIDOR_IMPOSSIBILITADO = '242427';
-const NOME_SERVIDOR_IMPOSSIBILITADO = 'Izzy Stradlin';
+const NOME_SERVIDOR = 'João Guilherme de Albuquerque Maranhão';
+const NOME_SERVIDOR_IMPOSSIBILITADO = 'Maria Eduarda Cavalcanti de Alencar';
 const TEXTO_BOTAO_ACOES = 'Ações';
 const TEXTO_ACEITE = 'Aceite registrado';
 const TEXTO_DEVOLUCAO = 'Devolução realizada';
@@ -152,23 +151,28 @@ async function abrirAcoesAnaliseUnidade(page: Page): Promise<void> {
 }
 
 async function verificarTelaAnaliseDiagnostico(page: Page): Promise<void> {
-    await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
+    await expect(page.getByTestId('diagnostico-unidade-titulo')).toHaveText(UNIDADE_SUBORDINADA);
     await expect(page.getByText(UNIDADE_SUBORDINADA, {exact: true})).toBeVisible();
     await expect(page.getByTestId('btn-historico-analise-unidade')).toBeEnabled();
+    await expect(page.getByText('Processo:', {exact: true})).toBeVisible();
+    await expect(page.getByText('Subprocesso:', {exact: true})).toBeVisible();
+    await expect(page.getByText('Situação:', {exact: true})).toBeVisible();
     await expect(page.getByText('Servidores participantes', {exact: true})).toBeVisible();
-    await expect(page.getByRole('listitem').filter({hasText: NOME_SERVIDOR})).toBeVisible();
-    await expect(page.getByRole('listitem').filter({hasText: NOME_SERVIDOR_IMPOSSIBILITADO})).toBeVisible();
-    await expect(page.getByRole('listitem').filter({hasText: NOME_CHEFE})).toHaveCount(0);
-    await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
-    await expect(page.getByTestId('matriz-diagnostico-unidade')).toContainText(NOME_SERVIDOR);
-    await expect(page.getByTestId('matriz-diagnostico-unidade')).toContainText(NOME_SERVIDOR_IMPOSSIBILITADO);
-    await expect(page.getByTestId('matriz-diagnostico-unidade')).toContainText('I');
-    await expect(page.getByTestId('matriz-diagnostico-unidade')).toContainText('D');
-    await expect(page.getByTestId('matriz-diagnostico-unidade')).toContainText('C');
-    await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
-    await expect(page.getByRole('button', {name: new RegExp(`${NOME_SERVIDOR}${TITULO_SERVIDOR}`)})).toBeVisible();
-    await expect(page.getByRole('button', {name: new RegExp(`${NOME_SERVIDOR_IMPOSSIBILITADO}${TITULO_SERVIDOR_IMPOSSIBILITADO}`)})).toBeVisible();
-    await expect(page.getByText('Histórico de Movimentações', {exact: true})).toBeVisible();
+    await expect(page.getByRole('cell', {name: NOME_SERVIDOR, exact: true}).first()).toBeVisible();
+    await expect(page.getByRole('cell', {name: NOME_SERVIDOR_IMPOSSIBILITADO, exact: true}).first()).toBeVisible();
+    await expect(page.getByText(NOME_CHEFE, {exact: true})).toHaveCount(0);
+    await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
+    const seletorServidor = page.getByTestId('select-servidor-diagnostico-unidade');
+    await expect(seletorServidor).toBeVisible();
+    await expect(seletorServidor).toContainText(NOME_SERVIDOR);
+    await expect(seletorServidor).toContainText(NOME_SERVIDOR_IMPOSSIBILITADO);
+    await seletorServidor.selectOption(TITULO_SERVIDOR);
+    await expect(page.getByTestId('detalhes-servidor-diagnostico-unidade')).toContainText(NOME_SERVIDOR);
+    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toBeVisible();
+    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toContainText('Importância');
+    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toContainText('Domínio');
+    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toContainText('Situação de Capacitação');
+    await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
 }
 
 test.describe.serial('CDU-50 - Analisar diagnóstico', () => {

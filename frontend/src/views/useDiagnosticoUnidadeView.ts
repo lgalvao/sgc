@@ -1,15 +1,17 @@
-import {computed, ref} from 'vue';
-import {useRouter} from 'vue-router';
+import {computed, ref, watch} from 'vue';
 import type {ColorVariant} from 'bootstrap-vue-next';
 import {normalizarErro} from '@/utils/apiError/normalizer';
-import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
+import {useDiagnosticoUnidade} from '@/composables/useDiagnosticoUnidade';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {listarAnalisesDiagnostico} from '@/services/analiseService';
 import {TEXTOS} from '@/constants/textos';
-import type {Analise} from '@/types/tipos';
-import type {AvaliacaoCompetencia, SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
+import type {Analise, Movimentacao} from '@/types/tipos';
+import type {
+    SituacaoAvaliacaoServidor,
+    ValorSituacaoCapacitacao,
+} from '@/types/diagnostico-competencias';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
 
@@ -18,19 +20,15 @@ interface DiagnosticoUnidadeViewProps {
     siglaUnidade: string;
 }
 
-interface MatrizCompetenciaServidor {
+interface CompetenciaServidorSelecionado {
     competenciaCodigo: number;
     competenciaDescricao: string;
-    avaliacoesPorServidor: Array<{
-        servidorTitulo: string;
-        importancia: number | null;
-        dominio: number | null;
-        situacaoCapacitacao: ValorSituacaoCapacitacao | null;
-    }>;
+    importancia: number | null;
+    dominio: number | null;
+    situacaoCapacitacao: ValorSituacaoCapacitacao | null;
 }
 
 export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
-    const router = useRouter();
     const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
     const {
         habilitarValidarDiagnostico,
@@ -45,8 +43,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         movimentacoes,
         carregando,
         situacao,
-        totalPendentes,
-    } = useMonitoramentoDiagnostico(props.codSubprocesso);
+    } = useDiagnosticoUnidade(props.codSubprocesso);
 
     const {
         validando,
@@ -220,67 +217,11 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         }
     });
 
-    function varianteSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): ColorVariant {
-        const mapa: Record<SituacaoAvaliacaoServidor, ColorVariant> = {
-            CONSENSO_APROVADO: 'success',
-            AVALIACAO_IMPOSSIBILITADA: 'secondary',
-            CONSENSO_CRIADO: 'warning',
-            AUTOAVALIACAO_CONCLUIDA: 'info',
-            AUTOAVALIACAO_NAO_INICIADA: 'light',
-        };
-        return mapa[situacaoServidor];
-    }
-
-    function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): string {
-        return {
-            AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
-            AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
-            CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
-            CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
-            AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
-        }[situacaoServidor];
-    }
-
-    function varianteCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): ColorVariant {
-        if (situacaoCapacitacao === null) return 'light';
-        const mapa: Record<ValorSituacaoCapacitacao, ColorVariant> = {NA: 'secondary', AC: 'danger', EC: 'warning', C: 'success', I: 'primary'};
-        return mapa[situacaoCapacitacao];
-    }
-
-    function formatarCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
-        if (situacaoCapacitacao === null) return '-';
-        return {
-            NA: TEXTOS.diagnostico.CAPACITACAO_NA,
-            AC: TEXTOS.diagnostico.CAPACITACAO_AC,
-            EC: TEXTOS.diagnostico.CAPACITACAO_EC,
-            C: TEXTOS.diagnostico.CAPACITACAO_C,
-            I: TEXTOS.diagnostico.CAPACITACAO_I,
-        }[situacaoCapacitacao];
-    }
-
     function formatarNota(valor: number | null): string {
         if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
         if (valor === 0) return TEXTOS.diagnostico.NOTA_NA;
         return String(valor);
     }
-
-    function calcularGap(item: AvaliacaoCompetencia): number | null {
-        if (item.importancia === null || item.dominio === null || item.importancia === 0 || item.dominio === 0) return null;
-        return item.importancia - item.dominio;
-    }
-
-    function obterGapInfo(item: AvaliacaoCompetencia): {texto: string; variante: string} | null {
-        const gap = calcularGap(item);
-        if (gap === null) return null;
-        return {
-            texto: gap > 0 ? `+${gap}` : String(gap),
-            variante: gap > 0 ? 'text-danger fw-bold' : 'text-success',
-        };
-    }
-
-    const mapaDescricaoCompetencia = computed(() =>
-        Object.fromEntries((contexto.value?.competencias ?? []).map((competencia) => [competencia.competenciaCodigo, competencia.descricao])),
-    );
 
     const servidoresExibidos = computed(() => {
         const responsavelTitulo = unidade.value?.responsavelTitulo;
@@ -289,6 +230,24 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         }
         return servidores.value.filter((item) => item.servidorTitulo !== responsavelTitulo);
     });
+
+    const servidorSelecionadoTitulo = ref<string>('');
+
+    watch(servidoresExibidos, (novosServidores) => {
+        const servidorAtualAindaExiste = novosServidores.some(
+            (item) => item.servidorTitulo === servidorSelecionadoTitulo.value,
+        );
+        if (servidorAtualAindaExiste) {
+            return;
+        }
+        servidorSelecionadoTitulo.value = novosServidores[0]?.servidorTitulo ?? '';
+    }, {immediate: true});
+
+    const servidorSelecionado = computed(() =>
+        servidoresExibidos.value.find(
+            (item) => item.servidorTitulo === servidorSelecionadoTitulo.value,
+        ) ?? null,
+    );
 
     const mapaSituacaoCapacitacao = computed(() =>
         Object.fromEntries(
@@ -299,37 +258,21 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         ),
     );
 
-    function criarAvaliacaoMatriz(
-        competenciaCodigo: number,
-        servidorItem: typeof servidoresExibidos.value[number],
-    ) {
-        const avaliacao = servidorItem.consenso.find(
-            (item) => item.competenciaCodigo === competenciaCodigo,
-        );
-        return {
-            servidorTitulo: servidorItem.servidorTitulo,
-            importancia: avaliacao?.importancia ?? null,
-            dominio: avaliacao?.dominio ?? null,
-            situacaoCapacitacao: mapaSituacaoCapacitacao.value[
-                `${servidorItem.servidorTitulo}:${competenciaCodigo}`
-            ] ?? null,
-        };
-    }
-
-    const matrizCompetencias = computed<MatrizCompetenciaServidor[]>(() =>
+    const competenciasServidorSelecionado = computed<CompetenciaServidorSelecionado[]>(() =>
         (contexto.value?.competencias ?? []).map((competencia) => ({
             competenciaCodigo: competencia.competenciaCodigo,
             competenciaDescricao: competencia.descricao,
-            avaliacoesPorServidor: servidoresExibidos.value.map((servidorItem) =>
-                criarAvaliacaoMatriz(competencia.competenciaCodigo, servidorItem),
-            ),
-        })),
-    );
-
-    const situacoesComDescricao = computed(() =>
-        situacoesCapacitacao.value.map((situacaoItem) => ({
-            ...situacaoItem,
-            nomeCompetencia: mapaDescricaoCompetencia.value[situacaoItem.competenciaCodigo] ?? `Competência ${situacaoItem.competenciaCodigo}`,
+            importancia: servidorSelecionado.value?.consenso.find(
+                (item) => item.competenciaCodigo === competencia.competenciaCodigo,
+            )?.importancia ?? null,
+            dominio: servidorSelecionado.value?.consenso.find(
+                (item) => item.competenciaCodigo === competencia.competenciaCodigo,
+            )?.dominio ?? null,
+            situacaoCapacitacao: servidorSelecionado.value
+                ? mapaSituacaoCapacitacao.value[
+                    `${servidorSelecionado.value.servidorTitulo}:${competencia.competenciaCodigo}`
+                ] ?? null
+                : null,
         })),
     );
 
@@ -337,28 +280,71 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         return situacaoCapacitacao ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
     }
 
-    const colunasCompetencias = [
-        {key: 'competenciaCodigo', label: 'Código'},
-        {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
-        {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
-        {key: 'gap', label: TEXTOS.diagnostico.COLUNA_GAP},
+    function formatarSituacaoCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
+        switch (situacaoCapacitacao) {
+            case 'NA': return TEXTOS.diagnostico.CAPACITACAO_NA;
+            case 'AC': return TEXTOS.diagnostico.CAPACITACAO_AC;
+            case 'EC': return TEXTOS.diagnostico.CAPACITACAO_EC;
+            case 'C': return TEXTOS.diagnostico.CAPACITACAO_C;
+            case 'I': return TEXTOS.diagnostico.CAPACITACAO_I;
+            default: return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+        }
+    }
+
+    function varianteSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): ColorVariant {
+        switch (situacaoServidor) {
+            case 'CONSENSO_APROVADO': return 'success';
+            case 'AVALIACAO_IMPOSSIBILITADA': return 'secondary';
+            case 'CONSENSO_CRIADO': return 'warning';
+            case 'AUTOAVALIACAO_CONCLUIDA': return 'info';
+            default: return 'light';
+        }
+    }
+
+    function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): string {
+        const mapa: Record<SituacaoAvaliacaoServidor, string> = {
+            AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
+            AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
+            CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
+            CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
+            AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
+        };
+        return mapa[situacaoServidor] ?? situacaoServidor;
+    }
+
+    const movimentacoesFormatadas = computed<Movimentacao[]>(() =>
+        movimentacoes.value.map((movimentacao, indice) => ({
+            codigo: indice + 1,
+            dataHora: movimentacao.dataHora,
+            unidadeOrigemCodigo: 0,
+            unidadeOrigemSigla: movimentacao.unidadeOrigem,
+            unidadeOrigemNome: movimentacao.unidadeOrigem,
+            unidadeDestinoCodigo: 0,
+            unidadeDestinoSigla: movimentacao.unidadeDestino,
+            unidadeDestinoNome: movimentacao.unidadeDestino,
+            usuarioTitulo: '',
+            usuarioNome: movimentacao.usuario ?? '',
+            descricao: movimentacao.descricao,
+        })),
+    );
+
+    const colunasServidoresParticipantes = [
+        {key: 'servidorNome', label: 'Servidor'},
+        {key: 'servidorTitulo', label: 'Título'},
     ];
 
-    const colunasSituacoes = [
-        {key: 'servidorTitulo', label: TEXTOS.diagnostico.COLUNA_SERVIDOR},
-        {key: 'nomeCompetencia', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
+    const colunasCompetenciasServidor = [
+        {key: 'competenciaDescricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
+        {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
+        {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
         {key: 'situacaoCapacitacao', label: TEXTOS.diagnostico.COLUNA_CAPACITACAO},
     ];
 
     return {
-        router,
+        contexto,
         unidade,
-        servidores,
-        situacoesCapacitacao,
-        movimentacoes,
         carregando,
         situacao,
-        totalPendentes,
         retornoFluxo,
         limparRetornoFluxo,
         modalHistoricoAberto,
@@ -386,16 +372,16 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         homologando,
         varianteSituacao,
         varianteSituacaoServidor,
-        formatarSituacaoServidor,
-        varianteCapacitacao,
-        formatarCapacitacao,
         formatarSituacaoCapacitacaoResumida,
+        formatarSituacaoCapacitacao,
+        formatarSituacaoServidor,
         formatarNota,
-        obterGapInfo,
         servidoresExibidos,
-        matrizCompetencias,
-        situacoesComDescricao,
-        colunasCompetencias,
-        colunasSituacoes,
+        servidorSelecionado,
+        servidorSelecionadoTitulo,
+        competenciasServidorSelecionado,
+        movimentacoesFormatadas,
+        colunasServidoresParticipantes,
+        colunasCompetenciasServidor,
     };
 }

@@ -25,12 +25,14 @@ export interface CompetenciaResumoDiag {
 /** Resultado por competência: código + notas de importância e domínio. */
 export interface AvaliacaoCompetencia {
     competenciaCodigo: number;
+    competenciaDescricao?: string | null;
     importancia: number | null;
     dominio: number | null;
 }
 
 export interface ConsensoCompetenciaDetalhada {
     competenciaCodigo: number;
+    competenciaDescricao?: string | null;
     autoimportancia: number | null;
     autodominio: number | null;
     chefiaImportancia: number | null;

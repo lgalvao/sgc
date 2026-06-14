@@ -29,20 +29,12 @@ Ator: GESTOR, ADMIN
     - `Registrar aceite`, apenas para GESTOR;
     - `Homologar`, apenas para ADMIN;
 - lista dos servidores participantes da unidade, *exceto o responsável pela unidade*;
-- grade `Competência x Servidor`, somente-leitura, contendo:
-    - uma linha para cada competência do mapa vigente da unidade;
-    - um grupo de três colunas para cada servidor participante da unidade, com valores para:
-        - `I` (Importância);
-        - `D` (Domínio);
-        - `C` (Situação de Capacitação).
-    - exemplo de grade (os nomes dos servidores devem ocupar células 'mescladas', acima das respectivas colunas I,D,C)
-
-  | Competência         | João |   |   | Maria |   |   |
-  | :------------------ | :--: |:-:|:-:| :---: |:-:|:-:|
-  |                     | **I** | **D** | **C** | **I** | **D** | **C** |
-  | Desc. competência 1 | 1    | 2 | EC | 4     | 3 | EC |
-  | Desc. competência 2 | NA   | NA | C | 5     | 4 | C |
-  | Desc. competência 3 | 3    | 5 | I  | 2     | 5 | I |
+- controle `Servidor analisado`, em formato *drop-down*, contendo os servidores participantes da unidade, exceto o
+  responsável pela unidade;
+- lista somente-leitura das competências do mapa vigente da unidade para o servidor selecionado, contendo:
+    - uma linha para cada competência;
+    - colunas `Importância`, `Domínio` e `Situação de Capacitação` referentes ao servidor selecionado;
+    - cabeçalho com nome completo, título e situação do servidor selecionado;
 
 - seção de movimentações do subprocesso;
 

@@ -30,7 +30,7 @@
       />
 
       <SubprocessoCards
-          v-if="codigoSubprocesso && (!ehDiagnostico || (subprocesso.permissoes?.podePreencherAutoavaliacao && !subprocesso.permissoes?.podeCriarConsenso))"
+          v-if="codigoSubprocesso"
           :cod-processo="props.codProcesso"
           :cod-subprocesso="codigoSubprocesso"
           :mapa="null"
@@ -40,7 +40,7 @@
           :tipo-processo="subprocesso.tipoProcesso || TipoProcesso.MAPEAMENTO"
       />
 
-      <DiagnosticoEquipePainel
+      <SubprocessoDiagnosticoPainel
           v-if="ehDiagnostico && codigoSubprocesso && !ehServidorPuro"
           :cod-subprocesso="codigoSubprocesso"
           :exibir-botao-voltar="false"
@@ -100,7 +100,7 @@
 <script lang="ts" setup>
 import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
-import DiagnosticoEquipePainel from "@/components/diagnostico/DiagnosticoEquipePainel.vue";
+import SubprocessoDiagnosticoPainel from "@/components/diagnostico/SubprocessoDiagnosticoPainel.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoFluxoModais from "@/components/processo/SubprocessoFluxoModais.vue";
 import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimentacoes.vue";

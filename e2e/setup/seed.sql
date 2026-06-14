@@ -167,7 +167,7 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('141414', 'CHEFE', 18);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('151515', '00151515', 'Axl Rose', 'axl.rose@tre-pe.jus.br', '2004', 4, 4);
+VALUES ('151515', '00151515', 'Ana Beatriz de Albuquerque e Souza', 'ana.beatriz.albuquerque@tre-pe.jus.br', '2004', 4, 4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('151515', 'CHEFE', 4);
 
@@ -214,18 +214,18 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('242424', 'SERVIDOR', 4);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('242425', '00242425', 'Slash', 'slash@tre-pe.jus.br', '2025', 4, 4);
+VALUES ('242425', '00242425', 'Luiz Fernando Cavalcanti de Moura', 'luiz.fernando.cavalcanti@tre-pe.jus.br', '2025', 4, 4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('242425', 'SERVIDOR', 4);
 
 -- Servidores adicionais para ASSESSORIA_12 (Unidade 4)
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('242426', '00242426', 'Duff McKagan', 'duff.mckagan@tre-pe.jus.br', '2026', 4, 4);
+VALUES ('242426', '00242426', 'João Guilherme de Albuquerque Maranhão', 'joao.guilherme.albuquerque@tre-pe.jus.br', '2026', 4, 4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('242426', 'SERVIDOR', 4);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('242427', '00242427', 'Izzy Stradlin', 'izzy.stradlin@tre-pe.jus.br', '2027', 4, 4);
+VALUES ('242427', '00242427', 'Maria Eduarda Cavalcanti de Alencar', 'maria.eduarda.cavalcanti@tre-pe.jus.br', '2027', 4, 4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('242427', 'SERVIDOR', 4);
 
@@ -388,27 +388,54 @@ VALUES (4, 99);
 -- Atividades e conhecimentos para o mapa 99 (ASSESSORIA_12)
 -- Necessário para testes de revisão (CDU-08, CDU-10)
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
-VALUES (9901, 'Atividade Seed 1', 99);
+VALUES (9901, 'Atividade Seed 1 - Planejar cronogramas de capacitação e acompanhar marcos críticos', 99);
 
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
-VALUES (990101, 'Conhecimento Seed 1.1', 9901);
+VALUES (990101, 'Conhecimento Seed 1.1 - Planejamento de trilhas formativas com foco em unidades judiciárias', 9901);
 
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
-VALUES (9902, 'Atividade Seed 2', 99);
+VALUES (9902, 'Atividade Seed 2 - Consolidar indicadores e orientar a priorização de desenvolvimento técnico', 99);
 
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
-VALUES (990201, 'Conhecimento Seed 2.1', 9902);
+VALUES (990201, 'Conhecimento Seed 2.1 - Leitura de indicadores institucionais e priorização por criticidade', 9902);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (9903, 'Atividade Seed 3 - Estruturar materiais de apoio e orientar multiplicadores internos da unidade', 99);
+
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (990301, 'Conhecimento Seed 3.1 - Curadoria de conteúdos, guias operacionais e padrões de comunicação interna', 9903);
+
+INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
+VALUES (9904, 'Atividade Seed 4 - Mapear riscos operacionais e definir ações preventivas de disseminação do conhecimento', 99);
+
+INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
+VALUES (990401, 'Conhecimento Seed 4.1 - Gestão de riscos, documentação processual e transferência estruturada de conhecimento', 9904);
 
 -- Competências para o mapa 99 (ASSESSORIA_12)
 -- Necessário para testes de CDU-18 (Visualização de mapa)
 INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
-VALUES (99001, 'Competência Técnica Seed 99', 99);
+VALUES (99001, 'Competência Técnica Seed 99 - Planejamento integrado de capacitação institucional e desenvolvimento continuado', 99);
+
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
+VALUES (99002, 'Competência Técnica Seed 99B - Análise de indicadores de aprendizagem e tomada de decisão orientada por evidências', 99);
+
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
+VALUES (99003, 'Competência Técnica Seed 99C - Produção de conteúdos instrucionais, guias operacionais e apoio à multiplicação interna', 99);
+
+INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
+VALUES (99004, 'Competência Técnica Seed 99D - Gestão de riscos operacionais aplicada à capacitação e continuidade do conhecimento', 99);
 
 -- Vincular atividades à competência
 INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
 VALUES (9901, 99001);
 INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
 VALUES (9902, 99001);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (9902, 99002);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (9903, 99003);
+INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)
+VALUES (9904, 99004);
 
 
 -- Parâmetros do sistema

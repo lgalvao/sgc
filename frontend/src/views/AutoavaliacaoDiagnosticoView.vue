@@ -3,21 +3,17 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
-      <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div>
-          <h1 class="h3 mb-1">
-            <i aria-hidden="true" class="bi text-primary me-2"/>
-            {{ TEXTOS.diagnostico.TITULO_AUTOAVALIACAO }}
-          </h1>
-          <div v-if="contexto" class="text-muted small">
-            <strong>{{ contexto.unidadeSigla }}</strong> - {{ contexto.unidadeNome }}
-          </div>
-        </div>
-        <BButton size="sm" variant="outline-secondary" @click="voltar">
-          <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
-          {{ TEXTOS.diagnostico.BTN_VOLTAR }}
-        </BButton>
-      </div>
+      <PageHeader
+          :subtitle="contexto ? `${contexto.unidadeSigla} - ${contexto.unidadeNome}` : undefined"
+          :title="TEXTOS.diagnostico.TITULO_AUTOAVALIACAO"
+      >
+        <template #actions>
+          <BButton size="sm" variant="outline-secondary" @click="voltar">
+            <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
+            {{ TEXTOS.diagnostico.BTN_VOLTAR }}
+          </BButton>
+        </template>
+      </PageHeader>
 
       <AppAlert
           v-if="retornoFluxo"
@@ -32,16 +28,6 @@
           {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
         </template>
       </div>
-
-      <BAlert
-          v-if="ehConsensoCriado && !ehChefe"
-          :model-value="true"
-          class="mb-4"
-          variant="warning"
-      >
-        <i aria-hidden="true" class="bi bi-exclamation-triangle me-2"/>
-        O responsavel pela unidade registrou a avaliação de consenso. Revise e aprove para finalizar.
-      </BAlert>
 
       <BAlert
           v-if="ehConsensoAprovado"
@@ -248,7 +234,6 @@
 
 <script lang="ts" setup>
 import {
-  BAlert,
   BBadge,
   BButton,
   BCard,
@@ -264,6 +249,7 @@ import {
   BTable,
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
@@ -274,7 +260,7 @@ const props = defineProps<{
   codSubprocesso: number;
   siglaUnidade: string;
 }>();
-const {
+  const {
   contexto,
   carregando,
   retornoFluxo,

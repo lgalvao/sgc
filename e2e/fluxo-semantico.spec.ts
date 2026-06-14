@@ -733,9 +733,9 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await navegarParaDiagnosticoUnidade(page, SIGLA_UNIDADE_DIAGNOSTICO);
             await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
             await expect(page.getByText(SIGLA_UNIDADE_DIAGNOSTICO, {exact: true})).toBeVisible();
-            await expect(page.getByText('Competência x Servidor', {exact: true})).toBeVisible();
-            await expect(page.getByText('Servidores e Consenso', {exact: true})).toBeVisible();
-            await expect(page.getByRole('listitem').filter({hasText: 'Duff McKagan'})).toBeVisible();
+            await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
+            await expect(page.getByTestId('select-servidor-diagnostico-unidade')).toBeVisible();
+            await expect(page.getByTestId('detalhes-servidor-diagnostico-unidade')).toContainText('João Guilherme de Albuquerque Maranhão');
 
             await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
             await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);

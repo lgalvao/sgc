@@ -267,12 +267,9 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         const mapaAtividades = new Map<number, Atividade[]>(
             (queryContextoEdicao.data.value?.mapa.competencias ?? []).map((competencia) => [competencia.codigo, competencia.atividades ?? []]),
         );
-        const mapa = Object.fromEntries(
-            (contexto.value?.competencias ?? []).map((competencia) => [competencia.competenciaCodigo, competencia.descricao]),
-        );
         return competenciasLocais.value.map((competencia) => ({
             ...competencia,
-            descricao: mapa[competencia.competenciaCodigo] ?? `Competencia ${competencia.competenciaCodigo}`,
+            descricao: competencia.competenciaDescricao,
             atividades: mapaAtividades.get(competencia.competenciaCodigo) ?? [],
         }));
     });

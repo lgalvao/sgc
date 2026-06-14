@@ -1,27 +1,22 @@
 <template>
   <div>
-    <div
+    <PageHeader
         v-if="exibirCabecalho"
-        class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2"
+        :subtitle="unidade?.unidadeSigla"
+        title="Detalhes do subprocesso"
     >
-      <div>
-        <h1 class="h4 mb-1">
-          {{ TEXTOS.diagnostico.TITULO_MONITORAMENTO }}
-        </h1>
-        <div v-if="unidade" class="text-muted small">
-          <strong>{{ unidade.unidadeSigla }}</strong>
-        </div>
-      </div>
-      <BButton
-          v-if="exibirBotaoVoltar"
-          size="sm"
-          variant="outline-secondary"
-          @click="void router.back()"
-      >
-        <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
-        {{ TEXTOS.diagnostico.BTN_VOLTAR }}
-      </BButton>
-    </div>
+      <template #actions>
+        <BButton
+            v-if="exibirBotaoVoltar"
+            size="sm"
+            variant="outline-secondary"
+            @click="void router.back()"
+        >
+          <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
+          {{ TEXTOS.diagnostico.BTN_VOLTAR }}
+        </BButton>
+      </template>
+    </PageHeader>
 
     <AppAlert
         v-if="erroMensagem"
@@ -73,13 +68,6 @@
                 @click="navegarParaConsenso(item.servidorTitulo)"
             >
               {{ TEXTOS.diagnostico.BTN_MANTER_CONSENSO }}
-            </BDropdownItemButton>
-            <BDropdownItemButton
-                :data-testid="`btn-manter-capacitacao-${item.servidorTitulo}`"
-                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
-                @click="navegarParaCapacitacao(item.servidorTitulo)"
-            >
-              {{ TEXTOS.diagnostico.BTN_MANTER_CAPACITACAO }}
             </BDropdownItemButton>
             <BDropdownItemButton
                 :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
@@ -316,9 +304,10 @@ import {
   BSpinner,
   BTable,
 } from 'bootstrap-vue-next';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
-import {useMonitoramentoDiagnostico} from '@/composables/useMonitoramentoDiagnostico';
+import {useDiagnosticoUnidade} from '@/composables/useDiagnosticoUnidade';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {useToastStore} from '@/stores/toast';
 import {TEXTOS} from '@/constants/textos';
@@ -343,7 +332,7 @@ const {
   habilitarDevolverDiagnostico,
   habilitarHomologarDiagnostico,
 } = useDiagnosticoPermissoes(props.codSubprocesso);
-const {unidade, servidores} = useMonitoramentoDiagnostico(props.codSubprocesso);
+const {unidade, servidores} = useDiagnosticoUnidade(props.codSubprocesso);
 const {
   concluindo,
   validando,
@@ -406,19 +395,6 @@ function navegarParaConsenso(servidorTitulo: string) {
     query: servidor?.servidorNome ? {servidorNome: servidor.servidorNome} : undefined,
   });
 }
-
-function navegarParaCapacitacao(servidorTitulo: string) {
-  void router.push({
-    name: 'SituacaoCapacitacaoDiagnostico',
-    params: {
-      codSubprocesso: props.codSubprocesso,
-      siglaUnidade: props.siglaUnidade,
-    },
-    query: {servidorTitulo},
-  });
-}
-
-
 
 function abrirModalImpossibilitar(servidor: ServidorDiagnostico) {
   servidorSelecionado.value = servidor;

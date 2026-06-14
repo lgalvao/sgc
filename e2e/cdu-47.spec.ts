@@ -29,7 +29,7 @@ test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
         await page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
         const modal = page.getByRole('dialog');
         await expect(modal).toContainText('Indicar impossibilidade de avaliação');
-        await expect(modal).toContainText('Duff McKagan');
+        await expect(modal).toContainText('João Guilherme de Albuquerque Maranhão');
 
         await page.getByTestId('btn-confirmar-impossibilitar').click();
         await expect(modal).toContainText('A justificativa é obrigatória.');

@@ -6,11 +6,10 @@ import type {DiagnosticoUnidade, SituacaoDiagnostico} from '@/types/diagnostico-
 import {chaveUnidade, criarContextoSessaoDiagnostico, useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 
 /**
- * Composable de monitoramento do diagnóstico da unidade.
+ * Composable de leitura do diagnóstico da unidade.
  * Carrega dados completos: servidores, consenso, situações de capacitação e movimentações.
- * Usado pelas views de monitoramento e análise da unidade pelo gestor/admin.
  */
-export function useMonitoramentoDiagnostico(codSubprocesso: number) {
+export function useDiagnosticoUnidade(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
     const {data: contexto} = useDiagnosticoContexto(codSubprocesso);
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);

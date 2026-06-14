@@ -3,21 +3,17 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
-      <!-- Cabeçalho -->
-      <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div>
-          <h1 class="h4 mb-1">
-            {{ TEXTOS.diagnostico.TITULO_SITUACAO_CAPACITACAO }}
-          </h1>
-          <div v-if="unidade" class="text-muted small">
-            <strong>{{ unidade.unidadeSigla }}</strong>
-          </div>
-        </div>
-        <BButton size="sm" variant="outline-secondary" @click="void router.back()">
-          <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
-          {{ TEXTOS.diagnostico.BTN_VOLTAR }}
-        </BButton>
-      </div>
+      <PageHeader
+          :subtitle="unidade?.unidadeSigla"
+          :title="TEXTOS.diagnostico.TITULO_SITUACAO_CAPACITACAO"
+      >
+        <template #actions>
+          <BButton size="sm" variant="outline-secondary" @click="void router.back()">
+            <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
+            {{ TEXTOS.diagnostico.BTN_VOLTAR }}
+          </BButton>
+        </template>
+      </PageHeader>
 
 
       <!-- Badge de autosave -->
@@ -28,7 +24,6 @@
         </template>
       </div>
 
-      <!-- Tabela de situação de capacitação -->
       <BCard class="mb-4">
         <EmptyState
             v-if="situacoesLocais.length === 0"
@@ -37,53 +32,59 @@
             icon="bi-award"
         />
 
-        <div v-else class="table-responsive">
-          <table class="table table-sm table-hover align-middle mb-0 tabela-capacitacao">
-            <thead>
-            <tr>
-              <th class="coluna-competencia">{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
-              <th
-                  v-for="servidor in servidoresCabecalho"
-                  :key="servidor.servidorTitulo"
-                  :title="servidor.servidorNome"
-                  class="text-center coluna-servidor"
+        <div v-else class="p-3">
+          <label class="form-label" for="select-servidor-situacao-capacitacao">
+            {{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}
+          </label>
+          <BFormSelect
+              id="select-servidor-situacao-capacitacao"
+              v-model="servidorSelecionadoTitulo"
+              class="mb-3"
+              data-testid="select-servidor-situacao-capacitacao"
+              :options="servidores.map((item) => ({
+                value: item.servidorTitulo,
+                text: `${item.servidorNome} (${item.servidorTitulo})`,
+              }))"
+          />
+
+          <BCard
+              v-if="servidorSelecionado"
+              class="mb-3 border-0 bg-body-tertiary"
+              data-testid="detalhes-servidor-situacao-capacitacao"
+          >
+            <div class="fw-semibold">{{ servidorSelecionado.servidorNome }}</div>
+            <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
+          </BCard>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead>
+              <tr>
+                <th>{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
+                <th class="coluna-capacitacao">{{ TEXTOS.diagnostico.COLUNA_CAPACITACAO }}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr
+                  v-for="linha in competenciasServidorSelecionado"
+                  :key="linha.competenciaCodigo"
               >
-                <div class="cabecalho-servidor">
-                  <span class="cabecalho-servidor-nome">{{ abreviarNomeServidor(servidor.servidorNome) }}</span>
-                  <small
-                      v-if="servidor.exibirTituloSecundario"
-                      class="cabecalho-servidor-titulo"
-                  >
-                    {{ servidor.servidorTitulo }}
-                  </small>
-                </div>
-              </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr
-                v-for="linha in matrizCapacitacao"
-                :key="linha.competenciaCodigo"
-            >
-              <th class="coluna-competencia celula-competencia" scope="row">
-                {{ linha.competenciaDescricao }}
-              </th>
-              <td
-                  v-for="celula in linha.celulas"
-                  :key="`${linha.competenciaCodigo}-${celula.servidorTitulo}`"
-                  class="text-center coluna-servidor"
-              >
+                <th class="celula-competencia" scope="row">
+                  {{ linha.competenciaDescricao }}
+                </th>
+                <td class="coluna-capacitacao">
                 <BFormSelect
-                    :data-testid="`situacao-${celula.servidorTitulo}-${linha.competenciaCodigo}`"
-                    :model-value="celula.situacaoCapacitacao"
+                    :data-testid="`situacao-${servidorSelecionadoTitulo}-${linha.competenciaCodigo}`"
+                    :model-value="linha.situacaoCapacitacao"
                     :options="opcoesCapacitacao"
                     class="form-select-sm seletor-capacitacao"
-                    @update:model-value="(v: unknown) => atualizarCapacitacao(celula.servidorTitulo, linha.competenciaCodigo, v as ValorSituacaoCapacitacao)"
+                    @update:model-value="(v: unknown) => atualizarCapacitacao(servidorSelecionadoTitulo, linha.competenciaCodigo, v as ValorSituacaoCapacitacao)"
                 />
-              </td>
-            </tr>
-            </tbody>
-          </table>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </BCard>
     </template>
@@ -91,7 +92,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {
   BButton,
@@ -100,6 +101,7 @@ import {
   BSpinner,
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
@@ -124,26 +126,21 @@ const {
   atualizarCapacitacao,
 } = useSituacaoCapacitacaoDiagnostico(props.codSubprocesso);
 
+const servidorSelecionadoTitulo = ref('');
 
-const servidoresCabecalho = computed(() => {
-  const nomesAbreviados = new Map<string, number>();
-  const lista = servidores.value.map((servidor) => {
-    const nomeAbreviado = abreviarNomeServidor(servidor.servidorNome);
-    nomesAbreviados.set(nomeAbreviado, (nomesAbreviados.get(nomeAbreviado) ?? 0) + 1);
-    return {
-      ...servidor,
-      nomeAbreviado,
-      exibirTituloSecundario: false,
-    };
-  });
+watch(servidores, (novosServidores) => {
+  const existeAtual = novosServidores.some((item) => item.servidorTitulo === servidorSelecionadoTitulo.value);
+  if (existeAtual) {
+    return;
+  }
+  servidorSelecionadoTitulo.value = novosServidores[0]?.servidorTitulo ?? '';
+}, {immediate: true});
 
-  return lista.map((servidor) => ({
-    ...servidor,
-    exibirTituloSecundario: (nomesAbreviados.get(servidor.nomeAbreviado) ?? 0) > 1,
-  }));
-});
+const servidorSelecionado = computed(() =>
+  servidores.value.find((item) => item.servidorTitulo === servidorSelecionadoTitulo.value) ?? null,
+);
 
-const matrizCapacitacao = computed(() => {
+const competenciasServidorSelecionado = computed(() => {
   const situacoesPorChave = new Map(
     situacoesLocais.value.map((o) => [`${o.competenciaCodigo}-${o.servidorTitulo}`, o]),
   );
@@ -151,11 +148,7 @@ const matrizCapacitacao = computed(() => {
   return (contexto.value?.competencias ?? []).map((competencia) => ({
     competenciaCodigo: competencia.competenciaCodigo,
     competenciaDescricao: competencia.descricao,
-    celulas: servidoresCabecalho.value.map((servidor) => ({
-      servidorTitulo: servidor.servidorTitulo,
-      servidorNome: servidor.servidorNome,
-      situacaoCapacitacao: situacoesPorChave.get(`${competencia.competenciaCodigo}-${servidor.servidorTitulo}`)?.situacaoCapacitacao ?? null,
-    })),
+    situacaoCapacitacao: situacoesPorChave.get(`${competencia.competenciaCodigo}-${servidorSelecionadoTitulo.value}`)?.situacaoCapacitacao ?? null,
   }));
 });
 
@@ -168,63 +161,20 @@ const opcoesCapacitacao = [
   {value: 'C', text: TEXTOS.diagnostico.CAPACITACAO_C},
   {value: 'I', text: TEXTOS.diagnostico.CAPACITACAO_I},
 ];
-
-function abreviarNomeServidor(nome: string): string {
-  const partes = nome.trim().split(/\s+/).filter(Boolean);
-  if (partes.length <= 1) {
-    return nome;
-  }
-  const primeiroNome = partes[0];
-  const segundoNome = partes[1];
-  if (primeiroNome.length >= 10) {
-    return primeiroNome;
-  }
-  return `${primeiroNome} ${segundoNome[0]}.`;
-}
 </script>
 
 <style scoped>
-.tabela-capacitacao {
-  width: 100%;
-  min-width: 52rem;
-}
-
-.coluna-competencia {
-  min-width: 16rem;
-  width: 16rem;
-  position: sticky;
-  left: 0;
-  background: var(--bs-body-bg, #fff);
-  z-index: 1;
-}
-
 .celula-competencia {
+  min-width: 16rem;
   white-space: normal;
 }
 
-.coluna-servidor {
-  min-width: 8rem;
-  width: 8rem;
-}
-
-.cabecalho-servidor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-}
-
-.cabecalho-servidor-nome {
-  font-weight: 600;
-}
-
-.cabecalho-servidor-titulo {
-  color: var(--bs-secondary-color, #6c757d);
-  font-weight: 400;
+.coluna-capacitacao {
+  min-width: 14rem;
+  width: 14rem;
 }
 
 .seletor-capacitacao {
-  min-width: 0;
   width: 100%;
 }
 </style>

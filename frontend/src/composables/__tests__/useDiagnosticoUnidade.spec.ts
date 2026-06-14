@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {effectScope, nextTick, ref} from 'vue';
-import {useMonitoramentoDiagnostico} from '../useMonitoramentoDiagnostico';
+import {useDiagnosticoUnidade} from '../useDiagnosticoUnidade';
 
 const mockQueryData = ref<any>(null);
 const mockQueryStatus = ref<'pending' | 'success'>('success');
@@ -37,7 +37,7 @@ vi.mock('@/composables/useDiagnosticoContexto', async () => {
     };
 });
 
-describe('useMonitoramentoDiagnostico', () => {
+describe('useDiagnosticoUnidade', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockQueryStatus.value = 'success';
@@ -62,10 +62,10 @@ describe('useMonitoramentoDiagnostico', () => {
 
     it('expõe unidade, situação e pendências com base na query principal', async () => {
         const scope = effectScope();
-        let composable: ReturnType<typeof useMonitoramentoDiagnostico> | undefined;
+        let composable: ReturnType<typeof useDiagnosticoUnidade> | undefined;
 
         scope.run(() => {
-            composable = useMonitoramentoDiagnostico(55);
+            composable = useDiagnosticoUnidade(55);
         });
         await nextTick();
 
@@ -93,10 +93,10 @@ describe('useMonitoramentoDiagnostico', () => {
         };
 
         const scope = effectScope();
-        let composable: ReturnType<typeof useMonitoramentoDiagnostico> | undefined;
+        let composable: ReturnType<typeof useDiagnosticoUnidade> | undefined;
 
         scope.run(() => {
-            composable = useMonitoramentoDiagnostico(77);
+            composable = useDiagnosticoUnidade(77);
         });
         await nextTick();
 

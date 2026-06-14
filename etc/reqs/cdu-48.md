@@ -17,29 +17,17 @@ Ator: CHEFE
 
 3. O usuário aciona o card `Situação de capacitação`.
 
-4. O sistema apresenta uma matriz `Competência x Servidor`, contendo:
+4. O sistema apresenta a lista das competências vigentes da unidade para um servidor selecionado, contendo:
+    - um controle `Servidor analisado`, em formato *drop-down*, com os servidores participantes da unidade;
     - uma linha para cada competência vigente da unidade;
-    - uma coluna para cada servidor participante da unidade;
-    - uma célula editável (dropdown) `Situação de capacitação` para cada combinação competência/servidor;
-    - cada célula `Situação de capacitação` admite os seguintes valores:
+    - uma coluna editável (dropdown) `Situação de capacitação` para cada competência do servidor selecionado;
+    - cabeçalho com nome completo e título do servidor selecionado;
+    - cada campo `Situação de capacitação` admite os seguintes valores:
         - `NA` (Não se aplica);
         - `AC` (A capacitar);
         - `EC` (Em capacitação);
         - `C` (Capacitado);
         - `I` (Instrutor).
-
-   **Regras de apresentação da matriz**:
-    - a primeira coluna da matriz identifica a competência;
-    - as colunas de servidores devem usar nomes abreviados, por limitação de espaço horizontal;
-    - o nome completo do servidor deve continuar acessível na interface, por exemplo via `tooltip` no cabeçalho.
-
-   Exemplo de matriz, depois de preenchida com situações de capacitação:
-
-   | Competência         | BOB MARLEY           | DAVID BOWIE         | ELVIS PRESLEY       |
-      |:--------------------|:---------------------|:--------------------|:--------------------|
-   | Desc. Competência 1 | NA - Não se aplica   | NA - Não se aplica  | I - Instrutor       |
-   | Desc. Competência 2 | I - Instrutor        | C - Capacitado      | C - Capacitado      |
-   | Desc. Competência 3 | EC - Em capacitação  | EC - Em capacitação | EC - Em capacitação |
 
 5. O usuário informa os valores de situação de capacitação para cada célula.
 

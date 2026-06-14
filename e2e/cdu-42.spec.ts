@@ -4,7 +4,7 @@ import {login} from './helpers/helpers-auth.js';
 
 const TITULO_CHEFE_ASSESSORIA_12 = '151515';
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
-const NOME_SERVIDOR_ASSESSORIA_12 = 'Duff McKagan';
+const NOME_SERVIDOR_ASSESSORIA_12 = 'João Guilherme de Albuquerque Maranhão';
 const UNIDADE = 'ASSESSORIA_12';
 
 test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEFE e SERVIDOR', () => {
@@ -35,9 +35,11 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
         await expect(dropdownAcoes).toBeVisible();
         await dropdownAcoes.getByRole('button', {name: 'Ações'}).click();
         await expect(page.getByTestId(`btn-manter-consenso-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
-        await expect(page.getByTestId(`btn-manter-capacitacao-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
         await expect(page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
         await expect(page.getByTestId(`btn-permitir-avaliacao-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeDisabled();
+
+        // CHEFE deve ver o card de Situação de capacitação
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toBeVisible();
 
         // CHEFE deve ver o botão para Concluir diagnóstico
         await expect(page.getByTestId('btn-concluir-diagnostico')).toBeVisible();

@@ -9,7 +9,7 @@ const UNIDADE = 'ASSESSORIA_12';
 const VALOR_CAPACITACAO = 'EC';
 
 test.describe('CDU-48 - Preencher situações de capacitação', () => {
-    test('CHEFE preenche a matriz de capacitação com autosave e reencontra o valor salvo ao reabrir', async ({
+    test('CHEFE preenche a situação de capacitação do servidor selecionado com autosave e reencontra o valor salvo ao reabrir', async ({
         _resetAutomatico,
         page,
         request
@@ -24,11 +24,14 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
 
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await expect(page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toBeVisible();
 
-        await abrirAcaoCapacitacaoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
+        await abrirAcaoCapacitacaoDiagnostico(page);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/situacao-capacitacao`));
         await expect(page.getByRole('heading', {name: /Situação de capacitação/i})).toBeVisible();
+        await expect(page.getByTestId('select-servidor-situacao-capacitacao')).toBeVisible();
+        await page.getByTestId('select-servidor-situacao-capacitacao').selectOption(TITULO_SERVIDOR_ASSESSORIA_12);
+        await expect(page.getByTestId('detalhes-servidor-situacao-capacitacao')).toContainText(TITULO_SERVIDOR_ASSESSORIA_12);
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
         const seletorCapacitacao = page.locator(`[data-testid^="situacao-${TITULO_SERVIDOR_ASSESSORIA_12}-"]`).first();
@@ -59,8 +62,9 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
         await page.goBack();
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
 
-        await abrirAcaoCapacitacaoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
+        await abrirAcaoCapacitacaoDiagnostico(page);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/situacao-capacitacao`));
+        await page.getByTestId('select-servidor-situacao-capacitacao').selectOption(TITULO_SERVIDOR_ASSESSORIA_12);
         await expect(page.getByTestId(testIdCapacitacao!)).toHaveValue(VALOR_CAPACITACAO);
     });
 });

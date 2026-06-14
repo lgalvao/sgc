@@ -3,21 +3,17 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
-      <!-- Cabeçalho -->
-      <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div>
-          <h1 class="h4 mb-1">
-            {{ TEXTOS.diagnostico.TITULO_CONSENSO }}
-          </h1>
-          <div class="text-muted small">
-            <strong>{{ subtituloServidor }}</strong>
-          </div>
-        </div>
-        <BButton size="sm" variant="outline-secondary" @click="void router.back()">
-          <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
-          {{ TEXTOS.diagnostico.BTN_VOLTAR }}
-        </BButton>
-      </div>
+      <PageHeader
+          :subtitle="subtituloServidor"
+          :title="TEXTOS.diagnostico.TITULO_CONSENSO"
+      >
+        <template #actions>
+          <BButton size="sm" variant="outline-secondary" @click="void router.back()">
+            <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
+            {{ TEXTOS.diagnostico.BTN_VOLTAR }}
+          </BButton>
+        </template>
+      </PageHeader>
 
       <!-- Alertas -->
       <AppAlert
@@ -163,6 +159,7 @@ import {
   BSpinner,
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
+import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
@@ -242,12 +239,9 @@ function formatarNota(valor: number | null): string {
 }
 
 const competenciasDetalhadasComDescricao = computed(() => {
-  const mapaDesc = Object.fromEntries(
-    (contexto.value?.competencias ?? []).map((c) => [c.competenciaCodigo, c.descricao]),
-  );
   return competenciasLocais.value.map((c) => ({
     ...c,
-    descricao: mapaDesc[c.competenciaCodigo] ?? `Competência ${c.competenciaCodigo}`,
+    descricao: c.competenciaDescricao,
   }));
 });
 

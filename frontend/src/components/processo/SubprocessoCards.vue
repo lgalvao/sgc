@@ -77,30 +77,6 @@
       </BCol>
 
       <BCol
-          v-if="permissoesDiagnostico?.podeCriarConsenso"
-          class="mb-3"
-          md="4"
-      >
-        <BCard
-            class="h-100 card-actionable"
-            data-testid="card-subprocesso-monitoramento"
-            role="button"
-            tabindex="0"
-            @click="navegarParaDiag('MonitoramentoDiagnostico')"
-            @keydown="aoPressionarTeclaDiagnostico($event, 'MonitoramentoDiagnostico')"
-        >
-          <div class="card-click-area">
-            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
-              <i aria-hidden="true" class="bi bi-activity text-primary flex-shrink-0 mt-1"></i>
-              <span class="lh-sm">{{ TEXTOS.subprocesso.cards.MONITORAMENTO_TITULO }}</span>
-            </BCardTitle>
-            <BCardText class="text-muted">
-              {{ TEXTOS.subprocesso.cards.MONITORAMENTO_TEXTO }}
-            </BCardText>
-          </div>
-        </BCard>
-      </BCol>
-      <BCol
           v-if="permissoesDiagnostico?.podePreencherAutoavaliacao && !permissoesDiagnostico?.podeCriarConsenso"
           class="mb-3"
           md="4"
@@ -182,7 +158,8 @@ const permissoesDiagnostico = computed(() => subprocesso.value?.permissoes ?? nu
 const {habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 
-const { situacaoServidor } = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO 
+const { situacaoServidor } = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
+  && props.subprocesso?.permissoes?.podePreencherAutoavaliacao
   ? useAutoavaliacaoDiagnostico(props.codSubprocesso)
   : { situacaoServidor: computed(() => 'AUTOAVALIACAO_NAO_INICIADA') };
 const habilitarCardConsenso = computed(() => {
@@ -230,10 +207,6 @@ function navegarParaConsenso() {
 }
 
 function navegarParaCardConsenso() {
-  if (permissoesDiagnostico.value?.podeCriarConsenso) {
-    navegarParaDiag('MonitoramentoDiagnostico');
-    return;
-  }
   navegarParaConsenso();
 }
 

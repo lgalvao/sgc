@@ -159,7 +159,7 @@ class DiagnosticoAvaliacaoServiceTest {
         when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
-        var detalhada = new ConsensoCompetenciaDto(200L, 2, 2, 4, 3, 4, 3);
+        var detalhada = new ConsensoCompetenciaDto(200L, null, 2, 2, 4, 3, 4, 3);
         var request = new ConsensoRequest(
                 List.of(detalhada)
         );

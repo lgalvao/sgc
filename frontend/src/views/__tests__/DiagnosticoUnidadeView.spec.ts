@@ -15,7 +15,7 @@ const COD_SUBPROCESSO = 400;
 const SIGLA_UNIDADE = 'ASSESSORIA_12';
 const NOME_UNIDADE = 'Assessoria 12';
 const TITULO_SERVIDOR = '242426';
-const NOME_SERVIDOR = 'Duff McKagan';
+const NOME_SERVIDOR = 'João Guilherme de Albuquerque Maranhão';
 const CODIGO_COMPETENCIA_BASE = 10;
 
 const perfilSelecionado = ref<Perfil>(Perfil.GESTOR);
@@ -71,8 +71,8 @@ const situacoesCapacitacaoVal = ref<any[]>([
     {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'EC'},
 ]);
 
-vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
-    useMonitoramentoDiagnostico: () => ({
+vi.mock('@/composables/useDiagnosticoUnidade', () => ({
+    useDiagnosticoUnidade: () => ({
         unidade: unidadeVal,
         servidores: servidoresVal,
         situacoesCapacitacao: situacoesCapacitacaoVal,
@@ -159,6 +159,7 @@ describe('DiagnosticoUnidadeView', () => {
             global: {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
+                    PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                     AppAlert: {
                         props: ['mensagem'],
@@ -173,16 +174,21 @@ describe('DiagnosticoUnidadeView', () => {
                     BDropdownItemButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BRow: {template: '<div><slot /></div>'},
                     BCol: {template: '<div><slot /></div>'},
-                    BAccordion: {template: '<div><slot /></div>'},
-                    BAccordionItem: {template: '<div><slot name="title" /><slot /></div>'},
-                    BListGroup: {template: '<div><slot /></div>'},
-                    BListGroupItem: {template: '<div><slot /></div>'},
                     BSpinner: {template: '<span />'},
                     BFormText: {template: '<small><slot /></small>'},
                     BFormTextarea: {
                         props: ['modelValue'],
                         emits: ['update:modelValue'],
                         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+                    },
+                    BFormSelect: {
+                        props: ['modelValue', 'options'],
+                        emits: ['update:modelValue'],
+                        template: `
+                          <select :value="modelValue" v-bind="$attrs" @change="$emit('update:modelValue', $event.target.value)">
+                            <option v-for="opcao in options" :key="opcao.value" :value="opcao.value">{{ opcao.text }}</option>
+                          </select>
+                        `,
                     },
                     BModal: {
                         props: ['modelValue'],
@@ -193,14 +199,18 @@ describe('DiagnosticoUnidadeView', () => {
                         props: ['mostrar'],
                         template: '<div v-if="mostrar" data-testid="modal-historico-analise" />',
                     },
+                    SubprocessoMovimentacoes: {
+                        props: ['movimentacoes'],
+                        template: '<div data-testid="movimentacoes">{{ movimentacoes.map((item) => item.descricao).join(" | ") }}</div>',
+                    },
                     BTable: {
                         props: ['items'],
                         template: `
                           <div>
                             <div v-for="item in items" :key="item.competenciaCodigo ?? item.servidorTitulo">
+                              <span v-for="(valor, chave) in item" :key="chave">{{ valor }}</span>
                               <slot name="cell(importancia)" :item="item" />
                               <slot name="cell(dominio)" :item="item" />
-                              <slot name="cell(gap)" :item="item" />
                               <slot name="cell(situacaoCapacitacao)" :item="item" />
                             </div>
                           </div>
@@ -211,26 +221,69 @@ describe('DiagnosticoUnidadeView', () => {
         });
     }
 
-    it('renderiza métricas, gaps, situações de capacitação e histórico do diagnóstico', () => {
+    it('renderiza o resumo da unidade, participantes, seletor de servidor e histórico do diagnóstico', () => {
         const wrapper = montar();
 
         expect(wrapper.text()).toContain(SIGLA_UNIDADE);
         expect(wrapper.text()).toContain(NOME_UNIDADE);
-        expect(wrapper.text()).toContain('Servidores');
-        expect(wrapper.text()).toContain('Pendentes');
-        expect(wrapper.text()).toContain('Situações de Capacitação');
-        expect(wrapper.text()).toContain('+2');
-        expect(wrapper.text()).toContain('---');
+        expect(wrapper.text()).toContain('Processo:');
+        expect(wrapper.text()).toContain('Subprocesso:');
+        expect(wrapper.text()).toContain('Situação:');
+        expect(wrapper.text()).toContain(NOME_SERVIDOR);
+        expect(wrapper.text()).toContain(TITULO_SERVIDOR);
         expect(wrapper.text()).toContain('EC');
         expect(wrapper.text()).toContain('Diagnóstico concluído');
         expect(wrapper.find('[data-testid="btn-historico-analise-unidade"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="matriz-diagnostico-unidade"]').exists()).toBe(true);
-        expect(wrapper.text()).toContain('I');
-        expect(wrapper.text()).toContain('D');
-        expect(wrapper.text()).toContain('C');
+        expect(wrapper.find('[data-testid="select-servidor-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="movimentacoes"]').exists()).toBe(true);
+        expect(wrapper.text()).toContain('Competências da unidade');
+        expect(wrapper.text()).toContain('Servidor analisado');
+        expect(wrapper.text()).toContain('Avaliação de consenso aprovada');
         expect(wrapper.find('[data-testid="btn-validar-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-devolver-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-homologar-diagnostico-unidade"]').exists()).toBe(false);
+    });
+
+    it('troca o servidor selecionado sem duplicar a lista de competências da unidade', async () => {
+        const outroServidorTitulo = '242427';
+        const outroServidorNome = 'Maria Eduarda Cavalcanti de Alencar';
+        servidoresVal.value = [
+            {
+                servidorTitulo: TITULO_SERVIDOR,
+                servidorNome: NOME_SERVIDOR,
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE, importancia: 4, dominio: 2},
+                ],
+            },
+            {
+                servidorTitulo: outroServidorTitulo,
+                servidorNome: outroServidorNome,
+                situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+                consenso: [
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE, importancia: 2, dominio: 5},
+                ],
+            },
+        ];
+        situacoesCapacitacaoVal.value = [
+            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'EC'},
+            {servidorTitulo: outroServidorTitulo, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'AC'},
+        ];
+
+        const wrapper = montar();
+        const seletor = wrapper.get('[data-testid="select-servidor-diagnostico-unidade"]');
+
+        expect(wrapper.text()).toContain(NOME_SERVIDOR);
+        expect(wrapper.text()).toContain('Avaliação de consenso aprovada');
+        expect(wrapper.text()).toContain('EC');
+
+        await seletor.setValue(outroServidorTitulo);
+
+        expect(wrapper.text()).toContain(outroServidorNome);
+        expect(wrapper.text()).toContain('Autoavaliação concluída');
+        expect(wrapper.text()).toContain('AC');
     });
 
     it('valida, devolve com justificativa obrigatória e homologa como admin', async () => {
@@ -297,13 +350,11 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('Falha ao homologar');
     });
 
-    it('cobre ramos default e todos os status de variantes em DiagnosticoUnidadeView', () => {
+    it('cobre os ramos de situação do diagnóstico exibidos no resumo', () => {
         situacaoDiagnostico.value = 'OUTRO_STATUS' as any;
-        servidoresVal.value[0].situacaoServidor = 'OUTRO_STATUS' as any;
         const wrapper = montar();
         expect(wrapper.text()).toContain('ASSESSORIA_12');
 
-        // Outros status de situacao do diagnostico
         situacaoDiagnostico.value = 'HOMOLOGADO';
         const wrapperHomologado = montar();
         expect(wrapperHomologado.text()).toContain('HOMOLOGADO');
@@ -311,22 +362,9 @@ describe('DiagnosticoUnidadeView', () => {
         situacaoDiagnostico.value = 'VALIDADO';
         const wrapperValidado = montar();
         expect(wrapperValidado.text()).toContain('VALIDADO');
-
-        // Status de servidores
-        servidoresVal.value = [
-            { servidorTitulo: '1', servidorNome: 'A', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA', consenso: [] },
-            { servidorTitulo: '2', servidorNome: 'B', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', consenso: [] },
-            { servidorTitulo: '3', servidorNome: 'C', situacaoServidor: 'CONSENSO_CRIADO', consenso: [] },
-            { servidorTitulo: '4', servidorNome: 'D', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', consenso: [] },
-        ];
-        const wrapperServidores = montar();
-        expect(wrapperServidores.text()).toContain('Autoavaliação não iniciada');
-        expect(wrapperServidores.text()).toContain('Autoavaliação concluída');
-        expect(wrapperServidores.text()).toContain('Avaliação de consenso criada');
-        expect(wrapperServidores.text()).toContain('Avaliação impossibilitada');
     });
 
-    it('exercita todas as variantes de capacitacao, gap e formatacao de notas', () => {
+    it('exercita as variantes de capacitação e formatação de notas na lista do servidor selecionado', () => {
         unidadeVal.value = {
             unidadeSigla: SIGLA_UNIDADE,
             unidadeNome: NOME_UNIDADE,
@@ -371,6 +409,7 @@ describe('DiagnosticoUnidadeView', () => {
             global: {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
+                    PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                     AppAlert: {template: '<div />'},
                     EmptyState: {template: '<div />'},
@@ -382,21 +421,27 @@ describe('DiagnosticoUnidadeView', () => {
                     BDropdownItemButton: {template: '<button><slot /></button>'},
                     BRow: {template: '<div><slot /></div>'},
                     BCol: {template: '<div><slot /></div>'},
-                    BAccordion: {template: '<div><slot /></div>'},
-                    BAccordionItem: {template: '<div><slot name="title" /><slot /></div>'},
-                    BListGroup: {template: '<div><slot /></div>'},
-                    BListGroupItem: {template: '<div><slot /></div>'},
                     BSpinner: {template: '<span />'},
                     BFormText: {template: '<small><slot /></small>'},
                     BFormTextarea: {template: '<textarea />'},
+                    BFormSelect: {
+                        props: ['modelValue', 'options'],
+                        emits: ['update:modelValue'],
+                        template: `
+                          <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
+                            <option v-for="opcao in options" :key="opcao.value" :value="opcao.value">{{ opcao.text }}</option>
+                          </select>
+                        `,
+                    },
                     BModal: {template: '<div />'},
                     HistoricoAnaliseModal: {template: '<div />'},
+                    SubprocessoMovimentacoes: {template: '<div />'},
                     BTable: {
                         props: ['items', 'fields'],
                         template: `
                           <div>
                             <div v-for="item in items" :key="item.competenciaCodigo ?? item.servidorTitulo">
-                              <slot name="cell(gap)" :item="item" />
+                              <span v-for="(valor, chave) in item" :key="chave">{{ valor }}</span>
                               <slot name="cell(importancia)" :item="item" />
                               <slot name="cell(dominio)" :item="item" />
                               <slot name="cell(situacaoCapacitacao)" :item="item" />
@@ -408,9 +453,6 @@ describe('DiagnosticoUnidadeView', () => {
             },
         });
 
-        expect(wrapper.text()).toContain('0');
-        expect(wrapper.text()).not.toContain('+0');
-        expect(wrapper.text()).toContain('-2');
         expect(wrapper.text()).toContain('-');
         expect(wrapper.text()).toContain('NA');
         expect(wrapper.text()).toContain('AC');

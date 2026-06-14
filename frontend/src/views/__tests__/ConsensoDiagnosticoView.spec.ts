@@ -33,6 +33,7 @@ vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
 const competenciasLocais = ref<any[]>([
     {
         competenciaCodigo: 10,
+        competenciaDescricao: 'Competência A',
         autoimportancia: 3,
         autodominio: 4,
         chefiaImportancia: 3,
@@ -90,6 +91,7 @@ describe('ConsensoDiagnosticoView', () => {
         competenciasLocais.value = [
             {
                 competenciaCodigo: 10,
+                competenciaDescricao: 'Competência A',
                 autoimportancia: 3,
                 autodominio: 4,
                 chefiaImportancia: 3,
@@ -176,6 +178,7 @@ describe('ConsensoDiagnosticoView', () => {
         competenciasLocais.value = [
             {
                 competenciaCodigo: 10,
+                competenciaDescricao: 'Competência A',
                 autoimportancia: 3,
                 autodominio: 4,
                 chefiaImportancia: null,
@@ -222,7 +225,7 @@ describe('ConsensoDiagnosticoView', () => {
     it('exibe alerta de erro quando falha aprovar consenso', async () => {
         podeCriarConsensoVal.value = false;
         competenciasLocais.value = [
-            {competenciaCodigo: 10, importancia: 3, dominio: 4}
+            {competenciaCodigo: 10, competenciaDescricao: 'Competência A', importancia: 3, dominio: 4}
         ];
         const erro = new Error('Falha ao salvar consenso');
         erroAprovarVal.value = erro;
@@ -255,6 +258,48 @@ describe('ConsensoDiagnosticoView', () => {
         const btnAprovar = wrapper.get('[data-testid="btn-aprovar-consenso"]');
         await btnAprovar.trigger('click');
         expect(wrapper.find('.app-alert').text()).toContain('Falha ao salvar consenso');
+    });
+
+    it('usa apenas a descrição vinda do consenso', () => {
+        competenciasLocais.value = [
+            {
+                competenciaCodigo: 10,
+                competenciaDescricao: 'Competência detalhada',
+                autoimportancia: 3,
+                autodominio: 4,
+                chefiaImportancia: 3,
+                chefiaDominio: 4,
+                consensoImportancia: 3,
+                consensoDominio: 4,
+            },
+        ];
+
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+                servidorNome: 'Servidor Exemplo',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {
+                        props: ['options', 'modelValue'],
+                        template: '<select v-bind="$attrs"></select>',
+                    },
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        expect(wrapper.text()).toContain('Competência detalhada');
+        expect(wrapper.text()).not.toContain('Competência 10');
     });
 
     it('exercita normalizarValorNota com ramificacoes', async () => {
@@ -363,7 +408,7 @@ describe('ConsensoDiagnosticoView', () => {
 
     it('deve exibir tabela padrao se não houver chefia importancias', () => {
         competenciasLocais.value = [
-            { competenciaCodigo: 15, autoimportancia: 5, autodominio: 2 },
+            {competenciaCodigo: 15, competenciaDescricao: 'Competência sem chefia', autoimportancia: 5, autodominio: 2},
         ];
         podeCriarConsensoVal.value = true;
         const wrapper = mount(ConsensoDiagnosticoView, {
@@ -386,7 +431,7 @@ describe('ConsensoDiagnosticoView', () => {
                 },
             },
         });
-        expect(wrapper.text()).toContain('Competência 15');
+        expect(wrapper.text()).toContain('Competência sem chefia');
     });
 
     it('deve exibir erro padrão de salvamento se erroAprovar não contiver mensagem', async () => {
@@ -593,8 +638,9 @@ describe('ConsensoDiagnosticoView', () => {
             },
         });
 
-        // Test fallback for unknown competencia
-        expect(wrapper.text()).toContain('Competência 999');
+        // Sem descrição disponível, a interface não deve inventar rótulo.
+        expect(wrapper.text()).not.toContain('Competência 15');
+        expect(wrapper.text()).not.toContain('Competência 999');
         // Test spinner in aprovando
         expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').find('.spinner').exists()).toBe(true);
     });

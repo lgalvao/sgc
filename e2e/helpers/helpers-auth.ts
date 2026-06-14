@@ -24,7 +24,7 @@ export const USUARIOS = {
     CHEFE_SECAO_212: {titulo: '181818', senha: 'senha'}, // Pete townshend (Seção 212)
     CHEFE_SECAO_221: {titulo: '141414', senha: 'senha'}, // Tina turner (Seção 221)
     CHEFE_ASSESSORIA_11: {titulo: '555555', senha: 'senha'}, // David bowie (Assessoria 11)
-    CHEFE_ASSESSORIA_12: {titulo: '151515', senha: 'senha'}, // Axl rose (Assessoria 12)
+    CHEFE_ASSESSORIA_12: {titulo: '151515', senha: 'senha'}, // Ana Beatriz de Albuquerque e Souza (Assessoria 12)
     CHEFE_SECAO_121: {titulo: '171717', senha: 'senha'}, // Lemmy kilmister (Seção 121)
     CHEFE_SECAO_111: {titulo: '333333', senha: 'senha'}, // Chefe da Seção 111
     CHEFE_SECAO_112: {titulo: '444444', senha: 'senha'}, // Chefe da Seção 112

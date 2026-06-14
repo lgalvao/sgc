@@ -26,3 +26,6 @@ Ator: CHEFE
 
 5. O sistema altera a situação individual do servidor para 'Avaliação impossibilitada' e mostra a mensagem
    "Impossibilidade registrada".
+
+6. A partir desse momento, na tela `Detalhes do subprocesso`, o sistema passa a habilitar a ação `Permitir avaliação`
+   para o servidor impossibilitado, permitindo reverter a impossibilidade quando necessário.

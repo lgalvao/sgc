@@ -3,7 +3,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {computed, nextTick, ref} from 'vue';
 import {createPinia, setActivePinia} from 'pinia';
-import DiagnosticoEquipePainel from '../DiagnosticoEquipePainel.vue';
+import SubprocessoDiagnosticoPainel from '../SubprocessoDiagnosticoPainel.vue';
 import {TEXTOS} from '@/constants/textos';
 
 const pushMock = vi.fn();
@@ -78,8 +78,8 @@ vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     }),
 }));
 
-vi.mock('@/composables/useMonitoramentoDiagnostico', () => ({
-    useMonitoramentoDiagnostico: () => ({
+vi.mock('@/composables/useDiagnosticoUnidade', () => ({
+    useDiagnosticoUnidade: () => ({
         unidade: ref({unidadeSigla: 'ASSESSORIA_12', unidadeNome: 'Assessoria 12'}),
         servidores,
     }),
@@ -118,7 +118,7 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
     }),
 }));
 
-describe('DiagnosticoEquipePainel', () => {
+describe('SubprocessoDiagnosticoPainel', () => {
     beforeEach(() => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
@@ -153,7 +153,7 @@ describe('DiagnosticoEquipePainel', () => {
     });
 
     function montar(props?: Record<string, unknown>) {
-        return mount(DiagnosticoEquipePainel, {
+        return mount(SubprocessoDiagnosticoPainel, {
             props: {
                 codSubprocesso: 400,
                 siglaUnidade: 'ASSESSORIA_12',
@@ -215,7 +215,7 @@ describe('DiagnosticoEquipePainel', () => {
         const wrapper = montar({exibirCabecalho: false, exibirBotaoVoltar: false});
 
         expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(true);
-        expect(wrapper.text()).not.toContain('Monitoramento do Diagnóstico');
+        expect(wrapper.text()).not.toContain('Monitoramento');
         expect(wrapper.text()).not.toContain('Voltar');
     });
 

@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
@@ -6,12 +7,30 @@ plugins {
     alias(libs.plugins.spotbugs) apply false
     alias(libs.plugins.open.rewrite) apply false
     alias(libs.plugins.node)
+    alias(libs.plugins.gradle.versions)
     idea
 }
 
 node {
     download.set(true)
     version.set("26.1.0")
+}
+
+tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
+    checkForGradleUpdate = false
+    revision = "release"
+    rejectVersionIf {
+        val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { candidate.version.uppercase().contains(it) }
+        val regex = "^[0-9,.v-]+(-r)?$".toRegex()
+        val isStable = stableKeyword || regex.matches(candidate.version)
+        val candidateIsNonStable = !isStable
+        
+        val currentStableKeyword = listOf("RELEASE", "FINAL", "GA").any { currentVersion.uppercase().contains(it) }
+        val currentIsStable = currentStableKeyword || regex.matches(currentVersion)
+        val currentIsNonStable = !currentIsStable
+        
+        candidateIsNonStable && !currentIsNonStable
+    }
 }
 
 allprojects {

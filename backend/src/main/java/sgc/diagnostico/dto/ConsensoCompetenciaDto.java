@@ -5,6 +5,7 @@ import lombok.Builder;
 @Builder
 public record ConsensoCompetenciaDto(
         Long competenciaCodigo,
+        String competenciaDescricao,
         Integer autoimportancia,
         Integer autodominio,
         Integer chefiaImportancia,

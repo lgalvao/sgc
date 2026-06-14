@@ -301,7 +301,7 @@ describe("SubprocessoCards.vue", () => {
         }));
     });
 
-    it("renderiza cards de Diagnóstico (Autoavaliacao e Consenso)", () => {
+    it("renderiza cards de Diagnóstico para servidor", () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -320,10 +320,9 @@ describe("SubprocessoCards.vue", () => {
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-consenso"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').exists()).toBe(false);
-        expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(false);
     });
 
-    it("renderiza cards de Diagnóstico (Monitoramento e Situações de Capacitação)", () => {
+    it("renderiza card de situação de capacitação para chefia", () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -342,7 +341,6 @@ describe("SubprocessoCards.vue", () => {
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="card-subprocesso-consenso"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="card-subprocesso-monitoramento"]').exists()).toBe(true);
     });
 
     it("navega para diagnóstico", async () => {
@@ -407,7 +405,7 @@ describe("SubprocessoCards.vue", () => {
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
     });
 
-    it("abre monitoramento ao clicar no card de monitoramento quando a chefia pode criar consenso", async () => {
+    it("abre situação de capacitação ao clicar no card da chefia", async () => {
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -424,10 +422,10 @@ describe("SubprocessoCards.vue", () => {
             }),
         });
 
-        await wrapper.find('[data-testid="card-subprocesso-monitoramento"]').trigger("click");
+        await wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').trigger("click");
 
         expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            name: "MonitoramentoDiagnostico",
+            name: "SituacaoCapacitacaoDiagnostico",
             params: {codSubprocesso: 1, siglaUnidade: "ASSESSORIA_12"},
         }));
     });

@@ -21,7 +21,7 @@ const itensEquipe = ref([
     {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'CONSENSO_CRIADO'},
 ]);
 const competenciasLocaisVal = ref<any>([
-    {competenciaCodigo: 10, importancia: 2, dominio: 1},
+    {competenciaCodigo: 10, competenciaDescricao: 'Competência A', importancia: 2, dominio: 1},
 ]);
 
 vi.mock('vue-router', () => ({
@@ -154,7 +154,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
             },
         };
         competenciasLocaisVal.value = [
-            {competenciaCodigo: 10, importancia: 2, dominio: 1},
+            {competenciaCodigo: 10, competenciaDescricao: 'Competência A', importancia: 2, dominio: 1},
         ];
     });
 
@@ -249,10 +249,20 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         aprovarConsensoMock.mockRejectedValue(erroAprovar.value);
         const wrapper = montar();
 
-        expect(wrapper.text()).toContain('O responsavel pela unidade registrou a avaliação de consenso.');
         await wrapper.get('[data-testid="btn-aprovar-consenso"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-aprovar"]').trigger('click');
         expect(wrapper.text()).toContain('Falha ao aprovar');
+    });
+
+    it('usa apenas a descrição vinda da autoavaliação', () => {
+        competenciasLocaisVal.value = [
+            {competenciaCodigo: 10, competenciaDescricao: 'Competência vinda do backend', importancia: 2, dominio: 1},
+        ];
+
+        const wrapper = montar();
+
+        expect(wrapper.text()).toContain('Competência vinda do backend');
+        expect(wrapper.text()).not.toContain('Competencia 10');
     });
 
     it('exibe alertas por situação do servidor, atualiza nota e volta pela navegação', async () => {

@@ -20,13 +20,13 @@ vi.mock('@/composables/useDiagnosticoContexto', () => ({
 }));
 
 const situacoesLocaisVal = ref<any[]>([
-    {servidorTitulo: '242426', servidorNome: 'Duff McKagan', competenciaCodigo: 10, situacaoCapacitacao: null},
-    {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
+    {servidorTitulo: '242426', servidorNome: 'João Guilherme de Albuquerque Maranhão', competenciaCodigo: 10, situacaoCapacitacao: null},
+    {servidorTitulo: '242427', servidorNome: 'Maria Eduarda Cavalcanti de Alencar', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
 ]);
 
 const servidoresVal = ref<any[]>([
-    {servidorTitulo: '242426', servidorNome: 'Duff McKagan'},
-    {servidorTitulo: '242427', servidorNome: 'Izzy Stradlin'},
+    {servidorTitulo: '242426', servidorNome: 'João Guilherme de Albuquerque Maranhão'},
+    {servidorTitulo: '242427', servidorNome: 'Maria Eduarda Cavalcanti de Alencar'},
 ]);
 
 const carregandoVal = ref(false);
@@ -50,7 +50,7 @@ vi.mock('@/composables/useSituacaoCapacitacaoDiagnostico', () => ({
 }));
 
 describe('SituacaoCapacitacaoDiagnosticoView', () => {
-    it('simplifica o cabeçalho e apresenta a matriz competência x servidor', () => {
+    it('simplifica o cabeçalho e apresenta competências para o servidor selecionado', () => {
         const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,
@@ -64,7 +64,10 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                     EmptyState: {template: '<div />'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
                     BCard: {template: '<section><slot /></section>'},
-                    BFormSelect: {template: '<select v-bind="$attrs"></select>'},
+                    BFormSelect: {
+                        props: ['modelValue', 'options'],
+                        template: '<select :value="modelValue" v-bind="$attrs"><option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.text }}</option></select>'
+                    },
                     BSpinner: {template: '<span />'},
                 },
             },
@@ -72,27 +75,25 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
 
         expect(wrapper.text()).toContain('Situação de Capacitação');
         expect(wrapper.text()).toContain('ASSESSORIA_12');
-        expect(wrapper.text()).toContain('Duff M.');
-        expect(wrapper.text()).toContain('Izzy S.');
+        expect(wrapper.text()).toContain('Servidor analisado');
+        expect(wrapper.text()).toContain('João Guilherme de Albuquerque Maranhão');
         expect(wrapper.text()).toContain('Competência A');
         expect(wrapper.text()).not.toContain('Assessoria 12');
         expect(wrapper.text()).not.toContain('Existem 1 situações de capacitação sem valor definido.');
-        expect(wrapper.text()).not.toContain('242426');
-        expect(wrapper.find('.bi-award').exists()).toBe(false);
-        expect(wrapper.find('th[title="Duff McKagan"]').exists()).toBe(true);
-        expect(wrapper.find('th[title="Izzy Stradlin"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="select-servidor-situacao-capacitacao"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="detalhes-servidor-situacao-capacitacao"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="situacao-242426-10"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="situacao-242427-10"]').exists()).toBe(true);
         expect(wrapper.text()).not.toContain('Concluir diagnóstico');
     });
 
-    it('exercita casos especiais de abreviarNomeServidor e exibirTituloSecundario', () => {
+    it('troca o servidor selecionado e reaproveita a mesma lista de competências', async () => {
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Axl'}, // Uma palavra só
-            {servidorTitulo: '2', servidorNome: 'Slash'}, // Outra
-            {servidorTitulo: '3', servidorNome: 'ChristopherR Wallace'}, // >= 10 letras no 1 nome + segundo nome
-            {servidorTitulo: '4', servidorNome: 'Steven Adler'},
-            {servidorTitulo: '5', servidorNome: 'Steven Adler'}, // Mesmo abreviado "Steven A.", forca exibirTituloSecundario
+            {servidorTitulo: '1', servidorNome: 'Ana Beatriz de Albuquerque e Souza'},
+            {servidorTitulo: '2', servidorNome: 'Luiz Fernando Cavalcanti de Moura'},
+        ];
+        situacoesLocaisVal.value = [
+            {servidorTitulo: '1', servidorNome: 'Ana Beatriz de Albuquerque e Souza', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
+            {servidorTitulo: '2', servidorNome: 'Luiz Fernando Cavalcanti de Moura', competenciaCodigo: 10, situacaoCapacitacao: 'I'},
         ];
 
         const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
@@ -108,16 +109,20 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                     EmptyState: {template: '<div />'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
                     BCard: {template: '<section><slot /></section>'},
-                    BFormSelect: {template: '<select v-bind="$attrs"></select>'},
+                    BFormSelect: {
+                        props: ['modelValue', 'options'],
+                        emits: ['update:modelValue'],
+                        template: '<select :value="modelValue" v-bind="$attrs" @change="$emit(\'update:modelValue\', $event.target.value)"><option v-for="opt in options" :key="opt.value" :value="opt.value">{{ opt.text }}</option></select>'
+                    },
                     BSpinner: {template: '<span />'},
                 },
             },
         });
 
-        expect(wrapper.text()).toContain('Axl');
-        expect(wrapper.text()).toContain('ChristopherR');
-        expect(wrapper.text()).toContain('Steven A.');
-        expect(wrapper.find('small.cabecalho-servidor-titulo').exists()).toBe(true);
+        expect(wrapper.text()).toContain('Ana Beatriz de Albuquerque e Souza');
+        await wrapper.get('[data-testid="select-servidor-situacao-capacitacao"]').setValue('2');
+        expect(wrapper.text()).toContain('Luiz Fernando Cavalcanti de Moura');
+        expect(wrapper.find('[data-testid="situacao-2-10"]').exists()).toBe(true);
     });
 
     it('exercita empty state e update capacitacao', async () => {
@@ -171,7 +176,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
             },
         });
 
-        const select = wrapperSelect.find('select');
+        const select = wrapperSelect.findAll('select')[1];
         await select.setValue('AC');
         expect(atualizarCapacitacaoMock).toHaveBeenCalledWith('1', 10, 'AC');
     });

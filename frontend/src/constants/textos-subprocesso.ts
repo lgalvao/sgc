@@ -53,13 +53,11 @@ export const TEXTOS_SUBPROCESSO = {
         MAPA_TITULO: "Mapa de competências",
         MAPA_TEXTO: "Mapa de competências técnicas da unidade",
         AUTOAVALIACAO_TITULO: "Autoavaliação",
-        AUTOAVALIACAO_TEXTO: "Realize sua autoavaliação",
+        AUTOAVALIACAO_TEXTO: "Avaliar importância e domínio de cada competência",
         CONSENSO_TITULO: "Avaliação de consenso",
-        CONSENSO_TEXTO: "Consulte, aprove ou mantenha as avaliações de consenso",
+        CONSENSO_TEXTO: "Consultar ou aprovar avaliações de consenso",
         SITUACAO_CAPACITACAO_TITULO: "Situação de capacitação",
         SITUACAO_CAPACITACAO_TEXTO: "Preenchimento da situação de capacitação dos servidores da unidade",
-        MONITORAMENTO_TITULO: "Monitoramento",
-        MONITORAMENTO_TEXTO: "Acompanhamento e conclusão do diagnóstico da unidade",
     },
 } as const;
 

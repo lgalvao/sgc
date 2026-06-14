@@ -30,7 +30,7 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
-        await expect(page.getByText(`Duff McKagan - ${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
+        await expect(page.getByText(`João Guilherme de Albuquerque Maranhão - ${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
         await expect(page.locator('[data-testid^="consenso-chefia-importancia-"]').first()).toBeVisible();
         await expect(page.locator('[data-testid^="consenso-chefia-dominio-"]').first()).toBeVisible();
         const seletorConsensoImportancia = page.locator('[data-testid^="consenso-final-importancia-"]').first();

@@ -8,8 +8,8 @@ import lombok.Builder;
 @Builder
 public record AvaliacaoCompetenciaDto(
         @NotNull Long competenciaCodigo,
+        String competenciaDescricao,
         @Min(0) @Max(6) Integer importancia,
         @Min(0) @Max(6) Integer dominio
 ) {
 }
-
