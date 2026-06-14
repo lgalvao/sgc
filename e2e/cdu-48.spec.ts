@@ -29,8 +29,8 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
         await abrirAcaoCapacitacaoDiagnostico(page);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/situacao-capacitacao`));
         await expect(page.getByRole('heading', {name: /Situação de capacitação/i})).toBeVisible();
-        await expect(page.getByTestId('select-servidor-situacao-capacitacao')).toBeVisible();
-        await page.getByTestId('select-servidor-situacao-capacitacao').selectOption(TITULO_SERVIDOR_ASSESSORIA_12);
+        await expect(page.getByTestId('lista-servidores-situacao-capacitacao')).toBeVisible();
+        await page.getByTestId(`btn-selecionar-servidor-situacao-capacitacao-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
         await expect(page.getByTestId('detalhes-servidor-situacao-capacitacao')).toContainText(TITULO_SERVIDOR_ASSESSORIA_12);
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
@@ -64,7 +64,7 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
 
         await abrirAcaoCapacitacaoDiagnostico(page);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/situacao-capacitacao`));
-        await page.getByTestId('select-servidor-situacao-capacitacao').selectOption(TITULO_SERVIDOR_ASSESSORIA_12);
+        await page.getByTestId(`btn-selecionar-servidor-situacao-capacitacao-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
         await expect(page.getByTestId(testIdCapacitacao!)).toHaveValue(VALOR_CAPACITACAO);
     });
 });

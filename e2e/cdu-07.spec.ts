@@ -380,7 +380,7 @@ test.describe('CDU-07 - Detalhar subprocesso', () => {
         await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
         await expect(page.getByText('Servidores participantes', {exact: true})).toBeVisible();
         await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
-        await expect(page.getByTestId('select-servidor-diagnostico-unidade')).toBeVisible();
+        await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toBeVisible();
     });
 
     test('Regressão - cache de sessão no subprocesso: deve habilitar atividades para CHEFE após logout de ADMIN sem limpar caches da SPA', async ({

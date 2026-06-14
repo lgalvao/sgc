@@ -18,7 +18,8 @@ Ator: CHEFE
 3. O usuário aciona o card `Situação de capacitação`.
 
 4. O sistema apresenta a lista das competências vigentes da unidade para um servidor selecionado, contendo:
-    - um controle `Servidor analisado`, em formato *drop-down*, com os servidores participantes da unidade;
+    - uma lista de servidores participantes da unidade para seleção do `Servidor analisado`;
+    - ao lado de cada servidor da lista, sua situação atual no diagnóstico;
     - uma linha para cada competência vigente da unidade;
     - uma coluna editável (dropdown) `Situação de capacitação` para cada competência do servidor selecionado;
     - cabeçalho com nome completo e título do servidor selecionado;

@@ -734,7 +734,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
             await expect(page.getByText(SIGLA_UNIDADE_DIAGNOSTICO, {exact: true})).toBeVisible();
             await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
-            await expect(page.getByTestId('select-servidor-diagnostico-unidade')).toBeVisible();
+            await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toBeVisible();
             await expect(page.getByTestId('detalhes-servidor-diagnostico-unidade')).toContainText('João Guilherme de Albuquerque Maranhão');
 
             await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);

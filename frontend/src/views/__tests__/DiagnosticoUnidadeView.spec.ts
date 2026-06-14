@@ -181,15 +181,8 @@ describe('DiagnosticoUnidadeView', () => {
                         emits: ['update:modelValue'],
                         template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
                     },
-                    BFormSelect: {
-                        props: ['modelValue', 'options'],
-                        emits: ['update:modelValue'],
-                        template: `
-                          <select :value="modelValue" v-bind="$attrs" @change="$emit('update:modelValue', $event.target.value)">
-                            <option v-for="opcao in options" :key="opcao.value" :value="opcao.value">{{ opcao.text }}</option>
-                          </select>
-                        `,
-                    },
+                    BListGroup: {template: '<div><slot /></div>'},
+                    BListGroupItem: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BModal: {
                         props: ['modelValue'],
                         emits: ['update:modelValue'],
@@ -221,7 +214,7 @@ describe('DiagnosticoUnidadeView', () => {
         });
     }
 
-    it('renderiza o resumo da unidade, participantes, seletor de servidor e histórico do diagnóstico', () => {
+    it('renderiza o resumo da unidade, participantes, lista de servidores e histórico do diagnóstico', () => {
         const wrapper = montar();
 
         expect(wrapper.text()).toContain(SIGLA_UNIDADE);
@@ -234,7 +227,8 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('EC');
         expect(wrapper.text()).toContain('Diagnóstico concluído');
         expect(wrapper.find('[data-testid="btn-historico-analise-unidade"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="select-servidor-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="lista-servidores-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.find(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}"]`).exists()).toBe(true);
         expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="movimentacoes"]').exists()).toBe(true);
@@ -273,13 +267,12 @@ describe('DiagnosticoUnidadeView', () => {
         ];
 
         const wrapper = montar();
-        const seletor = wrapper.get('[data-testid="select-servidor-diagnostico-unidade"]');
 
         expect(wrapper.text()).toContain(NOME_SERVIDOR);
         expect(wrapper.text()).toContain('Avaliação de consenso aprovada');
         expect(wrapper.text()).toContain('EC');
 
-        await seletor.setValue(outroServidorTitulo);
+        await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${outroServidorTitulo}"]`).trigger('click');
 
         expect(wrapper.text()).toContain(outroServidorNome);
         expect(wrapper.text()).toContain('Autoavaliação concluída');
@@ -424,15 +417,8 @@ describe('DiagnosticoUnidadeView', () => {
                     BSpinner: {template: '<span />'},
                     BFormText: {template: '<small><slot /></small>'},
                     BFormTextarea: {template: '<textarea />'},
-                    BFormSelect: {
-                        props: ['modelValue', 'options'],
-                        emits: ['update:modelValue'],
-                        template: `
-                          <select :value="modelValue" @change="$emit('update:modelValue', $event.target.value)">
-                            <option v-for="opcao in options" :key="opcao.value" :value="opcao.value">{{ opcao.text }}</option>
-                          </select>
-                        `,
-                    },
+                    BListGroup: {template: '<div><slot /></div>'},
+                    BListGroupItem: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BModal: {template: '<div />'},
                     HistoricoAnaliseModal: {template: '<div />'},
                     SubprocessoMovimentacoes: {template: '<div />'},

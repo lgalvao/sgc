@@ -162,11 +162,11 @@ async function verificarTelaAnaliseDiagnostico(page: Page): Promise<void> {
     await expect(page.getByRole('cell', {name: NOME_SERVIDOR_IMPOSSIBILITADO, exact: true}).first()).toBeVisible();
     await expect(page.getByText(NOME_CHEFE, {exact: true})).toHaveCount(0);
     await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
-    const seletorServidor = page.getByTestId('select-servidor-diagnostico-unidade');
-    await expect(seletorServidor).toBeVisible();
-    await expect(seletorServidor).toContainText(NOME_SERVIDOR);
-    await expect(seletorServidor).toContainText(NOME_SERVIDOR_IMPOSSIBILITADO);
-    await seletorServidor.selectOption(TITULO_SERVIDOR);
+    const listaServidores = page.getByTestId('lista-servidores-diagnostico-unidade');
+    await expect(listaServidores).toBeVisible();
+    await expect(listaServidores).toContainText(NOME_SERVIDOR);
+    await expect(listaServidores).toContainText(NOME_SERVIDOR_IMPOSSIBILITADO);
+    await page.getByTestId(`btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}`).click();
     await expect(page.getByTestId('detalhes-servidor-diagnostico-unidade')).toContainText(NOME_SERVIDOR);
     await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toBeVisible();
     await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toContainText('Importância');

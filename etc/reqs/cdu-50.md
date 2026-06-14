@@ -29,8 +29,8 @@ Ator: GESTOR, ADMIN
     - `Registrar aceite`, apenas para GESTOR;
     - `Homologar`, apenas para ADMIN;
 - lista dos servidores participantes da unidade, *exceto o responsável pela unidade*;
-- controle `Servidor analisado`, em formato *drop-down*, contendo os servidores participantes da unidade, exceto o
-  responsável pela unidade;
+- lista de servidores participantes da unidade, exceto o responsável pela unidade, para seleção do `Servidor analisado`;
+- ao lado de cada servidor dessa lista, sua situação atual no diagnóstico;
 - lista somente-leitura das competências do mapa vigente da unidade para o servidor selecionado, contendo:
     - uma linha para cada competência;
     - colunas `Importância`, `Domínio` e `Situação de Capacitação` referentes ao servidor selecionado;

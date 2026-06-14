@@ -124,19 +124,28 @@
           />
 
           <template v-else>
-            <label class="form-label" for="select-servidor-diagnostico-unidade">
-              {{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}
-            </label>
-            <BFormSelect
-                id="select-servidor-diagnostico-unidade"
-                v-model="servidorSelecionadoTitulo"
-                class="mb-3"
-                data-testid="select-servidor-diagnostico-unidade"
-                :options="servidoresExibidos.map((item) => ({
-                  value: item.servidorTitulo,
-                  text: `${item.servidorNome} (${item.servidorTitulo})`,
-                }))"
-            />
+            <div class="mb-3">
+              <div class="form-label">{{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}</div>
+              <BListGroup data-testid="lista-servidores-diagnostico-unidade">
+                <BListGroupItem
+                    v-for="item in servidoresExibidos"
+                    :key="item.servidorTitulo"
+                    :active="item.servidorTitulo === servidorSelecionadoTitulo"
+                    button
+                    class="d-flex align-items-center justify-content-between gap-3"
+                    :data-testid="`btn-selecionar-servidor-diagnostico-unidade-${item.servidorTitulo}`"
+                    @click="servidorSelecionadoTitulo = item.servidorTitulo"
+                >
+                  <div>
+                    <div class="fw-semibold">{{ item.servidorNome }}</div>
+                    <small class="text-muted">Título {{ item.servidorTitulo }}</small>
+                  </div>
+                  <BBadge :variant="varianteSituacaoServidor(item.situacaoServidor)">
+                    {{ formatarSituacaoServidor(item.situacaoServidor) }}
+                  </BBadge>
+                </BListGroupItem>
+              </BListGroup>
+            </div>
 
             <BCard
                 v-if="servidorSelecionado"
@@ -235,9 +244,10 @@ import {
   BCol,
   BDropdown,
   BDropdownItemButton,
-  BFormSelect,
   BFormText,
   BFormTextarea,
+  BListGroup,
+  BListGroupItem,
   BModal,
   BRow,
   BSpinner,

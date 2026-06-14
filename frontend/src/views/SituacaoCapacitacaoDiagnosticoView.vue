@@ -33,19 +33,28 @@
         />
 
         <div v-else class="p-3">
-          <label class="form-label" for="select-servidor-situacao-capacitacao">
-            {{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}
-          </label>
-          <BFormSelect
-              id="select-servidor-situacao-capacitacao"
-              v-model="servidorSelecionadoTitulo"
-              class="mb-3"
-              data-testid="select-servidor-situacao-capacitacao"
-              :options="servidores.map((item) => ({
-                value: item.servidorTitulo,
-                text: `${item.servidorNome} (${item.servidorTitulo})`,
-              }))"
-          />
+          <div class="mb-3">
+            <div class="form-label">{{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}</div>
+            <BListGroup data-testid="lista-servidores-situacao-capacitacao">
+              <BListGroupItem
+                  v-for="item in servidores"
+                  :key="item.servidorTitulo"
+                  :active="item.servidorTitulo === servidorSelecionadoTitulo"
+                  button
+                  class="d-flex align-items-center justify-content-between gap-3"
+                  :data-testid="`btn-selecionar-servidor-situacao-capacitacao-${item.servidorTitulo}`"
+                  @click="servidorSelecionadoTitulo = item.servidorTitulo"
+              >
+                <div>
+                  <div class="fw-semibold">{{ item.servidorNome }}</div>
+                  <small class="text-muted">Título {{ item.servidorTitulo }}</small>
+                </div>
+                <BBadge :variant="varianteSituacaoServidor(item.situacaoServidor)">
+                  {{ formatarSituacaoServidor(item.situacaoServidor) }}
+                </BBadge>
+              </BListGroupItem>
+            </BListGroup>
+          </div>
 
           <BCard
               v-if="servidorSelecionado"
@@ -95,9 +104,12 @@
 import {computed, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {
+  BBadge,
   BButton,
   BCard,
   BFormSelect,
+  BListGroup,
+  BListGroupItem,
   BSpinner,
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
@@ -107,7 +119,7 @@ import EmptyState from '@/components/comum/EmptyState.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useSituacaoCapacitacaoDiagnostico} from '@/composables/useSituacaoCapacitacaoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
-import type {ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
+import type {SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -161,6 +173,32 @@ const opcoesCapacitacao = [
   {value: 'C', text: TEXTOS.diagnostico.CAPACITACAO_C},
   {value: 'I', text: TEXTOS.diagnostico.CAPACITACAO_I},
 ];
+
+function varianteSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor) {
+  switch (situacaoServidor) {
+    case 'CONSENSO_APROVADO':
+      return 'success';
+    case 'AVALIACAO_IMPOSSIBILITADA':
+      return 'secondary';
+    case 'CONSENSO_CRIADO':
+      return 'warning';
+    case 'AUTOAVALIACAO_CONCLUIDA':
+      return 'info';
+    default:
+      return 'light';
+  }
+}
+
+function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): string {
+  const mapa: Record<SituacaoAvaliacaoServidor, string> = {
+    AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
+    AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
+    CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
+    CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
+    AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
+  };
+  return mapa[situacaoServidor] ?? situacaoServidor;
+}
 </script>
 
 <style scoped>
