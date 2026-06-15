@@ -48,6 +48,18 @@ const mainRoutes: RouteRecordRaw[] = [
         meta: {title: "Relatório de Mapas Vigentes"},
     },
     {
+        path: "/relatorios/diagnostico/gaps",
+        name: "RelatorioDiagnosticoGaps",
+        component: () => import("@/views/RelatorioDiagnosticoGapsView.vue"),
+        meta: {title: "Relatório de Gaps de Diagnóstico"},
+    },
+    {
+        path: "/relatorios/diagnostico/situacao-capacitacao",
+        name: "RelatorioDiagnosticoSituacaoCapacitacao",
+        component: () => import("@/views/RelatorioDiagnosticoSituacaoCapacitacaoView.vue"),
+        meta: {title: "Relatório de Situação de Capacitação"},
+    },
+    {
         path: "/relatorios/unidades-sem-mapas-vigentes",
         name: "RelatorioUnidadesSemMapasVigentes",
         component: () => import("@/views/RelatorioUnidadesSemMapasVigentesView.vue"),

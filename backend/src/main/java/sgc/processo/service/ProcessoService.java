@@ -68,6 +68,7 @@ public class ProcessoService {
     private final ConfiguracaoService configuracaoService;
     private final MapaManutencaoService mapaManutencaoService;
     private final sgc.diagnostico.service.DiagnosticoNotificacaoService diagnosticoNotificacaoService;
+    private final sgc.diagnostico.service.DiagnosticoFluxoService diagnosticoFluxoService;
     private final sgc.processo.ProcessoDtoMapper processoDtoMapper;
 
 
@@ -333,11 +334,7 @@ public class ProcessoService {
             List<Subprocesso> subprocessos,
             ProcessarAnaliseEmBlocoCommand analise
     ) {
-        AcaoPermissao acaoRequerida = switch (analise.acao()) {
-            case ACEITAR -> ACEITAR_MAPA;
-            case HOMOLOGAR -> HOMOLOGAR_MAPA;
-            default -> null;
-        };
+        AcaoPermissao acaoRequerida = obterAcaoPermissaoAnaliseEmBloco(subprocessos, analise.acao());
         if (acaoRequerida == null) {
             return;
         }
@@ -717,6 +714,22 @@ public class ProcessoService {
         );
     }
 
+    private boolean podeAceitarDiagnosticoEmBloco(
+            Subprocesso subprocesso,
+            Usuario usuario,
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
+    ) {
+        return podeExecutarAcaoEmBloco(
+                subprocesso,
+                usuario,
+                usarLocalizacoesPrecarregadas,
+                localizacoesPrecarregadas,
+                VALIDAR_DIAGNOSTICO,
+                situacao -> situacao == DIAGNOSTICO_CONCLUIDO
+        );
+    }
+
     private boolean podeHomologarCadastroEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
@@ -818,6 +831,7 @@ public class ProcessoService {
         return new ElegibilidadeAcaoBloco(
                 podeAceitarCadastroEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
                 podeAceitarMapaEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
+                podeAceitarDiagnosticoEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
                 podeHomologarCadastroEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
                 podeHomologarMapaEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
                 podeDisponibilizarEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas)
@@ -834,6 +848,7 @@ public class ProcessoService {
                 .situacao(sp.getSituacao().name())
                 .habilitarAceitarCadastroBloco(elegibilidade.habilitarAceitarCadastroBloco())
                 .habilitarAceitarMapaBloco(elegibilidade.habilitarAceitarMapaBloco())
+                .habilitarAceitarDiagnosticoBloco(elegibilidade.habilitarAceitarDiagnosticoBloco())
                 .habilitarHomologarCadastroBloco(elegibilidade.habilitarHomologarCadastroBloco())
                 .habilitarHomologarMapaBloco(elegibilidade.habilitarHomologarMapaBloco())
                 .habilitarDisponibilizarMapaBloco(elegibilidade.habilitarDisponibilizarMapaBloco())
@@ -875,6 +890,20 @@ public class ProcessoService {
                         .texto(Mensagens.TEXTO_SELECAO_ACEITE_MAPA)
                         .rotuloBotao(Mensagens.BOTAO_REGISTRAR_ACEITE)
                         .mensagemSucesso(Mensagens.SUCESSO_ACEITE_MAPA_BLOCO)
+                        .processoAtivo(processoAtivo)
+                        .build()),
+                criarAcaoBloco(AcaoBlocoContexto.builder()
+                        .codigo("aceitar-diagnostico")
+                        .acao(ACEITAR)
+                        .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarDiagnosticoBloco))
+                        .perfilPermite(AcaoPermissao.VALIDAR_DIAGNOSTICO.permitePerfil(perfil))
+                        .requerDataLimite(false)
+                        .redirecionarPainel(true)
+                        .rotulo(Mensagens.LABEL_VALIDAR_DIAGNOSTICO_BLOCO)
+                        .titulo(Mensagens.TITULO_VALIDACAO_DIAGNOSTICO_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_VALIDACAO_DIAGNOSTICO)
+                        .rotuloBotao(Mensagens.BOTAO_REGISTRAR_ACEITE)
+                        .mensagemSucesso(Mensagens.SUCESSO_VALIDACAO_DIAGNOSTICO_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
                 criarAcaoBloco(AcaoBlocoContexto.builder()
@@ -1318,22 +1347,31 @@ public class ProcessoService {
     }
 
     private void processarAcoesBlocoAceiteHomologacao(ProcessarAnaliseEmBlocoCommand req, List<Subprocesso> list) {
-        Map<Boolean, List<Long>> separacao = list.stream()
-                .collect(Collectors.partitioningBy(
-                        sp -> isSituacaoCadastro(sp.getSituacao()),
-                        Collectors.mapping(Subprocesso::getCodigo, Collectors.toList())
-                ));
-
-        List<Long> cadastro = separacao.getOrDefault(true, List.of());
-        List<Long> validacao = separacao.getOrDefault(false, List.of());
+        List<Long> cadastro = list.stream()
+                .filter(sp -> isSituacaoCadastro(sp.getSituacao()))
+                .map(Subprocesso::getCodigo)
+                .toList();
+        List<Long> diagnostico = list.stream()
+                .filter(sp -> sp.getSituacao() == DIAGNOSTICO_CONCLUIDO)
+                .map(Subprocesso::getCodigo)
+                .toList();
+        List<Long> validacao = list.stream()
+                .filter(sp -> !isSituacaoCadastro(sp.getSituacao()) && sp.getSituacao() != DIAGNOSTICO_CONCLUIDO)
+                .map(Subprocesso::getCodigo)
+                .toList();
 
         switch (req.acao()) {
-            case ACEITAR -> executarTransicoesEmBloco(
-                    cadastro,
-                    validacao,
-                    cadastroFluxoService::aceitarCadastroEmBloco,
-                    transicaoService::aceitarValidacaoEmBloco
-            );
+            case ACEITAR -> {
+                executarTransicoesEmBloco(
+                        cadastro,
+                        validacao,
+                        cadastroFluxoService::aceitarCadastroEmBloco,
+                        transicaoService::aceitarValidacaoEmBloco
+                );
+                if (!diagnostico.isEmpty()) {
+                    diagnosticoFluxoService.validarDiagnosticosEmBloco(diagnostico);
+                }
+            }
             case HOMOLOGAR -> executarTransicoesEmBloco(
                     cadastro,
                     validacao,
@@ -1362,6 +1400,29 @@ public class ProcessoService {
         return s == MAPEAMENTO_CADASTRO_DISPONIBILIZADO ||
                 s == REVISAO_CADASTRO_DISPONIBILIZADA ||
                 s == REVISAO_CADASTRO_HOMOLOGADA;
+    }
+
+    private @Nullable AcaoPermissao obterAcaoPermissaoAnaliseEmBloco(List<Subprocesso> subprocessos, AcaoProcesso acao) {
+        if (subprocessos.isEmpty()) {
+            return null;
+        }
+
+        if (acao == DISPONIBILIZAR) {
+            return null;
+        }
+
+        TipoProcesso tipoProcesso = subprocessos.getFirst().getProcesso().getTipo();
+        return switch (acao) {
+            case ACEITAR -> switch (tipoProcesso) {
+                case DIAGNOSTICO -> VALIDAR_DIAGNOSTICO;
+                case MAPEAMENTO, REVISAO -> ACEITAR_MAPA;
+            };
+            case HOMOLOGAR -> switch (tipoProcesso) {
+                case DIAGNOSTICO -> null;
+                case MAPEAMENTO, REVISAO -> HOMOLOGAR_MAPA;
+            };
+            case DISPONIBILIZAR -> null;
+        };
     }
 
     private void validarSelecaoBloco(List<Long> codigos, List<Subprocesso> list) {
@@ -1447,6 +1508,7 @@ public class ProcessoService {
     private record ElegibilidadeAcaoBloco(
             boolean habilitarAceitarCadastroBloco,
             boolean habilitarAceitarMapaBloco,
+            boolean habilitarAceitarDiagnosticoBloco,
             boolean habilitarHomologarCadastroBloco,
             boolean habilitarHomologarMapaBloco,
             boolean habilitarDisponibilizarMapaBloco
@@ -1454,6 +1516,7 @@ public class ProcessoService {
         private boolean possuiAlgumaAcao() {
             return habilitarAceitarCadastroBloco
                     || habilitarAceitarMapaBloco
+                    || habilitarAceitarDiagnosticoBloco
                     || habilitarHomologarCadastroBloco
                     || habilitarHomologarMapaBloco
                     || habilitarDisponibilizarMapaBloco;

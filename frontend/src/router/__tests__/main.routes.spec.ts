@@ -12,12 +12,14 @@ vi.mock('@/views/NotificacoesAdminView.vue', () => ({default: {name: 'Notificaco
 vi.mock('@/views/FeedbacksAdminView.vue', () => ({default: {name: 'FeedbacksAdminView'}}));
 vi.mock('@/views/RelatorioAndamentoView.vue', () => ({default: {name: 'RelatorioAndamentoView'}}));
 vi.mock('@/views/RelatorioMapasView.vue', () => ({default: {name: 'RelatorioMapasView'}}));
+vi.mock('@/views/RelatorioDiagnosticoGapsView.vue', () => ({default: {name: 'RelatorioDiagnosticoGapsView'}}));
+vi.mock('@/views/RelatorioDiagnosticoSituacaoCapacitacaoView.vue', () => ({default: {name: 'RelatorioDiagnosticoSituacaoCapacitacaoView'}}));
 vi.mock('@/views/RelatorioUnidadesSemMapasVigentesView.vue', () => ({default: {name: 'RelatorioUnidadesSemMapasVigentesView'}}));
 vi.mock('@/views/ErroGeralView.vue', () => ({default: {name: 'ErroGeralView'}}));
 describe("main.routes", () => {
     it("deve exportar um array de rotas", () => {
         expect(Array.isArray(mainRoutes)).toBe(true);
-        expect(mainRoutes).toHaveLength(14);
+        expect(mainRoutes).toHaveLength(16);
     });
 
     it("deve conter a rota RelatorioAndamento", async () => {
@@ -28,6 +30,16 @@ describe("main.routes", () => {
     it("deve conter a rota RelatorioMapas", async () => {
         const route = mainRoutes.find((r) => r.name === "RelatorioMapas");
         expect(route?.path).toBe("/relatorios/mapas-vigentes");
+    });
+
+    it("deve conter a rota RelatorioDiagnosticoGaps", async () => {
+        const route = mainRoutes.find((r) => r.name === "RelatorioDiagnosticoGaps");
+        expect(route?.path).toBe("/relatorios/diagnostico/gaps");
+    });
+
+    it("deve conter a rota RelatorioDiagnosticoSituacaoCapacitacao", async () => {
+        const route = mainRoutes.find((r) => r.name === "RelatorioDiagnosticoSituacaoCapacitacao");
+        expect(route?.path).toBe("/relatorios/diagnostico/situacao-capacitacao");
     });
 
     it("deve conter a rota RelatorioUnidadesSemMapasVigentes", async () => {

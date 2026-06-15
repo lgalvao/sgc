@@ -112,6 +112,37 @@ export interface RelatorioMapa {
     competencias: RelatorioMapaCompetencia[];
 }
 
+export interface RelatorioDiagnosticoGapCompetencia {
+    competenciaCodigo: number;
+    competenciaDescricao: string;
+    mediaGap: number | null;
+    totalAvaliacoesConsideradas: number;
+}
+
+export interface RelatorioDiagnosticoGap {
+    codigoUnidade: number;
+    siglaUnidade: string;
+    nomeUnidade: string;
+    competencias: RelatorioDiagnosticoGapCompetencia[];
+}
+
+export interface RelatorioDiagnosticoSituacaoCapacitacaoCompetencia {
+    competenciaCodigo: number;
+    competenciaDescricao: string;
+    totalNaoSeAplica: number;
+    totalACapacitar: number;
+    totalEmCapacitacao: number;
+    totalCapacitado: number;
+    totalInstrutor: number;
+}
+
+export interface RelatorioDiagnosticoSituacaoCapacitacao {
+    codigoUnidade: number;
+    siglaUnidade: string;
+    nomeUnidade: string;
+    competencias: RelatorioDiagnosticoSituacaoCapacitacaoCompetencia[];
+}
+
 export const relatoriosService = {
     async obterRelatorioAndamento(codProcesso: number): Promise<RelatorioAndamento[]> {
         const response = await apiClient.get<RelatorioAndamento[]>(`/relatorios/andamento/${codProcesso}`);
@@ -134,6 +165,30 @@ export const relatoriosService = {
 
     async obterRelatorioMapaVigenteUnidade(codUnidade: number): Promise<RelatorioMapa> {
         const response = await apiClient.get<RelatorioMapa>(`/relatorios/mapas-vigentes/unidades/${codUnidade}`);
+        return response.data;
+    },
+
+    async obterRelatorioGapsDiagnostico(codProcesso: number, codigosUnidades: number[]): Promise<RelatorioDiagnosticoGap[]> {
+        const response = await apiClient.get<RelatorioDiagnosticoGap[]>(`/relatorios/diagnostico/gaps/${codProcesso}`, {
+            params: {
+                codUnidade: codigosUnidades
+            }
+        });
+        return response.data;
+    },
+
+    async obterRelatorioSituacaoCapacitacaoDiagnostico(
+        codProcesso: number,
+        codigosUnidades: number[]
+    ): Promise<RelatorioDiagnosticoSituacaoCapacitacao[]> {
+        const response = await apiClient.get<RelatorioDiagnosticoSituacaoCapacitacao[]>(
+            `/relatorios/diagnostico/situacao-capacitacao/${codProcesso}`,
+            {
+                params: {
+                    codUnidade: codigosUnidades
+                }
+            }
+        );
         return response.data;
     },
 
@@ -183,5 +238,25 @@ export const relatoriosService = {
             responseType: "blob"
         });
         baixarArquivo(new Blob([response.data]), nomearArquivoRelatorio("sgc-rel-unidades-sem-mapas-vigentes", "pdf"));
+    },
+
+    async downloadRelatorioGapsDiagnosticoPdf(codProcesso: number, codigosUnidades: number[]): Promise<void> {
+        const response = await apiClient.get(`/relatorios/diagnostico/gaps/${codProcesso}/exportar`, {
+            params: {
+                codUnidade: codigosUnidades
+            },
+            responseType: "blob"
+        });
+        baixarArquivo(new Blob([response.data]), nomearArquivoRelatorio("sgc-rel-gaps-diagnostico", "pdf"));
+    },
+
+    async downloadRelatorioSituacaoCapacitacaoDiagnosticoPdf(codProcesso: number, codigosUnidades: number[]): Promise<void> {
+        const response = await apiClient.get(`/relatorios/diagnostico/situacao-capacitacao/${codProcesso}/exportar`, {
+            params: {
+                codUnidade: codigosUnidades
+            },
+            responseType: "blob"
+        });
+        baixarArquivo(new Blob([response.data]), nomearArquivoRelatorio("sgc-rel-situacao-capacitacao", "pdf"));
     }
 };

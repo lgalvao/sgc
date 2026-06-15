@@ -10,9 +10,11 @@ import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.diagnostico.service.*;
 import sgc.processo.*;
 import sgc.processo.model.*;
 import sgc.seguranca.*;
+import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.*;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -62,6 +64,10 @@ public abstract class ProcessoServiceTestBase {
     protected ConfiguracaoService configuracaoService;
     @Mock
     protected MapaManutencaoService mapaManutencaoService;
+    @Mock
+    protected DiagnosticoNotificacaoService diagnosticoNotificacaoService;
+    @Mock
+    protected DiagnosticoFluxoService diagnosticoFluxoService;
     @Spy
     protected ProcessoDtoMapper processoDtoMapper = new ProcessoDtoMapper();
 
@@ -77,5 +83,18 @@ public abstract class ProcessoServiceTestBase {
         unidade.setSigla("U" + codigo);
         unidade.setNome("Unidade " + codigo);
         return unidade;
+    }
+
+    protected Processo criarProcessoTeste(TipoProcesso tipo) {
+        Processo processo = new Processo();
+        processo.setCodigo(1L);
+        processo.setTipo(tipo);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        return processo;
+    }
+
+    protected Subprocesso vincularProcesso(Subprocesso subprocesso, TipoProcesso tipo) {
+        subprocesso.setProcesso(criarProcessoTeste(tipo));
+        return subprocesso;
     }
 }

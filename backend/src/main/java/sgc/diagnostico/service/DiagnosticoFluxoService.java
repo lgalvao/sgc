@@ -231,7 +231,6 @@ public class DiagnosticoFluxoService {
     }
 
     public void validarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
-        Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
@@ -257,6 +256,19 @@ public class DiagnosticoFluxoService {
                 .build());
 
         notificacaoService.notificarDiagnosticoAceito(subprocesso, unidadeAnalise, unidadeSuperior);
+    }
+
+    public void validarDiagnosticosEmBloco(List<Long> subprocessoCodigos) {
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
+        List<Subprocesso> subprocessos = subprocessoCodigos.stream()
+                .map(subprocessoConsultaService::buscarSubprocesso)
+                .toList();
+
+        for (Subprocesso subprocesso : subprocessos) {
+            validarDiagnosticoEmBloco(subprocesso, usuario);
+        }
+
+        notificacaoService.notificarDiagnosticosAceitosEmBloco(subprocessos);
     }
 
     public void validarAceiteDiagnostico(Long codSubprocesso) {
@@ -308,5 +320,29 @@ public class DiagnosticoFluxoService {
             return null;
         }
         return unidadeService.buscarPorCodigo(codigoPai);
+    }
+
+    private void validarDiagnosticoEmBloco(Subprocesso subprocesso, Usuario usuario) {
+        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+
+        Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
+        Unidade unidadeSuperior = buscarSuperiorImediato(unidadeAnalise.getCodigo());
+        if (unidadeSuperior == null) {
+            return;
+        }
+
+        transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
+                .sp(subprocesso)
+                .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO)
+                .tipoTransicao(TipoTransicao.DIAGNOSTICO_ACEITO)
+                .tipoAnalise(TipoAnalise.DIAGNOSTICO)
+                .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_DIAGNOSTICO)
+                .unidadeAnalise(unidadeAnalise)
+                .unidadeOrigemTransicao(unidadeAnalise)
+                .unidadeDestinoTransicao(unidadeSuperior)
+                .usuario(usuario)
+                .motivoAnalise(null)
+                .observacoes("Avaliação em bloco")
+                .build());
     }
 }

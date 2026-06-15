@@ -73,6 +73,8 @@ class E2eControllerTest {
     @Mock
     private AvaliacaoServidorRepo avaliacaoServidorRepo;
     @Mock
+    private SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
+    @Mock
     private CacheManager cacheManager;
 
     private final ProcessoDtoMapper processoDtoMapper = new ProcessoDtoMapper();
@@ -85,7 +87,7 @@ class E2eControllerTest {
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
         mockResourceLoader("file:../e2e/setup/seed.sql", true);
-        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+        controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
     }
 
     @AfterEach
@@ -333,7 +335,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Error"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
         assertThatThrownBy(controllerComErro::resetDatabase)
                 .isInstanceOf(RuntimeException.class);
     }
@@ -366,7 +368,7 @@ class E2eControllerTest {
         when(mockJdbc.getDataSource()).thenReturn(mockDataSource);
         when(mockDataSource.getConnection()).thenThrow(new SQLException("Erro simulado na conexao"));
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
 
         assertThatThrownBy(() -> controllerComErro.limparProcessoCompleto(999L))
                 .isInstanceOf(RuntimeException.class)
@@ -379,7 +381,7 @@ class E2eControllerTest {
         JdbcTemplate mockJdbc = Mockito.mock(JdbcTemplate.class);
         when(mockJdbc.getDataSource()).thenReturn(null);
 
-        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+        E2eController controllerComErro = new E2eController(mockJdbc, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
 
         // Deve retornar silenciosamente
         controllerComErro.limparProcessoCompleto(999L);
@@ -408,8 +410,9 @@ class E2eControllerTest {
             var mapaRepoMock = mock(MapaRepo.class);
             var diagnosticoRepoMock = mock(DiagnosticoRepo.class);
             var avaliacaoServidorRepoMock = mock(AvaliacaoServidorRepo.class);
+            var situacaoCapacitacaoRepoMock = mock(SituacaoCapacitacaoRepo.class);
             CacheManager cacheManagerMock = mock(CacheManager.class);
-            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoServiceMock, processoRepoMock, processoDtoMapper, subprocessoRepoMock, mapaRepoMock, diagnosticoRepoMock, avaliacaoServidorRepoMock, unidadeServiceMock, resourceLoaderMock, cacheManagerMock);
+            controllerIsolado = new E2eController(jdbcTemplateMock, namedJdbcTemplateMock, processoServiceMock, processoRepoMock, processoDtoMapper, subprocessoRepoMock, mapaRepoMock, diagnosticoRepoMock, avaliacaoServidorRepoMock, situacaoCapacitacaoRepoMock, unidadeServiceMock, resourceLoaderMock, cacheManagerMock);
         }
 
         @Test
@@ -500,6 +503,7 @@ class E2eControllerTest {
         private MapaRepo mapaRepo;
         private DiagnosticoRepo diagnosticoRepo;
         private AvaliacaoServidorRepo avaliacaoServidorRepo;
+        private SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
         private UnidadeService unidadeService;
         private ResourceLoader resourceLoader;
         private CacheManager cacheManager;
@@ -515,11 +519,12 @@ class E2eControllerTest {
             mapaRepo = mock(MapaRepo.class);
             diagnosticoRepo = mock(DiagnosticoRepo.class);
             avaliacaoServidorRepo = mock(AvaliacaoServidorRepo.class);
+            situacaoCapacitacaoRepo = mock(SituacaoCapacitacaoRepo.class);
             unidadeService = mock(UnidadeService.class);
             resourceLoader = mock(ResourceLoader.class);
             cacheManager = mock(CacheManager.class);
             SecurityContextHolder.clearContext();
-            controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+            controller = new E2eController(jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
         }
 
         @Test
@@ -668,7 +673,7 @@ class E2eControllerTest {
             when(cacheManagerMock.getCache("cache-inexistente")).thenReturn(null);
 
             E2eController controllerComCacheNulo = new E2eController(
-                    jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManagerMock);
+                    jdbcTemplate, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManagerMock);
 
             assertThatCode(controllerComCacheNulo::resetDatabase).doesNotThrowAnyException();
         }
@@ -863,6 +868,7 @@ class E2eControllerTest {
                     mapaRepo,
                     diagnosticoRepo,
                     avaliacaoServidorRepo,
+                    situacaoCapacitacaoRepo,
                     unidadeService,
                     resourceLoaderMock,
                     cacheManagerMock);
@@ -887,7 +893,7 @@ class E2eControllerTest {
         when(metaData.getURL()).thenReturn("jdbc:postgresql://localhost/sgc");
 
         E2eController controllerComMocks = new E2eController(
-                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
 
         assertThatThrownBy(controllerComMocks::validarAmbienteE2e)
                 .isInstanceOf(ErroConfiguracao.class)
@@ -909,7 +915,7 @@ class E2eControllerTest {
         when(metaData.getURL()).thenReturn(null);
 
         E2eController controllerComMocks = new E2eController(
-                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
 
         assertThatThrownBy(controllerComMocks::validarAmbienteE2e)
                 .isInstanceOf(ErroConfiguracao.class)
@@ -921,7 +927,7 @@ class E2eControllerTest {
     void criarProcessoRevisaoComMapaHomologadoDeveUsarDescricaoInformada() {
         JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
         E2eController controllerComMocks = new E2eController(
-                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
@@ -992,7 +998,7 @@ class E2eControllerTest {
     void criarProcessoRevisaoComMapaHomologadoDeveUsarDiasLimiteEDescricaoPadraoQuandoAusentes() {
         JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
         E2eController controllerComMocks = new E2eController(
-                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
@@ -1043,7 +1049,7 @@ class E2eControllerTest {
     void criarProcessoRevisaoComMapaHomologadoDeveUsarDescricaoPadraoQuandoDescricaoForNula() {
         JdbcTemplate jdbcTemplateMock = mock(JdbcTemplate.class);
         E2eController controllerComMocks = new E2eController(
-                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, unidadeService, resourceLoader, cacheManager);
+                jdbcTemplateMock, namedJdbcTemplate, processoService, processoRepo, processoDtoMapper, subprocessoRepo, mapaRepo, diagnosticoRepo, avaliacaoServidorRepo, situacaoCapacitacaoRepo, unidadeService, resourceLoader, cacheManager);
 
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);

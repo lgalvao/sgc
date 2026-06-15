@@ -16,6 +16,7 @@ public class SubprocessoElegivelDto {
     String situacao;
     boolean habilitarAceitarCadastroBloco;
     boolean habilitarAceitarMapaBloco;
+    boolean habilitarAceitarDiagnosticoBloco;
     boolean habilitarHomologarCadastroBloco;
     boolean habilitarHomologarMapaBloco;
     boolean habilitarDisponibilizarMapaBloco;

@@ -19,6 +19,7 @@ import sgc.subprocesso.model.Subprocesso;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -214,6 +215,48 @@ public class DiagnosticoNotificacaoService {
         );
     }
 
+    public void notificarDiagnosticosAceitosEmBloco(java.util.List<Subprocesso> subprocessos) {
+        if (subprocessos.isEmpty()) {
+            return;
+        }
+
+        agruparPorSuperiorImediato(subprocessos).forEach((unidadeSuperior, subprocessosSuperior) -> {
+            DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
+            Subprocesso base = subprocessosSuperior.getFirst();
+            String assunto = "SGC: Diagnósticos submetidos para análise";
+            String corpo = emailModelosService.criarEmailDiagnosticoAceitoEmBloco(
+                    unidadeSuperior.getSigla(),
+                    base.getProcesso().getDescricao(),
+                    subprocessosSuperior.stream()
+                            .map(Subprocesso::getUnidade)
+                            .map(Unidade::getSigla)
+                            .distinct()
+                            .sorted()
+                            .toList()
+            );
+
+            notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                    .subprocesso(base)
+                    .tipoNotificacao(TipoNotificacao.DIAGNOSTICO_ACEITO)
+                    .usuarioDestinoTitulo(destinatario.usuarioTitulo())
+                    .unidadeDestinoSigla(unidadeSuperior.getSigla())
+                    .destinatario(destinatario.email())
+                    .assunto(assunto)
+                    .corpoHtml(corpo)
+                    .chaveIdempotencia("diagnostico:%d:aceito:bloco:superior:%d:unidades:%s".formatted(
+                            base.getProcesso().getCodigo(),
+                            unidadeSuperior.getCodigo(),
+                            subprocessosSuperior.stream()
+                                    .map(Subprocesso::getUnidade)
+                                    .map(Unidade::getSigla)
+                                    .distinct()
+                                    .sorted()
+                                    .collect(Collectors.joining("-"))
+                    ))
+                    .build());
+        });
+    }
+
     public void notificarDiagnosticoHomologado(Subprocesso sp) {
         Unidade unidadeSubprocesso = sp.getUnidade();
         Unidade admin = unidadeRaiz();
@@ -287,6 +330,24 @@ public class DiagnosticoNotificacaoService {
                 ? configAplicacao.getUrlAcessoHom()
                 : configAplicacao.getUrlAcessoProd();
         return url == null || url.isBlank() ? "http://localhost:5173" : url;
+    }
+
+    private java.util.Map<Unidade, java.util.List<Subprocesso>> agruparPorSuperiorImediato(java.util.List<Subprocesso> subprocessos) {
+        java.util.Map<Long, Unidade> superiores = new java.util.LinkedHashMap<>();
+        java.util.Map<Long, java.util.List<Subprocesso>> agrupado = new java.util.LinkedHashMap<>();
+
+        for (Subprocesso subprocesso : subprocessos) {
+            Unidade superior = subprocesso.getUnidade().getUnidadeSuperior();
+            if (superior == null) {
+                continue;
+            }
+            superiores.putIfAbsent(superior.getCodigo(), superior);
+            agrupado.computeIfAbsent(superior.getCodigo(), ignorado -> new java.util.ArrayList<>()).add(subprocesso);
+        }
+
+        java.util.Map<Unidade, java.util.List<Subprocesso>> resultado = new java.util.LinkedHashMap<>();
+        agrupado.forEach((codigoSuperior, subprocessosSuperior) -> resultado.put(superiores.get(codigoSuperior), subprocessosSuperior));
+        return resultado;
     }
 
     private record DestinatarioNotificacao(

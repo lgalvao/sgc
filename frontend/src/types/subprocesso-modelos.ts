@@ -103,6 +103,7 @@ export interface SubprocessoElegivel {
     situacao: SituacaoSubprocesso;
     habilitarAceitarCadastroBloco: boolean;
     habilitarAceitarMapaBloco: boolean;
+    habilitarAceitarDiagnosticoBloco: boolean;
     habilitarHomologarCadastroBloco: boolean;
     habilitarHomologarMapaBloco: boolean;
     habilitarDisponibilizarMapaBloco: boolean;

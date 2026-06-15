@@ -103,6 +103,52 @@ public class RelatorioController {
         return ResponseEntity.ok(relatorioService.obterRelatorioUnidadesSemMapasVigentes());
     }
 
+    @GetMapping("/diagnostico/gaps/{codProcesso}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
+    @Operation(summary = "Gera a visualização em JSON do relatório de gaps de diagnóstico (CDU-53)")
+    public ResponseEntity<List<RelatorioDiagnosticoGapDto>> obterRelatorioGapsDiagnostico(
+            @PathVariable Long codProcesso,
+            @RequestParam(name = "codUnidade") List<Long> codigosUnidades
+    ) {
+        return ResponseEntity.ok(relatorioService.obterRelatorioGapsDiagnostico(codProcesso, codigosUnidades));
+    }
+
+    @GetMapping("/diagnostico/gaps/{codProcesso}/exportar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
+    @Operation(summary = "Gera relatório de gaps de diagnóstico em PDF (CDU-53)")
+    public void gerarRelatorioGapsDiagnosticoPdf(
+            @PathVariable Long codProcesso,
+            @RequestParam(name = "codUnidade") List<Long> codigosUnidades,
+            HttpServletResponse response
+    ) throws IOException {
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioGapsDiagnostico()));
+        relatorioService.gerarRelatorioGapsDiagnostico(codProcesso, codigosUnidades, response.getOutputStream());
+    }
+
+    @GetMapping("/diagnostico/situacao-capacitacao/{codProcesso}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
+    @Operation(summary = "Gera a visualização em JSON do relatório de situação de capacitação (CDU-54)")
+    public ResponseEntity<List<RelatorioDiagnosticoSituacaoCapacitacaoDto>> obterRelatorioSituacaoCapacitacaoDiagnostico(
+            @PathVariable Long codProcesso,
+            @RequestParam(name = "codUnidade") List<Long> codigosUnidades
+    ) {
+        return ResponseEntity.ok(relatorioService.obterRelatorioSituacaoCapacitacaoDiagnostico(codProcesso, codigosUnidades));
+    }
+
+    @GetMapping("/diagnostico/situacao-capacitacao/{codProcesso}/exportar")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
+    @Operation(summary = "Gera relatório de situação de capacitação em PDF (CDU-54)")
+    public void gerarRelatorioSituacaoCapacitacaoDiagnosticoPdf(
+            @PathVariable Long codProcesso,
+            @RequestParam(name = "codUnidade") List<Long> codigosUnidades,
+            HttpServletResponse response
+    ) throws IOException {
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioSituacaoCapacitacaoDiagnostico()));
+        relatorioService.gerarRelatorioSituacaoCapacitacaoDiagnostico(codProcesso, codigosUnidades, response.getOutputStream());
+    }
+
     private String nomeArquivoRelatorioAndamento() {
         return "sgc-rel-andamento-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
     }
@@ -121,5 +167,13 @@ public class RelatorioController {
 
     private String nomeArquivoRelatorioUnidadesSemMapasVigentes() {
         return "sgc-rel-unidades-sem-mapas-vigentes-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
+    }
+
+    private String nomeArquivoRelatorioGapsDiagnostico() {
+        return "sgc-rel-gaps-diagnostico-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
+    }
+
+    private String nomeArquivoRelatorioSituacaoCapacitacaoDiagnostico() {
+        return "sgc-rel-situacao-capacitacao-%s.pdf".formatted(LocalDate.now().format(FORMATADOR_DATA_ARQUIVO));
     }
 }

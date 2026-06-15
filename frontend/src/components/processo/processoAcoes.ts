@@ -4,6 +4,8 @@ export function obterIdBotaoAcaoProcesso(codigoAcao: string) {
             return "btn-aceitar-bloco";
         case "aceitar-mapa":
             return "btn-aceitar-mapas-bloco";
+        case "aceitar-diagnostico":
+            return "btn-validar-diagnosticos-bloco";
         case "homologar-cadastro":
             return "btn-homologar-bloco";
         case "homologar-mapa":
@@ -21,6 +23,8 @@ export function obterTestIdBotaoAcaoProcesso(codigoAcao: string) {
             return "btn-processo-aceitar-bloco";
         case "aceitar-mapa":
             return "btn-processo-aceitar-mapas-bloco";
+        case "aceitar-diagnostico":
+            return "btn-processo-validar-diagnosticos-bloco";
         case "homologar-cadastro":
             return "btn-processo-homologar-bloco";
         case "homologar-mapa":

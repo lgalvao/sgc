@@ -198,13 +198,11 @@ class DiagnosticoFluxoServiceTest {
     @DisplayName("validarDiagnostico deve marcar como validado e encaminhar para unidade superior")
     void validarDiagnostico_deveMarcarComoValidado() {
         Long codSubprocesso = 92L;
-        Diagnostico diagnostico = new Diagnostico();
         Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
         Unidade unidadeDestino = unidade(2L, "SECRETARIA_1", "Secretaria 1", TipoUnidade.INTEROPERACIONAL);
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setCodigo(codSubprocesso);
 
-        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
         when(unidadeHierarquiaService.buscarCodigoPai(unidadeGestora.getCodigo())).thenReturn(unidadeDestino.getCodigo());

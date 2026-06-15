@@ -89,6 +89,10 @@ public final class Mensagens {
     public static final String TITULO_ACEITE_MAPA_BLOCO = "Aceite de mapas em bloco";
     public static final String TEXTO_SELECAO_ACEITE_MAPA = "Selecione as unidades para aceite dos mapas correspondentes";
     public static final String SUCESSO_ACEITE_MAPA_BLOCO = "Mapas aceitos em bloco";
+    public static final String LABEL_VALIDAR_DIAGNOSTICO_BLOCO = "Validar diagnósticos em bloco";
+    public static final String TITULO_VALIDACAO_DIAGNOSTICO_BLOCO = "Validação de diagnósticos em bloco";
+    public static final String TEXTO_SELECAO_VALIDACAO_DIAGNOSTICO = "Selecione as unidades cujos diagnósticos deverão ser validados:";
+    public static final String SUCESSO_VALIDACAO_DIAGNOSTICO_BLOCO = "Diagnósticos aceitos em bloco";
     public static final String LABEL_HOMOLOGAR_EM_BLOCO = "Homologar em bloco";
     public static final String TITULO_HOMOLOGACAO_CADASTRO_BLOCO = "Homologação de cadastro em bloco";
     public static final String TEXTO_SELECAO_HOMOLOGACAO_CADASTRO = "Selecione as unidades cujos cadastros deverão ser homologados:";

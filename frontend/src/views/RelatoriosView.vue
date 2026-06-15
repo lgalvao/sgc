@@ -47,6 +47,50 @@
         </BCard>
       </BCol>
 
+      <BCol class="mb-4" md="4">
+        <BCard
+            class="h-100 card-actionable"
+            data-testid="card-relatorio-gaps-diagnostico"
+            role="button"
+            tabindex="0"
+            @click="void router.push('/relatorios/diagnostico/gaps')"
+            @keydown.enter="void router.push('/relatorios/diagnostico/gaps')"
+            @keydown.space.prevent="void router.push('/relatorios/diagnostico/gaps')"
+        >
+          <div class="card-click-area">
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-graph-up-arrow text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS_RELATORIOS.GAPS_DIAGNOSTICO }}</span>
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Consolidação dos gaps médios por unidade e competência em processos de diagnóstico
+            </BCardText>
+          </div>
+        </BCard>
+      </BCol>
+
+      <BCol class="mb-4" md="4">
+        <BCard
+            class="h-100 card-actionable"
+            data-testid="card-relatorio-situacao-capacitacao-diagnostico"
+            role="button"
+            tabindex="0"
+            @click="void router.push('/relatorios/diagnostico/situacao-capacitacao')"
+            @keydown.enter="void router.push('/relatorios/diagnostico/situacao-capacitacao')"
+            @keydown.space.prevent="void router.push('/relatorios/diagnostico/situacao-capacitacao')"
+        >
+          <div class="card-click-area">
+            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+              <i aria-hidden="true" class="bi bi-journal-check text-primary flex-shrink-0 mt-1"></i>
+              <span class="lh-sm">{{ TEXTOS_RELATORIOS.SITUACAO_CAPACITACAO_DIAGNOSTICO }}</span>
+            </BCardTitle>
+            <BCardText class="text-muted">
+              Quantitativos de NA, AC, EC, C e I por unidade e competência
+            </BCardText>
+          </div>
+        </BCard>
+      </BCol>
+
       <BCol v-if="perfilStore.perfilSelecionado === Perfil.ADMIN" class="mb-4" md="4">
         <BCard
             class="h-100 card-actionable"

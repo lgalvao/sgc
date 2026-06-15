@@ -12,6 +12,7 @@ import org.springframework.core.io.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
+import sgc.diagnostico.service.DiagnosticoRelatorioService;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
@@ -61,6 +62,7 @@ public class RelatorioService {
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final PdfFactory pdfFactory;
+    private final DiagnosticoRelatorioService diagnosticoRelatorioService;
 
     @Transactional(readOnly = true)
     public List<RelatorioAndamentoDto> obterRelatorioAndamento(Long codProcesso) {
@@ -221,6 +223,73 @@ public class RelatorioService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<RelatorioDiagnosticoGapDto> obterRelatorioGapsDiagnostico(Long codProcesso, List<Long> codigosUnidades) {
+        Processo processo = validarProcessoDiagnostico(codProcesso);
+        List<Subprocesso> subprocessosSelecionados = buscarSubprocessosDiagnosticoSelecionados(processo, codigosUnidades);
+
+        return subprocessosSelecionados.stream()
+                .map(diagnosticoRelatorioService::criarRelatorioGapDiagnostico)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public void gerarRelatorioGapsDiagnostico(Long codProcesso, List<Long> codigosUnidades, OutputStream outputStream) {
+        Processo processo = validarProcessoDiagnostico(codProcesso);
+        List<RelatorioDiagnosticoGapDto> relatorios = obterRelatorioGapsDiagnostico(codProcesso, codigosUnidades);
+
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
+            document.open();
+            adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
+                    "Relatório de Gaps de Diagnóstico",
+                    "Processo",
+                    processo.getDescricao(),
+                    LocalDateTime.now(),
+                    processo.getTipo().name(),
+                    relatorios.size()
+            ));
+            adicionarSecoesRelatorioGapsDiagnostico(document, relatorios);
+        } catch (DocumentException | IOException e) {
+            throw new ErroInconsistenciaInterna("Erro ao gerar PDF de gaps de diagnóstico", e);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public List<RelatorioDiagnosticoSituacaoCapacitacaoDto> obterRelatorioSituacaoCapacitacaoDiagnostico(
+            Long codProcesso,
+            List<Long> codigosUnidades
+    ) {
+        Processo processo = validarProcessoDiagnostico(codProcesso);
+        List<Subprocesso> subprocessosSelecionados = buscarSubprocessosDiagnosticoSelecionados(processo, codigosUnidades);
+
+        return subprocessosSelecionados.stream()
+                .map(diagnosticoRelatorioService::criarRelatorioSituacaoCapacitacaoDiagnostico)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public void gerarRelatorioSituacaoCapacitacaoDiagnostico(Long codProcesso, List<Long> codigosUnidades, OutputStream outputStream) {
+        Processo processo = validarProcessoDiagnostico(codProcesso);
+        List<RelatorioDiagnosticoSituacaoCapacitacaoDto> relatorios = obterRelatorioSituacaoCapacitacaoDiagnostico(codProcesso, codigosUnidades);
+
+        try (Document document = pdfFactory.createDocument()) {
+            pdfFactory.createWriter(document, outputStream);
+            document.open();
+            adicionarCabecalhoRelatorio(document, new CabecalhoRelatorio(
+                    "Relatório de Situação de Capacitação",
+                    "Processo",
+                    processo.getDescricao(),
+                    LocalDateTime.now(),
+                    processo.getTipo().name(),
+                    relatorios.size()
+            ));
+            adicionarSecoesRelatorioSituacaoCapacitacaoDiagnostico(document, relatorios);
+        } catch (DocumentException | IOException e) {
+            throw new ErroInconsistenciaInterna("Erro ao gerar PDF de situação de capacitação", e);
+        }
+    }
+
     private Map<Long, UnidadeResponsavelDto> buscarResponsaveisPorUnidade(List<Subprocesso> subprocessos) {
         List<Long> codigosUnidade = subprocessos.stream()
                 .map(Subprocesso::getUnidade)
@@ -229,6 +298,52 @@ public class RelatorioService {
                 .toList();
 
         return new HashMap<>(responsavelService.buscarResponsaveisUnidades(codigosUnidade));
+    }
+
+    private Processo validarProcessoDiagnostico(Long codProcesso) {
+        Processo processo = processoService.buscarPorCodigo(codProcesso);
+        if (processo.getTipo() != TipoProcesso.DIAGNOSTICO) {
+            throw new ErroValidacao("O processo informado não é do tipo diagnóstico.");
+        }
+        return processo;
+    }
+
+    private List<Subprocesso> buscarSubprocessosDiagnosticoSelecionados(Processo processo, List<Long> codigosUnidades) {
+        if (codigosUnidades.isEmpty()) {
+            return List.of();
+        }
+
+        Set<Long> codigosPermitidos = validarEscopoRelatorioDiagnostico(processo.getCodigo());
+        Set<Long> codigosSelecionados = new LinkedHashSet<>(codigosUnidades);
+        if (!codigosPermitidos.containsAll(codigosSelecionados)) {
+            throw new ErroAcessoNegado("Usuário não possui permissão para gerar relatório do diagnóstico para uma ou mais unidades selecionadas.");
+        }
+
+        return consultaService.listarEntidadesPorProcesso(processo.getCodigo()).stream()
+                .filter(subprocesso -> codigosSelecionados.contains(subprocesso.getUnidade().getCodigo()))
+                .toList();
+    }
+
+    private Set<Long> validarEscopoRelatorioDiagnostico(Long codProcesso) {
+        ContextoUsuarioAutenticado contextoUsuario = usuarioAplicacaoService.contextoAutenticado();
+        List<Subprocesso> subprocessos = consultaService.listarEntidadesPorProcesso(codProcesso);
+        Set<Long> codigosProcesso = subprocessos.stream()
+                .map(Subprocesso::getUnidade)
+                .map(Unidade::getCodigo)
+                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+
+        if (contextoUsuario.perfil() == Perfil.ADMIN) {
+            return codigosProcesso;
+        }
+
+        if (contextoUsuario.perfil() != Perfil.GESTOR) {
+            throw new ErroAcessoNegado("Usuário não possui permissão para gerar relatórios de diagnóstico.");
+        }
+
+        Set<Long> codigosPermitidos = new HashSet<>(unidadeHierarquiaService.buscarIdsDescendentes(contextoUsuario.unidadeAtivaCodigo()));
+        codigosPermitidos.add(contextoUsuario.unidadeAtivaCodigo());
+        codigosPermitidos.retainAll(codigosProcesso);
+        return codigosPermitidos;
     }
 
     private List<Subprocesso> buscarSubprocessosMapasVigentes(List<Long> codigosUnidades) {
@@ -534,6 +649,84 @@ public class RelatorioService {
             cartao.addCell(cardCell);
             document.add(cartao);
         }
+    }
+
+    private void adicionarSecoesRelatorioGapsDiagnostico(Document document, List<RelatorioDiagnosticoGapDto> relatorios)
+            throws DocumentException {
+        for (RelatorioDiagnosticoGapDto relatorio : relatorios) {
+            adicionarTituloRelatorioDiagnostico(document, relatorio.siglaUnidade(), relatorio.nomeUnidade());
+
+            PdfPTable tabela = new PdfPTable(new float[]{3.6f, 1.2f, 1.2f});
+            tabela.setWidthPercentage(100f);
+            tabela.setSpacingAfter(16f);
+            tabela.addCell(criarCelulaCabecalhoTabela("Competência"));
+            tabela.addCell(criarCelulaCabecalhoTabela("Gap médio"));
+            tabela.addCell(criarCelulaCabecalhoTabela("Avaliações"));
+
+            for (RelatorioDiagnosticoGapCompetenciaDto competencia : relatorio.competencias()) {
+                tabela.addCell(criarCelulaTabela(competencia.competenciaDescricao(), Element.ALIGN_LEFT));
+                tabela.addCell(criarCelulaTabela(
+                        competencia.mediaGap() == null ? "-" : String.format(Locale.US, "%.2f", competencia.mediaGap()),
+                        Element.ALIGN_CENTER
+                ));
+                tabela.addCell(criarCelulaTabela(String.valueOf(competencia.totalAvaliacoesConsideradas()), Element.ALIGN_CENTER));
+            }
+
+            document.add(tabela);
+        }
+    }
+
+    private void adicionarSecoesRelatorioSituacaoCapacitacaoDiagnostico(
+            Document document,
+            List<RelatorioDiagnosticoSituacaoCapacitacaoDto> relatorios
+    ) throws DocumentException {
+        for (RelatorioDiagnosticoSituacaoCapacitacaoDto relatorio : relatorios) {
+            adicionarTituloRelatorioDiagnostico(document, relatorio.siglaUnidade(), relatorio.nomeUnidade());
+
+            PdfPTable tabela = new PdfPTable(new float[]{3.6f, 0.8f, 0.8f, 0.8f, 0.8f, 0.8f});
+            tabela.setWidthPercentage(100f);
+            tabela.setSpacingAfter(16f);
+            tabela.addCell(criarCelulaCabecalhoTabela("Competência"));
+            tabela.addCell(criarCelulaCabecalhoTabela("NA"));
+            tabela.addCell(criarCelulaCabecalhoTabela("AC"));
+            tabela.addCell(criarCelulaCabecalhoTabela("EC"));
+            tabela.addCell(criarCelulaCabecalhoTabela("C"));
+            tabela.addCell(criarCelulaCabecalhoTabela("I"));
+
+            for (RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto competencia : relatorio.competencias()) {
+                tabela.addCell(criarCelulaTabela(competencia.competenciaDescricao(), Element.ALIGN_LEFT));
+                tabela.addCell(criarCelulaTabela(String.valueOf(competencia.totalNaoSeAplica()), Element.ALIGN_CENTER));
+                tabela.addCell(criarCelulaTabela(String.valueOf(competencia.totalACapacitar()), Element.ALIGN_CENTER));
+                tabela.addCell(criarCelulaTabela(String.valueOf(competencia.totalEmCapacitacao()), Element.ALIGN_CENTER));
+                tabela.addCell(criarCelulaTabela(String.valueOf(competencia.totalCapacitado()), Element.ALIGN_CENTER));
+                tabela.addCell(criarCelulaTabela(String.valueOf(competencia.totalInstrutor()), Element.ALIGN_CENTER));
+            }
+
+            document.add(tabela);
+        }
+    }
+
+    private void adicionarTituloRelatorioDiagnostico(Document document, String siglaUnidade, String nomeUnidade) throws DocumentException {
+        Paragraph titulo = new Paragraph("%s - %s".formatted(siglaUnidade, nomeUnidade), FONTE_SECAO);
+        titulo.setSpacingAfter(6f);
+        document.add(titulo);
+    }
+
+    private PdfPCell criarCelulaCabecalhoTabela(String texto) {
+        PdfPCell celula = new PdfPCell(new Phrase(texto, FONTE_TEXTO_NEGRITO));
+        celula.setBackgroundColor(new Color(232, 238, 247));
+        celula.setBorderColor(COR_BORDA);
+        celula.setPadding(5f);
+        celula.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return celula;
+    }
+
+    private PdfPCell criarCelulaTabela(String texto, int alinhamento) {
+        PdfPCell celula = new PdfPCell(new Phrase(texto, FONTE_TEXTO_CORPO));
+        celula.setBorderColor(COR_BORDA);
+        celula.setPadding(5f);
+        celula.setHorizontalAlignment(alinhamento);
+        return celula;
     }
 
     private PdfPCell criarCelulaRotuloValor(String rotulo, String valor) {

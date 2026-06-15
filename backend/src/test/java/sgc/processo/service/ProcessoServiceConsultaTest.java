@@ -174,8 +174,8 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         }
 
         @Test
-        @DisplayName("Deve cobrir branch de subprocesso sem processo na permissão de escrita")
-        void deveCobrirSubprocessoSemProcessoNaPermissao() {
+        @DisplayName("Deve cobrir permissão de escrita em subprocesso com processo válido")
+        void deveCobrirPermissaoComSubprocessoValido() {
             Long codProcesso = 1L;
             Usuario usuario = new Usuario();
             usuario.setUnidadeAtivaCodigo(10L);
@@ -187,13 +187,13 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             sp.setCodigo(100L);
             sp.setUnidade(u);
             sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-            sp.setProcesso(null); // Lacuna linha 807 - processo == null
 
             Processo p = new Processo();
             p.setCodigo(codProcesso);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(MAPEAMENTO);
             p.adicionarParticipantes(Set.of(u));
+            sp.setProcesso(p);
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
@@ -800,6 +800,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         sp.setCodigo(100L);
         sp.setUnidade(unidade);
         sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), any())).thenReturn(List.of(sp));
@@ -810,8 +811,9 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         assertThat(resultado).isNotEmpty();
 
         sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        sp.setProcesso(criarProcessoTeste(DIAGNOSTICO));
         List<SubprocessoElegivelDto> resultado2 = processoService.listarSubprocessosElegiveis(codProcesso);
-        assertThat(resultado2).isEmpty();
+        assertThat(resultado2).singleElement().satisfies(item -> assertThat(item.isHabilitarAceitarDiagnosticoBloco()).isTrue());
     }
 
     @Test
@@ -972,8 +974,8 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
     }
 
     @Test
-    @DisplayName("verificarPermissaoEscritaEmBloco deve permitir quando processo é nulo")
-    void devePermitirEscritaQuandoProcessoNulo() {
+    @DisplayName("verificarPermissaoEscritaEmBloco deve permitir quando processo está em andamento")
+    void devePermitirEscritaQuandoProcessoEmAndamento() {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
         lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
@@ -982,7 +984,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
         p.adicionarParticipantes(Set.of(uni));
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(null); 
+        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
         sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));

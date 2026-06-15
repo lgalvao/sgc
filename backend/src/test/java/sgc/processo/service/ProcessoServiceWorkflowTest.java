@@ -48,6 +48,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                 .codigo(100L)
                 .unidade(Unidade.builder().codigo(10L).build())
                 .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                .processo(criarProcessoTeste(MAPEAMENTO))
                 .build();
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
@@ -57,6 +58,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                 .codigo(101L)
                 .unidade(Unidade.builder().codigo(10L).build())
                 .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .processo(criarProcessoTeste(MAPEAMENTO))
                 .build();
         when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
                 .thenReturn(List.of(subNaoElegivel));
@@ -97,9 +99,9 @@ Usuario usuario = new Usuario();
 usuario.setPerfilAtivo(Perfil.ADMIN);
 when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-Subprocesso s1 = Subprocesso.builder().codigo(101L).situacao(REVISAO_CADASTRO_DISPONIBILIZADA).unidade(Unidade.builder().codigo(10L).build()).build();
-Subprocesso s2 = Subprocesso.builder().codigo(102L).situacao(REVISAO_CADASTRO_HOMOLOGADA).unidade(Unidade.builder().codigo(20L).build()).build();
-Subprocesso s3 = Subprocesso.builder().codigo(103L).situacao(MAPEAMENTO_MAPA_CRIADO).unidade(Unidade.builder().codigo(30L).build()).build();
+Subprocesso s1 = Subprocesso.builder().codigo(101L).situacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(Unidade.builder().codigo(10L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
+Subprocesso s2 = Subprocesso.builder().codigo(102L).situacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(Unidade.builder().codigo(20L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
+Subprocesso s3 = Subprocesso.builder().codigo(103L).situacao(MAPEAMENTO_MAPA_CRIADO).unidade(Unidade.builder().codigo(30L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
 
 when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
         .thenReturn(List.of(s1, s2, s3));
@@ -479,10 +481,12 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
             Subprocesso sCad = new Subprocesso();
             sCad.setCodigo(10L);
             sCad.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            sCad.setProcesso(criarProcessoTeste(MAPEAMENTO));
 
             Subprocesso sVal = new Subprocesso();
             sVal.setCodigo(20L);
             sVal.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+            sVal.setProcesso(criarProcessoTeste(MAPEAMENTO));
 
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList()))
                     .thenReturn(List.of(sCad, sVal));
@@ -603,11 +607,13 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
                         .codigo(1L)
                         .unidade(Unidade.builder().codigo(10L).build())
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                        .processo(criarProcessoTeste(MAPEAMENTO))
                         .build();
                 Subprocesso sp2 = Subprocesso.builder()
                         .codigo(2L)
                         .unidade(Unidade.builder().codigo(20L).build())
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO)
+                        .processo(criarProcessoTeste(MAPEAMENTO))
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L, 20L))).thenReturn(List.of(sp1, sp2));
@@ -634,6 +640,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
                         .codigo(1L)
                         .unidade(Unidade.builder().codigo(10L).build())
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO)
+                        .processo(criarProcessoTeste(MAPEAMENTO))
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
@@ -664,6 +671,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
                         .codigo(1L)
                         .unidade(Unidade.builder().codigo(10L).build())
                         .situacao(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA)
+                        .processo(criarProcessoTeste(REVISAO))
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
@@ -690,6 +698,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
                         .codigo(1L)
                         .unidade(Unidade.builder().codigo(10L).build())
                         .situacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO)
+                        .processo(criarProcessoTeste(MAPEAMENTO))
                         .build();
 
                 when(consultaService.listarEntidadesPorProcessoEUnidades(100L, List.of(10L))).thenReturn(List.of(sp1));
@@ -1222,6 +1231,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         Unidade u = new Unidade();
         u.setCodigo(10L);
         sp.setUnidade(u);
+        sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
         Usuario usuario = new Usuario();
@@ -1373,6 +1383,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         Unidade u1 = new Unidade();
         u1.setCodigo(10L);
         spCadastro.setUnidade(u1);
+        spCadastro.setProcesso(criarProcessoTeste(MAPEAMENTO));
 
         Subprocesso spValidacao = new Subprocesso();
         spValidacao.setCodigo(200L);
@@ -1380,6 +1391,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         Unidade u2 = new Unidade();
         u2.setCodigo(20L);
         spValidacao.setUnidade(u2);
+        spValidacao.setProcesso(criarProcessoTeste(MAPEAMENTO));
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(spCadastro, spValidacao));
         Usuario usuario = new Usuario();
@@ -1405,6 +1417,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         Unidade u = new Unidade();
         u.setCodigo(10L);
         sp.setUnidade(u);
+        sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
         Usuario usuario = new Usuario();
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(codProc, List.of(10L))).thenReturn(List.of(sp));
@@ -1729,6 +1742,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         sp.setCodigo(100L);
         sp.setUnidade(unidade);
         sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
+        sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), any())).thenReturn(List.of(sp));
@@ -1739,8 +1753,9 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         assertThat(resultado).isNotEmpty();
 
         sp.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        sp.setProcesso(criarProcessoTeste(DIAGNOSTICO));
         List<SubprocessoElegivelDto> resultado2 = processoService.listarSubprocessosElegiveis(codProcesso);
-        assertThat(resultado2).isEmpty();
+        assertThat(resultado2).singleElement().satisfies(item -> assertThat(item.isHabilitarAceitarDiagnosticoBloco()).isTrue());
     }
 
     @Test
@@ -1754,6 +1769,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         subprocesso.setUnidade(unidade);
+        subprocesso.setProcesso(criarProcessoTeste(MAPEAMENTO));
         Usuario usuario = new Usuario();
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);

@@ -1,6 +1,8 @@
 export const TEXTOS_RELATORIOS = {
     TITULO: "Relatórios",
     ANDAMENTO_PROCESSO: "Andamento de processo",
+    GAPS_DIAGNOSTICO: "Gaps de diagnóstico",
+    SITUACAO_CAPACITACAO_DIAGNOSTICO: "Situação de capacitação",
     LABEL_SELECIONE_PROCESSO: "Processo",
     LABEL_SELECIONE_UNIDADE: "Unidade",
     BOTAO_GERAR: "Gerar",
@@ -13,4 +15,5 @@ export const TEXTOS_RELATORIOS = {
     ERRO_EXPORTAR: "Erro ao exportar PDF",
     ERRO_EXPORTAR_CSV: "Erro ao exportar CSV",
     ERRO_GERAR: "Erro ao gerar PDF",
+    ERRO_CARREGAR_PROCESSO: "Erro ao carregar detalhes do processo",
 } as const;

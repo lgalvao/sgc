@@ -3,6 +3,7 @@ package sgc.e2e;
 import jakarta.annotation.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.cache.*;
 import org.springframework.context.annotation.*;
@@ -42,7 +43,6 @@ import java.util.function.*;
 @Profile("e2e")
 @ConditionalOnProperty(name = "aplicacao.ambiente-testes", havingValue = "true")
 @Slf4j
-@RequiredArgsConstructor
 public class E2eController {
     private static final String SQL_SUBPROCESSO_POR_PROCESSO = " sgc.subprocesso WHERE processo_codigo = ?)";
     private static final String TITULO_USUARIO_FIXTURE_ADMIN = "111111";
@@ -56,9 +56,41 @@ public class E2eController {
     private final MapaRepo mapaRepo;
     private final DiagnosticoRepo diagnosticoRepo;
     private final AvaliacaoServidorRepo avaliacaoServidorRepo;
+    private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     private final UnidadeService unidadeService;
     private final ResourceLoader resourceLoader;
     private final CacheManager cacheManager;
+
+    @Autowired
+    public E2eController(
+            JdbcTemplate jdbcTemplate,
+            NamedParameterJdbcTemplate namedJdbcTemplate,
+            ProcessoService processoService,
+            ProcessoRepo processoRepo,
+            ProcessoDtoMapper processoDtoMapper,
+            SubprocessoRepo subprocessoRepo,
+            MapaRepo mapaRepo,
+            DiagnosticoRepo diagnosticoRepo,
+            AvaliacaoServidorRepo avaliacaoServidorRepo,
+            SituacaoCapacitacaoRepo situacaoCapacitacaoRepo,
+            UnidadeService unidadeService,
+            ResourceLoader resourceLoader,
+            CacheManager cacheManager
+    ) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.namedJdbcTemplate = namedJdbcTemplate;
+        this.processoService = processoService;
+        this.processoRepo = processoRepo;
+        this.processoDtoMapper = processoDtoMapper;
+        this.subprocessoRepo = subprocessoRepo;
+        this.mapaRepo = mapaRepo;
+        this.diagnosticoRepo = diagnosticoRepo;
+        this.avaliacaoServidorRepo = avaliacaoServidorRepo;
+        this.situacaoCapacitacaoRepo = situacaoCapacitacaoRepo;
+        this.unidadeService = unidadeService;
+        this.resourceLoader = resourceLoader;
+        this.cacheManager = cacheManager;
+    }
 
     @PostConstruct
     public void validarAmbienteE2e() {
@@ -291,6 +323,26 @@ public class E2eController {
         Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
         concluirAutoavaliacaoFixture(processo.getCodigo(), request.unidadeSigla(), request.servidorTitulo());
         criarConsensoFixture(processo.getCodigo(), request.unidadeSigla(), request.servidorTitulo());
+        return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
+    }
+
+    @PostMapping("/fixtures/processo-diagnostico-concluido")
+    @Transactional
+    public ProcessoResumoDto criarProcessoDiagnosticoConcluido(
+            @RequestBody ProcessoDiagnosticoAutoavaliadoFixtureRequest request
+    ) {
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
+        concluirDiagnosticoFixture(processo.getCodigo(), request.unidadeSigla());
+        return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
+    }
+
+    @PostMapping("/fixtures/processo-diagnostico-homologado")
+    @Transactional
+    public ProcessoResumoDto criarProcessoDiagnosticoHomologado(
+            @RequestBody ProcessoDiagnosticoAutoavaliadoFixtureRequest request
+    ) {
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
+        homologarDiagnosticoFixture(processo.getCodigo(), request.unidadeSigla());
         return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
     }
 
@@ -953,6 +1005,98 @@ public class E2eController {
         });
         avaliacaoServidorRepo.saveAllAndFlush(avaliacoes);
         limparCaches();
+    }
+
+    private void concluirDiagnosticoFixture(Long codProcesso, String unidadeSigla) {
+        Long codSubprocesso = buscarCodigoSubprocesso(codProcesso, unidadeSigla);
+        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
+                .orElseThrow(() -> new IllegalStateException("Diagnóstico não encontrado para subprocesso " + codSubprocesso));
+
+        preencherAvaliacoesConclusaoFixture(diagnostico);
+        preencherSituacoesCapacitacaoFixture(diagnostico);
+
+        diagnostico.setDataConclusao(LocalDateTime.now());
+        diagnostico.setJustificativaConclusao(null);
+        diagnosticoRepo.saveAndFlush(diagnostico);
+
+        Unidade unidade = unidadeService.buscarPorSigla(unidadeSigla);
+        Unidade unidadeSuperior = obterUnidadeSuperiorObrigatoria(unidade);
+
+        Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso).orElseThrow();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocesso.setDataFimEtapa1(LocalDateTime.now());
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        registrarMovimentacaoFixture(
+                codSubprocesso,
+                unidade.getCodigo(),
+                unidadeSuperior.getCodigo(),
+                "Diagnóstico concluído via fixture"
+        );
+        limparCaches();
+    }
+
+    private void homologarDiagnosticoFixture(Long codProcesso, String unidadeSigla) {
+        concluirDiagnosticoFixture(codProcesso, unidadeSigla);
+
+        Long codSubprocesso = buscarCodigoSubprocesso(codProcesso, unidadeSigla);
+        Unidade admin = unidadeService.buscarAdmin();
+        Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso).orElseThrow();
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
+        subprocessoRepo.saveAndFlush(subprocesso);
+
+        registrarMovimentacaoFixture(
+                codSubprocesso,
+                admin.getCodigo(),
+                admin.getCodigo(),
+                "Diagnóstico homologado via fixture"
+        );
+        limparCaches();
+    }
+
+    private void preencherAvaliacoesConclusaoFixture(Diagnostico diagnostico) {
+        List<AvaliacaoServidor> avaliacoes = avaliacaoServidorRepo.listarPorDiagnostico(diagnostico.getCodigo()).stream()
+                .sorted(Comparator.comparing((AvaliacaoServidor avaliacao) -> avaliacao.getServidor().getTituloEleitoral())
+                        .thenComparing(avaliacao -> avaliacao.getCompetencia().getCodigo()))
+                .toList();
+
+        for (int i = 0; i < avaliacoes.size(); i++) {
+            AvaliacaoServidor avaliacao = avaliacoes.get(i);
+            int importancia = 4 - (i % 2);
+            int dominio = Math.max(1, importancia - 1 - (i % 2));
+
+            avaliacao.setAutoimportancia(importancia);
+            avaliacao.setAutodominio(dominio);
+            avaliacao.setChefiaImportancia(importancia);
+            avaliacao.setChefiaDominio(dominio);
+            avaliacao.setImportancia(importancia);
+            avaliacao.setDominio(dominio);
+            avaliacao.calculaGap();
+            avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+        }
+
+        avaliacaoServidorRepo.saveAllAndFlush(avaliacoes);
+    }
+
+    private void preencherSituacoesCapacitacaoFixture(Diagnostico diagnostico) {
+        ValorSituacaoCapacitacao[] valores = ValorSituacaoCapacitacao.values();
+        List<SituacaoCapacitacao> situacoes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnostico.getCodigo()).stream()
+                .sorted(Comparator.comparing((SituacaoCapacitacao situacao) -> situacao.getServidor().getTituloEleitoral())
+                        .thenComparing(situacao -> situacao.getCompetencia().getCodigo()))
+                .toList();
+
+        for (int i = 0; i < situacoes.size(); i++) {
+            situacoes.get(i).setSituacaoCapacitacao(valores[i % valores.length]);
+        }
+
+        situacaoCapacitacaoRepo.saveAllAndFlush(situacoes);
+    }
+
+    private Long buscarCodigoSubprocesso(Long codProcesso, String unidadeSigla) {
+        Long codUnidade = unidadeService.buscarCodigoPorSigla(unidadeSigla);
+        return subprocessoRepo.findByProcessoCodigoAndUnidadeCodigo(codProcesso, codUnidade)
+                .map(Subprocesso::getCodigo)
+                .orElseThrow();
     }
 
     private List<AvaliacaoServidor> buscarAvaliacoesDiagnostico(Long codProcesso, String unidadeSigla, String servidorTitulo) {

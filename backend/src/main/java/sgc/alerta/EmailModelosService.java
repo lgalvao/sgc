@@ -188,6 +188,15 @@ public class EmailModelosService {
         return templateEngine.process("diagnostico-aceito", ctx);
     }
 
+    public String criarEmailDiagnosticoAceitoEmBloco(String siglaUnidadeDestino, String nomeProcesso, List<String> siglasUnidades) {
+        Context ctx = new Context();
+        ctx.setVariable(VAR_TITULO, "Diagnósticos aceitos");
+        ctx.setVariable("siglaUnidadeSuperior", siglaUnidadeDestino);
+        ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        ctx.setVariable("siglasUnidades", siglasUnidades);
+        return templateEngine.process("diagnostico-aceito-bloco-superior", ctx);
+    }
+
     public String criarEmailDiagnosticoHomologado(String siglaUnidade, String nomeProcesso) {
         Context ctx = new Context();
         ctx.setVariable(VAR_TITULO, "Diagnóstico homologado");

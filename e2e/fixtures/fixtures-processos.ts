@@ -141,6 +141,52 @@ export async function criarProcessoDiagnosticoComConsensoCriadoFixture(
     return await response.json();
 }
 
+export async function criarProcessoDiagnosticoConcluidoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico-concluido', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E DIAGNOSTICO CONCLUIDO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo diagnóstico concluído: ` +
+            `${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
+export async function criarProcessoDiagnosticoHomologadoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico-homologado', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E DIAGNOSTICO HOMOLOGADO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo diagnóstico homologado: ` +
+            `${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
 /**
  * Cria um processo de mapeamento via API E2E que já nasce finalizado e com atividades,
  * ignorando validações, perfeito para testes de importação.
