@@ -41,9 +41,15 @@
     "typescript-eslint": "^8.59.2"
   },
   "overrides": {
-    "glob": "^13.0.0"
+    "glob": "^13.0.0",
+    "esbuild": "^0.29.0",
+    "js-yaml": "^4.1.2"
   },
   "allowScripts": {
-    "fsevents@2.3.2": true
+    "fsevents@2.3.2": true,
+    "fsevents@2.3.3": true,
+    "vue-demi@0.14.10": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.27.7": true
   }
 }
