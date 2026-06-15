@@ -227,11 +227,17 @@ Localização: `e2e/`
 - fixtures para autenticação, banco e preparação de estado
 - `lifecycle.js` para subir a infra local
 
-Comando principal:
+Comandos de execução:
 
-```bash
-npm run test:e2e
-```
+- **Todos os testes**:
+  ```bash
+  npm run test:e2e
+  ```
+- **Um arquivo de teste específico (CDU)**:
+  ```bash
+  npm run test:e2e e2e/cdu-28.spec.ts
+  ```
+
 
 ## Observabilidade e operação
 

@@ -15,7 +15,7 @@ tasks.register<NpmTask>("install") {
     description = "Instala as dependências do frontend (npm ci)"
     npmCommand.set(listOf("ci"))
     inputs.file("package.json")
-    inputs.file("package-lock.json")
+    inputs.file("../package-lock.json")
     outputs.dir("node_modules")
 }
 

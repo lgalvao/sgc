@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "test": "npm --prefix frontend run test",
-    "test:e2e": "npm run test:e2e -w e2e",
+    "test:e2e": "playwright test --config=e2e/playwright.config.ts --project=chromium",
+
     "test:unit": "npm --prefix frontend run test:unit",
     "typecheck": "npm run typecheck:e2e && npm --prefix frontend run typecheck",
     "typecheck:e2e": "npm run typecheck -w e2e",

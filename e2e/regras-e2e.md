@@ -30,9 +30,23 @@ O `e2e/lifecycle.js` agora opera em modo mais enxuto:
 Os testes que falharem geram arquivos `error-context.md`, com a situacao da tela no momento da falha -- nao deixe de ler
 esses arquivos.
 
+## Como Executar os Testes E2E
+
+Os testes E2E podem ser executados de forma simplificada a partir da raiz do projeto utilizando o gerenciador de pacotes npm:
+
+* **Todos os testes**:
+  ```bash
+  npm run test:e2e
+  ```
+* **Um teste específico (CDU)**:
+  ```bash
+  npm run test:e2e e2e/cdu-28.spec.ts
+  ```
+
 ## Regras para execução de testes E2E
 
 - **NUNCA rode apenas um cenário isolado se o teste for serial**: Muitos testes usam `test.describe.serial()`, o que
+
   significa que os cenários dependem da execução sequencial dos anteriores. Rodar um cenário isolado causará falhas.
 - **Prefira sempre `chromium` ao depurar**: Salvo necessidade explícita de outro navegador, use `--project=chromium`
   para ganhar tempo e reduzir ruído.
@@ -50,9 +64,10 @@ esses arquivos.
 Exemplo de execução recomendada:
 
 ```bash
-npx playwright test --config=e2e/playwright.config.ts --project=chromium e2e/cdu-28.spec.ts > /tmp/sgc-e2e-cdu28.log 2>&1
+npm run test:e2e e2e/cdu-28.spec.ts > /tmp/sgc-e2e-cdu28.log 2>&1
 tail -n 40 /tmp/sgc-e2e-cdu28.log
 ```
+
 
 
 ## Fixtures e preparação de estado (State-Jumping)
