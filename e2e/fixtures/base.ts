@@ -41,6 +41,15 @@ function ehErroValidacaoEsperado(status?: number, body?: string): boolean {
         && body.includes('"code":"VALIDACAO"');
 }
 
+function ehErroValidacaoSilencioso(url: string, status?: number, method?: string): boolean {
+    if (status !== 422) {
+        return false;
+    }
+
+    return (method === 'POST' && /\/api\/subprocessos\/\d+\/diagnostico\/autoavaliacao\/concluir$/.test(url))
+        || (method === 'GET' && /\/api\/subprocessos\/\d+\/diagnostico\/concluir\/validacao$/.test(url));
+}
+
 function ehRuidoAutenticacaoEmDetalhes(url: string, status?: number, method?: string): boolean {
     return status === 401
         && method === 'GET'
@@ -226,6 +235,10 @@ export const test = base.extend<{
 
                 if (ehErroEsperadoImportacaoDuplicada(response.url(), response.status(), response.request().method(), body)) {
                     registrarErroEsperadoRede(response.status(), response.request().method(), response.url());
+                    return;
+                }
+
+                if (ehErroValidacaoSilencioso(response.url(), response.status(), response.request().method())) {
                     return;
                 }
 

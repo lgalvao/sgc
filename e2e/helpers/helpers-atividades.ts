@@ -56,6 +56,8 @@ export async function navegarParaCadastro(page: Page) {
 
     const card = page.getByTestId('card-subprocesso-atividades');
     await expect(card).toBeVisible();
+    await expect(card).toHaveClass(/card-actionable/);
+    await expect(card).toHaveAttribute('role', 'button');
     await card.click();
     await expect(page).toHaveURL(/\/cadastro(?:\?.*)?$/);
     await esperarTelaAtividades(page);
