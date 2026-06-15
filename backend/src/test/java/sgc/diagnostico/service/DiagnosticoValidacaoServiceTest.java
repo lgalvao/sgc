@@ -10,10 +10,7 @@ import sgc.comum.Mensagens;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.SituacaoCapacitacao;
-import sgc.diagnostico.model.SituacaoCapacitacaoRepo;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.diagnostico.model.ValorSituacaoCapacitacao;
 import sgc.subprocesso.model.TipoAcaoAnalise;
 import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.service.SubprocessoVisualizacaoService;
@@ -28,7 +25,6 @@ import static org.mockito.Mockito.when;
 class DiagnosticoValidacaoServiceTest {
 
     @Mock AvaliacaoServidorRepo avaliacaoRepo;
-    @Mock SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     @Mock SubprocessoVisualizacaoService subprocessoVisualizacaoService;
 
     @InjectMocks
@@ -62,16 +58,26 @@ class DiagnosticoValidacaoServiceTest {
     }
 
     @Test
+    @DisplayName("validarConclusaoUnidade deve falhar quando não houver avaliações")
+    void validarConclusaoUnidade_deveFalharQuandoSemAvaliacoes() {
+        when(avaliacaoRepo.existsByDiagnosticoCodigo(19L)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.validarConclusaoUnidade(19L))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage(Mensagens.DIAGNOSTICO_PENDENTE);
+    }
+
+    @Test
     @DisplayName("validarConclusaoUnidade deve falhar quando houver avaliação pendente")
     void validarConclusaoUnidade_deveFalharQuandoAvaliacaoPendente() {
-        AvaliacaoServidor avaliacao = new AvaliacaoServidor();
-        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
-
-        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
-        situacao.setSituacaoCapacitacao(ValorSituacaoCapacitacao.EC);
-
-        when(avaliacaoRepo.listarPorDiagnostico(20L)).thenReturn(List.of(avaliacao));
-        when(situacaoCapacitacaoRepo.listarPorDiagnostico(20L)).thenReturn(List.of(situacao));
+        when(avaliacaoRepo.existsByDiagnosticoCodigo(20L)).thenReturn(true);
+        when(avaliacaoRepo.existsAvaliacaoPendentePorDiagnostico(
+                20L,
+                java.util.EnumSet.of(
+                        SituacaoAvaliacaoServidor.CONSENSO_APROVADO,
+                        SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                )
+        )).thenReturn(true);
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(20L))
                 .isInstanceOf(ErroValidacao.class)
@@ -79,16 +85,20 @@ class DiagnosticoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarConclusaoUnidade deve falhar quando houver situação de capacitação sem valor")
+    @DisplayName("validarConclusaoUnidade deve falhar quando houver situação de capacitação pendente para servidor aprovado")
     void validarConclusaoUnidade_deveFalharQuandoOcupacaoPendente() {
-        AvaliacaoServidor avaliacao = new AvaliacaoServidor();
-        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
-
-        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
-        situacao.setSituacaoCapacitacao(null);
-
-        when(avaliacaoRepo.listarPorDiagnostico(21L)).thenReturn(List.of(avaliacao));
-        when(situacaoCapacitacaoRepo.listarPorDiagnostico(21L)).thenReturn(List.of(situacao));
+        when(avaliacaoRepo.existsByDiagnosticoCodigo(21L)).thenReturn(true);
+        when(avaliacaoRepo.existsAvaliacaoPendentePorDiagnostico(
+                21L,
+                java.util.EnumSet.of(
+                        SituacaoAvaliacaoServidor.CONSENSO_APROVADO,
+                        SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                )
+        )).thenReturn(false);
+        when(avaliacaoRepo.existsAvaliacaoAprovadaSemSituacaoCapacitacao(
+                21L,
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        )).thenReturn(true);
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(21L))
                 .isInstanceOf(ErroValidacao.class)
@@ -98,16 +108,18 @@ class DiagnosticoValidacaoServiceTest {
     @Test
     @DisplayName("validarConclusaoUnidade deve aceitar quando tudo estiver concluído")
     void validarConclusaoUnidade_deveAceitarQuandoTudoConcluido() {
-        AvaliacaoServidor aprovada = new AvaliacaoServidor();
-        aprovada.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
-        AvaliacaoServidor impossibilitada = new AvaliacaoServidor();
-        impossibilitada.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
-
-        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
-        situacao.setSituacaoCapacitacao(ValorSituacaoCapacitacao.AC);
-
-        when(avaliacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(aprovada, impossibilitada));
-        when(situacaoCapacitacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(situacao));
+        when(avaliacaoRepo.existsByDiagnosticoCodigo(22L)).thenReturn(true);
+        when(avaliacaoRepo.existsAvaliacaoPendentePorDiagnostico(
+                22L,
+                java.util.EnumSet.of(
+                        SituacaoAvaliacaoServidor.CONSENSO_APROVADO,
+                        SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                )
+        )).thenReturn(false);
+        when(avaliacaoRepo.existsAvaliacaoAprovadaSemSituacaoCapacitacao(
+                22L,
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        )).thenReturn(false);
 
         assertThatCode(() -> service.validarConclusaoUnidade(22L))
                 .doesNotThrowAnyException();

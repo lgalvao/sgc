@@ -5,16 +5,22 @@ import org.springframework.stereotype.Service;
 import sgc.comum.Mensagens;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.SituacaoCapacitacaoRepo;
+import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.subprocesso.model.TipoAcaoAnalise;
 import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.service.SubprocessoVisualizacaoService;
 
+import java.util.EnumSet;
+
 @Service
 @RequiredArgsConstructor
 public class DiagnosticoValidacaoService {
+    private static final EnumSet<SituacaoAvaliacaoServidor> SITUACOES_CONCLUIDAS_UNIDADE = EnumSet.of(
+            SituacaoAvaliacaoServidor.CONSENSO_APROVADO,
+            SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+    );
+
     private final AvaliacaoServidorRepo avaliacaoRepo;
-    private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
     private final SubprocessoVisualizacaoService subprocessoVisualizacaoService;
 
     public void validarAutoavaliacaoCompleta(Long diagnosticoCodigo, String servidorTitulo) {
@@ -27,17 +33,17 @@ public class DiagnosticoValidacaoService {
     }
 
     public void validarConclusaoUnidade(Long diagnosticoCodigo) {
-        var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnosticoCodigo);
-        boolean avaliacoesPendentes = avaliacoes.isEmpty()
-                || avaliacoes.stream().anyMatch(a ->
-                a.getSituacaoServidor() != sgc.diagnostico.model.SituacaoAvaliacaoServidor.CONSENSO_APROVADO
-                        && a.getSituacaoServidor() != sgc.diagnostico.model.SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        boolean semAvaliacoes = !avaliacaoRepo.existsByDiagnosticoCodigo(diagnosticoCodigo);
+        boolean possuiAvaliacoesPendentes = avaliacaoRepo.existsAvaliacaoPendentePorDiagnostico(
+                diagnosticoCodigo,
+                SITUACOES_CONCLUIDAS_UNIDADE
+        );
+        boolean possuiSituacaoCapacitacaoPendente = avaliacaoRepo.existsAvaliacaoAprovadaSemSituacaoCapacitacao(
+                diagnosticoCodigo,
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        );
 
-        var situacoes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnosticoCodigo);
-        boolean situacoesPendentes = situacoes.isEmpty()
-                || situacoes.stream().anyMatch(o -> o.getSituacaoCapacitacao() == null);
-
-        if (avaliacoesPendentes || situacoesPendentes) {
+        if (semAvaliacoes || possuiAvaliacoesPendentes || possuiSituacaoCapacitacaoPendente) {
             throw new ErroValidacao(Mensagens.DIAGNOSTICO_PENDENTE);
         }
     }
