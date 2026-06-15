@@ -62,20 +62,20 @@ export function usePainelTela() {
     carregandoPainel.value = true;
     try {
       const {data: bootstrap} = await painelQuery.refetch();
-      if (!bootstrap) return;
-
-      const codigosNaoLidos = bootstrap.alertas
-          .filter((a: Alerta) => !a.dataHoraLeitura && !painelStore.isMarcadoComoLido(a.codigo))
-          .map((a: Alerta) => a.codigo);
-      if (codigosNaoLidos.length > 0) {
-        painelStore.registrarLeitura(codigosNaoLidos);
-        executarEmBackground(
-          () => painelService.marcarAlertasLidos(codigosNaoLidos),
-          "Falha ao marcar alertas como lidos em background:",
-        );
+      if (bootstrap) {
+        const codigosNaoLidos = bootstrap.alertas
+            .filter((a: Alerta) => !a.dataHoraLeitura && !painelStore.isMarcadoComoLido(a.codigo))
+            .map((a: Alerta) => a.codigo);
+        if (codigosNaoLidos.length > 0) {
+          painelStore.registrarLeitura(codigosNaoLidos);
+          executarEmBackground(
+            () => painelService.marcarAlertasLidos(codigosNaoLidos),
+            "Falha ao marcar alertas como lidos em background:",
+          );
+        }
       }
-      painelStore.marcarRecarregado();
     } finally {
+      painelStore.marcarRecarregado();
       carregandoPainel.value = false;
     }
   }
