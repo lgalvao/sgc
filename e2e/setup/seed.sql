@@ -388,42 +388,42 @@ VALUES (4, 99);
 -- Atividades e conhecimentos para o mapa 99 (ASSESSORIA_12)
 -- Necessário para testes de revisão (CDU-08, CDU-10)
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
-VALUES (9901, 'Atividade Seed 1 - Planejar cronogramas de capacitação e acompanhar marcos críticos', 99);
+VALUES (9901, 'Planejar cronogramas de capacitação e acompanhar marcos críticos', 99);
 
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
-VALUES (990101, 'Conhecimento Seed 1.1 - Planejamento de trilhas formativas com foco em unidades judiciárias', 9901);
+VALUES (990101, 'Planejamento de trilhas formativas com foco em unidades judiciárias', 9901);
 
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
-VALUES (9902, 'Atividade Seed 2 - Consolidar indicadores e orientar a priorização de desenvolvimento técnico', 99);
+VALUES (9902, 'Consolidar indicadores e orientar a priorização de desenvolvimento técnico', 99);
 
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
-VALUES (990201, 'Conhecimento Seed 2.1 - Leitura de indicadores institucionais e priorização por criticidade', 9902);
+VALUES (990201, 'Leitura de indicadores institucionais e priorização por criticidade', 9902);
 
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
-VALUES (9903, 'Atividade Seed 3 - Estruturar materiais de apoio e orientar multiplicadores internos da unidade', 99);
+VALUES (9903, 'Estruturar materiais de apoio e orientar multiplicadores internos da unidade', 99);
 
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
-VALUES (990301, 'Conhecimento Seed 3.1 - Curadoria de conteúdos, guias operacionais e padrões de comunicação interna', 9903);
+VALUES (990301, 'Curadoria de conteúdos, guias operacionais e padrões de comunicação interna', 9903);
 
 INSERT INTO sgc.atividade (codigo, descricao, mapa_codigo)
-VALUES (9904, 'Atividade Seed 4 - Mapear riscos operacionais e definir ações preventivas de disseminação do conhecimento', 99);
+VALUES (9904, 'Mapear riscos operacionais e definir ações preventivas de disseminação do conhecimento', 99);
 
 INSERT INTO sgc.conhecimento (codigo, descricao, atividade_codigo)
-VALUES (990401, 'Conhecimento Seed 4.1 - Gestão de riscos, documentação processual e transferência estruturada de conhecimento', 9904);
+VALUES (990401, 'Gestão de riscos, documentação processual e transferência estruturada de conhecimento', 9904);
 
 -- Competências para o mapa 99 (ASSESSORIA_12)
 -- Necessário para testes de CDU-18 (Visualização de mapa)
 INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
-VALUES (99001, 'Competência Técnica Seed 99 - Planejamento integrado de capacitação institucional e desenvolvimento continuado', 99);
+VALUES (99001, 'Planejamento integrado de capacitação institucional e desenvolvimento continuado', 99);
 
 INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
-VALUES (99002, 'Competência Técnica Seed 99B - Análise de indicadores de aprendizagem e tomada de decisão orientada por evidências', 99);
+VALUES (99002, 'Análise de indicadores de aprendizagem e tomada de decisão orientada por evidências', 99);
 
 INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
-VALUES (99003, 'Competência Técnica Seed 99C - Produção de conteúdos instrucionais, guias operacionais e apoio à multiplicação interna', 99);
+VALUES (99003, 'Produção de conteúdos instrucionais, guias operacionais e apoio à multiplicação interna', 99);
 
 INSERT INTO sgc.competencia (codigo, descricao, mapa_codigo)
-VALUES (99004, 'Competência Técnica Seed 99D - Gestão de riscos operacionais aplicada à capacitação e continuidade do conhecimento', 99);
+VALUES (99004, 'Gestão de riscos operacionais aplicada à capacitação e continuidade do conhecimento', 99);
 
 -- Vincular atividades à competência
 INSERT INTO sgc.competencia_atividade (atividade_codigo, competencia_codigo)

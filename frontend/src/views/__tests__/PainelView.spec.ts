@@ -7,6 +7,7 @@ import {useToastStore} from '@/stores/toast';
 import * as painelService from '@/services/painelService';
 import {createMemoryHistory, createRouter} from 'vue-router';
 import {usePerfilStore} from '@/stores/perfil';
+import {usePainelStore} from '@/stores/painel';
 
 vi.mock('@/services/painelService', () => ({
     obterBootstrap: vi.fn(),
@@ -258,6 +259,35 @@ describe('PainelView', () => {
         await flushPromises();
         // Permanece 2 pois o refresh() no onActivated respeita o cache válido
         expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); 
+    });
+
+    it('deve recarregar em foreground ao reativar quando o painel foi invalidado pela SPA', async () => {
+        const options = createMountOptions();
+        const painelStore = usePainelStore(options.pinia);
+
+        const KeepAliveWrapper = {
+            template: `<keep-alive><PainelView v-if="show" /></keep-alive>`,
+            components: {PainelView},
+            data() {
+                return {show: true}
+            }
+        };
+
+        const wrapper = mount(KeepAliveWrapper, options);
+        const vm = wrapper.vm as unknown as { show: boolean };
+        await flushPromises();
+
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
+
+        vm.show = false;
+        await flushPromises();
+
+        painelStore.invalidar();
+        vm.show = true;
+        await flushPromises();
+
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
+        expect(painelStore.precisaRecarregar).toBe(false);
     });
 
     it('deve mostrar estado vazio de alertas sem renderizar a tabela', async () => {

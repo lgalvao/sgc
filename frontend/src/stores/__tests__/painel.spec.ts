@@ -29,14 +29,26 @@ describe("usePainelStore", () => {
 
         expect(store.isMarcadoComoLido(1)).toBe(false);
         expect(store.isMarcadoComoLido(2)).toBe(false);
+        expect(store.precisaRecarregar).toBe(true);
     });
 
     it("resetar deve limpar marcações locais", () => {
         const store = usePainelStore();
         store.registrarLeitura([1]);
+        store.invalidar();
 
         store.resetar();
 
         expect(store.isMarcadoComoLido(1)).toBe(false);
+        expect(store.precisaRecarregar).toBe(false);
+    });
+
+    it("marcarRecarregado deve limpar o estado sujo do painel", () => {
+        const store = usePainelStore();
+
+        store.invalidar();
+        store.marcarRecarregado();
+
+        expect(store.precisaRecarregar).toBe(false);
     });
 });

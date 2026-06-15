@@ -53,6 +53,7 @@ export function usePainelTela() {
   async function carregarDados() {
     const unidadeCodigo = perfilStore.unidadeSelecionada;
     if (!perfil.perfilSelecionado.value || !unidadeCodigo) {
+      painelStore.marcarRecarregado();
       carregandoPainel.value = false;
       return;
     }
@@ -72,6 +73,7 @@ export function usePainelTela() {
           "Falha ao marcar alertas como lidos em background:",
         );
       }
+      painelStore.marcarRecarregado();
     } finally {
       carregandoPainel.value = false;
     }
@@ -103,6 +105,10 @@ export function usePainelTela() {
   onActivated(async () => {
     if (!carregamentoInicialConcluido.value) return;
     exibirToastPendente();
+    if (painelStore.precisaRecarregar) {
+      await carregarDados();
+      return;
+    }
     executarEmBackground(
       () => painelQuery.refresh(),
       "Falha na recarga em background do painel:",

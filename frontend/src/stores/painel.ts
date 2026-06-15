@@ -10,13 +10,20 @@ import {ref} from "vue";
  */
 export const usePainelStore = defineStore("painel", () => {
     const codigosMarcadosComoLidos = ref(new Set<number>());
+    const precisaRecarregar = ref(false);
 
     function invalidar() {
         codigosMarcadosComoLidos.value = new Set();
+        precisaRecarregar.value = true;
     }
 
     function resetar() {
         codigosMarcadosComoLidos.value = new Set();
+        precisaRecarregar.value = false;
+    }
+
+    function marcarRecarregado() {
+        precisaRecarregar.value = false;
     }
 
     function registrarLeitura(codigos: number[]) {
@@ -29,6 +36,8 @@ export const usePainelStore = defineStore("painel", () => {
 
     return {
         invalidar,
+        marcarRecarregado,
+        precisaRecarregar,
         resetar,
         registrarLeitura,
         isMarcadoComoLido

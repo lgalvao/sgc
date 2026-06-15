@@ -13,7 +13,7 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
  *
  * O seed contém:
  * - Processo 99 (FINALIZADO) com mapa homologado para unidade de assessoria
- * - Mapa 99 com competência "Competência técnica seed 99" vinculada às atividades
+ * - Mapa 99 com competências e atividades já vinculadas
  */
 test.describe('CDU-18: Visualizar mapa de competências', () => {
 
@@ -57,16 +57,18 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await expect(headerUnidade).toContainText(/ASSESSORIA_\d+/);
 
             // 5.3 Competência do seed
-            await expect(page.getByText(/Competência Técnica Seed 99 - Planejamento/i)).toBeVisible();
+            await expect(page.getByText(/Planejamento integrado de capacitação institucional/i)).toBeVisible();
 
             // 5.4 Atividades da competência
-            const cardCompetencia = page.locator('[data-testid$="card-competencia"]', {hasText: /Competência Técnica Seed 99 - Planejamento/i}).first();
-            await expect(cardCompetencia.getByText(/Atividade Seed 1/i)).toBeVisible();
-            await expect(cardCompetencia.getByText(/Atividade Seed 2/i)).toBeVisible();
+            const cardCompetencia = page.locator('[data-testid$="card-competencia"]', {hasText: /Planejamento integrado de capacitação institucional/i}).first();
+            const cardAtividade1 = cardCompetencia.locator('.atividade-associada-card-item', {hasText: /Planejar cronogramas de capacitação/i}).first();
+            const cardAtividade2 = cardCompetencia.locator('.atividade-associada-card-item', {hasText: /Consolidar indicadores e orientar a priorização/i}).first();
+            await expect(cardAtividade1).toBeVisible();
+            await expect(cardAtividade2).toBeVisible();
 
             // 5.5 Conhecimentos das atividades
-            await expect(cardCompetencia.getByText(/Conhecimento Seed 1.1/i)).toBeVisible();
-            await expect(cardCompetencia.getByText(/Conhecimento Seed 2.1/i)).toBeVisible();
+            await expect(cardAtividade1.getByText(/Planejamento de trilhas formativas/i)).toBeVisible();
+            await expect(cardAtividade2.getByText(/Leitura de indicadores institucionais/i)).toBeVisible();
         });
     });
 
@@ -96,7 +98,7 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             const headerUnidade = page.getByTestId('subprocesso-header__txt-header-unidade');
             await expect(headerUnidade).toBeVisible();
             await expect(headerUnidade).toHaveText('ASSESSORIA_12');
-            await expect(page.getByText(/Competência Técnica Seed 99 - Planejamento/i)).toBeVisible();
+            await expect(page.getByText(/Planejamento integrado de capacitação institucional/i)).toBeVisible();
         });
     });
 });
