@@ -252,10 +252,11 @@ const ADAPTADORES = {
         return execucao;
     },
     async e2ePlaywright() {
-        const execucao = criarExecucao("e2e-playwright", "E2E Playwright", "teste", "npx playwright test", ".");
+        const execucao = criarExecucao("e2e-playwright", "E2E Playwright", "teste", "npx playwright test --config=e2e/playwright.config.ts", ".");
         const saida = await executarComando({
             comando: "npx",
-            args: ["playwright", "test", "--reporter=json"],
+            args: ["playwright", "test", "--config=e2e/playwright.config.ts", "--reporter=json"],
+
             cwd: DIRETORIO_RAIZ,
             env: {CI: "1"}
         });

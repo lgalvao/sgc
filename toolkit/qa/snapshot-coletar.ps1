@@ -822,8 +822,9 @@ $adaptadores = @{
         return $execucao
     }
     e2ePlaywright = {
-        $execucao = Nova-Execucao 'e2e-playwright' 'E2E Playwright' 'teste' 'npx playwright test --reporter=json' '.'
-        $saida = Executar-ComandoCapturando 'npx.cmd' @('playwright', 'test', '--reporter=json') $diretorioRaiz (Join-Path $diretorioExecucao 'e2e-playwright.log')
+        $execucao = Nova-Execucao 'e2e-playwright' 'E2E Playwright' 'teste' 'npx playwright test --config=e2e/playwright.config.ts --reporter=json' '.'
+        $saida = Executar-ComandoCapturando 'npx.cmd' @('playwright', 'test', '--config=e2e/playwright.config.ts', '--reporter=json') $diretorioRaiz (Join-Path $diretorioExecucao 'e2e-playwright.log')
+
         $metricas = Extrair-ResumoPlaywright $saida.texto
         $execucao.status = Obter-StatusExecucao $saida.codigo $metricas
         $execucao.duracaoMs = $saida.duracaoMs

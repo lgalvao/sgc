@@ -50,6 +50,7 @@ invoke_passo 'Typecheck raiz' npm run typecheck
 invoke_passo 'Testes scripts' npm --prefix toolkit run test
 invoke_passo 'Testes frontend' npm --prefix frontend run test
 invoke_passo 'Testes backend' "$GRADLE_CMD" backend:test
-invoke_passo 'Testes e2e' npx playwright test --project=chromium
+invoke_passo 'Testes e2e' npx playwright test --config=e2e/playwright.config.ts --project=chromium
+
 
 echo -e "\n${GREEN}Tudo certo!${NC}"

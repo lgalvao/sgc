@@ -42,6 +42,7 @@ Invoke-Step "Typecheck raiz" { npm run typecheck }
 Invoke-Step "Testes scripts" { npm --prefix toolkit run test }
 Invoke-Step "Testes frontend" { npm --prefix frontend run test }
 Invoke-Step "Testes backend" { & $GRADLE_CMD backend:test }
-Invoke-Step "Testes e2e" { npx playwright test --project=chromium }
+Invoke-Step "Testes e2e" { npx playwright test --config=e2e/playwright.config.ts --project=chromium }
+
 
 Write-Host "`nTudo certo!" -ForegroundColor Green

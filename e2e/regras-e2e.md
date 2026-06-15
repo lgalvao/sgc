@@ -50,9 +50,10 @@ esses arquivos.
 Exemplo de execução recomendada:
 
 ```bash
-npx playwright test --project=chromium e2e/cdu-28.spec.ts > /tmp/sgc-e2e-cdu28.log 2>&1
+npx playwright test --config=e2e/playwright.config.ts --project=chromium e2e/cdu-28.spec.ts > /tmp/sgc-e2e-cdu28.log 2>&1
 tail -n 40 /tmp/sgc-e2e-cdu28.log
 ```
+
 
 ## Fixtures e preparação de estado (State-Jumping)
 

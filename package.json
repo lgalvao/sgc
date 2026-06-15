@@ -34,6 +34,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-playwright": "^2.10.2",
     "globals": "^17.6.0",
+    "js-yaml": "^4.2.0",
     "knip": "^6.12.1",
     "oxlint": "^1.63.0",
     "release-it": "^20.0.1",
@@ -42,14 +43,17 @@
   },
   "overrides": {
     "glob": "^13.0.0",
-    "esbuild": "^0.29.0",
-    "js-yaml": "^4.1.2"
+    "esbuild": "^0.28.1",
+    "vite": "^8.0.16",
+    "form-data": "^4.0.6",
+    "js-yaml": "$js-yaml"
   },
   "allowScripts": {
     "fsevents@2.3.2": true,
     "fsevents@2.3.3": true,
     "vue-demi@0.14.10": true,
     "esbuild@0.25.12": true,
-    "esbuild@0.27.7": true
+    "esbuild@0.27.7": true,
+    "esbuild@0.28.1": true
   }
 }
