@@ -20,6 +20,7 @@ export function usePainelTela() {
   const painelQuery = usePainelQuery();
   const toast = useToast();
   const carregandoPainel = ref(true);
+  const exibindoCarregamentoPainel = computed(() => carregandoPainel.value || painelStore.precisaRecarregar);
   const router = useRouter();
 
   const criterio = ref<keyof ProcessoResumo>("descricao");
@@ -173,7 +174,7 @@ export function usePainelTela() {
     asc,
     processosOrdenados,
     alertas,
-    carregandoPainel,
+    carregandoPainel: exibindoCarregamentoPainel,
     camposAlertas,
     rowClassAlerta,
     rowAttrAlerta,

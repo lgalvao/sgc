@@ -30,6 +30,7 @@ describe("usePainelStore", () => {
         expect(store.isMarcadoComoLido(1)).toBe(false);
         expect(store.isMarcadoComoLido(2)).toBe(false);
         expect(store.precisaRecarregar).toBe(true);
+        expect(store.versaoInvalidacao).toBe(1);
     });
 
     it("resetar deve limpar marcações locais", () => {
@@ -41,6 +42,7 @@ describe("usePainelStore", () => {
 
         expect(store.isMarcadoComoLido(1)).toBe(false);
         expect(store.precisaRecarregar).toBe(false);
+        expect(store.versaoInvalidacao).toBe(0);
     });
 
     it("marcarRecarregado deve limpar o estado sujo do painel", () => {

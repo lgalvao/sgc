@@ -11,15 +11,18 @@ import {ref} from "vue";
 export const usePainelStore = defineStore("painel", () => {
     const codigosMarcadosComoLidos = ref(new Set<number>());
     const precisaRecarregar = ref(false);
+    const versaoInvalidacao = ref(0);
 
     function invalidar() {
         codigosMarcadosComoLidos.value = new Set();
         precisaRecarregar.value = true;
+        versaoInvalidacao.value += 1;
     }
 
     function resetar() {
         codigosMarcadosComoLidos.value = new Set();
         precisaRecarregar.value = false;
+        versaoInvalidacao.value = 0;
     }
 
     function marcarRecarregado() {
@@ -38,6 +41,7 @@ export const usePainelStore = defineStore("painel", () => {
         invalidar,
         marcarRecarregado,
         precisaRecarregar,
+        versaoInvalidacao,
         resetar,
         registrarLeitura,
         isMarcadoComoLido
