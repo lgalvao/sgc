@@ -9,6 +9,14 @@ function monitoramentoAtivoNoPlaywright(): boolean {
     return process.env.SGC_MONITORAMENTO === 'sim';
 }
 
+function registrarErroEsperadoRede(status: number, metodo: string, url: string): void {
+    if (!monitoramentoAtivoNoPlaywright()) {
+        return;
+    }
+
+    logger.info(`[NETWORK EXPECTED] ${status} ${metodo} ${url}`);
+}
+
 function obterBaseUrlWorker(_workerIndex: number): string {
     const portaFrontend = Number.parseInt(process.env.E2E_FRONTEND_PORT || '5173', 10);
     return `http://localhost:${portaFrontend}`;
@@ -217,18 +225,18 @@ export const test = base.extend<{
                 }
 
                 if (ehErroEsperadoImportacaoDuplicada(response.url(), response.status(), response.request().method(), body)) {
-                    logger.info(`[NETWORK EXPECTED] ${response.status()} ${response.request().method()} ${response.url()}`);
+                    registrarErroEsperadoRede(response.status(), response.request().method(), response.url());
                     return;
                 }
 
                 if (ehErroValidacaoEsperado(response.status(), body)) {
-                    logger.info(`[NETWORK EXPECTED] ${response.status()} ${response.request().method()} ${response.url()}`);
+                    registrarErroEsperadoRede(response.status(), response.request().method(), response.url());
                     return;
                 }
 
                 if (ehRuidoAutenticacaoEmDetalhes(response.url(), response.status(), response.request().method())) {
                     ultimoRuidoAutenticacaoDetalhesEm = Date.now();
-                    logger.info(`[NETWORK EXPECTED] ${response.status()} ${response.request().method()} ${response.url()}`);
+                    registrarErroEsperadoRede(response.status(), response.request().method(), response.url());
                     return;
                 }
 
