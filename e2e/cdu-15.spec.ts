@@ -33,11 +33,11 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
         validarProcessoFixture(processo, descProcesso);
     });
 
-    test('Cenários CDU-15: Fluxo completo de manutenção do mapa pelo ADMIN', async ({
-                                                                                        _resetAutomatico,
-                                                                                        page,
-                                                                                        _autenticadoComoAdmin
-                                                                                    }) => {
+    test('Cenários CDU-15: CT-00 a CT-02 - Criar competência', async ({
+                                                                      _resetAutomatico,
+                                                                      page,
+                                                                      _autenticadoComoAdmin
+                                                                  }) => {
         // CT-00 e CT-01: Acessar edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -82,6 +82,17 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         await (await abrirAcaoMapa(page, 'btn-mapa-acao-disponibilizar')).click();
         await expect(page.getByText(TEXTOS.mapa.ERRO_ATIVIDADES_SEM_COMPETENCIA)).toBeVisible();
+    });
+
+    test('Cenários CDU-15: CT-02b a CT-03 - Editar competência', async ({
+                                                                        _resetAutomatico,
+                                                                        page,
+                                                                        _autenticadoComoAdmin
+                                                                    }) => {
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+
+        const compDesc = `Competência 1 ${timestamp}`;
 
         // CT-02b: Remover a última atividade diretamente no card e manter disponibilização bloqueada
         await removerAtividadeAssociada(page, compDesc, ATIVIDADE_1);
@@ -110,6 +121,17 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
 
         await navegarParaMapa(page);
         await verificarCompetenciaNoMapa(page, newDesc, [ATIVIDADE_1, ATIVIDADE_2]);
+    });
+
+    test('Cenários CDU-15: CT-04 a CT-06 - Excluir e disponibilizar mapa', async ({
+                                                                                  _resetAutomatico,
+                                                                                  page,
+                                                                                  _autenticadoComoAdmin
+                                                                              }) => {
+        await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
+        await navegarParaMapa(page);
+
+        const newDesc = `Competência 1 Editada ${timestamp}`;
 
         // CT-05: Validar cancelamento da Exclusão
         await excluirCompetenciaCancelando(page, newDesc);
@@ -140,5 +162,4 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
             tipo: 'Mapeamento'
         });
     });
-
 });

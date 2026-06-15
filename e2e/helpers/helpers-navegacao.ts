@@ -14,14 +14,18 @@ import {expect, type Locator, type Page} from '@playwright/test';
 export async function limparNotificacoes(page: Page): Promise<void> {
     try {
         const closeButtons = page.locator('.toast .btn-close, .orchestrator-container .btn-close, [role="alert"] .btn-close, .alert .btn-close, button[aria-label="Close"]');
-        while (await closeButtons.count() > 0) {
+        let safety = 0;
+        while (await closeButtons.count() > 0 && safety < 10) {
+            safety++;
             const btn = closeButtons.first();
             if (!(await btn.isVisible())) {
                 break;
             }
 
             try {
-                await btn.click();
+                await btn.click({ force: true, timeout: 1000 });
+                // Small delay to allow the element to be removed from the DOM
+                await page.waitForTimeout(100);
             } catch (e: any) {
                 const mensagem = (e.message ?? '').toLowerCase();
                 if (
