@@ -54,6 +54,7 @@ import {
 } from './helpers/helpers-diagnostico.js';
 
 test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
+    test.setTimeout(30000);
     const SIT_PROCESSO = {
         CRIADO: 'Criado',
         EM_ANDAMENTO: 'Em andamento',
