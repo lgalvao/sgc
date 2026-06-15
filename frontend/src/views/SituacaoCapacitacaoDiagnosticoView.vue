@@ -35,65 +35,90 @@
         <div v-else class="p-3">
           <div class="mb-3">
             <div class="form-label">{{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}</div>
-            <BListGroup data-testid="lista-servidores-situacao-capacitacao">
-              <BListGroupItem
-                  v-for="item in servidores"
-                  :key="item.servidorTitulo"
-                  :active="item.servidorTitulo === servidorSelecionadoTitulo"
-                  button
-                  class="d-flex align-items-center justify-content-between gap-3"
-                  :data-testid="`btn-selecionar-servidor-situacao-capacitacao-${item.servidorTitulo}`"
-                  @click="servidorSelecionadoTitulo = item.servidorTitulo"
-              >
-                <div>
+            <div class="scroll-container-servidores">
+              <BListGroup data-testid="lista-servidores-situacao-capacitacao">
+                <BListGroupItem
+                    v-for="item in servidoresOrdenados"
+                    :key="item.servidorTitulo"
+                    :active="item.servidorTitulo === servidorSelecionadoTitulo"
+                    button
+                    class="d-flex align-items-center justify-content-between gap-3"
+                    :data-testid="`btn-selecionar-servidor-situacao-capacitacao-${item.servidorTitulo}`"
+                    @click="servidorSelecionadoTitulo = item.servidorTitulo"
+                >
                   <div class="fw-semibold">{{ item.servidorNome }}</div>
-                  <small class="text-muted">Título {{ item.servidorTitulo }}</small>
-                </div>
-                <BBadge :variant="varianteSituacaoServidor(item.situacaoServidor)">
-                  {{ formatarSituacaoServidor(item.situacaoServidor) }}
-                </BBadge>
-              </BListGroupItem>
-            </BListGroup>
+                  <BBadge :variant="varianteSituacaoServidor(item.situacaoServidor)">
+                    {{ formatarSituacaoServidor(item.situacaoServidor) }}
+                  </BBadge>
+                </BListGroupItem>
+              </BListGroup>
+            </div>
           </div>
 
-          <BCard
-              v-if="servidorSelecionado"
-              class="mb-3 border-0 bg-body-tertiary"
-              data-testid="detalhes-servidor-situacao-capacitacao"
-          >
-            <div class="fw-semibold">{{ servidorSelecionado.servidorNome }}</div>
-            <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
-          </BCard>
+          <template v-if="servidorSelecionado">
+            <BCard
+                class="mb-3 border-0 bg-body-tertiary"
+                data-testid="detalhes-servidor-situacao-capacitacao"
+            >
+              <div class="fw-semibold text-primary">{{ servidorSelecionado.servidorNome }} ({{ servidorSelecionado.servidorTitulo }})</div>
+            </BCard>
 
-          <div class="table-responsive">
-            <table class="table table-sm table-hover align-middle mb-0">
-              <thead>
-              <tr>
-                <th>{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
-                <th class="coluna-capacitacao">{{ TEXTOS.diagnostico.COLUNA_CAPACITACAO }}</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr
-                  v-for="linha in competenciasServidorSelecionado"
-                  :key="linha.competenciaCodigo"
-              >
-                <th class="celula-competencia" scope="row">
-                  {{ linha.competenciaDescricao }}
-                </th>
-                <td class="coluna-capacitacao">
-                <BFormSelect
-                    :data-testid="`situacao-${servidorSelecionadoTitulo}-${linha.competenciaCodigo}`"
-                    :model-value="linha.situacaoCapacitacao"
-                    :options="opcoesCapacitacao"
-                    class="form-select-sm seletor-capacitacao"
-                    @update:model-value="(v: unknown) => atualizarCapacitacao(servidorSelecionadoTitulo, linha.competenciaCodigo, v as ValorSituacaoCapacitacao)"
-                />
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
+            <div v-if="servidorSelecionado.situacaoServidor === 'CONSENSO_APROVADO'">
+              <div class="table-responsive scroll-container-competencias">
+                <table class="table table-sm table-hover align-middle mb-0">
+                  <thead class="sticky-top bg-white shadow-sm">
+                  <tr>
+                    <th>{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
+                    <th class="text-center">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
+                    <th class="text-center">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
+                    <th class="coluna-capacitacao">{{ TEXTOS.diagnostico.COLUNA_CAPACITACAO }}</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr
+                      v-for="linha in competenciasServidorSelecionado"
+                      :key="linha.competenciaCodigo"
+                  >
+                    <th class="celula-competencia" scope="row">
+                      {{ linha.competenciaDescricao }}
+                    </th>
+                    <td class="text-center">
+                      <BBadge pill variant="light">{{ linha.importancia ?? '-' }}</BBadge>
+                    </td>
+                    <td class="text-center">
+                      <BBadge pill variant="light">{{ linha.dominio ?? '-' }}</BBadge>
+                    </td>
+                    <td class="coluna-capacitacao">
+                      <BFormSelect
+                          :data-testid="`situacao-${servidorSelecionadoTitulo}-${linha.competenciaCodigo}`"
+                          :model-value="linha.situacaoCapacitacao"
+                          :options="opcoesCapacitacao"
+                          class="form-select-sm seletor-capacitacao"
+                          @update:model-value="(v: unknown) => atualizarCapacitacao(servidorSelecionadoTitulo, linha.competenciaCodigo, v as ValorSituacaoCapacitacao)"
+                      />
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <EmptyState
+                v-else
+                :description="TEXTOS.diagnostico.VAZIO_CAPACITACAO_SERVIDOR_TEXTO"
+                :title="TEXTOS.diagnostico.VAZIO_CAPACITACAO_SERVIDOR_TITULO"
+                class="my-4"
+                icon="bi-hourglass-split"
+            />
+          </template>
+
+          <EmptyState
+              v-else
+              :description="TEXTOS.diagnostico.VAZIO_CAPACITACAO_SELECAO_TEXTO"
+              :title="TEXTOS.diagnostico.VAZIO_CAPACITACAO_SELECAO_TITULO"
+              class="my-4"
+              icon="bi-person-check"
+          />
         </div>
       </BCard>
     </template>
@@ -140,12 +165,26 @@ const {
 
 const servidorSelecionadoTitulo = ref('');
 
-watch(servidores, (novosServidores) => {
-  const existeAtual = novosServidores.some((item) => item.servidorTitulo === servidorSelecionadoTitulo.value);
-  if (existeAtual) {
+const servidoresOrdenados = computed(() => {
+  return [...servidores.value].sort((a, b) => {
+    if (a.situacaoServidor === 'CONSENSO_APROVADO' && b.situacaoServidor !== 'CONSENSO_APROVADO') {
+      return -1;
+    }
+    if (a.situacaoServidor !== 'CONSENSO_APROVADO' && b.situacaoServidor === 'CONSENSO_APROVADO') {
+      return 1;
+    }
+    return 0;
+  });
+});
+
+watch(servidoresOrdenados, (novosServidores) => {
+  if (!servidorSelecionadoTitulo.value) {
     return;
   }
-  servidorSelecionadoTitulo.value = novosServidores[0]?.servidorTitulo ?? '';
+  const existeAtual = novosServidores.some((item) => item.servidorTitulo === servidorSelecionadoTitulo.value);
+  if (!existeAtual) {
+    servidorSelecionadoTitulo.value = '';
+  }
 }, {immediate: true});
 
 const servidorSelecionado = computed(() =>
@@ -157,11 +196,20 @@ const competenciasServidorSelecionado = computed(() => {
     situacoesLocais.value.map((o) => [`${o.competenciaCodigo}-${o.servidorTitulo}`, o]),
   );
 
-  return (contexto.value?.competencias ?? []).map((competencia) => ({
-    competenciaCodigo: competencia.competenciaCodigo,
-    competenciaDescricao: competencia.descricao,
-    situacaoCapacitacao: situacoesPorChave.get(`${competencia.competenciaCodigo}-${servidorSelecionadoTitulo.value}`)?.situacaoCapacitacao ?? null,
-  }));
+  const consensoPorCompetencia = new Map(
+    (servidorSelecionado.value?.consenso ?? []).map((c) => [c.competenciaCodigo, c]),
+  );
+
+  return (contexto.value?.competencias ?? []).map((competencia) => {
+    const consenso = consensoPorCompetencia.get(competencia.competenciaCodigo);
+    return {
+      competenciaCodigo: competencia.competenciaCodigo,
+      competenciaDescricao: competencia.descricao,
+      importancia: consenso?.importancia ?? null,
+      dominio: consenso?.dominio ?? null,
+      situacaoCapacitacao: situacoesPorChave.get(`${competencia.competenciaCodigo}-${servidorSelecionadoTitulo.value}`)?.situacaoCapacitacao ?? null,
+    };
+  });
 });
 
 // « Opções de capacitação »
@@ -214,5 +262,17 @@ function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): 
 
 .seletor-capacitacao {
   width: 100%;
+}
+
+.scroll-container-servidores {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+.scroll-container-competencias {
+  max-height: 400px;
+  overflow-y: auto;
 }
 </style>

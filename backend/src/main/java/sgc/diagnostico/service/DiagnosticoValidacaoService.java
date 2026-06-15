@@ -28,17 +28,41 @@ public class DiagnosticoValidacaoService {
 
     public void validarConclusaoUnidade(Long diagnosticoCodigo) {
         var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnosticoCodigo);
-        boolean avaliacoesPendentes = avaliacoes.isEmpty()
+        
+        // 1. Todos os servidores devem ter a avaliação concluída (Aprovada ou Impossibilitada)
+        boolean avaliacoesIncompletas = avaliacoes.isEmpty()
                 || avaliacoes.stream().anyMatch(a ->
                 a.getSituacaoServidor() != sgc.diagnostico.model.SituacaoAvaliacaoServidor.CONSENSO_APROVADO
                         && a.getSituacaoServidor() != sgc.diagnostico.model.SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
 
-        var situacoes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnosticoCodigo);
-        boolean situacoesPendentes = situacoes.isEmpty()
-                || situacoes.stream().anyMatch(o -> o.getSituacaoCapacitacao() == null);
-
-        if (avaliacoesPendentes || situacoesPendentes) {
+        if (avaliacoesIncompletas) {
             throw new ErroValidacao(Mensagens.DIAGNOSTICO_PENDENTE);
+        }
+
+        // 2. Servidores com consenso aprovado devem ter todas as situações de capacitação preenchidas
+        var titulosAprovados = avaliacoes.stream()
+                .filter(a -> a.getSituacaoServidor() == sgc.diagnostico.model.SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .map(a -> a.getServidor().getTituloEleitoral())
+                .distinct()
+                .toList();
+
+        if (!titulosAprovados.isEmpty()) {
+            var situacoes = situacaoCapacitacaoRepo.listarPorDiagnostico(diagnosticoCodigo);
+            
+            // Mapeia situações preenchidas (não nulas)
+            var preenchidas = situacoes.stream()
+                    .filter(s -> s.getSituacaoCapacitacao() != null)
+                    .map(s -> s.getServidor().getTituloEleitoral() + "-" + s.getCompetencia().getCodigo())
+                    .toList();
+
+            // Verifica se alguma avaliação de servidor aprovado não tem sua situação de capacitação correspondente preenchida
+            boolean pendente = avaliacoes.stream()
+                    .filter(a -> titulosAprovados.contains(a.getServidor().getTituloEleitoral()))
+                    .anyMatch(a -> !preenchidas.contains(a.getServidor().getTituloEleitoral() + "-" + a.getCompetencia().getCodigo()));
+
+            if (pendente) {
+                throw new ErroValidacao(Mensagens.DIAGNOSTICO_PENDENTE);
+            }
         }
     }
 

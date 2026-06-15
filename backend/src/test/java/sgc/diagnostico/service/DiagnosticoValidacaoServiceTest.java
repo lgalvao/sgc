@@ -64,14 +64,11 @@ class DiagnosticoValidacaoServiceTest {
     @Test
     @DisplayName("validarConclusaoUnidade deve falhar quando houver avaliação pendente")
     void validarConclusaoUnidade_deveFalharQuandoAvaliacaoPendente() {
-        AvaliacaoServidor avaliacao = new AvaliacaoServidor();
-        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
-
-        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
-        situacao.setSituacaoCapacitacao(ValorSituacaoCapacitacao.EC);
+        AvaliacaoServidor avaliacao = AvaliacaoServidor.builder()
+                .situacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO)
+                .build();
 
         when(avaliacaoRepo.listarPorDiagnostico(20L)).thenReturn(List.of(avaliacao));
-        when(situacaoCapacitacaoRepo.listarPorDiagnostico(20L)).thenReturn(List.of(situacao));
 
         assertThatThrownBy(() -> service.validarConclusaoUnidade(20L))
                 .isInstanceOf(ErroValidacao.class)
@@ -79,13 +76,22 @@ class DiagnosticoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarConclusaoUnidade deve falhar quando houver situação de capacitação sem valor")
+    @DisplayName("validarConclusaoUnidade deve falhar quando houver situação de capacitação sem valor para servidor aprovado")
     void validarConclusaoUnidade_deveFalharQuandoOcupacaoPendente() {
-        AvaliacaoServidor avaliacao = new AvaliacaoServidor();
-        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+        sgc.organizacao.model.Usuario servidor = sgc.organizacao.model.Usuario.builder().tituloEleitoral("242426").build();
+        sgc.mapa.model.Competencia comp = sgc.mapa.model.Competencia.builder().codigo(1L).build();
 
-        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
-        situacao.setSituacaoCapacitacao(null);
+        AvaliacaoServidor avaliacao = AvaliacaoServidor.builder()
+                .servidor(servidor)
+                .competencia(comp)
+                .situacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .build();
+
+        SituacaoCapacitacao situacao = SituacaoCapacitacao.builder()
+                .servidor(servidor)
+                .competencia(comp)
+                .situacaoCapacitacao(null)
+                .build();
 
         when(avaliacaoRepo.listarPorDiagnostico(21L)).thenReturn(List.of(avaliacao));
         when(situacaoCapacitacaoRepo.listarPorDiagnostico(21L)).thenReturn(List.of(situacao));
@@ -96,18 +102,32 @@ class DiagnosticoValidacaoServiceTest {
     }
 
     @Test
-    @DisplayName("validarConclusaoUnidade deve aceitar quando tudo estiver concluído")
+    @DisplayName("validarConclusaoUnidade deve aceitar quando tudo estiver concluído (mesmo com impossibilitados)")
     void validarConclusaoUnidade_deveAceitarQuandoTudoConcluido() {
-        AvaliacaoServidor aprovada = new AvaliacaoServidor();
-        aprovada.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
-        AvaliacaoServidor impossibilitada = new AvaliacaoServidor();
-        impossibilitada.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        sgc.organizacao.model.Usuario s1 = sgc.organizacao.model.Usuario.builder().tituloEleitoral("1").build();
+        sgc.organizacao.model.Usuario s2 = sgc.organizacao.model.Usuario.builder().tituloEleitoral("2").build();
+        sgc.mapa.model.Competencia c1 = sgc.mapa.model.Competencia.builder().codigo(10L).build();
 
-        SituacaoCapacitacao situacao = new SituacaoCapacitacao();
-        situacao.setSituacaoCapacitacao(ValorSituacaoCapacitacao.AC);
+        AvaliacaoServidor aprovada = AvaliacaoServidor.builder()
+                .servidor(s1)
+                .competencia(c1)
+                .situacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .build();
+        
+        AvaliacaoServidor impossibilitada = AvaliacaoServidor.builder()
+                .servidor(s2)
+                .competencia(c1)
+                .situacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
+                .build();
+
+        SituacaoCapacitacao situacaoS1 = SituacaoCapacitacao.builder()
+                .servidor(s1)
+                .competencia(c1)
+                .situacaoCapacitacao(ValorSituacaoCapacitacao.AC)
+                .build();
 
         when(avaliacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(aprovada, impossibilitada));
-        when(situacaoCapacitacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(situacao));
+        when(situacaoCapacitacaoRepo.listarPorDiagnostico(22L)).thenReturn(List.of(situacaoS1));
 
         assertThatCode(() -> service.validarConclusaoUnidade(22L))
                 .doesNotThrowAnyException();
