@@ -731,7 +731,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await login(page, ADMIN.titulo, ADMIN.senha);
             await acessarDetalhesProcesso(page, `${descricaoProcessoDiagnostico} Monitoramento`);
             await navegarParaDiagnosticoUnidade(page, SIGLA_UNIDADE_DIAGNOSTICO);
-            await expect(page.getByRole('heading', {name: 'Análise do Diagnóstico da Unidade'})).toBeVisible();
+            await expect(page.getByTestId('diagnostico-unidade-titulo')).toBeVisible();
             await expect(page.getByText(SIGLA_UNIDADE_DIAGNOSTICO, {exact: true})).toBeVisible();
             await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
             await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toBeVisible();

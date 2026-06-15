@@ -60,13 +60,13 @@ test.describe('CDU-18: Visualizar mapa de competências', () => {
             await expect(page.getByText(/Competência Técnica Seed 99 - Planejamento/i)).toBeVisible();
 
             // 5.4 Atividades da competência
-            const cardCompetencia = page.locator('[data-testid$="card-competencia"]').first();
+            const cardCompetencia = page.locator('[data-testid$="card-competencia"]', {hasText: /Competência Técnica Seed 99 - Planejamento/i}).first();
             await expect(cardCompetencia.getByText(/Atividade Seed 1/i)).toBeVisible();
             await expect(cardCompetencia.getByText(/Atividade Seed 2/i)).toBeVisible();
 
             // 5.5 Conhecimentos das atividades
-            await expect(page.getByText(/Conhecimento Seed 1.1/i)).toBeVisible();
-            await expect(page.getByText(/Conhecimento Seed 2.1/i)).toBeVisible();
+            await expect(cardCompetencia.getByText(/Conhecimento Seed 1.1/i)).toBeVisible();
+            await expect(cardCompetencia.getByText(/Conhecimento Seed 2.1/i)).toBeVisible();
         });
     });
 
