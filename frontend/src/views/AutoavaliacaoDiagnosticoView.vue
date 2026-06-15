@@ -234,6 +234,7 @@
 
 <script lang="ts" setup>
 import {
+  BAlert,
   BBadge,
   BButton,
   BCard,

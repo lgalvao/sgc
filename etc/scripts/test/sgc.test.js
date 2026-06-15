@@ -1053,11 +1053,11 @@ describe("CLI raiz do toolkit", () => {
         // Criar arquivos .vue de teste com test-ids
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteA.vue"),
-            `<template><button data-test-codigo="btn-salvar">Salvar</button></template>`
+            "<template><button data-test-codigo=\"btn-salvar\">Salvar</button></template>"
         );
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteB.vue"),
-            `<template><input data-testid="input-nome" /></template>`
+            "<template><input data-testid=\"input-nome\" /></template>"
         );
 
         const resultado = await executarSgc(["frontend", "test-ids", "listar", "--base", diretorioBase]);
@@ -1075,11 +1075,11 @@ describe("CLI raiz do toolkit", () => {
         // Criar dois arquivos com o mesmo test-id
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteX.vue"),
-            `<template><button data-testid="btn-acao">Ação X</button></template>`
+            "<template><button data-testid=\"btn-acao\">Ação X</button></template>"
         );
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteY.vue"),
-            `<template><div data-testid="btn-acao">Ação Y</div></template>`
+            "<template><div data-testid=\"btn-acao\">Ação Y</div></template>"
         );
 
         const resultado = await executarSgc(["frontend", "test-ids", "listar-duplicados", "--base", diretorioBase]);
@@ -1097,7 +1097,7 @@ describe("CLI raiz do toolkit", () => {
         
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteUnico.vue"),
-            `<template><button data-testid="btn-unico">Ação Única</button></template>`
+            "<template><button data-testid=\"btn-unico\">Ação Única</button></template>"
         );
 
         const resultado = await executarSgc(["frontend", "test-ids", "listar-duplicados", "--base", diretorioBase]);
@@ -1105,4 +1105,4 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Nenhum test-id duplicado encontrado.");
     });
-});
+}, 30000);

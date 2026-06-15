@@ -56,7 +56,7 @@ class CDU38IntegrationTest extends BaseIntegrationTest {
                 .andExpect(result -> {
                     String body = result.getResponse().getContentAsString();
                     List<String> assuntos = new ArrayList<>();
-                    objectMapper.readTree(body).forEach(node -> assuntos.add(node.get("assunto").asText()));
+                    objectMapper.readTree(body).forEach(node -> assuntos.add(node.get("assunto").asString()));
 
                     // Ordem esperada:
                     // 1. Falha Definitiva Recente (mais crítica, mais recente entre as mesmas situações)

@@ -3,14 +3,6 @@ import {Command} from "commander";
 import pc from "picocolors";
 import {executarNode} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
-import {executarDoctor} from "./projeto/doctor.js";
-import {executarAuditoriaDependencias} from "./projeto/dependencias-auditar.js";
-import {executarLimpeza} from "./projeto/limpar.js";
-import {executarPerfilQualidade} from "./projeto/qualidade.js";
-import {executarSetup} from "./projeto/setup.js";
-import {executarSnapshotQa} from "./qa/snapshot-coletar.js";
-import {executarResumoQa} from "./qa/resumo.js";
-
 
 function criarComandoScript(pai, nome, descricao, relativo) {
     pai
@@ -129,6 +121,7 @@ qaSnapshot
     .allowUnknownOption(true)
     .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, backend, frontend).", "rapido")
     .action(async (opcoes, comando) => {
+        const {executarSnapshotQa} = await import("./qa/snapshot-coletar.js");
         const argsExtras = comando.args ?? [];
         const args = ["--perfil", opcoes.perfil, ...argsExtras];
         await executarSnapshotQa(args);
@@ -140,6 +133,7 @@ qa
     .option("--json", "Emite saida estruturada em JSON.")
     .option("--max-hotspots <n>", "Limita a quantidade de hotspots exibidos.", Number.parseInt)
     .action(async (opcoes) => {
+        const {executarResumoQa} = await import("./qa/resumo.js");
         await executarResumoQa(opcoes);
     });
 const qaDashboard = qa.command("dashboard").description("Ferramentas operacionais do dashboard.");
@@ -152,6 +146,7 @@ projeto
     .command("auditar")
     .description("Executa o knip na raiz, no frontend e no toolkit.")
     .action(async () => {
+        const {executarAuditoriaDependencias} = await import("./projeto/dependencias-auditar.js");
         await executarAuditoriaDependencias();
     });
 
@@ -161,6 +156,7 @@ projeto
     .option("--json", "Emite saida estruturada em JSON.")
     .option("--base <diretorio>", "Sobrescreve o diretório base para diagnostico.")
     .action(async (opcoes) => {
+        const {executarDoctor} = await import("./projeto/doctor.js");
         await executarDoctor(opcoes);
     });
 
@@ -171,6 +167,7 @@ projeto
     .option("--confirmar", "Remove de fato os artefatos elegiveis.")
     .option("--base <diretorio>", "Sobrescreve o diretório base para limpeza.")
     .action(async (opcoes) => {
+        const {executarLimpeza} = await import("./projeto/limpar.js");
         await executarLimpeza(opcoes);
     });
 
@@ -178,6 +175,7 @@ projeto
     .command("qualidade [perfil]")
     .description("Executa os perfis consolidados de qualidade do projeto.")
     .action(async (perfil = "rapido") => {
+        const {executarPerfilQualidade} = await import("./projeto/qualidade.js");
         await executarPerfilQualidade(perfil);
     });
 
@@ -188,6 +186,7 @@ projeto
     .option("--instalar-playwright", "Instala o Chromium do Playwright.")
     .option("--importar-certificados", "Executa a importacao de certificados Java locais.")
     .action(async (opcoes) => {
+        const {executarSetup} = await import("./projeto/setup.js");
         await executarSetup(opcoes);
     });
 

@@ -127,7 +127,7 @@ class CDU39IntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(multipart("/api/feedback")
                         .file(data))
-                .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()))
+                .andExpect(status().is(HttpStatus.UNPROCESSABLE_CONTENT.value()))
                 .andExpect(jsonPath("$.code").value("ERRO_VALIDACAO"));
     }
 
