@@ -1,0 +1,628 @@
+{
+  "versaoSchema": "3.0.0",
+  "geradoEm": "2026-06-06T12:19:32.768Z",
+  "resumo": {
+    "arquivosProducao": 282,
+    "scoreTotal": 58,
+    "faixa": "critico",
+    "metricas": {
+      "viewsComVazamentoCache": 0,
+      "viewsComServiceDireto": 0,
+      "viewsComServerStateCaseiro": 0,
+      "viewsComFanoutAlto": 1,
+      "acessosDiretosCache": 0,
+      "metodosEmCache": 0,
+      "invalidacoesExplicitasEmViews": 0,
+      "booleanosPosicionais": 0,
+      "ocorrenciasStale": 0,
+      "ocorrenciasSnapshot": 0,
+      "ocorrenciasForcar": 0,
+      "arquivosComBolsaDependenciasLarga": 0,
+      "arquivosComSuperficieAmpla": 8,
+      "arquivosComMisturaCamadas": 0,
+      "arquivosComServerStateCaseiro": 0,
+      "arquivosComAcoplamentoStoreAlto": 0,
+      "arquivosComServiceDireto": 43,
+      "chamadasEstrategiaCache": 0,
+      "chamadasInvalidacao": 0,
+      "hubsCentraisComSinais": 0,
+      "composablesMinusculos": 1,
+      "fachadasPuras": 0,
+      "familiasPulverizadas": 5
+    }
+  },
+  "hotspots": [
+    {
+      "arquivo": "frontend/src/composables/useFluxoDiagnostico.ts",
+      "camada": "composable",
+      "linhas": 94,
+      "score": 15,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 3,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 5,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 5,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "invalidacaoExplicita"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useConsensoDiagnostico.ts",
+      "camada": "composable",
+      "linhas": 185,
+      "score": 9,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 4,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 3,
+        "chamadasColadaCache": 1,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 1,
+        "categoriasAcoplamento": 3,
+        "importacoesArquiteturais": 3
+      },
+      "sinaisAtivos": [
+        "superficieAmpla"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useAutoavaliacaoDiagnostico.ts",
+      "camada": "composable",
+      "linhas": 98,
+      "score": 9,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 3,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 3,
+        "chamadasColadaCache": 1,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 1,
+        "categoriasAcoplamento": 3,
+        "importacoesArquiteturais": 3
+      },
+      "sinaisAtivos": [
+        "superficieAmpla"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useOcupacoesCriticasDiagnostico.ts",
+      "camada": "composable",
+      "linhas": 98,
+      "score": 9,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 2,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 2,
+        "chamadasColadaCache": 1,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 1,
+        "categoriasAcoplamento": 3,
+        "importacoesArquiteturais": 3
+      },
+      "sinaisAtivos": [
+        "superficieAmpla"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useMonitoramentoDiagnostico.ts",
+      "camada": "composable",
+      "linhas": 57,
+      "score": 9,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 1,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 1,
+        "categoriasAcoplamento": 3,
+        "importacoesArquiteturais": 3
+      },
+      "sinaisAtivos": [
+        "superficieAmpla"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/views/AutoavaliacaoDiagnosticoView.vue",
+      "camada": "view",
+      "linhas": 522,
+      "score": 6,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 0,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 0,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 1,
+        "importacoesArquiteturais": 6
+      },
+      "sinaisAtivos": [
+        "fanoutAlto"
+      ],
+      "hubCentral": false
+    },
+    {
+      "arquivo": "frontend/src/composables/useDiagnosticoPermissoes.ts",
+      "camada": "composable",
+      "linhas": 23,
+      "score": 1,
+      "sinaisLexicais": {
+        "acessoDiretoCache": 0,
+        "metodoEmCache": 0,
+        "invalidacaoExplicita": 0,
+        "booleanoPosicional": 0,
+        "palavraForcar": 0,
+        "palavraStale": 0,
+        "palavraSnapshot": 0
+      },
+      "metricasAst": {
+        "chamadasStore": 0,
+        "chamadasServiceDiretas": 1,
+        "chamadasEstrategiaCache": 0,
+        "chamadasInvalidacao": 0,
+        "chamadasColadaQuery": 1,
+        "chamadasColadaCache": 0,
+        "estadosAssincronosManuais": 0,
+        "coordenacaoServerStateCaseiro": 0,
+        "mapasPromessasDedupe": 0,
+        "bolsasDependenciasLargas": 0,
+        "superficieExportadaAmpla": 0,
+        "categoriasAcoplamento": 2,
+        "importacoesArquiteturais": 2
+      },
+      "sinaisAtivos": [
+        "arquivoMinusculo"
+      ],
+      "hubCentral": false
+    }
+  ],
+  "familias": {
+    "Administradores": {
+      "arquivos": [
+        "frontend/src/composables/useAdministradoresTela.ts"
+      ],
+      "totalLinhas": 135
+    },
+    "Async": {
+      "arquivos": [
+        "frontend/src/composables/useAsyncAction.ts"
+      ],
+      "totalLinhas": 66
+    },
+    "Atividade": {
+      "arquivos": [
+        "frontend/src/composables/useAtividadeForm.ts"
+      ],
+      "totalLinhas": 34
+    },
+    "Atribuicao": {
+      "arquivos": [
+        "frontend/src/composables/useAtribuicaoTemporariaTela.ts"
+      ],
+      "totalLinhas": 414
+    },
+    "Autoavaliacao": {
+      "arquivos": [
+        "frontend/src/composables/useAutoavaliacaoDiagnostico.ts"
+      ],
+      "totalLinhas": 98
+    },
+    "Breadcrumbs": {
+      "arquivos": [
+        "frontend/src/composables/useBreadcrumbs.ts"
+      ],
+      "totalLinhas": 165
+    },
+    "Buscador": {
+      "arquivos": [
+        "frontend/src/composables/useBuscadorUsuarios.ts"
+      ],
+      "totalLinhas": 124
+    },
+    "Cache": {
+      "arquivos": [
+        "frontend/src/composables/useCacheSync.ts"
+      ],
+      "totalLinhas": 60
+    },
+    "Cadastro": {
+      "arquivos": [
+        "frontend/src/composables/useCadastroAtividadesMutacoes.ts",
+        "frontend/src/composables/useCadastroOrquestracao.ts",
+        "frontend/src/composables/useCadastroRevisaoSemMudancas.ts",
+        "frontend/src/composables/useCadastroTela.ts"
+      ],
+      "totalLinhas": 918
+    },
+    "Configuracoes": {
+      "arquivos": [
+        "frontend/src/composables/useConfiguracoes.ts"
+      ],
+      "totalLinhas": 105
+    },
+    "Conhecimento": {
+      "arquivos": [
+        "frontend/src/composables/useConhecimentoMutacoes.ts"
+      ],
+      "totalLinhas": 37
+    },
+    "Consenso": {
+      "arquivos": [
+        "frontend/src/composables/useConsensoDiagnostico.ts"
+      ],
+      "totalLinhas": 185
+    },
+    "Diagnostico": {
+      "arquivos": [
+        "frontend/src/composables/useDiagnosticoCache.ts",
+        "frontend/src/composables/useDiagnosticoContexto.ts",
+        "frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts",
+        "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts",
+        "frontend/src/composables/useDiagnosticoPermissoes.ts"
+      ],
+      "totalLinhas": 320
+    },
+    "Equipe": {
+      "arquivos": [
+        "frontend/src/composables/useEquipeDiagnostico.ts"
+      ],
+      "totalLinhas": 38
+    },
+    "Error": {
+      "arquivos": [
+        "frontend/src/composables/useErrorHandler.ts"
+      ],
+      "totalLinhas": 47
+    },
+    "Feedback": {
+      "arquivos": [
+        "frontend/src/composables/useFeedback.ts"
+      ],
+      "totalLinhas": 116
+    },
+    "Feedbacks": {
+      "arquivos": [
+        "frontend/src/composables/useFeedbacksAdminQuery.ts"
+      ],
+      "totalLinhas": 17
+    },
+    "Fluxo": {
+      "arquivos": [
+        "frontend/src/composables/useFluxoAdministrativoSubprocesso.ts",
+        "frontend/src/composables/useFluxoCadastroSubprocesso.ts",
+        "frontend/src/composables/useFluxoDiagnostico.ts",
+        "frontend/src/composables/useFluxoMapa.ts",
+        "frontend/src/composables/useFluxoSubprocesso.ts",
+        "frontend/src/composables/useFluxoSubprocessoExecucao.ts"
+      ],
+      "totalLinhas": 518
+    },
+    "Form": {
+      "arquivos": [
+        "frontend/src/composables/useFormErrors.ts"
+      ],
+      "totalLinhas": 39
+    },
+    "Historico": {
+      "arquivos": [
+        "frontend/src/composables/useHistoricoQuery.ts"
+      ],
+      "totalLinhas": 24
+    },
+    "Impacto": {
+      "arquivos": [
+        "frontend/src/composables/useImpactoMapaModal.ts"
+      ],
+      "totalLinhas": 41
+    },
+    "Importar": {
+      "arquivos": [
+        "frontend/src/composables/useImportarAtividadesTela.ts"
+      ],
+      "totalLinhas": 202
+    },
+    "Invalidacao": {
+      "arquivos": [
+        "frontend/src/composables/useInvalidacaoNavegacao.ts"
+      ],
+      "totalLinhas": 102
+    },
+    "Limpeza": {
+      "arquivos": [
+        "frontend/src/composables/useLimpezaProcessosTela.ts"
+      ],
+      "totalLinhas": 61
+    },
+    "Mapa": {
+      "arquivos": [
+        "frontend/src/composables/useMapaCompetenciasMutacoes.ts",
+        "frontend/src/composables/useMapaOrquestracao.ts",
+        "frontend/src/composables/useMapaQuery.ts",
+        "frontend/src/composables/useMapaSugestoes.ts",
+        "frontend/src/composables/useMapaTela.ts"
+      ],
+      "totalLinhas": 955
+    },
+    "Mapas": {
+      "arquivos": [
+        "frontend/src/composables/useMapas.ts"
+      ],
+      "totalLinhas": 35
+    },
+    "Monitoramento": {
+      "arquivos": [
+        "frontend/src/composables/useMonitoramentoDiagnostico.ts"
+      ],
+      "totalLinhas": 57
+    },
+    "Notificacoes": {
+      "arquivos": [
+        "frontend/src/composables/useNotificacoesAdminQuery.ts"
+      ],
+      "totalLinhas": 52
+    },
+    "Notification": {
+      "arquivos": [
+        "frontend/src/composables/useNotification.ts"
+      ],
+      "totalLinhas": 44
+    },
+    "Ocupacoes": {
+      "arquivos": [
+        "frontend/src/composables/useOcupacoesCriticasDiagnostico.ts"
+      ],
+      "totalLinhas": 98
+    },
+    "Painel": {
+      "arquivos": [
+        "frontend/src/composables/usePainelQuery.ts",
+        "frontend/src/composables/usePainelTela.ts"
+      ],
+      "totalLinhas": 198
+    },
+    "Perfil": {
+      "arquivos": [
+        "frontend/src/composables/usePerfil.ts"
+      ],
+      "totalLinhas": 38
+    },
+    "Processo": {
+      "arquivos": [
+        "frontend/src/composables/useProcessoCadastroCarga.ts",
+        "frontend/src/composables/useProcessoCadastroTela.ts",
+        "frontend/src/composables/useProcessoForm.ts",
+        "frontend/src/composables/useProcessoMutacoes.ts",
+        "frontend/src/composables/useProcessoQuery.ts"
+      ],
+      "totalLinhas": 601
+    },
+    "Relatorio": {
+      "arquivos": [
+        "frontend/src/composables/useRelatorioAndamentoTela.ts",
+        "frontend/src/composables/useRelatorioMapasQuery.ts",
+        "frontend/src/composables/useRelatorioUnidadesSemMapasTela.ts"
+      ],
+      "totalLinhas": 236
+    },
+    "Subprocesso": {
+      "arquivos": [
+        "frontend/src/composables/useSubprocessoTela.ts"
+      ],
+      "totalLinhas": 200
+    },
+    "Tema": {
+      "arquivos": [
+        "frontend/src/composables/useTemaPreferencia.ts"
+      ],
+      "totalLinhas": 49
+    },
+    "Unidade": {
+      "arquivos": [
+        "frontend/src/composables/useUnidadeAtual.ts",
+        "frontend/src/composables/useUnidadeQuery.ts",
+        "frontend/src/composables/useUnidadeTela.ts"
+      ],
+      "totalLinhas": 335
+    },
+    "Unidades": {
+      "arquivos": [
+        "frontend/src/composables/useUnidadesQuery.ts"
+      ],
+      "totalLinhas": 24
+    },
+    "Validacao": {
+      "arquivos": [
+        "frontend/src/composables/useValidacaoFormulario.ts"
+      ],
+      "totalLinhas": 38
+    },
+    "Web": {
+      "arquivos": [
+        "frontend/src/composables/useWebStorage.ts"
+      ],
+      "totalLinhas": 46
+    }
+  },
+  "excecoesDocumentadas": [
+    {
+      "arquivo": "frontend/src/composables/useBuscadorUsuarios.ts",
+      "sinais": [
+        "superficieAmpla"
+      ],
+      "motivo": "Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue, extraído para testabilidade"
+    },
+    {
+      "arquivo": "frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useFeedbacksAdminQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useFluxoSubprocesso.ts",
+      "sinais": [
+        "fachadaPura",
+        "arquivoMinusculo"
+      ],
+      "motivo": "Fachada de coordenação deliberada: injeta `execucao` como dependência em useFluxoCadastroSubprocesso e useFluxoAdministrativoSubprocesso, isolando os consumers desse detalhe"
+    },
+    {
+      "arquivo": "frontend/src/composables/useHistoricoQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useMapaSugestoes.ts",
+      "sinais": [
+        "superficieAmpla"
+      ],
+      "motivo": "Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por useMapaTela"
+    },
+    {
+      "arquivo": "frontend/src/composables/usePainelQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useProcessoQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/composables/useRelatorioAndamentoTela.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "Composable de tela simples — funcionalidade de relatório de andamento não tem complexidade que justifique mais código"
+    },
+    {
+      "arquivo": "frontend/src/composables/useUnidadeAtual.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "Abstração deliberada: fornece acesso reativo + setter para unidadeAtualDetalhes; dois consumidores (useBreadcrumbs, useUnidadeTela) tornam o inline inadequado"
+    },
+    {
+      "arquivo": "frontend/src/composables/useUnidadesQuery.ts",
+      "sinais": [
+        "arquivoMinusculo"
+      ],
+      "motivo": "padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design"
+    },
+    {
+      "arquivo": "frontend/src/stores/subprocesso/index.ts",
+      "sinais": [
+        "superficieAmpla"
+      ],
+      "motivo": "Store dual-context (edicao + cadastro) com três níveis de invalidação (limpar, invalidar, resetar); 14 exports são inerentes ao contrato mínimo de dois contextos independentes"
+    }
+  ]
+}

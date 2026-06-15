@@ -1,0 +1,27 @@
+{
+  "entry": [
+    "backend/**/*.js",
+    "codigo/**/*.js",
+    "e2e/**/*.js",
+    "frontend/**/*.js",
+    "legado/**/*.js",
+    "lib/**/*.js",
+    "projeto/**/*.js",
+    "qa/**/*.js",
+    "test/**/*.js"
+  ],
+  "project": [
+    "backend/**/*.js",
+    "codigo/**/*.js",
+    "e2e/**/*.js",
+    "frontend/**/*.js",
+    "legado/**/*.js",
+    "lib/**/*.js",
+    "projeto/**/*.js",
+    "qa/**/*.js",
+    "test/**/*.js"
+  ],
+  "ignoreBinaries": [
+    "playwright"
+  ]
+}

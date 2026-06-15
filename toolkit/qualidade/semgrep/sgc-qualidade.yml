@@ -1,0 +1,28 @@
+rules:
+  - id: sgc.backend.dto-nao-deve-importar-model
+    message: "DTO de borda nao deve referenciar tipos de model.*; prefira DTO explicito ou mapper interno."
+    severity: WARNING
+    languages:
+      - java
+    paths:
+      include:
+        - backend/src/main/java/sgc/**/*Dto.java
+        - backend/src/main/java/sgc/**/*Response.java
+      exclude:
+        - backend/src/main/java/sgc/e2e/**
+    pattern-regex: 'sgc\\.[A-Za-z0-9_.]+\\.model\\.'
+
+  - id: sgc.backend.dto-nao-deve-ter-mapeamento-de-entidade
+    message: "DTO de borda nao deve carregar mapeamento de entidade; mova a conversao para um Mapper ou Service."
+    severity: WARNING
+    languages:
+      - java
+    paths:
+      include:
+        - backend/src/main/java/sgc/**/*Dto.java
+        - backend/src/main/java/sgc/**/*Response.java
+      exclude:
+        - backend/src/main/java/sgc/e2e/**
+    pattern-either:
+      - pattern: static $RET fromEntity(...)
+      - pattern: static $RET fromLeitura(...)
