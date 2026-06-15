@@ -21,7 +21,12 @@ export function useInvalidacaoNavegacao() {
     const painelStore = usePainelStore();
     const subprocessoStore = useSubprocessoStore();
 
+    function marcarPainelParaRecarregar(): void {
+        painelStore.invalidar();
+    }
+
     async function atualizarFluxoProcesso(): Promise<void> {
+        marcarPainelParaRecarregar();
         await Promise.all([
             invalidarPainel(),
             invalidarProcesso(),
@@ -29,7 +34,6 @@ export function useInvalidacaoNavegacao() {
             invalidarDadosTelaUnidade(),
             invalidarArvoreElegibilidade(),
         ]);
-        painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa();
     }
@@ -39,14 +43,14 @@ export function useInvalidacaoNavegacao() {
     }
 
     async function atualizarFluxoSubprocessoEPainel(): Promise<void> {
+        marcarPainelParaRecarregar();
         await invalidarPainel();
-        painelStore.invalidar();
         subprocessoStore.invalidar();
     }
 
     async function atualizarFluxoCadastro(codigoSubprocesso: number): Promise<void> {
+        marcarPainelParaRecarregar();
         await invalidarPainel();
-        painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa(codigoSubprocesso);
     }
@@ -57,16 +61,17 @@ export function useInvalidacaoNavegacao() {
     }
 
     async function atualizarFluxoMapa(codigoSubprocesso?: number): Promise<void> {
+        marcarPainelParaRecarregar();
         await Promise.all([
             invalidarPainel(),
             invalidarProcesso(),
         ]);
-        painelStore.invalidar();
         subprocessoStore.invalidar();
         invalidarMapa(codigoSubprocesso);
     }
 
     async function atualizarDadosOrganizacionais(): Promise<void> {
+        marcarPainelParaRecarregar();
         await Promise.all([
             invalidarDiagnostico(),
             invalidarPainel(),
@@ -74,7 +79,6 @@ export function useInvalidacaoNavegacao() {
             invalidarDadosTelaUnidade(),
             invalidarArvoreElegibilidade(),
         ]);
-        painelStore.invalidar();
     }
 
     function limparEstadoSubprocessoAtual(): void {

@@ -6,6 +6,7 @@ import pkg from "../package.json";
 import BarraNavegacao from "./components/layout/BarraNavegacao.vue";
 import MainNavbar from "./components/layout/MainNavbar.vue";
 import {TEXTOS} from "@/constants/textos";
+import {usePainelStore} from "@/stores/painel";
 import {usePerfilStore} from "@/stores/perfil";
 import {useCacheSync} from "@/composables/useCacheSync";
 import {useConfiguracoes} from "@/composables/useConfiguracoes";
@@ -19,6 +20,7 @@ interface PackageJson {
 
 const route = useRoute();
 const perfilStore = usePerfilStore();
+const painelStore = usePainelStore();
 const {carregarConfiguracoes} = useConfiguracoes();
 const {obterTemaEscuro, definirContextoUsuarioTemaEscuro} = useTemaPreferencia();
 const version = (pkg as PackageJson).version;
@@ -80,6 +82,11 @@ const maximoRotasEmCache = 10;
 const chaveSessao = computed(() =>
     `${perfilStore.versaoSessao}-${perfilStore.usuarioCodigo ?? "anon"}-${perfilStore.perfilSelecionado ?? "sem-perfil"}-${perfilStore.unidadeSelecionada ?? "sem-unidade"}`
 );
+
+const chaveRotaAtual = computed(() => {
+  const versaoPainel = route.path === "/painel" ? `:${painelStore.versaoInvalidacao}` : "";
+  return `${chaveSessao.value}:${route.fullPath}${versaoPainel}`;
+});
 </script>
 
 <template>
@@ -119,13 +126,13 @@ const chaveSessao = computed(() =>
           <component
               :is="Component"
               v-if="currentRoute.meta?.keepAlive"
-              :key="`${chaveSessao}:${currentRoute.fullPath}`"
+              :key="chaveRotaAtual"
           />
         </KeepAlive>
         <component
             :is="Component"
             v-if="!currentRoute.meta?.keepAlive"
-            :key="`${chaveSessao}:${currentRoute.fullPath}`"
+            :key="chaveRotaAtual"
         />
       </router-view>
     </main>

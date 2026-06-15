@@ -23,7 +23,7 @@ describe("useInvalidacaoNavegacao", () => {
     it("deve atualizar o fluxo completo de processo", async () => {
         const painel = usePainelStore();
         const subprocesso = useSubprocessoStore();
-        vi.spyOn(painel, 'invalidar');
+        const invalidarPainelStoreSpy = vi.spyOn(painel, 'invalidar');
         vi.spyOn(subprocesso, 'invalidar');
 
         const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
@@ -31,6 +31,8 @@ describe("useInvalidacaoNavegacao", () => {
 
         expect(painel.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["painel"]});
+        expect(invalidarPainelStoreSpy.mock.invocationCallOrder[0])
+            .toBeLessThan(invalidateQueriesMock.mock.invocationCallOrder[0]);
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["processo"]});
         expect(subprocesso.invalidar).toHaveBeenCalled();
         expect(invalidateQueriesMock).toHaveBeenCalledWith({key: ["mapa"]});
