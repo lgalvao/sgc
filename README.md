@@ -21,7 +21,7 @@ graph LR
     API --> Actuator[Actuator / métricas]
     E2E[Playwright + lifecycle] --> Frontend
     E2E --> API
-    Scripts[etc/scripts] --> Repo[Qualidade e automação do repositório]
+    Scripts[toolkit] --> Repo[Qualidade e automação do repositório]
 ```
 
 ## Mapa do repositório
@@ -31,10 +31,8 @@ sgc/
 ├── backend/                 # API REST, regras de negócio, segurança, persistência e testes Java
 ├── frontend/                # SPA Vue 3, stores Pinia, componentes e testes Vitest
 ├── e2e/                     # Suíte Playwright, fixtures, helpers e lifecycle local
-├── etc/
-│   ├── docs/                # Guias técnicos e regras operacionais
-│   ├── reqs/                # Regras de acesso e requisitos/CDUs de referência
-│   └── scripts/             # CLI de automação e auditoria do projeto
+├── toolkit/                 # CLI de automação, qualidade e governança técnica
+├── specs/                   # Regras de acesso, requisitos e CDUs de referência
 ├── deploy/                  # Artefatos auxiliares de implantação
 ├── compose.hom.yaml         # Stack de homologação
 ├── build.gradle.kts         # Orquestração Gradle raiz
@@ -135,7 +133,7 @@ flowchart LR
 ```bash
 npm install
 npm --prefix frontend install
-npm --prefix etc/scripts install
+npm --prefix toolkit install
 ```
 
 ### Backend
@@ -255,7 +253,7 @@ npm run test:e2e
 - [backend/README.md](backend/README.md)
 - [frontend/README.md](frontend/README.md)
 - [e2e/README.md](e2e/README.md)
-- [etc/scripts/README.md](etc/scripts/README.md)
-- [etc/reqs/acesso.md](etc/reqs/acesso.md)
-- [etc/docs/regras-e2e.md](etc/docs/regras-e2e.md)
+- [toolkit/README.md](toolkit/README.md)
+- [specs/design/acesso.md](specs/design/acesso.md)
+- [e2e/regras-e2e.md](e2e/regras-e2e.md)
 - [AGENTS.md](AGENTS.md)

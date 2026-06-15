@@ -3,29 +3,32 @@
   "description": "Sistema de Gestão de Competências",
   "version": "1.2.0",
   "type": "module",
+  "workspaces": [
+    "frontend",
+    "toolkit",
+    "e2e"
+  ],
   "scripts": {
     "test": "npm --prefix frontend run test",
-    "test:e2e": "playwright test --project=chromium",
+    "test:e2e": "npm run test:e2e -w e2e",
     "test:unit": "npm --prefix frontend run test:unit",
     "typecheck": "npm run typecheck:e2e && npm --prefix frontend run typecheck",
-    "typecheck:e2e": "tsc --noEmit -p e2e/tsconfig.json",
-    "sgc": "node etc/scripts/sgc.js",
-    "smells:auditar": "node etc/scripts/sgc.js codigo smells auditar",
-    "frontend:cruft": "node etc/scripts/sgc.js frontend cruft auditar",
-    "frontend:cruft:check": "node etc/scripts/sgc.js frontend cruft validar",
-    "frontend:arquitetura": "node etc/scripts/sgc.js frontend arquitetura auditar",
-    "qa:dashboard": "node etc/scripts/sgc.js qa snapshot coletar --perfil rapido",
-    "qa:dashboard:serve": "node etc/scripts/sgc.js qa dashboard servir --porta 4179",
-    "lint:ox": "oxlint e2e etc/scripts eslint.config.js playwright.config.ts --ignore-pattern e2e/lifecycle.js",
-    "lint": "npm run lint:ox && eslint e2e etc/scripts eslint.config.js playwright.config.ts --fix",
+    "typecheck:e2e": "npm run typecheck -w e2e",
+    "sgc": "node toolkit/sgc.js",
+    "smells:auditar": "node toolkit/sgc.js codigo smells auditar",
+    "frontend:cruft": "node toolkit/sgc.js frontend cruft auditar",
+    "frontend:cruft:check": "node toolkit/sgc.js frontend cruft validar",
+    "frontend:arquitetura": "node toolkit/sgc.js frontend arquitetura auditar",
+    "qa:dashboard": "node toolkit/sgc.js qa snapshot coletar --perfil rapido",
+    "qa:dashboard:serve": "node toolkit/sgc.js qa dashboard servir --porta 4179",
+    "lint:ox": "oxlint e2e toolkit eslint.config.js --ignore-pattern e2e/lifecycle.js",
+    "lint": "npm run lint:ox && eslint e2e toolkit eslint.config.js --fix",
     "deps:audit": "knip",
-    "deps:audit:all": "npm run deps:audit && npm --prefix frontend run deps:audit && npm --prefix etc/scripts run deps:audit",
+    "deps:audit:all": "npm run deps:audit && npm --prefix frontend run deps:audit && npm --prefix toolkit run deps:audit",
     "release": "release-it"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.59.1",
     "@types/node": "^25.6.2",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
@@ -34,11 +37,13 @@
     "knip": "^6.12.1",
     "oxlint": "^1.63.0",
     "release-it": "^20.0.1",
-    "smtp-server": "^3.18.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.2"
   },
   "overrides": {
     "glob": "^13.0.0"
+  },
+  "allowScripts": {
+    "fsevents@2.3.2": true
   }
 }

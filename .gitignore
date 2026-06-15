@@ -14,9 +14,9 @@ frontend/node_modules/
 frontend/dist/
 frontend/build/
 frontend/coverage/
-etc/scripts/node_modules/
-etc/scripts/coverage/
-etc/scripts/.vitest/
+toolkit/node_modules/
+toolkit/coverage/
+toolkit/.vitest/
 
 # Java
 /backend/src/main/resources/static/
@@ -69,9 +69,9 @@ unit-test-report.md
 view-validations-audit.md
 
 # Snapshots e artefatos gerados por auditorias estruturais
-etc/qualidade/openapi/
-!etc/qualidade/openapi/.gitkeep
-etc/qualidade/semgrep/latest/
+toolkit/qualidade/openapi/
+!toolkit/qualidade/openapi/.gitkeep
+toolkit/qualidade/semgrep/latest/
 frontend/src/generated/
 
 # Playwright E2E test results
@@ -83,4 +83,4 @@ screenshots/
 test-results/.last-run.json
 
 # Documento de acesso HOM
-etc/docs/como_logar_hom.md
+specs/docs/como_logar_hom.md

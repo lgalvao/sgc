@@ -33,15 +33,13 @@ if ($Host.UI.RawUI.WindowTitle) {
 Invoke-Step "Atualizar branch local" { git pull }
 
 Invoke-Step "npm install" {
-    npm install --prefix etc/scripts --silent
-    if ($LASTEXITCODE -eq 0) { npm install --silent }
-    if ($LASTEXITCODE -eq 0) { npm install --prefix frontend --silent }
+    npm install --silent
 }
 
 Invoke-Step "Lint raiz" { npm run lint }
 Invoke-Step "Typecheck raiz" { npm run typecheck }
 
-Invoke-Step "Testes scripts" { npm --prefix etc/scripts run test }
+Invoke-Step "Testes scripts" { npm --prefix toolkit run test }
 Invoke-Step "Testes frontend" { npm --prefix frontend run test }
 Invoke-Step "Testes backend" { & $GRADLE_CMD backend:test }
 Invoke-Step "Testes e2e" { npx playwright test --project=chromium }

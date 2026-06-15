@@ -18,7 +18,7 @@ export default [
     pluginJs.configs.recommended,
     ...tseslint.configs.recommended,
     {
-        files: ["etc/scripts/**/*.js", "etc/scripts/**/*.mjs", "*.config.js", "e2e/**/*.js", "summarize-lint.js"],
+        files: ["toolkit/**/*.js", "toolkit/**/*.mjs", "*.config.js", "e2e/**/*.js", "summarize-lint.js"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -26,7 +26,7 @@ export default [
         },
     },
     {
-        files: ["etc/scripts/**/*.js", "etc/scripts/**/*.mjs", "*.config.js", "summarize-lint.js"],
+        files: ["toolkit/**/*.js", "toolkit/**/*.mjs", "*.config.js", "summarize-lint.js"],
         rules: {
             "complexity": "off",
             "max-params": "off",
@@ -38,7 +38,7 @@ export default [
         },
     },
     {
-        files: ["etc/scripts/**/*.cjs"],
+        files: ["toolkit/**/*.cjs"],
         languageOptions: {
             sourceType: "commonjs",
             globals: {
@@ -50,7 +50,7 @@ export default [
         },
     },
     {
-        files: ["etc/qa-dashboard/**/*.js"],
+        files: ["toolkit/qa-dashboard/**/*.js"],
         languageOptions: {
             globals: {
                 ...globals.browser,

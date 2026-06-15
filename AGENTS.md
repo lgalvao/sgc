@@ -24,8 +24,8 @@ específicas** do projeto que diferem dos padrões genéricos.
 
 Para detalhes técnicos, consulte:
 
-* Regras de acesso /etc/docs/acesso.md
-* Regras para ajustes em testes e2e e correção de bugs: /etc/docs/regras-e2e.md
+* Regras de acesso /specs/design/acesso.md
+* Regras para ajustes em testes e2e e correção de bugs: /e2e/regras-e2e.md
 * README.md de cada camada para responsabilidades específicas
 
 ### Backend (Java 25 / Spring Boot 4)
@@ -37,7 +37,7 @@ Para detalhes técnicos, consulte:
       `/api/processos/{codigo}/iniciar`, `/api/processos/{codigo}/excluir`).
 * **Persistence:** Tabelas em `UPPER_CASE`, colunas em `snake_case`. Enums como `STRING`.
 * **Controle de Acesso (Security):**
-    * Baseado nas regras documentadas em [`acesso.md`](/etc/reqs/acesso.md):
+    * Baseado nas regras documentadas em [`acesso.md`](/specs/design/acesso.md):
     * **Leitura**: Hierarquia da Unidade responsável
     * **Escrita**: Localização atual do Subprocesso (com algumas exceções para admin quando não há processo envolvido)
     * **Implementação:** `SgcPermissionEvaluator` (implementa `PermissionEvaluator` do Spring Security)

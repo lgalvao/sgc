@@ -10,7 +10,7 @@
   },
   "overrides": [
     {
-      "files": ["e2e/**/*.ts", "etc/scripts/**/*"],
+      "files": ["e2e/**/*.ts", "toolkit/**/*"],
       "rules": {
         "complexity": "off",
         "max-params": "off",

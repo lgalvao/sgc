@@ -12,7 +12,7 @@
   },
   "hooks": {
     "after:bump": [
-      "node etc/scripts/projeto/versao-sincronizar.js ${version}"
+      "node toolkit/projeto/versao-sincronizar.js ${version}"
     ]
   }
 }
