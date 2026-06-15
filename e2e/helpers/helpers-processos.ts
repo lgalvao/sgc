@@ -404,6 +404,7 @@ export async function acessarDetalhesProcesso(page: Page, descricao: string) {
  * Finaliza o processo atual a partir da tela de detalhes do processo.
  */
 export async function finalizarProcesso(page: Page) {
+    const descricaoProcesso = (await page.getByTestId('processo-info').textContent())?.trim();
     const botaoFinalizar = page.getByTestId('btn-processo-finalizar');
     await expect(botaoFinalizar).toBeEnabled();
     await botaoFinalizar.click();
@@ -416,7 +417,9 @@ export async function finalizarProcesso(page: Page) {
     );
 
     const bootstrapPromise = page.waitForResponse(
-        r => r.url().includes('/api/painel/bootstrap') && r.ok()
+        r => r.url().includes('/api/painel/bootstrap')
+            && r.ok()
+            && /\/painel(?:\?.*)?$/.test(page.url())
     );
 
     // 2. Clicar no botão e aguardar o POST concluir
@@ -427,4 +430,10 @@ export async function finalizarProcesso(page: Page) {
     await page.waitForURL(/\/painel(?:\?.*)?$/);
     await bootstrapPromise;
     await expect(page.getByTestId('painel-carregando')).toBeHidden();
+
+    if (descricaoProcesso) {
+        const linhaProcesso = page.locator('[data-testid="tbl-processos"]').locator('tr').filter({hasText: descricaoProcesso}).first();
+        await expect(linhaProcesso).toBeVisible();
+        await expect(linhaProcesso.locator('[data-testid="badge-situacao"]')).toHaveText(/Finalizado/i);
+    }
 }
