@@ -31,6 +31,7 @@ import {
     navegarParaMapa
 } from './helpers/helpers-mapas.js';
 import {
+    aprovarConsensoDiagnostico,
     abrirAcaoConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
     preencherConsensoMinimo,
@@ -2122,6 +2123,11 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
             const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
+            await login(page, servidorTitulo, 'senha');
+            await page.goto(`/diagnostico/${codSubprocesso}/${unidadeAlvo}/consenso/${servidorTitulo}`);
+            await aprovarConsensoDiagnostico(page, codSubprocesso);
+
+            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
             await page.goto(`/diagnostico/${codSubprocesso}/${unidadeAlvo}/situacao-capacitacao`);
             await capturarTela(page, 'diagnostico', 'situacao-capacitacao-chefia', {
                 fullPage: true,

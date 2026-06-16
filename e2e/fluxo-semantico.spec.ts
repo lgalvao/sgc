@@ -48,9 +48,11 @@ import {
     verificarCompetenciaNoMapa
 } from './helpers/helpers-mapas.js';
 import {
+    aprovarConsensoDiagnostico,
     abrirAcaoConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
-    preencherPrimeiraSituacaoCapacitacao
+    preencherConsensoMinimo,
+    preencherSituacoesCapacitacaoPendentesPorApi
 } from './helpers/helpers-diagnostico.js';
 
 test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
@@ -745,6 +747,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await expect(page.getByText('Autoavaliação concluída')).toBeVisible();
             await abrirAcaoConsensoDiagnostico(page, SERVIDOR_DIAGNOSTICO.titulo);
             await expect(page.getByRole('heading', {name: /Avaliação de consenso/i})).toBeVisible();
+            await preencherConsensoMinimo(page, codSubprocesso, SERVIDOR_DIAGNOSTICO.titulo);
             await page.getByTestId('btn-nav-voltar').click();
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}(?:\\?.*)?$`));
 
@@ -765,8 +768,15 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
             await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);
             const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, codigoProcessoDiagnosticoMonitoramento, SIGLA_UNIDADE_DIAGNOSTICO);
+            await login(page, SERVIDOR_DIAGNOSTICO.titulo, SERVIDOR_DIAGNOSTICO.senha);
+            await page.goto(`/diagnostico/${codSubprocesso}/${SIGLA_UNIDADE_DIAGNOSTICO}/consenso/${SERVIDOR_DIAGNOSTICO.titulo}`);
+            await aprovarConsensoDiagnostico(page, codSubprocesso);
+
+            await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
             await page.goto(`/diagnostico/${codSubprocesso}/${SIGLA_UNIDADE_DIAGNOSTICO}/situacao-capacitacao`);
-            await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
+            await expect(page.getByRole('heading', {name: /Situação de Capacitação/i})).toBeVisible();
+            await expect(page.getByTestId('lista-servidores-situacao-capacitacao')).toBeVisible();
+            await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso, 'EC');
         });
     });
 });

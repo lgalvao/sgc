@@ -131,7 +131,36 @@ export async function abrirAcaoCapacitacaoDiagnostico(page: Page): Promise<void>
     await card.click();
 }
 
+export async function aprovarConsensoDiagnostico(page: Page, codSubprocesso: number): Promise<void> {
+    const botaoAprovar = page.getByTestId('btn-aprovar-consenso');
+    await expect(botaoAprovar).toBeVisible();
+    await Promise.all([
+        page.waitForResponse(res =>
+            res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/consenso/aprovar'))
+            && res.request().method() === 'POST'
+            && res.ok()
+        ),
+        botaoAprovar.click()
+    ]);
+}
+
 export async function preencherPrimeiraSituacaoCapacitacao(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
+    const botaoServidorAprovado = page.locator(
+        '[data-testid^="btn-selecionar-servidor-situacao-capacitacao-"]',
+        {hasText: 'Avaliação de consenso aprovada'}
+    ).first();
+    if (await botaoServidorAprovado.count() > 0) {
+        await expect(botaoServidorAprovado).toBeVisible();
+        await botaoServidorAprovado.click();
+        await expect(page.getByTestId('detalhes-servidor-situacao-capacitacao')).toBeVisible();
+    } else {
+        const botaoSelecionarServidor = page.locator('[data-testid^="btn-selecionar-servidor-situacao-capacitacao-"]').first();
+        if (await botaoSelecionarServidor.count() > 0) {
+            await expect(botaoSelecionarServidor).toBeVisible();
+            await botaoSelecionarServidor.click();
+            await expect(page.getByTestId('detalhes-servidor-situacao-capacitacao')).toBeVisible();
+        }
+    }
     const select = page.locator('[data-testid^="situacao-"]').first();
     await expect(select).toBeVisible();
     await Promise.all([
@@ -168,4 +197,35 @@ export async function preencherTodasSituacoesCapacitacao(page: Page, codSubproce
     if (houveAlteracao) {
         await page.waitForLoadState('networkidle');
     }
+}
+
+export async function preencherSituacoesCapacitacaoPendentesPorApi(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
+    await page.evaluate(async ({codigo, valorAtual}) => {
+        const respostaAtual = await fetch(`/api/subprocessos/${codigo}/diagnostico/unidade`, {credentials: 'include'});
+        if (!respostaAtual.ok) {
+            throw new Error(`Falha ao carregar situações de capacitação do subprocesso ${codigo}.`);
+        }
+
+        const dados = await respostaAtual.json();
+        const situacoes = dados.situacoesCapacitacao.map((item: {
+            servidorTitulo: string;
+            competenciaCodigo: number;
+            situacaoCapacitacao: string | null;
+        }) => ({
+            servidorTitulo: item.servidorTitulo,
+            competenciaCodigo: item.competenciaCodigo,
+            situacaoCapacitacao: item.situacaoCapacitacao ?? valorAtual,
+        }));
+
+        const respostaSalvar = await fetch(`/api/subprocessos/${codigo}/diagnostico/situacoes-capacitacao`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({situacoes}),
+        });
+
+        if (!respostaSalvar.ok) {
+            throw new Error(`Falha ao preencher situações de capacitação do subprocesso ${codigo}.`);
+        }
+    }, {codigo: codSubprocesso, valorAtual: valor});
 }

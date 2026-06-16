@@ -6,9 +6,11 @@ import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
 import {
+    aprovarConsensoDiagnostico,
     abrirAcaoConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
-    preencherPrimeiraSituacaoCapacitacao
+    preencherConsensoMinimo,
+    preencherSituacoesCapacitacaoPendentesPorApi
 } from './helpers/helpers-diagnostico.js';
 import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from "../frontend/src/constants/textos.js";
@@ -484,6 +486,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
 
             await abrirAcaoConsensoDiagnostico(page, SERVIDOR_DIAGNOSTICO.titulo);
             await expect(page.getByRole('heading', {name: /Avaliação de consenso/i})).toBeVisible();
+            await preencherConsensoMinimo(page, codSubprocesso, SERVIDOR_DIAGNOSTICO.titulo);
             await page.getByTestId('btn-nav-voltar').click();
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}(?:\\?.*)?$`));
 
@@ -501,12 +504,25 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
         });
         await expect(page).toHaveURL(/\/login/);
 
+        let codSubprocesso = 0;
         await AuthHelpers.executarComo(page, CHEFE_DIAGNOSTICO, async () => {
             await page.goto(`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}`);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}(?:\\?.*)?$`));
-            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, codigoProcessoDiagnostico, siglaUnidadeDiagnostico);
+            codSubprocesso = await buscarCodSubprocessoDiagnostico(page, codigoProcessoDiagnostico, siglaUnidadeDiagnostico);
+        });
+        await expect(page).toHaveURL(/\/login/);
+
+        await AuthHelpers.executarComo(page, SERVIDOR_DIAGNOSTICO, async () => {
+            await page.goto(`/diagnostico/${codSubprocesso}/${siglaUnidadeDiagnostico}/consenso/${SERVIDOR_DIAGNOSTICO.titulo}`);
+            await aprovarConsensoDiagnostico(page, codSubprocesso);
+        });
+        await expect(page).toHaveURL(/\/login/);
+
+        await AuthHelpers.executarComo(page, CHEFE_DIAGNOSTICO, async () => {
             await page.goto(`/diagnostico/${codSubprocesso}/${siglaUnidadeDiagnostico}/situacao-capacitacao`);
-            await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
+            await expect(page.getByRole('heading', {name: /Situação de Capacitação/i})).toBeVisible();
+            await expect(page.getByTestId('lista-servidores-situacao-capacitacao')).toBeVisible();
+            await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso, 'EC');
         });
         await expect(page).toHaveURL(/\/login/);
     };

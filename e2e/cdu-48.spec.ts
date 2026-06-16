@@ -1,6 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoDiagnosticoComConsensoCriadoFixture} from './fixtures/index.js';
-import {abrirAcaoCapacitacaoDiagnostico} from './helpers/helpers-diagnostico.js';
+import {abrirAcaoCapacitacaoDiagnostico, aprovarConsensoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 
 const TITULO_CHEFE_ASSESSORIA_12 = '151515';
@@ -24,8 +24,18 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
 
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toBeVisible();
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toHaveCount(0);
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao-desabilitado')).toBeVisible();
 
+        await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
+        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
+        await page.getByTestId('card-subprocesso-consenso').click();
+        const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
+        await aprovarConsensoDiagnostico(page, codSubprocesso);
+
+        await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
+        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toBeVisible();
         await abrirAcaoCapacitacaoDiagnostico(page);
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/situacao-capacitacao`));
         await expect(page.getByRole('heading', {name: /Situação de capacitação/i})).toBeVisible();
@@ -33,7 +43,6 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
         await page.getByTestId(`btn-selecionar-servidor-situacao-capacitacao-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
         await expect(page.getByTestId('detalhes-servidor-situacao-capacitacao')).toContainText(TITULO_SERVIDOR_ASSESSORIA_12);
 
-        const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
         const seletorCapacitacao = page.locator(`[data-testid^="situacao-${TITULO_SERVIDOR_ASSESSORIA_12}-"]`).first();
         const testIdCapacitacao = await seletorCapacitacao.getAttribute('data-testid');
         await expect(seletorCapacitacao).toBeVisible();
