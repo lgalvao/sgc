@@ -24,7 +24,7 @@ ARQUIVO_COMPOSE="compose.hom.yaml"
 
 uso() {
   cat <<EOF_USO
-Uso: ./release-hom.sh [opcoes]
+Uso: ./release.sh [opcoes]
 
 Opcoes:
   --container-cli <podman|docker>  CLI de container (padrao: $CONTAINER_CLI)

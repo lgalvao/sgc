@@ -22,15 +22,15 @@
    processo enquanto houver unidades com diagnóstico ainda não homologado`.
 
 6. Caso todas as unidades estejam homologadas, o sistema mostra diálogo de confirmação com:
-   - título `Finalização de processo`;
-   - mensagem `Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação encerrará o ciclo de diagnóstico e notificará todas as unidades participantes do processo.`;
-   - botões `Cancelar` e `Finalizar`.
-
-   6.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de finalização, permanecendo na mesma tela.
+    - título "Finalização de processo";
+    - mensagem:
+        - "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação encerrará o ciclo de diagnóstico e
+          notificará todas as unidades participantes do processo.";
+    - botões `Cancelar` e `Finalizar`.
 
 7. O usuário clica em `Finalizar`.
 
-8. O sistema muda a situação do processo para `Finalizado`.
+8. O sistema muda a situação do processo para `Finalizado` 
 
 9. O sistema envia notificações por e-mail para todas as unidades participantes, como a seguir:
 

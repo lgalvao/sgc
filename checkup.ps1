@@ -37,8 +37,7 @@ Invoke-Step "npm install" {
 }
 
 Invoke-Step "Lint raiz" { npm run lint }
-Invoke-Step "Typecheck raiz" { npm run typecheck }
-
+Invoke-Step "Typecheck raiz" { npm run typecheck --silent }
 Invoke-Step "Testes scripts" { npm --prefix toolkit run test }
 Invoke-Step "Testes frontend" { npm --prefix frontend run test }
 Invoke-Step "Testes backend" { & $GRADLE_CMD backend:test }

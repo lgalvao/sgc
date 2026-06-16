@@ -46,7 +46,7 @@ fi
 invoke_passo 'Atualizar branch local' git pull
 invoke_passo 'npm install' npm install --silent
 invoke_passo 'Lint raiz' npm run lint
-invoke_passo 'Typecheck raiz' npm run typecheck
+invoke_passo 'Typecheck raiz' npm run typecheck --silent
 invoke_passo 'Testes scripts' npm --prefix toolkit run test
 invoke_passo 'Testes frontend' npm --prefix frontend run test
 invoke_passo 'Testes backend' "$GRADLE_CMD" backend:test

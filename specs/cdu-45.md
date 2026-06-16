@@ -6,17 +6,18 @@ Ator: CHEFE
 
 - Login realizado com perfil CHEFE
 - Existência de processo de diagnóstico em andamento
-- Existência de servidor da unidade com uma das situações:
+- Existência ao menos um servidor da unidade com uma dessas situações:
     - 'Autoavaliação concluída'
     - 'Avaliação de consenso criada'
     - 'Avaliação de consenso aprovada'
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento e o sistema mostra a tela
-   `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
+1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. Na grade de servidores da unidade, o usuário escolhe a ação `Avaliação de consenso` para um servidor.
+2. O sistema mostra a tela `Detalhes do subprocesso`, conforme o caso de uso [CDU-42.md](cdu-42.md)`.
+
+3. Na grade de servidores da unidade, o usuário escolhe a ação `Manter avaliação de consenso` para um servidor.
 
 3. O sistema mostra a tela `Avaliação de consenso` para o servidor selecionado, com:
     - título: "Avaliação de consenso";
@@ -34,13 +35,14 @@ Regras de apresentação, para cada competência:
 
 - os campos `Importância` e `Domínio` do servidor devem ser **não editáveis**, sendo preenchidos com os valores
   fornecidos na autoavaliação correspondente;
-- os campos `Importância` e `Domínio` do chefe devem ser **editáveis**;
-- os dois campos de `Consenso` devem ser **editáveis**;
-- se os valores `Importância` e `Domínio` forem iguais, o sistema deve preencher automaticamente o valor de `Consenso`
+- os campos `Importância` e `Domínio` do chefe devem ser **editáveis** (via seleção de lista fechada de opções);
+- os dois campos de `Consenso` devem ser **editáveis** (via seleção de lista fechada de opções);
+- se os valores `Importância` e `Domínio` forem iguais, o sistema deve preencher automaticamente `Consenso`
   com o valor repetido.
 
 **IMPORTANTE**: Se a situação do servidor for 'Avaliação de consenso aprovada', ou o subprocesso não estiver localizado
-na unidade do usuário, o sistema permitirá apenas **visualização** de todos os itens acima.
+na unidade do usuário, o sistema permitirá apenas **visualização** de todos os itens acima e **o caso de uso é
+terminado**.
 
 4. O usuário preenche (com a presença física do servidor) o valor de consenso para cada competência.
 

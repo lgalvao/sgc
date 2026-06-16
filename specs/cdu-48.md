@@ -24,15 +24,15 @@ Ator: CHEFE
     - uma coluna editável (dropdown) `Situação de capacitação` para cada competência do servidor selecionado;
     - cabeçalho com nome completo e título do servidor selecionado;
     - cada campo `Situação de capacitação` admite os seguintes valores:
-        - `NA` (Não se aplica);
-        - `AC` (A capacitar);
-        - `EC` (Em capacitação);
-        - `C` (Capacitado);
-        - `I` (Instrutor).
+        - `NA - Não se aplica`;
+        - `AC - A capacitar`;
+        - `EC - Em capacitação`;
+        - `C - Capacitado`;
+        - `I - Instrutor`.
 
-5. O usuário informa os valores de situação de capacitação para cada célula.
+5. O usuário informa os valores de situação de capacitação para cada combinação servidor/competência.
 
 6. O sistema salva automaticamente cada alteração realizada.
-
+   
 7. O usuário preenche os valores totalmente ou parcialmente, podendo retornar a esta tela em outro momento para
    finalizar (ou seja, o sistema permite sair da tela sem completar o preenchimento de todos os campos).

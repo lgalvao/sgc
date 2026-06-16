@@ -16,7 +16,7 @@ Ator: CHEFE
 
 2. Ao lado do nome do servidor desejado, o usuário escolhe a ação `Indicar impossibilidade`.
 
-3. O sistema abre um modal:
+3. O sistema abre uma tela de confirmação:
     - título: "Indicar impossibilidade de avaliação";
     - texto: "Confirma a impossibilidade de avaliação para [NOME_SERVIDOR]?";
     - campo `Justificativa`, obrigatório;
@@ -24,8 +24,7 @@ Ator: CHEFE
 
 4. O usuário informa a justificativa e aciona `Indicar impossibilidade`.
 
-5. O sistema altera a situação individual do servidor para 'Avaliação impossibilitada' e mostra a mensagem
-   "Impossibilidade registrada".
+5. O sistema altera a situação do servidor para 'Avaliação impossibilitada'.
 
-6. A partir desse momento, na tela `Detalhes do subprocesso`, o sistema passa a habilitar a ação `Permitir avaliação`
-   para o servidor impossibilitado, permitindo reverter a impossibilidade quando necessário.
+6. A partir desse momento o sistema passa a habilitar a ação `Desfazer impossibilidade` para o servidor
+   impossibilitado.
