@@ -17,6 +17,9 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     const contextoCadastro = ref<ContextoCadastroAtividadesSubprocesso | null>(null);
     const contextoEdicaoInvalido = ref(false);
     const contextoCadastroInvalido = ref(false);
+    const contextoEdicaoSessao = ref<string | null>(null);
+    const contextoCadastroSessao = ref<string | null>(null);
+    const versaoContexto = ref(0);
     const erroIntegracaoContexto = ref<ErroNormalizado | null>(null);
     const carregamentos = new Map<string, Promise<object | string | number | boolean | null>>();
     const codigosEdicaoPorProcessoUnidade = new Map<string, number>();
@@ -27,6 +30,9 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         contextoCadastro.value = null;
         contextoEdicaoInvalido.value = false;
         contextoCadastroInvalido.value = false;
+        contextoEdicaoSessao.value = null;
+        contextoCadastroSessao.value = null;
+        versaoContexto.value += 1;
     }
 
     const limparErroIntegracao = () => {
@@ -37,6 +43,7 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         carregamentos.clear();
         contextoEdicaoInvalido.value = contextoEdicao.value !== null;
         contextoCadastroInvalido.value = contextoCadastro.value !== null;
+        versaoContexto.value += 1;
         limparErroIntegracao();
     }
 
@@ -50,16 +57,18 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         limparContextoAtual();
     }
 
-    const orquestrador = usarOrquestradorContexto(carregamentos, erroIntegracaoContexto, limparContextoAtual);
+    const orquestrador = usarOrquestradorContexto(carregamentos, erroIntegracaoContexto, limparContextoAtual, versaoContexto);
     const registrarContextoEdicao = (c: ContextoEdicaoSubprocesso) => registrarContexto({
         contextoRef: contextoEdicao,
         contextoInvalidoRef: contextoEdicaoInvalido,
+        contextoSessaoRef: contextoEdicaoSessao,
         contexto: c,
         limparErroIntegracao,
     });
     const registrarContextoCadastro = (c: ContextoCadastroAtividadesSubprocesso) => registrarContexto({
         contextoRef: contextoCadastro,
         contextoInvalidoRef: contextoCadastroInvalido,
+        contextoSessaoRef: contextoCadastroSessao,
         contexto: c,
         limparErroIntegracao,
     });
@@ -67,10 +76,12 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     const {configEdicao, configCadastro} = criarConfigs({
         contextoEdicao,
         contextoEdicaoInvalido,
+        contextoEdicaoSessao,
         codigosEdicaoPorProcessoUnidade,
         registrarContextoEdicao,
         contextoCadastro,
         contextoCadastroInvalido,
+        contextoCadastroSessao,
         codigosCadastroPorProcessoUnidade,
         registrarContextoCadastro,
     });
@@ -109,8 +120,8 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         contextoEdicao,
         contextoCadastro,
         erroIntegracaoContexto,
-        dadosEdicaoValidos: (codigoSubprocesso: number) => dadosValidos(contextoEdicao, contextoEdicaoInvalido, codigoSubprocesso),
-        dadosCadastroValidos: (codigoSubprocesso: number) => dadosValidos(contextoCadastro, contextoCadastroInvalido, codigoSubprocesso),
+        dadosEdicaoValidos: (codigoSubprocesso: number) => dadosValidos(contextoEdicao, contextoEdicaoInvalido, contextoEdicaoSessao, codigoSubprocesso),
+        dadosCadastroValidos: (codigoSubprocesso: number) => dadosValidos(contextoCadastro, contextoCadastroInvalido, contextoCadastroSessao, codigoSubprocesso),
         invalidar,
         resetar,
         limparContextoAtual,

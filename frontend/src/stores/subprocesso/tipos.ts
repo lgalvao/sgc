@@ -12,6 +12,7 @@ export type ConfiguracaoContexto<T extends ContextoSubprocesso> = {
     tipoProcessoUnidade: ChaveCarregamento;
     contextoRef: Ref<T | null>;
     contextoInvalidoRef: Ref<boolean>;
+    contextoSessaoRef: Ref<string | null>;
     codigosPorProcessoUnidade: Map<string, number>;
     buscarPorCodigo: (codigoSubprocesso: number) => Promise<T>;
     buscarPorProcessoEUnidade: (codProcesso: number, siglaUnidade: string) => Promise<T>;

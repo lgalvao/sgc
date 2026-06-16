@@ -3,11 +3,13 @@ import type {ConfiguracaoContexto} from "./tipos";
 import {type ContextoSubprocesso, dadosValidos} from "@/stores/subprocessoStoreHelpers";
 import type {ErroNormalizado} from "@/utils/apiError";
 import {gerarChave, gerarChaveProcessoUnidade, registrarErroIntegracao} from "./utils";
+import {criarContextoSessaoSubprocessoAtual, serializarContextoSessaoSubprocesso} from "./contextoSessao";
 
 type EstadoOrquestrador = {
     carregamentos: Map<string, Promise<object | string | number | boolean | null>>;
     erroIntegracaoContexto: Ref<ErroNormalizado | null>;
     limparContextoAtual: () => void;
+    versaoContexto: Ref<number>;
 };
 
 const toAny = (val: unknown) => {
@@ -45,9 +47,13 @@ async function executarComDedupe<T extends object | string | number | boolean | 
 async function buscarComRegistro<T extends ContextoSubprocesso>(
     buscar: () => Promise<T>,
     registrar: (contexto: T) => void,
+    versaoEsperada: number,
+    versaoContexto: Ref<number>,
 ): Promise<T> {
     const contexto = await buscar();
-    registrar(contexto);
+    if (versaoContexto.value === versaoEsperada) {
+        registrar(contexto);
+    }
     return contexto;
 }
 
@@ -58,15 +64,22 @@ async function garantirContextoPorCodigo<T extends ContextoSubprocesso>(
 ): Promise<T | null> {
     const {limparAntes, config} = opcoes;
     limparSeNecessario(limparAntes, estado.limparContextoAtual);
-    if (dadosValidos(config.contextoRef, config.contextoInvalidoRef, codigoSubprocesso)) {
+    if (dadosValidos(config.contextoRef, config.contextoInvalidoRef, config.contextoSessaoRef, codigoSubprocesso)) {
         return config.contextoRef.value;
     }
+    const versaoEsperada = estado.versaoContexto.value;
+    const contextoSessao = serializarContextoSessaoSubprocesso(criarContextoSessaoSubprocessoAtual());
 
     try {
         return await executarComDedupe(
             estado.carregamentos,
-            gerarChave(config.tipoCodigo, codigoSubprocesso),
-            () => buscarComRegistro(() => config.buscarPorCodigo(codigoSubprocesso), config.registrar),
+            gerarChave(config.tipoCodigo, codigoSubprocesso, contextoSessao),
+            () => buscarComRegistro(
+                () => config.buscarPorCodigo(codigoSubprocesso),
+                config.registrar,
+                versaoEsperada,
+                estado.versaoContexto,
+            ),
         );
     } catch (erro) {
         return registrarErroIntegracao(toAny(erro), config.mensagemCodigo(codigoSubprocesso), estado.erroIntegracaoContexto);
@@ -85,7 +98,8 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
     const {codProcesso, siglaUnidade, limparAntes, config} = opcoes;
     limparSeNecessario(limparAntes, estado.limparContextoAtual);
 
-    const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade);
+    const contextoSessao = serializarContextoSessaoSubprocesso(criarContextoSessaoSubprocessoAtual());
+    const chaveProcessoUnidade = gerarChaveProcessoUnidade(codProcesso, siglaUnidade, contextoSessao);
     const codigoMapeado = config.codigosPorProcessoUnidade.get(chaveProcessoUnidade);
     if (typeof codigoMapeado === "number") {
         const contexto = await garantirContextoPorCodigo(estado, codigoMapeado, {limparAntes, config});
@@ -93,18 +107,23 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
             return {codigo: codigoMapeado, contexto};
         }
     }
+    const versaoEsperada = estado.versaoContexto.value;
 
     try {
         return await executarComDedupe(
             estado.carregamentos,
-            gerarChave(config.tipoProcessoUnidade, chaveProcessoUnidade),
+            gerarChave(config.tipoProcessoUnidade, chaveProcessoUnidade, contextoSessao),
             async () => {
                 const contexto = await buscarComRegistro(
                     () => config.buscarPorProcessoEUnidade(codProcesso, siglaUnidade),
                     config.registrar,
+                    versaoEsperada,
+                    estado.versaoContexto,
                 );
                 const codigo = contexto.detalhes.codigo;
-                config.codigosPorProcessoUnidade.set(chaveProcessoUnidade, codigo);
+                if (estado.versaoContexto.value === versaoEsperada) {
+                    config.codigosPorProcessoUnidade.set(chaveProcessoUnidade, codigo);
+                }
                 return {codigo, contexto};
             },
         );
@@ -120,12 +139,14 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
 export function usarOrquestradorContexto(
     carregamentos: Map<string, Promise<object | string | number | boolean | null>>,
     erroIntegracaoContexto: Ref<ErroNormalizado | null>,
-    limparContextoAtual: () => void
+    limparContextoAtual: () => void,
+    versaoContexto: Ref<number>,
 ) {
     const estado = {
         carregamentos,
         erroIntegracaoContexto,
-        limparContextoAtual
+        limparContextoAtual,
+        versaoContexto,
     };
     return {
         garantirContextoPorCodigo: <T extends ContextoSubprocesso>(codigoSubprocesso: number, limparAntes: boolean, config: ConfiguracaoContexto<T>) =>

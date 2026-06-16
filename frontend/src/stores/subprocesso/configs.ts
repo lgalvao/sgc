@@ -11,10 +11,12 @@ import type {ConfiguracaoContexto} from "./tipos";
 export type CriarConfigsParams = {
     contextoEdicao: Ref<ContextoEdicaoSubprocesso | null>;
     contextoEdicaoInvalido: Ref<boolean>;
+    contextoEdicaoSessao: Ref<string | null>;
     codigosEdicaoPorProcessoUnidade: Map<string, number>;
     registrarContextoEdicao: (c: ContextoEdicaoSubprocesso) => void;
     contextoCadastro: Ref<ContextoCadastroAtividadesSubprocesso | null>;
     contextoCadastroInvalido: Ref<boolean>;
+    contextoCadastroSessao: Ref<string | null>;
     codigosCadastroPorProcessoUnidade: Map<string, number>;
     registrarContextoCadastro: (c: ContextoCadastroAtividadesSubprocesso) => void;
 };
@@ -22,10 +24,12 @@ export type CriarConfigsParams = {
 export function criarConfigs({
     contextoEdicao,
     contextoEdicaoInvalido,
+    contextoEdicaoSessao,
     codigosEdicaoPorProcessoUnidade,
     registrarContextoEdicao,
     contextoCadastro,
     contextoCadastroInvalido,
+    contextoCadastroSessao,
     codigosCadastroPorProcessoUnidade,
     registrarContextoCadastro,
 }: CriarConfigsParams) {
@@ -34,6 +38,7 @@ export function criarConfigs({
         tipoProcessoUnidade: "EDICAO_PROCESSO_UNIDADE",
         contextoRef: contextoEdicao,
         contextoInvalidoRef: contextoEdicaoInvalido,
+        contextoSessaoRef: contextoEdicaoSessao,
         codigosPorProcessoUnidade: codigosEdicaoPorProcessoUnidade,
         buscarPorCodigo: serviceBuscarContextoEdicao,
         buscarPorProcessoEUnidade: serviceBuscarContextoEdicaoPorProcessoEUnidade,
@@ -48,6 +53,7 @@ export function criarConfigs({
         tipoProcessoUnidade: "CADASTRO_PROCESSO_UNIDADE",
         contextoRef: contextoCadastro,
         contextoInvalidoRef: contextoCadastroInvalido,
+        contextoSessaoRef: contextoCadastroSessao,
         codigosPorProcessoUnidade: codigosCadastroPorProcessoUnidade,
         buscarPorCodigo: serviceBuscarContextoCadastroAtividades,
         buscarPorProcessoEUnidade: serviceBuscarContextoCadastroAtividadesPorProcessoEUnidade,

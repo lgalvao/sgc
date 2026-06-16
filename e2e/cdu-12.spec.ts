@@ -5,6 +5,7 @@ import {
     abrirModalImpacto,
     adicionarAtividade,
     adicionarConhecimento,
+    disponibilizarCadastro,
     editarAtividade,
     fecharModalImpacto,
     navegarParaCadastro,
@@ -65,8 +66,7 @@ test.describe.serial('CDU-12 - Verificar impactos no mapa de competências', () 
         await fecharModalImpacto(page);
 
         // Disponibilizar para permitir teste dos próximos atores
-        await page.getByTestId('btn-cad-atividades-disponibilizar').click();
-        await page.getByTestId('btn-confirmar-disponibilizacao').click();
+        await disponibilizarCadastro(page);
     });
 
     test('Passo 3.2: Verificação pelo GESTOR na tela de Visualização', async ({_resetAutomatico, page}) => {

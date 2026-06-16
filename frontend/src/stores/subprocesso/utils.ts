@@ -2,12 +2,12 @@ import type {ChaveCarregamento} from "./tipos";
 import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 import {logger} from "@/utils";
 
-export function gerarChave(tipo: ChaveCarregamento, identificador: number | string): string {
-    return `${tipo}:${identificador}`;
+export function gerarChave(tipo: ChaveCarregamento, identificador: number | string, contextoSessao: string): string {
+    return `${tipo}:${contextoSessao}:${identificador}`;
 }
 
-export function gerarChaveProcessoUnidade(codigoProcesso: number, siglaUnidade: string): string {
-    return `${codigoProcesso}:${siglaUnidade}`;
+export function gerarChaveProcessoUnidade(codigoProcesso: number, siglaUnidade: string, contextoSessao: string): string {
+    return `${contextoSessao}:${codigoProcesso}:${siglaUnidade}`;
 }
 
 export function criarErroSubprocessoNaoEncontrado(mensagemBase: string, erroNormalizado: ErroNormalizado): ErroNormalizado {

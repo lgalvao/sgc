@@ -5,6 +5,7 @@ import type {
     PermissoesSubprocesso,
     SituacaoSubprocesso,
 } from "@/types/tipos";
+import {criarContextoSessaoSubprocessoAtual, serializarContextoSessaoSubprocesso} from "@/stores/subprocesso/contextoSessao";
 
 export type ContextoSubprocesso = ContextoEdicaoSubprocesso | ContextoCadastroAtividadesSubprocesso;
 
@@ -17,6 +18,7 @@ export type AtualizacaoStatusLocal = {
 export type RegistrarContextoParams<T extends ContextoSubprocesso> = {
     contextoRef: Ref<T | null>;
     contextoInvalidoRef: Ref<boolean>;
+    contextoSessaoRef: Ref<string | null>;
     contexto: T;
     limparErroIntegracao: () => void;
 };
@@ -24,11 +26,13 @@ export type RegistrarContextoParams<T extends ContextoSubprocesso> = {
 export function registrarContexto<T extends ContextoSubprocesso>({
     contextoRef,
     contextoInvalidoRef,
+    contextoSessaoRef,
     contexto,
     limparErroIntegracao,
 }: RegistrarContextoParams<T>): void {
     contextoRef.value = contexto;
     contextoInvalidoRef.value = false;
+    contextoSessaoRef.value = serializarContextoSessaoSubprocesso(criarContextoSessaoSubprocessoAtual());
     limparErroIntegracao();
 }
 
@@ -51,7 +55,10 @@ export function atualizarDetalhesContexto<T extends ContextoSubprocesso>(
 export function dadosValidos<T extends ContextoSubprocesso>(
     contextoRef: Ref<T | null>,
     contextoInvalidoRef: Ref<boolean>,
+    contextoSessaoRef: Ref<string | null>,
     codigoSubprocesso: number,
 ): boolean {
-    return contextoRef.value?.detalhes.codigo === codigoSubprocesso && !contextoInvalidoRef.value;
+    return contextoRef.value?.detalhes.codigo === codigoSubprocesso
+        && !contextoInvalidoRef.value
+        && contextoSessaoRef.value === serializarContextoSessaoSubprocesso(criarContextoSessaoSubprocessoAtual());
 }

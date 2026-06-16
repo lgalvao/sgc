@@ -8,6 +8,12 @@ remontados. Para evitar consultas desnecessárias ao backend a cada reativação
 as stores Pinia funcionam como **cache de sessão**: enquanto os dados forem
 considerados válidos, o snapshot já carregado é reutilizado diretamente.
 
+Para stores de contexto sensíveis à autorização, a validade do snapshot depende
+também da **sessão corrente** (`usuarioCodigo`, `perfilSelecionado`,
+`unidadeSelecionada`). Um snapshot carregado por uma combinação de sessão não
+deve ser reaproveitado por outra, mesmo que o `codigo` do processo/subprocesso
+seja o mesmo.
+
 A consequência desta escolha é que **qualquer mutação que altere dados exibidos
 em outra tela deve invalidar explicitamente o cache correspondente**, caso
 contrário o usuário verá dados desatualizados até um refresh completo da página.
@@ -20,7 +26,7 @@ contrário o usuário verá dados desatualizados até um refresh completo da pá
 |---|---|---|---|
 | `painelStore` | `carregado + carregadoEm` | TTL 5 min | `useInvalidacaoNavegacao` |
 | `processoStore` | `contextoCompleto.codigo + !contextoInvalido` | Explícita por evento | `useInvalidacaoNavegacao` |
-| `subprocessoStore` | `contextoXXXInvalido + codigo` | Explícita por evento | `useInvalidacaoNavegacao` + métodos internos |
+| `subprocessoStore` | `contextoXXXInvalido + codigo + sessão` | Explícita por evento | `useInvalidacaoNavegacao` + métodos internos |
 | `mapasStore` | `codigosMapaInvalidos` | Explícita por evento | `useInvalidacaoNavegacao` + métodos internos |
 | `historicoStore` | `carregado` | Explícita por evento | `processoDetalheAcoes` diretamente |
 | `organizacaoStore` | `carregado` | Por sessão; SSE invalida | `useCacheSync` (SSE) |

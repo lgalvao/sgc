@@ -17,6 +17,9 @@ describe("subprocesso store (cache e dedupe)", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
+        sessionStorage.setItem("usuarioCodigo", "111111");
+        localStorage.setItem("perfilSelecionado", "CHEFE");
+        localStorage.setItem("unidadeSelecionada", "10");
     });
 
     it("deve inicializar com estado vazio", () => {
@@ -325,6 +328,75 @@ describe("subprocesso store (cache e dedupe)", () => {
 
             expect(store.contextoEdicao).toBeNull();
             expect(store.erroIntegracaoContexto).toBeNull();
+        });
+
+        it("deve considerar o contexto inválido quando a sessão muda", async () => {
+            const store = useSubprocessoStore();
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockResolvedValue({
+                detalhes: {codigo: 10, situacao: "ANTES"},
+                mapa: null,
+            } as any);
+
+            await store.obterContextoEdicao(10);
+            expect(store.dadosEdicaoValidos(10)).toBe(true);
+
+            localStorage.setItem("perfilSelecionado", "GESTOR");
+
+            expect(store.dadosEdicaoValidos(10)).toBe(false);
+        });
+
+        it("deve refazer busca por processo/unidade quando a sessão muda", async () => {
+            const store = useSubprocessoStore();
+            vi.mocked(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).mockResolvedValue({
+                detalhes: {codigo: 10, situacao: "ANTES"},
+                mapa: null,
+            } as any);
+
+            await store.obterContextoEdicaoPorProcessoEUnidade(1, "UNIDADE");
+            expect(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledTimes(1);
+
+            localStorage.setItem("perfilSelecionado", "GESTOR");
+
+            await store.obterContextoEdicaoPorProcessoEUnidade(1, "UNIDADE");
+            expect(subprocessoService.buscarContextoEdicaoPorProcessoEUnidade).toHaveBeenCalledTimes(2);
+        });
+
+        it("não deve reaplicar contexto stale resolvido após invalidar", async () => {
+            const store = useSubprocessoStore();
+            let resolver!: (valor: any) => void;
+            const promessa = new Promise<any>((resolve) => {
+                resolver = resolve;
+            });
+            vi.mocked(subprocessoService.buscarContextoEdicao).mockReturnValue(promessa);
+
+            const requisicao = store.obterContextoEdicao(10);
+            store.invalidar();
+            resolver({detalhes: {codigo: 10, situacao: "STALE"}, mapa: null});
+
+            const resultado = await requisicao;
+
+            expect(resultado?.detalhes.situacao).toBe("STALE");
+            expect(store.contextoEdicao).toBeNull();
+            expect(store.dadosEdicaoValidos(10)).toBe(false);
+        });
+
+        it("não deve reaplicar contexto stale resolvido após resetar", async () => {
+            const store = useSubprocessoStore();
+            let resolver!: (valor: any) => void;
+            const promessa = new Promise<any>((resolve) => {
+                resolver = resolve;
+            });
+            vi.mocked(subprocessoService.buscarContextoCadastroAtividades).mockReturnValue(promessa);
+
+            const requisicao = store.obterContextoCadastroAtividades(10);
+            store.resetar();
+            resolver({detalhes: {codigo: 10, situacao: "STALE"}, atividades: []});
+
+            const resultado = await requisicao;
+
+            expect(resultado?.detalhes.situacao).toBe("STALE");
+            expect(store.contextoCadastro).toBeNull();
+            expect(store.dadosCadastroValidos(10)).toBe(false);
         });
     });
 });
