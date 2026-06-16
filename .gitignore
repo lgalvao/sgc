@@ -17,6 +17,7 @@ frontend/coverage/
 toolkit/node_modules/
 toolkit/coverage/
 toolkit/.vitest/
+e2e/node_modules/
 
 # Java
 /backend/src/main/resources/static/

@@ -9,6 +9,7 @@ import * as useAcessoModule from "@/composables/acesso";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
 const situacaoServidorMock = ref('AUTOAVALIACAO_NAO_INICIADA');
+const servidoresMock = ref<any[]>([]);
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({
@@ -22,6 +23,12 @@ vi.mock("@/composables/useAutoavaliacaoDiagnostico", () => ({
     }),
 }));
 
+vi.mock("@/composables/useDiagnosticoUnidade", () => ({
+    useDiagnosticoUnidade: () => ({
+        servidores: servidoresMock,
+    }),
+}));
+
 vi.mock("@/stores/perfil", () => ({
     usePerfilStore: () => ({
         usuarioCodigo: '242426',
@@ -32,6 +39,7 @@ describe("SubprocessoCards.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         situacaoServidorMock.value = 'AUTOAVALIACAO_NAO_INICIADA';
+        servidoresMock.value = [];
     });
 
     function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
@@ -323,6 +331,7 @@ describe("SubprocessoCards.vue", () => {
     });
 
     it("renderiza card de situação de capacitação para chefia", () => {
+        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'CONSENSO_APROVADO'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -405,7 +414,8 @@ describe("SubprocessoCards.vue", () => {
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
     });
 
-    it("abre situação de capacitação ao clicar no card da chefia", async () => {
+    it("abre situação de capacitação ao clicar no card da chefia se habilitado", async () => {
+        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'CONSENSO_APROVADO'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -428,6 +438,67 @@ describe("SubprocessoCards.vue", () => {
             name: "SituacaoCapacitacaoDiagnostico",
             params: {codSubprocesso: 1, siglaUnidade: "ASSESSORIA_12"},
         }));
+    });
+
+    it("não abre situação de capacitação ao clicar no card da chefia se desabilitado", async () => {
+        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'}];
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "ASSESSORIA_12",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: {
+                    ...criarPermissoes(),
+                    podePreencherAutoavaliacao: false,
+                    podeCriarConsenso: true,
+                } as any,
+            }),
+        });
+
+        await wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao-desabilitado"]').trigger("click");
+
+        expect(pushMock).not.toHaveBeenCalled();
+    });
+
+    it("desabilita card de situação de capacitação se não houver consenso aprovado", () => {
+        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'}];
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "U1",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes({
+                    podeCriarConsenso: true,
+                }),
+            }),
+        });
+
+        expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao-desabilitado"]').exists()).toBe(true);
+    });
+
+    it("habilita card de situação de capacitação se houver consenso aprovado", () => {
+        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'CONSENSO_APROVADO'}];
+        const wrapper = createWrapper({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            mapa: null,
+            codSubprocesso: 1,
+            codProcesso: 1,
+            siglaUnidade: "U1",
+            subprocesso: criarSubprocesso({
+                tipoProcesso: TipoProcesso.DIAGNOSTICO,
+                permissoes: criarPermissoes({
+                    podeCriarConsenso: true,
+                }),
+            }),
+        });
+
+        expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').exists()).toBe(true);
     });
 
     it("abre consenso do servidor logado quando o usuário não pode criar consenso", async () => {

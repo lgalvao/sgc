@@ -106,15 +106,15 @@
           md="4"
       >
         <BCard
-            class="h-100 card-actionable"
-            data-testid="card-subprocesso-situacoes-capacitacao"
-            role="button"
-            tabindex="0"
-            @click="navegarParaDiag('SituacaoCapacitacaoDiagnostico')"
-            @keydown="aoPressionarTeclaDiagnostico($event, 'SituacaoCapacitacaoDiagnostico')"
+            :class="['h-100', habilitarCardSituacaoCapacitacao ? 'card-actionable' : 'card-disabled']"
+            :data-testid="habilitarCardSituacaoCapacitacao ? 'card-subprocesso-situacoes-capacitacao' : 'card-subprocesso-situacoes-capacitacao-desabilitado'"
+            :role="habilitarCardSituacaoCapacitacao ? 'button' : undefined"
+            :tabindex="habilitarCardSituacaoCapacitacao ? 0 : undefined"
+            @click="habilitarCardSituacaoCapacitacao && navegarParaDiag('SituacaoCapacitacaoDiagnostico')"
+            @keydown="habilitarCardSituacaoCapacitacao && aoPressionarTeclaDiagnostico($event, 'SituacaoCapacitacaoDiagnostico')"
         >
           <div class="card-click-area">
-            <BCardTitle class="d-flex align-items-start gap-3 mb-3">
+            <BCardTitle :class="['d-flex align-items-start gap-3 mb-3', habilitarCardSituacaoCapacitacao ? undefined : 'text-muted']">
               <i aria-hidden="true" class="bi bi-people text-primary flex-shrink-0 mt-1"></i>
               <span class="lh-sm">{{ TEXTOS.subprocesso.cards.SITUACAO_CAPACITACAO_TITULO }}</span>
             </BCardTitle>
@@ -135,6 +135,7 @@ import {computed} from "vue";
 import {useAcesso} from "@/composables/acesso";
 import {usePerfilStore} from "@/stores/perfil";
 import {useAutoavaliacaoDiagnostico} from "@/composables/useAutoavaliacaoDiagnostico";
+import {useDiagnosticoUnidade} from "@/composables/useDiagnosticoUnidade";
 import {type Mapa, type MapaCompleto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -164,6 +165,14 @@ const { situacaoServidor } = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
   : { situacaoServidor: computed(() => 'AUTOAVALIACAO_NAO_INICIADA') };
 const habilitarCardConsenso = computed(() => {
   return situacaoServidor.value === 'CONSENSO_CRIADO';
+});
+
+const {servidores} = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
+  ? useDiagnosticoUnidade(props.codSubprocesso)
+  : {servidores: computed(() => [])};
+
+const habilitarCardSituacaoCapacitacao = computed(() => {
+  return servidores.value.some((servidor) => servidor.situacaoServidor === 'CONSENSO_APROVADO');
 });
 
 function navegarPara(routeName: string) {
