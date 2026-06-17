@@ -24,11 +24,8 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
 
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toBeVisible();
-        await abrirAcaoCapacitacaoDiagnostico(page);
-        await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/\d+/${UNIDADE}/situacao-capacitacao`));
-        await expect(page.getByRole('heading', {name: 'Selecione um servidor'})).toBeVisible();
-        await page.goBack();
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toHaveCount(0);
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao-desabilitado')).toBeVisible();
 
         await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);

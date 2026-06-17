@@ -24,7 +24,7 @@ Ator: CHEFE ou SERVIDOR
           consenso aprovada';
         - `Desfazer impossibilidade`, habilitado apenas quando a situação for 'Avaliação impossibilitada';
     - card `Situação de capacitação`, com a descrição "Capacitação de cada servidor nas competências da unidade";
-      habilitado quando ao menos um servidor tiver situação 'Autoavaliação criada', ou posterior;
+      habilitado quando ao menos um servidor tiver situação 'Avaliação de consenso aprovada', ou posterior;
     - seção `Movimentações` do subprocesso (como em [CDU-07 seção 2.3](cdu-07.md));
 
    2.2. Para o perfil SERVIDOR:

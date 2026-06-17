@@ -38,8 +38,9 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
         await expect(page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
         await expect(page.getByTestId(`btn-desfazer-impossibilidade-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeDisabled();
 
-        // CHEFE já pode acessar Situação de capacitação após a autoavaliação concluída
-        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toBeVisible();
+        // CHEFE ainda não deve poder abrir Situação de capacitação sem consenso aprovado
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao')).toHaveCount(0);
+        await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao-desabilitado')).toBeVisible();
 
         // CHEFE deve ver o botão para Concluir diagnóstico
         await expect(page.getByTestId('btn-concluir-diagnostico')).toBeVisible();

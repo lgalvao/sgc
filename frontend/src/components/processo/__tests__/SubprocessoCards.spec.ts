@@ -440,7 +440,7 @@ describe("SubprocessoCards.vue", () => {
         }));
     });
 
-    it("abre situação de capacitação ao clicar no card da chefia após autoavaliação concluída", async () => {
+    it("não abre situação de capacitação ao clicar no card da chefia se desabilitado", async () => {
         servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
@@ -458,16 +458,13 @@ describe("SubprocessoCards.vue", () => {
             }),
         });
 
-        await wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').trigger("click");
+        await wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao-desabilitado"]').trigger("click");
 
-        expect(pushMock).toHaveBeenCalledWith(expect.objectContaining({
-            name: "SituacaoCapacitacaoDiagnostico",
-            params: {codSubprocesso: 1, siglaUnidade: "ASSESSORIA_12"},
-        }));
+        expect(pushMock).not.toHaveBeenCalled();
     });
 
-    it("desabilita card de situação de capacitação se todos os servidores estiverem sem autoavaliação", () => {
-        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA'}];
+    it("desabilita card de situação de capacitação se não houver consenso aprovado", () => {
+        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -485,8 +482,8 @@ describe("SubprocessoCards.vue", () => {
         expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao-desabilitado"]').exists()).toBe(true);
     });
 
-    it("habilita card de situação de capacitação a partir de autoavaliação concluída", () => {
-        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'}];
+    it("habilita card de situação de capacitação se houver consenso aprovado", () => {
+        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'CONSENSO_APROVADO'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
