@@ -64,20 +64,19 @@
           >
             <BDropdownItemButton
                 :data-testid="`btn-manter-consenso-${item.servidorTitulo}`"
-                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
                 @click="navegarParaConsenso(item.servidorTitulo)"
             >
               {{ TEXTOS.diagnostico.BTN_MANTER_CONSENSO }}
             </BDropdownItemButton>
             <BDropdownItemButton
                 :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
-                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA'"
+                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA' || item.situacaoServidor === 'CONSENSO_APROVADO'"
                 @click="abrirModalImpossibilitar(item)"
             >
               {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
             </BDropdownItemButton>
             <BDropdownItemButton
-                :data-testid="`btn-permitir-avaliacao-${item.servidorTitulo}`"
+                :data-testid="`btn-desfazer-impossibilidade-${item.servidorTitulo}`"
                 :disabled="item.situacaoServidor !== 'AVALIACAO_IMPOSSIBILITADA'"
                 @click="abrirModalPermitirAvaliacao(item)"
             >
@@ -228,7 +227,7 @@
             @click="confirmarValidar"
         >
           <BSpinner v-if="validando" aria-hidden="true" class="me-1" small/>
-          Validar
+          Aceitar
         </BButton>
       </template>
     </BModal>

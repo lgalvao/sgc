@@ -70,11 +70,12 @@ public class DiagnosticoNotificacaoService {
         Unidade unidade = sp.getUnidade();
 
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidade);
-        String assunto = "SGC: Autoavaliação de %s submetida para análise".formatted(nomeServidor);
+        String assunto = "SGC: Autoavaliação concluída: %s".formatted(nomeServidor);
         String corpo = emailModelosService.criarEmailDiagnosticoAutoavaliacaoConcluida(
                 unidade.getSigla(),
                 nomeServidor,
-                sp.getProcesso().getDescricao()
+                sp.getProcesso().getDescricao(),
+                urlSistema()
         );
 
         enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA, assunto, corpo,
@@ -82,7 +83,7 @@ public class DiagnosticoNotificacaoService {
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
-                "Autoavaliação de %s submetida para análise".formatted(nomeServidor),
+                "Autoavaliação concluída: %s".formatted(nomeServidor),
                 unidade,
                 unidade
         );
@@ -126,7 +127,7 @@ public class DiagnosticoNotificacaoService {
         Unidade unidade = sp.getUnidade();
 
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidade);
-        String assunto = "SGC: Avaliação de consenso de %s aprovada".formatted(nomeServidor);
+        String assunto = "SGC: Avaliação de consenso aprovada: %s".formatted(nomeServidor);
         String corpo = emailModelosService.criarEmailDiagnosticoConsensoAprovado(
                 unidade.getSigla(),
                 nomeServidor,

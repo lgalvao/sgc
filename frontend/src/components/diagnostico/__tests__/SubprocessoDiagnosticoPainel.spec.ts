@@ -236,14 +236,14 @@ describe('SubprocessoDiagnosticoPainel', () => {
         });
 
         // Servidor 242427 está impossibilitado
-        expect(wrapper.get('[data-testid="btn-manter-consenso-242427"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.get('[data-testid="btn-manter-consenso-242427"]').attributes('disabled')).toBeUndefined();
         expect(wrapper.get('[data-testid="btn-impossibilitar-242427"]').attributes('disabled')).toBeDefined();
-        expect(wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]').attributes('disabled')).toBeUndefined();
+        expect(wrapper.get('[data-testid="btn-desfazer-impossibilidade-242427"]').attributes('disabled')).toBeUndefined();
 
         // Servidor 242426 não está impossibilitado
         expect(wrapper.get('[data-testid="btn-manter-consenso-242426"]').attributes('disabled')).toBeUndefined();
         expect(wrapper.get('[data-testid="btn-impossibilitar-242426"]').attributes('disabled')).toBeUndefined();
-        expect(wrapper.get('[data-testid="btn-permitir-avaliacao-242426"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.get('[data-testid="btn-desfazer-impossibilidade-242426"]').attributes('disabled')).toBeDefined();
     });
 
     it('valida justificativa obrigatória e registra impossibilidade com sucesso', async () => {
@@ -449,7 +449,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         permitirAvaliacaoMock.mockResolvedValue(undefined);
         const wrapper = montar();
 
-        const btnPermitir = wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]');
+        const btnPermitir = wrapper.get('[data-testid="btn-desfazer-impossibilidade-242427"]');
         await btnPermitir.trigger('click');
 
         const btnConfirmar = wrapper.get('[data-testid="btn-confirmar-permitir-avaliacao"]');
@@ -470,7 +470,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await nextTick();
 
         // 2. Modal Permitir Avaliacao (novo)
-        await wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]').trigger('click');
+        await wrapper.get('[data-testid="btn-desfazer-impossibilidade-242427"]').trigger('click');
         await nextTick();
         await (modals[1] as any).vm.$emit('update:modelValue', false);
         await nextTick();
@@ -563,7 +563,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
-        await wrapper.get('[data-testid="btn-permitir-avaliacao-242427"]').trigger('click');
+        await wrapper.get('[data-testid="btn-desfazer-impossibilidade-242427"]').trigger('click');
         await nextTick();
 
         // Ativa os estados de loading

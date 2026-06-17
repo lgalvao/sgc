@@ -172,7 +172,7 @@ const {servidores} = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
   : {servidores: computed(() => [])};
 
 const habilitarCardSituacaoCapacitacao = computed(() => {
-  return servidores.value.some((servidor) => servidor.situacaoServidor === 'CONSENSO_APROVADO');
+  return servidores.value.some((servidor) => servidor.situacaoServidor !== 'AUTOAVALIACAO_NAO_INICIADA');
 });
 
 function navegarPara(routeName: string) {

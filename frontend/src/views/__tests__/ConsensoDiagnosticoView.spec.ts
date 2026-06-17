@@ -375,8 +375,76 @@ describe('ConsensoDiagnosticoView', () => {
         });
 
         expect(wrapper.find('.alert-consenso').exists()).toBe(true);
-        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação de consenso deste servidor já foi aprovada');
+        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação já foi aprovada.');
         expect(wrapper.find('select').exists()).toBe(false);
+    });
+
+    it('mantém o botão de aprovar visível e desabilitado quando o consenso já foi aprovado pelo servidor', () => {
+        ehConsensoAprovadoVal.value = true;
+        situacaoServidorVal.value = 'CONSENSO_APROVADO';
+        podeCriarConsensoVal.value = false;
+
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
+    });
+
+    it('desabilita o campo de consenso enquanto servidor e chefia não estiverem preenchidos', () => {
+        podeCriarConsensoVal.value = true;
+        competenciasLocais.value = [
+            {
+                competenciaCodigo: 10,
+                competenciaDescricao: 'Competência A',
+                autoimportancia: 3,
+                autodominio: 4,
+                chefiaImportancia: null,
+                chefiaDominio: 4,
+                consensoImportancia: null,
+                consensoDominio: null,
+            },
+        ];
+
+        const wrapper = mount(ConsensoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+                servidorTitulo: '242426',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    BAlert: {template: '<div><slot /></div>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section v-bind="$attrs"><slot /></section>'},
+                    BFormSelect: {
+                        props: ['options', 'modelValue'],
+                        template: '<select v-bind="$attrs"></select>',
+                    },
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        expect(wrapper.get('[data-testid="consenso-final-importancia-10"]').attributes('disabled')).toBeDefined();
     });
 
     it('deve usar nome e título no subtítulo quando o servidor não for o usuário logado', () => {

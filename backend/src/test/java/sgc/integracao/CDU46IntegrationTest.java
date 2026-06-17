@@ -56,7 +56,7 @@ class CDU46IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         // Validar o enfileiramento e conteudo do e-mail de notificacao no banco de dados
         List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll();
         assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getAssunto()).contains("Avaliação de consenso de " + servidor.getNome() + " aprovada");
+            assertThat(notificacao.getAssunto()).contains("Avaliação de consenso aprovada: " + servidor.getNome());
             assertThat(notificacao.getDestinatario()).isEqualTo("chefe.teste@tre-pe.jus.br");
             assertThat(notificacao.getCorpoHtml()).contains("Prezado(a) responsável pela <strong>" + unidade.getSigla() + "</strong>");
             assertThat(notificacao.getCorpoHtml()).contains("O servidor <strong>" + servidor.getNome() + "</strong> aprovou a avaliação de consenso do processo");

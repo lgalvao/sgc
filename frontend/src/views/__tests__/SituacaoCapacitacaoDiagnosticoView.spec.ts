@@ -311,4 +311,44 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
         expect(emptyState.text()).toContain('A situação de capacitação só pode ser preenchida após o servidor aprovar a avaliação de consenso.');
         expect(wrapper.find('table').exists()).toBe(false);
     });
+
+    it('formata NA na grade de competências quando importância e domínio forem zero', async () => {
+        servidoresVal.value = [
+            {
+                servidorTitulo: '1',
+                servidorNome: 'Servidor A',
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [{competenciaCodigo: 10, importancia: 0, dominio: 0}],
+            },
+        ];
+        situacoesLocaisVal.value = [
+            {servidorTitulo: '1', servidorNome: 'Servidor A', competenciaCodigo: 10, situacaoCapacitacao: 'NA'},
+        ];
+
+        const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    EmptyState: {template: '<div />'},
+                    BBadge: {template: '<span><slot /></span>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section><slot /></section>'},
+                    BListGroup: {template: '<div><slot /></div>'},
+                    BListGroupItem: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    BFormSelect: {template: '<select v-bind="$attrs"></select>'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        await wrapper.find('[data-testid="btn-selecionar-servidor-situacao-capacitacao-1"]').trigger('click');
+
+        expect(wrapper.text()).toContain('NA');
+    });
 });

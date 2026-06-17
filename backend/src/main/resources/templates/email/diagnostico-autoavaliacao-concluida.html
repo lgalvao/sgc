@@ -10,7 +10,12 @@
 
         <p>
             O servidor <strong th:text="${nomeServidor}">SERVIDOR</strong> concluiu a autoavaliação no processo
-            <strong th:text="${nomeProcesso}">PROCESSO</strong> para análise.
+            <strong th:text="${nomeProcesso}">PROCESSO</strong>.
+        </p>
+
+        <p>
+            A análise já pode ser realizada no Sistema de Gestão de Competências (SGC):
+            <a th:href="${urlSistema}" th:text="${urlSistema}">URL</a>.
         </p>
     </th:block>
 </th:block>

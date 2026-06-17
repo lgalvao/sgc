@@ -39,7 +39,7 @@
           variant="success"
       >
         <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        A avaliação de consenso deste servidor já foi aprovada. Apenas visualização.
+        A avaliação já foi aprovada.
       </BAlert>
 
       <!-- Tabela de competências com consenso (CDU-44) -->
@@ -94,6 +94,7 @@
                 <BFormSelect
                     v-if="ehChefe && !ehConsensoAprovado"
                     :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
+                    :disabled="!campoConsensoHabilitado(item, 'importancia')"
                     :model-value="item.consensoImportancia"
                     :options="opcoesNota"
                     class="form-select-sm seletor-nota seletor-consenso"
@@ -119,6 +120,7 @@
                 <BFormSelect
                     v-if="ehChefe && !ehConsensoAprovado"
                     :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
+                    :disabled="!campoConsensoHabilitado(item, 'dominio')"
                     :model-value="item.consensoDominio"
                     :options="opcoesNota"
                     class="form-select-sm seletor-nota seletor-consenso"
@@ -133,9 +135,9 @@
       </BCard>
 
       <!-- Ação: Aprovar consenso (servidor logado, CDU-45) -->
-      <div v-if="!ehChefe && !ehConsensoAprovado" class="d-flex gap-2 flex-wrap">
+      <div v-if="!ehChefe && (situacaoServidor === 'CONSENSO_CRIADO' || ehConsensoAprovado)" class="d-flex gap-2 flex-wrap">
         <BButton
-            :disabled="aprovando"
+            :disabled="aprovando || ehConsensoAprovado"
             data-testid="btn-aprovar-consenso"
             variant="success"
             @click="confirmarAprovarConsenso"
@@ -168,6 +170,7 @@ import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import {usePerfilStore} from '@/stores/perfil';
 import {useToastStore} from '@/stores/toast';
+import type {ConsensoCompetenciaDetalhada} from '@/types/diagnostico-competencias';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -186,6 +189,7 @@ const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
 const {
   competenciasLocais,
+  situacaoServidor,
   ehConsensoAprovado,
   carregando,
   salvandoAutomaticamente,
@@ -261,6 +265,16 @@ function normalizarValorNota(valor: unknown): number | null {
   if (typeof valor === 'number') return Number.isNaN(valor) ? null : valor;
   const numero = Number(valor);
   return Number.isNaN(numero) ? null : numero;
+}
+
+function campoConsensoHabilitado(
+  item: ConsensoCompetenciaDetalhada,
+  campo: 'importancia' | 'dominio',
+): boolean {
+  if (campo === 'importancia') {
+    return item.autoimportancia !== null && item.chefiaImportancia !== null;
+  }
+  return item.autodominio !== null && item.chefiaDominio !== null;
 }
 
 </script>

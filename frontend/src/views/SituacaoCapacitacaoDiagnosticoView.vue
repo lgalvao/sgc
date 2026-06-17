@@ -60,7 +60,8 @@
                 class="mb-3 border-0 bg-body-tertiary"
                 data-testid="detalhes-servidor-situacao-capacitacao"
             >
-              <div class="fw-semibold text-primary">{{ servidorSelecionado.servidorNome }} ({{ servidorSelecionado.servidorTitulo }})</div>
+              <div class="fw-semibold text-primary">{{ servidorSelecionado.servidorNome }}</div>
+              <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
             </BCard>
 
             <div v-if="servidorSelecionado.situacaoServidor === 'CONSENSO_APROVADO'">
@@ -83,10 +84,10 @@
                       {{ linha.competenciaDescricao }}
                     </th>
                     <td class="text-center">
-                      <BBadge pill variant="light">{{ linha.importancia ?? '-' }}</BBadge>
+                      <BBadge pill variant="light">{{ formatarNota(linha.importancia) }}</BBadge>
                     </td>
                     <td class="text-center">
-                      <BBadge pill variant="light">{{ linha.dominio ?? '-' }}</BBadge>
+                      <BBadge pill variant="light">{{ formatarNota(linha.dominio) }}</BBadge>
                     </td>
                     <td class="coluna-capacitacao">
                       <BFormSelect
@@ -246,6 +247,16 @@ function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): 
     AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
   };
   return mapa[situacaoServidor] ?? situacaoServidor;
+}
+
+function formatarNota(valor: number | null): string {
+  if (valor === null) {
+    return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+  }
+  if (valor === 0) {
+    return TEXTOS.diagnostico.NOTA_NA;
+  }
+  return String(valor);
 }
 </script>
 
