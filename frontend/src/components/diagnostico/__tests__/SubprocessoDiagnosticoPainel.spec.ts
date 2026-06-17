@@ -445,6 +445,29 @@ describe('SubprocessoDiagnosticoPainel', () => {
         expect(wrapper.text()).toContain('Erro: justificativa precisa de mais caracteres');
     });
 
+    it('deve exercitar o fechamento do alerta de erro após falha ao reverter impossibilidade', async () => {
+        permitirAvaliacaoMock.mockRejectedValue(new Error('Erro ao permitir'));
+        const wrapper = montar();
+
+        // Abre modal
+        const btnPermitir = wrapper.get('[data-testid="btn-desfazer-impossibilidade-242427"]');
+        await btnPermitir.trigger('click');
+
+        // Confirma
+        const btnConfirmar = wrapper.get('[data-testid="btn-confirmar-permitir-avaliacao"]');
+        await btnConfirmar.trigger('click');
+
+        // Verifica que o alerta apareceu
+        expect(wrapper.text()).toContain('Não foi possível salvar.');
+
+        // Fecha alerta
+        await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
+        await nextTick();
+
+        // Verifica que o alerta sumiu
+        expect(wrapper.text()).not.toContain('Não foi possível salvar.');
+    });
+
     it('deve reverter a impossibilidade de avaliação com sucesso', async () => {
         permitirAvaliacaoMock.mockResolvedValue(undefined);
         const wrapper = montar();
@@ -461,24 +484,23 @@ describe('SubprocessoDiagnosticoPainel', () => {
 
     it('cobre o fechamento dos modais de fluxo pelo evento update:modelValue', async () => {
         const wrapper = montar();
-        const modals = wrapper.findAllComponents('.b-modal-stub');
 
         // 1. Modal Impossibilitar
         await wrapper.get('[data-testid="btn-impossibilitar-242426"]').trigger('click');
         await nextTick();
-        await (modals[0] as any).vm.$emit('update:modelValue', false);
+        await (wrapper.findComponent('[data-testid="modal-impossibilitar"]') as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 2. Modal Permitir Avaliacao (novo)
         await wrapper.get('[data-testid="btn-desfazer-impossibilidade-242427"]').trigger('click');
         await nextTick();
-        await (modals[1] as any).vm.$emit('update:modelValue', false);
+        await (wrapper.findComponent('[data-testid="modal-permitir"]') as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 3. Modal Concluir
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
         await nextTick();
-        await (modals[2] as any).vm.$emit('update:modelValue', false);
+        await (wrapper.findComponent('[data-testid="modal-concluir"]') as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 4. Modal Validar
@@ -486,7 +508,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-validar-diagnostico"]').trigger('click');
         await nextTick();
-        await (modals[3] as any).vm.$emit('update:modelValue', false);
+        await (wrapper.findComponent('[data-testid="modal-validar"]') as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 5. Modal Devolver
@@ -494,7 +516,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         await nextTick();
-        await (modals[4] as any).vm.$emit('update:modelValue', false);
+        await (wrapper.findComponent('[data-testid="modal-devolver"]') as any).vm.$emit('update:modelValue', false);
         await nextTick();
 
         // 6. Modal Homologar
@@ -502,7 +524,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await nextTick();
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         await nextTick();
-        await (modals[5] as any).vm.$emit('update:modelValue', false);
+        await (wrapper.findComponent('[data-testid="modal-homologar"]') as any).vm.$emit('update:modelValue', false);
         await nextTick();
     });
 
@@ -587,9 +609,8 @@ describe('SubprocessoDiagnosticoPainel', () => {
     it('exercita o retorno antecipado de confirmarImpossibilitar quando servidorSelecionado for null', async () => {
         const wrapper = montar();
 
-        // Encontra o stub do modal pelo class selector .b-modal-stub
-        const modals = wrapper.findAllComponents('.b-modal-stub');
-        const modalImpossibilitar = modals[0];
+        // Encontra o stub do modal pelo data-testid
+        const modalImpossibilitar = wrapper.findComponent('[data-testid="modal-impossibilitar"]');
         await (modalImpossibilitar as any).vm.$emit('update:modelValue', true);
         await nextTick();
 

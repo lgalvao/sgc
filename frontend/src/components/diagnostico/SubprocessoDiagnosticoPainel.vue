@@ -132,6 +132,7 @@
     </div>
 
     <BModal
+        data-testid="modal-impossibilitar"
         v-model="modalImpossibilitarAberto"
         :title="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_TITULO"
         centered
@@ -163,6 +164,7 @@
     </BModal>
 
     <BModal
+        data-testid="modal-permitir"
         v-model="modalPermitirAvaliacaoAberto"
         :title="TEXTOS.diagnostico.MODAL_PERMITIR_AVALIACAO_TITULO"
         centered
@@ -186,6 +188,7 @@
 
     <BModal
         v-if="modalConcluirAberto"
+        data-testid="modal-concluir"
         v-model="modalConcluirAberto"
         :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
         centered
@@ -211,6 +214,7 @@
     </BModal>
 
     <BModal
+        data-testid="modal-validar"
         v-model="modalValidarAberto"
         :title="TEXTOS.diagnostico.MODAL_VALIDAR_TITULO"
         centered
@@ -235,6 +239,7 @@
     </BModal>
 
     <BModal
+        data-testid="modal-devolver"
         v-model="modalDevolverAberto"
         :title="TEXTOS.diagnostico.MODAL_DEVOLVER_TITULO"
         centered
@@ -262,6 +267,7 @@
     </BModal>
 
     <BModal
+        data-testid="modal-homologar"
         v-model="modalHomologarAberto"
         :title="TEXTOS.diagnostico.MODAL_HOMOLOGAR_TITULO"
         centered
