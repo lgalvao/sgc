@@ -1,5 +1,6 @@
 <template>
     <BModal
+        v-if="mostrar"
         :fade="false"
         :model-value="mostrar"
         centered

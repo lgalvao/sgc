@@ -70,6 +70,7 @@ describe('useConsensoDiagnostico', () => {
         } as any);
         
         vi.mocked(useQueryCache).mockReturnValue({
+            getQueryData: vi.fn(),
             setQueryData: vi.fn(),
             invalidateQueries: invalidateQueriesMock,
         } as any);
