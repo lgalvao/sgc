@@ -5,7 +5,7 @@ Ator: SERVIDOR
 ## Pré-condições
 
 - Login realizado com perfil SERVIDOR
-- Processo de diagnóstico em andamento com participação da unidade do servidor
+- Processo de diagnóstico em andamento, com participação da unidade do servidor
 
 ## Fluxo principal
 
@@ -16,17 +16,15 @@ Ator: SERVIDOR
 3. O usuário aciona o card `Autoavaliação`.
 
 4. O sistema mostra a tela `Autoavaliação de diagnóstico`, contendo:
-   4.1. Na barra de botões do cabeçalho, o botão `Concluir autoavaliação`, sempre habilitado;
-
-4.2. Uma tabela com as competências vigentes da unidade e para cada competência:
-
-- descrição da competência; - controle de *toggle* `Atividade e conhecimentos`, que permite expandir/recolher uma região
-  com as atividades e conhecimentos associados àquela competência; a região deve iniciar recolhida; - campo
-  `Importância`, com opções `NA` e os números de `1` a `6`; - campo `Domínio`, com opções `NA` e os números de `1` a
-  `6`;
-
-**IMPORTANTE**: Se o servidor já tiver concluído a autoavaliação, o sistema mostra os elementos acima apenas em modo
-somente-leitura e desabilita o botão `Concluir autoavaliação` e o **caso de uso termina**.
+    - Na barra de botões do cabeçalho, o botão `Concluir autoavaliação`;
+    - Uma tabela com as competências vigentes da unidade; para cada competência:
+        - descrição da competência;
+        - controle `Atividade e conhecimentos` para expandir/recolher uma região com as atividades e conhecimentos
+          associados à competência; a região deve iniciar recolhida;
+        - campo `Importância`, com opções `NA` e números de `1` a `6`;
+        - campo `Domínio`, com opções `NA` e os números de `1` a `6`;
+    - **IMPORTANTE**: Se o servidor já tiver concluído a autoavaliação, o sistema mostra os elementos acima apenas em
+      modo somente-leitura e desabilita o botão `Concluir autoavaliação`, e o **caso de uso termina**.
 
 5. O usuário atribui valores de domínio e de importância para todas as competências.
 
@@ -41,8 +39,9 @@ somente-leitura e desabilita o botão `Concluir autoavaliação` e o **caso de u
    "Preencha importância e domínio para todas as competências." e interrompe a conclusão.
 
    7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?",
-   com botões `Cancelar` e `Concluir`; feita a confirmação, o sistema altera a situação da avaliação do servidor para
-   `Autoavaliação concluída`.
+   com botões `Cancelar` e `Concluir`
+
+   7.3. feita a confirmação, o sistema altera a situação do servidor para 'Autoavaliação concluída'.
 
 8. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
 
@@ -56,8 +55,8 @@ somente-leitura e desabilita o botão `Concluir autoavaliação` e o **caso de u
    A análise já pode ser realizada no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
    ```
 
-9. O sistema cria internamente um alerta com os campos/valores:
-    - `Descrição`: "Autoavaliação de [NOME_SERVIDOR] concluída"
+9. O sistema cria internamente um alerta com estes campos/valores:
+    - `Descrição`: "Autoavaliação concluída: [NOME_SERVIDOR]"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]

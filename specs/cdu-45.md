@@ -19,9 +19,10 @@ Ator: CHEFE
 
 3. Na grade de servidores da unidade, o usuário escolhe a ação `Manter avaliação de consenso` para um servidor.
 
-3. O sistema mostra a tela `Avaliação de consenso` para o servidor selecionado, com:
+3. O sistema mostra a tela `Avaliação de consenso` para o servidor escolhido, com:
     - título: "Avaliação de consenso";
     - subtítulo: [nome e título do servidor];
+    - na barra de botões do cabeçalho, o botão `Concluir avaliação`;
     - grade de competências da unidade, com estrutura como no exemplo abaixo:
 
 |                     | Importância |       |          | Domínio  |       |          |
@@ -36,18 +37,27 @@ Regras de apresentação, para cada competência:
 - os campos `Importância` e `Domínio` do servidor devem ser **não editáveis**, sendo preenchidos com os valores
   fornecidos na autoavaliação correspondente;
 - os campos `Importância` e `Domínio` do chefe devem ser **editáveis** (via seleção de lista fechada de opções);
-- os dois campos de `Consenso` devem ser **editáveis** (via seleção de lista fechada de opções);
+- os dois campos de `Consenso` devem ser **editáveis** (via seleção de lista fechada de opções) apenas quando os campos
+  correspondentes do servidor e do chefe estiverem preenchidos;
 - se os valores `Importância` e `Domínio` forem iguais, o sistema deve preencher automaticamente `Consenso`
   com o valor repetido.
 
 **IMPORTANTE**: Se a situação do servidor for 'Avaliação de consenso aprovada', ou o subprocesso não estiver localizado
-na unidade do usuário, o sistema permitirá apenas **visualização** de todos os itens acima e **o caso de uso é
-terminado**.
+na unidade do usuário, o sistema mostra os elementos acima apenas em modo somente-leitura, desabilita o botão
+`Concluir avaliação` -- e o **caso de uso termina**.
 
-4. O usuário preenche (com a presença física do servidor) o valor de consenso para cada competência.
+4. O usuário atribui (com a presença física do servidor) o valor de consenso para cada competência.
 
 5. O sistema salva automaticamente cada alteração realizada. Não é necessária nenhuma ação para concluir a operação (a
    validação dos dados será feita na conclusão do diagnóstico, como um todo).
 
-6. O usuário continua o trabalho de avaliação de consenso para outros servidores; para isso, aciona o botão `Voltar`
-   para ver a lista de servidores e realiza as ações desejadas para cada um dos demais.
+6. Se o usuário acionar o botão `Voltar`, o sistema não valida o preenchimento dos dados, mantendo os dados salvos e o
+   **caso de uso termina**
+
+7. Se usuário acionar o botão `Concluir avaliação`, o sistema **valida** o preenchimento dos campos `Importância` e
+   `Domínio` do chefe e de consenso.
+
+   7.1. Se houver campos não preenchidos o sistema mostra a mensagem "Preencha todos os campos" e interrompe a operação.
+
+   7.2. Se preenchidos, o sistema muda a situação do servidor para 'Avaliação de consenso criada', redireciona para a
+   tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de consenso criada".
