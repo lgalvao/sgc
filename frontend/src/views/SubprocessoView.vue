@@ -41,7 +41,7 @@
           <BButton
               v-if="mostrarConcluirDiagnosticoCabecalho"
               :disabled="concluindoDiagnostico || !habilitarConcluirDiagnosticoCabecalho"
-              data-testid="btn-concluir-diagnostico-cabecalho"
+              data-testid="btn-concluir-diagnostico"
               size="sm"
               variant="success"
               @click="abrirModalConcluirDiagnostico"
@@ -121,6 +121,7 @@
   />
 
   <BModal
+      v-if="modalConcluirDiagnosticoAberto"
       v-model="modalConcluirDiagnosticoAberto"
       :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
       centered
@@ -136,7 +137,7 @@
       <BButton class="text-secondary" variant="link" @click="modalConcluirDiagnosticoAberto = false">Cancelar</BButton>
       <BButton
           :disabled="concluindoDiagnostico"
-          data-testid="btn-confirmar-concluir-diagnostico-cabecalho"
+          data-testid="btn-confirmar-concluir-diagnostico"
           variant="success"
           @click="confirmarConcluirDiagnostico"
       >

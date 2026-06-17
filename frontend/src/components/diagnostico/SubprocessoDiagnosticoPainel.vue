@@ -185,6 +185,7 @@
     </BModal>
 
     <BModal
+        v-if="modalConcluirAberto"
         v-model="modalConcluirAberto"
         :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
         centered
