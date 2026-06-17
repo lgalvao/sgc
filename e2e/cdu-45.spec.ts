@@ -31,12 +31,26 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
 
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
         await expect(page.getByText(`João Guilherme de Albuquerque Maranhão - ${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeVisible();
-        await expect(page.locator('[data-testid^="consenso-chefia-importancia-"]').first()).toBeVisible();
+        const seletorChefiaImportancia = page.locator('[data-testid^="consenso-chefia-importancia-"]').first();
+        await expect(seletorChefiaImportancia).toBeVisible();
         await expect(page.locator('[data-testid^="consenso-chefia-dominio-"]').first()).toBeVisible();
         const seletorConsensoImportancia = page.locator('[data-testid^="consenso-final-importancia-"]').first();
         await expect(seletorConsensoImportancia).toBeVisible();
         await expect(page.locator('[data-testid^="consenso-final-dominio-"]').first()).toBeVisible();
         await expect(page.getByTestId('btn-aprovar-consenso')).toHaveCount(0);
+        const testIdConsensoImportancia = await seletorConsensoImportancia.getAttribute('data-testid');
+        const competenciaCodigo = Number(testIdConsensoImportancia?.split('consenso-final-importancia-')[1]);
+
+        await Promise.all([
+            page.waitForResponse(res =>
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
+                && res.request().method() === 'POST'
+                && res.ok()
+            ),
+            seletorChefiaImportancia.selectOption(VALOR_CONSENSO_IMPORTANCIA)
+        ]);
+
+        await expect(seletorConsensoImportancia).toBeEnabled();
 
         await Promise.all([
             page.waitForResponse(res =>
@@ -47,14 +61,19 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
             seletorConsensoImportancia.selectOption(VALOR_CONSENSO_IMPORTANCIA)
         ]);
 
-        await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
+        await expect.poll(async () => await page.evaluate(async ({codigo, titulo, codigoCompetencia}) => {
             const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/consenso/${titulo}`, {credentials: 'include'});
             if (!resposta.ok) return null;
             const dados = await resposta.json();
-            return String(dados.competencias[0]?.consensoImportancia ?? '');
+            return String(
+                dados.competencias.find((item: {competenciaCodigo: number; consensoImportancia: number | null}) =>
+                    item.competenciaCodigo === codigoCompetencia
+                )?.consensoImportancia ?? ''
+            );
         }, {
             codigo: codSubprocesso,
-            titulo: TITULO_SERVIDOR_ASSESSORIA_12
+            titulo: TITULO_SERVIDOR_ASSESSORIA_12,
+            codigoCompetencia: competenciaCodigo,
         })).toBe(VALOR_CONSENSO_IMPORTANCIA);
 
         await page.goBack();

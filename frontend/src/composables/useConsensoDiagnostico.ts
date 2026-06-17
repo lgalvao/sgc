@@ -50,6 +50,9 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         () => query.data.value,
         (novoConsenso) => {
             if (novoConsenso) {
+                if (salvandoAutomaticamente.value) {
+                    return;
+                }
                 competenciasLocais.value = novoConsenso.competencias.map((c) => ({...c}));
             }
         },

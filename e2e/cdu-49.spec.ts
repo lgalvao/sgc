@@ -89,8 +89,21 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
         const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
 
         await abrirAcaoConsensoDiagnostico(page, TITULO_SERVIDOR_ASSESSORIA_12);
+        const seletorChefiaImportancia = page.locator('[data-testid^="consenso-chefia-importancia-"]').first();
         const seletorConsensoImportancia = page.locator('[data-testid^="consenso-final-importancia-"]').first();
+        await expect(seletorChefiaImportancia).toBeVisible();
         await expect(seletorConsensoImportancia).toBeVisible();
+        await Promise.all([
+            page.waitForResponse(res =>
+                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
+                && res.request().method() === 'POST'
+                && res.ok()
+            ),
+            seletorChefiaImportancia.selectOption('4')
+        ]);
+
+        await expect(seletorConsensoImportancia).toBeEnabled();
+
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
