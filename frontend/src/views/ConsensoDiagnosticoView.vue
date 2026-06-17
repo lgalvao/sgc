@@ -8,6 +8,28 @@
           :title="TEXTOS.diagnostico.TITULO_CONSENSO"
       >
         <template #actions>
+          <BButton
+              v-if="podeConcluirAvaliacao"
+              :disabled="concluindoAvaliacao || !habilitarConcluirAvaliacao"
+              data-testid="btn-concluir-avaliacao"
+              size="sm"
+              variant="success"
+              @click="confirmarConcluirAvaliacao"
+          >
+            <BSpinner v-if="concluindoAvaliacao" aria-hidden="true" class="me-1" small/>
+            {{ TEXTOS.diagnostico.BTN_CONCLUIR_AVALIACAO }}
+          </BButton>
+          <BButton
+              v-if="podeAprovarConsenso"
+              :disabled="aprovando || !habilitarAprovarConsenso"
+              data-testid="btn-aprovar-consenso"
+              size="sm"
+              variant="success"
+              @click="confirmarAprovarConsenso"
+          >
+            <BSpinner v-if="aprovando" aria-hidden="true" class="me-1" small/>
+            {{ TEXTOS.diagnostico.BTN_APROVAR_CONSENSO }}
+          </BButton>
           <BButton size="sm" variant="outline-secondary" @click="void router.back()">
             <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
             {{ TEXTOS.diagnostico.BTN_VOLTAR }}
@@ -24,7 +46,7 @@
       />
 
       <!-- Badge de autosave -->
-      <div v-if="ehChefe" class="mb-3 text-muted small d-flex align-items-center gap-2">
+      <div v-if="podeEditar" class="mb-3 text-muted small d-flex align-items-center gap-2">
         <template v-if="salvandoAutomaticamente">
           <BSpinner small variant="secondary"/>
           {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
@@ -81,7 +103,7 @@
               </td>
               <td class="text-center grupo-servidor coluna-nota">
                 <BFormSelect
-                    v-if="ehChefe && !ehConsensoAprovado"
+                    v-if="podeEditar"
                     :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
                     :model-value="item.chefiaImportancia"
                     :options="opcoesNota"
@@ -92,7 +114,7 @@
               </td>
               <td class="text-center grupo-consenso celula-consenso coluna-nota">
                 <BFormSelect
-                    v-if="ehChefe && !ehConsensoAprovado"
+                    v-if="podeEditar"
                     :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
                     :disabled="!campoConsensoHabilitado(item, 'importancia')"
                     :model-value="item.consensoImportancia"
@@ -107,7 +129,7 @@
               </td>
               <td class="text-center grupo-chefia coluna-nota">
                 <BFormSelect
-                    v-if="ehChefe && !ehConsensoAprovado"
+                    v-if="podeEditar"
                     :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
                     :model-value="item.chefiaDominio"
                     :options="opcoesNota"
@@ -118,7 +140,7 @@
               </td>
               <td class="text-center grupo-consenso celula-consenso coluna-nota">
                 <BFormSelect
-                    v-if="ehChefe && !ehConsensoAprovado"
+                    v-if="podeEditar"
                     :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
                     :disabled="!campoConsensoHabilitado(item, 'dominio')"
                     :model-value="item.consensoDominio"
@@ -134,18 +156,6 @@
         </div>
       </BCard>
 
-      <!-- Ação: Aprovar consenso (servidor logado, CDU-45) -->
-      <div v-if="!ehChefe && (situacaoServidor === 'CONSENSO_CRIADO' || ehConsensoAprovado)" class="d-flex gap-2 flex-wrap">
-        <BButton
-            :disabled="aprovando || ehConsensoAprovado"
-            data-testid="btn-aprovar-consenso"
-            variant="success"
-            @click="confirmarAprovarConsenso"
-        >
-          <BSpinner v-if="aprovando" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_APROVAR_CONSENSO }}
-        </BButton>
-      </div>
     </template>
   </LayoutPadrao>
 </template>
@@ -165,7 +175,6 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
-import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import {usePerfilStore} from '@/stores/perfil';
@@ -186,21 +195,22 @@ const servidorEhUsuarioLogado = computed(() =>
 );
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
-const {podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
 const {
   competenciasLocais,
-  situacaoServidor,
+  podeEditar,
+  podeConcluirAvaliacao,
+  habilitarConcluirAvaliacao,
+  podeAprovarConsenso,
+  habilitarAprovarConsenso,
   ehConsensoAprovado,
   carregando,
   salvandoAutomaticamente,
   aprovando,
   erroAprovar,
   atualizarNotaDetalhada,
+  salvarConsensoAgora,
   aprovarConsenso,
 } = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
-
-// « Perfil »
-const ehChefe = computed(() => podeCriarConsenso.value);
 const nomeServidorSubtitulo = computed(() =>
   servidorEhUsuarioLogado.value
     ? (perfilStore.usuarioNome ?? props.servidorNome ?? props.servidorTitulo)
@@ -210,6 +220,7 @@ const subtituloServidor = computed(() => `${nomeServidorSubtitulo.value} - ${pro
 
 // « Alertas »
 const erroMensagem = ref('');
+const concluindoAvaliacao = ref(false);
 
 async function confirmarAprovarConsenso() {
   try {
@@ -232,6 +243,45 @@ async function confirmarAprovarConsenso() {
     void router.back();
   } catch {
     erroMensagem.value = erroAprovar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
+}
+
+function consensoCompleto(item: ConsensoCompetenciaDetalhada): boolean {
+  return item.chefiaImportancia !== null
+    && item.chefiaDominio !== null
+    && item.consensoImportancia !== null
+    && item.consensoDominio !== null;
+}
+
+async function confirmarConcluirAvaliacao() {
+  if (competenciasLocais.value.some((item) => !consensoCompleto(item))) {
+    erroMensagem.value = TEXTOS.diagnostico.ERRO_PREENCHIMENTO_CONSENSO_INCOMPLETO;
+    return;
+  }
+
+  try {
+    concluindoAvaliacao.value = true;
+    await salvarConsensoAgora();
+    const toastStore = useToastStore();
+    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
+    if (contexto.value?.processoCodigo) {
+      await router.push({
+        name: 'Subprocesso',
+        params: {
+          codProcesso: String(contexto.value.processoCodigo),
+          siglaUnidade: props.siglaUnidade,
+        },
+        query: {
+          codSubprocesso: String(props.codSubprocesso),
+        },
+      });
+      return;
+    }
+    void router.back();
+  } catch {
+    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+  } finally {
+    concluindoAvaliacao.value = false;
   }
 }
 

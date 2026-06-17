@@ -60,6 +60,11 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     );
 
     const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_INICIADA');
+    const podeEditar = computed(() => query.data.value?.podeEditar ?? false);
+    const podeConcluirAvaliacao = computed(() => query.data.value?.podeConcluirAvaliacao ?? false);
+    const habilitarConcluirAvaliacao = computed(() => query.data.value?.habilitarConcluirAvaliacao ?? false);
+    const podeAprovarConsenso = computed(() => query.data.value?.podeAprovarConsenso ?? false);
+    const habilitarAprovarConsenso = computed(() => query.data.value?.habilitarAprovarConsenso ?? false);
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
 
     const mutacaoSalvar = useMutation({
@@ -71,11 +76,17 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             salvandoAutomaticamente.value = false;
         },
         onSuccess: () => {
+            const anterior = cache.getQueryData<Consenso>(chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo));
             cache.setQueryData(
                 chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
                 {
                     competencias: competenciasLocais.value.map((c) => ({...c})),
                     situacaoServidor: 'CONSENSO_CRIADO',
+                    podeEditar: anterior?.podeEditar ?? false,
+                    podeConcluirAvaliacao: anterior?.podeConcluirAvaliacao ?? false,
+                    habilitarConcluirAvaliacao: anterior?.habilitarConcluirAvaliacao ?? false,
+                    podeAprovarConsenso: anterior?.podeAprovarConsenso ?? false,
+                    habilitarAprovarConsenso: anterior?.habilitarAprovarConsenso ?? false,
                 } satisfies Consenso,
             );
             invalidarQueriesConsenso({cache, codSubprocesso, contextoSessao, servidorTitulo});
@@ -95,10 +106,18 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         salvandoAutomaticamente.value = true;
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
-            if (servidorTitulo) {
-                mutacaoSalvar.mutate(servidorTitulo);
-            }
+            void salvarConsensoAgora();
         }, 800);
+    }
+
+    async function salvarConsensoAgora() {
+        if (ehConsensoAprovado.value || !servidorTitulo) return;
+        if (timer) {
+            clearTimeout(timer);
+            timer = null;
+        }
+        salvandoAutomaticamente.value = true;
+        await mutacaoSalvar.mutateAsync(servidorTitulo);
     }
 
     function atualizarNotaDetalhada(
@@ -138,12 +157,18 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         query,
         competenciasLocais,
         situacaoServidor,
+        podeEditar,
+        podeConcluirAvaliacao,
+        habilitarConcluirAvaliacao,
+        podeAprovarConsenso,
+        habilitarAprovarConsenso,
         ehConsensoAprovado,
         carregando,
         salvandoAutomaticamente,
         aprovando,
         erroAprovar: computed(() => mutacaoAprovar.error.value),
         atualizarNotaDetalhada,
+        salvarConsensoAgora,
         aprovarConsenso: () => mutacaoAprovar.mutateAsync(),
     };
 }

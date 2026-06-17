@@ -6,6 +6,9 @@ import java.util.List;
 @Builder
 public record AutoavaliacaoDto(
         List<AvaliacaoCompetenciaDto> competencias,
-        String situacaoServidor
+        String situacaoServidor,
+        boolean podeEditar,
+        boolean podeConcluirAutoavaliacao,
+        boolean habilitarConcluirAutoavaliacao
 ) {
 }

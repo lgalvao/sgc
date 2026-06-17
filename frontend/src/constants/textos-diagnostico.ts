@@ -39,6 +39,7 @@ export const TEXTOS_DIAGNOSTICO = {
     // « Botões de ação »
     BTN_SALVAR: 'Salvar',
     BTN_CONCLUIR_AUTOAVALIACAO: 'Concluir autoavaliação',
+    BTN_CONCLUIR_AVALIACAO: 'Concluir avaliação',
     BTN_APROVAR_CONSENSO: 'Aprovar consenso',
     BTN_MANTER_CONSENSO: 'Manter avaliação de consenso',
     BTN_MANTER_CAPACITACAO: 'Situação de capacitação',
@@ -56,6 +57,7 @@ export const TEXTOS_DIAGNOSTICO = {
     SUCESSO_AUTOAVALIACAO_SALVA: 'Autoavaliação salva',
     SUCESSO_AUTOAVALIACAO_CONCLUIDA: 'Autoavaliação concluída',
     SUCESSO_CONSENSO_SALVO: 'Avaliação de consenso salva automaticamente',
+    SUCESSO_CONSENSO_CRIADO: 'Avaliação de consenso criada',
     SUCESSO_CONSENSO_APROVADO: 'Avaliação de consenso aprovada',
     SUCESSO_CAPACITACAO_SALVA: 'Situação de capacitação salva',
     SUCESSO_DIAGNOSTICO_CONCLUIDO: 'Diagnóstico concluído',
@@ -115,5 +117,6 @@ export const TEXTOS_DIAGNOSTICO = {
     ERRO_SALVAR: 'Não foi possível salvar. Tente novamente.',
     ERRO_JUSTIFICATIVA_OBRIGATORIA: 'A justificativa é obrigatória.',
     ERRO_PREENCHIMENTO_INCOMPLETO: 'Preencha importância e domínio para todas as competências.',
+    ERRO_PREENCHIMENTO_CONSENSO_INCOMPLETO: 'Preencha todos os campos',
     ERRO_PENDENCIAS_CONCLUSAO: 'Ainda existem avaliações e situações de capacitações não preenchidas.',
 } as const;

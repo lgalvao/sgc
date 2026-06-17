@@ -1,5 +1,6 @@
 import {useMutation} from '@pinia/colada';
-import {computed} from 'vue';
+import {computed, toValue} from 'vue';
+import type {MaybeRefOrGetter} from 'vue';
 import {useRouter} from 'vue-router';
 import {
     concluirDiagnostico,
@@ -20,76 +21,77 @@ import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
  * Concentra as mutations de concluir, validar, devolver e homologar.
  * Após cada ação bem-sucedida, invalida o contexto e opcionalmente redireciona.
  */
-export function useFluxoDiagnostico(codSubprocesso: number) {
+export function useFluxoDiagnostico(codSubprocesso: MaybeRefOrGetter<number>) {
     const router = useRouter();
     const cacheDiagnostico = useCacheDiagnostico();
+    const obterCodSubprocesso = () => toValue(codSubprocesso);
 
     function invalidarTudo() {
-        cacheDiagnostico.invalidarFluxoCompleto(codSubprocesso);
+        cacheDiagnostico.invalidarFluxoCompleto(obterCodSubprocesso());
     }
 
     const mutacaoConcluir = useMutation({
-        mutation: () => concluirDiagnostico(codSubprocesso),
+        mutation: () => concluirDiagnostico(obterCodSubprocesso()),
         onSuccess: () => {
             invalidarTudo();
         },
     });
 
     const mutacaoValidacaoConcluir = useMutation({
-        mutation: () => validarConclusaoDiagnostico(codSubprocesso),
+        mutation: () => validarConclusaoDiagnostico(obterCodSubprocesso()),
     });
 
     const mutacaoValidar = useMutation({
         mutation: (observacoes?: string) =>
-            validarDiagnostico(codSubprocesso, observacoes ? {texto: observacoes} : undefined),
+            validarDiagnostico(obterCodSubprocesso(), observacoes ? {texto: observacoes} : undefined),
         onSuccess: () => {
             invalidarTudo();
         },
     });
 
     const mutacaoValidacaoValidar = useMutation({
-        mutation: () => validarAcaoValidarDiagnostico(codSubprocesso),
+        mutation: () => validarAcaoValidarDiagnostico(obterCodSubprocesso()),
     });
 
     const mutacaoDevolver = useMutation({
         mutation: (justificativa: string) =>
-            devolverDiagnostico(codSubprocesso, {justificativa}),
+            devolverDiagnostico(obterCodSubprocesso(), {justificativa}),
         onSuccess: () => {
             invalidarTudo();
         },
     });
 
     const mutacaoValidacaoDevolver = useMutation({
-        mutation: () => validarAcaoDevolverDiagnostico(codSubprocesso),
+        mutation: () => validarAcaoDevolverDiagnostico(obterCodSubprocesso()),
     });
 
     const mutacaoHomologar = useMutation({
         mutation: (observacoes?: string) =>
-            homologarDiagnostico(codSubprocesso, observacoes ? {texto: observacoes} : undefined),
+            homologarDiagnostico(obterCodSubprocesso(), observacoes ? {texto: observacoes} : undefined),
         onSuccess: () => {
             invalidarTudo();
         },
     });
 
     const mutacaoValidacaoHomologar = useMutation({
-        mutation: () => validarAcaoHomologarDiagnostico(codSubprocesso),
+        mutation: () => validarAcaoHomologarDiagnostico(obterCodSubprocesso()),
     });
 
     const mutacaoImpossibilitar = useMutation({
         mutation: ({servidorTitulo, justificativa}: { servidorTitulo: string; justificativa: string }) =>
-            impossibilitarAvaliacao(codSubprocesso, servidorTitulo, {justificativa}),
+            impossibilitarAvaliacao(obterCodSubprocesso(), servidorTitulo, {justificativa}),
         onSuccess: () => {
-            cacheDiagnostico.invalidarEquipe(codSubprocesso);
-            cacheDiagnostico.invalidarUnidade(codSubprocesso);
+            cacheDiagnostico.invalidarEquipe(obterCodSubprocesso());
+            cacheDiagnostico.invalidarUnidade(obterCodSubprocesso());
         },
     });
 
     const mutacaoPermitirAvaliacao = useMutation({
         mutation: (servidorTitulo: string) =>
-            permitirAvaliacao(codSubprocesso, servidorTitulo),
+            permitirAvaliacao(obterCodSubprocesso(), servidorTitulo),
         onSuccess: () => {
-            cacheDiagnostico.invalidarEquipe(codSubprocesso);
-            cacheDiagnostico.invalidarUnidade(codSubprocesso);
+            cacheDiagnostico.invalidarEquipe(obterCodSubprocesso());
+            cacheDiagnostico.invalidarUnidade(obterCodSubprocesso());
         },
     });
 

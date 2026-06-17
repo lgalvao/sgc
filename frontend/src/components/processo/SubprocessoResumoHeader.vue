@@ -56,6 +56,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
         title-test-id="subprocesso-header__txt-header-unidade"
     >
       <template #actions>
+        <slot name="acoes-extras"/>
         <BDropdown
             v-if="mostrarAcoesCabecalhoNormalizado"
             :text="TEXTOS.mapa.BOTAO_ACOES"

@@ -10,6 +10,7 @@ import {TEXTOS} from "@/constants/textos";
 
 vi.mock('vue-router', () => ({
     useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),
+    useRouter: () => ({push: vi.fn(), back: vi.fn()}),
 }));
 
 type SubprocessoViewVm = {
@@ -61,7 +62,7 @@ const SubprocessoCardsStub = {
 };
 const SubprocessoDiagnosticoPainelStub = {
     template: '<div data-testid="diagnostico-equipe-painel"></div>',
-    props: ['codSubprocesso', 'siglaUnidade', 'exibirCabecalho', 'exibirBotaoVoltar']
+    props: ['codSubprocesso', 'siglaUnidade', 'exibirCabecalho', 'exibirBotaoVoltar', 'exibirBotaoConcluirDiagnostico']
 };
 const SubprocessoModalStub = {
     template: '<div data-testid="subprocesso-modal"></div>',

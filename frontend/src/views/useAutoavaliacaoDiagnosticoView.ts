@@ -3,7 +3,6 @@ import {useRouter} from 'vue-router';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
-import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {useEquipeDiagnostico} from '@/composables/useEquipeDiagnostico';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
@@ -31,13 +30,12 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         carregando,
         salvandoAutomaticamente,
         concluindo,
+        podeEditar,
+        podeConcluirAutoavaliacao,
+        habilitarConcluirAutoavaliacao,
         atualizarNota,
         concluirAutoavaliacao,
     } = useAutoavaliacaoDiagnostico(props.codSubprocesso);
-    const {
-        aprovando,
-        aprovarConsenso,
-    } = useConsensoDiagnostico(props.codSubprocesso);
     const {
         impossibilitando,
         impossibilitarAvaliacao,
@@ -46,15 +44,9 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
 
     const ehChefe = computed(() => podeCriarConsenso.value);
     const ehAutoavaliacaoConcluida = computed(() => situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA');
-    const ehConsensoCriado = computed(() => situacaoServidor.value === 'CONSENSO_CRIADO');
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
-    const podeEditar = computed(
-        () => situacaoServidor.value === 'AUTOAVALIACAO_NAO_INICIADA',
-    );
-
     const retornoFluxo = ref<RetornoFluxo | null>(null);
     const modalConcluirAberto = ref(false);
-    const modalAprovarAberto = ref(false);
     const modalImpossibilitarAberto = ref(false);
     const detalhesCompetenciaAbertos = ref<Record<number, boolean>>({});
     const servidorParaImpossibilitar = ref<ItemEquipeDiagnostico | null>(null);
@@ -64,10 +56,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     function abrirModalConcluir() {
         limparRetornoFluxo();
         modalConcluirAberto.value = true;
-    }
-
-    function abrirModalAprovar() {
-        modalAprovarAberto.value = true;
     }
 
     function abrirModalImpossibilitar(servidor: ItemEquipeDiagnostico) {
@@ -148,13 +136,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         }
     }
 
-    async function confirmarAprovar() {
-        await executarAcaoFluxo(
-            () => aprovarConsenso(),
-            TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO,
-        );
-    }
-
     async function confirmarImpossibilitar() {
         const justificativa = normalizarTextoOpcional(justificativaImpossibilidade.value);
         if (!justificativa) {
@@ -192,16 +173,6 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     function alternarDetalhesCompetencia(competenciaCodigo: number) {
         detalhesCompetenciaAbertos.value[competenciaCodigo] = !detalhesCompetenciaAbertos.value[competenciaCodigo];
     }
-
-    function podeImpossibilitar(situacao: SituacaoAvaliacaoServidor) {
-        return (
-            situacao === 'AUTOAVALIACAO_NAO_INICIADA' ||
-            situacao === 'AUTOAVALIACAO_CONCLUIDA' ||
-            situacao === 'CONSENSO_CRIADO'
-        );
-    }
-
-
 
     function varianteSituacaoServidor(situacao: SituacaoAvaliacaoServidor) {
         switch (situacao) {
@@ -290,9 +261,10 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         limparRetornoFluxo,
         salvandoAutomaticamente,
         ehAutoavaliacaoConcluida,
-        ehConsensoCriado,
         ehConsensoAprovado,
         ehChefe,
+        podeConcluirAutoavaliacao,
+        habilitarConcluirAutoavaliacao,
         podeEditar,
         colunas,
         competenciasComDescricao,
@@ -307,17 +279,11 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         modalConcluirAberto,
         abrirModalConcluir,
         concluindo,
-        confirmarAprovar,
-        modalAprovarAberto,
-        abrirModalAprovar,
-        aprovarConsenso: confirmarAprovar,
-        aprovando,
         itensEquipe,
         pendentes,
         varianteSituacaoServidor,
         formatarSituacaoServidor,
         navegarParaConsenso,
-        podeImpossibilitar,
         abrirModalImpossibilitar,
         modalImpossibilitarAberto,
         fecharModalImpossibilitar,

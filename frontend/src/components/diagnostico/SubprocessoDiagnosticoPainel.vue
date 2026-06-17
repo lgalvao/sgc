@@ -64,20 +64,21 @@
           >
             <BDropdownItemButton
                 :data-testid="`btn-manter-consenso-${item.servidorTitulo}`"
+                :disabled="!item.podeManterConsenso"
                 @click="navegarParaConsenso(item.servidorTitulo)"
             >
               {{ TEXTOS.diagnostico.BTN_MANTER_CONSENSO }}
             </BDropdownItemButton>
             <BDropdownItemButton
                 :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
-                :disabled="item.situacaoServidor === 'AVALIACAO_IMPOSSIBILITADA' || item.situacaoServidor === 'CONSENSO_APROVADO'"
+                :disabled="!item.podeImpossibilitar"
                 @click="abrirModalImpossibilitar(item)"
             >
               {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
             </BDropdownItemButton>
             <BDropdownItemButton
                 :data-testid="`btn-desfazer-impossibilidade-${item.servidorTitulo}`"
-                :disabled="item.situacaoServidor !== 'AVALIACAO_IMPOSSIBILITADA'"
+                :disabled="!item.podePermitirAvaliacao"
                 @click="abrirModalPermitirAvaliacao(item)"
             >
               {{ TEXTOS.diagnostico.BTN_PERMITIR_AVALIACAO }}
@@ -89,7 +90,7 @@
 
     <div class="d-flex gap-2 flex-wrap mb-4">
       <BButton
-          v-if="podeConcluir"
+          v-if="podeConcluir && exibirBotaoConcluirDiagnostico"
           :disabled="concluindo"
           data-testid="btn-concluir-diagnostico"
           variant="success"
@@ -317,9 +318,11 @@ const props = withDefaults(defineProps<{
   siglaUnidade: string;
   exibirCabecalho?: boolean;
   exibirBotaoVoltar?: boolean;
+  exibirBotaoConcluirDiagnostico?: boolean;
 }>(), {
   exibirCabecalho: true,
   exibirBotaoVoltar: true,
+  exibirBotaoConcluirDiagnostico: true,
 });
 
 const router = useRouter();

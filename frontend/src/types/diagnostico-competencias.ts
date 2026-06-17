@@ -57,12 +57,20 @@ export interface DiagnosticoContexto {
 export interface Autoavaliacao {
     competencias: AvaliacaoCompetencia[];
     situacaoServidor: SituacaoAvaliacaoServidor;
+    podeEditar: boolean;
+    podeConcluirAutoavaliacao: boolean;
+    habilitarConcluirAutoavaliacao: boolean;
 }
 
 /** Consenso da chefia para o servidor logado. */
 export interface Consenso {
     competencias: ConsensoCompetenciaDetalhada[];
     situacaoServidor: SituacaoAvaliacaoServidor;
+    podeEditar: boolean;
+    podeConcluirAvaliacao: boolean;
+    habilitarConcluirAvaliacao: boolean;
+    podeAprovarConsenso: boolean;
+    habilitarAprovarConsenso: boolean;
 }
 
 /** Item da lista de servidores da equipe no diagnóstico. */
@@ -70,6 +78,9 @@ export interface ItemEquipeDiagnostico {
     servidorTitulo: string;
     servidorNome: string;
     situacaoServidor: SituacaoAvaliacaoServidor;
+    podeManterConsenso: boolean;
+    podeImpossibilitar: boolean;
+    podePermitirAvaliacao: boolean;
 }
 
 /** Lista de servidores e suas situações na equipe. */
@@ -83,6 +94,9 @@ export interface ServidorDiagnostico {
     servidorNome: string;
     situacaoServidor: SituacaoAvaliacaoServidor;
     consenso: AvaliacaoCompetencia[];
+    podeManterConsenso: boolean;
+    podeImpossibilitar: boolean;
+    podePermitirAvaliacao: boolean;
 }
 
 /** Situação de capacitação registrada para servidor/competência. */

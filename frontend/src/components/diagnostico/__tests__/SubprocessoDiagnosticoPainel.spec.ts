@@ -31,9 +31,9 @@ const devolvendo = ref(false);
 const homologando = ref(false);
 const impossibilitando = ref(false);
 const servidores = ref<any[]>([
-    {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
-    {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
-    {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO'},
+    {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
+    {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: true},
+    {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: false},
 ]);
 
 const erroConcluir = ref<Error | null>(null);
@@ -142,9 +142,9 @@ describe('SubprocessoDiagnosticoPainel', () => {
         validarAcaoDevolverDiagnosticoMock.mockResolvedValue(undefined);
         validarAcaoHomologarDiagnosticoMock.mockResolvedValue(undefined);
         servidores.value = [
-            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
-            {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
-            {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO'},
+            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
+            {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: true},
+            {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: false},
         ];
         erroConcluir.value = null;
         erroValidar.value = null;
@@ -395,7 +395,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
 
     it('exercita formatarSituacaoServidor e varianteSituacaoServidor para situacoes desconhecidas', () => {
         servidores.value = [
-            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'STATUS_DESCONHECIDO' as any},
+            {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'STATUS_DESCONHECIDO' as any, podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
         ];
         const wrapper = montar();
         expect(wrapper.text()).toContain('STATUS_DESCONHECIDO');
@@ -403,11 +403,11 @@ describe('SubprocessoDiagnosticoPainel', () => {
 
     it('exercita todas as variantes de situacaoServidor e suas classes de badge correspondentes', () => {
         servidores.value = [
-            {servidorTitulo: '1', servidorNome: 'Servidor 1', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA'},
-            {servidorTitulo: '2', servidorNome: 'Servidor 2', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
-            {servidorTitulo: '3', servidorNome: 'Servidor 3', situacaoServidor: 'CONSENSO_CRIADO'},
-            {servidorTitulo: '4', servidorNome: 'Servidor 4', situacaoServidor: 'CONSENSO_APROVADO'},
-            {servidorTitulo: '5', servidorNome: 'Servidor 5', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
+            {servidorTitulo: '1', servidorNome: 'Servidor 1', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
+            {servidorTitulo: '2', servidorNome: 'Servidor 2', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
+            {servidorTitulo: '3', servidorNome: 'Servidor 3', situacaoServidor: 'CONSENSO_CRIADO', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
+            {servidorTitulo: '4', servidorNome: 'Servidor 4', situacaoServidor: 'CONSENSO_APROVADO', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: false},
+            {servidorTitulo: '5', servidorNome: 'Servidor 5', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: true},
         ];
 
         const wrapper = montar();

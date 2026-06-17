@@ -27,7 +27,30 @@
           @abrir-reabrir-cadastro="abrirModalReabrirCadastro"
           @abrir-reabrir-revisao="abrirModalReabrirRevisao"
           @confirmar-enviar-lembrete="confirmarEnviarLembrete"
-      />
+      >
+        <template #acoes-extras>
+          <BButton
+              v-if="mostrarHistoricoAnaliseDiagnostico"
+              data-testid="btn-historico-analise-subprocesso"
+              size="sm"
+              variant="outline-secondary"
+              @click="abrirHistoricoAnaliseDiagnostico"
+          >
+            {{ TEXTOS.diagnostico.BTN_HISTORICO_ANALISE }}
+          </BButton>
+          <BButton
+              v-if="mostrarConcluirDiagnosticoCabecalho"
+              :disabled="concluindoDiagnostico || !habilitarConcluirDiagnosticoCabecalho"
+              data-testid="btn-concluir-diagnostico-cabecalho"
+              size="sm"
+              variant="success"
+              @click="abrirModalConcluirDiagnostico"
+          >
+            <BSpinner v-if="concluindoDiagnostico" aria-hidden="true" class="me-1" small/>
+            {{ TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO }}
+          </BButton>
+        </template>
+      </SubprocessoResumoHeader>
 
       <SubprocessoCards
           v-if="codigoSubprocesso"
@@ -45,6 +68,7 @@
           :cod-subprocesso="codigoSubprocesso"
           :exibir-botao-voltar="false"
           :exibir-cabecalho="false"
+          :exibir-botao-concluir-diagnostico="false"
           :sigla-unidade="props.siglaUnidade"
       />
 
@@ -95,30 +119,72 @@
       @update:modal-lembrete-aberto="modalLembreteAberto = $event"
       @update:mostrar-modal-reabrir="mostrarModalReabrir = $event"
   />
+
+  <BModal
+      v-model="modalConcluirDiagnosticoAberto"
+      :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
+      centered
+  >
+    <AppAlert
+        v-if="erroConcluirDiagnostico"
+        :mensagem="erroConcluirDiagnostico"
+        variante="danger"
+        @dismissed="erroConcluirDiagnostico = ''"
+    />
+    <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
+    <template #footer>
+      <BButton class="text-secondary" variant="link" @click="modalConcluirDiagnosticoAberto = false">Cancelar</BButton>
+      <BButton
+          :disabled="concluindoDiagnostico"
+          data-testid="btn-confirmar-concluir-diagnostico-cabecalho"
+          variant="success"
+          @click="confirmarConcluirDiagnostico"
+      >
+        <BSpinner v-if="concluindoDiagnostico" aria-hidden="true" class="me-1" small/>
+        {{ TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO }}
+      </BButton>
+    </template>
+  </BModal>
+
+  <HistoricoAnaliseModal
+      :historico="historicoAnalisesDiagnostico"
+      :loading="carregandoHistoricoDiagnostico"
+      :mostrar="modalHistoricoDiagnosticoAberto"
+      @fechar="modalHistoricoDiagnosticoAberto = false"
+  />
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton} from "bootstrap-vue-next";
+import {BAlert, BButton, BModal, BSpinner} from "bootstrap-vue-next";
+import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import SubprocessoDiagnosticoPainel from "@/components/diagnostico/SubprocessoDiagnosticoPainel.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoFluxoModais from "@/components/processo/SubprocessoFluxoModais.vue";
+import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimentacoes.vue";
 import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import {useFluxoDiagnostico} from "@/composables/useFluxoDiagnostico";
+import {useToastStore} from "@/stores/toast";
+import {listarAnalisesDiagnostico} from "@/services/analiseService";
+import {normalizarErro} from "@/utils/apiError/normalizer";
+import type {Analise} from "@/types/tipos";
 import {useSubprocessoTela} from "@/composables/useSubprocessoTela";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
 const tela = useSubprocessoTela(props);
+const router = useRouter();
 
 const {
   erroIntegracaoContexto,
   limparErroIntegracao,
   notificacao,
   clear,
+  notify,
   subprocesso,
   formatDataSimples,
   formatSituacaoSubprocesso,
@@ -160,6 +226,66 @@ const {
 
 const ehDiagnostico = computed(() => subprocesso?.value?.tipoProcesso === TipoProcesso.DIAGNOSTICO);
 const ehServidorPuro = computed(() => !!subprocesso.value?.permissoes?.podePreencherAutoavaliacao && !subprocesso.value?.permissoes?.podeCriarConsenso);
+const toastStore = useToastStore();
+const modalConcluirDiagnosticoAberto = ref(false);
+const erroConcluirDiagnostico = ref('');
+const modalHistoricoDiagnosticoAberto = ref(false);
+const carregandoHistoricoDiagnostico = ref(false);
+const historicoAnalisesDiagnostico = ref<Analise[]>([]);
+const {
+  concluindo: concluindoDiagnostico,
+  erroConcluir,
+  erroValidacaoConcluir,
+  validarConclusaoDiagnostico,
+  concluirDiagnostico,
+} = useFluxoDiagnostico(() => codigoSubprocesso.value ?? 0);
+const mostrarHistoricoAnaliseDiagnostico = computed(() =>
+  ehDiagnostico.value && !!codigoSubprocesso.value && !ehServidorPuro.value && !!subprocesso.value?.permissoes?.habilitarAcessoDiagnostico,
+);
+const mostrarConcluirDiagnosticoCabecalho = computed(() =>
+  ehDiagnostico.value && !!codigoSubprocesso.value && !ehServidorPuro.value && !!subprocesso.value?.permissoes?.podeConcluirDiagnostico,
+);
+const habilitarConcluirDiagnosticoCabecalho = computed(() =>
+  !!subprocesso.value?.permissoes?.habilitarConcluirDiagnostico,
+);
+
+async function abrirHistoricoAnaliseDiagnostico() {
+  if (!codigoSubprocesso.value) return;
+  carregandoHistoricoDiagnostico.value = true;
+  modalHistoricoDiagnosticoAberto.value = true;
+  try {
+    historicoAnalisesDiagnostico.value = await listarAnalisesDiagnostico(codigoSubprocesso.value);
+  } catch {
+    notify(TEXTOS.diagnostico.ERRO_SALVAR, 'danger', true);
+  } finally {
+    carregandoHistoricoDiagnostico.value = false;
+  }
+}
+
+async function abrirModalConcluirDiagnostico() {
+  erroConcluirDiagnostico.value = '';
+  try {
+    await validarConclusaoDiagnostico();
+    modalConcluirDiagnosticoAberto.value = true;
+  } catch (erro) {
+    erroConcluirDiagnostico.value = normalizarErro(erro).mensagem
+      ?? erroValidacaoConcluir.value?.message
+      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
+}
+
+async function confirmarConcluirDiagnostico() {
+  try {
+    await concluirDiagnostico();
+    modalConcluirDiagnosticoAberto.value = false;
+    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
+    await router.push({name: 'Painel'});
+  } catch (erro) {
+    erroConcluirDiagnostico.value = normalizarErro(erro).mensagem
+      ?? erroConcluir.value?.message
+      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+  }
+}
 
 defineExpose({
   mostrarModalAlterarDataLimite: tela.mostrarModalAlterarDataLimite,

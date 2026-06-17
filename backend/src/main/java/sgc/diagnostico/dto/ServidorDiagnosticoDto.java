@@ -8,6 +8,9 @@ public record ServidorDiagnosticoDto(
         String servidorTitulo,
         String servidorNome,
         String situacaoServidor,
-        List<AvaliacaoCompetenciaDto> consenso
+        List<AvaliacaoCompetenciaDto> consenso,
+        boolean podeManterConsenso,
+        boolean podeImpossibilitar,
+        boolean podePermitirAvaliacao
 ) {
 }

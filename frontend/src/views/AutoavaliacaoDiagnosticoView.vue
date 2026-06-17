@@ -8,6 +8,17 @@
           :title="TEXTOS.diagnostico.TITULO_AUTOAVALIACAO"
       >
         <template #actions>
+          <BButton
+              v-if="!ehChefe && podeConcluirAutoavaliacao"
+              :disabled="concluindo || !habilitarConcluirAutoavaliacao"
+              data-testid="btn-concluir-autoavaliacao"
+              size="sm"
+              variant="success"
+              @click="abrirModalConcluir"
+          >
+            <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
+            {{ TEXTOS.diagnostico.BTN_CONCLUIR_AUTOAVALIACAO }}
+          </BButton>
           <BButton size="sm" variant="outline-secondary" @click="voltar">
             <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
             {{ TEXTOS.diagnostico.BTN_VOLTAR }}
@@ -107,30 +118,6 @@
         </BTable>
       </BCard>
 
-      <div v-if="!ehChefe && (podeEditar || ehAutoavaliacaoConcluida)" class="d-flex gap-2 mb-4">
-        <BButton
-            :disabled="concluindo || ehAutoavaliacaoConcluida"
-            data-testid="btn-concluir-autoavaliacao"
-            variant="success"
-            @click="abrirModalConcluir"
-        >
-          <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_CONCLUIR_AUTOAVALIACAO }}
-        </BButton>
-      </div>
-
-      <div v-if="ehConsensoCriado && !ehChefe" class="d-flex gap-2 mb-4">
-        <BButton
-            :disabled="aprovando"
-            data-testid="btn-aprovar-consenso"
-            variant="success"
-            @click="abrirModalAprovar"
-        >
-          <BSpinner v-if="aprovando" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_APROVAR_CONSENSO }}
-        </BButton>
-      </div>
-
       <BCard v-if="ehChefe" class="mb-4">
         <BCardHeader>
           <strong>Equipe</strong>
@@ -153,7 +140,7 @@
                 {{ formatarSituacaoServidor(membro.situacaoServidor) }}
               </BBadge>
               <BButton
-                  v-if="membro.situacaoServidor === 'AUTOAVALIACAO_CONCLUIDA'"
+                  v-if="membro.podeManterConsenso"
                   :data-testid="`btn-consenso-${membro.servidorTitulo}`"
                   size="sm"
                   variant="primary"
@@ -162,7 +149,7 @@
                 Registrar consenso
               </BButton>
               <BButton
-                  v-if="podeImpossibilitar(membro.situacaoServidor)"
+                  v-if="membro.podeImpossibilitar"
                   :data-testid="`btn-impossibilitar-${membro.servidorTitulo}`"
                   size="sm"
                   variant="danger"
@@ -185,17 +172,6 @@
         variant="success"
         test-id-confirmar="btn-confirmar-concluir"
         @confirmar="confirmarConcluir"
-    />
-
-    <ModalConfirmacao
-        v-model="modalAprovarAberto"
-        :loading="aprovando"
-        :mensagem="TEXTOS.diagnostico.MODAL_APROVAR_MENSAGEM"
-        :titulo="TEXTOS.diagnostico.MODAL_APROVAR_TITULO"
-        ok-title="Aprovar"
-        ok-variant="success"
-        test-id-confirmar="btn-confirmar-aprovar"
-        @confirmar="confirmarAprovar"
     />
 
     <BModal
@@ -268,9 +244,10 @@ const props = defineProps<{
   limparRetornoFluxo,
   salvandoAutomaticamente,
   ehAutoavaliacaoConcluida,
-  ehConsensoCriado,
   ehConsensoAprovado,
   ehChefe,
+  podeConcluirAutoavaliacao,
+  habilitarConcluirAutoavaliacao,
   podeEditar,
   colunas,
   competenciasComDescricao,
@@ -284,16 +261,11 @@ const props = defineProps<{
   modalConcluirAberto,
   abrirModalConcluir,
   concluindo,
-  modalAprovarAberto,
-  abrirModalAprovar,
-  confirmarAprovar,
-  aprovando,
   itensEquipe,
   pendentes,
   varianteSituacaoServidor,
   formatarSituacaoServidor,
   navegarParaConsenso,
-  podeImpossibilitar,
   abrirModalImpossibilitar,
   modalImpossibilitarAberto,
   fecharModalImpossibilitar,

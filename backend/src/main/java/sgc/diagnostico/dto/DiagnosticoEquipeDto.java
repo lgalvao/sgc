@@ -11,6 +11,9 @@ public record DiagnosticoEquipeDto(
     public record Item(
             String servidorTitulo,
             String servidorNome,
-            String situacaoServidor
+            String situacaoServidor,
+            boolean podeManterConsenso,
+            boolean podeImpossibilitar,
+            boolean podePermitirAvaliacao
     ) {}
 }

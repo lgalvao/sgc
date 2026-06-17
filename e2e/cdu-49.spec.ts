@@ -129,14 +129,14 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
 
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await expect(page.getByTestId('btn-concluir-diagnostico')).toBeVisible();
+        await expect(page.getByTestId('btn-concluir-diagnostico-cabecalho')).toBeVisible();
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/concluir/validacao`)
                 && res.request().method() === 'GET'
                 && res.status() >= 400
             ),
-            page.getByTestId('btn-concluir-diagnostico').click()
+            page.getByTestId('btn-concluir-diagnostico-cabecalho').click()
         ]);
         await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.diagnostico.ERRO_PENDENCIAS_CONCLUSAO);
         await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -161,7 +161,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
                 && res.request().method() === 'GET'
                 && res.ok()
             ),
-            page.getByTestId('btn-concluir-diagnostico').click()
+            page.getByTestId('btn-concluir-diagnostico-cabecalho').click()
         ]);
         await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM);
         await Promise.all([
@@ -170,7 +170,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
                 && res.request().method() === 'POST'
                 && res.ok()
             ),
-            page.getByTestId('btn-confirmar-concluir-diagnostico').click()
+            page.getByTestId('btn-confirmar-concluir-diagnostico-cabecalho').click()
         ]);
 
         await expect(page).toHaveURL(/\/painel/);

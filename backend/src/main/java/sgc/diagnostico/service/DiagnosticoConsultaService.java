@@ -75,9 +75,16 @@ public class DiagnosticoConsultaService {
                 .findFirst()
                 .map(a -> a.getSituacaoServidor().name())
                 .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA.name());
+        SituacaoAvaliacaoServidor situacao = SituacaoAvaliacaoServidor.valueOf(situacaoServidor);
         return AutoavaliacaoDto.builder()
                 .competencias(competencias)
                 .situacaoServidor(situacaoServidor)
+                .podeEditar(situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
+                .podeConcluirAutoavaliacao(
+                        situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA
+                                || situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA
+                )
+                .habilitarConcluirAutoavaliacao(situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
                 .build();
     }
 
@@ -87,6 +94,7 @@ public class DiagnosticoConsultaService {
     }
 
     public ConsensoDto obterConsenso(Long codSubprocesso, String servidorTitulo) {
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
@@ -106,9 +114,16 @@ public class DiagnosticoConsultaService {
                 .findFirst()
                 .map(a -> a.getSituacaoServidor().name())
                 .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA.name());
+        SituacaoAvaliacaoServidor situacao = SituacaoAvaliacaoServidor.valueOf(situacaoServidor);
+        boolean usuarioEhServidorAvaliado = usuario.getTituloEleitoral().equals(servidorTitulo);
         return ConsensoDto.builder()
                 .competencias(competencias)
                 .situacaoServidor(situacaoServidor)
+                .podeEditar(!usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .podeConcluirAvaliacao(!usuarioEhServidorAvaliado)
+                .habilitarConcluirAvaliacao(!usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .podeAprovarConsenso(usuarioEhServidorAvaliado)
+                .habilitarAprovarConsenso(usuarioEhServidorAvaliado && situacao == SituacaoAvaliacaoServidor.CONSENSO_CRIADO)
                 .build();
     }
 
@@ -125,11 +140,20 @@ public class DiagnosticoConsultaService {
         }
 
         List<DiagnosticoEquipeDto.Item> itens = situacoes.entrySet().stream()
-                .map(e -> DiagnosticoEquipeDto.Item.builder()
-                        .servidorTitulo(e.getKey())
-                        .servidorNome(nomes.get(e.getKey()))
-                        .situacaoServidor(e.getValue().name())
-                        .build())
+                .map(e -> {
+                    SituacaoAvaliacaoServidor situacao = e.getValue();
+                    return DiagnosticoEquipeDto.Item.builder()
+                            .servidorTitulo(e.getKey())
+                            .servidorNome(nomes.get(e.getKey()))
+                            .situacaoServidor(situacao.name())
+                            .podeManterConsenso(true)
+                            .podeImpossibilitar(
+                                    situacao != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                                            && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+                            )
+                            .podePermitirAvaliacao(situacao == SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
+                            .build();
+                })
                 .toList();
 
         return DiagnosticoEquipeDto.builder()
@@ -177,6 +201,14 @@ public class DiagnosticoConsultaService {
                             .servidorNome(primeiro.getServidorNomeDiagnostico())
                             .situacaoServidor(primeiro.getSituacaoServidor().name())
                             .consenso(consenso)
+                            .podeManterConsenso(true)
+                            .podeImpossibilitar(
+                                    primeiro.getSituacaoServidor() != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                                            && primeiro.getSituacaoServidor() != SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+                            )
+                            .podePermitirAvaliacao(
+                                    primeiro.getSituacaoServidor() == SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                            )
                             .build();
                 })
                 .toList();

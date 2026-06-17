@@ -91,6 +91,9 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     }
 
     const situacaoServidor = computed(() => query.data.value?.situacaoServidor ?? 'AUTOAVALIACAO_NAO_INICIADA');
+    const podeEditar = computed(() => query.data.value?.podeEditar ?? false);
+    const podeConcluirAutoavaliacao = computed(() => query.data.value?.podeConcluirAutoavaliacao ?? false);
+    const habilitarConcluirAutoavaliacao = computed(() => query.data.value?.habilitarConcluirAutoavaliacao ?? false);
     const carregando = computed(() => query.status.value === 'pending');
     const erro = computed(() => query.error.value);
     const concluindo = computed(() => mutacaoConcluir.isLoading.value);
@@ -100,6 +103,9 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
         query,
         competenciasLocais,
         situacaoServidor,
+        podeEditar,
+        podeConcluirAutoavaliacao,
+        habilitarConcluirAutoavaliacao,
         carregando,
         erro,
         salvandoAutomaticamente,
