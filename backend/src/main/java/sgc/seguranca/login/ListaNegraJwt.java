@@ -11,7 +11,7 @@ public class ListaNegraJwt {
     private final ConcurrentHashMap<String, Instant> tokensRevogados = new ConcurrentHashMap<>();
 
     public void revogar(String jti, Instant expiracao) {
-        if (jti == null || jti.isBlank()) {
+        if (jti == null || jti.isBlank() || expiracao == null) {
             return;
         }
         tokensRevogados.put(jti, expiracao);

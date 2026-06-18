@@ -36,10 +36,10 @@ public record AtualizarSubprocessoRequest(
 
     public AtualizarPrazosSubprocessoCommand paraPrazosCommand() {
         return AtualizarPrazosSubprocessoCommand.builder()
-                .dataLimiteEtapa1(Optional.of(dataLimiteEtapa1))
-                .dataFimEtapa1(Optional.of(dataFimEtapa1))
-                .dataLimiteEtapa2(Optional.of(dataLimiteEtapa2))
-                .dataFimEtapa2(Optional.of(dataFimEtapa2))
+                .dataLimiteEtapa1(Optional.ofNullable(dataLimiteEtapa1))
+                .dataFimEtapa1(Optional.ofNullable(dataFimEtapa1))
+                .dataLimiteEtapa2(Optional.ofNullable(dataLimiteEtapa2))
+                .dataFimEtapa2(Optional.ofNullable(dataFimEtapa2))
                 .build();
     }
 }

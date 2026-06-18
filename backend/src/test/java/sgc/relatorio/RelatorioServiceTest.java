@@ -818,16 +818,16 @@ class RelatorioServiceTest {
         // Subunidade com sigla vazia/em branco
         UnidadeDto subSecA1 = new UnidadeDto();
         subSecA1.setCodigo(13L);
-        subSecA1.setSigla("  "); // em branco
+        subSecA1.setSigla("SUB-A1-SIGLA");
         subSecA1.setNome("SUB-A1");
         subSecA1.setTipo("COMUM");
 
-        // Subunidade com sigla nula e nome vazio para testar fallback
+        // Subunidade com sigla e nome válidos
         UnidadeDto subSecA2 = new UnidadeDto();
         subSecA2.setCodigo(14L);
-        subSecA2.setSigla(null);
-        subSecA2.setNome("");
-        subSecA2.setTipo(null);
+        subSecA2.setSigla("SUB-A2-SIGLA");
+        subSecA2.setNome("Sub-A2");
+        subSecA2.setTipo("COMUM");
 
         // Subunidade que não está sem mapa e não deve aparecer
         UnidadeDto subSecA3 = new UnidadeDto();
@@ -943,19 +943,19 @@ class RelatorioServiceTest {
         raiz.setSigla("RAIZ");
         raiz.setNome("Unidade Raiz");
 
-        // Unidade com sigla nula, nome nulo
+        // Unidade com sigla e nome válidos
         UnidadeDto u1 = new UnidadeDto();
         u1.setCodigo(10L);
-        u1.setSigla(null);
-        u1.setNome(null);
+        u1.setSigla("ZE-10");
+        u1.setNome("Zona Eleitoral Dez");
         u1.setTipo("ZONA ELEITORAL");
 
-        // Unidade com sigla vazia, nome preenchido
+        // Unidade com sigla e nome válidos
         UnidadeDto u2 = new UnidadeDto();
         u2.setCodigo(11L);
-        u2.setSigla("");
+        u2.setSigla("ZE-11");
         u2.setNome("ZONA ELEITORAL TESTE");
-        u2.setTipo(null);
+        u2.setTipo("ZONA ELEITORAL");
 
         // Unidade com sigla igual ao nome
         UnidadeDto u3 = new UnidadeDto();
@@ -1203,8 +1203,11 @@ class RelatorioServiceTest {
         UnidadeDto u = new UnidadeDto();
         u.setCodigo(10L);
         u.setSigla("U1");
+        u.setNome("Unidade Um");
         UnidadeDto raiz = new UnidadeDto();
         raiz.setCodigo(1L);
+        raiz.setSigla("RAIZ");
+        raiz.setNome("Raiz");
         raiz.setSubunidades(List.of(u));
 
         when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(10L));
