@@ -119,7 +119,7 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
         await verificarToast(page, TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
 
-        await login(page, '111111111111', 'senha');
+        await login(page, '191919', 'senha');
         await verificarNotificacaoAdmin(page, {
             assunto: 'Avaliação de consenso criada',
             destinatario: TITULO_SERVIDOR_ASSESSORIA_12,
