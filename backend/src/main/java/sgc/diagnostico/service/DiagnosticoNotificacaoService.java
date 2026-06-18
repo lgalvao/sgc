@@ -40,7 +40,6 @@ public class DiagnosticoNotificacaoService {
         }
 
         String nomeProcesso = sp.getProcesso().getDescricao();
-        String dataLimite = sp.getDataLimiteEtapa1().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String assunto = "SGC: Autoavaliação de diagnóstico de competências disponível";
 
         String corpo = emailModelosService.criarEmailDiagnosticoInicioServidor(
@@ -57,12 +56,6 @@ public class DiagnosticoNotificacaoService {
                 assunto,
                 corpo,
                 "diagnostico:%d:inicio:servidor:%s".formatted(sp.getCodigo(), servidor.getTituloEleitoral()));
-
-        alertaService.criarAlertaPessoal(
-                sp.getProcesso(),
-                servidor.getTituloEleitoral(),
-                "Sua autoavaliação de diagnóstico no processo %s está disponível. Prazo: %s".formatted(nomeProcesso, dataLimite)
-        );
     }
 
     public void notificarAutoavaliacaoConcluida(Subprocesso sp, String servidorTitulo) {
