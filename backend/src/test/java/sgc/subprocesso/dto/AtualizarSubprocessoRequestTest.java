@@ -39,10 +39,11 @@ class AtualizarSubprocessoRequestTest {
 
     @Test
     void deveConverterParaCommandComCamposNulos() {
+        var dataLim1 = LocalDateTime.of(2023, 1, 1, 10, 0);
         var request = AtualizarSubprocessoRequest.builder()
                 .codUnidade(null)
                 .codMapa(null)
-                .dataLimiteEtapa1(null)
+                .dataLimiteEtapa1(dataLim1)
                 .dataFimEtapa1(null)
                 .dataLimiteEtapa2(null)
                 .dataFimEtapa2(null)
@@ -55,7 +56,7 @@ class AtualizarSubprocessoRequestTest {
         assertThat(command.vinculos().codMapa()).isNull();
 
         assertThat(command.prazos()).isNotNull();
-        assertThat(command.prazos().dataLimiteEtapa1()).isEmpty();
+        assertThat(command.prazos().dataLimiteEtapa1()).isPresent().contains(dataLim1);
         assertThat(command.prazos().dataFimEtapa1()).isEmpty();
         assertThat(command.prazos().dataLimiteEtapa2()).isEmpty();
         assertThat(command.prazos().dataFimEtapa2()).isEmpty();

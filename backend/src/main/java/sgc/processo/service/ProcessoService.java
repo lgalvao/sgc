@@ -1197,11 +1197,11 @@ public class ProcessoService {
         Usuario usuarioPrincipal = usuarioService.usuarioAutenticado();
         Usuario usuario = usuarioService.buscarUsuarioComUnidadeLotacao(usuarioPrincipal.getTituloEleitoral());
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
-        if (unidadeLotacao != null && SIGLA_UNIDADE_SEDOC.equalsIgnoreCase(unidadeLotacao.getSigla())) {
+        if (SIGLA_UNIDADE_SEDOC.equalsIgnoreCase(unidadeLotacao.getSigla())) {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(usuario.getEmail());
+        return Optional.of(usuario.getEmail());
     }
 
     private boolean isUnidadeAdmin(Unidade unidadeDestino) {

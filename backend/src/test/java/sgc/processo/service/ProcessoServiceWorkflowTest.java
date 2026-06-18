@@ -982,8 +982,8 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
 
 
         @Test
-        @DisplayName("Deve enfileirar e-mail de cópia de admin quando iniciar processo para unidade ADMIN e usuário logado tem lotação nula")
-        void deveEnfileirarEmailCopiaAdminQuandoUsuarioComLotacaoNula() {
+        @DisplayName("Deve enfileirar e-mail de cópia de admin quando iniciar processo para unidade ADMIN e usuário logado tem lotação que não seja SEDOC")
+        void deveEnfileirarEmailCopiaAdminQuandoUsuarioComLotacaoNaoSedoc() {
             Long id = 100L;
             Processo p = new Processo();
             p.setCodigo(id);
@@ -1004,10 +1004,15 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
             when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
             mockarResponsaveisEfetivos();
 
+            Unidade lotacaoComum = new Unidade();
+            lotacaoComum.setCodigo(2L);
+            lotacaoComum.setSigla("COMUM");
+            lotacaoComum.setTipo(TipoUnidade.OPERACIONAL);
+
             Usuario usuarioLogado = new Usuario();
             usuarioLogado.setTituloEleitoral("12345");
             usuarioLogado.setEmail("usuario@tre-pe.jus.br");
-            usuarioLogado.setUnidadeLotacao(null);
+            usuarioLogado.setUnidadeLotacao(lotacaoComum);
 
             when(usuarioService.usuarioAutenticado()).thenReturn(usuarioLogado);
             when(usuarioService.buscarUsuarioComUnidadeLotacao("12345")).thenReturn(usuarioLogado);
