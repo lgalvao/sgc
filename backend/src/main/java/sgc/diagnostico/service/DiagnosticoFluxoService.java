@@ -11,6 +11,7 @@ import org.jspecify.annotations.Nullable;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
+import sgc.organizacao.service.ResponsavelUnidadeService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
@@ -57,6 +58,7 @@ public class DiagnosticoFluxoService {
     private final HierarquiaService hierarquiaService;
     private final DiagnosticoUsuarioContextoService usuarioContextoService;
     private final UsuarioService usuarioService;
+    private final ResponsavelUnidadeService responsavelUnidadeService;
 
     public void inicializarDiagnostico(Subprocesso subprocesso) {
         Diagnostico diagnostico = Diagnostico.builder()
@@ -65,6 +67,12 @@ public class DiagnosticoFluxoService {
 
         List<ServidorProcesso> servidoresSnapshot = subprocesso.getProcesso()
                 .buscarServidoresParticipantes(subprocesso.getUnidade().getCodigo());
+        String responsavelTitulo = buscarResponsavelTitulo(subprocesso.getUnidade().getCodigo());
+        if (responsavelTitulo != null) {
+            servidoresSnapshot = servidoresSnapshot.stream()
+                    .filter(snapshot -> !Objects.equals(snapshot.getUsuarioTitulo(), responsavelTitulo))
+                    .toList();
+        }
         List<Usuario> servidores = carregarServidoresSnapshot(servidoresSnapshot);
         List<AvaliacaoServidor> avaliacoes = new ArrayList<>();
         List<SituacaoCapacitacao> situacaoCapacitacoes = new ArrayList<>();
@@ -134,6 +142,14 @@ public class DiagnosticoFluxoService {
                 .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
                         "Servidor %s não encontrado no snapshot do processo".formatted(tituloEleitoral)
                 ));
+    }
+
+    private @Nullable String buscarResponsavelTitulo(Long unidadeCodigo) {
+        return responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeCodigo)
+                .map(responsavel -> responsavel.substitutoTitulo() != null && !responsavel.substitutoTitulo().isBlank()
+                        ? responsavel.substitutoTitulo()
+                        : responsavel.titularTitulo())
+                .orElse(null);
     }
 
     public void concluirDiagnosticoUnidade(Long codSubprocesso) {

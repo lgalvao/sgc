@@ -20,6 +20,7 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.HierarquiaService;
+import sgc.organizacao.service.ResponsavelUnidadeService;
 import sgc.organizacao.service.UnidadeHierarquiaService;
 import sgc.organizacao.service.UnidadeService;
 import sgc.organizacao.service.UsuarioService;
@@ -65,6 +66,7 @@ class DiagnosticoFluxoServiceTest {
     @Mock HierarquiaService hierarquiaService;
     @Mock DiagnosticoUsuarioContextoService usuarioContextoService;
     @Mock UsuarioService usuarioService;
+    @Mock ResponsavelUnidadeService responsavelUnidadeService;
 
     @InjectMocks
     DiagnosticoFluxoService service;
@@ -95,6 +97,8 @@ class DiagnosticoFluxoServiceTest {
         ));
         when(usuarioService.buscarPorTitulos(List.of(servidor1.getTituloEleitoral(), servidor2.getTituloEleitoral())))
                 .thenReturn(List.of(servidor1, servidor2));
+        when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeOrigem.getCodigo()))
+                .thenReturn(java.util.Optional.empty());
 
         ArgumentCaptor<Diagnostico> captor = ArgumentCaptor.forClass(Diagnostico.class);
 
@@ -118,6 +122,45 @@ class DiagnosticoFluxoServiceTest {
                     assertThat(ocupacao.getUnidadeSiglaSnapshot()).isEqualTo("ASSESSORIA_12");
                     assertThat(ocupacao.getUnidadeNomeSnapshot()).isEqualTo("Assessoria 12");
                 });
+    }
+
+    @Test
+    @DisplayName("inicializarDiagnostico deve excluir o responsável da unidade das avaliações e situações de capacitação")
+    void inicializarDiagnostico_deveExcluirResponsavelDaUnidade() {
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+        Processo processo = subprocesso.getProcesso();
+        subprocesso.setMapa(mapa(101L, competencia(1L, "Competência 1")));
+
+        Usuario responsavel = usuario("151515", "Axl Rose");
+        Usuario servidor = usuario("242426", "Duff McKagan");
+        processo.adicionarServidoresParticipantes(List.of(
+                servidorSnapshot(processo, unidadeOrigem.getCodigo(), responsavel),
+                servidorSnapshot(processo, unidadeOrigem.getCodigo(), servidor)
+        ));
+        when(usuarioService.buscarPorTitulos(List.of(servidor.getTituloEleitoral())))
+                .thenReturn(List.of(servidor));
+        when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeOrigem.getCodigo()))
+                .thenReturn(java.util.Optional.of(new sgc.organizacao.dto.UnidadeResponsavelDto(
+                        unidadeOrigem.getCodigo(),
+                        responsavel.getTituloEleitoral(),
+                        responsavel.getNome(),
+                        null,
+                        null
+                )));
+
+        ArgumentCaptor<Diagnostico> captor = ArgumentCaptor.forClass(Diagnostico.class);
+
+        service.inicializarDiagnostico(subprocesso);
+
+        verify(diagnosticoRepo).save(captor.capture());
+        Diagnostico salvo = captor.getValue();
+
+        assertThat(salvo.getAvaliacaoServidores())
+                .extracting(avaliacao -> avaliacao.getServidor().getTituloEleitoral())
+                .containsExactly("242426");
+        assertThat(salvo.getSituacaoCapacitacoes())
+                .extracting(situacao -> situacao.getServidor().getTituloEleitoral())
+                .containsExactly("242426");
     }
 
     @Test

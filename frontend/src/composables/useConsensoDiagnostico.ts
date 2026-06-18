@@ -9,6 +9,7 @@ import {
     salvarConsenso,
 } from '@/services/diagnosticoService';
 import type {Consenso, ConsensoCompetenciaDetalhada} from '@/types/diagnostico-competencias';
+import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {
     chaveAutoavaliacao,
     chaveConsenso,
@@ -27,13 +28,14 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
-    const consensoDoServidorLogado = computed(() =>
-        servidorTitulo != null && String(servidorTitulo) === String(perfilStore.usuarioCodigo ?? '')
+    const {podeCriarConsenso} = useDiagnosticoPermissoes(codSubprocesso);
+    const deveConsultarConsensoServidor = computed(() =>
+        Boolean(servidorTitulo) && podeCriarConsenso.value
     );
 
     const query = useQuery<Consenso>({
         key: () => chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
-        query: () => servidorTitulo && !consensoDoServidorLogado.value
+        query: () => deveConsultarConsensoServidor.value
             ? obterConsensoServidor(codSubprocesso, servidorTitulo)
             : obterConsenso(codSubprocesso),
         enabled: () => codSubprocesso > 0,

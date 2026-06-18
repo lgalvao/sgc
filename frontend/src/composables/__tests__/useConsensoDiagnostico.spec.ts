@@ -38,6 +38,13 @@ vi.mock('@/stores/perfil', () => ({
     }),
 }));
 
+const podeCriarConsensoMock = ref(false);
+vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
+    useDiagnosticoPermissoes: () => ({
+        podeCriarConsenso: podeCriarConsensoMock,
+    }),
+}));
+
 vi.mock('@/services/diagnosticoService', () => ({
     obterConsenso: vi.fn(),
     obterConsensoServidor: vi.fn(),
@@ -61,6 +68,7 @@ describe('useConsensoDiagnostico', () => {
         vi.useFakeTimers();
         mutacaoSalvarOptions = null;
         mutacaoAprovarOptions = null;
+        podeCriarConsensoMock.value = false;
         
         invalidateQueriesMock = vi.fn();
         
@@ -80,6 +88,45 @@ describe('useConsensoDiagnostico', () => {
     it('deve inicializar com listas vazias', () => {
         const { competenciasLocais } = useConsensoDiagnostico(1);
         expect(competenciasLocais.value).toEqual([]);
+    });
+
+    it('deve consultar consenso do servidor especifico quando a sessao pode criar consenso', async () => {
+        const {obterConsenso, obterConsensoServidor} = await import('@/services/diagnosticoService');
+        podeCriarConsensoMock.value = true;
+        const queryMock = vi.fn(() => null);
+        vi.mocked(useQuery).mockImplementation((options: any) => {
+            queryMock(options.query);
+            return {
+                data: ref(null),
+                status: ref('success'),
+            } as any;
+        });
+
+        useConsensoDiagnostico(1, 'chefia123');
+        const queryOptions = vi.mocked(useQuery).mock.calls[0]?.[0] as any;
+        await queryOptions.query();
+
+        expect(obterConsensoServidor).toHaveBeenCalledWith(1, 'chefia123');
+        expect(obterConsenso).not.toHaveBeenCalled();
+    });
+
+    it('deve consultar consenso do usuario logado quando a sessao nao pode criar consenso', async () => {
+        const {obterConsenso, obterConsensoServidor} = await import('@/services/diagnosticoService');
+        const queryMock = vi.fn(() => null);
+        vi.mocked(useQuery).mockImplementation((options: any) => {
+            queryMock(options.query);
+            return {
+                data: ref(null),
+                status: ref('success'),
+            } as any;
+        });
+
+        useConsensoDiagnostico(1, 'chefia123');
+        const queryOptions = vi.mocked(useQuery).mock.calls[0]?.[0] as any;
+        await queryOptions.query();
+
+        expect(obterConsenso).toHaveBeenCalledWith(1);
+        expect(obterConsensoServidor).not.toHaveBeenCalled();
     });
 
     it('deve atualizar estado local quando a query retorna dados', async () => {

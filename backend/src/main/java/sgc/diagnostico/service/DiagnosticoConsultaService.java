@@ -129,12 +129,17 @@ public class DiagnosticoConsultaService {
 
     public DiagnosticoEquipeDto obterEquipe(Long codSubprocesso) {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
+        Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
+        String responsavelTitulo = buscarResponsavelTitulo(subprocesso.getUnidade().getCodigo());
 
         Map<String, SituacaoAvaliacaoServidor> situacoes = new HashMap<>();
         Map<String, String> nomes = new HashMap<>();
         for (AvaliacaoServidor a : avaliacoes) {
             String titulo = a.getServidor().getTituloEleitoral();
+            if (titulo.equals(responsavelTitulo)) {
+                continue;
+            }
             situacoes.put(titulo, a.getSituacaoServidor());
             nomes.put(titulo, a.getServidorNomeDiagnostico());
         }
@@ -179,6 +184,7 @@ public class DiagnosticoConsultaService {
                 .build();
 
         Map<String, List<AvaliacaoServidor>> porServidor = avaliacoes.stream()
+                .filter(a -> !a.getServidor().getTituloEleitoral().equals(responsavelTitulo))
                 .collect(java.util.stream.Collectors.groupingBy(
                         a -> a.getServidor().getTituloEleitoral(),
                         java.util.LinkedHashMap::new,
@@ -214,6 +220,7 @@ public class DiagnosticoConsultaService {
                 .toList();
 
         List<SituacaoCapacitacaoDto> situacoesCapacitacao = situacoes.stream()
+                .filter(o -> !o.getServidor().getTituloEleitoral().equals(responsavelTitulo))
                 .map(o -> SituacaoCapacitacaoDto.builder()
                         .competenciaCodigo(o.getCompetencia().getCodigo())
                         .servidorTitulo(o.getServidor().getTituloEleitoral())
