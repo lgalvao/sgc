@@ -38,7 +38,7 @@ public class AlertaAplicacaoService {
         if (contextoUsuario.perfil() == Perfil.SERVIDOR) {
             alertas = alertaService.listarParaServidor(usuarioTitulo);
         } else {
-            alertas = alertaService.listarParaGestao(contextoUsuario.unidadeAtivaCodigo());
+            alertas = alertaService.listarParaGestao(contextoUsuario.unidadeAtivaCodigo(), usuarioTitulo);
         }
 
         if (alertas.isEmpty()) return Collections.emptyList();
@@ -87,7 +87,10 @@ public class AlertaAplicacaoService {
         if (contextoUsuario.perfil() == Perfil.SERVIDOR) {
             return alertaService.listarParaServidorPaginado(contextoUsuario.usuarioTitulo(), sortedPageable);
         } else {
-            return alertaService.listarParaGestaoPaginado(contextoUsuario.unidadeAtivaCodigo(), sortedPageable);
+            return alertaService.listarParaGestaoPaginado(
+                    contextoUsuario.unidadeAtivaCodigo(),
+                    contextoUsuario.usuarioTitulo(),
+                    sortedPageable);
         }
     }
 

@@ -262,7 +262,7 @@ class E2eFixtureEndpointTest {
                         "DIAGNOSTICO_CONSENSO_APROVADO",
                         "FALHA_DEFINITIVA",
                         "ASSESSORIA_12",
-                        3,
+                        null,
                         "SMTP indisponível");
 
         mockMvc.perform(post("/e2e/fixtures/notificacao-email")

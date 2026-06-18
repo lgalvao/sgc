@@ -38,20 +38,21 @@ class AlertaServiceTest {
 
         assertThat(resultado).hasSize(1);
         verify(alertaRepo).buscarAlertasExclusivosDoUsuario(usuarioTitulo);
-        verify(alertaRepo, never()).buscarAlertasDaUnidade(anyLong());
+        verify(alertaRepo, never()).buscarAlertasDaGestao(anyLong(), anyString());
     }
 
     @Test
-    @DisplayName("Deve buscar alertas para Gestão (apenas unidade)")
+    @DisplayName("Deve buscar alertas para Gestão (pessoais e coletivos da unidade)")
     void deveListarParaGestao() {
         Long codigoUnidade = 1L;
+        String usuarioTitulo = "123";
         List<Alerta> alertas = Collections.singletonList(new Alerta());
-        when(alertaRepo.buscarAlertasDaUnidade(codigoUnidade)).thenReturn(alertas);
+        when(alertaRepo.buscarAlertasDaGestao(codigoUnidade, usuarioTitulo)).thenReturn(alertas);
 
-        List<Alerta> resultado = alertaService.listarParaGestao(codigoUnidade);
+        List<Alerta> resultado = alertaService.listarParaGestao(codigoUnidade, usuarioTitulo);
 
         assertThat(resultado).hasSize(1);
-        verify(alertaRepo).buscarAlertasDaUnidade(codigoUnidade);
+        verify(alertaRepo).buscarAlertasDaGestao(codigoUnidade, usuarioTitulo);
         verify(alertaRepo, never()).buscarAlertasExclusivosDoUsuario(anyString());
     }
 
@@ -108,13 +109,14 @@ class AlertaServiceTest {
     @DisplayName("Deve listar alertas paginados para gestão")
     void deveListarParaGestaoPaginado() {
         Pageable paginacao = PageRequest.of(0, 10);
+        String usuarioTitulo = "123";
         Page<Alerta> pagina = new PageImpl<>(List.of(new Alerta()));
-        when(alertaRepo.buscarAlertasDaUnidade(1L, paginacao)).thenReturn(pagina);
+        when(alertaRepo.buscarAlertasDaGestao(1L, usuarioTitulo, paginacao)).thenReturn(pagina);
 
-        Page<Alerta> resultado = alertaService.listarParaGestaoPaginado(1L, paginacao);
+        Page<Alerta> resultado = alertaService.listarParaGestaoPaginado(1L, usuarioTitulo, paginacao);
 
         assertThat(resultado.getContent()).hasSize(1);
-        verify(alertaRepo).buscarAlertasDaUnidade(1L, paginacao);
+        verify(alertaRepo).buscarAlertasDaGestao(1L, usuarioTitulo, paginacao);
     }
 
     @Test

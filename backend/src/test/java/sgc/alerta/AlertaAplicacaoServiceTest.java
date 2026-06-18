@@ -56,7 +56,7 @@ class AlertaAplicacaoServiceTest {
         leitura.setCodigo(AlertaUsuario.Chave.builder().alertaCodigo(1L).usuarioTitulo(titulo).build());
         leitura.setDataHoraLeitura(null);
 
-        when(alertaService.listarParaGestao(1L)).thenReturn(List.of(alerta));
+        when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(alerta));
         when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of(leitura));
         when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
 
@@ -74,7 +74,7 @@ class AlertaAplicacaoServiceTest {
         alerta.setCodigo(1L);
         alerta.setDataHora(LocalDateTime.now().minusDays(5));
 
-        when(alertaService.listarParaGestao(1L)).thenReturn(List.of(alerta));
+        when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(alerta));
         when(alertaService.alertasUsuarios(titulo, List.of(1L))).thenReturn(List.of());
         when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
 
@@ -273,7 +273,7 @@ class AlertaAplicacaoServiceTest {
             alertaAplicacaoService.alertasPorUsuario(CONTEXTO_SERVIDOR);
 
             verify(alertaService).listarParaServidor(titulo);
-            verify(alertaService, never()).listarParaGestao(anyLong());
+            verify(alertaService, never()).listarParaGestao(anyLong(), anyString());
         }
 
         @Test
@@ -281,11 +281,11 @@ class AlertaAplicacaoServiceTest {
         void deveListarParaGestao() {
             String titulo = "123";
             Long codUnidade = 1L;
-            when(alertaService.listarParaGestao(codUnidade)).thenReturn(Collections.emptyList());
+            when(alertaService.listarParaGestao(codUnidade, titulo)).thenReturn(Collections.emptyList());
 
             alertaAplicacaoService.alertasPorUsuario(CONTEXTO_GESTAO);
 
-            verify(alertaService).listarParaGestao(codUnidade);
+            verify(alertaService).listarParaGestao(codUnidade, titulo);
             verify(alertaService, never()).listarParaServidor(anyString());
         }
 
@@ -300,7 +300,7 @@ class AlertaAplicacaoServiceTest {
             a2.setCodigo(2L);
             a2.setDataHora(LocalDateTime.now());
 
-            when(alertaService.listarParaGestao(1L)).thenReturn(List.of(a1, a2));
+            when(alertaService.listarParaGestao(1L, titulo)).thenReturn(List.of(a1, a2));
             when(configuracaoService.buscarDiasAlertaNovo()).thenReturn(3);
 
             AlertaUsuario au1 = new AlertaUsuario();
@@ -323,11 +323,11 @@ class AlertaAplicacaoServiceTest {
         @DisplayName("Listar por unidade paginado (Gestão)")
         void listarPorUnidadePaginadoGestao() {
             Pageable p = Pageable.unpaged();
-            when(alertaService.listarParaGestaoPaginado(eq(1L), any(Pageable.class))).thenReturn(Page.empty());
+            when(alertaService.listarParaGestaoPaginado(eq(1L), eq("123"), any(Pageable.class))).thenReturn(Page.empty());
 
             alertaAplicacaoService.listarPorUnidade(CONTEXTO_GESTAO, p);
 
-            verify(alertaService).listarParaGestaoPaginado(eq(1L), any(Pageable.class));
+            verify(alertaService).listarParaGestaoPaginado(eq(1L), eq("123"), any(Pageable.class));
         }
 
         @Test

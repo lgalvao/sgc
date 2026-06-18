@@ -42,14 +42,14 @@ class AlertaRepoTest {
     }
 
     @Test
-    @DisplayName("deve paginar alertas da unidade sem incluir pessoais")
-    void devePaginarAlertasDaUnidadeSemIncluirPessoais() {
-        Page<Alerta> pagina = alertaRepo.buscarAlertasDaUnidade(6L, PageRequest.of(0, 10));
+    @DisplayName("deve paginar alertas visiveis para gestao incluindo pessoais e coletivos")
+    void devePaginarAlertasVisiveisParaGestao() {
+        Page<Alerta> pagina = alertaRepo.buscarAlertasDaGestao(6L, "8", PageRequest.of(0, 10));
 
         assertThat(pagina.getContent())
                 .extracting(Alerta::getCodigo)
                 .contains(70003L)
-                .doesNotContain(70002L);
+                .contains(70002L);
     }
 
     @Test

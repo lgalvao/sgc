@@ -37,19 +37,19 @@ public class AlertaService {
     }
 
     /**
-     * Regra CDU-02: Para os perfis de gestão, lista apenas alertas coletivos
-     * da unidade ativa.
+     * Regra CDU-02: Para os perfis de gestão, lista alertas pessoais do
+     * usuário logado e alertas coletivos da unidade ativa.
      */
-    public List<Alerta> listarParaGestao(Long codigoUnidade) {
-        return alertaRepo.buscarAlertasDaUnidade(codigoUnidade);
+    public List<Alerta> listarParaGestao(Long codigoUnidade, String usuarioTitulo) {
+        return alertaRepo.buscarAlertasDaGestao(codigoUnidade, usuarioTitulo);
     }
 
     public Page<Alerta> listarParaServidorPaginado(String usuarioTitulo, Pageable pageable) {
         return alertaRepo.buscarAlertasExclusivosDoUsuario(usuarioTitulo, pageable);
     }
 
-    public Page<Alerta> listarParaGestaoPaginado(Long codigoUnidade, Pageable pageable) {
-        return alertaRepo.buscarAlertasDaUnidade(codigoUnidade, pageable);
+    public Page<Alerta> listarParaGestaoPaginado(Long codigoUnidade, String usuarioTitulo, Pageable pageable) {
+        return alertaRepo.buscarAlertasDaGestao(codigoUnidade, usuarioTitulo, pageable);
     }
 
     public Optional<AlertaUsuario> alertaUsuario(AlertaUsuario.Chave chave) {

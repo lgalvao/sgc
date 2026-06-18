@@ -371,6 +371,7 @@ public class E2eController {
                 : "fixture" + codigo + "@tre-pe.jus.br";
         String situacao = request.situacao();
         String tipo = request.tipoNotificacao();
+        int tentativas = request.tentativas() == null ? 0 : request.tentativas();
         String chaveIdempotencia = "e2e:notificacao:" + codigo + ":" + UUID.randomUUID();
 
         jdbcTemplate.update("""
@@ -387,7 +388,7 @@ public class E2eController {
                 assunto,
                 corpoHtml,
                 situacao,
-                request.tentativas(),
+                tentativas,
                 SituacaoNotificacao.FALHA_TEMPORARIA.name().equals(situacao) ? agora.plusMinutes(10) : null,
                 agora.minusMinutes(5),
                 SituacaoNotificacao.ENVIADO.name().equals(situacao) ? agora.minusMinutes(1) : null,
