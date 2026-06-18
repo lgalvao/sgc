@@ -92,7 +92,7 @@ public class DiagnosticoNotificacaoService {
         Usuario servidor = servidorOpt.get();
         Unidade unidade = sp.getUnidade();
 
-        String assunto = "SGC: Avaliação de consenso de %s disponível para validação".formatted(servidor.getNome());
+        String assunto = "SGC: Avaliação de consenso criada";
         String corpo = emailModelosService.criarEmailDiagnosticoConsensoDisponivel(
                 servidor.getNome(),
                 unidade.getSigla(),
@@ -107,11 +107,12 @@ public class DiagnosticoNotificacaoService {
                 corpo,
                 "diagnostico:%d:consenso-disponivel:%s".formatted(sp.getCodigo(), servidorTitulo));
 
-        alertaService.criarAlertaTransicao(
+        alertaService.criarAlertaPessoal(
                 sp.getProcesso(),
-                "Avaliação de consenso de %s disponível para validação".formatted(servidor.getNome()),
                 unidade,
-                unidade
+                unidade,
+                servidor.getTituloEleitoral(),
+                "Avaliação de consenso criada"
         );
     }
 

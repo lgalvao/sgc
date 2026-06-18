@@ -5,6 +5,7 @@ import java.util.List;
 
 @Builder
 public record ConsensoDto(
+        String servidorNome,
         List<ConsensoCompetenciaDto> competencias,
         String situacaoServidor,
         boolean podeEditar,

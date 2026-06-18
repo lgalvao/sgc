@@ -151,6 +151,36 @@ class AlertaAplicacaoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve criar alerta pessoal contextualizado com processo e unidades")
+    void deveCriarAlertaPessoalContextualizado() {
+        Processo processo = new Processo();
+        processo.setCodigo(10L);
+        Unidade origem = new Unidade();
+        origem.setCodigo(2L);
+        origem.setSigla("ORIG");
+        Unidade destino = new Unidade();
+        destino.setCodigo(3L);
+        destino.setSigla("DEST");
+
+        when(alertaService.salvar(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Alerta alerta = alertaAplicacaoService.criarAlertaPessoal(
+                processo,
+                origem,
+                destino,
+                "123",
+                "Avaliação de consenso criada"
+        );
+
+        assertThat(alerta.getProcesso()).isSameAs(processo);
+        assertThat(alerta.getUnidadeOrigem()).isSameAs(origem);
+        assertThat(alerta.getUnidadeDestino()).isSameAs(destino);
+        assertThat(alerta.getUsuarioDestinoTitulo()).isEqualTo("123");
+        assertThat(alerta.getDescricao()).isEqualTo("Avaliação de consenso criada");
+        verify(alertaService).salvar(alerta);
+    }
+
+    @Test
     @DisplayName("Deve criar alerta para participante do tipo raiz")
     void deveCriarAlertaParaParticipanteRaiz() {
         Processo processo = new Processo();

@@ -39,9 +39,13 @@ vi.mock('@/stores/perfil', () => ({
 }));
 
 const podeCriarConsensoMock = ref(false);
+const statusContextoEdicaoMock = ref<'pending' | 'success'>('success');
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     useDiagnosticoPermissoes: () => ({
         podeCriarConsenso: podeCriarConsensoMock,
+        queryContextoEdicao: {
+            status: statusContextoEdicaoMock,
+        },
     }),
 }));
 
@@ -69,6 +73,7 @@ describe('useConsensoDiagnostico', () => {
         mutacaoSalvarOptions = null;
         mutacaoAprovarOptions = null;
         podeCriarConsensoMock.value = false;
+        statusContextoEdicaoMock.value = 'success';
         
         invalidateQueriesMock = vi.fn();
         
@@ -93,9 +98,7 @@ describe('useConsensoDiagnostico', () => {
     it('deve consultar consenso do servidor especifico quando a sessao pode criar consenso', async () => {
         const {obterConsenso, obterConsensoServidor} = await import('@/services/diagnosticoService');
         podeCriarConsensoMock.value = true;
-        const queryMock = vi.fn(() => null);
         vi.mocked(useQuery).mockImplementation((options: any) => {
-            queryMock(options.query);
             return {
                 data: ref(null),
                 status: ref('success'),
@@ -110,11 +113,23 @@ describe('useConsensoDiagnostico', () => {
         expect(obterConsenso).not.toHaveBeenCalled();
     });
 
+    it('deve aguardar permissoes antes de habilitar consulta com servidor na rota de consenso', () => {
+        statusContextoEdicaoMock.value = 'pending';
+        podeCriarConsensoMock.value = true;
+
+        useConsensoDiagnostico(1, '242424');
+        const queryOptions = vi.mocked(useQuery).mock.calls[0]?.[0] as any;
+
+        expect(queryOptions.enabled()).toBe(false);
+
+        statusContextoEdicaoMock.value = 'success';
+
+        expect(queryOptions.enabled()).toBe(true);
+    });
+
     it('deve consultar consenso do usuario logado quando a sessao nao pode criar consenso', async () => {
         const {obterConsenso, obterConsensoServidor} = await import('@/services/diagnosticoService');
-        const queryMock = vi.fn(() => null);
         vi.mocked(useQuery).mockImplementation((options: any) => {
-            queryMock(options.query);
             return {
                 data: ref(null),
                 status: ref('success'),
@@ -147,6 +162,34 @@ describe('useConsensoDiagnostico', () => {
         
         expect(competenciasLocais.value).toHaveLength(1);
         expect(competenciasLocais.value[0].consensoImportancia).toBe(3);
+    });
+
+    it('deve autopreencher consenso na carga quando servidor e chefia ja vierem iguais e nao nulos', async () => {
+        const queryData = ref<any>(null);
+        vi.mocked(useQuery).mockReturnValue({
+            data: queryData,
+            status: ref('success'),
+        } as any);
+
+        const { competenciasLocais } = useConsensoDiagnostico(1);
+
+        queryData.value = {
+            competencias: [{
+                competenciaCodigo: 1,
+                autoimportancia: 5,
+                autodominio: 4,
+                chefiaImportancia: 5,
+                chefiaDominio: 4,
+                consensoImportancia: null,
+                consensoDominio: null,
+            }],
+            situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+        };
+
+        await nextTick();
+
+        expect(competenciasLocais.value[0].consensoImportancia).toBe(5);
+        expect(competenciasLocais.value[0].consensoDominio).toBe(4);
     });
 
     it('deve disparar autosave e executar onSettled', async () => {
@@ -229,7 +272,7 @@ describe('useConsensoDiagnostico', () => {
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveAuto' }));
     });
 
-    it('deve atualizar nota detalhada (origem chefia) e autopreencher consenso se valores coincidirem', () => {
+    it('deve autopreencher consenso de importancia quando servidor e chefe forem iguais e nao nulos', () => {
         const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
         
         competenciasLocais.value = [{
@@ -243,9 +286,67 @@ describe('useConsensoDiagnostico', () => {
         }] as any;
 
         atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 5 });
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'dominio', valor: 4 });
 
         expect(competenciasLocais.value[0].consensoImportancia).toBe(5);
+        expect(competenciasLocais.value[0].consensoDominio).toBeNull();
+    });
+
+    it('deve autopreencher consenso de dominio quando servidor e chefe forem iguais e nao nulos', () => {
+        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+
+        competenciasLocais.value = [{
+            competenciaCodigo: 1,
+            autoimportancia: 5,
+            autodominio: 4,
+            chefiaImportancia: null,
+            chefiaDominio: null,
+            consensoImportancia: null,
+            consensoDominio: null,
+        }] as any;
+
+        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'dominio', valor: 4 });
+
+        expect(competenciasLocais.value[0].consensoDominio).toBe(4);
+        expect(competenciasLocais.value[0].consensoImportancia).toBeNull();
+    });
+
+    it('deve autopreencher apenas o campo igual e manter nulo o campo sem igualdade valida', () => {
+        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+
+        competenciasLocais.value = [{
+            competenciaCodigo: 1,
+            autoimportancia: 5,
+            autodominio: null,
+            chefiaImportancia: null,
+            chefiaDominio: null,
+            consensoImportancia: null,
+            consensoDominio: null,
+        }] as any;
+
+        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 5 });
+        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'dominio', valor: null });
+
+        expect(competenciasLocais.value[0].consensoImportancia).toBe(5);
+        expect(competenciasLocais.value[0].consensoDominio).toBeNull();
+    });
+
+    it('deve limpar o consenso quando a chefia alterar o campo para vazio', () => {
+        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+
+        competenciasLocais.value = [{
+            competenciaCodigo: 1,
+            autoimportancia: 5,
+            autodominio: 4,
+            chefiaImportancia: 5,
+            chefiaDominio: 4,
+            consensoImportancia: 5,
+            consensoDominio: 4,
+        }] as any;
+
+        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: null });
+
+        expect(competenciasLocais.value[0].chefiaImportancia).toBeNull();
+        expect(competenciasLocais.value[0].consensoImportancia).toBeNull();
         expect(competenciasLocais.value[0].consensoDominio).toBe(4);
     });
 

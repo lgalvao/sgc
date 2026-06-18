@@ -64,6 +64,7 @@ export interface Autoavaliacao {
 
 /** Consenso da chefia para o servidor logado. */
 export interface Consenso {
+    servidorNome?: string | null;
     competencias: ConsensoCompetenciaDetalhada[];
     situacaoServidor: SituacaoAvaliacaoServidor;
     podeEditar: boolean;

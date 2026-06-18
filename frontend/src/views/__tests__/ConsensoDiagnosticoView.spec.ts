@@ -57,6 +57,9 @@ const erroAprovar = ref<any>(null);
 
 vi.mock('@/composables/useConsensoDiagnostico', () => ({
     useConsensoDiagnostico: () => ({
+        query: {
+            data: computed(() => ({servidorNome: 'Servidor Exemplo'})),
+        },
         competenciasLocais,
         podeEditar,
         podeConcluirAvaliacao,
@@ -175,6 +178,12 @@ describe('ConsensoDiagnosticoView', () => {
         expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').exists()).toBe(false);
         expect(wrapper.findAll('thead tr')).toHaveLength(2);
         expect(wrapper.find('[data-testid="consenso-final-dominio-10"]').exists()).toBe(true);
+    });
+
+    it('usa o nome retornado pela query no subtitulo quando a rota nao traz servidorNome', () => {
+        const wrapper = montar({servidorTitulo: '999999', servidorNome: undefined});
+
+        expect(wrapper.text()).toContain('Servidor Exemplo - 999999');
     });
 
     it('conclui a avaliação pelo cabeçalho e volta ao subprocesso', async () => {

@@ -142,7 +142,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoConsensoDisponivel(String nomeServidor, String siglaUnidade, String nomeProcesso, String urlSistema) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Consenso disponível para validação");
+        ctx.setVariable(VAR_TITULO, "Avaliação de consenso criada");
         ctx.setVariable("nomeServidor", nomeServidor);
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);

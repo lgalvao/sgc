@@ -98,6 +98,10 @@ public class DiagnosticoConsultaService {
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
+        String servidorNome = avaliacoes.stream()
+                .findFirst()
+                .map(AvaliacaoServidor::getServidorNomeDiagnostico)
+                .orElse(servidorTitulo);
         List<ConsensoCompetenciaDto> competencias = avaliacoes.stream()
                 .map(a -> ConsensoCompetenciaDto.builder()
                         .competenciaCodigo(a.getCompetencia().getCodigo())
@@ -106,8 +110,8 @@ public class DiagnosticoConsultaService {
                         .autodominio(a.getAutodominio())
                         .chefiaImportancia(a.getChefiaImportancia())
                         .chefiaDominio(a.getChefiaDominio())
-                        .consensoImportancia(a.getConsensoImportancia())
-                        .consensoDominio(a.getConsensoDominio())
+                        .consensoImportancia(resolverConsensoImportancia(a))
+                        .consensoDominio(resolverConsensoDominio(a))
                         .build())
                 .toList();
         String situacaoServidor = avaliacoes.stream()
@@ -117,6 +121,7 @@ public class DiagnosticoConsultaService {
         SituacaoAvaliacaoServidor situacao = SituacaoAvaliacaoServidor.valueOf(situacaoServidor);
         boolean usuarioEhServidorAvaliado = usuario.getTituloEleitoral().equals(servidorTitulo);
         return ConsensoDto.builder()
+                .servidorNome(servidorNome)
                 .competencias(competencias)
                 .situacaoServidor(situacaoServidor)
                 .podeEditar(!usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
@@ -198,8 +203,8 @@ public class DiagnosticoConsultaService {
                             .map(a -> AvaliacaoCompetenciaDto.builder()
                                     .competenciaCodigo(a.getCompetencia().getCodigo())
                                     .competenciaDescricao(a.getCompetencia().getDescricao())
-                                    .importancia(a.getConsensoImportancia())
-                                    .dominio(a.getConsensoDominio())
+                                    .importancia(resolverConsensoImportancia(a))
+                                    .dominio(resolverConsensoDominio(a))
                                     .build())
                             .toList();
                     return ServidorDiagnosticoDto.builder()
@@ -276,5 +281,20 @@ public class DiagnosticoConsultaService {
         return responsavel.substitutoTitulo() != null && !responsavel.substitutoTitulo().isBlank()
                 ? responsavel.substitutoTitulo()
                 : responsavel.titularTitulo();
+    }
+
+    private Integer resolverConsensoImportancia(AvaliacaoServidor avaliacao) {
+        return consensoEspelhadoDaAutoavaliacao(avaliacao) ? null : avaliacao.getConsensoImportancia();
+    }
+
+    private Integer resolverConsensoDominio(AvaliacaoServidor avaliacao) {
+        return consensoEspelhadoDaAutoavaliacao(avaliacao) ? null : avaliacao.getConsensoDominio();
+    }
+
+    private boolean consensoEspelhadoDaAutoavaliacao(AvaliacaoServidor avaliacao) {
+        return avaliacao.getChefiaImportancia() == null
+                && avaliacao.getChefiaDominio() == null
+                && java.util.Objects.equals(avaliacao.getConsensoImportancia(), avaliacao.getAutoimportancia())
+                && java.util.Objects.equals(avaliacao.getConsensoDominio(), avaliacao.getAutodominio());
     }
 }

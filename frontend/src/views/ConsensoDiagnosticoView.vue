@@ -184,6 +184,7 @@ const servidorEhUsuarioLogado = computed(() =>
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
 const {
+  query,
   competenciasLocais,
   podeEditar,
   podeConcluirAvaliacao,
@@ -201,10 +202,11 @@ const {
   concluirAvaliacao,
   aprovarConsenso,
 } = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
+const nomeServidorQuery = computed(() => query.data.value?.servidorNome ?? null);
 const nomeServidorSubtitulo = computed(() =>
   servidorEhUsuarioLogado.value
-    ? (perfilStore.usuarioNome ?? props.servidorNome ?? props.servidorTitulo)
-    : (props.servidorNome ?? props.servidorTitulo),
+    ? (perfilStore.usuarioNome ?? nomeServidorQuery.value ?? props.servidorNome ?? props.servidorTitulo)
+    : (nomeServidorQuery.value ?? props.servidorNome ?? props.servidorTitulo),
 );
 const subtituloServidor = computed(() => `${nomeServidorSubtitulo.value} - ${props.servidorTitulo}`);
 
@@ -360,6 +362,10 @@ function campoConsensoHabilitado(
   display: block;
   width: 100%;
   min-width: 0;
+}
+
+.seletor-consenso:disabled {
+  cursor: not-allowed;
 }
 
 .valor-estatico {

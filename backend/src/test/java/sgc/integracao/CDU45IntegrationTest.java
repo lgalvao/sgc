@@ -1,7 +1,10 @@
 package sgc.integracao;
 
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.NotificacaoEmailRepo;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
 import sgc.integracao.mocks.*;
@@ -17,6 +20,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("CDU-45: Manter avaliação de consenso")
 class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
     private static final String API_DIAGNOSTICO = "/api/subprocessos/{codSubprocesso}/diagnostico";
+
+    @Autowired
+    private AlertaRepo alertaRepo;
+
+    @Autowired
+    private NotificacaoEmailRepo notificacaoEmailRepo;
 
     @BeforeEach
     void setUp() {
@@ -81,6 +90,19 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
         assertThat(buscarAvaliacoes("50003")).allSatisfy(avaliacao ->
                 assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
+        assertThat(notificacaoEmailRepo.findAll()).anySatisfy(notificacao -> {
+            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Avaliação de consenso criada");
+            assertThat(notificacao.getDestinatario()).isEqualTo(servidor.getEmail());
+            assertThat(notificacao.getCorpoHtml()).contains("concluiu a avaliação de consenso no processo");
+            assertThat(notificacao.getCorpoHtml()).contains(processo.getDescricao());
+        });
+        assertThat(alertaRepo.findAll()).anySatisfy(alerta -> {
+            assertThat(alerta.getDescricao()).isEqualTo("Avaliação de consenso criada");
+            assertThat(alerta.getProcesso().getCodigo()).isEqualTo(processo.getCodigo());
+            assertThat(alerta.getUsuarioDestinoTitulo()).isEqualTo(servidor.getTituloEleitoral());
+            assertThat(alerta.getUnidadeOrigem().getCodigo()).isEqualTo(unidade.getCodigo());
+            assertThat(alerta.getUnidadeDestino().getCodigo()).isEqualTo(unidade.getCodigo());
+        });
     }
 
     @Test

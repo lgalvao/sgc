@@ -28,17 +28,27 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
-    const {podeCriarConsenso} = useDiagnosticoPermissoes(codSubprocesso);
+    const {podeCriarConsenso, queryContextoEdicao} = useDiagnosticoPermissoes(codSubprocesso);
+    const carregandoPermissoes = computed(() => queryContextoEdicao.status.value === 'pending');
     const deveConsultarConsensoServidor = computed(() =>
         Boolean(servidorTitulo) && podeCriarConsenso.value
     );
+    const chaveConsultaConsenso = computed(() => servidorTitulo
+        ? (deveConsultarConsensoServidor.value ? servidorTitulo : 'usuario-logado')
+        : 'usuario-logado',
+    );
+    const podeCarregarConsenso = computed(() =>
+        codSubprocesso > 0
+        && !!perfilStore.usuarioCodigo
+        && (!servidorTitulo || !carregandoPermissoes.value),
+    );
 
     const query = useQuery<Consenso>({
-        key: () => chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
+        key: () => chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
         query: () => deveConsultarConsensoServidor.value
-            ? obterConsensoServidor(codSubprocesso, servidorTitulo)
+            ? obterConsensoServidor(codSubprocesso, servidorTitulo!)
             : obterConsenso(codSubprocesso),
-        enabled: () => codSubprocesso > 0,
+        enabled: () => podeCarregarConsenso.value,
         staleTime: Infinity,
     });
 
@@ -56,7 +66,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
                 if (salvandoAutomaticamente.value) {
                     return;
                 }
-                competenciasLocais.value = novoConsenso.competencias.map((c) => ({...c}));
+                competenciasLocais.value = novoConsenso.competencias.map(normalizarCompetenciaConsenso);
             }
         },
         {immediate: true},
@@ -79,9 +89,11 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             salvandoAutomaticamente.value = false;
         },
         onSuccess: () => {
-            const anterior = cache.getQueryData<Consenso>(chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo));
+            const anterior = cache.getQueryData<Consenso>(
+                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
+            );
             cache.setQueryData(
-                chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
+                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
                 {
                     competencias: competenciasLocais.value.map((c) => ({...c})),
                     situacaoServidor: anterior?.situacaoServidor ?? 'AUTOAVALIACAO_CONCLUIDA',
@@ -145,14 +157,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         if (atualizacao.origem === 'chefia') {
             if (atualizacao.campo === 'importancia') item.chefiaImportancia = atualizacao.valor;
             if (atualizacao.campo === 'dominio') item.chefiaDominio = atualizacao.valor;
-
-            // Autopreenchimento do consenso quando chefia coincide com servidor (CDU-44)
-            const chefiaImportancia = atualizacao.campo === 'importancia' ? atualizacao.valor : item.chefiaImportancia;
-            const chefiaDominio = atualizacao.campo === 'dominio' ? atualizacao.valor : item.chefiaDominio;
-            if (item.autoimportancia === chefiaImportancia && item.autodominio === chefiaDominio) {
-                item.consensoImportancia = chefiaImportancia;
-                item.consensoDominio = chefiaDominio;
-            }
+            aplicarAutopreenchimentoConsenso(item);
         } else {
             if (atualizacao.campo === 'importancia') item.consensoImportancia = atualizacao.valor;
             if (atualizacao.campo === 'dominio') item.consensoDominio = atualizacao.valor;
@@ -176,6 +181,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         habilitarAprovarConsenso,
         ehConsensoAprovado,
         carregando,
+        carregandoPermissoes,
         salvandoAutomaticamente,
         concluindo,
         aprovando,
@@ -204,4 +210,38 @@ function invalidarQueriesAprovar(ctx: InvalidaQueriesContext) {
     void ctx.cache.invalidateQueries({key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.servidorTitulo), exact: true});
     void ctx.cache.invalidateQueries({key: chaveEquipe(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
     void ctx.cache.invalidateQueries({key: chaveAutoavaliacao(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
+}
+
+function normalizarCompetenciaConsenso(competencia: ConsensoCompetenciaDetalhada): ConsensoCompetenciaDetalhada {
+    const item = {...competencia};
+    aplicarAutopreenchimentoConsenso(item);
+    return item;
+}
+
+function aplicarAutopreenchimentoConsenso(item: ConsensoCompetenciaDetalhada) {
+    if (item.chefiaImportancia === null) {
+        item.consensoImportancia = null;
+    }
+
+    if (item.chefiaDominio === null) {
+        item.consensoDominio = null;
+    }
+
+    if (
+        item.consensoImportancia === null
+        && item.autoimportancia !== null
+        && item.chefiaImportancia !== null
+        && item.autoimportancia === item.chefiaImportancia
+    ) {
+        item.consensoImportancia = item.chefiaImportancia;
+    }
+
+    if (
+        item.consensoDominio === null
+        && item.autodominio !== null
+        && item.chefiaDominio !== null
+        && item.autodominio === item.chefiaDominio
+    ) {
+        item.consensoDominio = item.chefiaDominio;
+    }
 }

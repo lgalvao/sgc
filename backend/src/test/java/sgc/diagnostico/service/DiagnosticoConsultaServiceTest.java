@@ -105,6 +105,36 @@ class DiagnosticoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("obterConsenso deve ocultar consenso espelhado da autoavaliação quando a chefia ainda não preencheu nada")
+    void obterConsenso_deveOcultarConsensoEspelhadoDaAutoavaliacao() {
+        Long codSubprocesso = 400L;
+        Long codDiagnostico = 900L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("151515");
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        avaliacao.setAutoimportancia(4);
+        avaliacao.setAutodominio(3);
+        avaliacao.setImportancia(4);
+        avaliacao.setDominio(3);
+        avaliacao.setChefiaImportancia(null);
+        avaliacao.setChefiaDominio(null);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        var dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.competencias()).singleElement().satisfies(item -> {
+            assertThat(item.autoimportancia()).isEqualTo(4);
+            assertThat(item.autodominio()).isEqualTo(3);
+            assertThat(item.consensoImportancia()).isNull();
+            assertThat(item.consensoDominio()).isNull();
+        });
+    }
+
+    @Test
     @DisplayName("obterDiagnosticoUnidade deve ocultar o responsável da unidade de servidores e situações de capacitação")
     void obterDiagnosticoUnidade_deveOcultarResponsavelDaUnidade() {
         Long codSubprocesso = 400L;
@@ -167,6 +197,38 @@ class DiagnosticoConsultaServiceTest {
             assertThat(item.podePermitirAvaliacao()).isTrue();
             assertThat(item.podeImpossibilitar()).isFalse();
         });
+    }
+
+    @Test
+    @DisplayName("obterDiagnosticoUnidade deve ocultar consenso espelhado da autoavaliação antes do preenchimento da chefia")
+    void obterDiagnosticoUnidade_deveOcultarConsensoEspelhadoDaAutoavaliacao() {
+        Long codSubprocesso = 400L;
+        Long codDiagnostico = 900L;
+        Unidade unidade = unidade(12L, "ASSESSORIA_12", "Assessoria 12");
+        Subprocesso subprocesso = subprocesso(codSubprocesso, unidade);
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        avaliacao.setAutoimportancia(4);
+        avaliacao.setAutodominio(3);
+        avaliacao.setImportancia(4);
+        avaliacao.setDominio(3);
+        avaliacao.setChefiaImportancia(null);
+        avaliacao.setChefiaDominio(null);
+
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(subprocessoConsultaService.listarMovimentacoes(subprocesso)).thenReturn(List.of());
+        when(avaliacaoRepo.listarPorDiagnostico(codDiagnostico)).thenReturn(List.of(avaliacao));
+        when(situacaoCapacitacaoRepo.listarPorDiagnostico(codDiagnostico)).thenReturn(List.of());
+        when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidade.getCodigo())).thenReturn(Optional.empty());
+
+        DiagnosticoUnidadeDto dto = service.obterDiagnosticoUnidade(codSubprocesso);
+
+        assertThat(dto.servidores()).singleElement().satisfies(item ->
+                assertThat(item.consenso()).singleElement().satisfies(consenso -> {
+                    assertThat(consenso.importancia()).isNull();
+                    assertThat(consenso.dominio()).isNull();
+                }));
     }
 
     private Diagnostico diagnostico(Long codigo) {

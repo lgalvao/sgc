@@ -3,6 +3,7 @@ import {criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture} from './fixtur
 import {abrirAcaoConsensoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 import {verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
@@ -117,6 +118,15 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         ]);
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
         await verificarToast(page, TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
+
+        await login(page, '111111111111', 'senha');
+        await verificarNotificacaoAdmin(page, {
+            assunto: 'Avaliação de consenso criada',
+            destinatario: TITULO_SERVIDOR_ASSESSORIA_12,
+            tipo: 'Consenso disponível',
+            situacao: 'PENDENTE',
+            trechoCorpo: 'concluiu a avaliação de consenso no processo',
+        });
 
         await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
