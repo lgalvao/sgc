@@ -79,7 +79,6 @@ export async function preencherConsensoMinimo(
         '[data-testid^="consenso-final-dominio-"]'
     ];
 
-    let alterouAlgumCampo = false;
     for (const seletor of campos) {
         const itens = page.locator(seletor);
         const total = await itens.count();
@@ -95,10 +94,7 @@ export async function preencherConsensoMinimo(
                 ),
                 itens.nth(i).selectOption('4')
             ]);
-            alterouAlgumCampo = true;
-            break;
         }
-        if (alterouAlgumCampo) break;
     }
 }
 
@@ -118,6 +114,7 @@ export async function abrirAcaoCapacitacaoDiagnostico(page: Page): Promise<void>
 export async function aprovarConsensoDiagnostico(page: Page, codSubprocesso: number): Promise<void> {
     const botaoAprovar = page.getByTestId('btn-aprovar-consenso');
     await expect(botaoAprovar).toBeVisible();
+    await expect(botaoAprovar).toBeEnabled();
     await Promise.all([
         page.waitForResponse(res =>
             res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/consenso/aprovar'))
@@ -125,6 +122,20 @@ export async function aprovarConsensoDiagnostico(page: Page, codSubprocesso: num
             && res.ok()
         ),
         botaoAprovar.click()
+    ]);
+}
+
+export async function concluirConsensoDiagnostico(page: Page, codSubprocesso: number, servidorTitulo: string): Promise<void> {
+    const botaoConcluir = page.getByTestId('btn-concluir-avaliacao');
+    await expect(botaoConcluir).toBeVisible();
+    await expect(botaoConcluir).toBeEnabled();
+    await Promise.all([
+        page.waitForResponse(res =>
+            res.url().includes(caminhoDiagnosticoApi(codSubprocesso, `/consenso/${servidorTitulo}/concluir`))
+            && res.request().method() === 'POST'
+            && res.ok()
+        ),
+        botaoConcluir.click()
     ]);
 }
 

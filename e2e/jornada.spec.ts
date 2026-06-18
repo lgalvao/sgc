@@ -9,6 +9,7 @@ import {
     aprovarConsensoDiagnostico,
     abrirAcaoConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
+    concluirConsensoDiagnostico,
     preencherConsensoMinimo,
     preencherSituacoesCapacitacaoPendentesPelaTela
 } from './helpers/helpers-diagnostico.js';
@@ -487,18 +488,22 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await abrirAcaoConsensoDiagnostico(page, SERVIDOR_DIAGNOSTICO.titulo);
             await expect(page.getByRole('heading', {name: /Avaliação de consenso/i})).toBeVisible();
             await preencherConsensoMinimo(page, codSubprocesso, SERVIDOR_DIAGNOSTICO.titulo);
-            await page.getByTestId('btn-nav-voltar').click();
+            await concluirConsensoDiagnostico(page, codSubprocesso, SERVIDOR_DIAGNOSTICO.titulo);
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}(?:\\?.*)?$`));
 
             await page.getByTestId(`dropdown-acoes-${SERVIDOR_IMPOSSIBILITADO.titulo}`).getByRole('button', {name: 'Ações'}).click();
             await page.getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO.titulo}`).click();
-            await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante o período da rodada.');
+            const modalImpossibilidade = page.getByRole('dialog', {name: /Indicar impossibilidade de avaliação/i});
+            await expect(modalImpossibilidade).toBeVisible();
+            await modalImpossibilidade.getByTestId('textarea-justificativa-impossibilidade').fill(
+                'Servidor afastado durante o período da rodada.'
+            );
             await Promise.all([
                 page.waitForResponse(res =>
                     res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/${SERVIDOR_IMPOSSIBILITADO.titulo}/impossibilitar`)
                     && res.ok()
                 ),
-                page.getByTestId('btn-confirmar-impossibilitar').click()
+                modalImpossibilidade.getByTestId('btn-confirmar-impossibilitar').click()
             ]);
             await expect(page.getByTestId('app-alert')).toContainText('Impossibilidade registrada');
         });
