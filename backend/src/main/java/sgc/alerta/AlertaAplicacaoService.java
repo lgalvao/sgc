@@ -123,7 +123,13 @@ public class AlertaAplicacaoService {
 
     @Transactional
     public Alerta criarAlertaPessoal(String usuarioTitulo, String descricao) {
+        return criarAlertaPessoal(null, usuarioTitulo, descricao);
+    }
+
+    @Transactional
+    public Alerta criarAlertaPessoal(Processo processo, String usuarioTitulo, String descricao) {
         Alerta alerta = Alerta.builder()
+                .processo(processo)
                 .dataHora(LocalDateTime.now())
                 .unidadeOrigem(unidadeRaiz())
                 .usuarioDestinoTitulo(usuarioTitulo)

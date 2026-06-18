@@ -59,6 +59,7 @@ public class DiagnosticoNotificacaoService {
                 "diagnostico:%d:inicio:servidor:%s".formatted(sp.getCodigo(), servidor.getTituloEleitoral()));
 
         alertaService.criarAlertaPessoal(
+                sp.getProcesso(),
                 servidor.getTituloEleitoral(),
                 "Sua autoavaliação de diagnóstico no processo %s está disponível. Prazo: %s".formatted(nomeProcesso, dataLimite)
         );

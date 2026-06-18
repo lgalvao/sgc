@@ -151,6 +151,28 @@ class AlertaAplicacaoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve criar alerta pessoal com processo vinculado")
+    void deveCriarAlertaPessoalComProcesso() {
+        Unidade raiz = new Unidade();
+        raiz.setCodigo(1L);
+        raiz.setSigla("ADMIN");
+        Processo processo = new Processo();
+        processo.setCodigo(99L);
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raiz);
+        when(alertaService.salvar(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Alerta alerta = alertaAplicacaoService.criarAlertaPessoal(processo, "123", "Alerta pessoal de diagnóstico");
+
+        assertThat(alerta.getProcesso()).isSameAs(processo);
+        assertThat(alerta.getUnidadeDestino()).isNull();
+        assertThat(alerta.getUnidadeOrigem()).isSameAs(raiz);
+        assertThat(alerta.getUsuarioDestinoTitulo()).isEqualTo("123");
+        assertThat(alerta.getDescricao()).isEqualTo("Alerta pessoal de diagnóstico");
+        verify(alertaService).salvar(alerta);
+    }
+
+    @Test
     @DisplayName("Deve criar alerta para participante do tipo raiz")
     void deveCriarAlertaParaParticipanteRaiz() {
         Processo processo = new Processo();
@@ -243,7 +265,7 @@ class AlertaAplicacaoServiceTest {
             alertaAplicacaoService.alertasPorUsuario(CONTEXTO_SERVIDOR);
 
             verify(alertaService).listarParaServidor(titulo);
-            verify(alertaService, never()).listarParaGestao(anyLong(), anyString());
+            verify(alertaService, never()).listarParaGestao(anyLong());
         }
 
         @Test

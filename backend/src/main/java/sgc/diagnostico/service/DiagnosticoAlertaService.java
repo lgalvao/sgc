@@ -19,6 +19,10 @@ public class DiagnosticoAlertaService {
         alertaAplicacaoService.criarAlertaPessoal(usuarioTitulo, descricao);
     }
 
+    public void criarAlertaPessoal(Processo processo, String usuarioTitulo, String descricao) {
+        alertaAplicacaoService.criarAlertaPessoal(processo, usuarioTitulo, descricao);
+    }
+
     public void criarAlertaTransicao(Processo processo, String descricao, Unidade origem, Unidade destino) {
         alertaAplicacaoService.criarAlertaTransicao(processo, descricao, origem, destino);
     }

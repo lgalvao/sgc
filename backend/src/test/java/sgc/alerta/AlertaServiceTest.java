@@ -38,7 +38,7 @@ class AlertaServiceTest {
 
         assertThat(resultado).hasSize(1);
         verify(alertaRepo).buscarAlertasExclusivosDoUsuario(usuarioTitulo);
-        verify(alertaRepo, never()).buscarAlertasDaUnidadeEIndividuais(anyLong(), anyString());
+        verify(alertaRepo, never()).buscarAlertasDaUnidade(anyLong());
     }
 
     @Test
