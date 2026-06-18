@@ -58,6 +58,14 @@ export async function salvarConsenso(
     return apiPost(caminhoDiagnostico(codSubprocesso, `/consenso/${encodeURIComponent(servidorTitulo)}`), request);
 }
 
+/** POST /subprocessos/{id}/diagnostico/consenso/{servidorTitulo}/concluir */
+export async function concluirConsenso(
+    codSubprocesso: number,
+    servidorTitulo: string,
+): Promise<void> {
+    return apiPost(caminhoDiagnostico(codSubprocesso, `/consenso/${encodeURIComponent(servidorTitulo)}/concluir`));
+}
+
 /** POST /subprocessos/{id}/diagnostico/consenso/aprovar */
 export async function aprovarConsenso(codSubprocesso: number): Promise<void> {
     return apiPost(caminhoDiagnostico(codSubprocesso, '/consenso/aprovar'));

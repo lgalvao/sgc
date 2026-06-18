@@ -63,6 +63,15 @@ public class DiagnosticoController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{codSubprocesso}/diagnostico/consenso/{servidorTitulo}/concluir")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
+    public ResponseEntity<Void> concluirConsenso(
+            @PathVariable Long codSubprocesso,
+            @PathVariable String servidorTitulo) {
+        avaliacaoService.concluirConsenso(codSubprocesso, servidorTitulo);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{codSubprocesso}/diagnostico/consenso")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
     public ResponseEntity<ConsensoDto> obterConsenso(@PathVariable Long codSubprocesso) {
@@ -114,7 +123,11 @@ public class DiagnosticoController {
     }
 
     @GetMapping("/{codSubprocesso}/diagnostico/equipe")
-    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
+    @PreAuthorize("""
+            hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')
+            or hasPermission(#codSubprocesso, 'Subprocesso', 'VALIDAR_DIAGNOSTICO')
+            or hasPermission(#codSubprocesso, 'Subprocesso', 'HOMOLOGAR_DIAGNOSTICO')
+            """)
     public ResponseEntity<DiagnosticoEquipeDto> obterEquipe(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterEquipe(codSubprocesso));
     }

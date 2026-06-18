@@ -42,6 +42,7 @@ vi.mock('@/services/diagnosticoService', () => ({
     obterConsenso: vi.fn(),
     obterConsensoServidor: vi.fn(),
     salvarConsenso: vi.fn(),
+    concluirConsenso: vi.fn(),
     aprovarConsenso: vi.fn(),
 }));
 
@@ -103,6 +104,19 @@ describe('useConsensoDiagnostico', () => {
 
     it('deve disparar autosave e executar onSettled', async () => {
         const { salvarConsenso } = await import('@/services/diagnosticoService');
+        const queryData = ref<any>({
+            situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+            competencias: [],
+            podeEditar: true,
+            podeConcluirAvaliacao: true,
+            habilitarConcluirAvaliacao: true,
+            podeAprovarConsenso: false,
+            habilitarAprovarConsenso: false,
+        });
+        vi.mocked(useQuery).mockReturnValue({
+            data: queryData,
+            status: ref('success'),
+        } as any);
         const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1, 'servidor1');
         
         competenciasLocais.value = [{ competenciaCodigo: 1, consensoImportancia: 1, consensoDominio: 1 }] as any;
@@ -152,6 +166,17 @@ describe('useConsensoDiagnostico', () => {
         await aprovar();
         
         expect(aprovarConsenso).toHaveBeenCalledWith(1);
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveConsenso' }));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveEquipe' }));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveAuto' }));
+    });
+
+    it('deve chamar mutacao de conclusao e invalidar as queries relevantes', async () => {
+        const { concluirConsenso } = await import('@/services/diagnosticoService');
+        const { concluirAvaliacao } = useConsensoDiagnostico(1, 'servidor1');
+        await concluirAvaliacao();
+
+        expect(concluirConsenso).toHaveBeenCalledWith(1, 'servidor1');
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveConsenso' }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveEquipe' }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveAuto' }));

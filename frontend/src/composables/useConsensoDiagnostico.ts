@@ -3,6 +3,7 @@ import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {
     aprovarConsenso,
+    concluirConsenso,
     obterConsenso,
     obterConsensoServidor,
     salvarConsenso,
@@ -81,7 +82,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
                 chaveConsenso(codSubprocesso, contextoSessao, servidorTitulo),
                 {
                     competencias: competenciasLocais.value.map((c) => ({...c})),
-                    situacaoServidor: 'CONSENSO_CRIADO',
+                    situacaoServidor: anterior?.situacaoServidor ?? 'AUTOAVALIACAO_CONCLUIDA',
                     podeEditar: anterior?.podeEditar ?? false,
                     podeConcluirAvaliacao: anterior?.podeConcluirAvaliacao ?? false,
                     habilitarConcluirAvaliacao: anterior?.habilitarConcluirAvaliacao ?? false,
@@ -90,6 +91,14 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
                 } satisfies Consenso,
             );
             invalidarQueriesConsenso({cache, codSubprocesso, contextoSessao, servidorTitulo});
+        },
+    });
+
+    const mutacaoConcluir = useMutation({
+        mutation: (titulo: string) => concluirConsenso(codSubprocesso, titulo),
+        onSuccess: () => {
+            invalidarQueriesConsenso({cache, codSubprocesso, contextoSessao, servidorTitulo});
+            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso, contextoSessao), exact: true});
         },
     });
 
@@ -152,6 +161,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
 
     const carregando = computed(() => query.status.value === 'pending');
     const aprovando = computed(() => mutacaoAprovar.isLoading.value);
+    const concluindo = computed(() => mutacaoConcluir.isLoading.value);
 
     return {
         query,
@@ -165,10 +175,13 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         ehConsensoAprovado,
         carregando,
         salvandoAutomaticamente,
+        concluindo,
         aprovando,
+        erroConcluir: computed(() => mutacaoConcluir.error.value),
         erroAprovar: computed(() => mutacaoAprovar.error.value),
         atualizarNotaDetalhada,
         salvarConsensoAgora,
+        concluirAvaliacao: () => servidorTitulo ? mutacaoConcluir.mutateAsync(servidorTitulo) : Promise.resolve(),
         aprovarConsenso: () => mutacaoAprovar.mutateAsync(),
     };
 }

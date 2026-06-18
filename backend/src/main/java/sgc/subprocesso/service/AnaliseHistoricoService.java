@@ -96,7 +96,7 @@ public class AnaliseHistoricoService {
         return switch (acao) {
             case ACEITE_MAPEAMENTO, ACEITE_REVISAO, ACEITE_DIAGNOSTICO  -> "Aceite";
             case DEVOLUCAO_MAPEAMENTO, DEVOLUCAO_REVISAO, DEVOLUCAO_DIAGNOSTICO -> "Devolução";
-
+            case HOMOLOGACAO_DIAGNOSTICO -> "Homologação";
         };
     }
 }

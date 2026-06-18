@@ -5,7 +5,7 @@ import {
 } from './helpers/helpers-processos.js';
 import {
     criarProcessoFinalizadoFixture,
-    criarProcessoDiagnosticoComConsensoCriadoFixture,
+    criarProcessoDiagnosticoConcluidoFixture,
     type ProcessoFixture,
 } from './fixtures/index.js';
 import {
@@ -15,7 +15,6 @@ import {
 } from './helpers/helpers-auth.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
-import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -33,117 +32,16 @@ const TEXTO_ACEITE = 'Aceite registrado';
 const TEXTO_DEVOLUCAO = 'Devolução realizada';
 const TEXTO_HOMOLOGACAO = 'Diagnóstico homologado';
 
-async function preencherSituacoesCapacitacaoPendentesPorApi(page: Page, codSubprocesso: number): Promise<void> {
-    await page.evaluate(async (codigo: number) => {
-        const respostaAtual = await fetch(`/api/subprocessos/${codigo}/diagnostico/unidade`, {credentials: 'include'});
-        if (!respostaAtual.ok) {
-            throw new Error(`Falha ao carregar situações de capacitação do subprocesso ${codigo}.`);
-        }
-
-        const dados = await respostaAtual.json();
-        const situacoes = dados.situacoesCapacitacao.map((item: {
-            servidorTitulo: string;
-            competenciaCodigo: number;
-            situacaoCapacitacao: string | null;
-        }) => ({
-            servidorTitulo: item.servidorTitulo,
-            competenciaCodigo: item.competenciaCodigo,
-            situacaoCapacitacao: item.situacaoCapacitacao ?? 'EC',
-        }));
-
-        const respostaSalvar = await fetch(`/api/subprocessos/${codigo}/diagnostico/situacoes-capacitacao`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({situacoes}),
-        });
-
-        if (!respostaSalvar.ok) {
-            throw new Error(`Falha ao preencher situações de capacitação do subprocesso ${codigo}.`);
-        }
-    }, codSubprocesso);
-}
-
-async function impossibilitarAvaliacoesPendentes(page: Page, codSubprocesso: number): Promise<void> {
-    const tabela = page.getByTestId('tbl-servidores-diagnostico');
-    await expect(tabela).toBeVisible();
-    await tabela.locator('tbody tr').first().waitFor({state: 'visible'});
-
-    const linhas = tabela.locator('tbody tr');
-    const total = await linhas.count();
-
-    for (let i = 0; i < total; i++) {
-        const linha = linhas.nth(i);
-        const texto = await linha.textContent();
-        if (!texto?.includes(TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA)) {
-            continue;
-        }
-
-        await linha.getByRole('button', {name: TEXTO_BOTAO_ACOES}).click();
-        await page.locator('[data-testid^="btn-impossibilitar-"]:visible').click();
-        await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante a rodada.');
-        await Promise.all([
-            page.waitForResponse((res: Response) =>
-                res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/`)
-                && res.url().includes('/impossibilitar')
-                && res.request().method() === 'POST'
-                && res.ok(),
-            ),
-            page.getByTestId('btn-confirmar-impossibilitar').click(),
-        ]);
-        // Aguarda o fechamento do modal esperando o textarea sumir
-        await expect(page.getByTestId('textarea-justificativa-impossibilidade')).toBeHidden();
-    }
-}
-
 async function prepararDiagnosticoConcluido(
-    page: Page,
     request: APIRequestContext,
     descricao: string,
 ): Promise<ProcessoFixture> {
-    const processo = await criarProcessoDiagnosticoComConsensoCriadoFixture(request, {
+    return criarProcessoDiagnosticoConcluidoFixture(request, {
         descricao,
         unidade: UNIDADE_SUBORDINADA,
         iniciar: true,
         servidorTitulo: TITULO_SERVIDOR,
     });
-
-    await login(page, TITULO_CHEFE, 'senha');
-    await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
-    const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE_SUBORDINADA);
-
-    await impossibilitarAvaliacoesPendentes(page, codSubprocesso);
-
-    await login(page, TITULO_SERVIDOR, 'senha');
-    await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
-    const cardConsenso = page.getByTestId('card-subprocesso-consenso');
-    await expect(cardConsenso).toBeVisible();
-    await cardConsenso.click();
-    await expect(page.getByTestId('btn-aprovar-consenso')).toBeVisible();
-    await Promise.all([
-        page.waitForResponse((res: Response) =>
-            res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/aprovar`)
-            && res.request().method() === 'POST'
-            && res.ok(),
-        ),
-        page.getByTestId('btn-aprovar-consenso').click(),
-    ]);
-
-    await login(page, TITULO_CHEFE, 'senha');
-    await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
-    await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso);
-    await page.getByTestId('btn-concluir-diagnostico').click();
-    await Promise.all([
-        page.waitForResponse((res: Response) =>
-            res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/concluir`)
-            && res.request().method() === 'POST'
-            && res.ok(),
-        ),
-        page.getByTestId('btn-confirmar-concluir-diagnostico').click(),
-    ]);
-    await expect(page).toHaveURL(/\/painel/);
-
-    return processo;
 }
 
 async function abrirAcoesAnaliseUnidade(page: Page): Promise<void> {
@@ -253,7 +151,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         request,
     }) => {
         await resetDatabase(request);
-        const processo = await prepararDiagnosticoConcluido(page, request, descricaoAceite);
+        const processo = await prepararDiagnosticoConcluido(request, descricaoAceite);
 
         await loginComPerfil(
             page,
@@ -289,7 +187,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await verificarNotificacaoAdmin(page, {
             destinatario: 'ADMIN',
-            assunto: `Diagnóstico da unidade ${UNIDADE_SUBORDINADA} submetido para análise`,
+            assunto: `Diagnóstico da unidade ${UNIDADE_SUBORDINADA} aceito`,
             tipo: 'Diagnóstico aceito',
             trechoCorpo: processo.descricao,
         });
@@ -301,7 +199,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         request,
     }) => {
         await resetDatabase(request);
-        const processo = await prepararDiagnosticoConcluido(page, request, descricaoDevolucao);
+        const processo = await prepararDiagnosticoConcluido(request, descricaoDevolucao);
 
         await loginComPerfil(
             page,
@@ -353,7 +251,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         request,
     }) => {
         await resetDatabase(request);
-        const processo = await prepararDiagnosticoConcluido(page, request, descricaoHomologacao);
+        const processo = await prepararDiagnosticoConcluido(request, descricaoHomologacao);
 
         await loginComPerfil(
             page,
@@ -386,8 +284,10 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await page.getByTestId('btn-historico-analise-unidade').click();
         const modalHistorico = page.getByTestId('mdl-historico-analise');
         await expect(modalHistorico).toBeVisible();
-        await expect(modalHistorico.getByTestId('cell-unidade-0')).toHaveText(UNIDADE_GESTOR);
-        await expect(modalHistorico.getByTestId('cell-resultado-0')).toContainText('Aceite');
+        await expect(modalHistorico.getByTestId('cell-unidade-0')).toHaveText('ADMIN');
+        await expect(modalHistorico.getByTestId('cell-resultado-0')).toContainText('Homologação');
+        await expect(modalHistorico.getByTestId('cell-unidade-1')).toHaveText(UNIDADE_GESTOR);
+        await expect(modalHistorico.getByTestId('cell-resultado-1')).toContainText('Aceite');
         await modalHistorico.getByTestId('btn-modal-fechar').click();
         await expect(modalHistorico).toBeHidden();
 

@@ -40,9 +40,9 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         impossibilitando,
         impossibilitarAvaliacao,
     } = useFluxoDiagnostico(props.codSubprocesso);
-    const {itens: itensEquipe, pendentes} = useEquipeDiagnostico(props.codSubprocesso);
 
     const ehChefe = computed(() => podeCriarConsenso.value);
+    const {itens: itensEquipe, pendentes} = useEquipeDiagnostico(props.codSubprocesso, ehChefe);
     const ehAutoavaliacaoConcluida = computed(() => situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA');
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
     const retornoFluxo = ref<RetornoFluxo | null>(null);

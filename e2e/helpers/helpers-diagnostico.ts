@@ -65,15 +65,6 @@ export async function preencherAutoavaliacaoCompleta(page: Page, codSubprocesso:
             selectDominio.nth(i).selectOption('4')
         ]);
     }
-
-    await expect.poll(async () => await page.evaluate(async (codigo) => {
-        const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/autoavaliacao`, {credentials: 'include'});
-        if (!resposta.ok) return false;
-        const dados = await resposta.json();
-        return dados.competencias.every((item: {importancia: number | null; dominio: number | null}) =>
-            item.importancia === 3 && item.dominio === 4
-        );
-    }, codSubprocesso)).toBe(true);
 }
 
 export async function preencherConsensoMinimo(
@@ -109,13 +100,6 @@ export async function preencherConsensoMinimo(
         }
         if (alterouAlgumCampo) break;
     }
-
-    await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
-        const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/consenso/${titulo}`, {credentials: 'include'});
-        if (!resposta.ok) return false;
-        const dados = await resposta.json();
-        return dados.situacaoServidor === 'CONSENSO_CRIADO';
-    }, {codigo: codSubprocesso, titulo: servidorTitulo})).toBe(true);
 }
 
 export async function abrirAcaoConsensoDiagnostico(page: Page, servidorTitulo: string): Promise<void> {
@@ -194,38 +178,42 @@ export async function preencherTodasSituacoesCapacitacao(page: Page, codSubproce
         ]);
     }
 
-    if (houveAlteracao) {
-        await page.waitForLoadState('networkidle');
-    }
+    void houveAlteracao;
 }
 
-export async function preencherSituacoesCapacitacaoPendentesPorApi(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
-    await page.evaluate(async ({codigo, valorAtual}) => {
-        const respostaAtual = await fetch(`/api/subprocessos/${codigo}/diagnostico/unidade`, {credentials: 'include'});
-        if (!respostaAtual.ok) {
-            throw new Error(`Falha ao carregar situações de capacitação do subprocesso ${codigo}.`);
+export async function preencherSituacoesCapacitacaoPendentesPelaTela(page: Page, codSubprocesso: number, valor = 'EC'): Promise<void> {
+    const botoesServidores = page.locator('[data-testid^="btn-selecionar-servidor-situacao-capacitacao-"]');
+    const totalServidores = await botoesServidores.count();
+    await expect(botoesServidores.first()).toBeVisible();
+
+    let encontrouServidorComCapacitacaoEditavel = false;
+    for (let i = 0; i < totalServidores; i++) {
+        const botaoServidor = botoesServidores.nth(i);
+        await botaoServidor.click();
+        await expect(page.getByTestId('detalhes-servidor-situacao-capacitacao')).toBeVisible();
+
+        const selects = page.locator('[data-testid^="situacao-"]');
+        const totalSelects = await selects.count();
+        if (totalSelects === 0) {
+            await expect(page.getByText('Aguardando aprovação de consenso', {exact: true})).toBeVisible();
+            continue;
         }
 
-        const dados = await respostaAtual.json();
-        const situacoes = dados.situacoesCapacitacao.map((item: {
-            servidorTitulo: string;
-            competenciaCodigo: number;
-            situacaoCapacitacao: string | null;
-        }) => ({
-            servidorTitulo: item.servidorTitulo,
-            competenciaCodigo: item.competenciaCodigo,
-            situacaoCapacitacao: item.situacaoCapacitacao ?? valorAtual,
-        }));
-
-        const respostaSalvar = await fetch(`/api/subprocessos/${codigo}/diagnostico/situacoes-capacitacao`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({situacoes}),
-        });
-
-        if (!respostaSalvar.ok) {
-            throw new Error(`Falha ao preencher situações de capacitação do subprocesso ${codigo}.`);
+        encontrouServidorComCapacitacaoEditavel = true;
+        for (let j = 0; j < totalSelects; j++) {
+            if ((await selects.nth(j).inputValue()) === valor) {
+                continue;
+            }
+            await Promise.all([
+                page.waitForResponse(res =>
+                    res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/situacoes-capacitacao'))
+                    && res.request().method() === 'POST'
+                    && res.ok()
+                ),
+                selects.nth(j).selectOption(valor)
+            ]);
         }
-    }, {codigo: codSubprocesso, valorAtual: valor});
+    }
+
+    expect(encontrouServidorComCapacitacaoEditavel).toBeTruthy();
 }

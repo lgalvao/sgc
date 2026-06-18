@@ -4,7 +4,7 @@ import {
     criarProcessoFinalizadoFixture
 } from './fixtures/index.js';
 import {login} from './helpers/helpers-auth.js';
-import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
+import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const TITULO_SERVIDOR_SECAO_111 = '444444';
@@ -55,10 +55,7 @@ test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GEST
         await expect(treeTable.getByText('SECAO_111')).toBeVisible();
 
         // 3. ADMIN clica na unidade subordinada e acessa a análise do diagnóstico
-        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
-        
-        // Acessa a view de análise do diagnóstico da unidade do Gestor/Admin
-        await page.goto(`/diagnostico/${codSubprocesso}/${UNIDADE}/unidade`);
+        await navegarParaDiagnosticoUnidade(page, UNIDADE);
 
         // Verifica a exibição da tela de análise do diagnóstico da unidade
         await expect(page.getByTestId('diagnostico-unidade-titulo')).toHaveText(UNIDADE);

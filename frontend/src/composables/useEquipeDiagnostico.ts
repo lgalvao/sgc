@@ -1,5 +1,5 @@
 import {useQuery} from '@pinia/colada';
-import {computed} from 'vue';
+import {computed, toValue, type MaybeRefOrGetter} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterEquipe} from '@/services/diagnosticoService';
 import type {DiagnosticoEquipe} from '@/types/diagnostico-competencias';
@@ -10,14 +10,17 @@ import {chaveEquipe, criarContextoSessaoDiagnostico} from '@/composables/useDiag
  * Carrega lista de servidores com suas situações de avaliação.
  * Apenas leitura — sem mutations.
  */
-export function useEquipeDiagnostico(codSubprocesso: number) {
+export function useEquipeDiagnostico(
+    codSubprocesso: number,
+    habilitado: MaybeRefOrGetter<boolean> = true,
+) {
     const perfilStore = usePerfilStore();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
 
     const query = useQuery<DiagnosticoEquipe>({
         key: () => chaveEquipe(codSubprocesso, contextoSessao),
         query: () => obterEquipe(codSubprocesso),
-        enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
+        enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0 && toValue(habilitado),
         staleTime: 30_000,
     });
 

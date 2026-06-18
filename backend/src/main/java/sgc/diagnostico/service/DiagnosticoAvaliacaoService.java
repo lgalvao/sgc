@@ -84,7 +84,6 @@ public class DiagnosticoAvaliacaoService {
     public void salvarConsenso(Long codSubprocesso, ConsensoRequest request, String servidorTitulo) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
-        Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
@@ -92,10 +91,6 @@ public class DiagnosticoAvaliacaoService {
         Map<Long, AvaliacaoServidor> porCompetencia = avaliacoes.stream()
                 .collect(java.util.stream.Collectors.toMap(
                         a -> a.getCompetencia().getCodigo(), a -> a));
-
-        for (AvaliacaoServidor avaliacao : avaliacoes) {
-            avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
-        }
 
         for (ConsensoCompetenciaDto item : request.competencias()) {
             AvaliacaoServidor avaliacao = porCompetencia.get(item.competenciaCodigo());
@@ -108,6 +103,20 @@ public class DiagnosticoAvaliacaoService {
         }
 
         avaliacaoRepo.saveAll(avaliacoes);
+    }
+
+    public void concluirConsenso(Long codSubprocesso, String servidorTitulo) {
+        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
+                .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
+        Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
+
+        validacaoService.validarConsensoCompleto(diagnostico.getCodigo(), servidorTitulo);
+
+        var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
+                diagnostico.getCodigo(), servidorTitulo);
+        avaliacoes.forEach(avaliacao -> avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
+        avaliacaoRepo.saveAll(avaliacoes);
+
         notificacaoService.notificarConsensoDisponivel(subprocesso, servidorTitulo);
     }
 

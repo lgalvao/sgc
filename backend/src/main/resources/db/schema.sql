@@ -293,7 +293,8 @@ create table if not exists sgc.analise
          'ACEITE_REVISAO',
          'DEVOLUCAO_REVISAO',
          'ACEITE_DIAGNOSTICO',
-         'DEVOLUCAO_DIAGNOSTICO'
+         'DEVOLUCAO_DIAGNOSTICO',
+         'HOMOLOGACAO_DIAGNOSTICO'
             )),
     tipo               varchar(20)  not null check
         (

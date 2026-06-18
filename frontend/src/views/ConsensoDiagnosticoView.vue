@@ -206,9 +206,11 @@ const {
   carregando,
   salvandoAutomaticamente,
   aprovando,
+  erroConcluir,
   erroAprovar,
   atualizarNotaDetalhada,
   salvarConsensoAgora,
+  concluirAvaliacao,
   aprovarConsenso,
 } = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
 const nomeServidorSubtitulo = computed(() =>
@@ -260,8 +262,9 @@ async function confirmarConcluirAvaliacao() {
   }
 
   try {
-    concluindoAvaliacao.value = true;
     await salvarConsensoAgora();
+    concluindoAvaliacao.value = true;
+    await concluirAvaliacao();
     const toastStore = useToastStore();
     toastStore.setPending(TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
     if (contexto.value?.processoCodigo) {
@@ -279,7 +282,7 @@ async function confirmarConcluirAvaliacao() {
     }
     void router.back();
   } catch {
-    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+    erroMensagem.value = erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
   } finally {
     concluindoAvaliacao.value = false;
   }

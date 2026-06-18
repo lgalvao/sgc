@@ -699,11 +699,34 @@ describe('SubprocessoView.vue', () => {
     it('incorpora o painel de diagnóstico no detalhe do subprocesso, mantém os cards do CDU-42 e exibe as movimentações', async () => {
         const {wrapper} = mountComponent({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            permissoes: {
+                podeCriarConsenso: true,
+                podeConcluirDiagnostico: true,
+            }
         });
         await flushPromises();
 
         expect(wrapper.find('[data-testid="diagnostico-equipe-painel"]').exists()).toBe(true);
         expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
         expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(true);
+    });
+
+    it('mantém a visão restrita do servidor após concluir a autoavaliação no diagnóstico', async () => {
+        const {wrapper} = mountComponent({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            permissoes: {
+                podePreencherAutoavaliacao: false,
+                podeCriarConsenso: false,
+                podeConcluirDiagnostico: false,
+                podeValidarDiagnostico: false,
+                podeDevolverDiagnostico: false,
+                podeHomologarDiagnostico: false,
+            }
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="diagnostico-equipe-painel"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(false);
+        expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
     });
 });

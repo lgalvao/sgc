@@ -144,7 +144,7 @@ class DiagnosticoAvaliacaoServiceTest {
     // ─── salvarConsenso ────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("salvarConsenso com detalhados: deve gravar chefiaImportancia, chefiaDominio, importancia (consenso) e dominio (consenso)")
+    @DisplayName("salvarConsenso com detalhados: deve gravar chefiaImportancia, chefiaDominio, importancia (consenso) e dominio (consenso) sem concluir")
     void salvarConsenso_comDetalhados_deveGravarCamposDaChefia() {
         Long codSubprocesso = 3L;
         Long diagCodigo = 30L;
@@ -153,11 +153,8 @@ class DiagnosticoAvaliacaoServiceTest {
         Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
         AvaliacaoServidor avaliacao = avaliacaoComNota(200L, 2, 2);
 
-        Subprocesso subprocesso = mock(Subprocesso.class);
-
         when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
         when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
-        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
         var detalhada = new ConsensoCompetenciaDto(200L, null, 2, 2, 4, 3, 4, 3);
         var request = new ConsensoRequest(
@@ -170,11 +167,11 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThat(avaliacao.getChefiaDominio()).isEqualTo(3);
         assertThat(avaliacao.getImportancia()).isEqualTo(4);   // consenso
         assertThat(avaliacao.getDominio()).isEqualTo(3);        // consenso
-        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
     }
 
     @Test
-    @DisplayName("salvarConsenso sem detalhados: deve usar competencias simples e igualar chefia ao consenso")
+    @DisplayName("salvarConsenso sem detalhados: deve usar competencias simples e igualar chefia ao consenso sem concluir")
     void salvarConsenso_semDetalhados_deveUsarCompetenciasSimples() {
         Long codSubprocesso = 4L;
         Long diagCodigo = 40L;
@@ -183,11 +180,8 @@ class DiagnosticoAvaliacaoServiceTest {
         Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
         AvaliacaoServidor avaliacao = avaliacaoComNota(201L, 1, 1);
 
-        Subprocesso subprocesso = mock(Subprocesso.class);
-
         when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
         when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
-        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
         var detalhada = ConsensoCompetenciaDto.builder()
                 .competenciaCodigo(201L)
@@ -204,11 +198,11 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThat(avaliacao.getChefiaDominio()).isEqualTo(3);
         assertThat(avaliacao.getImportancia()).isEqualTo(5);
         assertThat(avaliacao.getDominio()).isEqualTo(3);
-        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
     }
 
     @Test
-    @DisplayName("salvarConsenso com subconjunto: deve permitir preenchimento em etapas sem exigir todas as competências")
+    @DisplayName("salvarConsenso com subconjunto: deve permitir preenchimento em etapas sem exigir todas as competências nem concluir")
     void salvarConsenso_comSubconjunto_devePermitirPreenchimentoEmEtapas() {
         Long codSubprocesso = 41L;
         Long diagCodigo = 410L;
@@ -225,11 +219,8 @@ class DiagnosticoAvaliacaoServiceTest {
         Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
         AvaliacaoServidor avaliacao1 = avaliacaoComNota(competenciaPrimeira, autoimportanciaPrimeira, autodominioPrimeira);
         AvaliacaoServidor avaliacao2 = avaliacaoComNota(competenciaSegunda, autoimportanciaSegunda, autodominioSegunda);
-        Subprocesso subprocesso = mock(Subprocesso.class);
-
         when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
         when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao1, avaliacao2));
-        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
 
         var request = new ConsensoRequest(
                 List.of(ConsensoCompetenciaDto.builder()
@@ -253,8 +244,39 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThat(avaliacao2.getChefiaDominio()).isNull();
         assertThat(avaliacao2.getImportancia()).isEqualTo(autoimportanciaSegunda);
         assertThat(avaliacao2.getDominio()).isEqualTo(autodominioSegunda);
+        assertThat(avaliacao1.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        assertThat(avaliacao2.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+    }
+
+    @Test
+    @DisplayName("concluirConsenso: deve validar preenchimento completo, concluir e notificar o servidor")
+    void concluirConsenso_deveConcluirENotificar() {
+        Long codSubprocesso = 42L;
+        Long diagCodigo = 420L;
+        String servidorTitulo = "servidor@titulo";
+
+        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
+        AvaliacaoServidor avaliacao1 = avaliacaoComNota(301L, 2, 2);
+        AvaliacaoServidor avaliacao2 = avaliacaoComNota(302L, 3, 1);
+        avaliacao1.setChefiaImportancia(5);
+        avaliacao1.setChefiaDominio(4);
+        avaliacao1.setImportancia(5);
+        avaliacao1.setDominio(4);
+        avaliacao2.setChefiaImportancia(4);
+        avaliacao2.setChefiaDominio(3);
+        avaliacao2.setImportancia(4);
+        avaliacao2.setDominio(3);
+        Subprocesso subprocesso = mock(Subprocesso.class);
+
+        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao1, avaliacao2));
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+
+        service.concluirConsenso(codSubprocesso, servidorTitulo);
+
         assertThat(avaliacao1.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
         assertThat(avaliacao2.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        verify(notificacaoService).notificarConsensoDisponivel(subprocesso, servidorTitulo);
     }
 
     // ─── aprovarConsenso ───────────────────────────────────────────────────

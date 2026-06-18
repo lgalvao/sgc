@@ -198,7 +198,7 @@ public class DiagnosticoNotificacaoService {
     public void notificarDiagnosticoAceito(Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeSuperior) {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
-        String assunto = "SGC: Diagnóstico da unidade %s submetido para análise".formatted(unidadeSubprocesso.getSigla());
+        String assunto = "SGC: Diagnóstico da unidade %s aceito".formatted(unidadeSubprocesso.getSigla());
         String corpo = emailModelosService.criarEmailDiagnosticoAceito(
                 unidadeSuperior.getSigla(),
                 unidadeSubprocesso.getSigla(),
@@ -210,7 +210,7 @@ public class DiagnosticoNotificacaoService {
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
-                "Diagnóstico da unidade %s submetido para análise".formatted(unidadeSubprocesso.getSigla()),
+                sgc.comum.Mensagens.ALERTA_DIAGNOSTICO_ACEITO.formatted(unidadeSubprocesso.getSigla()),
                 unidadeAnalise,
                 unidadeSuperior
         );

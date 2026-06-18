@@ -7,6 +7,7 @@ const backMock = vi.fn();
 const pushMock = vi.fn();
 const atualizarNotaDetalhadaMock = vi.fn();
 const aprovarConsensoMock = vi.fn();
+const concluirAvaliacaoMock = vi.fn();
 const salvarConsensoAgoraMock = vi.fn();
 const setPendingMock = vi.fn();
 
@@ -49,7 +50,9 @@ const habilitarAprovarConsenso = ref(false);
 const ehConsensoAprovado = ref(false);
 const carregando = ref(false);
 const salvandoAutomaticamente = ref(false);
+const concluindo = ref(false);
 const aprovando = ref(false);
+const erroConcluir = ref<any>(null);
 const erroAprovar = ref<any>(null);
 
 vi.mock('@/composables/useConsensoDiagnostico', () => ({
@@ -63,10 +66,13 @@ vi.mock('@/composables/useConsensoDiagnostico', () => ({
         ehConsensoAprovado: computed(() => ehConsensoAprovado.value),
         carregando: computed(() => carregando.value),
         salvandoAutomaticamente,
+        concluindo: computed(() => concluindo.value),
         aprovando: computed(() => aprovando.value),
+        erroConcluir,
         erroAprovar,
         atualizarNotaDetalhada: atualizarNotaDetalhadaMock,
         salvarConsensoAgora: salvarConsensoAgoraMock,
+        concluirAvaliacao: concluirAvaliacaoMock,
         aprovarConsenso: aprovarConsensoMock,
     }),
 }));
@@ -154,7 +160,9 @@ describe('ConsensoDiagnosticoView', () => {
         ehConsensoAprovado.value = false;
         carregando.value = false;
         salvandoAutomaticamente.value = false;
+        concluindo.value = false;
         aprovando.value = false;
+        erroConcluir.value = null;
         erroAprovar.value = null;
     });
 
@@ -171,11 +179,13 @@ describe('ConsensoDiagnosticoView', () => {
 
     it('conclui a avaliação pelo cabeçalho e volta ao subprocesso', async () => {
         salvarConsensoAgoraMock.mockResolvedValue(undefined);
+        concluirAvaliacaoMock.mockResolvedValue(undefined);
         const wrapper = montar({servidorTitulo: '999999', servidorNome: 'Outro Servidor'});
 
         await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
 
         expect(salvarConsensoAgoraMock).toHaveBeenCalledTimes(1);
+        expect(concluirAvaliacaoMock).toHaveBeenCalledTimes(1);
         expect(setPendingMock).toHaveBeenCalledWith('Avaliação de consenso criada');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'Subprocesso',
@@ -256,6 +266,17 @@ describe('ConsensoDiagnosticoView', () => {
 
         await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
         expect(wrapper.find('.app-alert').exists()).toBe(false);
+    });
+
+    it('mostra erro do backend ao falhar concluir a avaliação', async () => {
+        salvarConsensoAgoraMock.mockResolvedValue(undefined);
+        erroConcluir.value = new Error('Preencha todos os campos');
+        concluirAvaliacaoMock.mockRejectedValue(erroConcluir.value);
+        const wrapper = montar({servidorTitulo: '999999', servidorNome: 'Outro Servidor'});
+
+        await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
+
+        expect(wrapper.find('.app-alert').text()).toContain('Preencha todos os campos');
     });
 
     it('usa o botão voltar do cabeçalho', async () => {

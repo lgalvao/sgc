@@ -336,6 +336,16 @@ public class E2eController {
         return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
     }
 
+    @PostMapping("/fixtures/processo-diagnostico-pronto-para-concluir")
+    @Transactional
+    public ProcessoResumoDto criarProcessoDiagnosticoProntoParaConcluir(
+            @RequestBody ProcessoDiagnosticoAutoavaliadoFixtureRequest request
+    ) {
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
+        prepararDiagnosticoParaConclusaoFixture(processo.getCodigo(), request.unidadeSigla());
+        return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
+    }
+
     @PostMapping("/fixtures/processo-diagnostico-homologado")
     @Transactional
     public ProcessoResumoDto criarProcessoDiagnosticoHomologado(
@@ -1033,6 +1043,21 @@ public class E2eController {
                 unidadeSuperior.getCodigo(),
                 "Diagnóstico concluído via fixture"
         );
+        limparCaches();
+    }
+
+    private void prepararDiagnosticoParaConclusaoFixture(Long codProcesso, String unidadeSigla) {
+        Long codSubprocesso = buscarCodigoSubprocesso(codProcesso, unidadeSigla);
+        Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
+                .orElseThrow(() -> new IllegalStateException("Diagnóstico não encontrado para subprocesso " + codSubprocesso));
+        Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso)
+                .orElseThrow(() -> new IllegalStateException("Subprocesso não encontrado: " + codSubprocesso));
+
+        preencherAvaliacoesConclusaoFixture(diagnostico);
+        preencherSituacoesCapacitacaoFixture(diagnostico);
+        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+        subprocesso.setDataFimEtapa1(null);
+        subprocessoRepo.saveAndFlush(subprocesso);
         limparCaches();
     }
 

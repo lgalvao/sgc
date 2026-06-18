@@ -41,7 +41,7 @@
           <BButton
               v-if="mostrarConcluirDiagnosticoCabecalho"
               :disabled="concluindoDiagnostico || !habilitarConcluirDiagnosticoCabecalho"
-              data-testid="btn-concluir-diagnostico"
+              data-testid="btn-concluir-diagnostico-cabecalho"
               size="sm"
               variant="success"
               @click="abrirModalConcluirDiagnostico"
@@ -137,7 +137,7 @@
       <BButton class="text-secondary" variant="link" @click="modalConcluirDiagnosticoAberto = false">Cancelar</BButton>
       <BButton
           :disabled="concluindoDiagnostico"
-          data-testid="btn-confirmar-concluir-diagnostico"
+          data-testid="btn-confirmar-concluir-diagnostico-cabecalho"
           variant="success"
           @click="confirmarConcluirDiagnostico"
       >
@@ -226,7 +226,17 @@ const {
 } = tela;
 
 const ehDiagnostico = computed(() => subprocesso?.value?.tipoProcesso === TipoProcesso.DIAGNOSTICO);
-const ehServidorPuro = computed(() => !!subprocesso.value?.permissoes?.podePreencherAutoavaliacao && !subprocesso.value?.permissoes?.podeCriarConsenso);
+const ehServidorPuro = computed(() => {
+  const permissoes = subprocesso.value?.permissoes;
+  if (!permissoes) {
+    return false;
+  }
+  return !permissoes.podeCriarConsenso
+    && !permissoes.podeConcluirDiagnostico
+    && !permissoes.podeValidarDiagnostico
+    && !permissoes.podeDevolverDiagnostico
+    && !permissoes.podeHomologarDiagnostico;
+});
 const toastStore = useToastStore();
 const modalConcluirDiagnosticoAberto = ref(false);
 const erroConcluirDiagnostico = ref('');
@@ -269,9 +279,11 @@ async function abrirModalConcluirDiagnostico() {
     await validarConclusaoDiagnostico();
     modalConcluirDiagnosticoAberto.value = true;
   } catch (erro) {
-    erroConcluirDiagnostico.value = normalizarErro(erro).mensagem
+    const mensagemErro = normalizarErro(erro).mensagem
       ?? erroValidacaoConcluir.value?.message
       ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    erroConcluirDiagnostico.value = mensagemErro;
+    notify(mensagemErro, 'danger', true);
   }
 }
 

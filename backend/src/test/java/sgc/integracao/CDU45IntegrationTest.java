@@ -26,7 +26,7 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
     @Test
     @WithMockChefe("333333333333")
-    @DisplayName("Deve salvar o consenso da chefia e disponibilizar a consulta detalhada")
+    @DisplayName("Deve salvar o rascunho do consenso sem concluir e só concluir após validação completa")
     void deveSalvarConsenso() throws Exception {
         ConsensoRequest request = new ConsensoRequest(
                 List.of(
@@ -61,7 +61,7 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         mockMvc.perform(get(API_DIAGNOSTICO + "/consenso/{servidorTitulo}",
                         subprocesso.getCodigo(), "50003"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.situacaoServidor").value("CONSENSO_CRIADO"))
+                .andExpect(jsonPath("$.situacaoServidor").value("AUTOAVALIACAO_CONCLUIDA"))
                 .andExpect(jsonPath("$.competencias.length()").value(2))
                 .andExpect(jsonPath("$.competencias[0].competenciaDescricao").isNotEmpty());
 
@@ -71,8 +71,16 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
             assertThat(avaliacao.getChefiaDominio()).isNotNull();
             assertThat(avaliacao.getImportancia()).isNotNull();
             assertThat(avaliacao.getDominio()).isNotNull();
-            assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+            assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         });
+
+        mockMvc.perform(post(API_DIAGNOSTICO + "/consenso/{servidorTitulo}/concluir",
+                        subprocesso.getCodigo(), "50003")
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        assertThat(buscarAvaliacoes("50003")).allSatisfy(avaliacao ->
+                assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
     }
 
     @Test
@@ -126,6 +134,6 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         assertThat(avaliacao2.getImportancia()).isEqualTo(autoimportanciaSegunda);
         assertThat(avaliacao2.getDominio()).isEqualTo(autodominioSegunda);
         assertThat(avaliacoes).allSatisfy(avaliacao ->
-                assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
+                assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA));
     }
 }

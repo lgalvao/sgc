@@ -1,6 +1,7 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {
     aprovarConsenso,
+    concluirConsenso,
     concluirAutoavaliacao,
     concluirDiagnostico,
     devolverDiagnostico,
@@ -61,12 +62,14 @@ describe('diagnosticoService', () => {
         await salvarAutoavaliacao(20, {competencias: []});
         await concluirAutoavaliacao(21);
         await salvarConsenso(22, '242426', {competencias: []});
-        await aprovarConsenso(23);
+        await concluirConsenso(23, '242426');
+        await aprovarConsenso(24);
 
         expect(apiPostMock).toHaveBeenNthCalledWith(1, caminhoDiagnostico(20, '/autoavaliacao'), {competencias: []});
         expect(apiPostMock).toHaveBeenNthCalledWith(2, caminhoDiagnostico(21, '/autoavaliacao/concluir'));
         expect(apiPostMock).toHaveBeenNthCalledWith(3, caminhoDiagnostico(22, '/consenso/242426'), {competencias: []});
-        expect(apiPostMock).toHaveBeenNthCalledWith(4, caminhoDiagnostico(23, '/consenso/aprovar'));
+        expect(apiPostMock).toHaveBeenNthCalledWith(4, caminhoDiagnostico(23, '/consenso/242426/concluir'));
+        expect(apiPostMock).toHaveBeenNthCalledWith(5, caminhoDiagnostico(24, '/consenso/aprovar'));
     });
 
     it('deve chamar endpoints POST de impossibilidade, situações e fluxo da unidade', async () => {

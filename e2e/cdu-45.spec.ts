@@ -2,14 +2,47 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture} from './fixtures/index.js';
 import {abrirAcaoConsensoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
+import {verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
 const TITULO_CHEFE_ASSESSORIA_12 = '151515';
 const UNIDADE = 'ASSESSORIA_12';
 const VALOR_CONSENSO_IMPORTANCIA = '4';
 
+async function preencherTodosOsCamposDeConsenso(page: import('@playwright/test').Page, codSubprocesso: number): Promise<void> {
+    const seletores = [
+        '[data-testid^="consenso-chefia-importancia-"]',
+        '[data-testid^="consenso-chefia-dominio-"]',
+        '[data-testid^="consenso-final-importancia-"]',
+        '[data-testid^="consenso-final-dominio-"]',
+    ];
+
+    for (const seletor of seletores) {
+        const campos = page.locator(seletor);
+        const total = await campos.count();
+        for (let i = 0; i < total; i++) {
+            const campo = campos.nth(i);
+            if (await campo.isDisabled()) {
+                continue;
+            }
+            if ((await campo.inputValue()) === '4') {
+                continue;
+            }
+            await Promise.all([
+                page.waitForResponse(res =>
+                    res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`)
+                    && res.request().method() === 'POST'
+                    && res.ok()
+                ),
+                campo.selectOption('4')
+            ]);
+        }
+    }
+}
+
 test.describe('CDU-45 - Manter avaliação de consenso', () => {
-    test('CHEFE mantém consenso por autosave e reencontra o valor salvo ao reabrir a avaliação', async ({
+    test('CHEFE salva rascunho por autosave, valida na conclusão e só então libera o consenso para o servidor', async ({
         _resetAutomatico,
         page,
         request
@@ -38,8 +71,6 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         await expect(seletorConsensoImportancia).toBeVisible();
         await expect(page.locator('[data-testid^="consenso-final-dominio-"]').first()).toBeVisible();
         await expect(page.getByTestId('btn-aprovar-consenso')).toHaveCount(0);
-        const testIdConsensoImportancia = await seletorConsensoImportancia.getAttribute('data-testid');
-        const competenciaCodigo = Number(testIdConsensoImportancia?.split('consenso-final-importancia-')[1]);
 
         await Promise.all([
             page.waitForResponse(res =>
@@ -61,21 +92,6 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
             seletorConsensoImportancia.selectOption(VALOR_CONSENSO_IMPORTANCIA)
         ]);
 
-        await expect.poll(async () => await page.evaluate(async ({codigo, titulo, codigoCompetencia}) => {
-            const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/consenso/${titulo}`, {credentials: 'include'});
-            if (!resposta.ok) return null;
-            const dados = await resposta.json();
-            return String(
-                dados.competencias.find((item: {competenciaCodigo: number; consensoImportancia: number | null}) =>
-                    item.competenciaCodigo === codigoCompetencia
-                )?.consensoImportancia ?? ''
-            );
-        }, {
-            codigo: codSubprocesso,
-            titulo: TITULO_SERVIDOR_ASSESSORIA_12,
-            codigoCompetencia: competenciaCodigo,
-        })).toBe(VALOR_CONSENSO_IMPORTANCIA);
-
         await page.goBack();
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
 
@@ -83,5 +99,27 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
         await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`));
         await expect(seletorConsensoImportancia).toHaveValue(VALOR_CONSENSO_IMPORTANCIA);
         await expect(page.locator('tbody tr').first().locator('span.valor-estatico').first()).toBeVisible();
+
+        await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
+        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
+        await expect(page.getByTestId('card-subprocesso-consenso')).toHaveClass(/card-disabled/);
+
+        await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
+        await page.goto(`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`);
+        await page.getByTestId('btn-concluir-avaliacao').click();
+        await verificarAppAlert(page, TEXTOS.diagnostico.ERRO_PREENCHIMENTO_CONSENSO_INCOMPLETO);
+
+        await preencherTodosOsCamposDeConsenso(page, codSubprocesso);
+
+        await Promise.all([
+            page.waitForURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`)),
+            page.getByTestId('btn-concluir-avaliacao').click(),
+        ]);
+        await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
+        await verificarToast(page, TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
+
+        await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
+        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
+        await expect(page.getByTestId('card-subprocesso-consenso')).not.toHaveClass(/card-disabled/);
     });
 });

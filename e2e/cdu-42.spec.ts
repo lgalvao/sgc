@@ -43,7 +43,7 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
         await expect(page.getByTestId('card-subprocesso-situacoes-capacitacao-desabilitado')).toBeVisible();
 
         // CHEFE deve ver o botão para Concluir diagnóstico
-        await expect(page.getByTestId('btn-concluir-diagnostico')).toBeVisible();
+        await expect(page.getByTestId('btn-concluir-diagnostico-cabecalho')).toBeVisible();
 
         // 2. Acesso como SERVIDOR
         await login(page, TITULO_SERVIDOR_ASSESSORIA_12, 'senha');
@@ -55,7 +55,7 @@ test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEF
 
         // SERVIDOR NÃO deve ver a grade de servidores (tabela) nem botão de Concluir diagnóstico
         await expect(page.getByTestId('tbl-servidores-diagnostico')).not.toBeVisible();
-        await expect(page.getByTestId('btn-concluir-diagnostico')).not.toBeVisible();
+        await expect(page.getByTestId('btn-concluir-diagnostico-cabecalho')).not.toBeVisible();
         await expect(page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`)).not.toBeVisible();
     });
 });

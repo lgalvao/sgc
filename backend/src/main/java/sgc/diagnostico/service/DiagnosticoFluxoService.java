@@ -277,7 +277,6 @@ public class DiagnosticoFluxoService {
     }
 
     public void homologarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
-        Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         validacaoService.validarDiagnosticoHomologavel(codSubprocesso);
@@ -286,11 +285,15 @@ public class DiagnosticoFluxoService {
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Unidade admin = unidadeService.buscarAdmin();
-        transicaoService.registrarTransicaoSemEmail(RegistrarTransicaoCommand.builder()
+        transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
                 .sp(subprocesso)
-                .tipo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO)
-                .origem(admin)
-                .destino(admin)
+                .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO)
+                .tipoTransicao(TipoTransicao.DIAGNOSTICO_HOMOLOGADO)
+                .tipoAnalise(TipoAnalise.DIAGNOSTICO)
+                .tipoAcaoAnalise(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO)
+                .unidadeAnalise(admin)
+                .unidadeOrigemTransicao(admin)
+                .unidadeDestinoTransicao(admin)
                 .usuario(usuario)
                 .observacoes(observacao)
                 .build());

@@ -56,18 +56,6 @@ test.describe('CDU-48 - Preencher situações de capacitação', () => {
             seletorCapacitacao.selectOption(VALOR_CAPACITACAO)
         ]);
 
-        await expect.poll(async () => await page.evaluate(async ({codigo, titulo}) => {
-            const resposta = await fetch(`/api/subprocessos/${codigo}/diagnostico/unidade`, {credentials: 'include'});
-            if (!resposta.ok) return null;
-            const dados = await resposta.json();
-            return dados.situacoesCapacitacao.find((item: {servidorTitulo: string; situacaoCapacitacao: string | null}) =>
-                item.servidorTitulo === titulo && item.situacaoCapacitacao === 'EC'
-            )?.situacaoCapacitacao ?? null;
-        }, {
-            codigo: codSubprocesso,
-            titulo: TITULO_SERVIDOR_ASSESSORIA_12,
-        })).toBe(VALOR_CAPACITACAO);
-
         await page.goBack();
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
 

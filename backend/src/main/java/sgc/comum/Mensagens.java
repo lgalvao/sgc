@@ -189,7 +189,7 @@ public final class Mensagens {
     public static final String HIST_DIAGNOSTICO_CONCLUIDO = "Conclusão de diagnóstico";
     public static final String HIST_DIAGNOSTICO_DEVOLVIDO = "Diagnóstico devolvido para ajustes";
     public static final String HIST_DIAGNOSTICO_ACEITO = "Diagnóstico aceito";
-    public static final String HIST_DIAGNOSTICO_HOMOLOGADO = "Diagnóstico homologado";
+    public static final String HIST_DIAGNOSTICO_HOMOLOGADO = "Homologação de diagnóstico";
     public static final String HIST_PROCESSO_INICIADO = "Processo iniciado";
 
     // ── Templates de Alertas ─────────────────────────────────────────────────
@@ -207,7 +207,7 @@ public final class Mensagens {
     public static final String ALERTA_MAPA_HOMOLOGADO = "Mapa de competências da unidade %s homologado";
     public static final String ALERTA_DIAGNOSTICO_CONCLUIDO = "Diagnóstico da unidade %s submetido para análise";
     public static final String ALERTA_DIAGNOSTICO_DEVOLVIDO = "Diagnóstico da unidade %s devolvido para ajustes";
-    public static final String ALERTA_DIAGNOSTICO_ACEITO = "Diagnóstico da unidade %s submetido para análise";
+    public static final String ALERTA_DIAGNOSTICO_ACEITO = "Diagnóstico da unidade %s aceito";
     public static final String ALERTA_DIAGNOSTICO_HOMOLOGADO = "Diagnóstico da unidade %s homologado";
 
     // ── Notificações e E-mails ───────────────────────────────────────────────

@@ -32,6 +32,20 @@ public class DiagnosticoValidacaoService {
         }
     }
 
+    public void validarConsensoCompleto(Long diagnosticoCodigo, String servidorTitulo) {
+        var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(diagnosticoCodigo, servidorTitulo);
+        boolean incompleto = avaliacoes.isEmpty()
+                || avaliacoes.stream().anyMatch(a ->
+                a.getChefiaImportancia() == null
+                        || a.getChefiaDominio() == null
+                        || a.getConsensoImportancia() == null
+                        || a.getConsensoDominio() == null
+        );
+        if (incompleto) {
+            throw new ErroValidacao("Preencha todos os campos");
+        }
+    }
+
     public void validarConclusaoUnidade(Long diagnosticoCodigo) {
         boolean semAvaliacoes = !avaliacaoRepo.existsByDiagnosticoCodigo(diagnosticoCodigo);
         boolean possuiAvaliacoesPendentes = avaliacaoRepo.existsAvaliacaoPendentePorDiagnostico(

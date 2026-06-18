@@ -164,10 +164,11 @@ const { situacaoServidor } = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
   ? useAutoavaliacaoDiagnostico(props.codSubprocesso)
   : { situacaoServidor: computed(() => 'AUTOAVALIACAO_NAO_INICIADA') };
 const habilitarCardConsenso = computed(() => {
-  return situacaoServidor.value === 'CONSENSO_CRIADO';
+  return situacaoServidor.value === 'CONSENSO_CRIADO' || situacaoServidor.value === 'CONSENSO_APROVADO';
 });
 
 const {servidores} = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
+  && !!props.subprocesso?.permissoes?.podeCriarConsenso
   ? useDiagnosticoUnidade(props.codSubprocesso)
   : {servidores: computed(() => [])};
 

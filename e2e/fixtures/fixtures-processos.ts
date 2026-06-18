@@ -164,6 +164,30 @@ export async function criarProcessoDiagnosticoConcluidoFixture(
     return await response.json();
 }
 
+export async function criarProcessoDiagnosticoProntoParaConcluirFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions & {servidorTitulo: string}
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico-pronto-para-concluir', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E DIAGNOSTICO PRONTO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30,
+            servidorTitulo: options.servidorTitulo
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo diagnóstico pronto para concluir: ` +
+            `${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
 export async function criarProcessoDiagnosticoHomologadoFixture(
     request: APIRequestContext,
     options: ProcessoFixtureOptions
