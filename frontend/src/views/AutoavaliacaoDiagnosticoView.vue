@@ -3,6 +3,7 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
+      <div :class="{'cursor-salvando': salvandoAutomaticamente}">
       <PageHeader
           :subtitle="contexto ? `${contexto.unidadeSigla} - ${contexto.unidadeNome}` : undefined"
           :title="TEXTOS.diagnostico.TITULO_AUTOAVALIACAO"
@@ -32,13 +33,6 @@
           :variante="retornoFluxo.variante"
           @dismissed="limparRetornoFluxo"
       />
-
-      <div class="mb-3 text-muted small d-flex align-items-center gap-2">
-        <template v-if="salvandoAutomaticamente">
-          <BSpinner small variant="secondary"/>
-          {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
-        </template>
-      </div>
 
       <BAlert
           v-if="ehConsensoAprovado"
@@ -161,6 +155,7 @@
           </BListGroupItem>
         </BListGroup>
       </BCard>
+      </div>
     </template>
 
     <ModalConfirmacao
@@ -278,3 +273,10 @@ const props = defineProps<{
   formatarNota,
 } = useAutoavaliacaoDiagnosticoView(props);
 </script>
+
+<style scoped>
+.cursor-salvando,
+.cursor-salvando * {
+  cursor: wait !important;
+}
+</style>

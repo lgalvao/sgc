@@ -3,6 +3,7 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
+      <div :class="{'cursor-salvando': salvandoAutomaticamente}">
       <PageHeader
           :subtitle="unidade?.unidadeSigla"
           :title="TEXTOS.diagnostico.TITULO_SITUACAO_CAPACITACAO"
@@ -14,15 +15,6 @@
           </BButton>
         </template>
       </PageHeader>
-
-
-      <!-- Badge de autosave -->
-      <div class="mb-3 text-muted small d-flex align-items-center gap-2">
-        <template v-if="salvandoAutomaticamente">
-          <BSpinner small variant="secondary"/>
-          {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
-        </template>
-      </div>
 
       <BCard class="mb-4">
         <EmptyState
@@ -122,6 +114,7 @@
           />
         </div>
       </BCard>
+      </div>
     </template>
   </LayoutPadrao>
 </template>
@@ -277,5 +270,10 @@ function formatarNota(valor: number | null): string {
 .scroll-container-competencias {
   max-height: 400px;
   overflow-y: auto;
+}
+
+.cursor-salvando,
+.cursor-salvando * {
+  cursor: wait !important;
 }
 </style>

@@ -3,6 +3,7 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
+      <div :class="{'cursor-salvando': salvandoAutomaticamente}">
       <PageHeader
           :subtitle="subtituloServidor"
           :title="TEXTOS.diagnostico.TITULO_CONSENSO"
@@ -44,14 +45,6 @@
           variante="danger"
           @dismissed="erroMensagem = ''"
       />
-
-      <!-- Badge de autosave -->
-      <div v-if="podeEditar" class="mb-3 text-muted small d-flex align-items-center gap-2">
-        <template v-if="salvandoAutomaticamente">
-          <BSpinner small variant="secondary"/>
-          {{ TEXTOS.diagnostico.LABEL_SALVANDO }}
-        </template>
-      </div>
 
       <!-- Aviso de consenso já aprovado -->
       <BAlert
@@ -155,6 +148,7 @@
           </table>
         </div>
       </BCard>
+      </div>
 
     </template>
   </LayoutPadrao>
@@ -388,5 +382,10 @@ function campoConsensoHabilitado(
 .grupo-consenso,
 .celula-consenso {
   font-weight: 600;
+}
+
+.cursor-salvando,
+.cursor-salvando * {
+  cursor: wait !important;
 }
 </style>

@@ -240,7 +240,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         const wrapper = montar();
 
         expect(wrapper.text()).toContain('ASSESSORIA_12 - Assessoria 12');
-        expect(wrapper.text()).toContain('Salvando');
+        expect(wrapper.find('.cursor-salvando').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-concluir-autoavaliacao"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="toggle-atividades-10"]').exists()).toBe(true);
 

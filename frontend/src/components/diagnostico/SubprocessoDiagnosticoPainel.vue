@@ -393,7 +393,6 @@ const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
 const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
 
 function navegarParaConsenso(servidorTitulo: string) {
-  const servidor = servidores.value.find((item) => item.servidorTitulo === servidorTitulo);
   void router.push({
     name: 'ConsensoDiagnostico',
     params: {
@@ -401,7 +400,6 @@ function navegarParaConsenso(servidorTitulo: string) {
       siglaUnidade: props.siglaUnidade,
       servidorTitulo,
     },
-    query: servidor?.servidorNome ? {servidorNome: servidor.servidorNome} : undefined,
   });
 }
 
@@ -422,7 +420,6 @@ async function confirmarPermitirAvaliacao() {
   try {
     await permitirAvaliacao(servidorSelecionado.value.servidorTitulo);
     modalPermitirAvaliacaoAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILIDADE_REVERTIDA;
   } catch {
     erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
   }
@@ -440,7 +437,6 @@ async function confirmarImpossibilitar() {
       justificativaImpossibilidade.value,
     );
     modalImpossibilitarAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO;
   } catch {
     erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
   }

@@ -42,17 +42,16 @@ class AlertaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve buscar alertas para Gestão (unidade + individuais)")
+    @DisplayName("Deve buscar alertas para Gestão (apenas unidade)")
     void deveListarParaGestao() {
         Long codigoUnidade = 1L;
-        String usuarioTitulo = "123";
         List<Alerta> alertas = Collections.singletonList(new Alerta());
-        when(alertaRepo.buscarAlertasDaUnidadeEIndividuais(codigoUnidade, usuarioTitulo)).thenReturn(alertas);
+        when(alertaRepo.buscarAlertasDaUnidade(codigoUnidade)).thenReturn(alertas);
 
-        List<Alerta> resultado = alertaService.listarParaGestao(codigoUnidade, usuarioTitulo);
+        List<Alerta> resultado = alertaService.listarParaGestao(codigoUnidade);
 
         assertThat(resultado).hasSize(1);
-        verify(alertaRepo).buscarAlertasDaUnidadeEIndividuais(codigoUnidade, usuarioTitulo);
+        verify(alertaRepo).buscarAlertasDaUnidade(codigoUnidade);
         verify(alertaRepo, never()).buscarAlertasExclusivosDoUsuario(anyString());
     }
 
@@ -110,12 +109,12 @@ class AlertaServiceTest {
     void deveListarParaGestaoPaginado() {
         Pageable paginacao = PageRequest.of(0, 10);
         Page<Alerta> pagina = new PageImpl<>(List.of(new Alerta()));
-        when(alertaRepo.buscarAlertasDaUnidadeEIndividuais(1L, "123", paginacao)).thenReturn(pagina);
+        when(alertaRepo.buscarAlertasDaUnidade(1L, paginacao)).thenReturn(pagina);
 
-        Page<Alerta> resultado = alertaService.listarParaGestaoPaginado(1L, "123", paginacao);
+        Page<Alerta> resultado = alertaService.listarParaGestaoPaginado(1L, paginacao);
 
         assertThat(resultado.getContent()).hasSize(1);
-        verify(alertaRepo).buscarAlertasDaUnidadeEIndividuais(1L, "123", paginacao);
+        verify(alertaRepo).buscarAlertasDaUnidade(1L, paginacao);
     }
 
     @Test

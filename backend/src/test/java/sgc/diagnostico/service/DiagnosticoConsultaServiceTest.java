@@ -79,6 +79,32 @@ class DiagnosticoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("obterEquipe deve desabilitar manter consenso para servidor com avaliação impossibilitada")
+    void obterEquipe_deveDesabilitarManterConsensoParaImpossibilitado() {
+        Long codSubprocesso = 400L;
+        Long codDiagnostico = 900L;
+        Unidade unidade = unidade(12L, "ASSESSORIA_12", "Assessoria 12");
+        Subprocesso subprocesso = subprocesso(codSubprocesso, unidade);
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(avaliacaoRepo.listarPorDiagnostico(codDiagnostico)).thenReturn(List.of(
+                avaliacao("242426", "Servidor Avaliado", 2L, SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
+        ));
+        when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
+                .thenReturn(Optional.empty());
+
+        DiagnosticoEquipeDto dto = service.obterEquipe(codSubprocesso);
+
+        assertThat(dto.servidores()).singleElement().satisfies(item -> {
+            assertThat(item.podeManterConsenso()).isFalse();
+            assertThat(item.podePermitirAvaliacao()).isTrue();
+            assertThat(item.podeImpossibilitar()).isFalse();
+        });
+    }
+
+    @Test
     @DisplayName("obterDiagnosticoUnidade deve ocultar o responsável da unidade de servidores e situações de capacitação")
     void obterDiagnosticoUnidade_deveOcultarResponsavelDaUnidade() {
         Long codSubprocesso = 400L;
@@ -111,6 +137,36 @@ class DiagnosticoConsultaServiceTest {
         assertThat(dto.situacoesCapacitacao())
                 .extracting(item -> item.servidorTitulo())
                 .containsExactly("242426");
+    }
+
+    @Test
+    @DisplayName("obterDiagnosticoUnidade deve desabilitar manter consenso para servidor com avaliação impossibilitada")
+    void obterDiagnosticoUnidade_deveDesabilitarManterConsensoParaImpossibilitado() {
+        Long codSubprocesso = 400L;
+        Long codDiagnostico = 900L;
+        Unidade unidade = unidade(12L, "ASSESSORIA_12", "Assessoria 12");
+        Subprocesso subprocesso = subprocesso(codSubprocesso, unidade);
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(subprocessoConsultaService.listarMovimentacoes(subprocesso)).thenReturn(List.of());
+        when(avaliacaoRepo.listarPorDiagnostico(codDiagnostico)).thenReturn(List.of(
+                avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
+        ));
+        when(situacaoCapacitacaoRepo.listarPorDiagnostico(codDiagnostico)).thenReturn(List.of(
+                situacaoCapacitacao("242426", "Servidor Avaliado", 1L)
+        ));
+        when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
+                .thenReturn(Optional.empty());
+
+        DiagnosticoUnidadeDto dto = service.obterDiagnosticoUnidade(codSubprocesso);
+
+        assertThat(dto.servidores()).singleElement().satisfies(item -> {
+            assertThat(item.podeManterConsenso()).isFalse();
+            assertThat(item.podePermitirAvaliacao()).isTrue();
+            assertThat(item.podeImpossibilitar()).isFalse();
+        });
     }
 
     private Diagnostico diagnostico(Long codigo) {

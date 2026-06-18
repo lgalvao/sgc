@@ -32,7 +32,7 @@ const homologando = ref(false);
 const impossibilitando = ref(false);
 const servidores = ref<any[]>([
     {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
-    {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: true},
+    {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: false, podeImpossibilitar: false, podePermitirAvaliacao: true},
     {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: false},
 ]);
 
@@ -143,7 +143,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         validarAcaoHomologarDiagnosticoMock.mockResolvedValue(undefined);
         servidores.value = [
             {servidorTitulo: '242426', servidorNome: 'Duff McKagan', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
-            {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: true},
+            {servidorTitulo: '242427', servidorNome: 'Slash', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: false, podeImpossibilitar: false, podePermitirAvaliacao: true},
             {servidorTitulo: '242428', servidorNome: 'Axl Rose', situacaoServidor: 'CONSENSO_APROVADO', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: false},
         ];
         erroConcluir.value = null;
@@ -230,13 +230,10 @@ describe('SubprocessoDiagnosticoPainel', () => {
                 siglaUnidade: 'ASSESSORIA_12',
                 servidorTitulo: '242426',
             },
-            query: {
-                servidorNome: 'Duff McKagan',
-            },
         });
 
         // Servidor 242427 está impossibilitado
-        expect(wrapper.get('[data-testid="btn-manter-consenso-242427"]').attributes('disabled')).toBeUndefined();
+        expect(wrapper.get('[data-testid="btn-manter-consenso-242427"]').attributes('disabled')).toBeDefined();
         expect(wrapper.get('[data-testid="btn-impossibilitar-242427"]').attributes('disabled')).toBeDefined();
         expect(wrapper.get('[data-testid="btn-desfazer-impossibilidade-242427"]').attributes('disabled')).toBeUndefined();
 
@@ -246,7 +243,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         expect(wrapper.get('[data-testid="btn-desfazer-impossibilidade-242426"]').attributes('disabled')).toBeDefined();
     });
 
-    it('valida justificativa obrigatória e registra impossibilidade com sucesso', async () => {
+    it('valida justificativa obrigatória e registra impossibilidade sem exibir alerta de sucesso', async () => {
         impossibilitarAvaliacaoMock.mockResolvedValue(undefined);
         const wrapper = montar();
 
@@ -258,7 +255,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
 
         expect(impossibilitarAvaliacaoMock).toHaveBeenCalledWith('242426', 'Servidor afastado.');
-        expect(wrapper.text()).toContain('Impossibilidade registrada');
+        expect(wrapper.text()).not.toContain('Impossibilidade registrada');
     });
 
     it('conclui diagnóstico e redireciona para o painel', async () => {
@@ -407,7 +404,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
             {servidorTitulo: '2', servidorNome: 'Servidor 2', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
             {servidorTitulo: '3', servidorNome: 'Servidor 3', situacaoServidor: 'CONSENSO_CRIADO', podeManterConsenso: true, podeImpossibilitar: true, podePermitirAvaliacao: false},
             {servidorTitulo: '4', servidorNome: 'Servidor 4', situacaoServidor: 'CONSENSO_APROVADO', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: false},
-            {servidorTitulo: '5', servidorNome: 'Servidor 5', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: true, podeImpossibilitar: false, podePermitirAvaliacao: true},
+            {servidorTitulo: '5', servidorNome: 'Servidor 5', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA', podeManterConsenso: false, podeImpossibilitar: false, podePermitirAvaliacao: true},
         ];
 
         const wrapper = montar();
@@ -468,7 +465,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         expect(wrapper.text()).not.toContain('Não foi possível salvar.');
     });
 
-    it('deve reverter a impossibilidade de avaliação com sucesso', async () => {
+    it('deve reverter a impossibilidade de avaliação sem exibir alerta de sucesso', async () => {
         permitirAvaliacaoMock.mockResolvedValue(undefined);
         const wrapper = montar();
 
@@ -479,7 +476,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await btnConfirmar.trigger('click');
 
         expect(permitirAvaliacaoMock).toHaveBeenCalledWith('242427');
-        expect(wrapper.text()).toContain('Permissão de avaliação registrada com sucesso');
+        expect(wrapper.text()).not.toContain('Permissão de avaliação registrada com sucesso');
     });
 
     it('cobre o fechamento dos modais de fluxo pelo evento update:modelValue', async () => {

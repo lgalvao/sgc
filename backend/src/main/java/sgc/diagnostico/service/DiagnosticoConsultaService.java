@@ -151,7 +151,7 @@ public class DiagnosticoConsultaService {
                             .servidorTitulo(e.getKey())
                             .servidorNome(nomes.get(e.getKey()))
                             .situacaoServidor(situacao.name())
-                            .podeManterConsenso(true)
+                            .podeManterConsenso(situacao != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
                             .podeImpossibilitar(
                                     situacao != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
                                             && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO
@@ -207,7 +207,9 @@ public class DiagnosticoConsultaService {
                             .servidorNome(primeiro.getServidorNomeDiagnostico())
                             .situacaoServidor(primeiro.getSituacaoServidor().name())
                             .consenso(consenso)
-                            .podeManterConsenso(true)
+                            .podeManterConsenso(
+                                    primeiro.getSituacaoServidor() != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                            )
                             .podeImpossibilitar(
                                     primeiro.getSituacaoServidor() != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
                                             && primeiro.getSituacaoServidor() != SituacaoAvaliacaoServidor.CONSENSO_APROVADO

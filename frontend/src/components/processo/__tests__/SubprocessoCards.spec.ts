@@ -534,9 +534,6 @@ describe("SubprocessoCards.vue", () => {
                 siglaUnidade: "ASSESSORIA_12",
                 servidorTitulo: '242426',
             }),
-            query: {
-                servidorNome: 'Duff',
-            },
         }));
     });
 

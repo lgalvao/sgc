@@ -201,7 +201,6 @@ function navegarParaDiag(routeName: string) {
 
 function navegarParaConsenso() {
   const servidorTitulo = perfilStore.usuarioCodigo ?? subprocesso.value?.titular?.tituloEleitoral;
-  const servidorNome = perfilStore.usuarioNome ?? subprocesso.value?.titular?.nome;
   if (!servidorTitulo) {
     return;
   }
@@ -212,7 +211,6 @@ function navegarParaConsenso() {
       siglaUnidade: props.siglaUnidade,
       servidorTitulo,
     },
-    query: servidorNome ? {servidorNome} : undefined,
   });
 }
 
