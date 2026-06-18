@@ -4,12 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.AlertaAplicacaoService;
-import sgc.alerta.model.Alerta;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.service.UnidadeService;
 import sgc.processo.model.Processo;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor

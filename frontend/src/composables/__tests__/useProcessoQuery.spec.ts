@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
-import {useProcessoQuery, useInvalidacaoProcesso, CHAVE_QUERY_PROCESSO} from "../useProcessoQuery";
+import {CHAVE_QUERY_PROCESSO, useInvalidacaoProcesso, useProcessoQuery} from "../useProcessoQuery";
 import * as processoService from "@/services/processo";
 
 let queryOptions: any = null;

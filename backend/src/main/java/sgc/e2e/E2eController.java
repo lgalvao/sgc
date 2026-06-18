@@ -1,7 +1,6 @@
 package sgc.e2e;
 
 import jakarta.annotation.*;
-import lombok.*;
 import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.*;
@@ -361,17 +360,17 @@ public class E2eController {
     public NotificacaoFixtureResponse criarNotificacaoEmailFixture(@RequestBody NotificacaoFixtureRequest request) {
         Long codigo = consultarProximoCodigo("notificacao_email");
         LocalDateTime agora = LocalDateTime.now();
-        String assunto = request.assunto() != null && !request.assunto().isBlank()
+        String assunto = !request.assunto().isBlank()
                 ? request.assunto()
                 : "SGC: Notificação fixture " + codigo;
-        String corpoHtml = request.corpoHtml() != null && !request.corpoHtml().isBlank()
+        String corpoHtml = !request.corpoHtml().isBlank()
                 ? request.corpoHtml()
                 : "<p>Conteúdo fixture " + codigo + "</p>";
-        String destinatario = request.destinatario() != null && !request.destinatario().isBlank()
+        String destinatario = !request.destinatario().isBlank()
                 ? request.destinatario()
                 : "fixture" + codigo + "@tre-pe.jus.br";
-        String situacao = request.situacao() != null ? request.situacao() : SituacaoNotificacao.ENVIADO.name();
-        String tipo = request.tipoNotificacao() != null ? request.tipoNotificacao() : TipoNotificacao.LEMBRETE_PRAZO.name();
+        String situacao = request.situacao();
+        String tipo = request.tipoNotificacao();
         String chaveIdempotencia = "e2e:notificacao:" + codigo + ":" + UUID.randomUUID();
 
         jdbcTemplate.update("""
@@ -388,7 +387,7 @@ public class E2eController {
                 assunto,
                 corpoHtml,
                 situacao,
-                request.tentativas() != null ? request.tentativas() : 0,
+                request.tentativas(),
                 SituacaoNotificacao.FALHA_TEMPORARIA.name().equals(situacao) ? agora.plusMinutes(10) : null,
                 agora.minusMinutes(5),
                 SituacaoNotificacao.ENVIADO.name().equals(situacao) ? agora.minusMinutes(1) : null,
@@ -404,16 +403,16 @@ public class E2eController {
     public FeedbackFixtureResponse criarFeedbackFixture(@RequestBody FeedbackFixtureRequest request) {
         UUID codigo = UUID.randomUUID();
         OffsetDateTime agora = OffsetDateTime.now();
-        String nota = request.nota() != null && !request.nota().isBlank()
+        String nota = !request.nota().isBlank()
                 ? request.nota()
                 : "<p>Feedback fixture " + codigo + "</p>";
-        String rota = request.rota() != null && !request.rota().isBlank()
+        String rota = !request.rota().isBlank()
                 ? request.rota()
                 : "/painel";
         String metadataJson = request.metadataJson();
         String caminhoScreenshot = null;
 
-        if (Boolean.TRUE.equals(request.comScreenshot())) {
+        if (request.comScreenshot()) {
             caminhoScreenshot = criarScreenshotFixture(codigo);
         }
 
@@ -424,12 +423,12 @@ public class E2eController {
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 codigo,
-                request.tipo() != null ? request.tipo() : FeedbackTipo.BUG.name(),
+                request.tipo(),
                 nota,
                 metadataJson,
                 caminhoScreenshot,
-                request.usuarioCodigo() != null ? request.usuarioCodigo() : "191919",
-                request.usuarioNome() != null ? request.usuarioNome() : "Administrador Fixture",
+                request.usuarioCodigo(),
+                request.usuarioNome(),
                 agora,
                 rota,
                 FeedbackStatus.NOVO.name()
@@ -864,7 +863,7 @@ public class E2eController {
 
     private String descricaoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         String descReq = request.descricao();
-        if (descReq != null && !descReq.isBlank()) {
+        if (!descReq.isBlank()) {
             return descReq;
         }
         return "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
@@ -912,7 +911,7 @@ public class E2eController {
 
         Processo processo = processoService.criar(criarReq);
 
-        if (Boolean.TRUE.equals(request.iniciar())) {
+        if (request.iniciar()) {
             List<Long> unidades = List.of(codUnidade);
             Long processoCodigo = processo.getCodigo();
             processoService.iniciar(processoCodigo, unidades);
@@ -990,7 +989,7 @@ public class E2eController {
         });
         avaliacaoServidorRepo.saveAllAndFlush(avaliacoes);
 
-        Subprocesso subprocesso = avaliacoes.get(0).getDiagnostico().getSubprocesso();
+        Subprocesso subprocesso = avaliacoes.getFirst().getDiagnostico().getSubprocesso();
         if (subprocesso.getSituacao() == SituacaoSubprocesso.NAO_INICIADO) {
             subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
             subprocessoRepo.saveAndFlush(subprocesso);
@@ -1150,7 +1149,7 @@ public class E2eController {
         }
 
         public int resolverDiasLimite() {
-            return diasLimite != null ? diasLimite : 30;
+            return diasLimite;
         }
     }
 

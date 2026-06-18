@@ -10,7 +10,7 @@ import {
     abrirAcaoConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
     preencherConsensoMinimo,
-    preencherSituacoesCapacitacaoPendentesPorApi
+    preencherSituacoesCapacitacaoPendentesPelaTela
 } from './helpers/helpers-diagnostico.js';
 import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from "../frontend/src/constants/textos.js";
@@ -522,7 +522,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await page.goto(`/diagnostico/${codSubprocesso}/${siglaUnidadeDiagnostico}/situacao-capacitacao`);
             await expect(page.getByRole('heading', {name: /Situação de Capacitação/i})).toBeVisible();
             await expect(page.getByTestId('lista-servidores-situacao-capacitacao')).toBeVisible();
-            await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso, 'EC');
+            await preencherSituacoesCapacitacaoPendentesPelaTela(page, codSubprocesso, 'EC');
         });
         await expect(page).toHaveURL(/\/login/);
     };

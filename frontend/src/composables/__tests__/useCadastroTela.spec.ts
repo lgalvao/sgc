@@ -1,11 +1,9 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {createPinia} from "pinia";
-import {createApp, nextTick, ref, reactive, toValue} from "vue";
+import {createApp, nextTick, reactive, ref} from "vue";
 import {PiniaColada} from "@pinia/colada";
 import {useCadastroTela} from "../useCadastroTela";
-import {useNotification} from "../useNotification";
-import {useErrorHandler} from "../useErrorHandler";
-import {TipoProcesso, SituacaoSubprocesso} from "@/types/tipos";
+import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 
 // Mocks de dependências pesadas
 vi.mock("@/composables/useAtividadeForm", () => ({

@@ -10,8 +10,7 @@
             role="button"
             tabindex="0"
             @click="void router.push('/relatorios/andamento')"
-            @keydown.enter="void router.push('/relatorios/andamento')"
-            @keydown.space.prevent="void router.push('/relatorios/andamento')"
+            @keydown="tratarKeyDown($event, '/relatorios/andamento')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -32,8 +31,7 @@
             role="button"
             tabindex="0"
             @click="void router.push('/relatorios/mapas-vigentes')"
-            @keydown.enter="void router.push('/relatorios/mapas-vigentes')"
-            @keydown.space.prevent="void router.push('/relatorios/mapas-vigentes')"
+            @keydown="tratarKeyDown($event, '/relatorios/mapas-vigentes')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -54,8 +52,7 @@
             role="button"
             tabindex="0"
             @click="void router.push('/relatorios/diagnostico/gaps')"
-            @keydown.enter="void router.push('/relatorios/diagnostico/gaps')"
-            @keydown.space.prevent="void router.push('/relatorios/diagnostico/gaps')"
+            @keydown="tratarKeyDown($event, '/relatorios/diagnostico/gaps')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -76,8 +73,7 @@
             role="button"
             tabindex="0"
             @click="void router.push('/relatorios/diagnostico/situacao-capacitacao')"
-            @keydown.enter="void router.push('/relatorios/diagnostico/situacao-capacitacao')"
-            @keydown.space.prevent="void router.push('/relatorios/diagnostico/situacao-capacitacao')"
+            @keydown="tratarKeyDown($event, '/relatorios/diagnostico/situacao-capacitacao')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -98,8 +94,7 @@
             role="button"
             tabindex="0"
             @click="void router.push('/relatorios/unidades-sem-mapas-vigentes')"
-            @keydown.enter="void router.push('/relatorios/unidades-sem-mapas-vigentes')"
-            @keydown.space.prevent="void router.push('/relatorios/unidades-sem-mapas-vigentes')"
+            @keydown="tratarKeyDown($event, '/relatorios/unidades-sem-mapas-vigentes')"
         >
           <div class="card-click-area">
             <BCardTitle class="d-flex align-items-start gap-3 mb-3">
@@ -127,6 +122,14 @@ import {Perfil} from "@/types/tipos";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
+
+function tratarKeyDown(event: KeyboardEvent, rota: string) {
+  const key = event.key ? event.key.toLowerCase() : '';
+  if (key === 'enter' || event.keyCode === 13 || key === ' ' || key === 'spacebar' || event.keyCode === 32) {
+    event.preventDefault();
+    void router.push(rota);
+  }
+}
 </script>
 
 <style scoped>

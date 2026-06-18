@@ -7,7 +7,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
-import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.*;

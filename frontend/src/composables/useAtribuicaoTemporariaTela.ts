@@ -15,7 +15,7 @@ import type {Unidade} from "@/types/tipos";
 import {obterHojeFormatado} from "@/utils/date";
 import {logger} from "@/utils";
 import {normalizarErro} from "@/utils/apiError";
-import {useUnidadeQuery, useInvalidacaoUnidade} from "@/composables/useUnidadeQuery";
+import {useInvalidacaoUnidade, useUnidadeQuery} from "@/composables/useUnidadeQuery";
 
 interface EstadoCampos {
     usuarioSelecionado: Ref<string | null>;

@@ -4,7 +4,6 @@ import org.springframework.stereotype.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
@@ -107,9 +106,6 @@ public class SubprocessoDtoMapper {
     }
 
     private LocalDateTime calcularUltimaDataLimite(LocalDateTime dataLimiteEtapa1, LocalDateTime dataLimiteEtapa2) {
-        if (dataLimiteEtapa2 == null) {
-            return dataLimiteEtapa1;
-        }
         return dataLimiteEtapa1.isAfter(dataLimiteEtapa2) ? dataLimiteEtapa1 : dataLimiteEtapa2;
     }
 }

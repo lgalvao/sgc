@@ -49,9 +49,9 @@ public class DiagnosticoConsultaService {
         return DiagnosticoContextoDto.builder()
                 .processoCodigo(sp.getProcesso().getCodigo())
                 .subprocessoCodigo(sp.getCodigo())
-                .unidadeCodigo(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : sp.getUnidade().getCodigo())
-                .unidadeSigla(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : sp.getUnidade().getSigla())
-                .unidadeNome(unidadeSnapshot != null ? unidadeSnapshot.getNome() : sp.getUnidade().getNome())
+                .unidadeCodigo(unidadeSnapshot.getUnidadeCodigoPersistido())
+                .unidadeSigla(unidadeSnapshot.getSigla())
+                .unidadeNome(unidadeSnapshot.getNome())
                 .situacaoSubprocesso(sp.getSituacao().name())
                 .situacaoDiagnostico(resolverSituacaoDiagnostico(sp))
                 .competencias(competencias)
@@ -171,9 +171,9 @@ public class DiagnosticoConsultaService {
 
         String responsavelTitulo = buscarResponsavelTitulo(subprocesso.getUnidade().getCodigo());
         UnidadeResumoDto unidade = UnidadeResumoDto.builder()
-                .unidadeCodigo(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : subprocesso.getUnidade().getCodigo())
-                .unidadeSigla(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : subprocesso.getUnidade().getSigla())
-                .unidadeNome(unidadeSnapshot != null ? unidadeSnapshot.getNome() : subprocesso.getUnidade().getNome())
+                .unidadeCodigo(unidadeSnapshot.getUnidadeCodigoPersistido())
+                .unidadeSigla(unidadeSnapshot.getSigla())
+                .unidadeNome(unidadeSnapshot.getNome())
                 .situacaoSubprocesso(subprocesso.getSituacao().name())
                 .responsavelTitulo(responsavelTitulo)
                 .build();

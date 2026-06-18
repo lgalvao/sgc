@@ -12,7 +12,6 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -190,7 +189,7 @@ public class DiagnosticoAvaliacaoService {
                 a.setImportancia(a.getAutoimportancia());
                 a.setDominio(a.getAutodominio());
                 a.calculaGap();
-            } else if (situacaoRetorno == SituacaoAvaliacaoServidor.CONSENSO_CRIADO) {
+            } else {
                 a.setImportancia(a.getChefiaImportancia() != null ? a.getChefiaImportancia() : a.getAutoimportancia());
                 a.setDominio(a.getChefiaDominio() != null ? a.getChefiaDominio() : a.getAutodominio());
                 a.calculaGap();

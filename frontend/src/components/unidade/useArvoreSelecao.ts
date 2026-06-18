@@ -1,5 +1,5 @@
-import {computed, ref, watch} from "vue";
 import type {Ref} from "vue";
+import {computed, ref, watch} from "vue";
 import type {Unidade} from "@/types/tipos";
 import {
     coletarCodigosElegiveis,

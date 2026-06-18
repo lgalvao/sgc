@@ -1,6 +1,6 @@
 import {useMutation} from '@pinia/colada';
-import {computed, toValue} from 'vue';
 import type {MaybeRefOrGetter} from 'vue';
+import {computed, toValue} from 'vue';
 import {useRouter} from 'vue-router';
 import {
     concluirDiagnostico,

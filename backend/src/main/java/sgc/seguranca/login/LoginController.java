@@ -18,7 +18,6 @@ import sgc.seguranca.config.*;
 import sgc.seguranca.dto.*;
 
 import java.time.*;
-import java.time.temporal.*;
 import java.util.*;
 
 /**
@@ -214,10 +213,7 @@ public class LoginController {
     }
 
     private Instant obterExpiracaoLogout(GerenciadorJwt.JwtClaims claims) {
-        if (claims.expiracao() != null) {
-            return claims.expiracao();
-        }
-        return Instant.now().plus(jwtProperties.expiracaoMinutos(), ChronoUnit.MINUTES);
+        return claims.expiracao();
     }
 
     @SuppressWarnings("ConstantConditions")

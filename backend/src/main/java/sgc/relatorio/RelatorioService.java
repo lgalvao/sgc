@@ -631,7 +631,7 @@ public class RelatorioService {
             PdfPTable dtEtapa2 = new PdfPTable(new float[]{1f, 1f});
             dtEtapa2.setWidthPercentage(100f);
             String dtLim2 = formatarData(relatorio.dataLimiteEtapa2());
-            if (relatorio.dataLimiteEtapa2() != null && !Objects.equals(relatorio.dataLimiteEtapa2(), relatorio.dataLimiteEtapa1())) {
+            if (!Objects.equals(relatorio.dataLimiteEtapa2(), relatorio.dataLimiteEtapa1())) {
                 dtLim2 += " (Prazo ajustado)";
             }
             dtEtapa2.addCell(criarCelulaRotuloValor("Data limite:", dtLim2));
@@ -666,7 +666,7 @@ public class RelatorioService {
             for (RelatorioDiagnosticoGapCompetenciaDto competencia : relatorio.competencias()) {
                 tabela.addCell(criarCelulaTabela(competencia.competenciaDescricao(), Element.ALIGN_LEFT));
                 tabela.addCell(criarCelulaTabela(
-                        competencia.mediaGap() == null ? "-" : String.format(Locale.US, "%.2f", competencia.mediaGap()),
+                        String.format(Locale.US, "%.2f", competencia.mediaGap()),
                         Element.ALIGN_CENTER
                 ));
                 tabela.addCell(criarCelulaTabela(String.valueOf(competencia.totalAvaliacoesConsideradas()), Element.ALIGN_CENTER));
@@ -894,7 +894,7 @@ public class RelatorioService {
                     String.valueOf(unidade.codigo())
             );
             UnidadeRelatorioSemMapa unidadeNormalizada = unidade.comFilhas(filhas);
-            String nome = Optional.ofNullable(unidadeNormalizada.nome()).orElse("");
+            String nome = Optional.of(unidadeNormalizada.nome()).orElse("");
 
             if (ehZonaEleitoralPorMetadados(unidadeNormalizada, nome)) {
                 zonasEleitorais.add(unidadeNormalizada);
@@ -948,10 +948,10 @@ public class RelatorioService {
     }
 
     private String obterTextoOrdenacao(UnidadeRelatorioSemMapa unidade) {
-        if (unidade.sigla() != null && !unidade.sigla().isBlank()) {
+        if (!unidade.sigla().isBlank()) {
             return unidade.sigla();
         }
-        return Optional.ofNullable(unidade.nome()).orElse("");
+        return Optional.of(unidade.nome()).orElse("");
     }
 
     private boolean ehZonaEleitoralPorMetadados(UnidadeRelatorioSemMapa unidade, String nome) {

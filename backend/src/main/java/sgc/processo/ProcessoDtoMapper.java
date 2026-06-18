@@ -7,7 +7,6 @@ import sgc.processo.model.*;
 import sgc.organizacao.model.*;
 import sgc.subprocesso.model.*;
 
-import java.time.*;
 import java.util.*;
 
 @Component

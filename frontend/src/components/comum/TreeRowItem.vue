@@ -4,8 +4,7 @@
       :data-testid="'tree-table-row-' + item.codigo"
       :tabindex="item.clickable !== false ? 0 : undefined"
       @click="aoClicarNaLinha"
-      @keydown.enter="aoClicarNaLinha"
-      @keydown.space="aoClicarNaLinha"
+      @keydown="tratarKeyDownLinha"
   >
     <td
         v-for="(column, index) in columns"
@@ -33,8 +32,7 @@
               :data-testid="`btn-toggle-expand-${item.codigo}`"
               variant="link"
               @click.stop="toggleExpand(item.codigo)"
-              @keydown.enter.stop="toggleExpand(item.codigo)"
-              @keydown.space.stop="toggleExpand(item.codigo)"
+              @keydown.stop="tratarKeyDownToggle($event, item.codigo)"
           >
             <i
                 :class="[
@@ -102,6 +100,22 @@ const obterEstiloPrimeiraColuna = (level: number) => ({
 const aoClicarNaLinha = () => {
   if (props.item.clickable === false) return;
   emit("row-click", props.item);
+};
+
+const tratarKeyDownLinha = (event: KeyboardEvent) => {
+  const key = event.key ? event.key.toLowerCase() : '';
+  if (key === 'enter' || event.keyCode === 13 || key === ' ' || key === 'spacebar' || event.keyCode === 32) {
+    event.preventDefault();
+    aoClicarNaLinha();
+  }
+};
+
+const tratarKeyDownToggle = (event: KeyboardEvent, codigo: number | string) => {
+  const key = event.key ? event.key.toLowerCase() : '';
+  if (key === 'enter' || event.keyCode === 13 || key === ' ' || key === 'spacebar' || event.keyCode === 32) {
+    event.preventDefault();
+    toggleExpand(codigo);
+  }
 };
 
 defineExpose({

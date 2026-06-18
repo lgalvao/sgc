@@ -1,9 +1,9 @@
-import {computed, toValue, type MaybeRefOrGetter} from "vue";
+import {computed, type MaybeRefOrGetter, toValue} from "vue";
 import {useQuery, useQueryCache} from "@pinia/colada";
 import {usePerfilStore} from "@/stores/perfil";
 import {
-    buscarArvoreUnidade,
     buscarArvoreComElegibilidade,
+    buscarArvoreUnidade,
     buscarReferenciaMapaVigente,
 } from "@/services/unidadeService";
 import type {MapaVigenteReferencia, Unidade} from "@/types/tipos";

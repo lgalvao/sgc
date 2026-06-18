@@ -1,10 +1,10 @@
-import {ref, watch, onMounted, nextTick, type Ref} from "vue";
+import {nextTick, onMounted, ref, type Ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {isErroCanceladoHttp} from "@/axios-setup";
 import {useArvoreElegibilidadeQuery} from "@/composables/useUnidadeQuery";
 import * as processoService from "@/services/processo";
-import {removerUnidadesSemEquipe, filtrarSelecionadasPorElegibilidade} from "@/views/processoCadastroUnidades";
-import type {Processo, Unidade, TipoProcesso} from "@/types/tipos";
+import {filtrarSelecionadasPorElegibilidade, removerUnidadesSemEquipe} from "@/views/processoCadastroUnidades";
+import type {Processo, TipoProcesso, Unidade} from "@/types/tipos";
 import {SituacaoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {logger} from "@/utils";

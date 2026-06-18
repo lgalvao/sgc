@@ -20,8 +20,7 @@
         role="button"
         tabindex="0"
         @click="abrirCalendario"
-        @keydown.enter.prevent="abrirCalendario"
-        @keydown.space.prevent="abrirCalendario"
+        @keydown="tratarKeyDown"
     >
       <i aria-hidden="true" class="bi bi-calendar-event"></i>
     </BInputGroupText>
@@ -64,6 +63,14 @@ function abrirCalendario() {
     } else {
       input.focus();
     }
+  }
+}
+
+function tratarKeyDown(event: KeyboardEvent) {
+  const key = event.key ? event.key.toLowerCase() : '';
+  if (key === 'enter' || event.keyCode === 13 || key === ' ' || key === 'spacebar' || event.keyCode === 32) {
+    event.preventDefault();
+    abrirCalendario();
   }
 }
 

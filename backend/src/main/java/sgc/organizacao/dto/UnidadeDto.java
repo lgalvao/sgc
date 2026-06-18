@@ -3,7 +3,6 @@ package sgc.organizacao.dto;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.jspecify.annotations.*;
 import sgc.comum.*;
 
 import java.time.*;

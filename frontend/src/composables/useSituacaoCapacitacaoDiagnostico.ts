@@ -2,7 +2,11 @@ import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade, salvarSituacoesCapacitacao} from '@/services/diagnosticoService';
-import type {DiagnosticoUnidade, SituacaoCapacitacaoItem, ValorSituacaoCapacitacao} from '@/types/diagnostico-competencias';
+import type {
+    DiagnosticoUnidade,
+    SituacaoCapacitacaoItem,
+    ValorSituacaoCapacitacao
+} from '@/types/diagnostico-competencias';
 import {chaveUnidade, criarContextoSessaoDiagnostico} from '@/composables/useDiagnosticoContexto';
 
 /**

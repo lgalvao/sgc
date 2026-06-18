@@ -1,6 +1,6 @@
-import {describe, expect, it, vi, beforeEach} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useMapaTela} from '../useMapaTela';
-import {ref, reactive} from 'vue';
+import {ref} from 'vue';
 
 // Mocks de dependências
 vi.mock('vue-router', () => ({

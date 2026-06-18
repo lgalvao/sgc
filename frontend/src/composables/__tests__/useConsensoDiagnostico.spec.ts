@@ -1,7 +1,7 @@
-import {describe, expect, it, vi, beforeEach} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {useConsensoDiagnostico} from '../useConsensoDiagnostico';
-import {ref, nextTick} from 'vue';
-import {useQuery, useMutation, useQueryCache} from '@pinia/colada';
+import {nextTick, ref} from 'vue';
+import {useQuery, useQueryCache} from '@pinia/colada';
 
 let mutacaoSalvarOptions: any = null;
 let mutacaoAprovarOptions: any = null;

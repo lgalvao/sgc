@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {ref, watch, nextTick} from "vue";
+import {nextTick, ref} from "vue";
 import {useUnidadeTela} from "../useUnidadeTela";
 import {relatoriosService} from "@/services/relatoriosService";
 import {TEXTOS} from "@/constants/textos";

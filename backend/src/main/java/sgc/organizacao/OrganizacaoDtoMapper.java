@@ -33,7 +33,7 @@ public class OrganizacaoDtoMapper {
                 unidade.getCodigo(),
                 unidade.getNome(),
                 unidade.getSigla(),
-                unidade.getTipo() != null ? unidade.getTipo().name() : null,
+                unidade.getTipo().name(),
                 unidade.getTituloTitular()
         );
     }
@@ -53,7 +53,7 @@ public class OrganizacaoDtoMapper {
                 unidade.getNome(),
                 unidade.getSigla(),
                 unidade.getUnidadeSuperior() != null ? unidade.getUnidadeSuperior().getCodigo() : null,
-                unidade.getTipo() != null ? unidade.getTipo().name() : null,
+                unidade.getTipo().name(),
                 unidade.getTituloTitular()
         );
 
@@ -77,7 +77,7 @@ public class OrganizacaoDtoMapper {
                 unidade.getNome(),
                 unidade.getSigla(),
                 null,
-                unidade.getTipo() != null ? unidade.getTipo().name() : null,
+                unidade.getTipo().name(),
                 unidade.getTituloTitular()
         );
     }

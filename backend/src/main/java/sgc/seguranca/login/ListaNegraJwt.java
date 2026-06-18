@@ -11,14 +11,14 @@ public class ListaNegraJwt {
     private final ConcurrentHashMap<String, Instant> tokensRevogados = new ConcurrentHashMap<>();
 
     public void revogar(String jti, Instant expiracao) {
-        if (jti == null || jti.isBlank() || expiracao == null) {
+        if (jti.isBlank()) {
             return;
         }
         tokensRevogados.put(jti, expiracao);
     }
 
     public boolean estaRevogado(String jti) {
-        if (jti == null || jti.isBlank()) {
+        if (jti.isBlank()) {
             return false;
         }
         Instant expiracao = tokensRevogados.get(jti);

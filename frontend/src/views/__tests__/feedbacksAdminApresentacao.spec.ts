@@ -1,11 +1,11 @@
 import {describe, expect, it, vi} from "vitest";
 import {
-  formatarMetadados,
-  formatarTipo,
-  obterIconeTipo,
-  obterUrlScreenshot,
-  obterVarianteTipo,
-  resumirNota
+    formatarMetadados,
+    formatarTipo,
+    obterIconeTipo,
+    obterUrlScreenshot,
+    obterVarianteTipo,
+    resumirNota
 } from "../feedbacksAdminApresentacao";
 
 vi.mock("@/axios-setup", () => ({

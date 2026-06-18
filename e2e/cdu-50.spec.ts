@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import type {Page, APIRequestContext, Response} from '@playwright/test';
+import type {Page, APIRequestContext} from '@playwright/test';
 import {
     criarProcesso,
 } from './helpers/helpers-processos.js';
@@ -17,7 +17,6 @@ import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
-import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const UNIDADE_GESTOR = 'SECRETARIA_1';
 const UNIDADE_SUBORDINADA = 'ASSESSORIA_12';
@@ -40,7 +39,6 @@ async function prepararDiagnosticoConcluido(
         descricao,
         unidade: UNIDADE_SUBORDINADA,
         iniciar: true,
-        servidorTitulo: TITULO_SERVIDOR,
     });
 }
 

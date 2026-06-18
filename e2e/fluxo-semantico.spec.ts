@@ -52,7 +52,7 @@ import {
     abrirAcaoConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
     preencherConsensoMinimo,
-    preencherSituacoesCapacitacaoPendentesPorApi
+    preencherSituacoesCapacitacaoPendentesPelaTela
 } from './helpers/helpers-diagnostico.js';
 
 test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a ponta', () => {
@@ -776,7 +776,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await page.goto(`/diagnostico/${codSubprocesso}/${SIGLA_UNIDADE_DIAGNOSTICO}/situacao-capacitacao`);
             await expect(page.getByRole('heading', {name: /Situação de Capacitação/i})).toBeVisible();
             await expect(page.getByTestId('lista-servidores-situacao-capacitacao')).toBeVisible();
-            await preencherSituacoesCapacitacaoPendentesPorApi(page, codSubprocesso, 'EC');
+            await preencherSituacoesCapacitacaoPendentesPelaTela(page, codSubprocesso, 'EC');
         });
     });
 });

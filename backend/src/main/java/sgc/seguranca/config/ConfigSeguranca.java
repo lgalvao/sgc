@@ -1,6 +1,5 @@
 package sgc.seguranca.config;
 
-import jakarta.servlet.DispatcherType;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.*;

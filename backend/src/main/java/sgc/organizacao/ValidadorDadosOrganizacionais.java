@@ -243,8 +243,7 @@ public class ValidadorDadosOrganizacionais {
                 GROUP BY titulo
                 HAVING COUNT(*) > 1
                 """, Map.of("titulos", titulos));
-        List<Map<String, Object>> linhas = new ArrayList<>();
-        linhas.addAll(result);
+        List<Map<String, Object>> linhas = new ArrayList<>(result);
 
         Set<String> titulosDuplicados = new TreeSet<>();
         for (Map<String, Object> linha : linhas) {

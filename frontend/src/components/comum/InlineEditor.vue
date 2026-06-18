@@ -9,8 +9,7 @@
             :data-testid="testIdInput"
             :size="size"
             :state="mensagemErroAtual ? false : null"
-            @keydown.enter="save"
-            @keydown.esc="cancel"
+            @keydown="tratarKeyDown"
         />
         <BFormInvalidFeedback :state="mensagemErroAtual ? false : null">
           {{ mensagemErroAtual }}
@@ -162,6 +161,15 @@ function cancel() {
   editando.value = false;
   emit('cancel');
   emit('edit-end');
+}
+
+function tratarKeyDown(event: KeyboardEvent) {
+  const key = event.key ? event.key.toLowerCase() : '';
+  if (key === 'enter' || event.keyCode === 13) {
+    save();
+  } else if (key === 'escape' || key === 'esc' || event.keyCode === 27) {
+    cancel();
+  }
 }
 
 watch(editValue, (valorAtual, valorAnterior) => {

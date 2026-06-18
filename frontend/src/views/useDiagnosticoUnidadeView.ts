@@ -8,10 +8,7 @@ import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {listarAnalisesDiagnostico} from '@/services/analiseService';
 import {TEXTOS} from '@/constants/textos';
 import type {Analise, Movimentacao} from '@/types/tipos';
-import type {
-    SituacaoAvaliacaoServidor,
-    ValorSituacaoCapacitacao,
-} from '@/types/diagnostico-competencias';
+import type {SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao,} from '@/types/diagnostico-competencias';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
 

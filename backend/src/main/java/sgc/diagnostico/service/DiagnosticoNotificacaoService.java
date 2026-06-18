@@ -34,7 +34,7 @@ public class DiagnosticoNotificacaoService {
     private final sgc.alerta.EmailModelosService emailModelosService;
 
     public void notificarInicioProcessoServidor(Subprocesso sp, Usuario servidor) {
-        if (servidor.getEmail() == null || servidor.getEmail().isBlank()) {
+        if (servidor.getEmail().isBlank()) {
             log.warn("Servidor {} sem email para notificação de início de diagnóstico.", servidor.getTituloEleitoral());
             return;
         }

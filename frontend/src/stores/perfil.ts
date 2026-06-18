@@ -6,7 +6,12 @@ import {useWebStorage} from "@/composables/useWebStorage";
 import {useQueryCache} from "@pinia/colada";
 import {usePainelStore} from "@/stores/painel";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {concluirLoginPerfil, encerrarLoginPerfil, iniciarLoginPerfil, type DadosSessaoPerfil} from "@/stores/perfilAutenticacao";
+import {
+    concluirLoginPerfil,
+    type DadosSessaoPerfil,
+    encerrarLoginPerfil,
+    iniciarLoginPerfil
+} from "@/stores/perfilAutenticacao";
 
 function obterUnidadeAtualSelecionada(
     perfilSelecionado: Perfil | null,

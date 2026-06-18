@@ -5,14 +5,14 @@ import {useNotification} from "@/composables/useNotification";
 import {usePerfil} from "@/composables/usePerfil";
 import {useProcessoForm} from "@/composables/useProcessoForm";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import type {FormFieldsRef} from "@/composables/useProcessoCadastroCarga";
 import {useProcessoCadastroCarga} from "@/composables/useProcessoCadastroCarga";
+import type {ModalUnidadesComEquipePropriaRef} from "@/composables/useProcessoMutacoes";
 import {useProcessoMutacoes} from "@/composables/useProcessoMutacoes";
-import {ehErroAxios, extrairErrosGenericos, normalizarErro, deveNotificarGlobalmente} from "@/utils/apiError";
+import {deveNotificarGlobalmente, ehErroAxios, extrairErrosGenericos, normalizarErro} from "@/utils/apiError";
 import {logger} from "@/utils";
 import {listarUnidadesComEquipePropriaSelecionadas} from "@/views/processoCadastroUnidades";
 import type {Processo, Unidade} from "@/types/tipos";
-import type {FormFieldsRef} from "@/composables/useProcessoCadastroCarga";
-import type {ModalUnidadesComEquipePropriaRef} from "@/composables/useProcessoMutacoes";
 
 interface TelaCadastroRefs {
     formFieldsRef: Ref<FormFieldsRef | null>;

@@ -1173,17 +1173,15 @@ public class ProcessoService {
                 .build());
 
         Optional<String> destinatarioCopia = emailCopiaAdmin(unidadeDestino);
-        if (destinatarioCopia.isPresent()) {
-            notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                    .subprocesso(subprocesso)
-                    .tipoNotificacao(tipoNotificacao)
-                    .unidadeDestinoSigla(unidadeDestino.getSigla())
-                    .destinatario(destinatarioCopia.get())
-                    .assunto(assunto)
-                    .corpoHtml(corpoHtml)
-                    .chaveIdempotencia(chaveIdempotencia + ":copia-admin")
-                    .build());
-        }
+        destinatarioCopia.ifPresent(s -> notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoNotificacao(tipoNotificacao)
+                .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .destinatario(s)
+                .assunto(assunto)
+                .corpoHtml(corpoHtml)
+                .chaveIdempotencia(chaveIdempotencia + ":copia-admin")
+                .build()));
     }
 
     private String emailDestinoPrincipal(Unidade unidadeDestino) {
@@ -1199,7 +1197,7 @@ public class ProcessoService {
         Usuario usuarioPrincipal = usuarioService.usuarioAutenticado();
         Usuario usuario = usuarioService.buscarUsuarioComUnidadeLotacao(usuarioPrincipal.getTituloEleitoral());
         Unidade unidadeLotacao = usuario.getUnidadeLotacao();
-        if (unidadeLotacao != null && SIGLA_UNIDADE_SEDOC.equalsIgnoreCase(unidadeLotacao.getSigla())) {
+        if (SIGLA_UNIDADE_SEDOC.equalsIgnoreCase(unidadeLotacao.getSigla())) {
             return Optional.empty();
         }
 

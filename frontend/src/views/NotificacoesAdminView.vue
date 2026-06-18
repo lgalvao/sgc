@@ -162,10 +162,7 @@ import {
 } from "@/composables/useNotificacoesAdminQuery";
 import {TEXTOS} from "@/constants/textos";
 import {TIPOS_NOTIFICACAO_LABELS} from "@/constants/notificacoes";
-import {
-  type Notificacao,
-  obterStatusNotificacao,
-} from "@/services/notificacaoService";
+import {type Notificacao, obterStatusNotificacao,} from "@/services/notificacaoService";
 import {formatarDataHoraBR} from "@/utils";
 import {ehModoProducao} from "@/utils/ambiente";
 import {normalizarErro} from "@/utils/apiError";

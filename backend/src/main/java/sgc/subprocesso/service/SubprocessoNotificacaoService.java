@@ -85,17 +85,15 @@ public class SubprocessoNotificacaoService {
         String chave = "subprocesso:%d:data-limite-alterada:etapa:%d:data:%s"
                 .formatted(sp.getCodigo(), etapa, novaDataFormatada);
 
-        executarNotificacaoSemInterromperAlerta(() -> {
-            notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                    .subprocesso(sp)
-                    .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
-                    .unidadeDestinoSigla(sp.getUnidade().getSigla())
-                    .destinatario(emailDestino)
-                    .assunto(assunto)
-                    .corpoHtml(corpo)
-                    .chaveIdempotencia(chave)
-                    .build());
-        }, "alteracao-data-limite", sp.getCodigo());
+        executarNotificacaoSemInterromperAlerta(() -> notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(sp)
+                .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
+                .unidadeDestinoSigla(sp.getUnidade().getSigla())
+                .destinatario(emailDestino)
+                .assunto(assunto)
+                .corpoHtml(corpo)
+                .chaveIdempotencia(chave)
+                .build()), "alteracao-data-limite", sp.getCodigo());
     }
 
     public void notificarHomologacaoMapa(Subprocesso sp) {

@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 import sgc.comum.ComumDtos.*;
-import sgc.comum.*;
 import sgc.mapa.dto.*;
 import sgc.organizacao.*;
 import sgc.organizacao.service.*;

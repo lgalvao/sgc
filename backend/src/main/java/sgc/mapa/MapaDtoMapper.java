@@ -28,7 +28,7 @@ public class MapaDtoMapper {
     }
 
     public List<ConhecimentoResumoDto> paraConhecimentosResumo(Collection<Conhecimento> conhecimentos) {
-        if (conhecimentos == null || conhecimentos.isEmpty()) {
+        if (conhecimentos.isEmpty()) {
             return List.of();
         }
         return conhecimentos.stream()
@@ -48,7 +48,7 @@ public class MapaDtoMapper {
         return new CompetenciaMapaDto(
                 competencia.getCodigo(),
                 competencia.getDescricao(),
-                (atividades == null ? Stream.<Atividade>empty() : atividades.stream())
+                atividades.stream()
                         .map(this::paraAtividadeMapaDto)
                         .toList());
     }
@@ -71,10 +71,10 @@ public class MapaDtoMapper {
                 mapa.getCodigo(),
                 mapa.getSubprocesso().getCodigo(),
                 mapa.getObservacoesDisponibilizacao(),
-                (competencias == null ? Stream.<Competencia>empty() : competencias.stream())
+                competencias.stream()
                         .map(this::paraCompetenciaMapaDto)
                         .toList(),
-                (atividades == null ? Stream.<Atividade>empty() : atividades.stream())
+                atividades.stream()
                         .map(this::paraAtividadeMapaDto)
                         .toList(),
                 null);

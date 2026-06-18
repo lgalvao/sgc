@@ -220,7 +220,7 @@ public class UnidadeHierarquiaService {
                     u.nome(),
                     u.sigla(),
                     u.unidadeSuperiorCodigo(),
-                    u.tipo() != null ? u.tipo().name() : null,
+                    u.tipo().name(),
                     u.tituloTitular()
             );
             dto.setElegivel(isElegivel);

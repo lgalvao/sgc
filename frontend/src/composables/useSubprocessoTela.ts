@@ -12,12 +12,7 @@ import {enviarLembrete as enviarLembreteService} from "@/services/processo";
 import {analisarData, formatarDataBR} from "@/utils";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {TEXTOS} from "@/constants/textos";
-import {
-    type Movimentacao,
-    type ResponsavelDto,
-    type SubprocessoDetalhe,
-    TipoProcesso
-} from "@/types/tipos";
+import {type Movimentacao, type ResponsavelDto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 
 interface SubprocessoTelaProps {
     codProcesso: number;

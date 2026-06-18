@@ -1,5 +1,5 @@
-import {describe, expect, it, vi, beforeEach, afterEach} from 'vitest';
-import {defineComponent, ref} from 'vue';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import {defineComponent, nextTick, ref} from 'vue';
 import {mount} from '@vue/test-utils';
 import {useBuscadorUsuarios} from '../useBuscadorUsuarios';
 import * as usuarioService from '@/services/usuarioService';
@@ -157,4 +157,3 @@ describe('useBuscadorUsuarios.ts', () => {
     });
 });
 
-import {nextTick} from 'vue';

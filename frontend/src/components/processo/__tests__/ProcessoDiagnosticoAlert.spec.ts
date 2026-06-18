@@ -1,7 +1,6 @@
 import {describe, expect, it} from "vitest";
 import {mount} from "@vue/test-utils";
 import ProcessoDiagnosticoAlert from "../ProcessoDiagnosticoAlert.vue";
-import {BAlert, BSpinner} from "bootstrap-vue-next";
 
 describe("ProcessoDiagnosticoAlert.vue", () => {
   const stubs = {

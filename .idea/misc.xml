@@ -1428,6 +1428,190 @@
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController usuarioService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService validacaoService" />
       <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaService visualizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens ALERTA_DIAGNOSTICO_HOMOLOGADO" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaController alertaAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAlertaService alertaAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelService alertaAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService alertaAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoNotificacaoService alertaAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService alertaAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaController alertaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoAdminController alertaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoController alertaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoService alertaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelController alertaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelService alertaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaAplicacaoService alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoNotificacaoService alertaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoApresentacaoService analiseHistoricoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeController atividadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor autodominio" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor autoimportancia" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService avaliacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService avaliacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoValidacaoService avaliacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.DiagnosticoController avaliacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.Diagnostico avaliacaoServidores" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoRelatorioService avaliacaoServidorRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracoes.model.Configuracao chave" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor chefiaDominio" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor chefiaImportancia" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro codigo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor competencia" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao competencia" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackService comumRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoExclusaoCompletaService comumRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoNotificacaoService configAplicacao" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.NotificacaoAdminController configAplicacao" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracoes.ConfiguracaoController configuracaoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracoes.ConfiguracaoService configuracaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaAplicacaoService configuracaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracoes.ConfiguracaoController configuracaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService configuracaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeService consultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.DiagnosticoController consultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService consultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoApresentacaoService consultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController cookieSecure" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.Diagnostico dataConclusao" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto dataFimResponsabilidade" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.dto.UnidadeDto dataInicioResponsabilidade" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracoes.model.Configuracao descricao" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor diagnostico" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao diagnostico" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService diagnosticoFluxoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService diagnosticoFluxoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService diagnosticoNotificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService diagnosticoRelatorioService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService diagnosticoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService diagnosticoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoRelatorioService diagnosticoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor dominio" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.ServidorProcesso email" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoNotificacaoService emailModelosService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.DiagnosticoController fluxoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor gap" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService gapService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.dto.SubprocessoElegivelDto habilitarAceitarDiagnosticoBloco" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelService hierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor importancia" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.Diagnostico justificativaConclusao" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController jwtProperties" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.FiltroJwt listaNegraJwt" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController listaNegraJwt" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService localizacaoSubprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController loginAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeService mapaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.MapaController mapaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaVisualizacaoService mapaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaService mapaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService mapaDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService mapaManutencaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.ServidorProcesso matricula" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.ServidorProcesso nome" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoNotificacaoService notificacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor observacao" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.Mensagens OBSERVACOES_MAX_1000" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.MapaVisualizacaoService organizacaoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService organizacaoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService organizacaoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UnidadeController organizacaoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.UnidadeHierarquiaService organizacaoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioAplicacaoService organizacaoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioController organizacaoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelController painelService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService pdfFactory" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeService permissionEvaluator" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoApresentacaoService permissionEvaluator" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.ServidorProcesso processo" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoController processoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.service.ProcessoService processoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelService processoService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService processoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.service.ResponsavelUnidadeService repo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoNotificacaoService responsavelService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService responsavelService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService responsavelUnidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioAplicacaoService responsavelUnidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor servidor" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao servidor" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.Processo servidoresParticipantes" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor servidorNomeSnapshot" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao servidorNomeSnapshot" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao situacaoCapacitacao" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService situacaoCapacitacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService situacaoCapacitacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoRelatorioService situacaoCapacitacaoRepo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.Diagnostico situacaoCapacitacoes" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.AvaliacaoServidor situacaoServidor" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.Diagnostico subprocesso" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController subprocessoApresentacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService subprocessoConsultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService subprocessoConsultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService subprocessoConsultaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService subprocessoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.ProcessoController subprocessoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoConsultaService subprocessoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.SubprocessoController subprocessoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService subprocessoDtoMapper" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoApresentacaoService subprocessoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService subprocessoValidacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService subprocessoVisualizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoValidacaoService subprocessoVisualizacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService transicaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoApresentacaoService transicaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.ServidorProcesso unidadeCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao unidadeCodigoSnapshot" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaAplicacaoService unidadeHierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService unidadeHierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService unidadeHierarquiaService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao unidadeNomeSnapshot" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaAplicacaoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAlertaService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoNotificacaoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoApresentacaoService unidadeService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.model.SituacaoCapacitacao unidadeSiglaSnapshot" />
+      <entry_point TYPE="field" FQNAME="sgc.comum.config.ConfigAplicacao urlLeitorEmailTestes" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaController usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.CadastroFluxoService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.service.ImpactoMapaService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.seguranca.login.LoginController usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.painel.PainelController usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.relatorio.RelatorioService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoApresentacaoService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoContextoConsultaService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoTransicaoService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.SubprocessoVisualizacaoService usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioController usuarioAplicacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.feedback.FeedbackRegistro usuarioCodigo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService usuarioContextoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoConsultaService usuarioContextoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService usuarioContextoService" />
+      <entry_point TYPE="field" FQNAME="sgc.alerta.AlertaAplicacaoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.subprocesso.service.AnaliseHistoricoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.mapa.AtividadeService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoNotificacaoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoUsuarioContextoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.organizacao.UsuarioAplicacaoService usuarioService" />
+      <entry_point TYPE="field" FQNAME="sgc.processo.model.ServidorProcesso usuarioTitulo" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoAvaliacaoService validacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.diagnostico.service.DiagnosticoFluxoService validacaoService" />
+      <entry_point TYPE="field" FQNAME="sgc.configuracoes.model.Configuracao valor" />
     </entry_points>
     <list size="3">
       <item index="0" class="java.lang.String" itemvalue="com.tngtech.archunit.junit.ArchTest" />
@@ -4766,6 +4950,185 @@
     <pattern value="sgc.organizacao.model.UnidadeResumoLeitura" method="UnidadeResumoLeitura" />
     <pattern value="sgc.organizacao.model.UsuarioConsultaLeitura" />
     <pattern value="sgc.organizacao.model.UsuarioConsultaLeitura" method="UsuarioConsultaLeitura" />
+    <pattern value="sgc.processo.model.Processo" method="adicionarServidoresParticipantes" />
+    <pattern value="sgc.alerta.AlertaAplicacaoService" />
+    <pattern value="sgc.alerta.AlertaDtoMapper" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="aprovarConsenso" />
+    <pattern value="sgc.mapa.AtividadeService" />
+    <pattern value="sgc.configuracoes.ConfiguracaoController" method="atualizar" />
+    <pattern value="sgc.configuracoes.ConfiguracaoService" method="atualizar" />
+    <pattern value="sgc.organizacao.UnidadeController" method="atualizarAtribuicaoTemporaria" />
+    <pattern value="sgc.diagnostico.dto.AutoavaliacaoDto" />
+    <pattern value="sgc.diagnostico.dto.AutoavaliacaoDto" method="AutoavaliacaoDto" />
+    <pattern value="sgc.diagnostico.dto.AutoavaliacaoRequest" />
+    <pattern value="sgc.diagnostico.dto.AutoavaliacaoRequest" method="AutoavaliacaoRequest" />
+    <pattern value="sgc.diagnostico.dto.AvaliacaoCompetenciaDto" />
+    <pattern value="sgc.diagnostico.dto.AvaliacaoCompetenciaDto" method="AvaliacaoCompetenciaDto" />
+    <pattern value="sgc.diagnostico.model.AvaliacaoServidor" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarAtribuicoesPorUnidade" />
+    <pattern value="sgc.mapa.model.MapaRepo" method="buscarCodigosUnidadesComMapaVigente" />
+    <pattern value="sgc.organizacao.UnidadeController" method="buscarCodigosUnidadesSemMapaVigente" />
+    <pattern value="sgc.organizacao.UsuarioAplicacaoService" method="buscarPerfisUsuario" />
+    <pattern value="sgc.diagnostico.model.DiagnosticoRepo" method="buscarPorSubprocessoComRelacionamentos" />
+    <pattern value="sgc.alerta.model.NotificacaoEmailRepo" method="buscarRecentesDeProcessosEmAndamento" />
+    <pattern value="sgc.organizacao.UsuarioAplicacaoService" method="buscarResponsabilidadeDetalhadaAtual" />
+    <pattern value="sgc.organizacao.UsuarioAplicacaoService" method="buscarResponsavelAtual" />
+    <pattern value="sgc.alerta.NotificacaoAdminController" method="buscarUrlLeitorEmailTestes" />
+    <pattern value="sgc.organizacao.UsuarioAplicacaoService" method="buscarUsuariosPorTitulos" />
+    <pattern value="sgc.diagnostico.dto.CompetenciaResumoDto" />
+    <pattern value="sgc.diagnostico.dto.CompetenciaResumoDto" method="CompetenciaResumoDto" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="concluirAutoavaliacao" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="concluirConsenso" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="concluirDiagnostico" />
+    <pattern value="sgc.configuracoes.model.Configuracao" />
+    <pattern value="sgc.configuracoes.ConfiguracaoController" />
+    <pattern value="sgc.configuracoes.ConfiguracaoDto" />
+    <pattern value="sgc.configuracoes.ConfiguracaoDto" method="ConfiguracaoDto" />
+    <pattern value="sgc.configuracoes.ConfiguracaoMapper" />
+    <pattern value="sgc.configuracoes.model.ConfiguracaoRepo" />
+    <pattern value="sgc.configuracoes.ConfiguracaoRequest" />
+    <pattern value="sgc.configuracoes.ConfiguracaoRequest" method="ConfiguracaoRequest" />
+    <pattern value="sgc.configuracoes.ConfiguracaoService" />
+    <pattern value="sgc.diagnostico.dto.ConsensoCompetenciaDto" />
+    <pattern value="sgc.diagnostico.dto.ConsensoCompetenciaDto" method="ConsensoCompetenciaDto" />
+    <pattern value="sgc.diagnostico.dto.ConsensoDto" />
+    <pattern value="sgc.diagnostico.dto.ConsensoDto" method="ConsensoDto" />
+    <pattern value="sgc.diagnostico.dto.ConsensoRequest" />
+    <pattern value="sgc.diagnostico.dto.ConsensoRequest" method="ConsensoRequest" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoAlertaService" method="criarAlertaPessoal" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoAlertaService" method="criarAlertaTransicao" />
+    <pattern value="sgc.e2e.E2eController" method="criarFeedbackFixture" />
+    <pattern value="sgc.e2e.E2eController" method="criarNotificacaoEmailFixture" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoDiagnostico" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoDiagnosticoComAutoavaliacaoConcluida" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoDiagnosticoComConsensoCriado" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoDiagnosticoConcluido" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoDiagnosticoHomologado" />
+    <pattern value="sgc.e2e.E2eController" method="criarProcessoDiagnosticoProntoParaConcluir" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoRelatorioService" method="criarRelatorioGapDiagnostico" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoRelatorioService" method="criarRelatorioSituacaoCapacitacaoDiagnostico" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="devolverDiagnostico" />
+    <pattern value="sgc.diagnostico.model.Diagnostico" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoAlertaService" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoAvaliacaoService" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoConsultaService" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoContextoDto" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoContextoDto" method="DiagnosticoContextoDto" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoEquipeDto" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoEquipeDto" method="DiagnosticoEquipeDto" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoFluxoService" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoGapService" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoMonitoramentoDto" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoMonitoramentoDto" method="DiagnosticoMonitoramentoDto" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoNotificacaoService" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoRelatorioService" />
+    <pattern value="sgc.diagnostico.model.DiagnosticoRepo" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoUnidadeDto" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoUnidadeDto" method="DiagnosticoUnidadeDto" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoUsuarioContextoService" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoValidacaoService" />
+    <pattern value="sgc.alerta.EmailService" method="EmailService" />
+    <pattern value="sgc.e2e.E2eController.FeedbackFixtureRequest" />
+    <pattern value="sgc.e2e.E2eController.FeedbackFixtureRequest" method="FeedbackFixtureRequest" />
+    <pattern value="sgc.alerta.model.NotificacaoEmailRepo" method="findAllByOrderByDataHoraCriacaoDesc" />
+    <pattern value="sgc.relatorio.RelatorioController" method="gerarRelatorioGapsDiagnosticoPdf" />
+    <pattern value="sgc.relatorio.RelatorioController" method="gerarRelatorioMapaAtualPdf" />
+    <pattern value="sgc.relatorio.RelatorioController" method="gerarRelatorioMapaVigenteUnidadePdf" />
+    <pattern value="sgc.relatorio.RelatorioController" method="gerarRelatorioSituacaoCapacitacaoDiagnosticoPdf" />
+    <pattern value="sgc.relatorio.RelatorioController" method="gerarRelatorioUnidadesSemMapasVigentesPdf" />
+    <pattern value="sgc.processo.model.Processo" method="getCodigosParticipantes" />
+    <pattern value="sgc.seguranca.login.LimitadorTentativasLogin" method="getTentativasPorIp" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="homologarDiagnostico" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="impossibilitarAvaliacao" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoEquipeDto.Item" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoMonitoramentoDto.Item" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoMonitoramentoDto.Item" method="Item" />
+    <pattern value="sgc.diagnostico.dto.DiagnosticoEquipeDto.Item" method="Item" />
+    <pattern value="sgc.diagnostico.dto.JustificativaRequest" />
+    <pattern value="sgc.diagnostico.dto.JustificativaRequest" method="JustificativaRequest" />
+    <pattern value="sgc.seguranca.login.ListaNegraJwt" method="limpar" />
+    <pattern value="sgc.seguranca.login.ListaNegraJwt" />
+    <pattern value="sgc.configuracoes.ConfiguracaoController" method="listar" />
+    <pattern value="sgc.processo.model.ProcessoRepo" method="listarCodigos" />
+    <pattern value="sgc.processo.model.ProcessoRepo" method="listarCodigosPorSubprocessosESituacaoDiferente" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoConsultaService" method="listarHistoricoDiagnostico" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="listarHistoricoDiagnostico" />
+    <pattern value="sgc.seguranca.LoginAplicacaoService" />
+    <pattern value="sgc.seguranca.LoginAplicacaoService" method="LoginAplicacaoService" />
+    <pattern value="sgc.mapa.MapaDtoMapper" />
+    <pattern value="sgc.mapa.service.MapaManutencaoService" method="mapas" />
+    <pattern value="sgc.alerta.model.NotificacaoEmailRepo" />
+    <pattern value="sgc.e2e.E2eController.NotificacaoFixtureRequest" />
+    <pattern value="sgc.e2e.E2eController.NotificacaoFixtureRequest" method="NotificacaoFixtureRequest" />
+    <pattern value="sgc.subprocesso.model.TipoTransicao" method="notificacaoSuperior" />
+    <pattern value="sgc.alerta.NotificacaoWorker" method="NotificacaoWorker" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoConsultaService" method="obterAutoavaliacao" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="obterAutoavaliacao" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoConsultaService" method="obterConsenso" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="obterConsenso" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="obterConsensoServidor" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoConsultaService" method="obterContexto" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="obterContexto" />
+    <pattern value="sgc.alerta.AlertaAplicacaoService" method="obterDataHoraLeitura" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoConsultaService" method="obterDiagnosticoUnidade" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="obterDiagnosticoUnidade" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoConsultaService" method="obterEquipe" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="obterEquipe" />
+    <pattern value="sgc.organizacao.service.RegistroSseEmitter" method="obterQuantidadeEmissores" />
+    <pattern value="sgc.relatorio.RelatorioController" method="obterRelatorioGapsDiagnostico" />
+    <pattern value="sgc.relatorio.RelatorioController" method="obterRelatorioMapaAtual" />
+    <pattern value="sgc.relatorio.RelatorioController" method="obterRelatorioMapaVigenteUnidade" />
+    <pattern value="sgc.relatorio.RelatorioController" method="obterRelatorioSituacaoCapacitacaoDiagnostico" />
+    <pattern value="sgc.relatorio.RelatorioController" method="obterRelatorioUnidadesSemMapasVigentes" />
+    <pattern value="sgc.organizacao.OrganizacaoDtoMapper" />
+    <pattern value="sgc.processo.painel.PainelService" />
+    <pattern value="sgc.organizacao.OrganizacaoDtoMapper" method="paraUnidadeDto" />
+    <pattern value="sgc.organizacao.OrganizacaoDtoMapper" method="paraUnidadeDtoResumoObrigatoria" />
+    <pattern value="sgc.processo.ProcessoDtoMapper" method="paraUnidadeParticipante" />
+    <pattern value="sgc.organizacao.dto.PerfilDto" method="PerfilDto" />
+    <pattern value="sgc.e2e.E2eController.ProcessoDiagnosticoAutoavaliadoFixtureRequest" />
+    <pattern value="sgc.e2e.E2eController.ProcessoDiagnosticoAutoavaliadoFixtureRequest" method="ProcessoDiagnosticoAutoavaliadoFixtureRequest" />
+    <pattern value="sgc.processo.ProcessoDtoMapper" />
+    <pattern value="sgc.organizacao.service.RegistroSseEmitter" method="RegistroSseEmitter" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoGapCompetenciaDto" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoGapCompetenciaDto" method="RelatorioDiagnosticoGapCompetenciaDto" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoGapDto" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoGapDto" method="RelatorioDiagnosticoGapDto" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto" method="RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoSituacaoCapacitacaoDto" />
+    <pattern value="sgc.relatorio.RelatorioDiagnosticoSituacaoCapacitacaoDto" method="RelatorioDiagnosticoSituacaoCapacitacaoDto" />
+    <pattern value="sgc.relatorio.RelatorioService" />
+    <pattern value="sgc.organizacao.UnidadeController" method="removerAtribuicaoTemporaria" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="reverterImpossibilidade" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="salvarAutoavaliacao" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="salvarConsenso" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="salvarSituacoesCapacitacao" />
+    <pattern value="sgc.diagnostico.dto.ServidorDiagnosticoDto" />
+    <pattern value="sgc.diagnostico.dto.ServidorDiagnosticoDto" method="ServidorDiagnosticoDto" />
+    <pattern value="sgc.processo.model.ServidorProcesso" />
+    <pattern value="sgc.e2e.AtribuicaoTemporariaViewsE2eAspect" method="sincronizarViewsAposAtualizacao" />
+    <pattern value="sgc.e2e.AtribuicaoTemporariaViewsE2eAspect" method="sincronizarViewsAposRemocao" />
+    <pattern value="sgc.diagnostico.model.SituacaoCapacitacao" />
+    <pattern value="sgc.diagnostico.dto.SituacaoCapacitacaoDto" />
+    <pattern value="sgc.diagnostico.dto.SituacaoCapacitacaoDto" method="SituacaoCapacitacaoDto" />
+    <pattern value="sgc.diagnostico.dto.SituacoesCapacitacaoRequest" />
+    <pattern value="sgc.diagnostico.dto.SituacoesCapacitacaoRequest" method="SituacoesCapacitacaoRequest" />
+    <pattern value="sgc.subprocesso.service.SubprocessoApresentacaoService" />
+    <pattern value="sgc.subprocesso.SubprocessoDtoMapper" />
+    <pattern value="sgc.subprocesso.SubprocessoDtoMapper" method="SubprocessoDtoMapper" />
+    <pattern value="sgc.diagnostico.service.DiagnosticoAlertaService" method="unidadeRaiz" />
+    <pattern value="sgc.diagnostico.dto.UnidadeResumoDto" />
+    <pattern value="sgc.diagnostico.dto.UnidadeResumoDto" method="UnidadeResumoDto" />
+    <pattern value="sgc.organizacao.UsuarioAplicacaoService" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="validarAcaoDevolverDiagnostico" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="validarAcaoHomologarDiagnostico" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="validarAcaoValidarDiagnostico" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="validarConclusaoDiagnostico" />
+    <pattern value="sgc.diagnostico.DiagnosticoController" method="validarDiagnostico" />
+    <pattern value="sgc.diagnostico.dto.ValidarDiagnosticosEmBlocoRequest" />
+    <pattern value="sgc.diagnostico.dto.ValidarDiagnosticosEmBlocoRequest" method="ValidarDiagnosticosEmBlocoRequest" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

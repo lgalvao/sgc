@@ -70,7 +70,7 @@ public class DiagnosticoFluxoService {
         List<SituacaoCapacitacao> situacaoCapacitacoes = new ArrayList<>();
 
         Mapa mapa = subprocesso.getMapa();
-        if (mapa != null && mapa.getCompetencias() != null) {
+        if (mapa != null) {
             UnidadeProcesso unidadeSnapshot = subprocesso.getProcesso()
                     .buscarParticipante(subprocesso.getUnidade().getCodigo())
                     .orElse(null);

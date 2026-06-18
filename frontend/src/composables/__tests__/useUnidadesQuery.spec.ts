@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ref} from "vue";
-import {useUnidadesQuery, useInvalidacaoUnidades, CHAVE_QUERY_UNIDADES} from "../useUnidadesQuery";
+import {CHAVE_QUERY_UNIDADES, useInvalidacaoUnidades, useUnidadesQuery} from "../useUnidadesQuery";
 import * as unidadeService from "@/services/unidadeService";
 
 let queryOptions: any = null;

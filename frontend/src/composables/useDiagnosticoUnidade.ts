@@ -3,7 +3,11 @@ import {computed} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade} from '@/services/diagnosticoService';
 import type {DiagnosticoUnidade, SituacaoDiagnostico} from '@/types/diagnostico-competencias';
-import {chaveUnidade, criarContextoSessaoDiagnostico, useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
+import {
+    chaveUnidade,
+    criarContextoSessaoDiagnostico,
+    useDiagnosticoContexto
+} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de leitura do diagnóstico da unidade.

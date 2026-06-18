@@ -163,13 +163,7 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {
-  BAlert,
-  BButton,
-  BCard,
-  BFormSelect,
-  BSpinner,
-} from 'bootstrap-vue-next';
+import {BAlert, BButton, BCard, BFormSelect, BSpinner,} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';

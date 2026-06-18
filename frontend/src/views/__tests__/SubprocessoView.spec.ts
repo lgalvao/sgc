@@ -7,6 +7,7 @@ import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
 import * as processoService from '@/services/processo';
 import * as useAcessoModule from '@/composables/acesso';
 import {TEXTOS} from "@/constants/textos";
+import type {PermissoesSubprocesso} from '@/types/subprocesso-contexto';
 
 vi.mock('vue-router', () => ({
     useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),
@@ -53,7 +54,7 @@ type SubprocessoDetalheMock = {
     isEmAndamento: boolean;
     elementosProcesso: unknown[];
     movimentacoes: unknown[];
-    permissoes?: { podeEditarCadastro?: boolean };
+    permissoes?: Partial<PermissoesSubprocesso>;
 };
 
 const SubprocessoCardsStub = {

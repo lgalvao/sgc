@@ -1,8 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {
     aprovarConsenso,
-    concluirConsenso,
     concluirAutoavaliacao,
+    concluirConsenso,
     concluirDiagnostico,
     devolverDiagnostico,
     homologarDiagnostico,

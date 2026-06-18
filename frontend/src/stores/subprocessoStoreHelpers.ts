@@ -5,7 +5,10 @@ import type {
     PermissoesSubprocesso,
     SituacaoSubprocesso,
 } from "@/types/tipos";
-import {criarContextoSessaoSubprocessoAtual, serializarContextoSessaoSubprocesso} from "@/stores/subprocesso/contextoSessao";
+import {
+    criarContextoSessaoSubprocessoAtual,
+    serializarContextoSessaoSubprocesso
+} from "@/stores/subprocesso/contextoSessao";
 
 export type ContextoSubprocesso = ContextoEdicaoSubprocesso | ContextoCadastroAtividadesSubprocesso;
 

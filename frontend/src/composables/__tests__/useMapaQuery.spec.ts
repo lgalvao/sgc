@@ -1,14 +1,8 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
-import {createPinia, setActivePinia} from "pinia";
+import {createPinia} from "pinia";
 import {createApp, ref} from "vue";
 import {PiniaColada} from "@pinia/colada";
-import {
-    useMapaQuery,
-    useImpactoMapaQuery,
-    useCacheMapa,
-    criarChaveMapa,
-    criarChaveImpactoMapa
-} from "../useMapaQuery";
+import {useCacheMapa, useImpactoMapaQuery, useMapaQuery} from "../useMapaQuery";
 import * as service from "@/services/subprocessoService";
 import {usePerfilStore} from "@/stores/perfil";
 

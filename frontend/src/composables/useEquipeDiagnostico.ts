@@ -1,5 +1,5 @@
 import {useQuery} from '@pinia/colada';
-import {computed, toValue, type MaybeRefOrGetter} from 'vue';
+import {computed, type MaybeRefOrGetter, toValue} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterEquipe} from '@/services/diagnosticoService';
 import type {DiagnosticoEquipe} from '@/types/diagnostico-competencias';

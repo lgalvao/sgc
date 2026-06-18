@@ -258,10 +258,7 @@ public class ResponsavelUnidadeService {
     @Transactional(readOnly = true)
     public @Nullable ResponsavelDto buscarResponsabilidadeDetalhadaAtual(String siglaUnidade) {
         Optional<Long> unidadeCodigoOpt = unidadeRepo.buscarCodigoAtivoPorSigla(siglaUnidade);
-        if (unidadeCodigoOpt.isEmpty()) {
-            return null;
-        }
-        return buscarResponsabilidadeDetalhadaAtual(unidadeCodigoOpt.get());
+        return unidadeCodigoOpt.map(this::buscarResponsabilidadeDetalhadaAtual).orElse(null);
     }
 
     /**

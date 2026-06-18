@@ -53,11 +53,9 @@ public final class AssuntosNotificacao {
             case MAPA_DISPONIBILIZADO -> "Mapa de competências disponibilizado";
             case MAPA_SUGESTOES_APRESENTADAS -> "Sugestões apresentadas para o mapa de competências da %s"
                     .formatted(siglaUnidade);
-            case MAPA_VALIDADO -> "Validação do mapa de competências da %s submetida para análise"
+            case MAPA_VALIDADO, MAPA_VALIDACAO_ACEITA -> "Validação do mapa de competências da %s submetida para análise"
                     .formatted(siglaUnidade);
             case MAPA_VALIDACAO_DEVOLVIDA -> "Validação do mapa da %s devolvida para ajustes"
-                    .formatted(siglaUnidade);
-            case MAPA_VALIDACAO_ACEITA -> "Validação do mapa de competências da %s submetida para análise"
                     .formatted(siglaUnidade);
             case REVISAO_CADASTRO_ACEITA -> "Revisão do cadastro de atividades e conhecimentos da %s submetido para análise"
                     .formatted(siglaUnidade);

@@ -108,8 +108,8 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
     Optional<Unidade> buscarPorSiglaComSuperior(@Param("sigla") String sigla);
 
     @Query("""
-            SELECT u.codigo 
-            FROM Unidade u 
+            SELECT u.codigo
+            FROM Unidade u
             WHERE u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
               AND u.codigo NOT IN (
                   SELECT um.unidadeCodigo
@@ -118,8 +118,8 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
                   JOIN mapa.subprocesso subprocesso
               )
               AND u.codigo NOT IN (
-                  SELECT up.codigo.unidadeCodigo 
-                  FROM UnidadeProcesso up 
+                  SELECT up.codigo.unidadeCodigo
+                  FROM UnidadeProcesso up
                   WHERE up.processo.situacao IN (sgc.processo.model.SituacaoProcesso.CRIADO, sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO)
               )
             """)

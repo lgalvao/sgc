@@ -1,17 +1,9 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, onUnmounted, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
-import {
-    concluirAutoavaliacao,
-    obterAutoavaliacao,
-    salvarAutoavaliacao,
-} from '@/services/diagnosticoService';
-import type {AvaliacaoCompetencia, Autoavaliacao} from '@/types/diagnostico-competencias';
-import {
-    chaveAutoavaliacao,
-    chaveEquipe,
-    criarContextoSessaoDiagnostico,
-} from '@/composables/useDiagnosticoContexto';
+import {concluirAutoavaliacao, obterAutoavaliacao, salvarAutoavaliacao,} from '@/services/diagnosticoService';
+import type {Autoavaliacao, AvaliacaoCompetencia} from '@/types/diagnostico-competencias';
+import {chaveAutoavaliacao, chaveEquipe, criarContextoSessaoDiagnostico,} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de autoavaliação do servidor logado.

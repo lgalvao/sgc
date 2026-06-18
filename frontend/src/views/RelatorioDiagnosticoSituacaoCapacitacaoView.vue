@@ -58,7 +58,7 @@ import {useRelatorioAndamentoTela} from "@/composables/useRelatorioAndamentoTela
 import {useNotification} from "@/composables/useNotification";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {buscarContextoCompleto} from "@/services/processo";
-import {TipoProcesso, type ProcessoResumo, type Unidade, type UnidadeParticipante} from "@/types/tipos";
+import {type ProcessoResumo, TipoProcesso, type Unidade, type UnidadeParticipante} from "@/types/tipos";
 import {normalizarErro} from "@/utils/apiError";
 
 const relatoriosStore = useRelatoriosStore();

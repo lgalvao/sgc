@@ -3,6 +3,7 @@ package sgc.diagnostico.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
+import org.jspecify.annotations.Nullable;
 import sgc.comum.model.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
@@ -50,7 +51,7 @@ public class AvaliacaoServidor extends EntidadeBase {
     private Integer dominio;
 
     @Column(name = "gap")
-    private Integer gap;
+    private @Nullable Integer gap;
 
     @Column(name = "observacoes")
     private String observacao;
