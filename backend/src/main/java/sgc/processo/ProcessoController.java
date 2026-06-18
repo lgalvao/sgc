@@ -78,7 +78,7 @@ public class ProcessoController {
     @Operation(summary = "Lista todos os processos com situação FINALIZADO, aceitando opcionalmente filtro para importação")
     public ResponseEntity<List<ProcessoResumoDto>> listarFinalizados(
             @RequestParam(name = "elegivelImportacao", required = false) Boolean elegivelImportacao) {
-        List<Processo> processos = elegivelImportacao
+        List<Processo> processos = Boolean.TRUE.equals(elegivelImportacao)
                 ? processoService.listarParaImportacao()
                 : processoService.listarFinalizados();
         return ResponseEntity.ok(processos.stream()

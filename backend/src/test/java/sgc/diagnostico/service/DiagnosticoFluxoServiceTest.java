@@ -231,7 +231,6 @@ class DiagnosticoFluxoServiceTest {
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setCodigo(codSubprocesso);
 
-        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
         when(unidadeService.buscarAdmin()).thenReturn(admin);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);

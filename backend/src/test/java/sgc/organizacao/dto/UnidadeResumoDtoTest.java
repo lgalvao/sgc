@@ -35,6 +35,7 @@ class UnidadeResumoDtoTest {
                 .codigo(1L)
                 .nome("Nome da Unidade")
                 .sigla("SIG")
+                .tipo(TipoUnidade.OPERACIONAL)
                 .build();
 
         var dto = mapper.paraUnidadeResumoObrigatoria(unidade);
@@ -42,7 +43,7 @@ class UnidadeResumoDtoTest {
         assertThat(dto.codigo()).isEqualTo(1L);
         assertThat(dto.nome()).isEqualTo("Nome da Unidade");
         assertThat(dto.sigla()).isEqualTo("SIG");
-        assertThat(dto.tipo()).isNull();
+        assertThat(dto.tipo()).isEqualTo("OPERACIONAL");
         assertThat(dto.tituloTitular()).isNull();
     }
 
