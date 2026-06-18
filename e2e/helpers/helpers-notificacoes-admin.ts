@@ -11,6 +11,7 @@ export interface CriteriosNotificacaoAdmin {
 interface NotificacaoAdminApi {
     codigo: number;
     unidadeSigla?: string | null;
+    usuarioDestinoTitulo?: string | null;
     destinatario: string;
     tipoNotificacao: string;
     assunto: string;
@@ -61,6 +62,7 @@ function correspondeTexto(valor: string | undefined | null, criterio?: string | 
 function obterPossiveisDestinatarios(item: NotificacaoAdminApi): string[] {
     const valores = new Set<string>();
     if (item.unidadeSigla?.trim()) valores.add(item.unidadeSigla.trim().toUpperCase());
+    if (item.usuarioDestinoTitulo?.trim()) valores.add(item.usuarioDestinoTitulo.trim());
     if (item.destinatario?.trim()) valores.add(item.destinatario.trim());
     const local = item.destinatario?.trim().match(/^([^@]+)@tre-pe\.jus\.br$/i)?.[1];
     if (local) valores.add(local.toUpperCase());
@@ -135,7 +137,10 @@ export async function verificarNotificacaoAdmin(page: Page, criterios: Criterios
         const notificacoes = await listarNotificacoesApi();
         const resumo = notificacoes
                 .slice(0, 10)
-                .map(item => `${item.tipoNotificacao} | ${item.unidadeSigla || item.destinatario} | ${item.assunto}`)
+                .map(item => {
+                    const destino = item.usuarioDestinoTitulo || item.destinatario || item.unidadeSigla || 'sem-destino';
+                    return `${item.tipoNotificacao} | ${destino} | ${item.assunto}`;
+                })
                 .join(' || ');
 
         throw new Error(
