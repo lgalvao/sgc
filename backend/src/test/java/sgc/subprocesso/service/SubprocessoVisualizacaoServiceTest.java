@@ -35,6 +35,7 @@ class SubprocessoVisualizacaoServiceTest {
         unidade.setCodigo(1L);
         unidade.setSigla("SIGLA");
         unidade.setNome("Nome da Unidade");
+        unidade.setTipo(TipoUnidade.RAIZ);
 
         Processo processo = new Processo();
         processo.setCodigo(1L);

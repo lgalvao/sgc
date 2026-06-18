@@ -863,7 +863,7 @@ public class E2eController {
 
     private String descricaoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         String descReq = request.descricao();
-        if (!descReq.isBlank()) {
+        if (descReq != null && !descReq.isBlank()) {
             return descReq;
         }
         return "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
@@ -1149,7 +1149,7 @@ public class E2eController {
         }
 
         public int resolverDiasLimite() {
-            return diasLimite;
+            return diasLimite != null ? diasLimite : 30;
         }
     }
 

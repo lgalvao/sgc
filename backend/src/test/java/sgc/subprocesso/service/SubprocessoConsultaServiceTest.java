@@ -389,6 +389,7 @@ class SubprocessoConsultaServiceTest {
             unidade.setCodigo(10L);
             unidade.setSigla("U10");
             unidade.setNome("Unidade 10");
+            unidade.setTipo(TipoUnidade.RAIZ);
 
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(100L);
@@ -445,6 +446,7 @@ class SubprocessoConsultaServiceTest {
             unidade.setCodigo(10L);
             unidade.setSigla("U10");
             unidade.setNome("Unidade 10");
+            unidade.setTipo(TipoUnidade.RAIZ);
 
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(100L);

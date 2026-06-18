@@ -242,11 +242,12 @@ class DiagnosticoFluxoServiceTest {
         service.homologarDiagnostico(codSubprocesso, "Homologado");
 
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
-        ArgumentCaptor<RegistrarTransicaoCommand> captor = ArgumentCaptor.forClass(RegistrarTransicaoCommand.class);
-        verify(transicaoService).registrarTransicaoSemEmail(captor.capture());
-        assertThat(captor.getValue().tipo()).isEqualTo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO);
-        assertThat(captor.getValue().origem()).isEqualTo(admin);
-        assertThat(captor.getValue().destino()).isEqualTo(admin);
+        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
+        verify(transicaoService).registrarAnaliseSemEmail(captor.capture());
+        assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO);
+        assertThat(captor.getValue().tipoAnalise()).isEqualTo(TipoAnalise.DIAGNOSTICO);
+        assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO);
+        assertThat(captor.getValue().unidadeAnalise()).isEqualTo(admin);
         verify(notificacaoService).notificarDiagnosticoHomologado(subprocesso);
     }
 

@@ -106,6 +106,15 @@ public class SubprocessoDtoMapper {
     }
 
     private LocalDateTime calcularUltimaDataLimite(LocalDateTime dataLimiteEtapa1, LocalDateTime dataLimiteEtapa2) {
+        if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
+            return null;
+        }
+        if (dataLimiteEtapa1 == null) {
+            return dataLimiteEtapa2;
+        }
+        if (dataLimiteEtapa2 == null) {
+            return dataLimiteEtapa1;
+        }
         return dataLimiteEtapa1.isAfter(dataLimiteEtapa2) ? dataLimiteEtapa1 : dataLimiteEtapa2;
     }
 }

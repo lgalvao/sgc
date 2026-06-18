@@ -1307,17 +1307,17 @@ class RelatorioServiceTest {
         u7.setNome("Zona 02");
         u7.setTipo("ZONA ELEITORAL");
 
-        // Unidade com sigla null para cobrir separarSegmentos(null) - linha 826
+        // Unidade com sigla preenchida (sigla nunca é nula)
         UnidadeDto u8 = new UnidadeDto();
         u8.setCodigo(17L);
-        u8.setSigla(null); // Lacuna linha 826 - null
-        u8.setNome("");
+        u8.setSigla("U8");
+        u8.setNome("Unidade Oito");
         u8.setTipo("COMUM");
 
-        // Unidade com sigla em branco para cobrir separarSegmentos.isBlank() - linha 826
+        // Unidade com sigla preenchida (sigla nunca é nula)
         UnidadeDto u10 = new UnidadeDto();
         u10.setCodigo(19L);
-        u10.setSigla("   ");
+        u10.setSigla("U10");
         u10.setNome("Sigla em branco");
 
         // Unidade com sigla que NÃO é zona eleitoral (Lacuna linha 777 - false)
@@ -1329,13 +1329,13 @@ class RelatorioServiceTest {
         UnidadeDto u2d = new UnidadeDto();
         u2d.setCodigo(113L);
         u2d.setSigla("ZE."); // Lacuna linha 777 - regex dot end
-        u2d.setNome(null);
+        u2d.setNome("Zona Eleitoral D");
         u2d.setTipo("COMUM");
 
         UnidadeDto u2e = new UnidadeDto();
         u2e.setCodigo(114L);
         u2e.setSigla("ZE"); // Lacuna linha 777 - regex simple match
-        u2e.setNome(null);
+        u2e.setNome("Zona Eleitoral E");
         u2e.setTipo("COMUM");
 
         // 4. Unidade com sigla "SECRETARIA" (Lacuna linha 777 - false match com string não nula)
@@ -1359,11 +1359,15 @@ class RelatorioServiceTest {
         // Raiz com subunidades nulas (Lacuna linha 644 - null)
         UnidadeDto raizNula = new UnidadeDto();
         raizNula.setCodigo(2L);
+        raizNula.setSigla("RN");
+        raizNula.setNome("Raiz Nula");
         raizNula.setSubunidades(null);
 
         // Raiz com subunidades vazias (Lacuna linha 644 - empty)
         UnidadeDto raizVazia = new UnidadeDto();
         raizVazia.setCodigo(3L);
+        raizVazia.setSigla("RV");
+        raizVazia.setNome("Raiz Vazia");
         raizVazia.setSubunidades(Collections.emptyList());
 
         when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(10L, 101L, 11L, 111L, 112L, 113L, 114L, 12L, 13L, 131L, 14L, 15L, 16L, 17L, 18L, 19L, 20L, 21L, 22L));
