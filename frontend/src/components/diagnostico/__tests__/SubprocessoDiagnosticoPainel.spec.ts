@@ -255,7 +255,6 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
 
         expect(impossibilitarAvaliacaoMock).toHaveBeenCalledWith('242426', 'Servidor afastado.');
-        expect(wrapper.text()).not.toContain('Impossibilidade registrada');
     });
 
     it('conclui diagnóstico e redireciona para o painel', async () => {

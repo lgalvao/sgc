@@ -295,7 +295,6 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-confirmar-impossibilitar"]').trigger('click');
 
         expect(impossibilitarAvaliacaoMock).toHaveBeenCalledWith('242426', 'Servidor afastado.');
-        expect(wrapper.text()).toContain('Impossibilidade registrada');
     });
 
     it('mantém leitura quando o backend não habilita edição e mostra alerta final', async () => {

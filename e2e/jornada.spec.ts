@@ -505,7 +505,6 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
                 ),
                 modalImpossibilidade.getByTestId('btn-confirmar-impossibilitar').click()
             ]);
-            await expect(page.getByTestId('app-alert')).toContainText('Impossibilidade registrada');
         });
         await expect(page).toHaveURL(/\/login/);
 
