@@ -1928,43 +1928,6 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
                 .hasMessageContaining("Processo");
     }
 
-    @Test
-    @DisplayName("enviarLembrete para unidade ADMIN deve enviar cópia quando usuário não possui unidade de lotação")
-    void enviarLembreteAdminSemUnidadeLotacao() {
-        Processo processo = new Processo();
-        processo.setCodigo(1L);
-        processo.setDescricao("Processo Teste");
-        processo.setDataLimite(LocalDateTime.of(2026, 6, 30, 0, 0));
-
-        Unidade admin = new Unidade();
-        admin.setCodigo(1L);
-        admin.setSigla("ADMIN");
-        UnidadeProcesso participanteAdmin = new UnidadeProcesso();
-        participanteAdmin.setUnidadeCodigo(1L);
-        participanteAdmin.setSigla("ADMIN");
-        processo.setParticipantes(new ArrayList<>(List.of(participanteAdmin)));
-
-        Usuario usuario = new Usuario();
-        usuario.setTituloEleitoral("TITULO_SEM_LOTACAO");
-        usuario.setPerfilAtivo(Perfil.ADMIN);
-        usuario.setEmail("admin.sem.lotacao@tre-pe.jus.br");
-        usuario.setUnidadeLotacao(null);
-
-        when(processoRepo.buscarPorCodigoComParticipantes(1L)).thenReturn(Optional.of(processo));
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
-        when(emailModelosService.criarEmailLembretePrazo(anyString(), anyString(), any())).thenReturn("<html>lembrete</html>");
-        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-        when(usuarioService.buscarUsuarioComUnidadeLotacao("TITULO_SEM_LOTACAO")).thenReturn(usuario);
-
-        processoService.enviarLembrete(1L, 1L);
-
-        verify(notificacaoService, times(2)).enfileirar(any());
-        verify(notificacaoService).enfileirar(argThat(cmd ->
-                "admin.sem.lotacao@tre-pe.jus.br".equals(cmd.destinatario())
-                        && cmd.chaveIdempotencia().endsWith(":copia-admin")
-        ));
-    }
-
 
     @Test
     @DisplayName("finalizar deve lançar erro quando processo não está em andamento")

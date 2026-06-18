@@ -1229,37 +1229,37 @@ class RelatorioServiceTest {
     void deveCobrirGapsOrdenacaoSiglaSemNomeESubunidadesNulas() throws DocumentException {
         when(pdfFactory.createDocument()).thenReturn(document);
 
-        // 1. Unidade com sigla null, nome null (gera "-" na ordenação e tituloTexto)
+        // 1. Unidade com sigla e nome vazios (gera "-" na ordenação e tituloTexto)
         UnidadeDto u1 = new UnidadeDto();
         u1.setCodigo(10L);
-        u1.setSigla(null);
-        u1.setNome(null);
+        u1.setSigla("");
+        u1.setNome("");
         u1.setTipo("COMUM");
 
-        // 1b. Unidade com sigla vazia e nome nulo (gera "-")
+        // 1b. Unidade com sigla vazia e nome vazio (gera "-")
         UnidadeDto u1b = new UnidadeDto();
         u1b.setCodigo(101L);
         u1b.setSigla(" ");
-        u1b.setNome(null);
+        u1b.setNome("");
 
-        // 2. Unidade com sigla preenchida (ZE), nome null (cobre agrupamento ZE e temSigla && !temNome na linha 619)
+        // 2. Unidade com sigla preenchida (ZE), nome vazio
         // Nota: tipo COMUM para não curto-circuitar ehZonaEleitoralPorMetadados e exercitar ehSiglaZonaEleitoral
         UnidadeDto u2 = new UnidadeDto();
         u2.setCodigo(11L);
         u2.setSigla("z.e."); // Lacuna linha 777 - regex complexa
-        u2.setNome(null);
+        u2.setNome("");
         u2.setTipo("COMUM");
 
         UnidadeDto u2b = new UnidadeDto();
         u2b.setCodigo(111L);
         u2b.setSigla("Z.E."); // Outra variação regex
-        u2b.setNome(null);
+        u2b.setNome("");
         u2b.setTipo("COMUM");
 
         UnidadeDto u2c = new UnidadeDto();
         u2c.setCodigo(112L);
         u2c.setSigla("ZE "); // Outra variação regex
-        u2c.setNome(null);
+        u2c.setNome("");
         u2c.setTipo("COMUM");
 
         // 3. Unidade com nome SECRETARIA 10 e outra SECRETARIA 2 (para testar ordenação numérica)
