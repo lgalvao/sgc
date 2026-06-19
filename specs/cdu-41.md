@@ -16,22 +16,26 @@ Ator: ADMIN
 
 3. O usuário clica em `Iniciar`.
 
-4. O sistema mostra uma tela de confirmação, com texto "Ao iniciar o processo, não será mais possível editá-lo ou removê-lo e todas as unidades participantes serão notificadas por e-mail." e botões `Iniciar` e `Cancelar`.
-   
-5. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma tela.
+4. O sistema mostra uma tela de confirmação, com texto "Ao iniciar o processo, não será mais possível editá-lo ou
+   removê-lo e todas as unidades participantes serão notificadas por e-mail." e botões `Iniciar` e `Cancelar`.
+
+5. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de iniciação do processo, permanecendo na mesma
+   tela.
 
 6. O usuário clica em `Iniciar`, dentro da tela de confirmação.
-   
-7. O sistema armazena internamente uma cópia (snapshot) da árvore de unidades participantes, incluindo todos os servidores lotados em cada unidade participante, e a vincula com o processo.
+
+7. O sistema armazena internamente uma cópia (snapshot) da árvore de unidades participantes, incluindo todos os
+   servidores lotados em cada unidade participante, e vincula essa cópia com o processo.
 
 8. O sistema muda a situação do processo para 'Em andamento'.
 
-9. O sistema cria um subprocesso para cada uma das unidades operacionais ou interoperacionais participantes, com os seguintes campos e valores iniciais:
-   - `Data limite etapa 1`: data copiada da data limite do processo;
-   - `Situação`: 'Não iniciado';
-    
-10. O sistema registra uma movimentação para cada subprocesso criado com:
-    - `Data/hora`: data/hora atual;
+9. O sistema cria um subprocesso para cada uma das unidades operacionais ou interoperacionais participantes, com os
+   seguintes campos/valores iniciais:
+    - `Data limite etapa 1`: data copiada da data limite do processo;
+    - `Situação`: 'Não iniciado';
+
+10. O sistema registra uma movimentação para cada subprocesso criado, com estes campos/valores:
+    - `Data/hora`: [data/hora atual];
     - `Unidade origem`: 'ADMIN';
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO];
     - `Descrição`: 'Processo iniciado'.
@@ -47,9 +51,9 @@ Ator: ADMIN
 
     Comunicamos o início do processo [DESCRICAO_PROCESSO] para a sua unidade.
 
-    Já é possível realizar o diagnóstico de competências no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    Já é possível realizar o diagnóstico de competências no Sistema de Gestão de Competências (SGC) ([URL_SISTEMA]).
 
-    O prazo para conclusão desta etapa é [DATA_LIMITE].
+    O prazo para conclusão do diagnóstico é [DATA_LIMITE].
     ```
 
     12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
@@ -60,11 +64,13 @@ Ator: ADMIN
 
     Prezado(a) responsável pela [SIGLA_UNIDADE],
 
-    Comunicamos o início do processo [DESCRICAO_PROCESSO] nas unidades [SIGLAS_UNIDADES_SUBORDINADAS]. Essas unidades já podem iniciar o diagnóstico de competências. À medida que os diagnósticos forem sendo concluídos, será possível acompanhar e realizar a sua análise.
+    Comunicamos o início do processo [DESCRICAO_PROCESSO] nas unidades [SIGLAS_UNIDADES_SUBORDINADAS]. 
+    Essas unidades já podem iniciar o diagnóstico de competências. À medida que os diagnósticos forem sendo 
+    concluídos, será possível acompanhar e realizar a análise.
 
-    O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+    O prazo para conclusão do processo é [DATA_LIMITE].
 
-    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    Acompanhe o processo no Sistema de Gestão de Competências (SGC):([URL_SISTEMA]).
     ```
 
 13. O sistema cria internamente alertas para todas as unidades participantes.
@@ -73,14 +79,23 @@ Ator: ADMIN
     - `Descrição`: "Início do processo"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: ADMIN
+    - `Unidade de origem`: 'ADMIN'
     - `Unidade de destino`: [SIGLA_UNIDADE]
 
-    13.2. Para a unidade intermediária imediatamente superior à unidade participante, será criado um alerta com:
-    - `Descrição`: "Início do processo em unidade(s) subordinada(s)"
+    13.2. Para a unidade intermediária imediatamente superior à unidade participante, será criado também um alerta com:
+    - `Descrição`: "Início do processo em unidade (s) subordinada (s)"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: ADMIN
+    - `Unidade de origem`: 'ADMIN'
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-  13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade intermediária, como especificado acima.
+    13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade
+    intermediária, como especificado acima.
+
+14. O sistema cria alertas individuais para todos os servidores de todas as unidades participantes, com exceção dos
+    servidores responsáveis pelas unidades, com os campos/valores:
+    - `Descrição`: "Início do processo"
+    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade de origem`: 'ADMIN'
+    - `Usuário de destino`: [TITULO_USUARIO]
