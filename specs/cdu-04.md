@@ -2,11 +2,11 @@
 
 Ator: ADMIN
 
-Pré-condições:
+## Pré-condições:
 
 - Existência de ao menos um processo de mapeamento na situação 'Criado'
 
-Fluxo principal:
+## Fluxo principal:
 
 1. No `Painel`, o usuário clica em um processo de mapeamento que esteja na situação 'Criado'.
 
@@ -22,8 +22,9 @@ Fluxo principal:
 
 6. O usuário escolhe `Iniciar`.
 
-7. Se a seleção incluir alguma unidade interoperacional, o sistema mostra um diálogo com a
-   mensagem `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo.`, apresentando essas unidades já selecionadas.
+7. Se a seleção incluir alguma unidade interoperacional, o sistema mostra um diálogo com a mensagem
+   `A seleção inclui unidades com equipe própria e unidades subordinadas. Indique quais também devem participar deste processo.`,
+   apresentando essas unidades já selecionadas.
 
 8. O usuário confirma a seleção complementar das unidades mostradas no diálogo.
 
@@ -33,9 +34,8 @@ Fluxo principal:
 10. O sistema muda a situação do processo para 'Em andamento';
 
 11. O sistema cria internamente um subprocesso para cada unidade participante direta, que seja do tipo Operacional ou
-   interoperacional confirmada no diálogo complementar (unidade do tipo Intermediária nunca participa diretamente), com os seguintes campos e valores
-   iniciais:
-
+    interoperacional confirmada no diálogo complementar (unidade do tipo Intermediária nunca participa diretamente), com
+    os seguintes campos e valores iniciais:
     - `Data limite etapa 1`: Data copiada da data limite da etapa inicial do processo.
     - `Situação`: 'Não iniciado'
     - `Observações`: Campo de texto **formatado** para registro de informações futuras pelo perfil ADMIN.
@@ -87,7 +87,7 @@ Fluxo principal:
     - `Unidade de destino`: [SIGLA_UNIDADE].
 
     13.2. Para cada unidade **intermediária** será criado um alerta com estes campos:
-    - `Descrição`: "Início do processo em unidade(s) subordinada(s)"
+    - `Descrição`: "Início do processo em unidade (s) subordinada (s)"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN

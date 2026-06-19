@@ -12,39 +12,34 @@
 
 ## Fluxo principal
 
-1. No painel, o usuário acessa um processo de mapeamento ou revisão em andamento.
+1. No `Painel`, o usuário acessa um processo de mapeamento ou revisão em andamento.
 
-2. O sistema mostra a tela Detalhes do processo.
+2. O sistema mostra a tela `Detalhes do processo`.
 
-3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do
+3. O sistema identifica se existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do
    cadastro de atividades (de acordo com as pré-condições) e exibe, na seção `Unidades participantes`, abaixo da árvore
    de unidades, o botão `Homologar em bloco`.
 
 4. O usuário clica no botão `Homologar em bloco`.
 
-5. O sistema abre modal de confirmação, com os elementos a seguir:
-
-    - Título "Homologação de cadastro em bloco";
-    - Texto "Selecione as unidades cujos cadastros deverão ser homologados:";
-    - Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros poderão ser homologados, sendo
-      apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome;
+5. O sistema abre um modal de confirmação, com os elementos a seguir:
+    - Título: "Homologação de cadastro em bloco";
+    - Texto: "Selecione as unidades para homologar o cadastro:";
+    - Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros estão aptos a homologar, com um
+      checkbox (selecionado por padrão) para cada unidade, além de sigla e nome da unidade;
     - Botões `Cancelar` e `Homologar`.
 
-6. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
-   processo.
+6. O usuário clica em `Homologar`.
 
-7. O usuário clica em `Homologar`.
+7. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
-8. O sistema atua, para cada unidade selecionada, da seguinte forma:
-
-   8.1. O sistema registra uma movimentação para o subprocesso:
-
+   7.1. O sistema registra uma movimentação para o subprocesso da unidade:
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: "ADMIN"
     - `Unidade destino`: "ADMIN"
     - `Descrição`: "Cadastro homologado"
 
-   8.2. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
+   7.2. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
 
-9. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e permanece na tela
+8. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e permanece na tela
    `Detalhes do processo`.

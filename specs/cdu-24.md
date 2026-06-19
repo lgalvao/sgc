@@ -18,7 +18,6 @@
    disponibilizados e caso positivo habilita o botão `Disponibilizar mapas em bloco`.
 
 4. O sistema abre um modal de confirmação, com os elementos a seguir:
-
     - Título: "Disponibilização de mapas em bloco";
     - Texto: "Selecione as unidades cujos mapas deverão ser disponibilizados:";
     - Siglas das unidades operacionais ou interoperacionais cujos mapas de competências poderão ser disponibilizados,
@@ -49,13 +48,12 @@
    9.2. O sistema altera a situação do subprocesso da unidade para 'Mapa disponibilizado'.
 
    9.3. O sistema registra uma movimentação para o subprocesso com os campos:
-
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: ADMIN
     - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Descrição`: 'Disponibilização do mapa de competências'
 
-   9.4. O sistema notifica individualmente a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
+   9.4. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
 
    ```text
    Assunto: SGC: Mapa de competências disponibilizado
@@ -68,7 +66,6 @@
    ```
 
    9.5. O sistema cria internamente um alerta:
-
     - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
     - `Processo`: [DESCRIÇÃO DO PROCESSO]
     - `Data/hora`: Data/hora atual
@@ -77,7 +74,8 @@
 
    9.6. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
-   9.7. O sistema agrupa as unidades selecionadas por unidade superior imediata, notificando cada uma dessas unidades superiores com um único e-mail consolidado, no modelo abaixo:
+   9.7. O sistema agrupa as unidades selecionadas por unidade superior imediata, notificando cada uma dessas unidades
+   superiores com um único e-mail consolidado, no modelo abaixo:
 
    ```text
    Assunto: SGC: Mapas de competências disponibilizados
@@ -89,6 +87,7 @@
    A validação destes mapas já pode ser realizada no Sistema de Gestão de Competências (URL_SISTEMA). O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
    ```
 
-   9.8. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
+   9.8. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O
+   sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
 
 10. O sistema redireciona para o `Painel` e mostra a mensagem de confirmação "Mapas disponibilizados em bloco".
