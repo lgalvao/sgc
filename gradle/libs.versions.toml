@@ -1,26 +1,26 @@
 [versions]
 # Spring & Frameworks
-springBoot = "4.0.6"
+springBoot = "4.1.0"
 springDependencyManagement = "1.1.7"
 springDoc = "3.0.2"
 
 # Tools & Plugins
-jacoco = "0.8.14"
-spotbugs = "4.9.8"
+jacoco = "0.8.15"
+spotbugs = "4.10.2"
 spotbugsPlugin = "6.4.8"
 pitest = "1.19.0"
 openRewrite = "7.18.0"
 gradleVersions = "0.54.0"
 
 # Security & Core Overrides
-jackson = "3.1.1"
-tomcat = "11.0.21"
+jackson = "3.2.0"
+tomcat = "11.0.22"
 jjwt = "0.13.0"
 owaspSanitizer = "20260313.1"
 
 # Libs
 lombok = "1.18.46"
-openpdf = "3.0.3"
+openpdf = "3.0.5"
 rhino = "1.9.1"
 caffeine = "3.1.8"
 h2 = "2.3.232"
@@ -32,7 +32,7 @@ archunit = "1.4.1"
 jqwik = "1.9.3"
 equalsverifier = "4.4.2"
 groovy = "5.0.4"
-greenmail = "2.1.8"
+greenmail = "2.1.9"
 swaggerParser = "2.1.39"
 swaggerValidator = "2.46.1"
 

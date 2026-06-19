@@ -11,7 +11,6 @@
   "scripts": {
     "test": "npm --prefix frontend run test",
     "test:e2e": "playwright test --config=e2e/playwright.config.ts --project=chromium",
-
     "test:unit": "npm --prefix frontend run test:unit",
     "typecheck": "npm run typecheck:e2e && npm --prefix frontend run typecheck",
     "typecheck:e2e": "npm run typecheck -w e2e",
@@ -30,31 +29,72 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.6.2",
-    "eslint": "^10.3.0",
+    "@types/node": "^26.0.0",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-playwright": "^2.10.2",
+    "eslint-plugin-playwright": "^2.10.4",
+    "form-data": "^4.0.6",
+    "glob": "^13.0.0",
     "globals": "^17.6.0",
     "js-yaml": "^4.2.0",
-    "knip": "^6.12.1",
-    "oxlint": "^1.63.0",
-    "release-it": "^20.0.1",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.2"
-  },
-  "overrides": {
-    "glob": "^13.0.0",
-    "esbuild": "^0.28.1",
-    "vite": "^8.0.16",
-    "form-data": "^4.0.6",
-    "js-yaml": "$js-yaml"
+    "knip": "^6.17.1",
+    "oxlint": "^1.70.0",
+    "release-it": "^20.2.0",
+    "typescript": "^7.0.1-rc",
+    "typescript-eslint": "^8.61.1",
+    "vite": "^8.0.16"
   },
   "allowScripts": {
-    "fsevents@2.3.2": true,
     "fsevents@2.3.3": true,
     "vue-demi@0.14.10": true,
-    "esbuild@0.25.12": true,
-    "esbuild@0.27.7": true,
     "esbuild@0.28.1": true
+  },
+  "overrides": {
+    "typescript": "$typescript",
+    "vue-tsc": {
+      "typescript": "npm:@typescript/typescript6@latest"
+    },
+    "typescript-eslint": {
+      "typescript": "npm:@typescript/typescript6@latest"
+    },
+    "@typescript-eslint/parser": {
+      "typescript": "npm:@typescript/typescript6@latest"
+    },
+    "@typescript-eslint/utils": {
+      "typescript": "npm:@typescript/typescript6@latest"
+    },
+    "sgc-frontend": {
+      "vue-tsc": {
+        "typescript": "npm:@typescript/typescript6@latest"
+      },
+      "typescript-eslint": {
+        "typescript": "npm:@typescript/typescript6@latest"
+      },
+      "@typescript-eslint/parser": {
+        "typescript": "npm:@typescript/typescript6@latest"
+      },
+      "@typescript-eslint/utils": {
+        "typescript": "npm:@typescript/typescript6@latest"
+      }
+    },
+    "js-yaml": "^4.2.0",
+    "undici": "^7.28.0",
+    "nodemailer": "^9.0.1",
+    "openapi-typescript": {
+      "@redocly/openapi-core": {
+        "js-yaml": "^4.2.0"
+      }
+    },
+    "sgc-scripts": {
+      "openapi-typescript": {
+        "@redocly/openapi-core": {
+          "js-yaml": "^4.2.0"
+        }
+      }
+    },
+    "@redocly/openapi-core": {
+      "js-yaml": "^4.2.0"
+    }
   }
 }
