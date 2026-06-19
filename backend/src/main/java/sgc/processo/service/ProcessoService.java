@@ -1081,7 +1081,7 @@ public class ProcessoService {
                     sp
             );
             if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && sp != null) {
-                notificarServidoresDiagnostico(sp);
+                criarAlertasServidoresDiagnostico(sp);
             }
         }
 
@@ -1101,11 +1101,21 @@ public class ProcessoService {
         }
     }
 
-    private void notificarServidoresDiagnostico(Subprocesso sp) {
+    private void criarAlertasServidoresDiagnostico(Subprocesso sp) {
+        String responsavelTitulo = buscarResponsavelTituloUnidade(sp.getUnidade().getCodigo());
         List<Usuario> servidores = usuarioService.buscarPorUnidadeLotacao(sp.getUnidade().getCodigo());
         for (Usuario servidor : servidores) {
-            diagnosticoNotificacaoService.notificarInicioProcessoServidor(sp, servidor);
+            if (Objects.equals(servidor.getTituloEleitoral(), responsavelTitulo)) continue;
+            diagnosticoNotificacaoService.criarAlertaInicioParaServidor(sp, servidor);
         }
+    }
+
+    private @Nullable String buscarResponsavelTituloUnidade(Long codigoUnidade) {
+        return responsavelUnidadeService.buscarResponsavelUnidadeOpt(codigoUnidade)
+                .map(responsavel -> responsavel.substitutoTitulo() != null && !responsavel.substitutoTitulo().isBlank()
+                        ? responsavel.substitutoTitulo()
+                        : responsavel.titularTitulo())
+                .orElse(null);
     }
 
     private void criarNotificacaoInicio(Processo processo, Unidade unidadeDestino, boolean participante,

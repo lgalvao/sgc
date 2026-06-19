@@ -33,29 +33,19 @@ public class DiagnosticoNotificacaoService {
     private final ConfigAplicacao configAplicacao;
     private final sgc.alerta.EmailModelosService emailModelosService;
 
-    public void notificarInicioProcessoServidor(Subprocesso sp, Usuario servidor) {
-        if (servidor.getEmail().isBlank()) {
-            log.warn("Servidor {} sem email para notificação de início de diagnóstico.", servidor.getTituloEleitoral());
-            return;
-        }
-
-        String nomeProcesso = sp.getProcesso().getDescricao();
-        String assunto = "SGC: Autoavaliação de diagnóstico de competências disponível";
-
-        String corpo = emailModelosService.criarEmailDiagnosticoInicioServidor(
-                servidor.getNome(),
-                nomeProcesso,
-                sp.getUnidade().getSigla(),
-                sp.getDataLimiteEtapa1(),
-                urlSistema()
+    /**
+     * Cria um alerta individual para o servidor no início do processo de diagnóstico (CDU-41 §14).
+     * O e-mail de início é enviado para a unidade (responsável), não para o servidor individualmente.
+     */
+    public void criarAlertaInicioParaServidor(Subprocesso sp, Usuario servidor) {
+        Unidade admin = unidadeService.buscarAdmin();
+        alertaService.criarAlertaPessoal(
+                sp.getProcesso(),
+                admin,
+                sp.getUnidade(),
+                servidor.getTituloEleitoral(),
+                "Início do processo"
         );
-
-        enfileirarNotificacao(sp, sp.getUnidade(),
-                new DestinatarioNotificacao(servidor.getEmail(), servidor.getTituloEleitoral(), servidor.getNome()),
-                TipoNotificacao.PROCESSO_INICIADO,
-                assunto,
-                corpo,
-                "diagnostico:%d:inicio:servidor:%s".formatted(sp.getCodigo(), servidor.getTituloEleitoral()));
     }
 
     public void notificarAutoavaliacaoConcluida(Subprocesso sp, String servidorTitulo) {
