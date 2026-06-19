@@ -95,6 +95,38 @@ class SubprocessoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("mapaCompletoDtoPorSubprocesso deve usar mapa vigente da unidade para subprocesso de diagnostico")
+    void mapaCompletoDtoPorSubprocessoDeveUsarMapaVigenteNoDiagnostico() {
+        Long codSubprocesso = 910L;
+        Long codUnidade = 4L;
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codSubprocesso);
+        Unidade unidade = new Unidade();
+        unidade.setCodigo(codUnidade);
+        sp.setUnidade(unidade);
+        Processo processo = new Processo();
+        processo.setTipo(TipoProcesso.DIAGNOSTICO);
+        sp.setProcesso(processo);
+
+        Mapa mapa = new Mapa();
+        mapa.setCodigo(99L);
+        mapa.setCompetencias(Set.of());
+        mapa.setAtividades(Set.of());
+        Subprocesso subprocessoMapa = new Subprocesso();
+        subprocessoMapa.setCodigo(99L);
+        mapa.setSubprocesso(subprocessoMapa);
+
+        when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(codSubprocesso)).thenReturn(Optional.of(sp));
+        when(mapaManutencaoService.mapaCompletoVigenteUnidade(codUnidade)).thenReturn(mapa);
+
+        MapaCompletoDto dto = service.mapaCompletoDtoPorSubprocesso(codSubprocesso);
+
+        assertThat(dto).isNotNull();
+        verify(mapaManutencaoService).mapaCompletoVigenteUnidade(codUnidade);
+        verify(mapaManutencaoService, never()).mapaCompletoSubprocesso(codSubprocesso);
+    }
+
+    @Test
     @DisplayName("obterSugestoes deve retornar SugestoesDto vazia quando o mapa for nulo")
     void obterSugestoesDeveRetornarVaziaQuandoMapaForNulo() {
         Long codSubprocesso = 1L;

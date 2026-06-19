@@ -34,8 +34,8 @@ const competenciasLocais = ref<any[]>([
     {
         competenciaCodigo: 10,
         competenciaDescricao: 'Competência A',
-        autoimportancia: 3,
-        autodominio: 4,
+        servidorImportancia: 3,
+        servidorDominio: 4,
         chefiaImportancia: 3,
         chefiaDominio: 4,
         consensoImportancia: 3,
@@ -111,7 +111,7 @@ function montar(props?: Record<string, unknown>) {
                 },
                 CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                 AppAlert: {
-                    props: ['mensagem'],
+                    props: ['mensagem', 'chave'],
                     emits: ['dismissed'],
                     template: '<div class="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
                 },
@@ -147,8 +147,8 @@ describe('ConsensoDiagnosticoView', () => {
             {
                 competenciaCodigo: 10,
                 competenciaDescricao: 'Competência A',
-                autoimportancia: 3,
-                autodominio: 4,
+                servidorImportancia: 3,
+                servidorDominio: 4,
                 chefiaImportancia: 3,
                 chefiaDominio: 4,
                 consensoImportancia: 3,
@@ -178,6 +178,16 @@ describe('ConsensoDiagnosticoView', () => {
         expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').exists()).toBe(false);
         expect(wrapper.findAll('thead tr')).toHaveLength(2);
         expect(wrapper.find('[data-testid="consenso-final-dominio-10"]').exists()).toBe(true);
+    });
+
+    it('renderiza os valores do servidor nas colunas estáticas', () => {
+        const wrapper = montar();
+        const texto = wrapper.text();
+
+        expect(texto).not.toContain('undefined');
+        expect(texto).toContain('Competência A');
+        expect(texto).toContain('3');
+        expect(texto).toContain('4');
     });
 
     it('usa o nome retornado pela query no subtitulo quando a rota nao traz servidorNome', () => {
@@ -262,6 +272,16 @@ describe('ConsensoDiagnosticoView', () => {
         expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
     });
 
+    it('mantem o botão concluir avaliação desabilitado quando a situação individual já é consenso criado', () => {
+        podeConcluirAvaliacao.value = true;
+        habilitarConcluirAvaliacao.value = false;
+
+        const wrapper = montar();
+
+        expect(wrapper.find('[data-testid="btn-concluir-avaliacao"]').exists()).toBe(true);
+        expect(wrapper.get('[data-testid="btn-concluir-avaliacao"]').attributes('disabled')).toBeDefined();
+    });
+
     it('mostra erro ao falhar aprovar e permite dispensar o alerta', async () => {
         podeConcluirAvaliacao.value = false;
         podeAprovarConsenso.value = true;
@@ -286,6 +306,33 @@ describe('ConsensoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
 
         expect(wrapper.find('.app-alert').text()).toContain('Preencha todos os campos');
+    });
+
+    it('reexibe o mesmo alerta local ao repetir conclusão com consenso incompleto', async () => {
+        competenciasLocais.value = [
+            {
+                competenciaCodigo: 10,
+                competenciaDescricao: 'Competência A',
+                servidorImportancia: 3,
+                servidorDominio: 4,
+                chefiaImportancia: 3,
+                chefiaDominio: 4,
+                consensoImportancia: null,
+                consensoDominio: null,
+            },
+        ];
+        const wrapper = montar({servidorTitulo: '999999', servidorNome: 'Outro Servidor'});
+
+        await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
+        expect(wrapper.find('.app-alert').text()).toContain('Preencha todos os campos');
+        expect(salvarConsensoAgoraMock).not.toHaveBeenCalled();
+
+        await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
+        expect(wrapper.find('.app-alert').exists()).toBe(false);
+
+        await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
+        expect(wrapper.find('.app-alert').text()).toContain('Preencha todos os campos');
+        expect(salvarConsensoAgoraMock).not.toHaveBeenCalled();
     });
 
     it('usa o botão voltar do cabeçalho', async () => {

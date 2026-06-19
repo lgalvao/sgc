@@ -41,6 +41,7 @@
       <!-- Alertas -->
       <AppAlert
           v-if="erroMensagem"
+          :chave="erroMensagemChave"
           :mensagem="erroMensagem"
           variante="danger"
           @dismissed="erroMensagem = ''"
@@ -92,7 +93,7 @@
             >
               <td class="celula-competencia">{{ item.descricao }}</td>
               <td class="text-center grupo-servidor divisor-grupo coluna-nota">
-                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.autoimportancia) }}</span>
+                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.servidorImportancia) }}</span>
               </td>
               <td class="text-center grupo-servidor coluna-nota">
                 <BFormSelect
@@ -118,7 +119,7 @@
                 <span v-else class="valor-estatico valor-consenso">{{ formatarNota(item.consensoImportancia) }}</span>
               </td>
               <td class="text-center grupo-chefia divisor-grupo coluna-nota">
-                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.autodominio) }}</span>
+                <span class="valor-estatico valor-estatico-bloco">{{ formatarNota(item.servidorDominio) }}</span>
               </td>
               <td class="text-center grupo-chefia coluna-nota">
                 <BFormSelect
@@ -212,7 +213,13 @@ const subtituloServidor = computed(() => `${nomeServidorSubtitulo.value} - ${pro
 
 // « Alertas »
 const erroMensagem = ref('');
+const erroMensagemChave = ref(0);
 const concluindoAvaliacao = ref(false);
+
+function exibirErro(mensagem: string) {
+  erroMensagemChave.value += 1;
+  erroMensagem.value = mensagem;
+}
 
 async function confirmarAprovarConsenso() {
   try {
@@ -234,7 +241,7 @@ async function confirmarAprovarConsenso() {
     }
     void router.back();
   } catch {
-    erroMensagem.value = erroAprovar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    exibirErro(erroAprovar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -247,7 +254,7 @@ function consensoCompleto(item: ConsensoCompetenciaDetalhada): boolean {
 
 async function confirmarConcluirAvaliacao() {
   if (competenciasLocais.value.some((item) => !consensoCompleto(item))) {
-    erroMensagem.value = TEXTOS.diagnostico.ERRO_PREENCHIMENTO_CONSENSO_INCOMPLETO;
+    exibirErro(TEXTOS.diagnostico.ERRO_PREENCHIMENTO_CONSENSO_INCOMPLETO);
     return;
   }
 
@@ -272,7 +279,7 @@ async function confirmarConcluirAvaliacao() {
     }
     void router.back();
   } catch {
-    erroMensagem.value = erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    exibirErro(erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   } finally {
     concluindoAvaliacao.value = false;
   }
@@ -315,9 +322,9 @@ function campoConsensoHabilitado(
   campo: 'importancia' | 'dominio',
 ): boolean {
   if (campo === 'importancia') {
-    return item.autoimportancia !== null && item.chefiaImportancia !== null;
+    return item.servidorImportancia !== null && item.chefiaImportancia !== null;
   }
-  return item.autodominio !== null && item.chefiaDominio !== null;
+  return item.servidorDominio !== null && item.chefiaDominio !== null;
 }
 
 </script>

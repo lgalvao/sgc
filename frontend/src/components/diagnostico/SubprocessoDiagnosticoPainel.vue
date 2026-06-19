@@ -59,6 +59,7 @@
               right
               size="sm"
               :text="TEXTOS.diagnostico.COLUNA_ACOES"
+              teleport-to="body"
               toggle-class="text-nowrap"
               variant="outline-secondary"
           >

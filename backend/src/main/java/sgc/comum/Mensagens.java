@@ -120,7 +120,7 @@ public final class Mensagens {
     public static final String ATIVIDADES_SEM_CONHECIMENTO_ASSOCIADO = "Existem atividades sem conhecimentos associados.";
     public static final String DESCRICAO_ATIVIDADE_DUPLICADA = "Já existe atividade com esta descrição neste mapa.";
     public static final String DESCRICAO_CONHECIMENTO_DUPLICADA = "Já existe conhecimento com esta descrição nesta atividade.";
-    public static final String DIAGNOSTICO_PENDENTE = "Ainda existem avaliações e situações de capacitações não preenchidas.";
+    public static final String DIAGNOSTICO_PENDENTE = "Ainda existem avaliações e situações de capacitações não aprovadas.";
     public static final String FEEDBACK_NOTA_MIN = "Descreva o problema com pelo menos 10 caracteres.";
     public static final String FEEDBACK_NOTA_MAX = "O feedback não pode exceder 500 caracteres.";
     public static final String FEEDBACK_SCREENSHOT_MAX = "A captura de tela excede o tamanho máximo permitido.";

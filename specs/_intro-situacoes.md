@@ -56,7 +56,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 ### Situações de avaliações individuais de diagnóstico
 
 - **Autoavaliação não iniciada**: Servidor ainda não concluiu sua autoavaliação.
-- **Autoavaliação concluída**: Servidor concluiu a autoavaliação e chefe/responsável já pode iniciar a avaliação de consenso.
+- **Autoavaliação concluída**: Servidor concluiu a autoavaliação e chefe/responsável já pode iniciar a avaliação de consenso para aquele servidor.
 - **Avaliação de consenso criada**: Chefe/responsável iniciou uma avaliação de consenso para o servidor.
 - **Avaliação de consenso aprovada**: O servidor aprovou a avaliação de consenso.
 - **Avaliação impossibilitada**: Chefe/responsável registrou impossibilidade de realização da avaliação daquele servidor no processo atual.

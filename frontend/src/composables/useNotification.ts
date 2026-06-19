@@ -8,6 +8,7 @@ export interface NotificacaoEstruturada {
 }
 
 export interface EstadoNotificacao {
+    chave: number;
     mensagem?: string;
     notificacao?: NotificacaoEstruturada;
     variante: VarianteAlerta;
@@ -17,9 +18,10 @@ export interface EstadoNotificacao {
 
 export function useNotification() {
     const notificacao = ref<EstadoNotificacao | null>(null);
+    let proximaChave = 1;
 
     function notify(mensagem: string, variante: VarianteAlerta = 'danger', dispensavel = true) {
-        notificacao.value = {mensagem, variante, dispensavel};
+        notificacao.value = {chave: proximaChave++, mensagem, variante, dispensavel};
     }
 
     function notifyStructured(
@@ -32,7 +34,13 @@ export function useNotification() {
         } = {}
     ) {
         const {variante = 'danger', stackTrace, dispensavel = true} = opcoes;
-        notificacao.value = {notificacao: {resumo, detalhes}, variante, stackTrace, dispensavel};
+        notificacao.value = {
+            chave: proximaChave++,
+            notificacao: {resumo, detalhes},
+            variante,
+            stackTrace,
+            dispensavel,
+        };
     }
 
     function clear() {

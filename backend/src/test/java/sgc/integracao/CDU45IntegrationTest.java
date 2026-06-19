@@ -41,8 +41,8 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                 List.of(
                         ConsensoCompetenciaDto.builder()
                                 .competenciaCodigo(competencia1.getCodigo())
-                                .autoimportancia(5)
-                                .autodominio(3)
+                                .servidorImportancia(5)
+                                .servidorDominio(3)
                                 .chefiaImportancia(6)
                                 .chefiaDominio(4)
                                 .consensoImportancia(6)
@@ -50,8 +50,8 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                                 .build(),
                         ConsensoCompetenciaDto.builder()
                                 .competenciaCodigo(competencia2.getCodigo())
-                                .autoimportancia(4)
-                                .autodominio(2)
+                                .servidorImportancia(4)
+                                .servidorDominio(2)
                                 .chefiaImportancia(5)
                                 .chefiaDominio(3)
                                 .consensoImportancia(5)
@@ -120,8 +120,8 @@ class CDU45IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                 List.of(
                         ConsensoCompetenciaDto.builder()
                                 .competenciaCodigo(competencia1.getCodigo())
-                                .autoimportancia(autoimportanciaPrimeira)
-                                .autodominio(autodominioPrimeira)
+                                .servidorImportancia(autoimportanciaPrimeira)
+                                .servidorDominio(autodominioPrimeira)
                                 .chefiaImportancia(chefiaImportanciaPrimeira)
                                 .chefiaDominio(chefiaDominioPrimeira)
                                 .consensoImportancia(chefiaImportanciaPrimeira)

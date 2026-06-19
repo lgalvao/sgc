@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.model.ComumRepo;
+import sgc.comum.erros.ErroInconsistenciaInterna;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Usuario;
 import sgc.processo.model.UnidadeProcesso;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.service.ResponsavelUnidadeService;
+import sgc.organizacao.service.UnidadeService;
 import sgc.subprocesso.SubprocessoDtoMapper;
 import sgc.subprocesso.dto.AnaliseHistoricoDto;
 import sgc.subprocesso.dto.MovimentacaoDto;
@@ -35,12 +38,13 @@ public class DiagnosticoConsultaService {
     private final DiagnosticoUsuarioContextoService usuarioContextoService;
     private final SubprocessoVisualizacaoService subprocessoVisualizacaoService;
     private final ResponsavelUnidadeService responsavelUnidadeService;
+    private final UnidadeService unidadeService;
 
     public DiagnosticoContextoDto obterContexto(Long codSubprocesso) {
         Subprocesso sp = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
         UnidadeProcesso unidadeSnapshot = resolverUnidadeSnapshot(sp);
-        List<CompetenciaResumoDto> competencias = sp.getMapa().getCompetencias().stream()
+        List<CompetenciaResumoDto> competencias = resolverMapaDiagnostico(sp).getCompetencias().stream()
                 .map(c -> CompetenciaResumoDto.builder()
                         .competenciaCodigo(c.getCodigo())
                         .descricao(c.getDescricao())
@@ -56,6 +60,13 @@ public class DiagnosticoConsultaService {
                 .situacaoDiagnostico(resolverSituacaoDiagnostico(sp))
                 .competencias(competencias)
                 .build();
+    }
+
+    private Mapa resolverMapaDiagnostico(Subprocesso subprocesso) {
+        return unidadeService.buscarMapaVigente(subprocesso.getUnidade().getCodigo())
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Processo de diagnóstico sem mapa vigente para a unidade %s".formatted(subprocesso.getUnidade().getSigla())
+                ));
     }
 
     public AutoavaliacaoDto obterAutoavaliacao(Long codSubprocesso) {
@@ -106,8 +117,8 @@ public class DiagnosticoConsultaService {
                 .map(a -> ConsensoCompetenciaDto.builder()
                         .competenciaCodigo(a.getCompetencia().getCodigo())
                         .competenciaDescricao(a.getCompetencia().getDescricao())
-                        .autoimportancia(a.getAutoimportancia())
-                        .autodominio(a.getAutodominio())
+                        .servidorImportancia(resolverImportanciaServidorParaConsenso(a))
+                        .servidorDominio(resolverDominioServidorParaConsenso(a))
                         .chefiaImportancia(a.getChefiaImportancia())
                         .chefiaDominio(a.getChefiaDominio())
                         .consensoImportancia(resolverConsensoImportancia(a))
@@ -126,7 +137,11 @@ public class DiagnosticoConsultaService {
                 .situacaoServidor(situacaoServidor)
                 .podeEditar(!usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
                 .podeConcluirAvaliacao(!usuarioEhServidorAvaliado)
-                .habilitarConcluirAvaliacao(!usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .habilitarConcluirAvaliacao(
+                        !usuarioEhServidorAvaliado
+                                && situacao != SituacaoAvaliacaoServidor.CONSENSO_CRIADO
+                                && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+                )
                 .podeAprovarConsenso(usuarioEhServidorAvaliado)
                 .habilitarAprovarConsenso(usuarioEhServidorAvaliado && situacao == SituacaoAvaliacaoServidor.CONSENSO_CRIADO)
                 .build();
@@ -289,6 +304,21 @@ public class DiagnosticoConsultaService {
 
     private Integer resolverConsensoDominio(AvaliacaoServidor avaliacao) {
         return consensoEspelhadoDaAutoavaliacao(avaliacao) ? null : avaliacao.getConsensoDominio();
+    }
+
+    private Integer resolverImportanciaServidorParaConsenso(AvaliacaoServidor avaliacao) {
+        return autoavaliacaoDisponivelParaConsenso(avaliacao) ? avaliacao.getAutoimportancia() : null;
+    }
+
+    private Integer resolverDominioServidorParaConsenso(AvaliacaoServidor avaliacao) {
+        return autoavaliacaoDisponivelParaConsenso(avaliacao) ? avaliacao.getAutodominio() : null;
+    }
+
+    private boolean autoavaliacaoDisponivelParaConsenso(AvaliacaoServidor avaliacao) {
+        return switch (avaliacao.getSituacaoServidor()) {
+            case AUTOAVALIACAO_CONCLUIDA, CONSENSO_CRIADO, CONSENSO_APROVADO -> true;
+            case AUTOAVALIACAO_NAO_INICIADA, AVALIACAO_IMPOSSIBILITADA -> false;
+        };
     }
 
     private boolean consensoEspelhadoDaAutoavaliacao(AvaliacaoServidor avaliacao) {

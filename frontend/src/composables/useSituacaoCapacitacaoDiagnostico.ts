@@ -3,6 +3,7 @@ import {computed, ref, watch} from 'vue';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade, salvarSituacoesCapacitacao} from '@/services/diagnosticoService';
 import type {
+    AvaliacaoCompetencia,
     DiagnosticoUnidade,
     SituacaoCapacitacaoItem,
     ValorSituacaoCapacitacao
@@ -30,10 +31,10 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     const salvandoAutomaticamente = ref(false);
 
     watch(
-        () => query.data.value?.situacoesCapacitacao,
-        (novas) => {
-            if (novas) {
-                situacoesLocais.value = novas.map((o) => ({...o}));
+        () => query.data.value,
+        (novoDiagnostico) => {
+            if (novoDiagnostico) {
+                situacoesLocais.value = montarSituacoesLocais(novoDiagnostico);
             }
         },
         {immediate: true},
@@ -66,7 +67,7 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     function atualizarCapacitacao(
         servidorTitulo: string,
         competenciaCodigo: number,
-        situacao: ValorSituacaoCapacitacao,
+        situacao: ValorSituacaoCapacitacao | null,
     ) {
         const item = situacoesLocais.value.find(
             (o) => o.servidorTitulo === servidorTitulo && o.competenciaCodigo === competenciaCodigo,
@@ -97,5 +98,44 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
         salvandoAutomaticamente,
         pendentes,
         atualizarCapacitacao,
+    };
+}
+
+function montarSituacoesLocais(diagnostico: DiagnosticoUnidade): SituacaoCapacitacaoItem[] {
+    const situacoesExistentes = new Map(
+        (diagnostico.situacoesCapacitacao ?? []).map((item) => [
+            `${item.servidorTitulo}-${item.competenciaCodigo}`,
+            {...item},
+        ]),
+    );
+
+    const situacoesCompletas: SituacaoCapacitacaoItem[] = [];
+
+    for (const servidor of diagnostico.servidores ?? []) {
+        if (servidor.situacaoServidor !== 'CONSENSO_APROVADO') {
+            continue;
+        }
+
+        for (const consenso of servidor.consenso ?? []) {
+            situacoesCompletas.push(
+                situacoesExistentes.get(`${servidor.servidorTitulo}-${consenso.competenciaCodigo}`)
+                ?? criarSituacaoCapacitacaoPendente(servidor.servidorTitulo, servidor.servidorNome, consenso),
+            );
+        }
+    }
+
+    return situacoesCompletas;
+}
+
+function criarSituacaoCapacitacaoPendente(
+    servidorTitulo: string,
+    servidorNome: string,
+    consenso: AvaliacaoCompetencia,
+): SituacaoCapacitacaoItem {
+    return {
+        servidorTitulo,
+        servidorNome,
+        competenciaCodigo: consenso.competenciaCodigo,
+        situacaoCapacitacao: null,
     };
 }

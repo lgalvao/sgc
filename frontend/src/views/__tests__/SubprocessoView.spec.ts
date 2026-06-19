@@ -8,6 +8,7 @@ import * as processoService from '@/services/processo';
 import * as useAcessoModule from '@/composables/acesso';
 import {TEXTOS} from "@/constants/textos";
 import type {PermissoesSubprocesso} from '@/types/subprocesso-contexto';
+import {TEXTOS_DIAGNOSTICO} from '@/constants/textos-diagnostico';
 
 vi.mock('vue-router', () => ({
     useRoute: () => ({params: {codProcesso: '1', siglaUnidade: 'TEST'}, query: {}}),
@@ -92,6 +93,18 @@ vi.mock('@/services/processo', () => ({
     enviarLembrete: vi.fn(),
 }));
 
+const fluxoDiagnosticoMock = {
+    concluindo: ref(false),
+    erroConcluir: ref<Error | null>(null),
+    erroValidacaoConcluir: ref<Error | null>(null),
+    validarConclusaoDiagnostico: vi.fn(),
+    concluirDiagnostico: vi.fn(),
+};
+
+vi.mock('@/composables/useFluxoDiagnostico', () => ({
+    useFluxoDiagnostico: () => fluxoDiagnosticoMock,
+}));
+
 const fluxoSubprocessoMock = {
     alterarDataLimiteSubprocesso: vi.fn(),
     reabrirCadastro: vi.fn(),
@@ -163,7 +176,8 @@ describe('SubprocessoView.vue', () => {
         },
         AppAlert: {
             name: 'AppAlert',
-            template: '<div><button @click="$emit(\'dismissed\')">x</button></div>'
+            props: ['mensagem'],
+            template: '<div data-testid="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>'
         },
         BModal: {
             template: '<div><slot /><slot name="footer" /></div>',
@@ -204,6 +218,11 @@ describe('SubprocessoView.vue', () => {
         fluxoSubprocessoMock.reabrirRevisaoCadastro.mockResolvedValue(true);
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = null;
+        fluxoDiagnosticoMock.concluindo.value = false;
+        fluxoDiagnosticoMock.erroConcluir.value = null;
+        fluxoDiagnosticoMock.erroValidacaoConcluir.value = null;
+        fluxoDiagnosticoMock.validarConclusaoDiagnostico.mockReset();
+        fluxoDiagnosticoMock.concluirDiagnostico.mockReset();
         subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade = vi.fn().mockImplementation(async () => {
             subprocessoStoreMock.contextoEdicao = {detalhes: mockSubprocesso};
             return {
@@ -729,5 +748,33 @@ describe('SubprocessoView.vue', () => {
         expect(wrapper.find('[data-testid="diagnostico-equipe-painel"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(false);
         expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
+    });
+
+    it('reexibe o mesmo alerta ao repetir validação de conclusão com pendências', async () => {
+        const erroPendencias = new Error(TEXTOS_DIAGNOSTICO.ERRO_PENDENCIAS_CONCLUSAO);
+        fluxoDiagnosticoMock.validarConclusaoDiagnostico.mockRejectedValue(erroPendencias);
+
+        const {wrapper} = mountComponent({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            permissoes: {
+                podeCriarConsenso: true,
+                podeConcluirDiagnostico: true,
+                habilitarConcluirDiagnostico: true,
+            }
+        });
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-concluir-diagnostico-cabecalho"]').trigger('click');
+        await flushPromises();
+        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain(TEXTOS_DIAGNOSTICO.ERRO_PENDENCIAS_CONCLUSAO);
+
+        await wrapper.find('[data-testid="btn-dismiss-alert"]').trigger('click');
+        await flushPromises();
+        expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(false);
+
+        await wrapper.find('[data-testid="btn-concluir-diagnostico-cabecalho"]').trigger('click');
+        await flushPromises();
+        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain(TEXTOS_DIAGNOSTICO.ERRO_PENDENCIAS_CONCLUSAO);
+        expect(fluxoDiagnosticoMock.validarConclusaoDiagnostico).toHaveBeenCalledTimes(2);
     });
 });

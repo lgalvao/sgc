@@ -2,6 +2,7 @@
   <LayoutPadrao>
     <AppAlert
         v-if="notificacao"
+        :chave="notificacao.chave"
         :dispensavel="notificacao.dispensavel ?? true"
         :mensagem="notificacao.mensagem"
         :variante="notificacao.variante"

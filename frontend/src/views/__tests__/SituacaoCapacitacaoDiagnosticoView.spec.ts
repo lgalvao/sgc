@@ -153,6 +153,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
 
     it('exercita empty state e update capacitacao', async () => {
         situacoesLocaisVal.value = [];
+        servidoresVal.value = [];
         const wrapperEmpty = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
                 codSubprocesso: 400,

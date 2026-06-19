@@ -45,7 +45,11 @@ public class SubprocessoConsultaService {
     }
 
     public MapaCompletoDto mapaCompletoDtoPorSubprocesso(Long codSubprocesso) {
-        return mapaDtoMapper.paraMapaCompletoDto(mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso));
+        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        Mapa mapa = subprocesso.getProcesso().getTipo() == TipoProcesso.DIAGNOSTICO
+                ? mapaManutencaoService.mapaCompletoVigenteUnidade(subprocesso.getUnidade().getCodigo())
+                : mapaManutencaoService.mapaCompletoSubprocesso(codSubprocesso);
+        return mapaDtoMapper.paraMapaCompletoDto(mapa);
     }
 
     public SugestoesDto obterSugestoes(Long codSubprocesso) {

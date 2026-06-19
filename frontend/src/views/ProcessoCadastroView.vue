@@ -15,6 +15,7 @@
       <BForm class="mt-4" @submit.prevent>
         <AppAlert
             v-if="notificacao"
+            :chave="notificacao.chave"
             :dispensavel="notificacao.dispensavel"
             :mensagem="notificacao.mensagem"
             :notification="notificacao.notificacao"

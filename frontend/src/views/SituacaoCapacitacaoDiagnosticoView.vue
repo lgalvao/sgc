@@ -18,7 +18,7 @@
 
       <BCard class="mb-4">
         <EmptyState
-            v-if="situacoesLocais.length === 0"
+            v-if="servidores.length === 0"
             :description="TEXTOS.diagnostico.VAZIO_CAPACITACAO_TEXTO"
             :title="TEXTOS.diagnostico.VAZIO_CAPACITACAO_TITULO"
             icon="bi-award"

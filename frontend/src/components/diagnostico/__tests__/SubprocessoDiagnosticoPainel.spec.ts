@@ -243,6 +243,12 @@ describe('SubprocessoDiagnosticoPainel', () => {
         expect(wrapper.get('[data-testid="btn-desfazer-impossibilidade-242426"]').attributes('disabled')).toBeDefined();
     });
 
+    it('configura o dropdown de ações da grade para teleportar o menu ao body', () => {
+        const wrapper = montar();
+
+        expect(wrapper.get('[data-testid="dropdown-acoes-242426"]').attributes('teleport-to')).toBe('body');
+    });
+
     it('valida justificativa obrigatória e registra impossibilidade sem exibir alerta de sucesso', async () => {
         impossibilitarAvaliacaoMock.mockResolvedValue(undefined);
         const wrapper = montar();

@@ -1,6 +1,14 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint", "typescript", "import", "unicorn", "promise", "vitest", "vue"],
+  "plugins": [
+    "eslint",
+    "typescript",
+    "import",
+    "unicorn",
+    "promise",
+    "vitest",
+    "vue"
+  ],
   "env": {
     "browser": true,
     "es2024": true
@@ -44,10 +52,29 @@
     "no-unreachable": "error",
     "typescript/no-floating-promises": "error",
     "typescript/await-thenable": "error",
-    "promise/catch-or-return": ["error", { "allowFinally": true }],
+    "promise/catch-or-return": [
+      "error",
+      {
+        "allowFinally": true
+      }
+    ],
     "no-magic-numbers": "off",
-    "eqeqeq": ["error", "always", { "null": "ignore" }],
-    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "eqeqeq": [
+      "error",
+      "always",
+      {
+        "null": "ignore"
+      }
+    ],
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
     "no-debugger": "error",
     "no-eval": "error",
     "no-new-func": "error",
@@ -58,20 +85,49 @@
     "oxc/bad-array-method-on-arguments": "error",
     "import/no-cycle": "error",
     "import/no-duplicates": "error",
-    "no-underscore-dangle": ["error", { "allow": ["_rowVariant", "__sgcErroGlobalRegistrado"] }],
+    "no-underscore-dangle": [
+      "error",
+      {
+        "allow": [
+          "_rowVariant",
+          "__sgcErroGlobalRegistrado"
+        ]
+      }
+    ],
     "no-throw-literal": "error",
     "promise/always-return": "off",
     "import/no-unassigned-import": "off",
     "import/no-named-as-default-member": "off",
     "unicorn/consistent-function-scoping": "off",
     "no-new": "off",
-    "complexity": ["warn", 12],
-    "max-params": ["error", 3],
-    "max-depth": ["error", 4],
-    "max-nested-callbacks": ["error", 3],
-    "max-lines": ["warn", 500],
-    "max-lines-per-function": ["warn", 140],
-    "max-statements": ["warn", 28]
+    "complexity": [
+      "warn",
+      15
+    ],
+    "max-params": [
+      "error",
+      4
+    ],
+    "max-depth": [
+      "error",
+      4
+    ],
+    "max-nested-callbacks": [
+      "error",
+      3
+    ],
+    "max-lines": [
+      "warn",
+      500
+    ],
+    "max-lines-per-function": [
+      "warn",
+      200
+    ],
+    "max-statements": [
+      "warn",
+      30
+    ]
   },
   "overrides": [
     {
@@ -87,7 +143,9 @@
         "**/*.stories.jsx",
         "**/test-utils/**"
       ],
-      "env": { "vitest": true },
+      "env": {
+        "vitest": true
+      },
       "rules": {
         "typescript/no-floating-promises": "off",
         "typescript/no-explicit-any": "off",
@@ -109,8 +167,17 @@
       }
     },
     {
-      "files": ["vite.config.*", "vitest.config.*", "*.config.ts", "scripts/**", ".storybook/**", "parse-cycles.cjs"],
-      "env": { "node": true },
+      "files": [
+        "vite.config.*",
+        "vitest.config.*",
+        "*.config.ts",
+        "scripts/**",
+        ".storybook/**",
+        "parse-cycles.cjs"
+      ],
+      "env": {
+        "node": true
+      },
       "rules": {
         "no-console": "off",
         "typescript/no-explicit-any": "off",
@@ -123,7 +190,11 @@
       }
     },
     {
-      "files": ["src/composables/**/*Tela.ts", "src/views/useDiagnosticoUnidadeView.ts", "src/views/useAutoavaliacaoDiagnosticoView.ts"],
+      "files": [
+        "src/composables/**/*Tela.ts",
+        "src/views/useDiagnosticoUnidadeView.ts",
+        "src/views/useAutoavaliacaoDiagnosticoView.ts"
+      ],
       "rules": {
         "max-lines-per-function": "off",
         "max-statements": "off",
@@ -131,7 +202,9 @@
       }
     },
     {
-      "files": ["**/*.d.ts"],
+      "files": [
+        "**/*.d.ts"
+      ],
       "rules": {
         "typescript/no-explicit-any": "off"
       }

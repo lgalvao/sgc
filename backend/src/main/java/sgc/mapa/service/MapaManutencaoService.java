@@ -117,6 +117,21 @@ public class MapaManutencaoService {
                         "Mapa completo não encontrado para subprocesso %s".formatted(subprocessoCodigo)));
     }
 
+    public Mapa mapaCompletoVigenteUnidade(Long unidadeCodigo) {
+        Long codigoMapaVigente = mapaVigenteUnidade(unidadeCodigo)
+                .map(Mapa::getCodigo)
+                .orElse(null);
+
+        if (codigoMapaVigente == null) {
+            throw new ErroInconsistenciaInterna(
+                    "Mapa vigente completo não encontrado para unidade %s".formatted(unidadeCodigo));
+        }
+
+        return mapaRepo.buscarCompletoPorCodigo(codigoMapaVigente)
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Mapa vigente completo não encontrado para unidade %s".formatted(unidadeCodigo)));
+    }
+
     public Mapa mapaComCompetenciasEAtividadesSubprocesso(Long subprocessoCodigo) {
         return mapaRepo.buscarComCompetenciasEAtividadesPorSubprocesso(subprocessoCodigo)
                 .orElseThrow(() -> new ErroInconsistenciaInterna(

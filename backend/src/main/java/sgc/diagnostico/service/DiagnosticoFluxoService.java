@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.model.ComumRepo;
+import sgc.comum.erros.ErroInconsistenciaInterna;
 import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.DiagnosticoRepo;
 import java.util.Optional;
@@ -77,39 +78,44 @@ public class DiagnosticoFluxoService {
         List<AvaliacaoServidor> avaliacoes = new ArrayList<>();
         List<SituacaoCapacitacao> situacaoCapacitacoes = new ArrayList<>();
 
-        Mapa mapa = subprocesso.getMapa();
-        if (mapa != null) {
-            UnidadeProcesso unidadeSnapshot = subprocesso.getProcesso()
-                    .buscarParticipante(subprocesso.getUnidade().getCodigo())
-                    .orElse(null);
-            for (Usuario servidor : servidores) {
-                ServidorProcesso servidorSnapshot = localizarSnapshotObrigatorio(servidoresSnapshot, servidor.getTituloEleitoral());
-                for (Competencia competencia : mapa.getCompetencias()) {
-                    AvaliacaoServidor avaliacao = AvaliacaoServidor.builder()
-                            .diagnostico(diagnostico)
-                            .servidor(servidor)
-                            .servidorNomeSnapshot(servidorSnapshot.getNome())
-                            .competencia(competencia)
-                            .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
-                            .build();
-                    avaliacoes.add(avaliacao);
+        Mapa mapa = resolverMapaDiagnostico(subprocesso);
+        UnidadeProcesso unidadeSnapshot = subprocesso.getProcesso()
+                .buscarParticipante(subprocesso.getUnidade().getCodigo())
+                .orElse(null);
+        for (Usuario servidor : servidores) {
+            ServidorProcesso servidorSnapshot = localizarSnapshotObrigatorio(servidoresSnapshot, servidor.getTituloEleitoral());
+            for (Competencia competencia : mapa.getCompetencias()) {
+                AvaliacaoServidor avaliacao = AvaliacaoServidor.builder()
+                        .diagnostico(diagnostico)
+                        .servidor(servidor)
+                        .servidorNomeSnapshot(servidorSnapshot.getNome())
+                        .competencia(competencia)
+                        .situacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
+                        .build();
+                avaliacoes.add(avaliacao);
 
-                    situacaoCapacitacoes.add(SituacaoCapacitacao.builder()
-                            .diagnostico(diagnostico)
-                            .servidor(servidor)
-                            .servidorNomeSnapshot(servidorSnapshot.getNome())
-                            .unidadeCodigoSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : subprocesso.getUnidade().getCodigo())
-                            .unidadeSiglaSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : subprocesso.getUnidade().getSigla())
-                            .unidadeNomeSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getNome() : subprocesso.getUnidade().getNome())
-                            .competencia(competencia)
-                            .build());
-                }
+                situacaoCapacitacoes.add(SituacaoCapacitacao.builder()
+                        .diagnostico(diagnostico)
+                        .servidor(servidor)
+                        .servidorNomeSnapshot(servidorSnapshot.getNome())
+                        .unidadeCodigoSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getUnidadeCodigoPersistido() : subprocesso.getUnidade().getCodigo())
+                        .unidadeSiglaSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getSigla() : subprocesso.getUnidade().getSigla())
+                        .unidadeNomeSnapshot(unidadeSnapshot != null ? unidadeSnapshot.getNome() : subprocesso.getUnidade().getNome())
+                        .competencia(competencia)
+                        .build());
             }
         }
 
         diagnostico.setAvaliacaoServidores(avaliacoes);
         diagnostico.setSituacaoCapacitacoes(situacaoCapacitacoes);
         diagnosticoRepo.save(diagnostico);
+    }
+
+    private Mapa resolverMapaDiagnostico(Subprocesso subprocesso) {
+        return unidadeService.buscarMapaVigente(subprocesso.getUnidade().getCodigo())
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Processo de diagnóstico sem mapa vigente para a unidade %s".formatted(subprocesso.getUnidade().getSigla())
+                ));
     }
 
     private List<Usuario> carregarServidoresSnapshot(List<ServidorProcesso> servidoresSnapshot) {

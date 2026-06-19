@@ -1,5 +1,6 @@
 <template>
   <BAlert
+      :key="chave"
       v-if="mensagem || notificacao"
       :dismissible="dispensavel"
       :fade="false"
@@ -63,10 +64,12 @@ interface NotificacaoEstruturada {
 withDefaults(defineProps<{
   mensagem?: string;
   notificacao?: NotificacaoEstruturada;
+  chave?: number;
   variante?: 'danger' | 'warning' | 'success' | 'info';
   dispensavel?: boolean;
   stackTrace?: string;
 }>(), {
+  chave: undefined,
   mensagem: undefined,
   notificacao: undefined,
   variante: 'danger',

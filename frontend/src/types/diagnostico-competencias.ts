@@ -33,11 +33,13 @@ export interface AvaliacaoCompetencia {
 export interface ConsensoCompetenciaDetalhada {
     competenciaCodigo: number;
     competenciaDescricao?: string | null;
-    autoimportancia: number | null;
-    autodominio: number | null;
+
+    servidorImportancia: number | null;
     chefiaImportancia: number | null;
-    chefiaDominio: number | null;
     consensoImportancia: number | null;
+
+    servidorDominio: number | null;
+    chefiaDominio: number | null;
     consensoDominio: number | null;
 }
 

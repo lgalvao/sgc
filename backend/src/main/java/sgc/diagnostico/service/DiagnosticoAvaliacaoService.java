@@ -96,6 +96,8 @@ public class DiagnosticoAvaliacaoService {
             if (avaliacao == null) continue;
             avaliacao.setChefiaImportancia(item.chefiaImportancia());
             avaliacao.setChefiaDominio(item.chefiaDominio());
+            avaliacao.setConsensoImportancia(item.consensoImportancia());
+            avaliacao.setConsensoDominio(item.consensoDominio());
             avaliacao.setImportancia(item.consensoImportancia());
             avaliacao.setDominio(item.consensoDominio());
             gapService.recalcularGap(avaliacao);
@@ -144,6 +146,8 @@ public class DiagnosticoAvaliacaoService {
             a.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
             a.setImportancia(null);
             a.setDominio(null);
+            a.setConsensoImportancia(null);
+            a.setConsensoDominio(null);
             a.setGap(null);
             a.setObservacao(justificativa);
         });
@@ -184,14 +188,18 @@ public class DiagnosticoAvaliacaoService {
             if (situacaoRetorno == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA) {
                 a.setImportancia(null);
                 a.setDominio(null);
+                a.setConsensoImportancia(null);
+                a.setConsensoDominio(null);
                 a.setGap(null);
             } else if (situacaoRetorno == SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA) {
                 a.setImportancia(a.getAutoimportancia());
                 a.setDominio(a.getAutodominio());
                 a.calculaGap();
             } else {
-                a.setImportancia(a.getChefiaImportancia() != null ? a.getChefiaImportancia() : a.getAutoimportancia());
-                a.setDominio(a.getChefiaDominio() != null ? a.getChefiaDominio() : a.getAutodominio());
+                a.setImportancia(a.getConsensoImportancia() != null ? a.getConsensoImportancia()
+                        : a.getChefiaImportancia() != null ? a.getChefiaImportancia() : a.getAutoimportancia());
+                a.setDominio(a.getConsensoDominio() != null ? a.getConsensoDominio()
+                        : a.getChefiaDominio() != null ? a.getChefiaDominio() : a.getAutodominio());
                 a.calculaGap();
             }
         });

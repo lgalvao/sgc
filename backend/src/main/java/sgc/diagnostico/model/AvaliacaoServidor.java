@@ -44,6 +44,12 @@ public class AvaliacaoServidor extends EntidadeBase {
     @Column(name = "chefia_dominio")
     private Integer chefiaDominio;
 
+    @Column(name = "consenso_importancia")
+    private Integer consensoImportancia;
+
+    @Column(name = "consenso_dominio")
+    private Integer consensoDominio;
+
     @Column(name ="importancia")
     private Integer importancia;
 
@@ -73,13 +79,5 @@ public class AvaliacaoServidor extends EntidadeBase {
             return servidorNomeSnapshot;
         }
         return servidor != null ? servidor.getNome() : null;
-    }
-
-    public Integer getConsensoImportancia() {
-        return importancia;
-    }
-
-    public Integer getConsensoDominio() {
-        return dominio;
     }
 }

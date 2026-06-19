@@ -15,6 +15,7 @@ import sgc.diagnostico.model.Diagnostico;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoCapacitacao;
 import sgc.diagnostico.model.SituacaoCapacitacaoRepo;
+import sgc.mapa.model.Mapa;
 import sgc.mapa.model.Competencia;
 import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.SituacaoUnidade;
@@ -22,6 +23,7 @@ import sgc.organizacao.model.TipoUnidade;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
 import sgc.organizacao.service.ResponsavelUnidadeService;
+import sgc.organizacao.service.UnidadeService;
 import sgc.processo.model.Processo;
 import sgc.subprocesso.SubprocessoDtoMapper;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -34,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,9 +50,50 @@ class DiagnosticoConsultaServiceTest {
     @Mock DiagnosticoUsuarioContextoService usuarioContextoService;
     @Mock SubprocessoVisualizacaoService subprocessoVisualizacaoService;
     @Mock ResponsavelUnidadeService responsavelUnidadeService;
+    @Mock UnidadeService unidadeService;
 
     @InjectMocks
     DiagnosticoConsultaService service;
+
+    @Test
+    @DisplayName("obterContexto deve usar o mapa vigente da unidade quando o subprocesso nao tiver mapa proprio")
+    void obterContexto_deveUsarMapaVigenteDaUnidade() {
+        Long codSubprocesso = 400L;
+        Long codDiagnostico = 900L;
+        Unidade unidade = unidade(12L, "ASSESSORIA_12", "Assessoria 12");
+        Subprocesso subprocesso = subprocesso(codSubprocesso, unidade);
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Mapa mapaVigente = new Mapa();
+        mapaVigente.setCompetencias(java.util.Set.of(competencia(1L, "Competência vigente")));
+
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(unidadeService.buscarMapaVigente(unidade.getCodigo())).thenReturn(Optional.of(mapaVigente));
+
+        var dto = service.obterContexto(codSubprocesso);
+
+        assertThat(dto.competencias()).singleElement().satisfies(item -> {
+            assertThat(item.competenciaCodigo()).isEqualTo(1L);
+            assertThat(item.descricao()).isEqualTo("Competência vigente");
+        });
+    }
+
+    @Test
+    @DisplayName("obterContexto deve falhar com erro interno quando nao houver mapa vigente da unidade")
+    void obterContexto_deveFalharSemMapaVigente() {
+        Long codSubprocesso = 400L;
+        Long codDiagnostico = 900L;
+        Unidade unidade = unidade(12L, "ASSESSORIA_12", "Assessoria 12");
+        Subprocesso subprocesso = subprocesso(codSubprocesso, unidade);
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(unidadeService.buscarMapaVigente(unidade.getCodigo())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obterContexto(codSubprocesso))
+                .hasMessageContaining("Processo de diagnóstico sem mapa vigente");
+    }
 
     @Test
     @DisplayName("obterEquipe deve ocultar o responsável da unidade da lista de servidores")
@@ -127,11 +171,113 @@ class DiagnosticoConsultaServiceTest {
         var dto = service.obterConsenso(codSubprocesso, "242426");
 
         assertThat(dto.competencias()).singleElement().satisfies(item -> {
-            assertThat(item.autoimportancia()).isEqualTo(4);
-            assertThat(item.autodominio()).isEqualTo(3);
+            assertThat(item.servidorImportancia()).isEqualTo(4);
+            assertThat(item.servidorDominio()).isEqualTo(3);
             assertThat(item.consensoImportancia()).isNull();
             assertThat(item.consensoDominio()).isNull();
         });
+    }
+
+    @Test
+    @DisplayName("obterConsenso nao deve expor autoavaliacao salva por autosave antes da conclusao")
+    void obterConsenso_naoDeveExporRascunhoAutoavaliacaoAntesDaConclusao() {
+        Long codSubprocesso = 403L;
+        Long codDiagnostico = 903L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("151515");
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+        avaliacao.setAutoimportancia(4);
+        avaliacao.setAutodominio(3);
+        avaliacao.setImportancia(4);
+        avaliacao.setDominio(3);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        var dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.competencias()).singleElement().satisfies(item -> {
+            assertThat(item.servidorImportancia()).isNull();
+            assertThat(item.servidorDominio()).isNull();
+        });
+    }
+
+    @Test
+    @DisplayName("obterConsenso deve expor autoavaliacao do servidor apos conclusao")
+    void obterConsenso_deveExporAutoavaliacaoAposConclusao() {
+        Long codSubprocesso = 404L;
+        Long codDiagnostico = 904L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("151515");
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        avaliacao.setAutoimportancia(4);
+        avaliacao.setAutodominio(3);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        var dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.competencias()).singleElement().satisfies(item -> {
+            assertThat(item.servidorImportancia()).isEqualTo(4);
+            assertThat(item.servidorDominio()).isEqualTo(3);
+        });
+    }
+
+    @Test
+    @DisplayName("obterConsenso nao deve usar o ultimo valor corrente do servidor como consenso quando nao houver consenso salvo")
+    void obterConsenso_naoDeveUsarUltimoValorCorrenteComoConsenso() {
+        Long codSubprocesso = 401L;
+        Long codDiagnostico = 901L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("151515");
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        avaliacao.setAutoimportancia(4);
+        avaliacao.setAutodominio(3);
+        avaliacao.setChefiaImportancia(6);
+        avaliacao.setChefiaDominio(5);
+        avaliacao.setConsensoImportancia(null);
+        avaliacao.setConsensoDominio(null);
+        avaliacao.setImportancia(4);
+        avaliacao.setDominio(3);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        var dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.competencias()).singleElement().satisfies(item -> {
+            assertThat(item.servidorImportancia()).isEqualTo(4);
+            assertThat(item.chefiaImportancia()).isEqualTo(6);
+            assertThat(item.consensoImportancia()).isNull();
+            assertThat(item.consensoDominio()).isNull();
+        });
+    }
+
+    @Test
+    @DisplayName("obterConsenso deve desabilitar concluir avaliacao quando o consenso ja foi criado")
+    void obterConsenso_deveDesabilitarConclusaoQuandoConsensoCriado() {
+        Long codSubprocesso = 402L;
+        Long codDiagnostico = 902L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("151515");
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        var dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.podeConcluirAvaliacao()).isTrue();
+        assertThat(dto.habilitarConcluirAvaliacao()).isFalse();
     }
 
     @Test
@@ -284,5 +430,12 @@ class DiagnosticoConsultaServiceTest {
         competencia.setCodigo(competenciaCodigo);
         situacao.setCompetencia(competencia);
         return situacao;
+    }
+
+    private Competencia competencia(Long codigo, String descricao) {
+        Competencia competencia = new Competencia();
+        competencia.setCodigo(codigo);
+        competencia.setDescricao(descricao);
+        return competencia;
     }
 }

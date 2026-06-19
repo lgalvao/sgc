@@ -617,6 +617,8 @@ create table if not exists sgc.avaliacao_servidor
     autodominio        int check (autodominio between 0 and 6),
     chefia_importancia int check (chefia_importancia between 0 and 6),
     chefia_dominio     int check (chefia_dominio between 0 and 6),
+    consenso_importancia int check (consenso_importancia between 0 and 6),
+    consenso_dominio     int check (consenso_dominio between 0 and 6),
     importancia        int check (importancia between 0 and 6),
     dominio            int check (dominio between 0 and 6),
     gap                int,
@@ -679,6 +681,8 @@ alter table if exists sgc.avaliacao_servidor add column if not exists autoimport
 alter table if exists sgc.avaliacao_servidor add column if not exists autodominio int;
 alter table if exists sgc.avaliacao_servidor add column if not exists chefia_importancia int;
 alter table if exists sgc.avaliacao_servidor add column if not exists chefia_dominio int;
+alter table if exists sgc.avaliacao_servidor add column if not exists consenso_importancia int;
+alter table if exists sgc.avaliacao_servidor add column if not exists consenso_dominio int;
 alter table if exists sgc.situacao_capacitacao add column if not exists servidor_nome_snapshot varchar(255);
 alter table if exists sgc.situacao_capacitacao add column if not exists unidade_codigo_snapshot bigint;
 alter table if exists sgc.situacao_capacitacao add column if not exists unidade_sigla_snapshot varchar(20);

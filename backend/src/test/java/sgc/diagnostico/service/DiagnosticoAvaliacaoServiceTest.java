@@ -144,7 +144,7 @@ class DiagnosticoAvaliacaoServiceTest {
     // ─── salvarConsenso ────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("salvarConsenso com detalhados: deve gravar chefiaImportancia, chefiaDominio, importancia (consenso) e dominio (consenso) sem concluir")
+    @DisplayName("salvarConsenso com detalhados: deve gravar chefia, consenso persistido e valor corrente sem concluir")
     void salvarConsenso_comDetalhados_deveGravarCamposDaChefia() {
         Long codSubprocesso = 3L;
         Long diagCodigo = 30L;
@@ -165,6 +165,8 @@ class DiagnosticoAvaliacaoServiceTest {
 
         assertThat(avaliacao.getChefiaImportancia()).isEqualTo(4);
         assertThat(avaliacao.getChefiaDominio()).isEqualTo(3);
+        assertThat(avaliacao.getConsensoImportancia()).isEqualTo(4);
+        assertThat(avaliacao.getConsensoDominio()).isEqualTo(3);
         assertThat(avaliacao.getImportancia()).isEqualTo(4);   // consenso
         assertThat(avaliacao.getDominio()).isEqualTo(3);        // consenso
         assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
@@ -196,6 +198,8 @@ class DiagnosticoAvaliacaoServiceTest {
 
         assertThat(avaliacao.getChefiaImportancia()).isEqualTo(5);
         assertThat(avaliacao.getChefiaDominio()).isEqualTo(3);
+        assertThat(avaliacao.getConsensoImportancia()).isEqualTo(5);
+        assertThat(avaliacao.getConsensoDominio()).isEqualTo(3);
         assertThat(avaliacao.getImportancia()).isEqualTo(5);
         assertThat(avaliacao.getDominio()).isEqualTo(3);
         assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
@@ -225,8 +229,8 @@ class DiagnosticoAvaliacaoServiceTest {
         var request = new ConsensoRequest(
                 List.of(ConsensoCompetenciaDto.builder()
                         .competenciaCodigo(competenciaPrimeira)
-                        .autoimportancia(autoimportanciaPrimeira)
-                        .autodominio(autodominioPrimeira)
+                        .servidorImportancia(autoimportanciaPrimeira)
+                        .servidorDominio(autodominioPrimeira)
                         .chefiaImportancia(chefiaImportanciaPrimeira)
                         .chefiaDominio(chefiaDominioPrimeira)
                         .consensoImportancia(chefiaImportanciaPrimeira)
@@ -238,10 +242,14 @@ class DiagnosticoAvaliacaoServiceTest {
 
         assertThat(avaliacao1.getChefiaImportancia()).isEqualTo(chefiaImportanciaPrimeira);
         assertThat(avaliacao1.getChefiaDominio()).isEqualTo(chefiaDominioPrimeira);
+        assertThat(avaliacao1.getConsensoImportancia()).isEqualTo(chefiaImportanciaPrimeira);
+        assertThat(avaliacao1.getConsensoDominio()).isEqualTo(chefiaDominioPrimeira);
         assertThat(avaliacao1.getImportancia()).isEqualTo(chefiaImportanciaPrimeira);
         assertThat(avaliacao1.getDominio()).isEqualTo(chefiaDominioPrimeira);
         assertThat(avaliacao2.getChefiaImportancia()).isNull();
         assertThat(avaliacao2.getChefiaDominio()).isNull();
+        assertThat(avaliacao2.getConsensoImportancia()).isNull();
+        assertThat(avaliacao2.getConsensoDominio()).isNull();
         assertThat(avaliacao2.getImportancia()).isEqualTo(autoimportanciaSegunda);
         assertThat(avaliacao2.getDominio()).isEqualTo(autodominioSegunda);
         assertThat(avaliacao1.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
@@ -260,10 +268,14 @@ class DiagnosticoAvaliacaoServiceTest {
         AvaliacaoServidor avaliacao2 = avaliacaoComNota(302L, 3, 1);
         avaliacao1.setChefiaImportancia(5);
         avaliacao1.setChefiaDominio(4);
+        avaliacao1.setConsensoImportancia(5);
+        avaliacao1.setConsensoDominio(4);
         avaliacao1.setImportancia(5);
         avaliacao1.setDominio(4);
         avaliacao2.setChefiaImportancia(4);
         avaliacao2.setChefiaDominio(3);
+        avaliacao2.setConsensoImportancia(4);
+        avaliacao2.setConsensoDominio(3);
         avaliacao2.setImportancia(4);
         avaliacao2.setDominio(3);
         Subprocesso subprocesso = mock(Subprocesso.class);

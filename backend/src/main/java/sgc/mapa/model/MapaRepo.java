@@ -51,6 +51,17 @@ public interface MapaRepo extends JpaRepository<Mapa, Long> {
 
     @Query("""
             SELECT DISTINCT m FROM Mapa m
+            LEFT JOIN FETCH m.atividades a
+            LEFT JOIN FETCH a.conhecimentos k
+            LEFT JOIN FETCH a.competencias ac
+            LEFT JOIN FETCH m.competencias c
+            LEFT JOIN FETCH c.atividades ca
+            WHERE m.codigo = :codigo
+            """)
+    Optional<Mapa> buscarCompletoPorCodigo(@Param("codigo") Long codigo);
+
+    @Query("""
+            SELECT DISTINCT m FROM Mapa m
             LEFT JOIN FETCH m.subprocesso
             LEFT JOIN FETCH m.competencias c
             LEFT JOIN FETCH c.atividades a

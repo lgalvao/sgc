@@ -213,35 +213,31 @@ function invalidarQueriesAprovar(ctx: InvalidaQueriesContext) {
 }
 
 function normalizarCompetenciaConsenso(competencia: ConsensoCompetenciaDetalhada): ConsensoCompetenciaDetalhada {
-    const item = {...competencia};
+    const item: ConsensoCompetenciaDetalhada = {...competencia};
     aplicarAutopreenchimentoConsenso(item);
     return item;
 }
 
 function aplicarAutopreenchimentoConsenso(item: ConsensoCompetenciaDetalhada) {
-    if (item.chefiaImportancia === null) {
-        item.consensoImportancia = null;
-    }
+    item.consensoImportancia = obterValorAutopreenchidoConsenso(
+        item.servidorImportancia,
+        item.chefiaImportancia,
+        item.consensoImportancia,
+    );
+    item.consensoDominio = obterValorAutopreenchidoConsenso(
+        item.servidorDominio,
+        item.chefiaDominio,
+        item.consensoDominio,
+    );
+}
 
-    if (item.chefiaDominio === null) {
-        item.consensoDominio = null;
-    }
-
-    if (
-        item.consensoImportancia === null
-        && item.autoimportancia !== null
-        && item.chefiaImportancia !== null
-        && item.autoimportancia === item.chefiaImportancia
-    ) {
-        item.consensoImportancia = item.chefiaImportancia;
-    }
-
-    if (
-        item.consensoDominio === null
-        && item.autodominio !== null
-        && item.chefiaDominio !== null
-        && item.autodominio === item.chefiaDominio
-    ) {
-        item.consensoDominio = item.chefiaDominio;
-    }
+function obterValorAutopreenchidoConsenso(
+    valorServidor: number | null,
+    valorChefia: number | null,
+    valorConsenso: number | null,
+): number | null {
+    if (valorChefia === null) return null;
+    if (valorConsenso !== null) return valorConsenso;
+    if (valorServidor !== valorChefia) return valorConsenso;
+    return valorChefia;
 }

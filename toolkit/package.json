@@ -33,16 +33,5 @@
     "knip": "^6.17.1",
     "oxlint": "^1.70.0",
     "vitest": "^4.1.9"
-  },
-  "overrides": {
-    "js-yaml": "^4.2.0",
-    "openapi-typescript": {
-      "@redocly/openapi-core": {
-        "js-yaml": "^4.2.0"
-      }
-    },
-    "@redocly/openapi-core": {
-      "js-yaml": "^4.2.0"
-    }
   }
 }

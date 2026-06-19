@@ -51,11 +51,12 @@
         {{ erroGlobal }}
       </BAlert>
 
-      <AppAlert
-          v-if="notificacao"
-          :dispensavel="notificacao.dispensavel"
-          :mensagem="notificacao.mensagem"
-          :variante="notificacao.variante"
+        <AppAlert
+            v-if="notificacao"
+            :chave="notificacao.chave"
+            :dispensavel="notificacao.dispensavel"
+            :mensagem="notificacao.mensagem"
+            :variante="notificacao.variante"
           @dismissed="clear()"
       />
 

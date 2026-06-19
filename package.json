@@ -41,8 +41,6 @@
     "knip": "^6.17.1",
     "oxlint": "^1.70.0",
     "release-it": "^20.2.0",
-    "typescript": "^7.0.1-rc",
-    "typescript-eslint": "^8.61.1",
     "vite": "^8.0.16"
   },
   "allowScripts": {
@@ -51,32 +49,14 @@
     "esbuild@0.28.1": true
   },
   "overrides": {
-    "typescript": "$typescript",
     "vue-tsc": {
-      "typescript": "npm:@typescript/typescript6@latest"
+      "typescript": "^6.0.3"
     },
     "typescript-eslint": {
-      "typescript": "npm:@typescript/typescript6@latest"
+      "typescript": "^6.0.3"
     },
     "@typescript-eslint/parser": {
-      "typescript": "npm:@typescript/typescript6@latest"
-    },
-    "@typescript-eslint/utils": {
-      "typescript": "npm:@typescript/typescript6@latest"
-    },
-    "sgc-frontend": {
-      "vue-tsc": {
-        "typescript": "npm:@typescript/typescript6@latest"
-      },
-      "typescript-eslint": {
-        "typescript": "npm:@typescript/typescript6@latest"
-      },
-      "@typescript-eslint/parser": {
-        "typescript": "npm:@typescript/typescript6@latest"
-      },
-      "@typescript-eslint/utils": {
-        "typescript": "npm:@typescript/typescript6@latest"
-      }
+      "typescript": "^6.0.3"
     },
     "js-yaml": "^4.2.0",
     "undici": "^7.28.0",

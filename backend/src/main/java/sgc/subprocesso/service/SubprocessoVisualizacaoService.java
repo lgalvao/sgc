@@ -67,7 +67,9 @@ public class SubprocessoVisualizacaoService {
     }
 
     public ContextoEdicaoResponse montarContextoEdicao(Subprocesso subprocesso, SubprocessoDetalheResponse detalhes) {
-        Mapa mapaCompleto = mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo());
+        Mapa mapaCompleto = subprocesso.getProcesso().getTipo() == TipoProcesso.DIAGNOSTICO
+                ? mapaManutencaoService.mapaCompletoVigenteUnidade(subprocesso.getUnidade().getCodigo())
+                : mapaManutencaoService.mapaCompletoSubprocesso(subprocesso.getCodigo());
 
         return new ContextoEdicaoResponse(
                 organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()),

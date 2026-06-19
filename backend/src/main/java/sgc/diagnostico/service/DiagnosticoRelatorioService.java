@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroInconsistenciaInterna;
 import sgc.diagnostico.model.*;
+import sgc.mapa.model.Mapa;
 import sgc.relatorio.*;
+import sgc.organizacao.service.UnidadeService;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.LinkedHashMap;
@@ -19,6 +22,7 @@ public class DiagnosticoRelatorioService {
     private final DiagnosticoRepo diagnosticoRepo;
     private final AvaliacaoServidorRepo avaliacaoServidorRepo;
     private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
+    private final UnidadeService unidadeService;
 
     public RelatorioDiagnosticoGapDto criarRelatorioGapDiagnostico(Subprocesso subprocesso) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(subprocesso.getCodigo())
@@ -32,7 +36,7 @@ public class DiagnosticoRelatorioService {
                         java.util.stream.Collectors.toList()
                 ));
 
-        List<RelatorioDiagnosticoGapCompetenciaDto> competencias = subprocesso.getMapa().getCompetencias().stream()
+        List<RelatorioDiagnosticoGapCompetenciaDto> competencias = resolverMapaDiagnostico(subprocesso).getCompetencias().stream()
                 .map(competencia -> {
                     List<AvaliacaoServidor> avaliacoesCompetencia = avaliacoesPorCompetencia.getOrDefault(competencia.getCodigo(), List.of());
                     java.util.IntSummaryStatistics estatisticas = avaliacoesCompetencia.stream()
@@ -72,7 +76,7 @@ public class DiagnosticoRelatorioService {
                         java.util.stream.Collectors.toList()
                 ));
 
-        List<RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto> competencias = subprocesso.getMapa().getCompetencias().stream()
+        List<RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto> competencias = resolverMapaDiagnostico(subprocesso).getCompetencias().stream()
                 .map(competencia -> {
                     List<SituacaoCapacitacao> situacoesCompetencia = situacoesPorCompetencia.getOrDefault(competencia.getCodigo(), List.of());
                     return RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto.builder()
@@ -103,5 +107,11 @@ public class DiagnosticoRelatorioService {
 
     private double arredondarDuasCasas(double valor) {
         return Math.round(valor * 100.0d) / 100.0d;
+    }
+
+    private Mapa resolverMapaDiagnostico(Subprocesso subprocesso) {
+        return unidadeService.buscarMapaVigente(subprocesso.getUnidade().getCodigo())
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Processo de diagnóstico sem mapa vigente para a unidade %s".formatted(subprocesso.getUnidade().getCodigo())));
     }
 }

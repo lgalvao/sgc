@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -87,7 +88,7 @@ class DiagnosticoFluxoServiceTest {
     void inicializarDiagnostico_deveCriarEstruturaCompleta() {
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         Processo processo = subprocesso.getProcesso();
-        subprocesso.setMapa(mapa(101L, competencia(1L, "Competência 1"), competencia(2L, "Competência 2")));
+        Mapa mapaVigente = mapa(101L, competencia(1L, "Competência 1"), competencia(2L, "Competência 2"));
 
         Usuario servidor1 = usuario("242426", "Duff McKagan");
         Usuario servidor2 = usuario("242427", "Izzy Stradlin");
@@ -99,6 +100,7 @@ class DiagnosticoFluxoServiceTest {
                 .thenReturn(List.of(servidor1, servidor2));
         when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeOrigem.getCodigo()))
                 .thenReturn(java.util.Optional.empty());
+        when(unidadeService.buscarMapaVigente(unidadeOrigem.getCodigo())).thenReturn(java.util.Optional.of(mapaVigente));
 
         ArgumentCaptor<Diagnostico> captor = ArgumentCaptor.forClass(Diagnostico.class);
 
@@ -125,11 +127,56 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
+    @DisplayName("inicializarDiagnostico deve usar o mapa vigente da unidade quando o subprocesso nao tiver mapa proprio")
+    void inicializarDiagnostico_deveUsarMapaVigenteDaUnidade() {
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+        Processo processo = subprocesso.getProcesso();
+        Mapa mapaVigente = mapa(101L, competencia(1L, "Competência vigente"));
+
+        Usuario servidor = usuario("242426", "Duff McKagan");
+        processo.adicionarServidoresParticipantes(List.of(
+                servidorSnapshot(processo, unidadeOrigem.getCodigo(), servidor)
+        ));
+        when(usuarioService.buscarPorTitulos(List.of(servidor.getTituloEleitoral()))).thenReturn(List.of(servidor));
+        when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeOrigem.getCodigo()))
+                .thenReturn(java.util.Optional.empty());
+        when(unidadeService.buscarMapaVigente(unidadeOrigem.getCodigo())).thenReturn(java.util.Optional.of(mapaVigente));
+
+        ArgumentCaptor<Diagnostico> captor = ArgumentCaptor.forClass(Diagnostico.class);
+
+        service.inicializarDiagnostico(subprocesso);
+
+        verify(diagnosticoRepo).save(captor.capture());
+        Diagnostico salvo = captor.getValue();
+
+        assertThat(salvo.getAvaliacaoServidores()).singleElement().satisfies(avaliacao ->
+                assertThat(avaliacao.getCompetencia().getDescricao()).isEqualTo("Competência vigente"));
+    }
+
+    @Test
+    @DisplayName("inicializarDiagnostico deve falhar com erro interno quando nao houver mapa vigente da unidade")
+    void inicializarDiagnostico_deveFalharSemMapaVigente() {
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+        Processo processo = subprocesso.getProcesso();
+        Usuario servidor = usuario("242426", "Duff McKagan");
+        processo.adicionarServidoresParticipantes(List.of(
+                servidorSnapshot(processo, unidadeOrigem.getCodigo(), servidor)
+        ));
+        when(usuarioService.buscarPorTitulos(List.of(servidor.getTituloEleitoral()))).thenReturn(List.of(servidor));
+        when(responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeOrigem.getCodigo()))
+                .thenReturn(java.util.Optional.empty());
+        when(unidadeService.buscarMapaVigente(unidadeOrigem.getCodigo())).thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> service.inicializarDiagnostico(subprocesso))
+                .hasMessageContaining("Processo de diagnóstico sem mapa vigente");
+    }
+
+    @Test
     @DisplayName("inicializarDiagnostico deve excluir o responsável da unidade das avaliações e situações de capacitação")
     void inicializarDiagnostico_deveExcluirResponsavelDaUnidade() {
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         Processo processo = subprocesso.getProcesso();
-        subprocesso.setMapa(mapa(101L, competencia(1L, "Competência 1")));
+        Mapa mapaVigente = mapa(101L, competencia(1L, "Competência 1"));
 
         Usuario responsavel = usuario("151515", "Axl Rose");
         Usuario servidor = usuario("242426", "Duff McKagan");
@@ -147,6 +194,7 @@ class DiagnosticoFluxoServiceTest {
                         null,
                         null
                 )));
+        when(unidadeService.buscarMapaVigente(unidadeOrigem.getCodigo())).thenReturn(java.util.Optional.of(mapaVigente));
 
         ArgumentCaptor<Diagnostico> captor = ArgumentCaptor.forClass(Diagnostico.class);
 

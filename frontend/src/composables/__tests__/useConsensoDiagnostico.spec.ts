@@ -90,6 +90,19 @@ describe('useConsensoDiagnostico', () => {
         } as any);
     });
 
+    function criarCompetenciaConsenso(overrides: Record<string, unknown> = {}) {
+        return {
+            competenciaCodigo: 1,
+            servidorImportancia: null,
+            servidorDominio: null,
+            chefiaImportancia: null,
+            chefiaDominio: null,
+            consensoImportancia: null,
+            consensoDominio: null,
+            ...overrides,
+        };
+    }
+
     it('deve inicializar com listas vazias', () => {
         const { competenciasLocais } = useConsensoDiagnostico(1);
         expect(competenciasLocais.value).toEqual([]);
@@ -176,8 +189,8 @@ describe('useConsensoDiagnostico', () => {
         queryData.value = {
             competencias: [{
                 competenciaCodigo: 1,
-                autoimportancia: 5,
-                autodominio: 4,
+                servidorImportancia: 5,
+                servidorDominio: 4,
                 chefiaImportancia: 5,
                 chefiaDominio: 4,
                 consensoImportancia: null,
@@ -190,6 +203,34 @@ describe('useConsensoDiagnostico', () => {
 
         expect(competenciasLocais.value[0].consensoImportancia).toBe(5);
         expect(competenciasLocais.value[0].consensoDominio).toBe(4);
+    });
+
+    it('deve normalizar autoavaliacao do backend para os campos do servidor', async () => {
+        const queryData = ref<any>(null);
+        vi.mocked(useQuery).mockReturnValue({
+            data: queryData,
+            status: ref('success'),
+        } as any);
+
+        const { competenciasLocais } = useConsensoDiagnostico(1);
+
+        queryData.value = {
+            competencias: [{
+                competenciaCodigo: 1,
+                servidorImportancia: 5,
+                servidorDominio: 4,
+                chefiaImportancia: null,
+                chefiaDominio: null,
+                consensoImportancia: null,
+                consensoDominio: null,
+            }],
+            situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+        };
+
+        await nextTick();
+
+        expect(competenciasLocais.value[0].servidorImportancia).toBe(5);
+        expect(competenciasLocais.value[0].servidorDominio).toBe(4);
     });
 
     it('deve disparar autosave e executar onSettled', async () => {
@@ -277,8 +318,8 @@ describe('useConsensoDiagnostico', () => {
         
         competenciasLocais.value = [{
             competenciaCodigo: 1,
-            autoimportancia: 5,
-            autodominio: 4,
+            servidorImportancia: 5,
+            servidorDominio: 4,
             chefiaImportancia: null,
             chefiaDominio: null,
             consensoImportancia: null,
@@ -296,8 +337,8 @@ describe('useConsensoDiagnostico', () => {
 
         competenciasLocais.value = [{
             competenciaCodigo: 1,
-            autoimportancia: 5,
-            autodominio: 4,
+            servidorImportancia: 5,
+            servidorDominio: 4,
             chefiaImportancia: null,
             chefiaDominio: null,
             consensoImportancia: null,
@@ -315,8 +356,8 @@ describe('useConsensoDiagnostico', () => {
 
         competenciasLocais.value = [{
             competenciaCodigo: 1,
-            autoimportancia: 5,
-            autodominio: null,
+            servidorImportancia: 5,
+            servidorDominio: null,
             chefiaImportancia: null,
             chefiaDominio: null,
             consensoImportancia: null,
@@ -333,21 +374,64 @@ describe('useConsensoDiagnostico', () => {
     it('deve limpar o consenso quando a chefia alterar o campo para vazio', () => {
         const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
 
-        competenciasLocais.value = [{
-            competenciaCodigo: 1,
-            autoimportancia: 5,
-            autodominio: 4,
+        competenciasLocais.value = [criarCompetenciaConsenso({
+            servidorImportancia: 5,
+            servidorDominio: 4,
             chefiaImportancia: 5,
             chefiaDominio: 4,
             consensoImportancia: 5,
             consensoDominio: 4,
-        }] as any;
+        })] as any;
 
         atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: null });
 
         expect(competenciasLocais.value[0].chefiaImportancia).toBeNull();
         expect(competenciasLocais.value[0].consensoImportancia).toBeNull();
         expect(competenciasLocais.value[0].consensoDominio).toBe(4);
+    });
+
+    it('deve preservar consenso anterior quando a chefia divergir do servidor na importancia', () => {
+        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+
+        competenciasLocais.value = [criarCompetenciaConsenso({
+            servidorImportancia: 2,
+            chefiaImportancia: 1,
+            consensoImportancia: 2,
+        })] as any;
+
+        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 4 });
+
+        expect(competenciasLocais.value[0].chefiaImportancia).toBe(4);
+        expect(competenciasLocais.value[0].consensoImportancia).toBe(2);
+    });
+
+    it('deve preservar consenso anterior quando a chefia divergir do servidor no dominio', () => {
+        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+
+        competenciasLocais.value = [criarCompetenciaConsenso({
+            servidorDominio: 2,
+            chefiaDominio: 5,
+            consensoDominio: 5,
+        })] as any;
+
+        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'dominio', valor: 4 });
+
+        expect(competenciasLocais.value[0].chefiaDominio).toBe(4);
+        expect(competenciasLocais.value[0].consensoDominio).toBe(5);
+    });
+
+    it('deve preservar consenso diferente mesmo quando servidor e chefia forem iguais', () => {
+        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+
+        competenciasLocais.value = [criarCompetenciaConsenso({
+            servidorImportancia: 1,
+            chefiaImportancia: 1,
+            consensoImportancia: 2,
+        })] as any;
+
+        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 1 });
+
+        expect(competenciasLocais.value[0].consensoImportancia).toBe(2);
     });
 
     it('nao deve atualizar nota detalhada se competencia nao existir', () => {
@@ -363,18 +447,25 @@ describe('useConsensoDiagnostico', () => {
         
         const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1, 'servidor1');
         
-        competenciasLocais.value = [{
-            competenciaCodigo: 1,
+        competenciasLocais.value = [criarCompetenciaConsenso({
+            servidorImportancia: 3,
+            servidorDominio: 2,
             consensoImportancia: 5,
             consensoDominio: 4,
-        }] as any;
+        })] as any;
 
         atualizarNotaDetalhada(1, { origem: 'consenso', campo: 'importancia', valor: 5 });
         
         vi.advanceTimersByTime(800);
         
         expect(salvarConsenso).toHaveBeenCalledWith(1, 'servidor1', expect.objectContaining({
-            competencias: [{ competenciaCodigo: 1, consensoImportancia: 5, consensoDominio: 4 }]
+            competencias: [expect.objectContaining({
+                competenciaCodigo: 1,
+                consensoImportancia: 5,
+                consensoDominio: 4,
+                servidorImportancia: 3,
+                servidorDominio: 2,
+            })]
         }));
     });
 });
