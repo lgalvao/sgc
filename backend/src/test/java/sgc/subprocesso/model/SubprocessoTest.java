@@ -1,16 +1,19 @@
 package sgc.subprocesso.model;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import sgc.comum.erros.*;
-import sgc.mapa.model.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.processo.model.TipoProcesso;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Entidade: Subprocesso")
 class SubprocessoTest {

@@ -1,6 +1,6 @@
 package sgc.mapa.dto;
 
-import java.util.*;
+import java.util.List;
 
 public record CompetenciaMapaDto(
         Long codigo,

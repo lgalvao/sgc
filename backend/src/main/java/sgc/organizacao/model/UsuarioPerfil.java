@@ -2,11 +2,11 @@ package sgc.organizacao.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.*;
-import org.jspecify.annotations.*;
+import org.hibernate.annotations.Immutable;
+import org.jspecify.annotations.Nullable;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Objects;
 
 @Entity
 @Immutable

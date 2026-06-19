@@ -1,24 +1,37 @@
 package sgc.mapa.service;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
-import sgc.mapa.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.mapa.AtividadeService;
+import sgc.mapa.MapaDtoMapper;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
-import sgc.organizacao.*;
-import sgc.organizacao.model.*;
-import sgc.seguranca.*;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.UsuarioAplicacaoService;
+import sgc.organizacao.model.Usuario;
+import sgc.seguranca.AcaoPermissao;
+import sgc.seguranca.SgcPermissionEvaluator;
+import sgc.subprocesso.dto.AtividadeOperacaoResponse;
+import sgc.subprocesso.dto.SubprocessoSituacaoDto;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoConsultaService;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import static sgc.seguranca.AcaoPermissao.*;
+import static sgc.seguranca.AcaoPermissao.EDITAR_CADASTRO;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AtividadeService")

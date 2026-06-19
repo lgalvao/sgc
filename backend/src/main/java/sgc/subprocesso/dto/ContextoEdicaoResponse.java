@@ -1,8 +1,8 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
-import sgc.mapa.dto.*;
-import sgc.organizacao.dto.*;
+import lombok.Builder;
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.organizacao.dto.UnidadeResumoDto;
 
 /**
  * Resposta agregada para o contexto de edição de um subprocesso.

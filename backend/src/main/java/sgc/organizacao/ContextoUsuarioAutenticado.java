@@ -1,9 +1,9 @@
 package sgc.organizacao;
 
-import lombok.*;
-import sgc.organizacao.model.*;
+import lombok.Builder;
+import sgc.organizacao.model.Perfil;
 
-import java.util.*;
+import java.util.Objects;
 
 @Builder
 public record ContextoUsuarioAutenticado(

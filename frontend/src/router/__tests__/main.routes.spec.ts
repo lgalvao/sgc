@@ -116,7 +116,7 @@ describe("main.routes", () => {
         }
     }, 30000);
 
-    it("deve conter a rota Parametros", async () => {
+    it("deve conter a rota Configuracoes", async () => {
         const route = mainRoutes.find((r) => r.name === "Parametros");
         expect(route).toBeDefined();
         expect(route?.path).toBe("/configuracoes");

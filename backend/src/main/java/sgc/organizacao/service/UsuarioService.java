@@ -1,17 +1,18 @@
 package sgc.organizacao.service;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.springframework.security.core.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
-import sgc.organizacao.dto.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
+import sgc.organizacao.dto.UsuarioPesquisaDto;
 import sgc.organizacao.model.*;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j

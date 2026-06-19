@@ -1,11 +1,13 @@
 package sgc.feedback.dto;
 
-import jakarta.validation.constraints.*;
-import org.jspecify.annotations.*;
-import sgc.comum.*;
-import sgc.feedback.*;
-import sgc.seguranca.sanitizacao.*;
-import tools.jackson.databind.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.jspecify.annotations.Nullable;
+import sgc.comum.Mensagens;
+import sgc.feedback.FeedbackTipo;
+import sgc.seguranca.sanitizacao.SanitizarHtmlFormatado;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Payload enviado pelo widget de feedback no campo {@code data} do formulário multipart.

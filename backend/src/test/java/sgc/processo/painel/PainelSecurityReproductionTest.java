@@ -1,22 +1,27 @@
 package sgc.processo.painel;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.*;
-import org.springframework.security.core.context.*;
-import sgc.alerta.model.*;
-import sgc.integracao.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.integracao.BaseIntegrationTest;
 import sgc.organizacao.model.*;
-import sgc.processo.model.*;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("PainelController - Reprodução de Vulnerabilidade de Segurança")
 class PainelSecurityReproductionTest extends BaseIntegrationTest {

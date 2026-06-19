@@ -1,19 +1,28 @@
 package sgc.organizacao;
 
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.test.context.*;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.context.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
+import sgc.organizacao.service.ResponsavelUnidadeService;
+import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeService;
+import sgc.organizacao.service.UsuarioService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tag("integration")
 @SpringBootTest

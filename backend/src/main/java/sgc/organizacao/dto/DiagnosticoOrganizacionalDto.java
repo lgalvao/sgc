@@ -1,6 +1,6 @@
 package sgc.organizacao.dto;
 
-import java.util.*;
+import java.util.List;
 
 public record DiagnosticoOrganizacionalDto(
         boolean possuiViolacoes,

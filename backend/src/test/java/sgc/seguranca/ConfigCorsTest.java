@@ -1,14 +1,17 @@
 package sgc.seguranca;
 
-import org.jspecify.annotations.*;
-import org.junit.jupiter.api.*;
-import org.springframework.mock.web.*;
-import org.springframework.web.cors.*;
-import sgc.seguranca.config.*;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import sgc.seguranca.config.ConfigCors;
+import sgc.seguranca.config.ConfigCorsProperties;
 
-import java.util.*;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ConfigCors - Testes de Configuração CORS")
 class ConfigCorsTest {

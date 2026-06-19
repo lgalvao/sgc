@@ -1,27 +1,34 @@
 package sgc.processo.painel;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.alerta.*;
-import sgc.alerta.model.*;
-import sgc.comum.erros.*;
-import sgc.organizacao.*;
-import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
-import sgc.processo.dto.*;
-import sgc.processo.model.*;
-import sgc.processo.painel.dto.*;
-import sgc.processo.service.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.AlertaAplicacaoService;
+import sgc.alerta.AlertaDtoMapper;
+import sgc.alerta.model.Alerta;
+import sgc.comum.erros.ErroInconsistenciaInterna;
+import sgc.organizacao.ContextoUsuarioAutenticado;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeService;
+import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.UnidadeProcesso;
+import sgc.processo.painel.dto.PainelBootstrapDto;
+import sgc.processo.service.ProcessoService;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 @RequiredArgsConstructor

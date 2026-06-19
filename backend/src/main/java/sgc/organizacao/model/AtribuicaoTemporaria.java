@@ -1,11 +1,13 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import sgc.comum.model.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import sgc.comum.model.EntidadeBase;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 /**
  * Representa a atribuição temporária de um usuário a uma unidade, por exemplo, para cobrir férias

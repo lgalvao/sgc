@@ -1,6 +1,6 @@
 package sgc.comum.erros;
 
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 
 public class ErroAutenticacao extends ErroNegocioBase {
 

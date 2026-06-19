@@ -1,12 +1,12 @@
 package sgc.alerta.dto;
 
-import org.junit.jupiter.api.*;
-import sgc.alerta.*;
-import sgc.subprocesso.model.*;
+import org.junit.jupiter.api.Test;
+import sgc.alerta.AlertaDtoMapper;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class NotificacaoSubprocessoResumoDtoTest {
     private final AlertaDtoMapper mapper = new AlertaDtoMapper();

@@ -1,6 +1,6 @@
 package sgc.comum.erros;
 
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 
 /**
  * Exceção lançada quando um domínio (entidade) não é encontrado. Usada para sinalizar retornos 404

@@ -1,12 +1,15 @@
 package sgc.mapa.dto;
 
-import org.junit.jupiter.api.*;
-import sgc.mapa.*;
-import sgc.mapa.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.mapa.MapaDtoMapper;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Conhecimento;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("AtividadeMapaDto")
 class AtividadeMapaDtoTest {

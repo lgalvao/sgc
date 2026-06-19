@@ -1,12 +1,14 @@
 package sgc.alerta;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
-import sgc.alerta.model.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.model.NotificacaoEmail;
 
-import java.util.*;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 

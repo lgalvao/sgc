@@ -1,24 +1,34 @@
 package sgc.processo.painel;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-import sgc.alerta.*;
-import sgc.alerta.model.*;
-import sgc.organizacao.*;
-import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
-import sgc.processo.dto.*;
-import sgc.processo.model.*;
-import sgc.processo.service.*;
-import sgc.testutils.*;
+import sgc.alerta.AlertaAplicacaoService;
+import sgc.alerta.AlertaDtoMapper;
+import sgc.alerta.model.Alerta;
+import sgc.organizacao.ContextoUsuarioAutenticado;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeService;
+import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.UnidadeProcesso;
+import sgc.processo.service.ProcessoService;
+import sgc.testutils.UnidadeTestBuilder;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,10 +1,12 @@
 package sgc.processo.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.*;
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.Nullable;
 
-import java.io.*;
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * Chave primária composta para {@link UnidadeProcesso}.

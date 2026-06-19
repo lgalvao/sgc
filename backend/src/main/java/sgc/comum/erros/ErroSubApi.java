@@ -1,6 +1,6 @@
 package sgc.comum.erros;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record ErroSubApi(

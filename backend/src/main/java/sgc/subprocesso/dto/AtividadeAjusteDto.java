@@ -1,8 +1,8 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
+import lombok.Builder;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * DTO para atividade no contexto de ajustes do mapa. CDU-16 item 4 e 5

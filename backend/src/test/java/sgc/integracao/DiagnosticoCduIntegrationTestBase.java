@@ -2,14 +2,7 @@ package sgc.integracao;
 
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import sgc.diagnostico.model.AvaliacaoServidor;
-import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.Diagnostico;
-import sgc.diagnostico.model.DiagnosticoRepo;
-import sgc.diagnostico.model.SituacaoCapacitacao;
-import sgc.diagnostico.model.SituacaoCapacitacaoRepo;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.diagnostico.model.ValorSituacaoCapacitacao;
+import sgc.diagnostico.model.*;
 import sgc.fixture.ProcessoFixture;
 import sgc.fixture.SubprocessoFixture;
 import sgc.mapa.model.Competencia;

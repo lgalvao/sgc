@@ -1,10 +1,13 @@
 package sgc.comum.config;
 
-import lombok.*;
-import org.springframework.boot.context.properties.*;
-import org.springframework.stereotype.*;
-import sgc.seguranca.config.*;
-import sgc.seguranca.login.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.stereotype.Component;
+import sgc.seguranca.config.ConfigCorsProperties;
+import sgc.seguranca.config.JwtProperties;
+import sgc.seguranca.login.PropriedadesAcessoAd;
 
 /**
  * Configuração centralizada para a aplicação SGC sob o prefixo 'aplicacao'.

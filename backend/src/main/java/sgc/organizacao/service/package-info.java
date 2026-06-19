@@ -1,4 +1,4 @@
 @NullMarked
 package sgc.organizacao.service;
 
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.NullMarked;

@@ -1,16 +1,19 @@
 package sgc.seguranca.login;
 
-import lombok.extern.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.core.env.*;
-import org.springframework.http.*;
-import org.springframework.scheduling.annotation.*;
-import org.springframework.stereotype.*;
-import sgc.comum.erros.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import sgc.comum.erros.ErroConfiguracao;
+import sgc.comum.erros.ErroNegocioBase;
 
-import java.time.*;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * Componente que limita tentativas de login por IP para prevenir ataques de

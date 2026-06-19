@@ -1,6 +1,8 @@
 package sgc.fixture;
 
-import sgc.organizacao.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
 public class UsuarioFixture {
 

@@ -1,12 +1,15 @@
 package sgc.comum.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 
 @MappedSuperclass
 @Getter

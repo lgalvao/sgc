@@ -1,7 +1,7 @@
 package sgc.mapa.dto;
 
-import lombok.*;
-import sgc.subprocesso.dto.*;
+import lombok.Builder;
+import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 
 /**
  * DTO para resultado de operação de conhecimento.

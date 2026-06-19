@@ -1,6 +1,6 @@
 package sgc.seguranca.dto;
 
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.UnidadeResumoDto;
 
 /**
  * DTO que representa um par perfil/unidade para autorização.

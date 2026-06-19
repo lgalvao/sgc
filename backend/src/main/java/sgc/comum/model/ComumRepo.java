@@ -1,11 +1,15 @@
 package sgc.comum.model;
 
-import jakarta.persistence.*;
-import jakarta.persistence.criteria.*;
-import org.springframework.stereotype.*;
-import sgc.comum.erros.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.springframework.stereotype.Component;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Componente centralizado para busca de entidades usando Hibernate/EntityManager.

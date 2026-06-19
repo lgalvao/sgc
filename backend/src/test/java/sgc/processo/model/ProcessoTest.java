@@ -1,13 +1,20 @@
 package sgc.processo.model;
 
-import org.junit.jupiter.api.*;
-import sgc.fixture.*;
-import sgc.organizacao.model.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import sgc.fixture.UnidadeFixture;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @DisplayName("Testes para Processo")
 class ProcessoTest {

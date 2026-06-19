@@ -1,11 +1,11 @@
 package sgc.organizacao.service;
 
-import lombok.extern.slf4j.*;
-import org.springframework.stereotype.*;
-import org.springframework.web.servlet.mvc.method.annotation.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Registro centralizado de emissores SSE.

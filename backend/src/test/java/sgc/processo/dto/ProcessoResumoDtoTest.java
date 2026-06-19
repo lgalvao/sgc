@@ -1,14 +1,19 @@
 package sgc.processo.dto;
 
-import org.junit.jupiter.api.*;
-import sgc.processo.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.ProcessoDtoMapper;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ProcessoResumoDto")
 class ProcessoResumoDtoTest {

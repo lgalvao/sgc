@@ -1,23 +1,33 @@
 package sgc.comum.erros;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.validation.*;
-import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
-import org.springframework.http.*;
-import org.springframework.http.converter.*;
-import org.springframework.security.access.*;
-import org.springframework.web.bind.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.*;
-import org.springframework.web.servlet.mvc.method.annotation.*;
-import org.springframework.web.servlet.resource.*;
-import sgc.comum.util.*;
-import sgc.seguranca.sanitizacao.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullUnmarked;
+import org.jspecify.annotations.Nullable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import sgc.comum.util.FiltroMonitoramentoHttp;
+import sgc.seguranca.sanitizacao.UtilSanitizacao;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Handler centralizado para tratamento de exceções REST.

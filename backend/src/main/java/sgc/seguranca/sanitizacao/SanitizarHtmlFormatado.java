@@ -1,9 +1,12 @@
 package sgc.seguranca.sanitizacao;
 
-import com.fasterxml.jackson.annotation.*;
-import tools.jackson.databind.annotation.*;
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Anotação para marcar campos String que devem ser sanitizados durante a

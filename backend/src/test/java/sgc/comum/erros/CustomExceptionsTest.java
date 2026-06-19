@@ -1,11 +1,12 @@
 package sgc.comum.erros;
 
-import org.junit.jupiter.api.*;
-import org.springframework.http.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
-import java.util.*;
+import java.util.HashMap;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Testes de Exceções customizadas")
 class CustomExceptionsTest {

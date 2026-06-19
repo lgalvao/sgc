@@ -1,10 +1,11 @@
 package sgc.subprocesso.dto;
 
-import org.jspecify.annotations.*;
-import sgc.mapa.dto.*;
-import sgc.organizacao.dto.*;
+import org.jspecify.annotations.Nullable;
+import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.MapaResumoDto;
+import sgc.organizacao.dto.UnidadeResumoDto;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Resposta enxuta para o cadastro de atividades.

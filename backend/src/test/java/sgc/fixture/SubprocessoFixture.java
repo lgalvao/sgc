@@ -1,10 +1,11 @@
 package sgc.fixture;
 
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.model.*;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 public class SubprocessoFixture {
 

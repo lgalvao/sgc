@@ -1,14 +1,15 @@
 package sgc.processo.dto;
 
-import org.junit.jupiter.api.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
-import sgc.processo.model.*;
+import org.junit.jupiter.api.Test;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroValidacao;
+import sgc.processo.model.AcaoProcesso;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AcaoEmBlocoRequestTest {
 

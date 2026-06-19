@@ -1,4 +1,4 @@
 @NullMarked
 package sgc.processo.service;
 
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.NullMarked;

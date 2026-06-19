@@ -1,26 +1,32 @@
 package sgc.integracao;
 
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.*;
-import org.springframework.security.core.authority.*;
-import org.springframework.security.core.context.*;
-import org.springframework.transaction.annotation.*;
-import sgc.alerta.model.*;
-import sgc.configuracoes.*;
-import sgc.configuracoes.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.configuracoes.ConfiguracaoService;
+import sgc.configuracoes.model.Configuracao;
+import sgc.configuracoes.model.ConfiguracaoRepo;
 import sgc.fixture.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.model.*;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.organizacao.model.UsuarioRepo;
+import sgc.processo.model.Processo;
+import sgc.subprocesso.model.SubprocessoRepo;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Set;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @Transactional

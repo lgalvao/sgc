@@ -1,16 +1,18 @@
 package sgc.e2e;
 
-import lombok.*;
-import org.aspectj.lang.*;
-import org.aspectj.lang.annotation.*;
-import org.jspecify.annotations.*;
-import org.springframework.context.annotation.*;
-import org.springframework.jdbc.core.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.organizacao.dto.*;
+import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
 
-import java.util.*;
+import java.util.Set;
 
 @Aspect
 @Component

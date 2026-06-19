@@ -1,12 +1,16 @@
 package sgc.comum.erros;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import org.jspecify.annotations.*;
-import org.springframework.http.*;
+import org.jspecify.annotations.Nullable;
+import org.springframework.http.HttpStatusCode;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Builder

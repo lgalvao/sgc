@@ -1,17 +1,24 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import sgc.alerta.model.*;
-import sgc.diagnostico.model.*;
-import sgc.integracao.mocks.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.NotificacaoEmail;
+import sgc.alerta.model.NotificacaoEmailRepo;
+import sgc.diagnostico.model.AvaliacaoServidor;
+import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
+import sgc.integracao.mocks.WithMockCustomUser;
 
-import java.util.*;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
 @DisplayName("CDU-46: Aprovar avaliação de consenso")

@@ -1,6 +1,7 @@
 package sgc.feedback;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * Tipo do feedback enviado pelo usuário durante homologação.

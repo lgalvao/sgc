@@ -1,13 +1,18 @@
 package sgc.subprocesso.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import sgc.comum.model.*;
-import sgc.organizacao.model.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import sgc.comum.model.ComumViews;
+import sgc.comum.model.EntidadeBase;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MOVIMENTACAO", schema = "sgc")

@@ -1,8 +1,8 @@
 package sgc.alerta;
 
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.TipoTransicao;
 
-import java.util.*;
+import java.util.Locale;
 
 public final class AssuntosNotificacao {
     private AssuntosNotificacao() {

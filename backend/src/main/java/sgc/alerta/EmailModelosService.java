@@ -1,13 +1,14 @@
 package sgc.alerta;
 
-import lombok.*;
-import org.springframework.stereotype.*;
-import org.thymeleaf.context.*;
-import org.thymeleaf.spring6.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.time.*;
-import java.time.format.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 /**
  * Cria templates HTML para diferentes tipos de e-mail.
  */

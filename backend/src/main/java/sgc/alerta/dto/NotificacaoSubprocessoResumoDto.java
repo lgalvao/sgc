@@ -1,6 +1,6 @@
 package sgc.alerta.dto;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 public record NotificacaoSubprocessoResumoDto(
         Long subprocessoCodigo,

@@ -1,15 +1,19 @@
 package sgc.processo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import sgc.comum.model.*;
-import sgc.organizacao.model.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import sgc.comum.model.EntidadeBase;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
-import java.io.*;
-import java.time.*;
+import java.io.Serial;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "PROCESSO", schema = "sgc")

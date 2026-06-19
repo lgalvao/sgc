@@ -1,20 +1,33 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import sgc.comum.erros.*;
-import sgc.integracao.mocks.*;
-import sgc.processo.dto.*;
-import sgc.processo.model.*;
-import sgc.processo.service.*;
-import sgc.subprocesso.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import sgc.comum.erros.ErroValidacao;
+import sgc.integracao.mocks.WithMockAdmin;
+import sgc.integracao.mocks.WithMockChefe;
+import sgc.integracao.mocks.WithMockGestor;
+import sgc.processo.dto.AtualizarProcessoRequest;
+import sgc.processo.dto.CriarProcessoRequest;
+import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.UnidadeProcesso;
+import sgc.processo.service.ProcessoService;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @DisplayName("Testes de Integração - ProcessoService")
 class ProcessoServiceIntegrationTest extends BaseIntegrationTest {

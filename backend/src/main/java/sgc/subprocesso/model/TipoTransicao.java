@@ -1,8 +1,9 @@
 package sgc.subprocesso.model;
 
-import lombok.*;
-import org.jspecify.annotations.*;
-import sgc.comum.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
+import sgc.comum.Mensagens;
 
 /**
  * Define os tipos de transição de subprocesso e seus metadados para comunicação.

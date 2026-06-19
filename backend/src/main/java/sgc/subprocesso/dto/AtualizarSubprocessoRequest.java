@@ -1,9 +1,9 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
+import lombok.Builder;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * DTO de requisição para atualizar um subprocesso existente.

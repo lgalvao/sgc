@@ -1,14 +1,14 @@
 package sgc.processo.dto;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
-import lombok.*;
-import sgc.comum.*;
-import sgc.processo.model.*;
-import sgc.seguranca.sanitizacao.*;
+import lombok.Builder;
+import sgc.comum.Mensagens;
+import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO usado para atualizar um processo existente.

@@ -1,14 +1,16 @@
 package sgc.subprocesso.dto;
 
-import org.junit.jupiter.api.*;
-import sgc.organizacao.*;
-import sgc.organizacao.model.*;
-import sgc.subprocesso.*;
-import sgc.subprocesso.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.organizacao.OrganizacaoDtoMapper;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
+import sgc.subprocesso.SubprocessoDtoMapper;
+import sgc.subprocesso.model.Movimentacao;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("MovimentacaoDto")
 class MovimentacaoDtoTest {

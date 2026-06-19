@@ -1,6 +1,6 @@
 package sgc.configuracoes;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record ConfiguracaoDto(

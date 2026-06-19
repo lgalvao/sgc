@@ -1,12 +1,18 @@
 package sgc.configuracoes.model;
 
-import jakarta.validation.*;
-import org.junit.jupiter.api.*;
-import sgc.comum.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.comum.Mensagens;
 
-import java.util.*;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Configuracao validation")
 class ConfiguracaoValidationTest {

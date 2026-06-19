@@ -1,22 +1,24 @@
 package sgc.relatorio;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.webmvc.test.autoconfigure.*;
-import org.springframework.context.annotation.*;
-import org.springframework.http.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.*;
-import org.springframework.test.context.bean.override.mockito.*;
-import org.springframework.test.web.servlet.*;
-import sgc.comum.erros.*;
-import sgc.processo.service.*;
-import sgc.seguranca.*;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import sgc.comum.erros.RestExceptionHandler;
+import sgc.processo.service.ProcessoService;
+import sgc.seguranca.SgcPermissionEvaluator;
 
-import java.util.*;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(RelatorioController.class)

@@ -1,6 +1,6 @@
 package sgc.seguranca.dto;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record PermissoesSessaoResponse(

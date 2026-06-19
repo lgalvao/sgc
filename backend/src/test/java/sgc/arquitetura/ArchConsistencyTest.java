@@ -1,24 +1,28 @@
 package sgc.arquitetura;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.tngtech.archunit.core.domain.*;
-import com.tngtech.archunit.core.importer.*;
-import com.tngtech.archunit.junit.*;
-import com.tngtech.archunit.lang.*;
-import jakarta.persistence.*;
-import org.jspecify.annotations.*;
-import org.junit.jupiter.api.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.security.core.annotation.*;
-import org.springframework.stereotype.*;
-import org.springframework.web.bind.annotation.*;
-import sgc.organizacao.model.*;
+import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
+import com.tngtech.archunit.lang.ArchCondition;
+import com.tngtech.archunit.lang.ArchRule;
+import com.tngtech.archunit.lang.ConditionEvents;
+import com.tngtech.archunit.lang.SimpleConditionEvent;
+import jakarta.persistence.Entity;
+import org.jspecify.annotations.NullMarked;
+import org.junit.jupiter.api.Tag;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import sgc.organizacao.model.Usuario;
 
 import java.lang.reflect.*;
-import java.util.*;
+import java.util.Set;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
-import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.*;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 @Tag("integration")
 @AnalyzeClasses(packages = "sgc", importOptions = {

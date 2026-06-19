@@ -1,7 +1,7 @@
 package sgc.organizacao.model;
 
-import lombok.*;
-import org.jspecify.annotations.*;
+import lombok.Builder;
+import org.jspecify.annotations.Nullable;
 
 @Builder
 public record UsuarioConsultaLeitura(

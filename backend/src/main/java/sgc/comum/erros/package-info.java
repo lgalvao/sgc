@@ -1,4 +1,4 @@
 @NullMarked
 package sgc.comum.erros;
 
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.NullMarked;

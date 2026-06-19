@@ -1,6 +1,6 @@
 package sgc.organizacao.dto;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record UsuarioResumoDto(

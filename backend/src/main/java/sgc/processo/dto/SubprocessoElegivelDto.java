@@ -1,9 +1,10 @@
 package sgc.processo.dto;
 
-import lombok.*;
-import org.jspecify.annotations.*;
+import lombok.Builder;
+import lombok.Value;
+import org.jspecify.annotations.Nullable;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Value
 @Builder

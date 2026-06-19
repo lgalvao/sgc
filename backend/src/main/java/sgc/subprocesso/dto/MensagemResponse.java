@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record MensagemResponse(

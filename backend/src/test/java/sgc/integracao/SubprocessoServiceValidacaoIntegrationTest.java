@@ -1,21 +1,29 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
-import sgc.fixture.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroValidacao;
+import sgc.fixture.UnidadeFixture;
 import sgc.mapa.model.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.*;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.dto.ValidacaoCadastroDto;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoConsultaService;
+import sgc.subprocesso.service.SubprocessoValidacaoService;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tag("integration")
 @Transactional

@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.Nullable;
 
 /**
  * DTO para retorno do texto de sugestões de um subprocesso.

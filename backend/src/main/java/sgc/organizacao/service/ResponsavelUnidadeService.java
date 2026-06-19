@@ -1,23 +1,30 @@
 package sgc.organizacao.service;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.*;
-import sgc.alerta.model.*;
-import sgc.comum.*;
-import sgc.comum.config.*;
-import sgc.comum.erros.*;
-import sgc.comum.model.*;
-import sgc.organizacao.dto.*;
+import sgc.alerta.model.TipoNotificacao;
+import sgc.comum.Mensagens;
+import sgc.comum.config.ConfigAplicacao;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroInconsistenciaInterna;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.model.ComumRepo;
+import sgc.organizacao.dto.AtribuicaoDto;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Serviço especializado para gerenciar responsáveis e atribuições de unidades.

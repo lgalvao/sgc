@@ -1,7 +1,9 @@
-import org.gradle.api.tasks.testing.logging.*
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
-import java.net.*
+import java.net.HttpURLConnection
+import java.net.URI
 
 val argumentosJvmSemAvisoUnsafe = emptyList<String>()
 

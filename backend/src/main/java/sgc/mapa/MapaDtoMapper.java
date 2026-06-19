@@ -1,14 +1,24 @@
 package sgc.mapa;
 
-import org.jspecify.annotations.*;
-import org.springframework.stereotype.*;
+import org.jspecify.annotations.Nullable;
+import org.springframework.stereotype.Component;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.*;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.subprocesso.dto.AtividadeAjusteDto;
+import sgc.subprocesso.dto.CompetenciaAjusteDto;
+import sgc.subprocesso.dto.ConhecimentoAjusteDto;
+import sgc.subprocesso.dto.MapaAjusteDto;
+import sgc.subprocesso.model.Analise;
+import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class MapaDtoMapper {

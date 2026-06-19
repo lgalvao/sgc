@@ -1,8 +1,8 @@
 package sgc.alerta.dto;
 
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 public record NotificacaoSubprocessoResumoQuery(
         Long subprocessoCodigo,

@@ -1,9 +1,10 @@
 package sgc.alerta;
 
-import org.junit.jupiter.api.*;
-import sgc.subprocesso.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.subprocesso.model.TipoTransicao;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("AssuntosNotificacao")
 class AssuntosNotificacaoTest {

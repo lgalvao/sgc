@@ -1,10 +1,11 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
-import org.jspecify.annotations.*;
-import sgc.organizacao.dto.*;
+import lombok.Builder;
+import org.jspecify.annotations.Nullable;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UsuarioResumoDto;
 
-import java.util.*;
+import java.util.List;
 
 @Builder
 public record SubprocessoDetalheResponse(

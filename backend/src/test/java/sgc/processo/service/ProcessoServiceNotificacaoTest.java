@@ -1,22 +1,32 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.*;
-import sgc.alerta.model.*;
-import sgc.comum.erros.*;
-import sgc.mapa.model.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoValidacaoService.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.TipoNotificacao;
+import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static sgc.processo.model.SituacaoProcesso.*;
-import static sgc.processo.model.TipoProcesso.*;
+import static sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO;
+import static sgc.processo.model.SituacaoProcesso.FINALIZADO;
+import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
+import static sgc.processo.model.TipoProcesso.MAPEAMENTO;
 
 @DisplayName("ProcessoService Notificação Test suite")
 class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {

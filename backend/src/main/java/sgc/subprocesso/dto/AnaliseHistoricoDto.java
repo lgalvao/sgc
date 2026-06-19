@@ -1,9 +1,9 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
-import org.hibernate.validator.constraints.br.*;
+import lombok.Builder;
+import org.hibernate.validator.constraints.br.TituloEleitoral;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Builder
 public record AnaliseHistoricoDto(

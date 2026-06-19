@@ -1,29 +1,42 @@
 package sgc.integracao;
 
-import jakarta.persistence.*;
-import org.junit.jupiter.api.*;
-import org.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.data.domain.*;
-import org.springframework.security.authentication.*;
-import org.springframework.security.core.authority.*;
-import org.springframework.security.core.context.*;
-import org.springframework.transaction.annotation.*;
-import sgc.alerta.model.*;
-import sgc.mapa.model.*;
-import sgc.organizacao.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.AlertaRepo;
+import sgc.alerta.model.AlertaUsuario;
+import sgc.alerta.model.AlertaUsuarioRepo;
+import sgc.mapa.model.Mapa;
+import sgc.organizacao.ContextoUsuarioAutenticado;
 import sgc.organizacao.model.*;
-import sgc.processo.dto.*;
-import sgc.processo.model.*;
-import sgc.processo.painel.*;
-import sgc.subprocesso.dto.*;
+import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.painel.PainelService;
+import sgc.subprocesso.dto.AnaliseHistoricoDto;
+import sgc.subprocesso.dto.SubprocessoDetalheResponse;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.*;
+import sgc.subprocesso.service.SubprocessoConsultaService;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("integration")
 @Transactional

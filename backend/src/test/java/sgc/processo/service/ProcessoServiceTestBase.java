@@ -1,24 +1,36 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
-import sgc.alerta.*;
-import sgc.comum.model.*;
-import sgc.configuracoes.*;
-import sgc.mapa.service.*;
-import sgc.organizacao.*;
-import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
-import sgc.diagnostico.service.*;
-import sgc.processo.*;
-import sgc.processo.model.*;
-import sgc.seguranca.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.AlertaAplicacaoService;
+import sgc.alerta.EmailModelosService;
+import sgc.alerta.NotificacaoService;
+import sgc.comum.model.ComumRepo;
+import sgc.configuracoes.ConfiguracaoService;
+import sgc.diagnostico.service.DiagnosticoFluxoService;
+import sgc.diagnostico.service.DiagnosticoNotificacaoService;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.UsuarioAplicacaoService;
+import sgc.organizacao.model.SituacaoUnidade;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.service.ResponsavelUnidadeService;
+import sgc.organizacao.service.UnidadeHierarquiaService;
+import sgc.organizacao.service.UnidadeService;
+import sgc.processo.ProcessoDtoMapper;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.SgcPermissionEvaluator;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.*;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.when;
 
 /**
  * Base para testes de unidade do ProcessoService, fornecendo mocks e utilitários comuns.

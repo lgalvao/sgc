@@ -1,8 +1,8 @@
 package sgc.mapa.dto;
 
-import lombok.*;
+import lombok.Builder;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * DTO que representa uma competência que foi impactada por mudanças nas atividades na revisão.

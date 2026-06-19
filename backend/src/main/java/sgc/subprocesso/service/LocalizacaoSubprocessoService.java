@@ -1,16 +1,21 @@
 package sgc.subprocesso.service;
 
-import lombok.*;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
-import sgc.organizacao.model.*;
-import sgc.subprocesso.model.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroValidacao;
+import sgc.organizacao.model.Unidade;
+import sgc.subprocesso.model.Movimentacao;
+import sgc.subprocesso.model.MovimentacaoRepo;
+import sgc.subprocesso.model.Subprocesso;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static sgc.subprocesso.model.SituacaoSubprocesso.NAO_INICIADO;
 
 @Service
 @RequiredArgsConstructor

@@ -1,12 +1,17 @@
 package sgc.configuracoes.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
-import lombok.experimental.*;
-import sgc.comum.*;
-import sgc.comum.model.*;
-import sgc.configuracoes.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import sgc.comum.Mensagens;
+import sgc.comum.model.EntidadeBase;
+import sgc.configuracoes.ConfiguracaoRequest;
 
 @Entity
 @Table(name = "CONFIGURACAO", schema = "sgc")

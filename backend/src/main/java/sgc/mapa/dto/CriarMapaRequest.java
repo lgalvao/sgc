@@ -1,11 +1,11 @@
 package sgc.mapa.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
-import org.jspecify.annotations.*;
-import sgc.comum.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import org.jspecify.annotations.Nullable;
+import sgc.comum.Mensagens;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Builder
 public record CriarMapaRequest(

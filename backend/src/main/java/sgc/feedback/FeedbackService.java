@@ -1,23 +1,31 @@
 package sgc.feedback;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import org.springframework.web.multipart.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
-import sgc.comum.model.*;
-import sgc.feedback.dto.*;
-import sgc.organizacao.*;
-import tools.jackson.databind.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroInconsistenciaInterna;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.model.ComumRepo;
+import sgc.feedback.dto.FeedbackListagemDto;
+import sgc.feedback.dto.FeedbackPayloadDto;
+import sgc.feedback.dto.FeedbackRespostaDto;
+import sgc.organizacao.UsuarioAplicacaoService;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
-import java.io.*;
-import java.nio.file.*;
-import java.time.*;
-import java.util.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Serviço responsável por validar e persistir registros de feedback.

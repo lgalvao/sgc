@@ -1,12 +1,15 @@
 package sgc.organizacao.dto;
 
-import com.fasterxml.jackson.annotation.*;
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import sgc.comum.*;
+import sgc.comum.Mensagens;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * DTO para dados de unidade do SGRH. Suporta estrutura hierárquica com subunidades.

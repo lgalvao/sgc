@@ -1,23 +1,27 @@
 package sgc.seguranca;
 
-import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
-import sgc.comum.util.*;
-import sgc.organizacao.*;
-import sgc.organizacao.dto.*;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroAcessoNegado;
+import sgc.comum.erros.ErroAutenticacao;
+import sgc.comum.util.MascaraUtil;
+import sgc.organizacao.UsuarioAplicacaoService;
+import sgc.organizacao.dto.UnidadeResumoDto;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
-import sgc.seguranca.dto.*;
-import sgc.seguranca.login.*;
+import sgc.organizacao.service.UnidadeService;
+import sgc.organizacao.service.UsuarioService;
+import sgc.seguranca.dto.EntrarRequest;
+import sgc.seguranca.dto.PerfilUnidadeDto;
+import sgc.seguranca.login.ClienteAcessoAd;
+import sgc.seguranca.login.GerenciadorJwt;
 
-import java.util.*;
+import java.util.List;
 
-import static sgc.organizacao.model.Perfil.*;
+import static sgc.organizacao.model.Perfil.ADMIN;
 
 /**
  * Serviço responsável pelo fluxo de login: autenticação, autorização e geração de tokens.

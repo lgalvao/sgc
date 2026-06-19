@@ -1,8 +1,9 @@
 package sgc.seguranca.login;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @DisplayName("ClienteAcessoAdE2e")
 class ClienteAcessoAdE2eTest {

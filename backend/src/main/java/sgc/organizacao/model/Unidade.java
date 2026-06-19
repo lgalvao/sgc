@@ -1,14 +1,18 @@
 package sgc.organizacao.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import org.hibernate.annotations.*;
-import org.jspecify.annotations.*;
-import sgc.comum.model.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Immutable;
+import org.jspecify.annotations.Nullable;
+import sgc.comum.model.ComumViews;
+import sgc.comum.model.EntidadeBase;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Immutable

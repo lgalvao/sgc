@@ -1,15 +1,24 @@
 package sgc.comum.util;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import org.slf4j.*;
-import org.springframework.stereotype.*;
-import org.springframework.util.*;
-import org.springframework.web.context.request.*;
-import org.springframework.web.filter.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 @Component
 public class FiltroMonitoramentoHttp extends OncePerRequestFilter {

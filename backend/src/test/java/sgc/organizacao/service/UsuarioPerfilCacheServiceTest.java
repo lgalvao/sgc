@@ -1,15 +1,16 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.test.context.bean.override.mockito.*;
-import org.springframework.test.context.junit.jupiter.*;
-import sgc.comum.config.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import sgc.comum.config.CacheConfig;
 import sgc.organizacao.model.*;
 
-import java.util.*;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @SpringJUnitConfig(classes = {CacheConfig.class, UsuarioPerfilCacheService.class})

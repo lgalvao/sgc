@@ -1,8 +1,9 @@
 package sgc.comum.erros;
 
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Interface para exceções de negócio que seguem o contrato padronizado.

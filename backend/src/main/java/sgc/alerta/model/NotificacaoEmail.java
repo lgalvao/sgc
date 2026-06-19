@@ -1,13 +1,15 @@
 package sgc.alerta.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import org.jspecify.annotations.*;
-import sgc.comum.model.*;
-import sgc.subprocesso.model.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.jspecify.annotations.Nullable;
+import sgc.comum.model.EntidadeBase;
+import sgc.subprocesso.model.Subprocesso;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "NOTIFICACAO_EMAIL", schema = "sgc")

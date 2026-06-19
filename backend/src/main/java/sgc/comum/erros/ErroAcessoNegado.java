@@ -1,6 +1,6 @@
 package sgc.comum.erros;
 
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 
 /**
  * Lançada quando o usuário não possui permissão para realizar uma operação.

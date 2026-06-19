@@ -1,12 +1,14 @@
 package sgc.subprocesso.model;
 
-import org.springframework.data.domain.*;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.repository.query.*;
-import org.springframework.stereotype.*;
-import sgc.organizacao.model.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import sgc.organizacao.model.Unidade;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositório JPA para a entidade Movimentacao. Inclui query para recuperar movimentações de um

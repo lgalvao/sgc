@@ -1,7 +1,7 @@
 package sgc.organizacao.model;
 
-import org.springframework.security.core.*;
-import org.springframework.security.core.authority.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public enum Perfil {
     ADMIN,

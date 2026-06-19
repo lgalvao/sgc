@@ -1,11 +1,12 @@
 package sgc.organizacao.model;
 
-import org.junit.jupiter.api.*;
-import org.springframework.security.core.authority.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.*;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Usuario")
 class UsuarioTest {

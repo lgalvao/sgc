@@ -1,10 +1,13 @@
 package sgc.comum;
 
-import jakarta.validation.constraints.*;
-import org.jspecify.annotations.*;
-import sgc.seguranca.sanitizacao.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.jspecify.annotations.Nullable;
+import sgc.seguranca.sanitizacao.SanitizarHtmlFormatado;
 
-import java.time.*;
+import java.time.LocalDate;
 
 public final class ComumDtos {
 

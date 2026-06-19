@@ -1,24 +1,33 @@
 package sgc.seguranca.login;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import jakarta.servlet.http.*;
-import jakarta.validation.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.*;
-import sgc.organizacao.*;
-import sgc.organizacao.model.*;
-import sgc.seguranca.*;
-import sgc.seguranca.config.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import sgc.comum.erros.ErroAutenticacao;
+import sgc.comum.erros.ErroConfiguracao;
+import sgc.organizacao.UsuarioAplicacaoService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Usuario;
+import sgc.seguranca.LoginAplicacaoService;
+import sgc.seguranca.config.JwtProperties;
 import sgc.seguranca.dto.*;
 
-import java.time.*;
-import java.util.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller responsável pelo fluxo de login: autenticação, autorização e entrada.

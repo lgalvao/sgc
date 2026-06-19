@@ -1,11 +1,13 @@
 package sgc.diagnostico.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import sgc.comum.model.*;
-import sgc.mapa.model.*;
-import sgc.organizacao.model.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import sgc.comum.model.EntidadeBase;
+import sgc.mapa.model.Competencia;
+import sgc.organizacao.model.Usuario;
 
 @Entity
 @Table(name = "SITUACAO_CAPACITACAO", schema = "sgc")

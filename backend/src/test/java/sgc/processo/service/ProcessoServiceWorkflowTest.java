@@ -1,24 +1,33 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.*;
-import org.junit.jupiter.params.provider.*;
-import org.mockito.*;
-import org.springframework.data.domain.*;
-import sgc.alerta.model.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
-import sgc.mapa.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.TipoNotificacao;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroAcessoNegado;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.model.*;
-import sgc.seguranca.*;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.*;
-import sgc.subprocesso.service.SubprocessoValidacaoService.*;
+import sgc.seguranca.AcaoPermissao;
+import sgc.subprocesso.dto.DisponibilizarMapaRequest;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoValidacaoService;
+import sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;

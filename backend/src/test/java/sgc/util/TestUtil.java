@@ -1,8 +1,8 @@
 package sgc.util;
 
-import org.springframework.stereotype.*;
-import tools.jackson.core.*;
-import tools.jackson.databind.*;
+import org.springframework.stereotype.Component;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class TestUtil {

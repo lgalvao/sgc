@@ -7,8 +7,11 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroInconsistenciaInterna;
 import sgc.diagnostico.model.*;
 import sgc.mapa.model.Mapa;
-import sgc.relatorio.*;
 import sgc.organizacao.service.UnidadeService;
+import sgc.relatorio.RelatorioDiagnosticoGapCompetenciaDto;
+import sgc.relatorio.RelatorioDiagnosticoGapDto;
+import sgc.relatorio.RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto;
+import sgc.relatorio.RelatorioDiagnosticoSituacaoCapacitacaoDto;
 import sgc.subprocesso.model.Subprocesso;
 
 import java.util.LinkedHashMap;

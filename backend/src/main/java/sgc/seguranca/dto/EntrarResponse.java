@@ -1,6 +1,6 @@
 package sgc.seguranca.dto;
 
-import lombok.*;
+import lombok.Builder;
 
 /**
  * DTO para resposta de login.

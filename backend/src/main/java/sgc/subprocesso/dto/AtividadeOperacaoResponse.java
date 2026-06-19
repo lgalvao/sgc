@@ -1,10 +1,10 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
-import org.jspecify.annotations.*;
-import sgc.mapa.dto.*;
+import lombok.Builder;
+import org.jspecify.annotations.Nullable;
+import sgc.mapa.dto.AtividadeDto;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * DTO de resposta para operações CRUD em atividades.

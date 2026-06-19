@@ -1,8 +1,10 @@
 package sgc.fixture;
 
-import sgc.processo.model.*;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 public class ProcessoFixture {
 

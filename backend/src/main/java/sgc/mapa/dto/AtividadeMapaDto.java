@@ -1,8 +1,8 @@
 package sgc.mapa.dto;
 
-import org.jspecify.annotations.*;
+import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
 
 public record AtividadeMapaDto(
         @Nullable Long codigo,

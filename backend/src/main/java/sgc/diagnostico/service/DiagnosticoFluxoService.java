@@ -1,46 +1,29 @@
 package sgc.diagnostico.service;
 
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.model.ComumRepo;
 import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.diagnostico.model.Diagnostico;
-import sgc.diagnostico.model.DiagnosticoRepo;
-import java.util.Optional;
-import org.jspecify.annotations.Nullable;
+import sgc.comum.model.ComumRepo;
+import sgc.diagnostico.model.*;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Mapa;
 import sgc.organizacao.model.Unidade;
 import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
+import sgc.organizacao.service.*;
 import sgc.processo.model.ServidorProcesso;
 import sgc.processo.model.UnidadeProcesso;
 import sgc.subprocesso.dto.RegistrarTransicaoCommand;
 import sgc.subprocesso.dto.RegistrarWorkflowCommand;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
-import sgc.subprocesso.model.TipoTransicao;
-import sgc.subprocesso.service.SubprocessoConsultaService;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.LocalizacaoSubprocessoService;
+import sgc.subprocesso.service.SubprocessoConsultaService;
 import sgc.subprocesso.service.SubprocessoTransicaoService;
 import sgc.subprocesso.service.SubprocessoValidacaoService;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.Competencia;
-import sgc.diagnostico.model.AvaliacaoServidor;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.diagnostico.model.SituacaoCapacitacao;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

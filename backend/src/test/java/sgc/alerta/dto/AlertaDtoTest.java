@@ -1,14 +1,15 @@
 package sgc.alerta.dto;
 
-import org.junit.jupiter.api.*;
-import sgc.alerta.*;
-import sgc.alerta.model.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.alerta.AlertaDtoMapper;
+import sgc.alerta.model.Alerta;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("AlertaDto")
 class AlertaDtoTest {

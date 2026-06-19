@@ -1,9 +1,10 @@
 package sgc.feedback;
 
-import org.junit.jupiter.api.*;
-import tools.jackson.databind.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("FeedbackTipo")
 class FeedbackTipoTest {

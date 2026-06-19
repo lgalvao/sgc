@@ -1,7 +1,7 @@
 package sgc.configuracoes;
 
-import org.springframework.stereotype.*;
-import sgc.configuracoes.model.*;
+import org.springframework.stereotype.Component;
+import sgc.configuracoes.model.Configuracao;
 
 @Component
 public class ConfiguracaoMapper {

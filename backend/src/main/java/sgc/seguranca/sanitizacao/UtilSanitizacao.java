@@ -1,7 +1,8 @@
 package sgc.seguranca.sanitizacao;
 
-import org.jspecify.annotations.*;
-import org.owasp.html.*;
+import org.jspecify.annotations.Nullable;
+import org.owasp.html.HtmlPolicyBuilder;
+import org.owasp.html.PolicyFactory;
 
 /**
  * Utilitário centralizado para sanitização de HTML.

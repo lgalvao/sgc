@@ -1,9 +1,9 @@
 package sgc.feedback;
 
-import org.springframework.data.jpa.repository.*;
-import org.springframework.stereotype.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.UUID;
 
 @Repository
 public interface FeedbackRepo extends JpaRepository<FeedbackRegistro, UUID> {

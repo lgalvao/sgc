@@ -1,15 +1,17 @@
 package sgc.alerta;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import lombok.*;
-import org.springframework.http.*;
-import org.springframework.security.access.prepost.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sgc.alerta.dto.*;
-import sgc.comum.config.*;
+import sgc.alerta.dto.NotificacaoDto;
+import sgc.alerta.dto.NotificacaoReenvioDto;
+import sgc.alerta.dto.UrlLeitorEmailTestesDto;
+import sgc.comum.config.ConfigAplicacao;
 
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/notificacoes")

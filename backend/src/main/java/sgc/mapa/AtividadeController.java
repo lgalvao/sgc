@@ -1,18 +1,18 @@
 package sgc.mapa;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import jakarta.validation.*;
-import lombok.*;
-import org.springframework.http.*;
-import org.springframework.security.access.prepost.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.erros.*;
+import sgc.comum.erros.ErroInconsistenciaInterna;
 import sgc.mapa.dto.*;
-import sgc.subprocesso.dto.*;
+import sgc.subprocesso.dto.AtividadeOperacaoResponse;
 
-import java.net.*;
-import java.util.*;
+import java.net.URI;
+import java.util.List;
 
 /**
  * Gerencia atividades e seus Conhecimentos associados.

@@ -1,10 +1,12 @@
 package sgc.relatorio;
 
-import org.openpdf.text.*;
-import org.openpdf.text.pdf.*;
-import org.springframework.stereotype.*;
+import org.openpdf.text.Document;
+import org.openpdf.text.DocumentException;
+import org.openpdf.text.PageSize;
+import org.openpdf.text.pdf.PdfWriter;
+import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.OutputStream;
 
 @Component
 public class PdfFactory {

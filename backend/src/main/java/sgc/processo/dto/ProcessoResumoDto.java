@@ -1,8 +1,8 @@
 package sgc.processo.dto;
 
-import lombok.*;
+import lombok.Builder;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 /**
  * DTO de resposta com resumo de um processo.

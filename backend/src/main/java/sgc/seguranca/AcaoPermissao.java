@@ -1,12 +1,14 @@
 package sgc.seguranca;
 
-import lombok.*;
-import sgc.organizacao.model.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import sgc.organizacao.model.Perfil;
 
-import java.util.*;
+import java.util.Set;
 
 import static sgc.organizacao.model.Perfil.*;
-import static sgc.seguranca.AcaoPermissao.Tipo.*;
+import static sgc.seguranca.AcaoPermissao.Tipo.ESCRITA;
+import static sgc.seguranca.AcaoPermissao.Tipo.LEITURA;
 
 /**
  * Define todas as ações de permissão do sistema e seus requisitos de acesso.

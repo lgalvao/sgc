@@ -2,8 +2,9 @@ package sgc.processo.dto;
 
 import lombok.*;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder

@@ -1,24 +1,38 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.*;
-import org.springframework.data.domain.*;
-import sgc.comum.erros.*;
-import sgc.fixture.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.fixture.ProcessoFixture;
 import sgc.organizacao.model.*;
-import sgc.processo.dto.*;
-import sgc.processo.model.*;
-import sgc.seguranca.*;
-import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.SubprocessoValidacaoService.*;
+import sgc.processo.dto.ProcessoDetalheDto;
+import sgc.processo.dto.SubprocessoElegivelDto;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.seguranca.AcaoPermissao;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static sgc.processo.model.SituacaoProcesso.*;
-import static sgc.processo.model.TipoProcesso.*;
+import static sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO;
+import static sgc.processo.model.TipoProcesso.DIAGNOSTICO;
+import static sgc.processo.model.TipoProcesso.MAPEAMENTO;
 import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

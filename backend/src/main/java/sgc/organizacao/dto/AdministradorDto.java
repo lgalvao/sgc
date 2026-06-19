@@ -1,7 +1,7 @@
 package sgc.organizacao.dto;
 
-import lombok.*;
-import sgc.comum.model.*;
+import lombok.Builder;
+import sgc.comum.model.TituloEleitoral;
 
 /**
  * DTO para representação de administrador.

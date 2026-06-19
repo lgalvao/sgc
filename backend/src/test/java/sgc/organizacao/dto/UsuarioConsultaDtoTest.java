@@ -1,10 +1,12 @@
 package sgc.organizacao.dto;
 
-import org.junit.jupiter.api.*;
-import sgc.organizacao.*;
-import sgc.organizacao.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import sgc.organizacao.OrganizacaoDtoMapper;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.UsuarioConsultaLeitura;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("UsuarioConsultaDto")
 class UsuarioConsultaDtoTest {

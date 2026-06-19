@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
-import org.jspecify.annotations.*;
+import lombok.Builder;
+import org.jspecify.annotations.Nullable;
 
 /**
  * DTO para conhecimento no contexto de ajustes do mapa.

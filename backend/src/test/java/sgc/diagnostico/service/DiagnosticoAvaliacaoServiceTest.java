@@ -1,11 +1,16 @@
 package sgc.diagnostico.service;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.diagnostico.dto.*;
+import sgc.diagnostico.dto.AutoavaliacaoRequest;
+import sgc.diagnostico.dto.AvaliacaoCompetenciaDto;
+import sgc.diagnostico.dto.ConsensoCompetenciaDto;
+import sgc.diagnostico.dto.ConsensoRequest;
 import sgc.diagnostico.model.*;
 import sgc.mapa.model.Competencia;
 import sgc.organizacao.model.Usuario;
@@ -18,8 +23,10 @@ import sgc.subprocesso.service.SubprocessoConsultaService;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

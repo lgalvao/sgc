@@ -1,20 +1,28 @@
 package sgc.subprocesso.service;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
-import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
-import sgc.mapa.service.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
+import lombok.Builder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroInconsistenciaInterna;
+import sgc.comum.erros.ErroValidacao;
+import sgc.mapa.dto.AtividadeDto;
+import sgc.mapa.dto.ImpactoMapaResponse;
+import sgc.mapa.dto.MapaCompletoDto;
+import sgc.mapa.dto.MapaVisualizacaoResponse;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.model.Perfil;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.util.*;
+import java.util.List;
 
 @Service
 @Slf4j

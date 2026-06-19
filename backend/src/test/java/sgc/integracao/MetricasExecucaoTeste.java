@@ -1,15 +1,17 @@
 package sgc.integracao;
 
-import jakarta.persistence.*;
-import org.hibernate.*;
-import org.hibernate.stat.*;
-import org.springframework.util.*;
-import sgc.integracao.mocks.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
+import org.springframework.util.StopWatch;
+import sgc.integracao.mocks.ColetorSqlTeste;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class MetricasExecucaoTeste {
     public static final String PROPRIEDADE_ORCAMENTO_TEMPO_ESTRITO = "sgc.performance.strict-time-budgets";

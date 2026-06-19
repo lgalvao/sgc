@@ -1,18 +1,23 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
-import org.springframework.cache.*;
-import org.springframework.jdbc.core.*;
-import sgc.comum.erros.*;
-import sgc.comum.model.*;
-import sgc.processo.model.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.jdbc.core.JdbcTemplate;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.model.ComumRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 
-import java.util.*;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

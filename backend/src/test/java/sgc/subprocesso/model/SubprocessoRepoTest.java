@@ -1,15 +1,17 @@
 package sgc.subprocesso.model;
 
-import org.hibernate.*;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.test.context.*;
-import org.springframework.transaction.annotation.*;
+import org.hibernate.Hibernate;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static sgc.subprocesso.model.SituacaoSubprocesso.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO;
 
 @SpringBootTest
 @Transactional

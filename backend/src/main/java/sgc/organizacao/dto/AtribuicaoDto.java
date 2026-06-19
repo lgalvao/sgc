@@ -1,8 +1,8 @@
 package sgc.organizacao.dto;
 
-import lombok.*;
+import lombok.Builder;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Builder
 public record AtribuicaoDto(

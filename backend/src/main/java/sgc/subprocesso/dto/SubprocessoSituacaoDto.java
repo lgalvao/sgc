@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
+import lombok.Builder;
 
 /**
  * DTO que representa o status atual de um subprocesso.

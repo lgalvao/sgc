@@ -1,8 +1,8 @@
 package sgc.seguranca.dto;
 
-import lombok.*;
+import lombok.Builder;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * DTO da resposta inicial do fluxo de login.

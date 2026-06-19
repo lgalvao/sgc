@@ -1,11 +1,11 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
-import sgc.comum.*;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Builder;
+import sgc.comum.Mensagens;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 public record ProcessarEmBlocoRequest(

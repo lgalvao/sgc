@@ -1,21 +1,23 @@
 package sgc.processo.painel;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import lombok.*;
-import org.springframework.data.domain.*;
-import org.springframework.data.web.*;
-import org.springframework.http.*;
-import org.springframework.security.access.prepost.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import sgc.alerta.*;
-import sgc.alerta.dto.*;
-import sgc.alerta.model.*;
-import sgc.organizacao.*;
-import sgc.processo.dto.*;
-import sgc.processo.painel.dto.*;
+import sgc.alerta.AlertaDtoMapper;
+import sgc.alerta.dto.AlertaDto;
+import sgc.alerta.model.Alerta;
+import sgc.organizacao.ContextoUsuarioAutenticado;
+import sgc.organizacao.UsuarioAplicacaoService;
+import sgc.processo.dto.ProcessoResumoDto;
+import sgc.processo.painel.dto.PainelBootstrapDto;
 
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/painel")

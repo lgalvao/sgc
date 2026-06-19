@@ -1,22 +1,38 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
-import sgc.alerta.*;
-import sgc.alerta.model.*;
-import sgc.comum.*;
-import sgc.comum.config.*;
-import sgc.comum.erros.*;
-import sgc.comum.model.*;
-import sgc.organizacao.dto.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.alerta.AlertaAplicacaoService;
+import sgc.alerta.EmailModelosService;
+import sgc.alerta.EnfileirarNotificacaoCommand;
+import sgc.alerta.NotificacaoService;
+import sgc.alerta.model.Alerta;
+import sgc.alerta.model.TipoNotificacao;
+import sgc.comum.Mensagens;
+import sgc.comum.config.ConfigAplicacao;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
+import sgc.comum.model.ComumRepo;
+import sgc.organizacao.dto.AtribuicaoDto;
+import sgc.organizacao.dto.CriarAtribuicaoRequest;
+import sgc.organizacao.dto.ResponsavelDto;
+import sgc.organizacao.dto.UnidadeResponsavelDto;
 import sgc.organizacao.model.*;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

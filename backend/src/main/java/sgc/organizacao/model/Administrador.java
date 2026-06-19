@@ -1,9 +1,14 @@
 package sgc.organizacao.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import org.jspecify.annotations.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.jspecify.annotations.Nullable;
 
 @Entity
 @Table(name = "ADMINISTRADOR", schema = "sgc")

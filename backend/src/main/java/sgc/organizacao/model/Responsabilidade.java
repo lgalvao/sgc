@@ -1,12 +1,15 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.*;
-import org.hibernate.annotations.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Immutable;
 
-import java.io.*;
-import java.time.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
 @Immutable

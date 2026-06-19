@@ -1,14 +1,19 @@
 package sgc.comum.dto;
 
-import jakarta.validation.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
-import sgc.comum.ComumDtos.*;
-import sgc.comum.*;
+import sgc.comum.ComumDtos.DataRequest;
+import sgc.comum.ComumDtos.JustificativaRequest;
+import sgc.comum.ComumDtos.TextoRequest;
+import sgc.comum.Mensagens;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Testes de Validação: ComumDtos")
 class ComumDtosValidationTest {

@@ -13,11 +13,7 @@ import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.diagnostico.model.ValorSituacaoCapacitacao;
 import sgc.integracao.mocks.WithMockAdmin;
 import sgc.integracao.mocks.WithMockGestor;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.AnaliseRepo;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
-import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.*;
 
 import java.time.LocalDateTime;
 

@@ -1,15 +1,15 @@
 package sgc.configuracoes;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import jakarta.validation.*;
-import lombok.*;
-import org.springframework.security.access.prepost.*;
-import org.springframework.validation.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import sgc.configuracoes.model.*;
+import sgc.configuracoes.model.Configuracao;
 
-import java.util.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/configuracoes")
@@ -34,7 +34,7 @@ public class ConfiguracaoController {
     @Operation(summary = "Atualizar configurações em bloco")
     public List<ConfiguracaoDto> atualizar(@RequestBody @Valid List<ConfiguracaoRequest> parametros) {
         // Buscar Configuraçãos existentes e atualizar com dados das requests
-        List<Configuracao> parametrosAtualizados = parametros.stream()
+        List<Configuracao> configsAtualizadas = parametros.stream()
                 .map(request -> {
                     Configuracao configuracao = configuracaoService.buscarPorCodigo(request.codigo());
                     configuracao.atualizarDe(request);
@@ -42,7 +42,7 @@ public class ConfiguracaoController {
                 })
                 .toList();
 
-        return configuracaoService.salvar(parametrosAtualizados).stream()
+        return configuracaoService.salvar(configsAtualizadas).stream()
                 .map(configuracaoMapper::paraDto)
                 .toList();
     }

@@ -1,26 +1,32 @@
 package sgc.subprocesso;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import jakarta.validation.*;
-import lombok.*;
-import org.jspecify.annotations.*;
-import org.springframework.http.*;
-import org.springframework.security.access.prepost.*;
-import org.springframework.transaction.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.ComumDtos.*;
+import sgc.comum.ComumDtos.DataRequest;
+import sgc.comum.ComumDtos.JustificativaRequest;
+import sgc.comum.ComumDtos.TextoOpcionalRequest;
 import sgc.mapa.dto.*;
-import sgc.organizacao.*;
-import sgc.organizacao.service.*;
-import sgc.seguranca.*;
-import sgc.seguranca.sanitizacao.*;
+import sgc.organizacao.UsuarioAplicacaoService;
+import sgc.organizacao.service.UnidadeService;
+import sgc.seguranca.SgcPermissionEvaluator;
+import sgc.seguranca.sanitizacao.UtilSanitizacao;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.*;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.service.*;
 
-import java.net.*;
-import java.util.*;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/subprocessos")

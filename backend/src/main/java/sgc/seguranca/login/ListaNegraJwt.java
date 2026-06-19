@@ -1,10 +1,10 @@
 package sgc.seguranca.login;
 
-import org.springframework.scheduling.annotation.*;
-import org.springframework.stereotype.*;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-import java.time.*;
-import java.util.concurrent.*;
+import java.time.Instant;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class ListaNegraJwt {

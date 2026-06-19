@@ -1,9 +1,9 @@
 package sgc.subprocesso.dto;
 
-import lombok.*;
+import lombok.Builder;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * Command interno para atualização dos prazos e datas de etapa do subprocesso.

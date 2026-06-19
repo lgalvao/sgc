@@ -1,27 +1,31 @@
 package sgc.processo;
 
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.tags.*;
-import jakarta.validation.*;
-import lombok.*;
-import org.springframework.http.*;
-import org.springframework.security.access.prepost.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.*;
-import sgc.comum.*;
-import sgc.comum.erros.*;
-import sgc.organizacao.model.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import sgc.comum.Mensagens;
+import sgc.comum.erros.ErroValidacao;
+import sgc.organizacao.model.Unidade;
 import sgc.processo.dto.*;
-import sgc.processo.model.*;
-import sgc.processo.service.*;
-import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.*;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.processo.service.ProcessoService;
+import sgc.subprocesso.dto.SubprocessoListagemDto;
+import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.service.LocalizacaoSubprocessoService;
+import sgc.subprocesso.service.SubprocessoConsultaService;
 
-import java.net.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/processos")

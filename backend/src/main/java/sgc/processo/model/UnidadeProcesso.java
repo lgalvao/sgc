@@ -1,14 +1,18 @@
 package sgc.processo.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-import org.jspecify.annotations.*;
-import sgc.comum.erros.*;
-import sgc.organizacao.model.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.jspecify.annotations.Nullable;
+import sgc.comum.erros.ErroInconsistenciaInterna;
+import sgc.organizacao.model.TipoUnidade;
+import sgc.organizacao.model.Unidade;
 
-import java.io.*;
-import java.time.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Entidade que representa a associação entre um Processo e uma Unidade participante,

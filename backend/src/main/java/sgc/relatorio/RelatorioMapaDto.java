@@ -1,6 +1,6 @@
 package sgc.relatorio;
 
-import java.util.*;
+import java.util.List;
 
 public record RelatorioMapaDto(
         Long codigoUnidade,

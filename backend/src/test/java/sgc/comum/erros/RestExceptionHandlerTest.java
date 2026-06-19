@@ -1,35 +1,44 @@
 package sgc.comum.erros;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.validation.*;
-import org.junit.jupiter.api.*;
-import org.mockito.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.webmvc.test.autoconfigure.*;
-import org.springframework.context.annotation.*;
-import org.springframework.core.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Path;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.*;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.*;
-import org.springframework.mock.web.*;
-import org.springframework.security.access.*;
-import org.springframework.test.context.bean.override.mockito.*;
-import org.springframework.test.web.servlet.*;
-import org.springframework.validation.*;
-import org.springframework.web.bind.*;
-import org.springframework.web.context.request.*;
-import org.springframework.web.servlet.resource.*;
-import sgc.integracao.mocks.*;
-import sgc.seguranca.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import sgc.integracao.mocks.TestSecurityConfig;
+import sgc.seguranca.SgcPermissionEvaluator;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TestSecurityController.class)
 @Import({TestSecurityConfig.class, RestExceptionHandler.class})

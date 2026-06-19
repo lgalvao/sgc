@@ -1,12 +1,15 @@
 package sgc.organizacao.service;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.organizacao.model.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.organizacao.model.ResponsabilidadeRepo;
+import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.Usuario;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

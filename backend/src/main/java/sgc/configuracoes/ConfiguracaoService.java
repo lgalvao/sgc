@@ -1,12 +1,14 @@
 package sgc.configuracoes;
 
-import lombok.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.erros.*;
-import sgc.configuracoes.model.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.erros.ErroConfiguracao;
+import sgc.configuracoes.model.Configuracao;
+import sgc.configuracoes.model.ConfiguracaoRepo;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

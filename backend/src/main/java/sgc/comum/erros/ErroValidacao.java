@@ -1,8 +1,8 @@
 package sgc.comum.erros;
 
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * Exceção para erros de validação de dados de entrada ou regras de negócio.

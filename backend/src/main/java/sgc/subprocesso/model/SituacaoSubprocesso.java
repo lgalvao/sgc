@@ -1,7 +1,8 @@
 package sgc.subprocesso.model;
 
-import lombok.*;
-import sgc.processo.model.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import sgc.processo.model.TipoProcesso;
 
 @Getter
 @RequiredArgsConstructor

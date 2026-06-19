@@ -1,8 +1,8 @@
 package sgc.seguranca.config;
 
-import org.springframework.boot.context.properties.*;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Propriedades de configuração CORS.

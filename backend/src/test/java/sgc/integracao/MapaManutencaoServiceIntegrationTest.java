@@ -1,20 +1,33 @@
 package sgc.integracao;
 
-import jakarta.persistence.*;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import sgc.comum.erros.*;
-import sgc.mapa.dto.*;
-import sgc.mapa.model.*;
-import sgc.mapa.service.*;
-import sgc.organizacao.model.*;
-import sgc.processo.model.*;
-import sgc.subprocesso.model.*;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.mapa.dto.AtualizarAtividadeRequest;
+import sgc.mapa.dto.AtualizarConhecimentoRequest;
+import sgc.mapa.dto.CriarAtividadeRequest;
+import sgc.mapa.dto.CriarConhecimentoRequest;
+import sgc.mapa.model.Atividade;
+import sgc.mapa.model.Competencia;
+import sgc.mapa.model.Conhecimento;
+import sgc.mapa.model.Mapa;
+import sgc.mapa.service.MapaManutencaoService;
+import sgc.organizacao.model.Unidade;
+import sgc.processo.model.Processo;
+import sgc.processo.model.SituacaoProcesso;
+import sgc.processo.model.TipoProcesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
+import sgc.subprocesso.model.Subprocesso;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("Testes de Integração - MapaManutencaoService (CDU-11/CDU-12)")
 class MapaManutencaoServiceIntegrationTest extends BaseIntegrationTest {

@@ -1,6 +1,6 @@
 package sgc.organizacao.model;
 
-import lombok.*;
+import lombok.Builder;
 
 @Builder
 public record UnidadeResumoLeitura(

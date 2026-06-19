@@ -1,23 +1,25 @@
 package sgc.organizacao;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.jspecify.annotations.*;
-import org.springframework.cache.annotation.*;
-import org.springframework.jdbc.core.namedparam.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.config.CacheConfig;
-import sgc.organizacao.dto.*;
+import sgc.organizacao.dto.DiagnosticoOrganizacionalDto;
+import sgc.organizacao.dto.GrupoViolacaoOrganizacionalDto;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.*;
+import sgc.organizacao.service.CacheViewsOrganizacaoService;
 
 import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static sgc.organizacao.model.Perfil.*;
-import static sgc.organizacao.model.SituacaoUnidade.*;
+import static sgc.organizacao.model.Perfil.GESTOR;
+import static sgc.organizacao.model.SituacaoUnidade.ATIVA;
 import static sgc.organizacao.model.TipoUnidade.*;
 
 /**

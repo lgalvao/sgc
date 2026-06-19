@@ -1,11 +1,13 @@
 package sgc.organizacao.dto;
 
-import jakarta.validation.constraints.*;
-import sgc.comum.*;
-import sgc.comum.model.*;
-import sgc.seguranca.sanitizacao.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import sgc.comum.Mensagens;
+import sgc.comum.model.TituloEleitoral;
+import sgc.seguranca.sanitizacao.SanitizarHtml;
 
-import java.time.*;
+import java.time.LocalDate;
 
 public record CriarAtribuicaoRequest(
         @TituloEleitoral

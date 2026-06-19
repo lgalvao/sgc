@@ -1,7 +1,9 @@
 package sgc.configuracoes;
 
-import jakarta.validation.constraints.*;
-import sgc.comum.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import sgc.comum.Mensagens;
 
 /**
  * DTO de requisição para atualização de Configuração de configuração.

@@ -1,16 +1,18 @@
 package sgc.processo.service;
 
-import lombok.*;
-import lombok.extern.slf4j.*;
-import org.springframework.cache.*;
-import org.springframework.context.annotation.*;
-import org.springframework.jdbc.core.*;
-import org.springframework.stereotype.*;
-import org.springframework.transaction.annotation.*;
-import sgc.comum.model.*;
-import sgc.processo.model.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.model.ComumRepo;
+import sgc.processo.model.Processo;
+import sgc.processo.model.ProcessoRepo;
 
-import java.util.*;
+import java.util.Locale;
 
 @Service
 @Profile("hom")
