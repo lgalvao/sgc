@@ -3,12 +3,14 @@
     <CarregamentoPagina v-if="carregando"/>
 
     <template v-else>
-      <PageHeader
-          :subtitle="unidade?.unidadeNome"
-          :title="unidade?.unidadeSigla ?? siglaUnidade"
-          title-test-id="diagnostico-unidade-titulo"
+      <SubprocessoResumoHeader
+          :format-data-simples="formatDataSimples"
+          :format-situacao-subprocesso="formatSituacaoSubprocesso"
+          :format-tipo-responsabilidade="formatTipoResponsabilidade"
+          :sigla-unidade-fallback="subprocessoDetalheObrigatorio.unidade.sigla"
+          :subprocesso="subprocessoDetalheObrigatorio"
       >
-        <template #actions>
+        <template #acoes-extras>
           <BButton
               data-testid="btn-historico-analise-unidade"
               size="sm"
@@ -56,7 +58,7 @@
             {{ TEXTOS.diagnostico.BTN_VOLTAR }}
           </BButton>
         </template>
-      </PageHeader>
+      </SubprocessoResumoHeader>
 
       <AppAlert
           v-if="retornoFluxo"
@@ -65,57 +67,16 @@
           @dismissed="limparRetornoFluxo"
       />
 
-      <BRow class="mb-4">
-        <BCol class="mb-3 mb-md-0" md="6">
-          <BCard class="h-100">
-            <p class="mb-2">
-              <strong>Processo:</strong> {{ contexto?.processoCodigo ?? '-' }}
-            </p>
-            <p class="mb-2">
-              <strong>Subprocesso:</strong> {{ contexto?.subprocessoCodigo ?? '-' }}
-            </p>
-            <p class="mb-0">
-              <strong>Situação:</strong>
-              <BBadge :variant="varianteSituacao" class="ms-1">{{ situacao }}</BBadge>
-            </p>
-          </BCard>
-        </BCol>
-
-        <BCol md="6">
-          <BCard class="h-100">
-            <p class="mb-2">
-              <strong>Unidade:</strong> {{ unidade?.unidadeSigla ?? siglaUnidade }}
-            </p>
-            <p class="mb-2">
-              <strong>Nome:</strong> {{ unidade?.unidadeNome ?? '-' }}
-            </p>
-            <p class="mb-0">
-              <strong>Responsável:</strong> {{ unidade?.responsavelTitulo ?? '-' }}
-            </p>
-          </BCard>
-        </BCol>
-      </BRow>
-
       <BCard class="mb-4">
-        <BCardHeader><strong>Servidores participantes</strong></BCardHeader>
-        <EmptyState
-            v-if="servidoresExibidos.length === 0"
-            :description="TEXTOS.diagnostico.VAZIO_EQUIPE_TEXTO"
-            :title="TEXTOS.diagnostico.VAZIO_EQUIPE_TITULO"
-            icon="bi-people"
-        />
-        <BTable
-            v-else
-            :fields="colunasServidoresParticipantes"
-            :items="servidoresExibidos"
-            responsive
-            small
-        />
-      </BCard>
+        <div class="p-3 p-md-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+            <div>
+              <h3 class="h5 mb-1">{{ TEXTOS.diagnostico.TITULO_COMPETENCIAS_UNIDADE }}</h3>
+              <p class="text-muted mb-0">Selecione um servidor para visualizar as competências avaliadas.</p>
+            </div>
+            <BBadge :variant="varianteSituacao" class="align-self-start">{{ situacao }}</BBadge>
+          </div>
 
-      <BCard class="mb-4">
-        <BCardHeader><strong>{{ TEXTOS.diagnostico.TITULO_COMPETENCIAS_UNIDADE }}</strong></BCardHeader>
-        <div class="p-3">
           <EmptyState
               v-if="servidoresExibidos.length === 0"
               :description="TEXTOS.diagnostico.VAZIO_EQUIPE_TEXTO"
@@ -126,6 +87,7 @@
           <template v-else>
             <div class="mb-3">
               <div class="form-label">{{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}</div>
+              <div class="scroll-container-servidores">
               <BListGroup data-testid="lista-servidores-diagnostico-unidade">
                 <BListGroupItem
                     v-for="item in servidoresExibidos"
@@ -145,43 +107,56 @@
                   </BBadge>
                 </BListGroupItem>
               </BListGroup>
+              </div>
             </div>
 
-            <BCard
-                v-if="servidorSelecionado"
-                class="mb-3 border-0 bg-body-tertiary"
-                data-testid="detalhes-servidor-diagnostico-unidade"
-            >
-              <div class="d-flex flex-column gap-2 flex-md-row justify-content-md-between align-items-md-start">
-                <div>
-                  <div class="fw-semibold">{{ servidorSelecionado.servidorNome }}</div>
-                  <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
+            <template v-if="servidorSelecionado">
+              <BCard
+                  class="mb-3 border-0 bg-body-tertiary"
+                  data-testid="detalhes-servidor-diagnostico-unidade"
+              >
+                <div class="d-flex flex-column gap-2 flex-md-row justify-content-md-between align-items-md-start">
+                  <div>
+                    <div class="fw-semibold text-primary">{{ servidorSelecionado.servidorNome }}</div>
+                    <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
+                  </div>
+                  <BBadge :variant="varianteSituacaoServidor(servidorSelecionado.situacaoServidor)">
+                    {{ formatarSituacaoServidor(servidorSelecionado.situacaoServidor) }}
+                  </BBadge>
                 </div>
-                <BBadge :variant="varianteSituacaoServidor(servidorSelecionado.situacaoServidor)">
-                  {{ formatarSituacaoServidor(servidorSelecionado.situacaoServidor) }}
-                </BBadge>
-              </div>
-            </BCard>
+              </BCard>
 
-            <BTable
-                :fields="colunasCompetenciasServidor"
-                :items="competenciasServidorSelecionado"
-                data-testid="tbl-competencias-servidor-diagnostico-unidade"
-                responsive
-                small
-            >
-              <template #cell(importancia)="{ item }">
-                {{ formatarNota(item.importancia) }}
-              </template>
-              <template #cell(dominio)="{ item }">
-                {{ formatarNota(item.dominio) }}
-              </template>
-              <template #cell(situacaoCapacitacao)="{ item }">
-                <span :title="formatarSituacaoCapacitacao(item.situacaoCapacitacao)">
-                  {{ formatarSituacaoCapacitacaoResumida(item.situacaoCapacitacao) }}
-                </span>
-              </template>
-            </BTable>
+              <div class="table-responsive scroll-container-competencias">
+                <BTable
+                    :fields="colunasCompetenciasServidor"
+                    :items="competenciasServidorSelecionado"
+                    class="mb-0"
+                    data-testid="tbl-competencias-servidor-diagnostico-unidade"
+                    hover
+                    small
+                >
+                  <template #cell(importancia)="{ item }">
+                    {{ formatarNota(item.importancia) }}
+                  </template>
+                  <template #cell(dominio)="{ item }">
+                    {{ formatarNota(item.dominio) }}
+                  </template>
+                  <template #cell(situacaoCapacitacao)="{ item }">
+                    <span :title="formatarSituacaoCapacitacao(item.situacaoCapacitacao)">
+                      {{ formatarSituacaoCapacitacaoResumida(item.situacaoCapacitacao) }}
+                    </span>
+                  </template>
+                </BTable>
+              </div>
+            </template>
+
+            <EmptyState
+                v-else
+                :description="TEXTOS.diagnostico.VAZIO_CAPACITACAO_SELECAO_TEXTO"
+                :title="TEXTOS.diagnostico.VAZIO_CAPACITACAO_SELECAO_TITULO"
+                class="my-4"
+                icon="bi-person-check"
+            />
           </template>
         </div>
       </BCard>
@@ -240,8 +215,6 @@ import {
   BBadge,
   BButton,
   BCard,
-  BCardHeader,
-  BCol,
   BDropdown,
   BDropdownItemButton,
   BFormText,
@@ -249,17 +222,16 @@ import {
   BListGroup,
   BListGroupItem,
   BModal,
-  BRow,
   BSpinner,
   BTable,
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
-import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import HistoricoAnaliseModal from '@/components/processo/HistoricoAnaliseModal.vue';
 import SubprocessoMovimentacoes from '@/components/processo/SubprocessoMovimentacoes.vue';
+import SubprocessoResumoHeader from '@/components/processo/SubprocessoResumoHeader.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useDiagnosticoUnidadeView} from '@/views/useDiagnosticoUnidadeView';
 
@@ -269,8 +241,7 @@ const props = defineProps<{
 }>();
 const router = useRouter();
 const {
-  contexto,
-  unidade,
+  subprocessoDetalheObrigatorio,
   carregando,
   situacao,
   retornoFluxo,
@@ -299,6 +270,9 @@ const {
   devolvendo,
   homologando,
   varianteSituacao,
+  formatDataSimples,
+  formatSituacaoSubprocesso,
+  formatTipoResponsabilidade,
   formatarSituacaoCapacitacaoResumida,
   formatarSituacaoCapacitacao,
   formatarSituacaoServidor,
@@ -309,7 +283,21 @@ const {
   servidorSelecionadoTitulo,
   competenciasServidorSelecionado,
   movimentacoesFormatadas,
-  colunasServidoresParticipantes,
   colunasCompetenciasServidor,
 } = useDiagnosticoUnidadeView(props);
 </script>
+
+<style scoped>
+.scroll-container-servidores {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--bs-border-color);
+  border-radius: var(--bs-border-radius);
+}
+
+.scroll-container-competencias {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+</style>

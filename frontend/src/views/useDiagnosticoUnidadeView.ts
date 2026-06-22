@@ -6,9 +6,11 @@ import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {listarAnalisesDiagnostico} from '@/services/analiseService';
+import {formatarDataBR} from '@/utils';
+import {formatSituacaoSubprocesso} from '@/utils/formatters';
 import {TEXTOS} from '@/constants/textos';
-import type {Analise, Movimentacao} from '@/types/tipos';
-import type {SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao,} from '@/types/diagnostico-competencias';
+import type {Analise, Movimentacao, ResponsavelDto, SubprocessoDetalhe} from '@/types/tipos';
+import type {DiagnosticoContexto, SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao,} from '@/types/diagnostico-competencias';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
 
@@ -26,8 +28,11 @@ interface CompetenciaServidorSelecionado {
 }
 
 export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
-    const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
+    const contextoQuery = useDiagnosticoContexto(props.codSubprocesso);
+    const {data: contexto} = contextoQuery;
     const {
+        queryContextoEdicao,
+        subprocesso: subprocessoDetalhe,
         habilitarValidarDiagnostico,
         habilitarDevolverDiagnostico,
         habilitarHomologarDiagnostico,
@@ -38,7 +43,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         servidores,
         situacoesCapacitacao,
         movimentacoes,
-        carregando,
+        carregando: carregandoUnidade,
         situacao,
     } = useDiagnosticoUnidade(props.codSubprocesso);
 
@@ -75,6 +80,55 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const podeValidar = computed(() => habilitarValidarDiagnostico.value);
     const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
     const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
+    const carregando = computed(() =>
+        carregandoUnidade.value
+        || contextoQuery.isPending.value
+        || contextoQuery.isLoading.value
+        || queryContextoEdicao.isPending.value
+        || queryContextoEdicao.isLoading.value,
+    );
+    const contextoObrigatorio = computed<DiagnosticoContexto>(() => {
+        const valor = contexto.value;
+        if (
+            !valor
+            || valor.processoCodigo == null
+            || valor.subprocessoCodigo == null
+            || valor.unidadeSigla == null
+            || valor.unidadeNome == null
+        ) {
+            throw new Error('Contexto de diagnóstico incompleto: processo, subprocesso e unidade são obrigatórios.');
+        }
+        return valor;
+    });
+    const subprocessoDetalheObrigatorio = computed<SubprocessoDetalhe>(() => {
+        const valor = subprocessoDetalhe.value;
+        if (
+            !valor
+            || !valor.processoDescricao
+            || !valor.unidade?.sigla
+            || !valor.unidade?.nome
+            || !valor.localizacaoAtual
+            || !valor.titular?.nome
+        ) {
+            throw new Error('Contexto de subprocesso incompleto: processo, unidade, localização e titular são obrigatórios.');
+        }
+        return valor;
+    });
+
+    function formatDataSimples(dataStr: string | null): string {
+        return dataStr ? formatarDataBR(dataStr) : '';
+    }
+
+    function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
+        if (!resp?.tipo) return '';
+        if (resp.tipo === 'Substituição' && resp.dataFim) {
+            return `Substituição (até ${formatDataSimples(resp.dataFim)})`;
+        }
+        if (resp.tipo === 'Atribuição temporária' && resp.dataFim) {
+            return `Atrib. temporária (até ${formatDataSimples(resp.dataFim)})`;
+        }
+        return resp.tipo;
+    }
 
     async function abrirModalValidar() {
         observacoesValidar.value = '';
@@ -231,13 +285,16 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const servidorSelecionadoTitulo = ref<string>('');
 
     watch(servidoresExibidos, (novosServidores) => {
+        if (!servidorSelecionadoTitulo.value) {
+            return;
+        }
         const servidorAtualAindaExiste = novosServidores.some(
             (item) => item.servidorTitulo === servidorSelecionadoTitulo.value,
         );
         if (servidorAtualAindaExiste) {
             return;
         }
-        servidorSelecionadoTitulo.value = novosServidores[0]?.servidorTitulo ?? '';
+        servidorSelecionadoTitulo.value = '';
     }, {immediate: true});
 
     const servidorSelecionado = computed(() =>
@@ -256,7 +313,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     );
 
     const competenciasServidorSelecionado = computed<CompetenciaServidorSelecionado[]>(() =>
-        (contexto.value?.competencias ?? []).map((competencia) => ({
+        contextoObrigatorio.value.competencias.map((competencia) => ({
             competenciaCodigo: competencia.competenciaCodigo,
             competenciaDescricao: competencia.descricao,
             importancia: servidorSelecionado.value?.consenso.find(
@@ -325,11 +382,6 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         })),
     );
 
-    const colunasServidoresParticipantes = [
-        {key: 'servidorNome', label: 'Servidor'},
-        {key: 'servidorTitulo', label: 'Título'},
-    ];
-
     const colunasCompetenciasServidor = [
         {key: 'competenciaDescricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
         {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
@@ -339,6 +391,8 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
 
     return {
         contexto,
+        contextoObrigatorio,
+        subprocessoDetalheObrigatorio,
         unidade,
         carregando,
         situacao,
@@ -369,6 +423,9 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         homologando,
         varianteSituacao,
         varianteSituacaoServidor,
+        formatDataSimples,
+        formatSituacaoSubprocesso,
+        formatTipoResponsabilidade,
         formatarSituacaoCapacitacaoResumida,
         formatarSituacaoCapacitacao,
         formatarSituacaoServidor,
@@ -378,7 +435,6 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         servidorSelecionadoTitulo,
         competenciasServidorSelecionado,
         movimentacoesFormatadas,
-        colunasServidoresParticipantes,
         colunasCompetenciasServidor,
     };
 }
