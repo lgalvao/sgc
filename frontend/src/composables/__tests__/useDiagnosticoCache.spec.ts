@@ -59,7 +59,7 @@ describe('useDiagnosticoCache', () => {
 
         cache.invalidarFluxoCompleto(20);
 
-        expect(invalidateQueriesMock).toHaveBeenCalledTimes(3);
+        expect(invalidateQueriesMock).toHaveBeenCalledTimes(4);
         expect(invalidateQueriesMock).toHaveBeenNthCalledWith(1, {
             key: ['diagnostico-competencias', 'contexto', '151515', 'CHEFE', '12', 20],
             exact: true,
@@ -70,6 +70,10 @@ describe('useDiagnosticoCache', () => {
         });
         expect(invalidateQueriesMock).toHaveBeenNthCalledWith(3, {
             key: ['diagnostico-competencias', 'unidade', '151515', 'CHEFE', '12', 20],
+            exact: true,
+        });
+        expect(invalidateQueriesMock).toHaveBeenNthCalledWith(4, {
+            key: ['subprocesso-contexto-edicao-diagnostico', 20],
             exact: true,
         });
     });

@@ -117,7 +117,7 @@ describe("main.routes", () => {
     }, 30000);
 
     it("deve conter a rota Configuracoes", async () => {
-        const route = mainRoutes.find((r) => r.name === "Parametros");
+        const route = mainRoutes.find((r) => r.name === "Configuracoes");
         expect(route).toBeDefined();
         expect(route?.path).toBe("/configuracoes");
         expect(route?.meta?.title).toBe("Configurações");

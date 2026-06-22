@@ -32,6 +32,7 @@ const servidoresVal = ref<any[]>([
 const carregandoVal = ref(false);
 const salvandoAutomaticamenteVal = ref(false);
 const atualizarCapacitacaoMock = vi.fn();
+const habilitarCriarConsensoVal = ref(true);
 
 const unidadeVal = ref<any>({
     unidadeSigla: 'ASSESSORIA_12',
@@ -45,6 +46,7 @@ vi.mock('@/composables/useSituacaoCapacitacaoDiagnostico', () => ({
         servidores: servidoresVal,
         carregando: carregandoVal,
         salvandoAutomaticamente: salvandoAutomaticamenteVal,
+        habilitarCriarConsenso: habilitarCriarConsensoVal,
         atualizarCapacitacao: atualizarCapacitacaoMock,
     }),
 }));
@@ -65,6 +67,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
             unidadeSigla: 'ASSESSORIA_12',
             unidadeNome: 'Assessoria 12',
         };
+        habilitarCriarConsensoVal.value = true;
         atualizarCapacitacaoMock.mockReset();
     });
 
