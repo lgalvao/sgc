@@ -120,9 +120,38 @@ class DiagnosticoValidacaoServiceTest {
                 22L,
                 SituacaoAvaliacaoServidor.CONSENSO_APROVADO
         )).thenReturn(false);
+        when(avaliacaoRepo.existsByDiagnosticoCodigoAndSituacaoServidor(
+                22L,
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        )).thenReturn(true);
 
         assertThatCode(() -> service.validarConclusaoUnidade(22L))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("validarConclusaoUnidade deve falhar quando todos os servidores estiverem impossibilitados")
+    void validarConclusaoUnidade_deveFalharQuandoTodosImpossibilitados() {
+        when(avaliacaoRepo.existsByDiagnosticoCodigo(23L)).thenReturn(true);
+        when(avaliacaoRepo.existsAvaliacaoPendentePorDiagnostico(
+                23L,
+                java.util.EnumSet.of(
+                        SituacaoAvaliacaoServidor.CONSENSO_APROVADO,
+                        SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                )
+        )).thenReturn(false);
+        when(avaliacaoRepo.existsAvaliacaoAprovadaSemSituacaoCapacitacao(
+                23L,
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        )).thenReturn(false);
+        when(avaliacaoRepo.existsByDiagnosticoCodigoAndSituacaoServidor(
+                23L,
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        )).thenReturn(false);
+
+        assertThatThrownBy(() -> service.validarConclusaoUnidade(23L))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage(Mensagens.DIAGNOSTICO_TODOS_SERVIDORES_IMPOSSIBILITADOS);
     }
 
     @Test

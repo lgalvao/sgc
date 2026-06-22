@@ -55,7 +55,7 @@
           variant="success"
       >
         <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        A avaliação já foi aprovada.
+        A avaliação de consenso já foi aprovada.
       </BAlert>
 
       <!-- Tabela de competências com consenso (CDU-44) -->

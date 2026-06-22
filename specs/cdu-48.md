@@ -7,7 +7,7 @@ Ator: CHEFE
 - Login realizado com perfil CHEFE
 - Processo de diagnóstico em andamento com participação da unidade do usuário
 - Subprocesso localizado na unidade do usuário
-- Existência de ao menos um servidor da unidade com avaliação de consenso aprovada.
+- Existência de ao menos um servidor da unidade com avaliação de consenso aprovada
 
 ## Fluxo principal
 

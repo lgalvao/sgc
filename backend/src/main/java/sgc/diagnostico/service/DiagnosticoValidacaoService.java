@@ -56,9 +56,16 @@ public class DiagnosticoValidacaoService {
                 diagnosticoCodigo,
                 SituacaoAvaliacaoServidor.CONSENSO_APROVADO
         );
+        boolean possuiAvaliacaoAprovada = avaliacaoRepo.existsByDiagnosticoCodigoAndSituacaoServidor(
+                diagnosticoCodigo,
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        );
 
         if (semAvaliacoes || possuiAvaliacoesPendentes || possuiSituacaoCapacitacaoPendente) {
             throw new ErroValidacao(Mensagens.DIAGNOSTICO_PENDENTE);
+        }
+        if (!possuiAvaliacaoAprovada) {
+            throw new ErroValidacao(Mensagens.DIAGNOSTICO_TODOS_SERVIDORES_IMPOSSIBILITADOS);
         }
     }
 

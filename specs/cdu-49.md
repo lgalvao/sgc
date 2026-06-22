@@ -20,10 +20,13 @@ Ator: CHEFE
 4. O sistema verifica se todas os servidores estão com a situação 'Avaliação de consenso aprovada' ou
    'Avaliação impossibilitada', e se as situações de capacitação foram preenchidas para todas as competências.
 
-   3.1. Caso haja campos não preenchidos ou situações dos servidores fora das especificadas acima, o sistema mostra a
+   3.1. Caso **todos** os servidores estiverem com situaação 'Avaliação impossibilitada' o sistema deve interromper a
+   operação e mostrar o alerta "Não é possível concluir com todos os servidores impossibilitados."
+
+   3.2. Caso haja campos não preenchidos ou situações dos servidores fora das especificadas acima, o sistema mostra a
    mensagem "Ainda existem avaliações e situações de capacitações não aprovadas." e interrompe a operação.
 
-   3.2. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação com título "Conclusão de diagnóstico",
+   3.3. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação com título "Conclusão de diagnóstico",
    texto "Confirma a conclusão do diagnóstico da unidade?", e botões `Cancelar` e `Concluir`.
 
 5. O sistema altera a situação do subprocesso para `Concluído`.

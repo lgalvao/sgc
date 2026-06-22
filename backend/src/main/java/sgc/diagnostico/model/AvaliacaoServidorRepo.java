@@ -13,6 +13,11 @@ public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, 
 
     boolean existsByDiagnosticoCodigo(long diagnosticoCodigo);
 
+    boolean existsByDiagnosticoCodigoAndSituacaoServidor(
+            long diagnosticoCodigo,
+            SituacaoAvaliacaoServidor situacaoServidor
+    );
+
     @Query("""
         SELECT a FROM AvaliacaoServidor a
         JOIN FETCH a.servidor

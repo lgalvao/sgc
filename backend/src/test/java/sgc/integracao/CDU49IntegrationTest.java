@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.NotificacaoEmailRepo;
+import sgc.comum.Mensagens;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.diagnostico.model.ValorSituacaoCapacitacao;
 import sgc.integracao.mocks.WithMockChefe;
@@ -16,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
@@ -45,6 +47,17 @@ class CDU49IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
         mockMvc.perform(get(API_DIAGNOSTICO + "/concluir/validacao", subprocesso.getCodigo()))
                 .andExpect(status().isUnprocessableContent());
+    }
+
+    @Test
+    @WithMockChefe("333333333333")
+    @DisplayName("Deve barrar a conclusão quando todos os servidores estiverem impossibilitados")
+    void deveBarrarConclusaoQuandoTodosServidoresImpossibilitados() throws Exception {
+        preencherAutoavaliacao("50003", 4, 4, 4, 4, SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+
+        mockMvc.perform(get(API_DIAGNOSTICO + "/concluir/validacao", subprocesso.getCodigo()))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.message").value(Mensagens.DIAGNOSTICO_TODOS_SERVIDORES_IMPOSSIBILITADOS));
     }
 
     @Test

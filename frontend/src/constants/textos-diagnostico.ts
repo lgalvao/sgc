@@ -118,5 +118,5 @@ export const TEXTOS_DIAGNOSTICO = {
     ERRO_JUSTIFICATIVA_OBRIGATORIA: 'A justificativa é obrigatória.',
     ERRO_PREENCHIMENTO_INCOMPLETO: 'Preencha importância e domínio para todas as competências.',
     ERRO_PREENCHIMENTO_CONSENSO_INCOMPLETO: 'Preencha todos os campos',
-    ERRO_PENDENCIAS_CONCLUSAO: 'Ainda existem avaliações e situações de capacitações não aprovadas.',
+    ERRO_PENDENCIAS_CONCLUSAO: 'Ainda existem avaliações ou situações de capacitação pendentes.',
 } as const;

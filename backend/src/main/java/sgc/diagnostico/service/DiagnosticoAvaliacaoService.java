@@ -12,6 +12,7 @@ import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.Subprocesso;
 import sgc.subprocesso.service.SubprocessoConsultaService;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -215,18 +216,44 @@ public class DiagnosticoAvaliacaoService {
         Map<String, SituacaoCapacitacao> porChave = existentes.stream()
                 .collect(java.util.stream.Collectors.toMap(
                         o -> o.getServidor().getTituloEleitoral() + ":" + o.getCompetencia().getCodigo(), o -> o));
+        Map<String, AvaliacaoServidor> avaliacoesAprovadasPorChave = avaliacaoRepo.listarPorDiagnostico(diagnostico.getCodigo()).stream()
+                .filter(avaliacao -> avaliacao.getSituacaoServidor() == SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .collect(java.util.stream.Collectors.toMap(
+                        avaliacao -> avaliacao.getServidor().getTituloEleitoral() + ":" + avaliacao.getCompetencia().getCodigo(),
+                        avaliacao -> avaliacao
+                ));
+        var registrosParaSalvar = new ArrayList<>(existentes);
 
         for (SituacaoCapacitacaoDto item : request.situacoes()) {
             String chave = item.servidorTitulo() + ":" + item.competenciaCodigo();
             SituacaoCapacitacao registro = porChave.get(chave);
             if (registro == null) {
-                continue;
+                AvaliacaoServidor avaliacao = avaliacoesAprovadasPorChave.get(chave);
+                if (avaliacao == null) {
+                    continue;
+                }
+                registro = criarSituacaoCapacitacao(diagnostico, avaliacao);
+                porChave.put(chave, registro);
+                registrosParaSalvar.add(registro);
             }
             registro.setSituacaoCapacitacao(
                     item.situacaoCapacitacao() == null ? null : ValorSituacaoCapacitacao.valueOf(item.situacaoCapacitacao())
             );
         }
-        situacaoCapacitacaoRepo.saveAll(existentes);
+        situacaoCapacitacaoRepo.saveAll(registrosParaSalvar);
+    }
+
+    private SituacaoCapacitacao criarSituacaoCapacitacao(Diagnostico diagnostico, AvaliacaoServidor avaliacao) {
+        Subprocesso subprocesso = diagnostico.getSubprocesso();
+        return SituacaoCapacitacao.builder()
+                .diagnostico(diagnostico)
+                .servidor(avaliacao.getServidor())
+                .servidorNomeSnapshot(avaliacao.getServidorNomeDiagnostico())
+                .unidadeCodigoSnapshot(subprocesso.getUnidade().getCodigo())
+                .unidadeSiglaSnapshot(subprocesso.getUnidade().getSigla())
+                .unidadeNomeSnapshot(subprocesso.getUnidade().getNome())
+                .competencia(avaliacao.getCompetencia())
+                .build();
     }
 
     private void validarCompetenciasEsperadas(

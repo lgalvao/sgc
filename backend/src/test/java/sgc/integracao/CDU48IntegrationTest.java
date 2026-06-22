@@ -64,4 +64,34 @@ class CDU48IntegrationTest extends DiagnosticoCduIntegrationTestBase {
             }
         });
     }
+
+    @Test
+    @WithMockChefe("333333333333")
+    @DisplayName("Deve criar registro de situação de capacitação quando ainda não houver registro persistido")
+    void deveCriarSituacaoCapacitacaoQuandoRegistroNaoExistir() throws Exception {
+        preencherConsenso("50003", 4, 4, 4, 4, 3, 3, 3, 3, sgc.diagnostico.model.SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+        situacaoCapacitacaoRepo.deleteAll(buscarSituacoesCapacitacao("50003"));
+        situacaoCapacitacaoRepo.flush();
+
+        SituacoesCapacitacaoRequest request = new SituacoesCapacitacaoRequest(List.of(
+                SituacaoCapacitacaoDto.builder()
+                        .competenciaCodigo(competencia1.getCodigo())
+                        .servidorTitulo("50003")
+                        .situacaoCapacitacao(ValorSituacaoCapacitacao.EC.name())
+                        .build()
+        ));
+
+        mockMvc.perform(post(API_DIAGNOSTICO + "/situacoes-capacitacao", subprocesso.getCodigo())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        List<SituacaoCapacitacao> ocupacoes = buscarSituacoesCapacitacao("50003");
+        assertThat(ocupacoes).singleElement().satisfies(ocupacao -> {
+            assertThat(ocupacao.getCompetencia().getCodigo()).isEqualTo(competencia1.getCodigo());
+            assertThat(ocupacao.getSituacaoCapacitacao()).isEqualTo(ValorSituacaoCapacitacao.EC);
+            assertThat(ocupacao.getUnidadeSiglaSnapshot()).isEqualTo(unidade.getSigla());
+        });
+    }
 }

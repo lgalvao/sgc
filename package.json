@@ -49,6 +49,9 @@
     "esbuild@0.28.1": true
   },
   "overrides": {
+    "z-schema": "^12.3.1",
+    "json-schema-ref-parser": "npm:@apidevtools/json-schema-ref-parser@^9.0.9",
+    "glob": "$glob",
     "vue-tsc": {
       "typescript": "^6.0.3"
     },

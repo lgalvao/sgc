@@ -267,7 +267,7 @@ describe('ConsensoDiagnosticoView', () => {
         habilitarAprovarConsenso.value = false;
         const wrapper = montar();
 
-        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação já foi aprovada.');
+        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação de consenso já foi aprovada.');
         expect(wrapper.find('select').exists()).toBe(false);
         expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
     });

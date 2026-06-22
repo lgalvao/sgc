@@ -44,7 +44,7 @@ test.describe('CDU-46 - Aprovar avaliação de consenso', () => {
         await verificarToast(page, 'Avaliação de consenso aprovada');
 
         await page.goto(`/diagnostico/${codSubprocesso}/${UNIDADE}/consenso/${TITULO_SERVIDOR_ASSESSORIA_12}`);
-        await expect(page.getByText('A avaliação já foi aprovada.')).toBeVisible();
+        await expect(page.getByText('A avaliação de consenso já foi aprovada.')).toBeVisible();
         await expect(page.getByTestId('btn-aprovar-consenso')).toBeDisabled();
 
         await login(page, '191919', 'senha');
