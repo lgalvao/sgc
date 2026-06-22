@@ -12,8 +12,7 @@
     "test": "npm --prefix frontend run test",
     "test:e2e": "playwright test --config=e2e/playwright.config.ts --project=chromium",
     "test:unit": "npm --prefix frontend run test:unit",
-    "typecheck": "npm run typecheck:e2e && npm --prefix frontend run typecheck",
-    "typecheck:e2e": "npm run typecheck -w e2e",
+    "typecheck": "npm run typecheck --workspaces --if-present",
     "sgc": "node toolkit/sgc.js",
     "smells:auditar": "node toolkit/sgc.js codigo smells auditar",
     "frontend:cruft": "node toolkit/sgc.js frontend cruft auditar",
@@ -41,6 +40,7 @@
     "knip": "^6.17.1",
     "oxlint": "^1.70.0",
     "release-it": "^20.2.0",
+    "typescript": "^6.0.3",
     "vite": "^8.0.16"
   },
   "allowScripts": {
