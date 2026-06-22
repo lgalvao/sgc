@@ -272,14 +272,28 @@ describe('ConsensoDiagnosticoView', () => {
         expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
     });
 
+    it('mantem a tabela em leitura quando o consenso ja esta aprovado mesmo se podeEditar vier true', () => {
+        ehConsensoAprovado.value = true;
+        podeEditar.value = true;
+
+        const wrapper = montar();
+
+        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação de consenso já foi aprovada.');
+        expect(wrapper.find('select').exists()).toBe(false);
+        expect(wrapper.text()).toContain('3');
+        expect(wrapper.text()).toContain('4');
+    });
+
     it('mantem o botão concluir avaliação desabilitado quando a situação individual já é consenso criado', () => {
         podeConcluirAvaliacao.value = true;
+        podeEditar.value = true;
         habilitarConcluirAvaliacao.value = false;
 
         const wrapper = montar();
 
         expect(wrapper.find('[data-testid="btn-concluir-avaliacao"]').exists()).toBe(true);
         expect(wrapper.get('[data-testid="btn-concluir-avaliacao"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('select').exists()).toBe(false);
     });
 
     it('mostra erro ao falhar aprovar e permite dispensar o alerta', async () => {

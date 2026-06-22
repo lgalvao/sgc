@@ -310,7 +310,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         expect(wrapper.find('select').exists()).toBe(false);
         expect(wrapper.text()).toContain('NA');
         expect(wrapper.text()).toContain('-');
-        expect(wrapper.text()).toContain('Avaliação de consenso aprovada. Fluxo finalizado.');
+        expect(wrapper.text()).toContain('A avaliação de consenso já foi aprovada.');
     });
 
     it('normaliza valores das notas antes de atualizar', async () => {

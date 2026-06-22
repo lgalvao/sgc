@@ -111,6 +111,23 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const mutacaoConcluir = useMutation({
         mutation: (titulo: string) => concluirConsenso(codSubprocesso, titulo),
         onSuccess: () => {
+            const anterior = cache.getQueryData<Consenso>(
+                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
+            );
+            if (anterior) {
+                cache.setQueryData(
+                    chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
+                    {
+                        ...anterior,
+                        situacaoServidor: 'CONSENSO_CRIADO',
+                        podeEditar: false,
+                        podeConcluirAvaliacao: true,
+                        habilitarConcluirAvaliacao: false,
+                        podeAprovarConsenso: anterior.podeAprovarConsenso,
+                        habilitarAprovarConsenso: anterior.habilitarAprovarConsenso,
+                    } satisfies Consenso,
+                );
+            }
             invalidarQueriesConsenso({cache, codSubprocesso, contextoSessao, servidorTitulo});
             void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso, contextoSessao), exact: true});
         },
@@ -119,6 +136,23 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const mutacaoAprovar = useMutation({
         mutation: () => aprovarConsenso(codSubprocesso),
         onSuccess: () => {
+            const anterior = cache.getQueryData<Consenso>(
+                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
+            );
+            if (anterior) {
+                cache.setQueryData(
+                    chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
+                    {
+                        ...anterior,
+                        situacaoServidor: 'CONSENSO_APROVADO',
+                        podeEditar: false,
+                        podeConcluirAvaliacao: false,
+                        habilitarConcluirAvaliacao: false,
+                        podeAprovarConsenso: true,
+                        habilitarAprovarConsenso: false,
+                    } satisfies Consenso,
+                );
+            }
             invalidarQueriesAprovar({cache, codSubprocesso, contextoSessao, chaveConsultaConsenso: chaveConsultaConsenso.value});
         },
     });

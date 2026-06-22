@@ -97,7 +97,7 @@
               </td>
               <td class="text-center grupo-servidor coluna-nota">
                 <BFormSelect
-                    v-if="podeEditar"
+                    v-if="podeEditar && habilitarConcluirAvaliacao && !ehConsensoAprovado"
                     :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
                     :model-value="item.chefiaImportancia"
                     :options="opcoesNota"
@@ -108,7 +108,7 @@
               </td>
               <td class="text-center grupo-consenso celula-consenso coluna-nota">
                 <BFormSelect
-                    v-if="podeEditar"
+                    v-if="podeEditar && habilitarConcluirAvaliacao && !ehConsensoAprovado"
                     :data-testid="`consenso-final-importancia-${item.competenciaCodigo}`"
                     :disabled="!campoConsensoHabilitado(item, 'importancia')"
                     :model-value="item.consensoImportancia"
@@ -123,7 +123,7 @@
               </td>
               <td class="text-center grupo-chefia coluna-nota">
                 <BFormSelect
-                    v-if="podeEditar"
+                    v-if="podeEditar && habilitarConcluirAvaliacao && !ehConsensoAprovado"
                     :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
                     :model-value="item.chefiaDominio"
                     :options="opcoesNota"
@@ -134,7 +134,7 @@
               </td>
               <td class="text-center grupo-consenso celula-consenso coluna-nota">
                 <BFormSelect
-                    v-if="podeEditar"
+                    v-if="podeEditar && habilitarConcluirAvaliacao && !ehConsensoAprovado"
                     :data-testid="`consenso-final-dominio-${item.competenciaCodigo}`"
                     :disabled="!campoConsensoHabilitado(item, 'dominio')"
                     :model-value="item.consensoDominio"

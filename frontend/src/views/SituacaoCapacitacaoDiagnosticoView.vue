@@ -72,9 +72,9 @@
                       v-for="linha in competenciasServidorSelecionado"
                       :key="linha.competenciaCodigo"
                   >
-                    <th class="celula-competencia" scope="row">
+                    <td class="celula-competencia">
                       {{ linha.competenciaDescricao }}
-                    </th>
+                    </td>
                     <td class="text-center">
                       <BBadge pill variant="light">{{ formatarNota(linha.importancia) }}</BBadge>
                     </td>

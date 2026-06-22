@@ -293,10 +293,33 @@ describe('useConsensoDiagnostico', () => {
 
     it('deve chamar mutacao de aprovacao e executar onSuccess', async () => {
         const { aprovarConsenso } = await import('@/services/diagnosticoService');
+        const cacheMock = {
+            getQueryData: vi.fn().mockReturnValue({
+                competencias: [{ competenciaCodigo: 1 }],
+                situacaoServidor: 'CONSENSO_CRIADO',
+                podeEditar: true,
+                podeConcluirAvaliacao: false,
+                habilitarConcluirAvaliacao: false,
+                podeAprovarConsenso: true,
+                habilitarAprovarConsenso: true,
+            }),
+            setQueryData: vi.fn(),
+            invalidateQueries: invalidateQueriesMock,
+        };
+        vi.mocked(useQueryCache).mockReturnValue(cacheMock as any);
+
         const { aprovarConsenso: aprovar } = useConsensoDiagnostico(1);
         await aprovar();
         
         expect(aprovarConsenso).toHaveBeenCalledWith(1);
+        expect(cacheMock.setQueryData).toHaveBeenCalledWith('chaveConsenso', expect.objectContaining({
+            situacaoServidor: 'CONSENSO_APROVADO',
+            podeEditar: false,
+            podeConcluirAvaliacao: false,
+            habilitarConcluirAvaliacao: false,
+            podeAprovarConsenso: true,
+            habilitarAprovarConsenso: false,
+        }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveConsenso' }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveEquipe' }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveAuto' }));
@@ -304,10 +327,31 @@ describe('useConsensoDiagnostico', () => {
 
     it('deve chamar mutacao de conclusao e invalidar as queries relevantes', async () => {
         const { concluirConsenso } = await import('@/services/diagnosticoService');
+        const cacheMock = {
+            getQueryData: vi.fn().mockReturnValue({
+                competencias: [{ competenciaCodigo: 1 }],
+                situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+                podeEditar: true,
+                podeConcluirAvaliacao: true,
+                habilitarConcluirAvaliacao: true,
+                podeAprovarConsenso: false,
+                habilitarAprovarConsenso: false,
+            }),
+            setQueryData: vi.fn(),
+            invalidateQueries: invalidateQueriesMock,
+        };
+        vi.mocked(useQueryCache).mockReturnValue(cacheMock as any);
+
         const { concluirAvaliacao } = useConsensoDiagnostico(1, 'servidor1');
         await concluirAvaliacao();
 
         expect(concluirConsenso).toHaveBeenCalledWith(1, 'servidor1');
+        expect(cacheMock.setQueryData).toHaveBeenCalledWith('chaveConsenso', expect.objectContaining({
+            situacaoServidor: 'CONSENSO_CRIADO',
+            podeEditar: false,
+            podeConcluirAvaliacao: true,
+            habilitarConcluirAvaliacao: false,
+        }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveConsenso' }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveEquipe' }));
         expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveAuto' }));

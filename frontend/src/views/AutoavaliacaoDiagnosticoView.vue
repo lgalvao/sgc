@@ -41,7 +41,7 @@
           variant="success"
       >
         <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        Avaliação de consenso aprovada. Fluxo finalizado.
+        A avaliação de consenso já foi aprovada.
       </BAlert>
 
       <BCard class="mb-4" style="max-width: 750px;">
