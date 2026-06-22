@@ -6,7 +6,8 @@ const CHAVES_PERMISSOES = [
     'podeHomologarCadastro', 'podeEditarMapa', 'podeDisponibilizarMapa', 'podeValidarMapa',
     'podeApresentarSugestoes', 'podeVerSugestoes', 'podeDevolverMapa', 'podeAceitarMapa',
     'podeHomologarMapa', 'podeVisualizarImpacto', 'podeAlterarDataLimite', 'podeReabrirCadastro',
-    'podeReabrirRevisao', 'podeEnviarLembrete', 'podePreencherAutoavaliacao', 'podeCriarConsenso',
+    'podeReabrirRevisao', 'podeEnviarLembrete', 'mostrarExportacaoMapa', 'mostrarHistoricoAnaliseDiagnostico',
+    'podePreencherAutoavaliacao', 'podeCriarConsenso',
     'podeConcluirDiagnostico', 'podeValidarDiagnostico', 'podeDevolverDiagnostico', 'podeHomologarDiagnostico',
     'mesmaUnidade', 'habilitarAcessoCadastro', 'habilitarAcessoMapa', 'habilitarAcessoDiagnostico',
     'habilitarEditarCadastro', 'habilitarDisponibilizarCadastro',
@@ -15,6 +16,7 @@ const CHAVES_PERMISSOES = [
     'habilitarApresentarSugestoes', 'habilitarDevolverMapa', 'habilitarAceitarMapa',
     'habilitarHomologarMapa', 'habilitarAlterarDataLimite', 'habilitarReabrirCadastro',
     'habilitarReabrirRevisao', 'habilitarEnviarLembrete', 'habilitarPreencherAutoavaliacao',
+    'habilitarCardConsenso', 'habilitarCardSituacaoCapacitacao',
     'habilitarCriarConsenso', 'habilitarConcluirDiagnostico', 'habilitarValidarDiagnostico',
     'habilitarDevolverDiagnostico', 'habilitarHomologarDiagnostico',
 ] as const satisfies readonly (keyof PermissoesSubprocesso)[];

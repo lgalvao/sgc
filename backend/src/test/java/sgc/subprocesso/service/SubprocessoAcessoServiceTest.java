@@ -7,7 +7,10 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.diagnostico.model.AvaliacaoServidorRepo;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.organizacao.ContextoUsuarioAutenticado;
+import sgc.organizacao.UsuarioAplicacaoService;
 import sgc.organizacao.model.Perfil;
 import sgc.organizacao.model.Unidade;
 import sgc.subprocesso.dto.PermissoesSubprocessoDto;
@@ -26,6 +29,10 @@ class SubprocessoAcessoServiceTest {
 
     @Mock
     private ImpactoMapaService impactoMapaService;
+    @Mock
+    private AvaliacaoServidorRepo avaliacaoServidorRepo;
+    @Mock
+    private UsuarioAplicacaoService usuarioAplicacaoService;
 
     @InjectMocks
     private SubprocessoAcessoService acessoService;
@@ -41,6 +48,7 @@ class SubprocessoAcessoServiceTest {
         PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(contexto);
 
         assertThat(dto.podeAlterarDataLimite()).isTrue();
+        assertThat(dto.mostrarExportacaoMapa()).isFalse();
         assertThat(dto.podeReabrirCadastro()).isTrue();
         assertThat(dto.podeReabrirRevisao()).isTrue();
         assertThat(dto.podeEnviarLembrete()).isTrue();
@@ -76,6 +84,7 @@ class SubprocessoAcessoServiceTest {
         assertThat(dto.habilitarEditarCadastro()).isTrue();
         assertThat(dto.habilitarDisponibilizarCadastro()).isTrue();
         assertThat(dto.habilitarAcessoCadastro()).isTrue();
+        assertThat(dto.mostrarExportacaoMapa()).isTrue();
         assertThat(dto.podeReabrirCadastro()).isFalse();
     }
 
@@ -362,6 +371,17 @@ class SubprocessoAcessoServiceTest {
     private SubprocessoConsultaService.ContextoConsultaSubprocesso createContexto(
             Subprocesso subprocesso, Perfil perfil, boolean mesmaUnidade, boolean isHierarquia,
             boolean processoFinalizado, boolean temMapaVigente) {
+        if (subprocesso.getCodigo() == null) {
+            subprocesso.setCodigo(1L);
+        }
+
+        if (perfil == Perfil.SERVIDOR && isFluxoDiagnostico(subprocesso.getSituacao())) {
+            when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(ContextoUsuarioAutenticado.builder()
+                    .usuarioTitulo("123456789012")
+                    .unidadeAtivaCodigo(1L)
+                    .perfil(perfil)
+                    .build());
+        }
 
         return new SubprocessoConsultaService.ContextoConsultaSubprocesso(
                 subprocesso,
@@ -391,5 +411,11 @@ class SubprocessoAcessoServiceTest {
         assertThat(extrator.apply(permissoes))
                 .as("%s %s %s", nomePermissao, situacao, perfil)
                 .isFalse();
+    }
+
+    private boolean isFluxoDiagnostico(SituacaoSubprocesso situacao) {
+        return situacao == DIAGNOSTICO_EM_ANDAMENTO
+                || situacao == DIAGNOSTICO_CONCLUIDO
+                || situacao == DIAGNOSTICO_HOMOLOGADO;
     }
 }

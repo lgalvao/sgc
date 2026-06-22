@@ -72,15 +72,13 @@
       </BTable>
     </template>
 
-    <BModal
+    <ModalPadrao
         v-model="mostrarDetalhes"
-        :title="TEXTOS.administracao.FEEDBACKS_MODAL_TITULO"
-        :ok-title="TEXTOS.comum.BOTAO_FECHAR"
-        ok-only
-        ok-variant="secondary"
+        :mostrar-botao-acao="false"
+        :texto-cancelar="TEXTOS.comum.BOTAO_FECHAR"
+        :titulo="TEXTOS.administracao.FEEDBACKS_MODAL_TITULO"
         data-testid="modal-detalhes-feedback"
-        scrollable
-        size="lg"
+        tamanho="lg"
     >
       <div v-if="feedbackSelecionado" class="p-2">
         <dl class="row mb-0">
@@ -148,33 +146,32 @@
           </dd>
         </dl>
       </div>
-    </BModal>
+    </ModalPadrao>
 
-    <!-- Modal de Imagem Ampliada -->
-    <BModal
+    <ModalPadrao
         v-model="mostrarImagemAmpliada"
-        :title="TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA"
-        :ok-title="TEXTOS.comum.BOTAO_FECHAR"
-        ok-only
-        ok-variant="secondary"
-        centered
-        size="xl"
+        :mostrar-botao-acao="false"
+        :texto-cancelar="TEXTOS.comum.BOTAO_FECHAR"
+        :titulo="TEXTOS.administracao.FEEDBACKS_CAMPOS.CAPTURA"
+        centralizado
         data-testid="modal-imagem-ampliada"
+        tamanho="xl"
     >
       <div class="text-center">
         <img :src="urlImagemAmpliada" alt="Captura ampliada" class="img-fluid rounded shadow"/>
       </div>
-    </BModal>
+    </ModalPadrao>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from "vue";
-import {BAlert, BBadge, BButton, BModal, BTable} from "bootstrap-vue-next";
+import {BAlert, BBadge, BButton, BTable} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {useFeedbacksAdminQuery} from "@/composables/useFeedbacksAdminQuery";
 import {TEXTOS} from "@/constants/textos";
 import type {FeedbackAdmin} from "@/services/feedbackAdminService";

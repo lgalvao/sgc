@@ -1,6 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import CadastroAcoesHeader from './CadastroAcoesHeader.vue';
 import type {PermissoesSubprocesso, Unidade} from '@/types/tipos';
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
 
 const meta: Meta<typeof CadastroAcoesHeader> = {
     title: 'Cadastro/CadastroAcoesHeader',
@@ -25,6 +26,7 @@ const unidadeMock: Unidade = {
 };
 
 const permissoesMock: PermissoesSubprocesso = {
+    ...PERMISSOES_SUBPROCESSO_VAZIAS,
     podeEditarCadastro: true,
     podeDisponibilizarCadastro: true,
     podeDevolverCadastro: true,

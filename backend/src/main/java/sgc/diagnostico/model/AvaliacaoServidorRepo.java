@@ -19,6 +19,30 @@ public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, 
     );
 
     @Query("""
+        SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END
+        FROM AvaliacaoServidor a
+        WHERE a.diagnostico.subprocesso.codigo = :codSubprocesso
+        AND a.situacaoServidor = :situacaoServidor
+    """)
+    boolean existsBySubprocessoCodigoAndSituacaoServidor(
+            @Param("codSubprocesso") long codSubprocesso,
+            @Param("situacaoServidor") SituacaoAvaliacaoServidor situacaoServidor
+    );
+
+    @Query("""
+        SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END
+        FROM AvaliacaoServidor a
+        WHERE a.diagnostico.subprocesso.codigo = :codSubprocesso
+        AND a.servidor.tituloEleitoral = :servidorTitulo
+        AND a.situacaoServidor IN :situacoes
+    """)
+    boolean existsBySubprocessoCodigoAndServidorTituloAndSituacaoServidorIn(
+            @Param("codSubprocesso") long codSubprocesso,
+            @Param("servidorTitulo") String servidorTitulo,
+            @Param("situacoes") Collection<SituacaoAvaliacaoServidor> situacoes
+    );
+
+    @Query("""
         SELECT a FROM AvaliacaoServidor a
         JOIN FETCH a.servidor
         JOIN FETCH a.competencia

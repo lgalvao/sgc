@@ -50,6 +50,7 @@ export function useMapaTela(props: MapaTelaProps) {
         mostrarApresentarSugestoes,
         mostrarDisponibilizarMapa,
         mostrarDevolverMapa,
+        mostrarExportacaoMapa,
         habilitarApresentarSugestoes,
         habilitarDisponibilizarMapa,
         habilitarEditarMapa,
@@ -85,7 +86,6 @@ export function useMapaTela(props: MapaTelaProps) {
         carregarContextoInicial,
     } = useMapaOrquestracao(props);
 
-    const mostrarExportacaoMapa = computed(() => perfilStore.perfilSelecionado === Perfil.CHEFE && Boolean(codigoSubprocesso.value));
     const loadingExportacaoPdf = ref(false);
     const loadingExportacaoCsv = ref(false);
 

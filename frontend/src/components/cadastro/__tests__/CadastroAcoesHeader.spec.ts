@@ -2,8 +2,10 @@ import {describe, expect, it} from 'vitest'
 import {mount} from '@vue/test-utils'
 import CadastroAcoesHeader from '../CadastroAcoesHeader.vue'
 import {TEXTOS} from "@/constants/textos"
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 
 const permissoesBase = {
+    ...PERMISSOES_SUBPROCESSO_VAZIAS,
     podeEditarCadastro: true,
     podeDisponibilizarCadastro: true,
     podeDevolverCadastro: true,

@@ -8,16 +8,8 @@ export function usarAcessoCadastro(
     permissoes: ComputedRef<PermissoesSubprocesso>,
     ehRevisao: ComputedRef<boolean>
 ) {
-    const podeAnalisarCadastro = computed(() =>
-        permissoes.value.podeDevolverCadastro ||
-        permissoes.value.podeAceitarCadastro ||
-        permissoes.value.podeHomologarCadastro
-    );
-
     const mostrarImportarAtividades = computed(() => permissoes.value.podeEditarCadastro);
-    const mostrarDisponibilizarCadastro = computed(() =>
-        permissoes.value.podeDisponibilizarCadastro || permissoes.value.podeEditarCadastro
-    );
+    const mostrarDisponibilizarCadastro = computed(() => permissoes.value.podeDisponibilizarCadastro);
     const mostrarDevolverCadastro = computed(() => permissoes.value.podeDevolverCadastro);
 
     const acaoPrincipalCadastro = computed<AcaoPrincipalCadastro | null>(() => {
@@ -57,7 +49,6 @@ export function usarAcessoCadastro(
     });
 
     return {
-        podeAnalisarCadastro,
         mostrarImportarAtividades,
         mostrarDisponibilizarCadastro,
         mostrarDevolverCadastro,

@@ -24,9 +24,18 @@ function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): Permiss
         podeReabrirCadastro: false,
         podeReabrirRevisao: false,
         podeEnviarLembrete: false,
+        mostrarExportacaoMapa: false,
+        mostrarHistoricoAnaliseDiagnostico: false,
+        podePreencherAutoavaliacao: false,
+        podeCriarConsenso: false,
+        podeConcluirDiagnostico: false,
+        podeValidarDiagnostico: false,
+        podeDevolverDiagnostico: false,
+        podeHomologarDiagnostico: false,
         mesmaUnidade: false,
         habilitarAcessoCadastro: false,
         habilitarAcessoMapa: false,
+        habilitarAcessoDiagnostico: false,
         habilitarEditarCadastro: false,
         habilitarDisponibilizarCadastro: false,
         habilitarDevolverCadastro: false,
@@ -43,6 +52,14 @@ function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): Permiss
         habilitarReabrirCadastro: false,
         habilitarReabrirRevisao: false,
         habilitarEnviarLembrete: false,
+        habilitarPreencherAutoavaliacao: false,
+        habilitarCardConsenso: false,
+        habilitarCardSituacaoCapacitacao: false,
+        habilitarCriarConsenso: false,
+        habilitarConcluirDiagnostico: false,
+        habilitarValidarDiagnostico: false,
+        habilitarDevolverDiagnostico: false,
+        habilitarHomologarDiagnostico: false,
         ...parciais,
     };
 }
@@ -173,38 +190,6 @@ describe('useAcesso', () => {
         const acesso = useAcesso(subprocesso);
         expect(acesso.podeEditarCadastro.value).toBe(true);
         expect(acesso.podeDisponibilizarCadastro.value).toBe(false); // default
-    });
-
-    it('deve calcular podeAnalisarCadastro e podeAnalisarMapa corretamente', () => {
-        const subprocesso = criarSubprocesso({
-            permissoes: criarPermissoes({
-                podeDevolverCadastro: true,
-                podeDevolverMapa: true
-            })
-        });
-        const acesso = useAcesso(subprocesso);
-        expect(acesso.podeAnalisarCadastro.value).toBe(true);
-        expect(acesso.podeAnalisarMapa.value).toBe(true);
-
-        const subprocesso2 = criarSubprocesso({
-            permissoes: criarPermissoes({
-                podeAceitarCadastro: true,
-                podeAceitarMapa: true
-            })
-        });
-        const acesso2 = useAcesso(subprocesso2);
-        expect(acesso2.podeAnalisarCadastro.value).toBe(true);
-        expect(acesso2.podeAnalisarMapa.value).toBe(true);
-
-        const subprocesso3 = criarSubprocesso({
-            permissoes: criarPermissoes({
-                podeHomologarCadastro: true,
-                podeHomologarMapa: true
-            })
-        });
-        const acesso3 = useAcesso(subprocesso3);
-        expect(acesso3.podeAnalisarCadastro.value).toBe(true);
-        expect(acesso3.podeAnalisarMapa.value).toBe(true);
     });
 
     it('deve expor a ação principal pronta para cadastro quando pode homologar', () => {
@@ -393,16 +378,10 @@ describe('useAcesso', () => {
         expect(acessoFalse.habilitarEditarCadastro.value).toBe(false);
     });
 
-    it('deve calcular analisadores de mapa e flags de habilitação de mapa', () => {
+    it('deve expor flags de habilitação de mapa vindas do backend', () => {
         const subprocesso = criarSubprocesso({
             permissoes: criarPermissoes({
                 podeDevolverMapa: true,
-                podeAceitarMapa: false,
-                podeHomologarMapa: false,
-                podeEditarMapa: true,
-                podeDisponibilizarMapa: true,
-                podeValidarMapa: true,
-                podeApresentarSugestoes: true,
                 habilitarDevolverMapa: true,
                 habilitarAceitarMapa: false,
                 habilitarHomologarMapa: false,
@@ -414,7 +393,6 @@ describe('useAcesso', () => {
         });
         const acesso = useAcesso(subprocesso);
 
-        expect(acesso.podeAnalisarMapa.value).toBe(true);
         expect(acesso.habilitarDevolverMapa.value).toBe(true);
         expect(acesso.habilitarAceitarMapa.value).toBe(false);
         expect(acesso.habilitarHomologarMapa.value).toBe(false);

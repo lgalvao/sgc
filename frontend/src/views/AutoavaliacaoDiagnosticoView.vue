@@ -169,37 +169,25 @@
         @confirmar="confirmarConcluir"
     />
 
-    <BModal
-        v-model="modalImpossibilitarAberto"
-        :title="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_TITULO"
-        centered
-        @hide="fecharModalImpossibilitar"
-    >
-      <p v-if="servidorParaImpossibilitar" class="mb-3">
-        {{ TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorParaImpossibilitar.servidorNome) }}
-      </p>
-      <BFormTextarea
-          v-model="justificativaImpossibilidade"
-          :placeholder="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_PLACEHOLDER"
-          data-testid="textarea-justificativa-impossibilidade"
-          rows="3"
-      />
-      <BFormText v-if="mensagemErroJustificativa" class="text-danger">
-        {{ mensagemErroJustificativa }}
-      </BFormText>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="fecharModalImpossibilitar">Cancelar</BButton>
-        <BButton
-            :disabled="impossibilitando"
-            data-testid="btn-confirmar-impossibilitar"
-            variant="danger"
-            @click="confirmarImpossibilitar"
-        >
-          <BSpinner v-if="impossibilitando" aria-hidden="true" class="me-1" small/>
-          {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
-        </BButton>
-      </template>
-    </BModal>
+    <ModalObservacaoAcao
+        :feedback-observacao="mensagemErroJustificativa"
+        :loading="impossibilitando"
+        :model-value="modalImpossibilitarAberto"
+        :observacao="justificativaImpossibilidade"
+        :obrigatoria="true"
+        :placeholder="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_PLACEHOLDER"
+        :texto="servidorParaImpossibilitar ? TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorParaImpossibilitar.servidorNome) : ''"
+        :texto-acao="TEXTOS.diagnostico.BTN_IMPOSSIBILITAR"
+        :titulo="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_TITULO"
+        input-data-testid="textarea-justificativa-impossibilidade"
+        label="Justificativa"
+        test-id-confirmar="btn-confirmar-impossibilitar"
+        variant-acao="danger"
+        @confirmar="confirmarImpossibilitar"
+        @fechar="fecharModalImpossibilitar"
+        @update:model-value="modalImpossibilitarAberto = $event"
+        @update:observacao="justificativaImpossibilidade = $event"
+    />
   </LayoutPadrao>
 </template>
 
@@ -212,11 +200,8 @@ import {
   BCardHeader,
   BCollapse,
   BFormSelect,
-  BFormText,
-  BFormTextarea,
   BListGroup,
   BListGroupItem,
-  BModal,
   BSpinner,
   BTable,
 } from 'bootstrap-vue-next';
@@ -225,6 +210,7 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
+import ModalObservacaoAcao from '@/components/comum/ModalObservacaoAcao.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useAutoavaliacaoDiagnosticoView} from '@/views/useAutoavaliacaoDiagnosticoView';
 
@@ -238,7 +224,6 @@ const props = defineProps<{
   retornoFluxo,
   limparRetornoFluxo,
   salvandoAutomaticamente,
-  ehAutoavaliacaoConcluida,
   ehConsensoAprovado,
   ehChefe,
   podeConcluirAutoavaliacao,

@@ -6,26 +6,12 @@ import type {PermissoesSubprocesso, SubprocessoDetalhe} from "@/types/tipos";
 import {SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {ref} from "vue";
 import * as useAcessoModule from "@/composables/acesso";
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from "@/utils/permissoesSubprocesso";
 
 const {pushMock} = vi.hoisted(() => ({pushMock: vi.fn()}));
-const situacaoServidorMock = ref('AUTOAVALIACAO_NAO_INICIADA');
-const servidoresMock = ref<any[]>([]);
-
 vi.mock("vue-router", () => ({
     useRouter: () => ({
         push: pushMock,
-    }),
-}));
-
-vi.mock("@/composables/useAutoavaliacaoDiagnostico", () => ({
-    useAutoavaliacaoDiagnostico: () => ({
-        situacaoServidor: situacaoServidorMock,
-    }),
-}));
-
-vi.mock("@/composables/useDiagnosticoUnidade", () => ({
-    useDiagnosticoUnidade: () => ({
-        servidores: servidoresMock,
     }),
 }));
 
@@ -38,61 +24,11 @@ vi.mock("@/stores/perfil", () => ({
 describe("SubprocessoCards.vue", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        situacaoServidorMock.value = 'AUTOAVALIACAO_NAO_INICIADA';
-        servidoresMock.value = [];
     });
 
     function criarPermissoes(parciais: Partial<PermissoesSubprocesso> = {}): PermissoesSubprocesso {
         return {
-            podeEditarCadastro: false,
-            podeDisponibilizarCadastro: false,
-            podeDevolverCadastro: false,
-            podeAceitarCadastro: false,
-            podeHomologarCadastro: false,
-            podeEditarMapa: false,
-            podeDisponibilizarMapa: false,
-            podeValidarMapa: false,
-            podeApresentarSugestoes: false,
-            podeVerSugestoes: false,
-            podeDevolverMapa: false,
-            podeAceitarMapa: false,
-            podeHomologarMapa: false,
-            podeVisualizarImpacto: false,
-            podeAlterarDataLimite: false,
-            podeReabrirCadastro: false,
-            podeReabrirRevisao: false,
-            podeEnviarLembrete: false,
-            podePreencherAutoavaliacao: false,
-            podeCriarConsenso: false,
-            podeConcluirDiagnostico: false,
-            podeValidarDiagnostico: false,
-            podeDevolverDiagnostico: false,
-            podeHomologarDiagnostico: false,
-            mesmaUnidade: false,
-            habilitarAcessoCadastro: false,
-            habilitarAcessoMapa: false,
-            habilitarEditarCadastro: false,
-            habilitarDisponibilizarCadastro: false,
-            habilitarDevolverCadastro: false,
-            habilitarAceitarCadastro: false,
-            habilitarHomologarCadastro: false,
-            habilitarEditarMapa: false,
-            habilitarDisponibilizarMapa: false,
-            habilitarValidarMapa: false,
-            habilitarApresentarSugestoes: false,
-            habilitarDevolverMapa: false,
-            habilitarAceitarMapa: false,
-            habilitarHomologarMapa: false,
-            habilitarAlterarDataLimite: false,
-            habilitarReabrirCadastro: false,
-            habilitarReabrirRevisao: false,
-            habilitarEnviarLembrete: false,
-            habilitarPreencherAutoavaliacao: false,
-            habilitarCriarConsenso: false,
-            habilitarConcluirDiagnostico: false,
-            habilitarValidarDiagnostico: false,
-            habilitarDevolverDiagnostico: false,
-            habilitarHomologarDiagnostico: false,
+            ...PERMISSOES_SUBPROCESSO_VAZIAS,
             ...parciais,
         };
     }
@@ -134,6 +70,8 @@ describe("SubprocessoCards.vue", () => {
             podeEditarMapa: ref(access.podeEditarMapa ?? false),
             habilitarAcessoCadastro: ref(access.habilitarAcessoCadastro ?? false),
             habilitarAcessoMapa: ref(access.habilitarAcessoMapa ?? false),
+            habilitarCardConsenso: ref(access.habilitarCardConsenso ?? false),
+            habilitarCardSituacaoCapacitacao: ref(access.habilitarCardSituacaoCapacitacao ?? false),
         } as ReturnType<typeof useAcessoModule.useAcesso>);
 
         return mount(SubprocessoCards, {
@@ -331,7 +269,6 @@ describe("SubprocessoCards.vue", () => {
     });
 
     it("renderiza card de situação de capacitação para chefia", () => {
-        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'CONSENSO_APROVADO'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -345,6 +282,8 @@ describe("SubprocessoCards.vue", () => {
                     podeCriarConsenso: true,
                 }),
             }),
+        }, {
+            habilitarCardSituacaoCapacitacao: true,
         });
 
         expect(wrapper.find('[data-testid="card-subprocesso-diagnostico"]').exists()).toBe(false);
@@ -415,7 +354,6 @@ describe("SubprocessoCards.vue", () => {
     });
 
     it("abre situação de capacitação ao clicar no card da chefia se habilitado", async () => {
-        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'CONSENSO_APROVADO'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -430,6 +368,8 @@ describe("SubprocessoCards.vue", () => {
                     podeCriarConsenso: true,
                 } as any,
             }),
+        }, {
+            habilitarCardSituacaoCapacitacao: true,
         });
 
         await wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').trigger("click");
@@ -441,7 +381,6 @@ describe("SubprocessoCards.vue", () => {
     });
 
     it("não abre situação de capacitação ao clicar no card da chefia se desabilitado", async () => {
-        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -464,7 +403,6 @@ describe("SubprocessoCards.vue", () => {
     });
 
     it("desabilita card de situação de capacitação se não houver consenso aprovado", () => {
-        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -483,7 +421,6 @@ describe("SubprocessoCards.vue", () => {
     });
 
     it("habilita card de situação de capacitação se houver consenso aprovado", () => {
-        servidoresMock.value = [{servidorTitulo: '1', situacaoServidor: 'CONSENSO_APROVADO'}];
         const wrapper = createWrapper({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,
             mapa: null,
@@ -496,6 +433,8 @@ describe("SubprocessoCards.vue", () => {
                     podeCriarConsenso: true,
                 }),
             }),
+        }, {
+            habilitarCardSituacaoCapacitacao: true,
         });
 
         expect(wrapper.find('[data-testid="card-subprocesso-situacoes-capacitacao"]').exists()).toBe(true);
@@ -517,13 +456,14 @@ describe("SubprocessoCards.vue", () => {
                     podeCriarConsenso: false,
                 } as any,
             }),
-        }, {}, {
+        }, {
+            habilitarCardConsenso: true,
+        }, {
             perfil: {
                 usuarioCodigo: '242426',
                 usuarioNome: 'Duff',
             }
         });
-        situacaoServidorMock.value = 'CONSENSO_CRIADO';
 
         await wrapper.find('[data-testid="card-subprocesso-consenso"]').trigger("click");
 
@@ -577,13 +517,14 @@ describe("SubprocessoCards.vue", () => {
                     podeCriarConsenso: false,
                 } as any,
             }),
-        }, {}, {
+        }, {
+            habilitarCardConsenso: true,
+        }, {
             perfil: {
                 usuarioCodigo: '242426',
                 usuarioNome: 'Duff',
             }
         });
-        situacaoServidorMock.value = 'CONSENSO_CRIADO';
 
         const card = wrapper.find('[data-testid="card-subprocesso-consenso"]');
         

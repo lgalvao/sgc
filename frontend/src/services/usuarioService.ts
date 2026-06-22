@@ -26,6 +26,7 @@ interface PermissoesSessaoDto {
     mostrarCriarProcesso: boolean;
     mostrarArvoreCompletaUnidades: boolean;
     mostrarCtaPainelVazio: boolean;
+    mostrarRelatorios: boolean;
     mostrarDiagnosticoOrganizacional: boolean;
     mostrarMenuConfiguracoes: boolean;
     mostrarMenuAdministradores: boolean;
@@ -54,6 +55,7 @@ function mapearPermissoesSessao(response: PermissoesSessaoDto): PermissoesSessao
         mostrarCriarProcesso: response.mostrarCriarProcesso,
         mostrarArvoreCompletaUnidades: response.mostrarArvoreCompletaUnidades,
         mostrarCtaPainelVazio: response.mostrarCtaPainelVazio,
+        mostrarRelatorios: response.mostrarRelatorios,
         mostrarDiagnosticoOrganizacional: response.mostrarDiagnosticoOrganizacional,
         mostrarMenuConfiguracoes: response.mostrarMenuConfiguracoes,
         mostrarMenuAdministradores: response.mostrarMenuAdministradores,

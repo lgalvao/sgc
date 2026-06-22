@@ -23,11 +23,12 @@
     "cruft:audit": "node ../toolkit/sgc.js frontend cruft auditar",
     "arquitetura:audit": "node ../toolkit/sgc.js frontend arquitetura auditar",
     "arquitetura:gate": "node ../toolkit/sgc.js frontend arquitetura validar",
+    "templates:check": "node ../toolkit/sgc.js frontend views templates-validar",
     "cruft:check": "node ../toolkit/sgc.js frontend cruft validar",
     "quality:test": "npm run test:unit",
     "quality:lint": "oxlint --ignore-path .oxlintignore . && eslint . --max-warnings 0",
     "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
-    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck && npm run cruft:check && npm run arquitetura:gate"
+    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck && npm run cruft:check && npm run arquitetura:gate && npm run templates:check"
   },
   "dependencies": {
     "@pinia/colada": "^1.3.1",

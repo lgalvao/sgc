@@ -170,41 +170,33 @@
       <SubprocessoMovimentacoes :movimentacoes="movimentacoesFormatadas"/>
     </template>
 
-    <BModal v-model="modalValidarAberto" :title="TEXTOS.diagnostico.MODAL_VALIDAR_TITULO" centered>
-      <BFormTextarea v-model="observacoesValidar" :placeholder="TEXTOS.diagnostico.LABEL_OBSERVACOES" rows="3"/>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalValidarAberto = false">Cancelar</BButton>
-        <BButton :disabled="validando" data-testid="btn-confirmar-validar-unidade" variant="success" @click="confirmarValidar">
-          <BSpinner v-if="validando" aria-hidden="true" class="me-1" small/>
-          Aceitar
-        </BButton>
-      </template>
-    </BModal>
-
-    <!-- Modal: Devolver -->
-    <BModal v-model="modalDevolverAberto" :title="TEXTOS.diagnostico.MODAL_DEVOLVER_TITULO" centered>
-      <BFormTextarea v-model="justificativaDevolver" :placeholder="TEXTOS.diagnostico.MODAL_DEVOLVER_PLACEHOLDER" rows="3"/>
-      <BFormText v-if="mensagemErroJustificativaDevolver" class="text-danger">{{ mensagemErroJustificativaDevolver }}</BFormText>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalDevolverAberto = false">Cancelar</BButton>
-        <BButton :disabled="devolvendo" data-testid="btn-confirmar-devolver-unidade" variant="warning" @click="confirmarDevolver">
-          <BSpinner v-if="devolvendo" aria-hidden="true" class="me-1" small/>
-          Devolver
-        </BButton>
-      </template>
-    </BModal>
-
-    <!-- Modal: Homologar -->
-    <BModal v-model="modalHomologarAberto" :title="TEXTOS.diagnostico.MODAL_HOMOLOGAR_TITULO" centered>
-      <BFormTextarea v-model="observacoesHomologar" :placeholder="TEXTOS.diagnostico.LABEL_OBSERVACOES" rows="3"/>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalHomologarAberto = false">Cancelar</BButton>
-        <BButton :disabled="homologando" data-testid="btn-confirmar-homologar-unidade" variant="primary" @click="confirmarHomologar">
-          <BSpinner v-if="homologando" aria-hidden="true" class="me-1" small/>
-          Homologar
-        </BButton>
-      </template>
-    </BModal>
+    <DiagnosticoFluxoModais
+        :devolvendo="devolvendo"
+        :erro-devolver="retornoFluxo?.variante === 'danger' ? retornoFluxo.mensagem : null"
+        :erro-homologar="retornoFluxo?.variante === 'danger' ? retornoFluxo.mensagem : null"
+        :erro-validar="retornoFluxo?.variante === 'danger' ? retornoFluxo.mensagem : null"
+        :feedback-justificativa-devolver="mensagemErroJustificativaDevolver"
+        :homologando="homologando"
+        :justificativa-devolver="justificativaDevolver"
+        :modal-devolver-aberto="modalDevolverAberto"
+        :modal-homologar-aberto="modalHomologarAberto"
+        :modal-validar-aberto="modalValidarAberto"
+        :observacoes-homologar="observacoesHomologar"
+        :observacoes-validar="observacoesValidar"
+        :test-id-confirmar-devolver="'btn-confirmar-devolver-unidade'"
+        :test-id-confirmar-homologar="'btn-confirmar-homologar-unidade'"
+        :test-id-confirmar-validar="'btn-confirmar-validar-unidade'"
+        :validando="validando"
+        @confirmar-devolver="confirmarDevolver"
+        @confirmar-homologar="confirmarHomologar"
+        @confirmar-validar="confirmarValidar"
+        @update:justificativa-devolver="justificativaDevolver = $event"
+        @update:modal-devolver-aberto="modalDevolverAberto = $event"
+        @update:modal-homologar-aberto="modalHomologarAberto = $event"
+        @update:modal-validar-aberto="modalValidarAberto = $event"
+        @update:observacoes-homologar="observacoesHomologar = $event"
+        @update:observacoes-validar="observacoesValidar = $event"
+    />
 
     <HistoricoAnaliseModal
         :historico="historicoAnalises"
@@ -217,24 +209,12 @@
 
 <script lang="ts" setup>
 import {useRouter} from 'vue-router';
-import {
-  BBadge,
-  BButton,
-  BCard,
-  BDropdown,
-  BDropdownItemButton,
-  BFormText,
-  BFormTextarea,
-  BListGroup,
-  BListGroupItem,
-  BModal,
-  BSpinner,
-  BTable,
-} from 'bootstrap-vue-next';
+import {BBadge, BButton, BCard, BDropdown, BDropdownItemButton, BListGroup, BListGroupItem, BTable,} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
+import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import HistoricoAnaliseModal from '@/components/processo/HistoricoAnaliseModal.vue';
 import SubprocessoMovimentacoes from '@/components/processo/SubprocessoMovimentacoes.vue';
 import SubprocessoResumoHeader from '@/components/processo/SubprocessoResumoHeader.vue';
@@ -249,7 +229,6 @@ const router = useRouter();
 const {
   subprocessoDetalheObrigatorio,
   carregando,
-  situacao,
   retornoFluxo,
   limparRetornoFluxo,
   modalHistoricoAberto,

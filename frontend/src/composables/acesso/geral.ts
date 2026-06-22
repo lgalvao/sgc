@@ -5,9 +5,8 @@ export function usarAcessoGeral(
     permissoes: ComputedRef<PermissoesSubprocesso>,
     ehRevisao: ComputedRef<boolean>
 ) {
-    const podeVisualizarImpacto = computed(() =>
-        ehRevisao.value && permissoes.value.podeVisualizarImpacto
-    );
+    void ehRevisao;
+    const podeVisualizarImpacto = computed(() => permissoes.value.podeVisualizarImpacto);
 
     const mostrarAlterarDataLimite = computed(() => permissoes.value.podeAlterarDataLimite);
     const mostrarReabrirCadastro = computed(() => permissoes.value.podeReabrirCadastro);

@@ -2,7 +2,10 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import sgc.diagnostico.model.AvaliacaoServidorRepo;
+import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.mapa.service.ImpactoMapaService;
+import sgc.organizacao.UsuarioAplicacaoService;
 import sgc.organizacao.model.Perfil;
 import sgc.subprocesso.dto.PermissoesSubprocessoDto;
 import sgc.subprocesso.model.SituacaoSubprocesso;
@@ -47,6 +50,8 @@ public class SubprocessoAcessoService {
             DIAGNOSTICO_EM_ANDAMENTO);
 
     private final ImpactoMapaService impactoMapaService;
+    private final AvaliacaoServidorRepo avaliacaoServidorRepo;
+    private final UsuarioAplicacaoService usuarioAplicacaoService;
 
     public PermissoesSubprocessoDto resolverPermissoes(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         if (contexto.processoFinalizado()) {
@@ -78,6 +83,8 @@ public class SubprocessoAcessoService {
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
+                .mostrarExportacaoMapa(contexto.isChefe())
+                .mostrarHistoricoAnaliseDiagnostico(verificarExibicaoHistoricoAnaliseDiagnostico(contexto))
                 .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR)
                 .podeCriarConsenso(contexto.isChefe())
                 .podeConcluirDiagnostico(contexto.isChefe())
@@ -108,6 +115,8 @@ public class SubprocessoAcessoService {
                 .habilitarHomologarMapa(verificarHomologarMapa(contexto) && mesmaUnidade);
 
         builder.habilitarPreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR && mesmaUnidade)
+                .habilitarCardConsenso(verificarHabilitacaoCardConsenso(contexto))
+                .habilitarCardSituacaoCapacitacao(verificarHabilitacaoCardSituacaoCapacitacao(contexto))
                 .habilitarCriarConsenso(contexto.isChefe() && mesmaUnidade)
                 .habilitarConcluirDiagnostico(contexto.isChefe()
                 && situacao == DIAGNOSTICO_EM_ANDAMENTO
@@ -143,6 +152,8 @@ public class SubprocessoAcessoService {
                 .podeReabrirCadastro(contexto.isAdmin())
                 .podeReabrirRevisao(contexto.isAdmin())
                 .podeEnviarLembrete(contexto.isAdmin())
+                .mostrarExportacaoMapa(contexto.isChefe())
+                .mostrarHistoricoAnaliseDiagnostico(verificarExibicaoHistoricoAnaliseDiagnostico(contexto))
                 .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR)
                 .podeCriarConsenso(contexto.isChefe())
                 .podeConcluirDiagnostico(contexto.isChefe())
@@ -170,6 +181,8 @@ public class SubprocessoAcessoService {
                 .habilitarReabrirRevisao(false)
                 .habilitarEnviarLembrete(false)
                 .habilitarPreencherAutoavaliacao(false)
+                .habilitarCardConsenso(verificarHabilitacaoCardConsenso(contexto))
+                .habilitarCardSituacaoCapacitacao(verificarHabilitacaoCardSituacaoCapacitacao(contexto))
                 .habilitarCriarConsenso(false)
                 .habilitarConcluirDiagnostico(false)
                 .habilitarValidarDiagnostico(false)
@@ -235,6 +248,35 @@ public class SubprocessoAcessoService {
                 && impactoMapaService.podeVisualizarImpactos(contexto.subprocesso());
     }
 
+    private boolean verificarExibicaoHistoricoAnaliseDiagnostico(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        return isFluxoDiagnostico(contexto.situacao())
+                && contexto.perfil() != Perfil.SERVIDOR
+                && verificarAcessoDiagnosticoHabilitado(contexto);
+    }
+
+    private boolean verificarHabilitacaoCardConsenso(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        if (!isFluxoDiagnostico(contexto.situacao()) || contexto.perfil() != Perfil.SERVIDOR) {
+            return false;
+        }
+
+        return avaliacaoServidorRepo.existsBySubprocessoCodigoAndServidorTituloAndSituacaoServidorIn(
+                contexto.subprocesso().getCodigo(),
+                usuarioAplicacaoService.contextoAutenticado().usuarioTitulo(),
+                Set.of(SituacaoAvaliacaoServidor.CONSENSO_CRIADO, SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+        );
+    }
+
+    private boolean verificarHabilitacaoCardSituacaoCapacitacao(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        if (!isFluxoDiagnostico(contexto.situacao()) || !contexto.isChefe()) {
+            return false;
+        }
+
+        return avaliacaoServidorRepo.existsBySubprocessoCodigoAndSituacaoServidor(
+                contexto.subprocesso().getCodigo(),
+                SituacaoAvaliacaoServidor.CONSENSO_APROVADO
+        );
+    }
+
     private boolean verificarDevolverMapa(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         SituacaoSubprocesso situacao = contexto.situacao();
         if (contexto.isAdmin()) {
@@ -265,5 +307,9 @@ public class SubprocessoAcessoService {
 
     private boolean isFluxoRevisao(SituacaoSubprocesso situacao) {
         return situacao.name().startsWith("REVISAO");
+    }
+
+    private boolean isFluxoDiagnostico(SituacaoSubprocesso situacao) {
+        return situacao.name().startsWith("DIAGNOSTICO");
     }
 }

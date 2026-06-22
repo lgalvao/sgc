@@ -121,32 +121,21 @@
       @update:mostrar-modal-reabrir="mostrarModalReabrir = $event"
   />
 
-  <BModal
-      v-if="modalConcluirDiagnosticoAberto"
+  <ModalConfirmacao
       v-model="modalConcluirDiagnosticoAberto"
-      :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
-      centered
+      :loading="concluindoDiagnostico"
+      :mensagem="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM"
+      :titulo="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
+      ok-title="Concluir diagnóstico"
+      test-id-confirmar="btn-confirmar-concluir-diagnostico-cabecalho"
+      variant="success"
+      @confirmar="confirmarConcluirDiagnostico"
   >
-    <AppAlert
-        v-if="erroConcluirDiagnostico"
-        :mensagem="erroConcluirDiagnostico"
-        variante="danger"
-        @dismissed="erroConcluirDiagnostico = ''"
-    />
-    <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
-    <template #footer>
-      <BButton class="text-secondary" variant="link" @click="modalConcluirDiagnosticoAberto = false">Cancelar</BButton>
-      <BButton
-          :disabled="concluindoDiagnostico"
-          data-testid="btn-confirmar-concluir-diagnostico-cabecalho"
-          variant="success"
-          @click="confirmarConcluirDiagnostico"
-      >
-        <BSpinner v-if="concluindoDiagnostico" aria-hidden="true" class="me-1" small/>
-        {{ TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO }}
-      </BButton>
-    </template>
-  </BModal>
+    <div>
+      <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
+      <div v-if="erroConcluirDiagnostico" class="text-danger small mt-3">{{ erroConcluirDiagnostico }}</div>
+    </div>
+  </ModalConfirmacao>
 
   <HistoricoAnaliseModal
       :historico="historicoAnalisesDiagnostico"
@@ -157,7 +146,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BModal, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import SubprocessoDiagnosticoPainel from "@/components/diagnostico/SubprocessoDiagnosticoPainel.vue";
@@ -168,6 +157,7 @@ import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimenta
 import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {useFluxoDiagnostico} from "@/composables/useFluxoDiagnostico";
 import {useToastStore} from "@/stores/toast";
 import {listarAnalisesDiagnostico} from "@/services/analiseService";
@@ -252,10 +242,10 @@ const {
   concluirDiagnostico,
 } = useFluxoDiagnostico(() => codigoSubprocesso.value ?? 0);
 const mostrarHistoricoAnaliseDiagnostico = computed(() =>
-  ehDiagnostico.value && !!codigoSubprocesso.value && !ehServidorPuro.value && !!subprocesso.value?.permissoes?.habilitarAcessoDiagnostico,
+  !!subprocesso.value?.permissoes?.mostrarHistoricoAnaliseDiagnostico,
 );
 const mostrarConcluirDiagnosticoCabecalho = computed(() =>
-  ehDiagnostico.value && !!codigoSubprocesso.value && !ehServidorPuro.value && !!subprocesso.value?.permissoes?.podeConcluirDiagnostico,
+  !!subprocesso.value?.permissoes?.podeConcluirDiagnostico,
 );
 const habilitarConcluirDiagnosticoCabecalho = computed(() =>
   !!subprocesso.value?.permissoes?.habilitarConcluirDiagnostico,

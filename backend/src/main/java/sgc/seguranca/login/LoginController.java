@@ -189,10 +189,12 @@ public class LoginController {
 
     private PermissoesSessaoResponse construirPermissoesSessao(Perfil perfil) {
         boolean admin = perfil == Perfil.ADMIN;
+        boolean gestor = perfil == Perfil.GESTOR;
         return PermissoesSessaoResponse.builder()
                 .mostrarCriarProcesso(admin)
                 .mostrarArvoreCompletaUnidades(admin)
                 .mostrarCtaPainelVazio(admin)
+                .mostrarRelatorios(admin || gestor)
                 .mostrarDiagnosticoOrganizacional(admin)
                 .mostrarMenuConfiguracoes(admin)
                 .mostrarMenuAdministradores(admin)

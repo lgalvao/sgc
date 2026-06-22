@@ -7,12 +7,6 @@ import type {AcaoPrincipalMapa} from './tipos';
 export function usarAcessoMapa(
     permissoes: ComputedRef<PermissoesSubprocesso>
 ) {
-    const podeAnalisarMapa = computed(() =>
-        permissoes.value.podeDevolverMapa ||
-        permissoes.value.podeAceitarMapa ||
-        permissoes.value.podeHomologarMapa
-    );
-
     const mostrarApresentarSugestoes = computed(() => permissoes.value.podeApresentarSugestoes);
     const mostrarValidarMapa = computed(() => permissoes.value.podeValidarMapa);
     const mostrarDisponibilizarMapa = computed(() => permissoes.value.podeDisponibilizarMapa);
@@ -43,7 +37,6 @@ export function usarAcessoMapa(
     });
 
     return {
-        podeAnalisarMapa,
         mostrarApresentarSugestoes,
         mostrarValidarMapa,
         mostrarDisponibilizarMapa,

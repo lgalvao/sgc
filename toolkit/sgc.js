@@ -73,6 +73,7 @@ criarComandoScript(frontendArquitetura, "validar", "Valida regras arquiteturais 
 
 const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
 criarComandoScript(frontendViews, "validacoes-auditar", "Audita links e validacoes nas views.", "toolkit/frontend/views-validacoes-auditar.js");
+criarComandoScript(frontendViews, "templates-validar", "Valida previsibilidade estrutural de templates das views.", "toolkit/frontend/views-templates-validar.js");
 criarComandoScript(frontendViews, "auditar-validacoes", "Alias legado para 'validacoes-auditar'.", "toolkit/legado/frontend/views-auditar-validacoes.js");
 
 const frontendTestIds = frontend.command("test-ids").description("Ferramentas para atributos data-test.");

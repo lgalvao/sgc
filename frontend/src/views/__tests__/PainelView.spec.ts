@@ -43,6 +43,7 @@ function createMountOptions(initialStateOverrides = {}): any {
         mostrarCriarProcesso: true,
         mostrarArvoreCompletaUnidades: true,
         mostrarCtaPainelVazio: true,
+        mostrarRelatorios: true,
         mostrarDiagnosticoOrganizacional: true,
         mostrarMenuConfiguracoes: true,
         mostrarMenuAdministradores: true,

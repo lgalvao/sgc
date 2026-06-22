@@ -100,6 +100,7 @@ class LoginControllerTest {
                 .andExpect(jsonPath("$.requerSelecaoPerfil").value(false))
                 .andExpect(jsonPath("$.sessao.nome").value("Admin user"))
                 .andExpect(jsonPath("$.sessao.permissoes.mostrarCriarProcesso").value(true))
+                .andExpect(jsonPath("$.sessao.permissoes.mostrarRelatorios").value(true))
                 .andExpect(jsonPath("$.sessao.permissoes.mostrarMenuAdministradores").value(true))
                 .andExpect(cookie().exists("jwtToken"))
                 .andExpect(cookie().maxAge("SGC_PRE_AUTH", 0));

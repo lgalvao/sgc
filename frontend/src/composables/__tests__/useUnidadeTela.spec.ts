@@ -4,7 +4,6 @@ import {useUnidadeTela} from "../useUnidadeTela";
 import {relatoriosService} from "@/services/relatoriosService";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
-import {Perfil} from "@/types/comum";
 
 const pushMock = vi.fn();
 vi.mock("vue-router", () => ({
@@ -32,13 +31,6 @@ vi.mock("@/composables/useUnidadeAtual", () => ({
     useUnidadeAtual: () => ({
         definirUnidadeAtual: mockDefinirUnidadeAtual,
     }),
-}));
-
-const mockPerfilStore = {
-    perfilSelecionado: Perfil.SERVIDOR,
-};
-vi.mock("@/stores/perfil", () => ({
-    usePerfilStore: () => mockPerfilStore,
 }));
 
 vi.mock("@/services/relatoriosService", () => ({
@@ -69,7 +61,6 @@ describe("useUnidadeTela", () => {
         mockQueryPending.value = false;
         mockQueryLoading.value = false;
         mockQueryError.value = null;
-        mockPerfilStore.perfilSelecionado = Perfil.SERVIDOR;
     });
 
     it("deve inicializar com valores padrão corretos", () => {
@@ -112,7 +103,7 @@ describe("useUnidadeTela", () => {
                 tipoResponsabilidade: "SUBSTITUTO",
                 dataFimResponsabilidade: "2026-12-31",
             },
-            mapaVigente: {codigo: 99, dataInicio: "2026-01-01"},
+            mapaVigente: {codProcesso: 9, codSubprocesso: 99, podeExportar: true},
         };
 
         const {
@@ -205,7 +196,7 @@ describe("useUnidadeTela", () => {
 
     it("deve exportar mapa pdf com sucesso", async () => {
         mockQueryData.value = {
-            mapaVigente: {codigo: 99},
+            mapaVigente: {codProcesso: 9, codSubprocesso: 99, podeExportar: true},
         };
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadePdf).mockResolvedValue(undefined);
 
@@ -220,7 +211,7 @@ describe("useUnidadeTela", () => {
 
     it("deve lidar com erro na exportacao pdf", async () => {
         mockQueryData.value = {
-            mapaVigente: {codigo: 99},
+            mapaVigente: {codProcesso: 9, codSubprocesso: 99, podeExportar: true},
         };
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadePdf).mockRejectedValue(new Error("Erro PDF"));
 
@@ -239,7 +230,7 @@ describe("useUnidadeTela", () => {
 
     it("deve exportar mapa csv com sucesso", async () => {
         mockQueryData.value = {
-            mapaVigente: {codigo: 99},
+            mapaVigente: {codProcesso: 9, codSubprocesso: 99, podeExportar: true},
         };
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv).mockResolvedValue(undefined);
 
@@ -254,7 +245,7 @@ describe("useUnidadeTela", () => {
 
     it("deve lidar com erro na exportacao csv", async () => {
         mockQueryData.value = {
-            mapaVigente: {codigo: 99},
+            mapaVigente: {codProcesso: 9, codSubprocesso: 99, podeExportar: true},
         };
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv).mockRejectedValue(new Error("Erro CSV"));
 
@@ -271,11 +262,10 @@ describe("useUnidadeTela", () => {
         expect(relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv).not.toHaveBeenCalled();
     });
 
-    it("podeExportarMapaVigente deve ser true se perfil selecionado for CHEFE e houver mapa vigente", () => {
+    it("podeExportarMapaVigente deve refletir a flag pronta do backend", () => {
         mockQueryData.value = {
-            mapaVigente: {codigo: 99},
+            mapaVigente: {codProcesso: 9, codSubprocesso: 99, podeExportar: true},
         };
-        mockPerfilStore.perfilSelecionado = Perfil.CHEFE;
 
         const {podeExportarMapaVigente} = useUnidadeTela({codUnidade: 10});
         expect(podeExportarMapaVigente.value).toBe(true);

@@ -8,8 +8,6 @@ import {formatarDataBR, logger} from "@/utils";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useNotification} from "@/composables/useNotification";
-import {usePerfilStore} from "@/stores/perfil";
-import {Perfil} from "@/types/comum";
 import {relatoriosService} from "@/services/relatoriosService";
 import {useDadosTelaUnidadeQuery} from "@/composables/useUnidadeQuery";
 
@@ -22,7 +20,6 @@ export function useUnidadeTela(props: UnidadeTelaProps) {
   const {mostrarCriarAtribuicaoTemporaria} = usePerfil();
   const {notify} = useNotification();
   const {definirUnidadeAtual} = useUnidadeAtual();
-  const perfilStore = usePerfilStore();
 
   const dadosTelaQuery = useDadosTelaUnidadeQuery(() => props.codUnidade);
   const loadingExportacaoPdf = ref(false);
@@ -93,7 +90,7 @@ export function useUnidadeTela(props: UnidadeTelaProps) {
   const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
   const subordinadas = computed(() => unidade.value?.filhas ?? []);
   const temSubordinadas = computed(() => subordinadas.value.length > 0);
-  const podeExportarMapaVigente = computed(() => perfilStore.perfilSelecionado === Perfil.CHEFE && Boolean(mapaVigente.value));
+  const podeExportarMapaVigente = computed(() => mapaVigente.value?.podeExportar === true);
 
   const dadosFormatadosSubordinadas = computed(() => formatarDadosParaArvore(subordinadas.value));
 

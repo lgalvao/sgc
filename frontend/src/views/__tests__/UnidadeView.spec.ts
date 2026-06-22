@@ -59,7 +59,7 @@ const unidadePadrao = {
     ],
 };
 
-const mapaVigentePadrao = {codProcesso: 99, codSubprocesso: 77};
+const mapaVigentePadrao = {codProcesso: 99, codSubprocesso: 77, podeExportar: true};
 
 vi.mock("vue-router", async (importOriginal) => {
     const actual: any = await importOriginal();
@@ -243,7 +243,10 @@ describe("UnidadeView.vue", () => {
     });
 
     it("não exibe exportação de mapa vigente para perfil sem permissão", async () => {
-        dadosTelaQueryMock.data.value = {unidade: unidadePadrao, mapaVigente: mapaVigentePadrao};
+        dadosTelaQueryMock.data.value = {
+            unidade: unidadePadrao,
+            mapaVigente: {...mapaVigentePadrao, podeExportar: false},
+        };
 
         const wrapper = criarWrapper();
         await flushPromises();

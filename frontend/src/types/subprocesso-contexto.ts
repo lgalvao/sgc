@@ -22,6 +22,8 @@ export interface PermissoesSubprocesso {
     podeReabrirCadastro: boolean;
     podeReabrirRevisao: boolean;
     podeEnviarLembrete: boolean;
+    mostrarExportacaoMapa: boolean;
+    mostrarHistoricoAnaliseDiagnostico: boolean;
     podePreencherAutoavaliacao?: boolean;
     podeCriarConsenso?: boolean;
     podeConcluirDiagnostico?: boolean;
@@ -49,6 +51,8 @@ export interface PermissoesSubprocesso {
     habilitarReabrirRevisao: boolean;
     habilitarEnviarLembrete: boolean;
     habilitarPreencherAutoavaliacao?: boolean;
+    habilitarCardConsenso?: boolean;
+    habilitarCardSituacaoCapacitacao?: boolean;
     habilitarCriarConsenso?: boolean;
     habilitarConcluirDiagnostico?: boolean;
     habilitarValidarDiagnostico?: boolean;

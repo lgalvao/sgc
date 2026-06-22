@@ -134,8 +134,6 @@ import {useRouter} from "vue-router";
 import {computed} from "vue";
 import {useAcesso} from "@/composables/acesso";
 import {usePerfilStore} from "@/stores/perfil";
-import {useAutoavaliacaoDiagnostico} from "@/composables/useAutoavaliacaoDiagnostico";
-import {useDiagnosticoUnidade} from "@/composables/useDiagnosticoUnidade";
 import {type Mapa, type MapaCompleto, type SubprocessoDetalhe, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 
@@ -156,25 +154,8 @@ const perfilStore = usePerfilStore();
 const subprocesso = computed(() => props.subprocesso ?? null);
 const permissoesDiagnostico = computed(() => subprocesso.value?.permissoes ?? null);
 
-const {habilitarAcessoCadastro, habilitarAcessoMapa} = useAcesso(subprocesso);
+const {habilitarAcessoCadastro, habilitarAcessoMapa, habilitarCardConsenso, habilitarCardSituacaoCapacitacao} = useAcesso(subprocesso);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
-
-const { situacaoServidor } = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
-  && props.subprocesso?.permissoes?.podePreencherAutoavaliacao
-  ? useAutoavaliacaoDiagnostico(props.codSubprocesso)
-  : { situacaoServidor: computed(() => 'AUTOAVALIACAO_NAO_INICIADA') };
-const habilitarCardConsenso = computed(() => {
-  return situacaoServidor.value === 'CONSENSO_CRIADO' || situacaoServidor.value === 'CONSENSO_APROVADO';
-});
-
-const {servidores} = props.tipoProcesso === TipoProcessoEnum.DIAGNOSTICO
-  && !!props.subprocesso?.permissoes?.podeCriarConsenso
-  ? useDiagnosticoUnidade(props.codSubprocesso)
-  : {servidores: computed(() => [])};
-
-const habilitarCardSituacaoCapacitacao = computed(() => {
-  return servidores.value.some((servidor) => servidor.situacaoServidor === 'CONSENSO_APROVADO');
-});
 
 function navegarPara(routeName: string) {
   void router.push({

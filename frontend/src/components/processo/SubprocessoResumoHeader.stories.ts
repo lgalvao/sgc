@@ -2,6 +2,7 @@ import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import SubprocessoResumoHeader from './SubprocessoResumoHeader.vue';
 import type {ResponsavelDto, SubprocessoDetalhe} from '@/types/tipos';
 import {SituacaoSubprocesso, TipoProcesso} from '@/types/tipos';
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
 
 const meta: Meta<typeof SubprocessoResumoHeader> = {
     title: 'Processo/SubprocessoResumoHeader',
@@ -24,6 +25,7 @@ export default meta;
 type Story = StoryObj<typeof SubprocessoResumoHeader>;
 
 const permissoesMock = {
+    ...PERMISSOES_SUBPROCESSO_VAZIAS,
     podeEditarCadastro: false,
     podeDisponibilizarCadastro: false,
     podeDevolverCadastro: false,

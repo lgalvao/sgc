@@ -12,6 +12,7 @@ const permissoesAdmin = {
     mostrarCriarProcesso: true,
     mostrarArvoreCompletaUnidades: true,
     mostrarCtaPainelVazio: true,
+    mostrarRelatorios: true,
     mostrarDiagnosticoOrganizacional: true,
     mostrarMenuConfiguracoes: true,
     mostrarMenuAdministradores: true,
@@ -83,12 +84,14 @@ describe("usePerfil", () => {
     it("deve permitir relatorios para admin e gestor", () => {
         vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             perfilSelecionado: Perfil.GESTOR,
+            permissoesSessao: {...permissoesAdmin, mostrarCriarProcesso: false},
         }));
 
         expect(usePerfil().podeVerRelatorios.value).toBe(true);
 
         vi.mocked(usePerfilStore).mockReturnValue(criarStoreMock({
             perfilSelecionado: Perfil.CHEFE,
+            permissoesSessao: {...permissoesAdmin, mostrarRelatorios: false},
         }));
 
         expect(usePerfil().podeVerRelatorios.value).toBe(false);

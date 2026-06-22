@@ -132,165 +132,55 @@
       </BButton>
     </div>
 
-    <BModal
-        data-testid="modal-impossibilitar"
-        v-model="modalImpossibilitarAberto"
-        :title="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_TITULO"
-        centered
-    >
-      <p v-if="servidorSelecionado" class="mb-3">
-        {{ TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorSelecionado.servidorNome) }}
-      </p>
-      <BFormTextarea
-          v-model="justificativaImpossibilidade"
-          :placeholder="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_PLACEHOLDER"
-          data-testid="textarea-justificativa-impossibilidade"
-          rows="3"
-      />
-      <BFormText v-if="erroJustificativaImpossibilidade" class="text-danger">
-        {{ erroJustificativaImpossibilidade }}
-      </BFormText>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalImpossibilitarAberto = false">Cancelar</BButton>
-        <BButton
-            :disabled="impossibilitando"
-            data-testid="btn-confirmar-impossibilitar"
-            variant="danger"
-            @click="confirmarImpossibilitar"
-        >
-          <BSpinner v-if="impossibilitando" aria-hidden="true" class="me-1" small/>
-          Indicar impossibilidade
-        </BButton>
-      </template>
-    </BModal>
-
-    <BModal
-        data-testid="modal-permitir"
-        v-model="modalPermitirAvaliacaoAberto"
-        :title="TEXTOS.diagnostico.MODAL_PERMITIR_AVALIACAO_TITULO"
-        centered
-    >
-      <p v-if="servidorSelecionado" class="mb-0">
-        {{ TEXTOS.diagnostico.MODAL_PERMITIR_AVALIACAO_MENSAGEM(servidorSelecionado.servidorNome) }}
-      </p>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalPermitirAvaliacaoAberto = false">Cancelar</BButton>
-        <BButton
-            :disabled="permitindo"
-            data-testid="btn-confirmar-permitir-avaliacao"
-            variant="success"
-            @click="confirmarPermitirAvaliacao"
-        >
-          <BSpinner v-if="permitindo" aria-hidden="true" class="me-1" small/>
-          Confirmar
-        </BButton>
-      </template>
-    </BModal>
-
-    <BModal
-        v-if="modalConcluirAberto"
-        data-testid="modal-concluir"
-        v-model="modalConcluirAberto"
-        :title="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
-        centered
-    >
-      <AppAlert
-          v-if="erroConcluirModal"
-          :mensagem="erroConcluirModal"
-          @dismissed="erroConcluirModal = ''"
-      />
-      <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalConcluirAberto = false">Cancelar</BButton>
-        <BButton
-            :disabled="concluindo"
-            data-testid="btn-confirmar-concluir-diagnostico"
-            variant="success"
-            @click="confirmarConcluir"
-        >
-          <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
-          Concluir diagnóstico
-        </BButton>
-      </template>
-    </BModal>
-
-    <BModal
-        data-testid="modal-validar"
-        v-model="modalValidarAberto"
-        :title="TEXTOS.diagnostico.MODAL_VALIDAR_TITULO"
-        centered
-    >
-      <BFormTextarea
-          v-model="observacoesValidar"
-          :placeholder="TEXTOS.diagnostico.LABEL_OBSERVACOES"
-          rows="3"
-      />
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalValidarAberto = false">Cancelar</BButton>
-        <BButton
-            :disabled="validando"
-            data-testid="btn-confirmar-validar"
-            variant="success"
-            @click="confirmarValidar"
-        >
-          <BSpinner v-if="validando" aria-hidden="true" class="me-1" small/>
-          Aceitar
-        </BButton>
-      </template>
-    </BModal>
-
-    <BModal
-        data-testid="modal-devolver"
-        v-model="modalDevolverAberto"
-        :title="TEXTOS.diagnostico.MODAL_DEVOLVER_TITULO"
-        centered
-    >
-      <BFormTextarea
-          v-model="justificativaDevolver"
-          :placeholder="TEXTOS.diagnostico.MODAL_DEVOLVER_PLACEHOLDER"
-          rows="3"
-      />
-      <BFormText v-if="erroJustificativaDevolver" class="text-danger">
-        {{ erroJustificativaDevolver }}
-      </BFormText>
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalDevolverAberto = false">Cancelar</BButton>
-        <BButton
-            :disabled="devolvendo"
-            data-testid="btn-confirmar-devolver"
-            variant="warning"
-            @click="confirmarDevolver"
-        >
-          <BSpinner v-if="devolvendo" aria-hidden="true" class="me-1" small/>
-          Devolver
-        </BButton>
-      </template>
-    </BModal>
-
-    <BModal
-        data-testid="modal-homologar"
-        v-model="modalHomologarAberto"
-        :title="TEXTOS.diagnostico.MODAL_HOMOLOGAR_TITULO"
-        centered
-    >
-      <BFormTextarea
-          v-model="observacoesHomologar"
-          :placeholder="TEXTOS.diagnostico.LABEL_OBSERVACOES"
-          rows="3"
-      />
-      <template #footer>
-        <BButton class="text-secondary" variant="link" @click="modalHomologarAberto = false">Cancelar</BButton>
-        <BButton
-            :disabled="homologando"
-            data-testid="btn-confirmar-homologar"
-            variant="primary"
-            @click="confirmarHomologar"
-        >
-          <BSpinner v-if="homologando" aria-hidden="true" class="me-1" small/>
-          Homologar
-        </BButton>
-      </template>
-    </BModal>
+    <DiagnosticoFluxoModais
+        :concluindo="concluindo"
+        :devolvendo="devolvendo"
+        :erro-concluir="erroConcluirModal"
+        :erro-devolver="erroDevolver?.message || null"
+        :erro-homologar="erroHomologar?.message || null"
+        :erro-impossibilitar="erroImpossibilitar?.message || null"
+        :erro-validar="erroValidar?.message || null"
+        :feedback-justificativa-devolver="erroJustificativaDevolver"
+        :feedback-justificativa-impossibilidade="erroJustificativaImpossibilidade"
+        :homologando="homologando"
+        :impossibilitando="impossibilitando"
+        :justificativa-devolver="justificativaDevolver"
+        :justificativa-impossibilidade="justificativaImpossibilidade"
+        :modal-concluir-aberto="modalConcluirAberto"
+        :modal-devolver-aberto="modalDevolverAberto"
+        :modal-homologar-aberto="modalHomologarAberto"
+        :modal-impossibilitar-aberto="modalImpossibilitarAberto"
+        :modal-permitir-avaliacao-aberto="modalPermitirAvaliacaoAberto"
+        :modal-validar-aberto="modalValidarAberto"
+        :observacoes-homologar="observacoesHomologar"
+        :observacoes-validar="observacoesValidar"
+        :permitindo="permitindo"
+        :test-id-confirmar-concluir="'btn-confirmar-concluir-diagnostico'"
+        :test-id-confirmar-devolver="'btn-confirmar-devolver'"
+        :test-id-confirmar-homologar="'btn-confirmar-homologar'"
+        :test-id-confirmar-impossibilitar="'btn-confirmar-impossibilitar'"
+        :test-id-confirmar-permitir-avaliacao="'btn-confirmar-permitir-avaliacao'"
+        :test-id-confirmar-validar="'btn-confirmar-validar'"
+        :texto-impossibilitar="servidorSelecionado ? TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorSelecionado.servidorNome) : ''"
+        :texto-permitir-avaliacao="servidorSelecionado ? TEXTOS.diagnostico.MODAL_PERMITIR_AVALIACAO_MENSAGEM(servidorSelecionado.servidorNome) : ''"
+        :validando="validando"
+        @confirmar-concluir="confirmarConcluir"
+        @confirmar-devolver="confirmarDevolver"
+        @confirmar-homologar="confirmarHomologar"
+        @confirmar-impossibilitar="confirmarImpossibilitar"
+        @confirmar-permitir-avaliacao="confirmarPermitirAvaliacao"
+        @confirmar-validar="confirmarValidar"
+        @update:justificativa-devolver="justificativaDevolver = $event"
+        @update:justificativa-impossibilidade="justificativaImpossibilidade = $event"
+        @update:modal-concluir-aberto="modalConcluirAberto = $event"
+        @update:modal-devolver-aberto="modalDevolverAberto = $event"
+        @update:modal-homologar-aberto="modalHomologarAberto = $event"
+        @update:modal-impossibilitar-aberto="modalImpossibilitarAberto = $event"
+        @update:modal-permitir-avaliacao-aberto="modalPermitirAvaliacaoAberto = $event"
+        @update:modal-validar-aberto="modalValidarAberto = $event"
+        @update:observacoes-homologar="observacoesHomologar = $event"
+        @update:observacoes-validar="observacoesValidar = $event"
+    />
   </div>
 </template>
 
@@ -306,12 +196,10 @@ import {
   BCard,
   BDropdown,
   BDropdownItemButton,
-  BFormText,
-  BFormTextarea,
-  BModal,
   BSpinner,
   BTable,
 } from 'bootstrap-vue-next';
+import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
@@ -359,6 +247,7 @@ const {
   erroValidacaoDevolver,
   erroHomologar,
   erroValidacaoHomologar,
+  erroImpossibilitar,
   validarConclusaoDiagnostico,
   validarAcaoValidarDiagnostico,
   validarAcaoDevolverDiagnostico,

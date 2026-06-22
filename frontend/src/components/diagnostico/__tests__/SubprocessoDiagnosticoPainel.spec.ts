@@ -1,6 +1,6 @@
 import {AxiosError} from 'axios';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import {computed, nextTick, ref} from 'vue';
 import {createPinia, setActivePinia} from 'pinia';
 import SubprocessoDiagnosticoPainel from '../SubprocessoDiagnosticoPainel.vue';
@@ -186,7 +186,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
                         props: ['modelValue'],
                         emits: ['update:modelValue'],
                         template: `
-                          <div class="b-modal-stub">
+                          <div class="b-modal-stub" v-bind="$attrs">
                             <template v-if="modelValue">
                               <slot />
                               <slot name="footer" />
@@ -634,7 +634,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
 
         await wrapper.get('[data-testid="btn-concluir-diagnostico"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-concluir-diagnostico"]').trigger('click');
-        await nextTick();
+        await flushPromises();
 
         expect(wrapper.text()).toContain('Mensagem customizada do erroConcluir ref');
     });

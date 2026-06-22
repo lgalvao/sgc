@@ -55,12 +55,14 @@
       </template>
     </template>
 
-    <BModal
+    <ModalPadrao
         v-model="mostrarPreview"
-        :title="itemParaPreview?.assunto"
+        :mostrar-botao-acao="false"
+        :test-id-cancelar="'btn-fechar-preview-email'"
+        :texto-cancelar="'Fechar'"
+        :titulo="itemParaPreview?.assunto ?? 'Preview do e-mail'"
         data-testid="modal-preview-email"
-        scrollable
-        size="lg"
+        tamanho="lg"
     >
       <div v-if="itemParaPreview" class="p-3">
         <div class="mb-3 border-bottom pb-2">
@@ -78,19 +80,7 @@
             title="Preview do e-mail"
         />
       </div>
-      <template #footer>
-        <div class="d-flex justify-content-end w-100">
-          <BButton
-              data-testid="btn-fechar-preview-email"
-              variant="link"
-              class="text-decoration-none text-secondary fw-medium btn-fechar-link"
-              @click="mostrarPreview = false"
-          >
-            Fechar
-          </BButton>
-        </div>
-      </template>
-    </BModal>
+    </ModalPadrao>
 
     <ModalPadrao
         v-model="mostrarDetalhes"
@@ -148,7 +138,7 @@
 
 <script lang="ts" setup>
 import {computed, ref} from "vue";
-import {BAlert, BButton, BModal} from "bootstrap-vue-next";
+import {BAlert, BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";

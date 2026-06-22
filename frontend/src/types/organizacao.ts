@@ -18,6 +18,7 @@ export interface Unidade {
 export interface MapaVigenteReferencia {
     codProcesso: number;
     codSubprocesso: number;
+    podeExportar: boolean;
 }
 
 export interface Responsavel {

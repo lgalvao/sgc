@@ -1009,6 +1009,50 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("validacoes-auditar");
         expect(resultado.stdout).toContain("auditar-validacoes");
+        expect(resultado.stdout).toContain("templates-validar");
+    });
+
+    test("valida previsibilidade estrutural das views em um recorte controlado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-views-templates-"));
+        const viewsDir = path.join(base, "frontend", "src", "views");
+
+        await fs.outputFile(
+            path.join(viewsDir, "PainelView.vue"),
+            [
+                "<template>",
+                "  <LayoutPadrao>",
+                "    <PageHeader title=\"Painel\" />",
+                "  </LayoutPadrao>",
+                "</template>"
+            ].join("\n")
+        );
+
+        await fs.outputFile(
+            path.join(viewsDir, "LegacyView.vue"),
+            [
+                "<template>",
+                "  <div>",
+                "    <BModal />",
+                "  </div>",
+                "</template>"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "views",
+            "templates-validar",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo.totalViews).toBe(2);
+        expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-com-bmodal-cru")).toBe(true);
+        expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-sem-layout-padrao")).toBe(true);
+        expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-sem-cabecalho-padrao")).toBe(true);
     });
 
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {

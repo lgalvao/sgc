@@ -242,12 +242,13 @@ class UnidadeControllerTest {
     @WithMockUser
     void deveRetornarReferenciaMapaVigente() throws Exception {
         when(unidadeService.buscarReferenciaMapaVigente(1L))
-                .thenReturn(Optional.of(new MapaVigenteReferenciaDto(10L, 20L)));
+                .thenReturn(Optional.of(new MapaVigenteReferenciaDto(10L, 20L, true)));
 
         mockMvc.perform(get("/api/unidades/1/mapa-vigente/referencia"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.codProcesso").value(10))
-                .andExpect(jsonPath("$.codSubprocesso").value(20));
+                .andExpect(jsonPath("$.codSubprocesso").value(20))
+                .andExpect(jsonPath("$.podeExportar").value(true));
     }
 
     @Test
