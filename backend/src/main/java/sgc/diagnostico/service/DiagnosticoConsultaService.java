@@ -17,6 +17,7 @@ import sgc.subprocesso.SubprocessoDtoMapper;
 import sgc.subprocesso.dto.AnaliseHistoricoDto;
 import sgc.subprocesso.dto.MovimentacaoDto;
 import sgc.subprocesso.model.Subprocesso;
+import sgc.subprocesso.model.SituacaoSubprocesso;
 import sgc.subprocesso.model.TipoAcaoAnalise;
 import sgc.subprocesso.model.TipoAnalise;
 import sgc.subprocesso.service.SubprocessoConsultaService;
@@ -152,6 +153,7 @@ public class DiagnosticoConsultaService {
         Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         var avaliacoes = avaliacaoRepo.listarPorDiagnostico(diagnostico.getCodigo());
         String responsavelTitulo = buscarResponsavelTitulo(subprocesso.getUnidade().getCodigo());
+        boolean diagnosticoEmAndamento = subprocesso.getSituacao() == SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO;
 
         Map<String, SituacaoAvaliacaoServidor> situacoes = new HashMap<>();
         Map<String, String> nomes = new HashMap<>();
@@ -173,10 +175,13 @@ public class DiagnosticoConsultaService {
                             .situacaoServidor(situacao.name())
                             .podeManterConsenso(situacao != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
                             .podeImpossibilitar(
-                                    situacao != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
+                                    diagnosticoEmAndamento
+                                            && situacao != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA
                                             && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO
                             )
-                            .podePermitirAvaliacao(situacao == SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
+                            .podePermitirAvaliacao(
+                                    diagnosticoEmAndamento
+                                            && situacao == SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA)
                             .build();
                 })
                 .toList();

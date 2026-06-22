@@ -134,7 +134,7 @@ class E2eFixtureEndpointTest {
     void devePermitirCriarProcessoMapeamentoComCadastroHomologadoViaFixture() throws Exception {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo fixture cadastro homologado", "ASSESSORIA_12", true, 30);
+                        "Processo fixture cadastro homologado", "ASSESSORIA_22", true, 30);
 
         mockMvc.perform(post("/e2e/fixtures/processo-mapeamento-com-cadastro-homologado")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -150,7 +150,7 @@ class E2eFixtureEndpointTest {
     void devePermitirCriarProcessoMapeamentoComMapaDisponibilizadoViaFixture() throws Exception {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo fixture mapa disponibilizado", "ASSESSORIA_12", true, 30);
+                        "Processo fixture mapa disponibilizado", "ASSESSORIA_22", true, 30);
 
         mockMvc.perform(post("/e2e/fixtures/processo-mapeamento-com-mapa-disponibilizado")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -166,7 +166,7 @@ class E2eFixtureEndpointTest {
     void devePermitirCriarProcessoMapeamentoComMapaValidadoViaFixture() throws Exception {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo fixture mapa validado", "ASSESSORIA_12", true, 30);
+                        "Processo fixture mapa validado", "ASSESSORIA_22", true, 30);
 
         mockMvc.perform(post("/e2e/fixtures/processo-mapeamento-com-mapa-validado")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -182,7 +182,7 @@ class E2eFixtureEndpointTest {
     void devePermitirCriarProcessoMapeamentoComMapaHomologadoViaFixture() throws Exception {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo fixture mapa homologado", "ASSESSORIA_12", true, 30);
+                        "Processo fixture mapa homologado", "ASSESSORIA_22", true, 30);
 
         mockMvc.perform(post("/e2e/fixtures/processo-mapeamento-com-mapa-homologado")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -198,7 +198,7 @@ class E2eFixtureEndpointTest {
     void devePermitirCriarProcessoRevisaoComCadastroHomologadoViaFixture() throws Exception {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo fixture revisão cadastro homologado", "ASSESSORIA_12", true, 30);
+                        "Processo fixture revisão cadastro homologado", "ASSESSORIA_22", true, 30);
 
         mockMvc.perform(post("/e2e/fixtures/processo-revisao-com-cadastro-homologado")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -214,10 +214,10 @@ class E2eFixtureEndpointTest {
     void devePermitirCriarProcessoRevisaoComMapaHomologadoViaFixture() throws Exception {
         E2eController.ProcessoFixtureRequest processoMapeamento =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo base mapa vigente", "ASSESSORIA_12", true, 30);
+                        "Processo base mapa vigente", "ASSESSORIA_22", true, 30);
         E2eController.ProcessoFixtureRequest processoRevisao =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo fixture revisão homologada", "ASSESSORIA_12", true, 30);
+                        "Processo fixture revisão homologada", "ASSESSORIA_22", true, 30);
 
         mockMvc.perform(post("/e2e/fixtures/processo-finalizado-com-atividades")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -232,7 +232,7 @@ class E2eFixtureEndpointTest {
                 .andExpect(jsonPath("$.tipo").value("REVISAO"))
                 .andExpect(jsonPath("$.situacao").value(SituacaoProcesso.EM_ANDAMENTO.name()));
 
-        Subprocesso subprocesso = subprocessoRepo.buscarPorProcessoEUnidadeComFetch(401L, 4L).orElseThrow();
+        Subprocesso subprocesso = subprocessoRepo.buscarPorProcessoEUnidadeComFetch(401L, 13L).orElseThrow();
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO);
         assertThat(movimentacaoRepo.buscarUltimaPorSubprocesso(subprocesso.getCodigo()))
                 .isPresent()
@@ -246,7 +246,7 @@ class E2eFixtureEndpointTest {
     void devePermitirCriarProcessoDiagnosticoViaFixture() throws Exception {
         E2eController.ProcessoFixtureRequest request =
                 new E2eController.ProcessoFixtureRequest(
-                        "Processo fixture diagnóstico", "ASSESSORIA_12", true, 30);
+                        "Processo fixture diagnóstico", "SECRETARIA_1", true, 30);
 
         mockMvc.perform(post("/e2e/fixtures/processo-diagnostico")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -267,7 +267,7 @@ class E2eFixtureEndpointTest {
                         "<p>Preview</p>",
                         "DIAGNOSTICO_CONSENSO_APROVADO",
                         "FALHA_DEFINITIVA",
-                        "ASSESSORIA_12",
+                        "ASSESSORIA_22",
                         null,
                         "SMTP indisponível");
 

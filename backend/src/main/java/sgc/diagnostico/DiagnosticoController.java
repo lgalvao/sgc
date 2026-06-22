@@ -34,7 +34,7 @@ public class DiagnosticoController {
     }
 
     @GetMapping("/{codSubprocesso}/diagnostico/autoavaliacao")
-    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'PREENCHER_AUTOAVALIACAO')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<AutoavaliacaoDto> obterAutoavaliacao(@PathVariable Long codSubprocesso) {
         return ResponseEntity.ok(consultaService.obterAutoavaliacao(codSubprocesso));
     }
@@ -81,7 +81,7 @@ public class DiagnosticoController {
     }
 
     @GetMapping("/{codSubprocesso}/diagnostico/consenso/{servidorTitulo}")
-    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'CRIAR_CONSENSO')")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_DIAGNOSTICO')")
     public ResponseEntity<ConsensoDto> obterConsensoServidor(
             @PathVariable Long codSubprocesso,
             @PathVariable String servidorTitulo

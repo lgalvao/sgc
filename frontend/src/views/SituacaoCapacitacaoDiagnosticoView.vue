@@ -84,6 +84,7 @@
                     <td class="coluna-capacitacao">
                       <BFormSelect
                           :data-testid="`situacao-${servidorSelecionadoTitulo}-${linha.competenciaCodigo}`"
+                          :disabled="!habilitarCriarConsenso"
                           :model-value="linha.situacaoCapacitacao"
                           :options="opcoesCapacitacao"
                           class="form-select-sm seletor-capacitacao"
@@ -146,6 +147,7 @@ const {
   servidores,
   carregando,
   salvandoAutomaticamente,
+  habilitarCriarConsenso,
   atualizarCapacitacao,
 } = useSituacaoCapacitacaoDiagnostico(props.codSubprocesso);
 

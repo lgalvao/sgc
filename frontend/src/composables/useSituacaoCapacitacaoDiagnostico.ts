@@ -9,6 +9,7 @@ import type {
     ValorSituacaoCapacitacao
 } from '@/types/diagnostico-competencias';
 import {chaveUnidade, criarContextoSessaoDiagnostico} from '@/composables/useDiagnosticoContexto';
+import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 
 /**
  * Composable de situação de capacitação do diagnóstico da unidade.
@@ -19,6 +20,7 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
+    const {habilitarCriarConsenso} = useDiagnosticoPermissoes(codSubprocesso);
 
     const query = useQuery<DiagnosticoUnidade>({
         key: () => chaveUnidade(codSubprocesso, contextoSessao),
@@ -60,6 +62,7 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     // Autosave com debounce nativo
     let timer: ReturnType<typeof setTimeout> | null = null;
     const dispararSalvamento = () => {
+        if (!habilitarCriarConsenso.value) return;
         if (timer !== null) clearTimeout(timer);
         timer = setTimeout(() => { mutacaoSalvar.mutate(situacoesLocais.value); }, 800);
     };
@@ -69,6 +72,7 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
         competenciaCodigo: number,
         situacao: ValorSituacaoCapacitacao | null,
     ) {
+        if (!habilitarCriarConsenso.value) return;
         const item = situacoesLocais.value.find(
             (o) => o.servidorTitulo === servidorTitulo && o.competenciaCodigo === competenciaCodigo,
         );
@@ -97,6 +101,7 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
         erro,
         salvandoAutomaticamente,
         pendentes,
+        habilitarCriarConsenso,
         atualizarCapacitacao,
     };
 }
