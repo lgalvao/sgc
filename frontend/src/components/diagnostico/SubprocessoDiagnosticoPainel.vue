@@ -92,7 +92,7 @@
     <div class="d-flex gap-2 flex-wrap mb-4">
       <BButton
           v-if="podeConcluir && exibirBotaoConcluirDiagnostico"
-          :disabled="concluindo"
+           :disabled="concluindo || !habilitarConcluir"
           data-testid="btn-concluir-diagnostico"
           variant="success"
           @click="abrirModalConcluir"
@@ -338,6 +338,7 @@ const toastStore = useToastStore();
 const {
   podeCriarConsenso,
   podeConcluirDiagnostico,
+  habilitarConcluirDiagnostico,
   habilitarValidarDiagnostico,
   habilitarDevolverDiagnostico,
   habilitarHomologarDiagnostico,
@@ -389,6 +390,7 @@ const erroJustificativaImpossibilidade = ref('');
 
 const ehChefe = computed(() => podeCriarConsenso.value);
 const podeConcluir = computed(() => podeConcluirDiagnostico.value);
+const habilitarConcluir = computed(() => habilitarConcluirDiagnostico.value);
 const podeValidar = computed(() => habilitarValidarDiagnostico.value);
 const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
 const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
