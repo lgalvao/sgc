@@ -24,7 +24,7 @@ Ator: CHEFE
    operação e mostrar o alerta "Não é possível concluir com todos os servidores impossibilitados."
 
    3.2. Caso haja campos não preenchidos ou situações dos servidores fora das especificadas acima, o sistema mostra a
-   mensagem "Ainda existem avaliações e situações de capacitações não aprovadas." e interrompe a operação.
+   mensagem "Ainda existem avaliações e situações de capacitação pendentes." e interrompe a operação.
 
    3.3. Caso esteja tudo preenchido, o sistema mostra um modal de confirmação com título "Conclusão de diagnóstico",
    texto "Confirma a conclusão do diagnóstico da unidade?", e botões `Cancelar` e `Concluir`.
