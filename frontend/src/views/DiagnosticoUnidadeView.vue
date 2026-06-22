@@ -69,12 +69,11 @@
 
       <BCard class="mb-4">
         <div class="p-3 p-md-4">
-          <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+          <div class="mb-3">
             <div>
               <h3 class="h5 mb-1">{{ TEXTOS.diagnostico.TITULO_COMPETENCIAS_UNIDADE }}</h3>
               <p class="text-muted mb-0">Selecione um servidor para visualizar as competências avaliadas.</p>
             </div>
-            <BBadge :variant="varianteSituacao" class="align-self-start">{{ situacao }}</BBadge>
           </div>
 
           <EmptyState
@@ -100,7 +99,6 @@
                 >
                   <div>
                     <div class="fw-semibold">{{ item.servidorNome }}</div>
-                    <small class="text-muted">Título {{ item.servidorTitulo }}</small>
                   </div>
                   <BBadge :variant="varianteSituacaoServidor(item.situacaoServidor)">
                     {{ formatarSituacaoServidor(item.situacaoServidor) }}
@@ -112,13 +110,13 @@
 
             <template v-if="servidorSelecionado">
               <BCard
+                  v-if="servidorSelecionado.situacaoServidor !== 'AUTOAVALIACAO_NAO_INICIADA'"
                   class="mb-3 border-0 bg-body-tertiary"
                   data-testid="detalhes-servidor-diagnostico-unidade"
               >
                 <div class="d-flex flex-column gap-2 flex-md-row justify-content-md-between align-items-md-start">
                   <div>
                     <div class="fw-semibold text-primary">{{ servidorSelecionado.servidorNome }}</div>
-                    <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
                   </div>
                   <BBadge :variant="varianteSituacaoServidor(servidorSelecionado.situacaoServidor)">
                     {{ formatarSituacaoServidor(servidorSelecionado.situacaoServidor) }}
@@ -126,7 +124,15 @@
                 </div>
               </BCard>
 
-              <div class="table-responsive scroll-container-competencias">
+              <EmptyState
+                  v-if="servidorSelecionado?.situacaoServidor === 'AUTOAVALIACAO_NAO_INICIADA'"
+                  :description="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TEXTO"
+                  :title="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TITULO"
+                  class="my-4"
+                  icon="bi-clipboard-x"
+              />
+
+              <div v-else class="table-responsive scroll-container-competencias">
                 <BTable
                     :fields="colunasCompetenciasServidor"
                     :items="competenciasServidorSelecionado"
@@ -269,7 +275,6 @@ const {
   validando,
   devolvendo,
   homologando,
-  varianteSituacao,
   formatDataSimples,
   formatSituacaoSubprocesso,
   formatTipoResponsabilidade,

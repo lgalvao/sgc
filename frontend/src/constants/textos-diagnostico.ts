@@ -102,6 +102,8 @@ export const TEXTOS_DIAGNOSTICO = {
     VAZIO_CAPACITACAO_TEXTO: 'Nenhuma situação de capacitação registrada para esta unidade.',
     VAZIO_CAPACITACAO_SELECAO_TITULO: 'Selecione um servidor',
     VAZIO_CAPACITACAO_SELECAO_TEXTO: 'Selecione um servidor na lista acima para visualizar e preencher sua situação de capacitação.',
+    VAZIO_COMPETENCIAS_AUTOAVALIACAO_TITULO: 'Autoavaliação não iniciada',
+    VAZIO_COMPETENCIAS_AUTOAVALIACAO_TEXTO: 'As competências deste servidor serão exibidas após o início da autoavaliação.',
     VAZIO_CAPACITACAO_SERVIDOR_TITULO: 'Aguardando aprovação de consenso',
     VAZIO_CAPACITACAO_SERVIDOR_TEXTO: 'A situação de capacitação só pode ser preenchida após o servidor aprovar a avaliação de consenso.',
     VAZIO_UNIDADES_TITULO: 'Sem unidades',

@@ -33,15 +33,19 @@ router.beforeEach((to) => {
         return "/login";
     }
 
-    if (to.path === "/relatorios/unidades-sem-mapas-vigentes" && perfilStore.perfilSelecionado !== Perfil.ADMIN) {
+    if (to.path === "/relatorios/unidades-sem-mapas-vigentes"
+        && perfilStore.perfilSelecionado !== Perfil.ADMIN) {
         return "/painel";
     }
 
-    if (to.path.startsWith("/relatorios") && perfilStore.perfilSelecionado !== Perfil.ADMIN && perfilStore.perfilSelecionado !== Perfil.GESTOR) {
+    if (to.path.startsWith("/relatorios")
+        && perfilStore.perfilSelecionado !== Perfil.ADMIN
+        && perfilStore.perfilSelecionado !== Perfil.GESTOR) {
         return "/painel";
     }
 
-    if (to.path.startsWith("/administracao") && perfilStore.perfilSelecionado !== Perfil.ADMIN) {
+    if (to.path.startsWith("/administracao")
+        && perfilStore.perfilSelecionado !== Perfil.ADMIN) {
         return "/painel";
     }
 

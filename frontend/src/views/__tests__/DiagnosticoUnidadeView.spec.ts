@@ -218,7 +218,10 @@ describe('DiagnosticoUnidadeView', () => {
                         props: ['mensagem'],
                         template: '<div class="app-alert">{{ mensagem }}</div>',
                     },
-                    EmptyState: {template: '<div data-testid="empty-state" />'},
+                    EmptyState: {
+                        props: ['title', 'description'],
+                        template: '<div data-testid="empty-state">{{ title }}{{ description }}</div>',
+                    },
                     BButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
                     BBadge: {template: '<span><slot /></span>'},
                     BCard: {template: '<section><slot /></section>'},
@@ -277,7 +280,6 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain(NOME_TITULAR);
         expect(wrapper.text()).toContain(NOME_RESPONSAVEL);
         expect(wrapper.text()).toContain(NOME_SERVIDOR);
-        expect(wrapper.text()).toContain(TITULO_SERVIDOR);
         expect(wrapper.text()).toContain('Diagnóstico concluído');
         expect(wrapper.find('[data-testid="btn-historico-analise-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="lista-servidores-diagnostico-unidade"]').exists()).toBe(true);
@@ -295,6 +297,8 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('Competências da unidade');
         expect(wrapper.text()).toContain('Servidor analisado');
         expect(wrapper.text()).toContain('Avaliação de consenso aprovada');
+        expect(wrapper.text()).not.toContain(TITULO_SERVIDOR);
+        expect(wrapper.text()).not.toContain('CONCLUIDO');
         expect(wrapper.find('[data-testid="btn-validar-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-devolver-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-homologar-diagnostico-unidade"]').exists()).toBe(false);
@@ -340,6 +344,28 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain(outroServidorNome);
         expect(wrapper.text()).toContain('Autoavaliação concluída');
         expect(wrapper.text()).toContain('AC');
+    });
+
+    it('mostra empty state em vez da tabela quando o servidor ainda nao iniciou a autoavaliacao', async () => {
+        const outroServidorTitulo = '242427';
+        const outroServidorNome = 'Maria Eduarda Cavalcanti de Alencar';
+        servidoresVal.value = [
+            {
+                servidorTitulo: outroServidorTitulo,
+                servidorNome: outroServidorNome,
+                situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA',
+                consenso: [],
+            },
+        ];
+
+        const wrapper = montar();
+
+        await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${outroServidorTitulo}"]`).trigger('click');
+
+        expect(wrapper.text()).toContain('Autoavaliação não iniciada');
+        expect(wrapper.text()).toContain('As competências deste servidor serão exibidas após o início da autoavaliação.');
+        expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(false);
     });
 
     it('valida, devolve com justificativa obrigatória e homologa como admin', async () => {
@@ -406,18 +432,13 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('Falha ao homologar');
     });
 
-    it('cobre os ramos de situação do diagnóstico exibidos no resumo', () => {
+    it('remove a situacao geral do card principal', () => {
         situacaoDiagnostico.value = 'OUTRO_STATUS' as any;
         const wrapper = montar();
         expect(wrapper.text()).toContain('ASSESSORIA_12');
-
-        situacaoDiagnostico.value = 'HOMOLOGADO';
-        const wrapperHomologado = montar();
-        expect(wrapperHomologado.text()).toContain('HOMOLOGADO');
-
-        situacaoDiagnostico.value = 'VALIDADO';
-        const wrapperValidado = montar();
-        expect(wrapperValidado.text()).toContain('VALIDADO');
+        expect(wrapper.text()).not.toContain('OUTRO_STATUS');
+        expect(wrapper.text()).not.toContain('HOMOLOGADO');
+        expect(wrapper.text()).not.toContain('VALIDADO');
     });
 
     it('exercita as variantes de capacitação e formatação de notas na lista do servidor selecionado', async () => {
@@ -475,7 +496,10 @@ describe('DiagnosticoUnidadeView', () => {
                     },
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                     AppAlert: {template: '<div />'},
-                    EmptyState: {template: '<div />'},
+                    EmptyState: {
+                        props: ['title', 'description'],
+                        template: '<div>{{ title }}{{ description }}</div>',
+                    },
                     BButton: {template: '<button><slot /></button>'},
                     BBadge: {template: '<span><slot /></span>'},
                     BCard: {template: '<section><slot /></section>'},
