@@ -17,6 +17,10 @@ const NOME_UNIDADE = 'Assessoria 12';
 const TITULO_SERVIDOR = '242426';
 const NOME_SERVIDOR = 'João Guilherme de Albuquerque Maranhão';
 const CODIGO_COMPETENCIA_BASE = 10;
+const PROCESSO_DESCRICAO = 'Processo de Diagnóstico 2026';
+const LOCALIZACAO_ATUAL = 'Assessoria 12';
+const NOME_TITULAR = 'Ana Paula Titular';
+const NOME_RESPONSAVEL = 'Carlos Responsável';
 
 const perfilSelecionado = ref<Perfil>(Perfil.GESTOR);
 const situacaoDiagnostico = ref<'EM_ANDAMENTO' | 'CONCLUIDO' | 'VALIDADO' | 'HOMOLOGADO'>('CONCLUIDO');
@@ -40,6 +44,10 @@ vi.mock('@/stores/perfil', () => ({
 }));
 
 const contextoVal = ref<any>({
+    processoCodigo: 910,
+    subprocessoCodigo: COD_SUBPROCESSO,
+    unidadeSigla: SIGLA_UNIDADE,
+    unidadeNome: NOME_UNIDADE,
     competencias: [
         {competenciaCodigo: CODIGO_COMPETENCIA_BASE, descricao: 'Competência A'},
     ],
@@ -48,6 +56,8 @@ const contextoVal = ref<any>({
 vi.mock('@/composables/useDiagnosticoContexto', () => ({
     useDiagnosticoContexto: () => ({
         data: contextoVal,
+        isPending: ref(false),
+        isLoading: ref(false),
     }),
 }));
 
@@ -70,6 +80,37 @@ const servidoresVal = ref<any[]>([
 const situacoesCapacitacaoVal = ref<any[]>([
     {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'EC'},
 ]);
+const subprocessoDetalheVal = ref<any>({
+    codigo: COD_SUBPROCESSO,
+    unidade: {
+        codigo: 12,
+        sigla: SIGLA_UNIDADE,
+        nome: NOME_UNIDADE,
+    },
+    titular: {
+        titulo: '111111',
+        nome: NOME_TITULAR,
+        email: 'titular@example.com',
+        ramal: '1234',
+    },
+    responsavel: {
+        usuario: {
+            titulo: '222222',
+            nome: NOME_RESPONSAVEL,
+            email: 'responsavel@example.com',
+            ramal: '5678',
+        },
+        tipo: 'Substituição',
+        dataInicio: '2026-06-01',
+        dataFim: '2026-06-30',
+    },
+    situacao: 'DIAGNOSTICO_CONCLUIDO',
+    localizacaoAtual: LOCALIZACAO_ATUAL,
+    processoDescricao: PROCESSO_DESCRICAO,
+    prazoEtapaAtual: '2026-06-30',
+    movimentacoes: [],
+    permissoes: {},
+});
 
 vi.mock('@/composables/useDiagnosticoUnidade', () => ({
     useDiagnosticoUnidade: () => ({
@@ -107,6 +148,11 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
 
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     useDiagnosticoPermissoes: () => ({
+        queryContextoEdicao: {
+            isPending: ref(false),
+            isLoading: ref(false),
+        },
+        subprocesso: subprocessoDetalheVal,
         habilitarValidarDiagnostico: computed(() => situacaoDiagnostico.value === 'CONCLUIDO'),
         habilitarDevolverDiagnostico: computed(() => situacaoDiagnostico.value === 'CONCLUIDO'),
         habilitarHomologarDiagnostico: computed(() => perfilSelecionado.value === Perfil.ADMIN && situacaoDiagnostico.value === 'VALIDADO'),
@@ -133,6 +179,10 @@ describe('DiagnosticoUnidadeView', () => {
             situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
         };
         contextoVal.value = {
+            processoCodigo: 910,
+            subprocessoCodigo: COD_SUBPROCESSO,
+            unidadeSigla: SIGLA_UNIDADE,
+            unidadeNome: NOME_UNIDADE,
             competencias: [
                 {competenciaCodigo: CODIGO_COMPETENCIA_BASE, descricao: 'Competência A'},
             ],
@@ -159,7 +209,10 @@ describe('DiagnosticoUnidadeView', () => {
             global: {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
-                    PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
+                    PageHeader: {
+                        props: ['title', 'subtitle'],
+                        template: '<div><h1>{{ title }}</h1><p>{{ subtitle }}</p><slot /><slot name="actions" /></div>',
+                    },
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                     AppAlert: {
                         props: ['mensagem'],
@@ -214,21 +267,28 @@ describe('DiagnosticoUnidadeView', () => {
         });
     }
 
-    it('renderiza o resumo da unidade, participantes, lista de servidores e histórico do diagnóstico', () => {
+    it('renderiza o cabeçalho contextual, lista de servidores, empty state inicial e histórico do diagnóstico', async () => {
         const wrapper = montar();
 
         expect(wrapper.text()).toContain(SIGLA_UNIDADE);
         expect(wrapper.text()).toContain(NOME_UNIDADE);
-        expect(wrapper.text()).toContain('Processo:');
-        expect(wrapper.text()).toContain('Subprocesso:');
-        expect(wrapper.text()).toContain('Situação:');
+        expect(wrapper.text()).toContain(PROCESSO_DESCRICAO);
+        expect(wrapper.text()).toContain(LOCALIZACAO_ATUAL);
+        expect(wrapper.text()).toContain(NOME_TITULAR);
+        expect(wrapper.text()).toContain(NOME_RESPONSAVEL);
         expect(wrapper.text()).toContain(NOME_SERVIDOR);
         expect(wrapper.text()).toContain(TITULO_SERVIDOR);
-        expect(wrapper.text()).toContain('EC');
         expect(wrapper.text()).toContain('Diagnóstico concluído');
         expect(wrapper.find('[data-testid="btn-historico-analise-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="lista-servidores-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}"]`).exists()).toBe(true);
+        expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(false);
+        expect(wrapper.text()).toContain('Selecione um servidor');
+
+        await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}"]`).trigger('click');
+
+        expect(wrapper.text()).toContain('EC');
         expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="movimentacoes"]').exists()).toBe(true);
@@ -270,6 +330,9 @@ describe('DiagnosticoUnidadeView', () => {
 
         expect(wrapper.text()).toContain(NOME_SERVIDOR);
         expect(wrapper.text()).toContain('Avaliação de consenso aprovada');
+        expect(wrapper.text()).not.toContain('EC');
+
+        await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}"]`).trigger('click');
         expect(wrapper.text()).toContain('EC');
 
         await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${outroServidorTitulo}"]`).trigger('click');
@@ -357,13 +420,17 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapperValidado.text()).toContain('VALIDADO');
     });
 
-    it('exercita as variantes de capacitação e formatação de notas na lista do servidor selecionado', () => {
+    it('exercita as variantes de capacitação e formatação de notas na lista do servidor selecionado', async () => {
         unidadeVal.value = {
             unidadeSigla: SIGLA_UNIDADE,
             unidadeNome: NOME_UNIDADE,
             situacaoSubprocesso: 'DIAGNOSTICO_CONCLUIDO',
         };
         contextoVal.value = {
+            processoCodigo: 910,
+            subprocessoCodigo: COD_SUBPROCESSO,
+            unidadeSigla: SIGLA_UNIDADE,
+            unidadeNome: NOME_UNIDADE,
             competencias: [
                 {competenciaCodigo: CODIGO_COMPETENCIA_BASE, descricao: 'Competência A'},
                 {competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1, descricao: 'Competência B'},
@@ -402,7 +469,10 @@ describe('DiagnosticoUnidadeView', () => {
             global: {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
-                    PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
+                    PageHeader: {
+                        props: ['title', 'subtitle'],
+                        template: '<div><h1>{{ title }}</h1><p>{{ subtitle }}</p><slot /><slot name="actions" /></div>',
+                    },
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                     AppAlert: {template: '<div />'},
                     EmptyState: {template: '<div />'},
@@ -438,6 +508,8 @@ describe('DiagnosticoUnidadeView', () => {
                 },
             },
         });
+
+        await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}"]`).trigger('click');
 
         expect(wrapper.text()).toContain('-');
         expect(wrapper.text()).toContain('NA');
