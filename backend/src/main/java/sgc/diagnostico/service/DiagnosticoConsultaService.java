@@ -142,7 +142,7 @@ public class DiagnosticoConsultaService {
                                 && situacao != SituacaoAvaliacaoServidor.CONSENSO_CRIADO
                                 && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO
                 )
-                .podeAprovarConsenso(usuarioEhServidorAvaliado)
+                .podeAprovarConsenso(usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
                 .habilitarAprovarConsenso(usuarioEhServidorAvaliado && situacao == SituacaoAvaliacaoServidor.CONSENSO_CRIADO)
                 .build();
     }

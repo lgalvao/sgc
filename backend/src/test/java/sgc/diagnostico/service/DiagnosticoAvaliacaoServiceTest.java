@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sgc.comum.Mensagens;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
+import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.dto.AutoavaliacaoRequest;
 import sgc.diagnostico.dto.AvaliacaoCompetenciaDto;
 import sgc.diagnostico.dto.ConsensoCompetenciaDto;
@@ -327,6 +329,34 @@ class DiagnosticoAvaliacaoServiceTest {
 
         assertThat(av1.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
         assertThat(av2.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+    }
+
+    @Test
+    @DisplayName("aprovarConsenso: deve falhar quando consenso ja estiver aprovado")
+    void aprovarConsenso_deveFalharQuandoJaAprovado() {
+        Long codSubprocesso = 51L;
+        Long diagCodigo = 510L;
+        String titulo = "servidor@titulo";
+
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral(titulo);
+
+        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
+        AvaliacaoServidor av1 = avaliacaoVazia(300L);
+        av1.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+        AvaliacaoServidor av2 = avaliacaoVazia(301L);
+        av2.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, titulo)).thenReturn(List.of(av1, av2));
+
+        assertThatThrownBy(() -> service.aprovarConsenso(codSubprocesso))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage(Mensagens.CONSENSO_JA_APROVADO);
+
+        verify(avaliacaoRepo, never()).saveAll(anyList());
+        verifyNoInteractions(notificacaoService);
     }
 
     // ─── impossibilitarAvaliacao ───────────────────────────────────────────

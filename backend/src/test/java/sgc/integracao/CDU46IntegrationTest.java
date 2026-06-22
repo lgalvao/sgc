@@ -9,6 +9,7 @@ import sgc.alerta.model.Alerta;
 import sgc.alerta.model.AlertaRepo;
 import sgc.alerta.model.NotificacaoEmail;
 import sgc.alerta.model.NotificacaoEmailRepo;
+import sgc.comum.Mensagens;
 import sgc.diagnostico.model.AvaliacaoServidor;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
 import sgc.integracao.mocks.WithMockCustomUser;
@@ -18,6 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Tag("integration")
@@ -69,5 +71,24 @@ class CDU46IntegrationTest extends DiagnosticoCduIntegrationTestBase {
             assertThat(notificacao.getCorpoHtml()).contains("O servidor <strong>" + servidor.getNome() + "</strong> aprovou a avaliação de consenso do processo");
             assertThat(notificacao.getCorpoHtml()).contains("Acompanhe o processo no Sistema de Gestão de Competências");
         });
+    }
+
+    @Test
+    @WithMockCustomUser(tituloEleitoral = "50003", unidadeId = 9L, perfis = {"SERVIDOR"})
+    @DisplayName("Deve barrar nova aprovação quando a avaliação de consenso já estiver aprovada")
+    void deveBarrarNovaAprovacaoQuandoConsensoJaAprovado() throws Exception {
+        mockMvc.perform(post(API_DIAGNOSTICO + "/consenso/aprovar", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isOk());
+        int totalAlertas = alertaRepo.findAll().size();
+        int totalNotificacoes = notificacaoEmailRepo.findAll().size();
+
+        mockMvc.perform(post(API_DIAGNOSTICO + "/consenso/aprovar", subprocesso.getCodigo())
+                        .with(csrf()))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.message").value(Mensagens.CONSENSO_JA_APROVADO));
+
+        assertThat(alertaRepo.findAll()).hasSize(totalAlertas);
+        assertThat(notificacaoEmailRepo.findAll()).hasSize(totalNotificacoes);
     }
 }

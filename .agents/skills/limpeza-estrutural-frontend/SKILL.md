@@ -16,11 +16,10 @@ gate de cruft e por hotspots reais do código.
 Antes de simplificar, confirme as restrições nestas fontes:
 
 - `AGENTS.md`
-- `etc/reqs`
-- `etc/docs/acesso.md`
-- `etc/qualidade/frontend-cruft-budget.json`
-- `etc/qualidade/frontend-cruft-waivers.json`
-- `etc/qualidade/frontend-cruft/latest`
+- `specs/design/acesso.md`
+- `toolkit/qualidade/frontend-cruft/latest`
+- `toolkit/qualidade/frontend-arquitetura/latest`
+- `toolkit/qualidade/frontend-arquitetura/acoes-backend-waivers.json`
 - testes e2e/unitários relacionados ao fluxo tocado
 
 No SGC, requisitos, contratos de UI e regras de acesso têm precedência sobre qualquer redução de cruft.
@@ -82,7 +81,8 @@ Reduzir complexidade acidental no frontend preservando:
 Comece por:
 
 ```bash
-node etc/scripts/sgc.js frontend cruft validar
+node toolkit/sgc.js frontend cruft validar
+node toolkit/sgc.js frontend arquitetura validar
 ```
 
 Use o resultado para descobrir:
@@ -91,11 +91,12 @@ Use o resultado para descobrir:
 - em qual camada está o excesso;
 - se há waiver obsoleto que já pode cair;
 - se a mudança proposta pode criar uma violação nova em outra camada.
+- se o frontend está calculando habilitação/exibição de ação que deve vir do backend.
 
 Se tocar em `data-testid`, rode também:
 
 ```bash
-node etc/scripts/frontend/test-ids-duplicados.js
+node toolkit/sgc.js frontend test-ids listar-duplicados
 ```
 
 ### 2. Classificar o hotspot
@@ -167,6 +168,7 @@ Não deixe:
 - Evite overengineering: menos camadas, mas só quando a leitura realmente melhora.
 - Não tente "recuperar" erro irrecuperável de backend no frontend; preserve o padrão fail-fast.
 - Não duplique regra de acesso no frontend se o backend já decide habilitação.
+- Não introduza cálculos locais de `pode*`, `habilitar*`, `mostrar*` ou `exibir*` para botões, cards ou ações. Use flags/action models vindos do backend; o gate `frontend arquitetura validar` bloqueia regressões novas.
 - Não mantenha código marcado como legado/depreciado se a dependência interna sumiu.
 
 ## Validação mínima por rodada
@@ -174,17 +176,19 @@ Não deixe:
 Depois de cada corte, rode o menor conjunto suficiente entre:
 
 ```bash
-pnpm -C frontend exec vitest run <arquivos> --reporter=dot --no-color
+npx vitest run <arquivos>
 npm run typecheck
 npm run lint
-node etc/scripts/sgc.js frontend cruft validar
-node etc/scripts/frontend/test-ids-duplicados.js
+node toolkit/sgc.js frontend cruft validar
+node toolkit/sgc.js frontend arquitetura validar
+node toolkit/sgc.js frontend test-ids listar-duplicados
 npx playwright test <arquivo-e2e>
 ```
 
 Regras práticas:
 
 - sempre rode `frontend cruft validar`;
+- rode `frontend arquitetura validar` se tocar em ações, botões, permissões ou fluxos de navegação;
 - rode `test-ids-duplicados` se tocar em seletores;
 - rode Playwright focado se tocar em contrato de navegação ou tela coberta por e2e.
 

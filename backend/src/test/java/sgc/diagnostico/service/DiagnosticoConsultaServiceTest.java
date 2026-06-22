@@ -276,6 +276,26 @@ class DiagnosticoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("obterConsenso deve negar aprovacao quando consenso ja estiver aprovado")
+    void obterConsenso_deveNegarAprovacaoQuandoConsensoJaAprovado() {
+        Long codSubprocesso = 405L;
+        Long codDiagnostico = 905L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("242426");
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        var dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.podeAprovarConsenso()).isFalse();
+        assertThat(dto.habilitarAprovarConsenso()).isFalse();
+    }
+
+    @Test
     @DisplayName("obterDiagnosticoUnidade deve ocultar o responsável da unidade de servidores e situações de capacitação")
     void obterDiagnosticoUnidade_deveOcultarResponsavelDaUnidade() {
         Long codSubprocesso = 400L;

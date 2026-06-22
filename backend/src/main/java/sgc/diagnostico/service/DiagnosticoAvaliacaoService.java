@@ -3,6 +3,7 @@ package sgc.diagnostico.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sgc.comum.Mensagens;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.comum.erros.ErroValidacao;
 import sgc.diagnostico.dto.*;
@@ -129,6 +130,9 @@ public class DiagnosticoAvaliacaoService {
 
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
+        if (avaliacoes.stream().allMatch(a -> a.getSituacaoServidor() == SituacaoAvaliacaoServidor.CONSENSO_APROVADO)) {
+            throw new ErroValidacao(Mensagens.CONSENSO_JA_APROVADO);
+        }
         avaliacoes.forEach(a -> a.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO));
         avaliacaoRepo.saveAll(avaliacoes);
 

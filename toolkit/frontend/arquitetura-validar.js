@@ -8,6 +8,7 @@ import {cruise} from "dependency-cruiser";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {auditarAcoesBackendFrontend} from "./acoes-backend-lib.js";
 
 function lerOpcao(argumentos, nome) {
     const indice = argumentos.indexOf(nome);
@@ -68,6 +69,22 @@ function imprimirViolacoes(violacoes, diretorioBase) {
     });
 }
 
+function imprimirViolacoesAcoesBackend(resultado) {
+    const violacoes = resultado.violacoes ?? [];
+    if (violacoes.length === 0) {
+        const detalheWaivers = resultado.dispensadas > 0 ? ` (${resultado.dispensadas} dispensadas por waiver)` : "";
+        escreverLinha(`${pc.green("✓")} Nenhum calculo local novo de habilitacao/exibicao de acoes encontrado${detalheWaivers}.`);
+        return;
+    }
+
+    escreverLinha(pc.red(`Foram encontrados ${violacoes.length} calculos locais de habilitacao/exibicao de acoes:`));
+    violacoes.forEach((violacao, indice) => {
+        escreverLinha(`${indice + 1}. [${violacao.regra}] ${violacao.arquivo}:${violacao.linha} (${violacao.identificador})`);
+        escreverLinha(`   ${violacao.motivo}`);
+        escreverLinha(`   ${violacao.trecho}`);
+    });
+}
+
 async function executarValidacaoArquiteturaFrontend(opcoes = {}) {
     const diretorioBase = realpathSync(path.resolve(opcoes.base ?? DIRETORIO_RAIZ));
     const diretorioFrontend = realpathSync(path.join(diretorioBase, "frontend"));
@@ -96,9 +113,14 @@ async function executarValidacaoArquiteturaFrontend(opcoes = {}) {
     );
 
     const parsed = JSON.parse(resultadoCruise.output);
+    const acoesBackend = await auditarAcoesBackendFrontend({
+        base: diretorioBase,
+    });
+
     return {
         ...parsed,
         exitCode: resultadoCruise.exitCode,
+        acoesBackend,
         summary: {
             ...parsed.summary,
             violations: extrairViolacoes(parsed),
@@ -136,10 +158,12 @@ async function main() {
     if (jsonMode) {
         imprimirJson(resultado);
     } else {
-        imprimirViolacoes(resultado.summary.violations ?? [], path.resolve(lerOpcao(args, "--base") ?? DIRETORIO_RAIZ));
+        const diretorioBase = path.resolve(lerOpcao(args, "--base") ?? DIRETORIO_RAIZ);
+        imprimirViolacoes(resultado.summary.violations ?? [], diretorioBase);
+        imprimirViolacoesAcoesBackend(resultado.acoesBackend);
     }
 
-    if ((resultado.summary.violations ?? []).length > 0 || resultado.exitCode !== 0) {
+    if ((resultado.summary.violations ?? []).length > 0 || resultado.exitCode !== 0 || (resultado.acoesBackend?.violacoes ?? []).length > 0) {
         process.exit(1);
     }
 }

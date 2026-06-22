@@ -119,7 +119,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const mutacaoAprovar = useMutation({
         mutation: () => aprovarConsenso(codSubprocesso),
         onSuccess: () => {
-            invalidarQueriesAprovar({cache, codSubprocesso, contextoSessao, servidorTitulo});
+            invalidarQueriesAprovar({cache, codSubprocesso, contextoSessao, chaveConsultaConsenso: chaveConsultaConsenso.value});
         },
     });
 
@@ -199,6 +199,7 @@ interface InvalidaQueriesContext {
     codSubprocesso: number;
     contextoSessao: ReturnType<typeof criarContextoSessaoDiagnostico>;
     servidorTitulo?: string;
+    chaveConsultaConsenso?: string;
 }
 
 function invalidarQueriesConsenso(ctx: InvalidaQueriesContext) {
@@ -207,7 +208,7 @@ function invalidarQueriesConsenso(ctx: InvalidaQueriesContext) {
 }
 
 function invalidarQueriesAprovar(ctx: InvalidaQueriesContext) {
-    void ctx.cache.invalidateQueries({key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.servidorTitulo), exact: true});
+    void ctx.cache.invalidateQueries({key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.chaveConsultaConsenso ?? ctx.servidorTitulo), exact: true});
     void ctx.cache.invalidateQueries({key: chaveEquipe(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
     void ctx.cache.invalidateQueries({key: chaveAutoavaliacao(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
 }

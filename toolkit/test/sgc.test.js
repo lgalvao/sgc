@@ -394,6 +394,71 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Nenhuma violacao arquitetural encontrada");
     });
 
+    test("gate arquitetural falha quando frontend calcula habilitacao de acao por perfil ou situacao", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-backend-falha-"));
+        const frontendDir = path.join(base, "frontend");
+
+        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+            compilerOptions: {
+                baseUrl: ".",
+                paths: {
+                    "@/*": ["./src/*"],
+                },
+            },
+            include: ["src/**/*.ts", "src/**/*.vue"],
+        });
+        await fs.outputFile(
+            path.join(frontendDir, "src", "views", "ConsensoView.vue"),
+            [
+                "<script setup lang=\"ts\">",
+                "import {computed} from 'vue';",
+                "import {Perfil} from '@/types/perfil';",
+                "const perfilStore = { perfilSelecionado: Perfil.SERVIDOR };",
+                "const consenso = { situacao: 'CONSENSO_CRIADO' };",
+                "const habilitarAprovarConsenso = computed(() => perfilStore.perfilSelecionado === Perfil.SERVIDOR && consenso.situacao === 'CONSENSO_CRIADO');",
+                "</script>",
+            ].join("\n")
+        );
+        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+
+        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        expect(resultado.exitCode).not.toBe(0);
+        expect(resultado.stdout).toContain("frontend-sem-regra-local-acoes");
+        expect(resultado.stdout).toContain("habilitarAprovarConsenso");
+    });
+
+    test("gate arquitetural permite flag de acao vinda diretamente do backend", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-backend-ok-"));
+        const frontendDir = path.join(base, "frontend");
+
+        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+            compilerOptions: {
+                baseUrl: ".",
+                paths: {
+                    "@/*": ["./src/*"],
+                },
+            },
+            include: ["src/**/*.ts", "src/**/*.vue"],
+        });
+        await fs.outputFile(
+            path.join(frontendDir, "src", "views", "ConsensoView.vue"),
+            [
+                "<script setup lang=\"ts\">",
+                "import {computed} from 'vue';",
+                "const query = { data: { value: { habilitarAprovarConsenso: true } } };",
+                "const habilitarAprovarConsenso = computed(() => query.data.value.habilitarAprovarConsenso ?? false);",
+                "</script>",
+            ].join("\n")
+        );
+        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+
+        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Nenhum calculo local novo de habilitacao/exibicao de acoes encontrado");
+    });
+
     test("composable fachada de store não é penalizado por chamadasStore >= 8", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-facade-"));
         const frontendDir = path.join(base, "frontend", "src");
