@@ -101,7 +101,8 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         assertThat(buscarAvaliacoes("50003")).allSatisfy(avaliacao ->
-                assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
+                assertThat(avaliacao.getSituacaoServidor())
+                        .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA));
         assertThat(buscarAvaliacoes("50004")).allSatisfy(avaliacao ->
                 assertThat(avaliacao.getSituacaoServidor())
                         .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA));

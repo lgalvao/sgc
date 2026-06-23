@@ -261,8 +261,9 @@ class DiagnosticoFluxoServiceTest {
         service.devolverDiagnostico(codSubprocesso, observacao);
 
         assertThat(diagnostico.getDataConclusao()).isNull();
-        assertThat(subprocesso.getDataFimEtapa1()).isNull();
-        assertThat(avaliacaoAprovada.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        assertThat(subprocesso.getDataFimEtapa1()).isNotNull();
+        assertThat(avaliacaoAprovada.getSituacaoServidor())
+                .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
         assertThat(avaliacaoImpossibilitada.getSituacaoServidor())
                 .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
 
