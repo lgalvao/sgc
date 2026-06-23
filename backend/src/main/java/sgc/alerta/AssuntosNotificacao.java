@@ -1,8 +1,8 @@
 package sgc.alerta;
 
-import sgc.subprocesso.model.TipoTransicao;
+import sgc.subprocesso.model.*;
 
-import java.util.Locale;
+import java.util.*;
 
 public final class AssuntosNotificacao {
     private AssuntosNotificacao() {
@@ -32,9 +32,7 @@ public final class AssuntosNotificacao {
         return "SGC: Lembrete de prazo - %s".formatted(nomeProcesso);
     }
 
-    public static String dataLimiteAlterada() {
-        return "SGC: Data limite alterada";
-    }
+    public static String dataLimiteAlterada = "SGC: Data limite alterada";
 
     public static String atribuicaoPerfilChefe(String siglaUnidade) {
         return "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(siglaUnidade);
@@ -53,16 +51,20 @@ public final class AssuntosNotificacao {
             case MAPA_DISPONIBILIZADO -> "Mapa de competências disponibilizado";
             case MAPA_SUGESTOES_APRESENTADAS -> "Sugestões apresentadas para o mapa de competências da %s"
                     .formatted(siglaUnidade);
-            case MAPA_VALIDADO, MAPA_VALIDACAO_ACEITA -> "Validação do mapa de competências da %s submetida para análise"
-                    .formatted(siglaUnidade);
+            case MAPA_VALIDADO, MAPA_VALIDACAO_ACEITA ->
+                    "Validação do mapa de competências da %s submetida para análise"
+                            .formatted(siglaUnidade);
             case MAPA_VALIDACAO_DEVOLVIDA -> "Validação do mapa da %s devolvida para ajustes"
                     .formatted(siglaUnidade);
-            case REVISAO_CADASTRO_ACEITA -> "Revisão do cadastro de atividades e conhecimentos da %s submetido para análise"
-                    .formatted(siglaUnidade);
-            case REVISAO_CADASTRO_DEVOLVIDA -> "Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes"
-                    .formatted(siglaUnidade);
-            case REVISAO_CADASTRO_DISPONIBILIZADA -> "Revisão do cadastro de atividades e conhecimentos disponibilizada: %s"
-                    .formatted(siglaUnidade);
+            case REVISAO_CADASTRO_ACEITA ->
+                    "Revisão do cadastro de atividades e conhecimentos da %s submetido para análise"
+                            .formatted(siglaUnidade);
+            case REVISAO_CADASTRO_DEVOLVIDA ->
+                    "Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes"
+                            .formatted(siglaUnidade);
+            case REVISAO_CADASTRO_DISPONIBILIZADA ->
+                    "Revisão do cadastro de atividades e conhecimentos disponibilizada: %s"
+                            .formatted(siglaUnidade);
             case REVISAO_CADASTRO_REABERTA -> "Reabertura de revisão de cadastro";
             default -> tipo.getDescMovimentacao();
         };

@@ -31,8 +31,6 @@ class AssuntosNotificacaoTest {
                 .isEqualTo("SGC: Finalização do processo Processo X em unidades subordinadas");
         assertThat(AssuntosNotificacao.lembretePrazo("Processo X"))
                 .isEqualTo("SGC: Lembrete de prazo - Processo X");
-        assertThat(AssuntosNotificacao.dataLimiteAlterada())
-                .isEqualTo("SGC: Data limite alterada");
         assertThat(AssuntosNotificacao.atribuicaoPerfilChefe("SEC"))
                 .isEqualTo("SGC: Atribuição de perfil CHEFE na unidade SEC");
         assertThat(AssuntosNotificacao.disponibilizacaoMapaBloco())

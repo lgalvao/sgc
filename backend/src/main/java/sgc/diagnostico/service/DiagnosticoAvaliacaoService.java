@@ -172,9 +172,13 @@ public class DiagnosticoAvaliacaoService {
         if (temAutoavaliacaoNula) {
             situacaoRetorno = SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA;
         } else {
-            boolean temChefiaPreenchida = avaliacoes.stream()
-                    .anyMatch(a -> a.getChefiaImportancia() != null || a.getChefiaDominio() != null);
-            if (temChefiaPreenchida) {
+            boolean consensoCompleto = avaliacoes.stream().allMatch(a ->
+                    a.getChefiaImportancia() != null
+                            && a.getChefiaDominio() != null
+                            && a.getConsensoImportancia() != null
+                            && a.getConsensoDominio() != null
+            );
+            if (consensoCompleto) {
                 situacaoRetorno = SituacaoAvaliacaoServidor.CONSENSO_CRIADO;
             } else {
                 situacaoRetorno = SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA;

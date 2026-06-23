@@ -82,7 +82,7 @@ public class SubprocessoNotificacaoService {
                 sp.getProcesso(), sp.getUnidade(), novaDataFormatada, etapa);
 
         Map<String, Object> variaveis = new HashMap<>();
-        String assunto = AssuntosNotificacao.dataLimiteAlterada();
+        String assunto = AssuntosNotificacao.dataLimiteAlterada;
         variaveis.put("titulo", assunto);
         variaveis.put("siglaUnidade", sp.getUnidade().getSigla());
         variaveis.put("nomeProcesso", sp.getProcesso().getDescricao());

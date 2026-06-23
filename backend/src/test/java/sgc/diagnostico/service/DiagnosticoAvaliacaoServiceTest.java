@@ -395,6 +395,39 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThat(avaliacao.getObservacao()).isEqualTo(justificativa);
     }
 
+    @Test
+    @DisplayName("reverterImpossibilidade: deve voltar para AUTOAVALIACAO_CONCLUIDA quando houver chefia preenchida mas consenso incompleto")
+    void reverterImpossibilidade_deveVoltarParaAutoavaliacaoConcluidaQuandoConsensoIncompleto() {
+        Long codSubprocesso = 7L;
+        Long diagCodigo = 70L;
+        String servidorTitulo = "servidor@titulo";
+
+        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
+        AvaliacaoServidor avaliacao = avaliacaoComNota(401L, 3, 2);
+        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        avaliacao.setChefiaImportancia(5);
+        avaliacao.setChefiaDominio(4);
+        avaliacao.setConsensoImportancia(null);
+        avaliacao.setConsensoDominio(null);
+        avaliacao.setImportancia(3);
+        avaliacao.setDominio(2);
+        avaliacao.setObservacao("Licença");
+
+        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
+
+        service.reverterImpossibilidade(codSubprocesso, servidorTitulo);
+
+        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        assertThat(avaliacao.getImportancia()).isEqualTo(3);
+        assertThat(avaliacao.getDominio()).isEqualTo(2);
+        assertThat(avaliacao.getChefiaImportancia()).isEqualTo(5);
+        assertThat(avaliacao.getChefiaDominio()).isEqualTo(4);
+        assertThat(avaliacao.getConsensoImportancia()).isNull();
+        assertThat(avaliacao.getConsensoDominio()).isNull();
+        assertThat(avaliacao.getObservacao()).isNull();
+    }
+
     // ─── findBySubprocessoCodigo não encontrado ────────────────────────────
 
     @Test

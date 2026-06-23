@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.Builder;
+import org.jspecify.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -17,9 +18,9 @@ public record AtualizarSubprocessoRequest(
         Long codUnidade,
         Long codMapa,
         LocalDateTime dataLimiteEtapa1,
-        LocalDateTime dataFimEtapa1,
-        LocalDateTime dataLimiteEtapa2,
-        LocalDateTime dataFimEtapa2) {
+        @Nullable LocalDateTime dataFimEtapa1,
+        @Nullable LocalDateTime dataLimiteEtapa2,
+        @Nullable LocalDateTime dataFimEtapa2) {
     public AtualizarSubprocessoCommand paraCommand() {
         return AtualizarSubprocessoCommand.builder()
                 .vinculos(paraVinculosCommand())
