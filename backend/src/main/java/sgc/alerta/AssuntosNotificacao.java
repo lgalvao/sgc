@@ -32,7 +32,7 @@ public final class AssuntosNotificacao {
         return "SGC: Lembrete de prazo - %s".formatted(nomeProcesso);
     }
 
-    public static String dataLimiteAlterada = "SGC: Data limite alterada";
+    public static final String dataLimiteAlterada = "SGC: Data limite alterada";
 
     public static String atribuicaoPerfilChefe(String siglaUnidade) {
         return "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(siglaUnidade);

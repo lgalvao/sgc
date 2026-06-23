@@ -149,7 +149,6 @@ public class DiagnosticoFluxoService {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
 
         diagnostico.setDataConclusao(LocalDateTime.now());
-        diagnostico.setJustificativaConclusao(null);
 
         subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setDataFimEtapa1(LocalDateTime.now());
@@ -199,7 +198,6 @@ public class DiagnosticoFluxoService {
         if (Objects.equals(unidadeDevolucao.getCodigo(), subprocesso.getUnidade().getCodigo())) {
             novaSituacao = SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO;
             diagnostico.setDataConclusao(null);
-            diagnostico.setJustificativaConclusao(null);
             diagnostico.getAvaliacaoServidores().forEach(avaliacao -> {
                 if (avaliacao.getSituacaoServidor() != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA) {
                     avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);

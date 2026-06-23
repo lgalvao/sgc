@@ -29,9 +29,6 @@ public class Diagnostico extends EntidadeBase {
     @Column(name = "data_conclusao")
     private LocalDateTime dataConclusao;
 
-    @Column(name = "justificativa_conclusao")
-    private String justificativaConclusao;
-
     @OneToMany(mappedBy = "diagnostico", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<AvaliacaoServidor> avaliacaoServidores = new ArrayList<>();

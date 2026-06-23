@@ -1040,7 +1040,6 @@ public class E2eController {
         preencherSituacoesCapacitacaoFixture(diagnostico);
 
         diagnostico.setDataConclusao(LocalDateTime.now());
-        diagnostico.setJustificativaConclusao(null);
         diagnosticoRepo.saveAndFlush(diagnostico);
 
         Unidade unidade = unidadeService.buscarPorSigla(unidadeSigla);
