@@ -375,21 +375,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         return mapa[situacaoServidor] ?? situacaoServidor;
     }
 
-    const movimentacoesFormatadas = computed<Movimentacao[]>(() =>
-        movimentacoes.value.map((movimentacao, indice) => ({
-            codigo: indice + 1,
-            dataHora: movimentacao.dataHora,
-            unidadeOrigemCodigo: 0,
-            unidadeOrigemSigla: movimentacao.unidadeOrigemSigla ?? movimentacao.unidadeOrigem,
-            unidadeOrigemNome: movimentacao.unidadeOrigemNome ?? movimentacao.unidadeOrigem,
-            unidadeDestinoCodigo: 0,
-            unidadeDestinoSigla: movimentacao.unidadeDestinoSigla ?? movimentacao.unidadeDestino,
-            unidadeDestinoNome: movimentacao.unidadeDestinoNome ?? movimentacao.unidadeDestino,
-            usuarioTitulo: '',
-            usuarioNome: movimentacao.usuario ?? '',
-            descricao: movimentacao.descricao,
-        })),
-    );
+    const movimentacoesFormatadas = computed<Movimentacao[]>(() => movimentacoes.value);
 
     const colunasCompetenciasServidor = [
         {key: 'competenciaDescricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},

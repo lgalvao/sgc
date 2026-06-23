@@ -9,7 +9,6 @@ import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.organizacao.ContextoUsuarioAutenticado;
 import sgc.organizacao.dto.MapaVigenteReferenciaDto;
 import sgc.organizacao.model.*;
 

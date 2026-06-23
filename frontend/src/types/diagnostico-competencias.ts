@@ -1,3 +1,5 @@
+import type { Movimentacao } from './subprocesso-modelos';
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Enums
 // ──────────────────────────────────────────────────────────────────────────────
@@ -125,16 +127,7 @@ export interface DiagnosticoUnidade {
     situacaoDiagnostico: SituacaoDiagnostico;
     servidores: ServidorDiagnostico[];
     situacoesCapacitacao: SituacaoCapacitacaoItem[];
-    movimentacoes: MovimentacaoDiag[];
-}
-
-/** Movimentação do histórico do subprocesso. */
-export interface MovimentacaoDiag {
-    descricao: string;
-    dataHora: string;
-    unidadeOrigem: string;
-    unidadeDestino: string;
-    usuario?: string;
+    movimentacoes: Movimentacao[];
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 package sgc.comum.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.jspecify.annotations.*;
 
 /**
  * Utilitário para mascaramento de dados sensíveis em logs.
@@ -12,7 +12,7 @@ public class MascaraUtil {
     /**
      * Mascara um valor (como Título Eleitoral), exibindo apenas os últimos 4 caracteres.
      */
-    public static String mascarar(String valor) {
+    public static String mascarar(@Nullable String valor) {
         if (valor == null || valor.length() <= 4) {
             return "***";
         }

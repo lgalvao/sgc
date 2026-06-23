@@ -111,20 +111,20 @@
             </div>
 
             <template v-if="servidorSelecionado">
+              <EmptyState
+                  v-if="servidorSelecionado.situacaoServidor === 'AUTOAVALIACAO_NAO_INICIADA'"
+                  :description="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TEXTO"
+                  :title="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TITULO"
+                  class="my-4"
+                  icon="bi-clipboard-x"
+              />
+
               <BCard
-                  v-if="servidorSelecionado.situacaoServidor !== 'AUTOAVALIACAO_NAO_INICIADA'"
+                  v-else
                   class="mb-3 border-1"
                   data-testid="detalhes-servidor-diagnostico-unidade"
               >
-                <EmptyState
-                    v-if="servidorSelecionado?.situacaoServidor === 'AUTOAVALIACAO_NAO_INICIADA'"
-                    :description="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TEXTO"
-                    :title="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TITULO"
-                    class="my-4"
-                    icon="bi-clipboard-x"
-                />
-
-                <div v-else class="table-responsive scroll-container-competencias">
+                <div class="table-responsive scroll-container-competencias">
                   <BTable
                       :fields="colunasCompetenciasServidor"
                       :items="competenciasServidorSelecionado"
@@ -139,11 +139,11 @@
                       <template #cell(dominio)="{ item }">
                       <div class="text-center">{{ formatarNota(item.dominio) }}</div>
                       </template>
-                    <template #cell(situacaoCapacitacao)="{ item }">
-                    <span :title="formatarSituacaoCapacitacao(item.situacaoCapacitacao)">
-                      {{ formatarSituacaoCapacitacaoResumida(item.situacaoCapacitacao) }}
-                    </span>
-                    </template>
+                      <template #cell(situacaoCapacitacao)="{ item }">
+                      <span :title="formatarSituacaoCapacitacao(item.situacaoCapacitacao)">
+                        {{ formatarSituacaoCapacitacaoResumida(item.situacaoCapacitacao) }}
+                      </span>
+                      </template>
                   </BTable>
                 </div>
               </BCard>
