@@ -1,0 +1,9 @@
+Telas fixas precisam caber em res. hd, sem barra de rolagem.
+
+Na tela DiagnosticoUnidadeView, alertas de erro de validação devem sumir depois de qualquer edição dos dados, aparecendo (se for o caso) apenas depois de clicar em 'Concluir diagnóstico'
+
+Breadcrumbs de diagnositico errados.
+
+Ações em bloco ADMIN/GESTOR para o diagnostico esta com ações erradas. As ações deveriam ser
+
+Padronização de botões grandes no cabeçalho.
