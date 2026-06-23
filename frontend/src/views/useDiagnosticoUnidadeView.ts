@@ -33,6 +33,9 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const {
         queryContextoEdicao,
         subprocesso: subprocessoDetalhe,
+        podeValidarDiagnostico,
+        podeDevolverDiagnostico,
+        podeHomologarDiagnostico,
         habilitarValidarDiagnostico,
         habilitarDevolverDiagnostico,
         habilitarHomologarDiagnostico,
@@ -77,9 +80,12 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const carregandoHistorico = ref(false);
     const historicoAnalises = ref<Analise[]>([]);
 
-    const podeValidar = computed(() => habilitarValidarDiagnostico.value);
-    const podeDevolver = computed(() => habilitarDevolverDiagnostico.value);
-    const podeHomologar = computed(() => habilitarHomologarDiagnostico.value);
+    const podeValidar = computed(() => podeValidarDiagnostico.value);
+    const podeDevolver = computed(() => podeDevolverDiagnostico.value);
+    const podeHomologar = computed(() => podeHomologarDiagnostico.value);
+    const habilitarValidar = computed(() => habilitarValidarDiagnostico.value);
+    const habilitarDevolver = computed(() => habilitarDevolverDiagnostico.value);
+    const habilitarHomologar = computed(() => habilitarHomologarDiagnostico.value);
     const carregando = computed(() =>
         carregandoUnidade.value
         || contextoQuery.isPending.value
@@ -331,7 +337,10 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     );
 
     function formatarSituacaoCapacitacaoResumida(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
-        return situacaoCapacitacao ?? TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+        if (!situacaoCapacitacao) {
+            return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+        }
+        return `${situacaoCapacitacao} - ${formatarSituacaoCapacitacao(situacaoCapacitacao)}`;
     }
 
     function formatarSituacaoCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
@@ -371,11 +380,11 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             codigo: indice + 1,
             dataHora: movimentacao.dataHora,
             unidadeOrigemCodigo: 0,
-            unidadeOrigemSigla: movimentacao.unidadeOrigem,
-            unidadeOrigemNome: movimentacao.unidadeOrigem,
+            unidadeOrigemSigla: movimentacao.unidadeOrigemSigla ?? movimentacao.unidadeOrigem,
+            unidadeOrigemNome: movimentacao.unidadeOrigemNome ?? movimentacao.unidadeOrigem,
             unidadeDestinoCodigo: 0,
-            unidadeDestinoSigla: movimentacao.unidadeDestino,
-            unidadeDestinoNome: movimentacao.unidadeDestino,
+            unidadeDestinoSigla: movimentacao.unidadeDestinoSigla ?? movimentacao.unidadeDestino,
+            unidadeDestinoNome: movimentacao.unidadeDestinoNome ?? movimentacao.unidadeDestino,
             usuarioTitulo: '',
             usuarioNome: movimentacao.usuario ?? '',
             descricao: movimentacao.descricao,
@@ -384,8 +393,8 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
 
     const colunasCompetenciasServidor = [
         {key: 'competenciaDescricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-        {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA},
-        {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO},
+        {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA, thClass: 'text-center', tdClass: 'text-center'},
+        {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO, thClass: 'text-center', tdClass: 'text-center'},
         {key: 'situacaoCapacitacao', label: TEXTOS.diagnostico.COLUNA_CAPACITACAO},
     ];
 
@@ -411,6 +420,9 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         podeValidar,
         podeDevolver,
         podeHomologar,
+        habilitarValidar,
+        habilitarDevolver,
+        habilitarHomologar,
         abrirHistoricoAnalise,
         abrirModalValidar,
         abrirModalDevolver,

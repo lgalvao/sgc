@@ -5,7 +5,7 @@ export const TEXTOS_DIAGNOSTICO = {
     TITULO_SITUACAO_CAPACITACAO: 'Situação de Capacitação',
     TITULO_MONITORAMENTO: 'Monitoramento do Diagnóstico',
     TITULO_UNIDADE: 'Análise do Diagnóstico da Unidade',
-    TITULO_COMPETENCIAS_UNIDADE: 'Competências da unidade',
+    TITULO_COMPETENCIAS_UNIDADE: 'Avaliações de competências',
 
     // « Cabeçalhos de tabela »
     COLUNA_COMPETENCIA: 'Competência',
@@ -89,7 +89,6 @@ export const TEXTOS_DIAGNOSTICO = {
 
     // « Labels de campos »
     LABEL_UNIDADE: 'Unidade',
-    LABEL_SERVIDOR_ANALISADO: 'Servidor analisado',
     LABEL_SITUACAO_SUBPROCESSO: 'Situação',
     LABEL_OBSERVACOES: 'Observações (opcional)',
     LABEL_JUSTIFICATIVA: 'Justificativa',

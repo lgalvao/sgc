@@ -153,6 +153,9 @@ vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
             isLoading: ref(false),
         },
         subprocesso: subprocessoDetalheVal,
+        podeValidarDiagnostico: computed(() => perfilSelecionado.value === Perfil.GESTOR),
+        podeDevolverDiagnostico: computed(() => perfilSelecionado.value === Perfil.GESTOR || perfilSelecionado.value === Perfil.ADMIN),
+        podeHomologarDiagnostico: computed(() => perfilSelecionado.value === Perfil.ADMIN),
         habilitarValidarDiagnostico: computed(() => situacaoDiagnostico.value === 'CONCLUIDO'),
         habilitarDevolverDiagnostico: computed(() => situacaoDiagnostico.value === 'CONCLUIDO'),
         habilitarHomologarDiagnostico: computed(() => perfilSelecionado.value === Perfil.ADMIN && situacaoDiagnostico.value === 'VALIDADO'),
@@ -250,7 +253,7 @@ describe('DiagnosticoUnidadeView', () => {
                     },
                     SubprocessoMovimentacoes: {
                         props: ['movimentacoes'],
-                        template: '<div data-testid="movimentacoes">{{ movimentacoes.map((item) => item.descricao).join(" | ") }}</div>',
+                        template: '<div data-testid="movimentacoes">{{ movimentacoes.map((item) => `${item.unidadeOrigemSigla}->${item.unidadeDestinoSigla}:${item.descricao}`).join(" | ") }}</div>',
                     },
                     BTable: {
                         props: ['items'],
@@ -290,12 +293,12 @@ describe('DiagnosticoUnidadeView', () => {
 
         await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}"]`).trigger('click');
 
-        expect(wrapper.text()).toContain('EC');
+        expect(wrapper.text()).toContain('EC - Em capacitação');
         expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="movimentacoes"]').exists()).toBe(true);
-        expect(wrapper.text()).toContain('Competências da unidade');
-        expect(wrapper.text()).toContain('Servidor analisado');
+        expect(wrapper.find('[data-testid="movimentacoes"]').text()).toContain('A->B:Diagnóstico concluído');
+        expect(wrapper.text()).toContain('Avaliações de competências');
         expect(wrapper.text()).toContain('Avaliação de consenso aprovada');
         expect(wrapper.text()).not.toContain(TITULO_SERVIDOR);
         expect(wrapper.text()).not.toContain('CONCLUIDO');
@@ -337,7 +340,7 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).not.toContain('EC');
 
         await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}"]`).trigger('click');
-        expect(wrapper.text()).toContain('EC');
+        expect(wrapper.text()).toContain('EC - Em capacitação');
 
         await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${outroServidorTitulo}"]`).trigger('click');
 
@@ -363,7 +366,6 @@ describe('DiagnosticoUnidadeView', () => {
         await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${outroServidorTitulo}"]`).trigger('click');
 
         expect(wrapper.text()).toContain('Autoavaliação não iniciada');
-        expect(wrapper.text()).toContain('As competências deste servidor serão exibidas após o início da autoavaliação.');
         expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(false);
     });
@@ -382,6 +384,7 @@ describe('DiagnosticoUnidadeView', () => {
         expect(homologarDiagnosticoMock).toHaveBeenCalledWith(undefined);
         expect(wrapper.text()).toContain('Diagnóstico homologado');
 
+        perfilSelecionado.value = Perfil.GESTOR;
         situacaoDiagnostico.value = 'CONCLUIDO';
         const wrapperConcluido = montar();
         await wrapperConcluido.get('[data-testid="btn-validar-diagnostico-unidade"]').trigger('click');
@@ -430,6 +433,17 @@ describe('DiagnosticoUnidadeView', () => {
         await wrapper.get('[data-testid="btn-homologar-diagnostico-unidade"]').trigger('click');
 
         expect(wrapper.text()).toContain('Falha ao homologar');
+    });
+
+    it('mantem o menu de acoes visivel e desabilita os itens quando o gestor nao pode mais executar', () => {
+        situacaoDiagnostico.value = 'EM_ANDAMENTO';
+
+        const wrapper = montar();
+
+        expect(wrapper.find('[data-testid="dropdown-acoes-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.get('[data-testid="btn-validar-diagnostico-unidade"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.get('[data-testid="btn-devolver-diagnostico-unidade"]').attributes('disabled')).toBeDefined();
+        expect(wrapper.find('[data-testid="btn-homologar-diagnostico-unidade"]').exists()).toBe(false);
     });
 
     it('remove a situacao geral do card principal', () => {

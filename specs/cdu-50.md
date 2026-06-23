@@ -23,17 +23,21 @@ Ator: GESTOR, ADMIN
 
 - cabeçalho com dados gerais do subprocesso e da unidade, como detalhado em [CDU-07](cdu-07.md),
 - botão `Histórico de análise`; sempre habilitado;
-- controle 'drop-down' `Ações`, que dá acesso às seguintes ações (habilitadas apenas se a localização do subprocesso for
-  a unidade do usuário)
+- botão 'drop-down' `Ações`, que dá acesso às seguintes ações (habilitadas apenas se a localização do subprocesso for a
+  unidade do usuário)
     - `Devolver para ajustes` para ambos GESTOR e ADMIN;
     - `Registrar aceite`, apenas para GESTOR;
     - `Homologar`, apenas para ADMIN;
-- lista dos servidores participantes da unidade, *exceto o responsável pela unidade*;
-- ao lado de cada servidor dessa lista, sua situação individual;
-- lista somente-leitura das competências do mapa vigente da unidade para o servidor selecionado, contendo:
-    - uma linha para cada competência;
-    - colunas `Importância`, `Domínio` e `Situação de Capacitação` referentes ao servidor selecionado;
-    - cabeçalho com nome completo, título e situação do servidor selecionado;
+- lista dos servidores participantes da unidade, *exceto o responsável pela unidade*, com a sua situação individual;
+
+5. O usuário aciona um servidor da lista.
+
+6. O sistema carrega uma grade somente-leitura com as competências do mapa vigente da unidade, contendo, para cada
+   competência:
+    - cabeçalho com nome completo, título eleitoral do servidor selecionado;
+    - descrição da competência;
+    - colunas `Importância`, `Domínio` e `Situação de capacitação` com os valores referentes ao servidor selecionado;
+
 - seção de movimentações do subprocesso;
 
 ---
@@ -42,20 +46,27 @@ Se o usuário clicar em `Histórico de análise`:
 5. O sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e observação.
 
 ---
-Se o usuário optar por `Devolver para ajustes`:
+Se o usuário acionar `Devolver para ajustes`:
+
+5A. O sistema identifica a unidade de devolução (referida comom [SIGLA_UNIDADE_DEVOLUCAO]) como sendo a unidade de
+origem da última movimentação do subprocesso.
 
 6. O sistema abre um modal, com título "Devolução de diagnóstico" e texto "Confirma a devolução do diagnóstico da
    unidade [SIGLA_UNIDADE_SUBPROCESSO]?", campo `Justificativa` obrigatório e botões `Cancelar` e `Devolver`.
 
 7. Caso o usuário confirme, o sistema:
-   7.1. Registra uma análise de validação para o subprocesso com:
+
+7.1. Registra uma análise de validação para o subprocesso com:
     - `Data/hora`: [Data/hora atual]
     - `Unidade`: [SIGLA_UNIDADE_ANALISE]
-    - `Resultado`: 'Devolução para ajustes' - `Observação`
+    - `Resultado`: 'Devolução para ajustes'
+    - `Justificativa`
 
-   7.2. Muda a localização do subprocesso para a unidade de origem da última movimentação do subprocesso. 7.3. Muda a
-   situação de todos os servidores da unidade para 'Avaliação de consenso criada' (isso faz com o sistema habilite a
-   edição das avaliações de consenso; ver [CDU-44](cdu-45.md))
+7.2. Muda a localização do subprocesso para a unidade de origem da última movimentação do subprocesso.
+
+7.3. Muda a situação de todos os servidores da unidade **que nao estejam na situação 'Avaliação impossibilitada'**, para
+a situação 'Avaliação de consenso criada' (isso faz com o sistema habilite a edição das avaliações de consenso;
+ver [CDU-44](cdu-45.md))
 
 8. O sistema envia uma notificação por e-mail para a unidade de origem da última movimentação do subprocesso, seguindo
    este modelo:
@@ -63,14 +74,14 @@ Se o usuário optar por `Devolver para ajustes`:
 ```text
 Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes
 
-Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
 
 O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi devolvido para ajustes.
 
 Realize as mudanças solicitadas, acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
 ```
 
-9. O sistema cria internamente um alerta com estes campos:
+9. O sistema cria um alerta com estes campos:
     - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
@@ -83,11 +94,11 @@ Realize as mudanças solicitadas, acessando o Sistema de Gestão de Competência
     - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
     - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
 
-11. O sistema mostra a mensagem `Devolução realizada`.
+11. O sistema mostra a mensagem *toast* "Devolução realizada".
 
 ---
 
-Se o usuário optar por `Registrar aceite`:
+Se o usuário acionar `Registrar aceite`:
 
 12. O sistema abre um modal, com título "Aceitar diagnóstico" e texto "Confirma o aceite do diagnóstico da
     unidade [SIGLA_UNIDADE_SUBPROCESSO]?", um campo `Observação` opcional e os botões `Cancelar` e `Aceitar`.

@@ -41,7 +41,7 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
         await expect(page.getByTestId('diagnostico-unidade-titulo')).toBeVisible();
         await expect(page.getByText('ASSESSORIA_12', {exact: true})).toBeVisible();
         await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
-        await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
+        await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
         await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toBeVisible();
         await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();

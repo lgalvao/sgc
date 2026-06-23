@@ -46,10 +46,44 @@ class CDU47IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         assertThat(avaliacoes).hasSize(2);
         assertThat(avaliacoes).allSatisfy(avaliacao -> {
             assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
-            assertThat(avaliacao.getImportancia()).isNull();
-            assertThat(avaliacao.getDominio()).isNull();
-            assertThat(avaliacao.getGap()).isNull();
+            assertThat(avaliacao.getImportancia()).isNotNull();
+            assertThat(avaliacao.getDominio()).isNotNull();
+            assertThat(avaliacao.getGap()).isNotNull();
             assertThat(avaliacao.getObservacao()).isEqualTo("Servidor afastado");
+        });
+    }
+
+    @Test
+    @WithMockChefe("333333333333")
+    @DisplayName("Deve restaurar o consenso salvo ao reverter impossibilidade de avaliação")
+    void deveRestaurarConsensoAoReverterImpossibilidade() throws Exception {
+        preencherConsenso("50003", 6, 4, 6, 4, 5, 3, 4, 2, SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        buscarAvaliacoes("50003").forEach(avaliacao -> {
+            avaliacao.setConsensoImportancia(avaliacao.getImportancia());
+            avaliacao.setConsensoDominio(avaliacao.getDominio());
+        });
+        avaliacaoServidorRepo.flush();
+        ComumDtos.JustificativaRequest request = new ComumDtos.JustificativaRequest("Servidor afastado");
+
+        mockMvc.perform(post(API_DIAGNOSTICO + "/avaliacoes/{servidorTitulo}/impossibilitar",
+                        subprocesso.getCodigo(), "50003")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post(API_DIAGNOSTICO + "/avaliacoes/{servidorTitulo}/reverter-impossibilidade",
+                        subprocesso.getCodigo(), "50003")
+                        .with(csrf()))
+                .andExpect(status().isOk());
+
+        List<AvaliacaoServidor> avaliacoes = buscarAvaliacoes("50003");
+        assertThat(avaliacoes).allSatisfy(avaliacao -> {
+            assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+            assertThat(avaliacao.getConsensoImportancia()).isNotNull();
+            assertThat(avaliacao.getConsensoDominio()).isNotNull();
+            assertThat(avaliacao.getImportancia()).isEqualTo(avaliacao.getConsensoImportancia());
+            assertThat(avaliacao.getDominio()).isEqualTo(avaliacao.getConsensoDominio());
         });
     }
 }

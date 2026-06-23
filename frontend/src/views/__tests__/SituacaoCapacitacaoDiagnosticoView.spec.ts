@@ -99,7 +99,6 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
 
         expect(wrapper.text()).toContain('Situação de Capacitação');
         expect(wrapper.text()).toContain('ASSESSORIA_12');
-        expect(wrapper.text()).toContain('Servidor analisado');
         expect(wrapper.text()).toContain('João Guilherme de Albuquerque Maranhão');
         expect(wrapper.text()).not.toContain('Competência A');
         await wrapper.find('[data-testid="btn-selecionar-servidor-situacao-capacitacao-242426"]').trigger('click');

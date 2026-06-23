@@ -149,11 +149,6 @@ public class DiagnosticoAvaliacaoService {
                 diagnostico.getCodigo(), servidorTitulo);
         avaliacoes.forEach(a -> {
             a.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
-            a.setImportancia(null);
-            a.setDominio(null);
-            a.setConsensoImportancia(null);
-            a.setConsensoDominio(null);
-            a.setGap(null);
             a.setObservacao(justificativa);
         });
         avaliacaoRepo.saveAll(avaliacoes);

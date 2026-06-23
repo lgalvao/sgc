@@ -262,9 +262,9 @@ class DiagnosticoFluxoServiceTest {
 
         assertThat(diagnostico.getDataConclusao()).isNull();
         assertThat(subprocesso.getDataFimEtapa1()).isNull();
-        assertThat(diagnostico.getAvaliacaoServidores())
-                .extracting(AvaliacaoServidor::getSituacaoServidor)
-                .containsOnly(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        assertThat(avaliacaoAprovada.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
+        assertThat(avaliacaoImpossibilitada.getSituacaoServidor())
+                .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
 
         ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
         verify(transicaoService).registrarAnaliseSemEmail(captor.capture());

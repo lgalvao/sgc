@@ -777,4 +777,29 @@ describe('SubprocessoView.vue', () => {
         expect(wrapper.find('[data-testid="app-alert"]').text()).toContain(TEXTOS_DIAGNOSTICO.ERRO_PENDENCIAS_CONCLUSAO);
         expect(fluxoDiagnosticoMock.validarConclusaoDiagnostico).toHaveBeenCalledTimes(2);
     });
+
+    it('invalida o contexto do subprocesso ao concluir diagnóstico', async () => {
+        fluxoDiagnosticoMock.validarConclusaoDiagnostico.mockResolvedValue(undefined);
+        fluxoDiagnosticoMock.concluirDiagnostico.mockImplementation(async () => {
+            subprocessoStoreMock.invalidar();
+        });
+
+        const {wrapper} = mountComponent({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            permissoes: {
+                podeCriarConsenso: true,
+                podeConcluirDiagnostico: true,
+                habilitarConcluirDiagnostico: true,
+            }
+        });
+        await flushPromises();
+
+        await wrapper.find('[data-testid="btn-concluir-diagnostico-cabecalho"]').trigger('click');
+        await flushPromises();
+        await wrapper.find('[data-testid="btn-confirmar-concluir-diagnostico-cabecalho"]').trigger('click');
+        await flushPromises();
+
+        expect(fluxoDiagnosticoMock.concluirDiagnostico).toHaveBeenCalled();
+        expect(subprocessoStoreMock.invalidar).toHaveBeenCalled();
+    });
 });

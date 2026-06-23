@@ -5,6 +5,7 @@ import {useFluxoDiagnostico} from '../useFluxoDiagnostico';
 
 const invalidateQueriesMock = vi.fn();
 const pushMock = vi.fn();
+const invalidarSubprocessoMock = vi.fn();
 
 vi.mock('@pinia/colada', () => ({
     useQueryCache: () => ({
@@ -50,6 +51,12 @@ vi.mock('@/stores/perfil', () => ({
     }),
 }));
 
+vi.mock('@/stores/subprocesso', () => ({
+    useSubprocessoStore: () => ({
+        invalidar: invalidarSubprocessoMock,
+    }),
+}));
+
 vi.mock('@/services/diagnosticoService', () => ({
     concluirDiagnostico: vi.fn(),
     validarConclusaoDiagnostico: vi.fn(),
@@ -86,6 +93,7 @@ describe('useFluxoDiagnostico', () => {
             key: ['diagnostico-competencias', 'unidade', '151515', 'CHEFE', '12', 41],
             exact: true,
         });
+        expect(invalidarSubprocessoMock).toHaveBeenCalled();
     });
 
     it('deve enviar payload correto ao validar, devolver e homologar', async () => {

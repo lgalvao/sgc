@@ -65,7 +65,7 @@ test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GEST
         await expect(page.getByText('Servidores participantes', {exact: true})).toBeVisible();
         await expect(page.getByRole('cell', {name: NOME_SERVIDOR_SECAO_111, exact: true}).first()).toBeVisible();
         await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toContainText(NOME_SERVIDOR_SECAO_111);
-        await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
+        await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
         await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
 

@@ -362,8 +362,8 @@ class DiagnosticoAvaliacaoServiceTest {
     // ─── impossibilitarAvaliacao ───────────────────────────────────────────
 
     @Test
-    @DisplayName("impossibilitarAvaliacao: deve limpar campos de nota e mudar situacao para AVALIACAO_IMPOSSIBILITADA")
-    void impossibilitarAvaliacao_deveLimparCamposEMudarSituacao() {
+    @DisplayName("impossibilitarAvaliacao: deve preservar os dados existentes e mudar situacao para AVALIACAO_IMPOSSIBILITADA")
+    void impossibilitarAvaliacao_devePreservarDadosEMudarSituacao() {
         Long codSubprocesso = 6L;
         Long diagCodigo = 60L;
         String servidorTitulo = "servidor@titulo";
@@ -372,6 +372,12 @@ class DiagnosticoAvaliacaoServiceTest {
         Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
         AvaliacaoServidor avaliacao = avaliacaoComNota(400L, 3, 3);
         avaliacao.setGap(0);
+        avaliacao.setChefiaImportancia(5);
+        avaliacao.setChefiaDominio(4);
+        avaliacao.setConsensoImportancia(4);
+        avaliacao.setConsensoDominio(2);
+        avaliacao.setImportancia(4);
+        avaliacao.setDominio(2);
 
         when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
         when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
@@ -379,9 +385,13 @@ class DiagnosticoAvaliacaoServiceTest {
         service.impossibilitarAvaliacao(codSubprocesso, servidorTitulo, justificativa);
 
         assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
-        assertThat(avaliacao.getImportancia()).isNull();
-        assertThat(avaliacao.getDominio()).isNull();
-        assertThat(avaliacao.getGap()).isNull();
+        assertThat(avaliacao.getImportancia()).isEqualTo(4);
+        assertThat(avaliacao.getDominio()).isEqualTo(2);
+        assertThat(avaliacao.getGap()).isEqualTo(0);
+        assertThat(avaliacao.getChefiaImportancia()).isEqualTo(5);
+        assertThat(avaliacao.getChefiaDominio()).isEqualTo(4);
+        assertThat(avaliacao.getConsensoImportancia()).isEqualTo(4);
+        assertThat(avaliacao.getConsensoDominio()).isEqualTo(2);
         assertThat(avaliacao.getObservacao()).isEqualTo(justificativa);
     }
 

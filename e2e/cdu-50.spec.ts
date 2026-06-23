@@ -57,7 +57,7 @@ async function verificarTelaAnaliseDiagnostico(page: Page): Promise<void> {
     await expect(page.getByRole('cell', {name: NOME_SERVIDOR, exact: true}).first()).toBeVisible();
     await expect(page.getByRole('cell', {name: NOME_SERVIDOR_IMPOSSIBILITADO, exact: true}).first()).toBeVisible();
     await expect(page.getByText(NOME_CHEFE, {exact: true})).toHaveCount(0);
-    await expect(page.getByText('Competências da unidade', {exact: true})).toBeVisible();
+    await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
     const listaServidores = page.getByTestId('lista-servidores-diagnostico-unidade');
     await expect(listaServidores).toBeVisible();
     await expect(listaServidores).toContainText(NOME_SERVIDOR);

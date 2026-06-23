@@ -26,7 +26,6 @@
 
         <div v-else class="p-3">
           <div class="mb-3">
-            <div class="form-label">{{ TEXTOS.diagnostico.LABEL_SERVIDOR_ANALISADO }}</div>
             <div class="scroll-container-servidores">
               <BListGroup data-testid="lista-servidores-situacao-capacitacao">
                 <BListGroupItem

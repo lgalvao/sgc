@@ -40,20 +40,19 @@ Atores: GESTOR e ADMIN
 9. Usuário analisa as informações obtidas através dos botões `Impactos no mapa` e `Histórico de análise` e opta por
    aceitar/homologar ou devolver o cadastro da unidade para ajustes.
 
-10. Se optar por devolver para ajustes:
+10. Se optar por **devolver para ajustes**:
 
-    10.1. Usuário clica em `Devolver para ajustes`.
+    10.1. O usuário clica em `Devolver para ajustes`.
 
     10.2. O sistema abre uma tela modal (título `Devolução`) com a pergunta "Confirma a devolução do cadastro para
     ajustes?", um campo de observação (opcional) e os botões `Confirmar` ou `Cancelar`.
 
-    10.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução do cadastro,
-    permanecendo na tela `Atividades e conhecimentos`.
+    10.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução do cadastro, permanecendo na
+    tela `Atividades e conhecimentos`.
 
     10.4. O usuário opcionalmente informa a observação e escolhe `Confirmar`.
 
     10.5. O sistema registra uma análise de cadastro para o subprocesso com:
-
     - `Data/hora`: Data/hora atual
     - `Unidade`: [SIGLA_UNIDADE_ANALISE]
     - `Resultado`: 'Devolução'
@@ -63,7 +62,6 @@ Atores: GESTOR e ADMIN
     subprocesso.
 
     10.7. O sistema registra uma movimentação para o subprocesso com:
-
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
     - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
