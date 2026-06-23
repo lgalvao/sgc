@@ -24,7 +24,7 @@ public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, 
         WHERE a.diagnostico.subprocesso.codigo = :codSubprocesso
         AND a.situacaoServidor = :situacaoServidor
     """)
-    boolean existsBySubprocessoCodigoAndSituacaoServidor(
+    boolean existePorSubprocessoESituacao(
             @Param("codSubprocesso") long codSubprocesso,
             @Param("situacaoServidor") SituacaoAvaliacaoServidor situacaoServidor
     );
@@ -36,7 +36,7 @@ public interface AvaliacaoServidorRepo extends JpaRepository<AvaliacaoServidor, 
         AND a.servidor.tituloEleitoral = :servidorTitulo
         AND a.situacaoServidor IN :situacoes
     """)
-    boolean existsBySubprocessoCodigoAndServidorTituloAndSituacaoServidorIn(
+    boolean existePorSubprocessoEServidorESituacoes(
             @Param("codSubprocesso") long codSubprocesso,
             @Param("servidorTitulo") String servidorTitulo,
             @Param("situacoes") Collection<SituacaoAvaliacaoServidor> situacoes

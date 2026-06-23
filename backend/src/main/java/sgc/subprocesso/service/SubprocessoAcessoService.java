@@ -2,8 +2,8 @@ package sgc.subprocesso.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import sgc.diagnostico.model.AvaliacaoServidorRepo;
 import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
+import sgc.diagnostico.service.AvaliacaoConsultaService;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.organizacao.UsuarioAplicacaoService;
 import sgc.organizacao.model.Perfil;
@@ -50,7 +50,7 @@ public class SubprocessoAcessoService {
             DIAGNOSTICO_EM_ANDAMENTO);
 
     private final ImpactoMapaService impactoMapaService;
-    private final AvaliacaoServidorRepo avaliacaoServidorRepo;
+    private final AvaliacaoConsultaService avaliacaoConsultaService;
     private final UsuarioAplicacaoService usuarioAplicacaoService;
 
     public PermissoesSubprocessoDto resolverPermissoes(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
@@ -259,7 +259,7 @@ public class SubprocessoAcessoService {
             return false;
         }
 
-        return avaliacaoServidorRepo.existsBySubprocessoCodigoAndServidorTituloAndSituacaoServidorIn(
+        return avaliacaoConsultaService.existeAvaliacaoPorSubprocessoEServidorESituacoes(
                 contexto.subprocesso().getCodigo(),
                 usuarioAplicacaoService.contextoAutenticado().usuarioTitulo(),
                 Set.of(SituacaoAvaliacaoServidor.CONSENSO_CRIADO, SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
@@ -271,7 +271,7 @@ public class SubprocessoAcessoService {
             return false;
         }
 
-        return avaliacaoServidorRepo.existsBySubprocessoCodigoAndSituacaoServidor(
+        return avaliacaoConsultaService.existeAvaliacaoPorSubprocessoESituacao(
                 contexto.subprocesso().getCodigo(),
                 SituacaoAvaliacaoServidor.CONSENSO_APROVADO
         );

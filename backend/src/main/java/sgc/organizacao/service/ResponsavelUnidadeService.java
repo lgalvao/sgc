@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 import sgc.alerta.*;
 import sgc.alerta.model.TipoNotificacao;
@@ -49,14 +47,7 @@ public class ResponsavelUnidadeService {
     private final ResponsabilidadeRepo responsabilidadeRepo;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
     private final CacheOrganizacaoService cacheOrganizacaoService;
-    private AlertaAplicacaoService alertaAplicacaoService;
-
-    @Autowired
-    @Lazy
-    public void setAlertaAplicacaoService(AlertaAplicacaoService alertaAplicacaoService) {
-        this.alertaAplicacaoService = alertaAplicacaoService;
-    }
-
+    private final AlertaAplicacaoService alertaAplicacaoService;
     private final NotificacaoService notificacaoService;
     private final EmailModelosService emailModelosService;
     private final ConfigAplicacao configAplicacao;

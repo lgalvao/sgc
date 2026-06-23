@@ -7,8 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import sgc.comum.config.CacheConfig;
 import sgc.comum.erros.ErroEntidadeNaoEncontrada;
 import sgc.mapa.model.Mapa;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.UsuarioAplicacaoService;
 import sgc.organizacao.dto.MapaVigenteReferenciaDto;
 import sgc.organizacao.model.*;
 
@@ -25,7 +26,6 @@ public class UnidadeService {
     private final UnidadeRepo unidadeRepo;
     private final UnidadeMapaRepo unidadeMapaRepo;
     private final CacheOrganizacaoService cacheOrganizacaoService;
-    private final UsuarioAplicacaoService usuarioAplicacaoService;
 
     public Unidade buscarPorCodigo(Long codigo) {
         return unidadeRepo.buscarPorCodigoComResponsavel(codigo)
@@ -92,8 +92,11 @@ public class UnidadeService {
     }
 
     private boolean podeExportarMapaVigente(Long codigoUnidade) {
-        ContextoUsuarioAutenticado contexto = usuarioAplicacaoService.contextoAutenticado();
-        return contexto.perfil() == Perfil.CHEFE && contexto.unidadeAtivaCodigo().equals(codigoUnidade);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Usuario usuario) {
+            return usuario.getPerfilAtivo() == Perfil.CHEFE && codigoUnidade.equals(usuario.getUnidadeAtivaCodigo());
+        }
+        return false;
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_UNIDADES_COM_MAPA, sync = true)

@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.diagnostico.model.AvaliacaoServidorRepo;
+import sgc.diagnostico.service.AvaliacaoConsultaService;
 import sgc.mapa.service.ImpactoMapaService;
 import sgc.organizacao.ContextoUsuarioAutenticado;
 import sgc.organizacao.UsuarioAplicacaoService;
@@ -30,7 +30,7 @@ class SubprocessoAcessoServiceTest {
     @Mock
     private ImpactoMapaService impactoMapaService;
     @Mock
-    private AvaliacaoServidorRepo avaliacaoServidorRepo;
+    private AvaliacaoConsultaService avaliacaoConsultaService;
     @Mock
     private UsuarioAplicacaoService usuarioAplicacaoService;
 
