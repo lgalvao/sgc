@@ -1,7 +1,7 @@
 <template>
   <BAlert
-      :key="chave"
       v-if="mensagem || notificacao"
+      :key="chave"
       :dismissible="dispensavel"
       :fade="false"
       :model-value="true"

@@ -118,7 +118,7 @@ vi.mock('@/composables/useDiagnosticoUnidade', () => ({
         servidores: servidoresVal,
         situacoesCapacitacao: situacoesCapacitacaoVal,
         movimentacoes: ref([
-            {descricao: 'Diagnóstico concluído', unidadeOrigem: 'A', unidadeDestino: 'B', dataHora: '2026-06-06 09:00'},
+            {codigo: 1, dataHora: '2026-06-06 09:00', unidadeOrigemCodigo: 1, unidadeOrigemSigla: 'A', unidadeOrigemNome: 'Unidade A', unidadeDestinoCodigo: 2, unidadeDestinoSigla: 'B', unidadeDestinoNome: 'Unidade B', usuarioTitulo: '1234567890', usuarioNome: 'Usuário Teste', descricao: 'Diagnóstico concluído'},
         ]),
         carregando: ref(false),
         situacao: situacaoDiagnostico,
