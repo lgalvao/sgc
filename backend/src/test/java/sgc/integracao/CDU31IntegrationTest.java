@@ -1,25 +1,20 @@
 package sgc.integracao;
 
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.configuracoes.model.Configuracao;
-import sgc.configuracoes.model.ConfiguracaoRepo;
-import sgc.integracao.mocks.WithMockAdmin;
-import tools.jackson.databind.ObjectMapper;
+import org.springframework.transaction.annotation.*;
+import sgc.configuracoes.model.*;
+import sgc.integracao.mocks.*;
+import tools.jackson.databind.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @Transactional

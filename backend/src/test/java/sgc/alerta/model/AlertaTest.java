@@ -1,11 +1,10 @@
 package sgc.alerta.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
+import org.junit.jupiter.api.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Alerta")
 class AlertaTest {

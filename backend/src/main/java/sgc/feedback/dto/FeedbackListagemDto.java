@@ -1,11 +1,9 @@
 package sgc.feedback.dto;
 
-import sgc.feedback.FeedbackRegistro;
-import sgc.feedback.FeedbackStatus;
-import sgc.feedback.FeedbackTipo;
+import sgc.feedback.*;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 public record FeedbackListagemDto(
         UUID codigo,

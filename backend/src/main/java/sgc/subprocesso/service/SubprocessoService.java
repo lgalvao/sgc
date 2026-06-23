@@ -1,43 +1,31 @@
 package sgc.subprocesso.service;
 
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.model.ComumRepo;
-import sgc.diagnostico.service.DiagnosticoFluxoService;
-import sgc.mapa.dto.SalvarMapaRequest;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.CopiaMapaService;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.mapa.service.MapaSalvamentoService;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeMapa;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.UnidadeService;
-import sgc.processo.model.Processo;
-import sgc.seguranca.SgcPermissionEvaluator;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.diagnostico.service.*;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.*;
+import java.util.stream.*;
 
-import static sgc.organizacao.model.TipoUnidade.INTEROPERACIONAL;
-import static sgc.organizacao.model.TipoUnidade.OPERACIONAL;
-import static sgc.seguranca.AcaoPermissao.CONSULTAR_PARA_IMPORTACAO;
-import static sgc.seguranca.AcaoPermissao.EDITAR_CADASTRO;
+import static sgc.organizacao.model.TipoUnidade.*;
+import static sgc.seguranca.AcaoPermissao.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Service

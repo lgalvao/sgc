@@ -1,16 +1,14 @@
 package sgc.diagnostico.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroValidacao;
-import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
-import sgc.subprocesso.service.SubprocessoVisualizacaoService;
+import lombok.*;
+import org.springframework.stereotype.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.diagnostico.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.EnumSet;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

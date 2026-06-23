@@ -1,7 +1,7 @@
 package sgc.feedback.dto;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 /**
  * Resposta retornada após o registro bem-sucedido de um feedback.

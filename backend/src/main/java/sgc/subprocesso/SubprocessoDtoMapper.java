@@ -1,21 +1,16 @@
 package sgc.subprocesso;
 
-import org.springframework.stereotype.Component;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.organizacao.OrganizacaoDtoMapper;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
-import sgc.subprocesso.dto.MovimentacaoDto;
-import sgc.subprocesso.dto.SubprocessoCadastroDto;
-import sgc.subprocesso.dto.SubprocessoListagemDto;
-import sgc.subprocesso.dto.SubprocessoResumoDto;
-import sgc.subprocesso.model.Movimentacao;
-import sgc.subprocesso.model.Subprocesso;
+import org.springframework.stereotype.*;
+import sgc.comum.erros.*;
+import sgc.mapa.dto.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 @Component
 public class SubprocessoDtoMapper {

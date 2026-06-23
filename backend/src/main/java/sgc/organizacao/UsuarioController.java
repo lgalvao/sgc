@@ -1,19 +1,16 @@
 package sgc.organizacao;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.organizacao.dto.AdicionarAdministradorRequest;
-import sgc.organizacao.dto.AdministradorDto;
-import sgc.organizacao.dto.UsuarioConsultaDto;
-import sgc.organizacao.dto.UsuarioPesquisaDto;
-import sgc.organizacao.service.UsuarioService;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.service.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/usuarios")

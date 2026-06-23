@@ -1,11 +1,9 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import lombok.*;
+import org.springframework.cache.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.support.*;
 
 @Service
 @RequiredArgsConstructor

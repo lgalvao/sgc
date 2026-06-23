@@ -1,8 +1,8 @@
 package sgc.organizacao.model;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 class UnidadeElegibilidadeInfoTest {
 

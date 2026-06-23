@@ -1,10 +1,10 @@
 package sgc.mapa.dto;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 class CriarMapaRequestTest {
 

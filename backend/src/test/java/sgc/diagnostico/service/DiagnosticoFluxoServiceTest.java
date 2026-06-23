@@ -1,43 +1,24 @@
 package sgc.diagnostico.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.model.ComumRepo;
-import sgc.diagnostico.model.AvaliacaoServidor;
-import sgc.diagnostico.model.Diagnostico;
-import sgc.diagnostico.model.DiagnosticoRepo;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.model.*;
+import sgc.diagnostico.model.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ServidorProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.dto.RegistrarWorkflowCommand;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.LocalizacaoSubprocessoService;
-import sgc.subprocesso.service.SubprocessoConsultaService;
-import sgc.subprocesso.service.SubprocessoTransicaoService;
-import sgc.subprocesso.service.SubprocessoValidacaoService;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

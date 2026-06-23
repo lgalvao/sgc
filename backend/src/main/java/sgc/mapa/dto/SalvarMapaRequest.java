@@ -1,14 +1,13 @@
 package sgc.mapa.dto;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import org.jspecify.annotations.Nullable;
-import sgc.comum.Mensagens;
-import sgc.seguranca.sanitizacao.SanitizarHtmlFormatado;
+import jakarta.validation.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import org.jspecify.annotations.*;
+import sgc.comum.*;
+import sgc.seguranca.sanitizacao.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * DTO de requisição para salvar mapa. CDU-09 item 1 a 4.

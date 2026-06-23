@@ -1,7 +1,8 @@
 package sgc.diagnostico.dto;
 
-import lombok.Builder;
-import java.util.List;
+import lombok.*;
+
+import java.util.*;
 
 @Builder
 public record ServidorDiagnosticoDto(

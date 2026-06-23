@@ -1,12 +1,11 @@
 package sgc.organizacao;
 
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Component;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 public class OrganizacaoDtoMapper {

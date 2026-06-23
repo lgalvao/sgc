@@ -1,9 +1,8 @@
 package sgc.seguranca.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Builder;
-import sgc.comum.Mensagens;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import sgc.comum.*;
 
 /**
  * DTO para a requisição de entrada (login) do usuário.

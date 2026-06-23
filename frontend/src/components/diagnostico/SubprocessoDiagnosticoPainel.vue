@@ -190,15 +190,7 @@ import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {normalizarErro} from '@/utils/apiError/normalizer';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
-import {
-  BBadge,
-  BButton,
-  BCard,
-  BDropdown,
-  BDropdownItemButton,
-  BSpinner,
-  BTable,
-} from 'bootstrap-vue-next';
+import {BBadge, BButton, BCard, BDropdown, BDropdownItemButton, BSpinner, BTable,} from 'bootstrap-vue-next';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';

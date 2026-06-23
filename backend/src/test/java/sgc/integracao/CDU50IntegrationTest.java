@@ -1,28 +1,20 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
-import sgc.alerta.model.AlertaRepo;
-import sgc.alerta.model.NotificacaoEmailRepo;
-import sgc.comum.ComumDtos;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.diagnostico.model.ValorSituacaoCapacitacao;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockGestor;
+import sgc.alerta.model.*;
+import sgc.comum.*;
+import sgc.diagnostico.model.*;
+import sgc.integracao.mocks.*;
 import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @DisplayName("CDU-50: Analisar diagnóstico")

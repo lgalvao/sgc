@@ -1,19 +1,16 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.organizacao.model.UnidadeResumoLeitura;
-import sgc.organizacao.model.UsuarioConsultaLeitura;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
-import sgc.subprocesso.dto.AnaliseHistoricoDto;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.TipoAcaoAnalise;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor

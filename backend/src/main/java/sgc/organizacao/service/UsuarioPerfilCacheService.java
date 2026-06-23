@@ -1,17 +1,12 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
+import lombok.*;
+import org.springframework.cache.annotation.*;
+import org.springframework.stereotype.*;
 import sgc.comum.config.CacheConfig;
-import sgc.organizacao.model.UnidadeHierarquiaLeitura;
-import sgc.organizacao.model.UsuarioPerfilAutorizacaoLeitura;
-import sgc.organizacao.model.UsuarioPerfilLeitura;
-import sgc.organizacao.model.UsuarioPerfilRepo;
+import sgc.organizacao.model.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

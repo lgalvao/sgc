@@ -1,10 +1,10 @@
 package sgc.alerta;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import sgc.alerta.model.NotificacaoEmail;
+import lombok.extern.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.scheduling.annotation.*;
+import org.springframework.stereotype.*;
+import sgc.alerta.model.*;
 
 @Component
 @Slf4j

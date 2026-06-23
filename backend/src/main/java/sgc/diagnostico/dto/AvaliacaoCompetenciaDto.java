@@ -1,9 +1,7 @@
 package sgc.diagnostico.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 @Builder
 public record AvaliacaoCompetenciaDto(

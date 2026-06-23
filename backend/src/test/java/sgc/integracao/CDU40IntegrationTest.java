@@ -1,22 +1,15 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import sgc.feedback.FeedbackRegistro;
-import sgc.feedback.FeedbackRepo;
-import sgc.feedback.FeedbackStatus;
-import sgc.feedback.FeedbackTipo;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockServidor;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.test.context.*;
+import sgc.feedback.*;
+import sgc.integracao.mocks.*;
 
-import java.time.OffsetDateTime;
+import java.time.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("CDU-40 — Consultar feedbacks enviados")
 @ActiveProfiles({"test", "hom"})

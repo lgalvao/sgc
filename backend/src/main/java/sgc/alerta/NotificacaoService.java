@@ -1,19 +1,17 @@
 package sgc.alerta;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.dto.NotificacaoSubprocessoResumoDto;
-import sgc.alerta.model.NotificacaoEmail;
-import sgc.alerta.model.NotificacaoEmailRepo;
+import lombok.*;
+import org.springframework.dao.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.dto.*;
+import sgc.alerta.model.*;
 import sgc.alerta.model.SituacaoNotificacao;
-import sgc.comum.erros.ErroInconsistenciaInterna;
+import sgc.comum.erros.*;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

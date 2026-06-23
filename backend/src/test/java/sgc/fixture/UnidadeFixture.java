@@ -1,10 +1,8 @@
 package sgc.fixture;
 
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 public class UnidadeFixture {
 

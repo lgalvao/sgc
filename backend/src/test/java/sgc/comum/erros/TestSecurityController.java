@@ -1,11 +1,9 @@
 package sgc.comum.erros;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.annotation.*;
+import jakarta.validation.*;
+import jakarta.validation.constraints.*;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class TestSecurityController {

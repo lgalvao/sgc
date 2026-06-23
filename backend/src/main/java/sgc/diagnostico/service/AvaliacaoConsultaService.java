@@ -1,12 +1,11 @@
 package sgc.diagnostico.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.diagnostico.model.*;
 
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

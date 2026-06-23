@@ -1,7 +1,7 @@
 package sgc.feedback;
 
-import org.jspecify.annotations.Nullable;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.jspecify.annotations.*;
+import org.springframework.boot.context.properties.*;
 
 /**
  * Propriedades de configuração do módulo de feedback.

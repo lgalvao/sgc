@@ -1,25 +1,19 @@
 package sgc.seguranca.login;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroAutenticacao;
-import sgc.organizacao.UsuarioAplicacaoService;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
-import sgc.seguranca.LoginAplicacaoService;
-import sgc.seguranca.dto.EntrarRequest;
-import sgc.seguranca.dto.PerfilUnidadeDto;
+import sgc.organizacao.service.*;
+import sgc.seguranca.*;
+import sgc.seguranca.dto.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

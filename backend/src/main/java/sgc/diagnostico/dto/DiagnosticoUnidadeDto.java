@@ -1,9 +1,9 @@
 package sgc.diagnostico.dto;
 
-import lombok.Builder;
-import sgc.subprocesso.dto.MovimentacaoDto;
+import lombok.*;
+import sgc.subprocesso.dto.*;
 
-import java.util.List;
+import java.util.*;
 
 @Builder
 public record DiagnosticoUnidadeDto(

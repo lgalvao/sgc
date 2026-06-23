@@ -1,8 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {
-    criarProcessoDiagnosticoConcluidoFixture,
-    criarProcessoDiagnosticoHomologadoFixture
-} from './fixtures/index.js';
+import {criarProcessoDiagnosticoConcluidoFixture, criarProcessoDiagnosticoHomologadoFixture} from './fixtures/index.js';
 import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';

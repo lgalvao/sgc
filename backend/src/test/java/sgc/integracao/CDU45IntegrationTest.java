@@ -1,27 +1,19 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
-import sgc.alerta.model.AlertaRepo;
-import sgc.alerta.model.NotificacaoEmailRepo;
-import sgc.diagnostico.dto.ConsensoCompetenciaDto;
-import sgc.diagnostico.dto.ConsensoRequest;
-import sgc.diagnostico.model.AvaliacaoServidor;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.integracao.mocks.WithMockChefe;
+import sgc.alerta.model.*;
+import sgc.diagnostico.dto.*;
+import sgc.diagnostico.model.*;
+import sgc.integracao.mocks.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @DisplayName("CDU-45: Manter avaliação de consenso")

@@ -1,22 +1,16 @@
 package sgc.subprocesso.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.OrganizacaoDtoMapper;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.SubprocessoDtoMapper;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("SubprocessoListagemDto")
 class SubprocessoListagemDtoTest {

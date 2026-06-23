@@ -1,24 +1,19 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ImpactoMapaResponse;
-import sgc.mapa.dto.MapaVisualizacaoResponse;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.ImpactoMapaService;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.mapa.service.MapaVisualizacaoService;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.TipoProcesso;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor

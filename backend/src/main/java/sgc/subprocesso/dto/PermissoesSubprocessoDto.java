@@ -1,6 +1,6 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
+import lombok.*;
 
 /**
  * DTO que consolida as permissões de UI para um subprocesso,

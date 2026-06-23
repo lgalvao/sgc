@@ -1,38 +1,28 @@
 package sgc.subprocesso.service;
 
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import sgc.alerta.AlertaAplicacaoService;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.processo.model.TipoProcesso;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import org.springframework.util.*;
+import sgc.alerta.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.*;
+import java.time.format.*;
+import java.util.*;
 
-import static sgc.processo.model.TipoProcesso.MAPEAMENTO;
-import static sgc.processo.model.TipoProcesso.REVISAO;
+import static sgc.processo.model.TipoProcesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @Slf4j

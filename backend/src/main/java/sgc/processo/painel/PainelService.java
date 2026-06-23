@@ -1,34 +1,28 @@
 package sgc.processo.painel;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaAplicacaoService;
-import sgc.alerta.AlertaDtoMapper;
-import sgc.alerta.model.Alerta;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.UnidadeProcesso;
-import sgc.processo.painel.dto.PainelBootstrapDto;
-import sgc.processo.service.ProcessoService;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.dto.*;
+import sgc.processo.model.*;
+import sgc.processo.painel.dto.*;
+import sgc.processo.service.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 @Service
 @RequiredArgsConstructor
@@ -72,21 +66,19 @@ public class PainelService {
     }
 
     private Pageable garantirOrdenacaoPadrao(Pageable pageable) {
-        if (pageable.isUnpaged()) {
-            return pageable;
-        }
-        if (pageable.getSort().isUnsorted()) {
-            return PageRequest.of(
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    Sort.by(Sort.Direction.DESC, "dataCriacao").and(Sort.by(Sort.Direction.DESC, "codigo")));
-        }
+        if (pageable.isUnpaged()) return pageable;
+
+        if (pageable.getSort().isUnsorted()) return PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Direction.DESC, "dataCriacao").and(Sort.by(Direction.DESC, "codigo")));
+
         return pageable;
     }
 
     public Page<Alerta> listarAlertas(ContextoUsuarioAutenticado contextoUsuario, Pageable pageable) {
         Pageable sortedPageable = pageable.isPaged()
-                ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "dataHora"))
+                ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Direction.DESC, "dataHora"))
                 : pageable;
 
         Page<Alerta> alertasPage = alertaAplicacaoService.listarPorUnidade(contextoUsuario, sortedPageable);
@@ -100,9 +92,7 @@ public class PainelService {
 
     @Transactional
     public void marcarAlertasLidos(ContextoUsuarioAutenticado contextoUsuario, List<Long> codigos) {
-        if (codigos.isEmpty()) {
-            return;
-        }
+        if (codigos.isEmpty()) return;
         alertaAplicacaoService.marcarComoLidos(contextoUsuario, codigos);
     }
 
@@ -125,8 +115,8 @@ public class PainelService {
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
-                .situacao(processo.getSituacao() != null ? processo.getSituacao().name() : null)
-                .tipo(processo.getTipo() != null ? processo.getTipo().name() : null)
+                .situacao(processo.getSituacao().name())
+                .tipo(processo.getTipo().name())
                 .dataLimite(processo.getDataLimite())
                 .dataCriacao(processo.getDataCriacao())
                 .unidadeCodigo(codUnidMapeado)
@@ -158,9 +148,7 @@ public class PainelService {
                 if (isCovered(parent, participantesIds, mapaPaiFilhos, coveredCache)) {
                     candidate = parent;
                     parent = mapaFilhoPai.get(candidate);
-                } else {
-                    break;
-                }
+                } else break;
             }
             displayIds.add(candidate);
         }
@@ -205,6 +193,7 @@ public class PainelService {
             cache.put(codUnidade, false);
             return false;
         }
+
         if (children.isEmpty()) {
             cache.put(codUnidade, false);
             return false;
@@ -247,11 +236,9 @@ public class PainelService {
                 .build();
     }
 
+    // TODO nao faz sentido retornar nulo para sigla. Todo usuário tem sigla de unidade!
     private @Nullable String obterSiglaUnidadeUsuario(Perfil perfil, Long codigoUnidade) {
-        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) {
-            return null;
-        }
-
+        if (perfil == Perfil.ADMIN || perfil == Perfil.GESTOR) return null;
         return unidadeService.buscarSiglaPorCodigo(codigoUnidade);
     }
 }

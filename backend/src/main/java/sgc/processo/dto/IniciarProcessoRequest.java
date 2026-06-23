@@ -1,10 +1,10 @@
 package sgc.processo.dto;
 
-import jakarta.validation.constraints.NotNull;
-import sgc.comum.Mensagens;
-import sgc.processo.model.TipoProcesso;
+import jakarta.validation.constraints.*;
+import sgc.comum.*;
+import sgc.processo.model.*;
 
-import java.util.List;
+import java.util.*;
 
 public record IniciarProcessoRequest(
         @NotNull(message = Mensagens.TIPO_PROCESSO_OBRIGATORIO)

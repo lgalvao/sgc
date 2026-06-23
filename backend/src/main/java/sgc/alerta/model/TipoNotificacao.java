@@ -1,7 +1,6 @@
 package sgc.alerta.model;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 /**
  * Tipos de notificações de e-mail enviadas pelo sistema.

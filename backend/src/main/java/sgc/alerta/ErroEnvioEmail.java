@@ -1,6 +1,6 @@
 package sgc.alerta;
 
-import sgc.comum.erros.ErroInterno;
+import sgc.comum.erros.*;
 
 public class ErroEnvioEmail extends ErroInterno {
     public ErroEnvioEmail(String destinatario, Throwable cause) {

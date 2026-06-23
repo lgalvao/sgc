@@ -1,14 +1,11 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.junit.jupiter.api.*;
+import org.springframework.web.servlet.mvc.method.annotation.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.*;
 
 class RegistroSseEmitterTest {
 

@@ -1,31 +1,23 @@
 package sgc.organizacao;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.util.MascaraUtil;
-import sgc.organizacao.dto.AdministradorDto;
-import sgc.organizacao.dto.PerfilDto;
-import sgc.organizacao.dto.ResponsavelDto;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.*;
+import org.springframework.security.core.context.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.comum.util.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UsuarioService;
+import sgc.organizacao.service.*;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 
 @Service
 @Slf4j

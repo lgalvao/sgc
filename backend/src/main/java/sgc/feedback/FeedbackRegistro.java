@@ -2,10 +2,10 @@ package sgc.feedback;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.*;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 /**
  * Entidade que persiste um registro de feedback enviado durante homologação.

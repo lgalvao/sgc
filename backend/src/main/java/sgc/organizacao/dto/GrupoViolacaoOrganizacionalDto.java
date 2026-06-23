@@ -1,6 +1,6 @@
 package sgc.organizacao.dto;
 
-import java.util.List;
+import java.util.*;
 
 public record GrupoViolacaoOrganizacionalDto(
         String tipo,

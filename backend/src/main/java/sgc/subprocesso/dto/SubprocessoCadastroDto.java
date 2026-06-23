@@ -1,10 +1,10 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.organizacao.dto.UnidadeResumoDto;
+import lombok.*;
+import sgc.mapa.dto.*;
+import sgc.organizacao.dto.*;
 
-import java.util.List;
+import java.util.*;
 
 @Builder
 public record SubprocessoCadastroDto(

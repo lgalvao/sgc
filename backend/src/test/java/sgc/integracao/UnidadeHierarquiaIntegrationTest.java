@@ -1,20 +1,16 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockChefe;
-import tools.jackson.databind.JsonNode;
+import org.junit.jupiter.api.*;
+import org.springframework.test.web.servlet.*;
+import org.springframework.transaction.annotation.*;
+import sgc.integracao.mocks.*;
+import tools.jackson.databind.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @Transactional

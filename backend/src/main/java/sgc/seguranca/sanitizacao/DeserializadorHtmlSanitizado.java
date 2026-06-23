@@ -1,9 +1,9 @@
 package sgc.seguranca.sanitizacao;
 
-import org.jspecify.annotations.Nullable;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
-import tools.jackson.databind.deser.std.StdDeserializer;
+import org.jspecify.annotations.*;
+import tools.jackson.core.*;
+import tools.jackson.databind.*;
+import tools.jackson.databind.deser.std.*;
 
 /**
  * Deserializador JSON customizado que sanitiza conteúdo HTML em campos String.

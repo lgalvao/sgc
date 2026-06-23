@@ -1,28 +1,21 @@
 package sgc.subprocesso.service;
 
-import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaAplicacaoService;
-import sgc.comum.Mensagens;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.dto.RegistrarWorkflowCommand;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.*;
+import sgc.comum.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
+import java.time.*;
+import java.util.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 import static sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA;

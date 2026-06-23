@@ -1,28 +1,21 @@
 package sgc.diagnostico.service;
 
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.comum.model.ComumRepo;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.diagnostico.model.*;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
-import sgc.processo.model.ServidorProcesso;
-import sgc.processo.model.UnidadeProcesso;
-import sgc.subprocesso.dto.RegistrarTransicaoCommand;
-import sgc.subprocesso.dto.RegistrarWorkflowCommand;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
-import sgc.subprocesso.service.LocalizacaoSubprocessoService;
-import sgc.subprocesso.service.SubprocessoConsultaService;
-import sgc.subprocesso.service.SubprocessoTransicaoService;
-import sgc.subprocesso.service.SubprocessoValidacaoService;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
 @Service

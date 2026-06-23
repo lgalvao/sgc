@@ -1,12 +1,10 @@
 package sgc.organizacao.dto;
 
-import org.junit.jupiter.api.Test;
-import sgc.organizacao.OrganizacaoDtoMapper;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
+import org.junit.jupiter.api.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 class UnidadeResumoDtoTest {
     private final OrganizacaoDtoMapper mapper = new OrganizacaoDtoMapper();

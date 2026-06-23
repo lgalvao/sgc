@@ -1,9 +1,9 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import sgc.organizacao.dto.UnidadeResumoDto;
+import lombok.*;
+import sgc.organizacao.dto.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Builder
 public record SubprocessoResumoDto(

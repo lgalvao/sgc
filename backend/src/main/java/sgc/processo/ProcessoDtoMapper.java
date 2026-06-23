@@ -1,20 +1,13 @@
 package sgc.processo;
 
-import org.springframework.stereotype.Component;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.dto.ProcessoDetalheDto;
-import sgc.processo.dto.ProcessoDetalheDto.AcaoBlocoDto;
-import sgc.processo.dto.ProcessoDetalheDto.UnidadeParticipanteDto;
-import sgc.processo.dto.ProcessoResumoDto;
-import sgc.processo.dto.SubprocessoElegivelDto;
-import sgc.processo.model.AcaoProcesso;
-import sgc.processo.model.Processo;
-import sgc.processo.model.UnidadeProcesso;
-import sgc.subprocesso.model.Subprocesso;
+import org.springframework.stereotype.*;
+import sgc.organizacao.model.*;
+import sgc.processo.dto.*;
+import sgc.processo.dto.ProcessoDetalheDto.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 public class ProcessoDtoMapper {

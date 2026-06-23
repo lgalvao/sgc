@@ -1,34 +1,23 @@
 package sgc.diagnostico.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.diagnostico.dto.AutoavaliacaoRequest;
-import sgc.diagnostico.dto.AvaliacaoCompetenciaDto;
-import sgc.diagnostico.dto.ConsensoCompetenciaDto;
-import sgc.diagnostico.dto.ConsensoRequest;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
-import sgc.mapa.model.Competencia;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoConsultaService;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

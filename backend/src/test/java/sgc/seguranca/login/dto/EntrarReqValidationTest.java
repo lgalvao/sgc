@@ -1,15 +1,12 @@
 package sgc.seguranca.login.dto;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+import jakarta.validation.*;
 import org.junit.jupiter.api.*;
-import sgc.seguranca.dto.EntrarRequest;
+import sgc.seguranca.dto.*;
 
-import java.util.Set;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de Validação: EntrarRequest")
 class EntrarReqValidationTest {

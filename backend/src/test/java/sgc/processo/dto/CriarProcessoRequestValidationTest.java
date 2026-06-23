@@ -1,18 +1,14 @@
 package sgc.processo.dto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+import com.fasterxml.jackson.databind.*;
+import jakarta.validation.*;
 import org.junit.jupiter.api.*;
-import sgc.processo.model.TipoProcesso;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Testes de Validação: CriarProcessoRequest")
 class CriarProcessoRequestValidationTest {

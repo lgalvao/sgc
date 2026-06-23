@@ -1,13 +1,11 @@
 package sgc.organizacao.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.jspecify.annotations.Nullable;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.mapa.model.Mapa;
+import lombok.*;
+import lombok.experimental.*;
+import org.jspecify.annotations.*;
+import sgc.comum.erros.*;
+import sgc.mapa.model.*;
 
 @Entity
 @Table(name = "UNIDADE_MAPA", schema = "sgc")

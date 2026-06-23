@@ -1,30 +1,20 @@
 package sgc.alerta;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.model.Alerta;
-import sgc.alerta.model.AlertaUsuario;
-import sgc.comum.util.MascaraUtil;
-import sgc.configuracoes.ConfiguracaoService;
-import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.dao.*;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.model.*;
+import sgc.comum.util.*;
+import sgc.configuracoes.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
 
 @Service

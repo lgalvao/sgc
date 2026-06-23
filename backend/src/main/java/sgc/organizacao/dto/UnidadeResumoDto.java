@@ -1,8 +1,8 @@
 package sgc.organizacao.dto;
 
-import lombok.Builder;
+import lombok.*;
 
-import java.util.Objects;
+import java.util.*;
 
 @Builder
 public record UnidadeResumoDto(

@@ -1,12 +1,10 @@
 package sgc.processo.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import sgc.comum.model.EntidadeBase;
-import sgc.organizacao.model.Usuario;
+import lombok.*;
+import lombok.experimental.*;
+import sgc.comum.model.*;
+import sgc.organizacao.model.*;
 
 @Entity
 @Table(name = "SERVIDOR_PROCESSO", schema = "sgc")

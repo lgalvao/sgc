@@ -1,10 +1,10 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.boot.context.event.*;
+import org.springframework.context.*;
+import org.springframework.stereotype.*;
 
 /**
  * Aquece os caches das views organizacionais ao inicializar a aplicação.

@@ -1,9 +1,8 @@
 package sgc.mapa.dto;
 
-import lombok.Builder;
+import lombok.*;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Representa os impactos causados pela disponibilização de um mapa.

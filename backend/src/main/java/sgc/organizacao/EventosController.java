@@ -1,13 +1,11 @@
 package sgc.organizacao;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import sgc.organizacao.service.RegistroSseEmitter;
+import lombok.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.*;
+import sgc.organizacao.service.*;
 
 /**
  * Endpoint SSE para notificações de atualização de cache.

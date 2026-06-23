@@ -1,14 +1,13 @@
 package sgc.processo.dto;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import org.jspecify.annotations.Nullable;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroValidacao;
-import sgc.processo.model.AcaoProcesso;
+import jakarta.validation.constraints.*;
+import org.jspecify.annotations.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 public record AcaoEmBlocoRequest(
         @NotEmpty(message = Mensagens.PELO_MENOS_UMA_UNIDADE)

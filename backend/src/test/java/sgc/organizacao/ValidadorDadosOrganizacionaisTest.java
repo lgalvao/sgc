@@ -1,25 +1,20 @@
 package sgc.organizacao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import sgc.organizacao.dto.DiagnosticoOrganizacionalDto;
-import sgc.organizacao.dto.GrupoViolacaoOrganizacionalDto;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.springframework.jdbc.core.namedparam.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.CacheViewsOrganizacaoService;
+import sgc.organizacao.service.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyCollection;
 
 @ExtendWith(MockitoExtension.class)
 class ValidadorDadosOrganizacionaisTest {

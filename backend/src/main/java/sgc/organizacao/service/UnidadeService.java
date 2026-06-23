@@ -1,20 +1,18 @@
 package sgc.organizacao.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import lombok.*;
+import org.springframework.cache.annotation.*;
+import org.springframework.security.core.*;
+import org.springframework.security.core.context.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 import sgc.comum.config.CacheConfig;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.mapa.model.Mapa;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import sgc.organizacao.dto.MapaVigenteReferenciaDto;
+import sgc.comum.erros.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

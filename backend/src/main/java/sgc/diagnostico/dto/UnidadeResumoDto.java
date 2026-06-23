@@ -1,6 +1,6 @@
 package sgc.diagnostico.dto;
 
-import lombok.Builder;
+import lombok.*;
 
 @Builder
 public record UnidadeResumoDto(

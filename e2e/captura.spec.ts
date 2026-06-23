@@ -31,8 +31,8 @@ import {
     navegarParaMapa
 } from './helpers/helpers-mapas.js';
 import {
-    aprovarConsensoDiagnostico,
     abrirAcaoConsensoDiagnostico,
+    aprovarConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
     preencherConsensoMinimo,
     preencherPrimeiraSituacaoCapacitacao

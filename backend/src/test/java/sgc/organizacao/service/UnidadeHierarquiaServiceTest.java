@@ -1,24 +1,19 @@
 package sgc.organizacao.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.ObjectProvider;
-import sgc.organizacao.dto.UnidadeDto;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import org.springframework.beans.factory.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
-import sgc.testutils.UnidadeTestBuilder;
+import sgc.testutils.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.function.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**

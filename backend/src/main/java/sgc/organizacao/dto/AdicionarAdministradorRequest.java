@@ -1,6 +1,6 @@
 package sgc.organizacao.dto;
 
-import sgc.comum.model.TituloEleitoral;
+import sgc.comum.model.*;
 
 public record AdicionarAdministradorRequest(
         @TituloEleitoral

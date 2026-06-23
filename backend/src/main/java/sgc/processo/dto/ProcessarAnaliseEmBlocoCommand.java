@@ -1,8 +1,8 @@
 package sgc.processo.dto;
 
-import sgc.processo.model.AcaoProcesso;
+import sgc.processo.model.*;
 
-import java.util.List;
+import java.util.*;
 
 public record ProcessarAnaliseEmBlocoCommand(
         List<Long> unidadeCodigos,

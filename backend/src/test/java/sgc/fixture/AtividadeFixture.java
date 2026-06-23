@@ -1,7 +1,6 @@
 package sgc.fixture;
 
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Mapa;
+import sgc.mapa.model.*;
 
 public class AtividadeFixture {
     public static Atividade atividadePadrao(Mapa mapa) {

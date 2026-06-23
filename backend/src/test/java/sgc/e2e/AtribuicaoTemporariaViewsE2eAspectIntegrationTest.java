@@ -1,21 +1,18 @@
 package sgc.e2e;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.organizacao.dto.CriarAtribuicaoRequest;
-import sgc.organizacao.service.ResponsavelUnidadeService;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.jdbc.core.*;
+import org.springframework.test.context.*;
+import org.springframework.transaction.annotation.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.service.*;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
+import java.sql.*;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @SpringBootTest

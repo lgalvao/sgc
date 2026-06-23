@@ -1,8 +1,8 @@
 package sgc.relatorio;
 
-import lombok.Builder;
+import lombok.*;
 
-import java.util.List;
+import java.util.*;
 
 @Builder
 public record RelatorioDiagnosticoGapDto(

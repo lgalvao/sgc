@@ -1,8 +1,6 @@
 package sgc.testutils;
 
-import sgc.organizacao.model.SituacaoUnidade;
-import sgc.organizacao.model.TipoUnidade;
-import sgc.organizacao.model.Unidade;
+import sgc.organizacao.model.*;
 
 /**
  * Builder para criação de objetos Unidade em testes.

@@ -1,18 +1,15 @@
 package sgc.alerta;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import sgc.alerta.dto.AlertaDto;
-import sgc.alerta.model.Alerta;
-import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.UsuarioAplicacaoService;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import lombok.*;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import sgc.alerta.dto.*;
+import sgc.alerta.model.*;
+import sgc.organizacao.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/alertas")

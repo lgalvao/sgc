@@ -1,20 +1,15 @@
 package sgc.alerta.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.jspecify.annotations.Nullable;
-import sgc.comum.model.ComumViews;
-import sgc.comum.model.EntidadeBase;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
+import lombok.*;
+import lombok.experimental.*;
+import org.jspecify.annotations.*;
+import sgc.comum.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Entity
 @Table(name = "ALERTA", schema = "sgc")

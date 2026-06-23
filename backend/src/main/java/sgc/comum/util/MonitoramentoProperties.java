@@ -1,8 +1,7 @@
 package sgc.comum.util;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import lombok.*;
+import org.springframework.boot.context.properties.*;
 
 @ConfigurationProperties(prefix = "sgc.monitoramento")
 @Getter

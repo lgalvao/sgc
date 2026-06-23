@@ -1,15 +1,12 @@
 package sgc.feedback.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.feedback.FeedbackRegistro;
-import sgc.feedback.FeedbackStatus;
-import sgc.feedback.FeedbackTipo;
+import org.junit.jupiter.api.*;
+import sgc.feedback.*;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("FeedbackListagemDto")
 class FeedbackListagemDtoTest {

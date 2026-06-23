@@ -1,6 +1,6 @@
 package sgc.organizacao.dto;
 
-import lombok.Builder;
+import lombok.*;
 
 /**
  * DTO para dados de responsável (titular/substituto) de uma unidade.

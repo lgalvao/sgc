@@ -1,19 +1,12 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import type {Page, APIRequestContext} from '@playwright/test';
+import type {APIRequestContext, Page} from '@playwright/test';
+import {acessarDetalhesProcesso, criarProcesso,} from './helpers/helpers-processos.js';
 import {
-    criarProcesso,
-} from './helpers/helpers-processos.js';
-import {
-    criarProcessoFinalizadoFixture,
     criarProcessoDiagnosticoConcluidoFixture,
+    criarProcessoFinalizadoFixture,
     type ProcessoFixture,
 } from './fixtures/index.js';
-import {
-    USUARIOS,
-    login,
-    loginComPerfil,
-} from './helpers/helpers-auth.js';
-import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {login, loginComPerfil, USUARIOS,} from './helpers/helpers-auth.js';
 import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';

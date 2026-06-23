@@ -1,11 +1,10 @@
 package sgc.subprocesso.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Builder;
-import sgc.comum.Mensagens;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import sgc.comum.*;
 
-import java.util.List;
+import java.util.*;
 
 @Builder
 public record CriarCompetenciaRequest(

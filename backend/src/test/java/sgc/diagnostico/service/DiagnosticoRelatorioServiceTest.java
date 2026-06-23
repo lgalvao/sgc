@@ -1,25 +1,19 @@
 package sgc.diagnostico.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
 import sgc.diagnostico.model.*;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.service.UnidadeService;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.subprocesso.model.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DiagnosticoRelatorioServiceTest {

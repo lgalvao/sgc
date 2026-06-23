@@ -1,33 +1,25 @@
 package sgc.seguranca;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Component;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.comum.util.MascaraUtil;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.AtividadeRepo;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.HierarquiaService;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
-import sgc.subprocesso.service.LocalizacaoSubprocessoService;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.security.access.*;
+import org.springframework.security.core.*;
+import org.springframework.stereotype.*;
+import sgc.comum.erros.*;
+import sgc.comum.util.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Objects;
+import java.io.*;
+import java.util.*;
 
 import static sgc.organizacao.model.Perfil.*;
-import static sgc.processo.model.SituacaoProcesso.FINALIZADO;
+import static sgc.processo.model.SituacaoProcesso.*;
 
 /**
  * Avaliador central de permissões do SGC.

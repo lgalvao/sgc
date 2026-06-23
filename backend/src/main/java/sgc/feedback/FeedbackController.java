@@ -1,26 +1,19 @@
 package sgc.feedback;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.*;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.context.annotation.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import sgc.comum.erros.ErroValidacao;
-import sgc.feedback.dto.FeedbackListagemDto;
-import sgc.feedback.dto.FeedbackPayloadDto;
-import sgc.feedback.dto.FeedbackRespostaDto;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
+import org.springframework.web.multipart.*;
+import sgc.comum.erros.*;
+import sgc.feedback.dto.*;
+import tools.jackson.core.*;
+import tools.jackson.databind.*;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Endpoint de feedback disponível apenas no perfil {@code hom}.

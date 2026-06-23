@@ -1,8 +1,8 @@
 package sgc.diagnostico.service;
 
 
-import org.springframework.stereotype.Service;
-import sgc.diagnostico.model.AvaliacaoServidor;
+import org.springframework.stereotype.*;
+import sgc.diagnostico.model.*;
 
 @Service
 public class DiagnosticoGapService {

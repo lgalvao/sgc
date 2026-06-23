@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import pc from "picocolors";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
-import {imprimirCabecalho, imprimirJson, escreverLinha} from "../lib/saida.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 async function main() {

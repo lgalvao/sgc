@@ -1,9 +1,9 @@
 package sgc.mapa.dto;
 
-import lombok.Builder;
-import sgc.organizacao.dto.UnidadeResumoDto;
+import lombok.*;
+import sgc.organizacao.dto.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Resposta para visualização completa de um mapa de competências.

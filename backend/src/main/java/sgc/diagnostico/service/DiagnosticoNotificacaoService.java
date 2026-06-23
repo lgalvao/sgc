@@ -1,25 +1,20 @@
 package sgc.diagnostico.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import sgc.alerta.EnfileirarNotificacaoCommand;
-import sgc.alerta.NotificacaoService;
-import sgc.alerta.model.TipoNotificacao;
-import sgc.comum.config.ConfigAplicacao;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
-import sgc.subprocesso.model.Subprocesso;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
+import sgc.comum.config.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.subprocesso.model.*;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor

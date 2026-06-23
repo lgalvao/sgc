@@ -1,23 +1,21 @@
 package sgc.organizacao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import sgc.organizacao.service.RegistroSseEmitter;
-import sgc.seguranca.config.ConfigSeguranca;
+import org.springframework.security.config.annotation.method.configuration.*;
+import org.springframework.security.test.context.support.*;
+import org.springframework.test.context.bean.override.mockito.*;
+import org.springframework.test.web.servlet.*;
+import org.springframework.web.servlet.mvc.method.annotation.*;
+import sgc.organizacao.service.*;
+import sgc.seguranca.config.*;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(EventosController.class)
 @Import(ConfigSeguranca.class)

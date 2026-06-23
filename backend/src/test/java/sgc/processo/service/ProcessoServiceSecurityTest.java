@@ -1,18 +1,14 @@
 package sgc.processo.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.security.core.Authentication;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import org.springframework.security.core.*;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.model.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DisplayName("ProcessoService Security Test suite")
 class ProcessoServiceSecurityTest extends ProcessoServiceTestBase {

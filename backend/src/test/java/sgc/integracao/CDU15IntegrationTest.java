@@ -1,35 +1,21 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroValidacao;
-import sgc.fixture.AtividadeFixture;
-import sgc.fixture.ProcessoFixture;
-import sgc.fixture.SubprocessoFixture;
-import sgc.fixture.UnidadeFixture;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.CompetenciaRepo;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.CriarCompetenciaRequest;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoService;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.fixture.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @DisplayName("CDU-15: Manter mapa de competências")

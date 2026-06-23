@@ -1,15 +1,15 @@
 package sgc.configuracoes;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import jakarta.validation.*;
+import lombok.*;
+import org.springframework.security.access.prepost.*;
+import org.springframework.validation.annotation.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.configuracoes.model.Configuracao;
+import sgc.configuracoes.model.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/configuracoes")

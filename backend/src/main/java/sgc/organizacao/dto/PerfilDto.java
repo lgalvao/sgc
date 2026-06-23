@@ -1,7 +1,7 @@
 package sgc.organizacao.dto;
 
-import lombok.Builder;
-import sgc.comum.model.TituloEleitoral;
+import lombok.*;
+import sgc.comum.model.*;
 
 @Builder
 public record PerfilDto(

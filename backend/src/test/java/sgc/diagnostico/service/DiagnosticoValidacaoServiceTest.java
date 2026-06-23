@@ -1,25 +1,19 @@
 package sgc.diagnostico.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroValidacao;
-import sgc.diagnostico.model.AvaliacaoServidor;
-import sgc.diagnostico.model.AvaliacaoServidorRepo;
-import sgc.diagnostico.model.SituacaoAvaliacaoServidor;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
-import sgc.subprocesso.service.SubprocessoVisualizacaoService;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.diagnostico.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DiagnosticoValidacaoServiceTest {

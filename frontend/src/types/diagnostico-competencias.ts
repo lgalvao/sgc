@@ -1,4 +1,4 @@
-import type { Movimentacao } from './subprocesso-modelos';
+import type {Movimentacao} from './subprocesso-modelos';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Enums

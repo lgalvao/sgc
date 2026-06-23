@@ -1,31 +1,22 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
-import sgc.alerta.AlertaAplicacaoService;
-import sgc.alerta.AssuntosNotificacao;
-import sgc.alerta.EnfileirarNotificacaoCommand;
-import sgc.alerta.NotificacaoService;
-import sgc.alerta.model.TipoNotificacao;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.UnidadeResumoLeitura;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.NotificacaoCommand;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoTransicao;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.thymeleaf.context.*;
+import org.thymeleaf.spring6.*;
+import sgc.alerta.*;
+import sgc.alerta.model.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.*;
+import java.time.format.*;
 import java.util.*;
 
 @Service

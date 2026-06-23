@@ -1,18 +1,15 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.Mensagens;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.seguranca.AcaoPermissao;
-import sgc.seguranca.SgcPermissionEvaluator;
+import lombok.*;
+import org.springframework.security.access.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
+import sgc.organizacao.*;
+import sgc.organizacao.service.*;
+import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.Analise;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoAnalise;
+import sgc.subprocesso.model.*;
 
 @Service
 @RequiredArgsConstructor

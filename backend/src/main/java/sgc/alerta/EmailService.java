@@ -1,17 +1,15 @@
 package sgc.alerta;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import lombok.extern.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.mail.javamail.*;
 import org.springframework.stereotype.Service;
-import sgc.comum.config.ConfigAplicacao;
+import sgc.comum.config.*;
 
-import java.io.UnsupportedEncodingException;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.util.regex.*;
 
 @Service
 @Slf4j

@@ -1,18 +1,14 @@
 package sgc.comum.json;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
-import sgc.seguranca.sanitizacao.DeserializadorHtmlSanitizado;
-import tools.jackson.core.JsonParser;
-import tools.jackson.databind.DeserializationContext;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.*;
+import sgc.seguranca.sanitizacao.*;
+import tools.jackson.core.*;
+import tools.jackson.databind.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Testes para DeserializadorHtmlSanitizado")
 class DeserializadorHtmlSanitizadoTest {

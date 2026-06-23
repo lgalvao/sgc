@@ -1,10 +1,9 @@
 package sgc.configuracoes.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.configuracoes.ConfiguracaoRequest;
+import org.junit.jupiter.api.*;
+import sgc.configuracoes.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Configuracao")
 class ConfiguracaoTest {

@@ -1,19 +1,15 @@
 package sgc.subprocesso.service;
 
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.service.MapaManutencaoService;
-import sgc.subprocesso.dto.ValidacaoCadastroDto;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SubprocessoRepo;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.mapa.model.*;
+import sgc.mapa.service.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
 
 import java.util.*;
 

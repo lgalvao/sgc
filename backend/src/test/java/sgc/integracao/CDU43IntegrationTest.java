@@ -1,25 +1,18 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import sgc.fixture.ProcessoFixture;
-import sgc.fixture.SubprocessoFixture;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.integracao.mocks.WithMockGestor;
-import sgc.mapa.model.Mapa;
-import sgc.processo.model.Processo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import sgc.fixture.*;
+import sgc.integracao.mocks.*;
+import sgc.mapa.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @DisplayName("CDU-43: Visualizar detalhes de subprocesso de diagnóstico para GESTOR e ADMIN")

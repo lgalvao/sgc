@@ -1,9 +1,8 @@
 package sgc.alerta;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.*;
 import sgc.alerta.dto.*;
-import sgc.alerta.model.Alerta;
-import sgc.alerta.model.NotificacaoEmail;
+import sgc.alerta.model.*;
 
 @Component
 public class AlertaDtoMapper {

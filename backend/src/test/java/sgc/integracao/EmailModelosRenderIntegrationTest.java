@@ -1,17 +1,15 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
-import sgc.alerta.EmailModelosService;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.thymeleaf.context.*;
+import org.thymeleaf.spring6.*;
+import sgc.alerta.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @DisplayName("Integração: Renderização de modelos de e-mail")

@@ -1,7 +1,7 @@
 package sgc.subprocesso.dto;
 
-import lombok.Builder;
-import org.jspecify.annotations.Nullable;
+import lombok.*;
+import org.jspecify.annotations.*;
 
 /**
  * Command interno para atualização dos vínculos principais do subprocesso.

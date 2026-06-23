@@ -1,22 +1,17 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
-import sgc.diagnostico.dto.SituacaoCapacitacaoDto;
-import sgc.diagnostico.dto.SituacoesCapacitacaoRequest;
-import sgc.diagnostico.model.SituacaoCapacitacao;
-import sgc.diagnostico.model.ValorSituacaoCapacitacao;
-import sgc.integracao.mocks.WithMockChefe;
+import sgc.diagnostico.dto.*;
+import sgc.diagnostico.model.*;
+import sgc.integracao.mocks.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Tag("integration")
 @DisplayName("CDU-48: Preencher situações de capacitação")

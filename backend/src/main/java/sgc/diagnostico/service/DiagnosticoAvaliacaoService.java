@@ -1,22 +1,18 @@
 package sgc.diagnostico.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
-import sgc.organizacao.model.Usuario;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.service.SubprocessoConsultaService;
+import sgc.organizacao.model.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor

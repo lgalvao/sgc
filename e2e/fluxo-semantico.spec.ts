@@ -48,8 +48,8 @@ import {
     verificarCompetenciaNoMapa
 } from './helpers/helpers-mapas.js';
 import {
-    aprovarConsensoDiagnostico,
     abrirAcaoConsensoDiagnostico,
+    aprovarConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
     concluirConsensoDiagnostico,
     preencherConsensoMinimo,

@@ -1,29 +1,20 @@
 package sgc.integracao;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import sgc.alerta.model.NotificacaoEmail;
-import sgc.alerta.model.NotificacaoEmailRepo;
-import sgc.alerta.model.SituacaoNotificacao;
-import sgc.alerta.model.TipoNotificacao;
-import sgc.fixture.ProcessoFixture;
-import sgc.fixture.SubprocessoFixture;
-import sgc.integracao.mocks.WithMockAdmin;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import sgc.alerta.model.*;
+import sgc.fixture.*;
+import sgc.integracao.mocks.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @DisplayName("CDU-38 — Acompanhar notificações por e-mail")
 class CDU38IntegrationTest extends BaseIntegrationTest {

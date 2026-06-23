@@ -1,42 +1,30 @@
 package sgc.seguranca.login;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import jakarta.servlet.http.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.erros.ErroConfiguracao;
-import sgc.comum.erros.RestExceptionHandler;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.dto.UnidadeResumoDto;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Usuario;
-import sgc.seguranca.LoginAplicacaoService;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.seguranca.config.JwtProperties;
-import sgc.seguranca.dto.AutenticarRequest;
-import sgc.seguranca.dto.EntrarRequest;
-import sgc.seguranca.dto.PerfilUnidadeDto;
-import tools.jackson.databind.ObjectMapper;
+import org.springframework.security.test.context.support.*;
+import org.springframework.test.context.bean.override.mockito.*;
+import org.springframework.test.web.servlet.*;
+import sgc.comum.erros.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.*;
+import sgc.seguranca.config.*;
+import sgc.seguranca.dto.*;
+import tools.jackson.databind.*;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
+import java.time.*;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LoginController.class)

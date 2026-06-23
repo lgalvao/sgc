@@ -1,11 +1,9 @@
 package sgc.mapa.model;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.mapa.dto.AtualizarAtividadeRequest;
-import sgc.mapa.dto.CriarAtividadeRequest;
+import org.junit.jupiter.api.*;
+import sgc.mapa.dto.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("Atividade")
 class AtividadeTest {

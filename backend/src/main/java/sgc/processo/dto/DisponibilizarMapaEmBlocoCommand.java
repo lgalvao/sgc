@@ -1,7 +1,7 @@
 package sgc.processo.dto;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 public record DisponibilizarMapaEmBlocoCommand(
         List<Long> unidadeCodigos,

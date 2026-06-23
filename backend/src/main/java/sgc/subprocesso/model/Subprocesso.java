@@ -1,24 +1,18 @@
 package sgc.subprocesso.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.jspecify.annotations.Nullable;
-import sgc.comum.Mensagens;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.model.EntidadeBase;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.model.Unidade;
-import sgc.processo.model.Processo;
+import lombok.*;
+import lombok.experimental.*;
+import org.jspecify.annotations.*;
+import sgc.comum.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
 import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 

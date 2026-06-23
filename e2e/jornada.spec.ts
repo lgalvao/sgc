@@ -6,8 +6,8 @@ import * as AtividadeHelpers from './helpers/helpers-atividades.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import * as AnaliseHelpers from './helpers/helpers-analise.js';
 import {
-    aprovarConsensoDiagnostico,
     abrirAcaoConsensoDiagnostico,
+    aprovarConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
     concluirConsensoDiagnostico,
     preencherConsensoMinimo,

@@ -1,21 +1,19 @@
 package sgc.diagnostico;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.tags.*;
+import jakarta.validation.*;
+import lombok.*;
+import org.jspecify.annotations.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
 import org.springframework.web.bind.annotation.*;
-import sgc.comum.ComumDtos;
+import sgc.comum.*;
 import sgc.diagnostico.dto.*;
-import sgc.diagnostico.service.DiagnosticoAvaliacaoService;
-import sgc.diagnostico.service.DiagnosticoConsultaService;
-import sgc.diagnostico.service.DiagnosticoFluxoService;
-import sgc.seguranca.sanitizacao.UtilSanitizacao;
-import sgc.subprocesso.dto.AnaliseHistoricoDto;
+import sgc.diagnostico.service.*;
+import sgc.seguranca.sanitizacao.*;
+import sgc.subprocesso.dto.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/subprocessos")

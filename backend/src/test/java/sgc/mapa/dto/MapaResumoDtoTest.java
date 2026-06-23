@@ -1,14 +1,13 @@
 package sgc.mapa.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.mapa.MapaDtoMapper;
-import sgc.mapa.model.Mapa;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import sgc.mapa.*;
+import sgc.mapa.model.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("MapaResumoDto")
 class MapaResumoDtoTest {

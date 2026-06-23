@@ -1,7 +1,7 @@
 package sgc.mapa.dto;
 
-import lombok.Builder;
-import org.jspecify.annotations.Nullable;
+import lombok.*;
+import org.jspecify.annotations.*;
 
 @Builder
 public record CriarMapaCommand(

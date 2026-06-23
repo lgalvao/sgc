@@ -1,9 +1,9 @@
 package sgc.organizacao.model;
 
 import lombok.*;
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.*;
 
-import java.io.Serializable;
+import java.io.*;
 
 @Getter
 @Setter

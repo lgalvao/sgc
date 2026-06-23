@@ -1,11 +1,8 @@
 package sgc.integracao.mocks;
 
-import org.hibernate.resource.jdbc.spi.StatementInspector;
+import org.hibernate.resource.jdbc.spi.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class ColetorSqlTeste implements StatementInspector {
     private static final Set<String> VIEWS_ORGANIZACIONAIS = Set.of(

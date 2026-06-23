@@ -10,7 +10,11 @@ import {formatarDataBR} from '@/utils';
 import {formatSituacaoSubprocesso} from '@/utils/formatters';
 import {TEXTOS} from '@/constants/textos';
 import type {Analise, Movimentacao, ResponsavelDto, SubprocessoDetalhe} from '@/types/tipos';
-import type {DiagnosticoContexto, SituacaoAvaliacaoServidor, ValorSituacaoCapacitacao,} from '@/types/diagnostico-competencias';
+import type {
+    DiagnosticoContexto,
+    SituacaoAvaliacaoServidor,
+    ValorSituacaoCapacitacao,
+} from '@/types/diagnostico-competencias';
 
 type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
 

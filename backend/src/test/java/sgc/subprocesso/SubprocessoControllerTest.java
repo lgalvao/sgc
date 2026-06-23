@@ -1,46 +1,34 @@
 package sgc.subprocesso;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import com.fasterxml.jackson.databind.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import sgc.comum.ComumDtos.JustificativaRequest;
-import sgc.comum.ComumDtos.TextoOpcionalRequest;
-import sgc.comum.ComumDtos.TextoRequest;
-import sgc.comum.erros.ErroValidacao;
-import sgc.comum.erros.RestExceptionHandler;
+import org.springframework.security.test.context.support.*;
+import org.springframework.test.context.bean.override.mockito.*;
+import org.springframework.test.web.servlet.*;
+import sgc.comum.ComumDtos.*;
+import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.OrganizacaoDtoMapper;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.service.UnidadeService;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.SgcPermissionEvaluator;
+import sgc.mapa.model.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
+import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SubprocessoController.class)
 @Import({RestExceptionHandler.class, SubprocessoDtoMapper.class, OrganizacaoDtoMapper.class})

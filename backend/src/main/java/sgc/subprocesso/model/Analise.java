@@ -1,14 +1,12 @@
 package sgc.subprocesso.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.jspecify.annotations.Nullable;
-import sgc.comum.model.EntidadeBase;
+import lombok.*;
+import lombok.experimental.*;
+import org.jspecify.annotations.*;
+import sgc.comum.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 /**
  * Representa um registro de análise realizado em um subprocesso.

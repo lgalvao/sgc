@@ -1,13 +1,11 @@
 package sgc.comum.util;
 
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
+import lombok.extern.slf4j.*;
+import org.aspectj.lang.*;
+import org.aspectj.lang.annotation.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
+import org.springframework.util.*;
 
 @Aspect
 @Component

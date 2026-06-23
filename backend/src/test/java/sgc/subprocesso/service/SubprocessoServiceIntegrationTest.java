@@ -1,36 +1,27 @@
 package sgc.subprocesso.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.Sgc;
-import sgc.mapa.dto.AtividadeDto;
-import sgc.mapa.dto.ConhecimentoResumoDto;
-import sgc.mapa.model.Mapa;
-import sgc.mapa.model.MapaRepo;
-import sgc.organizacao.ContextoUsuarioAutenticado;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.dto.ResponsavelDto;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.mail.javamail.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.context.*;
+import org.springframework.test.context.*;
+import org.springframework.test.context.bean.override.mockito.*;
+import org.springframework.transaction.annotation.*;
+import sgc.*;
+import sgc.mapa.dto.*;
+import sgc.mapa.model.*;
+import sgc.organizacao.*;
+import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
-import sgc.processo.model.Processo;
-import sgc.processo.model.ProcessoRepo;
-import sgc.processo.model.SituacaoProcesso;
-import sgc.processo.model.TipoProcesso;
-import sgc.subprocesso.dto.AtualizarSubprocessoRequest;
-import sgc.subprocesso.dto.ContextoEdicaoResponse;
+import sgc.processo.model.*;
+import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = Sgc.class)

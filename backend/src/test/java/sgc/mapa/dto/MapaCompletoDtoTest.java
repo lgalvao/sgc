@@ -1,17 +1,13 @@
 package sgc.mapa.dto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import sgc.mapa.MapaDtoMapper;
-import sgc.mapa.model.Atividade;
-import sgc.mapa.model.Competencia;
-import sgc.mapa.model.Mapa;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import sgc.mapa.*;
+import sgc.mapa.model.*;
+import sgc.subprocesso.model.*;
 
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("MapaCompletoDto")
 class MapaCompletoDtoTest {

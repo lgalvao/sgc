@@ -8,8 +8,8 @@ import {
 } from './fixtures/index.js';
 import {login, reloginSemLimparSpa, USUARIOS} from './helpers/helpers-auth.js';
 import {
-    esperarPaginaDiagnosticoUnidade,
     esperarPaginaDetalhesProcesso,
+    esperarPaginaDiagnosticoUnidade,
     esperarPaginaSubprocesso,
     fazerLogout,
     navegarParaDiagnosticoUnidade,

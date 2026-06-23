@@ -1,24 +1,18 @@
 package sgc.integracao;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import org.hibernate.SessionFactory;
-import org.hibernate.stat.Statistics;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import sgc.organizacao.UsuarioAplicacaoService;
+import jakarta.persistence.*;
+import org.hibernate.*;
+import org.hibernate.stat.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.data.domain.*;
+import sgc.organizacao.*;
 import sgc.organizacao.model.*;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UnidadeHierarquiaService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.organizacao.service.UsuarioService;
+import sgc.organizacao.service.*;
 
-import java.util.List;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 @Tag("integration")
 @DisplayName("Budget de Queries das Views Organizacionais")

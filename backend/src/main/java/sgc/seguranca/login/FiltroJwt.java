@@ -1,21 +1,18 @@
 package sgc.seguranca.login;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
-import sgc.comum.util.MascaraUtil;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.model.Usuario;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.context.*;
+import org.springframework.web.filter.*;
+import sgc.comum.util.*;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
 
-import java.io.IOException;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 /**
  * Filtro de segurança que valida tokens JWT em cada requisição.

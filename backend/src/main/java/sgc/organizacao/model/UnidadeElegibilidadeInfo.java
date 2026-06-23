@@ -1,6 +1,6 @@
 package sgc.organizacao.model;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.*;
 
 /**
  * Dados escalares de uma unidade usados para verificação de elegibilidade.

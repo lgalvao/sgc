@@ -1,39 +1,23 @@
 package sgc.mapa.service;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import sgc.comum.erros.ErroAcessoNegado;
-import sgc.comum.erros.ErroEntidadeNaoEncontrada;
-import sgc.comum.erros.ErroValidacao;
-import sgc.mapa.dto.AtividadeImpactadaDto;
-import sgc.mapa.dto.CompetenciaImpactadaDto;
-import sgc.mapa.dto.ImpactoMapaResponse;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.*;
+import org.mockito.*;
+import org.mockito.junit.jupiter.*;
+import sgc.comum.erros.*;
+import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
-import sgc.organizacao.UsuarioAplicacaoService;
-import sgc.organizacao.model.Perfil;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.model.Usuario;
-import sgc.processo.model.Processo;
-import sgc.processo.model.TipoProcesso;
-import sgc.seguranca.AcaoPermissao;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.Subprocesso;
+import sgc.organizacao.*;
+import sgc.organizacao.model.*;
+import sgc.processo.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static sgc.seguranca.AcaoPermissao.VERIFICAR_IMPACTOS;
+import static sgc.seguranca.AcaoPermissao.*;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("NullAway.Init")

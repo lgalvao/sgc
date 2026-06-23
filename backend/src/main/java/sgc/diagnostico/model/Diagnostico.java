@@ -1,17 +1,13 @@
 package sgc.diagnostico.model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import sgc.comum.model.EntidadeBase;
-import sgc.subprocesso.model.Subprocesso;
+import lombok.*;
+import lombok.experimental.*;
+import sgc.comum.model.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 @Entity
 @Table(name = "DIAGNOSTICO", schema = "sgc")

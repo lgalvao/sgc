@@ -1,11 +1,8 @@
 package sgc.comum.model;
 
-import jakarta.validation.Constraint;
-import jakarta.validation.Payload;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import sgc.comum.Mensagens;
+import jakarta.validation.*;
+import jakarta.validation.constraints.*;
+import sgc.comum.*;
 
 import java.lang.annotation.*;
 

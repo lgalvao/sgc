@@ -1,6 +1,6 @@
 package sgc.relatorio;
 
-import lombok.Builder;
+import lombok.*;
 
 @Builder
 public record RelatorioDiagnosticoSituacaoCapacitacaoCompetenciaDto(

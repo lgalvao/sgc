@@ -1,27 +1,23 @@
 package sgc.alerta;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import sgc.alerta.model.NotificacaoEmail;
-import sgc.alerta.model.SituacaoNotificacao;
-import sgc.alerta.model.TipoNotificacao;
-import sgc.organizacao.model.Unidade;
-import sgc.seguranca.SgcPermissionEvaluator;
-import sgc.subprocesso.model.Subprocesso;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.webmvc.test.autoconfigure.*;
+import org.springframework.context.annotation.*;
+import org.springframework.security.test.context.support.*;
+import org.springframework.test.context.bean.override.mockito.*;
+import org.springframework.test.web.servlet.*;
+import sgc.alerta.model.*;
+import sgc.organizacao.model.*;
+import sgc.seguranca.*;
+import sgc.subprocesso.model.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(NotificacaoController.class)
 @Import(AlertaDtoMapper.class)

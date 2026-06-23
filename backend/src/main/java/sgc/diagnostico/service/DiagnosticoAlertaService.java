@@ -1,12 +1,12 @@
 package sgc.diagnostico.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.alerta.AlertaAplicacaoService;
-import sgc.organizacao.model.Unidade;
-import sgc.organizacao.service.UnidadeService;
-import sgc.processo.model.Processo;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.alerta.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 
 @Service
 @RequiredArgsConstructor

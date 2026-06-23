@@ -1,16 +1,13 @@
 package sgc.alerta.model;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.jspecify.annotations.Nullable;
-import sgc.organizacao.model.Usuario;
+import lombok.*;
+import lombok.experimental.*;
+import org.jspecify.annotations.*;
+import sgc.organizacao.model.*;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.io.*;
+import java.time.*;
 
 /**
  * Tabela de associação que conecta um {@link Alerta} a um {@link Usuario} específico.

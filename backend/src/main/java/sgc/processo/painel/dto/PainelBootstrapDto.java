@@ -1,13 +1,10 @@
 package sgc.processo.painel.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import sgc.alerta.dto.AlertaDto;
-import sgc.processo.dto.ProcessoResumoDto;
+import lombok.*;
+import sgc.alerta.dto.*;
+import sgc.processo.dto.*;
 
-import java.util.List;
+import java.util.*;
 
 @Data
 @Builder

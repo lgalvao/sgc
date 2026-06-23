@@ -1,9 +1,8 @@
 package sgc.diagnostico.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import org.jspecify.annotations.Nullable;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import org.jspecify.annotations.*;
 
 @Builder
 public record SituacaoCapacitacaoDto(

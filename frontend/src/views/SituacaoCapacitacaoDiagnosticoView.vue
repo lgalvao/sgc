@@ -122,7 +122,7 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
 import {useRouter} from 'vue-router';
-import {BBadge, BButton, BCard, BFormSelect, BListGroup, BListGroupItem, BSpinner,} from 'bootstrap-vue-next';
+import {BBadge, BButton, BCard, BFormSelect, BListGroup, BListGroupItem,} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';

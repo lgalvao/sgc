@@ -1,31 +1,24 @@
 package sgc.diagnostico.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import sgc.comum.erros.ErroInconsistenciaInterna;
-import sgc.comum.model.ComumRepo;
+import lombok.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
+import sgc.comum.erros.*;
+import sgc.comum.model.*;
 import sgc.diagnostico.dto.*;
+import sgc.diagnostico.dto.UnidadeResumoDto;
 import sgc.diagnostico.model.*;
-import sgc.mapa.model.Mapa;
-import sgc.organizacao.dto.UnidadeResponsavelDto;
-import sgc.organizacao.model.Usuario;
-import sgc.organizacao.service.ResponsavelUnidadeService;
-import sgc.organizacao.service.UnidadeService;
-import sgc.processo.model.UnidadeProcesso;
-import sgc.subprocesso.SubprocessoDtoMapper;
-import sgc.subprocesso.dto.AnaliseHistoricoDto;
-import sgc.subprocesso.dto.MovimentacaoDto;
-import sgc.subprocesso.model.Subprocesso;
-import sgc.subprocesso.model.SituacaoSubprocesso;
-import sgc.subprocesso.model.TipoAcaoAnalise;
-import sgc.subprocesso.model.TipoAnalise;
-import sgc.subprocesso.service.SubprocessoConsultaService;
-import sgc.subprocesso.service.SubprocessoVisualizacaoService;
+import sgc.mapa.model.*;
+import sgc.organizacao.dto.*;
+import sgc.organizacao.model.*;
+import sgc.organizacao.service.*;
+import sgc.processo.model.*;
+import sgc.subprocesso.*;
+import sgc.subprocesso.dto.*;
+import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

@@ -1,13 +1,10 @@
 package sgc.organizacao;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import sgc.organizacao.service.AgendadorRefreshCache;
-import sgc.organizacao.service.RegistroSseEmitter;
+import lombok.*;
+import org.springframework.http.*;
+import org.springframework.security.access.prepost.*;
+import org.springframework.web.bind.annotation.*;
+import sgc.organizacao.service.*;
 
 /**
  * Endpoint administrativo para invalidação e recarga manual dos caches.

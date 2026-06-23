@@ -1,9 +1,9 @@
 package sgc.alerta;
 
-import lombok.Builder;
-import org.jspecify.annotations.Nullable;
-import sgc.alerta.model.TipoNotificacao;
-import sgc.subprocesso.model.Subprocesso;
+import lombok.*;
+import org.jspecify.annotations.*;
+import sgc.alerta.model.*;
+import sgc.subprocesso.model.*;
 
 @Builder
 public record EnfileirarNotificacaoCommand(

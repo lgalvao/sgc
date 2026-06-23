@@ -1,6 +1,7 @@
 package sgc.diagnostico.dto;
-import java.time.LocalDateTime;
-import java.util.List;
+
+import java.time.*;
+import java.util.*;
 
 public record DiagnosticoMonitoramentoDto(
         Long processoCodigo,
