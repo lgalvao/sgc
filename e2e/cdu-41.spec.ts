@@ -38,14 +38,13 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
 
         await page.goto(`/processo/${processo.codigo}`);
         await navegarParaDiagnosticoUnidade(page, 'ASSESSORIA_12');
-        await expect(page.getByTestId('diagnostico-unidade-titulo')).toBeVisible();
-        await expect(page.getByText('ASSESSORIA_12', {exact: true})).toBeVisible();
+        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText('ASSESSORIA_12');
         await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
         await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
-        await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toBeVisible();
-        await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toBeVisible();
+        const listaServidores = page.getByTestId('lista-servidores-diagnostico-unidade');
+        await expect(listaServidores).toBeVisible();
+        await expect(listaServidores).toContainText('Jon Lord');
         await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
-        await expect(page.getByTestId('detalhes-servidor-diagnostico-unidade')).toContainText('Jon Lord');
 
         await verificarNotificacaoAdmin(page, {
             destinatario: 'ASSESSORIA_12',

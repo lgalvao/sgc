@@ -58,14 +58,14 @@ test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GEST
         await navegarParaDiagnosticoUnidade(page, UNIDADE);
 
         // Verifica a exibição da tela de análise do diagnóstico da unidade
-        await expect(page.getByTestId('diagnostico-unidade-titulo')).toHaveText(UNIDADE);
+        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE);
         await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
         
         // Deve mostrar a tabela de Servidores e Consenso
-        await expect(page.getByText('Servidores participantes', {exact: true})).toBeVisible();
-        await expect(page.getByRole('cell', {name: NOME_SERVIDOR_SECAO_111, exact: true}).first()).toBeVisible();
-        await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toContainText(NOME_SERVIDOR_SECAO_111);
+        const listaServidores = page.getByTestId('lista-servidores-diagnostico-unidade');
+        await expect(listaServidores).toContainText(NOME_SERVIDOR_SECAO_111);
         await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
+        await page.getByTestId(`btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR_SECAO_111}`).click();
         await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toBeVisible();
         await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
 

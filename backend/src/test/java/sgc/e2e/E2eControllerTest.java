@@ -270,6 +270,53 @@ class E2eControllerTest {
     }
 
     @Test
+    @DisplayName("Deve limpar processo ativo da unidade antes de criar novo fixture")
+    void deveLimparProcessoAtivoDaUnidadeAntesDeCriarNovoFixture() {
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.processo");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.subprocesso");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.unidade_processo");
+        jdbcTemplate.execute("TRUNCATE TABLE sgc.vw_unidade");
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+
+        jdbcTemplate.execute("""
+                INSERT INTO sgc.vw_unidade (codigo, nome, sigla, tipo, situacao)
+                VALUES (999, 'Teste Unit', 'SIGLA', 'OPERACIONAL', 'ATIVA')
+                """);
+        jdbcTemplate.execute("""
+                INSERT INTO sgc.processo (codigo, descricao, situacao, tipo, data_criacao, data_limite)
+                VALUES (100, 'Processo ativo', 'EM_ANDAMENTO', 'DIAGNOSTICO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + 30)
+                """);
+        jdbcTemplate.execute("""
+                INSERT INTO sgc.subprocesso (codigo, processo_codigo, unidade_codigo, situacao, data_limite_etapa1)
+                VALUES (300, 100, 999, 'DIAGNOSTICO_EM_ANDAMENTO', CURRENT_TIMESTAMP)
+                """);
+        jdbcTemplate.execute("""
+                INSERT INTO sgc.unidade_processo (
+                    processo_codigo, unidade_codigo, situacao, nome, sigla, tipo, matricula_titular, titulo_titular, data_inicio_titularidade
+                ) VALUES (
+                    100, 999, 'EM_ANDAMENTO', 'Teste Unit', 'SIGLA', 'OPERACIONAL', '00999999', '999999', CURRENT_TIMESTAMP
+                )
+                """);
+
+        when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(999L);
+        Processo processoNovo = new Processo();
+        processoNovo.setCodigo(101L);
+        when(processoService.criar(any())).thenReturn(processoNovo);
+
+        E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
+                "Novo processo", "SIGLA", false, null);
+
+        ProcessoResumoDto response = controller.criarProcessoDiagnostico(req);
+
+        assertThat(response.codigo()).isEqualTo(101L);
+        assertCount("sgc.processo WHERE codigo=100", 0);
+        assertCount("sgc.subprocesso WHERE processo_codigo=100", 0);
+        assertCount("sgc.unidade_processo WHERE processo_codigo=100", 0);
+        verify(processoService).criar(any());
+    }
+
+    @Test
     @DisplayName("Deve criar processo de revisão fixture com descrição informada e iniciado")
     void deveCriarProcessoRevisaoFixture() {
 

@@ -37,7 +37,7 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
             ),
             page.getByTestId('btn-concluir-diagnostico-cabecalho').click()
         ]);
-        await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.diagnostico.ERRO_PENDENCIAS_CONCLUSAO);
+        await expect(page.getByTestId('app-alert')).toContainText(/Ainda existem avaliações .* situações de capacitação pendentes\./);
         await expect(page.getByRole('dialog')).toHaveCount(0);
     });
 

@@ -492,7 +492,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnostico}/${siglaUnidadeDiagnostico}(?:\\?.*)?$`));
 
             await page.getByTestId(`dropdown-acoes-${SERVIDOR_IMPOSSIBILITADO.titulo}`).getByRole('button', {name: 'Ações'}).click();
-            await page.getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO.titulo}`).click();
+            await page.locator('[role="menu"]:visible').getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO.titulo}`).click();
             const modalImpossibilidade = page.getByRole('dialog', {name: /Indicar impossibilidade de avaliação/i});
             await expect(modalImpossibilidade).toBeVisible();
             await modalImpossibilidade.getByTestId('textarea-justificativa-impossibilidade').fill(

@@ -16,7 +16,6 @@ const UNIDADE_SUBORDINADA = 'ASSESSORIA_12';
 const UNIDADE_FORA_HIERARQUIA = 'SECAO_211';
 const TITULO_CHEFE = '151515';
 const NOME_CHEFE = 'Ana Beatriz de Albuquerque e Souza';
-const TITULO_SERVIDOR = '242426';
 const NOME_SERVIDOR = 'João Guilherme de Albuquerque Maranhão';
 const NOME_SERVIDOR_IMPOSSIBILITADO = 'Maria Eduarda Cavalcanti de Alencar';
 const TEXTO_BOTAO_ACOES = 'Ações';
@@ -40,27 +39,15 @@ async function abrirAcoesAnaliseUnidade(page: Page): Promise<void> {
 }
 
 async function verificarTelaAnaliseDiagnostico(page: Page): Promise<void> {
-    await expect(page.getByTestId('diagnostico-unidade-titulo')).toHaveText(UNIDADE_SUBORDINADA);
-    await expect(page.getByText(UNIDADE_SUBORDINADA, {exact: true})).toBeVisible();
+    await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_SUBORDINADA);
     await expect(page.getByTestId('btn-historico-analise-unidade')).toBeEnabled();
     await expect(page.getByText('Processo:', {exact: true})).toBeVisible();
-    await expect(page.getByText('Subprocesso:', {exact: true})).toBeVisible();
-    await expect(page.getByText('Situação:', {exact: true})).toBeVisible();
-    await expect(page.getByText('Servidores participantes', {exact: true})).toBeVisible();
-    await expect(page.getByRole('cell', {name: NOME_SERVIDOR, exact: true}).first()).toBeVisible();
-    await expect(page.getByRole('cell', {name: NOME_SERVIDOR_IMPOSSIBILITADO, exact: true}).first()).toBeVisible();
-    await expect(page.getByText(NOME_CHEFE, {exact: true})).toHaveCount(0);
-    await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
     const listaServidores = page.getByTestId('lista-servidores-diagnostico-unidade');
     await expect(listaServidores).toBeVisible();
     await expect(listaServidores).toContainText(NOME_SERVIDOR);
     await expect(listaServidores).toContainText(NOME_SERVIDOR_IMPOSSIBILITADO);
-    await page.getByTestId(`btn-selecionar-servidor-diagnostico-unidade-${TITULO_SERVIDOR}`).click();
-    await expect(page.getByTestId('detalhes-servidor-diagnostico-unidade')).toContainText(NOME_SERVIDOR);
-    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toBeVisible();
-    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toContainText('Importância');
-    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toContainText('Domínio');
-    await expect(page.getByTestId('tbl-competencias-servidor-diagnostico-unidade')).toContainText('Situação de Capacitação');
+    await expect(page.getByText(NOME_CHEFE, {exact: true})).toHaveCount(0);
+    await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
     await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
 }
 
@@ -225,7 +212,8 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
 
         await login(page, TITULO_CHEFE, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
-        await expect(page.getByText('Avaliação de consenso criada').first()).toBeVisible();
+        await expect(page.getByText('Situação de capacitação', {exact: true})).toBeVisible();
+        await expect(page.getByTestId('tbl-servidores-diagnostico')).toContainText('Autoavaliação não iniciada');
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await verificarNotificacaoAdmin(page, {

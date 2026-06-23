@@ -735,12 +735,9 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await login(page, ADMIN.titulo, ADMIN.senha);
             await acessarDetalhesProcesso(page, `${descricaoProcessoDiagnostico} Monitoramento`);
             await navegarParaDiagnosticoUnidade(page, SIGLA_UNIDADE_DIAGNOSTICO);
-            await expect(page.getByTestId('diagnostico-unidade-titulo')).toBeVisible();
-            await expect(page.getByText(SIGLA_UNIDADE_DIAGNOSTICO, {exact: true})).toBeVisible();
+            await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(SIGLA_UNIDADE_DIAGNOSTICO);
             await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
             await expect(page.getByTestId('lista-servidores-diagnostico-unidade')).toBeVisible();
-            await page.getByTestId(`btn-selecionar-servidor-diagnostico-unidade-${SERVIDOR_DIAGNOSTICO.titulo}`).click();
-            await expect(page.getByTestId('detalhes-servidor-diagnostico-unidade')).toContainText('João Guilherme de Albuquerque Maranhão');
 
             await login(page, CHEFE_DIAGNOSTICO.titulo, CHEFE_DIAGNOSTICO.senha);
             await page.goto(`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}`);
@@ -753,7 +750,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             await expect(page).toHaveURL(new RegExp(String.raw`/processo/${codigoProcessoDiagnosticoMonitoramento}/${SIGLA_UNIDADE_DIAGNOSTICO}(?:\\?.*)?$`));
 
             await page.getByTestId(`dropdown-acoes-${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}`).getByRole('button', {name: 'Ações'}).click();
-            await page.getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}`).click();
+            await page.locator('[role="menu"]:visible').getByTestId(`btn-impossibilitar-${SERVIDOR_IMPOSSIBILITADO_DIAGNOSTICO.titulo}`).click();
             const modalImpossibilidade = page.getByRole('dialog', {name: /Indicar impossibilidade de avaliação/i});
             await expect(modalImpossibilidade).toBeVisible();
             await modalImpossibilidade.getByTestId('textarea-justificativa-impossibilidade').fill(

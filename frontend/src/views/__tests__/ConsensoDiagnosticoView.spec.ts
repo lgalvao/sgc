@@ -175,7 +175,8 @@ describe('ConsensoDiagnosticoView', () => {
         expect(wrapper.text()).toContain('Avaliação de consenso');
         expect(wrapper.text()).toContain('Servidor Exemplo - 242426');
         expect(wrapper.find('[data-testid="btn-concluir-avaliacao"]').exists()).toBe(true);
-        expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').exists()).toBe(true);
+        expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
         expect(wrapper.findAll('thead tr')).toHaveLength(2);
         expect(wrapper.find('[data-testid="consenso-final-dominio-10"]').exists()).toBe(true);
     });
@@ -269,6 +270,17 @@ describe('ConsensoDiagnosticoView', () => {
 
         expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação de consenso já foi aprovada.');
         expect(wrapper.find('select').exists()).toBe(false);
+        expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
+    });
+
+    it('mantem o botão aprovar visível e desabilitado para o proprio servidor quando o estado nao permite a ação', () => {
+        podeConcluirAvaliacao.value = false;
+        podeAprovarConsenso.value = false;
+        habilitarAprovarConsenso.value = false;
+
+        const wrapper = montar();
+
+        expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').exists()).toBe(true);
         expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
     });
 

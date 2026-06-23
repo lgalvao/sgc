@@ -897,6 +897,7 @@ public class E2eController {
         }
 
         Long codUnidade = unidadeService.buscarCodigoPorSigla(request.unidadeSigla());
+        limparProcessosAtivosDaUnidade(codUnidade);
 
         int diasLimite = request.resolverDiasLimite();
         LocalDateTime dataLimite = LocalDate.now().plusDays(diasLimite).atStartOfDay();
@@ -922,6 +923,18 @@ public class E2eController {
         }
 
         return processo;
+    }
+
+    private void limparProcessosAtivosDaUnidade(Long codUnidade) {
+        List<Long> codigosProcessosAtivos = jdbcTemplate.queryForList("""
+                SELECT DISTINCT p.codigo
+                FROM sgc.processo p
+                JOIN sgc.unidade_processo up ON up.processo_codigo = p.codigo
+                WHERE up.unidade_codigo = ?
+                  AND p.situacao IN (?, ?)
+                """, Long.class, codUnidade, SituacaoProcesso.CRIADO.name(), SituacaoProcesso.EM_ANDAMENTO.name());
+
+        codigosProcessosAtivos.forEach(this::limparProcessoCompleto);
     }
 
     private Long consultarCodigoGerado(String sql, Object... args) {

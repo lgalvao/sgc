@@ -21,7 +21,7 @@
             {{ TEXTOS.diagnostico.BTN_CONCLUIR_AVALIACAO }}
           </BButton>
           <BButton
-              v-if="podeAprovarConsenso"
+              v-if="podeAprovarConsenso || servidorEhUsuarioLogado"
               :disabled="aprovando || !habilitarAprovarConsenso"
               data-testid="btn-aprovar-consenso"
               size="sm"
