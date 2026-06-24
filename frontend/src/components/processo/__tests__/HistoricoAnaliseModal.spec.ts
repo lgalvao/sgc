@@ -33,9 +33,15 @@ describe('HistoricoAnaliseModal.vue', () => {
     ];
 
     const stubs = {
-        BModal: {
-            props: ['modelValue'],
-            template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>'
+        ModalPadrao: {
+            props: ['modelValue', 'testIdCancelar'],
+            template: `
+                <div v-if="modelValue">
+                    <slot />
+                    <button :data-testid="testIdCancelar" @click="$emit('update:modelValue', false)">Fechar</button>
+                </div>
+            `,
+            emits: ['update:modelValue']
         },
         BTable: {
             props: ['items'],

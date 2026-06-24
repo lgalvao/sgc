@@ -242,14 +242,58 @@ describe('DiagnosticoUnidadeView', () => {
                     },
                     BListGroup: {template: '<div><slot /></div>'},
                     BListGroupItem: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
-                    BModal: {
-                        props: ['modelValue'],
-                        emits: ['update:modelValue'],
-                        template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
-                    },
-                    HistoricoAnaliseModal: {
-                        props: ['mostrar'],
-                        template: '<div v-if="mostrar" data-testid="modal-historico-analise" />',
+                    DiagnosticoFluxoModais: {
+                        props: [
+                            'modalHistoricoAberto',
+                            'modalValidarAberto',
+                            'modalDevolverAberto',
+                            'modalHomologarAberto',
+                            'testIdConfirmarValidar',
+                            'testIdConfirmarDevolver',
+                            'testIdConfirmarHomologar',
+                            'observacoesValidar',
+                            'justificativaDevolver',
+                            'feedbackJustificativaDevolver',
+                            'erroValidar',
+                            'erroDevolver',
+                            'erroHomologar'
+                        ],
+                        emits: [
+                            'confirmar-validar',
+                            'confirmar-devolver',
+                            'confirmar-homologar',
+                            'update:modal-validar-aberto',
+                            'update:modal-devolver-aberto',
+                            'update:modal-homologar-aberto',
+                            'update:observacoes-validar',
+                            'update:justificativa-devolver'
+                        ],
+                        template: `
+                          <div>
+                            <div v-if="modalHistoricoAberto" data-testid="modal-historico-analise" />
+                            <div v-if="modalValidarAberto">
+                              <textarea
+                                :value="observacoesValidar"
+                                @input="$emit('update:observacoes-validar', $event.target.value)"
+                              />
+                              <button :data-testid="testIdConfirmarValidar" @click="$emit('confirmar-validar')">Validar</button>
+                              <div v-if="erroValidar">{{ erroValidar }}</div>
+                            </div>
+                            <div v-if="modalDevolverAberto">
+                              <textarea
+                                :value="justificativaDevolver"
+                                @input="$emit('update:justificativa-devolver', $event.target.value)"
+                              />
+                              <button :data-testid="testIdConfirmarDevolver" @click="$emit('confirmar-devolver')">Devolver</button>
+                              <div v-if="feedbackJustificativaDevolver">{{ feedbackJustificativaDevolver }}</div>
+                              <div v-if="erroDevolver">{{ erroDevolver }}</div>
+                            </div>
+                            <div v-if="modalHomologarAberto">
+                              <button :data-testid="testIdConfirmarHomologar" @click="$emit('confirmar-homologar')">Homologar</button>
+                              <div v-if="erroHomologar">{{ erroHomologar }}</div>
+                            </div>
+                          </div>
+                        `,
                     },
                     SubprocessoMovimentacoes: {
                         props: ['movimentacoes'],
@@ -527,8 +571,7 @@ describe('DiagnosticoUnidadeView', () => {
                     BFormTextarea: {template: '<textarea />'},
                     BListGroup: {template: '<div><slot /></div>'},
                     BListGroupItem: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
-                    BModal: {template: '<div />'},
-                    HistoricoAnaliseModal: {template: '<div />'},
+                    DiagnosticoFluxoModais: {template: '<div />'},
                     SubprocessoMovimentacoes: {template: '<div />'},
                     BTable: {
                         props: ['items', 'fields'],

@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue'
-import {BFormGroup, BModal} from 'bootstrap-vue-next'
+import {BFormGroup} from 'bootstrap-vue-next'
 import EditorTextoRico from '@/components/comum/EditorTextoRico.vue'
+import ModalPadrao from '@/components/comum/ModalPadrao.vue'
 import type {FeedbackTipo} from '@/types/feedback'
 
 const props = defineProps<{
@@ -57,6 +58,14 @@ const notaTextoPlano = computed(() =>
 )
 
 const notaValida = computed(() => notaTextoPlano.value.length >= 10)
+const visivelComputado = computed({
+  get: () => props.visivel,
+  set: (valor) => {
+    if (!valor) {
+      emit('fechar')
+    }
+  }
+})
 
 function submeter() {
   if (!notaValida.value) {
@@ -70,19 +79,30 @@ function submeter() {
 </script>
 
 <template>
-  <BModal
-      :model-value="visivel"
+  <ModalPadrao
+      v-model="visivelComputado"
       body-class="p-0"
-      data-testid="feedback-modal"
-      hide-footer
-      no-footer
-      size="lg"
-      @hide="emit('fechar')"
+      :loading="enviando"
+      :mostrar-botao-acao="false"
+      tamanho="lg"
+      test-id-cancelar="feedback-btn-cancelar"
+      test-id-titulo="feedback-modal-title"
+      titulo="Enviar feedback"
+      texto-cancelar="Cancelar"
   >
-    <template #title>
-      <span data-testid="feedback-modal-title">Enviar feedback</span>
+    <template #acao>
+      <button
+          :disabled="enviando"
+          class="btn btn-success feedback-modal__btn-enviar"
+          data-testid="feedback-btn-enviar"
+          type="button"
+          @click="submeter"
+      >
+        <output v-if="enviando" aria-hidden="true" class="spinner-border spinner-border-sm me-1" />
+        Enviar feedback
+      </button>
     </template>
-    <form @submit.prevent="submeter">
+    <form data-testid="feedback-modal" @submit.prevent="submeter">
       <div class="feedback-modal__conteudo">
         <section class="feedback-modal__principal">
           <div class="feedback-modal__campo">
@@ -161,28 +181,8 @@ function submeter() {
         </aside>
       </div>
 
-      <div class="feedback-modal__acoes">
-        <button
-            :disabled="enviando"
-            class="btn btn-outline-secondary"
-            data-testid="feedback-btn-cancelar"
-            type="button"
-            @click="emit('fechar')"
-        >
-          Cancelar
-        </button>
-        <button
-            :disabled="enviando"
-            class="btn btn-success"
-            data-testid="feedback-btn-enviar"
-            type="submit"
-        >
-          <output v-if="enviando" aria-hidden="true" class="spinner-border spinner-border-sm me-1" />
-          Enviar feedback
-        </button>
-      </div>
     </form>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <style scoped>
@@ -315,29 +315,15 @@ function submeter() {
   justify-content: center;
 }
 
-.feedback-modal__acoes {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.65rem;
-  padding: 0.9rem 1rem 1rem;
-  margin-top: 0.75rem;
-  border-top: 1px solid var(--bs-border-color-translucent);
-  background: transparent;
-}
-
-.feedback-modal__acoes .btn {
+.feedback-modal__btn-enviar {
   min-width: 9.25rem;
   min-height: 2.6rem;
   border-radius: 0.6rem;
   font-weight: 600;
 }
 
-.feedback-modal__acoes .btn-success {
+.feedback-modal__btn-enviar.btn-success {
   box-shadow: none;
-}
-
-.feedback-modal__acoes .btn-outline-secondary {
-  background: var(--bs-body-bg);
 }
 
 @media (max-width: 991px) {
@@ -349,20 +335,6 @@ function submeter() {
 }
 
 @media (max-width: 576px) {
-  .feedback-modal__conteudo,
-  .feedback-modal__acoes {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .feedback-modal__acoes {
-    flex-direction: column-reverse;
-  }
-
-  .feedback-modal__acoes .btn {
-    width: 100%;
-  }
-
   .feedback-modal__captura-card,
   .feedback-modal__captura-vazia {
     min-height: 13rem;

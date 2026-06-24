@@ -1,14 +1,18 @@
 <template>
   <BModal
       v-model="modelValueComputed"
+      :body-class="bodyClass"
       :centered="centralizado"
       :fade="fade"
       :size="tamanho"
-      :title="titulo"
+      :title="testIdTitulo ? undefined : titulo"
       modal-class="modal-responsivo"
       @hide="fechar"
       @shown="emit('shown')"
   >
+    <template v-if="testIdTitulo" #title>
+      <span :data-testid="testIdTitulo">{{ titulo }}</span>
+    </template>
     <slot/>
     <template #footer>
       <div class="d-flex justify-content-end w-100 footer-modal-padrao gap-3 align-items-center">
@@ -57,11 +61,13 @@ const props = withDefaults(defineProps<{
   textoCancelar?: string;
   textoAcao?: string;
   textoAcaoCarregando?: string;
+  testIdTitulo?: string;
   variantAcao?: "primary" | "secondary" | "success" | "danger";
   variantCancelar?: "link" | "secondary" | "outline-secondary";
   loading?: boolean;
   acaoDesabilitada?: boolean;
   mostrarBotaoAcao?: boolean;
+  bodyClass?: string;
   testIdConfirmar?: string;
   testIdCancelar?: string;
 }>(), {
@@ -71,11 +77,13 @@ const props = withDefaults(defineProps<{
   textoCancelar: "Cancelar",
   textoAcao: "Confirmar",
   textoAcaoCarregando: "Processando...",
+  testIdTitulo: "",
   variantAcao: "success",
   variantCancelar: "link",
   loading: false,
   acaoDesabilitada: false,
   mostrarBotaoAcao: true,
+  bodyClass: undefined,
   testIdConfirmar: "",
   testIdCancelar: "",
 });

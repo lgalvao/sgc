@@ -2,8 +2,10 @@
 import {BFormInvalidFeedback} from "bootstrap-vue-next";
 import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
+import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import SubprocessoModal from "@/components/processo/SubprocessoModal.vue";
 import {TEXTOS} from "@/constants/textos";
+import type {Analise} from "@/types/tipos";
 
 defineProps<{
     dataLimiteAtual: Date | null;
@@ -20,6 +22,12 @@ defineProps<{
     modalLembreteAberto: boolean;
     loadingLembrete: boolean;
     siglaUnidade: string;
+    modalConcluirDiagnosticoAberto?: boolean;
+    concluindoDiagnostico?: boolean;
+    erroConcluirDiagnostico?: string;
+    modalHistoricoDiagnosticoAberto?: boolean;
+    carregandoHistoricoDiagnostico?: boolean;
+    historicoAnalisesDiagnostico?: Analise[];
 }>();
 
 defineEmits<{
@@ -30,6 +38,9 @@ defineEmits<{
     (e: "update:justificativaReabertura", valor: string): void;
     (e: "update:modalLembreteAberto", valor: boolean): void;
     (e: "confirmar-enviar-lembrete"): void;
+    (e: "update:modalConcluirDiagnosticoAberto", valor: boolean): void;
+    (e: "confirmar-concluir-diagnostico"): void;
+    (e: "update:modalHistoricoDiagnosticoAberto", valor: boolean): void;
 }>();
 </script>
 
@@ -92,4 +103,30 @@ defineEmits<{
             {{ TEXTOS.subprocesso.LEMBRETE_MODELO_PREFIXO(siglaUnidade) }}
         </p>
     </ModalConfirmacao>
+
+    <ModalConfirmacao
+        v-if="modalConcluirDiagnosticoAberto !== undefined"
+        :model-value="modalConcluirDiagnosticoAberto"
+        :loading="concluindoDiagnostico"
+        :mensagem="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM"
+        :titulo="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
+        ok-title="Concluir diagnóstico"
+        test-id-confirmar="btn-confirmar-concluir-diagnostico-cabecalho"
+        variant="success"
+        @confirmar="$emit('confirmar-concluir-diagnostico')"
+        @update:model-value="$emit('update:modalConcluirDiagnosticoAberto', $event)"
+    >
+        <div>
+            <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
+            <div v-if="erroConcluirDiagnostico" class="text-danger small mt-3">{{ erroConcluirDiagnostico }}</div>
+        </div>
+    </ModalConfirmacao>
+
+    <HistoricoAnaliseModal
+        v-if="modalHistoricoDiagnosticoAberto !== undefined && historicoAnalisesDiagnostico !== undefined"
+        :historico="historicoAnalisesDiagnostico"
+        :loading="carregandoHistoricoDiagnostico"
+        :mostrar="modalHistoricoDiagnosticoAberto"
+        @fechar="$emit('update:modalHistoricoDiagnosticoAberto', false)"
+    />
 </template>

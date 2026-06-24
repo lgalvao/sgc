@@ -1,10 +1,12 @@
 <template>
-  <BModal
+  <ModalPadrao
       v-model="mostrarComputado"
-      :title="TEXTOS.mapa.impacto.TITULO_MODAL"
-      centered
-      size="lg"
-      @hide="fechar">
+      :mostrar-botao-acao="false"
+      tamanho="lg"
+      test-id-cancelar="btn-fechar-impacto"
+      :titulo="TEXTOS.mapa.impacto.TITULO_MODAL"
+      texto-cancelar="Fechar"
+  >
     <div v-if="loading" class="text-center p-4">
       <BSpinner label="Carregando..." variant="primary"/>
       <p class="mt-2 text-muted">
@@ -78,27 +80,15 @@
       {{ TEXTOS.mapa.impacto.ERRO_CARREGAR }}
     </BAlert>
 
-    <template #footer>
-      <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
-        <BButton
-            data-testid="btn-fechar-impacto"
-            type="button"
-            variant="link"
-            class="text-decoration-none text-secondary fw-medium btn-fechar-link"
-            @click="fechar"
-        >
-          {{ TEXTOS.comum.BOTAO_FECHAR }}
-        </BButton>
-      </div>
-    </template>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BListGroup, BListGroupItem, BModal, BSpinner} from "bootstrap-vue-next";
+import {BAlert, BCard, BCardBody, BListGroup, BListGroupItem, BSpinner} from "bootstrap-vue-next";
 import {type ImpactoMapa} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {computed} from "vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 
 interface Props {
   mostrar: boolean;
@@ -116,27 +106,14 @@ const emit = defineEmits<(e: "fechar") => void>();
 const mostrarComputado = computed({
   get: () => props.mostrar,
   set: (val) => {
-    if (!val) emit("fechar");
+    if (!val) {
+      emit("fechar");
+    }
   }
 });
-
-function fechar() {
-  emit("fechar");
-}
 </script>
 
 <style scoped>
-.btn-fechar-link {
-  padding: 0.375rem 0.75rem;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-}
-
-.btn-fechar-link:hover {
-  color: var(--bs-emphasis-color) !important;
-  background-color: var(--bs-secondary-bg);
-}
-
 .impacto-container {
   max-height: 60vh;
   overflow-y: auto;

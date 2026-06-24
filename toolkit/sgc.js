@@ -76,6 +76,9 @@ criarComandoScript(frontendViews, "validacoes-auditar", "Audita links e validaco
 criarComandoScript(frontendViews, "templates-validar", "Valida previsibilidade estrutural de templates das views.", "toolkit/frontend/views-templates-validar.js");
 criarComandoScript(frontendViews, "auditar-validacoes", "Alias legado para 'validacoes-auditar'.", "toolkit/legado/frontend/views-auditar-validacoes.js");
 
+const frontendModais = frontend.command("modais").description("Auditorias especificas de modais.");
+criarComandoScript(frontendModais, "validar", "Valida o uso padronizado de ModalPadrao e proibe BModal cru fora do componente-base.", "toolkit/frontend/modais-validar.js");
+
 const frontendTestIds = frontend.command("test-ids").description("Ferramentas para atributos data-test.");
 criarComandoScript(frontendTestIds, "listar", "Lista data-test do frontend.", "toolkit/frontend/test-ids-listar.js");
 criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplicados.", "toolkit/frontend/test-ids-listar-duplicados.js");

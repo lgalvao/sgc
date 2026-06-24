@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalObservacaoAcao from "@/components/comum/ModalObservacaoAcao.vue";
+import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import {TEXTOS} from "@/constants/textos";
+import type {Analise} from "@/types/tipos";
 
 defineProps<{
     modalConcluirAberto?: boolean;
@@ -29,6 +31,9 @@ defineProps<{
     modalPermitirAvaliacaoAberto?: boolean;
     permitindo?: boolean;
     textoPermitirAvaliacao?: string;
+    modalHistoricoAberto?: boolean;
+    carregandoHistorico?: boolean;
+    historicoAnalises?: Analise[];
     testIdConfirmarConcluir?: string;
     testIdConfirmarValidar?: string;
     testIdConfirmarDevolver?: string;
@@ -54,6 +59,7 @@ defineEmits<{
     (e: "confirmarImpossibilitar"): void;
     (e: "update:modalPermitirAvaliacaoAberto", valor: boolean): void;
     (e: "confirmarPermitirAvaliacao"): void;
+    (e: "update:modalHistoricoAberto", valor: boolean): void;
 }>();
 </script>
 
@@ -171,5 +177,13 @@ defineEmits<{
         variant="success"
         @confirmar="$emit('confirmarPermitirAvaliacao')"
         @update:model-value="$emit('update:modalPermitirAvaliacaoAberto', $event)"
+    />
+
+    <HistoricoAnaliseModal
+        v-if="modalHistoricoAberto !== undefined && historicoAnalises !== undefined"
+        :historico="historicoAnalises"
+        :loading="carregandoHistorico"
+        :mostrar="modalHistoricoAberto"
+        @fechar="$emit('update:modalHistoricoAberto', false)"
     />
 </template>

@@ -1012,6 +1012,13 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("templates-validar");
     });
 
+    test("despacha ajuda da validacao de modais do frontend", async () => {
+        const resultado = await executarSgc(["frontend", "modais", "validar", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("ModalPadrao");
+        expect(resultado.stdout).toContain("componente-base");
+    });
+
     test("valida previsibilidade estrutural das views em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-views-templates-"));
         const viewsDir = path.join(base, "frontend", "src", "views");
@@ -1053,6 +1060,33 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-com-bmodal-cru")).toBe(true);
         expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-sem-layout-padrao")).toBe(true);
         expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-sem-cabecalho-padrao")).toBe(true);
+    });
+
+    test("valida padronizacao de modais em um recorte controlado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-modais-validar-"));
+        await fs.outputFile(
+            path.join(base, "frontend", "src", "components", "comum", "ModalPadrao.vue"),
+            "<template><BModal title=\"Base\" /></template>"
+        );
+        await fs.outputFile(
+            path.join(base, "frontend", "src", "components", "mapa", "ImpactoMapaModal.vue"),
+            "<template><BModal title=\"Impacto\" /></template>"
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "modais",
+            "validar",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.violacoes).toHaveLength(1);
+        expect(conteudo.violacoes[0].arquivo).toBe("frontend/src/components/mapa/ImpactoMapaModal.vue");
+        expect(conteudo.violacoes[0].regra).toBe("componente-com-bmodal-cru");
     });
 
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {

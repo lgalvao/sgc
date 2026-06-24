@@ -18,14 +18,18 @@ describe('FeedbackModal.vue', () => {
         vi.clearAllMocks()
     })
 
-    const modalStub = {
-        props: ['modelValue'],
-        template: '<div v-if="modelValue"><slot name="title" /><slot /></div>'
-    }
-
     const stubs = {
-        BModal: modalStub,
-        'b-modal': modalStub,
+        ModalPadrao: {
+            name: 'ModalPadrao',
+            props: ['modelValue', 'titulo', 'testIdTitulo'],
+            template: `
+                <div v-if="modelValue">
+                    <span :data-testid="testIdTitulo">{{ titulo }}</span>
+                    <slot />
+                    <slot name="acao" />
+                </div>
+            `
+        },
         EditorTextoRico: {
             props: ['modelValue'],
             emits: ['update:modelValue'],

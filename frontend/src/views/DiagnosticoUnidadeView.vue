@@ -164,14 +164,17 @@
     </template>
 
     <DiagnosticoFluxoModais
+        :carregando-historico="carregandoHistorico"
         :devolvendo="devolvendo"
         :erro-devolver="retornoFluxo?.variante === 'danger' ? retornoFluxo.mensagem : null"
         :erro-homologar="retornoFluxo?.variante === 'danger' ? retornoFluxo.mensagem : null"
         :erro-validar="retornoFluxo?.variante === 'danger' ? retornoFluxo.mensagem : null"
         :feedback-justificativa-devolver="mensagemErroJustificativaDevolver"
         :homologando="homologando"
+        :historico-analises="historicoAnalises"
         :justificativa-devolver="justificativaDevolver"
         :modal-devolver-aberto="modalDevolverAberto"
+        :modal-historico-aberto="modalHistoricoAberto"
         :modal-homologar-aberto="modalHomologarAberto"
         :modal-validar-aberto="modalValidarAberto"
         :observacoes-homologar="observacoesHomologar"
@@ -185,17 +188,11 @@
         @confirmar-validar="confirmarValidar"
         @update:justificativa-devolver="justificativaDevolver = $event"
         @update:modal-devolver-aberto="modalDevolverAberto = $event"
+        @update:modal-historico-aberto="modalHistoricoAberto = $event"
         @update:modal-homologar-aberto="modalHomologarAberto = $event"
         @update:modal-validar-aberto="modalValidarAberto = $event"
         @update:observacoes-homologar="observacoesHomologar = $event"
         @update:observacoes-validar="observacoesValidar = $event"
-    />
-
-    <HistoricoAnaliseModal
-        :historico="historicoAnalises"
-        :loading="carregandoHistorico"
-        :mostrar="modalHistoricoAberto"
-        @fechar="modalHistoricoAberto = false"
     />
   </LayoutPadrao>
 </template>
@@ -217,7 +214,6 @@ import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
-import HistoricoAnaliseModal from '@/components/processo/HistoricoAnaliseModal.vue';
 import SubprocessoMovimentacoes from '@/components/processo/SubprocessoMovimentacoes.vue';
 import SubprocessoResumoHeader from '@/components/processo/SubprocessoResumoHeader.vue';
 import {TEXTOS} from '@/constants/textos';

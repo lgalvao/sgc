@@ -1,13 +1,13 @@
 <template>
-    <BModal
+    <ModalPadrao
         v-if="mostrar"
+        v-model="mostrarComputado"
         :fade="false"
-        :model-value="mostrar"
-        centered
-        data-testid="mdl-historico-analise"
-        size="lg"
-        title="Histórico de análise"
-        @hide="fechar"
+        :mostrar-botao-acao="false"
+        tamanho="lg"
+        test-id-cancelar="btn-modal-fechar"
+        titulo="Histórico de análise"
+        texto-cancelar="Fechar"
     >
         <div data-testid="modal-historico-body">
             <div v-if="loading" class="text-center py-4">
@@ -99,19 +99,7 @@
                 </div>
             </template>
         </div>
-        <template #footer>
-            <div class="d-flex justify-content-end w-100 gap-3 align-items-center">
-                <BButton
-                    data-testid="btn-modal-fechar"
-                    variant="link"
-                    class="text-decoration-none text-secondary fw-medium btn-fechar-link"
-                    @click="fechar"
-                >
-                    Fechar
-                </BButton>
-            </div>
-        </template>
-    </BModal>
+    </ModalPadrao>
 
     <ModalVisualizacaoTextoFormatado
         v-model="mostrarObservacao"
@@ -123,14 +111,15 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from "vue";
-import {BButton, BModal, BSpinner, BTable} from "bootstrap-vue-next";
+import {computed, ref} from "vue";
+import {BSpinner, BTable} from "bootstrap-vue-next";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import ModalVisualizacaoTextoFormatado from "@/components/comum/ModalVisualizacaoTextoFormatado.vue";
 import type {Analise} from "@/types/tipos";
 import {formatarDataHoraBR} from "@/utils/date";
 import {extrairTextoPlanoHtml} from "@/utils/textoFormatado";
 
-defineProps<{
+const props = defineProps<{
     mostrar: boolean;
     historico: Analise[];
     loading?: boolean;
@@ -149,10 +138,14 @@ const fields = [
 
 const mostrarObservacao = ref(false);
 const observacaoSelecionada = ref("");
-
-function fechar() {
-    emit("fechar");
-}
+const mostrarComputado = computed({
+    get: () => props.mostrar,
+    set: (valor: boolean) => {
+        if (!valor) {
+            emit("fechar");
+        }
+    },
+});
 
 function abrirObservacao(observacoes: string | null | undefined) {
     observacaoSelecionada.value = observacoes || "";
@@ -192,17 +185,6 @@ function formatarAcaoAnalise(acao: string | null | undefined): string {
 </script>
 
 <style scoped>
-.btn-fechar-link {
-    padding: 0.375rem 0.75rem;
-    transition: all 0.2s;
-    border-radius: 0.375rem;
-}
-
-.btn-fechar-link:hover {
-    color: var(--bs-emphasis-color) !important;
-    background-color: var(--bs-secondary-bg);
-}
-
 .texto-truncado-usuario {
     display: inline-block;
     max-width: 16rem;

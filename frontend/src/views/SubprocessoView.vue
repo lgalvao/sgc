@@ -98,13 +98,19 @@
   </LayoutPadrao>
 
   <SubprocessoFluxoModais
+      :carregando-historico-diagnostico="carregandoHistoricoDiagnostico"
+      :concluindo-diagnostico="concluindoDiagnostico"
       :data-limite-atual="dataLimite"
       :data-fim-etapa1="subprocesso?.dataFimEtapa1 ? analisarData(subprocesso.dataFimEtapa1) : null"
+      :erro-concluir-diagnostico="erroConcluirDiagnostico"
       :etapa-atual="subprocesso?.etapaAtual ?? null"
+      :historico-analises-diagnostico="historicoAnalisesDiagnostico"
       :justificativa-reabertura="justificativaReabertura"
       :loading-data-limite="loadingDataLimite"
       :loading-lembrete="loadingLembrete"
       :loading-reabertura="loadingReabertura"
+      :modal-concluir-diagnostico-aberto="modalConcluirDiagnosticoAberto"
+      :modal-historico-diagnostico-aberto="modalHistoricoDiagnosticoAberto"
       :mensagem-erro-justificativa="mensagemErroJustificativa"
       :modal-lembrete-aberto="modalLembreteAberto"
       :mostrar-modal-alterar-data-limite="mostrarModalAlterarDataLimite"
@@ -113,35 +119,15 @@
       :tipo-reabertura="tipoReabertura"
       :ultima-data-limite-subprocesso="subprocesso?.ultimaDataLimiteSubprocesso ? analisarData(subprocesso.ultimaDataLimiteSubprocesso) : null"
       @confirmar-alteracao-data="confirmarAlteracaoDataLimite"
+      @confirmar-concluir-diagnostico="confirmarConcluirDiagnostico"
       @confirmar-enviar-lembrete="enviarLembreteConfirmado"
       @confirmar-reabertura="confirmarReabertura"
       @fechar-modal-data="fecharModalAlterarDataLimite"
       @update:justificativa-reabertura="justificativaReabertura = $event"
+      @update:modal-concluir-diagnostico-aberto="modalConcluirDiagnosticoAberto = $event"
+      @update:modal-historico-diagnostico-aberto="modalHistoricoDiagnosticoAberto = $event"
       @update:modal-lembrete-aberto="modalLembreteAberto = $event"
       @update:mostrar-modal-reabrir="mostrarModalReabrir = $event"
-  />
-
-  <ModalConfirmacao
-      v-model="modalConcluirDiagnosticoAberto"
-      :loading="concluindoDiagnostico"
-      :mensagem="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM"
-      :titulo="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
-      ok-title="Concluir diagnóstico"
-      test-id-confirmar="btn-confirmar-concluir-diagnostico-cabecalho"
-      variant="success"
-      @confirmar="confirmarConcluirDiagnostico"
-  >
-    <div>
-      <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
-      <div v-if="erroConcluirDiagnostico" class="text-danger small mt-3">{{ erroConcluirDiagnostico }}</div>
-    </div>
-  </ModalConfirmacao>
-
-  <HistoricoAnaliseModal
-      :historico="historicoAnalisesDiagnostico"
-      :loading="carregandoHistoricoDiagnostico"
-      :mostrar="modalHistoricoDiagnosticoAberto"
-      @fechar="modalHistoricoDiagnosticoAberto = false"
   />
 </template>
 
@@ -152,12 +138,10 @@ import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import SubprocessoDiagnosticoPainel from "@/components/diagnostico/SubprocessoDiagnosticoPainel.vue";
 import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoFluxoModais from "@/components/processo/SubprocessoFluxoModais.vue";
-import HistoricoAnaliseModal from "@/components/processo/HistoricoAnaliseModal.vue";
 import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimentacoes.vue";
 import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {useFluxoDiagnostico} from "@/composables/useFluxoDiagnostico";
 import {useToastStore} from "@/stores/toast";
 import {listarAnalisesDiagnostico} from "@/services/analiseService";

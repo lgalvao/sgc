@@ -158,35 +158,21 @@
       </div>
     </template>
 
-    <ModalConfirmacao
-        v-model="modalConcluirAberto"
-        :loading="concluindo"
-        :mensagem="TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM"
-        :titulo="TEXTOS.diagnostico.MODAL_CONCLUIR_TITULO"
-        ok-title="Concluir"
-        variant="success"
-        test-id-confirmar="btn-confirmar-concluir"
-        @confirmar="confirmarConcluir"
-    />
-
-    <ModalObservacaoAcao
-        :feedback-observacao="mensagemErroJustificativa"
-        :loading="impossibilitando"
-        :model-value="modalImpossibilitarAberto"
-        :observacao="justificativaImpossibilidade"
-        :obrigatoria="true"
-        :placeholder="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_PLACEHOLDER"
-        :texto="servidorParaImpossibilitar ? TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorParaImpossibilitar.servidorNome) : ''"
-        :texto-acao="TEXTOS.diagnostico.BTN_IMPOSSIBILITAR"
-        :titulo="TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_TITULO"
-        input-data-testid="textarea-justificativa-impossibilidade"
-        label="Justificativa"
-        test-id-confirmar="btn-confirmar-impossibilitar"
-        variant-acao="danger"
-        @confirmar="confirmarImpossibilitar"
-        @fechar="fecharModalImpossibilitar"
-        @update:model-value="modalImpossibilitarAberto = $event"
-        @update:observacao="justificativaImpossibilidade = $event"
+    <DiagnosticoFluxoModais
+        :concluindo="concluindo"
+        :feedback-justificativa-impossibilidade="mensagemErroJustificativa"
+        :impossibilitando="impossibilitando"
+        :justificativa-impossibilidade="justificativaImpossibilidade"
+        :modal-concluir-aberto="modalConcluirAberto"
+        :modal-impossibilitar-aberto="modalImpossibilitarAberto"
+        :texto-impossibilitar="servidorParaImpossibilitar ? TEXTOS.diagnostico.MODAL_IMPOSSIBILITAR_MENSAGEM(servidorParaImpossibilitar.servidorNome) : ''"
+        test-id-confirmar-concluir="btn-confirmar-concluir"
+        test-id-confirmar-impossibilitar="btn-confirmar-impossibilitar"
+        @confirmar-concluir="confirmarConcluir"
+        @confirmar-impossibilitar="confirmarImpossibilitar"
+        @update:justificativa-impossibilidade="justificativaImpossibilidade = $event"
+        @update:modal-concluir-aberto="modalConcluirAberto = $event"
+        @update:modal-impossibilitar-aberto="modalImpossibilitarAberto = $event"
     />
   </LayoutPadrao>
 </template>
@@ -209,8 +195,7 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
-import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
-import ModalObservacaoAcao from '@/components/comum/ModalObservacaoAcao.vue';
+import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useAutoavaliacaoDiagnosticoView} from '@/views/useAutoavaliacaoDiagnosticoView';
 
@@ -248,7 +233,6 @@ const props = defineProps<{
   navegarParaConsenso,
   abrirModalImpossibilitar,
   modalImpossibilitarAberto,
-  fecharModalImpossibilitar,
   servidorParaImpossibilitar,
   justificativaImpossibilidade,
   mensagemErroJustificativa,

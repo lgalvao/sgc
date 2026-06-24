@@ -144,10 +144,33 @@ function montar() {
                     emits: ['dismissed'],
                     template: '<div class="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
                 },
-                ModalConfirmacao: {
-                    props: ['modelValue', 'testIdConfirmar'],
-                    emits: ['update:modelValue', 'confirmar'],
-                    template: '<div v-if="modelValue"><button :data-testid="testIdConfirmar" @click="$emit(\'confirmar\')">Confirmar</button></div>',
+                DiagnosticoFluxoModais: {
+                    props: ['modalConcluirAberto', 'modalImpossibilitarAberto', 'testIdConfirmarConcluir', 'testIdConfirmarImpossibilitar', 'justificativaImpossibilidade', 'feedbackJustificativaImpossibilidade'],
+                    emits: ['confirmarConcluir', 'confirmarImpossibilitar', 'update:justificativaImpossibilidade', 'update:modalConcluirAberto', 'update:modalImpossibilitarAberto'],
+                    template: `
+                      <div>
+                        <button
+                          v-if="modalConcluirAberto"
+                          :data-testid="testIdConfirmarConcluir"
+                          @click="$emit('confirmarConcluir')"
+                        >
+                          Confirmar
+                        </button>
+                        <div v-if="modalImpossibilitarAberto">
+                          <textarea
+                            :value="justificativaImpossibilidade"
+                            @input="$emit('update:justificativaImpossibilidade', $event.target.value)"
+                          />
+                          <div v-if="feedbackJustificativaImpossibilidade">{{ feedbackJustificativaImpossibilidade }}</div>
+                          <button
+                            :data-testid="testIdConfirmarImpossibilitar"
+                            @click="$emit('confirmarImpossibilitar')"
+                          >
+                            Confirmar
+                          </button>
+                        </div>
+                      </div>
+                    `,
                 },
                 BAlert: {template: '<div><slot /></div>'},
                 BBadge: {template: '<span><slot /></span>'},
@@ -171,11 +194,6 @@ function montar() {
                 },
                 BListGroup: {template: '<div><slot /></div>'},
                 BListGroupItem: {template: '<div><slot /></div>'},
-                BModal: {
-                    props: ['modelValue'],
-                    emits: ['update:modelValue', 'hide'],
-                    template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
-                },
                 BCollapse: {template: '<div><slot /></div>'},
                 BTable: {
                     props: ['items'],

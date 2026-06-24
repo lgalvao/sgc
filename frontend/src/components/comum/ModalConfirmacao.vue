@@ -1,11 +1,19 @@
 <template>
-  <BModal
+  <ModalPadrao
       v-model="modelValueComputed"
-      :title="titulo"
-      centered
-      modal-class="modal-responsivo"
-      @hide="fechar"
+      :acao-desabilitada="okDisabled"
+      :loading="loading"
+      :test-id-cancelar="testIdCancelar"
+      :test-id-confirmar="testIdConfirmar"
+      :texto-acao="okTitle"
+      :texto-acao-carregando="okTitle === 'Confirmar' ? 'Processando...' : okTitle"
+      :texto-cancelar="cancelTitle"
+      :titulo="titulo"
+      :variant-acao="variantAcao"
+      centralizado
       @shown="onShown"
+      @confirmar="confirmar"
+      @fechar="emit('hide')"
   >
     <slot>
       <div class="d-flex align-items-start">
@@ -17,41 +25,12 @@
         <p class="mb-0 pt-1">{{ mensagem }}</p>
       </div>
     </slot>
-    <template #footer>
-      <div class="d-flex justify-content-end w-100 footer-confirmacao gap-3 align-items-center">
-        <BButton
-            ref="btnCancelar"
-            :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
-            :disabled="loading"
-            class="text-decoration-none text-secondary fw-medium btn-cancelar-link"
-            variant="link"
-            @click="fechar"
-        >
-          {{ cancelTitle }}
-        </BButton>
-        <BButton
-            :aria-busy="loading"
-            :data-testid="testIdConfirmar || 'btn-modal-confirmacao-confirmar'"
-            :disabled="loading || okDisabled"
-            :variant="((okVariant || variant || 'primary') as unknown as ButtonVariant)"
-            @click="confirmar"
-        >
-          <BSpinner
-              v-if="loading"
-              aria-hidden="true"
-              class="me-1"
-              small
-          />
-          {{ loading ? (okTitle === 'Confirmar' ? 'Processando...' : okTitle) : okTitle }}
-        </BButton>
-      </div>
-    </template>
-  </BModal>
+  </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BButton, BModal, BSpinner, type ButtonVariant} from "bootstrap-vue-next";
-import {computed, ref} from "vue";
+import {computed, nextTick} from "vue";
+import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 
 const props = withDefaults(defineProps<{
   modelValue: boolean;
@@ -86,17 +65,19 @@ const emit = defineEmits<{
   (e: 'hide'): void;
 }>();
 
-const btnCancelar = ref<InstanceType<typeof BButton> | null>(null);
-
 const modelValueComputed = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 });
-
-function fechar() {
-  emit('hide');
-  modelValueComputed.value = false;
-}
+const variantAcao = computed((): "primary" | "secondary" | "success" | "danger" => {
+  const variantCandidata = props.okVariant || props.variant || "primary";
+  return variantCandidata === "primary"
+    || variantCandidata === "secondary"
+    || variantCandidata === "success"
+    || variantCandidata === "danger"
+    ? variantCandidata
+    : "primary";
+});
 
 function confirmar() {
   emit('confirmar');
@@ -105,39 +86,12 @@ function confirmar() {
   }
 }
 
-function onShown() {
-  // UX Improvement: Auto-focus Cancel button for destructive actions
-  if (props.variant === 'danger' && btnCancelar.value?.$el) {
-    btnCancelar.value.$el.focus();
+async function onShown() {
+  if (props.variant === 'danger') {
+    await nextTick();
+    const testIdCancelar = props.testIdCancelar || 'btn-modal-confirmacao-cancelar';
+    document.querySelector<HTMLButtonElement>(`[data-testid="${testIdCancelar}"]`)?.focus();
   }
   emit('shown');
 }
 </script>
-
-<style scoped>
-@media (max-width: 576px) {
-  .footer-confirmacao {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .footer-confirmacao > button {
-    width: 100%;
-  }
-
-  :deep(.modal-responsivo .modal-dialog) {
-    margin: 0.5rem;
-  }
-}
-
-.btn-cancelar-link {
-  padding: 0.375rem 0.75rem;
-  transition: all 0.2s;
-  border-radius: 0.375rem;
-}
-
-.btn-cancelar-link:hover {
-  color: var(--bs-emphasis-color) !important;
-  background-color: var(--bs-secondary-bg);
-}
-</style>
