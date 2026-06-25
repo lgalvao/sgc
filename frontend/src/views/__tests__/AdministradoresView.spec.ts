@@ -48,31 +48,26 @@ describe("AdministradoresView.vue", () => {
                             </table>
                         `
                     },
-                    ModalConfirmacao: {
-                        name: 'ModalConfirmacao',
-                        props: ['modelValue', 'loading'],
-                        template: `<div v-if="modelValue"><slot /><button class="confirm" @click="$emit('confirmar')">OK</button></div>`,
-                        emits: ['confirmar', 'shown', 'update:modelValue']
+                    AdministradoresFluxoModais: {
+                        name: 'AdministradoresFluxoModais',
+                        props: ['mostrarModalAdicionarAdmin', 'mostrarModalRemoverAdmin', 'termoUsuario'],
+                        template: `
+                          <div>
+                            <div v-if="mostrarModalAdicionarAdmin">
+                              <input class="buscador-input" :value="termoUsuario" @input="$emit('update:termoUsuario', $event.target.value)" />
+                              <button class="confirm" @click="$emit('adicionarAdmin')">OK</button>
+                            </div>
+                            <div v-if="mostrarModalRemoverAdmin">
+                              <button class="confirm" @click="$emit('removerAdmin')">OK</button>
+                            </div>
+                          </div>`,
+                        emits: ['adicionarAdmin', 'modalAdicionarExibido', 'removerAdmin', 'update:mostrarModalAdicionarAdmin', 'update:mostrarModalRemoverAdmin', 'update:termoUsuario', 'update:usuarioSelecionado']
                     },
                     LoadingButton: {
                         props: ['loading', 'text', 'icon'],
                         template: `<button class="loading-btn" @click="$emit('click')">{{ text }}<i v-if="icon" :class="'bi bi-' + icon"></i><slot /></button>`,
                         emits: ['click']
                     },
-                    BuscadorUsuarios: {
-                        name: 'BuscadorUsuarios',
-                        props: ['termo', 'selecionado', 'state'],
-                        template: '<div><input class="buscador-input" :value="termo" @input="$emit(\'update:termo\', $event.target.value)" /></div>',
-                        emits: ['update:termo', 'update:selecionado'],
-                        methods: {
-                            focus() {
-                            },
-                            limparResultadosPesquisaUsuarios() {
-                            }
-                        }
-                    },
-                    BFormInvalidFeedback: {template: '<div><slot /></div>'},
-                    BFormGroup: {template: '<div><slot /><slot name="label" /></div>'},
                 }
             }
         });

@@ -165,15 +165,14 @@ describe("AtribuicaoTemporariaView", () => {
                     },
                     AppAlert: {template: "<div />"},
                     CarregamentoPagina: {template: "<div data-testid='loading'>Carregando...</div>"},
-                    ModalConfirmacao: {
+                    AtribuicaoTemporariaFluxoModais: {
+                        props: ["mostrarModalRemocao"],
+                        emits: ["update:mostrarModalRemocao", "confirmarRemocao"],
                         template: `
-                          <div v-if="modelValue">
-                            <slot />
-                            <button :data-testid="testIdConfirmar" @click="$emit('confirmar')">{{ okTitle }}</button>
+                          <div v-if="mostrarModalRemocao">
+                            <button data-testid="btn-confirmar-remover-atribuicao" @click="$emit('confirmarRemocao')">Remover</button>
                           </div>
                         `,
-                        props: ["modelValue", "testIdConfirmar", "okTitle", "loading", "titulo", "variant", "autoClose"],
-                        emits: ["update:modelValue", "confirmar"],
                     },
                 },
             },

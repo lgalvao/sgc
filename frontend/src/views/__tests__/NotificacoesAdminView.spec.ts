@@ -58,7 +58,24 @@ describe('NotificacoesAdminView', () => {
                     LayoutPadrao: {template: '<div><slot/></div>'},
                     CarregamentoPagina: {template: '<div data-testid="pagina-carregando"></div>'},
                     PageHeader: {template: '<div><slot name="actions"/></div>', props: ['title']},
-                    ModalConfirmacao: {template: '<div><slot/></div>', props: ['modelValue']},
+                    NotificacoesAdminFluxoModais: {
+                        props: ['mostrarPreview', 'mostrarDetalhes', 'mostrarModalReenvio', 'itemSelecionado', 'itemParaPreview', 'itemParaDetalhes'],
+                        template: `
+                          <div>
+                            <div v-if="mostrarPreview" data-testid="modal-preview-email">
+                              <iframe data-testid="iframe-preview-email" :srcdoc="itemParaPreview?.corpoHtml || ''"></iframe>
+                            </div>
+                            <div v-if="mostrarDetalhes" data-testid="modal-detalhes-notificacao">
+                              {{ itemParaDetalhes?.ultimoErro }}
+                            </div>
+                            <div v-if="mostrarModalReenvio">
+                              <p data-testid="txt-notificacoes-reenviar-confirmacao">
+                                Confirma o reenvio deste e-mail específico para {{ itemSelecionado?.destinatario }}?
+                              </p>
+                            </div>
+                          </div>
+                        `
+                    },
                     AppAlert: true,
                     EmptyState: {
                         template: '<div class="empty-state-stub"><slot/></div>',
@@ -75,10 +92,6 @@ describe('NotificacoesAdminView', () => {
                     },
                     BSpinner: true,
                     BBadge: true,
-                    BModal: {
-                        template: '<div v-if="modelValue" class="modal-stub" v-bind="$attrs"><slot/></div>',
-                        props: ['modelValue', 'title']
-                    },
                     NotificacaoTabela: {
                         template: '<div data-testid="tbl-notificacoes"><div v-for="item in items" :key="item.codigo" class="row-stub"><span>{{ item.assunto }}</span><span>{{ item.tipoNotificacao }}</span><button :data-testid="\'btn-detalhes-\' + item.codigo" @click="$emit(\'detalhes\', item)"></button><button :data-testid="\'btn-preview-\' + item.codigo" @click="$emit(\'preview\', item)"></button><button :data-testid="\'btn-notificacoes-reenviar-\' + item.codigo" @click="$emit(\'reenviar\', item)"></button></div></div>',
                         props: ['items']

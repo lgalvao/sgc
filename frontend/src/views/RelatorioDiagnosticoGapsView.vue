@@ -23,34 +23,22 @@
           @update:cod-processo-selecionado="atualizarProcessoSelecionado"
           @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
 
-      <div v-if="relatorio.length > 0" class="d-flex flex-column gap-3">
-        <BCard v-for="item in relatorio" :key="item.codigoUnidade" class="shadow-sm" data-testid="card-relatorio-gaps-diagnostico">
-          <BCardTitle class="mb-1 relatorio-diagnostico__titulo">{{ item.siglaUnidade }}</BCardTitle>
-          <BCardText class="text-muted mb-3">{{ item.nomeUnidade }}</BCardText>
-
-          <BTable
-              :fields="campos"
-              :items="item.competencias"
-              bordered
-              responsive
-              small
-          >
-            <template #cell(mediaGap)="{ item: competencia }">
-              {{ formatarMediaGap(competencia.mediaGap) }}
-            </template>
-          </BTable>
-        </BCard>
-      </div>
+      <RelatorioDiagnosticoGapsResultado
+          v-if="relatorio.length > 0"
+          :campos="campos"
+          :itens="relatorio"
+      />
     </template>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onMounted, ref} from "vue";
-import {BButton, BCard, BCardText, BCardTitle, BTable} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import RelatorioDiagnosticoGapsResultado from "@/components/relatorios/RelatorioDiagnosticoGapsResultado.vue";
 import RelatorioDiagnosticoFiltros from "@/components/relatorios/RelatorioDiagnosticoFiltros.vue";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useRelatorioAndamentoTela} from "@/composables/useRelatorioAndamentoTela";
@@ -148,19 +136,8 @@ async function exportarPdf() {
   }
 }
 
-function formatarMediaGap(mediaGap: number | null) {
-  return mediaGap == null ? "-" : mediaGap.toFixed(2);
-}
-
 onMounted(() => {
   relatoriosStore.limparRelatorio();
   carregarProcessos();
 });
 </script>
-
-<style scoped>
-.relatorio-diagnostico__titulo {
-  color: var(--bs-heading-color);
-  font-size: 1.05rem;
-}
-</style>

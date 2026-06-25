@@ -35,48 +35,37 @@
 
     <CarregamentoPagina v-else-if="!ultimoErro" :mensagem="TEXTOS.processo.CARREGANDO_DETALHES"/>
 
-    <ModalAcaoBloco
-        :id="'modal-acao-bloco'"
-        ref="modalBlocoRef"
+    <ProcessoDetalheFluxoModais
+        :descricao-processo="descricaoProcesso"
+        :ids-elegiveis="idsElegiveis"
+        :loading-finalizacao="loadingFinalizacao"
+        :registrar-modal-bloco-ref="registrarModalBlocoRef"
         :mostrar-data-limite="acaoBlocoAtual?.requerDataLimite"
-        :rotulo-botao="acaoBlocoAtual?.rotuloBotao"
-        :texto="acaoBlocoAtual?.texto"
-        :titulo="acaoBlocoAtual?.titulo"
-        :unidades="unidadesElegiveis"
-        :unidades-pre-selecionadas="idsElegiveis"
-        @confirmar="executarAcaoBloco"/>
-
-    <ModalConfirmacao
-        v-model="mostrarModalFinalizacao"
-        :loading="loadingFinalizacao"
-        :ok-title="TEXTOS.comum.BOTAO_FINALIZAR"
-        :titulo="TEXTOS.processo.FINALIZACAO_TITULO"
-        test-id-cancelar="btn-finalizar-processo-cancelar"
-        test-id-confirmar="btn-finalizar-processo-confirmar"
-        variant="danger"
-        @confirmar="confirmarFinalizacao">
-      <p class="mb-2">
-        {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO }}
-        <strong>{{ descricaoProcesso }}</strong>?
-      </p>
-      <p class="mb-0">{{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO }}</p>
-    </ModalConfirmacao>
+        :mostrar-modal-finalizacao="mostrarModalFinalizacao"
+        :processo-acao-rotulo-botao="acaoBlocoAtual?.rotuloBotao"
+        :processo-acao-texto="acaoBlocoAtual?.texto"
+        :processo-acao-titulo="acaoBlocoAtual?.titulo"
+        :unidades-elegiveis="unidadesElegiveis"
+        @confirmar-finalizacao="confirmarFinalizacao"
+        @executar-acao-bloco="executarAcaoBloco"
+        @update:mostrar-modal-finalizacao="mostrarModalFinalizacao = $event"
+    />
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import ProcessoDetalheFluxoModais from "@/components/processo/ProcessoDetalheFluxoModais.vue";
 import ProcessoAcoes from "@/components/processo/ProcessoAcoes.vue";
 import ProcessoSubprocessosTable from "@/components/processo/ProcessoSubprocessosTable.vue";
 import {useNotification} from "@/composables/useNotification";
 import {useProcessoQuery} from "@/composables/useProcessoQuery";
 import {useProcessoAcoes} from "@/views/processoDetalheAcoes";
+import type {ModalAcaoBlocoRef} from "@/views/processoDetalheTipos";
 import {usePerfil} from "@/composables/usePerfil";
 import type {Processo} from "@/types/tipos";
 import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
@@ -157,6 +146,10 @@ const {
   notify,
   registrarErro,
 });
+
+function registrarModalBlocoRef(instancia: unknown) {
+  modalBlocoRef.value = (instancia as ModalAcaoBlocoRef | null) ?? null;
+}
 
 async function abrirDetalhesUnidade(row: LinhaCliqueSubprocesso) {
   if (!row.clickable || !row.sigla) {

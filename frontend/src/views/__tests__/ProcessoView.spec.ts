@@ -333,8 +333,55 @@ const BButtonStub = {
 };
 
 const stubsProcessoDetalhe = {
-    ModalAcaoBloco: ModalAcaoBlocoStub,
-    ModalConfirmacao: ModalConfirmacaoStub,
+    ProcessoDetalheFluxoModais: {
+        name: "ProcessoDetalheFluxoModais",
+        components: {
+            ModalAcaoBloco: ModalAcaoBlocoStub,
+            ModalConfirmacao: ModalConfirmacaoStub,
+        },
+        props: [
+            "descricaoProcesso",
+            "idsElegiveis",
+            "loadingFinalizacao",
+            "registrarModalBlocoRef",
+            "mostrarDataLimite",
+            "mostrarModalFinalizacao",
+            "processoAcaoRotuloBotao",
+            "processoAcaoTexto",
+            "processoAcaoTitulo",
+            "unidadesElegiveis"
+        ],
+        emits: ["confirmarFinalizacao", "executarAcaoBloco", "update:mostrarModalFinalizacao"],
+        template: `
+          <div>
+            <ModalAcaoBloco
+              :ref="registrarModalBlocoRef"
+              :unidades="unidadesElegiveis"
+              :titulo="processoAcaoTitulo"
+              :texto="processoAcaoTexto"
+              :rotuloBotao="processoAcaoRotuloBotao"
+              :mostrarDataLimite="mostrarDataLimite"
+              :unidadesPreSelecionadas="idsElegiveis"
+              @confirmar="$emit('executarAcaoBloco', $event)"
+            />
+            <ModalConfirmacao
+              :modelValue="mostrarModalFinalizacao"
+              :loading="loadingFinalizacao"
+              titulo="Finalizar"
+              variant="danger"
+              okTitle="Finalizar"
+              @confirmar="$emit('confirmarFinalizacao')"
+              @update:modelValue="$emit('update:mostrarModalFinalizacao', $event)"
+            >
+              <p>
+                ${TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO}
+                <strong>{{ descricaoProcesso }}</strong>?
+              </p>
+              <p>${TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO}</p>
+            </ModalConfirmacao>
+          </div>
+        `
+    },
     ProcessoSubprocessosTable: TreeTableStub,
     PageHeader: PageHeaderStub,
     ProcessoInfo: ProcessoInfoStub,

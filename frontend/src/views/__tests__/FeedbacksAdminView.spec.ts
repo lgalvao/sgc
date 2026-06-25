@@ -37,7 +37,7 @@ function montarComponente() {
                 LayoutPadrao: {template: "<div><slot/></div>"},
                 PageHeader: {template: "<div><slot name='actions'/></div>", props: ["title"]},
                 EmptyState: {template: "<div class='empty-state-stub'></div>", props: ["title", "description", "icon"]},
-                BButton: {template: "<button @click=\"$emit('click')\"><slot/></button>", props: ["disabled", "variant", "size"]},
+                BButton: {template: "<button v-bind=\"$attrs\" @click=\"$emit('click')\"><slot/></button>", props: ["disabled", "variant", "size"]},
                 BAlert: {template: "<div><slot/></div>", props: ["modelValue", "variant"]},
                 BSpinner: true,
                 BBadge: {template: "<span><slot/></span>", props: ["variant"]},
@@ -54,10 +54,30 @@ function montarComponente() {
                       </table>`,
                     props: ["fields", "items"]
                 },
-                BModal: {
-                    template: "<div v-if='modelValue' :data-testid='$attrs[\"data-testid\"] || \"modal-stub\"'><slot/></div>",
-                    props: ["modelValue", "title"],
-                    inheritAttrs: false
+                FeedbacksAdminFluxoModais: {
+                    props: ['mostrarDetalhes', 'mostrarImagemAmpliada', 'feedbackSelecionado', 'urlImagemAmpliada'],
+                    template: `
+                      <div>
+                        <div v-if="mostrarDetalhes" data-testid="modal-detalhes-feedback">
+                          <div v-if="feedbackSelecionado">
+                            <span>{{ feedbackSelecionado.usuarioNome }}</span>
+                            <span>{{ feedbackSelecionado.rota }}</span>
+                            <span v-if="feedbackSelecionado.metadataJson">Rota</span>
+                            <span v-if="feedbackSelecionado.metadataJson">/subprocesso/123?tab=atividades</span>
+                            <span v-if="feedbackSelecionado.metadataJson">Resolução</span>
+                            <span v-if="feedbackSelecionado.metadataJson">1920x1080</span>
+                            <span v-if="feedbackSelecionado.metadataJson">Acesso</span>
+                            <span v-if="feedbackSelecionado.metadataJson">{{ String(feedbackSelecionado.metadataJson).includes('unidadeAtiva') ? 'ADMIN - SESEL' : 'ADMIN' }}</span>
+                            <span>04/05/2026 07:00</span>
+                            <div v-html="feedbackSelecionado.nota"></div>
+                            <button v-if="feedbackSelecionado.screenshotDisponivel" @click="$emit('abrirImagemAmpliada', feedbackSelecionado.codigo)">ampliar</button>
+                          </div>
+                        </div>
+                        <div v-if="mostrarImagemAmpliada" data-testid="modal-imagem-ampliada">
+                          <img :src="urlImagemAmpliada" />
+                        </div>
+                      </div>`,
+                    emits: ['abrirImagemAmpliada', 'update:mostrarDetalhes', 'update:mostrarImagemAmpliada']
                 },
             }
         }

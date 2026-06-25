@@ -63,69 +63,39 @@
         </template>
       </BTable>
 
-      <!-- Modal: Adicionar administrador -->
-      <ModalConfirmacao
-          v-model="mostrarModalAdicionarAdmin"
-          :auto-close="false"
-          :loading="adicionandoAdmin"
-          :ok-title="TEXTOS.comum.BOTAO_CRIAR"
-          :titulo="TEXTOS.administracao.MODAL_ADICIONAR_TITULO"
-          variant="success"
-          @confirmar="adicionarAdmin"
-          @shown="() => inputTituloRef?.focus()"
-      >
-        <BAlert v-if="erroAdicionarAdmin" :model-value="true" class="mb-3" dismissible variant="danger">
-          {{ erroAdicionarAdmin }}
-        </BAlert>
-        <BFormGroup
-            class="mb-3"
-        >
-          <BuscadorUsuarios
-              id="tituloEleitoral"
-              ref="inputTituloRef"
-              v-model:selecionado="usuarioSelecionado"
-              v-model:termo="termoUsuario"
-              :placeholder="TEXTOS.administracao.PLACEHOLDER_TITULO"
-              :state="mensagemErroNovoAdmin ? false : null"
-              @keydown.enter.prevent="adicionarAdmin"
-          />
-          <BFormInvalidFeedback :state="mensagemErroNovoAdmin ? false : null">
-            {{ mensagemErroNovoAdmin }}
-          </BFormInvalidFeedback>
-        </BFormGroup>
-      </ModalConfirmacao>
-
-      <!-- Modal: Remover administrador -->
-      <ModalConfirmacao
-          v-model="mostrarModalRemoverAdmin"
-          :auto-close="false"
-          :loading="removendoAdmin !== null"
-          :ok-title="TEXTOS.comum.BOTAO_REMOVER"
-          :titulo="TEXTOS.administracao.MODAL_REMOVER_TITULO"
-          variant="danger"
-          @confirmar="removerAdmin"
-      >
-        <BAlert v-if="erroRemoverAdmin" :model-value="true" class="mb-3" dismissible variant="danger">
-          {{ erroRemoverAdmin }}
-        </BAlert>
-        <p v-if="adminParaRemover">
-          {{ TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(adminParaRemover.nome) }}
-        </p>
-      </ModalConfirmacao>
+      <AdministradoresFluxoModais
+          :adicionando-admin="adicionandoAdmin"
+          :admin-para-remover="adminParaRemover"
+          :erro-adicionar-admin="erroAdicionarAdmin"
+          :erro-remover-admin="erroRemoverAdmin"
+          :input-titulo-ref="inputTituloRef"
+          :mensagem-erro-novo-admin="mensagemErroNovoAdmin"
+          :mostrar-modal-adicionar-admin="mostrarModalAdicionarAdmin"
+          :mostrar-modal-remover-admin="mostrarModalRemoverAdmin"
+          :removendo-admin="removendoAdmin"
+          :termo-usuario="termoUsuario"
+          :usuario-selecionado="usuarioSelecionado"
+          @adicionar-admin="adicionarAdmin"
+          @modal-adicionar-exibido="() => inputTituloRef?.focus()"
+          @remover-admin="removerAdmin"
+          @update:mostrar-modal-adicionar-admin="mostrarModalAdicionarAdmin = $event"
+          @update:mostrar-modal-remover-admin="mostrarModalRemoverAdmin = $event"
+          @update:termo-usuario="termoUsuario = String($event ?? '')"
+          @update:usuario-selecionado="usuarioSelecionado = ($event as string | null)"
+      />
     </template>
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormGroup, BFormInvalidFeedback, BSpinner, BTable} from 'bootstrap-vue-next';
+import {BAlert, BButton, BSpinner, BTable} from 'bootstrap-vue-next';
 
+import AdministradoresFluxoModais from '@/components/administracao/AdministradoresFluxoModais.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
-import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
-import BuscadorUsuarios from '@/components/comum/BuscadorUsuarios.vue';
 import {useAdministradoresTela} from '@/composables/useAdministradoresTela';
 import {TEXTOS} from '@/constants/textos';
 

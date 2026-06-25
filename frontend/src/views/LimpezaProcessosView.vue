@@ -49,29 +49,23 @@
       </div>
     </BCard>
 
-    <ModalConfirmacao
-        v-model="mostrarConfirmacao"
-        :auto-close="false"
-        :loading="excluindo"
-        :ok-title="TEXTOS.comum.BOTAO_REMOVER"
-        :titulo="TEXTOS.administracao.LIMPEZA_MODAL_TITULO"
-        variant="danger"
-        @confirmar="confirmarExclusao"
-    >
-      <p v-if="codigoConfirmacao">
-        {{ TEXTOS.administracao.LIMPEZA_MODAL_TEXTO(codigoConfirmacao) }}
-      </p>
-    </ModalConfirmacao>
+    <LimpezaProcessosFluxoModais
+        :codigo-confirmacao="codigoConfirmacao ?? null"
+        :excluindo="excluindo"
+        :mostrar-confirmacao="mostrarConfirmacao"
+        @confirmar-exclusao="confirmarExclusao"
+        @update:mostrar-confirmacao="mostrarConfirmacao = $event"
+    />
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {BAlert, BCard, BFormGroup, BFormInput} from 'bootstrap-vue-next';
 import AppAlert from '@/components/comum/AppAlert.vue';
+import LimpezaProcessosFluxoModais from '@/components/administracao/LimpezaProcessosFluxoModais.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
-import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useLimpezaProcessosTela} from '@/composables/useLimpezaProcessosTela';
 

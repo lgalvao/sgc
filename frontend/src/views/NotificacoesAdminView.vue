@@ -55,95 +55,34 @@
       </template>
     </template>
 
-    <ModalPadrao
-        v-model="mostrarPreview"
-        :mostrar-botao-acao="false"
-        :test-id-cancelar="'btn-fechar-preview-email'"
-        :texto-cancelar="'Fechar'"
-        :titulo="itemParaPreview?.assunto ?? 'Preview do e-mail'"
-        data-testid="modal-preview-email"
-        tamanho="lg"
-    >
-      <div v-if="itemParaPreview" class="p-3">
-        <div class="mb-3 border-bottom pb-2">
-          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_DESTINATARIO }}:</strong> {{
-            itemParaPreview.destinatario
-          }}<br>
-          <strong>{{ TEXTOS.administracao.NOTIFICACOES_PREVIEW_CRIACAO }}:</strong>
-          {{ formatarDataOuHifen(itemParaPreview.dataHoraCriacao) }}
-        </div>
-        <iframe
-            :srcdoc="montarPreviewHtml(itemParaPreview.corpoHtml)"
-            class="email-content-preview"
-            data-testid="iframe-preview-email"
-            sandbox=""
-            title="Preview do e-mail"
-        />
-      </div>
-    </ModalPadrao>
-
-    <ModalPadrao
-        v-model="mostrarDetalhes"
-        :mostrar-botao-acao="false"
-        data-testid="modal-detalhes-notificacao"
-        tamanho="lg"
-        texto-cancelar="Fechar"
-        titulo="Detalhes da notificação"
-    >
-      <div v-if="itemParaDetalhes" class="p-3">
-        <dl class="row mb-0 detalhes-notificacao">
-          <dt class="col-sm-4">Destinatário</dt>
-          <dd class="col-sm-8">{{ itemParaDetalhes.destinatario }}</dd>
-
-          <dt class="col-sm-4">Tipo</dt>
-          <dd class="col-sm-8">{{ formatarTipoNotificacao(itemParaDetalhes.tipoNotificacao) }}</dd>
-
-          <dt class="col-sm-4">Situação</dt>
-          <dd class="col-sm-8">{{ obterStatusNotificacao(itemParaDetalhes.situacao).label }}</dd>
-
-          <dt class="col-sm-4">Criado em</dt>
-          <dd class="col-sm-8">{{ formatarDataOuHifen(itemParaDetalhes.dataHoraCriacao) }}</dd>
-
-          <dt class="col-sm-4">Enviado em</dt>
-          <dd class="col-sm-8">{{ formatarDataOuHifen(itemParaDetalhes.dataHoraEnvio) }}</dd>
-
-          <dt class="col-sm-4">Próxima tentativa</dt>
-          <dd class="col-sm-8">{{ formatarDataOuHifen(itemParaDetalhes.proximaTentativaEm) }}</dd>
-
-          <dt class="col-sm-4">Falhas anteriores</dt>
-          <dd class="col-sm-8">{{ itemParaDetalhes.tentativas }}</dd>
-
-          <dt class="col-sm-4">Último erro</dt>
-          <dd class="col-sm-8 text-break">{{ formatarTextoOuHifen(itemParaDetalhes.ultimoErro) }}</dd>
-        </dl>
-      </div>
-    </ModalPadrao>
-
-    <ModalConfirmacao
-        v-model="mostrarModalReenvio"
-        :auto-close="false"
-        :loading="reenviando"
-        :ok-title="TEXTOS.administracao.NOTIFICACOES_REENVIAR"
-        :titulo="TEXTOS.administracao.NOTIFICACOES_MODAL_REENVIAR_TITULO"
-        test-id-confirmar="btn-notificacoes-reenviar-confirmar"
-        variant="danger"
-        @confirmar="reenviar"
-    >
-      <p v-if="itemSelecionado" data-testid="txt-notificacoes-reenviar-confirmacao">
-        Confirma o reenvio deste e-mail específico para {{ itemSelecionado.destinatario }}?
-      </p>
-    </ModalConfirmacao>
+    <NotificacoesAdminFluxoModais
+        :formatar-data-ou-hifen="formatarDataOuHifen"
+        :formatar-texto-ou-hifen="formatarTextoOuHifen"
+        :formatar-tipo-notificacao="formatarTipoNotificacao"
+        :item-para-detalhes="itemParaDetalhes"
+        :item-para-preview="itemParaPreview"
+        :item-selecionado="itemSelecionado"
+        :montar-preview-html="montarPreviewHtml"
+        :mostrar-detalhes="mostrarDetalhes"
+        :mostrar-modal-reenvio="mostrarModalReenvio"
+        :mostrar-preview="mostrarPreview"
+        :obter-status-notificacao="(situacao) => obterStatusNotificacao(situacao ?? '')"
+        :reenviando="reenviando"
+        @confirmar-reenvio="reenviar"
+        @update:mostrar-detalhes="mostrarDetalhes = $event"
+        @update:mostrar-modal-reenvio="mostrarModalReenvio = $event"
+        @update:mostrar-preview="mostrarPreview = $event"
+    />
   </LayoutPadrao>
 </template>
 
 <script lang="ts" setup>
 import {computed, ref} from "vue";
 import {BAlert, BButton} from "bootstrap-vue-next";
+import NotificacoesAdminFluxoModais from "@/components/administracao/NotificacoesAdminFluxoModais.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
-import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import NotificacaoTabela from "@/components/administracao/NotificacaoTabela.vue";
 import {

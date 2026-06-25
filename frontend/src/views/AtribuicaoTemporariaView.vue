@@ -158,18 +158,12 @@
         </div>
       </BForm>
 
-      <ModalConfirmacao
-          v-model="mostrarModalRemocao"
-          :loading="carregando"
-          :auto-close="false"
-          :ok-title="TEXTOS.comum.BOTAO_REMOVER"
-          :titulo="TEXTOS.atribuicaoTemporaria.MODAL_REMOVER_TITULO"
-          test-id-confirmar="btn-confirmar-remover-atribuicao"
-          variant="danger"
-          @confirmar="removerAtribuicao"
-      >
-        <p class="mb-0">{{ TEXTOS.atribuicaoTemporaria.MODAL_REMOVER_TEXTO }}</p>
-      </ModalConfirmacao>
+      <AtribuicaoTemporariaFluxoModais
+          :carregando="carregando"
+          :mostrar-modal-remocao="mostrarModalRemocao"
+          @confirmar-remocao="removerAtribuicao"
+          @update:mostrar-modal-remocao="mostrarModalRemocao = $event"
+      />
     </div>
   </LayoutPadrao>
 </template>
@@ -180,11 +174,11 @@ import {ref} from "vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
+import AtribuicaoTemporariaFluxoModais from "@/components/unidade/AtribuicaoTemporariaFluxoModais.vue";
 import InputData from "@/components/comum/InputData.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
 import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
-import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import {useAtribuicaoTemporariaTela} from "@/composables/useAtribuicaoTemporariaTela";
 import {TEXTOS} from "@/constants/textos";
 import {obterHojeFormatado} from "@/utils/date";

@@ -51,9 +51,9 @@ describe('LimpezaProcessosView', () => {
                         template: '<button class="btn-stub" @click="$emit(\'click\')"><slot/></button>',
                         props: ['loading', 'text']
                     },
-                    ModalConfirmacao: {
-                        template: '<div v-if="modelValue" class="modal-stub"><button @click="$emit(\'confirmar\')">Confirmar</button></div>',
-                        props: ['modelValue']
+                    LimpezaProcessosFluxoModais: {
+                        template: '<div v-if="mostrarConfirmacao" class="modal-stub"><button @click="$emit(\'confirmarExclusao\')">Confirmar</button></div>',
+                        props: ['mostrarConfirmacao']
                     },
                     BAlert: {template: '<div><slot/></div>'},
                     BCard: {template: '<div><slot/></div>'},
