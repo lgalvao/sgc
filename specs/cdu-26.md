@@ -1,4 +1,4 @@
-# CDU-26 - Homologar validação de mapas de competências em bloco
+# CDU-26 - Homologar validação de mapas em bloco
 
 **Ator:** ADMIN
 
@@ -42,7 +42,6 @@
    relevante do subprocesso.
 
    9.1. O sistema registra uma movimentação para o subprocesso:
-
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: "ADMIN"
     - `Unidade destino`: "ADMIN"
@@ -51,7 +50,6 @@
    9.2. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
 
    9.3. O sistema cria internamente um alerta:
-
     - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
     - `Processo`: [DESCRIÇÃO_PROCESSO]
     - `Data/hora`: [Data/hora atual]

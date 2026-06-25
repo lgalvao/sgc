@@ -1,27 +1,27 @@
 # CDU-29 - Consultar histórico de processos
 
-**Atores:** ADMIN/GESTOR/CHEFE/SERVIDOR
+**Atores:** Todos
 
 ## Pré-condições
 
-- Usuário logado com qualquer perfil
+- Usuário logado (qualquer perfil)
 
 ## Fluxo principal
 
-1. Em qualquer tela do sistema, na barra de navegação, usuário clica `Histórico`.
+1. Na barra de navegação, o usuário aciona `Histórico`.
 
-2. Sistema apresenta uma tabela com os processos com situação 'Finalizado' visíveis ao perfil logado, com:
-
+2. O sistema apresenta uma tabela com os processos com situação 'Finalizado', com estas colunas:
     - `Processo`: Descrição do processo.
     - `Tipo`: Tipo do processo.
     - `Finalizado em`: Data de finalização do processo
     - `Unidades participantes`: Lista de unidades participantes, agregando pelas unidades que tiverem todas as
-      subunidades participando (da mesma forma usada no Painel)
+      subunidades participando (da mesma forma usada no `Painel`)
 
-   2.1. Regras de visibilidade:
-    - Para `SERVIDOR`, devem ser exibidos apenas os processos que incluam a sua unidade.
-    - Para os demais perfis, aplicam-se as regras gerais de visibilidade conforme o escopo da unidade ativa do usuário.
+   2.1. Os seguintes procesos finalizados serão mostrados, de acordo com o perfil:
+    - perfis SERVIDOR e CHEFE: apenas processos que incluem a unidade do usuário;
+    - perfil GESTOR: processos que incluem a unidade do usuário ou qualquer unidade subordinada (recursivamente);
+    - perfil ADMIN: todos os processos.
 
-3. Usuário clica em um processo para detalhamento.
+3. O usuário clica em um processo para detalhamento.
 
 4. O sistema apresenta a página `Detalhes do processo`, sem permitir mudanças ou mostrar botões de ação.

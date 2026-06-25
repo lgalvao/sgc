@@ -1,4 +1,4 @@
-# CDU-25 - Aceitar validação de mapas de competências em bloco
+# CDU-25 - Aceitar validação de mapas em bloco
 
 **Ator:** GESTOR
 
@@ -6,8 +6,8 @@
 
 - Usuário logado com perfil GESTOR.
 - Processo de mapeamento ou de revisão iniciado que tenha a unidade como participante.
-- Existência de subprocessos de unidades da hierarquia do usuário (ou subordinadas, recursivamente), nas situações 'Mapa
-  validado' ou 'Mapa com sugestões' e com localização atual na unidade do usuário.
+- Existência de subprocessos de unidades que estejam na hierarquia do usuário, nas situações 'Mapa validado' ou 'Mapa
+  com sugestões' e com localização atual na unidade do usuário.
 
 ## Fluxo principal
 
@@ -16,69 +16,69 @@
 2. O sistema mostra a tela `Detalhes do processo`, exibindo apenas os subprocessos das unidades que compõem a hierarquia
    do usuário (sua própria unidade e subordinadas recursivamente).
 
-3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco e se
-   houver mostra o botão `Aceitar mapas em bloco`.
+3. O sistema verifica se existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco; se
+   houver habilita a ação `Aceitar mapas em bloco`.
 
-4. O usuário clica no botão `Aceitar mapas em bloco`.
+4. O usuário aciona `Aceitar mapas em bloco`.
 
-5. O sistema abre um modal de confirmação, com os elementos a seguir:
-    - Título "Aceite de mapas em bloco";
-    - Texto "Selecione as unidades para aceite dos mapas correspondentes";
-    - Lista das unidades cujos mapas poderão ser aceitos (conforme pré-condições); devem ser apresentados para cada
-      unidade um checkbox (selecionado por padrão) ao lado da sigla e nome; e
-    - Botão `Cancelar` e botão `Registrar aceite`.
+5. O sistema abre um modal de confirmação, com:
+    - Título: "Aceite de mapas em bloco";
+    - Texto: "Selecione as unidades para aceite dos mapas correspondentes";
+    - Lista das unidades cujos mapas poderão ser aceitos; devem ser apresentados para cada unidade um checkbox
+      (selecionado por padrão) ao lado da sigla e nome da unidade;
+    - Botões `Cancelar` e `Registrar aceite`.
 
-6. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação, permanecendo na tela `Detalhes do processo`.
+6. O usuário clica em `Registrar aceite`.
 
-7. O usuário clica em `Registrar aceite`.
+7. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
-8. O sistema atua, para cada unidade selecionada, da seguinte forma:
-   8.1. Registra internamente uma análise de validação para o subprocesso:
-
+   7.1. Registra uma análise de validação para o subprocesso:
     - `Data/hora`: [Data/hora atual]
     - `Unidade`: [SIGLA_UNIDADE_ATUAL]
     - `Resultado`: "Aceite de mapa"
-    - `Observação`: "De acordo com a validação do mapa realizada pela unidade"
 
-   8.2. Registra internamente uma movimentação para o subprocesso:
-
+   7.2. Registra uma movimentação para o subprocesso:
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: "Mapa de competências aceito"
+    - `Descrição`: "Mapa aceito"
 
-   8.3. Registra internamente um alerta:
-
-    - `Descrição`: "Validação do mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
+   7.3. Registra um alerta:
+    - `Descrição`: "Validação do mapa submetida para análise: [SIGLA_UNIDADE_SUBPROCESSO]"
     - `Processo`: [DESCRIÇÃO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
 
-   8.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, com o modelo a seguir:
+   7.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, com o modelo a seguir:
 
     ```text
     Assunto: SGC: Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
 
-    A validação do mapa de competências da sua unidade no processo [DESCRIÇÃO_PROCESSO] foi aceita e submetida para análise pela unidade superior imediata.
+    A validação do mapa de competências da sua unidade no processo [DESCRIÇÃO_PROCESSO] foi aceita e submetida
+    para análise pela unidade superior imediata.
 
     Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-   8.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e envia, para cada unidade superior imediata que tenha ao menos uma subordinada direta selecionada, uma única notificação consolidada por e-mail, com o modelo a seguir:
+   7.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e envia, para cada unidade superior
+   imediata que tenha ao menos uma subordinada direta selecionada, uma única notificação consolidada por e-mail, com o
+   modelo a seguir:
 
     ```text
     Assunto: SGC: Validação de mapas de competências submetida para análise
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
 
-    A validação dos mapas de competências das unidades [LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS] no processo [DESCRIÇÃO_PROCESSO] foi submetida para análise por essa unidade.
+    A validação dos mapas de competências das unidades [LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS] 
+    no processo [DESCRIÇÃO_PROCESSO] foi submetida para análise por essa unidade.
 
     As análises já podem ser realizadas no Sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-   8.6. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
+   7.6. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O
+   sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
 
-9. O sistema mostra mensagem de confirmação: "Mapas aceitos em bloco" e redireciona para o Painel.
+8. O sistema redireciona para o Painel e mostra *toast*: "Mapas aceitos em bloco".

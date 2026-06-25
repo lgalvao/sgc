@@ -2,48 +2,52 @@
 
 Ator: ADMIN
 
-## Descrição
+## Pré-condições
 
-Permite o gerenciamento dos usuários que possuem perfil de administrador no sistema.
+- Usuário logado com perfil ADMIN.
 
 ## Fluxo principal
 
-1. O usuário clica em Configurações (ícone de engrenagem) e escolhe `Administradores`.
+1. O usuário aciona o ícone `Administradores do sistema` na barra principal.
 
-2. O sistema exibe a lista de administradores cadastrados, mostrando nome, título de eleitor, matricula e unidade de
-   lotação.
+2. O sistema mostra, botão `Adicionar` no cabeçalho; e uma tabela com os administradores cadastrados, com nome, título
+   de eleitor, matrícula, unidade de lotação e uma coluna de ações, com ícone para remover. Regras:
+    - Não deve ser mostrado o ícone de exclusão para o usuário logado.
+    - Não deve ser mostrado o ícone de exclusão para o usuário se ele for o único administrador cadastrado.
 
-3. O sistema apresenta opções para:
+---
 
-    - Adicionar novo administrador.
-    - Remover administrador existente.
+### Adição de administrador
 
-4. **<<Início de fluxo de adição de administrador>>** O usuário aciona a opção "Adicionar".
+3. O usuário aciona `Adicionar`.
 
-5. O sistema apresenta um modal com título "Adicionar administrador" contendo um campo de texto para o título eleitoral
-   do usuário e botões "Cancelar" e "Adicionar".
+4. O sistema mostra um modal com título "Adicionar administrador" com um campo para título ou nome, e botões `Cancelar`
+   e`Adicionar`.
+    - O campo deve ter texto informativo "Digite o nome ou título" e a funcionalidade de 'autocompletar', reconhecendo o
+      título ou parte do nome do usuário.
 
-6. O usuário informa o título eleitoral e clica em "Adicionar".
+5. O usuário digita o título eleitoral ou parte do nome do usuário.
 
-7. O sistema valida se o usuário existe e se já é administrador. Se houver erro, exibe mensagem de erro.
+6. O sistema realiza o "autocompletar", filtrando pelo título ou parte do nome.
+    - A lista de opções não deve incluir o usuários que já sejam administradores do sistema.
 
-8. Sistema insere o registro na tabela ADMINISTRADOR e mostra uma mensagem de sucesso "Administrador adicionado com
-   sucesso!". **<<Término de fluxo de adição de administrador>>**
+7. usuário seleciona o usuário da lista e aciona `Adicionar`.
 
-9. **<<Início de fluxo de remoção de administrador>>** O usuário aciona o ícone de exclusão em um registro da lista.
+8. O sistema registra o usuário como administrador e mostra *toast* "Administrador adicionado".
 
-10. O sistema exibe um modal com título "Confirmar remoção" e a mensagem "Deseja realmente
-    remover [NOME_DO_ADMINISTRADOR] como administrador do sistema?", com botões "Cancelar" e "Remover".
+---
 
-11. O usuário confirma clicando em "Remover".
+### Remoção de administrador
 
-12. O sistema valida se a exclusão é permitida:
-    - Verifica se o usuário está tentando remover a si mesmo.
-    - Verifica se é o único administrador do sistema.
+9. Ao lado de um servidor, o usuário aciona o ícone de exclusão.
 
-13. Se a validação falhar, o sistema exibe mensagem de erro correspondente.
+10. O sistema valida se a exclusão é permitida: um usuário não pode remover a si mesmo; e não pode remover o único
+    administrador.
+    - Essas ações são protegidas pela própria interface gráfica, mas devem ser validadas defensivamente no servidor.
 
-14. Se a validação for bem sucedida, o sistema remove o registro da tabela ADMINISTRADOR.
+11. O sistema mostra um modal com título "Confirmar remoção" e a mensagem "Realmente remover [NOME_DO_ADMINISTRADOR]
+    dos administradores do sistema?", com botões `Cancelar` e `Remover`.
 
-15. O sistema exibe mensagem "Administrador removido" e atualiza a lista. *
-    *<<Término de fluxo de remoção de administrador>>**
+12. O usuário confirma acionando `Remover`.
+    
+13. O sistema remove o usuário, mostra *toast* "Administrador removido", e atualiza a tabela de administradores na tela.

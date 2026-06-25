@@ -8,18 +8,23 @@ diagnóstico de competências são iniciados e concluídos, após passarem pela 
 Para fins de classificação estrutural (detalhada no [Glossário](_intro-glossario.md)), as unidades são divididas em:
 
 - **Unidade operacional**: Unidade de ponta, com mais de um servidor e sem unidades subordinadas.
+
 - **Unidade intermediária**: Unidade de chefia/gestão, com unidades subordinadas mas apenas um servidor (o titular)
   lotado.
-- **Unidade interoperacional**: Unidade híbrida (atua tanto como chefia quanto ponta), que possui unidades subordinadas
+
+- **Unidade interoperacional**: Unidade híbrida (atua tanto como chefia quanto "ponta"), que possui unidades subordinadas
   e também mais de um servidor lotado.
 
-Os componentes essenciais do sistema incluem:
+Os elementos essenciais do sistema incluem:
 
 - **atividades**: ações específicas desempenhadas por cada unidade no exercício de suas funções;
+
 - **conhecimentos**: conhecimentos técnicos necessários para executar cada atividade (cada atividade terá um ou mais
   conhecimentos)
+
 - **competências**: elementos sintetizantes agrupando atividades relacionadas, criadas e mantidas apenas pelo perfil
   ADMIN;
+
 - **mapas de competências**: conjunto de competências associadas a uma unidade, resultante do processo de mapeamento,
   criadas e mantidas apenas pelo perfil ADMIN
 
@@ -27,8 +32,10 @@ O sistema suporta três tipos de processos:
 
 - **mapeamento**: representa o processo inicial de coleta sistemática das atividades e conhecimentos necessários para
   cada unidade operacional visando a construção do primeiro mapa de competências da unidade;
+
 - **revisão**: consiste na atualização periódica dos mapas de competências vigentes em cada unidade considerando as
   mudanças organizacionais e de atribuições;
+
 - **diagnóstico**: avalia a importância e domínio das competências pelos servidores das unidades, identificando lacunas
   (gaps) e necessidades de capacitação, a partir do mapa de competências vigente de cada unidade.
 
