@@ -82,13 +82,20 @@
                     </td>
                     <td class="coluna-capacitacao">
                       <BFormSelect
+                          v-if="habilitarCriarConsenso"
                           :data-testid="`situacao-${servidorSelecionadoTitulo}-${linha.competenciaCodigo}`"
-                          :disabled="!habilitarCriarConsenso"
                           :model-value="linha.situacaoCapacitacao"
                           :options="opcoesCapacitacao"
                           class="form-select-sm seletor-capacitacao"
                           @update:model-value="(v: unknown) => atualizarCapacitacao(servidorSelecionadoTitulo, linha.competenciaCodigo, v as ValorSituacaoCapacitacao)"
                       />
+                      <span
+                          v-else
+                          :data-testid="`situacao-${servidorSelecionadoTitulo}-${linha.competenciaCodigo}`"
+                          class="texto-situacao-capacitacao"
+                      >
+                        {{ formatarSituacaoCapacitacao(linha.situacaoCapacitacao) }}
+                      </span>
                     </td>
                   </tr>
                   </tbody>
@@ -202,12 +209,17 @@ const competenciasServidorSelecionado = computed(() => {
 // « Opções de capacitação »
 const opcoesCapacitacao = [
   {value: null, text: '-'},
-  {value: 'NA', text: TEXTOS.diagnostico.CAPACITACAO_NA},
-  {value: 'AC', text: TEXTOS.diagnostico.CAPACITACAO_AC},
-  {value: 'EC', text: TEXTOS.diagnostico.CAPACITACAO_EC},
-  {value: 'C', text: TEXTOS.diagnostico.CAPACITACAO_C},
-  {value: 'I', text: TEXTOS.diagnostico.CAPACITACAO_I},
+  {value: 'NA', text: `NA - ${TEXTOS.diagnostico.CAPACITACAO_NA}`},
+  {value: 'AC', text: `AC - ${TEXTOS.diagnostico.CAPACITACAO_AC}`},
+  {value: 'EC', text: `EC - ${TEXTOS.diagnostico.CAPACITACAO_EC}`},
+  {value: 'C', text: `C - ${TEXTOS.diagnostico.CAPACITACAO_C}`},
+  {value: 'I', text: `I - ${TEXTOS.diagnostico.CAPACITACAO_I}`},
 ];
+
+function formatarSituacaoCapacitacao(valor: ValorSituacaoCapacitacao | null): string {
+  const opcao = opcoesCapacitacao.find((o) => o.value === valor);
+  return opcao ? opcao.text : '-';
+}
 
 function varianteSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor) {
   switch (situacaoServidor) {

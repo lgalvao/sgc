@@ -243,6 +243,46 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
         expect(wrapper.text()).not.toContain('ASSESSORIA_12');
     });
 
+    it('renderiza a situacao de capacitacao como texto plano span quando habilitarCriarConsenso for falso', async () => {
+        habilitarCriarConsensoVal.value = false;
+        servidoresVal.value = [
+            {servidorTitulo: '1', servidorNome: 'Servidor A', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]},
+        ];
+        situacoesLocaisVal.value = [
+            {servidorTitulo: '1', servidorNome: 'Servidor A', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
+        ];
+
+        const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
+            props: {
+                codSubprocesso: 400,
+                siglaUnidade: 'ASSESSORIA_12',
+            },
+            global: {
+                stubs: {
+                    LayoutPadrao: {template: '<div><slot /></div>'},
+                    CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                    AppAlert: {template: '<div />'},
+                    EmptyState: {template: '<div />'},
+                    BBadge: {template: '<span><slot /></span>'},
+                    BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
+                    BCard: {template: '<section><slot /></section>'},
+                    BListGroup: {template: '<div><slot /></div>'},
+                    BListGroupItem: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
+                    BFormSelect: {template: '<select v-bind="$attrs"></select>'},
+                    BSpinner: {template: '<span />'},
+                },
+            },
+        });
+
+        await wrapper.find('[data-testid="btn-selecionar-servidor-situacao-capacitacao-1"]').trigger('click');
+
+        const span = wrapper.find('[data-testid="situacao-1-10"]');
+        expect(span.exists()).toBe(true);
+        expect(span.element.tagName).toBe('SPAN');
+        expect(span.text()).toContain('EC - Em capacitação');
+        expect(wrapper.find('select').exists()).toBe(false);
+    });
+
     it('ordena servidores com consenso aprovado no topo', () => {
         servidoresVal.value = [
             {servidorTitulo: '1', servidorNome: 'Servidor B', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', consenso: []},
