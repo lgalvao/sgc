@@ -192,6 +192,7 @@ public class DiagnosticoFluxoService {
             novaSituacao = SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO;
             diagnostico.setDataConclusao(null);
             diagnostico.getAvaliacaoServidores().forEach(avaliacao -> {
+                avaliacao.setSituacaoServidorAnterior(null);
                 if (avaliacao.getSituacaoServidor() != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA) {
                     avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
                 }

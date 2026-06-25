@@ -83,6 +83,12 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
     @WithMockGestor("666666666666")
     @DisplayName("GESTOR deve devolver para ajustes e reabrir o consenso da unidade")
     void gestorDeveDevolverParaAjustes() throws Exception {
+        buscarAvaliacoes("50003").forEach(avaliacao ->
+                avaliacao.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
+        buscarAvaliacoes("50004").forEach(avaliacao ->
+                avaliacao.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA));
+        avaliacaoServidorRepo.flush();
+
         mockMvc.perform(post(API_DIAGNOSTICO + "/devolver", subprocesso.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,11 +99,17 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         assertThat(buscarAvaliacoes("50003")).allSatisfy(avaliacao ->
-                assertThat(avaliacao.getSituacaoServidor())
-                        .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA));
+                {
+                    assertThat(avaliacao.getSituacaoServidor())
+                            .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+                    assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
+                });
         assertThat(buscarAvaliacoes("50004")).allSatisfy(avaliacao ->
-                assertThat(avaliacao.getSituacaoServidor())
-                        .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA));
+                {
+                    assertThat(avaliacao.getSituacaoServidor())
+                            .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+                    assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
+                });
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()))
                 .anySatisfy(analise -> assertThat(analise.getAcao().name()).isEqualTo("DEVOLUCAO_DIAGNOSTICO"));
     }

@@ -381,6 +381,7 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThat(avaliacao.getChefiaDominio()).isEqualTo(4);
         assertThat(avaliacao.getConsensoImportancia()).isEqualTo(4);
         assertThat(avaliacao.getConsensoDominio()).isEqualTo(2);
+        assertThat(avaliacao.getSituacaoServidorAnterior()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         assertThat(avaliacao.getObservacao()).isEqualTo(justificativa);
     }
 
@@ -394,6 +395,7 @@ class DiagnosticoAvaliacaoServiceTest {
         Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
         AvaliacaoServidor avaliacao = avaliacaoComNota(401L, 3, 2);
         avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        avaliacao.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         avaliacao.setChefiaImportancia(5);
         avaliacao.setChefiaDominio(4);
         avaliacao.setConsensoImportancia(null);
@@ -414,6 +416,43 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThat(avaliacao.getChefiaDominio()).isEqualTo(4);
         assertThat(avaliacao.getConsensoImportancia()).isNull();
         assertThat(avaliacao.getConsensoDominio()).isNull();
+        assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
+        assertThat(avaliacao.getObservacao()).isNull();
+    }
+
+    @Test
+    @DisplayName("reverterImpossibilidade: deve restaurar AUTOAVALIACAO_CONCLUIDA quando a impossibilitacao ocorreu antes de concluir consenso manual")
+    void reverterImpossibilidade_deveRestaurarSituacaoAnteriorQuandoHouverRascunhoManualSalvo() {
+        Long codSubprocesso = 8L;
+        Long diagCodigo = 80L;
+        String servidorTitulo = "servidor@titulo";
+
+        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
+        AvaliacaoServidor avaliacao = avaliacaoComNota(402L, 3, 2);
+        avaliacao.setChefiaImportancia(5);
+        avaliacao.setChefiaDominio(4);
+        avaliacao.setConsensoImportancia(4);
+        avaliacao.setConsensoDominio(3);
+        avaliacao.setImportancia(4);
+        avaliacao.setDominio(3);
+
+        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
+
+        service.impossibilitarAvaliacao(codSubprocesso, servidorTitulo, "Licença");
+
+        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+
+        service.reverterImpossibilidade(codSubprocesso, servidorTitulo);
+
+        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+        assertThat(avaliacao.getImportancia()).isEqualTo(3);
+        assertThat(avaliacao.getDominio()).isEqualTo(2);
+        assertThat(avaliacao.getChefiaImportancia()).isEqualTo(5);
+        assertThat(avaliacao.getChefiaDominio()).isEqualTo(4);
+        assertThat(avaliacao.getConsensoImportancia()).isEqualTo(4);
+        assertThat(avaliacao.getConsensoDominio()).isEqualTo(3);
+        assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
         assertThat(avaliacao.getObservacao()).isNull();
     }
 

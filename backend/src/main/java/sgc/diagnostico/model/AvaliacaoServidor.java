@@ -66,6 +66,10 @@ public class AvaliacaoServidor extends EntidadeBase {
     @Column(name = "situacao_servidor", length = 50, nullable = false)
     private SituacaoAvaliacaoServidor situacaoServidor;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "situacao_servidor_anterior", length = 50)
+    private SituacaoAvaliacaoServidor situacaoServidorAnterior;
+
     public void calculaGap() {
         if (importancia == null || dominio == null || importancia == 0 || dominio == 0) {
             gap = null;

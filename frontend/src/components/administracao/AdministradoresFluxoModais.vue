@@ -3,7 +3,7 @@
       :model-value="mostrarModalAdicionarAdmin"
       :auto-close="false"
       :loading="adicionandoAdmin"
-      :ok-title="TEXTOS.comum.BOTAO_CRIAR"
+      ok-title="Adicionar"
       :titulo="TEXTOS.administracao.MODAL_ADICIONAR_TITULO"
       variant="success"
       @confirmar="$emit('adicionarAdmin')"

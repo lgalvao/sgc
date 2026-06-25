@@ -218,8 +218,10 @@ class DiagnosticoFluxoServiceTest {
         diagnostico.setDataConclusao(LocalDateTime.now());
         AvaliacaoServidor avaliacaoAprovada = new AvaliacaoServidor();
         avaliacaoAprovada.setSituacaoServidor(SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+        avaliacaoAprovada.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         AvaliacaoServidor avaliacaoImpossibilitada = new AvaliacaoServidor();
         avaliacaoImpossibilitada.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        avaliacaoImpossibilitada.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
         diagnostico.setAvaliacaoServidores(List.of(avaliacaoAprovada, avaliacaoImpossibilitada));
 
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -245,8 +247,10 @@ class DiagnosticoFluxoServiceTest {
         assertThat(subprocesso.getDataFimEtapa1()).isNotNull();
         assertThat(avaliacaoAprovada.getSituacaoServidor())
                 .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+        assertThat(avaliacaoAprovada.getSituacaoServidorAnterior()).isNull();
         assertThat(avaliacaoImpossibilitada.getSituacaoServidor())
                 .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        assertThat(avaliacaoImpossibilitada.getSituacaoServidorAnterior()).isNull();
 
         ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
         verify(transicaoService).registrarAnaliseSemEmail(captor.capture());

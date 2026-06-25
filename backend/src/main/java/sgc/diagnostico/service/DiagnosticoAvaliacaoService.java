@@ -144,6 +144,7 @@ public class DiagnosticoAvaliacaoService {
         var avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
         avaliacoes.forEach(a -> {
+            a.setSituacaoServidorAnterior(a.getSituacaoServidor());
             a.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
             a.setObservacao(justificativa);
         });
@@ -161,28 +162,15 @@ public class DiagnosticoAvaliacaoService {
             throw new ErroEntidadeNaoEncontrada("AvaliacaoServidor", servidorTitulo);
         }
 
-        boolean temAutoavaliacaoNula = avaliacoes.stream()
-                .anyMatch(a -> a.getAutoimportancia() == null || a.getAutodominio() == null);
-
-        SituacaoAvaliacaoServidor situacaoRetorno;
-        if (temAutoavaliacaoNula) {
-            situacaoRetorno = SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA;
-        } else {
-            boolean consensoCompleto = avaliacoes.stream().allMatch(a ->
-                    a.getChefiaImportancia() != null
-                            && a.getChefiaDominio() != null
-                            && a.getConsensoImportancia() != null
-                            && a.getConsensoDominio() != null
-            );
-            if (consensoCompleto) {
-                situacaoRetorno = SituacaoAvaliacaoServidor.CONSENSO_CRIADO;
-            } else {
-                situacaoRetorno = SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA;
-            }
-        }
+        SituacaoAvaliacaoServidor situacaoRetorno = avaliacoes.stream()
+                .map(AvaliacaoServidor::getSituacaoServidorAnterior)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new ErroValidacao("Situação anterior da avaliação não informada para reverter impossibilitação."));
 
         avaliacoes.forEach(a -> {
             a.setSituacaoServidor(situacaoRetorno);
+            a.setSituacaoServidorAnterior(null);
             a.setObservacao(null);
 
             if (situacaoRetorno == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA) {
@@ -206,7 +194,6 @@ public class DiagnosticoAvaliacaoService {
 
         avaliacaoRepo.saveAll(avaliacoes);
     }
-
     public void salvarSituacoesCapacitacao(Long codSubprocesso, SituacoesCapacitacaoRequest request) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));
