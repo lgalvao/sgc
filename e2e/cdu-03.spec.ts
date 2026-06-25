@@ -254,7 +254,7 @@ test.describe('CDU-03 - Manter processo', () => {
 
         await acessarDetalhesProcesso(page, descricao);
         await page.getByTestId('btn-processo-remover-rodape').click();
-        await page.getByTestId('btn-modal-confirmacao-cancelar').click();
+        await page.getByRole('dialog').getByRole('button', {name: TEXTOS.comum.BOTAO_CANCELAR}).click();
         await expect(page.getByText(TEXTOS.processo.cadastro.REMOVER_CONFIRMACAO(descricao))).toBeHidden();
     });
 

@@ -191,7 +191,7 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
         const modal = page.getByRole('dialog');
         await expect(modal.getByRole('heading', {name: TEXTOS.atividades.MODAL_DEVOLVER_TITULO})).toBeVisible();
         await expect(modal.getByText(TEXTOS.atividades.MODAL_DEVOLVER_TEXTO)).toBeVisible();
-        await modal.getByTestId('btn-modal-confirmacao-cancelar').click();
+        await modal.getByRole('button', {name: TEXTOS.comum.BOTAO_CANCELAR}).click();
 
         await expect(modal).toBeHidden();
         await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();
@@ -230,7 +230,7 @@ test.describe.serial('CDU-13 - Cancelamentos de análise', () => {
         const modal = page.getByRole('dialog');
         await expect(modal.getByRole('heading', {name: TEXTOS.atividades.MODAL_HOMOLOGAR_TITULO})).toBeVisible();
         await expect(modal.getByText(TEXTOS.atividades.MODAL_HOMOLOGAR_TEXTO)).toBeVisible();
-        await modal.getByTestId('btn-modal-confirmacao-cancelar').click();
+        await modal.getByRole('button', {name: TEXTOS.comum.BOTAO_CANCELAR}).click();
 
         await expect(modal).toBeHidden();
         await expect(page.getByRole('heading', {name: TEXTOS.atividades.TITULO})).toBeVisible();

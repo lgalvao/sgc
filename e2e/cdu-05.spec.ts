@@ -135,7 +135,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Cleanup: remove a atividade incompleta para não quebrar os próximos testes do serial
         const card = page.getByTestId('cad-atividades__card-atividade').filter({has: page.getByText(descAtividadeInvalida)});
         await card.getByTestId('btn-remover-atividade').click();
-        await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+        await page.getByRole('dialog').getByRole('button', {name: TEXTOS.comum.BOTAO_REMOVER}).click();
     });
 
     test('Fase 1.3: CHEFE disponibiliza cadastro', async ({_resetAutomatico, page}) => {

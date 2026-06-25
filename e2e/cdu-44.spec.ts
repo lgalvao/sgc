@@ -38,7 +38,7 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
 
         // 2. Tentar concluir sem preencher nenhuma competência
         await page.getByTestId('btn-concluir-autoavaliacao').click();
-        await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM);
+        await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM);
         
         await Promise.all([
             page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/autoavaliacao/concluir`) && res.status() === 422),
@@ -71,7 +71,7 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
 
         // 4. Concluir com sucesso
         await page.getByTestId('btn-concluir-autoavaliacao').click();
-        await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM);
+        await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM);
         await Promise.all([
             page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/autoavaliacao/concluir`) && res.ok()),
             page.getByTestId('btn-confirmar-concluir').click()

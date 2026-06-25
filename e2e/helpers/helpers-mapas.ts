@@ -3,6 +3,10 @@ import {calcularDataLimite} from './helpers-processos.js';
 import {limparNotificacoes, verificarPaginaPainel, verificarToast} from './helpers-navegacao.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
+function obterModalExclusaoCompetencia(page: Page) {
+    return page.getByRole('dialog', {name: TEXTOS.mapa.EXCLUSAO_TITULO});
+}
+
 
 export async function esperarTelaMapa(page: Page) {
     await expect(page.getByRole('heading', {name: TEXTOS.mapa.TITULO_TECNICO})).toBeVisible();
@@ -130,7 +134,7 @@ export async function excluirCompetenciaConfirmando(page: Page, descricao: strin
     await card.hover();
     await card.getByTestId('btn-excluir-competencia').click();
 
-    const modal = page.getByTestId('mdl-excluir-competencia');
+    const modal = obterModalExclusaoCompetencia(page);
     await expect(modal).toBeVisible();
     await expect(modal).toContainText(descricao);
 
@@ -150,11 +154,11 @@ export async function excluirCompetenciaCancelando(page: Page, descricao: string
     await card.hover();
     await card.getByTestId('btn-excluir-competencia').click();
 
-    const modal = page.getByTestId('mdl-excluir-competencia');
+    const modal = obterModalExclusaoCompetencia(page);
     await expect(modal).toBeVisible();
     await expect(modal).toContainText(descricao);
 
-    await modal.getByTestId('btn-modal-confirmacao-cancelar').click();
+    await modal.getByRole('button', {name: TEXTOS.comum.BOTAO_CANCELAR}).click();
     await expect(modal).toBeHidden();
     await expect(page.getByText(descricao, {exact: true})).toBeVisible();
 }

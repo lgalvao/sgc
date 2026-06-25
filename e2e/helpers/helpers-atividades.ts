@@ -120,7 +120,7 @@ export async function removerAtividade(page: Page, descricao: string | RegExp) {
 
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByText(TEXTOS.atividades.MODAL_REMOVER_ATIVIDADE_TEXTO)).toBeVisible();
-    await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+    await dialog.getByRole('button', {name: TEXTOS.comum.BOTAO_REMOVER}).click();
     await expect(page.getByText(descricao)).toBeHidden();
 }
 
@@ -169,7 +169,7 @@ export async function removerConhecimento(page: Page, atividadeDescricao: string
 
     const dialog = page.getByRole('dialog');
     await expect(dialog.getByText(TEXTOS.atividades.MODAL_REMOVER_CONHECIMENTO_TEXTO)).toBeVisible();
-    await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+    await dialog.getByRole('button', {name: TEXTOS.comum.BOTAO_REMOVER}).click();
     await expect(card.getByText(conhecimento)).toBeHidden();
 }
 

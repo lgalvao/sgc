@@ -1733,13 +1733,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const cardExcluir = page.getByTestId('cad-mapa__card-competencia').filter({has: page.getByText(competencia1, {exact: true})});
             await cardExcluir.hover();
             await cardExcluir.getByTestId('btn-excluir-competencia').click();
-            const modalExclusao = page.getByTestId('mdl-excluir-competencia');
+            const modalExclusao = page.getByRole('dialog', {name: TEXTOS.mapa.EXCLUSAO_TITULO});
             await expect(modalExclusao).toBeVisible();
             await capturarTela(page, 'mapa-modais', 'modal-excluir-competencia', {
                 tags: ['modal', 'exclusao'],
                 extra: {competencia: competencia1}
             });
-            await modalExclusao.getByTestId('btn-modal-confirmacao-cancelar').click();
+            await modalExclusao.getByRole('button', {name: TEXTOS.comum.BOTAO_CANCELAR}).click();
             await expect(modalExclusao).toBeHidden();
             await expect(page.getByText(competencia1, {exact: true})).toBeVisible();
             await capturarTela(page, 'mapa-modais', 'competencia-mantida-apos-cancelar-exclusao', {
@@ -1985,8 +1985,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 extra: {conhecimento: conhecimentoDesc}
             });
             // Cancelar remoção
-            await page.getByRole('dialog').last().getByTestId('btn-modal-confirmacao-cancelar').click();
-            await expect(page.getByRole('dialog')).toBeHidden();
+            await modalRemoverConhecimento.getByRole('button', {name: TEXTOS.comum.BOTAO_CANCELAR}).click();
+            await expect(modalRemoverConhecimento).toBeHidden();
             await expect(cardComConhecimento.getByText(conhecimentoDesc)).toBeVisible();
             await capturarTela(page, 'remocao', 'conhecimento-mantido-apos-cancelar', {
                 tags: ['cancelamento', 'conhecimento']
@@ -2008,7 +2008,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 extra: {atividade: atividadeDesc}
             });
             // Confirmar remoção
-            await page.getByTestId('btn-modal-confirmacao-confirmar').click();
+            await modalRemoverAtividade.getByRole('button', {name: TEXTOS.comum.BOTAO_REMOVER}).click();
             await expect(page.getByText(atividadeDesc, {exact: true})).toBeHidden();
             await capturarTela(page, 'remocao', 'atividade-removida', {
                 tags: ['remocao', 'confirmado']

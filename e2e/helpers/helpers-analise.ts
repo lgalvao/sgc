@@ -174,13 +174,13 @@ export async function cancelarDevolucao(page: Page) {
     await btnDevolver.click();
 
     // Verificar modal de devolução
-    const modal = page.getByRole('dialog');
+    const modal = page.getByRole('dialog').filter({has: page.getByTestId('btn-devolucao-cadastro-confirmar')});
     await expect(modal).toBeVisible();
 
-    await modal.getByTestId('btn-modal-confirmacao-cancelar').click();
+    await modal.getByRole('button', {name: TEXTOS.comum.BOTAO_CANCELAR}).click();
 
     // Verificar que modal fechou
-    await expect(page.getByRole('dialog')).toBeHidden();
+    await expect(modal).toBeHidden();
 }
 
 // Funções de Aceite (GESTOR)
