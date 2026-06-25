@@ -5,7 +5,7 @@ import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-process
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
-test.describe.serial('CDU-51 - Validar diagnósticos em bloco', () => {
+test.describe.serial('CDU-51 - aceitar diagnósticos em bloco', () => {
     const UNIDADE = 'ASSESSORIA_12';
     const DESCRICAO_PROCESSO = `Diagnóstico CDU-51 ${Date.now()}`;
 

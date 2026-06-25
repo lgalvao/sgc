@@ -4,7 +4,3 @@ Na tela DiagnosticoUnidadeView, alertas de erro de validação devem sumir depoi
 aparecendo (se for o caso) apenas depois de clicar em 'Concluir diagnóstico'
 
 Breadcrumbs de diagnositico errados.
-
-Ações em bloco ADMIN/GESTOR para o diagnostico esta com ações erradas. As ações deveriam ser...
-
-Padronização de botões grandes no cabeçalho.
