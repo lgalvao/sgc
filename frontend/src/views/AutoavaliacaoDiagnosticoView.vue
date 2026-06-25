@@ -13,14 +13,13 @@
               v-if="!ehChefe && podeConcluirAutoavaliacao"
               :disabled="concluindo || !habilitarConcluirAutoavaliacao"
               data-testid="btn-concluir-autoavaliacao"
-              size="sm"
               variant="success"
               @click="abrirModalConcluir"
           >
             <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
             {{ TEXTOS.diagnostico.BTN_CONCLUIR_AUTOAVALIACAO }}
           </BButton>
-          <BButton size="sm" variant="outline-secondary" @click="voltar">
+          <BButton variant="outline-secondary" @click="voltar">
             <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
             {{ TEXTOS.diagnostico.BTN_VOLTAR }}
           </BButton>

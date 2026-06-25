@@ -4,7 +4,6 @@
         v-if="podeConcluirAvaliacao"
         :disabled="concluindoAvaliacao || !habilitarConcluirAvaliacao"
         data-testid="btn-concluir-avaliacao"
-        size="sm"
         variant="success"
         @click="$emit('concluirAvaliacao')"
     >
@@ -15,14 +14,13 @@
         v-if="podeAprovarConsenso || servidorEhUsuarioLogado"
         :disabled="aprovando || !habilitarAprovarConsenso"
         data-testid="btn-aprovar-consenso"
-        size="sm"
         variant="success"
         @click="$emit('aprovarConsenso')"
     >
       <BSpinner v-if="aprovando" aria-hidden="true" class="me-1" small/>
       {{ TEXTOS.diagnostico.BTN_APROVAR_CONSENSO }}
     </BButton>
-    <BButton size="sm" variant="outline-secondary" @click="$emit('voltar')">
+    <BButton variant="outline-secondary" @click="$emit('voltar')">
       <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
       {{ TEXTOS.diagnostico.BTN_VOLTAR }}
     </BButton>

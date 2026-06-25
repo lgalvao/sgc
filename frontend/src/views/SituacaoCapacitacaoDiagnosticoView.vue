@@ -9,7 +9,7 @@
           :title="TEXTOS.diagnostico.TITULO_SITUACAO_CAPACITACAO"
       >
         <template #actions>
-          <BButton size="sm" variant="outline-secondary" @click="void router.back()">
+          <BButton variant="outline-secondary" @click="void router.back()">
             <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
             {{ TEXTOS.diagnostico.BTN_VOLTAR }}
           </BButton>

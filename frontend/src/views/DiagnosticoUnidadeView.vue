@@ -13,7 +13,6 @@
         <template #acoes-extras>
           <BButton
               data-testid="btn-historico-analise-unidade"
-              size="sm"
               variant="outline-secondary"
               @click="abrirHistoricoAnalise"
           >
@@ -22,7 +21,6 @@
 
           <BDropdown
               v-if="podeValidar || podeDevolver || podeHomologar"
-              size="sm"
               text="Ações"
               data-testid="dropdown-acoes-diagnostico-unidade"
               toggle-class="text-nowrap"
@@ -54,7 +52,7 @@
             </BDropdownItemButton>
           </BDropdown>
 
-          <BButton size="sm" variant="outline-secondary" @click="void router.back()">
+          <BButton variant="outline-secondary" @click="void router.back()">
             <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
             {{ TEXTOS.diagnostico.BTN_VOLTAR }}
           </BButton>
