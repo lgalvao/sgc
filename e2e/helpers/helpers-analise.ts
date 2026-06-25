@@ -55,7 +55,7 @@ export async function abrirHistoricoAnalise(page: Page) {
     await expect(itemHistorico).toBeVisible();
     await itemHistorico.click();
 
-    const modal = page.getByTestId('mdl-historico-analise');
+    const modal = page.getByRole('dialog', {name: 'Histórico de análise'});
     await expect(modal).toBeVisible();
     return modal;
 }
@@ -101,7 +101,7 @@ export async function verificarAcoesAnaliseCadastro(page: Page, options: {
  * Fecha modal de histórico de análise
  */
 export async function fecharHistoricoAnalise(page: Page) {
-    const modal = page.getByTestId('mdl-historico-analise');
+    const modal = page.getByRole('dialog', {name: 'Histórico de análise'});
     const btnFechar = modal.getByTestId('btn-modal-fechar');
     await expect(btnFechar).toBeVisible();
     await btnFechar.click();

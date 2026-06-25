@@ -10,6 +10,7 @@ import {login, loginComPerfil, USUARIOS,} from './helpers/helpers-auth.js';
 import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
+import {fecharHistoricoAnalise} from './helpers/helpers-analise.js';
 
 const UNIDADE_GESTOR = 'SECRETARIA_1';
 const UNIDADE_SUBORDINADA = 'ASSESSORIA_12';
@@ -102,11 +103,10 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await verificarTelaAnaliseDiagnostico(page);
 
         await page.getByTestId('btn-historico-analise-unidade').click();
-        const modalHistorico = page.getByTestId('mdl-historico-analise');
+        const modalHistorico = page.getByRole('dialog', {name: 'Histórico de análise'});
         await expect(modalHistorico).toBeVisible();
         await expect(modalHistorico.getByTestId('alert-historico-vazio')).toBeVisible();
-        await modalHistorico.getByTestId('btn-modal-fechar').click();
-        await expect(modalHistorico).toBeHidden();
+        await fecharHistoricoAnalise(page);
     });
 
     test('ADMIN vê todas as unidades participantes na árvore do processo', async ({
@@ -153,12 +153,11 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await expect(page.getByTestId('app-alert')).toContainText(TEXTO_ACEITE);
 
         await page.getByTestId('btn-historico-analise-unidade').click();
-        const modalHistorico = page.getByTestId('mdl-historico-analise');
+        const modalHistorico = page.getByRole('dialog', {name: 'Histórico de análise'});
         await expect(modalHistorico).toBeVisible();
         await expect(modalHistorico.getByTestId('cell-unidade-0')).toHaveText(UNIDADE_GESTOR);
         await expect(modalHistorico.getByTestId('cell-resultado-0')).toContainText('Aceite');
-        await modalHistorico.getByTestId('btn-modal-fechar').click();
-        await expect(modalHistorico).toBeHidden();
+        await fecharHistoricoAnalise(page);
 
         await expect(page.getByText('Diagnóstico aceito', {exact: true})).toBeVisible();
 
@@ -200,13 +199,12 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await expect(page.getByTestId('app-alert')).toContainText(TEXTO_DEVOLUCAO);
 
         await page.getByTestId('btn-historico-analise-unidade').click();
-        const modalHistorico = page.getByTestId('mdl-historico-analise');
+        const modalHistorico = page.getByRole('dialog', {name: 'Histórico de análise'});
         await expect(modalHistorico).toBeVisible();
         await expect(modalHistorico.getByTestId('cell-unidade-0')).toHaveText(UNIDADE_GESTOR);
         await expect(modalHistorico.getByTestId('cell-resultado-0')).toContainText('Devolução');
         await expect(modalHistorico.getByTestId('cell-observacao-0')).toContainText('Ajustar consenso e rever observações.');
-        await modalHistorico.getByTestId('btn-modal-fechar').click();
-        await expect(modalHistorico).toBeHidden();
+        await fecharHistoricoAnalise(page);
 
         await expect(page.getByText('Diagnóstico devolvido para ajustes', {exact: true})).toBeVisible();
 
@@ -261,14 +259,13 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await expect(page.getByTestId('app-alert')).toContainText(TEXTO_HOMOLOGACAO);
 
         await page.getByTestId('btn-historico-analise-unidade').click();
-        const modalHistorico = page.getByTestId('mdl-historico-analise');
+        const modalHistorico = page.getByRole('dialog', {name: 'Histórico de análise'});
         await expect(modalHistorico).toBeVisible();
         await expect(modalHistorico.getByTestId('cell-unidade-0')).toHaveText('ADMIN');
         await expect(modalHistorico.getByTestId('cell-resultado-0')).toContainText('Homologação');
         await expect(modalHistorico.getByTestId('cell-unidade-1')).toHaveText(UNIDADE_GESTOR);
         await expect(modalHistorico.getByTestId('cell-resultado-1')).toContainText('Aceite');
-        await modalHistorico.getByTestId('btn-modal-fechar').click();
-        await expect(modalHistorico).toBeHidden();
+        await fecharHistoricoAnalise(page);
 
         await expect(page.getByText('Diagnóstico homologado', {exact: true}).first()).toBeVisible();
 
