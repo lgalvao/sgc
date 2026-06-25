@@ -112,7 +112,7 @@
 
 <script lang="ts" setup>
 import {computed, ref} from "vue";
-import {BSpinner, BTable} from "bootstrap-vue-next";
+import {BButton, BSpinner, BTable} from "bootstrap-vue-next";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import ModalVisualizacaoTextoFormatado from "@/components/comum/ModalVisualizacaoTextoFormatado.vue";
 import type {Analise} from "@/types/tipos";
