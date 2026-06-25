@@ -57,9 +57,6 @@ Diferença entre o valor de importância e o valor de domínio atribuídos a uma
 identificar lacunas de capacitação. Quando a importância ou o domínio forem marcados como `NA`, o gap não entra nos
 cálculos consolidados.
 
-PENDÊNCIA DE REFINAMENTO: a fórmula acima foi adotada como regra inicial de especificação e ainda precisa de validação
-funcional final com a área de negócio.
-
 ## Localização atual de subprocesso
 
 Unidade destino da última movimentação registrada para o subprocesso. É fundamental para o fluxo dos processos de

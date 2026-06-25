@@ -19,7 +19,7 @@
     - `Validar em bloco`,
     - `Devolver para ajustes`
 
-   Esta ações só devem estar habilitadas se houver ao menos um subprocesso de unidades subordinadas com situação 'Concluído'
+   Esta ações só devem estar habilitadas se houver ao menos um subprocesso de unidade subordinada com situação 'Concluído'
 
 3. O usuário aciona `Validar em bloco`
 
