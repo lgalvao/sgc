@@ -4,11 +4,12 @@
 
 ## Descrição
 
-Permite ao usuário autenticado enviar um feedback contextual sobre a tela atual, com classificação, descrição textual, metadados automáticos da navegação e captura de tela opcional.
+Permite ao usuário autenticado enviar um feedback contextual sobre a tela atual, com classificação, descrição textual,
+metadados automáticos da navegação e captura de tela opcional.
 
 ## Pré-condições
 
-- Perfil de homologação ou testes. Funcionalidade NÃO disponível em produção
+- Perfil de homologação ou testes (funcionalidade NÃO disponível em produção).
 - Usuário autenticado.
 - Widget de feedback habilitado no build atual.
 - Endpoint de feedback disponível no ambiente atual.
@@ -21,14 +22,15 @@ Permite ao usuário autenticado enviar um feedback contextual sobre a tela atual
 
 3. Se a captura for concluída com sucesso, o sistema associa a imagem ao feedback em preparação.
 
-4. Se a captura falhar ou exceder o tempo limite interno, o sistema registra a falha localmente e prossegue sem screenshot.
+4. Se a captura falhar ou exceder o tempo limite interno, o sistema registra a falha localmente e prossegue sem
+   screenshot.
 
 5. O sistema abre o modal `Enviar feedback`.
 
 6. No modal, o sistema apresenta:
-   - editor rico para a descrição;
-   - opções de classificação `Problema`, `Sugestão` e `Dúvida`;
-   - área lateral para a captura de tela.
+    - editor rico para a descrição;
+    - opções de classificação `Problema`, `Sugestão` e `Dúvida`;
+    - área lateral para a captura de tela.
 
 7. A classificação inicial do feedback é `Problema`.
 
@@ -92,8 +94,3 @@ Permite ao usuário autenticado enviar um feedback contextual sobre a tela atual
 22. Após o intervalo curto de erro, o botão flutuante volta ao estado normal.
 
 23. O usuário pode fechar o modal a qualquer momento por `Cancelar`, sem enviar o feedback.
-
-## Observações
-
-- Embora o domínio de feedback suporte o tipo `ELOGIO`, o widget atualmente não expõe essa opção ao usuário.
-- O registro persistido usa sempre o usuário autenticado no servidor como fonte de `usuarioCodigo` e `usuarioNome`, ainda que metadados do cliente informem esses campos.

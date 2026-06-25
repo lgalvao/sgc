@@ -11,12 +11,12 @@ Ator:  GESTOR ou ADMIN
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do processo`, com uma tabela hierárquica contendo as unidades participantes, com a
-   situação atual do subprocesso de cada unidade, de acordo com estas restrições:
+2. O sistema mostra a tela `Detalhes do processo`, contendo uma tabela hierárquica com a sigla, nome e situação atual do
+   subprocesso de cada unidade, de acordo com estas restrições:
     - Para o perfil GESTOR, a tabela se limita à unidade do usuário e às suas subordinadas, recursivamente.
     - Para o perfil ADMIN, a tabela mostra todas as unidades participantes.
 
-3. O usuário aciona uma unidade na tabela.
+3. O usuário aciona uma unidade na tabela hierárquica.
 
 4. O sistema mostra a tela `Detalhes do subprocesso` da unidade selecionada. Os elementos da tela serão:
     - cabeçalho com dados gerais do subprocesso e da unidade, como detalhado em [CDU-07](cdu-07.md),
@@ -26,6 +26,5 @@ Ator:  GESTOR ou ADMIN
             - `Devolver para ajustes`, mostrado tanto para GESTOR como ADMIN;
             - `Registrar aceite`, mostrada apenas para GESTOR;
             - `Homologar`, mostrada apenas para ADMIN;
-    - lista dos servidores participantes da unidade do subprocesso, **exceto o responsável pela unidade do
-      subprocesso**;
+    - lista com todos os servidores lotados da unidade do subprocesso, **exceto o responsável pela unidade**;
     - seção de `Movimentações` do subprocesso;

@@ -9,31 +9,44 @@ Atores: ADMIN e GESTOR
 
 ## Fluxo principal
 
-1. No `Painel`, o usuáio aciona um processo na situação 'Em andamento'.
+1. No `Painel`, o usuário aciona um processo na situação 'Em andamento'.
 
-2. O sistema mostra a tela `Detalhes do processo` com os dados do processo escolhido.
+2. O sistema mostra a tela `Detalhes do processo` com os dados do processo acionado, compondo a tela como a seguir:
 
-3. A tela será composta por duas seções principais:  e `Unidades participantes`.
+   3.1. Cabeçalho de dados do processo, com:
+    - Descrição, tipo e situação do processo;
+    - Para perfil ADMIN, botão `Finalizar processo` no topo da tela, sempre habilitado.
 
-   3.1. Seção `Dados do processo` (sem título):
-    - Descrição, tipo e da situação do processo;
-    - Para perfil ADMIN, botão `Finalizar processo`.
+   3.2. Botão *drop-down* `Ações em bloco`, no topo da tela, sempre habilitado, com ações que variam com o perfil e o
+   tipo de processo:
+    - Perfil GESTOR
+        - Processos de mapeamento/revisão:
+            - `Aceitar cadastros em bloco`, habilitado se existirem unidades subordinadas na situação 'Cadastro
+              disponibilizado' (mapeamento) ou 'Revisão do cadastro disponibilizada' (revisão) e suprocesso localizado
+              na unidade
+            - `Aceitar mapas em bloco`, habilitado se existirem unidades subordinadas com subprocesso nas situações
+              'Mapa validado' ou 'Mapa com sugestões' e suprocesso localizado na unidade.
+        - Processos de diagnóstico:
+            - `Aceitar diagnósticos em bloco`, se existirem unidades subordinadas com subprocesso na situação
+              'Avaliação de consenso concluída' e suprocesso localizado na unidade.
 
-   3.2. Seção `Unidades participantes`:
-    - Subárvore das unidades hierarquicamente inferiores.
-        - Para cada unidade operacional e interoperacional da subárvore são exibidas, em linha, as informações da
-          situação do subprocesso da unidade e da data limite para a conclusão da etapa atual do processo naquela
-          unidade.
-        - O usuário poderá clicar nas unidades operacionais e interoperacionais para visualizar a tela Detalhes do
-          subprocesso (ver caso de uso Detalhar subprocesso) com os dados da unidade selecionada. Caso o perfil do
-          usuário seja ADMIN, serão exibidos, na seção Dados da unidade da tela, elementos para possibilitar a alteração
-          da data limite da etapa atual da unidade assim como da situação atual do subprocesso da unidade (ex.
-          Reabertura do cadastro de atividades)
+    - Perfil ADMIN:
+        - Processos de mapeamento/revisão:
+            - `Homologar cadastros em bloco`, habilitado se existirem unidades participantes com subprocesso na situação
+              'Cadastro disponibilizado' (mapeamento) ou 'Revisão do cadastro disponibilizada' (revisão) e suprocesso
+              localizado na unidade
+            - `Homologar mapas em bloco`, habilitado se existirem unidades participantes com subprocesso nas situações
+              'Mapa validado' ou 'Mapa com sugestões' e suprocesso localizado na unidade;
+            - `Disponibilizar mapas em bloco`, habilitado se existirem unidades participantes com subprocesso nas
+              situações 'Mapa criado' (mapeamento) ou 'Mapa ajustado' (revisão) e suprocesso localizado na unidade.
 
-    - Caso existam unidades subordinadas com subprocesso localizado na unidade do usuário, os seguintes botões serão
-      apresentados, de acordo com as condições dadas:
-        - `Aceitar cadastros em bloco` ou `Homologar cadastros em bloco`, se existirem unidades subordinadas com
-          subprocesso na situação 'Cadastro disponibilizado' (processo de mapeamento) ou 'Revisão do cadastro
-          disponibilizada' (processo de revisão); ver caso de uso [Aceitar cadastros em bloco](cdu-22.md) .
-        - `Aceitar mapas em bloco` ou `Homologar mapas em bloco`, se existirem unidades subordinadas com subprocesso
-          nas situações 'Mapa validado' ou 'Mapa com sugestões'; ver caso de uso [Aceitar mapas em bloco/).
+        - Processos de diagnóstico:
+            - `Homologar diagnósticos em bloco`, habilitado se existirem unidades subordinadas com subprocesso na
+              situação 'Concluído' e suprocesso localizado na unidade.
+
+   3.3. Seção `Unidades participantes`:
+    - Subárvore das unidades hierarquicamente inferiores, incluindo a hierarquia acima até a unidade logo abaixo da raiz.
+        - Para cada unidade operacional e interoperacional da subárvore são exibidas, as informações de situação da
+          unidade e a data limite para a conclusão da etapa atual do processo naquela unidade.
+    - O usuário poderá acionar as unidades operacionais e interoperacionais para visualizar a tela `Detalhes do
+        subprocesso`

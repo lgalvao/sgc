@@ -4,7 +4,8 @@
 
 ## Descrição
 
-Permite ao administrador acompanhar as notificações de e-mail registradas pelo sistema, inspecionar seu conteúdo, consultar detalhes operacionais e reenfileirar notificações com falha definitiva.
+Permite ao administrador acompanhar as notificações de e-mail registradas pelo sistema, inspecionar seu conteúdo,
+consultar detalhes operacionais e reenfileirar notificações com falha definitiva.
 
 ## Pré-condições
 
@@ -19,39 +20,42 @@ Permite ao administrador acompanhar as notificações de e-mail registradas pelo
 3. Ao abrir a tela, o sistema consulta até 50 notificações administrativas recentes registradas no sistema.
 
 4. O sistema apresenta a listagem com as colunas:
-   - `Destinatário`
-   - `Tipo`
-   - `Assunto`
-   - `Status`
-   - `Quando`
-   - ações da linha
+    - `Destinatário`
+    - `Tipo`
+    - `Assunto`
+    - `Situação`
+    - `Quando`
+    - ações da linha
 
-5. O sistema ordena os itens priorizando notificações mais críticas primeiro. Dentro de uma mesma situação, os itens mais recentes aparecem antes.
+5. O sistema ordena os itens priorizando notificações mais críticas primeiro. Dentro de uma mesma situação, os itens
+   mais recentes aparecem antes.
 
 6. Para cada linha, o sistema pode disponibilizar as seguintes ações:
-   - `Detalhes`, para abrir os dados completos da notificação;
-   - `Preview`, quando houver corpo HTML salvo;
-   - `Reenviar`, apenas quando a situação for `Falha definitiva`.
-   - Estas são as situações de notificação: `Pendente`, `Enviando`, `Enviado`, `Falha temporária` e `Falha definitiva`.
+    - `Detalhes`, para abrir os dados completos da notificação;
+    - `Preview`, quando houver corpo HTML salvo;
+    - `Reenviar`, apenas quando a situação for `Falha definitiva`.
+    - Estas são as situações de notificação: `Pendente`, `Enviando`, `Enviado`, `Falha temporária` e `Falha definitiva`.
 
 7. Ao acionar `Detalhes`, o sistema abre um modal `Detalhes da notificação`, exibindo:
-   - destinatário;
-   - tipo;
-   - situação;
-   - criado em;
-   - enviado em;
-   - próxima tentativa;
-   - falhas anteriores;
-   - último erro.
+    - destinatário;
+    - tipo;
+    - situação;
+    - criado em;
+    - enviado em;
+    - próxima tentativa;
+    - falhas anteriores;
+    - último erro.
 
 8. Ao acionar `Preview`, o sistema abre um modal com o assunto da notificação e mostra:
-   - destinatário;
-   - data/hora de criação;
-   - conteúdo HTML do e-mail renderizado em visualização isolada.
+    - destinatário;
+    - data/hora de criação;
+    - conteúdo HTML do e-mail renderizado em visualização isolada.
 
-9. Ao acionar `Reenviar` em uma notificação com falha definitiva, o sistema mostra um modal de confirmação com a pergunta `Confirma o reenvio deste e-mail específico para [DESTINATARIO]?`.
+9. Ao acionar `Reenviar` em uma notificação com falha definitiva, o sistema mostra um modal de confirmação com a
+   pergunta `Confirma o reenvio deste e-mail específico para [DESTINATARIO]?`.
 
-10. Se o usuário confirmar, o sistema recoloca a notificação na fila de envio e mostra a mensagem `E-mail recolocado na fila de envio`.
+10. Se o usuário confirmar, o sistema recoloca a notificação na fila de envio e mostra a mensagem
+    `E-mail recolocado na fila de envio`.
 
 11. Após o reenvio com sucesso, o sistema recarrega a listagem.
 
@@ -59,4 +63,5 @@ Permite ao administrador acompanhar as notificações de e-mail registradas pelo
 
 13. Se não houver notificações para exibir, o sistema mostra o estado vazio `Sem notificações`.
 
-14. Se o ambiente não for de produção e houver URL configurada para o leitor de e-mail de testes, o sistema mostra o link `Leitor de e-mail de testes`, abrindo-o em nova aba.
+14. Se o ambiente não for de produção e houver URL configurada para o leitor de e-mail de testes, o sistema mostra o
+    link `Leitor de e-mail de testes`, abrindo-o em nova aba.

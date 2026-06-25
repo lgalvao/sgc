@@ -47,11 +47,12 @@ Fluxo principal:
 
    2.4. Na seção `Elementos do subprocesso` (sem título) serão apresentados cards acionáveis com informação variável em
    função do tipo do subprocesso, os quais darão acesso às telas específicas. As regras de exibição e habilitação dos
-   cards são definidas em função do tipo do processo e do perfil ativo, além da situação do subprocesso, como a seguir:
+   cards são definidas em função do tipo do processo e do perfil ativo, além da situação e localização do subprocesso,
+   como a seguir:
 
-   2.4.1. A seção apresentará cards para acesso ao cadastro de atividades e conhecimentos (descrição "Cadastro de
-   atividades e conhecimentos da unidade") e ao Mapa de competências (descrição "Mapa de competências da unidade").
-
+   2.4.1. A seção apresentará cards para acesso ao cadastro (descrição "Cadastro de atividades e conhecimentos da
+   unidade") e ao mapa de competências (descrição "Mapa de competências da unidade").
+   
     - O card `Atividades e conhecimentos` estará sempre habilitado para usuários com o perfil CHEFE, inclusive com
       opções para alteração do cadastro (se a situação do subprocesso permitir -- ver caso de uso "Manter cadastro de
       atividades e conhecimentos"). Para os demais perfis, a habilitação acontecerá apenas após a disponibilização do

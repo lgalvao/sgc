@@ -5,10 +5,6 @@
 ## Pré-condições
 
 - Usuário logado com perfil ADMIN
-- Existência de processo de mapeamento ou revisão em andamento com pelo menos uma unidade subordinada cujo subprocesso
-  tenha localização atual na unidade do usuário e a situação:
-    - 'Cadastro disponibilizado', para processos de mapeamento; ou
-    - 'Revisão do cadastro disponibilizada', para processos de revisão.
 
 ## Fluxo principal
 
@@ -16,30 +12,33 @@
 
 2. O sistema mostra a tela `Detalhes do processo`.
 
-3. O sistema identifica se existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do
-   cadastro de atividades (de acordo com as pré-condições) e exibe, na seção `Unidades participantes`, abaixo da árvore
-   de unidades, o botão `Homologar em bloco`.
+4. O usuário aciona `Homologar cadastros em bloco`.
 
-4. O usuário clica no botão `Homologar em bloco`.
+3. O sistema identifica as **unidades aptas** para homologação em bloco: unidades subordinadas com subprocessos
+   localizados na unidade do usuário e situação 'Cadastro disponibilizado' (mapeamento), ou 'Revisão do cadastro
+   disponibilizada' (revisão).
 
 5. O sistema abre um modal de confirmação, com os elementos a seguir:
-    - Título: "Homologação de cadastro em bloco";
-    - Texto: "Selecione as unidades para homologar o cadastro:";
-    - Lista das unidades operacionais ou interoperacionais subordinadas cujos cadastros estão aptos a homologar, com um
-      checkbox (selecionado por padrão) para cada unidade, além de sigla e nome da unidade;
-    - Botões `Cancelar` e `Homologar`.
+    - Título: "Homologação de cadastros em bloco";
+    - Texto: "Selecione as unidades para homologação do cadastro:";
+    - Grade com as unidades aptas com checkbox (marcado inicialmente) para cada unidade, além de sigla e nome da
+      unidade;
+    - Botões `Cancelar` e `Homologar em bloco`.
 
-6. O usuário clica em `Homologar`.
+6. O usuário determina as unidades a serem homologadas (marcando ou desmarcando as checkboxes) e aciona
+   `Homologar em bloco`.
 
-7. O sistema atua, para cada unidade selecionada, da seguinte forma:
+7. O sistema atua, para cada unidade marcada, da seguinte forma:
 
-   7.1. O sistema registra uma movimentação para o subprocesso da unidade:
+   7.1. Registra uma movimentação para o subprocesso da unidade:
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: "ADMIN"
     - `Unidade destino`: "ADMIN"
     - `Descrição`: "Cadastro homologado"
 
-   7.2. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
+   7.2. Altera a situação do subprocesso da unidade para 'Cadastro homologado'.
 
-8. O sistema mostra mensagem de confirmação: "Cadastros homologados em bloco" e permanece na tela
-   `Detalhes do processo`.
+   ** IMPORTANTE: Como a homologação não gera demandas de ações de outras unidades, não são gerados nem alertas nem
+   notificações neste caso de uso.
+
+8. O sistema mostra *toast* "Cadastros homologados em bloco" e permanece na tela.
