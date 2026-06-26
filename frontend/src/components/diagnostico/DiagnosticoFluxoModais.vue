@@ -9,6 +9,9 @@ defineProps<{
     modalConcluirAberto?: boolean;
     erroConcluir?: string;
     concluindo?: boolean;
+    tituloConcluir?: string;
+    mensagemConcluir?: string;
+    botaoConcluir?: string;
     modalValidarAberto?: boolean;
     observacoesValidar?: string;
     validando?: boolean;
@@ -70,16 +73,16 @@ defineEmits<{
         data-testid="modal-concluir"
         :model-value="modalConcluirAberto"
         :loading="concluindo"
-        :mensagem="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM"
-        :ok-title="TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO"
-        :titulo="TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
+        :mensagem="mensagemConcluir || TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM"
+        :ok-title="botaoConcluir || TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO"
+        :titulo="tituloConcluir || TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_TITULO"
         :test-id-confirmar="testIdConfirmarConcluir || 'btn-confirmar-concluir-diagnostico'"
         variant="success"
         @confirmar="$emit('confirmarConcluir')"
         @update:model-value="$emit('update:modalConcluirAberto', $event)"
     >
         <div>
-            <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
+            <p class="mb-0">{{ mensagemConcluir || TEXTOS.diagnostico.MODAL_CONCLUIR_DIAG_MENSAGEM }}</p>
             <div v-if="erroConcluir" class="text-danger small mt-3">{{ erroConcluir }}</div>
         </div>
     </ModalConfirmacao>

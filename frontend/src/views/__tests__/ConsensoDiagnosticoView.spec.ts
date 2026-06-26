@@ -110,6 +110,21 @@ function montar(props?: Record<string, unknown>) {
                     template: '<div><h1>{{ title }}</h1><p v-if="subtitle">{{ subtitle }}</p><slot /><slot name="actions" /></div>',
                 },
                 CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
+                DiagnosticoFluxoModais: {
+                    props: ['modalConcluirAberto', 'testIdConfirmarConcluir', 'tituloConcluir', 'mensagemConcluir', 'botaoConcluir'],
+                    emits: ['confirmarConcluir', 'update:modalConcluirAberto'],
+                    template: `
+                      <div>
+                        <button
+                          v-if="modalConcluirAberto"
+                          :data-testid="testIdConfirmarConcluir || 'btn-confirmar-concluir'"
+                          @click="$emit('confirmarConcluir')"
+                        >
+                          Confirmar
+                        </button>
+                      </div>
+                    `,
+                },
                 AppAlert: {
                     props: ['mensagem', 'chave'],
                     emits: ['dismissed'],
@@ -203,6 +218,7 @@ describe('ConsensoDiagnosticoView', () => {
         const wrapper = montar({servidorTitulo: '999999', servidorNome: 'Outro Servidor'});
 
         await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-concluir"]').trigger('click');
 
         expect(salvarConsensoAgoraMock).toHaveBeenCalledTimes(1);
         expect(concluirAvaliacaoMock).toHaveBeenCalledTimes(1);
@@ -330,6 +346,7 @@ describe('ConsensoDiagnosticoView', () => {
         const wrapper = montar({servidorTitulo: '999999', servidorNome: 'Outro Servidor'});
 
         await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-concluir"]').trigger('click');
 
         expect(wrapper.find('.app-alert').text()).toContain('Preencha todos os campos');
     });

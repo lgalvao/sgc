@@ -53,6 +53,16 @@
       />
       </div>
 
+      <DiagnosticoFluxoModais
+          :concluindo="concluindoAvaliacao"
+          :modal-concluir-aberto="modalConcluirAberto"
+          :titulo-concluir="TEXTOS.diagnostico.MODAL_CONCLUIR_CONSENSO_TITULO"
+          :mensagem-concluir="TEXTOS.diagnostico.MODAL_CONCLUIR_CONSENSO_MENSAGEM"
+          :botao-concluir="TEXTOS.diagnostico.BTN_CONCLUIR_CONSENSO"
+          test-id-confirmar-concluir="btn-confirmar-concluir"
+          @confirmar-concluir="confirmarConcluir"
+          @update:modal-concluir-aberto="modalConcluirAberto = $event"
+      />
     </template>
   </LayoutPadrao>
 </template>
@@ -67,6 +77,7 @@ import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import ConsensoDiagnosticoAcoes from '@/components/diagnostico/ConsensoDiagnosticoAcoes.vue';
 import ConsensoDiagnosticoTabela from '@/components/diagnostico/ConsensoDiagnosticoTabela.vue';
+import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
@@ -160,16 +171,22 @@ function consensoCompleto(item: ConsensoCompetenciaDetalhada): boolean {
     && item.consensoDominio !== null;
 }
 
-async function confirmarConcluirAvaliacao() {
+const modalConcluirAberto = ref(false);
+
+function confirmarConcluirAvaliacao() {
   if (competenciasLocais.value.some((item) => !consensoCompleto(item))) {
     exibirErro(TEXTOS.diagnostico.ERRO_PREENCHIMENTO_CONSENSO_INCOMPLETO);
     return;
   }
+  modalConcluirAberto.value = true;
+}
 
+async function confirmarConcluir() {
   try {
     await salvarConsensoAgora();
     concluindoAvaliacao.value = true;
     await concluirAvaliacao();
+    modalConcluirAberto.value = false;
     const toastStore = useToastStore();
     toastStore.setPending(TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
     if (contexto.value?.processoCodigo) {

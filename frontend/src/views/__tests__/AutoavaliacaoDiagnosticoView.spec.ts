@@ -145,7 +145,7 @@ function montar() {
                     template: '<div class="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
                 },
                 DiagnosticoFluxoModais: {
-                    props: ['modalConcluirAberto', 'modalImpossibilitarAberto', 'testIdConfirmarConcluir', 'testIdConfirmarImpossibilitar', 'justificativaImpossibilidade', 'feedbackJustificativaImpossibilidade'],
+                    props: ['modalConcluirAberto', 'modalImpossibilitarAberto', 'testIdConfirmarConcluir', 'testIdConfirmarImpossibilitar', 'justificativaImpossibilidade', 'feedbackJustificativaImpossibilidade', 'tituloConcluir', 'mensagemConcluir', 'botaoConcluir'],
                     emits: ['confirmarConcluir', 'confirmarImpossibilitar', 'update:justificativaImpossibilidade', 'update:modalConcluirAberto', 'update:modalImpossibilitarAberto'],
                     template: `
                       <div>

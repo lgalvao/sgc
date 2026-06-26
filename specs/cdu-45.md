@@ -61,9 +61,12 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
 
    7.1. Se houver campos não preenchidos o sistema mostra a mensagem "Preencha todos os campos" e interrompe a operação.
 
-8. O sistema muda a situação do servidor para 'Avaliação de consenso criada',
+   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão de avaliação de consenso?",
+   com botões `Cancelar` e `Concluir consenso`
 
-9. O sistema envia uma notificação por e-mail pessoal para o servidor da avaliação, com este modelo:
+   7.3. feita a confirmação,o sistema muda a situação do servidor para 'Avaliação de consenso criada',
+
+8. O sistema envia uma notificação por e-mail pessoal para o servidor da avaliação, com este modelo:
 
     ```text
     Assunto: SGC: Avaliação de consenso criada 
@@ -75,7 +78,7 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
     A aprovação dessa avaliação pode ser realizada no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
     ```
 
-10. O sistema cria internamente um alerta com estes campos/valores:
+9. O sistema cria internamente um alerta com estes campos/valores:
     - `Descrição`: "Avaliação de consenso criada"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
@@ -83,5 +86,5 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-11. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de consenso
+10. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de consenso
    criada".

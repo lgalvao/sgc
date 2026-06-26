@@ -112,9 +112,11 @@ test.describe('CDU-45 - Manter avaliação de consenso', () => {
 
         await preencherTodosOsCamposDeConsenso(page, codSubprocesso);
 
+        await page.getByTestId('btn-concluir-avaliacao').click();
+        await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_CONSENSO_MENSAGEM);
         await Promise.all([
             page.waitForURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`)),
-            page.getByTestId('btn-concluir-avaliacao').click(),
+            page.getByTestId('btn-confirmar-concluir').click(),
         ]);
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}(?:\\?.*)?$`));
         await verificarToast(page, TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
