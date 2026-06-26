@@ -39,8 +39,8 @@ import {
     preencherPrimeiraSituacaoCapacitacao
 } from '../helpers/helpers-diagnostico.js';
 import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
-import * as path from 'node:path';
-import * as fs from 'node:fs';
+
+type ProcessoCleanup = ReturnType<typeof useProcessoCleanup>;
 
 /**
  * Suite de testes para a capturar screenshots de todas as telas do sistema
@@ -55,26 +55,6 @@ interface OpcoesCapturaTela {
     tags?: string[];
 }
 
-interface CapturaMetadata {
-    ordem: number;
-    arquivo: string;
-    categoria: string;
-    nome: string;
-    rota: string;
-    titulo: string;
-    tags?: string[];
-    viewport?: { largura: number; altura: number };
-    contexto?: ContextoCaptura;
-}
-
-interface DocumentoCapturasMetadata {
-    versaoEsquema: 1;
-    geradoEm: string;
-    baseUrl: string;
-    viewportPadrao: { largura: number; altura: number };
-    capturas: CapturaMetadata[];
-}
-
 const capturasMetadata = [];
 
 /**
@@ -82,9 +62,9 @@ const capturasMetadata = [];
  */
 async function capturarTela(
     page: Page,
-    categoria: string,
-    nome: string,
-    opcoes?: OpcoesCapturaTela
+    _categoria: string,
+    _nome: string,
+    _opcoes?: OpcoesCapturaTela
 ) {
     await aguardarInterfaceEstavelParaCaptura(page);
     
@@ -95,65 +75,6 @@ async function capturarTela(
         .analyze();
         
     expect(accessibilityScanResults.violations).toEqual([]);
-}
-
-function extrairRota(url: string): string {
-    try {
-        const urlObj = new URL(url);
-        return urlObj.pathname + urlObj.search;
-    } catch {
-        return url;
-    }
-}
-
-function extrairBaseUrl(url: string): string {
-    try {
-        return new URL(url).origin;
-    } catch {
-        return '';
-    }
-}
-
-
-
-async function prepararPaginaParaCaptura(
-    page: Page,
-    isFullPage: boolean
-): Promise<{ x: number; y: number } | null> {
-    if (!isFullPage) {
-        return null;
-    }
-
-    return page.evaluate(() => {
-        const estiloId = 'sgc-captura-fullpage-style';
-        if (!document.getElementById(estiloId)) {
-            const estilo = document.createElement('style');
-            estilo.id = estiloId;
-            estilo.textContent = '.navbar.sticky-top { position: static !important; top: auto !important; }';
-            document.head.appendChild(estilo);
-        }
-
-        const scrollOriginal = {x: globalThis.scrollX, y: globalThis.scrollY};
-        globalThis.scrollTo(0, 0);
-        return scrollOriginal;
-    });
-}
-
-async function restaurarScrollAposCaptura(
-    page: Page,
-    scrollOriginal: { x: number; y: number } | null
-): Promise<void> {
-    if (!scrollOriginal || (scrollOriginal.x === 0 && scrollOriginal.y === 0)) {
-        await page.evaluate(() => {
-            document.getElementById('sgc-captura-fullpage-style')?.remove();
-        });
-        return;
-    }
-
-    await page.evaluate(({x, y}) => {
-        document.getElementById('sgc-captura-fullpage-style')?.remove();
-        globalThis.scrollTo(x, y);
-    }, scrollOriginal);
 }
 
 async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {

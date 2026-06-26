@@ -1,4 +1,4 @@
-import {TipoProcesso} from "@/types/comum";
+import {TipoProcesso} from "../types/comum.js";
 
 export const TEXTOS_TABELA_PROCESSOS = {
     EMPTY_TITLE: "Sem processos",
