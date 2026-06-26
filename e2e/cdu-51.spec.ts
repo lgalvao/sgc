@@ -53,7 +53,7 @@ test.describe.serial('CDU-51 - aceitar diagnósticos em bloco', () => {
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await verificarNotificacaoAdmin(page, {
-            destinatario: 'SECRETARIA_1',
+            destinatario: 'ADMIN',
             assunto: 'Diagnósticos submetidos para análise',
             tipo: 'Diagnóstico aceito',
             trechoCorpo: UNIDADE

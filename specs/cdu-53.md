@@ -1,4 +1,4 @@
-# CDU-52 - Finalizar processo de diagnóstico
+# CDU-53 - Finalizar processo de diagnóstico
 
 **Ator:** ADMIN
 
@@ -18,18 +18,17 @@
 4. O sistema verifica se todos os subprocessos das unidades participantes estão na situação 'Homologado'.
 
 5. Caso exista ao menos uma unidade ainda não homologada, o sistema mostra o alerta "Não é possível finalizar o
-   processo: há unidades ainda não homologadas".
+   processo: há unidades não homologadas".
 
-6. Caso todas as unidades estejam homologadas, o sistema mostra diálogo de confirmação com:
-    - título "Finalização de processo";
-    - mensagem:
-        - "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação encerrará o ciclo de diagnóstico e
-          notificará todas as unidades participantes do processo.";
-    - botões `Cancelar` e `Finalizar`.
+6. Caso todas as unidades estejam homologadas, o sistema mostra diálogo de confirmação:
+    - Título "Finalização de processo";
+    - Texto: "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação encerrará o diagnóstico e notificará
+      todas as unidades participantes.";
+    - Botões `Cancelar` e `Finalizar`.
 
-7. O usuário clica em `Finalizar`.
+7. O usuário aciona `Finalizar`.
 
-8. O sistema muda a situação do processo para `Finalizado`
+8. O sistema muda a situação do processo para 'Finalizado'.
 
 9. O sistema envia notificações por e-mail para todas as unidades participantes, como a seguir:
 
@@ -45,9 +44,9 @@
    Os resultados consolidados do diagnóstico já podem ser consultados no 
    Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
    ```
-
-   9.2. Unidades intermediárias deverão receber um e-mail com informações consolidadas das unidades operacionais e
-   interoperacionais subordinadas a elas, segundo o modelo:
+   
+   9.2. Unidades intermediárias deverão receber notificação por e-mail com informações consolidadas das unidades
+   subordinadas, segundo o modelo:
 
    ```text
    Assunto: SGC: Finalização do processo [DESCRICAO_PROCESSO] em unidades subordinadas

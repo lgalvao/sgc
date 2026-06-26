@@ -1,57 +1,70 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoDiagnosticoHomologadoFixture} from './fixtures/index.js';
-import {TEXTOS_RELATORIOS} from '../frontend/src/constants/textos-relatorios.js';
+import {criarProcessoDiagnosticoConcluidoFixture, criarProcessoDiagnosticoHomologadoFixture} from './fixtures/index.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
+import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
+import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
-test.describe('CDU-53 - Gerar relatório de gaps de diagnóstico', () => {
-    test('ADMIN visualiza o relatório e exporta PDF', async ({
+test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
+    const UNIDADE = 'ASSESSORIA_12';
+    const DESCRICAO_PROCESSO = `Diagnóstico CDU-52 ${Date.now()}`;
+
+    test('Setup data', async ({_resetAutomatico, request}) => {
+        const processo = await criarProcessoDiagnosticoHomologadoFixture(request, {
+            descricao: DESCRICAO_PROCESSO,
+            unidade: UNIDADE
+        });
+        expect(processo.codigo).toBeGreaterThan(0);
+    });
+
+    test('Cenários CDU-52: ADMIN finaliza processo de diagnóstico', async ({
         _resetAutomatico,
         page,
-        request,
         _autenticadoComoAdmin
     }) => {
-        test.slow();
-        const descricaoProcesso = `Relatório CDU-53 ${Date.now()}`;
-        await criarProcessoDiagnosticoHomologadoFixture(request, {
+        await acessarDetalhesProcesso(page, DESCRICAO_PROCESSO);
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeEnabled();
+
+        await page.getByTestId('btn-processo-finalizar').click();
+
+        const modal = page.getByRole('dialog');
+        await expect(modal).toBeVisible();
+        await expect(modal.getByRole('heading', {name: TEXTOS.processo.FINALIZACAO_TITULO})).toBeVisible();
+        await modal.getByTestId('btn-finalizar-processo-cancelar').click();
+        await expect(modal).toBeHidden();
+
+        await page.getByTestId('btn-processo-finalizar').click();
+        await expect(modal).toBeVisible();
+        await modal.getByTestId('btn-finalizar-processo-confirmar').click();
+
+        await verificarPaginaPainel(page);
+        await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
+        await verificarNotificacaoAdmin(page, {
+            destinatario: UNIDADE,
+            assunto: `Finalização do processo ${DESCRICAO_PROCESSO}`,
+            tipo: 'Finalização de processo',
+            trechoCorpo: 'Comunicamos a finalização do processo'
+        });
+    });
+});
+
+test.describe('CDU-52 - Processo de diagnóstico ainda não homologado', () => {
+    test('ADMIN não consegue finalizar processo apenas concluído', async ({
+        _resetAutomatico,
+        request,
+        page,
+        _autenticadoComoAdmin
+    }) => {
+        const descricaoProcesso = `Diagnóstico CDU-52 pendente ${Date.now()}`;
+        await criarProcessoDiagnosticoConcluidoFixture(request, {
             descricao: descricaoProcesso,
             unidade: 'ASSESSORIA_12'
         });
 
-        await page.goto('/relatorios');
-        await expect(page.getByRole('heading', {name: /Relatórios/i})).toBeVisible();
-
-        await page.getByTestId('card-relatorio-gaps-diagnostico').click();
-        await expect(page).toHaveURL(/\/relatorios\/diagnostico\/gaps/);
-        await expect(page.getByRole('heading', {name: TEXTOS_RELATORIOS.GAPS_DIAGNOSTICO})).toBeVisible();
-
-        const selectProcesso = page.getByTestId('select-processo-relatorio-diagnostico');
-        const botaoVisualizar = page.getByTestId('btn-visualizar-relatorio-diagnostico');
-        const botaoExportar = page.getByTestId('btn-exportar-relatorio-diagnostico');
-
-        await expect(botaoVisualizar).toBeDisabled();
-        await selectProcesso.selectOption({label: descricaoProcesso});
-        await expect(page.getByTestId('container-arvore-unidades-diagnostico')).toBeVisible();
-
-        const busca = page.getByRole('searchbox', {name: 'Buscar unidade por sigla'});
-        await busca.fill('ASSESSORIA_12');
-        await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').check();
-
-        await expect(botaoVisualizar).toBeEnabled();
-        await expect(botaoExportar).toBeEnabled();
-
-        await botaoVisualizar.click();
-
-        const card = page.getByTestId('card-relatorio-gaps-diagnostico').first();
-        await expect(card).toBeVisible();
-        await expect(card).toContainText('ASSESSORIA_12');
-        await expect(card.locator('th', {hasText: 'Competência'})).toBeVisible();
-        await expect(card.locator('th', {hasText: 'Gap médio'})).toBeVisible();
-        await expect(card.locator('tbody tr').first()).toBeVisible();
-        await expect(card.locator('tbody')).toContainText(/\d+\.\d{2}/);
-
-        const downloadPromise = page.waitForEvent('download');
-        await botaoExportar.click();
-        const download = await downloadPromise;
-        const hoje = new Date().toLocaleDateString('en-CA');
-        expect(download.suggestedFilename()).toBe(`sgc-rel-gaps-diagnostico-${hoje}.pdf`);
+        await page.goto('/painel');
+        await acessarDetalhesProcesso(page, descricaoProcesso);
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
     });
 });

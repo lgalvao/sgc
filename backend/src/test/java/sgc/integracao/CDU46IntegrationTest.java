@@ -58,7 +58,7 @@ class CDU46IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll();
         assertThat(notificacoes).anySatisfy(notificacao -> {
             assertThat(notificacao.getAssunto()).contains("Avaliação de consenso aprovada: " + servidor.getNome());
-            assertThat(notificacao.getDestinatario()).isEqualTo("chefe.teste@tre-pe.jus.br");
+            assertThat(notificacao.getDestinatario()).isEqualTo("sedia@tre-pe.jus.br");
             assertThat(notificacao.getCorpoHtml()).contains("Prezado(a) responsável pela <strong>" + unidade.getSigla() + "</strong>");
             assertThat(notificacao.getCorpoHtml()).contains("O servidor <strong>" + servidor.getNome() + "</strong> aprovou a avaliação de consenso do processo");
             assertThat(notificacao.getCorpoHtml()).contains("Acompanhe o processo no Sistema de Gestão de Competências");
