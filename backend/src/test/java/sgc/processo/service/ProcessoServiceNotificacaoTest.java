@@ -106,11 +106,11 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         when(repo.buscar(Processo.class, id)).thenReturn(p);
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidade));
         when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
-        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SECAO", "Mapeamento 2026"))
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SECAO", "Mapeamento 2026", TipoProcesso.DIAGNOSTICO))
                 .thenReturn("<html>finalizado</html>");
-        when(emailModelosService.criarAssuntoProcessoFinalizado("Mapeamento 2026"))
-                .thenReturn("SGC: Finalização do processo Mapeamento 2026");
-        when(validacaoService.validarSubprocessosParaFinalizacao(id))
+        when(emailModelosService.criarAssuntoProcessoFinalizado(TipoProcesso.DIAGNOSTICO))
+                .thenReturn("SGC: Finalização de processo de diagnóstico");
+        when(validacaoService.validarSubprocessosParaFinalizacao(id, TipoProcesso.DIAGNOSTICO))
                 .thenReturn(ResultadoValidacao.ofValido());
 
         processoService.finalizar(id);
@@ -119,7 +119,7 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         verify(notificacaoService).enfileirar(argThat(command ->
                 command.tipoNotificacao() == TipoNotificacao.PROCESSO_FINALIZADO
                         && command.destinatario().equals("secao@tre-pe.jus.br")
-                        && command.assunto().equals("SGC: Finalização do processo Mapeamento 2026")
+                        && command.assunto().equals("SGC: Finalização de processo de diagnóstico")
                         && command.corpoHtml().equals("<html>finalizado</html>")
                         && command.chaveIdempotencia().equals("processo:100:finalizacao:unidade:10:direto")
         ));
@@ -333,9 +333,9 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidadeInterop));
         when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of());
-        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString()))
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString(), any()))
                 .thenReturn("<html>finalizado interop</html>");
-        when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso))
+        when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso, TipoProcesso.MAPEAMENTO))
                 .thenReturn(ResultadoValidacao.ofValido());
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(2000L);
@@ -373,11 +373,11 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidadeInter, unidadeOper));
         when(unidadeHierarquiaService.buscarCodigosSuperiores(30L)).thenReturn(List.of());
         when(unidadeHierarquiaService.buscarCodigosSuperiores(31L)).thenReturn(List.of(30L));
-        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString()))
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString(), any()))
                 .thenReturn("<html>finalizado inter</html>");
-        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(anyString(), anyString(), anyList()))
+        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(anyString(), anyString(), anyList(), any()))
                 .thenReturn("<html>consolidado</html>");
-        when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso))
+        when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso, TipoProcesso.MAPEAMENTO))
                 .thenReturn(ResultadoValidacao.ofValido());
         Subprocesso subprocessoInter = new Subprocesso();
         subprocessoInter.setCodigo(3000L);
@@ -414,17 +414,19 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
 
         Unidade uni = new Unidade();
         uni.setCodigo(10L);
+        uni.setSigla("SECAO");
+        uni.setTipo(TipoUnidade.OPERACIONAL);
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uni));
 
         when(repo.buscar(Processo.class, codigo)).thenReturn(p);
 
         ResultadoValidacao v = ResultadoValidacao.ofValido();
-        when(validacaoService.validarSubprocessosParaFinalizacao(codigo)).thenReturn(v);
+        when(validacaoService.validarSubprocessosParaFinalizacao(codigo, TipoProcesso.DIAGNOSTICO)).thenReturn(v);
 
         processoService.finalizar(codigo);
 
         verify(p).setSituacao(FINALIZADO);
-        verify(servicoAlertas).criarAlertaAdmin(p, uni, "Processo finalizado: Desc");
+        verify(servicoAlertas).criarAlertaAdmin(p, uni, "Processo finalizado");
         verify(processoRepo).save(p);
     }
 
@@ -452,7 +454,7 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         mapa.setSubprocesso(subprocesso);
 
         when(repo.buscar(Processo.class, codigoProcesso)).thenReturn(processo);
-        when(validacaoService.validarSubprocessosParaFinalizacao(codigoProcesso)).thenReturn(ResultadoValidacao.ofValido());
+        when(validacaoService.validarSubprocessosParaFinalizacao(codigoProcesso, TipoProcesso.MAPEAMENTO)).thenReturn(ResultadoValidacao.ofValido());
         when(consultaService.listarEntidadesPorProcesso(codigoProcesso)).thenReturn(List.of(subprocesso));
         when(mapaManutencaoService.buscarMapasPorSubprocessos(List.of(3100L))).thenReturn(List.of(mapa));
         when(unidadeService.buscarPorCodigos(anyList())).thenAnswer(invocation -> {
@@ -466,8 +468,8 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
             return List.of();
         });
         when(unidadeHierarquiaService.buscarCodigosSuperiores(31L)).thenReturn(List.of(30L));
-        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString())).thenReturn("<html>direto</html>");
-        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(eq("SUP"), eq("Processo consolidado"), eq(List.of("OPER"))))
+        when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString(), any())).thenReturn("<html>direto</html>");
+        when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(eq("SUP"), eq("Processo consolidado"), eq(List.of("OPER")), eq(TipoProcesso.MAPEAMENTO)))
                 .thenReturn("<html>consolidado</html>");
 
         processoService.finalizar(codigoProcesso);

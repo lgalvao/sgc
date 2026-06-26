@@ -8,6 +8,7 @@ import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 import sgc.mapa.service.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -213,14 +214,36 @@ public class SubprocessoValidacaoService {
         );
 
         if (total != homologados) {
-            return ResultadoValidacao.ofInvalido(
-                    ("Apenas %d de %d subprocessos foram homologados. " +
-                            "Todos os subprocessos devem estar homologados para finalizar o processo.")
-                            .formatted(homologados, total)
-            );
+            return ResultadoValidacao.ofInvalido(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
         }
 
         return ResultadoValidacao.ofValido();
+    }
+
+    public ResultadoValidacao validarSubprocessosParaFinalizacao(Long codProcesso, TipoProcesso tipoProcesso) {
+        long total = subprocessoRepo.countByProcessoCodigo(codProcesso);
+
+        if (total == 0) return ResultadoValidacao.ofInvalido("O processo não possui subprocessos para finalizar");
+
+        long homologados = subprocessoRepo.countByProcessoCodigoAndSituacaoIn(codProcesso,
+                List.of(
+                        SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.REVISAO_MAPA_HOMOLOGADO,
+                        SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO
+                )
+        );
+
+        if (total != homologados) {
+            return ResultadoValidacao.ofInvalido(mensagemFinalizacaoNaoPermitida(tipoProcesso));
+        }
+
+        return ResultadoValidacao.ofValido();
+    }
+
+    private String mensagemFinalizacaoNaoPermitida(TipoProcesso tipoProcesso) {
+        return tipoProcesso == TipoProcesso.DIAGNOSTICO
+                ? Mensagens.PROCESSO_FINALIZACAO_DIAGNOSTICO_PENDENTE
+                : Mensagens.PROCESSO_FINALIZACAO_MAPAS_PENDENTES;
     }
 
     public record ResultadoValidacao(boolean valido, @Nullable String mensagem) {

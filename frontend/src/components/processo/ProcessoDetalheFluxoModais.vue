@@ -2,6 +2,7 @@
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
 import {TEXTOS} from "@/constants/textos";
+import {TipoProcesso} from "@/types/comum";
 import type {UnidadeSelecao} from "@/types/subprocesso-modelos";
 import type {DadosAcaoBloco} from "@/views/processoDetalheTipos";
 
@@ -12,6 +13,7 @@ defineProps<{
     registrarModalBlocoRef: (instancia: unknown) => void;
     mostrarDataLimite?: boolean;
     mostrarModalFinalizacao: boolean;
+    tipoProcesso: TipoProcesso;
     processoAcaoRotuloBotao?: string;
     processoAcaoTexto?: string;
     processoAcaoTitulo?: string;
@@ -53,6 +55,6 @@ defineEmits<{
             {{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO }}
             <strong>{{ descricaoProcesso }}</strong>?
         </p>
-        <p class="mb-0">{{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO }}</p>
+        <p class="mb-0">{{ TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO(tipoProcesso) }}</p>
     </ModalConfirmacao>
 </template>

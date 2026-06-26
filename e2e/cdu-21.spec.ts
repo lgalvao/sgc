@@ -65,7 +65,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(modal.getByRole('heading', {name: TEXTOS.processo.FINALIZACAO_TITULO})).toBeVisible();
         await expect(modal.getByText(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO)).toBeVisible();
         await expect(modal.getByText(descProcesso)).toBeVisible();
-        await expect(modal.getByText(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO)).toBeVisible();
+        await expect(modal.getByText('Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo.')).toBeVisible();
         await expect(page.getByTestId('btn-finalizar-processo-cancelar')).toBeVisible();
         await expect(page.getByTestId('btn-finalizar-processo-confirmar')).toBeVisible();
 
@@ -93,7 +93,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECAO_221',
-            assunto: `Finalização do processo ${descProcesso}`,
+            assunto: 'Finalização de processo de mapeamento',
             tipo: 'Finalização de processo',
             trechoCorpo: 'Comunicamos a finalização do processo'
         });
@@ -147,18 +147,20 @@ test.describe.serial('CDU-21 - Processo com mapas não homologados', () => {
         validarProcessoFixture(processo, descProcessoErro);
     });
 
-    test('Cenario 5: ADMIN não vê botão Finalizar quando mapas não estão todos homologados', async ({
-                                                                                                        _resetAutomatico,
-                                                                                                        page,
-                                                                                                        _autenticadoComoAdmin
-                                                                                                    }) => {
+    test('Cenario 5: ADMIN recebe alerta quando mapas não estão todos homologados', async ({
+                                                                                                         _resetAutomatico,
+                                                                                                         page,
+                                                                                                         _autenticadoComoAdmin
+                                                                                                     }) => {
         // CDU-21 Passos 4-5: sistema verifica situação dos subprocessos e bloqueia finalização
         await acessarDetalhesProcesso(page, descProcessoErro);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 
-        // Processo com mapa validado (não homologado): botão Finalizar não deve estar disponível
+        // Processo com mapa validado (não homologado): clicar em finalizar deve bloquear a operação
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
-        await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeEnabled();
+        await page.getByTestId('btn-processo-finalizar').click();
+        await expect(page.getByText('Não é possível finalizar o processo enquanto houver unidades com mapa não homologado')).toBeVisible();
     });
 });
 
@@ -205,7 +207,7 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECAO_212',
-            assunto: `Finalização do processo ${descProcessoRevisao}`,
+            assunto: 'Finalização de processo de revisão',
             tipo: 'Finalização de processo',
             trechoCorpo: 'Comunicamos a finalização do processo'
         });

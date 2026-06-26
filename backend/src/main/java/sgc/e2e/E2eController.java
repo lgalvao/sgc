@@ -100,6 +100,41 @@ public class E2eController {
         this.cacheManager = cacheManager;
     }
 
+    E2eController(
+            JdbcTemplate jdbcTemplate,
+            NamedParameterJdbcTemplate namedJdbcTemplate,
+            ProcessoService processoService,
+            ProcessoRepo processoRepo,
+            ProcessoDtoMapper processoDtoMapper,
+            SubprocessoRepo subprocessoRepo,
+            MapaRepo mapaRepo,
+            DiagnosticoRepo diagnosticoRepo,
+            AvaliacaoServidorRepo avaliacaoServidorRepo,
+            SituacaoCapacitacaoRepo situacaoCapacitacaoRepo,
+            UnidadeService unidadeService,
+            ResourceLoader resourceLoader,
+            CacheManager cacheManager
+    ) {
+        this(
+                jdbcTemplate,
+                namedJdbcTemplate,
+                processoService,
+                processoRepo,
+                processoDtoMapper,
+                subprocessoRepo,
+                mapaRepo,
+                diagnosticoRepo,
+                avaliacaoServidorRepo,
+                situacaoCapacitacaoRepo,
+                null,
+                null,
+                null,
+                unidadeService,
+                resourceLoader,
+                cacheManager
+        );
+    }
+
     @PostConstruct
     public void validarAmbienteE2e() {
         DataSource dataSource = jdbcTemplate.getDataSource();

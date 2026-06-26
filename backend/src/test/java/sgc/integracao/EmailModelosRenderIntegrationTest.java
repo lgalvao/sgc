@@ -2,6 +2,7 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
+import sgc.processo.model.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
@@ -64,7 +65,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve renderizar finalização de processo para unidade participante")
     void deveRenderizarFinalizacaoDireta() {
-        String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SESEL", "Processo final 2026");
+        String html = emailModelosService.criarEmailProcessoFinalizadoPorUnidade("SESEL", "Processo final 2026", TipoProcesso.MAPEAMENTO);
 
         assertThat(html)
                 .contains("Prezado(a) responsável pela <span>SESEL</span>")

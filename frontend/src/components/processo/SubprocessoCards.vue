@@ -254,7 +254,14 @@ defineExpose({
 }
 
 .card-disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  background-color: #f8f9fa !important;
+  border-color: #dee2e6 !important;
+}
+
+.card-disabled :deep(.card-title),
+.card-disabled :deep(.card-text),
+.card-disabled :deep(.bi) {
+  color: #5a6268 !important;
 }
 </style>

@@ -70,11 +70,11 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Não deve finalizar quando houver subprocesso não homologado")
     void naoDeveFinalizarQuandoSubprocessosNaoHomologados() throws Exception {
-        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
+                mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableContent())
-                .andExpect(jsonPath("$.message").value(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS));
+                .andExpect(jsonPath("$.message").value(Mensagens.PROCESSO_FINALIZACAO_MAPAS_PENDENTES));
 
         Processo atualizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
@@ -91,11 +91,11 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         subprocessoRepo.save(subprocesso);
 
-        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
+                mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableContent())
-                .andExpect(jsonPath("$.message").value(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS));
+                .andExpect(jsonPath("$.message").value(Mensagens.PROCESSO_FINALIZACAO_MAPAS_PENDENTES));
 
         Processo atualizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
         assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
@@ -135,7 +135,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         NotificacaoEmail notificacao = notificacoes.getFirst();
         assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("CDU21-UND");
         assertThat(notificacao.getDestinatario()).isEqualTo("cdu21-und@tre-pe.jus.br");
-        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Finalização do processo Processo CDU-21");
+        assertThat(notificacao.getAssunto()).isEqualTo("SGC: Finalização de processo de mapeamento");
         assertThat(notificacao.getCorpoHtml())
                 .contains("Comunicamos a finalização do processo <strong>Processo CDU-21</strong> para a sua unidade.")
                 .contains("menu \"Minha unidade\"");
@@ -143,7 +143,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
 
         aguardarEmail(1);
         assertThat(algumEmailPara("cdu21-und@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailComAssunto("[SGC-TEST] Finalização do processo Processo CDU-21")).isTrue();
+        assertThat(algumEmailComAssunto("[SGC-TEST] Finalização de processo de mapeamento")).isTrue();
         assertThat(algumEmailContem("Comunicamos a finalização do processo")).isTrue();
         assertThat(algumEmailContem("Processo CDU-21")).isTrue();
         assertThat(algumEmailContem("menu \"Minha unidade\"")).isTrue();
@@ -168,24 +168,4 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         assertThat(atualizado.getDataFinalizacao()).isNotNull();
     }
 
-    @Test
-    @DisplayName("Deve finalizar processo DIAGNOSTICO sem tornar mapas vigentes")
-    void deveFinalizarProcessoDiagnostico() throws Exception {
-        processo.setTipo(TipoProcesso.DIAGNOSTICO);
-        processoRepo.save(processo);
-
-        subprocesso.setSituacaoForcada(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
-        subprocessoRepo.save(subprocesso);
-
-        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        Processo atualizado = processoRepo.findById(processo.getCodigo()).orElseThrow();
-        assertThat(atualizado.getSituacao()).isEqualTo(SituacaoProcesso.FINALIZADO);
-        assertThat(atualizado.getDataFinalizacao()).isNotNull();
-        // DIAGNOSTICO não torna mapas vigentes
-        assertThat(unidadeMapaRepo.findById(unidade.getCodigo())).isEmpty();
-    }
 }

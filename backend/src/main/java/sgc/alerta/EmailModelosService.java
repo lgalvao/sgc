@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.stereotype.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
+import sgc.processo.model.*;
 
 import java.time.*;
 import java.time.format.*;
@@ -54,12 +55,12 @@ public class EmailModelosService {
         return AssuntosNotificacao.inicioProcesso(tipoProcesso, participante);
     }
 
-    public String criarAssuntoProcessoFinalizado(String nomeProcesso) {
-        return AssuntosNotificacao.processoFinalizado(nomeProcesso);
+    public String criarAssuntoProcessoFinalizado(TipoProcesso tipoProcesso) {
+        return AssuntosNotificacao.processoFinalizado(tipoProcesso);
     }
 
-    public String criarAssuntoProcessoFinalizadoUnidadesSubordinadas(String nomeProcesso) {
-        return AssuntosNotificacao.processoFinalizadoUnidadesSubordinadas(nomeProcesso);
+    public String criarAssuntoProcessoFinalizadoUnidadesSubordinadas(TipoProcesso tipoProcesso) {
+        return AssuntosNotificacao.processoFinalizadoUnidadesSubordinadas(tipoProcesso);
     }
 
     public String criarAssuntoLembretePrazo(String nomeProcesso) {
@@ -69,11 +70,12 @@ public class EmailModelosService {
     /**
      * Gera o conteúdo HTML para o email que notifica a conclusão de um processo para uma unidade
      */
-    public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso) {
+    public String criarEmailProcessoFinalizadoPorUnidade(String siglaUnidade, String nomeProcesso, TipoProcesso tipoProcesso) {
         Context context = new Context();
-        context.setVariable(VAR_TITULO, criarAssuntoProcessoFinalizado(nomeProcesso));
+        context.setVariable(VAR_TITULO, criarAssuntoProcessoFinalizado(tipoProcesso));
         context.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         context.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
+        context.setVariable("tipoProcesso", tipoProcesso.name());
 
         return templateEngine.process("processo-finalizado-por-unidade", context);
     }
@@ -83,13 +85,18 @@ public class EmailModelosService {
      * processo em suas unidades subordinadas.
      */
     public String criarEmailProcessoFinalizadoUnidadesSubordinadas(
-            String siglaUnidade, String nomeProcesso, List<String> siglasUnidadesSubordinadas) {
+            String siglaUnidade,
+            String nomeProcesso,
+            List<String> siglasUnidadesSubordinadas,
+            TipoProcesso tipoProcesso
+    ) {
 
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, criarAssuntoProcessoFinalizadoUnidadesSubordinadas(nomeProcesso));
+        ctx.setVariable(VAR_TITULO, criarAssuntoProcessoFinalizadoUnidadesSubordinadas(tipoProcesso));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         ctx.setVariable("siglasUnidadesSubordinadas", siglasUnidadesSubordinadas);
+        ctx.setVariable("tipoProcesso", tipoProcesso.name());
 
         return templateEngine.process("processo-finalizado-unidades-subordinadas", ctx);
     }

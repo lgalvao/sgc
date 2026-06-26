@@ -11,6 +11,7 @@ export interface Processo {
     dataCriacao: string;
     dataFinalizacao?: string;
     podeFinalizar?: boolean;
+    mensagemFinalizacao?: string;
     podeHomologarCadastro?: boolean;
     podeHomologarMapa?: boolean;
     podeAceitarCadastroBloco?: boolean;

@@ -46,6 +46,7 @@ export function mapearProcessoDetalhe(dto: ProcessoDetalheResponseBackend): Proc
         dataCriacao: dto.dataCriacao,
         dataFinalizacao: dto.dataFinalizacao,
         podeFinalizar: dto.podeFinalizar,
+        mensagemFinalizacao: dto.mensagemFinalizacao,
         podeHomologarCadastro: dto.podeHomologarCadastro,
         podeHomologarMapa: dto.podeHomologarMapa,
         podeAceitarCadastroBloco: dto.podeAceitarCadastroBloco,

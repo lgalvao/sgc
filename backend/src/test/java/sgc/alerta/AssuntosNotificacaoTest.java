@@ -1,6 +1,7 @@
 package sgc.alerta;
 
 import org.junit.jupiter.api.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -24,10 +25,14 @@ class AssuntosNotificacaoTest {
     @Test
     @DisplayName("deve retornar assuntos simples")
     void deveRetornarAssuntosSimples() {
-        assertThat(AssuntosNotificacao.processoFinalizado("Processo X"))
-                .isEqualTo("SGC: Finalização do processo Processo X");
-        assertThat(AssuntosNotificacao.processoFinalizadoUnidadesSubordinadas("Processo X"))
-                .isEqualTo("SGC: Finalização do processo Processo X em unidades subordinadas");
+        assertThat(AssuntosNotificacao.processoFinalizado(TipoProcesso.MAPEAMENTO))
+                .isEqualTo("SGC: Finalização de processo de mapeamento");
+        assertThat(AssuntosNotificacao.processoFinalizado(TipoProcesso.REVISAO))
+                .isEqualTo("SGC: Finalização de processo de revisão");
+        assertThat(AssuntosNotificacao.processoFinalizado(TipoProcesso.DIAGNOSTICO))
+                .isEqualTo("SGC: Finalização de processo de diagnóstico");
+        assertThat(AssuntosNotificacao.processoFinalizadoUnidadesSubordinadas(TipoProcesso.MAPEAMENTO))
+                .isEqualTo("SGC: Finalização de processo de mapeamento em unidades subordinadas");
         assertThat(AssuntosNotificacao.lembretePrazo("Processo X"))
                 .isEqualTo("SGC: Lembrete de prazo - Processo X");
         assertThat(AssuntosNotificacao.atribuicaoPerfilChefe("SEC"))

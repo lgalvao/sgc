@@ -28,6 +28,7 @@ public class ProcessoDtoMapper {
     public ProcessoDetalheDto criarDetalheBase(
             Processo processo,
             boolean podeFinalizar,
+            String mensagemFinalizacao,
             boolean podeHomologarCadastro,
             boolean podeHomologarMapa,
             boolean podeAceitarCadastroBloco,
@@ -43,6 +44,7 @@ public class ProcessoDtoMapper {
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
                 .podeFinalizar(podeFinalizar)
+                .mensagemFinalizacao(mensagemFinalizacao)
                 .podeHomologarCadastro(podeHomologarCadastro)
                 .podeHomologarMapa(podeHomologarMapa)
                 .podeAceitarCadastroBloco(podeAceitarCadastroBloco)

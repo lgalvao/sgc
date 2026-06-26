@@ -7,7 +7,7 @@ import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
     const UNIDADE = 'ASSESSORIA_12';
-    const DESCRICAO_PROCESSO = `Diagnóstico CDU-52 ${Date.now()}`;
+    const DESCRICAO_PROCESSO = `Diagnóstico CDU-53 ${Date.now()}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
         const processo = await criarProcessoDiagnosticoHomologadoFixture(request, {
@@ -17,7 +17,7 @@ test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
         expect(processo.codigo).toBeGreaterThan(0);
     });
 
-    test('Cenários CDU-52: ADMIN finaliza processo de diagnóstico', async ({
+    test('Cenários CDU-53: ADMIN finaliza processo de diagnóstico', async ({
         _resetAutomatico,
         page,
         _autenticadoComoAdmin
@@ -31,6 +31,7 @@ test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await expect(modal.getByRole('heading', {name: TEXTOS.processo.FINALIZACAO_TITULO})).toBeVisible();
+        await expect(modal.getByText('Essa ação encerrará o processo e notificará todas as unidades participantes.')).toBeVisible();
         await modal.getByTestId('btn-finalizar-processo-cancelar').click();
         await expect(modal).toBeHidden();
 
@@ -42,14 +43,14 @@ test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
         await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
         await verificarNotificacaoAdmin(page, {
             destinatario: UNIDADE,
-            assunto: `Finalização do processo ${DESCRICAO_PROCESSO}`,
+            assunto: 'Finalização de processo de diagnóstico',
             tipo: 'Finalização de processo',
             trechoCorpo: 'Comunicamos a finalização do processo'
         });
     });
 });
 
-test.describe('CDU-52 - Processo de diagnóstico ainda não homologado', () => {
+test.describe('CDU-53 - Processo de diagnóstico ainda não homologado', () => {
     test('ADMIN não consegue finalizar processo apenas concluído', async ({
         _resetAutomatico,
         request,
@@ -65,6 +66,8 @@ test.describe('CDU-52 - Processo de diagnóstico ainda não homologado', () => {
         await page.goto('/painel');
         await acessarDetalhesProcesso(page, descricaoProcesso);
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
-        await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
+        await expect(page.getByTestId('btn-processo-finalizar')).toBeEnabled();
+        await page.getByTestId('btn-processo-finalizar').click();
+        await expect(page.getByText('Não é possível finalizar o processo: há unidades não homologadas')).toBeVisible();
     });
 });

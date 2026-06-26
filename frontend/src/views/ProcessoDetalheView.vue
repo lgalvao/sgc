@@ -42,6 +42,7 @@
         :registrar-modal-bloco-ref="registrarModalBlocoRef"
         :mostrar-data-limite="acaoBlocoAtual?.requerDataLimite"
         :mostrar-modal-finalizacao="mostrarModalFinalizacao"
+        :tipo-processo="tipoProcessoAtual"
         :processo-acao-rotulo-botao="acaoBlocoAtual?.rotuloBotao"
         :processo-acao-texto="acaoBlocoAtual?.texto"
         :processo-acao-titulo="acaoBlocoAtual?.titulo"
@@ -67,6 +68,7 @@ import {useProcessoQuery} from "@/composables/useProcessoQuery";
 import {useProcessoAcoes} from "@/views/processoDetalheAcoes";
 import type {ModalAcaoBlocoRef} from "@/views/processoDetalheTipos";
 import {usePerfil} from "@/composables/usePerfil";
+import {TipoProcesso} from "@/types/comum";
 import type {Processo} from "@/types/tipos";
 import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
@@ -126,6 +128,7 @@ const usarMenuAcoesBloco = computed(() => acoesBlocoVisiveis.value.length > 1);
 const acaoBlocoPrincipal = computed(() => acoesBlocoVisiveis.value[0] ?? null);
 
 const descricaoProcesso = computed(() => processo.value ? processo.value.descricao : "");
+const tipoProcessoAtual = computed(() => processo.value?.tipo ?? TipoProcesso.MAPEAMENTO);
 const {
   acaoBlocoAtual,
   abrirModalBloco,

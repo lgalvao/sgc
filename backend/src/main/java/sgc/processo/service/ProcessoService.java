@@ -25,6 +25,7 @@ import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
+import sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao;
 
 import java.time.*;
 import java.time.format.*;
@@ -352,11 +353,13 @@ public class ProcessoService {
         Map<Long, Unidade> localizacoesPorSubprocesso = localizacaoSubprocessoService.obterLocalizacoesAtuais(subprocessos);
         Set<Long> unidadesAcesso = obterIdsUnidadesAcesso(processo, usuario);
         Perfil perfil = usuario.getPerfilAtivo();
+        ResultadoValidacao validacaoFinalizacao = validacaoService.validarSubprocessosParaFinalizacao(codProcesso, processo.getTipo());
 
         ProcessoDetalheDto dto = processoDtoMapper.criarDetalheBase(
                 processo,
                 permissionEvaluator.verificarPermissao(usuario, processo, FINALIZAR_PROCESSO)
-                        && validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido(),
+                        && validacaoFinalizacao.valido(),
+                validacaoFinalizacao.mensagem(),
                 AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
                 AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil),
                 AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil),
@@ -512,8 +515,8 @@ public class ProcessoService {
 
     private void validarFinalizacao(Long codProcesso, Processo processo) {
         if (processo.getSituacao() != EM_ANDAMENTO) throw new ErroValidacao(Mensagens.SITUACAO_INVALIDA);
-        if (!validacaoService.validarSubprocessosParaFinalizacao(codProcesso).valido())
-            throw new ErroValidacao(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
+        ResultadoValidacao resultado = validacaoService.validarSubprocessosParaFinalizacao(codProcesso, processo.getTipo());
+        if (!resultado.valido()) throw new ErroValidacao(resultado.mensagem());
     }
 
     private void tornarMapasVigentes(Long codProcesso) {
@@ -1266,10 +1269,80 @@ public class ProcessoService {
 
     private void criarAlertasFinalizacaoProcesso(Processo p) {
         log.info("Criando alertas de finalização do processo {}", p.getCodigo());
-        List<Long> unidadesCods = p.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigoPersistido).toList();
-        List<Unidade> participantes = unidadeService.buscarPorCodigos(unidadesCods);
-        for (Unidade u : participantes) {
-            servicoAlertas.criarAlertaAdmin(p, u, "Processo finalizado: " + p.getDescricao());
+        List<Unidade> participantes = buscarParticipantes(p);
+        for (Unidade unidade : participantes) {
+            TipoUnidade tipo = unidade.getTipo();
+            if (tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL) {
+                servicoAlertas.criarAlertaAdmin(p, unidade, "Processo finalizado");
+            }
+        }
+
+        Map<Long, List<String>> subordinadasPorSuperior = mapearSiglasSubordinadasPorSuperior(participantes);
+        if (subordinadasPorSuperior.isEmpty()) {
+            return;
+        }
+
+        unidadeService.buscarPorCodigos(new ArrayList<>(subordinadasPorSuperior.keySet()))
+                .forEach(unidadeSuperior -> servicoAlertas.criarAlertaAdmin(
+                        p,
+                        unidadeSuperior,
+                        "Processo finalizado em unidades subordinadas"
+                ));
+    }
+
+    private TipoNotificacao tipoNotificacaoFinalizacao(Processo processo) {
+        return TipoNotificacao.PROCESSO_FINALIZADO;
+    }
+
+    private String assuntoFinalizacaoDireta(Processo processo) {
+        return emailModelosService.criarAssuntoProcessoFinalizado(processo.getTipo());
+    }
+
+    private String assuntoFinalizacaoConsolidada(Processo processo) {
+        return emailModelosService.criarAssuntoProcessoFinalizadoUnidadesSubordinadas(processo.getTipo());
+    }
+
+    private String corpoFinalizacaoDireta(Processo processo, Unidade unidade) {
+        return emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
+                unidade.getSigla(),
+                processo.getDescricao(),
+                processo.getTipo()
+        );
+    }
+
+    private String corpoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
+        return emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
+                unidade.getSigla(),
+                processo.getDescricao(),
+                subordinadas,
+                processo.getTipo()
+        );
+    }
+
+    private boolean isUnidadeDiretaFinalizacao(Unidade participante) {
+        TipoUnidade tipo = participante.getTipo();
+        return tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL;
+    }
+
+    private boolean isUnidadeConsolidadaFinalizacao(Unidade participante) {
+        TipoUnidade tipo = participante.getTipo();
+        return tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL;
+    }
+
+    private void adicionarDestinosFinalizacao(
+            List<Unidade> participantes,
+            Set<Long> codigosDiretos,
+            Set<Long> codigosConsolidados,
+            Map<Long, Unidade> unidades
+    ) {
+        for (Unidade participante : participantes) {
+            unidades.put(participante.getCodigo(), participante);
+            if (isUnidadeDiretaFinalizacao(participante)) {
+                codigosDiretos.add(participante.getCodigo());
+            }
+            if (isUnidadeConsolidadaFinalizacao(participante)) {
+                codigosConsolidados.add(participante.getCodigo());
+            }
         }
     }
 
@@ -1280,16 +1353,7 @@ public class ProcessoService {
         Set<Long> codigosConsolidados = new HashSet<>();
         Map<Long, Unidade> unidades = new HashMap<>();
 
-        for (Unidade participante : participantes) {
-            unidades.put(participante.getCodigo(), participante);
-            TipoUnidade tipo = participante.getTipo();
-            if (tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL) {
-                codigosDiretos.add(participante.getCodigo());
-            }
-            if (tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL) {
-                codigosConsolidados.add(participante.getCodigo());
-            }
-        }
+        adicionarDestinosFinalizacao(participantes, codigosDiretos, codigosConsolidados, unidades);
 
         Map<Long, List<String>> subordinadasPorSuperior = mapearSiglasSubordinadasPorSuperior(participantes);
         carregarUnidadesConsolidadas(codigosConsolidados, subordinadasPorSuperior, unidades);
@@ -1327,31 +1391,22 @@ public class ProcessoService {
     }
 
     private void criarNotificacaoFinalizacaoDireta(Processo processo, Unidade unidade) {
-        String corpo = emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
-                unidade.getSigla(),
-                processo.getDescricao()
-        );
         enfileirarNotificacaoUnidade(
                 unidade,
-                TipoNotificacao.PROCESSO_FINALIZADO,
-                emailModelosService.criarAssuntoProcessoFinalizado(processo.getDescricao()),
-                corpo,
+                tipoNotificacaoFinalizacao(processo),
+                assuntoFinalizacaoDireta(processo),
+                corpoFinalizacaoDireta(processo, unidade),
                 chaveFinalizacaoProcesso(processo, unidade, true),
                 null
         );
     }
 
     private void criarNotificacaoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
-        String corpo = emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
-                unidade.getSigla(),
-                processo.getDescricao(),
-                subordinadas
-        );
         enfileirarNotificacaoUnidade(
                 unidade,
-                TipoNotificacao.PROCESSO_FINALIZADO,
-                emailModelosService.criarAssuntoProcessoFinalizadoUnidadesSubordinadas(processo.getDescricao()),
-                corpo,
+                tipoNotificacaoFinalizacao(processo),
+                assuntoFinalizacaoConsolidada(processo),
+                corpoFinalizacaoConsolidada(processo, unidade, subordinadas),
                 chaveFinalizacaoProcesso(processo, unidade, false),
                 null
         );

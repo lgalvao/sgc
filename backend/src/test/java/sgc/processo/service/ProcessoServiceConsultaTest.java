@@ -25,6 +25,12 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @DisplayName("ProcessoService Consulta Test suite")
 class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
 
+    @BeforeEach
+    void setUpValidacaoFinalizacaoPadrao() {
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any()))
+                .thenReturn(ResultadoValidacao.ofValido());
+    }
+
     @Nested
     @DisplayName("Detalhes e Elegibilidade")
     class DetalhesEElegibilidade {
@@ -53,7 +59,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
-            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso)).thenReturn(ResultadoValidacao.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso, TipoProcesso.MAPEAMENTO)).thenReturn(ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
             ProcessoDetalheDto result = processoService.obterDetalhesCompleto(codProcesso, false);
@@ -590,7 +596,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod, TipoProcesso.MAPEAMENTO)).thenReturn(ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
@@ -626,7 +632,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(u, p, sgc.seguranca.AcaoPermissao.FINALIZAR_PROCESSO)).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod, TipoProcesso.MAPEAMENTO)).thenReturn(ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
@@ -664,7 +670,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
             when(permissionEvaluator.verificarPermissao(any(Usuario.class), any(Processo.class), any(AcaoPermissao.class))).thenReturn(true);
-            when(validacaoService.validarSubprocessosParaFinalizacao(cod)).thenReturn(ResultadoValidacao.ofValido());
+            when(validacaoService.validarSubprocessosParaFinalizacao(cod, TipoProcesso.MAPEAMENTO)).thenReturn(ResultadoValidacao.ofValido());
 
             when(usuarioService.usuarioAutenticado()).thenReturn(u);
             ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, false);
@@ -938,7 +944,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
     void devePermitirEscritaQuandoAtivoEPermitido() {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
-        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
         Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
         Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
@@ -957,7 +963,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
     void deveNegarEscritaQuandoProcessoFinalizado() {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
-        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
         Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
         Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(SituacaoProcesso.FINALIZADO); p.setTipo(MAPEAMENTO);
@@ -978,7 +984,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
     void devePermitirEscritaQuandoProcessoEmAndamento() {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
-        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
         Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
         Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
@@ -997,7 +1003,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
     void deveNegarEscritaQuandoPerfilNaoPermitido() {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
-        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(any())).thenReturn(ResultadoValidacao.ofValido());
+        lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
         lenient().when(unidadeHierarquiaService.buscarIdsDescendentes(anyLong())).thenReturn(List.of(10L));
         Usuario gestor = new Usuario(); gestor.setPerfilAtivo(Perfil.GESTOR); gestor.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(gestor);

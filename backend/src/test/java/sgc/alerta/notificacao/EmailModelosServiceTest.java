@@ -1,6 +1,7 @@
 package sgc.alerta.notificacao;
 
 import org.junit.jupiter.api.*;
+import sgc.processo.model.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
@@ -169,13 +170,14 @@ class EmailModelosServiceTest {
             String nomeProcesso = "Processo teste";
 
             emailModelosService.criarEmailProcessoFinalizadoPorUnidade(
-                    siglaUnidade, nomeProcesso);
+                    siglaUnidade, nomeProcesso, TipoProcesso.MAPEAMENTO);
 
             assertThat(templateNameCaptor.getValue()).isEqualTo("processo-finalizado-por-unidade");
             Context context = contextCaptor.getValue();
-            assertThat(context.getVariable("titulo")).isEqualTo("SGC: Finalização do processo " + nomeProcesso);
+            assertThat(context.getVariable("titulo")).isEqualTo("SGC: Finalização de processo de mapeamento");
             assertThat(context.getVariable("siglaUnidade")).isEqualTo(siglaUnidade);
             assertThat(context.getVariable("nomeProcesso")).isEqualTo(nomeProcesso);
+            assertThat(context.getVariable("tipoProcesso")).isEqualTo("MAPEAMENTO");
         }
 
         @Test
@@ -187,15 +189,16 @@ class EmailModelosServiceTest {
             List<String> siglas = List.of("SUB1", "SUB2");
 
             emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(
-                    siglaUnidade, nomeProcesso, siglas);
+                    siglaUnidade, nomeProcesso, siglas, TipoProcesso.DIAGNOSTICO);
 
             assertThat(templateNameCaptor.getValue()).isEqualTo("processo-finalizado-unidades-subordinadas");
             Context context = contextCaptor.getValue();
             assertThat(context.getVariable("titulo"))
-                    .isEqualTo("SGC: Finalização do processo %s em unidades subordinadas".formatted(nomeProcesso));
+                    .isEqualTo("SGC: Finalização de processo de diagnóstico em unidades subordinadas");
             assertThat(context.getVariable("siglaUnidade")).isEqualTo(siglaUnidade);
             assertThat(context.getVariable("nomeProcesso")).isEqualTo(nomeProcesso);
             assertThat(context.getVariable("siglasUnidadesSubordinadas")).isEqualTo(siglas);
+            assertThat(context.getVariable("tipoProcesso")).isEqualTo("DIAGNOSTICO");
         }
     }
 }

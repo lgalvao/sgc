@@ -7,8 +7,17 @@
     </th:block>
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <span th:text="${siglaUnidade}"></span>,</p>
-        <p>Comunicamos a finalização do processo <strong th:text="${nomeProcesso}"></strong> para a sua unidade.</p>
-        <p>
+        <p th:if="${tipoProcesso == 'DIAGNOSTICO'}">
+            Comunicamos a finalização do processo <strong th:text="${nomeProcesso}"></strong>.
+        </p>
+        <p th:unless="${tipoProcesso == 'DIAGNOSTICO'}">
+            Comunicamos a finalização do processo <strong th:text="${nomeProcesso}"></strong> para a sua unidade.
+        </p>
+        <p th:if="${tipoProcesso == 'DIAGNOSTICO'}">
+            Os resultados consolidados do diagnóstico já podem ser consultados no Sistema de Gestão de Competências
+            (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).
+        </p>
+        <p th:unless="${tipoProcesso == 'DIAGNOSTICO'}">
             Já é possível visualizar o seu mapa de competências atualizado através do menu "Minha unidade" do Sistema
             de Gestão de Competências (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).
         </p>

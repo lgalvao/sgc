@@ -29,6 +29,7 @@ public class ProcessoDetalheDto {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataFinalizacao;
     private boolean podeFinalizar;
+    private String mensagemFinalizacao;
     private boolean podeHomologarCadastro;
     private boolean podeHomologarMapa;
     private boolean podeAceitarCadastroBloco;

@@ -383,7 +383,7 @@ const stubsProcessoDetalhe = {
                 ${TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO}
                 <strong>{{ descricaoProcesso }}</strong>?
               </p>
-              <p>${TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO}</p>
+              <p>${TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO(TipoProcesso.MAPEAMENTO)}</p>
             </ModalConfirmacao>
           </div>
         `
@@ -1080,7 +1080,7 @@ describe("Processo.vue", () => {
         expect(paragrafos).toHaveLength(2);
         expect(paragrafos[0].text()).toContain(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_PREFIXO);
         expect(paragrafos[0].text()).toContain(mockProcesso.descricao);
-        expect(paragrafos[1].text()).toBe(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO);
+        expect(paragrafos[1].text()).toBe(TEXTOS.processo.FINALIZACAO_CONFIRMACAO_COMPLEMENTO(TipoProcesso.MAPEAMENTO));
     });
 
     it("deve chamar API de finalizar processo com sucesso", async () => {
@@ -1161,12 +1161,13 @@ describe("Processo.vue", () => {
         expect(wrapper.findComponent(BSpinnerStub).exists()).toBe(true);
     });
 
-    it("deve manter botão de finalizar visível e desabilitado para ADMIN quando o processo não puder ser finalizado", async () => {
+    it("deve manter botão de finalizar visível e mostrar alerta ao tentar finalizar processo inválido", async () => {
         wrapper.unmount();
         wrapper = createWrapper({
             processo: {
                 ...mockProcesso,
                 podeFinalizar: false,
+                mensagemFinalizacao: "Não é possível finalizar o processo enquanto houver unidades com mapa não homologado",
             }
         });
         perfilStore = usePerfilStore();
@@ -1177,7 +1178,11 @@ describe("Processo.vue", () => {
 
         const btnFinalizar = wrapper.find('[data-testid="btn-processo-finalizar"]');
         expect(btnFinalizar.exists()).toBe(true);
-        expect(btnFinalizar.attributes('disabled')).toBeDefined();
+        expect(btnFinalizar.attributes('disabled')).toBeUndefined();
+
+        await btnFinalizar.trigger("click");
+        expect((wrapper.vm as any).mostrarModalFinalizacao).toBe(false);
+        expect(wrapper.text()).toContain("Não é possível finalizar o processo enquanto houver unidades com mapa não homologado");
     });
 
     it("deve manter menu de ações em bloco visível e habilitado mesmo quando nenhuma ação estiver habilitada", async () => {

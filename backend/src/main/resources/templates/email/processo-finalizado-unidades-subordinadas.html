@@ -11,7 +11,11 @@
             Comunicamos a finalização do processo <strong th:text="${nomeProcesso}"></strong> para as unidades
             <strong th:text="${#strings.listJoin(siglasUnidadesSubordinadas, ', ')}"></strong>.
         </p>
-        <p>
+        <p th:if="${tipoProcesso == 'DIAGNOSTICO'}">
+            Os resultados do diagnóstico destas unidades podem ser consultados no Sistema de Gestão de Competências
+            (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).
+        </p>
+        <p th:unless="${tipoProcesso == 'DIAGNOSTICO'}">
             Já é possível visualizar os mapas de competências atualizados destas unidades através do menu "Minha
             unidade" do Sistema de Gestão de Competências
             (<a href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>).

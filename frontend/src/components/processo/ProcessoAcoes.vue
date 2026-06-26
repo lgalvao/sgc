@@ -3,6 +3,7 @@ import {BButton, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import ProcessoInfo from "@/components/processo/ProcessoInfo.vue";
 import {TEXTOS} from "@/constants/textos";
+import {SituacaoProcesso} from "@/types/comum";
 import type {AcaoBlocoProcesso, Processo} from "@/types/tipos";
 import {obterIdBotaoAcaoProcesso, obterTestIdBotaoAcaoProcesso} from "@/components/processo/processoAcoes";
 
@@ -36,7 +37,7 @@ const emit = defineEmits<{
     <template #actions>
       <BButton
           v-if="mostrarFinalizarProcesso"
-          :disabled="!podeFinalizar"
+          :disabled="processo.situacao === SituacaoProcesso.FINALIZADO"
           data-testid="btn-processo-finalizar"
           variant="danger"
           @click="emit('finalizar')"

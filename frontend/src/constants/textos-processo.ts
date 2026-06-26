@@ -1,3 +1,5 @@
+import {TipoProcesso} from "@/types/comum";
+
 export const TEXTOS_TABELA_PROCESSOS = {
     EMPTY_TITLE: "Sem processos",
     EMPTY_DESCRIPTION: "Processos ativos aparecem aqui.",
@@ -15,8 +17,10 @@ export const TEXTOS_PROCESSO = {
     ERRO_PADRAO: "Ocorreu um erro",
     FINALIZACAO_TITULO: "Finalização de processo",
     FINALIZACAO_CONFIRMACAO_PREFIXO: "Confirma a finalização do processo",
-    FINALIZACAO_CONFIRMACAO_COMPLEMENTO:
-        "Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo.",
+    FINALIZACAO_CONFIRMACAO_COMPLEMENTO: (tipoProcesso: TipoProcesso) =>
+        tipoProcesso === TipoProcesso.DIAGNOSTICO
+            ? "Essa ação encerrará o processo e notificará todas as unidades participantes."
+            : "Essa ação tornará vigentes os mapas de competências homologados e notificará todas as unidades participantes do processo.",
     ERRO_ACAO_BLOCO: "Erro ao executar ação em bloco",
     INFO_TIPO: "Tipo",
     INFO_SITUACAO: "Situação",

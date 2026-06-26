@@ -140,6 +140,10 @@ public final class Mensagens {
     public static final String UNIDADE_NAO_PARTICIPA = "Unidade não participa deste processo.";
     public static final String SITUACAO_INVALIDA = "Situação inválida.";
     public static final String SUBPROCESSOS_NAO_HOMOLOGADOS = "Subprocessos não homologados.";
+    public static final String PROCESSO_FINALIZACAO_MAPAS_PENDENTES =
+            "Não é possível finalizar o processo enquanto houver unidades com mapa não homologado";
+    public static final String PROCESSO_FINALIZACAO_DIAGNOSTICO_PENDENTE =
+            "Não é possível finalizar o processo: há unidades não homologadas";
     public static final String PROCESSO_DEVE_ESTAR_FINALIZADO = "Processo deve estar finalizado.";
     public static final String DATA_FIM_DEVE_SER_POSTERIOR = "A data de término deve ser posterior à data de início.";
     public static final String ATRIBUICAO_TEMPORARIA_SOBREPOSTA = "Já existe uma atribuição temporária sobreposta para a unidade no período informado.";

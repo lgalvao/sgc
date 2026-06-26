@@ -1,5 +1,6 @@
 package sgc.alerta;
 
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -20,12 +21,12 @@ public final class AssuntosNotificacao {
                 : "SGC: Início de processo de %s em unidades subordinadas".formatted(descricaoTipoProcesso);
     }
 
-    public static String processoFinalizado(String nomeProcesso) {
-        return "SGC: Finalização do processo %s".formatted(nomeProcesso);
+    public static String processoFinalizado(TipoProcesso tipoProcesso) {
+        return "SGC: Finalização de processo de %s".formatted(descricaoTipoProcessoFinalizacao(tipoProcesso));
     }
 
-    public static String processoFinalizadoUnidadesSubordinadas(String nomeProcesso) {
-        return "%s em unidades subordinadas".formatted(processoFinalizado(nomeProcesso));
+    public static String processoFinalizadoUnidadesSubordinadas(TipoProcesso tipoProcesso) {
+        return "%s em unidades subordinadas".formatted(processoFinalizado(tipoProcesso));
     }
 
     public static String lembretePrazo(String nomeProcesso) {
@@ -87,6 +88,14 @@ public final class AssuntosNotificacao {
 
     public static String disponibilizacaoMapaBloco() {
         return "SGC: Mapas de competências disponibilizados";
+    }
+
+    private static String descricaoTipoProcessoFinalizacao(TipoProcesso tipoProcesso) {
+        return switch (tipoProcesso) {
+            case MAPEAMENTO -> "mapeamento";
+            case REVISAO -> "revisão";
+            case DIAGNOSTICO -> "diagnóstico";
+        };
     }
 
     public static String aceiteValidacaoBlocoDireto(String siglaUnidade) {

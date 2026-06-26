@@ -38,6 +38,11 @@ export function useFinalizacaoProcesso(dependencias: DependenciasProcessoAcoes) 
     }
 
     function finalizarProcesso() {
+        const processo = dependencias.processo.value;
+        if (processo && processo.podeFinalizar === false) {
+            dependencias.notify(processo.mensagemFinalizacao || TEXTOS.processo.ERRO_PADRAO, "danger");
+            return;
+        }
         mostrarModalFinalizacao.value = true;
     }
 
