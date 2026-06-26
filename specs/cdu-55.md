@@ -1,6 +1,6 @@
-# CDU-54 - Gerar relatório de situação de capacitação
+# CDU-55 - Gerar relatório de situação de capacitação
 
-**Ator:** ADMIN, GESTOR
+**Ator:** ADMIN ou GESTOR
 
 ## Pré-condições
 

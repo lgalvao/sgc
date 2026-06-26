@@ -214,7 +214,10 @@ public class SubprocessoValidacaoService {
         );
 
         if (total != homologados) {
-            return ResultadoValidacao.ofInvalido(Mensagens.SUBPROCESSOS_NAO_HOMOLOGADOS);
+            return ResultadoValidacao.ofInvalido(
+                    "Apenas %d de %d subprocessos foram homologados. Todos os subprocessos devem estar homologados."
+                            .formatted(homologados, total)
+            );
         }
 
         return ResultadoValidacao.ofValido();
