@@ -1099,8 +1099,10 @@ public class E2eController {
         Unidade unidade = unidadeService.buscarPorSigla(unidadeSigla);
         Unidade unidadeSuperior = obterUnidadeSuperiorObrigatoria(unidade);
         Unidade admin = unidadeService.buscarAdmin();
-        Usuario usuarioGestor = usuarioRepo.findById("666666666666")
-                .orElseThrow(() -> new IllegalStateException("Usuário gestor fixture não encontrado"));
+        String tituloTitular = Optional.ofNullable(unidadeSuperior.getTituloTitular())
+                .orElseThrow(() -> new IllegalStateException("Unidade superior da fixture sem titular"));
+        Usuario usuarioGestor = usuarioRepo.findById(tituloTitular)
+                .orElseThrow(() -> new IllegalStateException("Titular da unidade superior da fixture não encontrado"));
         Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso).orElseThrow();
 
         analiseRepo.saveAndFlush(Analise.builder()
