@@ -77,6 +77,8 @@ export const TEXTOS_DIAGNOSTICO = {
     MODAL_CONCLUIR_CONSENSO_MENSAGEM: 'Confirma a conclusão de avaliação de consenso?',
     MODAL_APROVAR_TITULO: 'Aprovar avaliação de consenso',
     MODAL_APROVAR_MENSAGEM: 'Confirma a aprovação da avaliação de consenso definida pelo responsavel da unidade?',
+    MODAL_APROVAR_CONSENSO_TITULO: 'Aprovar consenso',
+    MODAL_APROVAR_CONSENSO_MENSAGEM: 'Confirma a aprovação do consenso?',
     MODAL_VALIDAR_TITULO: 'Aceitar diagnóstico',
     MODAL_DEVOLVER_TITULO: 'Devolver diagnóstico',
     MODAL_DEVOLVER_PLACEHOLDER: 'Informe a justificativa para devolução...',

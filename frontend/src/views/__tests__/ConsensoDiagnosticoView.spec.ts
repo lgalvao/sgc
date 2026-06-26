@@ -111,8 +111,11 @@ function montar(props?: Record<string, unknown>) {
                 },
                 CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                 DiagnosticoFluxoModais: {
-                    props: ['modalConcluirAberto', 'testIdConfirmarConcluir', 'tituloConcluir', 'mensagemConcluir', 'botaoConcluir'],
-                    emits: ['confirmarConcluir', 'update:modalConcluirAberto'],
+                    props: [
+                        'modalConcluirAberto', 'testIdConfirmarConcluir', 'tituloConcluir', 'mensagemConcluir', 'botaoConcluir',
+                        'modalAprovarConsensoAberto', 'testIdConfirmarAprovarConsenso'
+                    ],
+                    emits: ['confirmarConcluir', 'update:modalConcluirAberto', 'confirmarAprovarConsenso', 'update:modalAprovarConsensoAberto'],
                     template: `
                       <div>
                         <button
@@ -121,6 +124,13 @@ function montar(props?: Record<string, unknown>) {
                           @click="$emit('confirmarConcluir')"
                         >
                           Confirmar
+                        </button>
+                        <button
+                          v-if="modalAprovarConsensoAberto"
+                          :data-testid="testIdConfirmarAprovarConsenso || 'btn-confirmar-aprovar-consenso'"
+                          @click="$emit('confirmarAprovarConsenso')"
+                        >
+                          Confirmar Aprovar
                         </button>
                       </div>
                     `,
@@ -243,6 +253,7 @@ describe('ConsensoDiagnosticoView', () => {
         const wrapper = montar();
 
         await wrapper.get('[data-testid="btn-aprovar-consenso"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-aprovar-consenso"]').trigger('click');
 
         expect(aprovarConsensoMock).toHaveBeenCalledTimes(1);
         expect(setPendingMock).toHaveBeenCalledWith('Avaliação de consenso aprovada');
@@ -333,6 +344,7 @@ describe('ConsensoDiagnosticoView', () => {
         const wrapper = montar();
 
         await wrapper.get('[data-testid="btn-aprovar-consenso"]').trigger('click');
+        await wrapper.get('[data-testid="btn-confirmar-aprovar-consenso"]').trigger('click');
         expect(wrapper.find('.app-alert').text()).toContain('Falha ao salvar consenso');
 
         await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');

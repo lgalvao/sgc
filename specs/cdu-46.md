@@ -32,9 +32,12 @@ Ator: SERVIDOR
 
 5. Se o usuário acionar o botão `Aprovar consenso`.
 
-6. O sistema altera a situação do servidor para 'Avaliação de consenso aprovada'.
+   5.1. O sistema mostra uma tela de confirmação: "Confirma a aprovação do cosenso?"
+   com botões `Cancelar` e `Aprovar consenso`
+   
+   5.2. Feita a confirmação, o sistema altera a situação do servidor para 'Avaliação de consenso aprovada'.
 
-7. O sistema envia uma notificação por e-mail ao responsável pela unidade do subprocesso, com este modelo:
+6. O sistema envia uma notificação por e-mail ao responsável pela unidade do subprocesso, com este modelo:
 
    ```text
    Assunto: SGC: Avaliação de consenso aprovada: [NOME_SERVIDOR]
@@ -46,12 +49,12 @@ Ator: SERVIDOR
    Acompanhe o processo no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
    ```
 
-8. O sistema cria internamente um alerta com estes campos/valores:
+7. O sistema cria internamente um alerta com estes campos/valores:
     - `Descrição`: "Avaliação de consenso aprovada: [NOME_SERVIDOR]"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-9. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com mensagem "Avaliação de consenso
+8. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com mensagem "Avaliação de consenso
    aprovada".

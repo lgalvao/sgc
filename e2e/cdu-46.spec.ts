@@ -3,6 +3,7 @@ import {criarProcessoDiagnosticoComConsensoCriadoFixture} from './fixtures/index
 import {login} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {verificarToast} from './helpers/helpers-navegacao.js';
+import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const TITULO_SERVIDOR_ASSESSORIA_12 = '242426';
 const UNIDADE = 'ASSESSORIA_12';
@@ -35,9 +36,11 @@ test.describe('CDU-46 - Aprovar avaliação de consenso', () => {
         const codSubprocesso = Number(new URL(page.url()).pathname.split('/')[2]);
 
         await expect(page.getByTestId('btn-aprovar-consenso')).toBeVisible();
+        await page.getByTestId('btn-aprovar-consenso').click();
+        await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_APROVAR_CONSENSO_MENSAGEM);
         await Promise.all([
             page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/consenso/aprovar`) && res.ok()),
-            page.getByTestId('btn-aprovar-consenso').click()
+            page.getByTestId('btn-confirmar-aprovar-consenso').click()
         ]);
 
         await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processo.codigo}/${UNIDADE}`));

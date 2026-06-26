@@ -43,6 +43,10 @@ defineProps<{
     testIdConfirmarHomologar?: string;
     testIdConfirmarImpossibilitar?: string;
     testIdConfirmarPermitirAvaliacao?: string;
+    modalAprovarConsensoAberto?: boolean;
+    aprovandoConsenso?: boolean;
+    erroAprovarConsenso?: string | null;
+    testIdConfirmarAprovarConsenso?: string;
 }>()
 
 defineEmits<{
@@ -63,6 +67,8 @@ defineEmits<{
     (e: "update:modalPermitirAvaliacaoAberto", valor: boolean): void;
     (e: "confirmarPermitirAvaliacao"): void;
     (e: "update:modalHistoricoAberto", valor: boolean): void;
+    (e: "update:modalAprovarConsensoAberto", valor: boolean): void;
+    (e: "confirmarAprovarConsenso"): void;
 }>();
 </script>
 
@@ -181,6 +187,26 @@ defineEmits<{
         @confirmar="$emit('confirmarPermitirAvaliacao')"
         @update:model-value="$emit('update:modalPermitirAvaliacaoAberto', $event)"
     />
+
+    <ModalConfirmacao
+        v-if="modalAprovarConsensoAberto !== undefined"
+        :auto-close="false"
+        data-testid="modal-aprovar-consenso"
+        :model-value="modalAprovarConsensoAberto"
+        :loading="aprovandoConsenso"
+        :mensagem="TEXTOS.diagnostico.MODAL_APROVAR_CONSENSO_MENSAGEM"
+        :ok-title="TEXTOS.diagnostico.BTN_APROVAR_CONSENSO"
+        :titulo="TEXTOS.diagnostico.MODAL_APROVAR_CONSENSO_TITULO"
+        :test-id-confirmar="testIdConfirmarAprovarConsenso || 'btn-confirmar-aprovar-consenso'"
+        variant="success"
+        @confirmar="$emit('confirmarAprovarConsenso')"
+        @update:model-value="$emit('update:modalAprovarConsensoAberto', $event)"
+    >
+        <div>
+            <p class="mb-0">{{ TEXTOS.diagnostico.MODAL_APROVAR_CONSENSO_MENSAGEM }}</p>
+            <div v-if="erroAprovarConsenso" class="text-danger small mt-3">{{ erroAprovarConsenso }}</div>
+        </div>
+    </ModalConfirmacao>
 
     <HistoricoAnaliseModal
         v-if="modalHistoricoAberto !== undefined && historicoAnalises !== undefined"

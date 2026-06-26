@@ -17,7 +17,7 @@
               :pode-aprovar-consenso="podeAprovarConsenso"
               :pode-concluir-avaliacao="podeConcluirAvaliacao"
               :servidor-eh-usuario-logado="servidorEhUsuarioLogado"
-              @aprovar-consenso="confirmarAprovarConsenso"
+              @aprovar-consenso="abrirModalAprovarConsenso"
               @concluir-avaliacao="confirmarConcluirAvaliacao"
               @voltar="voltar"
           />
@@ -60,8 +60,14 @@
           :mensagem-concluir="TEXTOS.diagnostico.MODAL_CONCLUIR_CONSENSO_MENSAGEM"
           :botao-concluir="TEXTOS.diagnostico.BTN_CONCLUIR_CONSENSO"
           test-id-confirmar-concluir="btn-confirmar-concluir"
+          :aprovando-consenso="aprovando"
+          :modal-aprovar-consenso-aberto="modalAprovarConsensoAberto"
+          :erro-aprovar-consenso="erroAprovar ? erroAprovar.message : null"
+          test-id-confirmar-aprovar-consenso="btn-confirmar-aprovar-consenso"
           @confirmar-concluir="confirmarConcluir"
           @update:modal-concluir-aberto="modalConcluirAberto = $event"
+          @confirmar-aprovar-consenso="confirmarAprovarConsenso"
+          @update:modal-aprovar-consenso-aberto="modalAprovarConsensoAberto = $event"
       />
     </template>
   </LayoutPadrao>
@@ -140,9 +146,16 @@ function voltar() {
   void router.back();
 }
 
+const modalAprovarConsensoAberto = ref(false);
+
+function abrirModalAprovarConsenso() {
+  modalAprovarConsensoAberto.value = true;
+}
+
 async function confirmarAprovarConsenso() {
   try {
     await aprovarConsenso();
+    modalAprovarConsensoAberto.value = false;
     const toastStore = useToastStore();
     toastStore.setPending(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
     if (contexto.value?.processoCodigo) {
