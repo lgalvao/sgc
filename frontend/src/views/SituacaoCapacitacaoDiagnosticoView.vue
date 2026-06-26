@@ -51,7 +51,7 @@
                 class="mb-3 border-0 bg-body-tertiary"
                 data-testid="detalhes-servidor-situacao-capacitacao"
             >
-              <div class="fw-semibold text-primary">{{ servidorSelecionado.servidorNome }}</div>
+              <div class="fw-semibold text-primary-emphasis">{{ servidorSelecionado.servidorNome }}</div>
               <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
             </BCard>
 
@@ -86,6 +86,7 @@
                           :data-testid="`situacao-${servidorSelecionadoTitulo}-${linha.competenciaCodigo}`"
                           :model-value="linha.situacaoCapacitacao"
                           :options="opcoesCapacitacao"
+                          :aria-label="`Situação de capacitação para ${linha.competenciaDescricao}`"
                           class="form-select-sm seletor-capacitacao"
                           @update:model-value="(v: unknown) => atualizarCapacitacao(servidorSelecionadoTitulo, linha.competenciaCodigo, v as ValorSituacaoCapacitacao)"
                       />
