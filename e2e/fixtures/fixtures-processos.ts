@@ -188,6 +188,29 @@ export async function criarProcessoDiagnosticoProntoParaConcluirFixture(
     return await response.json();
 }
 
+export async function criarProcessoDiagnosticoAceitoFixture(
+    request: APIRequestContext,
+    options: ProcessoFixtureOptions
+): Promise<ProcessoFixture> {
+    const response = await request.post('/e2e/fixtures/processo-diagnostico-aceito', {
+        data: {
+            unidadeSigla: options.unidade,
+            iniciar: options.iniciar ?? true,
+            descricao: options.descricao ?? `Fixture E2E DIAGNOSTICO ACEITO ${Date.now()}`,
+            diasLimite: options.diasLimite ?? 30
+        }
+    });
+
+    if (!response.ok()) {
+        throw new Error(
+            `Falha ao criar processo diagnóstico aceito: ` +
+            `${response.status()} ${response.statusText()}`
+        );
+    }
+
+    return await response.json();
+}
+
 export async function criarProcessoDiagnosticoHomologadoFixture(
     request: APIRequestContext,
     options: ProcessoFixtureOptions

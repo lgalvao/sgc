@@ -56,6 +56,9 @@ public class E2eController {
     private final DiagnosticoRepo diagnosticoRepo;
     private final AvaliacaoServidorRepo avaliacaoServidorRepo;
     private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
+    private final AnaliseRepo analiseRepo;
+    private final MovimentacaoRepo movimentacaoRepo;
+    private final UsuarioRepo usuarioRepo;
     private final UnidadeService unidadeService;
     private final ResourceLoader resourceLoader;
     private final CacheManager cacheManager;
@@ -72,6 +75,9 @@ public class E2eController {
             DiagnosticoRepo diagnosticoRepo,
             AvaliacaoServidorRepo avaliacaoServidorRepo,
             SituacaoCapacitacaoRepo situacaoCapacitacaoRepo,
+            AnaliseRepo analiseRepo,
+            MovimentacaoRepo movimentacaoRepo,
+            UsuarioRepo usuarioRepo,
             UnidadeService unidadeService,
             ResourceLoader resourceLoader,
             CacheManager cacheManager
@@ -86,6 +92,9 @@ public class E2eController {
         this.diagnosticoRepo = diagnosticoRepo;
         this.avaliacaoServidorRepo = avaliacaoServidorRepo;
         this.situacaoCapacitacaoRepo = situacaoCapacitacaoRepo;
+        this.analiseRepo = analiseRepo;
+        this.movimentacaoRepo = movimentacaoRepo;
+        this.usuarioRepo = usuarioRepo;
         this.unidadeService = unidadeService;
         this.resourceLoader = resourceLoader;
         this.cacheManager = cacheManager;
@@ -342,6 +351,16 @@ public class E2eController {
     ) {
         Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
         prepararDiagnosticoParaConclusaoFixture(processo.getCodigo(), request.unidadeSigla());
+        return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
+    }
+
+    @PostMapping("/fixtures/processo-diagnostico-aceito")
+    @Transactional
+    public ProcessoResumoDto criarProcessoDiagnosticoAceito(
+            @RequestBody ProcessoDiagnosticoAutoavaliadoFixtureRequest request
+    ) {
+        Processo processo = executeAsAdmin(() -> criarProcessoFixture(request.paraProcessoFixtureRequest(), TipoProcesso.DIAGNOSTICO));
+        aceitarDiagnosticoFixture(processo.getCodigo(), request.unidadeSigla());
         return processoResumoFixture(processoService.buscarPorCodigo(processo.getCodigo()));
     }
 
@@ -1073,8 +1092,38 @@ public class E2eController {
         limparCaches();
     }
 
-    private void homologarDiagnosticoFixture(Long codProcesso, String unidadeSigla) {
+    private void aceitarDiagnosticoFixture(Long codProcesso, String unidadeSigla) {
         concluirDiagnosticoFixture(codProcesso, unidadeSigla);
+
+        Long codSubprocesso = buscarCodigoSubprocesso(codProcesso, unidadeSigla);
+        Unidade unidade = unidadeService.buscarPorSigla(unidadeSigla);
+        Unidade unidadeSuperior = obterUnidadeSuperiorObrigatoria(unidade);
+        Unidade admin = unidadeService.buscarAdmin();
+        Usuario usuarioGestor = usuarioRepo.findById("666666666666")
+                .orElseThrow(() -> new IllegalStateException("Usuário gestor fixture não encontrado"));
+        Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso).orElseThrow();
+
+        analiseRepo.saveAndFlush(Analise.builder()
+                .tipo(TipoAnalise.DIAGNOSTICO)
+                .subprocesso(subprocesso)
+                .acao(TipoAcaoAnalise.ACEITE_DIAGNOSTICO)
+                .dataHora(LocalDateTime.now())
+                .unidadeCodigo(unidadeSuperior.getCodigo())
+                .usuarioTitulo(usuarioGestor.getTituloEleitoral())
+                .build());
+
+        movimentacaoRepo.saveAndFlush(Movimentacao.builder()
+                .subprocesso(subprocesso)
+                .unidadeOrigem(unidadeSuperior)
+                .unidadeDestino(admin)
+                .usuario(usuarioGestor)
+                .descricao("Aceite de diagnóstico via fixture")
+                .build());
+        limparCaches();
+    }
+
+    private void homologarDiagnosticoFixture(Long codProcesso, String unidadeSigla) {
+        aceitarDiagnosticoFixture(codProcesso, unidadeSigla);
 
         Long codSubprocesso = buscarCodigoSubprocesso(codProcesso, unidadeSigla);
         Unidade admin = unidadeService.buscarAdmin();

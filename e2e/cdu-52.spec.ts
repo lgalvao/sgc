@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoDiagnosticoConcluidoFixture} from './fixtures/index.js';
+import {criarProcessoDiagnosticoAceitoFixture} from './fixtures/index.js';
 import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {verificarPaginaPainel} from './helpers/helpers-navegacao.js';
 import {verificarAusenciaNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
@@ -9,7 +9,7 @@ test.describe.serial('CDU-52 - homologar diagnósticos em bloco', () => {
     const DESCRICAO_PROCESSO = `Diagnóstico CDU-52 ${Date.now()}`;
 
     test('Setup data', async ({_resetAutomatico, request}) => {
-        const processo = await criarProcessoDiagnosticoConcluidoFixture(request, {
+        const processo = await criarProcessoDiagnosticoAceitoFixture(request, {
             descricao: DESCRICAO_PROCESSO,
             unidade: UNIDADE
         });
