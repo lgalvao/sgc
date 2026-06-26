@@ -17,7 +17,7 @@ test.describe.serial('CDU-51 - aceitar diagnósticos em bloco', () => {
         expect(processo.codigo).toBeGreaterThan(0);
     });
 
-    test('Cenários CDU-51: GESTOR valida diagnósticos em bloco', async ({_resetAutomatico, page}) => {
+    test('Cenários CDU-51: GESTOR aceita diagnósticos em bloco', async ({_resetAutomatico, page}) => {
         await loginComPerfil(
             page,
             USUARIOS.GESTOR_SECRETARIA_1.titulo,
@@ -28,11 +28,11 @@ test.describe.serial('CDU-51 - aceitar diagnósticos em bloco', () => {
         await acessarDetalhesProcesso(page, DESCRICAO_PROCESSO);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 
-        const botaoValidar = await obterAcaoBloco(page, 'btn-processo-validar-diagnosticos-bloco');
-        await expect(botaoValidar).toBeVisible();
-        await expect(botaoValidar).toBeEnabled();
+        const botaoAceitar = await obterAcaoBloco(page, 'btn-processo-aceitar-diagnosticos-bloco');
+        await expect(botaoAceitar).toBeVisible();
+        await expect(botaoAceitar).toBeEnabled();
 
-        await botaoValidar.click();
+        await botaoAceitar.click();
 
         const modal = page.locator('#modal-acao-bloco');
         await expect(modal).toHaveClass(/show/);
@@ -43,13 +43,13 @@ test.describe.serial('CDU-51 - aceitar diagnósticos em bloco', () => {
         await expect(modal).not.toHaveClass(/show/);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 
-        const botaoValidarConfirmacao = await obterAcaoBloco(page, 'btn-processo-validar-diagnosticos-bloco');
-        await botaoValidarConfirmacao.click();
+        const botaoAceitarConfirmacao = await obterAcaoBloco(page, 'btn-processo-aceitar-diagnosticos-bloco');
+        await botaoAceitarConfirmacao.click();
         await expect(modal).toHaveClass(/show/);
         await modal.getByTestId('btn-acao-bloco-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText('Diagnósticos aceitos em bloco')).toBeVisible();
+        await expect(page.getByText('Diagnósticos aceitos')).toBeVisible();
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await verificarNotificacaoAdmin(page, {

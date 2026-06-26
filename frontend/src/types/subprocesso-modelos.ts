@@ -106,6 +106,7 @@ export interface SubprocessoElegivel {
     habilitarAceitarDiagnosticoBloco: boolean;
     habilitarHomologarCadastroBloco: boolean;
     habilitarHomologarMapaBloco: boolean;
+    habilitarHomologarDiagnosticoBloco?: boolean;
     habilitarDisponibilizarMapaBloco: boolean;
     ultimaDataLimite?: string;
 }

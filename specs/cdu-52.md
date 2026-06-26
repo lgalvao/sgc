@@ -1,62 +1,45 @@
-# CDU-52 - Finalizar processo de diagnóstico
+# CDU-52 - Homologar diagnósticos em bloco
 
 **Ator:** ADMIN
 
 ## Pré-condições
 
 - Usuário logado com perfil ADMIN.
-- Existência de processo de diagnóstico na situação `Em andamento`.
+- Ao menos um processo de diagnóstico em andamento.
+- Ao menos um subprocesso de unidade subordinada na situação 'Concluído' e localizado na unidade do usuário.
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário clica em um processo de diagnóstico com situação `Em andamento`.
+1. No `Painel`, o usuário aciona um processo de diagnóstico em andamento.
 
-2. O sistema mostra a tela `Detalhes do processo`.
+2. O sistema mostra a tela `Detalhes do processo`, especificada em [CDU-06 - Detalhar processo](cdu-06.md)
 
-3. O usuário clica no botão `Finalizar`.
+3. O usuário aciona `Homologar em bloco`
 
-4. O sistema verifica se todos os subprocessos das unidades operacionais e interoperacionais participantes estão na
-   situação `Homologado`.
+4. O sistema mostra um modal de confirmação:
+    - Título: "Homologação de diagnósticos em bloco";
+    - Texto: "Selecione as unidades cujos diagnósticos devem ser homologados";
+    - Uma grade com as unidades na situação 'Concluído' e com subprocesso localizado na unidade do usuário, com um
+      checkbox (pré-selecionado), sigla, nome e situação de cada unidade;
+    - Botões `Cancelar` e `Homologar em bloco`.
 
-5. Caso exista ao menos uma unidade ainda não homologada, o sistema exibe a mensagem `Não é possível finalizar o
-   processo enquanto houver unidades com diagnóstico ainda não homologado`.
+5. O usuário seleciona as unidades a serem homologadas e aciona `Homologar em bloco`.
+    - 5.1. Se o usuário desmarcar todas as unidades, o sistema mostra um alerta "Selecione ao menos uma unidade" e
+      interrompe a operação.
 
-6. Caso todas as unidades estejam homologadas, o sistema mostra diálogo de confirmação com:
-    - título "Finalização de processo";
-    - mensagem:
-        - "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação encerrará o ciclo de diagnóstico e
-          notificará todas as unidades participantes do processo.";
-    - botões `Cancelar` e `Finalizar`.
+6. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
-7. O usuário clica em `Finalizar`.
+   6.1. Registra uma análise de validação para o subprocesso da unidade:
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade`: [SIGLA_UNIDADE_ATUAL]
+    - `Resultado`: "Homologação"
 
-8. O sistema muda a situação do processo para `Finalizado` 
+   6.2. Registra uma movimentação para o subprocesso da unidade:
+    - `Data/hora`: [Data/hora atual]
+    - `Unidade origem`: ADMIN
+    - `Unidade destino`: ADMIN
+    - `Descrição`: "Homologação"
 
-9. O sistema envia notificações por e-mail para todas as unidades participantes, como a seguir:
+   A localização do subprocesso não é alterada.
 
-   9.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo o modelo:
-
-   ```text
-   Assunto: SGC: Finalização do processo [DESCRICAO_PROCESSO]
-
-   Prezado(a) responsável pela [SIGLA_UNIDADE],
-
-   Comunicamos a finalização do processo [DESCRICAO_PROCESSO] para a sua unidade.
-
-   Os resultados consolidados do diagnóstico já podem ser consultados no Sistema de Gestão de Competências ([URL_SISTEMA]).
-   ```
-
-   9.2. Unidades intermediárias deverão receber um e-mail com informações consolidadas das unidades operacionais e
-   interoperacionais subordinadas a elas, segundo o modelo:
-
-   ```text
-   Assunto: SGC: Finalização do processo [DESCRICAO_PROCESSO] em unidades subordinadas
-
-   Prezado(a) responsável pela [SIGLA_UNIDADE],
-
-   Comunicamos a finalização do processo [DESCRICAO_PROCESSO] para as unidades [SIGLAS_UNIDADES_SUBORDINADAS].
-
-   Os resultados consolidados do diagnóstico destas unidades já podem ser consultados no Sistema de Gestão de Competências ([URL_SISTEMA]).
-   ```
-
-10. O sistema redireciona para o `Painel`, mostrando a mensagem `Processo finalizado`.
+7. O sistema mostra um *toast* `Diagnósticos homologados`. 

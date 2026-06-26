@@ -257,17 +257,30 @@ public class DiagnosticoFluxoService {
         notificacaoService.notificarDiagnosticoAceito(subprocesso, unidadeAnalise, unidadeSuperior);
     }
 
-    public void validarDiagnosticosEmBloco(List<Long> subprocessoCodigos) {
+    public void aceitarDiagnosticosEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoCodigos.stream()
                 .map(subprocessoConsultaService::buscarSubprocesso)
                 .toList();
+        Unidade unidadeAnalise = null;
+        Unidade unidadeSuperior = null;
 
         for (Subprocesso subprocesso : subprocessos) {
-            validarDiagnosticoEmBloco(subprocesso, usuario);
+            Unidade[] contexto = validarDiagnosticoEmBloco(subprocesso, usuario);
+            if (unidadeAnalise == null && unidadeSuperior == null) {
+                unidadeAnalise = contexto[0];
+                unidadeSuperior = contexto[1];
+            }
         }
 
-        notificacaoService.notificarDiagnosticosAceitosEmBloco(subprocessos);
+        if (!subprocessos.isEmpty() && unidadeAnalise != null && unidadeSuperior != null) {
+            notificacaoService.notificarDiagnosticosAceitosEmBloco(subprocessos, unidadeSuperior);
+            notificacaoService.criarAlertaDiagnosticosAceitosEmBloco(
+                    subprocessos.getFirst().getProcesso(),
+                    unidadeAnalise,
+                    unidadeSuperior
+            );
+        }
     }
 
     public void validarAceiteDiagnostico(Long codSubprocesso) {
@@ -300,6 +313,16 @@ public class DiagnosticoFluxoService {
         notificacaoService.notificarDiagnosticoHomologado(subprocesso);
     }
 
+    public void homologarDiagnosticosEmBloco(List<Long> subprocessoCodigos) {
+        List<Subprocesso> subprocessos = subprocessoCodigos.stream()
+                .map(subprocessoConsultaService::buscarSubprocesso)
+                .toList();
+
+        for (Subprocesso subprocesso : subprocessos) {
+            homologarDiagnosticoEmBloco(subprocesso);
+        }
+    }
+
     public void validarHomologacaoDiagnostico(Long codSubprocesso) {
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -324,16 +347,16 @@ public class DiagnosticoFluxoService {
         return unidadeService.buscarPorCodigo(codigoPai);
     }
 
-    private void validarDiagnosticoEmBloco(Subprocesso subprocesso, Usuario usuario) {
+    private Unidade[] validarDiagnosticoEmBloco(Subprocesso subprocesso, Usuario usuario) {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
         Unidade unidadeSuperior = buscarSuperiorImediato(unidadeAnalise.getCodigo());
         if (unidadeSuperior == null) {
-            return;
+            return new Unidade[] {unidadeAnalise, unidadeAnalise};
         }
 
-        transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
+        transicaoService.registrarAnaliseSemComunicacoes(RegistrarWorkflowCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_ACEITO)
@@ -344,7 +367,30 @@ public class DiagnosticoFluxoService {
                 .unidadeDestinoTransicao(unidadeSuperior)
                 .usuario(usuario)
                 .motivoAnalise(null)
-                .observacoes("Avaliação em bloco")
+                .observacoes(null)
+                .build());
+        return new Unidade[] {unidadeAnalise, unidadeSuperior};
+    }
+
+    private void homologarDiagnosticoEmBloco(Subprocesso subprocesso) {
+        subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        validacaoService.validarDiagnosticoHomologavel(subprocesso.getCodigo());
+
+        subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
+
+        Usuario usuario = usuarioContextoService.usuarioAutenticado();
+        Unidade admin = unidadeService.buscarAdmin();
+        transicaoService.registrarAnaliseSemComunicacoes(RegistrarWorkflowCommand.builder()
+                .sp(subprocesso)
+                .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO)
+                .tipoTransicao(TipoTransicao.DIAGNOSTICO_HOMOLOGADO)
+                .tipoAnalise(TipoAnalise.DIAGNOSTICO)
+                .tipoAcaoAnalise(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO)
+                .unidadeAnalise(admin)
+                .unidadeOrigemTransicao(admin)
+                .unidadeDestinoTransicao(admin)
+                .usuario(usuario)
+                .observacoes(null)
                 .build());
     }
 }

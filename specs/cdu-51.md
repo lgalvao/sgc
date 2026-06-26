@@ -14,47 +14,51 @@
 
 2. O sistema mostra a tela `Detalhes do processo`, especificada em [CDU-06 - Detalhar processo](cdu-06.md)
 
-3. O usuário aciona `Aceitar diagnósticos em bloco`
+3. O usuário aciona `Aceitar em bloco`
 
 4. O sistema mostra um modal de confirmação:
     - Título: "Aceite de diagnósticos em bloco";
     - Texto: "Selecione as unidades cujos diagnósticos devem ser aceitos";
-    - Uma grade com as unidades na situação 'Concluído' e localizado na unidade do usuário, com um checkbox (selecionado),
-      sigla, nome e situação de cada unidade;
+    - Uma grade com as unidades que estejam em situação 'Concluído' e localizadas na unidade do usuário, com checkbox
+      (pré-selecionado), sigla, nome e situação de cada unidade;
     - Botões `Cancelar` e `Aceitar em bloco`.
 
-6. O usuário seleciona as unidades a serem aceitas e aciona `Aceitar em bloco`.
+5. O usuário seleciona as unidades a serem aceitas e aciona `Aceitar em bloco`.
+    - 5.1. Se o usuário desmarcar todas as unidades, o sistema mostra um alerta "Selecione ao menos uma unidade" e
+      interrompe a operação.
 
-7. O sistema atua, para cada unidade selecionada, da seguinte forma:
+6. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
-   7.1. Registra uma análise de validação para o subprocesso da unidade:
+   6.1. Registra uma análise de validação para o subprocesso da unidade:
     - `Data/hora`: [Data/hora atual]
     - `Unidade`: [SIGLA_UNIDADE_ATUAL]
     - `Resultado`: "Aceite"
-   
-   7.2. Registra uma movimentação para o subprocesso da unidade:
+
+   6.2. Registra uma movimentação para o subprocesso da unidade:
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
     - `Descrição`: "Aceite"
 
-8. O sistema envia uma notificação consolidada por e-mail para a unidade superior:
+   Isso muda a localização do subprocesso para a unidade superior.
+
+7. O sistema envia notificação consolidada por e-mail para a unidade superior:
       ```text
       Assunto: SGC: Diagnósticos submetidos para análise
    
       Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
    
-      Os diagnósticos das unidades [LISTA_UNIDADES_MARCADAS] no processo [DESCRICAO_PROCESSO]
+      Os diagnósticos das unidades [LISTA_UNIDADES_SELECIONADAS] no processo [DESCRICAO_PROCESSO]
       foram submetidos para análise por essa unidade.
    
       As análises já podem ser realizadas no Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
       ```
 
-9. O sistema registra um alerta para a unidade superior:
+8. O sistema registra um alerta para a unidade superior:
     - `Descrição`: "Diagnóstico aceito para unidades subordinadas"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
-   
-9. O sistema mostra um *toast* `Diagnósticos aceitos em bloco` e permanece na mesma tela. 
+
+9. O sistema mostra um *toast* `Diagnósticos aceitos`. 

@@ -11,6 +11,7 @@ import sgc.comum.erros.*;
 import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -196,46 +197,49 @@ public class DiagnosticoNotificacaoService {
         );
     }
 
-    public void notificarDiagnosticosAceitosEmBloco(java.util.List<Subprocesso> subprocessos) {
+    public void notificarDiagnosticosAceitosEmBloco(java.util.List<Subprocesso> subprocessos, Unidade unidadeSuperior) {
         if (subprocessos.isEmpty()) {
             return;
         }
 
-        agruparPorSuperiorImediato(subprocessos).forEach((unidadeSuperior, subprocessosSuperior) -> {
-            DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
-            Subprocesso base = subprocessosSuperior.getFirst();
-            String assunto = "SGC: Diagnósticos submetidos para análise";
-            String corpo = emailModelosService.criarEmailDiagnosticoAceitoEmBloco(
-                    unidadeSuperior.getSigla(),
-                    base.getProcesso().getDescricao(),
-                    subprocessosSuperior.stream()
-                            .map(Subprocesso::getUnidade)
-                            .map(Unidade::getSigla)
-                            .distinct()
-                            .sorted()
-                            .toList()
-            );
+        DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
+        Subprocesso base = subprocessos.getFirst();
+        List<String> siglasUnidades = subprocessos.stream()
+                .map(Subprocesso::getUnidade)
+                .map(Unidade::getSigla)
+                .distinct()
+                .sorted()
+                .toList();
+        String assunto = "SGC: Diagnósticos submetidos para análise";
+        String corpo = emailModelosService.criarEmailDiagnosticoAceitoEmBloco(
+                unidadeSuperior.getSigla(),
+                base.getProcesso().getDescricao(),
+                siglasUnidades
+        );
 
-            notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                    .subprocesso(base)
-                    .tipoNotificacao(TipoNotificacao.DIAGNOSTICO_ACEITO)
-                    .usuarioDestinoTitulo(destinatario.usuarioTitulo())
-                    .unidadeDestinoSigla(unidadeSuperior.getSigla())
-                    .destinatario(destinatario.email())
-                    .assunto(assunto)
-                    .corpoHtml(corpo)
-                    .chaveIdempotencia("diagnostico:%d:aceito:bloco:superior:%d:unidades:%s".formatted(
-                            base.getProcesso().getCodigo(),
-                            unidadeSuperior.getCodigo(),
-                            subprocessosSuperior.stream()
-                                    .map(Subprocesso::getUnidade)
-                                    .map(Unidade::getSigla)
-                                    .distinct()
-                                    .sorted()
-                                    .collect(Collectors.joining("-"))
-                    ))
-                    .build());
-        });
+        notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
+                .subprocesso(base)
+                .tipoNotificacao(TipoNotificacao.DIAGNOSTICO_ACEITO)
+                .usuarioDestinoTitulo(destinatario.usuarioTitulo())
+                .unidadeDestinoSigla(unidadeSuperior.getSigla())
+                .destinatario(destinatario.email())
+                .assunto(assunto)
+                .corpoHtml(corpo)
+                .chaveIdempotencia("diagnostico:%d:aceito:bloco:superior:%d:unidades:%s".formatted(
+                        base.getProcesso().getCodigo(),
+                        unidadeSuperior.getCodigo(),
+                        siglasUnidades.stream().collect(Collectors.joining("-"))
+                ))
+                .build());
+    }
+
+    public void criarAlertaDiagnosticosAceitosEmBloco(Processo processo, Unidade unidadeAnalise, Unidade unidadeSuperior) {
+        alertaService.criarAlertaTransicao(
+                processo,
+                sgc.comum.Mensagens.ALERTA_DIAGNOSTICO_ACEITO_BLOCO,
+                unidadeAnalise,
+                unidadeSuperior
+        );
     }
 
     public void notificarDiagnosticoHomologado(Subprocesso sp) {
@@ -288,14 +292,14 @@ public class DiagnosticoNotificacaoService {
     private DestinatarioNotificacao obterDestinatarioResponsavel(Unidade unidade) {
         try {
             UnidadeResponsavelDto responsavel = responsavelService.buscarResponsavelUnidade(unidade.getCodigo());
-            String titulo = responsavel.substitutoTitulo() != null
-                    ? responsavel.substitutoTitulo()
-                    : responsavel.titularTitulo();
-            Usuario usuario = usuarioService.buscarOpt(titulo).orElse(null);
-            if (usuario == null || usuario.getEmail().isBlank()) {
-                return new DestinatarioNotificacao(emailUnidade(unidade), null, null);
+            String substitutoTitulo = responsavel.substitutoTitulo();
+            if (substitutoTitulo != null && !substitutoTitulo.isBlank()) {
+                Usuario usuario = usuarioService.buscarOpt(substitutoTitulo).orElse(null);
+                if (usuario != null && !usuario.getEmail().isBlank()) {
+                    return new DestinatarioNotificacao(usuario.getEmail(), usuario.getTituloEleitoral(), usuario.getNome());
+                }
             }
-            return new DestinatarioNotificacao(usuario.getEmail(), usuario.getTituloEleitoral(), usuario.getNome());
+            return new DestinatarioNotificacao(emailUnidade(unidade), null, null);
         } catch (ErroEntidadeNaoEncontrada ex) {
             log.warn("Responsável não encontrado para unidade {}. Notificação será enviada para o e-mail da unidade.", unidade.getCodigo());
             return new DestinatarioNotificacao(emailUnidade(unidade), null, null);
@@ -311,24 +315,6 @@ public class DiagnosticoNotificacaoService {
                 ? configAplicacao.getUrlAcessoHom()
                 : configAplicacao.getUrlAcessoProd();
         return url == null || url.isBlank() ? "http://localhost:5173" : url;
-    }
-
-    private java.util.Map<Unidade, java.util.List<Subprocesso>> agruparPorSuperiorImediato(java.util.List<Subprocesso> subprocessos) {
-        java.util.Map<Long, Unidade> superiores = new java.util.LinkedHashMap<>();
-        java.util.Map<Long, java.util.List<Subprocesso>> agrupado = new java.util.LinkedHashMap<>();
-
-        for (Subprocesso subprocesso : subprocessos) {
-            Unidade superior = subprocesso.getUnidade().getUnidadeSuperior();
-            if (superior == null) {
-                continue;
-            }
-            superiores.putIfAbsent(superior.getCodigo(), superior);
-            agrupado.computeIfAbsent(superior.getCodigo(), ignorado -> new java.util.ArrayList<>()).add(subprocesso);
-        }
-
-        java.util.Map<Unidade, java.util.List<Subprocesso>> resultado = new java.util.LinkedHashMap<>();
-        agrupado.forEach((codigoSuperior, subprocessosSuperior) -> resultado.put(superiores.get(codigoSuperior), subprocessosSuperior));
-        return resultado;
     }
 
     private record DestinatarioNotificacao(

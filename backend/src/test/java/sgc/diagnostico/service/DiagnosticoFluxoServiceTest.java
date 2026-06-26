@@ -289,6 +289,32 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
+    @DisplayName("aceitarDiagnosticosEmBloco deve registrar aceite e consolidar notificações")
+    void aceitarDiagnosticosEmBloco_deveRegistrarAceiteEConsolidarNotificacoes() {
+        Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
+        Unidade unidadeDestino = unidade(2L, "SECRETARIA_1", "Secretaria 1", TipoUnidade.INTEROPERACIONAL);
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocesso.setCodigo(94L);
+
+        when(subprocessoConsultaService.buscarSubprocesso(94L)).thenReturn(subprocesso);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
+        when(unidadeHierarquiaService.buscarCodigoPai(unidadeGestora.getCodigo())).thenReturn(unidadeDestino.getCodigo());
+        when(unidadeService.buscarPorCodigo(unidadeDestino.getCodigo())).thenReturn(unidadeDestino);
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
+        doNothing().when(subprocessoValidacaoService)
+                .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+
+        service.aceitarDiagnosticosEmBloco(List.of(94L));
+
+        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
+        verify(transicaoService).registrarAnaliseSemComunicacoes(captor.capture());
+        assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.ACEITE_DIAGNOSTICO);
+        assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_ACEITO);
+        assertThat(captor.getValue().observacoes()).isNull();
+        verify(notificacaoService).notificarDiagnosticosAceitosEmBloco(List.of(subprocesso), unidadeDestino);
+    }
+
+    @Test
     @DisplayName("homologarDiagnostico deve exigir validado e registrar homologação no admin")
     void homologarDiagnostico_deveHomologar() {
         Long codSubprocesso = 93L;
@@ -314,6 +340,31 @@ class DiagnosticoFluxoServiceTest {
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO);
         assertThat(captor.getValue().unidadeAnalise()).isEqualTo(admin);
         verify(notificacaoService).notificarDiagnosticoHomologado(subprocesso);
+    }
+
+    @Test
+    @DisplayName("homologarDiagnosticosEmBloco deve homologar sem notificação individual")
+    void homologarDiagnosticosEmBloco_deveHomologarSemNotificacaoIndividual() {
+        Long codSubprocesso = 95L;
+        Unidade admin = unidade(1L, "ADMIN", "Administração", TipoUnidade.RAIZ);
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocesso.setCodigo(codSubprocesso);
+
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
+        doNothing().when(subprocessoValidacaoService)
+                .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        doNothing().when(validacaoService).validarDiagnosticoHomologavel(codSubprocesso);
+
+        service.homologarDiagnosticosEmBloco(List.of(codSubprocesso));
+
+        assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
+        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
+        verify(transicaoService).registrarAnaliseSemComunicacoes(captor.capture());
+        assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO);
+        assertThat(captor.getValue().observacoes()).isNull();
+        verify(notificacaoService, never()).notificarDiagnosticoHomologado(any());
     }
 
     private Unidade unidade(Long codigo, String sigla, String nome, TipoUnidade tipo) {

@@ -102,8 +102,10 @@ const mockElegiveis = [
         localizacaoCodigo: 999,
         habilitarAceitarCadastroBloco: true,
         habilitarAceitarMapaBloco: false,
+        habilitarAceitarDiagnosticoBloco: false,
         habilitarHomologarCadastroBloco: true,
         habilitarHomologarMapaBloco: false,
+        habilitarHomologarDiagnosticoBloco: false,
         habilitarDisponibilizarMapaBloco: false
     },
     {
@@ -114,8 +116,10 @@ const mockElegiveis = [
         localizacaoCodigo: 999,
         habilitarAceitarCadastroBloco: false,
         habilitarAceitarMapaBloco: true,
+        habilitarAceitarDiagnosticoBloco: false,
         habilitarHomologarCadastroBloco: false,
         habilitarHomologarMapaBloco: true,
+        habilitarHomologarDiagnosticoBloco: false,
         habilitarDisponibilizarMapaBloco: false
     },
     {
@@ -126,8 +130,10 @@ const mockElegiveis = [
         localizacaoCodigo: 999,
         habilitarAceitarCadastroBloco: false,
         habilitarAceitarMapaBloco: false,
+        habilitarAceitarDiagnosticoBloco: false,
         habilitarHomologarCadastroBloco: false,
         habilitarHomologarMapaBloco: false,
+        habilitarHomologarDiagnosticoBloco: false,
         habilitarDisponibilizarMapaBloco: true
     }
 ];
@@ -1362,8 +1368,10 @@ function criarAcoesBlocoCobertura(subprocessosElegiveis: any[]) {
     return [
         criarAcao("aceitar-cadastro", "ACEITAR", "habilitarAceitarCadastroBloco", true),
         criarAcao("aceitar-mapa", "ACEITAR", "habilitarAceitarMapaBloco", true),
+        criarAcao("aceitar-diagnostico", "ACEITAR", "habilitarAceitarDiagnosticoBloco", true),
         criarAcao("homologar-cadastro", "HOMOLOGAR", "habilitarHomologarCadastroBloco", false),
         criarAcao("homologar-mapa", "HOMOLOGAR", "habilitarHomologarMapaBloco", true),
+        criarAcao("homologar-diagnostico", "HOMOLOGAR", "habilitarHomologarDiagnosticoBloco", true),
         criarAcao("disponibilizar-mapa", "DISPONIBILIZAR", "habilitarDisponibilizarMapaBloco", true, true),
     ];
 }

@@ -19,6 +19,7 @@ public class SubprocessoElegivelDto {
     boolean habilitarAceitarDiagnosticoBloco;
     boolean habilitarHomologarCadastroBloco;
     boolean habilitarHomologarMapaBloco;
+    boolean habilitarHomologarDiagnosticoBloco;
     boolean habilitarDisponibilizarMapaBloco;
     @Nullable LocalDateTime ultimaDataLimite;
 }

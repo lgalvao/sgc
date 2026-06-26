@@ -18,35 +18,33 @@ Atores: ADMIN e GESTOR
     - Para perfil ADMIN, botão `Finalizar processo` no topo da tela, sempre habilitado.
 
    3.2. Botão *drop-down* `Ações em bloco`, no topo da tela, sempre habilitado, com ações que variam com o perfil e o
-   tipo de processo:
+   tipo do processo:
     - Perfil GESTOR
         - Processos de mapeamento/revisão:
             - `Aceitar cadastros em bloco`, habilitado se existirem unidades subordinadas na situação 'Cadastro
-              disponibilizado' (mapeamento) ou 'Revisão do cadastro disponibilizada' (revisão) e suprocesso localizado
-              na unidade
+              disponibilizado' (mapeamento) ou 'Revisão do cadastro disponibilizada' (revisão), localizado na unidade
             - `Aceitar mapas em bloco`, habilitado se existirem unidades subordinadas com subprocesso nas situações
-              'Mapa validado' ou 'Mapa com sugestões' e suprocesso localizado na unidade.
+              'Mapa validado' ou 'Mapa com sugestões' e localizados na unidade.
         - Processos de diagnóstico:
-            - `Aceitar diagnósticos em bloco`, se existirem unidades subordinadas com subprocesso na situação
-              'Avaliação de consenso concluída' e suprocesso localizado na unidade.
+            - `Aceitar em bloco`, habilitado se existirem unidades no processo com situação 'Concluído' e subprocesso
+              localizado na unidade.
 
     - Perfil ADMIN:
         - Processos de mapeamento/revisão:
-            - `Homologar cadastros em bloco`, habilitado se existirem unidades participantes com subprocesso na situação
-              'Cadastro disponibilizado' (mapeamento) ou 'Revisão do cadastro disponibilizada' (revisão) e suprocesso
-              localizado na unidade
-            - `Homologar mapas em bloco`, habilitado se existirem unidades participantes com subprocesso nas situações
-              'Mapa validado' ou 'Mapa com sugestões' e suprocesso localizado na unidade;
-            - `Disponibilizar mapas em bloco`, habilitado se existirem unidades participantes com subprocesso nas
-              situações 'Mapa criado' (mapeamento) ou 'Mapa ajustado' (revisão) e suprocesso localizado na unidade.
-
+            - `Homologar cadastros em bloco`, habilitado se existirem unidades no processo com subprocesso na situação
+              'Cadastro disponibilizado' (mapeamento) ou 'Revisão do cadastro disponibilizada' (revisão), localizados na
+              unidade
+            - `Homologar mapas em bloco`, habilitado se existirem unidades no processo com subprocesso nas situações
+              'Mapa validado' ou 'Mapa com sugestões' e localizados na unidade;
+            - `Disponibilizar mapas em bloco`, habilitado se existirem unidades no processo com subprocesso nas
+              situações 'Mapa criado' (mapeamento) ou 'Mapa ajustado' (revisão) e localizados na unidade.
         - Processos de diagnóstico:
-            - `Homologar diagnósticos em bloco`, habilitado se existirem unidades subordinadas com subprocesso na
-              situação 'Concluído' e suprocesso localizado na unidade.
+            - `Homologar em bloco`, habilitado se existirem unidades no processo com subprocesso na situação
+              'Concluído', localizados na unidade.
 
    3.3. Seção `Unidades participantes`:
-    - Subárvore das unidades hierarquicamente inferiores, incluindo a hierarquia acima até a unidade logo abaixo da raiz.
-        - Para cada unidade operacional e interoperacional da subárvore são exibidas, as informações de situação da
-          unidade e a data limite para a conclusão da etapa atual do processo naquela unidade.
+    - Subárvore das unidades hierarquicamente inferiores, incluindo a cadeia hierárquica da raiz até a unidade atual.
+        - Para cada unidade operacional e interoperacional da subárvore são exibidas a situação da unidade e a data
+          limite para a conclusão da etapa atual do processo naquela unidade.
     - O usuário poderá acionar as unidades operacionais e interoperacionais para visualizar a tela `Detalhes do
         subprocesso`

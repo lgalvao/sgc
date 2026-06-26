@@ -163,6 +163,29 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
+    public void registrarAnaliseSemComunicacoes(RegistrarWorkflowCommand cmd) {
+        Subprocesso sp = cmd.sp();
+        Usuario usuario = cmd.usuario();
+
+        CriarAnaliseRequest request = CriarAnaliseRequest.builder()
+                .observacoes(cmd.observacoes())
+                .acao(cmd.tipoAcaoAnalise())
+                .motivo(cmd.motivoAnalise())
+                .build();
+
+        criarAnalise(sp, request, cmd.tipoAnalise());
+        sp.setSituacao(cmd.novaSituacao());
+
+        persistirTransicao(RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(cmd.tipoTransicao())
+                .origem(cmd.unidadeOrigemTransicao())
+                .destino(cmd.unidadeDestinoTransicao())
+                .usuario(usuario)
+                .observacoes(cmd.observacoes())
+                .build());
+    }
+
     public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Analise analise = Analise.builder()

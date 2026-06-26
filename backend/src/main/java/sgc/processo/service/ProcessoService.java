@@ -730,6 +730,22 @@ public class ProcessoService {
         );
     }
 
+    private boolean podeHomologarDiagnosticoEmBloco(
+            Subprocesso subprocesso,
+            Usuario usuario,
+            boolean usarLocalizacoesPrecarregadas,
+            Map<Long, Unidade> localizacoesPrecarregadas
+    ) {
+        return podeExecutarAcaoEmBloco(
+                subprocesso,
+                usuario,
+                usarLocalizacoesPrecarregadas,
+                localizacoesPrecarregadas,
+                HOMOLOGAR_DIAGNOSTICO,
+                situacao -> situacao == DIAGNOSTICO_CONCLUIDO
+        );
+    }
+
     private boolean podeHomologarCadastroEmBloco(
             Subprocesso subprocesso,
             Usuario usuario,
@@ -834,6 +850,7 @@ public class ProcessoService {
                 podeAceitarDiagnosticoEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
                 podeHomologarCadastroEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
                 podeHomologarMapaEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
+                podeHomologarDiagnosticoEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas),
                 podeDisponibilizarEmBloco(subprocesso, usuario, usarLocalizacoesPrecarregadas, localizacoesPrecarregadas)
         );
     }
@@ -851,6 +868,7 @@ public class ProcessoService {
                 .habilitarAceitarDiagnosticoBloco(elegibilidade.habilitarAceitarDiagnosticoBloco())
                 .habilitarHomologarCadastroBloco(elegibilidade.habilitarHomologarCadastroBloco())
                 .habilitarHomologarMapaBloco(elegibilidade.habilitarHomologarMapaBloco())
+                .habilitarHomologarDiagnosticoBloco(elegibilidade.habilitarHomologarDiagnosticoBloco())
                 .habilitarDisponibilizarMapaBloco(elegibilidade.habilitarDisponibilizarMapaBloco())
                 .ultimaDataLimite(obterUltimaDataLimite(sp))
                 .build();
@@ -899,11 +917,11 @@ public class ProcessoService {
                         .perfilPermite(AcaoPermissao.VALIDAR_DIAGNOSTICO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(true)
-                        .rotulo(Mensagens.LABEL_VALIDAR_DIAGNOSTICO_BLOCO)
-                        .titulo(Mensagens.TITULO_VALIDACAO_DIAGNOSTICO_BLOCO)
-                        .texto(Mensagens.TEXTO_SELECAO_VALIDACAO_DIAGNOSTICO)
+                        .rotulo(Mensagens.LABEL_ACEITAR_DIAGNOSTICO_BLOCO)
+                        .titulo(Mensagens.TITULO_ACEITE_DIAGNOSTICO_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_ACEITE_DIAGNOSTICO)
                         .rotuloBotao(Mensagens.BOTAO_REGISTRAR_ACEITE)
-                        .mensagemSucesso(Mensagens.SUCESSO_VALIDACAO_DIAGNOSTICO_BLOCO)
+                        .mensagemSucesso(Mensagens.SUCESSO_ACEITE_DIAGNOSTICO_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
                 criarAcaoBloco(AcaoBlocoContexto.builder()
@@ -932,6 +950,20 @@ public class ProcessoService {
                         .texto(Mensagens.TEXTO_SELECAO_HOMOLOGACAO_MAPA)
                         .rotuloBotao(Mensagens.BOTAO_HOMOLOGAR)
                         .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_MAPA_BLOCO)
+                        .processoAtivo(processoAtivo)
+                        .build()),
+                criarAcaoBloco(AcaoBlocoContexto.builder()
+                        .codigo("homologar-diagnostico")
+                        .acao(HOMOLOGAR)
+                        .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarDiagnosticoBloco))
+                        .perfilPermite(AcaoPermissao.HOMOLOGAR_DIAGNOSTICO.permitePerfil(perfil))
+                        .requerDataLimite(false)
+                        .redirecionarPainel(true)
+                        .rotulo(Mensagens.LABEL_HOMOLOGAR_EM_BLOCO)
+                        .titulo(Mensagens.TITULO_HOMOLOGACAO_DIAGNOSTICO_BLOCO)
+                        .texto(Mensagens.TEXTO_SELECAO_HOMOLOGACAO_DIAGNOSTICO)
+                        .rotuloBotao(Mensagens.BOTAO_HOMOLOGAR)
+                        .mensagemSucesso(Mensagens.SUCESSO_HOMOLOGACAO_DIAGNOSTICO_BLOCO)
                         .processoAtivo(processoAtivo)
                         .build()),
                 criarAcaoBloco(AcaoBlocoContexto.builder()
@@ -1377,15 +1409,20 @@ public class ProcessoService {
                         transicaoService::aceitarValidacaoEmBloco
                 );
                 if (!diagnostico.isEmpty()) {
-                    diagnosticoFluxoService.validarDiagnosticosEmBloco(diagnostico);
+                    diagnosticoFluxoService.aceitarDiagnosticosEmBloco(diagnostico);
                 }
             }
-            case HOMOLOGAR -> executarTransicoesEmBloco(
-                    cadastro,
-                    validacao,
-                    cadastroFluxoService::homologarCadastroEmBloco,
-                    transicaoService::homologarValidacaoEmBloco
-            );
+            case HOMOLOGAR -> {
+                executarTransicoesEmBloco(
+                        cadastro,
+                        validacao,
+                        cadastroFluxoService::homologarCadastroEmBloco,
+                        transicaoService::homologarValidacaoEmBloco
+                );
+                if (!diagnostico.isEmpty()) {
+                    diagnosticoFluxoService.homologarDiagnosticosEmBloco(diagnostico);
+                }
+            }
             default -> log.debug("Ação em bloco {} sem processamento no fluxo de análise", req.acao());
         }
     }
@@ -1426,7 +1463,7 @@ public class ProcessoService {
                 case MAPEAMENTO, REVISAO -> ACEITAR_MAPA;
             };
             case HOMOLOGAR -> switch (tipoProcesso) {
-                case DIAGNOSTICO -> null;
+                case DIAGNOSTICO -> HOMOLOGAR_DIAGNOSTICO;
                 case MAPEAMENTO, REVISAO -> HOMOLOGAR_MAPA;
             };
             case DISPONIBILIZAR -> null;
@@ -1519,6 +1556,7 @@ public class ProcessoService {
             boolean habilitarAceitarDiagnosticoBloco,
             boolean habilitarHomologarCadastroBloco,
             boolean habilitarHomologarMapaBloco,
+            boolean habilitarHomologarDiagnosticoBloco,
             boolean habilitarDisponibilizarMapaBloco
     ) {
         private boolean possuiAlgumaAcao() {
@@ -1527,6 +1565,7 @@ public class ProcessoService {
                     || habilitarAceitarDiagnosticoBloco
                     || habilitarHomologarCadastroBloco
                     || habilitarHomologarMapaBloco
+                    || habilitarHomologarDiagnosticoBloco
                     || habilitarDisponibilizarMapaBloco;
         }
     }

@@ -71,6 +71,56 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         verify(cadastroFluxoService, never()).homologarCadastroEmBloco(any());
     }
 
+    @Test
+    @DisplayName("executarAcaoEmBloco deve aceitar diagnósticos em bloco quando a ação for ACEITAR")
+    void executarAcaoEmBloco_DeveAceitarDiagnosticosEmBloco() {
+        Long codProcesso = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), ACEITAR);
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+        Subprocesso subprocesso = Subprocesso.builder()
+                .codigo(100L)
+                .situacao(DIAGNOSTICO_CONCLUIDO)
+                .unidade(Unidade.builder().codigo(10L).build())
+                .processo(criarProcessoTeste(DIAGNOSTICO))
+                .build();
+
+        when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+                .thenReturn(List.of(subprocesso));
+        when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), eq(VALIDAR_DIAGNOSTICO))).thenReturn(true);
+
+        processoService.executarAcaoEmBloco(codProcesso, req);
+
+        verify(diagnosticoFluxoService).aceitarDiagnosticosEmBloco(List.of(100L));
+    }
+
+    @Test
+    @DisplayName("executarAcaoEmBloco deve homologar diagnósticos em bloco quando a ação for HOMOLOGAR")
+    void executarAcaoEmBloco_DeveHomologarDiagnosticosEmBloco() {
+        Long codProcesso = 1L;
+        ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), HOMOLOGAR);
+        Usuario usuario = new Usuario();
+        usuario.setPerfilAtivo(Perfil.ADMIN);
+        when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+
+        Subprocesso subprocesso = Subprocesso.builder()
+                .codigo(101L)
+                .situacao(DIAGNOSTICO_CONCLUIDO)
+                .unidade(Unidade.builder().codigo(10L).build())
+                .processo(criarProcessoTeste(DIAGNOSTICO))
+                .build();
+
+        when(consultaService.listarEntidadesPorProcessoEUnidades(codProcesso, req.unidadeCodigos()))
+                .thenReturn(List.of(subprocesso));
+        when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), eq(HOMOLOGAR_DIAGNOSTICO))).thenReturn(true);
+
+        processoService.executarAcaoEmBloco(codProcesso, req);
+
+        verify(diagnosticoFluxoService).homologarDiagnosticosEmBloco(List.of(101L));
+    }
+
     @Nested
     @DisplayName("Cobertura e Casos de Borda")
     class CoverageTests {

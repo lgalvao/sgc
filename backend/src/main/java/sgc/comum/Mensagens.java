@@ -89,10 +89,10 @@ public final class Mensagens {
     public static final String TITULO_ACEITE_MAPA_BLOCO = "Aceite de mapas em bloco";
     public static final String TEXTO_SELECAO_ACEITE_MAPA = "Selecione as unidades para aceite dos mapas correspondentes";
     public static final String SUCESSO_ACEITE_MAPA_BLOCO = "Mapas aceitos em bloco";
-    public static final String LABEL_VALIDAR_DIAGNOSTICO_BLOCO = "aceitar diagnósticos em bloco";
-    public static final String TITULO_VALIDACAO_DIAGNOSTICO_BLOCO = "Validação de diagnósticos em bloco";
-    public static final String TEXTO_SELECAO_VALIDACAO_DIAGNOSTICO = "Selecione as unidades cujos diagnósticos deverão ser validados:";
-    public static final String SUCESSO_VALIDACAO_DIAGNOSTICO_BLOCO = "Diagnósticos aceitos em bloco";
+    public static final String LABEL_ACEITAR_DIAGNOSTICO_BLOCO = "Aceitar em bloco";
+    public static final String TITULO_ACEITE_DIAGNOSTICO_BLOCO = "Aceite de diagnósticos em bloco";
+    public static final String TEXTO_SELECAO_ACEITE_DIAGNOSTICO = "Selecione as unidades cujos diagnósticos devem ser aceitos";
+    public static final String SUCESSO_ACEITE_DIAGNOSTICO_BLOCO = "Diagnósticos aceitos";
     public static final String LABEL_HOMOLOGAR_EM_BLOCO = "Homologar em bloco";
     public static final String TITULO_HOMOLOGACAO_CADASTRO_BLOCO = "Homologação de cadastro em bloco";
     public static final String TEXTO_SELECAO_HOMOLOGACAO_CADASTRO = "Selecione as unidades cujos cadastros deverão ser homologados:";
@@ -102,6 +102,9 @@ public final class Mensagens {
     public static final String TITULO_HOMOLOGACAO_MAPA_BLOCO = "Homologação de mapa em bloco";
     public static final String TEXTO_SELECAO_HOMOLOGACAO_MAPA = "Selecione as unidades cujos mapas deverão ser homologados:";
     public static final String SUCESSO_HOMOLOGACAO_MAPA_BLOCO = "Mapas homologados em bloco";
+    public static final String TITULO_HOMOLOGACAO_DIAGNOSTICO_BLOCO = "Homologação de diagnósticos em bloco";
+    public static final String TEXTO_SELECAO_HOMOLOGACAO_DIAGNOSTICO = "Selecione as unidades cujos diagnósticos devem ser homologados";
+    public static final String SUCESSO_HOMOLOGACAO_DIAGNOSTICO_BLOCO = "Diagnósticos homologados";
     public static final String LABEL_DISPONIBILIZAR_EM_BLOCO = "Disponibilizar em bloco";
     public static final String TITULO_DISPONIBILIZACAO_MAPA_BLOCO = "Disponibilização de mapa em bloco";
     public static final String TEXTO_SELECAO_DISPONIBILIZACAO_MAPA = "Selecione as unidades cujos mapas deverão ser disponibilizados:";
@@ -211,6 +214,7 @@ public final class Mensagens {
     public static final String ALERTA_DIAGNOSTICO_DEVOLVIDO = "Diagnóstico da unidade %s devolvido para ajustes";
     public static final String ALERTA_DIAGNOSTICO_ACEITO = "Diagnóstico da unidade %s aceito";
     public static final String ALERTA_DIAGNOSTICO_HOMOLOGADO = "Diagnóstico da unidade %s homologado";
+    public static final String ALERTA_DIAGNOSTICO_ACEITO_BLOCO = "Diagnóstico aceito para unidades subordinadas";
 
     // ── Notificações e E-mails ───────────────────────────────────────────────
     private Mensagens() {
