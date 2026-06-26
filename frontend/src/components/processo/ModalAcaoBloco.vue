@@ -57,6 +57,7 @@
         <BFormCheckbox
             v-model="todosSelecionados"
             :disabled="processando"
+            aria-label="Selecionar todas as unidades"
         />
       </template>
       <template #cell(selecao)="{ item }">
@@ -64,6 +65,7 @@
             v-model="selecionadosLocal"
             :disabled="processando"
             :value="item.codigo"
+            :aria-label="`Selecionar unidade ${item.sigla}`"
         />
       </template>
     </BTable>

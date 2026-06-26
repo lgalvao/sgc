@@ -98,6 +98,10 @@ async function aguardarModaisEstaveis(page: Page): Promise<void> {
             '.modal.show .modal-dialog',
             '.modal-backdrop.show',
             '[role="dialog"]:not([aria-hidden="true"])',
+            '.tooltip.show',
+            '.tooltip',
+            '.dropdown-menu.show',
+            '.dropdown-menu',
         ];
 
         const elementos = Array.from(document.querySelectorAll<HTMLElement>(seletores.join(',')))
@@ -410,7 +414,6 @@ async function criarProcessoDiagnosticoComConsensoCriadoPorFixture(
 }
 
 test.describe('Captura de Telas - Sistema SGC', () => {
-    test.setTimeout(90000);
     let cleanup: ReturnType<typeof useProcessoCleanup>;
 
     test.beforeAll(async ({request}) => {
@@ -1123,7 +1126,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
 
         test('Captura análise de mapa por gestores', async ({page, request}) => {
-            test.setTimeout(30000);
             const descricao = `Proc mapa analise ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_121';
             const codProcesso = await criarProcessoMapeamentoComMapaValidadoPorFixture(
@@ -1250,8 +1252,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     // SEÇÃO 09 - OPERAÇÕES EM BLOCO (CDUs 22-26)
     test.describe('09 - Operações em Bloco', () => {
         test('Captura fluxo de aceitar cadastros em bloco', async ({page, request}) => {
-            test.setTimeout(30000); // Fluxo muito longo (múltiplos logins/logouts)
-
             const descricao = `Processo bloco ${Date.now()}`;
             // Prepara cenário: criar processo com cadastro disponibilizado 
             // COORD_22 tem SECAO_221 e é gerido por GESTOR_COORD_22
@@ -1687,6 +1687,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Abrir dropdown de ações do mapa e sugestões
             await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
             await page.getByTestId('btn-mapa-acoes').click();
+            // Garantir que a animação de abertura do menu dropdown foi concluída e o menu está visível
+            await page.locator('.dropdown-menu.show').waitFor({ state: 'visible' });
+
             const btnSugestoes = page.getByTestId('btn-mapa-acao-sugestoes');
             if (await btnSugestoes.isVisible()) {
                 await capturarTela(page, 'mapa-modais', 'menu-acoes-com-sugestoes', {
@@ -1897,6 +1900,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('15 - Diagnóstico de Competências', () => {
+        test.beforeEach(async () => {
+            test.slow();
+        });
+
         test('Captura dashboard do subprocesso de diagnóstico e autoavaliação do servidor', async ({page, request}) => {
             await resetDatabase(request);
             const unidadeAlvo = 'ASSESSORIA_12';

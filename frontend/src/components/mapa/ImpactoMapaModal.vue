@@ -14,7 +14,13 @@
       </p>
     </div>
 
-    <div v-else-if="impacto" class="impacto-container" data-testid="modal-impacto-body">
+    <div
+        v-else-if="impacto"
+        class="impacto-container"
+        data-testid="modal-impacto-body"
+        tabindex="0"
+        :aria-label="TEXTOS.mapa.impacto.TITULO_MODAL"
+    >
       <div v-if="!impacto.temImpactos" class="text-center py-4" data-testid="alert-sem-impactos">
         <i aria-hidden="true" class="bi bi-check-circle-fill fs-3 text-success d-block mb-2"/>
         <span class="text-success fw-medium">{{ TEXTOS.mapa.impacto.SEM_IMPACTOS }}</span>

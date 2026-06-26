@@ -88,6 +88,7 @@
                                     class="btn-acao-sutil"
                                     size="sm"
                                     variant="outline-secondary"
+                                    aria-label="Ver observação"
                                     @click="abrirObservacao((item as Analise).observacoes)"
                                 >
                                     <i aria-hidden="true" class="bi bi-eye"/>

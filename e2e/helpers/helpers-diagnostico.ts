@@ -115,13 +115,17 @@ export async function aprovarConsensoDiagnostico(page: Page, codSubprocesso: num
     const botaoAprovar = page.getByTestId('btn-aprovar-consenso');
     await expect(botaoAprovar).toBeVisible();
     await expect(botaoAprovar).toBeEnabled();
+    await botaoAprovar.click();
+
+    const botaoConfirmar = page.getByTestId('btn-confirmar-aprovar-consenso');
+    await expect(botaoConfirmar).toBeVisible();
     await Promise.all([
         page.waitForResponse(res =>
             res.url().includes(caminhoDiagnosticoApi(codSubprocesso, '/consenso/aprovar'))
             && res.request().method() === 'POST'
             && res.ok()
         ),
-        botaoAprovar.click()
+        botaoConfirmar.click()
     ]);
 }
 

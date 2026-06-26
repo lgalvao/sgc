@@ -90,6 +90,7 @@
                 :disabled="!podeEditar"
                 :model-value="item.importancia"
                 :options="opcoesNota"
+                :aria-label="`Importância para ${item.descricao}`"
                 class="form-select-sm w-auto mx-auto"
                 @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'importancia', normalizarValorNota(v))"
             />
@@ -103,6 +104,7 @@
                 :disabled="!podeEditar"
                 :model-value="item.dominio"
                 :options="opcoesNota"
+                :aria-label="`Domínio para ${item.descricao}`"
                 class="form-select-sm w-auto mx-auto"
                 @update:model-value="(v: unknown) => atualizarNota(item.competenciaCodigo, 'dominio', normalizarValorNota(v))"
             />

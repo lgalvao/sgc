@@ -41,6 +41,7 @@
                 :data-testid="`consenso-chefia-importancia-${item.competenciaCodigo}`"
                 :model-value="item.chefiaImportancia"
                 :options="opcoesNota"
+                :aria-label="`Importância da chefia para ${item.descricao}`"
                 class="form-select-sm seletor-nota"
                 @update:model-value="emitirAtualizacao(item.competenciaCodigo, {origem: 'chefia', campo: 'importancia', valor: $event})"
             />
@@ -53,6 +54,7 @@
                 :disabled="!campoConsensoHabilitado(item, 'importancia')"
                 :model-value="item.consensoImportancia"
                 :options="opcoesNota"
+                :aria-label="`Importância do consenso para ${item.descricao}`"
                 class="form-select-sm seletor-nota seletor-consenso"
                 @update:model-value="emitirAtualizacao(item.competenciaCodigo, {origem: 'consenso', campo: 'importancia', valor: $event})"
             />
@@ -67,6 +69,7 @@
                 :data-testid="`consenso-chefia-dominio-${item.competenciaCodigo}`"
                 :model-value="item.chefiaDominio"
                 :options="opcoesNota"
+                :aria-label="`Domínio da chefia para ${item.descricao}`"
                 class="form-select-sm seletor-nota"
                 @update:model-value="emitirAtualizacao(item.competenciaCodigo, {origem: 'chefia', campo: 'dominio', valor: $event})"
             />
@@ -79,6 +82,7 @@
                 :disabled="!campoConsensoHabilitado(item, 'dominio')"
                 :model-value="item.consensoDominio"
                 :options="opcoesNota"
+                :aria-label="`Domínio do consenso para ${item.descricao}`"
                 class="form-select-sm seletor-nota seletor-consenso"
                 @update:model-value="emitirAtualizacao(item.competenciaCodigo, {origem: 'consenso', campo: 'dominio', valor: $event})"
             />

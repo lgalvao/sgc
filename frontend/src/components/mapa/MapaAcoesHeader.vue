@@ -124,6 +124,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
           <BDropdownItemButton
               :disabled="loadingExportacaoPdf"
               data-testid="btn-mapa-exportar-pdf"
+              role="menuitem"
               @click="$emit('exportar-pdf')"
           >
             PDF
@@ -131,6 +132,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
           <BDropdownItemButton
               :disabled="loadingExportacaoCsv"
               data-testid="btn-mapa-exportar-csv"
+              role="menuitem"
               @click="$emit('exportar-csv')"
           >
                 {{ TEXTOS_RELATORIOS.BOTAO_CSV }}
@@ -148,6 +150,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
               v-if="mostrarApresentarSugestoes"
               :disabled="!habilitarApresentarSugestoes"
               data-testid="btn-mapa-acao-sugestoes"
+              role="menuitem"
               @click="$emit('abrir-sugestoes')"
           >
             {{ TEXTOS.mapa.BOTAO_SUGESTOES }}
@@ -156,6 +159,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
               v-if="mostrarValidarMapa"
               :disabled="!habilitarValidarMapa"
               data-testid="btn-mapa-acao-validar"
+              role="menuitem"
               @click="$emit('abrir-validar')"
           >
             {{ TEXTOS.mapa.BOTAO_VALIDAR }}
@@ -164,6 +168,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
               v-if="mostrarDisponibilizarMapa"
               :disabled="!habilitarDisponibilizarMapa || loadingDisponibilizacao"
               data-testid="btn-mapa-acao-disponibilizar"
+              role="menuitem"
               @click="$emit('abrir-disponibilizar')"
           >
             {{ TEXTOS.mapa.BOTAO_DISPONIBILIZAR }}
@@ -172,6 +177,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
               v-if="mostrarDevolverMapa"
               :disabled="!habilitarDevolverMapa"
               data-testid="btn-mapa-acao-devolver"
+              role="menuitem"
               @click="$emit('abrir-devolver')"
           >
             {{ TEXTOS.mapa.BOTAO_DEVOLVER }}
@@ -180,6 +186,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
               v-if="mostrarAcaoPrincipalMapa"
               :disabled="!habilitarAcaoPrincipalMapa"
               data-testid="btn-mapa-acao-homologar-aceite"
+              role="menuitem"
               @click="$emit('abrir-acao-principal')"
           >
             {{ rotuloAcaoPrincipalMapa }}

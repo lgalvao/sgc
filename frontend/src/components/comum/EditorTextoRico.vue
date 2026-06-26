@@ -62,6 +62,7 @@ const editor = new Editor({
             "data-testid": dataTestid,
             ...(ariaRequired ? {"aria-required": ariaRequired} : {}),
             role: "textbox",
+            "aria-label": props.rotulo,
         },
     },
     content: normalizarHtmlEditor(props.modelValue),
@@ -196,7 +197,6 @@ function sincronizarPorDom(event: Event) {
 
         <EditorContent
             :editor="editor"
-            :aria-label="rotulo"
             :aria-invalid="erroComprimento ? 'true' : 'false'"
             :class="['editor-texto-rico__editor', classesEditor]"
             :style="{ '--editor-minimo-altura': minimoAltura }"

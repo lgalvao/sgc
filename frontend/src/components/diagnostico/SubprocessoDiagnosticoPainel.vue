@@ -66,6 +66,7 @@
             <BDropdownItemButton
                 :data-testid="`btn-manter-consenso-${item.servidorTitulo}`"
                 :disabled="!item.podeManterConsenso"
+                role="menuitem"
                 @click="navegarParaConsenso(item.servidorTitulo)"
             >
               {{ TEXTOS.diagnostico.BTN_MANTER_CONSENSO }}
@@ -73,6 +74,7 @@
             <BDropdownItemButton
                 :data-testid="`btn-impossibilitar-${item.servidorTitulo}`"
                 :disabled="!item.podeImpossibilitar"
+                role="menuitem"
                 @click="abrirModalImpossibilitar(item)"
             >
               {{ TEXTOS.diagnostico.BTN_IMPOSSIBILITAR }}
@@ -80,6 +82,7 @@
             <BDropdownItemButton
                 :data-testid="`btn-desfazer-impossibilidade-${item.servidorTitulo}`"
                 :disabled="!item.podePermitirAvaliacao"
+                role="menuitem"
                 @click="abrirModalPermitirAvaliacao(item)"
             >
               {{ TEXTOS.diagnostico.BTN_PERMITIR_AVALIACAO }}

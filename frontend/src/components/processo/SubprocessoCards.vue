@@ -255,13 +255,24 @@ defineExpose({
 
 .card-disabled {
   cursor: not-allowed;
-  background-color: #f8f9fa !important;
-  border-color: #dee2e6 !important;
+  border-color: #e4e4e7 !important;
+  background-color: transparent !important;
 }
-
 .card-disabled :deep(.card-title),
 .card-disabled :deep(.card-text),
 .card-disabled :deep(.bi) {
-  color: #5a6268 !important;
+  color: #71717a !important;
+  font-weight: normal !important;
+}
+
+[data-bs-theme="dark"] .card-disabled {
+  border-color: #334155 !important;
+  background-color: transparent !important;
+}
+[data-bs-theme="dark"] .card-disabled :deep(.card-title),
+[data-bs-theme="dark"] .card-disabled :deep(.card-text),
+[data-bs-theme="dark"] .card-disabled :deep(.bi) {
+  color: #94a3b8 !important;
+  font-weight: normal !important;
 }
 </style>

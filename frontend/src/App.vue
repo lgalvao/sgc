@@ -281,4 +281,36 @@ button:disabled,
   border-color: var(--bs-border-color-translucent) !important;
   color: var(--bs-emphasis-color) !important;
 }
+
+.toast.text-bg-success {
+  background-color: var(--bs-success-bg-subtle) !important;
+  border-color: var(--bs-success-border-subtle) !important;
+  opacity: 1 !important;
+}
+.toast.text-bg-success .toast-body {
+  color: var(--bs-success-text-emphasis) !important;
+}
+
+.toast.text-bg-danger {
+  background-color: var(--bs-danger-bg-subtle) !important;
+  border-color: var(--bs-danger-border-subtle) !important;
+  opacity: 1 !important;
+}
+.toast.text-bg-danger .toast-body {
+  color: var(--bs-danger-text-emphasis) !important;
+}
+
+:not([data-bs-theme="dark"]) .btn-outline-secondary:hover,
+:not([data-bs-theme="dark"]) .btn-outline-secondary:focus,
+:not([data-bs-theme="dark"]) .btn-outline-secondary:active,
+:not([data-bs-theme="dark"]) .btn-outline-secondary.show {
+  background-color: #5a6268 !important;
+  border-color: #5a6268 !important;
+  color: #fff !important;
+}
+
+/* --- Garantia de Contraste para Itens de Dropdown Habilitados no Modo Claro --- */
+:not([data-bs-theme="dark"]) .dropdown-item:not(.disabled):not(:disabled) {
+  color: #212529 !important;
+}
 </style>
