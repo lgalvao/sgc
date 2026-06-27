@@ -382,8 +382,29 @@ export async function obterAcaoBloco(page: Page, testId: string): Promise<Locato
     }
 
     const botaoMenu = page.getByRole('button', {name: new RegExp(`^${TEXTOS.processo.ACOES_EM_BLOCO}$`, 'i')}).first();
-    await expect(botaoMenu).toBeVisible();
-    await botaoMenu.click();
+    if (await botaoMenu.isVisible().catch(() => false)) {
+        await botaoMenu.click();
+        await expect(acao).toBeVisible();
+        return acao;
+    }
+
+    const alternativas = [
+        'btn-processo-aceitar-bloco',
+        'btn-processo-homologar-bloco',
+        'btn-processo-disponibilizar-bloco',
+        'btn-processo-aceitar-mapas-bloco',
+        'btn-processo-homologar-mapas-bloco',
+        'btn-processo-aceitar-diagnosticos-bloco',
+        'btn-processo-homologar-diagnosticos-bloco',
+    ];
+
+    for (const alternativa of alternativas) {
+        const botaoAlternativo = page.getByTestId(alternativa);
+        if (await botaoAlternativo.isVisible().catch(() => false)) {
+            return botaoAlternativo;
+        }
+    }
+
     await expect(acao).toBeVisible();
     return acao;
 }

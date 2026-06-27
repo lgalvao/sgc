@@ -380,7 +380,7 @@ public class ProcessoService {
                     localizacoesPorSubprocesso
             );
             dto.getElegiveis().addAll(subprocessosElegiveis);
-            dto.getAcoesBloco().addAll(montarAcoesBloco(processo, subprocessosElegiveis, perfil));
+            dto.getAcoesBloco().addAll(montarAcoesBloco(subprocessosVisiveis, subprocessosElegiveis, perfil));
         }
 
         return dto;
@@ -878,17 +878,27 @@ public class ProcessoService {
     }
 
     private List<ProcessoDetalheDto.AcaoBlocoDto> montarAcoesBloco(
-            Processo processo,
+            List<Subprocesso> subprocessosVisiveis,
             List<SubprocessoElegivelDto> subprocessosElegiveis,
             Perfil perfil
     ) {
-        boolean processoAtivo = processo.getSituacao() != FINALIZADO;
+        boolean processoAtivo = subprocessosVisiveis.stream()
+                .map(Subprocesso::getProcesso)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .map(processo -> processo.getSituacao() != FINALIZADO)
+                .orElse(false);
 
         return List.of(
                 criarAcaoBloco(AcaoBlocoContexto.builder()
                         .codigo("aceitar-cadastro")
                         .acao(ACEITAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarCadastroBloco))
+                        .mostrar(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil)
+                                && temSubprocessoComSituacao(subprocessosVisiveis, this::isSituacaoCadastroDisponibilizado))
+                        .habilitar(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil)
+                                && processoAtivo
+                                && !filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarCadastroBloco).isEmpty())
                         .perfilPermite(AcaoPermissao.ACEITAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(true)
@@ -903,6 +913,11 @@ public class ProcessoService {
                         .codigo("aceitar-mapa")
                         .acao(ACEITAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarMapaBloco))
+                        .mostrar(AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+                                && temSubprocessoComSituacao(subprocessosVisiveis, this::isSituacaoMapaAceitavel))
+                        .habilitar(AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+                                && processoAtivo
+                                && !filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarMapaBloco).isEmpty())
                         .perfilPermite(AcaoPermissao.ACEITAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(true)
@@ -917,6 +932,11 @@ public class ProcessoService {
                         .codigo("aceitar-diagnostico")
                         .acao(ACEITAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarDiagnosticoBloco))
+                        .mostrar(AcaoPermissao.VALIDAR_DIAGNOSTICO.permitePerfil(perfil)
+                                && temSubprocessoComSituacao(subprocessosVisiveis, situacao -> situacao == DIAGNOSTICO_CONCLUIDO))
+                        .habilitar(AcaoPermissao.VALIDAR_DIAGNOSTICO.permitePerfil(perfil)
+                                && processoAtivo
+                                && !filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarAceitarDiagnosticoBloco).isEmpty())
                         .perfilPermite(AcaoPermissao.VALIDAR_DIAGNOSTICO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(true)
@@ -931,6 +951,11 @@ public class ProcessoService {
                         .codigo("homologar-cadastro")
                         .acao(HOMOLOGAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarCadastroBloco))
+                        .mostrar(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil)
+                                && temSubprocessoComSituacao(subprocessosVisiveis, this::isSituacaoCadastroDisponibilizado))
+                        .habilitar(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil)
+                                && processoAtivo
+                                && !filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarCadastroBloco).isEmpty())
                         .perfilPermite(AcaoPermissao.HOMOLOGAR_CADASTRO_EM_BLOCO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(false)
@@ -945,6 +970,11 @@ public class ProcessoService {
                         .codigo("homologar-mapa")
                         .acao(HOMOLOGAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarMapaBloco))
+                        .mostrar(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+                                && temSubprocessoComSituacao(subprocessosVisiveis, this::isSituacaoMapaHomologavel))
+                        .habilitar(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+                                && processoAtivo
+                                && !filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarMapaBloco).isEmpty())
                         .perfilPermite(AcaoPermissao.HOMOLOGAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(true)
@@ -959,6 +989,11 @@ public class ProcessoService {
                         .codigo("homologar-diagnostico")
                         .acao(HOMOLOGAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarDiagnosticoBloco))
+                        .mostrar(AcaoPermissao.HOMOLOGAR_DIAGNOSTICO.permitePerfil(perfil)
+                                && temSubprocessoComSituacao(subprocessosVisiveis, situacao -> situacao == DIAGNOSTICO_CONCLUIDO))
+                        .habilitar(AcaoPermissao.HOMOLOGAR_DIAGNOSTICO.permitePerfil(perfil)
+                                && processoAtivo
+                                && !filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarHomologarDiagnosticoBloco).isEmpty())
                         .perfilPermite(AcaoPermissao.HOMOLOGAR_DIAGNOSTICO.permitePerfil(perfil))
                         .requerDataLimite(false)
                         .redirecionarPainel(true)
@@ -973,6 +1008,11 @@ public class ProcessoService {
                         .codigo("disponibilizar-mapa")
                         .acao(DISPONIBILIZAR)
                         .unidades(filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarDisponibilizarMapaBloco))
+                        .mostrar(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+                                && temSubprocessoComSituacao(subprocessosVisiveis, this::isSituacaoMapaDisponibilizavel))
+                        .habilitar(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil)
+                                && processoAtivo
+                                && !filtrarElegiveis(subprocessosElegiveis, SubprocessoElegivelDto::isHabilitarDisponibilizarMapaBloco).isEmpty())
                         .perfilPermite(AcaoPermissao.DISPONIBILIZAR_MAPA_EM_BLOCO.permitePerfil(perfil))
                         .requerDataLimite(true)
                         .redirecionarPainel(true)
@@ -987,13 +1027,11 @@ public class ProcessoService {
     }
 
     private ProcessoDetalheDto.AcaoBlocoDto criarAcaoBloco(AcaoBlocoContexto contexto) {
-        boolean temUnidades = !contexto.unidades().isEmpty();
-        boolean habilitar = contexto.perfilPermite() && contexto.processoAtivo() && temUnidades;
         return processoDtoMapper.criarAcaoBloco(
                 contexto.codigo(),
                 contexto.acao(),
-                contexto.perfilPermite(),
-                habilitar,
+                contexto.mostrar(),
+                contexto.habilitar(),
                 contexto.requerDataLimite(),
                 contexto.redirecionarPainel(),
                 contexto.rotulo(),
@@ -1026,6 +1064,22 @@ public class ProcessoService {
     private boolean isSituacaoMapaHomologavel(SituacaoSubprocesso situacao) {
         return situacao == MAPEAMENTO_MAPA_VALIDADO
                 || situacao == REVISAO_MAPA_VALIDADO;
+    }
+
+    private boolean isSituacaoMapaDisponibilizavel(SituacaoSubprocesso situacao) {
+        return situacao == MAPEAMENTO_MAPA_CRIADO
+                || situacao == MAPEAMENTO_MAPA_COM_SUGESTOES
+                || situacao == REVISAO_MAPA_COM_SUGESTOES
+                || situacao == REVISAO_MAPA_AJUSTADO
+                || situacao == REVISAO_CADASTRO_HOMOLOGADA;
+    }
+
+    private boolean temSubprocessoComSituacao(
+            List<Subprocesso> subprocessosVisiveis,
+            java.util.function.Predicate<SituacaoSubprocesso> criterioSituacao
+    ) {
+        return subprocessosVisiveis.stream()
+                .anyMatch(subprocesso -> criterioSituacao.test(subprocesso.getSituacao()));
     }
 
 
@@ -1647,6 +1701,8 @@ public class ProcessoService {
             String codigo,
             AcaoProcesso acao,
             List<SubprocessoElegivelDto> unidades,
+            boolean mostrar,
+            boolean habilitar,
             boolean perfilPermite,
             boolean requerDataLimite,
             boolean redirecionarPainel,

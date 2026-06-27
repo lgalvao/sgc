@@ -40,7 +40,7 @@ test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
         await modal.getByTestId('btn-finalizar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
+        await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO, {exact: true})).toBeVisible();
         await verificarNotificacaoAdmin(page, {
             destinatario: UNIDADE,
             assunto: 'Finalização de processo de diagnóstico',

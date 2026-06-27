@@ -58,7 +58,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await modal.getByPlaceholder(TEXTOS.administracao.PLACEHOLDER_TITULO).fill(TITULO_NOVO_ADMIN);
 
         const responsePromise = page.waitForResponse(resp => resp.url().includes('/api/') && resp.request().method() === 'POST');
-        await modal.getByRole('button', {name: TEXTOS.comum.BOTAO_CRIAR}).click();
+        await modal.getByRole('button', {name: /Adicionar|Criar/i}).click();
         await responsePromise;
 
         await expect(modal).toBeHidden();
@@ -107,7 +107,7 @@ test.describe.serial('CDU-30 - Manter administradores', () => {
         await modalAdicionar.getByPlaceholder(TEXTOS.administracao.PLACEHOLDER_TITULO).fill(TITULO_ADMIN_CACHE_QUENTE);
 
         const respostaAdicionar = page.waitForResponse(resp => resp.url().includes('/api/') && resp.request().method() === 'POST');
-        await modalAdicionar.getByRole('button', {name: TEXTOS.comum.BOTAO_CRIAR}).click();
+        await modalAdicionar.getByRole('button', {name: /Adicionar|Criar/i}).click();
         await respostaAdicionar;
         await expect(modalAdicionar).toBeHidden();
 

@@ -14,7 +14,6 @@
       <div class="d-flex gap-1 actions-container">
         <BButton
             v-if="podeEditar !== false"
-            v-b-tooltip.hover
             :aria-label="`Editar competência ${competencia.descricao}`"
             class="botao-acao"
             data-testid="btn-editar-competencia"
@@ -26,7 +25,6 @@
         </BButton>
         <BButton
             v-if="podeEditar !== false"
-            v-b-tooltip.hover
             :aria-label="`Excluir competência ${competencia.descricao}`"
             class="botao-acao"
             data-testid="btn-excluir-competencia"

@@ -1,4 +1,5 @@
 import {expect, type Page} from '@playwright/test';
+import {TEXTOS} from '../../frontend/src/constants/textos.js';
 
 function caminhoDiagnosticoApi(codSubprocesso: number, sufixo: string): string {
     return `/api/subprocessos/${codSubprocesso}/diagnostico${sufixo}`;
@@ -133,13 +134,18 @@ export async function concluirConsensoDiagnostico(page: Page, codSubprocesso: nu
     const botaoConcluir = page.getByTestId('btn-concluir-avaliacao');
     await expect(botaoConcluir).toBeVisible();
     await expect(botaoConcluir).toBeEnabled();
+    await botaoConcluir.click();
+
+    const dialogo = page.getByRole('dialog');
+    await expect(dialogo).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_CONSENSO_MENSAGEM);
+
     await Promise.all([
         page.waitForResponse(res =>
-            res.url().includes(caminhoDiagnosticoApi(codSubprocesso, `/consenso/${servidorTitulo}/concluir`))
+            res.url().includes(caminhoDiagnosticoApi(codSubprocesso, `/consenso/${encodeURIComponent(servidorTitulo)}/concluir`))
             && res.request().method() === 'POST'
             && res.ok()
         ),
-        botaoConcluir.click()
+        page.getByTestId('btn-confirmar-concluir').click()
     ]);
 }
 

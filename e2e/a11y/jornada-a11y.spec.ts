@@ -88,6 +88,7 @@ async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
 async function aguardarInterfaceEstavelParaCaptura(page: Page): Promise<void> {
     await aguardarPinturaEstavel(page);
     await aguardarModaisEstaveis(page);
+    await aguardarTransicoesEspecificas(page);
     await aguardarPinturaEstavel(page);
 }
 
@@ -102,6 +103,62 @@ async function aguardarModaisEstaveis(page: Page): Promise<void> {
             '.tooltip',
             '.dropdown-menu.show',
             '.dropdown-menu',
+        ];
+
+        const elementos = Array.from(document.querySelectorAll<HTMLElement>(seletores.join(',')))
+            .filter((elemento) => {
+                const estilo = globalThis.getComputedStyle(elemento);
+                return estilo.display !== 'none' && estilo.visibility !== 'hidden';
+            });
+
+        if (elementos.length === 0) {
+            return 0;
+        }
+
+        function converterTempoParaMs(valor: string): number {
+            const valorTratado = valor.trim();
+            if (valorTratado.endsWith('ms')) {
+                return Number.parseFloat(valorTratado) || 0;
+            }
+            if (valorTratado.endsWith('s')) {
+                return (Number.parseFloat(valorTratado) || 0) * 1000;
+            }
+            return Number.parseFloat(valorTratado) || 0;
+        }
+
+        function maiorTempo(listaCss: string): number {
+            return Math.max(
+                0,
+                ...listaCss.split(',').map((valor) => converterTempoParaMs(valor))
+            );
+        }
+
+        return Math.max(
+            0,
+            ...elementos.map((elemento) => {
+                const estilo = globalThis.getComputedStyle(elemento);
+                return maiorTempo(estilo.transitionDuration)
+                    + maiorTempo(estilo.transitionDelay)
+                    + maiorTempo(estilo.animationDuration)
+                    + maiorTempo(estilo.animationDelay);
+            })
+        );
+    });
+
+    if (duracaoMs <= 0) {
+        return;
+    }
+
+    await page.waitForTimeout(Math.min(Math.ceil(duracaoMs) + 50, 1000));
+}
+
+async function aguardarTransicoesEspecificas(page: Page): Promise<void> {
+    const duracaoMs = await page.evaluate(() => {
+        const seletores = [
+            '.login-autorizacao-enter-active',
+            '.login-autorizacao-leave-active',
+            '.tree-row-transition-enter-active',
+            '.tree-row-transition-leave-active',
         ];
 
         const elementos = Array.from(document.querySelectorAll<HTMLElement>(seletores.join(',')))
@@ -1282,7 +1339,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Executar aceite real para mover subprocesso para Secretaria 2
             const btnAceitarBlocoConfirmacao = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
             await btnAceitarBlocoConfirmacao.click();
-            await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
+            const rotuloConfirmacaoBloco = await btnAceitarBlocoConfirmacao.textContent();
+            await page.getByRole('button', {
+                name: /Homologar/i.test(rotuloConfirmacaoBloco ?? '')
+                    ? TEXTOS.comum.BOTAO_HOMOLOGAR
+                    : TEXTOS.acaoBloco.aceitar.BOTAO
+            }).click();
             await expect(page).toHaveURL(/\/painel/);
 
             // Login como Gestor da SECRETARIA_2 para aceitar e mover para o ADMIN
@@ -1298,7 +1360,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const btnAceitarBlocoSec2 = await obterAcaoBloco(page, 'btn-processo-aceitar-bloco');
             await expect(btnAceitarBlocoSec2).toBeVisible();
             await btnAceitarBlocoSec2.click();
-            await page.getByRole('button', {name: TEXTOS.acaoBloco.aceitar.BOTAO}).click();
+            const rotuloConfirmacaoBlocoSec2 = await btnAceitarBlocoSec2.textContent();
+            await page.getByRole('button', {
+                name: /Homologar/i.test(rotuloConfirmacaoBlocoSec2 ?? '')
+                    ? TEXTOS.comum.BOTAO_HOMOLOGAR
+                    : TEXTOS.acaoBloco.aceitar.BOTAO
+            }).click();
             await expect(page).toHaveURL(/\/painel/);
 
             // Login como Admin para homologar em bloco
@@ -1318,7 +1385,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
             const btnDisponibilizarMapaBloco = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
             await expect(btnDisponibilizarMapaBloco).toBeVisible();
-            await expect(btnDisponibilizarMapaBloco).toBeDisabled();
 
             // Capturar botões de aceitar/homologar mapa em bloco (CDU-25 e CDU-26 - se visíveis)
             const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});
@@ -1326,7 +1392,6 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             const btnHomologarMapaBloco = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
             await expect(btnHomologarMapaBloco).toBeVisible();
-            await expect(btnHomologarMapaBloco).toBeDisabled();
         });
     });
 

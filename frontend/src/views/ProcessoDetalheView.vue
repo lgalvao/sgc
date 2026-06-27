@@ -123,12 +123,7 @@ const mostrarFinalizarProcesso = computed(() => ehAdmin.value);
 const acoesBlocoVisiveis = computed(() => {
   const acoes = processo.value?.acoesBloco;
   if (!acoes) return [];
-  const filtradas = acoes.filter(acao => acao.mostrar);
-  if (processo.value?.tipo === 'DIAGNOSTICO') {
-    return filtradas.filter(acao => acao.codigo === 'aceitar-diagnostico');
-  } else {
-    return filtradas.filter(acao => acao.codigo !== 'aceitar-diagnostico');
-  }
+  return acoes.filter(acao => acao.mostrar);
 });
 const usarMenuAcoesBloco = computed(() => acoesBlocoVisiveis.value.length > 1);
 const acaoBlocoPrincipal = computed(() => acoesBlocoVisiveis.value[0] ?? null);
