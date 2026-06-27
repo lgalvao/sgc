@@ -102,9 +102,9 @@ Direção:
 - Criar um padrão explícito para erro de tela.
 - A view não deve decidir isoladamente se usa `BAlert` bruto, `AppAlert` ou string local.
 
-### 4. Sucesso persistente na mesma tela
+### 4. Sucesso na mesma tela
 
-Esse caso hoje aparece sob nomes diferentes e não está consolidado.
+Esse caso hoje aparece sob nomes diferentes e precisa de uma política mais restritiva.
 
 Exemplos:
 
@@ -114,8 +114,10 @@ Exemplos:
 
 Direção:
 
-- Padronizar sucesso persistente local como uma classe própria de feedback.
-- Não misturar sucesso persistente com erro global nem com toast pós-navegação.
+- Não usar alerta persistente para sucesso local por padrão.
+- Se a mudança já ficar óbvia pela própria interface, não mostrar mensagem de sucesso.
+- Se ainda houver valor em confirmar a operação, preferir toast breve.
+- Não misturar sucesso local com erro global.
 
 ### 5. Sucesso transitório após navegação
 
@@ -149,11 +151,11 @@ O frontend deve convergir para uma pequena família de primitives:
 
 - `AppAlert`
   - feedback persistente de ação ou de tela
-- `AppFormAlert`
+- `AppAlertaFormulario`
   - erro global de formulário ou modal
-- `AppStatusAlert`
+- `AppAlertaStatus`
   - banner informativo de estado, sem semântica de erro de ação
-- `AppToast`
+- `useToast`
   - fachada única para sucesso transitório
 
 Observação:
@@ -235,7 +237,7 @@ Escopo inicial sugerido:
 
 Ações:
 
-- introduzir `AppFormAlert` ou ampliar `AppAlert` para suportar o caso
+- introduzir `AppAlertaFormulario` ou ampliar `AppAlert` para suportar o caso
 - trocar `BAlert` direto desses modais pelo primitive
 - alinhar props mínimas:
   - `mensagem`
@@ -274,11 +276,13 @@ Critério de aceite:
 - telas equivalentes deixam de alternar entre `BAlert` bruto e `AppAlert`
 - o ciclo de vida do erro fica explícito
 
-### Fase 4. Consolidar sucesso persistente sem navegação
+### Fase 4. Remover sucesso persistente sem navegação
 
 Objetivo:
 
-- Unificar casos hoje espalhados entre `alertaSucesso`, `retornoFluxo` e `notify("success")`.
+- Eliminar alertas persistentes de sucesso local e substituir por:
+  - nenhuma mensagem, quando a UI já comunicar o resultado;
+  - toast breve, quando a confirmação ainda agregar valor.
 
 Escopo inicial sugerido:
 
@@ -289,15 +293,16 @@ Escopo inicial sugerido:
 
 Ações:
 
-- criar um padrão único para sucesso persistente local
-- substituir estados ad hoc como `alertaSucesso` quando o primitive puder carregar esse caso
+- remover estados ad hoc como `alertaSucesso` quando eles servirem apenas para sucesso local
+- revisar `retornoFluxo` e equivalentes para que carreguem erro local, não sucesso persistente
 - separar claramente:
-  - sucesso local persistente
+  - erro local persistente
+  - sucesso local sem mensagem
   - sucesso transitório pós-navegação
 
 Critério de aceite:
 
-- ações equivalentes na mesma tela não alternam arbitrariamente entre `AppAlert` e string local
+- ações equivalentes na mesma tela não alternam arbitrariamente entre alerta persistente, toast e ausência de mensagem
 
 ### Fase 5. Reduzir `BAlert` informativo ou de estado
 
@@ -314,7 +319,7 @@ Escopo inicial sugerido:
 
 Ações:
 
-- criar ou formalizar `AppStatusAlert`
+- criar ou formalizar `AppAlertaStatus`
 - migrar mensagens de estado persistente para esse primitive
 
 Critério de aceite:
@@ -364,7 +369,7 @@ Perguntas que devem ser respondidas em qualquer alteração de feedback:
 - Ela reaparece em nova tentativa inválida?
 - Ela some quando a condição deixa de valer?
 - O uso direto de `BAlert` é realmente necessário?
-- Esse caso deveria ser `AppAlert`, `AppFormAlert`, `AppStatusAlert` ou toast?
+- Esse caso deveria ser `AppAlert`, `AppAlertaFormulario`, `AppAlertaStatus` ou toast?
 
 ## Próximo passo recomendado
 

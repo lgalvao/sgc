@@ -4,14 +4,14 @@ import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
 import {useEquipeDiagnostico} from '@/composables/useEquipeDiagnostico';
+import {useToast} from '@/composables/useToast';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
 import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
-import {useToastStore} from '@/stores/toast';
 import {normalizarErro} from '@/utils/apiError';
 
-type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
+type RetornoFluxo = {mensagem: string; variante: 'danger'};
 
 interface AutoavaliacaoDiagnosticoViewProps {
     codSubprocesso: number;
@@ -20,7 +20,7 @@ interface AutoavaliacaoDiagnosticoViewProps {
 
 export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoViewProps) {
     const router = useRouter();
-    const toastStore = useToastStore();
+    const {registrarPendente} = useToast();
 
     const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
     const {queryContextoEdicao, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
@@ -73,19 +73,15 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         retornoFluxo.value = null;
     }
 
-    function registrarRetornoFluxo(variante: RetornoFluxo['variante'], mensagem?: string | null) {
+    function registrarRetornoFluxo(mensagem?: string | null) {
         retornoFluxo.value = {
-            variante,
+            variante: 'danger',
             mensagem: mensagem?.trim() || TEXTOS.diagnostico.ERRO_SALVAR,
         };
     }
 
-    function registrarSucesso(mensagem: string) {
-        registrarRetornoFluxo('success', mensagem);
-    }
-
     function registrarErro(mensagem?: string | null) {
-        registrarRetornoFluxo('danger', mensagem);
+        registrarRetornoFluxo(mensagem);
     }
 
     function normalizarTextoOpcional(texto: string) {
@@ -101,11 +97,11 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
 
     async function executarAcaoFluxo(
         acao: () => Promise<void>,
-        mensagemSucesso: string,
+        aoSucesso?: () => void,
     ) {
         try {
             await acao();
-            registrarSucesso(mensagemSucesso);
+            aoSucesso?.();
         } catch (err) {
             registrarErro(normalizarErro(err).mensagem);
         }
@@ -115,7 +111,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         try {
             await concluirAutoavaliacao();
             modalConcluirAberto.value = false;
-            toastStore.setPending(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
+            registrarPendente(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
             if (contexto.value?.processoCodigo) {
                 await router.push({
                     name: 'Subprocesso',
@@ -123,13 +119,11 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
                         codProcesso: contexto.value.processoCodigo,
                         siglaUnidade: props.siglaUnidade,
                     },
-                    query: {
-                        codSubprocesso: String(props.codSubprocesso),
-                    },
-                });
-                return;
+            query: {
+                codSubprocesso: String(props.codSubprocesso),
+            },
+        });
             }
-            registrarSucesso(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
         } catch (err) {
             modalConcluirAberto.value = false;
             registrarErro(normalizarErro(err).mensagem);
@@ -148,11 +142,8 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
 
         await executarAcaoFluxo(
             () => impossibilitarAvaliacao(servidor.servidorTitulo, justificativa),
-            TEXTOS.diagnostico.SUCESSO_IMPOSSIBILITADO,
+            fecharModalImpossibilitar,
         );
-        if (retornoFluxo.value?.variante === 'success') {
-            fecharModalImpossibilitar();
-        }
     }
 
     function navegarParaConsenso(servidorTitulo: string) {

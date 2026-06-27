@@ -107,7 +107,7 @@ function montar(props?: Record<string, unknown>) {
                 LayoutPadrao: {template: '<div><slot /></div>'},
                 PageHeader: {
                     props: ['title', 'subtitle'],
-                    template: '<div><h1>{{ title }}</h1><p v-if="subtitle">{{ subtitle }}</p><slot /><slot name="actions" /></div>',
+                    template: '<div><h1>{{ title }}</h1><p v-if="subtitle">{{ subtitle }}</p><slot /><slot name="alerta" /><slot name="actions" /></div>',
                 },
                 CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                 DiagnosticoFluxoModais: {
@@ -138,9 +138,8 @@ function montar(props?: Record<string, unknown>) {
                 AppAlert: {
                     props: ['mensagem', 'chave'],
                     emits: ['dismissed'],
-                    template: '<div class="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
+                    template: '<div class="app-alert" v-bind="$attrs">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
                 },
-                BAlert: {template: '<div class="alert-consenso"><slot /></div>'},
                 BButton: {
                     emits: ['click'],
                     template: '<button :data-testid="$attrs[\'data-testid\']" :disabled="$attrs.disabled" @click="$emit(\'click\')"><slot /></button>',
@@ -232,7 +231,7 @@ describe('ConsensoDiagnosticoView', () => {
 
         expect(salvarConsensoAgoraMock).toHaveBeenCalledTimes(1);
         expect(concluirAvaliacaoMock).toHaveBeenCalledTimes(1);
-        expect(setPendingMock).toHaveBeenCalledWith('Avaliação de consenso criada');
+        expect(setPendingMock).toHaveBeenCalledWith('Avaliação de consenso criada', 'success');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'Subprocesso',
             params: {
@@ -256,7 +255,7 @@ describe('ConsensoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-confirmar-aprovar-consenso"]').trigger('click');
 
         expect(aprovarConsensoMock).toHaveBeenCalledTimes(1);
-        expect(setPendingMock).toHaveBeenCalledWith('Avaliação de consenso aprovada');
+        expect(setPendingMock).toHaveBeenCalledWith('Avaliação de consenso aprovada', 'success');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'Subprocesso',
             params: {
@@ -295,7 +294,7 @@ describe('ConsensoDiagnosticoView', () => {
         habilitarAprovarConsenso.value = false;
         const wrapper = montar();
 
-        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação de consenso já foi aprovada.');
+        expect(wrapper.text()).toContain('A avaliação de consenso já foi aprovada.');
         expect(wrapper.find('select').exists()).toBe(false);
         expect(wrapper.get('[data-testid="btn-aprovar-consenso"]').attributes('disabled')).toBeDefined();
     });
@@ -317,7 +316,7 @@ describe('ConsensoDiagnosticoView', () => {
 
         const wrapper = montar();
 
-        expect(wrapper.find('.alert-consenso').text()).toContain('A avaliação de consenso já foi aprovada.');
+        expect(wrapper.text()).toContain('A avaliação de consenso já foi aprovada.');
         expect(wrapper.find('select').exists()).toBe(false);
         expect(wrapper.text()).toContain('3');
         expect(wrapper.text()).toContain('4');

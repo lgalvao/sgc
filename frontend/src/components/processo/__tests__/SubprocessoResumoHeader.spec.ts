@@ -31,7 +31,7 @@ describe('SubprocessoResumoHeader.vue', () => {
     const stubs = {
         PageHeader: {
             props: ['title', 'subtitle'],
-            template: `<div><h1>{{ title }}</h1><h2>{{ subtitle }}</h2><slot name="actions"></slot></div>`
+            template: `<div><h1>{{ title }}</h1><h2>{{ subtitle }}</h2><slot name="alerta"></slot><slot name="actions"></slot></div>`
         },
         BDropdown: {template: `<div><slot></slot></div>`},
         BDropdownItemButton: {template: `<button @click="$emit('click')"><slot></slot></button>`},

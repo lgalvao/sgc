@@ -1,10 +1,9 @@
 import {computed} from "vue";
 import {useNotification} from "@/composables/useNotification";
+import {useToast} from "@/composables/useToast";
 import {useFluxoSubprocesso} from "@/composables/useFluxoSubprocesso";
 import {useAcesso} from "@/composables/acesso";
 import {useSubprocessoStore} from "@/stores/subprocesso";
-import {useToastStore} from "@/stores/toast";
-import {useToast} from "bootstrap-vue-next";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {useSubprocessoAcoesAdministrativas} from "@/views/subprocessoAcoesAdministrativas";
 import {useSubprocessoCarregamento} from "@/views/subprocessoCarregamento";
@@ -38,8 +37,7 @@ export function useSubprocessoTela(props: SubprocessoTelaProps) {
     const subprocessoStore = useSubprocessoStore();
     const fluxoSubprocesso = useFluxoSubprocesso();
     const {notificacao, notify, clear} = useNotification();
-    const toastStore = useToastStore();
-    const toast = useToast();
+    const {exibirPendente} = useToast();
     const {
         validarSubmissao,
         resetarValidacao,
@@ -48,18 +46,7 @@ export function useSubprocessoTela(props: SubprocessoTelaProps) {
     } = useValidacaoFormulario();
 
     function exibirToastPendente() {
-        const pendente = toastStore.consumePending();
-        if (pendente) {
-            void toast.create({
-                props: {
-                    body: pendente.mensagem,
-                    variant: 'success',
-                    modelValue: 4000,
-                    pos: 'bottom-end',
-                    noProgress: true,
-                }
-            });
-        }
+        exibirPendente();
     }
 
     const {

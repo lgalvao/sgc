@@ -26,6 +26,12 @@ export type RegistrarContextoParams<T extends ContextoSubprocesso> = {
     limparErroIntegracao: () => void;
 };
 
+export type EstadoContextoRef<T extends ContextoSubprocesso> = {
+    contextoRef: Ref<T | null>;
+    contextoInvalidoRef: Ref<boolean>;
+    contextoSessaoRef: Ref<string | null>;
+};
+
 export function registrarContexto<T extends ContextoSubprocesso>({
     contextoRef,
     contextoInvalidoRef,
@@ -56,12 +62,10 @@ export function atualizarDetalhesContexto<T extends ContextoSubprocesso>(
 }
 
 export function dadosValidos<T extends ContextoSubprocesso>(
-    contextoRef: Ref<T | null>,
-    contextoInvalidoRef: Ref<boolean>,
-    contextoSessaoRef: Ref<string | null>,
+    estado: EstadoContextoRef<T>,
     codigoSubprocesso: number,
 ): boolean {
-    return contextoRef.value?.detalhes.codigo === codigoSubprocesso
-        && !contextoInvalidoRef.value
-        && contextoSessaoRef.value === serializarContextoSessaoSubprocesso(criarContextoSessaoSubprocessoAtual());
+    return estado.contextoRef.value?.detalhes.codigo === codigoSubprocesso
+        && !estado.contextoInvalidoRef.value
+        && estado.contextoSessaoRef.value === serializarContextoSessaoSubprocesso(criarContextoSessaoSubprocessoAtual());
 }

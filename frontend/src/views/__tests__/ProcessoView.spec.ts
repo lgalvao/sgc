@@ -3,7 +3,6 @@ import {DOMWrapper, flushPromises, mount} from "@vue/test-utils";
 import ProcessoView from "../ProcessoDetalheView.vue";
 import {createTestingPinia} from "@pinia/testing";
 import {usePerfilStore} from "@/stores/perfil";
-import {useToastStore} from "@/stores/toast";
 import {nextTick, ref} from "vue";
 import {Perfil, SituacaoProcesso, SituacaoSubprocesso, TipoProcesso} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
@@ -23,6 +22,19 @@ const mocks = {
     params: {codProcesso: "1"},
     query: {}
 };
+
+const registrarPendenteMock = vi.fn();
+const exibirSucessoMock = vi.fn();
+
+vi.mock("@/composables/useToast", () => ({
+    useToast: () => ({
+        registrarPendente: registrarPendenteMock,
+        exibirSucesso: exibirSucessoMock,
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        exibirPendente: vi.fn(),
+    }),
+}));
 
 const processoQueryData = ref<any>(null);
 let processoQueryEstaStale = false;
@@ -401,7 +413,6 @@ const stubsProcessoDetalhe = {
 describe("Processo.vue", () => {
     let wrapper: any;
     let perfilStore: any;
-    let toastStore: any;
 
     const montarKeepAliveProcessoView = (manterMontado: { value: boolean }) => {
         return mount({
@@ -462,7 +473,6 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
-        toastStore = useToastStore();
     });
 
     afterEach(() => {
@@ -539,7 +549,6 @@ describe("Processo.vue", () => {
         wrapper.unmount();
         wrapper = createWrapper({erroCarregamento: new Error("Erro ao carregar")});
         perfilStore = usePerfilStore();
-        toastStore = useToastStore();
         await nextTick();
         await flushPromises();
 
@@ -617,8 +626,6 @@ describe("Processo.vue", () => {
     it("deve executar ação em bloco com sucesso (Aceitar cadastro)", async () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
-        toastStore = useToastStore();
-
         perfilStore.$patch({perfilSelecionado: Perfil.GESTOR, unidadeSelecionada: 999});
 
         await nextTick();
@@ -637,7 +644,7 @@ describe("Processo.vue", () => {
             acao: 'ACEITAR',
             dataLimite: undefined,
         });
-        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.CADASTROS_ACEITOS_EM_BLOCO);
+        expect(registrarPendenteMock).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.CADASTROS_ACEITOS_EM_BLOCO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -697,8 +704,6 @@ describe("Processo.vue", () => {
             elegiveis: [mockElegiveis[0]],
         });
         perfilStore = usePerfilStore();
-        toastStore = useToastStore();
-
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
 
         await nextTick();
@@ -715,9 +720,9 @@ describe("Processo.vue", () => {
         await modal.vm.$emit("confirmar", {ids: [101]});
         await flushPromises();
 
-        expect(toastStore.setPending).not.toHaveBeenCalled();
+        expect(registrarPendenteMock).not.toHaveBeenCalled();
         expect(mocks.push).not.toHaveBeenCalledWith("/painel");
-        expect(wrapper.find('[data-testid="app-alert"]').text()).toContain(TEXTOS_SUCESSO_PROCESSO.CADASTROS_HOMOLOGADOS_EM_BLOCO);
+        expect(exibirSucessoMock).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.CADASTROS_HOMOLOGADOS_EM_BLOCO);
     });
 
     it("deve usar textos de CDU-26 quando houver apenas validacao elegível para homologacao", async () => {
@@ -731,8 +736,6 @@ describe("Processo.vue", () => {
             elegiveis: [mockElegiveis[1]],
         });
         perfilStore = usePerfilStore();
-        toastStore = useToastStore();
-
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
 
         await nextTick();
@@ -748,7 +751,7 @@ describe("Processo.vue", () => {
         const modal = wrapper.findComponent(ModalAcaoBlocoStub);
         await modal.vm.$emit("confirmar", {ids: [103]});
         await flushPromises();
-        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.MAPAS_HOMOLOGADOS_EM_BLOCO);
+        expect(registrarPendenteMock).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.MAPAS_HOMOLOGADOS_EM_BLOCO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 
@@ -1087,15 +1090,13 @@ describe("Processo.vue", () => {
         wrapper = createWrapper();
         perfilStore = usePerfilStore();
         perfilStore.$patch({perfilSelecionado: Perfil.ADMIN});
-        toastStore = useToastStore();
-
         await nextTick();
         await flushPromises();
 
         await (wrapper.vm).confirmarFinalizacao();
 
         expect(processoService.finalizarProcesso).toHaveBeenCalledWith(1);
-        expect(toastStore.setPending).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
+        expect(registrarPendenteMock).toHaveBeenCalledWith(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
         expect(mocks.push).toHaveBeenCalledWith("/painel");
     });
 

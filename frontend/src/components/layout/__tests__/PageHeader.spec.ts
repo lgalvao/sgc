@@ -45,6 +45,18 @@ describe('PageHeader.vue', () => {
         expect(wrapper.find('.d-flex.gap-2').exists()).toBe(true)
     })
 
+    it('renders alert slot below the main header content', () => {
+        const wrapper = mount(PageHeader, {
+            props: {title: 'Title'},
+            slots: {
+                alerta: '<div class="alerta-teste">Alerta</div>'
+            }
+        })
+
+        expect(wrapper.find('.page-header__alerta').exists()).toBe(true)
+        expect(wrapper.find('.alerta-teste').text()).toBe('Alerta')
+    })
+
     it('does not render subtitle element if no prop or slot provided', () => {
         const wrapper = mount(PageHeader, {
             props: {title: 'Title'}

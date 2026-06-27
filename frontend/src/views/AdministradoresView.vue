@@ -20,9 +20,12 @@
         </template>
       </PageHeader>
 
-      <BAlert v-if="erroAdmins" :model-value="true" dismissible variant="danger">
-        {{ erroAdmins.mensagem }}
-      </BAlert>
+      <AppAlertaTela
+          v-if="erroTela"
+          data-testid="alert-administradores-erro"
+          :mensagem="erroTela"
+          @dismissed="erroDispensado = true"
+      />
 
       <div v-else-if="administradores.length === 0">
         <EmptyState
@@ -88,9 +91,11 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BSpinner, BTable} from 'bootstrap-vue-next';
+import {computed, ref, watch} from 'vue';
+import {BButton, BSpinner, BTable} from 'bootstrap-vue-next';
 
 import AdministradoresFluxoModais from '@/components/administracao/AdministradoresFluxoModais.vue';
+import AppAlertaTela from '@/components/comum/AppAlertaTela.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
@@ -120,6 +125,15 @@ const {
   confirmarRemocao,
   removerAdmin,
 } = useAdministradoresTela();
+
+const erroDispensado = ref(false);
+const erroTela = computed(() => erroDispensado.value ? null : erroAdmins.value?.mensagem ?? null);
+
+watch(erroAdmins, (novoErro) => {
+  if (novoErro) {
+    erroDispensado.value = false;
+  }
+});
 
 const camposAdmins = [
   {key: 'nome', label: TEXTOS.administracao.CAMPO_NOME},

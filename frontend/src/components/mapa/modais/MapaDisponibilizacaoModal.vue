@@ -11,9 +11,12 @@
       @confirmar="disponibilizar"
       @fechar="fechar"
   >
-    <BAlert v-if="fieldErrors?.generic" :model-value="true" class="mb-3" dismissible variant="danger">
-      {{ fieldErrors.generic }}
-    </BAlert>
+    <template #alerta>
+      <AppAlertaFormulario
+          :mensagem="fieldErrors?.generic"
+          data-testid="alert-disponibilizar-mapa-erro"
+      />
+    </template>
     <BFormGroup
         :invalid-feedback="mensagemErroDataLimite"
         :state="mensagemErroDataLimite ? false : null"
@@ -77,7 +80,8 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormGroup, BFormInvalidFeedback} from "bootstrap-vue-next";
+import {BFormGroup, BFormInvalidFeedback} from "bootstrap-vue-next";
+import AppAlertaFormulario from "@/components/comum/AppAlertaFormulario.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";
@@ -181,5 +185,3 @@ function somarDias(dataIso: string, dias: number) {
   return data.toISOString().split("T")[0];
 }
 </script>
-
-

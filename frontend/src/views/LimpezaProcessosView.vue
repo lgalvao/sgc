@@ -1,19 +1,23 @@
 <template>
   <LayoutPadrao>
-    <PageHeader :title="TEXTOS.administracao.LIMPEZA_TITULO"/>
+    <PageHeader :title="TEXTOS.administracao.LIMPEZA_TITULO">
+      <template #alerta>
+        <AppAlert
+            v-if="notificacao"
+            :chave="notificacao.chave"
+            :dispensavel="notificacao.dispensavel ?? true"
+            :mensagem="notificacao.mensagem"
+            :variante="notificacao.variante"
+            @dismissed="clear()"
+        />
 
-    <AppAlert
-        v-if="notificacao"
-        :chave="notificacao.chave"
-        :dispensavel="notificacao.dispensavel ?? true"
-        :mensagem="notificacao.mensagem"
-        :variante="notificacao.variante"
-        @dismissed="clear()"
-    />
-
-    <BAlert :model-value="true" dismissible variant="warning">
-      {{ TEXTOS.administracao.LIMPEZA_ALERTA }}
-    </BAlert>
+        <AppAlert
+            :dispensavel="true"
+            :mensagem="TEXTOS.administracao.LIMPEZA_ALERTA"
+            variante="warning"
+        />
+      </template>
+    </PageHeader>
 
     <BCard class="mt-3">
       <BFormGroup
@@ -60,7 +64,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BCard, BFormGroup, BFormInput} from 'bootstrap-vue-next';
+import {BCard, BFormGroup, BFormInput} from 'bootstrap-vue-next';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import LimpezaProcessosFluxoModais from '@/components/administracao/LimpezaProcessosFluxoModais.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';

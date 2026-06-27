@@ -426,7 +426,7 @@ describe('DiagnosticoUnidadeView', () => {
         await wrapper.get('[data-testid="btn-homologar-diagnostico-unidade"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-homologar-unidade"]').trigger('click');
         expect(homologarDiagnosticoMock).toHaveBeenCalledWith(undefined);
-        expect(wrapper.text()).toContain('Diagnóstico homologado');
+        expect(wrapper.text()).not.toContain('Diagnóstico homologado');
 
         perfilSelecionado.value = Perfil.GESTOR;
         situacaoDiagnostico.value = 'CONCLUIDO';

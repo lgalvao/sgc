@@ -59,10 +59,9 @@
         </template>
       </SubprocessoResumoHeader>
 
-      <AppAlert
-          v-if="retornoFluxo"
-          :mensagem="retornoFluxo.mensagem"
-          :variante="retornoFluxo.variante"
+      <AppAlertaAcao
+          :feedback="retornoFluxo"
+          data-testid="alert-diagnostico-unidade-feedback"
           @dismissed="limparRetornoFluxo"
       />
 
@@ -209,7 +208,7 @@ import {
 } from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
-import AppAlert from '@/components/comum/AppAlert.vue';
+import AppAlertaAcao from '@/components/comum/AppAlertaAcao.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import SubprocessoMovimentacoes from '@/components/processo/SubprocessoMovimentacoes.vue';

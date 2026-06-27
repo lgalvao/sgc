@@ -18,7 +18,27 @@
           @abrir-validar="abrirModalValidarAnalise"
           @abrir-impacto="abrirModalImpacto"
           @abrir-importar="mostrarModalImportar = true"
-      />
+      >
+        <template #alerta>
+          <AppAlert
+              v-if="erroGlobal"
+              :chave="erroTick"
+              data-testid="alerta-erro-global"
+              :mensagem="erroGlobal"
+              variante="danger"
+              @dismissed="erroGlobal = null"
+          />
+
+          <AppAlert
+              v-if="notificacao"
+              :chave="notificacao.chave"
+              :dispensavel="notificacao.dispensavel"
+              :mensagem="notificacao.mensagem"
+              :variante="notificacao.variante"
+              @dismissed="clear()"
+          />
+        </template>
+      </CadastroAcoesHeader>
 
       <div v-if="mostrarControlesEdicaoCadastro && isRevisao" class="mt-3 mb-2">
         <BFormCheckbox
@@ -36,29 +56,6 @@
           <BSpinner small/>
         </div>
       </div>
-
-      <BAlert
-          v-if="erroGlobal"
-          :key="erroTick"
-          :model-value="true"
-          data-testid="alerta-erro-global"
-          dismissible
-          no-fade
-          show
-          variant="danger"
-          @dismissed="erroGlobal = null"
-      >
-        {{ erroGlobal }}
-      </BAlert>
-
-        <AppAlert
-            v-if="notificacao"
-            :chave="notificacao.chave"
-            :dispensavel="notificacao.dispensavel"
-            :mensagem="notificacao.mensagem"
-            :variante="notificacao.variante"
-          @dismissed="clear()"
-      />
 
       <CadAtividadeForm
           v-if="mostrarControlesEdicaoCadastro"
@@ -139,7 +136,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormCheckbox, BSpinner} from "bootstrap-vue-next";
+import {BFormCheckbox, BSpinner} from "bootstrap-vue-next";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";

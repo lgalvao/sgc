@@ -14,6 +14,17 @@ describe('AppAlert.vue', () => {
         expect(wrapper.text()).toContain('Alerta de erro simples');
     });
 
+    it('deve permitir configurar o data-testid do alerta', () => {
+        const wrapper = mount(AppAlert, {
+            props: {
+                mensagem: 'Alerta customizado',
+                dataTestid: 'alerta-customizado',
+            }
+        });
+
+        expect(wrapper.find('[data-testid="alerta-customizado"]').exists()).toBe(true);
+    });
+
     it('deve renderizar o notificacao no modo estruturado e ocultar/exibir detalhes', async () => {
         const wrapper = mount(AppAlert, {
             props: {

@@ -1,13 +1,5 @@
 <template>
   <LayoutPadrao>
-    <AppAlert
-        v-if="notificacao"
-        :chave="notificacao.chave"
-        :dispensavel="notificacao.dispensavel ?? true"
-        :mensagem="notificacao.mensagem"
-        :variante="notificacao.variante"
-        @dismissed="clear()"
-    />
     <div v-if="subprocesso">
       <SubprocessoResumoHeader
           :format-data-simples="formatDataSimples"
@@ -29,6 +21,16 @@
           @abrir-reabrir-revisao="abrirModalReabrirRevisao"
           @confirmar-enviar-lembrete="confirmarEnviarLembrete"
       >
+        <template #alerta>
+          <AppAlert
+              v-if="notificacao"
+              :chave="notificacao.chave"
+              :dispensavel="notificacao.dispensavel ?? true"
+              :mensagem="notificacao.mensagem"
+              :variante="notificacao.variante"
+              @dismissed="clear()"
+          />
+        </template>
         <template #acoes-extras>
           <BButton
               v-if="mostrarHistoricoAnaliseDiagnostico"
@@ -76,17 +78,13 @@
       <SubprocessoMovimentacoes v-if="!ehDiagnostico || !ehServidorPuro" :movimentacoes="movimentacoes"/>
     </div>
     <div v-else-if="erroIntegracaoContexto" class="py-2">
-      <BAlert
-          :model-value="true"
-          dismissible
-          variant="danger"
+      <AppAlert
+          :dispensavel="true"
+          :mensagem="erroIntegracaoContexto.detalhes ? undefined : erroIntegracaoContexto.mensagem"
+          :notificacao="erroIntegracaoContexto.detalhes ? { resumo: erroIntegracaoContexto.mensagem, detalhes: [String(erroIntegracaoContexto.detalhes)] } : undefined"
+          variante="danger"
           @dismissed="limparErroIntegracao()"
-      >
-        {{ erroIntegracaoContexto.mensagem }}
-        <div v-if="erroIntegracaoContexto.detalhes">
-          <small>Detalhes: {{ erroIntegracaoContexto.detalhes }}</small>
-        </div>
-      </BAlert>
+      />
     </div>
     <div v-else-if="erroNaoEncontrado" class="text-center py-5">
       <i class="bi bi-exclamation-triangle fs-1 text-warning mb-3 d-block"></i>
@@ -132,7 +130,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BSpinner} from "bootstrap-vue-next";
+import {BButton, BSpinner} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import SubprocessoDiagnosticoPainel from "@/components/diagnostico/SubprocessoDiagnosticoPainel.vue";
@@ -142,8 +140,8 @@ import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimenta
 import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHeader.vue";
 import AppAlert from "@/components/comum/AppAlert.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import {useToast} from "@/composables/useToast";
 import {useFluxoDiagnostico} from "@/composables/useFluxoDiagnostico";
-import {useToastStore} from "@/stores/toast";
 import {listarAnalisesDiagnostico} from "@/services/analiseService";
 import {normalizarErro} from "@/utils/apiError/normalizer";
 import type {Analise} from "@/types/tipos";
@@ -212,7 +210,7 @@ const ehServidorPuro = computed(() => {
     && !permissoes.podeDevolverDiagnostico
     && !permissoes.podeHomologarDiagnostico;
 });
-const toastStore = useToastStore();
+const {registrarPendente} = useToast();
 const modalConcluirDiagnosticoAberto = ref(false);
 const erroConcluirDiagnostico = ref('');
 const modalHistoricoDiagnosticoAberto = ref(false);
@@ -266,7 +264,7 @@ async function confirmarConcluirDiagnostico() {
   try {
     await concluirDiagnostico();
     modalConcluirDiagnosticoAberto.value = false;
-    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
+    registrarPendente(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
     await router.push({name: 'Painel'});
   } catch (erro) {
     erroConcluirDiagnostico.value = normalizarErro(erro).mensagem

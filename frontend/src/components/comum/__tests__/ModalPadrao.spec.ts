@@ -47,4 +47,17 @@ describe("ModalPadrao.vue", () => {
         expect(wrapper.emitted("fechar")).toBeDefined();
         expect(wrapper.emitted("update:modelValue")?.[0]).toEqual([false]);
     });
+
+    it("renderiza a regiao de alerta antes do conteudo principal", () => {
+        const wrapper = mount(ModalPadrao, {
+            ...mountOptions,
+            slots: {
+                alerta: '<div class="alerta-modal">Erro</div>',
+                default: '<div>Conteúdo</div>',
+            },
+        });
+
+        expect(wrapper.find('.modal-padrao__alerta').exists()).toBe(true);
+        expect(wrapper.find('.alerta-modal').text()).toBe("Erro");
+    });
 });

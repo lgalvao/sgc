@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue'
-import {BOrchestrator, useToast} from 'bootstrap-vue-next'
+import {BOrchestrator} from 'bootstrap-vue-next'
+import {useToast} from '@/composables/useToast'
 import FeedbackButton from './FeedbackButton.vue'
 import FeedbackModal from './FeedbackModal.vue'
 import {useFeedback} from '@/composables/useFeedback'
@@ -9,7 +10,7 @@ import type {FeedbackTipo} from '@/types/feedback'
 type EstadoBotao = 'normal' | 'carregando' | 'sucesso' | 'erro'
 
 const {captura, enviando, capturarTela, enviarFeedback, removerCaptura} = useFeedback()
-const {create: criarToast} = useToast()
+const {exibirErro, exibirSucesso} = useToast()
 
 const modalAberto = ref(false)
 const estadoBotao = ref<EstadoBotao>('normal')
@@ -26,29 +27,13 @@ async function aoEnviar(tipo: FeedbackTipo, nota: string) {
     await enviarFeedback(tipo, nota)
     modalAberto.value = false
     estadoBotao.value = 'sucesso'
-    criarToast({
-      props: {
-        body: 'Feedback enviado',
-        variant: 'success',
-        modelValue: 4000,
-        pos: 'bottom-end',
-        noProgress: true,
-      },
-    })
+    exibirSucesso('Feedback enviado')
     setTimeout(() => {
       estadoBotao.value = 'normal'
     }, 1500)
   } catch {
     estadoBotao.value = 'erro'
-    criarToast({
-      props: {
-        body: 'Não foi possível enviar o feedback. Tente novamente.',
-        variant: 'danger',
-        modelValue: 5000,
-        pos: 'bottom-end',
-        noProgress: true,
-      },
-    })
+    exibirErro('Não foi possível enviar o feedback. Tente novamente.')
     setTimeout(() => {
       estadoBotao.value = 'normal'
     }, 2000)

@@ -121,17 +121,12 @@ describe("AtribuicaoTemporariaView", () => {
                 stubs: {
                     LayoutPadrao: {template: "<div><slot /></div>"},
                     PageHeader: {
-                        template: "<div><h1>{{ title }}</h1><slot /><slot name='actions' /></div>",
+                        template: "<div><h1>{{ title }}</h1><slot /><slot name='alerta' /><slot name='actions' /></div>",
                         props: ["title"],
                     },
                     BButton: {
                         template: "<button :disabled='disabled' @click=\"$emit('click')\"><slot /></button>",
                         props: ["disabled", "to", "variant"],
-                    },
-                    BAlert: {
-                        template: "<div><slot /></div>",
-                        props: ["modelValue"],
-                        emits: ["dismissed"],
                     },
                     BForm: {
                         template: "<form @submit.prevent=\"$emit('submit', $event)\"><slot /></form>",
@@ -163,7 +158,11 @@ describe("AtribuicaoTemporariaView", () => {
                         props: ["disabled", "loading", "loadingText", "text", "variant"],
                         emits: ["click"],
                     },
-                    AppAlert: {template: "<div />"},
+                    AppAlert: {
+                        template: "<div><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
+                        props: ["mensagem", "variante", "chave", "dispensavel"],
+                        emits: ["dismissed"],
+                    },
                     CarregamentoPagina: {template: "<div data-testid='loading'>Carregando...</div>"},
                     AtribuicaoTemporariaFluxoModais: {
                         props: ["mostrarModalRemocao"],
@@ -214,7 +213,7 @@ describe("AtribuicaoTemporariaView", () => {
             justificativa: "<p>Justificativa de teste</p>",
         });
         expect(mockAtualizarAtribuicao).not.toHaveBeenCalled();
-        expect(mockNotify).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO, "success");
+        expect(mockNotify).not.toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO, "success");
     });
 
     it("entra em modo edição quando há AT vigente", async () => {
@@ -300,7 +299,7 @@ describe("AtribuicaoTemporariaView", () => {
             dataTermino: "2026-06-05",
             justificativa: "<p>Atualizada</p>",
         });
-        expect(mockNotify).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO, "success");
+        expect(mockNotify).not.toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO, "success");
     });
 
     it("remove atribuição vigente", async () => {
@@ -339,7 +338,7 @@ describe("AtribuicaoTemporariaView", () => {
         await flushPromises();
 
         expect(mockRemoverAtribuicao).toHaveBeenCalledWith(1, 10);
-        expect(mockNotify).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
+        expect(mockNotify).not.toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
     });
 
     it("navega de volta ao cancelar", async () => {

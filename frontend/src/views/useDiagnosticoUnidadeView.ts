@@ -16,7 +16,7 @@ import type {
     ValorSituacaoCapacitacao,
 } from '@/types/diagnostico-competencias';
 
-type RetornoFluxo = {mensagem: string; variante: 'danger' | 'success'};
+type RetornoFluxo = {mensagem: string; variante: 'danger'};
 
 interface DiagnosticoUnidadeViewProps {
     codSubprocesso: number;
@@ -187,19 +187,15 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         }
     }
 
-    function registrarRetornoFluxo(variante: RetornoFluxo['variante'], mensagem?: string | null) {
+    function registrarRetornoFluxo(mensagem?: string | null) {
         retornoFluxo.value = {
-            variante,
+            variante: 'danger',
             mensagem: mensagem?.trim() || TEXTOS.diagnostico.ERRO_SALVAR,
         };
     }
 
-    function registrarSucesso(mensagem: string) {
-        registrarRetornoFluxo('success', mensagem);
-    }
-
     function registrarErro(mensagem?: string | null) {
-        registrarRetornoFluxo('danger', mensagem);
+        registrarRetornoFluxo(mensagem);
     }
 
     function normalizarTextoOpcional(texto: string) {
@@ -217,14 +213,12 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         config: {
             acao: () => Promise<void>;
             aoConcluir: () => void;
-            mensagemSucesso: string;
             mensagemErro?: string | null;
         },
     ) {
         try {
             await config.acao();
             config.aoConcluir();
-            registrarSucesso(config.mensagemSucesso);
         } catch {
             registrarErro(config.mensagemErro);
         }
@@ -236,7 +230,6 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             aoConcluir: () => {
                 modalValidarAberto.value = false;
             },
-            mensagemSucesso: TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO,
             mensagemErro: erroValidar.value?.message,
         });
     }
@@ -253,7 +246,6 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             aoConcluir: () => {
                 modalDevolverAberto.value = false;
             },
-            mensagemSucesso: TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO,
             mensagemErro: erroDevolver.value?.message,
         });
     }
@@ -264,7 +256,6 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             aoConcluir: () => {
                 modalHomologarAberto.value = false;
             },
-            mensagemSucesso: TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO,
             mensagemErro: erroHomologar.value?.message,
         });
     }

@@ -1,12 +1,14 @@
 import {computed, ref} from 'vue';
 import {TEXTOS} from '@/constants/textos';
 import {useNotification} from '@/composables/useNotification';
+import {useToast} from '@/composables/useToast';
 import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
 import {normalizarErro} from '@/utils/apiError';
 import {excluirProcessoCompleto} from '@/services/processo';
 
 export function useLimpezaProcessosTela() {
     const {notificacao, notify, clear} = useNotification();
+    const {exibirSucesso} = useToast();
     const {validarSubmissao, deveExibirErro, focarPrimeiroErroInvalido} = useValidacaoFormulario();
 
     const codigoProcesso = ref('');
@@ -38,7 +40,8 @@ export function useLimpezaProcessosTela() {
             await excluirProcessoCompleto(codigoConfirmacao.value);
             mostrarConfirmacao.value = false;
             codigoProcesso.value = '';
-            notify(TEXTOS.administracao.LIMPEZA_SUCESSO, 'success');
+            clear();
+            exibirSucesso(TEXTOS.administracao.LIMPEZA_SUCESSO);
         } catch (error) {
             notify(normalizarErro(error).mensagem, 'danger');
         } finally {

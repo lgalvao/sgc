@@ -1,5 +1,5 @@
 import {useErrorHandler} from "@/composables/useErrorHandler";
-import {useToastStore} from "@/stores/toast";
+import {useToast} from "@/composables/useToast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import type {RouteLocationRaw} from "vue-router";
 import {useRouter} from "vue-router";
@@ -33,7 +33,7 @@ export type ExecucaoFluxoSubprocesso = ReturnType<typeof useFluxoSubprocessoExec
 export function useFluxoSubprocessoExecucao() {
     const {ultimoErro, limparErro, executarComTratamentoDeErros} = useErrorHandler();
     const subprocessoStore = useSubprocessoStore();
-    const toastStore = useToastStore();
+    const {registrarPendente} = useToast();
     const router = useRouter();
     const {atualizarFluxoMapa, limparEstadoSubprocessoAtual} = useInvalidacaoNavegacao();
 
@@ -46,7 +46,7 @@ export function useFluxoSubprocessoExecucao() {
                 await acao();
 
                 if (workflow.mensagemSucesso) {
-                    toastStore.setPending(workflow.mensagemSucesso);
+                    registrarPendente(workflow.mensagemSucesso);
                 }
 
                 if (typeof workflow.atualizarFluxoMapa === "number") {

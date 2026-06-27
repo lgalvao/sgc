@@ -13,11 +13,14 @@
       @confirmar="confirmar"
       @fechar="fechar"
   >
-    <p class="mb-3">{{ texto }}</p>
+    <template #alerta>
+      <AppAlertaFormulario
+          :mensagem="erro"
+          data-testid="alert-acao-bloco"
+      />
+    </template>
 
-    <BAlert v-if="erro" :model-value="true" class="mb-3" dismissible variant="danger">
-      {{ erro }}
-    </BAlert>
+    <p class="mb-3">{{ texto }}</p>
 
     <div v-if="mostrarDataLimite" class="mb-3">
       <BFormGroup
@@ -77,7 +80,8 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
-import {BAlert, BFormCheckbox, BFormGroup, BTable} from 'bootstrap-vue-next';
+import {BFormCheckbox, BFormGroup, BTable} from 'bootstrap-vue-next';
+import AppAlertaFormulario from '@/components/comum/AppAlertaFormulario.vue';
 import InputData from '@/components/comum/InputData.vue';
 import ModalPadrao from '@/components/comum/ModalPadrao.vue';
 import {ehDataEstritamenteFutura, formatarDataBR, obterAmanhaFormatado} from "@/utils/date";

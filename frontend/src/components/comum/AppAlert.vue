@@ -7,7 +7,7 @@
       :model-value="true"
       :variant="variante"
       class="mb-3"
-      data-testid="app-alert"
+      :data-testid="dataTestid"
       @dismissed="emit('dismissed')"
   >
     <!-- Modo simples -->
@@ -62,12 +62,13 @@ interface NotificacaoEstruturada {
 }
 
 withDefaults(defineProps<{
-  mensagem?: string;
+  mensagem?: string | null;
   notificacao?: NotificacaoEstruturada;
   chave?: number;
   variante?: 'danger' | 'warning' | 'success' | 'info';
   dispensavel?: boolean;
   stackTrace?: string;
+  dataTestid?: string;
 }>(), {
   chave: undefined,
   mensagem: undefined,
@@ -75,6 +76,7 @@ withDefaults(defineProps<{
   variante: 'danger',
   dispensavel: true,
   stackTrace: undefined,
+  dataTestid: 'app-alert',
 });
 
 const emit = defineEmits<{

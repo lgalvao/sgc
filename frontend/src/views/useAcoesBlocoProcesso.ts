@@ -4,14 +4,14 @@ import * as processoService from "@/services/processo";
 import {TEXTOS} from "@/constants/textos";
 import {formatSituacaoSubprocesso} from "@/utils/formatters";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
+import {useToast} from "@/composables/useToast";
 import type {AcaoBlocoProcesso, SubprocessoElegivel} from "@/types/tipos";
 import {obterIdBotaoAcaoProcesso, obterTestIdBotaoAcaoProcesso} from "@/components/processo/processoAcoes";
 import type {DadosAcaoBloco, DependenciasProcessoAcoes, ModalAcaoBlocoRef} from "@/views/processoDetalheTipos";
-import {useToastStore} from "@/stores/toast";
 
 export function useAcoesBlocoProcesso(dependencias: DependenciasProcessoAcoes) {
     const router = useRouter();
-    const toastStore = useToastStore();
+    const {exibirSucesso, registrarPendente} = useToast();
     const {atualizarFluxoProcesso, atualizarFluxoSubprocessoEProcesso} = useInvalidacaoNavegacao();
     const modalBlocoRef = ref<ModalAcaoBlocoRef | null>(null);
     const acaoBlocoAtual = ref<AcaoBlocoProcesso | null>(null);
@@ -21,14 +21,14 @@ export function useAcoesBlocoProcesso(dependencias: DependenciasProcessoAcoes) {
         modalBlocoRef.value?.fechar();
 
         if (acao.redirecionarPainel) {
-            toastStore.setPending(acao.mensagemSucesso);
+            registrarPendente(acao.mensagemSucesso);
             await atualizarFluxoProcesso();
             dependencias.processo.value = null;
             await router.push("/painel");
             return;
         }
 
-        dependencias.notify(acao.mensagemSucesso, "success");
+        exibirSucesso(acao.mensagemSucesso);
         await atualizarFluxoSubprocessoEProcesso();
         await dependencias.carregarContextoCompleto();
     }

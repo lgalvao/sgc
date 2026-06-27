@@ -17,6 +17,7 @@ vi.mock("@/utils/date", async () => {
 const ModalPadraoStub = {
     template: `
         <div v-if="modelValue" data-testid="modal-stub">
+            <slot name="alerta" />
             <slot />
             <button
                 :data-testid="testIdCancelar || 'btn-modal-padrao-cancelar'"

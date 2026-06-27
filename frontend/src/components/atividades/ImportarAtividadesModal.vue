@@ -13,16 +13,13 @@
       @confirmar="importar"
       @fechar="fechar"
   >
-    <BAlert
-        v-if="erroImportacao"
-        :fade="false"
-        :model-value="true"
-        dismissible
-        variant="danger"
-        @dismissed="limparErroImportacao"
-    >
-      {{ erroImportacao }}
-    </BAlert>
+    <template #alerta>
+      <AppAlertaFormulario
+          :mensagem="erroImportacao"
+          data-testid="alert-importacao-atividades"
+          @dismissed="limparErroImportacao"
+      />
+    </template>
     <fieldset :disabled="importando">
       <div class="mb-3">
         <label
@@ -156,8 +153,9 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BFormCheckbox, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from "bootstrap-vue-next";
+import {BButton, BFormCheckbox, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from "bootstrap-vue-next";
 import {computed, toRef} from "vue";
+import AppAlertaFormulario from "@/components/comum/AppAlertaFormulario.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {TEXTOS} from "@/constants/textos";
 import {useImportarAtividadesTela} from "@/composables/useImportarAtividadesTela";

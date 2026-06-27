@@ -7,7 +7,7 @@ import {useMapaCompetenciasMutacoes} from "@/composables/useMapaCompetenciasMuta
 import {useImpactoMapaModal} from "@/composables/useImpactoMapaModal";
 import {useMapas} from "@/composables/useMapas";
 import {useNotification} from "@/composables/useNotification";
-import {useToastStore} from "@/stores/toast";
+import {useToast} from "@/composables/useToast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 import {usePerfilStore} from "@/stores/perfil";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
@@ -36,7 +36,7 @@ export function useMapaTela(props: MapaTelaProps) {
     const fluxoMapa = useFluxoMapa();
     const carregandoFluxoMapa = computed(() => unref(fluxoMapa.carregando));
     const {notify} = useNotification();
-    const toastStore = useToastStore();
+    const {registrarPendente} = useToast();
     const subprocessoStore = useSubprocessoStore();
     const perfilStore = usePerfilStore();
     const {atualizarFluxoMapa} = useInvalidacaoNavegacao();
@@ -124,7 +124,7 @@ export function useMapaTela(props: MapaTelaProps) {
 
     async function concluirAcaoPainel(mensagem: string, fecharModal: () => void) {
         fecharModal();
-        toastStore.setPending(mensagem);
+        registrarPendente(mensagem);
         const codigoAtual = codigoSubprocesso.value;
         void atualizarFluxoMapa(codigoAtual === null ? undefined : codigoAtual);
         await router.push({name: "Painel"});

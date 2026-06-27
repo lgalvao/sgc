@@ -79,82 +79,19 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const podeAprovarConsenso = computed(() => query.data.value?.podeAprovarConsenso ?? false);
     const habilitarAprovarConsenso = computed(() => query.data.value?.habilitarAprovarConsenso ?? false);
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
+    const obterChaveConsensoAtual = () => chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value);
 
-    const mutacaoSalvar = useMutation({
-        mutation: (titulo: string) =>
-            salvarConsenso(codSubprocesso, titulo, {
-                competencias: competenciasLocais.value.map((c) => ({...c})),
-            }),
-        onSettled: () => {
+    const {mutacaoSalvar, mutacaoConcluir, mutacaoAprovar} = criarMutacoesConsenso({
+        cache,
+        codSubprocesso,
+        contextoSessao,
+        servidorTitulo,
+        obterChaveConsensoAtual,
+        obterCompetenciasLocais: () => competenciasLocais.value,
+        finalizarAutosave: () => {
             salvandoAutomaticamente.value = false;
         },
-        onSuccess: () => {
-            const anterior = cache.getQueryData<Consenso>(
-                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
-            );
-            cache.setQueryData(
-                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
-                {
-                    competencias: competenciasLocais.value.map((c) => ({...c})),
-                    situacaoServidor: anterior?.situacaoServidor ?? 'AUTOAVALIACAO_CONCLUIDA',
-                    podeEditar: anterior?.podeEditar ?? false,
-                    podeConcluirAvaliacao: anterior?.podeConcluirAvaliacao ?? false,
-                    habilitarConcluirAvaliacao: anterior?.habilitarConcluirAvaliacao ?? false,
-                    podeAprovarConsenso: anterior?.podeAprovarConsenso ?? false,
-                    habilitarAprovarConsenso: anterior?.habilitarAprovarConsenso ?? false,
-                } satisfies Consenso,
-            );
-            invalidarQueriesConsenso({cache, codSubprocesso, contextoSessao, servidorTitulo});
-        },
-    });
-
-    const mutacaoConcluir = useMutation({
-        mutation: (titulo: string) => concluirConsenso(codSubprocesso, titulo),
-        onSuccess: () => {
-            const anterior = cache.getQueryData<Consenso>(
-                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
-            );
-            if (anterior) {
-                cache.setQueryData(
-                    chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
-                    {
-                        ...anterior,
-                        situacaoServidor: 'CONSENSO_CRIADO',
-                        podeEditar: false,
-                        podeConcluirAvaliacao: true,
-                        habilitarConcluirAvaliacao: false,
-                        podeAprovarConsenso: anterior.podeAprovarConsenso,
-                        habilitarAprovarConsenso: anterior.habilitarAprovarConsenso,
-                    } satisfies Consenso,
-                );
-            }
-            invalidarQueriesConsenso({cache, codSubprocesso, contextoSessao, servidorTitulo});
-            void cache.invalidateQueries({key: chaveAutoavaliacao(codSubprocesso, contextoSessao), exact: true});
-        },
-    });
-
-    const mutacaoAprovar = useMutation({
-        mutation: () => aprovarConsenso(codSubprocesso),
-        onSuccess: () => {
-            const anterior = cache.getQueryData<Consenso>(
-                chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
-            );
-            if (anterior) {
-                cache.setQueryData(
-                    chaveConsenso(codSubprocesso, contextoSessao, chaveConsultaConsenso.value),
-                    {
-                        ...anterior,
-                        situacaoServidor: 'CONSENSO_APROVADO',
-                        podeEditar: false,
-                        podeConcluirAvaliacao: false,
-                        habilitarConcluirAvaliacao: false,
-                        podeAprovarConsenso: true,
-                        habilitarAprovarConsenso: false,
-                    } satisfies Consenso,
-                );
-            }
-            invalidarQueriesAprovar({cache, codSubprocesso, contextoSessao, chaveConsultaConsenso: chaveConsultaConsenso.value});
-        },
+        obterChaveConsultaConsenso: () => chaveConsultaConsenso.value,
     });
 
     /** Dispara autosave com debounce. Só salva se não estiver aprovado. */
@@ -200,10 +137,6 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         agendarAutosave();
     }
 
-    const carregando = computed(() => query.status.value === 'pending');
-    const aprovando = computed(() => mutacaoAprovar.isLoading.value);
-    const concluindo = computed(() => mutacaoConcluir.isLoading.value);
-
     return {
         query,
         competenciasLocais,
@@ -214,11 +147,11 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         podeAprovarConsenso,
         habilitarAprovarConsenso,
         ehConsensoAprovado,
-        carregando,
+        carregando: computed(() => query.status.value === 'pending'),
         carregandoPermissoes,
         salvandoAutomaticamente,
-        concluindo,
-        aprovando,
+        concluindo: computed(() => mutacaoConcluir.isLoading.value),
+        aprovando: computed(() => mutacaoAprovar.isLoading.value),
         erroConcluir: computed(() => mutacaoConcluir.error.value),
         erroAprovar: computed(() => mutacaoAprovar.error.value),
         atualizarNotaDetalhada,
@@ -234,6 +167,129 @@ interface InvalidaQueriesContext {
     contextoSessao: ReturnType<typeof criarContextoSessaoDiagnostico>;
     servidorTitulo?: string;
     chaveConsultaConsenso?: string;
+}
+
+type CriarMutacoesConsensoParams = {
+    cache: ReturnType<typeof useQueryCache>;
+    codSubprocesso: number;
+    contextoSessao: ReturnType<typeof criarContextoSessaoDiagnostico>;
+    servidorTitulo?: string;
+    obterChaveConsensoAtual: () => ReturnType<typeof chaveConsenso>;
+    obterCompetenciasLocais: () => ConsensoCompetenciaDetalhada[];
+    finalizarAutosave: () => void;
+    obterChaveConsultaConsenso: () => string;
+};
+
+function criarMutacoesConsenso(params: CriarMutacoesConsensoParams) {
+    const mutacaoSalvar = useMutation({
+        mutation: (titulo: string) =>
+            salvarConsenso(params.codSubprocesso, titulo, {
+                competencias: clonarCompetencias(params.obterCompetenciasLocais()),
+            }),
+        onSettled: params.finalizarAutosave,
+        onSuccess: () => {
+            atualizarCacheAposSalvar(params);
+            invalidarQueriesConsenso(params);
+        },
+    });
+
+    const mutacaoConcluir = useMutation({
+        mutation: (titulo: string) => concluirConsenso(params.codSubprocesso, titulo),
+        onSuccess: () => {
+            atualizarCacheAposConcluir(params);
+            invalidarQueriesConsenso(params);
+            void params.cache.invalidateQueries({key: chaveAutoavaliacao(params.codSubprocesso, params.contextoSessao), exact: true});
+        },
+    });
+
+    const mutacaoAprovar = useMutation({
+        mutation: () => aprovarConsenso(params.codSubprocesso),
+        onSuccess: () => {
+            atualizarCacheAposAprovar(params);
+            invalidarQueriesAprovar({
+                ...params,
+                chaveConsultaConsenso: params.obterChaveConsultaConsenso(),
+            });
+        },
+    });
+
+    return {mutacaoSalvar, mutacaoConcluir, mutacaoAprovar};
+}
+
+function atualizarCacheAposSalvar(params: CriarMutacoesConsensoParams) {
+    const anterior = obterConsensoAnterior(params);
+    const estadoAnterior = obterEstadoAnteriorConsenso(anterior);
+    params.cache.setQueryData(
+        params.obterChaveConsensoAtual(),
+        {
+            competencias: clonarCompetencias(params.obterCompetenciasLocais()),
+            ...estadoAnterior,
+        } satisfies Consenso,
+    );
+}
+
+function atualizarCacheAposConcluir(params: CriarMutacoesConsensoParams) {
+    const anterior = obterConsensoAnterior(params);
+    if (!anterior) {
+        return;
+    }
+    params.cache.setQueryData(
+        params.obterChaveConsensoAtual(),
+        {
+            ...anterior,
+            situacaoServidor: 'CONSENSO_CRIADO',
+            podeEditar: false,
+            podeConcluirAvaliacao: true,
+            habilitarConcluirAvaliacao: false,
+            podeAprovarConsenso: anterior.podeAprovarConsenso,
+            habilitarAprovarConsenso: anterior.habilitarAprovarConsenso,
+        } satisfies Consenso,
+    );
+}
+
+function atualizarCacheAposAprovar(params: CriarMutacoesConsensoParams) {
+    const anterior = obterConsensoAnterior(params);
+    if (!anterior) {
+        return;
+    }
+    params.cache.setQueryData(
+        params.obterChaveConsensoAtual(),
+        {
+            ...anterior,
+            situacaoServidor: 'CONSENSO_APROVADO',
+            podeEditar: false,
+            podeConcluirAvaliacao: false,
+            habilitarConcluirAvaliacao: false,
+            podeAprovarConsenso: true,
+            habilitarAprovarConsenso: false,
+        } satisfies Consenso,
+    );
+}
+
+function obterConsensoAnterior(params: CriarMutacoesConsensoParams) {
+    return params.cache.getQueryData<Consenso>(params.obterChaveConsensoAtual());
+}
+
+function obterEstadoAnteriorConsenso(anterior?: Consenso) {
+    const estadoPadrao = {
+        situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+        podeEditar: false,
+        podeConcluirAvaliacao: false,
+        habilitarConcluirAvaliacao: false,
+        podeAprovarConsenso: false,
+        habilitarAprovarConsenso: false,
+    } satisfies Omit<Consenso, "competencias">;
+    if (!anterior) {
+        return estadoPadrao;
+    }
+    return {
+        ...estadoPadrao,
+        ...anterior,
+    } satisfies Omit<Consenso, "competencias">;
+}
+
+function clonarCompetencias(competencias: ConsensoCompetenciaDetalhada[]) {
+    return competencias.map((competencia) => ({...competencia}));
 }
 
 function invalidarQueriesConsenso(ctx: InvalidaQueriesContext) {

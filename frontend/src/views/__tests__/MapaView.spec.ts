@@ -104,7 +104,7 @@ vi.mock("vue-router", () => ({
 
 describe('MapaView', () => {
     const commonStubs = {
-        PageHeader: {template: '<div><slot /><slot name="actions" /></div>'},
+        PageHeader: {template: '<div><slot name="alerta" /><slot /><slot name="actions" /></div>'},
         BButton: {template: '<button />'},
         BContainer: {template: '<div><slot /></div>'},
         LoadingButton: {template: '<button />'},
@@ -113,8 +113,7 @@ describe('MapaView', () => {
         CriarCompetenciaModal: {template: '<div />'},
         DisponibilizarMapaModal: {template: '<div />'},
         ModalConfirmacao: {template: '<div />'},
-        ImpactoMapaModal: {template: '<div />'},
-        BAlert: {template: '<div />'}
+        ImpactoMapaModal: {template: '<div />'}
     };
     const fluxoMapaMock = {
         erro: null as { message: string } | null,

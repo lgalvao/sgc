@@ -23,6 +23,13 @@ const toAny = (val: unknown) => {
     return val;
 };
 
+type BuscarComRegistroParams<T extends ContextoSubprocesso> = {
+    buscar: () => Promise<T>;
+    registrar: (contexto: T) => void;
+    versaoEsperada: number;
+    versaoContexto: Ref<number>;
+};
+
 function limparSeNecessario(limparAntes: boolean, limparContextoAtual: () => void) {
     if (limparAntes) {
         limparContextoAtual();
@@ -45,14 +52,11 @@ async function executarComDedupe<T extends object | string | number | boolean | 
 }
 
 async function buscarComRegistro<T extends ContextoSubprocesso>(
-    buscar: () => Promise<T>,
-    registrar: (contexto: T) => void,
-    versaoEsperada: number,
-    versaoContexto: Ref<number>,
+    params: BuscarComRegistroParams<T>,
 ): Promise<T> {
-    const contexto = await buscar();
-    if (versaoContexto.value === versaoEsperada) {
-        registrar(contexto);
+    const contexto = await params.buscar();
+    if (params.versaoContexto.value === params.versaoEsperada) {
+        params.registrar(contexto);
     }
     return contexto;
 }
@@ -64,7 +68,11 @@ async function garantirContextoPorCodigo<T extends ContextoSubprocesso>(
 ): Promise<T | null> {
     const {limparAntes, config} = opcoes;
     limparSeNecessario(limparAntes, estado.limparContextoAtual);
-    if (dadosValidos(config.contextoRef, config.contextoInvalidoRef, config.contextoSessaoRef, codigoSubprocesso)) {
+    if (dadosValidos({
+        contextoRef: config.contextoRef,
+        contextoInvalidoRef: config.contextoInvalidoRef,
+        contextoSessaoRef: config.contextoSessaoRef,
+    }, codigoSubprocesso)) {
         return config.contextoRef.value;
     }
     const versaoEsperada = estado.versaoContexto.value;
@@ -74,12 +82,12 @@ async function garantirContextoPorCodigo<T extends ContextoSubprocesso>(
         return await executarComDedupe(
             estado.carregamentos,
             gerarChave(config.tipoCodigo, codigoSubprocesso, contextoSessao),
-            () => buscarComRegistro(
-                () => config.buscarPorCodigo(codigoSubprocesso),
-                config.registrar,
+            () => buscarComRegistro({
+                buscar: () => config.buscarPorCodigo(codigoSubprocesso),
+                registrar: config.registrar,
                 versaoEsperada,
-                estado.versaoContexto,
-            ),
+                versaoContexto: estado.versaoContexto,
+            }),
         );
     } catch (erro) {
         return registrarErroIntegracao(toAny(erro), config.mensagemCodigo(codigoSubprocesso), estado.erroIntegracaoContexto);
@@ -114,12 +122,12 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
             estado.carregamentos,
             gerarChave(config.tipoProcessoUnidade, chaveProcessoUnidade, contextoSessao),
             async () => {
-                const contexto = await buscarComRegistro(
-                    () => config.buscarPorProcessoEUnidade(codProcesso, siglaUnidade),
-                    config.registrar,
+                const contexto = await buscarComRegistro({
+                    buscar: () => config.buscarPorProcessoEUnidade(codProcesso, siglaUnidade),
+                    registrar: config.registrar,
                     versaoEsperada,
-                    estado.versaoContexto,
-                );
+                    versaoContexto: estado.versaoContexto,
+                });
                 const codigo = contexto.detalhes.codigo;
                 if (estado.versaoContexto.value === versaoEsperada) {
                     config.codigosPorProcessoUnidade.set(chaveProcessoUnidade, codigo);
@@ -137,17 +145,8 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
 }
 
 export function usarOrquestradorContexto(
-    carregamentos: Map<string, Promise<object | string | number | boolean | null>>,
-    erroIntegracaoContexto: Ref<ErroNormalizado | null>,
-    limparContextoAtual: () => void,
-    versaoContexto: Ref<number>,
+    estado: EstadoOrquestrador,
 ) {
-    const estado = {
-        carregamentos,
-        erroIntegracaoContexto,
-        limparContextoAtual,
-        versaoContexto,
-    };
     return {
         garantirContextoPorCodigo: <T extends ContextoSubprocesso>(codigoSubprocesso: number, limparAntes: boolean, config: ConfiguracaoContexto<T>) =>
             garantirContextoPorCodigo(estado, codigoSubprocesso, {limparAntes, config}),

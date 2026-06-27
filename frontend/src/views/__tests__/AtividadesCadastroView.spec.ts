@@ -280,7 +280,7 @@ const stubs = {
     LayoutPadrao: {template: '<div><slot /></div>'},
     PageHeader: {
         props: ['title'],
-        template: '<div><h1>{{ title }}</h1><slot /><slot name="actions" /></div>'
+        template: '<div><h1>{{ title }}</h1><slot name="alerta" /><slot /><slot name="actions" /></div>'
     },
     LoadingButton: {
         props: {
@@ -304,8 +304,8 @@ const stubs = {
         props: ['modelValue']
     },
     AppAlert: {
-        template: '<div><button data-testid="btn-dismiss-app-alert" @click="$emit(\'dismissed\')">x</button></div>',
-        props: ['message', 'variant', 'dismissible']
+        template: '<div v-bind="$attrs">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button><button data-testid="btn-dismiss-app-alert" @click="$emit(\'dismissed\')">x</button></div>',
+        props: ['mensagem', 'variante', 'dispensavel']
     },
     ErrorAlert: {template: '<div></div>'},
     CadAtividadeForm: {
@@ -344,6 +344,7 @@ const stubs = {
             <div data-testid="debug-header">
                 <h1>Atividades e conhecimentos</h1>
                 <div v-if="unidade">{{ unidade.sigla }}</div>
+                <slot name="alerta" />
                 <button data-testid="btn-cad-atividades-historico" @click="$emit('abrir-historico')">Histórico</button>
                 <button v-if="permissoes.podeDevolverCadastro" data-testid="btn-acao-devolver" :disabled="!permissoes.habilitarDevolverCadastro" @click="$emit('abrir-devolver')">Devolver</button>
                 <button v-if="acaoPrincipalCadastro?.mostrar" data-testid="btn-acao-analisar-principal" :disabled="!acaoPrincipalCadastro?.habilitar" @click="$emit('abrir-validar')">{{ acaoPrincipalCadastro?.rotuloBotao }}</button>
@@ -1115,6 +1116,8 @@ describe("CadastroView.vue", () => {
         await vm.$nextTick();
 
         expect(vm.erroGlobal).toBe("Erro de validação");
+        const alertaErroGlobal = wrapper.find('[data-testid="alerta-erro-global"]');
+        expect(alertaErroGlobal.exists()).toBe(true);
         const alert = wrapper.find('[data-testid="btn-dismiss-alert"]');
         expect(alert.exists()).toBe(true);
 
@@ -1122,7 +1125,7 @@ describe("CadastroView.vue", () => {
         await alert.trigger('click');
         await vm.$nextTick();
         expect(vm.erroGlobal).toBeNull();
-        expect(wrapper.find('[data-testid="btn-dismiss-alert"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="alerta-erro-global"]').exists()).toBe(false);
 
         // 3. Segunda tentativa (mesmo erro)
         fluxoSubprocesso.validarCadastro.mockResolvedValueOnce({

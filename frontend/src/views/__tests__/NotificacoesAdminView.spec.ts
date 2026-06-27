@@ -25,12 +25,23 @@ vi.mock('@/utils/ambiente', () => ({
 
 const mockNotify = vi.fn();
 const mockClear = vi.fn();
+const exibirSucessoMock = vi.fn();
 
 vi.mock('@/composables/useNotification', () => ({
     useNotification: vi.fn(() => ({
         notificacao: null,
         notify: mockNotify,
         clear: mockClear
+    }))
+}));
+
+vi.mock('@/composables/useToast', () => ({
+    useToast: vi.fn(() => ({
+        exibirSucesso: exibirSucessoMock,
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        registrarPendente: vi.fn(),
+        exibirPendente: vi.fn(),
     }))
 }));
 
@@ -75,6 +86,10 @@ describe('NotificacoesAdminView', () => {
                             </div>
                           </div>
                         `
+                    },
+                    AppAlertaTela: {
+                        props: ['mensagem'],
+                        template: '<div>{{ mensagem }}</div>',
                     },
                     AppAlert: true,
                     EmptyState: {
@@ -239,7 +254,7 @@ describe('NotificacoesAdminView', () => {
         await flushPromises();
 
         expect(reenviarNotificacao).toHaveBeenCalledWith(2);
-        expect(mockNotify).toHaveBeenCalledWith('E-mail recolocado na fila de envio', 'success');
+        expect(exibirSucessoMock).toHaveBeenCalledWith('E-mail recolocado na fila de envio');
     });
 
     it('handles re-send failure', async () => {

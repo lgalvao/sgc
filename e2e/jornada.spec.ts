@@ -239,7 +239,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(modal.getByText(TEXTOS.acaoBloco.homologar.TITULO_CADASTRO)).toBeVisible();
             await modal.getByRole('button', {name: TEXTOS.acaoBloco.homologar.BOTAO}).click();
 
-            await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
+            await verificarToast(page, TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
 
             await AnaliseHelpers.acessarSubprocessoAdmin(page, descricaoMapeamento, siglaUnidade);
 

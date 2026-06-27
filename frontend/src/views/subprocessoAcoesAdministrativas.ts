@@ -5,7 +5,7 @@ import {TEXTOS} from "@/constants/textos";
 import type {SubprocessoDetalhe} from "@/types/tipos";
 import {formatarDataBR} from "@/utils";
 import logger from "@/utils/logger";
-import {useToastStore} from "@/stores/toast";
+import {useToast} from "@/composables/useToast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
 
 type TipoReabertura = "cadastro" | "revisao";
@@ -54,7 +54,7 @@ function abrirReabertura(estado: ReturnType<typeof criarEstado>, resetarValidaca
 
 export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSubprocessoAcoesAdministrativas) {
     const {atualizarFluxoSubprocessoEPainel} = useInvalidacaoNavegacao();
-    const toastStore = useToastStore();
+    const {exibirSucesso} = useToast();
     const subprocessoStore = useSubprocessoStore();
     const estado = criarEstado();
 
@@ -68,7 +68,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
         try {
             await dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
             estado.mostrarModalAlterarDataLimite.value = false;
-            toastStore.setPending(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
+            exibirSucesso(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
             await atualizarFluxoSubprocessoEPainel();
             await dependencias.atualizarSubprocessoAtual();
         } catch (error) {
@@ -121,8 +121,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
             await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
             await subprocessoStore.obterContextoEdicao(codSubprocesso, {recarregar: true});
             estado.modalLembreteAberto.value = false;
-            toastStore.setPending(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
-            dependencias.exibirToastPendente();
+            exibirSucesso(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
         } catch (error) {
             logger.error(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, error);
             dependencias.notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, "danger");

@@ -13,6 +13,9 @@
     <template v-if="testIdTitulo" #title>
       <span :data-testid="testIdTitulo">{{ titulo }}</span>
     </template>
+    <div v-if="$slots.alerta" class="modal-padrao__alerta mb-3">
+      <slot name="alerta"></slot>
+    </div>
     <slot/>
     <template #footer>
       <div class="d-flex justify-content-end w-100 footer-modal-padrao gap-3 align-items-center">

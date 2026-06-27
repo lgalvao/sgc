@@ -1,6 +1,6 @@
 import {computed, onActivated, onMounted, ref, type Ref} from "vue";
 import {useRouter} from "vue-router";
-import {useNotification, type VarianteAlerta} from "@/composables/useNotification";
+import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {TEXTOS} from "@/constants/textos";
 import {
@@ -204,9 +204,7 @@ function criarFluxoMutacao({
     formularioValido,
     invalidarDiagnostico,
     carregando,
-    modoEdicao,
     mostrarModalRemocao,
-    notify,
     resetarValidacao,
     unidade,
     unidadeQuery,
@@ -222,9 +220,7 @@ function criarFluxoMutacao({
     formularioValido: Ref<boolean>;
     invalidarDiagnostico: () => void;
     carregando: Ref<boolean>;
-    modoEdicao: Ref<boolean>;
     mostrarModalRemocao: Ref<boolean>;
-    notify: (mensagem: string, variante?: VarianteAlerta, dispensavel?: boolean) => void;
     resetarValidacao: () => void;
     unidade: Readonly<Ref<Unidade | null>>;
     unidadeQuery: ReturnType<typeof useUnidadeQuery>;
@@ -262,8 +258,6 @@ function criarFluxoMutacao({
             dataTermino: campos.dataTermino.value,
             justificativa: campos.justificativa.value
         };
-        const estavaEmEdicao = modoEdicao.value;
-
         carregando.value = true;
 
         try {
@@ -275,12 +269,6 @@ function criarFluxoMutacao({
 
             invalidarDiagnostico();
             await atualizarCachesPosMutacao();
-            notify(
-                estavaEmEdicao
-                    ? TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO
-                    : TEXTOS.atribuicaoTemporaria.SUCESSO,
-                "success"
-            );
         } catch (error) {
             logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
@@ -305,7 +293,6 @@ function criarFluxoMutacao({
             await atualizarCachesPosMutacao();
             mostrarModalRemocao.value = false;
             resetarFormularioAtribuicao(campos, resetarValidacao);
-            notify(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
         } catch (error) {
             logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
@@ -319,7 +306,7 @@ function criarFluxoMutacao({
 
 export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
     const router = useRouter();
-    const {notificacao, notify, clear} = useNotification();
+    const {notificacao, clear} = useNotification();
 
     const unidadeQuery = useUnidadeQuery(codigoUnidade);
     const {invalidarDiagnostico} = useInvalidacaoDiagnosticoOrganizacional();
@@ -366,9 +353,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         formularioValido,
         invalidarDiagnostico,
         carregando,
-        modoEdicao,
         mostrarModalRemocao,
-        notify,
         resetarValidacao,
         unidade,
         unidadeQuery,
@@ -400,7 +385,6 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         modoEdicao,
         mostrarModalRemocao,
         notificacao,
-        notify: notify as (mensagem: string, variante?: VarianteAlerta, dispensavel?: boolean) => void,
         removerAtribuicao,
         salvarAtribuicao,
         termoUsuario: campos.termoUsuario,

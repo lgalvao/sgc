@@ -136,13 +136,13 @@ function montar() {
                 LayoutPadrao: {template: '<div><slot /></div>'},
                 PageHeader: {
                     props: ['title', 'subtitle'],
-                    template: '<div><h1>{{ title }}</h1><p v-if="subtitle">{{ subtitle }}</p><slot /><slot name="actions" /></div>',
+                    template: '<div><h1>{{ title }}</h1><p v-if="subtitle">{{ subtitle }}</p><slot name="alerta" /><slot /><slot name="actions" /></div>',
                 },
                 CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
                 AppAlert: {
                     props: ['mensagem'],
                     emits: ['dismissed'],
-                    template: '<div class="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
+                    template: '<div class="app-alert" v-bind="$attrs">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
                 },
                 DiagnosticoFluxoModais: {
                     props: ['modalConcluirAberto', 'modalImpossibilitarAberto', 'testIdConfirmarConcluir', 'testIdConfirmarImpossibilitar', 'justificativaImpossibilidade', 'feedbackJustificativaImpossibilidade', 'tituloConcluir', 'mensagemConcluir', 'botaoConcluir'],
@@ -266,7 +266,7 @@ describe('AutoavaliacaoDiagnosticoView', () => {
         await wrapper.get('[data-testid="btn-confirmar-concluir"]').trigger('click');
 
         expect(concluirAutoavaliacaoMock).toHaveBeenCalledTimes(1);
-        expect(setPendingMock).toHaveBeenCalledWith('Autoavaliação concluída');
+        expect(setPendingMock).toHaveBeenCalledWith('Autoavaliação concluída', 'success');
         expect(pushMock).toHaveBeenCalledWith({
             name: 'Subprocesso',
             params: {

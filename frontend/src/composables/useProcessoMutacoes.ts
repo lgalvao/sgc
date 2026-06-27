@@ -1,6 +1,6 @@
 import {ref, type Ref} from "vue";
 import {useRouter} from "vue-router";
-import {useToastStore} from "@/stores/toast";
+import {useToast} from "@/composables/useToast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import * as processoService from "@/services/processo";
 import {aplicarSelecaoDiretaUnidadesComEquipePropria} from "@/views/processoCadastroUnidades";
@@ -38,7 +38,7 @@ export function useProcessoMutacoes({
     tratarErrosApi
 }: UseProcessoMutacoesParams) {
     const router = useRouter();
-    const toastStore = useToastStore();
+    const {registrarPendente} = useToast();
     const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
 
     const isSaving = ref(false);
@@ -52,11 +52,11 @@ export function useProcessoMutacoes({
             if (processoEditando.value) {
                 const request = formulario.construirAtualizarRequest(processoEditando.value.codigo);
                 await processoService.atualizarProcesso(processoEditando.value.codigo, request);
-                toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_ALTERADO);
+                registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_ALTERADO);
             } else {
                 const request = formulario.construirCriarRequest();
                 await processoService.criarProcesso(request);
-                toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_CRIADO);
+                registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_CRIADO);
             }
             await atualizarFluxoProcesso();
             await router.push("/painel");
@@ -99,7 +99,7 @@ export function useProcessoMutacoes({
             }
             await processoService.iniciarProcesso(codigoProcesso, formulario.tipo.value, codigosDiretos);
 
-            toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
+            registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
             await atualizarFluxoProcesso();
             await router.push("/painel");
             mostrarModalConfirmacao.value = false;
@@ -141,7 +141,7 @@ export function useProcessoMutacoes({
         const descricaoRemovida = processoEditando.value.descricao;
         try {
             await processoService.excluirProcesso(processoEditando.value.codigo);
-            toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_REMOVIDO(descricaoRemovida));
+            registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_REMOVIDO(descricaoRemovida));
             await atualizarFluxoProcesso();
             await router.push("/painel");
             formulario.limpar();

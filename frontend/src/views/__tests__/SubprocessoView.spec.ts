@@ -72,22 +72,6 @@ const SubprocessoModalStub = {
     emits: ['confirmar-alteracao', 'fechar-modal']
 };
 
-const toast = {
-    create: vi.fn(),
-    success: vi.fn(),
-};
-vi.mock('bootstrap-vue-next', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('bootstrap-vue-next')>();
-    return {
-        ...actual,
-        useToast: () => ({
-            show: vi.fn(),
-            success: toast.success,
-            create: toast.create,
-        }),
-    };
-});
-
 vi.mock('@/services/processo', () => ({
     reabrirCadastro: vi.fn(),
     enviarLembrete: vi.fn(),
@@ -100,6 +84,19 @@ const fluxoDiagnosticoMock = {
     validarConclusaoDiagnostico: vi.fn(),
     concluirDiagnostico: vi.fn(),
 };
+
+const registrarPendenteMock = vi.fn();
+const exibirSucessoMock = vi.fn();
+
+vi.mock('@/composables/useToast', () => ({
+    useToast: () => ({
+        registrarPendente: registrarPendenteMock,
+        exibirSucesso: exibirSucessoMock,
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        exibirPendente: vi.fn(),
+    }),
+}));
 
 vi.mock('@/composables/useFluxoDiagnostico', () => ({
     useFluxoDiagnostico: () => fluxoDiagnosticoMock,
@@ -176,8 +173,8 @@ describe('SubprocessoView.vue', () => {
         },
         AppAlert: {
             name: 'AppAlert',
-            props: ['mensagem'],
-            template: '<div data-testid="app-alert">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>'
+            props: ['mensagem', 'notificacao'],
+            template: '<div data-testid="app-alert">{{ mensagem ?? notificacao?.resumo }}<div v-if="notificacao?.detalhes?.length">Detalhes: {{ notificacao.detalhes.join(\', \') }}</div><button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>'
         },
         BModal: {
             template: '<div><slot /><slot name="footer" /></div>',
@@ -202,11 +199,6 @@ describe('SubprocessoView.vue', () => {
             props: ['modelValue'],
             emits: ['update:modelValue'],
             template: '<textarea :data-testid="$attrs[\'data-testid\']" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>'
-        },
-        BAlert: {
-            name: 'BAlert',
-            template: '<div><slot /><button @click="$emit(\'dismissed\')">x</button></div>',
-            props: ['variant', 'dismissible', 'modelValue']
         },
         BSpinner: {template: '<div></div>'},
     };
@@ -464,11 +456,7 @@ describe('SubprocessoView.vue', () => {
 
         expect(fluxoSubprocessoMock.alterarDataLimiteSubprocesso).toHaveBeenCalledWith(10, {novaData: '2024-01-01'});
         expect(vm.mostrarModalAlterarDataLimite).toBe(false);
-        expect(toast.create).toHaveBeenCalledWith(expect.objectContaining({
-            props: expect.objectContaining({
-                body: expect.stringContaining(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA)
-            })
-        }));
+        expect(exibirSucessoMock).toHaveBeenCalledWith(expect.stringContaining(TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA));
     });
 
     it('trata erro ao alterar data limite', async () => {
@@ -564,11 +552,7 @@ describe('SubprocessoView.vue', () => {
         await flushPromises();
 
         expect(processoService.enviarLembrete).toHaveBeenCalledWith(1, 1);
-        expect(toast.create).toHaveBeenCalledWith(expect.objectContaining({
-            props: expect.objectContaining({
-                body: expect.stringContaining(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO)
-            })
-        }));
+        expect(exibirSucessoMock).toHaveBeenCalledWith(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
     });
 
     it('trata erro ao enviar lembrete', async () => {
@@ -602,8 +586,8 @@ describe('SubprocessoView.vue', () => {
         subprocessoStoreMock.contextoEdicao = null;
         subprocessoStoreMock.erroIntegracaoContexto = {message: "Erro"};
         await vm.$nextTick();
-        const bAlert = wrapper.findComponent({name: 'BAlert'});
-        if (bAlert.exists()) await bAlert.vm.$emit('dismissed');
+        const alertaErro = wrapper.find('[data-testid="app-alert"]');
+        if (alertaErro.exists()) await wrapper.find('[data-testid="btn-dismiss-alert"]').trigger('click');
         expect(subprocessoStoreMock.limparErroIntegracao).toHaveBeenCalled();
 
         // Atualização de estados de v-model nos modais
@@ -617,9 +601,6 @@ describe('SubprocessoView.vue', () => {
         expect(await vm.confirmarAlteracaoDataLimite(null)).toBeUndefined();
 
         // Exibição de toast pendente ao montar componente
-        const {useToastStore} = await import("@/stores/toast");
-        const toastStore = useToastStore();
-        toastStore.setPending("Msg");
         mountComponent();
     });
 

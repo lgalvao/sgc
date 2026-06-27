@@ -80,6 +80,9 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
         {{ unidade.sigla }}
       </div>
     </template>
+    <template #alerta>
+      <slot name="alerta"/>
+    </template>
 
     <template #actions>
       <div class="d-flex gap-2">

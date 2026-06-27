@@ -15,7 +15,7 @@ describe('Toast store', () => {
     it('deve setar uma mensagem pending', () => {
         const store = useToastStore();
         store.setPending('Mensagem de teste');
-        expect(store.toastPendente).toEqual({mensagem: 'Mensagem de teste'});
+        expect(store.toastPendente).toEqual({mensagem: 'Mensagem de teste', variante: 'success'});
     });
 
     it('deve consumir a mensagem pending e retornar o valor', () => {
@@ -24,7 +24,7 @@ describe('Toast store', () => {
 
         const consumed = store.consumePending();
 
-        expect(consumed).toEqual({mensagem: 'Mensagem de teste'});
+        expect(consumed).toEqual({mensagem: 'Mensagem de teste', variante: 'success'});
         expect(store.toastPendente).toBeNull();
     });
 

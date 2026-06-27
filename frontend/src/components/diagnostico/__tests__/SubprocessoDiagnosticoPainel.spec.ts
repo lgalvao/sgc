@@ -312,7 +312,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await wrapper.get('textarea').setValue('Observações');
         await wrapper.get('[data-testid="btn-confirmar-validar"]').trigger('click');
         expect(validarDiagnosticoMock).toHaveBeenCalledWith('Observações');
-        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_VALIDADO);
+        expect(wrapper.text()).not.toContain(TEXTO_DIAGNOSTICO_VALIDADO);
 
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         expect(validarAcaoDevolverDiagnosticoMock).toHaveBeenCalled();
@@ -322,14 +322,14 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await wrapper.get('textarea').setValue('Ajustes');
         await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
         expect(devolverDiagnosticoMock).toHaveBeenCalledWith('Ajustes');
-        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
+        expect(wrapper.text()).not.toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
 
         await wrapper.get('[data-testid="btn-homologar-diagnostico"]').trigger('click');
         expect(validarAcaoHomologarDiagnosticoMock).toHaveBeenCalled();
         await wrapper.get('textarea').setValue('Homologado');
         await wrapper.get('[data-testid="btn-confirmar-homologar"]').trigger('click');
         expect(homologarDiagnosticoMock).toHaveBeenCalledWith('Homologado');
-        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_HOMOLOGADO);
+        expect(wrapper.text()).not.toContain(TEXTO_DIAGNOSTICO_HOMOLOGADO);
     });
 
     it('oculta ações e ajusta colunas se não for chefe', () => {
@@ -552,16 +552,13 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await nextTick();
         expect(wrapper.text()).not.toContain('Não foi possível salvar.');
 
-        // Testar dismiss do alerta de sucesso
+        // Em sucesso local, a UI deve comunicar a mudanca sem alerta persistente adicional
         devolverDiagnosticoMock.mockResolvedValue(undefined);
         await wrapper.get('[data-testid="btn-devolver-diagnostico"]').trigger('click');
         await wrapper.get('textarea').setValue('Justificativa');
         await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
         await nextTick();
 
-        expect(wrapper.text()).toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
-        await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
-        await nextTick();
         expect(wrapper.text()).not.toContain(TEXTO_DIAGNOSTICO_DEVOLVIDO);
     });
 

@@ -6,14 +6,12 @@ import {
     removerAdministrador,
 } from "@/services/administradorService";
 import {normalizarErro} from "@/utils/apiError";
-import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
 import type BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
 
 export function useAdministradoresTela() {
-    const {notify} = useNotification();
     const {carregando: carregandoAdmins, erro: erroAdmins, executar} = useAsyncAction();
     const {validarSubmissao, resetarValidacao, deveExibirErro, focarPrimeiroErroInvalido} =
         useValidacaoFormulario();
@@ -72,7 +70,6 @@ export function useAdministradoresTela() {
         try {
             await adicionarAdministrador(adminId);
             fecharModalAdicionarAdmin();
-            notify(TEXTOS.administracao.SUCESSO_ADICIONADO, "success");
             await carregarAdministradores();
         } catch (error) {
             erroAdicionarAdmin.value = normalizarErro(error).mensagem;
@@ -93,7 +90,6 @@ export function useAdministradoresTela() {
         removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
         try {
             await removerAdministrador(adminParaRemover.value.tituloEleitoral);
-            notify(TEXTOS.administracao.SUCESSO_REMOVIDO, "success");
             await carregarAdministradores();
             mostrarModalRemoverAdmin.value = false;
             adminParaRemover.value = null;

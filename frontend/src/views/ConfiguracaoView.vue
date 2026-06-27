@@ -4,9 +4,12 @@
 
     <CarregamentoPagina v-if="carregandoConfiguracoes"/>
 
-    <BAlert v-else-if="erro" :model-value="true" dismissible variant="danger">
-      {{ erro }}
-    </BAlert>
+    <AppAlertaTela
+        v-else-if="erroTela"
+        data-testid="alert-configuracao-erro"
+        :mensagem="erroTela"
+        @dismissed="erroDispensado = true"
+    />
 
     <template v-else>
       <AppAlert
@@ -82,13 +85,15 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive, ref} from 'vue';
-import {BAlert, BForm, BFormGroup, BFormInput, BFormInvalidFeedback} from 'bootstrap-vue-next';
+import {computed, onMounted, reactive, ref, watch} from 'vue';
+import {BForm, BFormGroup, BFormInput, BFormInvalidFeedback} from 'bootstrap-vue-next';
+import AppAlertaTela from '@/components/comum/AppAlertaTela.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
+import {useToast} from '@/composables/useToast';
 import {type Parametro, useConfiguracoes} from '@/composables/useConfiguracoes';
 import {useNotification} from '@/composables/useNotification';
 import {useValidacaoFormulario} from '@/composables/useValidacaoFormulario';
@@ -105,7 +110,9 @@ const {
   obterDiasAlertaNovo
 } = useConfiguracoes();
 const {notify, notificacao, clear} = useNotification();
+const {exibirSucesso} = useToast();
 const salvando = ref(false);
+const erroDispensado = ref(false);
 const {
   validacaoSubmetida,
   validarSubmissao,
@@ -129,6 +136,13 @@ const mensagemErroDiasInativacao = computed(() =>
 const mensagemErroDiasAlertaNovo = computed(() =>
     validacaoSubmetida.value && diasAlertaNovoInvalido.value ? "Informe um valor maior ou igual a 1." : ""
 );
+const erroTela = computed(() => erroDispensado.value ? null : erro.value);
+
+watch(erro, (novoErro) => {
+  if (novoErro) {
+    erroDispensado.value = false;
+  }
+});
 
 function atualizarFormulario() {
   form.diasInativacao = obterDiasInativacaoProcesso();
@@ -173,7 +187,8 @@ async function salvar() {
 
   if (!houveMudanca) {
     resetarValidacao();
-    notify(TEXTOS.configuracoes.SUCESSO_SALVAR, 'success');
+    clear();
+    exibirSucesso(TEXTOS.configuracoes.SUCESSO_SALVAR);
     salvando.value = false;
     return;
   }
@@ -182,7 +197,8 @@ async function salvar() {
 
   if (sucesso) {
     resetarValidacao();
-    notify(TEXTOS.configuracoes.SUCESSO_SALVAR, 'success');
+    clear();
+    exibirSucesso(TEXTOS.configuracoes.SUCESSO_SALVAR);
   } else {
     notify(TEXTOS.configuracoes.ERRO_SALVAR, 'danger');
   }

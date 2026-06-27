@@ -27,9 +27,12 @@ específicos que funcionam melhor com tratamento próprio.
 - **Campo**: usar para erro de preenchimento, formato, obrigatoriedade e regra local corrigível na própria tela.
 - **Bloco/alerta inline**: usar para erro global do formulário, conflito de regra de negócio ou problema sem campo
   único.
-- **Erro global de validação**: exibir em `BAlert` no contexto do formulário ou modal, preferencialmente antes dos
-  campos ou da área de ações.
+- **Erro global de validação**: exibir via primitive do app no contexto do formulário ou modal, preferencialmente antes
+  dos campos ou da área de ações.
+- Em views e modais, evitar importar `BAlert` diretamente para feedback persistente novo; preferir `AppAlert`,
+  `AppAlertaFormulario` ou primitive equivalente do app.
 - **Toast/notificação de sucesso**: usar apenas para sucesso de operações.
+- **Sucesso na mesma tela**: se a mudança já ficar óbvia pela própria interface, não mostrar mensagem; se a confirmação ainda ajudar, preferir toast breve.
 - **Toast para validação**: não usar. Resultado de validação deve ficar inline ou em bloco no contexto da tela.
 - **Erro sistêmico**: pode usar alerta global da tela e log técnico com `logger`.
 

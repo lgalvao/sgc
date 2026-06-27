@@ -11,32 +11,30 @@
         <template v-if="unidade" #default>
           <span data-testid="atribuicao-view__sigla">{{ unidade.sigla }}</span>
         </template>
+        <template #alerta>
+          <AppAlert
+              v-if="notificacao"
+              :chave="notificacao.chave"
+              :dispensavel="notificacao.dispensavel ?? true"
+              :mensagem="notificacao.mensagem"
+              :variante="notificacao.variante"
+              @dismissed="clear()"
+          />
+
+          <AppAlert
+              v-if="erroFormulario"
+              :mensagem="erroFormulario"
+              class="mt-3"
+              variante="danger"
+              @dismissed="erroFormulario = ''"
+          />
+        </template>
         <template #actions>
           <BButton :to="`/unidade/${props.codUnidade}`" variant="outline-secondary">
             <i class="bi bi-arrow-left me-1"/> {{ TEXTOS.comum.BOTAO_VOLTAR }}
           </BButton>
         </template>
       </PageHeader>
-
-        <AppAlert
-            v-if="notificacao"
-            :chave="notificacao.chave"
-            :dispensavel="notificacao.dispensavel ?? true"
-            :mensagem="notificacao.mensagem"
-            :variante="notificacao.variante"
-          @dismissed="clear()"
-      />
-
-      <BAlert
-          v-if="erroFormulario"
-          :model-value="true"
-          class="mt-3"
-          dismissible
-          variant="danger"
-          @dismissed="erroFormulario = ''"
-      >
-        {{ erroFormulario }}
-      </BAlert>
 
       <BForm class="mt-4" @submit.prevent="salvarAtribuicao">
         <BFormGroup
@@ -169,7 +167,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BRow} from "bootstrap-vue-next";
+import {BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BRow} from "bootstrap-vue-next";
 import {ref} from "vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
@@ -206,7 +204,6 @@ const {
   modoEdicao,
   mostrarModalRemocao,
   notificacao,
-  notify,
   removerAtribuicao,
   salvarAtribuicao,
   termoUsuario,
@@ -232,7 +229,6 @@ defineExpose({
   mensagemErroUsuario,
   modoEdicao,
   mostrarModalRemocao,
-  notify,
   removerAtribuicao,
   salvarAtribuicao,
   termoUsuario,

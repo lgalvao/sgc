@@ -3,13 +3,17 @@ import {ref} from 'vue';
 
 export interface ToastPendente {
     mensagem: string;
+    variante?: 'success' | 'danger' | 'warning' | 'info';
 }
 
 export const useToastStore = defineStore('toast', () => {
     const toastPendente = ref<ToastPendente | null>(null);
 
-    function setPending(mensagem: string) {
-        toastPendente.value = {mensagem};
+    function setPending(
+        mensagem: string,
+        variante: ToastPendente['variante'] = 'success',
+    ) {
+        toastPendente.value = {mensagem, variante};
     }
 
     function consumePending(): ToastPendente | null {

@@ -17,9 +17,12 @@
         </template>
       </PageHeader>
 
-      <BAlert v-if="erro" :model-value="true" dismissible variant="danger">
-        {{ erro }}
-      </BAlert>
+      <AppAlertaTela
+          v-if="erroTela"
+          data-testid="alert-feedbacks-admin-erro"
+          :mensagem="erroTela"
+          @dismissed="erroDispensado = true"
+      />
 
       <EmptyState
           v-else-if="feedbacks.length === 0"
@@ -85,9 +88,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from "vue";
-import {BAlert, BBadge, BButton, BTable} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
+import {BBadge, BButton, BTable} from "bootstrap-vue-next";
 import FeedbacksAdminFluxoModais from "@/components/administracao/FeedbacksAdminFluxoModais.vue";
+import AppAlertaTela from "@/components/comum/AppAlertaTela.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
@@ -109,10 +113,12 @@ const mostrarDetalhes = ref(false);
 const feedbackSelecionado = ref<FeedbackAdmin | null>(null);
 const mostrarImagemAmpliada = ref(false);
 const urlImagemAmpliada = ref("");
+const erroDispensado = ref(false);
 
 const feedbacks = computed(() => feedbacksQuery.data.value ?? []);
 const carregando = computed(() => feedbacksQuery.isPending.value || feedbacksQuery.isLoading.value);
 const erro = computed(() => feedbacksQuery.error.value?.message || null);
+const erroTela = computed(() => erroDispensado.value ? null : erro.value);
 
 const campos = [
   {key: "tipo", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.TIPO},
@@ -122,6 +128,12 @@ const campos = [
   {key: "enviadoEm", label: TEXTOS.administracao.FEEDBACKS_CAMPOS.ENVIADO_EM},
   {key: "acoes", label: ""},
 ];
+
+watch(erro, (novoErro) => {
+  if (novoErro) {
+    erroDispensado.value = false;
+  }
+});
 
 function abrirDetalhes(item: FeedbackAdmin) {
   feedbackSelecionado.value = item;

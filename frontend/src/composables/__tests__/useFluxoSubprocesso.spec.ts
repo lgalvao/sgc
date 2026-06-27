@@ -44,9 +44,13 @@ vi.mock("@/stores/subprocesso", () => ({
     useSubprocessoStore: () => subprocessoStoreMock
 }));
 
-vi.mock("@/stores/toast", () => ({
-    useToastStore: () => ({
-        setPending: vi.fn()
+vi.mock("@/composables/useToast", () => ({
+    useToast: () => ({
+        registrarPendente: vi.fn(),
+        exibirSucesso: vi.fn(),
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        exibirPendente: vi.fn(),
     })
 }));
 

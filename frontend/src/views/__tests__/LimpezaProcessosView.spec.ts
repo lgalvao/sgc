@@ -11,6 +11,7 @@ vi.mock('@/services/processo', () => ({
 const mockNotify = vi.fn();
 const mockNotifyStructured = vi.fn();
 const mockClear = vi.fn();
+const mockExibirSucesso = vi.fn();
 const mockValidarSubmissao = vi.fn((v) => v);
 const mockDeveExibirErro = vi.fn((v) => v);
 
@@ -31,6 +32,16 @@ vi.mock('@/composables/useValidacaoFormulario', () => ({
     }))
 }));
 
+vi.mock('@/composables/useToast', () => ({
+    useToast: vi.fn(() => ({
+        exibirSucesso: mockExibirSucesso,
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        registrarPendente: vi.fn(),
+        exibirPendente: vi.fn(),
+    }))
+}));
+
 describe('LimpezaProcessosView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -42,10 +53,10 @@ describe('LimpezaProcessosView', () => {
                 plugins: [createTestingPinia()],
                 stubs: {
                     LayoutPadrao: {template: '<div><slot/></div>'},
-                    PageHeader: {template: '<div><slot/></div>', props: ['title']},
+                    PageHeader: {template: '<div><slot name="alerta"/><slot/></div>', props: ['title']},
                     AppAlert: {
                         template: '<div class="app-alert-stub" @click="$emit(\'dismissed\')">Alert</div>',
-                        props: ['message', 'variant']
+                        props: ['mensagem', 'variante']
                     },
                     LoadingButton: {
                         template: '<button class="btn-stub" @click="$emit(\'click\')"><slot/></button>',
@@ -55,7 +66,6 @@ describe('LimpezaProcessosView', () => {
                         template: '<div v-if="mostrarConfirmacao" class="modal-stub"><button @click="$emit(\'confirmarExclusao\')">Confirmar</button></div>',
                         props: ['mostrarConfirmacao']
                     },
-                    BAlert: {template: '<div><slot/></div>'},
                     BCard: {template: '<div><slot/></div>'},
                     BFormGroup: {template: '<div><slot/><slot name="label"/></div>', props: ['state']},
                     BFormInput: {template: '<input data-testid="input-codigo-processo" type="number" @keydown.enter="$emit(\'keydown\', $event)" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['state', 'modelValue']},
@@ -112,7 +122,7 @@ describe('LimpezaProcessosView', () => {
         await flushPromises();
 
         expect(excluirProcessoCompleto).toHaveBeenCalledWith(123);
-        expect(mockNotify).toHaveBeenCalledWith(expect.any(String), 'success');
+        expect(mockExibirSucesso).toHaveBeenCalledWith(expect.any(String));
         expect((wrapper.vm as any).codigoProcesso).toBe('');
         expect((wrapper.vm as any).mostrarConfirmacao).toBe(false);
     });

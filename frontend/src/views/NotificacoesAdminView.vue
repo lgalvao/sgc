@@ -30,9 +30,12 @@
         </template>
       </PageHeader>
 
-      <BAlert v-if="erro" :model-value="true" dismissible variant="danger">
-        {{ erro }}
-      </BAlert>
+      <AppAlertaTela
+          v-if="erroTela"
+          data-testid="alert-notificacoes-admin-erro"
+          :mensagem="erroTela"
+          @dismissed="erroDispensado = true"
+      />
 
       <template v-else>
         <AppAlert
@@ -77,9 +80,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from "vue";
-import {BAlert, BButton} from "bootstrap-vue-next";
+import {computed, ref, watch} from "vue";
+import {BButton} from "bootstrap-vue-next";
 import NotificacoesAdminFluxoModais from "@/components/administracao/NotificacoesAdminFluxoModais.vue";
+import AppAlertaTela from "@/components/comum/AppAlertaTela.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
@@ -96,9 +100,11 @@ import {type Notificacao, obterStatusNotificacao,} from "@/services/notificacaoS
 import {formatarDataHoraBR} from "@/utils";
 import {ehModoProducao} from "@/utils/ambiente";
 import {normalizarErro} from "@/utils/apiError";
+import {useToast} from "@/composables/useToast";
 import {useNotification} from "@/composables/useNotification";
 
 const {notificacao, notify, clear} = useNotification();
+const {exibirSucesso} = useToast();
 const notificacoesQuery = useNotificacoesAdminQuery();
 const leitorEmailTestesQuery = useUrlLeitorEmailTestesQuery();
 const reenvioMutation = useReenvioNotificacaoMutation();
@@ -109,13 +115,21 @@ const itemParaDetalhes = ref<Notificacao | null>(null);
 const mostrarModalReenvio = ref(false);
 const mostrarPreview = ref(false);
 const mostrarDetalhes = ref(false);
+const erroDispensado = ref(false);
 
 const carregando = computed(() => notificacoesQuery.isPending.value || notificacoesQuery.isLoading.value);
 const erro = computed(() => notificacoesQuery.error.value?.message ?? null);
+const erroTela = computed(() => erroDispensado.value ? null : erro.value);
 const itensOrdenados = notificacoesQuery.itensOrdenados;
 const reenviando = computed(() => reenvioMutation.isLoading.value);
 const urlLeitorEmailTestes = computed(() => leitorEmailTestesQuery.data.value ?? undefined);
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
+
+watch(erro, (novoErro) => {
+  if (novoErro) {
+    erroDispensado.value = false;
+  }
+});
 
 function obterMensagemErro(error: unknown, mensagemPadrao: string) {
   return normalizarErro(error).mensagem || mensagemPadrao;
@@ -205,7 +219,7 @@ async function reenviar() {
   if (!itemSelecionado.value) return;
   try {
     await reenvioMutation.mutateAsync(itemSelecionado.value.codigo);
-    notify(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO, "success");
+    exibirSucesso(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO);
     fecharReenvio();
   } catch (error) {
     notify(obterMensagemErro(error, TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO), "danger");

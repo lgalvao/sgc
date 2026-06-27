@@ -35,20 +35,17 @@
           @exportar-csv="exportarMapaAtualCsv"
           @exportar-pdf="exportarMapaAtualPdf"
           @ver-sugestoes="verSugestoes"
-      />
-
-      <BAlert
-          v-if="erroMapaExibido"
-          :key="`${erroMapaExibido}-${erroValidacaoMapaTick}`"
-          :model-value="true"
-          dismissible
-          no-fade
-          show
-          variant="danger"
-          @dismissed="dispensarErroMapa"
       >
-        {{ erroMapaExibido }}
-      </BAlert>
+        <template #alerta>
+          <AppAlert
+              v-if="erroMapaExibido"
+              :chave="erroValidacaoMapaTick"
+              :mensagem="erroMapaExibido"
+              variante="danger"
+              @dismissed="dispensarErroMapa"
+          />
+        </template>
+      </MapaAcoesHeader>
 
       <div v-if="unidade">
         <div v-if="modoSomenteLeitura" class="mb-4 mt-3">
@@ -157,7 +154,8 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
+import AppAlert from "@/components/comum/AppAlert.vue";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import EmptyState from "@/components/comum/EmptyState.vue";
 import MapaAcoesHeader from "@/components/mapa/MapaAcoesHeader.vue";

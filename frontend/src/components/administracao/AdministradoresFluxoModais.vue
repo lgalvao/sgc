@@ -10,9 +10,10 @@
       @shown="$emit('modalAdicionarExibido')"
       @update:model-value="$emit('update:mostrarModalAdicionarAdmin', $event)"
   >
-    <BAlert v-if="erroAdicionarAdmin" :model-value="true" class="mb-3" dismissible variant="danger">
-      {{ erroAdicionarAdmin }}
-    </BAlert>
+    <AppAlertaFormulario
+        :mensagem="erroAdicionarAdmin"
+        data-testid="alert-adicionar-admin"
+    />
     <BFormGroup class="mb-3">
       <BuscadorUsuarios
           id="tituloEleitoral"
@@ -41,9 +42,10 @@
       @confirmar="$emit('removerAdmin')"
       @update:model-value="$emit('update:mostrarModalRemoverAdmin', $event)"
   >
-    <BAlert v-if="erroRemoverAdmin" :model-value="true" class="mb-3" dismissible variant="danger">
-      {{ erroRemoverAdmin }}
-    </BAlert>
+    <AppAlertaFormulario
+        :mensagem="erroRemoverAdmin"
+        data-testid="alert-remover-admin"
+    />
     <p v-if="adminParaRemover">
       {{ TEXTOS.administracao.MODAL_REMOVER_PERGUNTA(adminParaRemover.nome) }}
     </p>
@@ -51,7 +53,8 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BFormGroup, BFormInvalidFeedback} from 'bootstrap-vue-next';
+import {BFormGroup, BFormInvalidFeedback} from 'bootstrap-vue-next';
+import AppAlertaFormulario from '@/components/comum/AppAlertaFormulario.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import BuscadorUsuarios from '@/components/comum/BuscadorUsuarios.vue';
 import {TEXTOS} from '@/constants/textos';

@@ -4,14 +4,14 @@ import {useRouter} from "vue-router";
 import * as processoService from "@/services/processo";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_PROCESSO} from "@/constants/textos-processo";
-import {useToastStore} from "@/stores/toast";
+import {useToast} from "@/composables/useToast";
 import {CHAVE_QUERY_HISTORICO} from "@/composables/useHistoricoQuery";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
 import type {DependenciasProcessoAcoes} from "@/views/processoDetalheTipos";
 
 export function useFinalizacaoProcesso(dependencias: DependenciasProcessoAcoes) {
     const router = useRouter();
-    const toastStore = useToastStore();
+    const {registrarPendente} = useToast();
     const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
     const loadingFinalizacao = ref(false);
     const mostrarModalFinalizacao = ref(false);
@@ -25,7 +25,7 @@ export function useFinalizacaoProcesso(dependencias: DependenciasProcessoAcoes) 
         try {
             dependencias.limparErro();
             await processoService.finalizarProcesso(dependencias.codProcesso);
-            toastStore.setPending(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
+            registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_FINALIZADO);
             await atualizarFluxoProcesso();
             dependencias.processo.value = null;
             await useQueryCache().invalidateQueries({key: CHAVE_QUERY_HISTORICO, exact: true});

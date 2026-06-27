@@ -8,6 +8,21 @@
           :subtitle="contexto ? `${contexto.unidadeSigla} - ${contexto.unidadeNome}` : undefined"
           :title="TEXTOS.diagnostico.TITULO_AUTOAVALIACAO"
       >
+        <template #alerta>
+          <AppAlertaAcao
+              :feedback="retornoFluxo"
+              data-testid="alert-autoavaliacao-feedback"
+              @dismissed="limparRetornoFluxo"
+          />
+
+          <AppAlert
+              v-if="ehConsensoAprovado"
+              :dispensavel="false"
+              data-testid="alert-autoavaliacao-consenso-aprovado"
+              mensagem="A avaliação de consenso já foi aprovada."
+              variante="success"
+          />
+        </template>
         <template #actions>
           <BButton
               v-if="!ehChefe && podeConcluirAutoavaliacao"
@@ -25,23 +40,6 @@
           </BButton>
         </template>
       </PageHeader>
-
-      <AppAlert
-          v-if="retornoFluxo"
-          :mensagem="retornoFluxo.mensagem"
-          :variante="retornoFluxo.variante"
-          @dismissed="limparRetornoFluxo"
-      />
-
-      <BAlert
-          v-if="ehConsensoAprovado"
-          :model-value="true"
-          class="mb-4"
-          variant="success"
-      >
-        <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        A avaliação de consenso já foi aprovada.
-      </BAlert>
 
       <BCard class="mb-4" style="max-width: 750px;">
         <BTable
@@ -183,7 +181,6 @@
 
 <script lang="ts" setup>
 import {
-  BAlert,
   BBadge,
   BButton,
   BCard,
@@ -199,6 +196,7 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import AppAlert from '@/components/comum/AppAlert.vue';
+import AppAlertaAcao from '@/components/comum/AppAlertaAcao.vue';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useAutoavaliacaoDiagnosticoView} from '@/views/useAutoavaliacaoDiagnosticoView';

@@ -1,14 +1,11 @@
 <template>
   <LayoutPadrao>
-    <BAlert
+    <AppAlertaTela
         v-if="!carregandoPagina && ultimoErro"
-        :model-value="true"
-        dismissible
-        variant="danger"
+        data-testid="alert-unidade-erro"
+        :mensagem="ultimoErro"
         @dismissed="erroDispensado = true"
-    >
-      {{ ultimoErro }}
-    </BAlert>
+    />
 
     <CarregamentoPagina v-if="carregandoPagina" :mensagem="TEXTOS.unidade.CARREGANDO"/>
     <template v-else>
@@ -97,7 +94,8 @@
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
+import {BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
+import AppAlertaTela from '@/components/comum/AppAlertaTela.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import TreeTable from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";

@@ -16,6 +16,7 @@ describe('ModalConfirmacao.vue', () => {
                 template: `
                     <div class="modal-padrao-stub">
                         <span>{{ titulo }}</span>
+                        <slot name="alerta" />
                         <button
                             :data-testid="testIdCancelar || 'btn-modal-confirmacao-cancelar'"
                             :disabled="loading"
@@ -174,5 +175,18 @@ describe('ModalConfirmacao.vue', () => {
         expect(cancelBtn.attributes('disabled')).toBe('')
         expect(confirmBtn.find('.spinner-border').exists()).toBe(true)
         expect(confirmBtn.text()).toContain('Processando...')
+    })
+
+    it('encaminha a regiao de alerta para o modal base', () => {
+        const wrapper = mount(ModalConfirmacao, {
+            props: defaultProps,
+            slots: {
+                alerta: '<div class="alerta-confirmacao">Alerta</div>'
+            },
+            global: globalOptions
+        })
+
+        expect(wrapper.find('.alerta-confirmacao').exists()).toBe(true)
+        expect(wrapper.find('.alerta-confirmacao').text()).toBe('Alerta')
     })
 })

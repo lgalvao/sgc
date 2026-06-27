@@ -173,15 +173,15 @@ describe("Unidades.vue", () => {
                 {},
                 {
                     PageHeader: {
-                        template: "<div><h1>Page header</h1><slot name='description' /><slot name='actions' /></div>"
+                        template: "<div><h1>Page header</h1><slot name='description' /><slot name='alerta' /><slot name='actions' /></div>"
+                    },
+                    AppAlertaTela: {
+                        template: "<div><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
+                        props: ["mensagem"],
+                        emits: ["dismissed"],
                     },
                     TreeTable: TreeTableStub,
                     BContainer: {template: "<div><slot /></div>"},
-                    BAlert: {
-                        name: "BAlert",
-                        template: "<div><slot /><button @click=\"$emit('dismissed')\">Close</button></div>",
-                        props: ["modelValue", "variant", "dismissible"]
-                    },
                     BSpinner: {
                         name: "BSpinner",
                         template: "<div class='spinner'></div>",
@@ -286,7 +286,12 @@ describe("Unidades.vue", () => {
                 {},
                 {
                     PageHeader: {
-                        template: "<div><h1>Page header</h1><slot name='description' /><slot name='actions' /></div>"
+                        template: "<div><h1>Page header</h1><slot name='description' /><slot name='alerta' /><slot name='actions' /></div>"
+                    },
+                    AppAlertaTela: {
+                        template: "<div><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
+                        props: ["mensagem"],
+                        emits: ["dismissed"],
                     },
                     TreeTable: TreeTableStub,
                     BContainer: {template: "<div><slot /></div>"},

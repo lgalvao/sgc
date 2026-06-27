@@ -57,6 +57,9 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
           unidade.sigla
         }}</span>
     </template>
+    <template #alerta>
+      <slot name="alerta"/>
+    </template>
     <template #actions>
       <div class="d-flex gap-2">
         <BButton

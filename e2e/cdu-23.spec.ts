@@ -6,7 +6,7 @@ import {
     acessarSubprocessoGestor,
     devolverCadastroMapeamento
 } from './helpers/helpers-analise.js';
-import {fazerLogout, navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
+import {fazerLogout, navegarParaSubprocesso, verificarToast} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {verificarAusenciaNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
@@ -100,11 +100,10 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(modal).toHaveClass(/show/);
         await modal.getByRole('button', {name: TEXTOS.acaoBloco.homologar.BOTAO}).click();
 
-        await expect(page.getByText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO).first()).toBeVisible();
+        await verificarToast(page, TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
 
         await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
         await expect(page.getByTestId('processo-info')).toBeVisible();
-        await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
         await expect(page.getByTestId('btn-processo-homologar-bloco')).toHaveCount(0);
         await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();
 

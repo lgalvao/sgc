@@ -55,6 +55,9 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
         :title="subprocesso.unidade?.sigla ?? siglaUnidadeFallback"
         title-test-id="subprocesso-header__txt-header-unidade"
     >
+      <template #alerta>
+        <slot name="alerta"/>
+      </template>
       <template #actions>
         <slot name="acoes-extras"/>
         <BDropdown

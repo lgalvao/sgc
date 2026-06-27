@@ -8,6 +8,18 @@ vi.mock('@/composables/useConfiguracoes', () => ({
     useConfiguracoes: vi.fn()
 }));
 
+const exibirSucessoMock = vi.fn();
+
+vi.mock('@/composables/useToast', () => ({
+    useToast: () => ({
+        exibirSucesso: exibirSucessoMock,
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        registrarPendente: vi.fn(),
+        exibirPendente: vi.fn(),
+    }),
+}));
+
 describe('ConfiguracaoView', () => {
     let wrapper: any;
     let configuracoesStore: any;
@@ -76,7 +88,7 @@ describe('ConfiguracaoView', () => {
         await wrapper.vm.$nextTick();
         await wrapper.find('form').trigger('submit.prevent');
         expect(configuracoesStore.salvarConfiguracoes).not.toHaveBeenCalled();
-        expect(wrapper.text()).toContain('Configurações salvas.');
+        expect(exibirSucessoMock).toHaveBeenCalledWith('Configurações salvas.');
     });
 
     it('deve mostrar erro ao falhar ao salvar', async () => {

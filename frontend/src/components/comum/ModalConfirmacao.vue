@@ -15,6 +15,9 @@
       @confirmar="confirmar"
       @fechar="emit('hide')"
   >
+    <template #alerta>
+      <slot name="alerta"></slot>
+    </template>
     <slot>
       <div class="d-flex align-items-start">
         <i

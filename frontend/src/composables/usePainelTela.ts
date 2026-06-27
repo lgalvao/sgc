@@ -1,10 +1,9 @@
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
-import {useToast} from "bootstrap-vue-next";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePainelQuery} from "@/composables/usePainelQuery";
 import {usePerfil} from "@/composables/usePerfil";
-import {useToastStore} from "@/stores/toast";
+import {useToast} from "@/composables/useToast";
 import {usePainelStore} from "@/stores/painel";
 import type {Alerta, ProcessoResumo} from "@/types/tipos";
 import * as painelService from "@/services/painelService";
@@ -15,10 +14,9 @@ import {normalizarErro} from "@/utils/apiError";
 export function usePainelTela() {
   const perfilStore = usePerfilStore();
   const perfil = usePerfil();
-  const toastStore = useToastStore();
   const painelStore = usePainelStore();
   const painelQuery = usePainelQuery();
-  const toast = useToast();
+  const {exibirPendente} = useToast();
   const carregandoPainel = ref(true);
   const exibindoCarregamentoPainel = computed(() => carregandoPainel.value || painelStore.precisaRecarregar);
   const router = useRouter();
@@ -81,20 +79,7 @@ export function usePainelTela() {
   }
 
   function exibirToastPendente() {
-    const pendente = toastStore.consumePending();
-    if (pendente) {
-      void toast.create({
-        props: {
-          body: pendente.mensagem,
-          variant: 'success',
-          modelValue: 4000,
-          pos: 'bottom-end',
-          noProgress: true,
-        }
-      });
-      return true;
-    }
-    return false;
+    return exibirPendente();
   }
 
   onMounted(async () => {

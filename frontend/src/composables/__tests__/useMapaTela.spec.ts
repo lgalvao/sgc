@@ -14,9 +14,14 @@ vi.mock('@/composables/useNotification', () => ({
     useNotification: () => ({ notify: notifyMock }),
 }));
 
-vi.mock('@/stores/toast', () => ({
-    useToastStore: () => ({
-        setPending: vi.fn(),
+const registrarPendenteMock = vi.fn();
+vi.mock('@/composables/useToast', () => ({
+    useToast: () => ({
+        registrarPendente: registrarPendenteMock,
+        exibirSucesso: vi.fn(),
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        exibirPendente: vi.fn(),
     }),
 }));
 

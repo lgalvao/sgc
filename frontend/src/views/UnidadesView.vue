@@ -7,6 +7,13 @@
         <template #description>
           {{ TEXTOS.unidades.SUBTITULO }}
         </template>
+        <template #alerta>
+          <AppAlertaTela
+              v-if="erroUnidades"
+              :mensagem="erroUnidades.message"
+              @dismissed="limparErro()"
+          />
+        </template>
         <template #actions>
           <BButton
               aria-label="Expandir todas as linhas"
@@ -37,16 +44,6 @@
           :unidades-sem-responsavel="unidadesSemResponsavel"
           @dismiss="dispensarAlertaDiagnostico"
       />
-
-      <BAlert
-          v-if="erroUnidades"
-          :model-value="true"
-          dismissible
-          variant="danger"
-          @dismissed="limparErro()"
-      >
-        {{ erroUnidades.message }}
-      </BAlert>
 
       <div v-if="dadosArvore.length > 0">
         <ArvoreToolbar
@@ -86,8 +83,9 @@
 
 <script lang="ts" setup>
 import {computed, ref, watch} from "vue";
-import {BAlert, BButton} from "bootstrap-vue-next";
+import {BButton} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
+import AppAlertaTela from "@/components/comum/AppAlertaTela.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";

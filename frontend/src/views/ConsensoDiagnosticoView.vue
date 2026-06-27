@@ -8,6 +8,23 @@
           :subtitle="subtituloServidor"
           :title="TEXTOS.diagnostico.TITULO_CONSENSO"
       >
+        <template #alerta>
+          <AppAlert
+              v-if="erroMensagem"
+              :chave="erroMensagemChave"
+              :mensagem="erroMensagem"
+              variante="danger"
+              @dismissed="erroMensagem = ''"
+          />
+
+          <AppAlert
+              v-if="ehConsensoAprovado"
+              :dispensavel="false"
+              data-testid="alert-consenso-aprovado"
+              mensagem="A avaliação de consenso já foi aprovada."
+              variante="success"
+          />
+        </template>
         <template #actions>
           <ConsensoDiagnosticoAcoes
               :aprovando="aprovando"
@@ -23,26 +40,6 @@
           />
         </template>
       </PageHeader>
-
-      <!-- Alertas -->
-      <AppAlert
-          v-if="erroMensagem"
-          :chave="erroMensagemChave"
-          :mensagem="erroMensagem"
-          variante="danger"
-          @dismissed="erroMensagem = ''"
-      />
-
-      <!-- Aviso de consenso já aprovado -->
-      <BAlert
-          v-if="ehConsensoAprovado"
-          :model-value="true"
-          class="mb-4"
-          variant="success"
-      >
-        <i aria-hidden="true" class="bi bi-check-circle me-2"/>
-        A avaliação de consenso já foi aprovada.
-      </BAlert>
 
       <ConsensoDiagnosticoTabela
           :competencias="competenciasDetalhadasComDescricao"
@@ -76,7 +73,6 @@
 <script lang="ts" setup>
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
-import {BAlert} from 'bootstrap-vue-next';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
@@ -84,11 +80,11 @@ import AppAlert from '@/components/comum/AppAlert.vue';
 import ConsensoDiagnosticoAcoes from '@/components/diagnostico/ConsensoDiagnosticoAcoes.vue';
 import ConsensoDiagnosticoTabela from '@/components/diagnostico/ConsensoDiagnosticoTabela.vue';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
+import {useToast} from '@/composables/useToast';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import {usePerfilStore} from '@/stores/perfil';
-import {useToastStore} from '@/stores/toast';
 import type {ConsensoCompetenciaDetalhada} from '@/types/diagnostico-competencias';
 
 const props = defineProps<{
@@ -100,6 +96,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
+const {registrarPendente} = useToast();
 const servidorEhUsuarioLogado = computed(() =>
   String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? ''),
 );
@@ -156,8 +153,7 @@ async function confirmarAprovarConsenso() {
   try {
     await aprovarConsenso();
     modalAprovarConsensoAberto.value = false;
-    const toastStore = useToastStore();
-    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
+    registrarPendente(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
     if (contexto.value?.processoCodigo) {
       await router.push({
         name: 'Subprocesso',
@@ -200,8 +196,7 @@ async function confirmarConcluir() {
     concluindoAvaliacao.value = true;
     await concluirAvaliacao();
     modalConcluirAberto.value = false;
-    const toastStore = useToastStore();
-    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
+    registrarPendente(TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
     if (contexto.value?.processoCodigo) {
       await router.push({
         name: 'Subprocesso',

@@ -18,17 +18,10 @@
       </template>
     </PageHeader>
 
-    <AppAlert
-        v-if="erroMensagem"
-        :mensagem="erroMensagem"
-        variante="danger"
-        @dismissed="erroMensagem = ''"
-    />
-    <AppAlert
-        v-if="alertaSucesso"
-        :mensagem="alertaSucesso"
-        variante="success"
-        @dismissed="alertaSucesso = ''"
+    <AppAlertaAcao
+        :feedback="feedbackAcao"
+        data-testid="alert-subprocesso-diagnostico-feedback"
+        @dismissed="limparFeedbackAcao"
     />
 
     <BCard class="mb-4">
@@ -192,15 +185,15 @@
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {normalizarErro} from '@/utils/apiError/normalizer';
+import {useToast} from '@/composables/useToast';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {BBadge, BButton, BCard, BDropdown, BDropdownItemButton, BSpinner, BTable,} from 'bootstrap-vue-next';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
-import AppAlert from '@/components/comum/AppAlert.vue';
+import AppAlertaAcao, {type FeedbackAcao} from '@/components/comum/AppAlertaAcao.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useDiagnosticoUnidade} from '@/composables/useDiagnosticoUnidade';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
-import {useToastStore} from '@/stores/toast';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 
@@ -217,7 +210,7 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
-const toastStore = useToastStore();
+const {registrarPendente} = useToast();
 const {
   podeCriarConsenso,
   podeConcluirDiagnostico,
@@ -255,9 +248,8 @@ const {
   permitirAvaliacao,
 } = useFluxoDiagnostico(props.codSubprocesso);
 
-const erroMensagem = ref('');
 const erroConcluirModal = ref('');
-const alertaSucesso = ref('');
+const feedbackAcao = ref<FeedbackAcao | null>(null);
 const modalConcluirAberto = ref(false);
 const modalValidarAberto = ref(false);
 const modalDevolverAberto = ref(false);
@@ -271,6 +263,21 @@ const observacoesHomologar = ref('');
 const servidorSelecionado = ref<ServidorDiagnostico | null>(null);
 const justificativaImpossibilidade = ref('');
 const erroJustificativaImpossibilidade = ref('');
+
+function limparFeedbackAcao() {
+  feedbackAcao.value = null;
+}
+
+function registrarFeedbackAcao(variante: FeedbackAcao["variante"], mensagem?: string | null) {
+  feedbackAcao.value = {
+    variante,
+    mensagem: mensagem?.trim() || TEXTOS.diagnostico.ERRO_SALVAR,
+  };
+}
+
+function registrarErro(mensagem?: string | null) {
+  registrarFeedbackAcao('danger', mensagem);
+}
 
 const ehChefe = computed(() => podeCriarConsenso.value);
 const podeConcluir = computed(() => podeConcluirDiagnostico.value);
@@ -308,7 +315,7 @@ async function confirmarPermitirAvaliacao() {
     await permitirAvaliacao(servidorSelecionado.value.servidorTitulo);
     modalPermitirAvaliacaoAberto.value = false;
   } catch {
-    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -325,7 +332,7 @@ async function confirmarImpossibilitar() {
     );
     modalImpossibilitarAberto.value = false;
   } catch {
-    erroMensagem.value = TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -335,9 +342,9 @@ async function abrirModalValidar() {
     await validarAcaoValidarDiagnostico();
     modalValidarAberto.value = true;
   } catch (erro) {
-    erroMensagem.value = normalizarErro(erro).mensagem
+    registrarErro(normalizarErro(erro).mensagem
       ?? erroValidacaoValidar.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+      ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -347,9 +354,9 @@ async function abrirModalConcluir() {
     await validarConclusaoDiagnostico();
     modalConcluirAberto.value = true;
   } catch (erro) {
-    erroMensagem.value = normalizarErro(erro).mensagem
+    registrarErro(normalizarErro(erro).mensagem
       ?? erroValidacaoConcluir.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+      ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -360,9 +367,9 @@ async function abrirModalDevolver() {
     await validarAcaoDevolverDiagnostico();
     modalDevolverAberto.value = true;
   } catch (erro) {
-    erroMensagem.value = normalizarErro(erro).mensagem
+    registrarErro(normalizarErro(erro).mensagem
       ?? erroValidacaoDevolver.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+      ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -372,9 +379,9 @@ async function abrirModalHomologar() {
     await validarAcaoHomologarDiagnostico();
     modalHomologarAberto.value = true;
   } catch (erro) {
-    erroMensagem.value = normalizarErro(erro).mensagem
+    registrarErro(normalizarErro(erro).mensagem
       ?? erroValidacaoHomologar.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+      ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -382,7 +389,7 @@ async function confirmarConcluir() {
   try {
     await concluirDiagnostico();
     modalConcluirAberto.value = false;
-    toastStore.setPending(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
+    registrarPendente(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
     await router.push({name: 'Painel'});
   } catch (erro) {
     erroConcluirModal.value = normalizarErro(erro).mensagem
@@ -395,9 +402,9 @@ async function confirmarValidar() {
   try {
     await validarDiagnostico(observacoesValidar.value || undefined);
     modalValidarAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO;
+    limparFeedbackAcao();
   } catch {
-    erroMensagem.value = erroValidar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroValidar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -409,9 +416,9 @@ async function confirmarDevolver() {
   try {
     await devolverDiagnostico(justificativaDevolver.value);
     modalDevolverAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO;
+    limparFeedbackAcao();
   } catch {
-    erroMensagem.value = erroDevolver.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroDevolver.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -419,9 +426,9 @@ async function confirmarHomologar() {
   try {
     await homologarDiagnostico(observacoesHomologar.value || undefined);
     modalHomologarAberto.value = false;
-    alertaSucesso.value = TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO;
+    limparFeedbackAcao();
   } catch {
-    erroMensagem.value = erroHomologar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR;
+    registrarErro(erroHomologar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
