@@ -388,23 +388,6 @@ export async function obterAcaoBloco(page: Page, testId: string): Promise<Locato
         return acao;
     }
 
-    const alternativas = [
-        'btn-processo-aceitar-bloco',
-        'btn-processo-homologar-bloco',
-        'btn-processo-disponibilizar-bloco',
-        'btn-processo-aceitar-mapas-bloco',
-        'btn-processo-homologar-mapas-bloco',
-        'btn-processo-aceitar-diagnosticos-bloco',
-        'btn-processo-homologar-diagnosticos-bloco',
-    ];
-
-    for (const alternativa of alternativas) {
-        const botaoAlternativo = page.getByTestId(alternativa);
-        if (await botaoAlternativo.isVisible().catch(() => false)) {
-            return botaoAlternativo;
-        }
-    }
-
     await expect(acao).toBeVisible();
     return acao;
 }

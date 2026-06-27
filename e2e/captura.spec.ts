@@ -1465,17 +1465,13 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await page.getByRole('button', {name: /Cancelar/i}).click();
 
             // Capturar botão de disponibilizar mapas em bloco (CDU-24)
-            const btnDisponibilizarMapaBloco = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
-            await expect(btnDisponibilizarMapaBloco).toBeVisible();
-            await expect(btnDisponibilizarMapaBloco).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-disponibilizar-bloco')).toHaveCount(0);
 
             // Capturar botões de aceitar/homologar mapa em bloco (CDU-25 e CDU-26 - se visíveis)
             const btnAceitarMapaBloco = page.getByRole('button', {name: /Aceitar.*mapa.*Bloco/i});
             await expect(btnAceitarMapaBloco).toBeHidden();
 
-            const btnHomologarMapaBloco = await obterAcaoBloco(page, 'btn-processo-homologar-mapas-bloco');
-            await expect(btnHomologarMapaBloco).toBeVisible();
-            await expect(btnHomologarMapaBloco).toBeDisabled();
+            await expect(page.getByTestId('btn-processo-homologar-mapas-bloco')).toHaveCount(0);
         });
     });
 

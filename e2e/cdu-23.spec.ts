@@ -105,7 +105,7 @@ test.describe.serial('CDU-23 - Homologar cadastros em bloco', () => {
         await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
         await expect(page.getByTestId('processo-info')).toBeVisible();
         await expect(page.getByTestId('app-alert')).toContainText(TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
-        await expect(btnHomologar).toBeDisabled();
+        await expect(page.getByTestId('btn-processo-homologar-bloco')).toHaveCount(0);
         await expect(page.getByRole('row', {name: /SECAO_221 - Seção 221 Cadastro homologado/i})).toBeVisible();
 
         await verificarAusenciaNotificacaoAdmin(page, {

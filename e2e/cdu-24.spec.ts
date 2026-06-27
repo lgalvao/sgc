@@ -51,9 +51,7 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
                                                                                                          }) => {
         await acessarDetalhesProcesso(page, descProcesso);
 
-        const btnDisponibilizar = await obterAcaoBloco(page, 'btn-processo-disponibilizar-bloco');
-        await expect(btnDisponibilizar).toBeVisible();
-        await expect(btnDisponibilizar).toBeDisabled();
+        await expect(page.getByTestId('btn-processo-disponibilizar-bloco')).toHaveCount(0);
     });
 
     test('ADMIN visualiza erro ao tentar disponibilizar mapa com atividade sem competência', async ({

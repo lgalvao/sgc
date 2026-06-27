@@ -194,11 +194,17 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
 
     const modal = page.getByRole('dialog');
     const alert = page.getByTestId('app-alert');
+    const resultadoAbertura = await Promise.race([
+        modal.waitFor({state: 'visible', timeout: 3_000}).then(() => 'modal').catch(() => null),
+        alert.waitFor({state: 'visible', timeout: 3_000}).then(() => 'alerta').catch(() => null),
+        page.waitForURL(/\/painel/, {timeout: 3_000}).then(() => 'painel').catch(() => null),
+    ]);
 
-    await modal.waitFor({state: 'visible'}).catch(() => {
-    });
+    if (resultadoAbertura === 'painel') {
+        return null;
+    }
 
-    if (!(await modal.isVisible()) && await alert.isVisible()) {
+    if (resultadoAbertura === 'alerta') {
         atividadeExtraCriada = `Atividade complementar ${Date.now()}`;
         await adicionarAtividade(page, atividadeExtraCriada);
         await adicionarConhecimento(page, atividadeExtraCriada, 'Conhecimento complementar');

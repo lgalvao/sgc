@@ -9,7 +9,8 @@ import {acessarDetalhesProcesso, verificarDetalhesProcesso} from './helpers/help
 import {
     navegarParaSubprocesso,
     obterAcaoCabecalhoSubprocesso,
-    verificarPaginaPainel
+    verificarPaginaPainel,
+    verificarToast
 } from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
@@ -90,7 +91,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
+        await verificarToast(page, TEXTOS.sucesso.PROCESSO_FINALIZADO);
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECAO_221',
             assunto: 'Finalização de processo de mapeamento',
@@ -118,8 +119,7 @@ test.describe.serial('CDU-21 - Finalizar processo de mapeamento ou de revisão',
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
         await expect(page.getByTestId('btn-processo-finalizar')).toBeDisabled();
 
-        await expect(page.getByTestId('btn-processo-acoes-bloco')).toBeVisible();
-        await expect(page.getByTestId('btn-processo-acoes-bloco').getByRole('button')).toBeEnabled();
+        await expect(page.getByTestId('btn-processo-acoes-bloco')).toHaveCount(0);
 
         await navegarParaSubprocesso(page, 'SECAO_221');
         await expect(page.getByTestId('btn-subprocesso-acoes')).toBeVisible();
@@ -204,7 +204,7 @@ test.describe.serial('CDU-21 - Finalizar processo de REVISÃO', () => {
         await page.getByTestId('btn-finalizar-processo-confirmar').click();
 
         await verificarPaginaPainel(page);
-        await expect(page.getByText(TEXTOS.sucesso.PROCESSO_FINALIZADO)).toBeVisible();
+        await verificarToast(page, TEXTOS.sucesso.PROCESSO_FINALIZADO);
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECAO_212',
             assunto: 'Finalização de processo de revisão',
