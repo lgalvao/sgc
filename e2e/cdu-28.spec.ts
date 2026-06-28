@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {loginComPerfil} from './helpers/helpers-auth.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
+import {verificarToast} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 
 const SIGLA_UNIDADE = 'ASSESSORIA_11';
@@ -77,7 +78,7 @@ async function garantirSemAtribuicaoVigente(page: import('@playwright/test').Pag
         const modal = page.getByRole('dialog');
         await expect(modal).toBeVisible();
         await modal.getByRole('button', {name: 'Remover'}).click();
-        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO).first()).toBeVisible();
+        await verificarToast(page, TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO);
 
         await page.getByTestId('btn-cancelar-atribuicao').click();
         await expect(page).toHaveURL(/\/unidade\/\d+(?:\?.*)?$/);
@@ -101,7 +102,7 @@ async function criarAtribuicaoVigente(page: import('@playwright/test').Page, jus
     await page.getByTestId('input-data-termino').fill(dataTermino);
     await page.getByTestId('textarea-justificativa').fill(justificativa);
     await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
-    await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO).first()).toBeVisible();
+    await verificarToast(page, TEXTOS.atribuicaoTemporaria.SUCESSO);
 }
 
 async function selecionarUsuarioAlvo(page: import('@playwright/test').Page) {
@@ -244,7 +245,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await page.getByTestId('textarea-justificativa').fill('Cobertura de férias atualizada');
         await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
 
-        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO).first()).toBeVisible();
+        await verificarToast(page, TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO);
     });
 
     test('Cenario 7: ADMIN remove atribuição vigente', async ({
@@ -261,7 +262,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
         await expect(modal).toBeVisible();
         await page.getByTestId('btn-confirmar-remover-atribuicao').click();
 
-        await expect(page.getByText(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO).first()).toBeVisible();
+        await verificarToast(page, TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO);
 
         await page.getByTestId('btn-cancelar-atribuicao').click();
         await expect(page.getByTestId('unidade-view__btn-atribuicao-texto')).toHaveText('Criar atribuição');

@@ -85,6 +85,17 @@ vi.mock("@/services/atribuicaoTemporariaService", () => ({
     removerAtribuicaoTemporaria: mockRemoverAtribuicao,
 }));
 
+const mockExibirSucesso = vi.fn();
+vi.mock("@/composables/useToast", () => ({
+    useToast: () => ({
+        exibirSucesso: mockExibirSucesso,
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        registrarPendente: vi.fn(),
+        exibirPendente: vi.fn(),
+    }),
+}));
+
 describe("AtribuicaoTemporariaView", () => {
     beforeEach(() => {
         vi.useFakeTimers();
@@ -213,7 +224,7 @@ describe("AtribuicaoTemporariaView", () => {
             justificativa: "<p>Justificativa de teste</p>",
         });
         expect(mockAtualizarAtribuicao).not.toHaveBeenCalled();
-        expect(mockNotify).not.toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO, "success");
+        expect(mockExibirSucesso).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO);
     });
 
     it("entra em modo edição quando há AT vigente", async () => {
@@ -299,7 +310,7 @@ describe("AtribuicaoTemporariaView", () => {
             dataTermino: "2026-06-05",
             justificativa: "<p>Atualizada</p>",
         });
-        expect(mockNotify).not.toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO, "success");
+        expect(mockExibirSucesso).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO);
     });
 
     it("remove atribuição vigente", async () => {
@@ -338,7 +349,7 @@ describe("AtribuicaoTemporariaView", () => {
         await flushPromises();
 
         expect(mockRemoverAtribuicao).toHaveBeenCalledWith(1, 10);
-        expect(mockNotify).not.toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO, "success");
+        expect(mockExibirSucesso).toHaveBeenCalledWith(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO);
     });
 
     it("navega de volta ao cancelar", async () => {

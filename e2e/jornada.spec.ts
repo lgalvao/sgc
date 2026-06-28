@@ -122,7 +122,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('txt-notificacoes-reenviar-confirmacao')).toContainText(/Confirma o reenvio/i);
             await page.getByTestId('btn-notificacoes-reenviar-confirmar').click();
 
-            await verificarAppAlert(page, /recolocad[oa] na fila/i);
+            await verificarToast(page, /recolocad[oa] na fila/i);
             await expect(tabelaNotificacoes).toContainText('Pendente');
             await expect(tabelaNotificacoes.locator('[data-testid^="btn-notificacoes-reenviar-"]')).toHaveCount(0);
         });

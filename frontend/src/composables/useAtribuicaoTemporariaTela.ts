@@ -2,6 +2,7 @@ import {computed, onActivated, onMounted, ref, type Ref} from "vue";
 import {useRouter} from "vue-router";
 import {useNotification} from "@/composables/useNotification";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
+import {useToast} from "@/composables/useToast";
 import {TEXTOS} from "@/constants/textos";
 import {
     type AtribuicaoTemporaria,
@@ -204,6 +205,7 @@ function criarFluxoMutacao({
     formularioValido,
     invalidarDiagnostico,
     carregando,
+    exibirSucesso,
     mostrarModalRemocao,
     resetarValidacao,
     unidade,
@@ -220,6 +222,7 @@ function criarFluxoMutacao({
     formularioValido: Ref<boolean>;
     invalidarDiagnostico: () => void;
     carregando: Ref<boolean>;
+    exibirSucesso: (mensagem: string) => void;
     mostrarModalRemocao: Ref<boolean>;
     resetarValidacao: () => void;
     unidade: Readonly<Ref<Unidade | null>>;
@@ -263,12 +266,15 @@ function criarFluxoMutacao({
         try {
             if (atribuicaoVigente.value) {
                 await atualizarAtribuicaoTemporaria(unidadeAtual.codigo, atribuicaoVigente.value.codigo, request);
+                invalidarDiagnostico();
+                await atualizarCachesPosMutacao();
+                exibirSucesso(TEXTOS.atribuicaoTemporaria.SUCESSO_ATUALIZACAO);
             } else {
                 await criarAtribuicaoTemporaria(unidadeAtual.codigo, request);
+                invalidarDiagnostico();
+                await atualizarCachesPosMutacao();
+                exibirSucesso(TEXTOS.atribuicaoTemporaria.SUCESSO);
             }
-
-            invalidarDiagnostico();
-            await atualizarCachesPosMutacao();
         } catch (error) {
             logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
@@ -293,6 +299,7 @@ function criarFluxoMutacao({
             await atualizarCachesPosMutacao();
             mostrarModalRemocao.value = false;
             resetarFormularioAtribuicao(campos, resetarValidacao);
+            exibirSucesso(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO);
         } catch (error) {
             logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
@@ -307,6 +314,7 @@ function criarFluxoMutacao({
 export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
     const router = useRouter();
     const {notificacao, clear} = useNotification();
+    const {exibirSucesso} = useToast();
 
     const unidadeQuery = useUnidadeQuery(codigoUnidade);
     const {invalidarDiagnostico} = useInvalidacaoDiagnosticoOrganizacional();
@@ -353,6 +361,7 @@ export function useAtribuicaoTemporariaTela(codigoUnidade: number) {
         formularioValido,
         invalidarDiagnostico,
         carregando,
+        exibirSucesso,
         mostrarModalRemocao,
         resetarValidacao,
         unidade,

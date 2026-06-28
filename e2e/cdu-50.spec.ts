@@ -7,7 +7,7 @@ import {
     type ProcessoFixture,
 } from './fixtures/index.js';
 import {login, loginComPerfil, USUARIOS,} from './helpers/helpers-auth.js';
-import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
+import {navegarParaDiagnosticoUnidade, verificarToast} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 import {resetDatabase} from './hooks/hooks-limpeza.js';
 import {fecharHistoricoAnalise} from './helpers/helpers-analise.js';
@@ -150,7 +150,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         const modal = page.getByRole('dialog');
         await expect(modal).toContainText('Aceitar diagnóstico');
         await modal.getByRole('button', {name: 'Aceitar'}).click();
-        await expect(page.getByTestId('app-alert')).toContainText(TEXTO_ACEITE);
+        await verificarToast(page, TEXTO_ACEITE);
 
         await page.getByTestId('btn-historico-analise-unidade').click();
         const modalHistorico = page.getByRole('dialog', {name: 'Histórico de análise'});
@@ -196,7 +196,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
 
         await modal.getByRole('textbox').fill('Ajustar consenso e rever observações.');
         await modal.getByTestId('btn-confirmar-devolver-unidade').click();
-        await expect(page.getByTestId('app-alert')).toContainText(TEXTO_DEVOLUCAO);
+        await verificarToast(page, TEXTO_DEVOLUCAO);
 
         await page.getByTestId('btn-historico-analise-unidade').click();
         const modalHistorico = page.getByRole('dialog', {name: 'Histórico de análise'});
@@ -241,7 +241,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await abrirAcoesAnaliseUnidade(page);
         await page.getByTestId('btn-validar-diagnostico-unidade').click();
         await page.getByRole('dialog').getByRole('button', {name: 'Aceitar'}).click();
-        await expect(page.getByTestId('app-alert')).toContainText(TEXTO_ACEITE);
+        await verificarToast(page, TEXTO_ACEITE);
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await acessarDetalhesProcesso(page, processo.descricao);
@@ -256,7 +256,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         const modal = page.getByRole('dialog');
         await expect(modal).toContainText('Homologar diagnóstico');
         await modal.getByRole('button', {name: 'Homologar'}).click();
-        await expect(page.getByTestId('app-alert')).toContainText(TEXTO_HOMOLOGACAO);
+        await verificarToast(page, TEXTO_HOMOLOGACAO);
 
         await page.getByTestId('btn-historico-analise-unidade').click();
         const modalHistorico = page.getByRole('dialog', {name: 'Histórico de análise'});

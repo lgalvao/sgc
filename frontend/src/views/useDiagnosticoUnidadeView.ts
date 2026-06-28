@@ -9,6 +9,7 @@ import {listarAnalisesDiagnostico} from '@/services/analiseService';
 import {formatarDataBR} from '@/utils';
 import {formatSituacaoSubprocesso} from '@/utils/formatters';
 import {TEXTOS} from '@/constants/textos';
+import {useToast} from '@/composables/useToast';
 import type {Analise, Movimentacao, ResponsavelDto, SubprocessoDetalhe} from '@/types/tipos';
 import type {
     DiagnosticoContexto,
@@ -32,6 +33,7 @@ interface CompetenciaServidorSelecionado {
 }
 
 export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
+    const {exibirSucesso} = useToast();
     const contextoQuery = useDiagnosticoContexto(props.codSubprocesso);
     const {data: contexto} = contextoQuery;
     const {
@@ -229,6 +231,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             acao: () => validarDiagnostico(normalizarTextoOpcional(observacoesValidar.value)),
             aoConcluir: () => {
                 modalValidarAberto.value = false;
+                exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO);
             },
             mensagemErro: erroValidar.value?.message,
         });
@@ -245,6 +248,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             acao: () => devolverDiagnostico(justificativa),
             aoConcluir: () => {
                 modalDevolverAberto.value = false;
+                exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO);
             },
             mensagemErro: erroDevolver.value?.message,
         });
@@ -255,6 +259,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             acao: () => homologarDiagnostico(normalizarTextoOpcional(observacoesHomologar.value)),
             aoConcluir: () => {
                 modalHomologarAberto.value = false;
+                exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO);
             },
             mensagemErro: erroHomologar.value?.message,
         });

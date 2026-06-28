@@ -217,7 +217,7 @@ const props = withDefaults(defineProps<{
 });
 
 const router = useRouter();
-const {registrarPendente} = useToast();
+const {registrarPendente, exibirSucesso} = useToast();
 const {
   podeCriarConsenso,
   podeConcluirDiagnostico,
@@ -410,6 +410,7 @@ async function confirmarValidar() {
     await validarDiagnostico(observacoesValidar.value || undefined);
     modalValidarAberto.value = false;
     limparFeedbackAcao();
+    exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO);
   } catch {
     registrarErro(erroValidar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
@@ -424,6 +425,7 @@ async function confirmarDevolver() {
     await devolverDiagnostico(justificativaDevolver.value);
     modalDevolverAberto.value = false;
     limparFeedbackAcao();
+    exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO);
   } catch {
     registrarErro(erroDevolver.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
@@ -434,6 +436,7 @@ async function confirmarHomologar() {
     await homologarDiagnostico(observacoesHomologar.value || undefined);
     modalHomologarAberto.value = false;
     limparFeedbackAcao();
+    exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO);
   } catch {
     registrarErro(erroHomologar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }

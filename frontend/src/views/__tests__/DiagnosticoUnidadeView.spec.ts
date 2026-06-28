@@ -162,6 +162,16 @@ vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     }),
 }));
 
+vi.mock('@/composables/useToast', () => ({
+    useToast: () => ({
+        exibirSucesso: vi.fn(),
+        exibirErro: vi.fn(),
+        exibirToast: vi.fn(),
+        registrarPendente: vi.fn(),
+        exibirPendente: vi.fn(),
+    }),
+}));
+
 describe('DiagnosticoUnidadeView', () => {
     beforeEach(() => {
         vi.clearAllMocks();
