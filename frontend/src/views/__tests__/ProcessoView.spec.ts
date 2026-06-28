@@ -1135,7 +1135,7 @@ describe("Processo.vue", () => {
         vm.notificacao = {message: "Msg", variant: "info"};
         await nextTick();
         wrapper.find('[data-testid="app-alert"]');
-        // If app-alert is covered via BAlert stub or real AppAlert
+        // If app-alert is covered via BAlert stub or real Alerta
         const bAlerts = wrapper.findAllComponents(BAlertStub);
         if (bAlerts.length > 0) await bAlerts[0].vm.$emit('dismissed');
 

@@ -20,7 +20,7 @@
         </template>
       </PageHeader>
 
-      <AppAlertaTela
+      <Alerta
           v-if="erroTela"
           data-testid="alert-administradores-erro"
           :mensagem="erroTela"
@@ -95,7 +95,7 @@ import {computed, ref, watch} from 'vue';
 import {BButton, BSpinner, BTable} from 'bootstrap-vue-next';
 
 import AdministradoresFluxoModais from '@/components/administracao/AdministradoresFluxoModais.vue';
-import AppAlertaTela from '@/components/comum/AppAlertaTela.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';

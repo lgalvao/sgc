@@ -22,7 +22,7 @@
           @confirmar-enviar-lembrete="confirmarEnviarLembrete"
       >
         <template #alerta>
-          <AppAlert
+          <Alerta
               v-if="notificacao"
               :chave="notificacao.chave"
               :dispensavel="notificacao.dispensavel ?? true"
@@ -78,7 +78,7 @@
       <SubprocessoMovimentacoes v-if="!ehDiagnostico || !ehServidorPuro" :movimentacoes="movimentacoes"/>
     </div>
     <div v-else-if="erroIntegracaoContexto" class="py-2">
-      <AppAlert
+      <Alerta
           :dispensavel="true"
           :mensagem="erroIntegracaoContexto.detalhes ? undefined : erroIntegracaoContexto.mensagem"
           :notificacao="erroIntegracaoContexto.detalhes ? { resumo: erroIntegracaoContexto.mensagem, detalhes: [String(erroIntegracaoContexto.detalhes)] } : undefined"
@@ -138,7 +138,7 @@ import SubprocessoCards from "@/components/processo/SubprocessoCards.vue";
 import SubprocessoFluxoModais from "@/components/processo/SubprocessoFluxoModais.vue";
 import SubprocessoMovimentacoes from "@/components/processo/SubprocessoMovimentacoes.vue";
 import SubprocessoResumoHeader from "@/components/processo/SubprocessoResumoHeader.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import {useToast} from "@/composables/useToast";
 import {useFluxoDiagnostico} from "@/composables/useFluxoDiagnostico";

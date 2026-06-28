@@ -1,7 +1,7 @@
 ﻿<script lang="ts" setup>
 import {BButton, BFormInvalidFeedback, BFormTextarea} from "bootstrap-vue-next";
 import {computed, nextTick, ref, watch} from "vue";
-import AppAlertaFormulario from "@/components/comum/AppAlertaFormulario.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import CompetenciaAtividadeItem from "./CompetenciaAtividadeItem.vue";
 import type {Atividade, Competencia} from "@/types/tipos";
@@ -88,7 +88,7 @@ function limparSelecaoAtividades() {
         @shown="nextTick(() => inputRef?.$el?.focus())"
     >
         <template #alerta>
-            <AppAlertaFormulario
+            <Alerta
                 :mensagem="fieldErrors?.generic"
                 data-testid="alert-criar-competencia-erro"
             />

@@ -14,7 +14,7 @@
       @fechar="fechar"
   >
     <template #alerta>
-      <AppAlertaFormulario
+      <Alerta
           :mensagem="erroImportacao"
           data-testid="alert-importacao-atividades"
           @dismissed="limparErroImportacao"
@@ -155,7 +155,7 @@
 <script lang="ts" setup>
 import {BButton, BFormCheckbox, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from "bootstrap-vue-next";
 import {computed, toRef} from "vue";
-import AppAlertaFormulario from "@/components/comum/AppAlertaFormulario.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {TEXTOS} from "@/constants/textos";
 import {useImportarAtividadesTela} from "@/composables/useImportarAtividadesTela";

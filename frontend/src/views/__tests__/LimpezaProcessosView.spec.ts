@@ -54,7 +54,7 @@ describe('LimpezaProcessosView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot/></div>'},
                     PageHeader: {template: '<div><slot name="alerta"/><slot/></div>', props: ['title']},
-                    AppAlert: {
+                    Alerta: {
                         template: '<div class="app-alert-stub" @click="$emit(\'dismissed\')">Alert</div>',
                         props: ['mensagem', 'variante']
                     },

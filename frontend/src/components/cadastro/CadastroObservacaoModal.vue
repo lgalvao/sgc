@@ -3,7 +3,7 @@ import {computed, ref, watch} from "vue";
 import {BFormGroup, BFormInvalidFeedback} from "bootstrap-vue-next";
 import EditorTextoRico from "@/components/comum/EditorTextoRico.vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 
 interface Props {
     modelValue: boolean;
@@ -79,7 +79,7 @@ function confirmar() {
         :variant="variant"
         @confirmar="confirmar"
     >
-        <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
+        <Alerta v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
         <p>{{ texto }}</p>
         <BFormGroup class="mb-3">
             <template v-if="labelObrigatoria" #label>

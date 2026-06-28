@@ -37,7 +37,7 @@
           @ver-sugestoes="verSugestoes"
       >
         <template #alerta>
-          <AppAlert
+          <Alerta
               v-if="erroMapaExibido"
               :chave="erroValidacaoMapaTick"
               :mensagem="erroMapaExibido"
@@ -155,7 +155,7 @@
 
 <script lang="ts" setup>
 import {BButton} from "bootstrap-vue-next";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import EmptyState from "@/components/comum/EmptyState.vue";
 import MapaAcoesHeader from "@/components/mapa/MapaAcoesHeader.vue";

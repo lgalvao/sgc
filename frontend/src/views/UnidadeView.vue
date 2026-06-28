@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <AppAlertaTela
+    <Alerta
         v-if="!carregandoPagina && ultimoErro"
         data-testid="alert-unidade-erro"
         :mensagem="ultimoErro"
@@ -95,7 +95,7 @@
 
 <script lang="ts" setup>
 import {BButton, BCard, BCardBody, BDropdown, BDropdownItemButton} from "bootstrap-vue-next";
-import AppAlertaTela from '@/components/comum/AppAlertaTela.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import TreeTable from "@/components/comum/TreeTable.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";

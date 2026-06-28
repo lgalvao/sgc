@@ -30,7 +30,7 @@
         </template>
       </PageHeader>
 
-      <AppAlertaTela
+      <Alerta
           v-if="erroTela"
           data-testid="alert-notificacoes-admin-erro"
           :mensagem="erroTela"
@@ -38,12 +38,12 @@
       />
 
       <template v-else>
-        <AppAlert
+        <Alerta
             v-if="notificacao"
             :chave="notificacao.chave"
             :dispensavel="notificacao.dispensavel"
             :mensagem="notificacao.mensagem"
-            :notification="notificacao.notificacao"
+            :notificacao="notificacao.notificacao"
             :stack-trace="notificacao.stackTrace"
             :variante="notificacao.variante"
             @dismissed="clear"
@@ -83,11 +83,10 @@
 import {computed, ref, watch} from "vue";
 import {BButton} from "bootstrap-vue-next";
 import NotificacoesAdminFluxoModais from "@/components/administracao/NotificacoesAdminFluxoModais.vue";
-import AppAlertaTela from "@/components/comum/AppAlertaTela.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import NotificacaoTabela from "@/components/administracao/NotificacaoTabela.vue";
 import {
   useNotificacoesAdminQuery,

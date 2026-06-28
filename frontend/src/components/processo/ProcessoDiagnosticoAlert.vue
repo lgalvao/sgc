@@ -1,10 +1,9 @@
 <template>
   <div v-if="exibir" class="mb-3 pt-2">
-    <BAlert
-        :model-value="true"
+    <Alerta
         data-testid="alert-diagnostico-organizacional"
-        dismissible
-        :variant="carregando ? 'info' : 'warning'"
+        :dispensavel="true"
+        :variante="carregando ? 'info' : 'warning'"
         @dismissed="$emit('dismiss')"
     >
       <div class="d-flex align-items-start gap-2">
@@ -41,12 +40,13 @@
           </ul>
         </div>
       </div>
-    </BAlert>
+    </Alerta>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BSpinner} from "bootstrap-vue-next";
+import {BSpinner} from "bootstrap-vue-next";
+import Alerta from "@/components/comum/Alerta.vue";
 import {computed} from "vue";
 import {RouterLink} from "vue-router";
 

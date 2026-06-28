@@ -1,6 +1,6 @@
 <template>
   <BAlert
-      v-if="mensagem || notificacao"
+      v-if="mensagem || notificacao || slots.default"
       :key="chave"
       :dismissible="dispensavel"
       :fade="false"
@@ -10,8 +10,12 @@
       :data-testid="dataTestid"
       @dismissed="emit('dismissed')"
   >
+    <template v-if="slots.default">
+      <slot />
+    </template>
+
     <!-- Modo simples -->
-    <template v-if="mensagem">
+    <template v-else-if="mensagem">
       <p class="mb-0">{{ mensagem }}</p>
     </template>
 
@@ -53,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {ref, useSlots} from 'vue';
 import {BAlert, BButton} from 'bootstrap-vue-next';
 
 interface NotificacaoEstruturada {
@@ -83,6 +87,7 @@ const emit = defineEmits<{
   dismissed: [];
 }>();
 
+const slots = useSlots();
 const mostrarDetalhes = ref(false);
 const mostrarStackTrace = ref(false);
 const ehDev = import.meta.env.DEV;

@@ -12,7 +12,7 @@
       @fechar="fechar"
   >
     <template #alerta>
-      <AppAlertaFormulario
+      <Alerta
           :mensagem="fieldErrors?.generic"
           data-testid="alert-disponibilizar-mapa-erro"
       />
@@ -81,7 +81,7 @@
 
 <script lang="ts" setup>
 import {BFormGroup, BFormInvalidFeedback} from "bootstrap-vue-next";
-import AppAlertaFormulario from "@/components/comum/AppAlertaFormulario.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import InputData from "@/components/comum/InputData.vue";

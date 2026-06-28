@@ -139,7 +139,7 @@ function montar() {
                     template: '<div><h1>{{ title }}</h1><p v-if="subtitle">{{ subtitle }}</p><slot name="alerta" /><slot /><slot name="actions" /></div>',
                 },
                 CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                AppAlert: {
+                Alerta: {
                     props: ['mensagem'],
                     emits: ['dismissed'],
                     template: '<div class="app-alert" v-bind="$attrs">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',

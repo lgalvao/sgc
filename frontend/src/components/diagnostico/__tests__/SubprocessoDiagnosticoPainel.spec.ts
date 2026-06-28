@@ -161,7 +161,7 @@ describe('SubprocessoDiagnosticoPainel', () => {
             },
             global: {
                 stubs: {
-                    AppAlert: {
+                    Alerta: {
                         props: ['mensagem'],
                         emits: ['dismissed'],
                         template: '<div class="app-alert">{{ mensagem }} <button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">X</button></div>',

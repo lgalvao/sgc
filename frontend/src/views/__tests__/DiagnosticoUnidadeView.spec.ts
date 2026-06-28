@@ -217,7 +217,7 @@ describe('DiagnosticoUnidadeView', () => {
                         template: '<div><h1>{{ title }}</h1><p>{{ subtitle }}</p><slot /><slot name="actions" /></div>',
                     },
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {
+                    Alerta: {
                         props: ['mensagem'],
                         template: '<div class="app-alert">{{ mensagem }}</div>',
                     },
@@ -553,7 +553,7 @@ describe('DiagnosticoUnidadeView', () => {
                         template: '<div><h1>{{ title }}</h1><p>{{ subtitle }}</p><slot /><slot name="actions" /></div>',
                     },
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {
                         props: ['title', 'description'],
                         template: '<div>{{ title }}{{ description }}</div>',

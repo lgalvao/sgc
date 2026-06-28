@@ -4,9 +4,9 @@ import ProcessoDiagnosticoAlert from "../ProcessoDiagnosticoAlert.vue";
 
 describe("ProcessoDiagnosticoAlert.vue", () => {
   const stubs = {
-    BAlert: {
+    Alerta: {
       template: '<div class="alert"><slot /><button class="close" @click="$emit(\'dismissed\')">x</button></div>',
-      props: ['modelValue', 'variant', 'dismissible']
+      props: ['mensagem', 'variante', 'dispensavel']
     },
     BSpinner: { template: '<div class="spinner" />' },
     RouterLink: { template: '<a :href="to"><slot /></a>', props: ['to'] }

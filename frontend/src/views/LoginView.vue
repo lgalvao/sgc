@@ -70,7 +70,7 @@
                 type="submit"
                 variant="primary"
             />
-            <AppAlert
+            <Alerta
                 v-if="notificacao"
                 :chave="notificacao.chave"
                 :dispensavel="notificacao.dispensavel ?? true"
@@ -91,7 +91,7 @@ import {BCard, BCol, BContainer, BForm, BRow,} from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import LoginCredenciaisCampos from "@/components/login/LoginCredenciaisCampos.vue";
 import LoginPerfilSelect from "@/components/login/LoginPerfilSelect.vue";
 import {logger} from "@/utils";

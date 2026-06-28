@@ -1,17 +1,17 @@
 <template>
   <LayoutPadrao>
-    <AppAlert
+    <Alerta
         v-if="ultimoErro"
         :mensagem="ultimoErro.mensagem"
-        variant="danger"
+        variante="danger"
         @dismissed="limparErro()"/>
 
-    <AppAlert
+    <Alerta
         v-if="notificacao"
         :chave="notificacao.chave"
         :dispensavel="notificacao.dispensavel"
         :mensagem="notificacao.mensagem"
-        :notification="notificacao.notificacao"
+        :notificacao="notificacao.notificacao"
         :stack-trace="notificacao.stackTrace"
         :variante="notificacao.variante"
         @dismissed="clear()"/>
@@ -58,7 +58,7 @@
 import {computed, onActivated, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import ProcessoDetalheFluxoModais from "@/components/processo/ProcessoDetalheFluxoModais.vue";
 import ProcessoAcoes from "@/components/processo/ProcessoAcoes.vue";

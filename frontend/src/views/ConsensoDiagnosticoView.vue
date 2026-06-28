@@ -9,7 +9,7 @@
           :title="TEXTOS.diagnostico.TITULO_CONSENSO"
       >
         <template #alerta>
-          <AppAlert
+          <Alerta
               v-if="erroMensagem"
               :chave="erroMensagemChave"
               :mensagem="erroMensagem"
@@ -17,7 +17,7 @@
               @dismissed="erroMensagem = ''"
           />
 
-          <AppAlert
+          <Alerta
               v-if="ehConsensoAprovado"
               :dispensavel="false"
               data-testid="alert-consenso-aprovado"
@@ -76,7 +76,7 @@ import {useRouter} from 'vue-router';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
-import AppAlert from '@/components/comum/AppAlert.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import ConsensoDiagnosticoAcoes from '@/components/diagnostico/ConsensoDiagnosticoAcoes.vue';
 import ConsensoDiagnosticoTabela from '@/components/diagnostico/ConsensoDiagnosticoTabela.vue';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';

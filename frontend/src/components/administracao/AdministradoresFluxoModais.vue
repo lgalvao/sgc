@@ -10,7 +10,7 @@
       @shown="$emit('modalAdicionarExibido')"
       @update:model-value="$emit('update:mostrarModalAdicionarAdmin', $event)"
   >
-    <AppAlertaFormulario
+    <Alerta
         :mensagem="erroAdicionarAdmin"
         data-testid="alert-adicionar-admin"
     />
@@ -42,7 +42,7 @@
       @confirmar="$emit('removerAdmin')"
       @update:model-value="$emit('update:mostrarModalRemoverAdmin', $event)"
   >
-    <AppAlertaFormulario
+    <Alerta
         :mensagem="erroRemoverAdmin"
         data-testid="alert-remover-admin"
     />
@@ -54,7 +54,7 @@
 
 <script lang="ts" setup>
 import {BFormGroup, BFormInvalidFeedback} from 'bootstrap-vue-next';
-import AppAlertaFormulario from '@/components/comum/AppAlertaFormulario.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import BuscadorUsuarios from '@/components/comum/BuscadorUsuarios.vue';
 import {TEXTOS} from '@/constants/textos';

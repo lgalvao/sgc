@@ -13,12 +13,12 @@
       />
 
       <BForm class="mt-4" @submit.prevent>
-        <AppAlert
+        <Alerta
             v-if="notificacao"
             :chave="notificacao.chave"
             :dispensavel="notificacao.dispensavel"
             :mensagem="notificacao.mensagem"
-            :notification="notificacao.notificacao"
+            :notificacao="notificacao.notificacao"
             :stack-trace="notificacao.stackTrace"
             :variante="notificacao.variante"
             @dismissed="clear()"
@@ -115,7 +115,7 @@ import ProcessoFormFields from "@/components/processo/ProcessoFormFields.vue";
 import ProcessoDiagnosticoAlert from "@/components/processo/ProcessoDiagnosticoAlert.vue";
 import ProcessoCadastroModais from "@/components/processo/ProcessoCadastroModais.vue";
 import ModalAcaoBloco from "@/components/processo/ModalAcaoBloco.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import {useProcessoCadastroTela} from "@/composables/useProcessoCadastroTela";
 import {TEXTOS} from "@/constants/textos";
 

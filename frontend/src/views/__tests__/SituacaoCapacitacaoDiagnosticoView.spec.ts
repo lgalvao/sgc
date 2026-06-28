@@ -81,7 +81,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div />'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
@@ -130,7 +130,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div />'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
@@ -165,7 +165,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div class="empty-state">Vazio</div>'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
@@ -194,7 +194,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div />'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
@@ -228,7 +228,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div />'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
@@ -261,7 +261,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div />'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
@@ -298,7 +298,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div />'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},
@@ -330,7 +330,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {
                         props: ['title', 'description'],
                         template: '<div class="empty-state"><h3>{{ title }}</h3><p>{{ description }}</p></div>'
@@ -377,7 +377,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
                 stubs: {
                     LayoutPadrao: {template: '<div><slot /></div>'},
                     CarregamentoPagina: {template: '<div data-testid="carregamento-pagina" />'},
-                    AppAlert: {template: '<div />'},
+                    Alerta: {template: '<div />'},
                     EmptyState: {template: '<div />'},
                     BBadge: {template: '<span><slot /></span>'},
                     BButton: {template: '<button v-bind="$attrs"><slot /></button>'},

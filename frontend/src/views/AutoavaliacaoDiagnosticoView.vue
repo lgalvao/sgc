@@ -9,13 +9,15 @@
           :title="TEXTOS.diagnostico.TITULO_AUTOAVALIACAO"
       >
         <template #alerta>
-          <AppAlertaAcao
-              :feedback="retornoFluxo"
+          <Alerta
+              v-if="retornoFluxo"
+              :mensagem="retornoFluxo.mensagem"
+              :variante="retornoFluxo.variante"
               data-testid="alert-autoavaliacao-feedback"
               @dismissed="limparRetornoFluxo"
           />
 
-          <AppAlert
+          <Alerta
               v-if="ehConsensoAprovado"
               :dispensavel="false"
               data-testid="alert-autoavaliacao-consenso-aprovado"
@@ -195,8 +197,7 @@ import {
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
-import AppAlert from '@/components/comum/AppAlert.vue';
-import AppAlertaAcao from '@/components/comum/AppAlertaAcao.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import {TEXTOS} from '@/constants/textos';
 import {useAutoavaliacaoDiagnosticoView} from '@/views/useAutoavaliacaoDiagnosticoView';

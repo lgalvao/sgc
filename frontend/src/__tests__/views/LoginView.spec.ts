@@ -314,12 +314,12 @@ describe("LoginView.vue", () => {
         expect(routerPushMock).toHaveBeenCalledWith("/erro");
     });
 
-    it("cobre branch de AppAlert clear", async () => {
+    it("cobre branch de Alerta clear", async () => {
         const wrapper = mount(LoginView, mountOptions());
         const vm = wrapper.vm as any;
         vm.notify("Mensagem", "success");
         await flushPromises();
-        const alert = wrapper.findComponent({name: 'AppAlert'});
+        const alert = wrapper.findComponent({name: 'Alerta'});
         if (alert.exists()) {
             await alert.vm.$emit("dismissed");
             expect(vm.notificacao).toBeNull();

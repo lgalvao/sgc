@@ -20,7 +20,7 @@
           @abrir-importar="mostrarModalImportar = true"
       >
         <template #alerta>
-          <AppAlert
+          <Alerta
               v-if="erroGlobal"
               :chave="erroTick"
               data-testid="alerta-erro-global"
@@ -29,7 +29,7 @@
               @dismissed="erroGlobal = null"
           />
 
-          <AppAlert
+          <Alerta
               v-if="notificacao"
               :chave="notificacao.chave"
               :dispensavel="notificacao.dispensavel"
@@ -137,7 +137,7 @@
 
 <script lang="ts" setup>
 import {BFormCheckbox, BSpinner} from "bootstrap-vue-next";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
 import EmptyState from "@/components/comum/EmptyState.vue";

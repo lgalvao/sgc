@@ -2,7 +2,7 @@
   <LayoutPadrao>
     <PageHeader :title="TEXTOS.administracao.LIMPEZA_TITULO">
       <template #alerta>
-        <AppAlert
+        <Alerta
             v-if="notificacao"
             :chave="notificacao.chave"
             :dispensavel="notificacao.dispensavel ?? true"
@@ -11,7 +11,7 @@
             @dismissed="clear()"
         />
 
-        <AppAlert
+        <Alerta
             :dispensavel="true"
             :mensagem="TEXTOS.administracao.LIMPEZA_ALERTA"
             variante="warning"
@@ -65,7 +65,7 @@
 
 <script lang="ts" setup>
 import {BCard, BFormGroup, BFormInput} from 'bootstrap-vue-next';
-import AppAlert from '@/components/comum/AppAlert.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import LimpezaProcessosFluxoModais from '@/components/administracao/LimpezaProcessosFluxoModais.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';

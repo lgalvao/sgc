@@ -12,7 +12,7 @@
           <span data-testid="atribuicao-view__sigla">{{ unidade.sigla }}</span>
         </template>
         <template #alerta>
-          <AppAlert
+          <Alerta
               v-if="notificacao"
               :chave="notificacao.chave"
               :dispensavel="notificacao.dispensavel ?? true"
@@ -21,7 +21,7 @@
               @dismissed="clear()"
           />
 
-          <AppAlert
+          <Alerta
               v-if="erroFormulario"
               :mensagem="erroFormulario"
               class="mt-3"
@@ -171,7 +171,7 @@ import {BButton, BCol, BForm, BFormGroup, BFormInvalidFeedback, BRow} from "boot
 import {ref} from "vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import LoadingButton from "@/components/comum/LoadingButton.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import AtribuicaoTemporariaFluxoModais from "@/components/unidade/AtribuicaoTemporariaFluxoModais.vue";
 import InputData from "@/components/comum/InputData.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";

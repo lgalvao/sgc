@@ -14,7 +14,7 @@
       @fechar="fechar"
   >
     <template #alerta>
-      <AppAlertaFormulario
+      <Alerta
           :mensagem="erro"
           data-testid="alert-acao-bloco"
       />
@@ -81,7 +81,7 @@
 <script lang="ts" setup>
 import {computed, ref, watch} from 'vue';
 import {BFormCheckbox, BFormGroup, BTable} from 'bootstrap-vue-next';
-import AppAlertaFormulario from '@/components/comum/AppAlertaFormulario.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import InputData from '@/components/comum/InputData.vue';
 import ModalPadrao from '@/components/comum/ModalPadrao.vue';
 import {ehDataEstritamenteFutura, formatarDataBR, obterAmanhaFormatado} from "@/utils/date";

@@ -4,7 +4,7 @@
 
     <CarregamentoPagina v-if="carregandoConfiguracoes"/>
 
-    <AppAlertaTela
+    <Alerta
         v-else-if="erroTela"
         data-testid="alert-configuracao-erro"
         :mensagem="erroTela"
@@ -12,7 +12,7 @@
     />
 
     <template v-else>
-      <AppAlert
+      <Alerta
           v-if="notificacao"
           :chave="notificacao.chave"
           :dispensavel="notificacao.dispensavel ?? true"
@@ -87,11 +87,10 @@
 <script lang="ts" setup>
 import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {BForm, BFormGroup, BFormInput, BFormInvalidFeedback} from 'bootstrap-vue-next';
-import AppAlertaTela from '@/components/comum/AppAlertaTela.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
-import AppAlert from '@/components/comum/AppAlert.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import LoadingButton from '@/components/comum/LoadingButton.vue';
 import {useToast} from '@/composables/useToast';
 import {type Parametro, useConfiguracoes} from '@/composables/useConfiguracoes';

@@ -2,7 +2,7 @@
 import {computed} from "vue";
 import {BFormGroup, BFormText, BFormTextarea} from "bootstrap-vue-next";
 import ModalPadrao from "@/components/comum/ModalPadrao.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 
 const props = withDefaults(defineProps<{
     modelValue: boolean;
@@ -74,7 +74,7 @@ const observacaoModel = computed({
         @confirmar="$emit('confirmar')"
         @fechar="$emit('fechar')"
     >
-        <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
+        <Alerta v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
         <p v-if="texto" class="mb-3">{{ texto }}</p>
         <BFormGroup class="mb-0">
             <template v-if="obrigatoria" #label>

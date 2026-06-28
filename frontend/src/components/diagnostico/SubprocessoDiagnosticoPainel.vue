@@ -18,8 +18,10 @@
       </template>
     </PageHeader>
 
-    <AppAlertaAcao
-        :feedback="feedbackAcao"
+    <Alerta
+        v-if="feedbackAcao"
+        :mensagem="feedbackAcao.mensagem"
+        :variante="feedbackAcao.variante"
         data-testid="alert-subprocesso-diagnostico-feedback"
         @dismissed="limparFeedbackAcao"
     />
@@ -190,12 +192,17 @@ import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {BBadge, BButton, BCard, BDropdown, BDropdownItemButton, BSpinner, BTable,} from 'bootstrap-vue-next';
 import DiagnosticoFluxoModais from '@/components/diagnostico/DiagnosticoFluxoModais.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
-import AppAlertaAcao, {type FeedbackAcao} from '@/components/comum/AppAlertaAcao.vue';
+import Alerta from '@/components/comum/Alerta.vue';
 import EmptyState from '@/components/comum/EmptyState.vue';
 import {useDiagnosticoUnidade} from '@/composables/useDiagnosticoUnidade';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
+
+type FeedbackAcao = {
+  mensagem: string;
+  variante: "danger" | "success";
+};
 
 const props = withDefaults(defineProps<{
   codSubprocesso: number;

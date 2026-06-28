@@ -10,7 +10,7 @@
       variant="success"
       @confirmar="confirmar"
   >
-    <AppAlert v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
+    <Alerta v-if="erro" :mensagem="erro" class="mb-3" variante="danger"/>
     <p>
       {{
         isRevisao ? TEXTOS.atividades.MODAL_DISPONIBILIZAR_REVISAO_TEXTO : TEXTOS.atividades.MODAL_DISPONIBILIZAR_TEXTO
@@ -22,7 +22,7 @@
 <script lang="ts" setup>
 import {computed} from "vue";
 import ModalConfirmacao from "@/components/comum/ModalConfirmacao.vue";
-import AppAlert from "@/components/comum/AppAlert.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import {TEXTOS} from "@/constants/textos";
 
 const props = defineProps<{

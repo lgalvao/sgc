@@ -175,10 +175,22 @@ describe("Unidades.vue", () => {
                     PageHeader: {
                         template: "<div><h1>Page header</h1><slot name='description' /><slot name='alerta' /><slot name='actions' /></div>"
                     },
-                    AppAlertaTela: {
-                        template: "<div><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
+                    Alerta: {
+                        template: "<div><slot /><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
                         props: ["mensagem"],
                         emits: ["dismissed"],
+                    },
+                    ProcessoDiagnosticoAlert: {
+                        template: `
+                            <div>
+                                <span>As unidades</span>
+                                <a data-testid="link-unidade-sem-responsavel-0">43ª Z.E.</a>
+                                <a data-testid="link-unidade-sem-responsavel-1">45ª Z.E.</a>
+                                <span>estão atualmente sem responsável</span>
+                                <span>não poderão participar de processos</span>
+                                <span>A responsabilidade deve ser definida externamente, no SGRH, ou por atribuição temporária no próprio sistema.</span>
+                            </div>
+                        `
                     },
                     TreeTable: TreeTableStub,
                     BContainer: {template: "<div><slot /></div>"},
@@ -288,10 +300,22 @@ describe("Unidades.vue", () => {
                     PageHeader: {
                         template: "<div><h1>Page header</h1><slot name='description' /><slot name='alerta' /><slot name='actions' /></div>"
                     },
-                    AppAlertaTela: {
-                        template: "<div><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
+                    Alerta: {
+                        template: "<div><slot /><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
                         props: ["mensagem"],
                         emits: ["dismissed"],
+                    },
+                    ProcessoDiagnosticoAlert: {
+                        template: `
+                            <div>
+                                <span>As unidades</span>
+                                <a data-testid="link-unidade-sem-responsavel-0">43ª Z.E.</a>
+                                <a data-testid="link-unidade-sem-responsavel-1">45ª Z.E.</a>
+                                <span>estão atualmente sem responsável</span>
+                                <span>não poderão participar de processos</span>
+                                <span>A responsabilidade deve ser definida externamente, no SGRH, ou por atribuição temporária no próprio sistema.</span>
+                            </div>
+                        `
                     },
                     TreeTable: TreeTableStub,
                     BContainer: {template: "<div><slot /></div>"},

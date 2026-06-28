@@ -1,9 +1,9 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
-import AppAlert from './AppAlert.vue';
+import Alerta from './Alerta.vue';
 
-const meta: Meta<typeof AppAlert> = {
-    title: 'Comum/AppAlert',
-    component: AppAlert,
+const meta: Meta<typeof Alerta> = {
+    title: 'Comum/Alerta',
+    component: Alerta,
     tags: ['autodocs'],
     argTypes: {
         variante: {
@@ -15,7 +15,7 @@ const meta: Meta<typeof AppAlert> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof AppAlert>;
+type Story = StoryObj<typeof Alerta>;
 
 export const MensagemSimples: Story = {
     args: {

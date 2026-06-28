@@ -87,11 +87,10 @@ describe('NotificacoesAdminView', () => {
                           </div>
                         `
                     },
-                    AppAlertaTela: {
-                        props: ['mensagem'],
-                        template: '<div>{{ mensagem }}</div>',
+                    Alerta: {
+                        template: '<div><slot />{{ mensagem }}{{ notificacao?.resumo }}</div>',
+                        props: ['mensagem', 'notificacao']
                     },
-                    AppAlert: true,
                     EmptyState: {
                         template: '<div class="empty-state-stub"><slot/></div>',
                         props: ['title', 'description', 'icon']

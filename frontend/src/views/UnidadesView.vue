@@ -8,7 +8,7 @@
           {{ TEXTOS.unidades.SUBTITULO }}
         </template>
         <template #alerta>
-          <AppAlertaTela
+          <Alerta
               v-if="erroUnidades"
               :mensagem="erroUnidades.message"
               @dismissed="limparErro()"
@@ -85,7 +85,7 @@
 import {computed, ref, watch} from "vue";
 import {BButton} from "bootstrap-vue-next";
 import {useRouter} from "vue-router";
-import AppAlertaTela from "@/components/comum/AppAlertaTela.vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";

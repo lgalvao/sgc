@@ -21,7 +21,7 @@ describe("ModalObservacaoAcao.vue", () => {
                         props: ["modelValue", "titulo", "loading", "variantAcao", "textoAcao", "textoAcaoCarregando", "testIdConfirmar", "testIdCancelar"],
                         emits: ["confirmar", "fechar", "update:modelValue"],
                     },
-                    AppAlert: {
+                    Alerta: {
                         props: ["mensagem"],
                         template: "<div class=\"app-alert\">{{ mensagem }}</div>",
                     },

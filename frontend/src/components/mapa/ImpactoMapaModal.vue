@@ -7,6 +7,14 @@
       :titulo="TEXTOS.mapa.impacto.TITULO_MODAL"
       texto-cancelar="Fechar"
   >
+    <template #alerta>
+      <Alerta
+          v-if="mostrar && !loading && !impacto"
+          :dispensavel="false"
+          :mensagem="TEXTOS.mapa.impacto.ERRO_CARREGAR"
+          data-testid="alert-impacto-mapa-erro"
+      />
+    </template>
     <div v-if="loading" class="text-center p-4">
       <BSpinner label="Carregando..." variant="primary"/>
       <p class="mt-2 text-muted">
@@ -82,15 +90,12 @@
       </div>
     </div>
 
-    <BAlert v-else-if="mostrar" :model-value="true" dismissible variant="danger">
-      {{ TEXTOS.mapa.impacto.ERRO_CARREGAR }}
-    </BAlert>
-
   </ModalPadrao>
 </template>
 
 <script lang="ts" setup>
-import {BAlert, BCard, BCardBody, BListGroup, BListGroupItem, BSpinner} from "bootstrap-vue-next";
+import {BCard, BCardBody, BListGroup, BListGroupItem, BSpinner} from "bootstrap-vue-next";
+import Alerta from "@/components/comum/Alerta.vue";
 import {type ImpactoMapa} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {computed} from "vue";

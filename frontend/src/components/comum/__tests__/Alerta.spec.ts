@@ -1,11 +1,11 @@
 import {describe, expect, it} from 'vitest';
 import {mount} from '@vue/test-utils';
 import {run} from 'axe-core';
-import AppAlert from '../AppAlert.vue';
+import Alerta from '../Alerta.vue';
 
-describe('AppAlert.vue', () => {
+describe('Alerta.vue', () => {
     it('deve renderizar a prop mensagem no modo simples', () => {
-        const wrapper = mount(AppAlert, {
+        const wrapper = mount(Alerta, {
             props: {
                 mensagem: 'Alerta de erro simples'
             }
@@ -15,7 +15,7 @@ describe('AppAlert.vue', () => {
     });
 
     it('deve permitir configurar o data-testid do alerta', () => {
-        const wrapper = mount(AppAlert, {
+        const wrapper = mount(Alerta, {
             props: {
                 mensagem: 'Alerta customizado',
                 dataTestid: 'alerta-customizado',
@@ -25,8 +25,20 @@ describe('AppAlert.vue', () => {
         expect(wrapper.find('[data-testid="alerta-customizado"]').exists()).toBe(true);
     });
 
+    it('deve renderizar conteudo rico via slot', () => {
+        const wrapper = mount(Alerta, {
+            slots: {
+                default: '<div data-testid="conteudo-alerta">Conteudo customizado</div>',
+            },
+        });
+
+        expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="conteudo-alerta"]').exists()).toBe(true);
+        expect(wrapper.text()).toContain('Conteudo customizado');
+    });
+
     it('deve renderizar o notificacao no modo estruturado e ocultar/exibir detalhes', async () => {
-        const wrapper = mount(AppAlert, {
+        const wrapper = mount(Alerta, {
             props: {
                 notificacao: {
                     resumo: 'Resumo do erro',
@@ -47,7 +59,7 @@ describe('AppAlert.vue', () => {
     });
 
     it('deve renderizar o stack trace quando em modo dev', async () => {
-        const wrapper = mount(AppAlert, {
+        const wrapper = mount(Alerta, {
             props: {
                 mensagem: 'Erro com stack',
                 stackTrace: 'Error at line 1'
@@ -61,15 +73,15 @@ describe('AppAlert.vue', () => {
         expect(wrapper.text()).toContain('Error at line 1');
     });
 
-    it('nao deve renderizar se não houver mensagem ou notificacao', () => {
-        const wrapper = mount(AppAlert, {
+    it('nao deve renderizar se não houver mensagem, notificacao ou slot', () => {
+        const wrapper = mount(Alerta, {
             props: {}
         });
         expect(wrapper.find('[data-testid="app-alert"]').exists()).toBe(false);
     });
 
     it('deve emitir o evento dismissed', async () => {
-        const wrapper = mount(AppAlert, {
+        const wrapper = mount(Alerta, {
             props: {
                 mensagem: 'Erro'
             }
@@ -80,12 +92,12 @@ describe('AppAlert.vue', () => {
     });
 });
 
-describe('AppAlert A11y', () => {
-    function montarAlerta(props: InstanceType<typeof AppAlert>['$props']) {
+describe('Alerta A11y', () => {
+    function montarAlerta(props: InstanceType<typeof Alerta>['$props']) {
         const alvo = document.createElement('div');
         document.body.appendChild(alvo);
 
-        const wrapper = mount(AppAlert, {
+        const wrapper = mount(Alerta, {
             props,
             attachTo: alvo,
         });

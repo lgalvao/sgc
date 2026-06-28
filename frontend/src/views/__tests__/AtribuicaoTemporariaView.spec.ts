@@ -158,7 +158,7 @@ describe("AtribuicaoTemporariaView", () => {
                         props: ["disabled", "loading", "loadingText", "text", "variant"],
                         emits: ["click"],
                     },
-                    AppAlert: {
+                    Alerta: {
                         template: "<div><span>{{ mensagem }}</span><button @click=\"$emit('dismissed')\">Close</button></div>",
                         props: ["mensagem", "variante", "chave", "dispensavel"],
                         emits: ["dismissed"],

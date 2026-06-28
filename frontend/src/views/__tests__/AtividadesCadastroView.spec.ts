@@ -303,7 +303,7 @@ const stubs = {
         template: '<div><slot /><button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
         props: ['modelValue']
     },
-    AppAlert: {
+    Alerta: {
         template: '<div v-bind="$attrs">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button><button data-testid="btn-dismiss-app-alert" @click="$emit(\'dismissed\')">x</button></div>',
         props: ['mensagem', 'variante', 'dispensavel']
     },

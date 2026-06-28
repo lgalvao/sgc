@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import {BAlert, BButton, BFormGroup, BFormInput, BFormInvalidFeedback, BInputGroup,} from "bootstrap-vue-next";
+import {BButton, BFormGroup, BFormInput, BFormInvalidFeedback, BInputGroup,} from "bootstrap-vue-next";
 import {TEXTOS} from "@/constants/textos";
+import Alerta from "@/components/comum/Alerta.vue";
 
 interface Props {
   titulo: string;
@@ -138,20 +139,18 @@ function atualizarSenha(valor: string | number | null) {
     <BFormInvalidFeedback :state="mensagemErroSenha ? false : null">
       {{ mensagemErroSenha }}
     </BFormInvalidFeedback>
-    <BAlert
+    <Alerta
         v-if="capsLockAtivado"
-        :model-value="true"
         class="small mt-1 py-1 px-2 mb-0"
         data-testid="alert-caps-lock"
-        dismissible
-        variant="warning"
+        variante="warning"
     >
       <i
           aria-hidden="true"
           class="bi bi-exclamation-triangle-fill me-1"
       />
       {{ TEXTOS.login.CAPS_LOCK }}
-    </BAlert>
+    </Alerta>
   </BFormGroup>
 </template>
 

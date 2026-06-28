@@ -171,8 +171,8 @@ describe('SubprocessoView.vue', () => {
             props: ['modelValue', 'titulo', 'testIdConfirmar', 'okDisabled'],
             emits: ['update:modelValue', 'confirmar']
         },
-        AppAlert: {
-            name: 'AppAlert',
+        Alerta: {
+            name: 'Alerta',
             props: ['mensagem', 'notificacao'],
             template: '<div data-testid="app-alert">{{ mensagem ?? notificacao?.resumo }}<div v-if="notificacao?.detalhes?.length">Detalhes: {{ notificacao.detalhes.join(\', \') }}</div><button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>'
         },
@@ -579,7 +579,7 @@ describe('SubprocessoView.vue', () => {
         // Gerenciamento de notificações
         vm.notify("Msg", "info");
         await vm.$nextTick();
-        const appAlert = wrapper.findComponent({name: 'AppAlert'});
+        const appAlert = wrapper.findComponent({name: 'Alerta'});
         if (appAlert.exists()) await appAlert.vm.$emit('dismissed');
 
         // Gerenciamento de erros de subprocesso

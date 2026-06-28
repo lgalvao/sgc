@@ -210,9 +210,9 @@ describe('ProcessoCadastroView.vue', () => {
                     BSpinner: {template: '<span>Loading...</span>'},
                     PageHeader: true,
                     LoadingButton: {template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>'},
-                    AppAlert: {
-                        template: '<div v-if="message || notification" data-testid="app-alert"><p v-if="message">{{message}}</p><template v-if="notification"><p>{{notification.resumo}}</p><ul><li v-for="d in notification.detalhes" :key="d">{{d}}</li></ul></template></div>',
-                        props: ['message', 'notification', 'variant', 'dismissible', 'stackTrace'],
+                    Alerta: {
+                        template: '<div v-if="mensagem || notificacao || $slots.default" :data-testid="dataTestid || \'app-alert\'"><slot /><p v-if="mensagem">{{mensagem}}</p><template v-if="notificacao"><p>{{notificacao.resumo}}</p><ul><li v-for="d in notificacao.detalhes" :key="d">{{d}}</li></ul></template></div>',
+                        props: ['mensagem', 'notificacao', 'variante', 'dispensavel', 'stackTrace', 'dataTestid'],
                     },
                     ProcessoFormFields: ProcessoFormFieldsStub,
                     ModalAcaoBloco: ModalAcaoBlocoStub,
@@ -652,9 +652,9 @@ describe('ProcessoCadastroView.vue', () => {
                         ProcessoFormFields: ProcessoFormFieldsStub,
                         ModalAcaoBloco: ModalAcaoBlocoStub,
                         PageHeader: true,
-                        AppAlert: {
-                            template: '<div v-if="message || notification" data-testid="app-alert"></div>',
-                            props: ['message', 'notification', 'variant', 'dismissible', 'stackTrace'],
+                        Alerta: {
+                            template: '<div v-if="mensagem || notificacao || $slots.default" data-testid="app-alert"><slot /></div>',
+                            props: ['mensagem', 'notificacao', 'variante', 'dispensavel', 'stackTrace'],
                         },
                         InputData: {template: '<input type="date" />', props: ['modelValue', 'state']},
                     }
@@ -860,8 +860,8 @@ describe('ProcessoCadastroView.vue', () => {
             BButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
             LoadingButton: {template: '<button :data-testid="$attrs[\'data-testid\']" @click="$emit(\'click\')"><slot /></button>'},
             BAlert: {template: '<div class="b-alert"><slot /></div>'},
-            AppAlert: {
-                name: 'AppAlert',
+            Alerta: {
+                name: 'Alerta',
                 template: '<div class="app-alert"></div>',
                 emits: ['dismissed'],
             },
@@ -888,7 +888,7 @@ describe('ProcessoCadastroView.vue', () => {
             });
         });
 
-        it('cobre AppAlert clear e ModalConfirmacao v-model', async () => {
+        it('cobre Alerta clear e ModalConfirmacao v-model', async () => {
             const wrapper = mount(ProcessoCadastroView, {
                 global: {plugins: [pinaRamoNaoCoberto], stubs: stubsNaoCobertos}
             });
@@ -898,7 +898,7 @@ describe('ProcessoCadastroView.vue', () => {
             vm.notify('Mensagem', 'success');
             await flushPromises();
  
-            const appAlert = wrapper.findComponent({name: 'AppAlert'});
+            const appAlert = wrapper.findComponent({name: 'Alerta'});
             if (appAlert.exists()) {
                 await appAlert.vm.$emit('dismissed');
                 expect(vm.notificacao).toBeNull();

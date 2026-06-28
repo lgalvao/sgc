@@ -50,17 +50,14 @@
 
     <BCardBody class="py-2 position-relative">
       <!-- Mensagem de erro inline -->
-      <BAlert
+      <Alerta
           v-if="erroValidacao"
-          :model-value="true"
           class="mt-2 py-2 mb-0"
           data-testid="atividade-erro-validacao"
-          dismissible
-          variant="danger"
-      >
-        <i aria-hidden="true" class="bi bi-exclamation-circle-fill me-2"/>
-        {{ erroValidacao }}
-      </BAlert>
+          :dispensavel="false"
+          :mensagem="erroValidacao"
+          variante="danger"
+      />
 
       <div
           :class="{'pode-editar': podeEditar}"
@@ -152,7 +149,6 @@
 
 <script lang="ts" setup>
 import {
-  BAlert,
   BButton,
   BCard,
   BCardBody,
@@ -165,6 +161,7 @@ import {
   BRow
 } from "bootstrap-vue-next";
 import {computed, ref, watch} from "vue";
+import Alerta from "@/components/comum/Alerta.vue";
 import type {Atividade} from "@/types/tipos";
 import InlineEditor from "@/components/comum/InlineEditor.vue";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";

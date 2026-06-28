@@ -135,7 +135,7 @@ function montar(props?: Record<string, unknown>) {
                       </div>
                     `,
                 },
-                AppAlert: {
+                Alerta: {
                     props: ['mensagem', 'chave'],
                     emits: ['dismissed'],
                     template: '<div class="app-alert" v-bind="$attrs">{{ mensagem }}<button data-testid="btn-dismiss-alert" @click="$emit(\'dismissed\')">x</button></div>',
