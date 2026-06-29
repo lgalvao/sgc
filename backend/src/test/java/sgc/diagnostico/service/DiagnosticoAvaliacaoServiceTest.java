@@ -468,4 +468,68 @@ class DiagnosticoAvaliacaoServiceTest {
         assertThatThrownBy(() -> service.salvarConsenso(99L, request, "titulo"))
                 .isInstanceOf(ErroEntidadeNaoEncontrada.class);
     }
+
+    @Test
+    @DisplayName("reverterImpossibilidade: deve manter notas nulas ao reverter impossibilitação para servidor que nunca iniciou autoavaliação")
+    void reverterImpossibilidade_semAutoavaliacaoPreenchida_deveManterCamposNulos() {
+        Long codSubprocesso = 9L;
+        Long diagCodigo = 90L;
+        String servidorTitulo = "servidor@titulo";
+
+        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
+        AvaliacaoServidor avaliacao = avaliacaoVazia(501L);
+        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        avaliacao.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+        avaliacao.setObservacao("Licença");
+
+        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
+
+        service.reverterImpossibilidade(codSubprocesso, servidorTitulo);
+
+        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+        assertThat(avaliacao.getImportancia()).isNull();
+        assertThat(avaliacao.getDominio()).isNull();
+        assertThat(avaliacao.getAutoimportancia()).isNull();
+        assertThat(avaliacao.getAutodominio()).isNull();
+        assertThat(avaliacao.getGap()).isNull();
+        assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
+        assertThat(avaliacao.getObservacao()).isNull();
+    }
+
+    @Test
+    @DisplayName("reverterImpossibilidade: deve restaurar notas salvas temporariamente ao reverter impossibilitação para servidor que preencheu mas não concluiu autoavaliação")
+    void reverterImpossibilidade_comAutoavaliacaoSalvaTemporariamente_deveRestaurarNotas() {
+        Long codSubprocesso = 10L;
+        Long diagCodigo = 100L;
+        String servidorTitulo = "servidor@titulo";
+
+        Diagnostico diagnostico = diagnosticoComCodigo(diagCodigo);
+        AvaliacaoServidor avaliacao = avaliacaoVazia(601L);
+        // O servidor salvou temporariamente as notas
+        avaliacao.setAutoimportancia(4);
+        avaliacao.setAutodominio(3);
+        avaliacao.setImportancia(4);
+        avaliacao.setDominio(3);
+        avaliacao.calculaGap();
+        // Mas a situação ainda era AUTOAVALIACAO_NAO_INICIADA quando foi impossibilitado
+        avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+        avaliacao.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+        avaliacao.setObservacao("Licença");
+
+        when(diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)).thenReturn(Optional.of(diagnostico));
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(diagCodigo, servidorTitulo)).thenReturn(List.of(avaliacao));
+
+        service.reverterImpossibilidade(codSubprocesso, servidorTitulo);
+
+        assertThat(avaliacao.getSituacaoServidor()).isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+        assertThat(avaliacao.getImportancia()).isEqualTo(4);
+        assertThat(avaliacao.getDominio()).isEqualTo(3);
+        assertThat(avaliacao.getAutoimportancia()).isEqualTo(4);
+        assertThat(avaliacao.getAutodominio()).isEqualTo(3);
+        assertThat(avaliacao.getGap()).isEqualTo(1); // 4 - 3 = 1
+        assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
+        assertThat(avaliacao.getObservacao()).isNull();
+    }
 }
+

@@ -174,11 +174,11 @@ public class DiagnosticoAvaliacaoService {
             a.setObservacao(null);
 
             if (situacaoRetorno == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA) {
-                a.setImportancia(null);
-                a.setDominio(null);
+                a.setImportancia(a.getAutoimportancia());
+                a.setDominio(a.getAutodominio());
                 a.setConsensoImportancia(null);
                 a.setConsensoDominio(null);
-                a.setGap(null);
+                a.calculaGap();
             } else if (situacaoRetorno == SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA) {
                 a.setImportancia(a.getAutoimportancia());
                 a.setDominio(a.getAutodominio());
