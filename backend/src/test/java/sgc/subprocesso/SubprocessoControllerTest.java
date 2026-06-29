@@ -30,7 +30,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(SubprocessoController.class)
+@WebMvcTest({SubprocessoController.class, SubprocessoCadastroController.class})
 @Import({RestExceptionHandler.class, SubprocessoDtoMapper.class, OrganizacaoDtoMapper.class})
 @DisplayName("SubprocessoController")
 class SubprocessoControllerTest {

@@ -13,7 +13,7 @@ import {
     preencherConsensoMinimo,
     preencherSituacoesCapacitacaoPendentesPelaTela
 } from './helpers/helpers-diagnostico.js';
-import {limparNotificacoes, verificarAppAlert, verificarToast} from './helpers/helpers-navegacao.js';
+import {limparNotificacoes, verificarToast} from './helpers/helpers-navegacao.js';
 import {TEXTOS} from "../frontend/src/constants/textos.js";
 
 test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {

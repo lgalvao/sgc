@@ -44,9 +44,9 @@ class SubprocessoTransicaoServiceTest {
     @Mock
     private SubprocessoNotificacaoService notificacaoService;
     @Mock
-    private UnidadeService unidadeService;
+    private SubprocessoFluxoContextoService fluxoContextoService;
     @Mock
-    private HierarquiaService hierarquiaService;
+    private UnidadeService unidadeService;
     @Mock
     private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
@@ -107,8 +107,7 @@ class SubprocessoTransicaoServiceTest {
         when(consultaService.buscarSubprocesso(1L)).thenReturn(subprocesso);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
         when(analiseRepo.save(any(Analise.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(fluxoContextoService.buscarSuperiorImediato(10L)).thenReturn(admin);
 
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
@@ -146,8 +145,7 @@ class SubprocessoTransicaoServiceTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidade);
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(1L);
-        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(fluxoContextoService.buscarSuperiorImediato(10L)).thenReturn(admin);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
         service.apresentarSugestoes(1L, "Novas sugestões");
@@ -290,8 +288,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uAnalise);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(m1, m2));
-            when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
+            when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(sp, uAnalise)).thenReturn(uOrigem);
 
             Usuario usuario = criarUsuario();
             usuario.setUnidadeAtivaCodigo(10L);
@@ -525,7 +522,7 @@ class SubprocessoTransicaoServiceTest {
             when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(1L))).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
             when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
-            when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(null); // Admin na raiz
+            when(fluxoContextoService.buscarSuperiorImediato(10L)).thenReturn(null); // Admin na raiz
 
             service.aceitarValidacaoEmBloco(List.of(1L));
 
@@ -544,7 +541,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(any())).thenReturn(u);
-            when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(null);
+            when(fluxoContextoService.buscarSuperiorImediato(1L)).thenReturn(null);
             when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             when(analiseRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
@@ -593,8 +590,7 @@ class SubprocessoTransicaoServiceTest {
 
             when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
-            when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
-            when(hierarquiaService.isSubordinada(unidadeDevolucao, unidadeAnalise)).thenReturn(true);
+            when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(sp, unidadeAnalise)).thenReturn(unidadeDevolucao);
             when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             when(analiseRepo.save(any())).thenAnswer(i -> i.getArgument(0));
 
@@ -623,8 +619,7 @@ class SubprocessoTransicaoServiceTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
-        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
-        when(hierarquiaService.isSubordinada(unidadeSubprocesso, unidadeAnalise)).thenReturn(true);
+        when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(sp, unidadeAnalise)).thenReturn(unidadeSubprocesso);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
         when(analiseRepo.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -652,7 +647,10 @@ class SubprocessoTransicaoServiceTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(unidadeAnalise);
-        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(movimentacao));
+        when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(sp, unidadeAnalise))
+                .thenThrow(new sgc.comum.erros.ErroInconsistenciaInterna(
+                        "Historico de movimentacoes inconsistente para devolucao do subprocesso 1 na unidade 10"
+                ));
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
 
         assertThatThrownBy(() -> service.devolverValidacao(1L, "Justificativa"))
@@ -691,7 +689,7 @@ class SubprocessoTransicaoServiceTest {
         when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(1L))).thenReturn(List.of(subprocesso));
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidade);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(null);
+        when(fluxoContextoService.buscarSuperiorImediato(10L)).thenReturn(null);
 
         service.aceitarValidacaoEmBloco(List.of(1L));
 

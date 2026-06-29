@@ -46,7 +46,7 @@ function auditarArquivo(caminhoArquivo) {
     }
 
     for (const assunto of extrairAssuntos(texto)) {
-        if (/\]$/.test(assunto)) {
+        if (assunto.endsWith(']')) {
             adicionarAchado(
                 achados,
                 "aviso",

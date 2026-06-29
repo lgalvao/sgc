@@ -351,7 +351,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
         const emptyState = wrapper.find('.empty-state');
         expect(emptyState.exists()).toBe(true);
         expect(emptyState.text()).toContain('Aguardando aprovação de consenso');
-        expect(emptyState.text()).toContain('A situação de capacitação só pode ser preenchida após o servidor aprovar a avaliação de consenso.');
+        expect(emptyState.text()).toContain('A situação de capacitação só pode ser preenchida após servidor aprovar a avaliação de consenso.');
         expect(wrapper.find('table').exists()).toBe(false);
     });
 

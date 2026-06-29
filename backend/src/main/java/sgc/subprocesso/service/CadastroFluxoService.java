@@ -31,14 +31,12 @@ public class CadastroFluxoService {
     private static final String ETAPA_REVISAO = "revisão";
     private static final String ETAPA_CADASTRO = "cadastro";
     private final SubprocessoRepo subprocessoRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
     private final SubprocessoConsultaService consultaService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final SubprocessoValidacaoService validacaoService;
     private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final UnidadeService unidadeService;
-    private final HierarquiaService hierarquiaService;
-    private final UnidadeHierarquiaService unidadeHierarquiaService;
+    private final SubprocessoFluxoContextoService fluxoContextoService;
     private final AlertaAplicacaoService alertaService;
     private final SubprocessoTransicaoService transicaoService;
     private final SubprocessoNotificacaoService notificacaoService;
@@ -146,7 +144,7 @@ public class CadastroFluxoService {
         sp.setDataFimEtapa1(LocalDateTime.now());
 
         Unidade unidade = sp.getUnidade();
-        Unidade unidadeSuperior = buscarSuperiorImediato(unidade.getCodigo());
+        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidade.getCodigo());
         if (unidadeSuperior != null) {
             transicaoService.registrarTransicao(RegistrarTransicaoCommand.builder()
                     .sp(sp)
@@ -164,7 +162,7 @@ public class CadastroFluxoService {
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
-        Unidade unidadeDevolucao = obterUnidadeDevolucao(sp, unidadeAnalise);
+        Unidade unidadeDevolucao = fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(sp, unidadeAnalise);
 
         SituacaoSubprocesso novaSituacao = contexto.situacaoDisponibilizada();
         if (Objects.equals(unidadeDevolucao.getCodigo(), sp.getUnidade().getCodigo())) {
@@ -173,18 +171,18 @@ public class CadastroFluxoService {
         }
 
         String obs = normalizarTexto(observacoes);
-        transicaoService.registrarAnalise(RegistrarWorkflowCommand.builder()
+        transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(sp)
                 .novaSituacao(novaSituacao)
                 .tipoTransicao(contexto.transicaoDevolucao())
                 .tipoAnalise(TipoAnalise.CADASTRO)
                 .tipoAcaoAnalise(contexto.acaoDevolucao())
                 .unidadeAnalise(unidadeAnalise)
-                .unidadeOrigemTransicao(unidadeAnalise)
-                .unidadeDestinoTransicao(unidadeDevolucao)
+                .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
                 .motivoAnalise(null)
                 .observacoes(obs)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO)
                 .build());
 
         log.info("Devolvido {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
@@ -199,30 +197,21 @@ public class CadastroFluxoService {
         log.info("Aceitando {} do subprocesso {}", contexto.etapa(), sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
-        Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
-        Unidade unidadeDestino = buscarSuperiorImediato(unidadeAtual.getCodigo());
-        if (unidadeDestino != null) {
-            String obs = normalizarTexto(observacoes);
-            RegistrarWorkflowCommand cmd = RegistrarWorkflowCommand.builder()
-                    .sp(sp)
-                    .novaSituacao(contexto.situacaoDisponibilizada())
-                    .tipoTransicao(contexto.transicaoAceite())
-                    .tipoAnalise(TipoAnalise.CADASTRO)
-                    .tipoAcaoAnalise(contexto.acaoAceite())
-                    .unidadeAnalise(unidadeAtual)
-                    .unidadeOrigemTransicao(unidadeAtual)
-                    .unidadeDestinoTransicao(unidadeDestino)
-                    .usuario(usuario)
-                    .motivoAnalise(null)
-                    .observacoes(obs)
-                    .notificarSuperior(enviarEmails ? null : Boolean.FALSE)
-                    .build();
-            if (enviarEmails) {
-                transicaoService.registrarAnalise(cmd);
-            } else {
-                transicaoService.registrarAnaliseSemEmail(cmd);
-            }
-        }
+        String obs = normalizarTexto(observacoes);
+        RegistrarWorkflowAnaliseCommand cmd = RegistrarWorkflowAnaliseCommand.builder()
+                .sp(sp)
+                .novaSituacao(contexto.situacaoDisponibilizada())
+                .tipoTransicao(contexto.transicaoAceite())
+                .tipoAnalise(TipoAnalise.CADASTRO)
+                .tipoAcaoAnalise(contexto.acaoAceite())
+                .usuario(usuario)
+                .motivoAnalise(null)
+                .observacoes(obs)
+                .modoComunicacao(enviarEmails
+                        ? RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO
+                        : RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
+                .build();
+        transicaoService.registrarWorkflowParaSuperiorAtual(cmd);
     }
 
     private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
@@ -273,7 +262,7 @@ public class CadastroFluxoService {
         Unidade unidade = contexto.unidadeOrigem();
         criarAlertaReaberturaUnidade(contexto);
 
-        Unidade superiorImediato = buscarSuperiorImediato(unidade.getCodigo());
+        Unidade superiorImediato = fluxoContextoService.buscarSuperiorImediato(unidade.getCodigo());
         if (superiorImediato != null) {
             criarAlertaReaberturaSuperior(contexto, superiorImediato);
         }
@@ -293,28 +282,6 @@ public class CadastroFluxoService {
             return;
         }
         alertaService.criarAlertaReaberturaCadastroSuperior(contexto.processo(), unidadeSuperior, contexto.unidadeOrigem());
-    }
-
-    private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {
-        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
-        if (codigoPai == null) {
-            return null;
-        }
-        return unidadeService.buscarPorCodigo(codigoPai);
-    }
-
-    private Unidade obterUnidadeDevolucao(Subprocesso sp, Unidade unidadeAnalise) {
-        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(sp.getCodigo());
-
-        return movimentacoes.stream()
-                .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .map(Movimentacao::getUnidadeOrigem)
-                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
-                .findFirst()
-                .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
-                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
-                                .formatted(sp.getCodigo(), unidadeAnalise.getCodigo())
-                ));
     }
 
     private FluxoCadastroContexto obterContextoCadastro(Subprocesso sp) {

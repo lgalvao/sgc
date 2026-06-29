@@ -31,10 +31,9 @@ class DiagnosticoFluxoServiceTest {
     @Mock SubprocessoConsultaService subprocessoConsultaService;
     @Mock SubprocessoTransicaoService transicaoService;
     @Mock SubprocessoValidacaoService subprocessoValidacaoService;
+    @Mock SubprocessoFluxoContextoService fluxoContextoService;
     @Mock LocalizacaoSubprocessoService localizacaoSubprocessoService;
     @Mock UnidadeService unidadeService;
-    @Mock UnidadeHierarquiaService unidadeHierarquiaService;
-    @Mock HierarquiaService hierarquiaService;
     @Mock DiagnosticoUsuarioContextoService usuarioContextoService;
     @Mock UsuarioService usuarioService;
     @Mock ResponsavelUnidadeService responsavelUnidadeService;
@@ -193,8 +192,7 @@ class DiagnosticoFluxoServiceTest {
         when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
-        when(unidadeHierarquiaService.buscarCodigoPai(unidadeOrigem.getCodigo())).thenReturn(unidadeSuperior.getCodigo());
-        when(unidadeService.buscarPorCodigo(unidadeSuperior.getCodigo())).thenReturn(unidadeSuperior);
+        when(fluxoContextoService.buscarSuperiorImediato(unidadeOrigem.getCodigo())).thenReturn(unidadeSuperior);
         doNothing().when(validacaoService).validarConclusaoUnidade(diagnostico.getCodigo());
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
@@ -235,8 +233,7 @@ class DiagnosticoFluxoServiceTest {
         when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeSuperior);
-        when(subprocessoConsultaService.listarMovimentacoesOrdenadas(codSubprocesso)).thenReturn(List.of(movimentacao));
-        when(hierarquiaService.isSubordinada(unidadeOrigem, unidadeSuperior)).thenReturn(true);
+        when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(subprocesso, unidadeSuperior)).thenReturn(unidadeOrigem);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -252,11 +249,11 @@ class DiagnosticoFluxoServiceTest {
                 .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
         assertThat(avaliacaoImpossibilitada.getSituacaoServidorAnterior()).isNull();
 
-        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
-        verify(transicaoService).registrarAnaliseSemEmail(captor.capture());
+        ArgumentCaptor<RegistrarWorkflowAnaliseCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowAnaliseCommand.class);
+        verify(transicaoService).registrarWorkflowComDestino(captor.capture());
         assertThat(captor.getValue().novaSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_DIAGNOSTICO);
-        assertThat(captor.getValue().unidadeDestinoTransicao()).isEqualTo(unidadeOrigem);
+        assertThat(captor.getValue().unidadeDestino()).isEqualTo(unidadeOrigem);
         verify(notificacaoService).notificarDiagnosticoDevolvido(subprocesso, unidadeSuperior, unidadeOrigem, observacao);
     }
 
@@ -271,20 +268,19 @@ class DiagnosticoFluxoServiceTest {
 
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
-        when(unidadeHierarquiaService.buscarCodigoPai(unidadeGestora.getCodigo())).thenReturn(unidadeDestino.getCodigo());
-        when(unidadeService.buscarPorCodigo(unidadeDestino.getCodigo())).thenReturn(unidadeDestino);
+        when(fluxoContextoService.buscarSuperiorImediato(unidadeGestora.getCodigo())).thenReturn(unidadeDestino);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         service.validarDiagnostico(codSubprocesso, "Pode seguir");
 
-        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
-        verify(transicaoService).registrarAnaliseSemEmail(captor.capture());
+        ArgumentCaptor<RegistrarWorkflowAnaliseCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowAnaliseCommand.class);
+        verify(transicaoService).registrarWorkflowComDestino(captor.capture());
         assertThat(captor.getValue().tipoAnalise()).isEqualTo(TipoAnalise.DIAGNOSTICO);
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.ACEITE_DIAGNOSTICO);
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_ACEITO);
-        assertThat(captor.getValue().unidadeDestinoTransicao()).isEqualTo(unidadeDestino);
+        assertThat(captor.getValue().unidadeDestino()).isEqualTo(unidadeDestino);
         verify(notificacaoService).notificarDiagnosticoAceito(subprocesso, unidadeGestora, unidadeDestino);
     }
 
@@ -298,16 +294,15 @@ class DiagnosticoFluxoServiceTest {
 
         when(subprocessoConsultaService.buscarSubprocesso(94L)).thenReturn(subprocesso);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
-        when(unidadeHierarquiaService.buscarCodigoPai(unidadeGestora.getCodigo())).thenReturn(unidadeDestino.getCodigo());
-        when(unidadeService.buscarPorCodigo(unidadeDestino.getCodigo())).thenReturn(unidadeDestino);
+        when(fluxoContextoService.buscarSuperiorImediato(unidadeGestora.getCodigo())).thenReturn(unidadeDestino);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         service.aceitarDiagnosticosEmBloco(List.of(94L));
 
-        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
-        verify(transicaoService).registrarAnaliseSemComunicacoes(captor.capture());
+        ArgumentCaptor<RegistrarWorkflowAnaliseCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowAnaliseCommand.class);
+        verify(transicaoService).registrarWorkflowComDestino(captor.capture());
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.ACEITE_DIAGNOSTICO);
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_ACEITO);
         assertThat(captor.getValue().observacoes()).isNull();
@@ -319,12 +314,10 @@ class DiagnosticoFluxoServiceTest {
     void homologarDiagnostico_deveHomologar() {
         Long codSubprocesso = 93L;
         Diagnostico diagnostico = new Diagnostico();
-        Unidade admin = unidade(1L, "ADMIN", "Administração", TipoUnidade.RAIZ);
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setCodigo(codSubprocesso);
 
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
-        when(unidadeService.buscarAdmin()).thenReturn(admin);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -333,12 +326,12 @@ class DiagnosticoFluxoServiceTest {
         service.homologarDiagnostico(codSubprocesso, "Homologado");
 
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
-        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
-        verify(transicaoService).registrarAnaliseSemEmail(captor.capture());
+        ArgumentCaptor<RegistrarWorkflowAnaliseCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowAnaliseCommand.class);
+        verify(transicaoService).registrarWorkflowDentroDoAdmin(captor.capture());
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO);
         assertThat(captor.getValue().tipoAnalise()).isEqualTo(TipoAnalise.DIAGNOSTICO);
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO);
-        assertThat(captor.getValue().unidadeAnalise()).isEqualTo(admin);
+        assertThat(captor.getValue().modoComunicacao()).isEqualTo(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL);
         verify(notificacaoService).notificarDiagnosticoHomologado(subprocesso);
     }
 
@@ -346,12 +339,10 @@ class DiagnosticoFluxoServiceTest {
     @DisplayName("homologarDiagnosticosEmBloco deve homologar sem notificação individual")
     void homologarDiagnosticosEmBloco_deveHomologarSemNotificacaoIndividual() {
         Long codSubprocesso = 95L;
-        Unidade admin = unidade(1L, "ADMIN", "Administração", TipoUnidade.RAIZ);
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         subprocesso.setCodigo(codSubprocesso);
 
         when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
-        when(unidadeService.buscarAdmin()).thenReturn(admin);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -360,10 +351,11 @@ class DiagnosticoFluxoServiceTest {
         service.homologarDiagnosticosEmBloco(List.of(codSubprocesso));
 
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
-        ArgumentCaptor<RegistrarWorkflowCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowCommand.class);
-        verify(transicaoService).registrarAnaliseSemComunicacoes(captor.capture());
+        ArgumentCaptor<RegistrarWorkflowAnaliseCommand> captor = ArgumentCaptor.forClass(RegistrarWorkflowAnaliseCommand.class);
+        verify(transicaoService).registrarWorkflowDentroDoAdmin(captor.capture());
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO);
         assertThat(captor.getValue().observacoes()).isNull();
+        assertThat(captor.getValue().modoComunicacao()).isEqualTo(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES);
         verify(notificacaoService, never()).notificarDiagnosticoHomologado(any());
     }
 

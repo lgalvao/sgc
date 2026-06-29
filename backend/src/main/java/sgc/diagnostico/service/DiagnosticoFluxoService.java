@@ -29,10 +29,9 @@ public class DiagnosticoFluxoService {
     private final SubprocessoConsultaService subprocessoConsultaService;
     private final SubprocessoTransicaoService transicaoService;
     private final SubprocessoValidacaoService subprocessoValidacaoService;
+    private final SubprocessoFluxoContextoService fluxoContextoService;
     private final LocalizacaoSubprocessoService localizacaoSubprocessoService;
     private final UnidadeService unidadeService;
-    private final UnidadeHierarquiaService unidadeHierarquiaService;
-    private final HierarquiaService hierarquiaService;
     private final DiagnosticoUsuarioContextoService usuarioContextoService;
     private final UsuarioService usuarioService;
     private final ResponsavelUnidadeService responsavelUnidadeService;
@@ -148,7 +147,7 @@ public class DiagnosticoFluxoService {
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Unidade unidadeOrigem = subprocesso.getUnidade();
-        Unidade unidadeDestino = buscarSuperiorImediato(unidadeOrigem.getCodigo());
+        Unidade unidadeDestino = fluxoContextoService.buscarSuperiorImediato(unidadeOrigem.getCodigo());
         if (unidadeDestino == null) {
             // Caso ocorra na unidade ADMIN (topo da hierarquia), que não possui superior imediato
             unidadeDestino = unidadeOrigem;
@@ -181,11 +180,7 @@ public class DiagnosticoFluxoService {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
-        Unidade unidadeDevolucao = obterUnidadeDevolucao(subprocesso, unidadeAnalise)
-                .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
-                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
-                                .formatted(subprocesso.getCodigo(), unidadeAnalise.getCodigo())
-                ));
+        Unidade unidadeDevolucao = fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(subprocesso, unidadeAnalise);
 
         SituacaoSubprocesso novaSituacao = SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO;
         if (Objects.equals(unidadeDevolucao.getCodigo(), subprocesso.getUnidade().getCodigo())) {
@@ -200,18 +195,18 @@ public class DiagnosticoFluxoService {
         }
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
-        transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
+        transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(novaSituacao)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_DEVOLVIDO)
                 .tipoAnalise(TipoAnalise.DIAGNOSTICO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.DEVOLUCAO_DIAGNOSTICO)
                 .unidadeAnalise(unidadeAnalise)
-                .unidadeOrigemTransicao(unidadeAnalise)
-                .unidadeDestinoTransicao(unidadeDevolucao)
+                .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
                 .motivoAnalise(null)
                 .observacoes(observacao)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
                 .build());
 
         notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, observacao);
@@ -222,11 +217,7 @@ public class DiagnosticoFluxoService {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
-        obterUnidadeDevolucao(subprocesso, unidadeAnalise)
-                .orElseThrow(() -> new sgc.comum.erros.ErroInconsistenciaInterna(
-                        "Historico de movimentacoes inconsistente para devolucao do subprocesso %s na unidade %s"
-                                .formatted(subprocesso.getCodigo(), unidadeAnalise.getCodigo())
-                ));
+        fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(subprocesso, unidadeAnalise);
     }
 
     public void validarDiagnostico(Long codSubprocesso, @Nullable String observacao) {
@@ -234,24 +225,24 @@ public class DiagnosticoFluxoService {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
-        Unidade unidadeSuperior = buscarSuperiorImediato(unidadeAnalise.getCodigo());
+        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeAnalise.getCodigo());
         if (unidadeSuperior == null) {
             return;
         }
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
-        transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
+        transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_ACEITO)
                 .tipoAnalise(TipoAnalise.DIAGNOSTICO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_DIAGNOSTICO)
                 .unidadeAnalise(unidadeAnalise)
-                .unidadeOrigemTransicao(unidadeAnalise)
-                .unidadeDestinoTransicao(unidadeSuperior)
+                .unidadeDestino(unidadeSuperior)
                 .usuario(usuario)
                 .motivoAnalise(null)
                 .observacoes(observacao)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
                 .build());
 
         notificacaoService.notificarDiagnosticoAceito(subprocesso, unidadeAnalise, unidadeSuperior);
@@ -296,18 +287,15 @@ public class DiagnosticoFluxoService {
         subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
-        Unidade admin = unidadeService.buscarAdmin();
-        transicaoService.registrarAnaliseSemEmail(RegistrarWorkflowCommand.builder()
+        transicaoService.registrarWorkflowDentroDoAdmin(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_HOMOLOGADO)
                 .tipoAnalise(TipoAnalise.DIAGNOSTICO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO)
-                .unidadeAnalise(admin)
-                .unidadeOrigemTransicao(admin)
-                .unidadeDestinoTransicao(admin)
                 .usuario(usuario)
                 .observacoes(observacao)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
                 .build());
 
         notificacaoService.notificarDiagnosticoHomologado(subprocesso);
@@ -329,45 +317,27 @@ public class DiagnosticoFluxoService {
         validacaoService.validarDiagnosticoHomologavel(codSubprocesso);
     }
 
-    private Optional<Unidade> obterUnidadeDevolucao(sgc.subprocesso.model.Subprocesso subprocesso, Unidade unidadeAnalise) {
-        List<Movimentacao> movimentacoes = subprocessoConsultaService.listarMovimentacoesOrdenadas(subprocesso.getCodigo());
-
-        return movimentacoes.stream()
-                .filter(movimentacao -> Objects.equals(movimentacao.getUnidadeDestino().getCodigo(), unidadeAnalise.getCodigo()))
-                .map(Movimentacao::getUnidadeOrigem)
-                .filter(unidadeOrigem -> hierarquiaService.isSubordinada(unidadeOrigem, unidadeAnalise))
-                .findFirst();
-    }
-
-    private @Nullable Unidade buscarSuperiorImediato(Long codigoUnidade) {
-        Long codigoPai = unidadeHierarquiaService.buscarCodigoPai(codigoUnidade);
-        if (codigoPai == null) {
-            return null;
-        }
-        return unidadeService.buscarPorCodigo(codigoPai);
-    }
-
     private Unidade[] validarDiagnosticoEmBloco(Subprocesso subprocesso, Usuario usuario) {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
-        Unidade unidadeSuperior = buscarSuperiorImediato(unidadeAnalise.getCodigo());
+        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeAnalise.getCodigo());
         if (unidadeSuperior == null) {
             return new Unidade[] {unidadeAnalise, unidadeAnalise};
         }
 
-        transicaoService.registrarAnaliseSemComunicacoes(RegistrarWorkflowCommand.builder()
+        transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_ACEITO)
                 .tipoAnalise(TipoAnalise.DIAGNOSTICO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.ACEITE_DIAGNOSTICO)
                 .unidadeAnalise(unidadeAnalise)
-                .unidadeOrigemTransicao(unidadeAnalise)
-                .unidadeDestinoTransicao(unidadeSuperior)
+                .unidadeDestino(unidadeSuperior)
                 .usuario(usuario)
                 .motivoAnalise(null)
                 .observacoes(null)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
         return new Unidade[] {unidadeAnalise, unidadeSuperior};
     }
@@ -379,18 +349,15 @@ public class DiagnosticoFluxoService {
         subprocesso.setSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO);
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
-        Unidade admin = unidadeService.buscarAdmin();
-        transicaoService.registrarAnaliseSemComunicacoes(RegistrarWorkflowCommand.builder()
+        transicaoService.registrarWorkflowDentroDoAdmin(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_HOMOLOGADO)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_HOMOLOGADO)
                 .tipoAnalise(TipoAnalise.DIAGNOSTICO)
                 .tipoAcaoAnalise(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO)
-                .unidadeAnalise(admin)
-                .unidadeOrigemTransicao(admin)
-                .unidadeDestinoTransicao(admin)
                 .usuario(usuario)
                 .observacoes(null)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
     }
 }

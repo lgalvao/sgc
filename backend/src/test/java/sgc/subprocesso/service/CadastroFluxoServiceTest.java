@@ -39,9 +39,7 @@ class CadastroFluxoServiceTest {
     @Mock
     private UnidadeService unidadeService;
     @Mock
-    private HierarquiaService hierarquiaService;
-    @Mock
-    private UnidadeHierarquiaService unidadeHierarquiaService;
+    private SubprocessoFluxoContextoService fluxoContextoService;
     @Mock
     private AlertaAplicacaoService alertaService;
     @Mock
@@ -73,8 +71,7 @@ class CadastroFluxoServiceTest {
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
-        when(unidadeHierarquiaService.buscarCodigoPai(1L)).thenReturn(99L);
-        when(unidadeService.buscarPorCodigo(99L)).thenReturn(admin);
+        when(fluxoContextoService.buscarSuperiorImediato(1L)).thenReturn(admin);
 
         service.disponibilizarCadastro(100L);
 
@@ -103,9 +100,6 @@ class CadastroFluxoServiceTest {
         Subprocesso spRev = criarSubprocesso(REVISAO, REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
 
         when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(spMap)).thenReturn(spMap.getUnidade());
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(spRev)).thenReturn(spRev.getUnidade());
-
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
 
         service.aceitarCadastroEmBloco(List.of(10L, 20L));
@@ -147,7 +141,10 @@ class CadastroFluxoServiceTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
-        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of());
+        when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(sp, u))
+                .thenThrow(new sgc.comum.erros.ErroInconsistenciaInterna(
+                        "Historico de movimentacoes inconsistente para devolucao do subprocesso 1 na unidade 1"
+                ));
 
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
 
@@ -162,7 +159,6 @@ class CadastroFluxoServiceTest {
         Unidade u = criarUnidade(1L, "U", "Unid");
         Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_CADASTRO_DISPONIBILIZADA, u);
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
-        when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
 
         service.aceitar(1L, "Obs");
@@ -194,8 +190,7 @@ class CadastroFluxoServiceTest {
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(30L);
-        when(unidadeService.buscarPorCodigo(30L)).thenReturn(sup1);
+        when(fluxoContextoService.buscarSuperiorImediato(20L)).thenReturn(sup1);
 
         service.reabrirCadastro(100L, "justificativa");
 
@@ -226,8 +221,7 @@ class CadastroFluxoServiceTest {
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(30L);
-        when(unidadeService.buscarPorCodigo(30L)).thenReturn(sup);
+        when(fluxoContextoService.buscarSuperiorImediato(20L)).thenReturn(sup);
 
         service.reabrirRevisaoCadastro(100L, "justificativa");
 
@@ -297,15 +291,14 @@ class CadastroFluxoServiceTest {
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(uAnalise);
-        when(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(1L)).thenReturn(List.of(mov));
-        when(hierarquiaService.isSubordinada(uOrigem, uAnalise)).thenReturn(true);
+        when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(sp, uAnalise)).thenReturn(uOrigem);
 
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
 
         service.devolver(1L, "Obs");
 
-        verify(transicaoService).registrarAnalise(argThat(cmd ->
-                cmd.unidadeDestinoTransicao().equals(uOrigem)
+        verify(transicaoService).registrarWorkflowComDestino(argThat(cmd ->
+                cmd.unidadeDestino().equals(uOrigem)
                         && cmd.motivoAnalise() == null
                         && "Obs".equals(cmd.observacoes())));
     }
@@ -454,7 +447,7 @@ class CadastroFluxoServiceTest {
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
         when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(unidadeHierarquiaService.buscarCodigoPai(20L)).thenReturn(null);
+        when(fluxoContextoService.buscarSuperiorImediato(20L)).thenReturn(null);
 
         service.reabrirCadastro(100L, "justificativa");
 

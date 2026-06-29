@@ -64,7 +64,7 @@ function extrairAssuntosBackend(texto, caminhoRelativo) {
         }
     }
 
-    const blocoSubprocesso = texto.match(/public static String subprocesso\([\s\S]*?return incluirSigla[\s\S]*?\n    }/);
+    const blocoSubprocesso = texto.match(/public static String subprocesso\([\s\S]*?return incluirSigla[\s\S]*?\n {4}}/);
     const textoSubprocesso = blocoSubprocesso?.[0] ?? "";
 
     for (const match of textoSubprocesso.matchAll(/case\s+([A-Z0-9_, ]+)\s*->\s*"([^"]+)"(?:\s*\.\s*formatted\([^)]+\))?;/g)) {
