@@ -1,0 +1,151 @@
+import fs from "node:fs";
+import path from "node:path";
+import {globby} from "globby";
+
+const REGEX_TITULO = /^#\s+CDU-(\d{2})\s+-\s+(.+)$/m;
+const REGEX_LINHA_ATOR = /^\*\*Ator:\*\*\s+(.+)$/m;
+const REGEX_SECAO_PRE = /^##\s+Pré-condições\s*$/m;
+const REGEX_SECAO_FLUXO = /^##\s+Fluxo principal\s*$/m;
+const REGEX_PASSO = /^(\d+)\.\s+/gm;
+const REGEX_LINK_CDU = /\[[^\]]+\]\(([^)]+)\)/g;
+const REGEX_PLACEHOLDER = /\[[A-Z0-9_]+\]/g;
+const REGEX_UI_CRONICA = /`[^`]+`/g;
+const REGEX_SITUACOES = /'[^'\n]+'/g;
+
+function normalizarCaminho(caminho) {
+    return caminho.replaceAll("\\", "/");
+}
+
+async function listarArquivosCdu(base = process.cwd()) {
+    const padrao = normalizarCaminho(path.join(base, "specs", "cdu-*.md"));
+    const arquivos = await globby(padrao, {absolute: true});
+    return arquivos.sort((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
+}
+
+function lerArquivo(caminho) {
+    return fs.readFileSync(caminho, "utf8");
+}
+
+function obterLinhas(texto) {
+    return texto.split(/\r?\n/);
+}
+
+function encontrarIndicesSecoes(linhas) {
+    return {
+        ator: linhas.findIndex(linha => /^\*\*Ator:\*\*\s+.+$/.test(linha)),
+        pre: linhas.findIndex(linha => /^##\s+Pré-condições\s*$/.test(linha)),
+        fluxo: linhas.findIndex(linha => /^##\s+Fluxo principal\s*$/.test(linha))
+    };
+}
+
+function contarOcorrencias(linhas, regex) {
+    return linhas.filter(linha => regex.test(linha)).length;
+}
+
+function extrairPassosNumerados(texto) {
+    return [...texto.matchAll(REGEX_PASSO)].map(correspondencia => Number(correspondencia[1]));
+}
+
+function localizarLinksInternosCdu(texto) {
+    return [...texto.matchAll(REGEX_LINK_CDU)]
+        .map(correspondencia => correspondencia[1])
+        .filter(destino => destino.endsWith(".md"));
+}
+
+function resolverDestinoMarkdown(caminhoArquivo, destino) {
+    if (destino.startsWith("http://") || destino.startsWith("https://") || destino.startsWith("#")) {
+        return null;
+    }
+
+    return path.resolve(path.dirname(caminhoArquivo), destino);
+}
+
+function analisarArquivo(caminhoArquivo, texto) {
+    const nomeArquivo = path.basename(caminhoArquivo);
+    const linhas = obterLinhas(texto);
+    const titulo = texto.match(REGEX_TITULO);
+    const ator = texto.match(REGEX_LINHA_ATOR);
+    const temPre = REGEX_SECAO_PRE.test(texto);
+    const temFluxo = REGEX_SECAO_FLUXO.test(texto);
+    const indices = encontrarIndicesSecoes(linhas);
+    const passos = extrairPassosNumerados(texto);
+    const preCondicoes = linhas
+        .slice(indices.pre + 1, indices.fluxo > indices.pre ? indices.fluxo : undefined)
+        .filter(linha => /^\s*-\s+/.test(linha));
+
+    const repeticoes = [];
+    const regressoes = [];
+    for (let i = 1; i < passos.length; i += 1) {
+        if (passos[i] === passos[i - 1]) {
+            repeticoes.push(passos[i]);
+        }
+
+        if (passos[i] < passos[i - 1]) {
+            regressoes.push(`${passos[i - 1]}->${passos[i]}`);
+        }
+    }
+
+    return {
+        caminhoArquivo,
+        nomeArquivo,
+        texto,
+        linhas,
+        tituloNumero: titulo?.[1] ?? null,
+        tituloTexto: titulo?.[2] ?? null,
+        atorTexto: ator?.[1] ?? null,
+        temTituloCanonico: Boolean(titulo),
+        quantidadeLinhasAtorCanonicas: contarOcorrencias(linhas, /^\*\*Ator:\*\*\s+.+$/),
+        temPre,
+        temFluxo,
+        indices,
+        passos,
+        repeticoes: [...new Set(repeticoes)],
+        regressoes: [...new Set(regressoes)],
+        quantidadePreCondicoes: preCondicoes.length,
+        linksMarkdown: localizarLinksInternosCdu(texto),
+        contagens: {
+            placeholders: (texto.match(REGEX_PLACEHOLDER) ?? []).length,
+            uiEmCrases: (texto.match(REGEX_UI_CRONICA) ?? []).length,
+            situacoesEntreAspas: (texto.match(REGEX_SITUACOES) ?? []).length,
+            palavras: texto.split(/\s+/).filter(Boolean).length
+        }
+    };
+}
+
+function validarLinksMarkdown(analise) {
+    const invalidos = [];
+
+    for (const destino of analise.linksMarkdown) {
+        const resolvido = resolverDestinoMarkdown(analise.caminhoArquivo, destino);
+        if (resolvido && !fs.existsSync(resolvido)) {
+            invalidos.push(destino);
+        }
+    }
+
+    return invalidos;
+}
+
+function extrairLinhaAtor(texto) {
+    const linhas = obterLinhas(texto);
+    return linhas.find(linha => /Ator(?:es)?/.test(linha)) ?? null;
+}
+
+function extrairCabecalhoPre(texto) {
+    const linhas = obterLinhas(texto);
+    return linhas.find(linha => /Pré-condiç(?:ão|ões)/.test(linha)) ?? null;
+}
+
+function extrairCabecalhoFluxo(texto) {
+    const linhas = obterLinhas(texto);
+    return linhas.find(linha => /Fluxo principal/.test(linha)) ?? null;
+}
+
+export {
+    analisarArquivo,
+    extrairCabecalhoFluxo,
+    extrairCabecalhoPre,
+    extrairLinhaAtor,
+    listarArquivosCdu,
+    lerArquivo,
+    validarLinksMarkdown
+};

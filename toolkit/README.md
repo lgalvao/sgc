@@ -103,6 +103,13 @@ node toolkit/sgc.js comunicacao strings
 node toolkit/sgc.js comunicacao templates-email
 ```
 
+### Requisitos
+
+```bash
+node toolkit/sgc.js requisitos cdus inventariar
+node toolkit/sgc.js requisitos cdus auditar
+```
+
 ### QA
 
 ```bash
