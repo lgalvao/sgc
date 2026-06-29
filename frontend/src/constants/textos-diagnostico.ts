@@ -90,7 +90,7 @@ export const TEXTOS_DIAGNOSTICO = {
     MODAL_IMPOSSIBILITAR_PLACEHOLDER: '',
     MODAL_PERMITIR_AVALIACAO_TITULO: 'Permitir avaliação de diagnóstico',
     MODAL_PERMITIR_AVALIACAO_MENSAGEM: (nomeServidor: string) =>
-        `Confirma a permissão de avaliação para ${nomeServidor}?`,
+        `Confirma desfazer impossibilidade para ${nomeServidor}?`,
 
     // « Labels de campos »
     LABEL_UNIDADE: 'Unidade',
@@ -107,7 +107,7 @@ export const TEXTOS_DIAGNOSTICO = {
     VAZIO_CAPACITACAO_SELECAO_TITULO: 'Selecione um servidor',
     VAZIO_CAPACITACAO_SELECAO_TEXTO: 'Selecione um servidor na lista para visualizar sua situação de capacitação.',
     VAZIO_COMPETENCIAS_AUTOAVALIACAO_TITULO: 'Autoavaliação não iniciada',
-    VAZIO_COMPETENCIAS_AUTOAVALIACAO_TEXTO: 'As competências deste servidor serão exibidas após o início da autoavaliação.',
+    VAZIO_COMPETENCIAS_AUTOAVALIACAO_TEXTO: 'As competências do servidor serão exibidas após o início da autoavaliação.',
     VAZIO_CAPACITACAO_SERVIDOR_TITULO: 'Aguardando aprovação de consenso',
     VAZIO_CAPACITACAO_SERVIDOR_TEXTO: 'A situação de capacitação só pode ser preenchida após servidor aprovar a avaliação de consenso.',
     VAZIO_UNIDADES_TITULO: 'Sem unidades',
