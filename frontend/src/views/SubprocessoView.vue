@@ -45,11 +45,10 @@
               v-if="mostrarConcluirDiagnosticoCabecalho"
               :disabled="concluindoDiagnostico || !habilitarConcluirDiagnosticoCabecalho"
               data-testid="btn-concluir-diagnostico-cabecalho"
-              size="sm"
               variant="success"
               @click="abrirModalConcluirDiagnostico"
           >
-            <BSpinner v-if="concluindoDiagnostico" aria-hidden="true" class="me-1" small/>
+            <BSpinner v-if="concluindoDiagnostico" aria-hidden="true" class="me-1"/>
             {{ TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO }}
           </BButton>
         </template>

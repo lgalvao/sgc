@@ -103,7 +103,15 @@ export async function abrirAcaoConsensoDiagnostico(page: Page, servidorTitulo: s
     const dropdownAcoes = page.getByTestId(`dropdown-acoes-${servidorTitulo}`);
     await expect(dropdownAcoes).toBeVisible();
     await dropdownAcoes.getByRole('button', {name: 'Ações'}).click();
-    await page.getByTestId(`btn-manter-consenso-${servidorTitulo}`).click();
+    await expect(page.getByTestId(`btn-manter-consenso-${servidorTitulo}`)).toBeVisible();
+}
+
+export async function navegarParaConsensoDiagnostico(page: Page, servidorTitulo: string): Promise<void> {
+    const botaoManterConsenso = page.getByTestId(`btn-manter-consenso-${servidorTitulo}`);
+    if (!(await botaoManterConsenso.isVisible())) {
+        await abrirAcaoConsensoDiagnostico(page, servidorTitulo);
+    }
+    await botaoManterConsenso.click();
 }
 
 export async function abrirAcaoCapacitacaoDiagnostico(page: Page): Promise<void> {

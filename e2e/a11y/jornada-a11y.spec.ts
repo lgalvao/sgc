@@ -35,6 +35,7 @@ import {
     abrirAcaoConsensoDiagnostico,
     aprovarConsensoDiagnostico,
     buscarCodSubprocessoDiagnostico,
+    navegarParaConsensoDiagnostico,
     preencherConsensoMinimo,
     preencherPrimeiraSituacaoCapacitacao
 } from '../helpers/helpers-diagnostico.js';
@@ -67,14 +68,41 @@ async function capturarTela(
     _opcoes?: OpcoesCapturaTela
 ) {
     await aguardarInterfaceEstavelParaCaptura(page);
-    
+
+    await auditarAcessibilidadeNosTemas(page);
+}
+
+async function auditarAcessibilidadeNosTemas(page: Page): Promise<void> {
+    const temaOriginal = await obterTemaAtual(page);
+
+    await auditarAcessibilidade(page);
+    await definirTemaTemporario(page, 'dark');
+    await auditarAcessibilidade(page);
+    await definirTemaTemporario(page, temaOriginal);
+}
+
+async function auditarAcessibilidade(page: Page): Promise<void> {
     // Executa auditoria do Axe-core cobrindo até WCAG 2.2
     const accessibilityScanResults = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
         .disableRules(['list'])
         .analyze();
-        
+
     expect(accessibilityScanResults.violations).toEqual([]);
+}
+
+async function obterTemaAtual(page: Page): Promise<'light' | 'dark'> {
+    return page.evaluate(() => {
+        return document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+    });
+}
+
+async function definirTemaTemporario(page: Page, tema: 'light' | 'dark'): Promise<void> {
+    await page.evaluate((temaAtual) => {
+        document.documentElement.setAttribute('data-bs-theme', temaAtual);
+        document.documentElement.style.colorScheme = temaAtual;
+    }, tema);
+    await aguardarInterfaceEstavelParaCaptura(page);
 }
 
 async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
@@ -472,6 +500,8 @@ async function criarProcessoDiagnosticoComConsensoCriadoPorFixture(
 
 test.describe('Captura de Telas - Sistema SGC', () => {
     let cleanup: ReturnType<typeof useProcessoCleanup>;
+
+    test.describe.configure({timeout: 40000});
 
     test.beforeAll(async ({request}) => {
         await resetDatabase(request);
@@ -2010,6 +2040,12 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             await abrirAcaoConsensoDiagnostico(page, servidorTitulo);
+            await capturarTela(page, 'diagnostico', 'menu-acoes-consenso-chefia', {
+                fullPage: true,
+                tags: ['diagnostico', 'consenso', 'dropdown']
+            });
+
+            await navegarParaConsensoDiagnostico(page, servidorTitulo);
             await capturarTela(page, 'diagnostico', 'consenso-chefia', {
                 fullPage: true,
                 tags: ['diagnostico', 'consenso', 'chefia']

@@ -135,4 +135,8 @@ function fechar() {
   color: var(--bs-emphasis-color) !important;
   background-color: var(--bs-secondary-bg);
 }
+
+:global([data-bs-theme="dark"] .btn-cancelar-link) {
+  color: #cbd5e1 !important;
+}
 </style>

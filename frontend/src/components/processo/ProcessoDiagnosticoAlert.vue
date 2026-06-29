@@ -99,4 +99,15 @@ a {
 a:hover {
   color: #004085;
 }
+
+:global([data-bs-theme="dark"] [data-testid="alert-diagnostico-organizacional"] a),
+:global([data-bs-theme="dark"] [data-testid="alert-diagnostico-organizacional"] a strong),
+:global([data-bs-theme="dark"] [data-testid="alert-diagnostico-organizacional"] strong) {
+  color: #fde68a;
+}
+
+:global([data-bs-theme="dark"] [data-testid="alert-diagnostico-organizacional"] a:hover),
+:global([data-bs-theme="dark"] [data-testid="alert-diagnostico-organizacional"] a:hover strong) {
+  color: #fef3c7;
+}
 </style>

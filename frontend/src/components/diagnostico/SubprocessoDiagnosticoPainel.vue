@@ -95,7 +95,7 @@
           variant="success"
           @click="abrirModalConcluir"
       >
-        <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
+        <BSpinner v-if="concluindo" aria-hidden="true" class="me-1"/>
         {{ TEXTOS.diagnostico.BTN_CONCLUIR_DIAGNOSTICO }}
       </BButton>
       <BButton
@@ -105,7 +105,7 @@
           variant="success"
           @click="abrirModalValidar"
       >
-        <BSpinner v-if="validando" aria-hidden="true" class="me-1" small/>
+        <BSpinner v-if="validando" aria-hidden="true" class="me-1"/>
         {{ TEXTOS.diagnostico.BTN_VALIDAR }}
       </BButton>
       <BButton
@@ -115,7 +115,7 @@
           variant="warning"
           @click="abrirModalDevolver"
       >
-        <BSpinner v-if="devolvendo" aria-hidden="true" class="me-1" small/>
+        <BSpinner v-if="devolvendo" aria-hidden="true" class="me-1"/>
         {{ TEXTOS.diagnostico.BTN_DEVOLVER }}
       </BButton>
       <BButton
@@ -125,7 +125,7 @@
           variant="primary"
           @click="abrirModalHomologar"
       >
-        <BSpinner v-if="homologando" aria-hidden="true" class="me-1" small/>
+        <BSpinner v-if="homologando" aria-hidden="true" class="me-1"/>
         {{ TEXTOS.diagnostico.BTN_HOMOLOGAR }}
       </BButton>
     </div>

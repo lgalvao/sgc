@@ -203,12 +203,58 @@ const chaveRotaAtual = computed(() => {
   --bs-btn-active-border-color: #334155;
 }
 
+[data-bs-theme="dark"] .btn-outline-danger {
+  --bs-btn-color: #fda4af;
+  --bs-btn-border-color: #fb7185;
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #e11d48;
+  --bs-btn-hover-border-color: #e11d48;
+  --bs-btn-focus-shadow-rgb: 251, 113, 133;
+  --bs-btn-active-color: #ffffff;
+  --bs-btn-active-bg: #e11d48;
+  --bs-btn-active-border-color: #e11d48;
+}
+
 [data-bs-theme="dark"] .bg-body-tertiary {
   background-color: var(--bs-tertiary-bg) !important;
 }
 
 [data-bs-theme="dark"] .text-muted {
   color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .text-success {
+  color: #6ee7b7 !important;
+}
+
+html[data-bs-theme="dark"] .dropdown-menu {
+  --bs-dropdown-bg: #212529;
+  --bs-dropdown-border-color: #495057;
+  --bs-dropdown-link-color: #f8fafc;
+  --bs-dropdown-link-hover-color: #ffffff;
+  --bs-dropdown-link-hover-bg: #343a40;
+  --bs-dropdown-link-active-color: #ffffff;
+  --bs-dropdown-link-active-bg: #343a40;
+  --bs-dropdown-link-disabled-color: #94a3b8;
+}
+
+html[data-bs-theme="dark"] .dropdown-item:not(.disabled):not(:disabled) {
+  color: var(--bs-dropdown-link-color) !important;
+}
+
+html[data-bs-theme="dark"] .dropdown-item:hover,
+html[data-bs-theme="dark"] .dropdown-item:focus,
+html[data-bs-theme="dark"] .dropdown-item.active,
+html[data-bs-theme="dark"] .dropdown-item:active,
+html[data-bs-theme="dark"] .dropdown-item:focus-visible {
+  color: #ffffff !important;
+  background-color: #343a40 !important;
+}
+
+html[data-bs-theme="dark"] .dropdown-item.disabled,
+html[data-bs-theme="dark"] .dropdown-item:disabled {
+  color: #94a3b8 !important;
+  background-color: transparent !important;
 }
 
 .cabecalho-fixo {
@@ -300,17 +346,17 @@ button:disabled,
   color: var(--bs-danger-text-emphasis) !important;
 }
 
-:not([data-bs-theme="dark"]) .btn-outline-secondary:hover,
-:not([data-bs-theme="dark"]) .btn-outline-secondary:focus,
-:not([data-bs-theme="dark"]) .btn-outline-secondary:active,
-:not([data-bs-theme="dark"]) .btn-outline-secondary.show {
+html:not([data-bs-theme="dark"]) .btn-outline-secondary:hover,
+html:not([data-bs-theme="dark"]) .btn-outline-secondary:focus,
+html:not([data-bs-theme="dark"]) .btn-outline-secondary:active,
+html:not([data-bs-theme="dark"]) .btn-outline-secondary.show {
   background-color: #5a6268 !important;
   border-color: #5a6268 !important;
   color: #fff !important;
 }
 
 /* --- Garantia de Contraste para Itens de Dropdown Habilitados no Modo Claro --- */
-:not([data-bs-theme="dark"]) .dropdown-item:not(.disabled):not(:disabled) {
+html:not([data-bs-theme="dark"]) .dropdown-item:not(.disabled):not(:disabled) {
   color: #212529 !important;
 }
 </style>
