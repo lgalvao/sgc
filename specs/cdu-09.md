@@ -40,7 +40,7 @@
    8.1. Se houver esses problemas de validação, o sistema indica quais atividades estão precisando de adição de
    conhecimentos e interrompe a operação de disponibilização, permanecendo na mesma tela.
 
-9. O sistema mostra um diálogo de confirmação com título "Disponibilização do cadastro", com mensagem "Confirma a
+9. O sistema mostra um diálogo de confirmação com título `Disponibilização do cadastro`, com mensagem "Confirma a
    disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades
    superiores", além dos botões `Confirmar` e `Cancelar`.
 
@@ -53,31 +53,31 @@
 
 12. O sistema registra uma movimentação para o subprocesso com os campos:
 
-    - `Descrição`: 'Disponibilização do cadastro'
+    - `Descrição`: 'Cadastro disponibilizado'
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+    - `Unidade origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
 
 13. O sistema notifica a unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 
     ```text
-    Assunto: SGC: Cadastro de atividades e conhecimentos disponibilizado - [SIGLA_UNIDADE_SUBPROCESSO]
+    Assunto: SGC: Cadastro de atividades e conhecimentos disponibilizado - :SIGLA_UNIDADE_SUBPROCESSO:
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-    A unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizou o cadastro de atividades
-    e conhecimentos do processo [DESCRICAO_PROCESSO].
+    Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
+    A unidade :SIGLA_UNIDADE_SUBPROCESSO: disponibilizou o cadastro de atividades
+    e conhecimentos do processo :DESCRICAO_PROCESSO:.
 
-    A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+    A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências (:URL_SISTEMA:).
     ```
 
 14. O sistema cria internamente um alerta:
 
-    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: disponibilizado para análise"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+    - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:.
 
 15. O sistema define a data/hora de conclusão da etapa 1 do subprocesso da unidade como sendo a data/hora atual.
 
-16. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro de atividades disponibilizado".
+16. O sistema redireciona para o Painel, mostrando a mensagem "Cadastro disponibilizado".

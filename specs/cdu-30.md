@@ -23,7 +23,7 @@
 
 3. O usuário aciona `Adicionar`.
 
-4. O sistema mostra um modal com título "Adicionar administrador" com um campo para título ou nome, e botões `Cancelar`
+4. O sistema mostra um modal com título `Adicionar administrador` com um campo para título ou nome, e botões `Cancelar`
    e`Adicionar`.
     - O campo deve ter texto informativo "Digite o nome ou título" e a funcionalidade de 'autocompletar', reconhecendo o
       título ou parte do nome do usuário.
@@ -47,7 +47,7 @@
     administrador.
     - Essas ações são protegidas pela própria interface gráfica, mas devem ser validadas defensivamente no servidor.
 
-11. O sistema mostra um modal com título "Confirmar remoção" e a mensagem "Realmente remover [NOME_DO_ADMINISTRADOR]
+11. O sistema mostra um modal com título `Confirmar remoção` e a mensagem "Realmente remover :NOME_DO_ADMINISTRADOR:
     dos administradores do sistema?", com botões `Cancelar` e `Remover`.
 
 12. O usuário confirma acionando `Remover`.

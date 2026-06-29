@@ -22,7 +22,7 @@
 3. Na grade de servidores da unidade, o usuário escolhe a ação `Manter avaliação de consenso` para um servidor.
 
 4. O sistema mostra a tela `Avaliação de consenso` para o servidor escolhido, com:
-    - título: "Avaliação de consenso";
+    - título: `Avaliação de consenso`;
     - subtítulo: [nome e título do servidor];
     - na barra de botões do cabeçalho, o botão `Concluir avaliação`;
     - grade de competências da unidade, com estrutura como no exemplo abaixo:
@@ -73,20 +73,20 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
     ```text
     Assunto: SGC: Avaliação de consenso criada 
     
-    Prezado(a) [NOME_SERVIDOR],
+    Prezado(a) :NOME_SERVIDOR:,
     
-    O responsável pela sua unidade concluiu a avaliação de consenso no processo [DESCRICAO_PROCESSO].
+    O responsável pela sua unidade concluiu a avaliação de consenso no processo :DESCRICAO_PROCESSO:.
     
-    A aprovação dessa avaliação pode ser realizada no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
+    A aprovação dessa avaliação pode ser realizada no Sistema de Gestão de Competências (SGC): (:URL_SISTEMA:).
     ```
 
 10. O sistema cria internamente um alerta com estes campos/valores:
     - `Descrição`: "Avaliação de consenso criada"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
-    - `Usuário de destino`: [TITULO_SERVIDOR]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Usuário de destino`: :TITULO_SERVIDOR:
+    - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
 11. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de consenso
    criada".

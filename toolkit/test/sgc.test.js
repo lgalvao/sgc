@@ -57,6 +57,56 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Executa a jornada consolidada de cobertura do backend.");
     });
 
+    test("despacha ajuda da auditoria de assuntos de notificacao do backend", async () => {
+        const resultado = await executarSgc(["backend", "notificacoes", "auditar-assuntos", "--help"]);
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Audita literais de assunto de notificacao fora de AssuntosNotificacao.");
+    });
+
+    test("audita assuntos literais fora de AssuntosNotificacao", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-assuntos-auditar-"));
+        const dir = path.join(base, "backend", "src", "main", "java", "sgc");
+
+        await fs.outputFile(
+            path.join(dir, "alerta", "AssuntosNotificacao.java"),
+            [
+                "package sgc.alerta;",
+                "public final class AssuntosNotificacao {",
+                "  public static String ok() {",
+                "    return \"SGC: Assunto centralizado\";",
+                "  }",
+                "}"
+            ].join("\n")
+        );
+
+        await fs.outputFile(
+            path.join(dir, "diagnostico", "ServicoInvalido.java"),
+            [
+                "package sgc.diagnostico;",
+                "class ServicoInvalido {",
+                "  void enviar() {",
+                "    String assunto = \"SGC: Assunto espalhado\";",
+                "  }",
+                "}"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "notificacoes",
+            "auditar-assuntos",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        const corpo = JSON.parse(resultado.stdout.slice(resultado.stdout.indexOf("{")));
+        expect(corpo.resumo.arquivosComViolacao).toBe(1);
+        expect(corpo.relatorio[0].arquivo).toBe("backend/src/main/java/sgc/diagnostico/ServicoInvalido.java");
+        expect(corpo.relatorio[0].achados.some(item => item.regra === "literal_sgc")).toBe(true);
+    });
+
     test("audita cheiros de codigo em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-smells-"));
         const frontendDir = path.join(base, "frontend", "src");

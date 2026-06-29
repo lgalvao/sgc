@@ -46,7 +46,7 @@
 
    9.1. Usuário aciona `Devolver para ajustes`.
 
-   9.2. O sistema abre modal com título "Devolução" e texto "Confirma a devolução do cadastro para ajustes?", um campo
+   9.2. O sistema abre modal com título `Devolução` e texto "Confirma a devolução do cadastro para ajustes?", um campo
    `Justificativa`, obrigatório e os botões `Cancelar` e `Devolver`.
 
    9.3. O usuário informa a justificativa e aciona `Devolver`.
@@ -54,16 +54,16 @@
    9.4. O sistema registra uma análise de cadastro para o subprocesso:
     - `Resultado`: 'Devolução'
     - `Data/hora`: Data/hora atual
-    - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+    - `Unidade`: :SIGLA_UNIDADE_ANALISE:
     - `Justificativa`: [Justificativa fornecida].
 
    9.5. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do
-   subprocesso, referenciada aqui como [SIGLA_UNIDADE_DEVOLUCAO].
+   subprocesso, referenciada aqui como :SIGLA_UNIDADE_DEVOLUCAO:.
 
    9.6. O sistema registra uma movimentação para o subprocesso:
-    - `Descrição`: 'Devolução do cadastro para ajustes'
+    - `Descrição`: 'Cadastro devolvido para ajustes'
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
+    - `Unidade origem`: :SIGLA_UNIDADE_ANALISE:
 
    9.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso para
    'Cadastro em andamento' e apaga a data/hora de conclusão da etapa 1 do subprocesso da unidade.
@@ -72,20 +72,20 @@
    ```text
       Assunto: SGC: Cadastro de atividades e conhecimentos devolvido para ajustes
 
-      Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
+      Prezado(a) responsável pela :SIGLA_UNIDADE_DEVOLUCAO:,
 
-      O cadastro de atividades e conhecimentos da sua unidade, no processo [DESCRIÇÃO_PROCESSO], foi
+      O cadastro de atividades e conhecimentos da sua unidade, no processo :DESCRICAO_PROCESSO:, foi
       devolvido para ajustes.
 
-      Faça os ajustes no Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
+      Faça os ajustes no Sistema de Gestão de Competências (SGC): :URL_SISTEMA:.
    ```
 
    9.10. O sistema cria um alerta:
-    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para ajustes"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: devolvido para ajustes"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
-    - `Unidade de destino`: [SIGLA_UNIDADE_DEVOLUCAO].
+    - `Unidade de origem`: :SIGLA_UNIDADE_ANALISE:
+    - `Unidade de destino`: :SIGLA_UNIDADE_DEVOLUCAO:.
 
    9.11. O sistema redireciona para o `Painel`, e mostra *toast* "Devolução realizada".
 
@@ -95,7 +95,7 @@
 
 10.1. Usuário clica em `Registrar aceite`.
 
-10.2. O sistema abre um diálogo modal (título "Aceite") com a pergunta "Confirma o aceite do cadastro de atividades?",
+10.2. O sistema abre um diálogo modal (título `Aceite`) com a pergunta "Confirma o aceite do cadastro de atividades?",
 um campo para preenchimento de uma observação opcional e os botões Confirmar ou Cancelar.
 
 10.3. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na mesma tela.
@@ -105,37 +105,37 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
 10.5. O sistema registra uma análise de cadastro para o subprocesso:
 
 - `Data/hora`: Data/hora atual
-- `Unidade`: [SIGLA_UNIDADE_ANALISE]
+- `Unidade`: :SIGLA_UNIDADE_ANALISE:
 - `Resultado`: 'Aceite'
 - `Observação`: [Observação, caso fornecida]
 
 10.6. O sistema registra uma movimentação para o subprocesso:
 
 - `Data/hora`: Data/hora atual
-- `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
-- `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+- `Unidade origem`: :SIGLA_UNIDADE_ANALISE:
+- `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
 - `Descrição`: 'Cadastro aceito'
 
 10.7. O sistema envia notificação por e-mail para a unidade superior:
 
    ```text
-   Assunto: SGC: Cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
+   Assunto: SGC: Cadastro de atividades e conhecimentos da :SIGLA_UNIDADE_SUBPROCESSO: submetido para análise
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
 
-   O cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO], no processo [DESCRICAO_PROCESSO], 
+   O cadastro de atividades e conhecimentos da :SIGLA_UNIDADE_SUBPROCESSO:, no processo :DESCRICAO_PROCESSO:, 
    foi submetido para análise por essa unidade.
 
-   A análise já pode ser realizada no sistema de Gestão de Competências ([URL_SISTEMA]).
+   A análise já pode ser realizada no sistema de Gestão de Competências (:URL_SISTEMA:).
    ```
 
 10.8. O sistema cria um alerta:
 
-- `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise"
-- `Processo`: [DESCRICA_PROCESSO]
+- `Descrição`: "Cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetido para análise"
+- `Processo`: :DESCRICAO_PROCESSO:
 - `Data/hora`: Data/hora atual
-- `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
-- `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+- `Unidade de origem`: :SIGLA_UNIDADE_ANALISE:
+- `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:.
 
 10.9. O sistema redireciona para o `Painel` e mostra o *toast* "Aceite registrado".
 
@@ -145,7 +145,7 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
 
 11.1. O usuário aciona `Homologar`.
 
-11.2. O sistema abre um modal de confirmação, com título "Homologação do cadastro" e texto "Confirma a homologação?"
+11.2. O sistema abre um modal de confirmação, com título `Homologação do cadastro` e texto "Confirma a homologação?"
 e botões `Cancelar` e `Homologar`.
 
 11.3. O usuário aciona `Homologar`.
@@ -154,8 +154,8 @@ e botões `Cancelar` e `Homologar`.
 
 - `Descrição`: 'Cadastro homologado'
 - `Data/hora`: Data/hora atual
-- `Unidade origem`: 'ADMIN'
-- `Unidade destino`: 'ADMIN'
+- `Unidade origem`: `ADMIN`
+- `Unidade destino`: `ADMIN`
 
 11.5. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
 

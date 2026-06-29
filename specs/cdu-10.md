@@ -46,7 +46,7 @@
 
 10. O usuário clica no botão `Disponibilizar`.
 
-11. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a
+11. O sistema mostra um diálogo de confirmação: título `Disponibilização da revisão do cadastro`, mensagem "Confirma a
     disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades
     superiores" / Botões `Disponibilizar` e `Cancelar`.
 
@@ -60,30 +60,30 @@ tela.
 14. O sistema registra uma movimentação para o subprocesso com os campos:
 
     - Data/hora: Data/hora atual
-    - Unidade origem: [SIGLA_UNIDADE_SUBPROCESSO]
-    - Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
+    - Unidade origem: :SIGLA_UNIDADE_SUBPROCESSO:
+    - Unidade destino: :SIGLA_UNIDADE_SUPERIOR:
     - Descrição: 'Disponibilização da revisão do cadastro'
 
 15. O sistema notifica unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 
     ```text
-    Assunto: SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: [SIGLA_UNIDADE_SUBPROCESSO]
+    Assunto: SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: :SIGLA_UNIDADE_SUBPROCESSO:
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+    Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
     
-    A unidade [SIGLA_UNIDADE_SUBPROCESSO] concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo [DESCRICAO_PROCESSO].
+    A unidade :SIGLA_UNIDADE_SUBPROCESSO: concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo :DESCRICAO_PROCESSO:.
     
-    A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+    A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências (:URL_SISTEMA:).
     ```
 
 16. O sistema cria internamente um alerta com:
 
-    - Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
+    - Descrição: "Cadastro de atividades e conhecimentos da unidade :SIGLA_UNIDADE_SUBPROCESSO: disponibilizado para
       análise"
-    - Processo: [DESCRICAO_PROCESSO]
+    - Processo: :DESCRICAO_PROCESSO:
     - Data/hora: [Data/hora atual]
-    - Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
-    - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
+    - Unidade de origem: :SIGLA_UNIDADE_SUBPROCESSO:
+    - Unidade de destino: :SIGLA_UNIDADE_SUPERIOR:.
 
 17. O sistema define a data/hora de conclusão da Etapa 1 do subprocesso da unidade como sendo a data/hora atual.
 

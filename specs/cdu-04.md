@@ -48,7 +48,7 @@
 13. O sistema registra uma movimentação para cada subprocesso criado com os campos:
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: ADMIN
-    - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade destino`: :SIGLA_UNIDADE_SUBPROCESSO:
     - `Descrição`: 'Processo iniciado'
 
 14. O sistema envia notificações por e-mail para todas as unidades participantes.
@@ -57,14 +57,14 @@
     ```text
         Assunto: SGC: Início de processo de mapeamento de competências
 
-        Prezado(a) responsável pela [SIGLA_UNIDADE],
+        Prezado(a) responsável pela :SIGLA_UNIDADE:,
 
-        Comunicamos o início do processo [DESCRICAO_PROCESSO] para a sua unidade.
+        Comunicamos o início do processo :DESCRICAO_PROCESSO: para a sua unidade.
 
         Já é possível realizar o cadastro de atividades e conhecimentos no O sistema de Gestão de
-        Competências ([URL_SISTEMA]).
+        Competências (:URL_SISTEMA:).
 
-        O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+        O prazo para conclusão desta etapa do processo é :DATA_LIMITE:.
     ```
 
     12.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das
@@ -72,28 +72,28 @@
      ```text
         Assunto: SGC: Início de processo de mapeamento de competências em unidades subordinadas
         
-        Prezado(a) responsável pela [SIGLA_UNIDADE],
+        Prezado(a) responsável pela :SIGLA_UNIDADE:,
         
-        Comunicamos o início do processo [DESCRICAO_PROCESSO] nas unidades [SIGLAS_UNIDADES_SUBORDINADAS]. Estas unidades já podem iniciar o cadastro de atividades e conhecimentos. À medida que estes cadastros forem sendo disponibilizados, será possível visualizar e realizar a sua validação.
+        Comunicamos o início do processo :DESCRICAO_PROCESSO: nas unidades :SIGLAS_UNIDADES_SUBORDINADAS:. Estas unidades já podem iniciar o cadastro de atividades e conhecimentos. À medida que estes cadastros forem sendo disponibilizados, será possível visualizar e realizar a sua validação.
 
-        O prazo para conclusão desta etapa do processo é [DATA_LIMITE]. Acompanhe o processo no O sistema de Gestão de Competências: [URL_SISTEMA].
+        O prazo para conclusão desta etapa do processo é :DATA_LIMITE:. Acompanhe o processo no O sistema de Gestão de Competências: :URL_SISTEMA:.
      ```
 
 15. sistema cria internamente alertas para todas as unidades participantes.
 
     13.1. Para cada unidade **operacional** será criado um alerta com estes campos:
     - `Descrição`: "Início do processo"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE].
+    - `Unidade de destino`: :SIGLA_UNIDADE:.
 
     13.2. Para cada unidade **intermediária** será criado um alerta com estes campos:
-    - `Descrição`: "Início do processo em unidade (s) subordinada (s)"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Início do processo"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE].
+    - `Unidade de destino`: :SIGLA_UNIDADE:.
 
     13.3. Para cada unidade **interoperacional** serão criados dois alertas: um de unidade operacional e outro de
     unidade intermediária, como especificado acima.

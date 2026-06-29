@@ -21,7 +21,7 @@
 4. O usuário aciona `Homologar cadastros em bloco`.
 
 5. O sistema abre um modal de confirmação, com os elementos a seguir:
-    - Título: "Homologação de cadastros em bloco";
+    - Título: `Homologação de cadastros em bloco`;
     - Texto: "Selecione as unidades para homologação do cadastro:";
     - Grade com as unidades aptas, com checkbox (marcado inicialmente) para cada unidade, além de sigla e nome da
       unidade;

@@ -20,7 +20,7 @@
    disponibilizados e caso positivo habilita o botão `Disponibilizar mapas em bloco`.
 
 4. O sistema abre um modal de confirmação, com os elementos a seguir:
-    - Título: "Disponibilização de mapas em bloco";
+    - Título: `Disponibilização de mapas em bloco`;
     - Texto: "Selecione as unidades cujos mapas deverão ser disponibilizados:";
     - Siglas das unidades operacionais ou interoperacionais cujos mapas de competências podem ser disponibilizados, com
       um checkbox (selecionado por padrão) para cada unidade;
@@ -35,7 +35,7 @@
 
 7. Caso negativo, o sistema interrompe a operação e permanece na tela `Detalhes do processo`, informando a mensagem de
    erro: "Não é possível realizar a disponibilização em bloco dos mapas de competências das
-   unidades [LISTA_UNIDADES_SELECIONADAS]. Realize a disponibilização individual do mapa de cada unidade para obter mais
+   unidades :LISTA_UNIDADES_SELECIONADAS:. Realize a disponibilização individual do mapa de cada unidade para obter mais
    detalhes."
 
 8. Caso positivo, o sistema atua, para cada unidade selecionada, da seguinte forma:
@@ -49,28 +49,28 @@
    8.3. O sistema registra uma movimentação para o subprocesso com os campos:
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: ADMIN
-    - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Descrição`: 'Disponibilização do mapa de competências'
+    - `Unidade destino`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Descrição`: 'Mapa disponibilizado para validação'
 
    8.4. O sistema notifica a unidade do subprocesso quanto à disponibilização, com e-mail no modelo abaixo:
 
    ```text
    Assunto: SGC: Mapa de competências disponibilizado
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_SUBPROCESSO:,
 
-   O mapa de competências de sua unidade foi disponibilizado no contexto do processo [DESCRIÇÃO_PROCESSO].
+    O mapa de competências de sua unidade foi disponibilizado no contexto do processo :DESCRICAO_PROCESSO:.
 
-   A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências (URL_SISTEMA). 
-   O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+    A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências (:URL_SISTEMA:). 
+   O prazo para conclusão desta etapa do processo é :DATA_LIMITE:.
    ```
 
    8.5. O sistema cria internamente um alerta:
-    - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
-    - `Processo`: [DESCRIÇÃO DO PROCESSO]
+    - `Descrição`: "Mapa de competências da unidade :SIGLA_UNIDADE_SUBPROCESSO: disponibilizado para validação"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO].
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:.
 
    8.6. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
@@ -80,14 +80,14 @@
    ```text
    Assunto: SGC: Mapas de competências disponibilizados
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
 
-   Os mapas de competências das unidades [LISTA_UNIDADE_SUBORDINADAS_SELECIONADAS] 
-   foram disponibilizados no contexto do processo [DESCRIÇÃO DO PROCESSO].
+   Os mapas de competências das unidades :LISTA_UNIDADE_SUBORDINADAS_SELECIONADAS: 
+   foram disponibilizados no contexto do processo :DESCRICAO_PROCESSO:.
 
-   A validação destes mapas já pode ser realizada no Sistema de Gestão de Competências (URL_SISTEMA). 
+   A validação destes mapas já pode ser realizada no Sistema de Gestão de Competências (:URL_SISTEMA:). 
    
-   O prazo para conclusão desta etapa do processo é [DATA_LIMITE].
+   O prazo para conclusão desta etapa do processo é :DATA_LIMITE:.
    ```
 
    8.8. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O

@@ -48,21 +48,21 @@
 9. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
 
    ```text
-   Assunto: SGC: Autoavaliação concluída: [NOME_SERVIDOR] 
+   Assunto: SGC: Autoavaliação concluída: :NOME_SERVIDOR: 
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_SUBPROCESSO:,
 
-   O servidor [NOME_SERVIDOR] concluiu a autoavaliação no processo [DESCRICAO_PROCESSO].
+   O servidor :NOME_SERVIDOR: concluiu a autoavaliação no processo :DESCRICAO_PROCESSO:.
 
-   A análise já pode ser realizada no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
+   A análise já pode ser realizada no Sistema de Gestão de Competências (SGC): (:URL_SISTEMA:).
    ```
 
 10. O sistema cria internamente um alerta com estes campos/valores:
-    - `Descrição`: "Autoavaliação concluída: [NOME_SERVIDOR]"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Autoavaliação concluída: :NOME_SERVIDOR:"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
 11. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Autoavaliação
     concluída".

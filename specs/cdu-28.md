@@ -22,7 +22,7 @@
 5. Se **não houver** atribuição temporária vigente para a unidade, o sistema mostra o botão `Criar atribuição`.
 
 6. Se **houver** atribuição temporária vigente, o sistema mostra:
-    - o responsável com o tipo `Atrib. temporária (até [DATA_TERMINO_ATRIB])`;
+    - o responsável com o tipo `Atrib. temporária (até :DATA_TERMINO_ATRIB:)`;
     - botão `Editar atribuição` (em vez de `Criar atribuição`).
 
 7. Ao acionar em `Criar/Editar atribuição`, o sistema apresenta a tela `Atribuição temporária`, com estes campos:
@@ -50,28 +50,28 @@
 11. O sistema envia uma notificação por e-mail para o usuário que recebeu a atribuição temporária, com este modelo:
 
     ```text
-    Assunto: SGC: Atribuição de perfil CHEFE na unidade [SIGLA_UNIDADE]
+    Assunto: SGC: Atribuição de perfil CHEFE na unidade :SIGLA_UNIDADE:
 
-    Prezado(a) [NOME_SERVIDOR],
+    Prezado(a) :NOME_SERVIDOR:,
 
-    Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade [SIGLA_UNIDADE].
+    Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade :SIGLA_UNIDADE:.
 
-    Período: [DATA_INICIO] a [DATA_TERMINO].
+    Período: :DATA_INICIO: a :DATA_TERMINO:.
 
-    Justificativa: [JUSTIFICATIVA].
+    Justificativa: :JUSTIFICATIVA:.
 
-    Acesse o sistema em [URL_SISTEMA] e escolha o perfil 'CHEFE' para a unidade da atribuição.
+    Acesse o sistema em :URL_SISTEMA: e escolha o perfil `CHEFE` para a unidade da atribuição.
     ```
 
 12. O sistema registra internamente um alerta:
     - `Data/hora`: [Data/hora atual]
-    - `Descrição`: "Atribuição temporária para unidade [SIGLA_UNIDADE]"
+    - `Descrição`: "Atribuição temporária para unidade :SIGLA_UNIDADE:"
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: (**Não preencher**)
     - `Usuário de destino`: [Usuário destinatário da atribuição]
 
 13. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE durante o período
-    especificado, para a unidade da atribuição. Em um próximo login, o novo par `CHEFE-[UNIDADE_ATRIBUICAO]` será
+    especificado, para a unidade da atribuição. Em um próximo login, o novo par `CHEFE-:UNIDADE_ATRIBUICAO:` será
     mostrado pra o usuário entre as opções de login.
 
     14.1. O novo perfil será incluído automaticamente através de cálculos das views no banco de dados. O sistema não

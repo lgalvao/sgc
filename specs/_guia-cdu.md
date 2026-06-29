@@ -31,11 +31,19 @@ Todo CDU deve conter, nesta ordem:
 - A seção de pré-condições deve usar exatamente o título `## Pré-condições`.
 - A seção de fluxo principal deve usar exatamente o título `## Fluxo principal`.
 - A numeração do fluxo principal deve ser contínua, sem reinício, repetição ou regressão.
-- Situações do sistema devem ser escritas entre aspas simples, por exemplo: `'Em andamento'`.
+- Valores enumerados do domínio devem ser escritos entre aspas simples, por exemplo: `'Em andamento'`, `'Aceite'`,
+  `'Diagnóstico'`.
 - Elementos observáveis de interface devem ser escritos entre crases, por exemplo: `Painel`, `Salvar`,
   `Atividades e conhecimentos`.
+- Mensagens literais exibidas ao usuário e textos completos de confirmação devem ser escritos entre aspas duplas, por
+  exemplo: "Preencha a descrição", "Confirma a homologação?".
+- Perfis não devem ser escritos entre aspas simples. Use `ADMIN`, `GESTOR`, `CHEFE` e `SERVIDOR`.
+- Rótulos e elementos de interface não devem ser escritos entre aspas duplas quando o item for um elemento observável
+  da interface. Nesses casos, use crases.
 - Perfis devem ser escritos em maiúsculas: `ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`.
-- Placeholders devem usar caixa alta entre colchetes, por exemplo: `[SIGLA_UNIDADE]`, `[DATA_LIMITE]`.
+- Placeholders devem usar caixa alta entre dois `:`, por exemplo: `:SIGLA_UNIDADE:`, `:DATA_LIMITE:`,
+  `:URL_SISTEMA:`.
+- O formato antigo com colchetes, como `[SIGLA_UNIDADE]`, é aceito apenas como legado durante a transição.
 - Referências para outros casos de uso ou documentos devem usar links do Markdown.
 
 ## Escopo do CDU

@@ -22,8 +22,8 @@
       processo: há unidades não homologadas", e interrompe a operação, sem sair da tela.
 
 5. Caso todas as unidades estejam homologadas, o sistema mostra um diálogo de confirmação:
-    - Título "Finalização de processo";
-    - Texto: "Confirma a finalização do processo [DESCRICAO_PROCESSO]? Essa ação encerrará o processo e notificará todas
+    - Título `Finalização de processo`;
+    - Texto: "Confirma a finalização do processo :DESCRICAO_PROCESSO:? Essa ação encerrará o processo e notificará todas
       as unidades participantes.";
     - Botões `Cancelar` e `Finalizar`.
 
@@ -35,21 +35,21 @@
 
    8.1. Cria um alerta voltado à unidade do subprocesso:
     - `Descrição`: "Processo finalizado"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
    8.2 Envia uma notificação por e-mail à unidade do subprocesso:
       ```text
       Assunto: SGC: Finalização de processo de diagnóstico
     
-      Prezado(a) responsável pela [SIGLA_UNIDADE],
+      Prezado(a) responsável pela :SIGLA_UNIDADE:,
     
-      Comunicamos a finalização do processo [DESCRICAO_PROCESSO].
+      Comunicamos a finalização do processo :DESCRICAO_PROCESSO:.
     
       Os resultados consolidados do diagnóstico já podem ser consultados no 
-      Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
+      Sistema de Gestão de Competências (SGC): (:URL_SISTEMA:).
       ```
 
 9. Para cada unidade intermediária, o sistema:
@@ -58,19 +58,19 @@
    ```text
        Assunto: SGC: Finalização de processo de diagnóstico em unidades subordinadas
 
-       Prezado(a) responsável pela [SIGLA_UNIDADE],
+       Prezado(a) responsável pela :SIGLA_UNIDADE:,
        
-       Comunicamos a finalização do processo [DESCRICAO_PROCESSO] para as unidades [SIGLAS_UNIDADES_SUBORDINADAS].
+       Comunicamos a finalização do processo :DESCRICAO_PROCESSO: para as unidades :SIGLAS_UNIDADES_SUBORDINADAS:.
        
        Os resultados do diagnóstico destas unidades podem ser consultados no 
-       Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
+       Sistema de Gestão de Competências (SGC): (:URL_SISTEMA:).
     ```
 
    9.2. Cria um alerta voltado à unidade, consolidando as unidades subordinadas:
     - `Descrição`: "Processo finalizado em unidades subordinadas"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE_INTERMEDIARIA]
+    - `Unidade de destino`: :SIGLA_UNIDADE_INTERMEDIARIA:
 
 10. O sistema redireciona para o `Painel` e mostra o *toast* `Processo finalizado`.

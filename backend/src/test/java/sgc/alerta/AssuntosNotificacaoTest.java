@@ -43,6 +43,22 @@ class AssuntosNotificacaoTest {
                 .isEqualTo("SGC: Validação do mapa de competências da SEC submetida para análise");
         assertThat(AssuntosNotificacao.aceiteValidacaoBlocoSuperior())
                 .isEqualTo("SGC: Validação de mapas de competências submetida para análise");
+        assertThat(AssuntosNotificacao.diagnosticoAutoavaliacaoConcluida("Maria"))
+                .isEqualTo("SGC: Autoavaliação concluída: Maria");
+        assertThat(AssuntosNotificacao.diagnosticoConsensoDisponivel())
+                .isEqualTo("SGC: Avaliação de consenso criada");
+        assertThat(AssuntosNotificacao.diagnosticoConsensoAprovado("Maria"))
+                .isEqualTo("SGC: Avaliação de consenso aprovada: Maria");
+        assertThat(AssuntosNotificacao.diagnosticoConcluido("SEC"))
+                .isEqualTo("SGC: Diagnóstico da unidade SEC submetido para análise");
+        assertThat(AssuntosNotificacao.diagnosticoDevolvido("SEC"))
+                .isEqualTo("SGC: Diagnóstico da unidade SEC devolvido para ajustes");
+        assertThat(AssuntosNotificacao.diagnosticoAceito("SEC"))
+                .isEqualTo("SGC: Diagnóstico da unidade SEC aceito");
+        assertThat(AssuntosNotificacao.diagnosticosAceitosEmBloco())
+                .isEqualTo("SGC: Diagnósticos submetidos para análise");
+        assertThat(AssuntosNotificacao.diagnosticoHomologado("SEC"))
+                .isEqualTo("SGC: Diagnóstico da unidade SEC homologado");
     }
 
     @Test

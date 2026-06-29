@@ -40,7 +40,7 @@
 
    8.1. Usuário clica em `Devolver para ajustes`.
 
-   8.2. O sistema abre um modal (título "Devolver mapa") com a pergunta "Confirma a devolução da validação do mapa para
+   8.2. O sistema abre um modal (título `Devolver mapa`) com a pergunta "Confirma a devolução da validação do mapa para
    ajustes?", um campo de observação (opcional) e os botões `Devolver` e `Cancelar`.
 
    8.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de devolução, permanecendo na tela
@@ -51,7 +51,7 @@
    8.5. O sistema registra uma análise de validação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+    - `Unidade`: :SIGLA_UNIDADE_ANALISE:
     - `Resultado`: 'Devolução para ajustes'
     - `Observação`: A observação caso tenha sido fornecida.
 
@@ -59,10 +59,10 @@
 
    8.7. O sistema registra uma movimentação para o subprocesso com:
 
-    - `Descrição`: 'Devolução da validação do mapa de competências para ajustes'
+    - `Descrição`: 'Validação do mapa devolvida para ajustes'
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
-    - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+    - `Unidade origem`: :SIGLA_UNIDADE_ANALISE:
+    - `Unidade destino`: :SIGLA_UNIDADE_DEVOLUCAO:
 
    8.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso
    para 'Mapa disponibilizado' e apaga a data/hora de conclusão da Etapa 2 do subprocesso da unidade.
@@ -70,22 +70,22 @@
    8.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
    ```text
-   Assunto: SGC: Validação do mapa da [SIGLA_UNIDADE_SUBPROCESSO] devolvida para ajustes
+   Assunto: SGC: Validação do mapa da :SIGLA_UNIDADE_SUBPROCESSO: devolvida para ajustes
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_DEVOLUCAO:,
 
-   A validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi devolvida para ajustes.
+   A validação do mapa de competências da :SIGLA_UNIDADE_SUBPROCESSO: no processo :DESCRICAO_PROCESSO: foi devolvida para ajustes.
 
-   Acompanhe o processo no Sistema de Gestão de Competências: [URL_SISTEMA].
+   Acompanhe o processo no Sistema de Gestão de Competências: :URL_SISTEMA:.
    ```
 
    8.10. O sistema cria internamente um alerta com:
 
-    - Descrição: "Validação do mapa da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvida para ajustes"
-    - Processo: [DESCRICAO_PROCESSO]
+    - Descrição: "Validação do mapa da unidade :SIGLA_UNIDADE_SUBPROCESSO: devolvida para ajustes"
+    - Processo: :DESCRICAO_PROCESSO:
     - Data/hora: Data/hora atual
-    - Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-    - Unidade de destino: [SIGLA_UNIDADE_DEVOLUCAO].
+    - Unidade de origem: :SIGLA_UNIDADE_ANALISE:
+    - Unidade de destino: :SIGLA_UNIDADE_DEVOLUCAO:.
 
    8.11. O sistema redireciona para o `Painel` e mostra a mensagem "Devolução realizada".
 
@@ -93,7 +93,7 @@
 
    9.1. Usuário clica em `Registrar aceite`.
 
-   9.2. O sistema abre um modal (título "Aceitar mapa") com o texto "Confirma o aceite da validação do mapa?", um campo
+   9.2. O sistema abre um modal (título `Aceitar mapa`) com o texto "Confirma o aceite da validação do mapa?", um campo
    de observação opcional e os botões `Aceitar` e `Cancelar`.
 
    9.3. Caso o usuário escolha o `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela
@@ -104,36 +104,36 @@
    9.5. O sistema registra uma análise de validação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+    - `Unidade`: :SIGLA_UNIDADE_ANALISE:
     - `Resultado`: 'Aceite'
     - `Observação`: A observação da janela modal, caso tenha sido fornecida.
 
    9.6. O sistema registra uma movimentação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
-    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: 'Mapa de competências validado'
+    - `Unidade origem`: :SIGLA_UNIDADE_ANALISE:
+    - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
+    - `Descrição`: 'Validação do mapa aceita'
 
    9.7. O sistema envia notificação por e-mail para a unidade superior:
 
    ```text
-   Assunto: SGC: Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise 
+   Assunto: SGC: Validação do mapa de competências da :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise
    
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
 
-   A validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRICAO_PROCESSO] foi submetida para análise por essa unidade. 
+   A validação do mapa de competências da :SIGLA_UNIDADE_SUBPROCESSO: no processo :DESCRICAO_PROCESSO: foi submetida para análise por essa unidade. 
    
-   A análise já pode ser realizada no Sistema de Gestão de Competências ([URL_SISTEMA]).
+   A análise já pode ser realizada no Sistema de Gestão de Competências (:URL_SISTEMA:).
    ```
 
    9.8. O sistema cria internamente um alerta com:
 
-    - Descrição: "Validação do mapa da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise"
-    - Processo: [DESCRICAO_PROCESSO]
+    - Descrição: "Validação do mapa da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise"
+    - Processo: :DESCRICAO_PROCESSO:
     - Data/hora: Data/hora atual
-    - Unidade de origem: [SIGLA_UNIDADE_ANALISE]
-    - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
+    - Unidade de origem: :SIGLA_UNIDADE_ANALISE:
+    - Unidade de destino: :SIGLA_UNIDADE_SUPERIOR:.
 
    9.9. O sistema redireciona para o Painel e mostra a mensagem "Aceite registrado".
 

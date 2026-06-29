@@ -19,7 +19,7 @@
 3. O usuário aciona `Homologar em bloco`
 
 4. O sistema mostra um modal de confirmação:
-    - Título: "Homologação de diagnósticos em bloco";
+    - Título: `Homologação de diagnósticos em bloco`;
     - Texto: "Selecione as unidades cujos diagnósticos devem ser homologados";
     - Uma grade com as unidades na situação 'Concluído' e com subprocesso localizado na unidade do usuário, com um
       checkbox (pré-selecionado), sigla, nome e situação de cada unidade;
@@ -33,7 +33,7 @@
 
    6.1. Registra uma análise de validação para o subprocesso da unidade:
     - `Data/hora`: [Data/hora atual]
-    - `Unidade`: [SIGLA_UNIDADE_ATUAL]
+    - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: "Homologação"
 
    6.2. Registra uma movimentação para o subprocesso da unidade:

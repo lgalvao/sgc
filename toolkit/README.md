@@ -60,6 +60,7 @@ node toolkit/sgc.js backend testes gerar-stub
 node toolkit/sgc.js backend java corrigir-fqn
 node toolkit/sgc.js backend java auditar-null
 node toolkit/sgc.js backend java instalar-certificados
+node toolkit/sgc.js backend notificacoes auditar-assuntos
 ```
 
 ### Frontend
@@ -108,6 +109,14 @@ node toolkit/sgc.js comunicacao templates-email
 ```bash
 node toolkit/sgc.js requisitos cdus inventariar
 node toolkit/sgc.js requisitos cdus auditar
+node toolkit/sgc.js requisitos cdus auditar-estilo
+node toolkit/sgc.js requisitos cdus inventariar-vocabulario
+node toolkit/sgc.js requisitos cdus auditar-vocabulario
+node toolkit/sgc.js requisitos cdus inventariar-mensagens
+node toolkit/sgc.js requisitos cdus auditar-mensagens
+node toolkit/sgc.js requisitos cdus auditar-mensagens-codigo
+node toolkit/sgc.js requisitos cdus inventariar-densidade
+node toolkit/sgc.js requisitos cdus inventariar-duplicacoes
 ```
 
 ### QA

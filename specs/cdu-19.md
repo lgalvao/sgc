@@ -26,7 +26,7 @@
 
 4. Se o usuário clicar em `Apresentar sugestões`:
 
-   4.1. O sistema abre um modal "Apresentar sugestões" com um campo de **texto formatado** (obrigatório), para inclusão
+   4.1. O sistema abre um modal `Apresentar sugestões` com um campo de **texto formatado** (obrigatório), para inclusão
    das sugestões.
 
     - Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com
@@ -41,27 +41,27 @@
    abaixo:
 
       ```text
-      Assunto: SGC: Sugestões apresentadas para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO]
+      Assunto: SGC: Sugestões apresentadas para o mapa de competências da :SIGLA_UNIDADE_SUBPROCESSO:
 
-      Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-      A unidade [SIGLA_UNIDADE_SUBPROCESSO] apresentou sugestões para o mapa de competências elaborado no processo [DESCRICAO_PROCESSO].
+      Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
+      A unidade :SIGLA_UNIDADE_SUBPROCESSO: apresentou sugestões para o mapa de competências elaborado no processo :DESCRICAO_PROCESSO:.
 
-      A análise dessas sugestões já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+      A análise dessas sugestões já pode ser realizada no O sistema de Gestão de Competências (:URL_SISTEMA:).
       ```
 
    4.5. O sistema cria internamente um alerta com:
 
-    - `Descrição`: "Sugestões para o mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Sugestões para o mapa de competências da unidade :SIGLA_UNIDADE_SUBPROCESSO: aguardando análise"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+    - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:.
 
    4.6. O sistema mostra a mensagem "Mapa submetido com sugestões para análise da unidade superior".
 
 5. Se usuário clicar em **Validar**:
 
-   5.1. O sistema mostra diálogo de confirmação, com título ''Validação do mapa" e mensagem "Confirma a validação do
+   5.1. O sistema mostra diálogo de confirmação, com título `Validação do mapa` e mensagem "Confirma a validação do
    mapa de competências? Essa ação habilita a análise por unidades superiores''/ Botões `Cancelar` e `Validar`.
 
    5.1.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de validação, permanecendo na mesma tela.
@@ -73,31 +73,31 @@
    5.4. O sistema notifica a unidade superior hierárquica da validação do mapa, com e-mail no modelo abaixo:
 
       ```text
-      Assunto: SGC: Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] submetida para análise
+      Assunto: SGC: Validação do mapa de competências da :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise
 
-      Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+      Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
 
-      A unidade [SIGLA_UNIDADE_SUBPROCESSO] validou o mapa de competências elaborado no processo [DESCRICAO_PROCESSO].
+      A unidade :SIGLA_UNIDADE_SUBPROCESSO: validou o mapa de competências elaborado no processo :DESCRICAO_PROCESSO:.
 
-      A análise dessa validação já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+      A análise dessa validação já pode ser realizada no O sistema de Gestão de Competências (:URL_SISTEMA:).
       ```
 
    5.5. O sistema cria internamente um alerta com:
 
-    - `Descrição`: "Validação do mapa de competências da [SIGLA_UNIDADE_SUBPROCESSO] aguardando análise"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Validação do mapa de competências da unidade :SIGLA_UNIDADE_SUBPROCESSO: aguardando análise"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+    - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:.
 
    5.6. O sistema mostra a mensagem "Mapa validado e submetido para análise à unidade superior".
 
 6. O sistema registra uma movimentação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: "Apresentação de sugestões para o mapa", ou "Validação do mapa", conforme o caso.
+    - `Unidade origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
+    - `Descrição`: "Sugestões apresentadas para o mapa", ou "Mapa validado", conforme o caso.
 
 7. O sistema define a data/hora de conclusão da Etapa 2 do subprocesso da unidade como sendo a atual.
 

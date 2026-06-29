@@ -29,8 +29,8 @@
 8. O sistema registra uma movimentação para o subprocesso, com os campos:
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: ADMIN
-    - `Unidade destino`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Descrição`: "Reabertura de cadastro"
+    - `Unidade destino`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Descrição`: "Cadastro reaberto"
 
 9. O sistema envia notificações por e-mail para a unidade do subprocesso e para a sua unidade superior na hierarquia,
    seguindo estes modelos:
@@ -38,44 +38,44 @@
    9.1. Para a unidade do subprocesso:
 
     ```text
-    Assunto: SGC: Reabertura de cadastro de atividades
+    Assunto: SGC: Reabertura de cadastro de atividades - :SIGLA_UNIDADE_SUBPROCESSO:
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+    Prezado(a) responsável pela :SIGLA_UNIDADE_SUBPROCESSO:,
 
     O cadastro de atividades da sua unidade foi reaberto para ajustes.
 
-    Justificativa: [JUSTIFICATIVA]
+    Justificativa: :JUSTIFICATIVA:
 
-    Acesse o sistema SGC para realizar as alterações necessárias: [URL_SISTEMA].
+    Acesse o sistema SGC para realizar as alterações necessárias: :URL_SISTEMA:.
     ```
 
    9.2. Para a unidade imediatamente superior:
 
     ```text
-    Assunto: SGC: Reabertura de cadastro de atividades: [SIGLA_UNIDADE_SUBPROCESSO]
+    Assunto: SGC: Reabertura de cadastro de atividades - :SIGLA_UNIDADE_SUBPROCESSO:
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+    Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
 
-    Informamos que o cadastro de atividades da unidade [SIGLA_UNIDADE_SUBPROCESSO] foi reaberto para ajustes.
+    Informamos que o cadastro de atividades da unidade :SIGLA_UNIDADE_SUBPROCESSO: foi reaberto para ajustes.
 
-    Justificativa: [JUSTIFICATIVA]
+    Justificativa: :JUSTIFICATIVA:
 
     Após a conclusão dos ajustes, o cadastro será submetido novamente para sua análise.
     ```
 
 10. O sistema cria internamente alertas:
    10.1. Para a unidade solicitante:
-    - `Descrição`: "Cadastro de atividades reaberto"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Cadastro reaberto"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE]
+    - `Unidade de destino`: :SIGLA_UNIDADE:
 
    10.2. Para a unidade superior:
-    - `Descrição`: "Cadastro reaberto para unidade [SIGLA_UNIDADE_SUBORDINADA]"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Cadastro reaberto"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 
 11. O sistema mostra *toast* "Cadastro reaberto".

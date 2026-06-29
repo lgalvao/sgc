@@ -47,16 +47,16 @@ Se o usuário acionar `Histórico de análise`:
 Se o usuário acionar `Devolver para ajustes`:
 
 - O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso
-   (referida como [SIGLA_UNIDADE_DEVOLUCAO]).
+   (referida como :SIGLA_UNIDADE_DEVOLUCAO:).
 
-7. O sistema mostra um modal com título "Devolução de diagnóstico" e texto "Confirma a devolução do diagnóstico da
-   unidade [SIGLA_UNIDADE_SUBPROCESSO]?", campo `Justificativa` obrigatório e botões `Cancelar` e `Devolver`.
+7. O sistema mostra um modal com título `Devolução de diagnóstico` e texto "Confirma a devolução do diagnóstico da
+   unidade :SIGLA_UNIDADE_SUBPROCESSO:?", campo `Justificativa` obrigatório e botões `Cancelar` e `Devolver`.
 
 8. O usuário aciona `Devolver`, e o sistema realiza estas ações:
 
    8.1. Registra uma análise de validação para o subprocesso:
     - `Data/hora`: [Data/hora atual]
-    - `Unidade`: [SIGLA_UNIDADE_ATUAL]
+    - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: 'Devolução para ajustes'
     - `Justificativa`: [Justificativa fornecida]
 
@@ -64,29 +64,29 @@ Se o usuário acionar `Devolver para ajustes`:
    para 'Avaliação de consenso criada'. (Isso faz com o sistema volte a habilitar a edição das avaliações de consenso.)
 
 9. O sistema envia notificação por e-mail para a unidade de origem da última movimentação do subprocesso
-   ([SIGLA_UNIDADE_DEVOLUCAO]):
+   (:SIGLA_UNIDADE_DEVOLUCAO:):
     ```text
     Assunto: SGC: Diagnóstico devolvido para ajustes
     
-    Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
+    Prezado(a) responsável pela :SIGLA_UNIDADE_DEVOLUCAO:,
     
-    O diagnóstico da sua unidade, no processo [DESCRICAO_PROCESSO], foi devolvido para ajustes.
+    O diagnóstico da sua unidade, no processo :DESCRICAO_PROCESSO:, foi devolvido para ajustes.
     
-    Realize as mudanças solicitadas no Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
+    Realize as mudanças solicitadas no Sistema de Gestão de Competências (SGC): :URL_SISTEMA:.
     ```
 
 10. O sistema cria um alerta:
     - `Descrição`: "Diagnóstico devolvido para ajustes"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
-    - `Unidade de destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+    - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
+    - `Unidade de destino`: :SIGLA_UNIDADE_DEVOLUCAO:
 
 11. O sistema cria uma movimentação para o subprocesso:
     - `Descrição`: 'Devolução para ajustes'
     - `Data/hora`: [Data/hora atual]
-    - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
-    - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
+    - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
+    - `Unidade destino`: :SIGLA_UNIDADE_DEVOLUCAO:
 
     Isso muda a localização do subprocesso para a unidade de devolução.
 
@@ -96,42 +96,42 @@ Se o usuário acionar `Devolver para ajustes`:
 
 Se o usuário acionar `Registrar aceite`:
 
-13. O sistema abre um modal, com título "Aceitar diagnóstico" e texto "Confirma o aceite do diagnóstico da
-    unidade [SIGLA_UNIDADE_SUBPROCESSO]?" e os botões `Cancelar` e `Aceitar`.
+13. O sistema abre um modal, com título `Aceitar diagnóstico` e texto "Confirma o aceite do diagnóstico da
+    unidade :SIGLA_UNIDADE_SUBPROCESSO:?" e os botões `Cancelar` e `Aceitar`.
 
 14. O usuário aciona `Aceitar`.
 
 15. O sistema registra uma análise de validação para o subprocesso:
     - `Resultado`: 'Aceite'
     - `Data/hora`: [Data/hora atual]
-    - `Unidade`: [SIGLA_UNIDADE_ATUAL]
+    - `Unidade`: :SIGLA_UNIDADE_ATUAL:
 
 16. O sistema cria um alerta:
-    - `Descrição`: "Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Diagnóstico da unidade :SIGLA_UNIDADE_SUBPROCESSO: aceito"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_ATUAL]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR]
+    - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 
 17. O sistema cria uma movimentação para o subprocesso com estes campos:
     - `Descrição`: 'Aceite'
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_ATUAL]
-    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
+    - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
+    - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
 
     Isso muda a localização do subprocesso para a unidade superior.
 
 18. O sistema envia notificação por e-mail para a unidade superior:
 
    ```text
-   Assunto: SGC: Diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO] aceito
+   Assunto: SGC: Diagnóstico da unidade :SIGLA_UNIDADE_SUBPROCESSO: aceito
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
 
-   O diagnóstico da unidade [SIGLA_UNIDADE_SUBPROCESSO], no processo [DESCRICAO_PROCESSO],
+   O diagnóstico da unidade :SIGLA_UNIDADE_SUBPROCESSO:, no processo :DESCRICAO_PROCESSO:,
    foi submetido para análise.
 
-   Realize a análise acessando o Sistema de Gestão de Competências (SGC): [URL_SISTEMA].
+   Realize a análise acessando o Sistema de Gestão de Competências (SGC): :URL_SISTEMA:.
    ```
 
 19. O sistema mostra o *toast* "Aceite registrado".
@@ -140,15 +140,15 @@ Se o usuário acionar `Registrar aceite`:
 
 Se o usuário optar por `Homologar` (apenas perfil ADMIN):
 
-20. O sistema mostra um modal com título "Homologar diagnóstico" e texto "Confirma a homologação diagnóstico da
-    unidade [SIGLA_UNIDADE_SUBPROCESSO]?" e botões `Cancelar` e `Homologar`.
+20. O sistema mostra um modal com título `Homologar diagnóstico` e texto "Confirma a homologação diagnóstico da
+    unidade :SIGLA_UNIDADE_SUBPROCESSO:?" e botões `Cancelar` e `Homologar`.
 
 21. O usuário aciona `Homologar`.
 
 22. O sistema registra uma análise de validação para o subprocesso:
     - `Resultado`: 'Homologação'
     - `Data/hora`: [Data/hora atual]
-    - `Unidade`: [SIGLA_UNIDADE_ATUAL]
+    - `Unidade`: :SIGLA_UNIDADE_ATUAL:
 
 23. O sistema cria uma movimentação para o subprocesso com estes campos:
     - `Descrição`: 'Homologação'

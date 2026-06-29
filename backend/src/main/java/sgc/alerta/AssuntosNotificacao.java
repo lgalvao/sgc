@@ -105,4 +105,36 @@ public final class AssuntosNotificacao {
     public static String aceiteValidacaoBlocoSuperior() {
         return "SGC: Validação de mapas de competências submetida para análise";
     }
+
+    public static String diagnosticoAutoavaliacaoConcluida(String nomeServidor) {
+        return "SGC: Autoavaliação concluída: %s".formatted(nomeServidor);
+    }
+
+    public static String diagnosticoConsensoDisponivel() {
+        return "SGC: Avaliação de consenso criada";
+    }
+
+    public static String diagnosticoConsensoAprovado(String nomeServidor) {
+        return "SGC: Avaliação de consenso aprovada: %s".formatted(nomeServidor);
+    }
+
+    public static String diagnosticoConcluido(String siglaUnidade) {
+        return "SGC: Diagnóstico da unidade %s submetido para análise".formatted(siglaUnidade);
+    }
+
+    public static String diagnosticoDevolvido(String siglaUnidade) {
+        return "SGC: Diagnóstico da unidade %s devolvido para ajustes".formatted(siglaUnidade);
+    }
+
+    public static String diagnosticoAceito(String siglaUnidade) {
+        return "SGC: Diagnóstico da unidade %s aceito".formatted(siglaUnidade);
+    }
+
+    public static String diagnosticosAceitosEmBloco() {
+        return "SGC: Diagnósticos submetidos para análise";
+    }
+
+    public static String diagnosticoHomologado(String siglaUnidade) {
+        return "SGC: Diagnóstico da unidade %s homologado".formatted(siglaUnidade);
+    }
 }

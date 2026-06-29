@@ -26,7 +26,7 @@
 
 6. O sistema abre modal de confirmação, com os elementos a seguir:
 
-    - Título "Homologação de mapa em bloco";
+    - Título `Homologação de mapa em bloco`;
     - Texto "Selecione as unidades cujos mapas deverão ser homologados:";
     - Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser homologados, sendo
       apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome;
@@ -47,27 +47,27 @@
     - `Data/hora`: [Data/hora atual]
     - `Unidade origem`: "ADMIN"
     - `Unidade destino`: "ADMIN"
-    - `Descrição`: "Mapa de competências homologado"
+    - `Descrição`: "Mapa homologado"
 
    9.2. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
 
    9.3. O sistema cria internamente um alerta:
-    - `Descrição`: "Mapa de competências da unidade [SIGLA_UNIDADE_SUBPROCESSO] homologado"
-    - `Processo`: [DESCRIÇÃO_PROCESSO]
+    - `Descrição`: "Mapa de competências da unidade :SIGLA_UNIDADE_SUBPROCESSO: homologado"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
    9.4. O sistema envia notificação por e-mail para a unidade do subprocesso:
 
     ```text
     Assunto: SGC: Mapa de competências homologado
 
-    Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+    Prezado(a) responsável pela :SIGLA_UNIDADE_SUBPROCESSO:,
 
-    O mapa de competências da sua unidade foi homologado no processo [DESCRIÇÃO_PROCESSO].
+    O mapa de competências da sua unidade foi homologado no processo :DESCRICAO_PROCESSO:.
 
-    Acompanhe o processo no Sistema de Gestão de Competências ([URL_SISTEMA]).
+    Acompanhe o processo no Sistema de Gestão de Competências (:URL_SISTEMA:).
     ```
 
 10. O sistema mostra mensagem de confirmação: "Mapas de competências homologados em bloco" e redireciona para o Painel.

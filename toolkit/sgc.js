@@ -49,6 +49,8 @@ const backendJava = backend.command("java").description("Utilitarios Java do bac
 criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "toolkit/backend/java-corrigir-fqn.js");
 criarComandoScript(backendJava, "auditar-null", "Audita verificacoes de null no backend.", "toolkit/backend/java-auditar-null.js");
 criarComandoScript(backendJava, "instalar-certificados", "Importa certificados locais no cacerts.", "toolkit/backend/java-instalar-certificados.js");
+const backendNotificacoes = backend.command("notificacoes").description("Auditorias de notificacoes e assuntos do backend.");
+criarComandoScript(backendNotificacoes, "auditar-assuntos", "Audita literais de assunto de notificacao fora de AssuntosNotificacao.", "toolkit/backend/notificacoes-assuntos-auditar.js");
 
 const frontend = program.command("frontend").description("Ferramentas do frontend.");
 const frontendCobertura = frontend.command("cobertura").description("Cobertura e diagnosticos do frontend.");
@@ -121,6 +123,14 @@ const requisitos = program.command("requisitos").description("Ferramentas de inv
 const requisitosCdus = requisitos.command("cdus").description("Inventario e auditoria read-only dos casos de uso.");
 criarComandoScript(requisitosCdus, "inventariar", "Inventaria formatos e convenções implícitas dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar.js");
 criarComandoScript(requisitosCdus, "auditar", "Audita a estrutura canônica mínima dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar.js");
+criarComandoScript(requisitosCdus, "auditar-estilo", "Audita convenções tipográficas de aspas simples, aspas duplas e crases nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-estilo.js");
+criarComandoScript(requisitosCdus, "inventariar-vocabulario", "Inventaria perfis, situações, tipos de processo e elementos de UI recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-vocabulario.js");
+criarComandoScript(requisitosCdus, "auditar-vocabulario", "Audita variações de vocabulário controlado nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-vocabulario.js");
+criarComandoScript(requisitosCdus, "inventariar-mensagens", "Inventaria descrições, assuntos, mensagens e toasts recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-mensagens.js");
+criarComandoScript(requisitosCdus, "auditar-mensagens", "Audita problemas mecânicos em descrições, assuntos, mensagens e toasts dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-mensagens.js");
+criarComandoScript(requisitosCdus, "auditar-mensagens-codigo", "Compara descrições, mensagens e toasts dos `specs/cdu-*.md` com mensagens canônicas extraídas do código.", "toolkit/requisitos/cdus-auditar-mensagens-codigo.js");
+criarComandoScript(requisitosCdus, "inventariar-densidade", "Inventaria densidade documental dos `specs/cdu-*.md` por palavras, passos e profundidade de listas.", "toolkit/requisitos/cdus-inventariar-densidade.js");
+criarComandoScript(requisitosCdus, "inventariar-duplicacoes", "Inventaria blocos textuais duplicados nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-duplicacoes.js");
 
 const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
 const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");

@@ -66,8 +66,8 @@ Se desejar **excluir** uma competência criada:
 
 13.1. O usuário clica no botão de ação de excluir no cabeçalho do bloco correspondente à competência.
 
-13.2. O sistema mostra diálogo de confirmação: Título "Exclusão de competência", mensagem "Confirma a exclusão da
-competência [DESCRICAO_COMPETENCIA]?", Botões `Confirmar` e `Cancelar`.
+13.2. O sistema mostra diálogo de confirmação: Título `Exclusão de competência`, mensagem "Confirma a exclusão da
+competência :DESCRICAO_COMPETENCIA:?", Botões `Confirmar` e `Cancelar`.
 
 13.3. O usuário confirma a exclusão.
 

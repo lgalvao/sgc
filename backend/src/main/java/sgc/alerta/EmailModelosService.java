@@ -129,7 +129,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoAutoavaliacaoConcluida(String siglaUnidade, String nomeServidor, String nomeProcesso, String urlSistema) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Autoavaliação concluída");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoAutoavaliacaoConcluida(nomeServidor));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable("nomeServidor", nomeServidor);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
@@ -139,7 +139,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoConsensoDisponivel(String nomeServidor, String siglaUnidade, String nomeProcesso, String urlSistema) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Avaliação de consenso criada");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoConsensoDisponivel());
         ctx.setVariable("nomeServidor", nomeServidor);
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
@@ -149,7 +149,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoConsensoAprovado(String siglaUnidade, String nomeServidor, String nomeProcesso, String urlSistema) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Consenso aprovado");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoConsensoAprovado(nomeServidor));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable("nomeServidor", nomeServidor);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
@@ -159,7 +159,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoConcluido(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso, String urlSistema) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Diagnóstico concluído");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoConcluido(siglaUnidadeOrigem));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
         ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
@@ -169,7 +169,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoDevolvido(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso, String observacoes) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Diagnóstico devolvido");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoDevolvido(siglaUnidadeOrigem));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
         ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
@@ -179,7 +179,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoAceito(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Diagnóstico aceito");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoAceito(siglaUnidadeOrigem));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
         ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
@@ -188,7 +188,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoAceitoEmBloco(String siglaUnidadeDestino, String nomeProcesso, List<String> siglasUnidades) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Diagnósticos aceitos");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticosAceitosEmBloco());
         ctx.setVariable("siglaUnidadeSuperior", siglaUnidadeDestino);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         ctx.setVariable("siglasUnidades", siglasUnidades);
@@ -197,7 +197,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoHomologado(String siglaUnidade, String nomeProcesso) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, "Diagnóstico homologado");
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoHomologado(siglaUnidade));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         return templateEngine.process("diagnostico-homologado", ctx);

@@ -31,7 +31,7 @@
 
 5.1. Se o usuário acionar um servidor com situação **diferente** de 'Avaliação de consenso aprovada'.
 
-5.2. O sistema mostra, no `Painel de competências`, um painel com título "Aguardando aprovação de consenso" e
+5.2. O sistema mostra, no `Painel de competências`, um painel com título `Aguardando aprovação de consenso` e
 subtítulo "A situação de capacitação só pode ser preenchida após o servidor aprovar a avaliação de consenso."
 
 ---

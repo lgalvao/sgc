@@ -33,7 +33,7 @@
 
 5. O sistema mostra a tela `Mapa de competências`, com as seguintes informações:
 
-    - Título "Mapa de competências técnicas"
+    - Título `Mapa de competências técnicas`
     - Identificação da unidade (sigla e nome).
     - Conjunto de competências, com cada competência mostrada em um bloco individual, contendo:
         - Descrição da competência como título.

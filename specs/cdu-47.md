@@ -19,8 +19,8 @@
 3. Ao lado do nome do servidor, o usuário escolhe a ação `Indicar impossibilidade`.
 
 4. O sistema abre uma tela de confirmação:
-    - título: "Indicação de impossibilidade";
-    - texto: "Confirma a impossibilidade de avaliação para [NOME_SERVIDOR]?";
+    - título: `Indicação de impossibilidade`;
+    - texto: "Confirma a impossibilidade de avaliação para :NOME_SERVIDOR:?";
     - campo `Justificativa`, obrigatório;
     - botões `Cancelar` e `Indicar impossibilidade`.
 

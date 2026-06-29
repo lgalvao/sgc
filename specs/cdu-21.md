@@ -23,8 +23,8 @@
 5. Caso negativo, o sistema exibe a mensagem "Não é possível finalizar o processo enquanto houver unidades com mapa não
    homologado", interrompe a operação e permanece na mesma tela.
 
-6. Caso positivo, o sistema mostra diálogo com título "Finalização de processo" e mensagem "Confirma a finalização do
-   processo [DESCRICAO_PROCESSO]? Essa ação tornará vigentes os mapas de competências homologados e notificará todas as
+6. Caso positivo, o sistema mostra diálogo com título `Finalização de processo` e mensagem "Confirma a finalização do
+   processo :DESCRICAO_PROCESSO:? Essa ação tornará vigentes os mapas de competências homologados e notificará todas as
    unidades participantes do processo.", além de botões `Cancelar` e `Finalizar`.
 
 7. O usuário aciona `Finalizar`.
@@ -38,30 +38,30 @@
    9.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo o modelo:
 
    ```text
-   Assunto: SGC: Finalização de processo de [TIPO_PROCESSO]
+   Assunto: SGC: Finalização de processo de :TIPO_PROCESSO:
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE],
+   Prezado(a) responsável pela :SIGLA_UNIDADE:,
 
    Comunicamos a finalização do processo [DESCRIÇÃO_PROCESSO] para a sua unidade.
 
    Já é possível visualizar o seu mapa de competências atualizado através do menu 
-   "Minha unidade" do Sistema de Gestão de Competências ([URL_SISTEMA]).
+   "Minha unidade" do Sistema de Gestão de Competências (:URL_SISTEMA:).
    ```
 
    9.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das unidades
    operacionais e interoperacionais subordinadas a elas, segundo o modelo:
 
    ```text
-   Assunto: SGC: Finalização do processo de [TIPO_PROCESSO] em unidades subordinadas
+   Assunto: SGC: Finalização do processo de :TIPO_PROCESSO: em unidades subordinadas
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE],
+   Prezado(a) responsável pela :SIGLA_UNIDADE:,
 
-   Comunicamos a finalização do processo [DESCRIÇÃO_PROCESSO] para as unidades [SIGLAS_UNIDADES_SUBORDINADAS].
+   Comunicamos a finalização do processo [DESCRIÇÃO_PROCESSO] para as unidades :SIGLAS_UNIDADES_SUBORDINADAS:.
 
    Já é possível visualizar os mapas de competências atualizados destas unidades através do menu 
-   "Minha unidade" do Sistema de Gestão de Competências ([URL_SISTEMA]).
+   "Minha unidade" do Sistema de Gestão de Competências (:URL_SISTEMA:).
    ```
 
-   Em ambos os modelos, [TIPO_PROCESSO] será "mapeamento" ou "revisão", conforme o caso.
+   Em ambos os modelos, :TIPO_PROCESSO: será "mapeamento" ou "revisão", conforme o caso.
 
 10. O sistema redireciona para o `Painel`, mostrando a mensagem "Processo finalizado".

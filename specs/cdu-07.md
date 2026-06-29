@@ -32,8 +32,8 @@
     - [Nome do responsável]
     - [Tipo da responsabilidade]: com estes valores possíveis:
         - "Titular"; ou
-        - "Substituição (até [DATA_TERMINO_SUBST])"; ou
-        - "Atrib. temporária (até [DATA_TERMINO_ATRIB])".
+        - "Substituição (até :DATA_TERMINO_SUBST:)"; ou
+        - "Atrib. temporária (até :DATA_TERMINO_ATRIB:)".
     - Ramal: [Ramal do responsável, no SGRH]
     - E-mail: [Endereço de e-mail do responsável, no SGRH]
 
@@ -46,7 +46,7 @@
    2.1.6. `Prazo para conclusão (etapa atual)`: Data limite da última etapa do subprocesso ainda não concluída na
    unidade.
 
-   2.3. Na seção `Movimentações do processo`, com título "Movimentações", é apresentada uma tabela com as movimentações
+   2.3. Na seção `Movimentações do processo`, com título `Movimentações`, é apresentada uma tabela com as movimentações
    pelas quais o subprocesso passou, com os campos: `Data/hora`, `Origem`, `Destino` e `Descrição`. Essas informações
    deverão ser apresentadas em ordem decrescente de data/hora.
 

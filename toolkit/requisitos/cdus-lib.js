@@ -8,7 +8,8 @@ const REGEX_SECAO_PRE = /^##\s+Pré-condições\s*$/m;
 const REGEX_SECAO_FLUXO = /^##\s+Fluxo principal\s*$/m;
 const REGEX_PASSO = /^(\d+)\.\s+/gm;
 const REGEX_LINK_CDU = /\[[^\]]+\]\(([^)]+)\)/g;
-const REGEX_PLACEHOLDER = /\[[A-Z0-9_]+\]/g;
+const REGEX_PLACEHOLDER_LEGADO = /\[[A-Z0-9_]+\]/g;
+const REGEX_PLACEHOLDER_CANONICO = /:[A-Z0-9_]+:/g;
 const REGEX_UI_CRONICA = /`[^`]+`/g;
 const REGEX_SITUACOES = /'[^'\n]+'/g;
 
@@ -108,7 +109,8 @@ function analisarArquivo(caminhoArquivo, texto) {
         quantidadePreCondicoes: preCondicoes.length,
         linksMarkdown: localizarLinksInternosCdu(texto),
         contagens: {
-            placeholders: (texto.match(REGEX_PLACEHOLDER) ?? []).length,
+            placeholdersCanonicos: (texto.match(REGEX_PLACEHOLDER_CANONICO) ?? []).length,
+            placeholdersLegados: (texto.match(REGEX_PLACEHOLDER_LEGADO) ?? []).length,
             uiEmCrases: (texto.match(REGEX_UI_CRONICA) ?? []).length,
             situacoesEntreAspas: (texto.match(REGEX_SITUACOES) ?? []).length,
             palavras: texto.split(/\s+/).filter(Boolean).length
@@ -151,5 +153,6 @@ export {
     extrairLinhaAtor,
     listarArquivosCdu,
     lerArquivo,
+    obterLinhas,
     validarLinksMarkdown
 };

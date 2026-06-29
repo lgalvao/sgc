@@ -87,7 +87,7 @@
    efetuar alterações.
 
    4.2. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente e redireciona para o Painel,
-   mostrando a mensagem "Processo [Descrição do Processo] removido".
+   mostrando a mensagem "Processo :DESCRICAO_PROCESSO: removido".
 
 ## Fluxo alternativo
 

@@ -42,21 +42,21 @@
 6. O sistema envia uma notificação por e-mail ao responsável pela unidade do subprocesso, com este modelo:
 
    ```text
-   Assunto: SGC: Avaliação de consenso aprovada: [NOME_SERVIDOR]
+   Assunto: SGC: Avaliação de consenso aprovada: :NOME_SERVIDOR:
 
-   Prezado(a) responsável pela [SIGLA_UNIDADE_SUBPROCESSO],
+   Prezado(a) responsável pela :SIGLA_UNIDADE_SUBPROCESSO:,
 
-   O servidor [NOME_SERVIDOR] aprovou a avaliação de consenso do processo [DESCRICAO_PROCESSO].
+   O servidor :NOME_SERVIDOR: aprovou a avaliação de consenso do processo :DESCRICAO_PROCESSO:.
 
-   Acompanhe o processo no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
+   Acompanhe o processo no Sistema de Gestão de Competências (SGC): (:URL_SISTEMA:).
    ```
 
 7. O sistema cria internamente um alerta com estes campos/valores:
-    - `Descrição`: "Avaliação de consenso aprovada: [NOME_SERVIDOR]"
-    - `Processo`: [DESCRICAO_PROCESSO]
+    - `Descrição`: "Avaliação de consenso aprovada: :NOME_SERVIDOR:"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
+    - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
 8. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com mensagem "Avaliação de consenso
    aprovada".

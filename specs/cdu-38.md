@@ -54,7 +54,7 @@ consultar detalhes operacionais e reenfileirar notificações com falha definiti
     - conteúdo HTML do e-mail renderizado em visualização isolada.
 
 9. Ao acionar `Reenviar` em uma notificação com falha definitiva, o sistema mostra um modal de confirmação com a
-   pergunta `Confirma o reenvio deste e-mail específico para [DESTINATARIO]?`.
+   pergunta `Confirma o reenvio deste e-mail específico para :DESTINATARIO:?`.
 
 10. Se o usuário confirmar, o sistema recoloca a notificação na fila de envio e mostra a mensagem
     `E-mail recolocado na fila de envio`.

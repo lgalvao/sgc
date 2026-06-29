@@ -57,7 +57,7 @@
 
     10.5. O sistema registra uma análise de cadastro para o subprocesso com:
     - `Data/hora`: Data/hora atual
-    - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+    - `Unidade`: :SIGLA_UNIDADE_ANALISE:
     - `Resultado`: 'Devolução'
     - `Observação`: A observação da janela modal, caso tenha sido fornecida.
 
@@ -66,9 +66,9 @@
 
     10.7. O sistema registra uma movimentação para o subprocesso com:
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
-    - `Unidade destino`: [SIGLA_UNIDADE_DEVOLUCAO]
-    - `Descrição`: 'Devolução do cadastro de atividades e conhecimentos para ajustes'
+    - `Unidade origem`: :SIGLA_UNIDADE_ANALISE:
+    - `Unidade destino`: :SIGLA_UNIDADE_DEVOLUCAO:
+    - `Descrição`: 'Revisão do cadastro devolvida para ajustes'
 
     10.8. Se a unidade de devolução for a própria unidade do subprocesso, o sistema altera a situação do subprocesso
     para 'Revisão do cadastro em andamento' e apaga a data/hora de conclusão da etapa 1 do subprocesso da unidade.
@@ -76,23 +76,22 @@
     10.9. O sistema envia notificação por e-mail para a unidade de devolução:
 
       ```text
-      Assunto: SGC: Revisão do cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] devolvida para ajustes
+      Assunto: SGC: Revisão do cadastro de atividades e conhecimentos da :SIGLA_UNIDADE_SUBPROCESSO: devolvida para ajustes
       
-      Prezado(a) responsável pela [SIGLA_UNIDADE_DEVOLUCAO],
+      Prezado(a) responsável pela :SIGLA_UNIDADE_DEVOLUCAO:,
       
-      A revisão do cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRIÇÃO DO PROCESSO] foi devolvida para ajustes.
+      A revisão do cadastro de atividades e conhecimentos da :SIGLA_UNIDADE_SUBPROCESSO: no processo :DESCRICAO_PROCESSO: foi devolvida para ajustes.
 
-      Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
+      Acompanhe o processo no sistema de Gestão de Competências: :URL_SISTEMA:.
       ```
 
     10.10. O sistema cria internamente um alerta:
 
-    - `Descrição`: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] devolvido para
-      ajustes"
-    - `Processo`: [DESCRIÇÃO DO PROCESSO]
+    - `Descrição`: "Revisão do cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: devolvida para ajustes"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
-    - `Unidade de destino`: [SIGLA_UNIDADE_DEVOLUCAO].
+    - `Unidade de origem`: :SIGLA_UNIDADE_ANALISE:
+    - `Unidade de destino`: :SIGLA_UNIDADE_DEVOLUCAO:.
 
     10.11. O sistema redireciona para o Painel, mostrando a mensagem "Devolução realizada".
 
@@ -100,7 +99,7 @@
 
     11.1. Usuário clica em `Registrar aceite`.
 
-    11.2. O sistema abre um diálogo modal (título "Aceite") com a pergunta "Confirma o aceite da revisão do cadastro de
+    11.2. O sistema abre um diálogo modal (título `Aceite`) com a pergunta "Confirma o aceite da revisão do cadastro de
     atividades?", um campo de observação (opcional) e os botões `Confirmar` ou `Cancelar`.
 
     11.3. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de aceite, permanecendo na tela
@@ -111,38 +110,37 @@
     11.5. O sistema registra uma análise de cadastro para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade`: [SIGLA_UNIDADE_ANALISE]
+    - `Unidade`: :SIGLA_UNIDADE_ANALISE:
     - `Resultado`: 'Aceite'
     - `Observação`: A observação da janela modal, caso tenha sido fornecida.
 
     11.6. O sistema registra uma movimentação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: [SIGLA_UNIDADE_ANALISE]
-    - `Unidade destino`: [SIGLA_UNIDADE_SUPERIOR]
-    - `Descrição`: 'Revisão do cadastro de atividades e conhecimentos aceita'
+    - `Unidade origem`: :SIGLA_UNIDADE_ANALISE:
+    - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
+    - `Descrição`: 'Revisão do cadastro aceita'
 
     11.7. O sistema envia notificação por e-mail para a unidade superior:
 
       ```text
-      Assunto: SGC: Revisão do cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] submetido para análise
+      Assunto: SGC: Revisão do cadastro de atividades e conhecimentos da :SIGLA_UNIDADE_SUBPROCESSO: submetido para análise
       
-      Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
+      Prezado(a) responsável pela :SIGLA_UNIDADE_SUPERIOR:,
 
-      A revisão do cadastro de atividades e conhecimentos da [SIGLA_UNIDADE_SUBPROCESSO] no processo [DESCRIÇÃO_PROCESSO]
+      A revisão do cadastro de atividades e conhecimentos da :SIGLA_UNIDADE_SUBPROCESSO: no processo :DESCRICAO_PROCESSO:
       foi submetida para análise por essa unidade.
 
-      A análise já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
+      A análise já pode ser realizada no O sistema de Gestão de Competências (:URL_SISTEMA:).
       ```
 
     11.8. O sistema cria internamente um alerta com:
 
-    - `Descrição`: "Revisão do cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] submetida
-      para análise"
-    - `Processo`: [DESCRIÇÃO DO PROCESSO]
+    - `Descrição`: "Revisão do cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise"
+    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
-    - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
+    - `Unidade de origem`: :SIGLA_UNIDADE_ANALISE:
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:.
 
     11.9. O sistema mostra a mensagem "Aceite registrado" e redireciona para o Painel.
 
@@ -177,8 +175,8 @@
     12.3.4. O sistema registra uma movimentação para o subprocesso com:
 
     - `Data/hora`: Data/hora atual
-    - `Unidade origem`: 'ADMIN'
-    - `Unidade destino`: 'ADMIN'
+    - `Unidade origem`: `ADMIN`
+    - `Unidade destino`: `ADMIN`
     - `Descrição`: 'Cadastro homologado'
 
     12.3.5. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro homologada'.
