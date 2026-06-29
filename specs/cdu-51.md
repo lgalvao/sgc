@@ -1,6 +1,8 @@
 # CDU-51 - Aceitar diagnósticos em bloco
 
-**Ator:** GESTOR
+## Atores
+
+- GESTOR
 
 ## Pré-condições
 

@@ -1,6 +1,6 @@
 # CDU-09 - Disponibilizar cadastro de atividades e conhecimentos
 
-## Ator
+## Atores
 
 - CHEFE
 

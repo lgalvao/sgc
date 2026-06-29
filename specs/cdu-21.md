@@ -1,6 +1,8 @@
 # CDU-21 - Finalizar processo de mapeamento ou de revisão
 
-Ator: ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

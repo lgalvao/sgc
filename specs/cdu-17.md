@@ -1,6 +1,8 @@
 # CDU-17 - Disponibilizar mapa de competências
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

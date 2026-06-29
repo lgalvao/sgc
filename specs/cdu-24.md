@@ -1,6 +1,8 @@
 # CDU-24 - Disponibilizar mapas de competências em bloco
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

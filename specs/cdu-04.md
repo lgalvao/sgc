@@ -4,11 +4,11 @@
 
 - ADMIN
 
-## Pré-condições:
+## Pré-condições
 
 - Existência de ao menos um processo de mapeamento na situação 'Criado'
 
-## Fluxo principal:
+## Fluxo principal
 
 1. No `Painel`, o usuário clica em um processo de mapeamento que esteja na situação 'Criado'.
 

@@ -1,6 +1,11 @@
 # CDU-29 - Consultar histórico de processos
 
-**Atores:** Todos
+## Atores
+
+- ADMIN
+- GESTOR
+- CHEFE
+- SERVIDOR
 
 ## Pré-condições
 

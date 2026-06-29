@@ -1,6 +1,9 @@
 # CDU-50 - Analisar diagnóstico
 
-Ator: GESTOR, ADMIN
+## Atores
+
+- GESTOR
+- ADMIN
 
 ## Pré-condições
 
@@ -37,13 +40,13 @@ Ator: GESTOR, ADMIN
 ---
 Se o usuário acionar `Histórico de análise`:
 
-5. O sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e
+- O sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e
    observação/justificativa.
 
 ---
 Se o usuário acionar `Devolver para ajustes`:
 
-6. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso
+- O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso
    (referida como [SIGLA_UNIDADE_DEVOLUCAO]).
 
 7. O sistema mostra um modal com título "Devolução de diagnóstico" e texto "Confirma a devolução do diagnóstico da

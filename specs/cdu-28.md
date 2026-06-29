@@ -1,6 +1,8 @@
 # CDU-28 - Manter atribuição temporária
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

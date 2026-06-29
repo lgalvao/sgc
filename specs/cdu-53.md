@@ -1,6 +1,8 @@
 # CDU-53 - Finalizar processo de diagnóstico
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

@@ -1,6 +1,9 @@
 # CDU-14 - Analisar revisão de cadastro de atividades e conhecimentos
 
-Atores: GESTOR e ADMIN
+## Atores
+
+- GESTOR
+- ADMIN
 
 ## Pré-condições
 

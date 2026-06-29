@@ -1,6 +1,8 @@
 # CDU-31 - Configurar sistema
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

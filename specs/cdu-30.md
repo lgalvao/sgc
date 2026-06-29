@@ -1,6 +1,8 @@
 # CDU-30 - Manter administradores
 
-Ator: ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

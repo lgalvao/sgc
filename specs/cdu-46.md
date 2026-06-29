@@ -1,6 +1,8 @@
 # CDU-46 - Aprovar avaliação de consenso
 
-Ator: SERVIDOR
+## Atores
+
+- SERVIDOR
 
 ## Pré-condições
 

@@ -1,6 +1,8 @@
 # CDU-26 - Homologar validação de mapas em bloco
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

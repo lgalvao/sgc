@@ -1,6 +1,9 @@
 # CDU-54 - Gerar relatório de gaps de diagnóstico
 
-**Ator:** ADMIN ou GESTOR
+## Atores
+
+- ADMIN
+- GESTOR
 
 ## Pré-condições
 

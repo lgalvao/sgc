@@ -1,6 +1,11 @@
 # CDU-18 - Visualizar mapa de competências
 
-Ator: Usuário (todos os perfis)
+## Atores
+
+- ADMIN
+- GESTOR
+- CHEFE
+- SERVIDOR
 
 ## Pré-condições
 

@@ -1,6 +1,8 @@
 # CDU-40 - Consultar feedbacks enviados
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Descrição
 

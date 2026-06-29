@@ -1,6 +1,8 @@
 # CDU-27 - Alterar data limite de subprocesso
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

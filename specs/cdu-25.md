@@ -1,6 +1,8 @@
 # CDU-25 - Aceitar validação de mapas em bloco
 
-**Ator:** GESTOR
+## Atores
+
+- GESTOR
 
 ## Pré-condições
 

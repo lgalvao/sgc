@@ -1,6 +1,8 @@
 # CDU-49 - Concluir diagnóstico de uma unidade
 
-Ator: CHEFE
+## Atores
+
+- CHEFE
 
 ## Pré-condições
 

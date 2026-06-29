@@ -1,6 +1,8 @@
 # CDU-44 - Realizar autoavaliação
 
-Ator: SERVIDOR
+## Atores
+
+- SERVIDOR
 
 ## Pré-condições
 
@@ -28,22 +30,22 @@ Ator: SERVIDOR
 
 5. O usuário atribui valores de domínio e de importância para todas as competências.
 
-5. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de
+6. O sistema, durante a edição, salva automaticamente cada alteração realizada, sem necessidade de ação explícita de
    salvamento.
 
-6. O usuário clica em `Concluir autoavaliação`.
+7. O usuário clica em `Concluir autoavaliação`.
 
-7. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos.
+8. O sistema verifica se todas as competências tiveram seus campos `Importância` e `Domínio` preenchidos.
 
-   7.1. Caso exista competência com valores sem preencher, o sistema mostra a mensagem
+   8.1. Caso exista competência com valores sem preencher, o sistema mostra a mensagem
    "Preencha importância e domínio para todas as competências." e interrompe a conclusão.
 
-   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?",
+   8.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão da autoavaliação?",
    com botões `Cancelar` e `Concluir`
 
-   7.3. feita a confirmação, o sistema altera a situação do servidor para 'Autoavaliação concluída'.
+   8.3. feita a confirmação, o sistema altera a situação do servidor para 'Autoavaliação concluída'.
 
-8. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
+9. O sistema envia uma notificação por e-mail para o responsável pela unidade do subprocesso, com este modelo:
 
    ```text
    Assunto: SGC: Autoavaliação concluída: [NOME_SERVIDOR] 
@@ -55,12 +57,12 @@ Ator: SERVIDOR
    A análise já pode ser realizada no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
    ```
 
-9. O sistema cria internamente um alerta com estes campos/valores:
+10. O sistema cria internamente um alerta com estes campos/valores:
     - `Descrição`: "Autoavaliação concluída: [NOME_SERVIDOR]"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-10. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Autoavaliação
+11. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Autoavaliação
     concluída".

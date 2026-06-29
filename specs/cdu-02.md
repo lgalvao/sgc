@@ -7,7 +7,7 @@
 - CHEFE
 - SERVIDOR
 
-## Pré-condição
+## Pré-condições
 
 - Usuário ter feito login (qualquer perfil)
 

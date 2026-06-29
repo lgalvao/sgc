@@ -1,6 +1,8 @@
 # CDU-19 - Validar mapa de competências
 
-Ator: CHEFE
+## Atores
+
+- CHEFE
 
 ## Pré-condições
 

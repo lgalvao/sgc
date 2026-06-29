@@ -1,6 +1,11 @@
 # CDU-39 - Enviar feedback contextual
 
-**Ator:** TODOS
+## Atores
+
+- ADMIN
+- GESTOR
+- CHEFE
+- SERVIDOR
 
 ## Descrição
 

@@ -4,12 +4,12 @@
 
 - CHEFE
 
-## Pré-condições:
+## Pré-condições
 
 - Usuário logado com perfil CHEFE.
 - Subprocesso de revisão da unidade na situação 'Revisão do cadastro em andamento'.
 
-## Fluxo principal:
+## Fluxo principal
 
 1. No `Painel`, o usuário clica no processo de revisão na situação 'Em andamento'.
 
@@ -44,27 +44,27 @@
    9.1. Se o usuário desmarcar o checkbox, o sistema muda a situação do subprocesso de volta a 'Não iniciado' e desativa
    o botão `Disponibilizar`, até que sejam feitas mudanças no cadastro (e o cadastro esteja válido).
 
-9. O usuário clica no botão `Disponibilizar`.
+10. O usuário clica no botão `Disponibilizar`.
 
-10. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a
+11. O sistema mostra um diálogo de confirmação: título "Disponibilização da revisão do cadastro", mensagem "Confirma a
     disponibilização do cadastro? Essa ação bloqueia a edição pelo chefe e habilita a análise do cadastro por unidades
     superiores" / Botões `Disponibilizar` e `Cancelar`.
 
-10.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma
+11.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de disponibilização, permanecendo na mesma
 tela.
 
-11. O usuário escolhe `Disponibilizar`.
+12. O usuário escolhe `Disponibilizar`.
 
-12. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro disponibilizada'
+13. O sistema altera a situação do subprocesso da unidade para 'Revisão do cadastro disponibilizada'
 
-13. O sistema registra uma movimentação para o subprocesso com os campos:
+14. O sistema registra uma movimentação para o subprocesso com os campos:
 
     - Data/hora: Data/hora atual
     - Unidade origem: [SIGLA_UNIDADE_SUBPROCESSO]
     - Unidade destino: [SIGLA_UNIDADE_SUPERIOR]
     - Descrição: 'Disponibilização da revisão do cadastro'
 
-14. O sistema notifica unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
+15. O sistema notifica unidade superior hierárquica quanto à disponibilização, com e-mail no modelo abaixo:
 
     ```text
     Assunto: SGC: Revisão do cadastro de atividades e conhecimentos disponibilizada: [SIGLA_UNIDADE_SUBPROCESSO]
@@ -76,7 +76,7 @@ tela.
     A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
-15. O sistema cria internamente um alerta com:
+16. O sistema cria internamente um alerta com:
 
     - Descrição: "Cadastro de atividades e conhecimentos da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
       análise"
@@ -85,6 +85,6 @@ tela.
     - Unidade de origem: [SIGLA_UNIDADE_SUBPROCESSO]
     - Unidade de destino: [SIGLA_UNIDADE_SUPERIOR].
 
-16. O sistema define a data/hora de conclusão da Etapa 1 do subprocesso da unidade como sendo a data/hora atual.
+17. O sistema define a data/hora de conclusão da Etapa 1 do subprocesso da unidade como sendo a data/hora atual.
 
-17. O sistema redireciona para o `Painel`, e mostra a mensagem "Revisão do cadastro disponibilizada".
+18. O sistema redireciona para o `Painel`, e mostra a mensagem "Revisão do cadastro disponibilizada".

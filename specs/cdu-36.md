@@ -1,6 +1,13 @@
 # CDU-36 - Gerar relatório de mapas vigentes
 
-**Atores:** ADMIN, GESTOR
+## Atores
+
+- ADMIN
+- GESTOR
+
+## Pré-condições
+
+- Usuário autenticado com perfil ADMIN ou GESTOR.
 
 ## Descrição
 
@@ -21,7 +28,7 @@ Permite a geração dos mapas de competências vigentes, incluindo Competências
 
 4. O usuário escolhe as unidades na árvore para as quais quer gerar o relatório e aciona o botão `Gerar`.
 
-6. O sistema processa os dados e mostra na tela, logo abaixo dos controles, uma prévia contendo, para cada mapa, as seguintes informações:
+5. O sistema processa os dados e mostra na tela, logo abaixo dos controles, uma prévia contendo, para cada mapa, as seguintes informações:
 
     - (Para cada unidade selecionada:)
         - Unidade (Sigla e Nome)
@@ -30,6 +37,6 @@ Permite a geração dos mapas de competências vigentes, incluindo Competências
                 - Atividades da competencia
                     - Conhecimentos da atividade
 
-7. O usuário aciona o botão `PDF`.
+6. O usuário aciona o botão `PDF`.
 
-8. O sistema gera o arquivo PDF com os dados especificados acima, precedidos de um cabeçalho formal com brasão, nome do sistema, data/hora da geração e filtros aplicados.
+7. O sistema gera o arquivo PDF com os dados especificados acima, precedidos de um cabeçalho formal com brasão, nome do sistema, data/hora da geração e filtros aplicados.

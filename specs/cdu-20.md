@@ -1,6 +1,9 @@
 # CDU-20 - Analisar validação de mapa de competências
 
-Ator: GESTOR e ADMIN
+## Atores
+
+- GESTOR
+- ADMIN
 
 ## Pré-condições
 

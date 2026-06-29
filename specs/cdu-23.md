@@ -1,6 +1,8 @@
 # CDU-23 - Homologar cadastros em bloco
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 
@@ -12,11 +14,11 @@
 
 2. O sistema mostra a tela `Detalhes do processo`.
 
-4. O usuário aciona `Homologar cadastros em bloco`.
-
 3. O sistema identifica as **unidades aptas** para homologação em bloco: unidades subordinadas com subprocessos
    localizados na unidade do usuário e situação 'Cadastro disponibilizado' (mapeamento), ou 'Revisão do cadastro
    disponibilizada' (revisão).
+
+4. O usuário aciona `Homologar cadastros em bloco`.
 
 5. O sistema abre um modal de confirmação, com os elementos a seguir:
     - Título: "Homologação de cadastros em bloco";

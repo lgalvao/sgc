@@ -1,6 +1,8 @@
 # CDU-41 - Iniciar processo de diagnóstico
 
-Ator: ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

@@ -1,6 +1,8 @@
 # CDU-22 - Aceitar cadastros em bloco
 
-**Ator:** GESTOR
+## Atores
+
+- GESTOR
 
 ## Pré-condições
 

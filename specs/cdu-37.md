@@ -1,6 +1,8 @@
 # CDU-37 - Gerar relatório de unidades sem mapas vigentes
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Descrição
 

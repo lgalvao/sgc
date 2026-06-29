@@ -1,6 +1,8 @@
 # CDU-38 - Acompanhar notificações por e-mail
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Descrição
 

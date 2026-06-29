@@ -1,6 +1,9 @@
 # CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEFE e SERVIDOR
 
-Ator: CHEFE ou SERVIDOR
+## Atores
+
+- CHEFE
+- SERVIDOR
 
 ## Pré-condições
 

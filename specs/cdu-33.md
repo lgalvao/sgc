@@ -1,6 +1,8 @@
 # CDU-33 - Reabrir revisão de cadastro
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

@@ -1,6 +1,13 @@
 # CDU-35 - Gerar relatório de andamento
 
-**Ator:** ADMIN, GESTOR
+## Atores
+
+- ADMIN
+- GESTOR
+
+## Pré-condições
+
+- Usuário autenticado com perfil ADMIN ou GESTOR.
 
 ## Fluxo principal
 

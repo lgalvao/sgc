@@ -54,33 +54,33 @@
 
 ### Edição de processo
 
-1. Se usuário quiser editar o processo, clica na linha do processo na listagem de processos do `Painel` (apenas
+7. Se usuário quiser editar o processo, clica na linha do processo na listagem de processos do `Painel` (apenas
    processos na situação 'Criado' podem ser editados). Além dos botões `Cancelar`, `Salvar` e `Iniciar processo`, também
    será exibido o botão `Remover`.
 
-2. O sistema abre a tela `Cadastro de processo` preenchida com os dados atuais do processo.
+8. O sistema abre a tela `Cadastro de processo` preenchida com os dados atuais do processo.
 
-3. O usuário modifica os dados desejados. Apenas a descrição, as unidades participantes e a data limite podem ser
+9. O usuário modifica os dados desejados. Apenas a descrição, as unidades participantes e a data limite podem ser
    alteradas. O tipo do processo não pode ser alterado.
 
-4. O usuário escolhe o botão `Salvar`.
+10. O usuário escolhe o botão `Salvar`.
 
-5. O sistema valida os dados depois de editados, de acordo com as mesmas regras aplicadas no momento do primeiro
+11. O sistema valida os dados depois de editados, de acordo com as mesmas regras aplicadas no momento do primeiro
    cadastro.
 
-6. O sistema atualiza o processo e mostra a mensagem "Processo alterado.".
+12. O sistema atualiza o processo e mostra a mensagem "Processo alterado.".
 
 ### Remoção de processo
 
-1. Se usuário quiser remover o processo, clica na linha do processo na listagem de processos do `Painel` (apenas
+13. Se usuário quiser remover o processo, clica na linha do processo na listagem de processos do `Painel` (apenas
    processos na situação 'Criado' podem ser removidos). Além dos botões `Cancelar`, `Salvar` e `Iniciar processo`,
    também será exibido o botão `Remover`.
 
-2. O sistema abre a tela `Cadastro de processo`, preenchida com os dados atuais do processo.
+14. O sistema abre a tela `Cadastro de processo`, preenchida com os dados atuais do processo.
 
-3. O usuário escolhe o botão `Remover`.
+15. O usuário escolhe o botão `Remover`.
 
-4. O sistema mostra o diálogo de confirmação "Remover o processo '[Descrição do processo]'? Esta ação não poderá ser
+16. O sistema mostra o diálogo de confirmação "Remover o processo '[Descrição do processo]'? Esta ação não poderá ser
    desfeita.", com botões `Remover` e `Cancelar`.
 
    4.1. Se escolher `Cancelar` no diálogo: sistema fecha o diálogo e permanece na tela `Cadastro de processo`, sem

@@ -1,6 +1,8 @@
 # CDU-45 - Manter avaliação de consenso
 
-Ator: CHEFE
+## Atores
+
+- CHEFE
 
 ## Pré-condições
 
@@ -19,7 +21,7 @@ Ator: CHEFE
 
 3. Na grade de servidores da unidade, o usuário escolhe a ação `Manter avaliação de consenso` para um servidor.
 
-3. O sistema mostra a tela `Avaliação de consenso` para o servidor escolhido, com:
+4. O sistema mostra a tela `Avaliação de consenso` para o servidor escolhido, com:
     - título: "Avaliação de consenso";
     - subtítulo: [nome e título do servidor];
     - na barra de botões do cabeçalho, o botão `Concluir avaliação`;
@@ -48,25 +50,25 @@ Regras de apresentação, para cada competência:
 na unidade do usuário, o sistema mostra os elementos acima apenas em modo somente-leitura, desabilita o botão
 `Concluir avaliação` -- e o **caso de uso termina**.
 
-4. O usuário atribui (com a presença física do servidor) o valor de consenso para cada competência.
+5. O usuário atribui (com a presença física do servidor) o valor de consenso para cada competência.
 
-5. O sistema salva automaticamente cada alteração realizada. Não é necessária nenhuma ação para concluir a operação (a
+6. O sistema salva automaticamente cada alteração realizada. Não é necessária nenhuma ação para concluir a operação (a
    validação dos dados será feita na conclusão do diagnóstico, como um todo).
 
-6. Se o usuário acionar o botão `Voltar`, o sistema não valida o preenchimento dos dados, mantendo os dados salvos e o
+7. Se o usuário acionar o botão `Voltar`, o sistema não valida o preenchimento dos dados, mantendo os dados salvos e o
    **caso de uso termina**
 
-7. Se usuário acionar o botão `Concluir avaliação`, o sistema **valida** o preenchimento dos campos `Importância` e
+8. Se usuário acionar o botão `Concluir avaliação`, o sistema **valida** o preenchimento dos campos `Importância` e
    `Domínio` do chefe e de consenso.
 
-   7.1. Se houver campos não preenchidos o sistema mostra a mensagem "Preencha todos os campos" e interrompe a operação.
+   8.1. Se houver campos não preenchidos o sistema mostra a mensagem "Preencha todos os campos" e interrompe a operação.
 
-   7.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão de avaliação de consenso?",
+   8.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão de avaliação de consenso?",
    com botões `Cancelar` e `Concluir consenso`
 
-   7.3. feita a confirmação,o sistema muda a situação do servidor para 'Avaliação de consenso criada',
+   8.3. feita a confirmação,o sistema muda a situação do servidor para 'Avaliação de consenso criada',
 
-8. O sistema envia uma notificação por e-mail pessoal para o servidor da avaliação, com este modelo:
+9. O sistema envia uma notificação por e-mail pessoal para o servidor da avaliação, com este modelo:
 
     ```text
     Assunto: SGC: Avaliação de consenso criada 
@@ -78,7 +80,7 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
     A aprovação dessa avaliação pode ser realizada no Sistema de Gestão de Competências (SGC): ([URL_SISTEMA]).
     ```
 
-9. O sistema cria internamente um alerta com estes campos/valores:
+10. O sistema cria internamente um alerta com estes campos/valores:
     - `Descrição`: "Avaliação de consenso criada"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: [Data/hora atual]
@@ -86,5 +88,5 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]
     - `Unidade de destino`: [SIGLA_UNIDADE_SUBPROCESSO]
 
-10. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de consenso
+11. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de consenso
    criada".

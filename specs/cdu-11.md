@@ -1,6 +1,11 @@
 # CDU-11 - Visualizar cadastro de atividades e conhecimentos
 
-Ator: Usuário (todos os perfis)
+## Atores
+
+- ADMIN
+- GESTOR
+- CHEFE
+- SERVIDOR
 
 ## Pré-condições
 

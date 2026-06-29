@@ -7,12 +7,12 @@
 - CHEFE
 - SERVIDOR
 
-## Pré-condições:
+## Pré-condições
 
 - Usuário com credenciais válidas no TRE-PE (título e senha de rede)
 - Usuário cadastrado no SGRH, com lotação ativa em alguma unidade
 
-## Fluxo principal:
+## Fluxo principal
 
 1. O usuário abre a URL principal do sistema: https://sgc.tre-pe.jus.br.
 

@@ -1,6 +1,8 @@
 # CDU-16 - Ajustar mapa de competências
 
-Ator: ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

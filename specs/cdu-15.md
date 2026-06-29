@@ -1,6 +1,8 @@
 # CDU-15 - Manter mapa de competências
 
-Ator: ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

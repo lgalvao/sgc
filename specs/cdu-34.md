@@ -1,6 +1,8 @@
 # CDU-34 - Enviar lembrete de prazo
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 

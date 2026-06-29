@@ -1,6 +1,8 @@
 # CDU-48 - Preencher situações de capacitação
 
-Ator: CHEFE
+## Atores
+
+- CHEFE
 
 ## Pré-condições
 

@@ -1,6 +1,8 @@
 # CDU-52 - Homologar diagnósticos em bloco
 
-**Ator:** ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições
 
