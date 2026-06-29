@@ -3,7 +3,7 @@ import path from "node:path";
 import {globby} from "globby";
 
 const REGEX_TITULO = /^#\s+CDU-(\d{2})\s+-\s+(.+)$/m;
-const REGEX_LINHA_ATOR = /^\*\*Ator:\*\*\s+(.+)$/m;
+const REGEX_SECAO_ATORES = /^##\s+Atores\s*$/m;
 const REGEX_SECAO_PRE = /^##\s+Pré-condições\s*$/m;
 const REGEX_SECAO_FLUXO = /^##\s+Fluxo principal\s*$/m;
 const REGEX_PASSO = /^(\d+)\.\s+/gm;
@@ -32,7 +32,7 @@ function obterLinhas(texto) {
 
 function encontrarIndicesSecoes(linhas) {
     return {
-        ator: linhas.findIndex(linha => /^\*\*Ator:\*\*\s+.+$/.test(linha)),
+        ator: linhas.findIndex(linha => /^##\s+Atores\s*$/.test(linha)),
         pre: linhas.findIndex(linha => /^##\s+Pré-condições\s*$/.test(linha)),
         fluxo: linhas.findIndex(linha => /^##\s+Fluxo principal\s*$/.test(linha))
     };
@@ -64,11 +64,14 @@ function analisarArquivo(caminhoArquivo, texto) {
     const nomeArquivo = path.basename(caminhoArquivo);
     const linhas = obterLinhas(texto);
     const titulo = texto.match(REGEX_TITULO);
-    const ator = texto.match(REGEX_LINHA_ATOR);
+    const temAtores = REGEX_SECAO_ATORES.test(texto);
     const temPre = REGEX_SECAO_PRE.test(texto);
     const temFluxo = REGEX_SECAO_FLUXO.test(texto);
     const indices = encontrarIndicesSecoes(linhas);
     const passos = extrairPassosNumerados(texto);
+    const atores = linhas
+        .slice(indices.ator + 1, indices.pre > indices.ator ? indices.pre : undefined)
+        .filter(linha => /^\s*-\s+/.test(linha));
     const preCondicoes = linhas
         .slice(indices.pre + 1, indices.fluxo > indices.pre ? indices.fluxo : undefined)
         .filter(linha => /^\s*-\s+/.test(linha));
@@ -92,15 +95,16 @@ function analisarArquivo(caminhoArquivo, texto) {
         linhas,
         tituloNumero: titulo?.[1] ?? null,
         tituloTexto: titulo?.[2] ?? null,
-        atorTexto: ator?.[1] ?? null,
         temTituloCanonico: Boolean(titulo),
-        quantidadeLinhasAtorCanonicas: contarOcorrencias(linhas, /^\*\*Ator:\*\*\s+.+$/),
+        temAtores,
+        quantidadeSecoesAtoresCanonicas: contarOcorrencias(linhas, /^##\s+Atores\s*$/),
         temPre,
         temFluxo,
         indices,
         passos,
         repeticoes: [...new Set(repeticoes)],
         regressoes: [...new Set(regressoes)],
+        quantidadeAtores: atores.length,
         quantidadePreCondicoes: preCondicoes.length,
         linksMarkdown: localizarLinksInternosCdu(texto),
         contagens: {
@@ -127,7 +131,7 @@ function validarLinksMarkdown(analise) {
 
 function extrairLinhaAtor(texto) {
     const linhas = obterLinhas(texto);
-    return linhas.find(linha => /Ator(?:es)?/.test(linha)) ?? null;
+    return linhas.find(linha => /Atores|Ator(?:es)?/.test(linha)) ?? null;
 }
 
 function extrairCabecalhoPre(texto) {

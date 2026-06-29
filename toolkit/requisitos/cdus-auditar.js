@@ -23,8 +23,8 @@ function auditarAnalise(analise) {
         adicionarAchado(achados, "erro", "titulo_numero", "Número do título diverge do número do arquivo.");
     }
 
-    if (analise.quantidadeLinhasAtorCanonicas !== 1) {
-        adicionarAchado(achados, "erro", "ator_canonico", "Deve existir exatamente uma linha `**Ator:** ...`.");
+    if (analise.quantidadeSecoesAtoresCanonicas !== 1) {
+        adicionarAchado(achados, "erro", "atores_canonicos", "Deve existir exatamente uma seção `## Atores`.");
     }
 
     if (!analise.temPre) {
@@ -37,7 +37,11 @@ function auditarAnalise(analise) {
 
     const {ator, pre, fluxo} = analise.indices;
     if (ator >= 0 && pre >= 0 && fluxo >= 0 && !(ator < pre && pre < fluxo)) {
-        adicionarAchado(achados, "erro", "ordem_canonica", "A ordem canônica deve ser Ator, Pré-condições e Fluxo principal.");
+        adicionarAchado(achados, "erro", "ordem_canonica", "A ordem canônica deve ser Atores, Pré-condições e Fluxo principal.");
+    }
+
+    if (analise.temAtores && analise.quantidadeAtores === 0) {
+        adicionarAchado(achados, "erro", "atores_vazios", "A seção `Atores` deve conter ao menos um item.");
     }
 
     if (analise.temPre && analise.quantidadePreCondicoes === 0) {

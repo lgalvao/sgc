@@ -9,10 +9,12 @@ Todo CDU deve conter, nesta ordem:
 ```md
 # CDU-XX - Título do caso de uso
 
-**Ator:** ATOR1 ou AUTOR2
+## Atores
+
+- ATOR1
+- ATOR2
 
 ## Pré-condições
-
 - ...
 
 ## Fluxo principal
@@ -24,7 +26,8 @@ Todo CDU deve conter, nesta ordem:
 
 - O nome do arquivo deve seguir o padrão `cdu-xx.md`.
 - O título deve seguir o padrão `# CDU-XX - ...`, com o mesmo número do arquivo.
-- A linha de ator deve usar o formato `**Ator:** ...`.
+- A seção de atores deve usar exatamente o título `## Atores`.
+- A seção de atores deve listar um ou mais atores em itens de lista.
 - A seção de pré-condições deve usar exatamente o título `## Pré-condições`.
 - A seção de fluxo principal deve usar exatamente o título `## Fluxo principal`.
 - A numeração do fluxo principal deve ser contínua, sem reinício, repetição ou regressão.

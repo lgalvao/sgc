@@ -26,7 +26,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
             [
                 "# CDU-01 - Exemplo",
                 "",
-                "**Ator:** ADMIN",
+                "## Atores",
+                "",
+                "- ADMIN",
                 "",
                 "## Pré-condições",
                 "",
@@ -51,7 +53,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.totalArquivos).toBe(1);
-        expect(conteudo.formatosAtor["**Ator:** ADMIN"]).toBe(1);
+        expect(conteudo.formatosAtor["## Atores"]).toBe(1);
         expect(conteudo.formatosPreCondicoes["## Pré-condições"]).toBe(1);
         expect(conteudo.formatosFluxoPrincipal["## Fluxo principal"]).toBe(1);
         expect(conteudo.situacoesMaisFrequentes["'Em andamento'"]).toBe(1);
@@ -67,7 +69,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
             [
                 "# CDU-01 - Exemplo válido",
                 "",
-                "**Ator:** CHEFE",
+                "## Atores",
+                "",
+                "- CHEFE",
                 "",
                 "## Pré-condições",
                 "",
@@ -112,7 +116,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
         const invalido = conteudo.relatorio.find(item => item.arquivo === "specs/cdu-02.md");
         expect(invalido.achados.some(achado => achado.regra === "titulo_numero")).toBe(true);
-        expect(invalido.achados.some(achado => achado.regra === "ator_canonico")).toBe(true);
+        expect(invalido.achados.some(achado => achado.regra === "atores_canonicos")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "pre_condicoes")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "numeracao_repetida")).toBe(true);
     });
