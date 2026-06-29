@@ -35,7 +35,6 @@
           <BButton
               v-if="mostrarHistoricoAnaliseDiagnostico"
               data-testid="btn-historico-analise-subprocesso"
-              size="sm"
               variant="outline-secondary"
               @click="abrirHistoricoAnaliseDiagnostico"
           >

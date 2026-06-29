@@ -7,7 +7,7 @@ plugins {
 
 node {
     download.set(true)
-    version.set("22.22.0")
+    version.set("26.4.0")
 }
 
 tasks.register<NpmTask>("install") {

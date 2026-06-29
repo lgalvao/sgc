@@ -111,7 +111,7 @@
 
             <template v-if="servidorSelecionado">
               <EmptyState
-                  v-if="servidorSelecionado.situacaoServidor === 'AUTOAVALIACAO_NAO_INICIADA'"
+                  v-if="!possuiDadosCompetenciasServidorSelecionado"
                   :description="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TEXTO"
                   :title="TEXTOS.diagnostico.VAZIO_COMPETENCIAS_AUTOAVALIACAO_TITULO"
                   class="my-4"
@@ -266,6 +266,7 @@ const {
   servidorSelecionado,
   servidorSelecionadoTitulo,
   competenciasServidorSelecionado,
+  possuiDadosCompetenciasServidorSelecionado,
   movimentacoesFormatadas,
   colunasCompetenciasServidor,
 } = useDiagnosticoUnidadeView(props);

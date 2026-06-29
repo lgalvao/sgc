@@ -81,7 +81,7 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
     @Test
     @WithMockGestor("666666666666")
-    @DisplayName("GESTOR deve devolver para ajustes e reabrir o consenso da unidade")
+    @DisplayName("GESTOR deve devolver para ajustes sem reabrir a autoavaliação da unidade")
     void gestorDeveDevolverParaAjustes() throws Exception {
         buscarAvaliacoes("50003").forEach(avaliacao ->
                 avaliacao.setSituacaoServidorAnterior(SituacaoAvaliacaoServidor.CONSENSO_CRIADO));
@@ -101,7 +101,7 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         assertThat(buscarAvaliacoes("50003")).allSatisfy(avaliacao ->
                 {
                     assertThat(avaliacao.getSituacaoServidor())
-                            .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+                            .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
                     assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
                 });
         assertThat(buscarAvaliacoes("50004")).allSatisfy(avaliacao ->

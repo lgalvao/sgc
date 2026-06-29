@@ -210,7 +210,7 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
-    @DisplayName("devolverDiagnostico deve retornar para autoavaliação quando devolvido à unidade dona")
+    @DisplayName("devolverDiagnostico deve retornar para autoavaliação concluída quando devolvido à unidade dona")
     void devolverDiagnostico_deveRetornarParaAutoavaliacaoDaUnidade() {
         Long codSubprocesso = 91L;
         String observacao = "Ajustar consenso pendente";
@@ -246,7 +246,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(diagnostico.getDataConclusao()).isNull();
         assertThat(subprocesso.getDataFimEtapa1()).isNotNull();
         assertThat(avaliacaoAprovada.getSituacaoServidor())
-                .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+                .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         assertThat(avaliacaoAprovada.getSituacaoServidorAnterior()).isNull();
         assertThat(avaliacaoImpossibilitada.getSituacaoServidor())
                 .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);

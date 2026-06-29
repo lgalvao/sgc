@@ -336,6 +336,12 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         })),
     );
 
+    const possuiDadosCompetenciasServidorSelecionado = computed(() =>
+        competenciasServidorSelecionado.value.some((item) =>
+            item.importancia !== null || item.dominio !== null,
+        ),
+    );
+
     function formatarSituacaoCapacitacaoResumida(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
         if (!situacaoCapacitacao) {
             return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
@@ -432,6 +438,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         servidorSelecionado,
         servidorSelecionadoTitulo,
         competenciasServidorSelecionado,
+        possuiDadosCompetenciasServidorSelecionado,
         movimentacoesFormatadas,
         colunasCompetenciasServidor,
     };

@@ -403,14 +403,14 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('AC');
     });
 
-    it('mostra empty state em vez da tabela quando o servidor ainda nao iniciou a autoavaliacao', async () => {
+    it('mostra empty state em vez da tabela quando o servidor nao possui dados de importancia/dominio', async () => {
         const outroServidorTitulo = '242427';
         const outroServidorNome = 'Maria Eduarda Cavalcanti de Alencar';
         servidoresVal.value = [
             {
                 servidorTitulo: outroServidorTitulo,
                 servidorNome: outroServidorNome,
-                situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA',
+                situacaoServidor: 'CONSENSO_CRIADO',
                 consenso: [],
             },
         ];
@@ -422,6 +422,29 @@ describe('DiagnosticoUnidadeView', () => {
         expect(wrapper.text()).toContain('Autoavaliação não iniciada');
         expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(false);
         expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(false);
+    });
+
+    it('mostra a tabela quando existem dados de importancia/dominio independentemente da situacao do servidor', async () => {
+        const outroServidorTitulo = '242427';
+        const outroServidorNome = 'Maria Eduarda Cavalcanti de Alencar';
+        servidoresVal.value = [
+            {
+                servidorTitulo: outroServidorTitulo,
+                servidorNome: outroServidorNome,
+                situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA',
+                consenso: [
+                    {competenciaCodigo: CODIGO_COMPETENCIA_BASE, importancia: 3, dominio: 1},
+                ],
+            },
+        ];
+
+        const wrapper = montar();
+
+        await wrapper.get(`[data-testid="btn-selecionar-servidor-diagnostico-unidade-${outroServidorTitulo}"]`).trigger('click');
+
+        expect(wrapper.find('[data-testid="tbl-competencias-servidor-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="detalhes-servidor-diagnostico-unidade"]').exists()).toBe(true);
+        expect(wrapper.text()).not.toContain('As competências do servidor serão exibidas após o início da autoavaliação.');
     });
 
     it('valida, devolve com justificativa obrigatória e homologa como admin', async () => {

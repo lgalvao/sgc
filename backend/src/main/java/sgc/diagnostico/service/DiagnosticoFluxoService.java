@@ -194,7 +194,7 @@ public class DiagnosticoFluxoService {
             diagnostico.getAvaliacaoServidores().forEach(avaliacao -> {
                 avaliacao.setSituacaoServidorAnterior(null);
                 if (avaliacao.getSituacaoServidor() != SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA) {
-                    avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+                    avaliacao.setSituacaoServidor(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
                 }
             });
         }
