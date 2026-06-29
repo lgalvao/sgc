@@ -1,8 +1,12 @@
 # CDU-12 - Verificar impactos no mapa de competências
 
-Atores: CHEFE, GESTOR, ADMIN
+## Atores
 
-Pré-condições:
+- ADMIN
+- GESTOR
+- CHEFE
+
+## Pré-condições
 
 - Processo de Revisão
 - Uma das seguintes situações:
@@ -12,7 +16,7 @@ Pré-condições:
     - Perfil ADMIN e subprocesso nas situações 'Revisão do cadastro disponibilizada', 'Revisão do cadastro homologada'
       ou 'Mapa ajustado'
 
-Fluxo principal:
+## Fluxo principal
 
 1. No painel, o usuário clica no processo de revisão na situação 'Em andamento'.
 
@@ -69,7 +73,7 @@ Fluxo principal:
             <DESCRIÇÃO_ALTERAÇÃO>
    ```
 
-8. O usuário analisa as informações apresentadas na tela modal `Impacto no Mapa de Competências` e, ao concluir a
-   análise, clica em Fechar.
+8. O usuário analisa as informações apresentadas na tela modal `Impacto no mapa` e, ao concluir a análise, aciona
+   `Fechar`.
 
 9. O sistema fecha o modal, retornando o usuário para a tela original, que permanece com seu estado inalterado.

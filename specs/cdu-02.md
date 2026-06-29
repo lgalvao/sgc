@@ -1,6 +1,11 @@
 # CDU-02 - Visualizar painel
 
-Ator: Usuário (todos os perfis)
+## Atores
+
+- ADMIN
+- GESTOR
+- CHEFE
+- SERVIDOR
 
 ## Pré-condição
 

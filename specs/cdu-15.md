@@ -13,7 +13,7 @@ Ator: ADMIN
 
 2. O sistema mostra a tela `Detalhes do subprocesso`.
 
-3. O usuário clica no card `Mapa de competências`.
+3. O usuário aciona o card `Mapa de competências`.
 
 4. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa da unidade, com os seguintes elementos
    visuais:

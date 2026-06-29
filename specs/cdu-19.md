@@ -9,7 +9,7 @@ Ator: CHEFE
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário escolhe um processo e, na tela `Detalhes do subprocesso`, clica no card
+1. No `Painel`, o usuário escolhe um processo e, na tela `Detalhes do subprocesso`, aciona o card
    `Mapa de competências`.
 
 2. O sistema mostra a tela `Mapa de competências` com os botões `Apresentar sugestões` e `Validar`.

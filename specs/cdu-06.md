@@ -1,6 +1,9 @@
 # CDU-06 - Detalhar processo
 
-Atores: ADMIN e GESTOR
+## Atores
+
+- ADMIN
+- GESTOR
 
 ## Pré-condições
 

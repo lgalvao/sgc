@@ -1,13 +1,15 @@
 # CDU-05 - Iniciar processo de revisão
 
-Ator: ADMIN
+## Atores
 
-Pré-condições:
+- ADMIN
+
+## Pré-condições
 
 - Login realizado com perfil ADMIN
 - Existência de processo de revisão na situação 'Criado'
 
-Fluxo principal:
+## Fluxo principal
 
 1. No painel, o usuário clica em um processo de revisão que esteja na situação 'Criado'.
 
@@ -29,8 +31,8 @@ Fluxo principal:
        A seleção inclui unidades com equipe própria e unidades subordinadas. 
        Indique quais também devem participar deste processo.
       ```
-   Além disso, devem ser apresentadas essas unidades já selecionadas. 
-   
+   Além disso, devem ser apresentadas essas unidades já selecionadas.
+
 8. O usuário confirma a seleção complementar das unidades mostradas no diálogo.
 
 9. O sistema armazena internamente uma cópia da árvore de unidades participantes ('snapshot') e a vincula com o
@@ -85,15 +87,16 @@ Fluxo principal:
         Acompanhe o processo no sistema de Gestão de Competências: [URL_SISTEMA].
     ```
 
-15. O sistema cria internamente alertas para todas as unidades participantes. 15.1. Para cada unidade **operacional**
-    será criado um alerta com estes campos/valores:
+15. O sistema cria internamente alertas para todas as unidades participantes.
+
+    15.1. Para cada unidade **operacional**, será criado um alerta com estes campos/valores:
     - `Descrição`: "Início do processo"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: [SIGLA_UNIDADE].
 
-    15.2. Para cada unidade **intermediária** será criado um alerta com estes campos/valores:
+    15.2. Para cada unidade **intermediária**, será criado um alerta com estes campos/valores:
     - `Descrição`: "Início do processo em unidade (s) subordinada (s)"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual

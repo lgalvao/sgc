@@ -1,6 +1,8 @@
 # CDU-09 - Disponibilizar cadastro de atividades e conhecimentos
 
-Ator: CHEFE
+## Ator
+
+- CHEFE
 
 ## Pré-condições
 
@@ -13,7 +15,7 @@ Ator: CHEFE
 
 2. O sistema mostra tela `Detalhes do subprocesso` da unidade.
 
-3. O usuário clica no card `Atividades e conhecimentos`.
+3. O usuário aciona o card `Atividades e conhecimentos`.
 
 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos`, preenchida com os dados cadastrados até o momento.
 
@@ -62,15 +64,15 @@ Ator: CHEFE
     Assunto: SGC: Cadastro de atividades e conhecimentos disponibilizado - [SIGLA_UNIDADE_SUBPROCESSO]
 
     Prezado(a) responsável pela [SIGLA_UNIDADE_SUPERIOR],
-    A unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizou o cadastro de atividades e conhecimentos do processo [DESCRICAO_PROCESSO].
+    A unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizou o cadastro de atividades
+    e conhecimentos do processo [DESCRICAO_PROCESSO].
 
     A análise desse cadastro já pode ser realizada no O sistema de Gestão de Competências ([URL_SISTEMA]).
     ```
 
 14. O sistema cria internamente um alerta:
 
-    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para
-      análise"
+    - `Descrição`: "Cadastro da unidade [SIGLA_UNIDADE_SUBPROCESSO] disponibilizado para análise"
     - `Processo`: [DESCRICAO_PROCESSO]
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: [SIGLA_UNIDADE_SUBPROCESSO]

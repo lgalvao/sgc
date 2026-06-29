@@ -1,6 +1,8 @@
 # CDU-08 - Manter cadastro de atividades e conhecimentos
 
-Ator: CHEFE
+## Atores
+
+- CHEFE
 
 ## Pré-condições
 

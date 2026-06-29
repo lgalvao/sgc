@@ -1,6 +1,8 @@
 # CDU-10 - Disponibilizar revisão do cadastro de atividades e conhecimentos
 
-Ator: CHEFE
+## Atores
+
+- CHEFE
 
 ## Pré-condições:
 
@@ -16,17 +18,16 @@ Ator: CHEFE
 3. O usuário clica em `Atividades e conhecimentos`.
 
 4. O sistema mostra a tela `Cadastro de atividades e conhecimentos` preenchida com os dados cadastrados/revisados até o
-   momento.
-   4.1. Além dos dados do cadastro, será mostrada a checkbox `Disponibilização sem mudanças`.
+   momento. 4.1. Além dos dados do cadastro, será mostrada a checkbox `Disponibilização sem mudanças`.
 
 5. Se o subprocesso tiver retornado de análise pelas unidades superiores, deverá ser habilitado, além dos botões fixos
    da tela, o botão `Histórico de análise`.
 
    5.1. Se o usuário clicar no botão `Histórico de análise`, o sistema mostra, em tela modal, os dados das análises do
    cadastro realizadas pelas unidades superiores desde a última disponibilização.
-   - As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução'
-   ou 'Aceite') e observações. Essas informações serão usadas como subsídio para ajustes no cadastro, antes de nova
-   disponibilização.
+    - As análises deverão ser apresentadas em uma pequena tabela com data/hora, sigla da unidade, resultado ('Devolução'
+      ou 'Aceite') e observações. Essas informações serão usadas como subsídio para ajustes no cadastro, antes de nova
+      disponibilização.
 
 6. O usuário faz as mudanças necessárias no cadastro.
 
@@ -34,12 +35,14 @@ Ator: CHEFE
    associado. Caso negativo, indica quais atividades precisam de conhecimentos e bloqueia a disponibilização.
 
 8. Se o usuário decidir disponibilizar sem mudanças, marca o checkbox `Disponibilização sem mudanças`. Este checkbox só
-   deve estar habilitado caso realmente não tenham sido feitas mudanças no cadastro **em relação ao mapa vigente da unidade**.
+   deve estar habilitado caso realmente não tenham sido feitas mudanças no cadastro **em relação ao mapa vigente da
+   unidade**.
 
-9. Se houver mudanças, ou se o usuário clicar no checkbox, o sistema muda a situação do subprocesso para 'Revisão do cadastro em andamento' e habilita o botão `Disponibilizar`.
+9. Se houver mudanças, ou se o usuário clicar no checkbox, o sistema muda a situação do subprocesso para 'Revisão do
+   cadastro em andamento' e habilita o botão `Disponibilizar`.
 
-   9.1. Se o usuário desmarcar o checkbox, o sistema muda a situação do subprocesso de volta a 'Não iniciado' e
-   desativa o botão `Disponibilizar`, até que sejam feitas mudanças no cadastro (e o cadastro esteja válido).
+   9.1. Se o usuário desmarcar o checkbox, o sistema muda a situação do subprocesso de volta a 'Não iniciado' e desativa
+   o botão `Disponibilizar`, até que sejam feitas mudanças no cadastro (e o cadastro esteja válido).
 
 9. O usuário clica no botão `Disponibilizar`.
 

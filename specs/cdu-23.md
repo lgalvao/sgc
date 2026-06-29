@@ -21,7 +21,7 @@
 5. O sistema abre um modal de confirmação, com os elementos a seguir:
     - Título: "Homologação de cadastros em bloco";
     - Texto: "Selecione as unidades para homologação do cadastro:";
-    - Grade com as unidades aptas com checkbox (marcado inicialmente) para cada unidade, além de sigla e nome da
+    - Grade com as unidades aptas, com checkbox (marcado inicialmente) para cada unidade, além de sigla e nome da
       unidade;
     - Botões `Cancelar` e `Homologar em bloco`.
 
@@ -32,8 +32,8 @@
 
    7.1. Registra uma movimentação para o subprocesso da unidade:
     - `Data/hora`: [Data/hora atual]
-    - `Unidade origem`: "ADMIN"
-    - `Unidade destino`: "ADMIN"
+    - `Unidade origem`: ADMIN
+    - `Unidade destino`: ADMIN
     - `Descrição`: "Cadastro homologado"
 
    7.2. Altera a situação do subprocesso da unidade para 'Cadastro homologado'.

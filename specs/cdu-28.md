@@ -24,7 +24,7 @@
     - botão `Editar atribuição` (em vez de `Criar atribuição`).
 
 7. Ao acionar em `Criar/Editar atribuição`, o sistema apresenta a tela `Atribuição temporária`, com estes campos:
-    - Dropdown pesquisável `Usuário` com os nomes dos servidores da unidade
+    - Controle *drop-down* pesquisável `Usuário` com os nomes dos servidores da unidade
     - `Data de início`
     - `Data de término`
     - `Justificativa`

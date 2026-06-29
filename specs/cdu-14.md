@@ -19,7 +19,7 @@ Atores: GESTOR e ADMIN
 
 4. O sistema exibe a tela `Detalhes do subprocesso` com os dados da unidade selecionada.
 
-5. Usuário clica no card `Atividades e conhecimentos`.
+5. Usuário aciona o card `Atividades e conhecimentos`.
 
 6. O sistema apresenta as atividades e conhecimentos da unidade na tela `Atividades e conhecimentos`, com os botões:
 

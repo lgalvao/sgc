@@ -20,7 +20,7 @@
 
 4. O sistema mostra a tela `Detalhes de subprocesso`.
 
-5. O usuário clica no card `Mapa de competências`.
+5. O usuário aciona o card `Mapa de competências`.
 
 6. O sistema mostra a tela `Edição de mapa` preenchida com os dados do mapa de competências da unidade.
 

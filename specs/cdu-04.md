@@ -1,6 +1,8 @@
 # CDU-04 - Iniciar processo de mapeamento
 
-Ator: ADMIN
+## Atores
+
+- ADMIN
 
 ## Pré-condições:
 

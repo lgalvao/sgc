@@ -24,7 +24,7 @@ Ator: Usuário (todos os perfis)
 
    3.1. O sistema exibe a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade do usuário.
 
-4. Na tela de `Detalhes do subprocesso`, usuário clica no card `Mapa de Competências`.
+4. Na tela de `Detalhes do subprocesso`, usuário aciona o card `Mapa de Competências`.
 
 5. O sistema mostra a tela `Mapa de competências`, com as seguintes informações:
 

@@ -18,7 +18,7 @@ Ator: ADMIN
 
 4. O sistema mostra a tela `Detalhes do subprocesso` para a unidade selecionada.
 
-5. O usuário clica no card `Mapa de Competências`.
+5. O usuário aciona o card `Mapa de Competências`.
 
 6. O sistema mostra a tela `Edição de mapa` preenchida com o mapa do subprocesso da unidade (ver detalhes sobre a tela
    no caso de uso `Manter mapa de competências`), com os botões Impactos no mapa e `Disponibilizar`.

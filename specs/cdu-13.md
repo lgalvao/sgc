@@ -1,6 +1,9 @@
 # CDU-13 - Analisar cadastro de atividades e conhecimentos
 
-Atores: GESTOR e ADMIN
+## Atores
+
+- ADMIN
+- GESTOR
 
 ## Pré-condições
 
@@ -9,9 +12,9 @@ Atores: GESTOR e ADMIN
 - Subprocesso com cadastro de atividades e conhecimentos já disponibilizado, e com localização atual na unidade do
   usuário.
 
-## Fluxo principal:
+## Fluxo principal
 
-1. No painel, o usuário clica no processo de mapeamento.
+1. No `Painel`, o usuário clica no processo de mapeamento.
 
 2. O sistema mostra a tela `Detalhes do processo`.
 
@@ -134,7 +137,7 @@ um campo para preenchimento de uma observação opcional e os botões Confirmar 
 - `Unidade de origem`: [SIGLA_UNIDADE_ANALISE]
 - `Unidade de destino`: [SIGLA_UNIDADE_SUPERIOR].
 
-10.9. O sistema redireciona para o Painel e mostra o *toast* "Aceite registrado".
+10.9. O sistema redireciona para o `Painel` e mostra o *toast* "Aceite registrado".
 
 ---
 
@@ -156,4 +159,4 @@ e botões `Cancelar` e `Homologar`.
 
 11.5. O sistema altera a situação do subprocesso da unidade para 'Cadastro homologado'.
 
-10.9. O sistema redireciona para o `Painel` e mostra o *toast* "Homologação efetivada".
+12. O sistema redireciona para o `Painel` e mostra o *toast* "Homologação efetivada".

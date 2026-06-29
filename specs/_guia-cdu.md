@@ -9,7 +9,7 @@ Todo CDU deve conter, nesta ordem:
 ```md
 # CDU-XX - Título do caso de uso
 
-**Ator:** PERFIL ou ATORES
+**Ator:** ATOR1 ou AUTOR2
 
 ## Pré-condições
 
@@ -29,16 +29,18 @@ Todo CDU deve conter, nesta ordem:
 - A seção de fluxo principal deve usar exatamente o título `## Fluxo principal`.
 - A numeração do fluxo principal deve ser contínua, sem reinício, repetição ou regressão.
 - Situações do sistema devem ser escritas entre aspas simples, por exemplo: `'Em andamento'`.
-- Elementos observáveis de interface devem ser escritos entre crases, por exemplo: `Painel`, `Salvar`, `Atividades e conhecimentos`.
+- Elementos observáveis de interface devem ser escritos entre crases, por exemplo: `Painel`, `Salvar`,
+  `Atividades e conhecimentos`.
 - Perfis devem ser escritos em maiúsculas: `ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`.
 - Placeholders devem usar caixa alta entre colchetes, por exemplo: `[SIGLA_UNIDADE]`, `[DATA_LIMITE]`.
-- Referências para outros casos de uso ou documentos devem usar links Markdown.
+- Referências para outros casos de uso ou documentos devem usar links do Markdown.
 
 ## Escopo do CDU
 
 - O CDU deve descrever o contrato funcional observável do caso de uso.
-- O CDU pode incluir mensagens, telas, botões e estados quando isso fizer parte do contrato observável.
-- O CDU não deve depender de detalhes de implementação, como nome de componente, store, classe, endpoint ou estratégia técnica interna.
+- O CDU pode incluir mensagens, telas, botões e situações, quando isso fizer parte do contrato observável.
+- O CDU não deve depender de detalhes de implementação, como nome de componente, enum, store, classe, endpoint ou
+  estratégia técnica interna.
 
 ## Documentos complementares
 

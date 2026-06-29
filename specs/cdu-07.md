@@ -1,13 +1,18 @@
 # CDU-07 - Detalhar subprocesso de mapeamento ou revisão
 
-Atores: Todos os perfis
+## Atores
 
-Pré-condições:
+- ADMIN
+- GESTOR
+- CHEFE
+- SERVIDOR
+
+## Pré-condições
 
 - Usuário ter feito login (qualquer perfil).
 - Ao menos um subprocesso nas situações 'Em andamento' ou 'Finalizado'.
 
-Fluxo principal:
+## Fluxo principal
 
 1. O sistema mostra a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade do perfil.
 
@@ -52,7 +57,7 @@ Fluxo principal:
 
    2.4.1. A seção apresentará cards para acesso ao cadastro (descrição "Cadastro de atividades e conhecimentos da
    unidade") e ao mapa de competências (descrição "Mapa de competências da unidade").
-   
+
     - O card `Atividades e conhecimentos` estará sempre habilitado para usuários com o perfil CHEFE, inclusive com
       opções para alteração do cadastro (se a situação do subprocesso permitir -- ver caso de uso "Manter cadastro de
       atividades e conhecimentos"). Para os demais perfis, a habilitação acontecerá apenas após a disponibilização do

@@ -15,7 +15,7 @@ Ator: GESTOR e ADMIN
 
 2. O sistema mostra a tela `Detalhes do subprocesso`.
 
-3. Usuário clica no card `Mapa de competências`.
+3. Usuário aciona o card `Mapa de competências`.
 
 4. O sistema apresenta o mapa de competências da unidade na tela `Mapa de competências`, com os botões:
     - `Histórico de análise`;
