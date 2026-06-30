@@ -2,13 +2,8 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {listarArquivosCdu, lerArquivo} from "./cdus-lib.js";
-import {
-    extrairAssuntos,
-    extrairDescricoes,
-    extrairMensagens,
-    extrairToasts
-} from "./cdus-mensagens-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
+import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 import {carregarMensagensCanonicas, normalizarTextoComparacao, sugerirCanonicos} from "./cdus-mensagens-codigo-lib.js";
 
 function consolidarOcorrencias(base, arquivos, extrator, tipo) {

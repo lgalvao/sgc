@@ -2,7 +2,7 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {analisarArquivo, listarArquivosCdu, lerArquivo} from "./cdus-lib.js";
+import {analisarArquivo, lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
 
 function calcularProfundidadeMaxima(linhas) {
     let maximo = 0;

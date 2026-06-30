@@ -1,9 +1,6 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, ref, watch} from 'vue';
-import {
-    DEBOUNCE_AUTOSAVE_PADRAO_MS,
-    STALE_TIME_CONTROLADO_POR_INVALIDACAO,
-} from '@/composables/cachePolicy';
+import {DEBOUNCE_AUTOSAVE_PADRAO_MS, STALE_TIME_CONTROLADO_POR_INVALIDACAO,} from '@/composables/cachePolicy';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade, salvarSituacoesCapacitacao} from '@/services/diagnosticoService';
 import type {
@@ -12,7 +9,11 @@ import type {
     SituacaoCapacitacaoItem,
     ValorSituacaoCapacitacao
 } from '@/types/diagnostico-competencias';
-import {chaveUnidade, criarContextoSessaoDiagnostico, habilitarQueryDiagnostico} from '@/composables/useDiagnosticoContexto';
+import {
+    chaveUnidade,
+    criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico
+} from '@/composables/useDiagnosticoContexto';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 
 /**

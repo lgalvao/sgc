@@ -7,8 +7,8 @@ import {
     extrairCabecalhoFluxo,
     extrairCabecalhoPre,
     extrairLinhaAtor,
-    listarArquivosCdu,
-    lerArquivo
+    lerArquivo,
+    listarArquivosCdu
 } from "./cdus-lib.js";
 
 function acumularMapa(mapa, chave) {

@@ -2,13 +2,8 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {listarArquivosCdu, lerArquivo, obterLinhas} from "./cdus-lib.js";
-import {
-    extrairAssuntos,
-    extrairDescricoes,
-    extrairMensagens,
-    extrairToasts
-} from "./cdus-mensagens-lib.js";
+import {lerArquivo, listarArquivosCdu, obterLinhas} from "./cdus-lib.js";
+import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 
 function adicionarAchado(achados, severidade, regra, mensagem, linha = null) {
     achados.push({severidade, regra, mensagem, linha});

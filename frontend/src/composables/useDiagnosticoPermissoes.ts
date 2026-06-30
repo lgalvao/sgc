@@ -2,10 +2,7 @@ import {computed} from 'vue';
 import {useQuery} from '@pinia/colada';
 import {criarAcessosPermissao} from '@/composables/acessoPermissoes';
 import {STALE_TIME_LEITURA_AUXILIAR} from '@/composables/cachePolicy';
-import {
-    criarContextoSessaoDiagnostico,
-    habilitarQueryDiagnostico,
-} from '@/composables/diagnosticoQueryUtils';
+import {criarContextoSessaoDiagnostico, habilitarQueryDiagnostico,} from '@/composables/diagnosticoQueryUtils';
 import {buscarPermissoesSubprocesso} from '@/services/subprocessoServiceContexto';
 import {usePerfilStore} from '@/stores/perfil';
 import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';

@@ -2,12 +2,7 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {
-    analisarArquivo,
-    listarArquivosCdu,
-    lerArquivo,
-    validarLinksMarkdown
-} from "./cdus-lib.js";
+import {analisarArquivo, lerArquivo, listarArquivosCdu, validarLinksMarkdown} from "./cdus-lib.js";
 
 function adicionarAchado(achados, severidade, regra, mensagem) {
     achados.push({severidade, regra, mensagem});

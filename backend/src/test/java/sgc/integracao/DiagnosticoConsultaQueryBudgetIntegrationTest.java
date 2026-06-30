@@ -5,10 +5,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import sgc.diagnostico.dto.*;
 import sgc.diagnostico.model.*;
+import sgc.diagnostico.service.*;
 import sgc.fixture.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.model.*;
-import sgc.diagnostico.service.*;
 
 import java.util.*;
 

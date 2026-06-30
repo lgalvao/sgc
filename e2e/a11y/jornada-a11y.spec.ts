@@ -1,4 +1,4 @@
-import { AxeBuilder } from '@axe-core/playwright';
+import {AxeBuilder} from '@axe-core/playwright';
 import type {APIRequestContext, Page} from '@playwright/test';
 import {expect, test} from '../fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth.js';

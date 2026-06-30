@@ -1,13 +1,13 @@
 package sgc.alerta.notificacao;
 
 import org.junit.jupiter.api.*;
-import sgc.processo.model.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
+import sgc.processo.model.*;
 
 import java.time.*;
 import java.util.*;

@@ -2,7 +2,7 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {listarArquivosCdu, lerArquivo, obterLinhas} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu, obterLinhas} from "./cdus-lib.js";
 
 const REGEX_ASPAS_SIMPLES = /'([^'\n]+)'/g;
 const REGEX_TITULO_UI_EM_ASPAS = /(?:título|titulo|subtítulo|subtitulo)\s*:?\s*"([^"\n]+)"/gi;

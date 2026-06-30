@@ -2,13 +2,8 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {listarArquivosCdu, lerArquivo} from "./cdus-lib.js";
-import {
-    extrairAssuntos,
-    extrairDescricoes,
-    extrairMensagens,
-    extrairToasts
-} from "./cdus-mensagens-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
+import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 
 function normalizarBloco(texto) {
     return texto

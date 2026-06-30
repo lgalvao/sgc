@@ -15,8 +15,8 @@ import {
     CAMINHO_SUBPROCESSOS,
     caminhoSubprocesso,
     type ImportarAtividadesRequest,
-    mapearDetalheSubprocesso,
     mapearContextoComDetalhes,
+    mapearDetalheSubprocesso,
 } from "./subprocessoServiceBase";
 
 const obter = async <T>(caminho: string, params?: object): Promise<T> =>

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.MediaType;
-import sgc.alerta.*;
 import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.fixture.*;

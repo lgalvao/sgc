@@ -2,12 +2,8 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {listarArquivosCdu, lerArquivo} from "./cdus-lib.js";
-import {
-    PERFIS_CANONICOS,
-    TIPOS_PROCESSO_CANONICOS,
-    carregarSituacoesCanonicas
-} from "./cdus-vocabulario-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
+import {carregarSituacoesCanonicas, PERFIS_CANONICOS, TIPOS_PROCESSO_CANONICOS} from "./cdus-vocabulario-lib.js";
 
 function acumularMapa(mapa, chave) {
     mapa[chave] = (mapa[chave] ?? 0) + 1;

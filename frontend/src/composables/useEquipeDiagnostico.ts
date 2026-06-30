@@ -4,7 +4,11 @@ import {STALE_TIME_LEITURA_AUXILIAR} from '@/composables/cachePolicy';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterEquipe} from '@/services/diagnosticoService';
 import type {DiagnosticoEquipe} from '@/types/diagnostico-competencias';
-import {chaveEquipe, criarContextoSessaoDiagnostico, habilitarQueryDiagnostico} from '@/composables/useDiagnosticoContexto';
+import {
+    chaveEquipe,
+    criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico
+} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de acompanhamento da equipe no diagnóstico.

@@ -25,7 +25,7 @@ import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
-import sgc.subprocesso.service.SubprocessoValidacaoService.ResultadoValidacao;
+import sgc.subprocesso.service.SubprocessoValidacaoService.*;
 
 import java.time.*;
 import java.time.format.*;

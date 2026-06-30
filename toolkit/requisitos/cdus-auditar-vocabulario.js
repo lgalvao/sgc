@@ -2,12 +2,12 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {listarArquivosCdu, lerArquivo} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
 import {
-    PERFIS_CANONICOS,
-    TIPOS_PROCESSO_CANONICOS,
     carregarSituacoesCanonicas,
-    sugerirCanonico
+    PERFIS_CANONICOS,
+    sugerirCanonico,
+    TIPOS_PROCESSO_CANONICOS
 } from "./cdus-vocabulario-lib.js";
 
 function adicionarAchado(achados, severidade, regra, mensagem, linha = null) {

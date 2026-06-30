@@ -2,7 +2,7 @@
 
 import path from "node:path";
 import {imprimirJson} from "../lib/saida.js";
-import {listarArquivosCdu, lerArquivo} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
 import {
     acumularMapa,
     extrairAssuntos,

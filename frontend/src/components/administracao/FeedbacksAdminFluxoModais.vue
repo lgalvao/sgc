@@ -100,7 +100,13 @@ import ModalPadrao from "@/components/comum/ModalPadrao.vue";
 import {TEXTOS} from "@/constants/textos";
 import type {FeedbackAdmin} from "@/services/feedbackAdminService";
 import {formatarDataHoraBR} from "@/utils";
-import {formatarMetadados, formatarTipo, obterIconeTipo, obterUrlScreenshot, obterVarianteTipo} from "@/views/feedbacksAdminApresentacao";
+import {
+  formatarMetadados,
+  formatarTipo,
+  obterIconeTipo,
+  obterUrlScreenshot,
+  obterVarianteTipo
+} from "@/views/feedbacksAdminApresentacao";
 
 defineProps<{
   feedbackSelecionado: FeedbackAdmin | null;

@@ -5,9 +5,9 @@ import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade} from '@/services/diagnosticoService';
 import type {DiagnosticoUnidade, SituacaoDiagnostico} from '@/types/diagnostico-competencias';
 import {
-    habilitarQueryDiagnostico,
     chaveUnidade,
     criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico,
     useDiagnosticoContexto
 } from '@/composables/useDiagnosticoContexto';
 

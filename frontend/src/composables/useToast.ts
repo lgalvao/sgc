@@ -1,5 +1,5 @@
 import {useToast as useToastBootstrap} from "bootstrap-vue-next";
-import {useToastStore, type ToastPendente} from "@/stores/toast";
+import {type ToastPendente, useToastStore} from "@/stores/toast";
 
 type VarianteToast = NonNullable<ToastPendente["variante"]>;
 

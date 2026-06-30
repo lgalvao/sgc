@@ -2,10 +2,10 @@ package sgc.integracao;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
-import sgc.processo.model.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
+import sgc.processo.model.*;
 
 import java.time.*;
 import java.util.*;
