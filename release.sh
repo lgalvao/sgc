@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DIRETORIO_SCRIPT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DIRETORIO_SCRIPT="$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]:-.}")")" && pwd)"
 cd "$DIRETORIO_SCRIPT"
 
 NOME_SISTEMA="sgc"
@@ -19,8 +19,8 @@ SEM_CACHE=false
 SEM_PULL=false
 TIMEOUT_SUBIDA_SEGUNDOS="${TIMEOUT_SUBIDA_SEGUNDOS:-60}"
 ARQUIVO_JAR_DOCKER="sgc.jar"
-ARQUIVO_ENV=".env.hom"
-ARQUIVO_COMPOSE="compose.hom.yaml"
+ARQUIVO_ENV="${DIRETORIO_SCRIPT}/.env.hom"
+ARQUIVO_COMPOSE="${DIRETORIO_SCRIPT}/compose.hom.yaml"
 
 uso() {
   cat <<EOF_USO
@@ -203,7 +203,7 @@ if [[ "$SEM_IMAGEM" == false ]]; then
   echo "==> Construindo imagem multi-stage com $CONTAINER_CLI: $TAG_VERSAO"
   
   ARGS_BUILD=(build -t "$TAG_VERSAO" -t "$TAG_LATEST")
-  ARGS_BUILD+=(--build-arg "FRONTEND_BUILD_MODE=hom")
+  ARGS_BUILD+=(--build-arg "FRONTEND_BUILD_MODE=hom)
   if [[ "$SEM_CACHE" == true ]]; then
     ARGS_BUILD+=(--no-cache)
   fi
