@@ -30,7 +30,7 @@
     - `Data de início`
     - `Data de término`
     - `Justificativa`
-    - Botão `Criar`, se não houver atribuição temporária vigente;
+    - Botão `Criar`, se não houver atribuição temporária vigente
     - Botões `Salvar`e `Remover`, se houver atribuição temporária vigente
     - Botão `Cancelar`
 
@@ -40,41 +40,38 @@
 
 ### Criação de atribuição temporária
 
-9. O usuário seleciona o servidor, define as datas e inclui uma justificativa; depois clica em `Criar` ou `Salvar`.
-   Regras:
+9. O usuário seleciona o servidor, define as datas e inclui uma justificativa; depois clica em `Criar` ou `Salvar`;
+   regras:
     - Todos os campos são obrigatórios;
     - Não pode haver sobreposição entre períodos de atribuição temporária da mesma unidade.
 
 10. O sistema registra internamente a atribuição temporária e mostra o *toast* `Atribuição criada`.
 
 11. O sistema envia uma notificação por e-mail para o usuário que recebeu a atribuição temporária, com este modelo:
-
     ```text
     Assunto: SGC: Atribuição de perfil CHEFE na unidade :SIGLA_UNIDADE:
 
     Prezado(a) :NOME_SERVIDOR:,
 
-    Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade :SIGLA_UNIDADE:.
+    Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade :SIGLA_UNIDADE:
 
-    Período: :DATA_INICIO: a :DATA_TERMINO:.
+    - Período: :DATA_INICIO: a :DATA_TERMINO:.
+    - Justificativa: :JUSTIFICATIVA:.
 
-    Justificativa: :JUSTIFICATIVA:.
-
-    Acesse o sistema em :URL_SISTEMA: e escolha o perfil `CHEFE` para a unidade da atribuição.
+    Para acessar o sistema com a nova atribuição, acesse o sistema SGC (:URL_SISTEMA:) e escolha o perfil `CHEFE` para a unidade da atribuição.
     ```
 
 12. O sistema registra internamente um alerta:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Descrição`: "Atribuição temporária para unidade :SIGLA_UNIDADE:"
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: (**Não preencher**)
-    - `Usuário de destino`: [Usuário destinatário da atribuição]
+    - `Usuário de destino`: :USARIO_DESTINO:
 
 13. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE durante o período
     especificado, para a unidade da atribuição. Em um próximo login, o novo par `CHEFE-:UNIDADE_ATRIBUICAO:` será
     mostrado pra o usuário entre as opções de login.
-
-    14.1. O novo perfil será incluído automaticamente através de cálculos das views no banco de dados. O sistema não
+    - O novo perfil será incluído automaticamente através de cálculos das views no banco de dados. O sistema não
     precisa realizar nenhuma operação, além das especificadas neste caso de uso, para que o novo perfil se torne
     disponível ao usuário.
 

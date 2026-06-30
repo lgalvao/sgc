@@ -138,7 +138,7 @@ Se o usuário acionar `Registrar aceite`:
 
 ---
 
-Se o usuário optar por `Homologar` (apenas perfil ADMIN):
+Se o usuário acionar `Homologar` (apenas perfil ADMIN):
 
 20. O sistema mostra um modal com título `Homologar diagnóstico` e texto "Confirma a homologação diagnóstico da
     unidade :SIGLA_UNIDADE_SUBPROCESSO:?" e botões `Cancelar` e `Homologar`.

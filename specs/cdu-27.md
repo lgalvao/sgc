@@ -18,13 +18,13 @@
 
 3. O usuário aciona `Alterar data limite`.
 
-4. O sistema abre um modal com título `Alterar data limite`, com o campo de data preenchido com a data limite atual da
-   etapa em andamento, e botões `Cancelar` e `Alterar`.
+4. O sistema abre um modal com título "Alterar data limite", campo de data preenchido com a data limite da
+   etapa atual, e botões `Cancelar` e `Alterar`.
 
-5. O usuário fornece a nova data limite e aciona `Alterar`. A data limite deve ser estritamente no futuro.
+5. O usuário fornece a nova data limite e aciona `Alterar`. 
+   - A data limite deve ser estritamente no futuro.
 
-6. O sistema atualiza a data limite do subprocesso e envia notificação por e-mail para a unidade do subprocesso, neste
-   modelo:
+6. O sistema atualiza a data limite do subprocesso e envia notificação por e-mail para a unidade do subprocesso:
 
     ```text
     Assunto: SGC: Data limite alterada
@@ -37,8 +37,8 @@
 7. O sistema cria um alerta com as seguintes informações:
     - `Descrição`: "Data limite da etapa :NUMERO_ETAPA: alterada para :NOVA_DATA_LIMITE:"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
-    - `Unidade de origem`: `ADMIN`
+    - `Data/hora`: :DATA_HORA:
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
 8. O sistema fecha o modal e mostra um *toast*: "Data limite alterada".

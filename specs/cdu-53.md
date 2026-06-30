@@ -21,11 +21,7 @@
     - Caso exista ao menos uma unidade ainda não homologada, o sistema mostra o alerta "Não é possível finalizar o
       processo: há unidades não homologadas", e interrompe a operação, sem sair da tela.
 
-5. Caso todas as unidades estejam homologadas, o sistema mostra um diálogo de confirmação:
-    - Título `Finalização de processo`;
-    - Texto: "Confirma a finalização do processo :DESCRICAO_PROCESSO:? Essa ação encerrará o processo e notificará todas
-      as unidades participantes.";
-    - Botões `Cancelar` e `Finalizar`.
+5. Caso todas as unidades estejam homologadas, o sistema mostra um diálogo de confirmação, com título "Finalização de processo"; "Confirma a finalização do processo :DESCRICAO_PROCESSO:? Essa ação encerrará o processo e notificará todas as unidades participantes." e botões `Cancelar` e `Finalizar`.
 
 6. O usuário aciona `Finalizar`.
 
@@ -36,7 +32,7 @@
    8.1. Cria um alerta voltado à unidade do subprocesso:
     - `Descrição`: "Processo finalizado"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
