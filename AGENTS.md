@@ -58,8 +58,7 @@ Para detalhes técnicos, consulte:
 * **E2E:** Playwright `npm run test:e2e` (ou `npx playwright test --config=e2e/playwright.config.ts` se executado de
   forma detalhada)
     * Para depuração produtiva, prefira `--project=chromium`.
-    * Sempre redirecione a saída para arquivo: `npm run test:e2e e2e/cdu-28.spec.ts > /tmp/sgc-e2e.log 2>&1`
-
+    * Sempre redirecione a saída para arquivo: `npm run test:e2e e2e/cdu-28.spec.ts > sgc-e2e.log 2>&1`
     * Não leia o log inteiro. Comece com `tail -n 40 /tmp/sgc-e2e.log` e só depois use `rg`/`sed -n` no trecho do erro.
     * Logs detalhados de backend/frontend ficam em `e2e/server.log`; leia apenas recortes mínimos.
     * Se o arquivo usar `test.describe.serial()`, rode o spec inteiro, não um cenário isolado.
