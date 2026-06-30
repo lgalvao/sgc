@@ -35,8 +35,9 @@ RUN --mount=type=cache,target=/root/.gradle \
 # Estágio de cache das dependências do frontend
 FROM deps-java AS deps-frontend
 
+COPY package.json package-lock.json ./
 COPY frontend/build.gradle.kts frontend/
-COPY frontend/package.json frontend/package-lock.json frontend/
+COPY frontend/package.json frontend/
 
 # Instala dependências do frontend, preservando a orquestração oficial do Gradle
 RUN --mount=type=cache,target=/root/.gradle \
