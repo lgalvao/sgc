@@ -24,13 +24,14 @@ RUN microdnf install -y findutils libatomic && microdnf clean all
 FROM build-base AS deps-java
 
 COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
+RUN chmod +x gradlew
 COPY gradle/ gradle/
 COPY backend/build.gradle.kts backend/
 RUN mkdir -p frontend
 
 # Baixa dependências Java em camada separada para preservar cache quando só o frontend muda
 RUN --mount=type=cache,target=/root/.gradle \
-    gradle :backend:dependencies --no-daemon --configuration-cache
+    ./gradlew :backend:dependencies --no-daemon --configuration-cache
 
 # Estágio de cache das dependências do frontend
 FROM deps-java AS deps-frontend
@@ -41,7 +42,7 @@ COPY frontend/package.json frontend/
 
 # Instala dependências do frontend, preservando a orquestração oficial do Gradle
 RUN --mount=type=cache,target=/root/.gradle \
-    gradle :frontend:install --no-daemon --configuration-cache
+    ./gradlew :frontend:install --no-daemon --configuration-cache
 
 # Estágio 1: Build unificado (Backend + Frontend)
 FROM deps-frontend AS build-env
@@ -51,7 +52,7 @@ COPY . .
 
 # 5. Executa o build completo orquestrado pelo Gradle
 RUN --mount=type=cache,target=/root/.gradle \
-    gradle :backend:bootJar -x test --no-daemon --configuration-cache
+    ./gradlew :backend:bootJar -x test --no-daemon --configuration-cache
 # Estágio 2: Extrator (prepara as camadas do Spring Boot)
 FROM docker.io/library/amazoncorretto:25-al2023-headless AS extrator
 WORKDIR /aplicacao
