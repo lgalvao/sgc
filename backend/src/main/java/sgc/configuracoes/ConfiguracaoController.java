@@ -32,7 +32,7 @@ public class ConfiguracaoController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualizar configurações em bloco")
-    public List<ConfiguracaoDto> atualizar(@RequestBody @Valid List<ConfiguracaoRequest> parametros) {
+    public List<ConfiguracaoDto> atualizar(@RequestBody List<@Valid ConfiguracaoRequest> parametros) {
         // Buscar Configuraçãos existentes e atualizar com dados das requests
         List<Configuracao> configsAtualizadas = parametros.stream()
                 .map(request -> {
