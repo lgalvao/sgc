@@ -100,6 +100,12 @@ export async function preencherConsensoMinimo(
 }
 
 export async function abrirAcaoConsensoDiagnostico(page: Page, servidorTitulo: string): Promise<void> {
+    const cardConsenso = page.getByTestId('card-subprocesso-consenso');
+    if (await cardConsenso.count() > 0 && await cardConsenso.first().isVisible()) {
+        await cardConsenso.first().click();
+        return;
+    }
+
     const dropdownAcoes = page.getByTestId(`dropdown-acoes-${servidorTitulo}`);
     await expect(dropdownAcoes).toBeVisible();
     await dropdownAcoes.getByRole('button', {name: 'Ações'}).click();
@@ -109,6 +115,16 @@ export async function abrirAcaoConsensoDiagnostico(page: Page, servidorTitulo: s
 }
 
 export async function navegarParaConsensoDiagnostico(page: Page, servidorTitulo: string): Promise<void> {
+    if (page.url().includes('/consenso/')) {
+        return;
+    }
+
+    const cardConsenso = page.getByTestId('card-subprocesso-consenso');
+    if (await cardConsenso.count() > 0 && await cardConsenso.first().isVisible()) {
+        await cardConsenso.first().click();
+        return;
+    }
+
     const botaoManterConsenso = page.getByTestId(`btn-manter-consenso-${servidorTitulo}`);
     if (!(await botaoManterConsenso.isVisible())) {
         await abrirAcaoConsensoDiagnostico(page, servidorTitulo);
