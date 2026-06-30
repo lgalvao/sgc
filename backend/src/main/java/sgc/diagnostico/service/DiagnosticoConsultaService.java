@@ -216,8 +216,8 @@ public class DiagnosticoConsultaService {
                             .map(a -> AvaliacaoCompetenciaDto.builder()
                                     .competenciaCodigo(a.getCompetencia().getCodigo())
                                     .competenciaDescricao(a.getCompetencia().getDescricao())
-                                    .importancia(resolverConsensoImportancia(a))
-                                    .dominio(resolverConsensoDominio(a))
+                                    .importancia(resolverImportanciaParaDiagnosticoUnidade(a))
+                                    .dominio(resolverDominioParaDiagnosticoUnidade(a))
                                     .build())
                             .toList();
                     return ServidorDiagnosticoDto.builder()
@@ -302,6 +302,16 @@ public class DiagnosticoConsultaService {
 
     private Integer resolverConsensoDominio(AvaliacaoServidor avaliacao) {
         return consensoEspelhadoDaAutoavaliacao(avaliacao) ? null : avaliacao.getConsensoDominio();
+    }
+
+    private Integer resolverImportanciaParaDiagnosticoUnidade(AvaliacaoServidor avaliacao) {
+        Integer consenso = resolverConsensoImportancia(avaliacao);
+        return consenso != null ? consenso : resolverImportanciaServidorParaConsenso(avaliacao);
+    }
+
+    private Integer resolverDominioParaDiagnosticoUnidade(AvaliacaoServidor avaliacao) {
+        Integer consenso = resolverConsensoDominio(avaliacao);
+        return consenso != null ? consenso : resolverDominioServidorParaConsenso(avaliacao);
     }
 
     private Integer resolverImportanciaServidorParaConsenso(AvaliacaoServidor avaliacao) {

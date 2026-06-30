@@ -113,8 +113,8 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
 
     it('troca o servidor selecionado e reaproveita a mesma lista de competências', async () => {
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Ana Beatriz de Albuquerque e Souza', situacaoServidor: 'CONSENSO_APROVADO', consenso: []},
-            {servidorTitulo: '2', servidorNome: 'Luiz Fernando Cavalcanti de Moura', situacaoServidor: 'CONSENSO_APROVADO', consenso: []},
+            {servidorTitulo: '1', servidorNome: 'Ana Beatriz de Albuquerque e Souza', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]},
+            {servidorTitulo: '2', servidorNome: 'Luiz Fernando Cavalcanti de Moura', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 4, dominio: 2}]},
         ];
         situacoesLocaisVal.value = [
             {servidorTitulo: '1', servidorNome: 'Ana Beatriz de Albuquerque e Souza', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
@@ -183,7 +183,7 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
             {servidorTitulo: '1', servidorNome: 'Axl', competenciaCodigo: 10, situacaoCapacitacao: null},
         ];
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Axl', situacaoServidor: 'CONSENSO_APROVADO', consenso: []},
+            {servidorTitulo: '1', servidorNome: 'Axl', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]},
         ];
         const wrapperSelect = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
@@ -316,9 +316,14 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
         expect(itens[1].text()).toContain('Servidor B');
     });
 
-    it('exibe EmptyState informativo se o servidor selecionado não tiver consenso aprovado', async () => {
+    it('exibe competências da autoavaliação concluída mesmo antes do consenso aprovado', async () => {
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Servidor A', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', consenso: []},
+            {
+                servidorTitulo: '1',
+                servidorNome: 'Servidor A',
+                situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+                consenso: [{competenciaCodigo: 10, importancia: 4, dominio: 2}],
+            },
         ];
 
         const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
@@ -348,11 +353,11 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
 
         await wrapper.find('[data-testid="btn-selecionar-servidor-situacao-capacitacao-1"]').trigger('click');
 
-        const emptyState = wrapper.find('.empty-state');
-        expect(emptyState.exists()).toBe(true);
-        expect(emptyState.text()).toContain('Aguardando aprovação de consenso');
-        expect(emptyState.text()).toContain('A situação de capacitação só pode ser preenchida após servidor aprovar a avaliação de consenso.');
-        expect(wrapper.find('table').exists()).toBe(false);
+        expect(wrapper.find('.empty-state').exists()).toBe(false);
+        expect(wrapper.find('table').exists()).toBe(true);
+        expect(wrapper.text()).toContain('Competência A');
+        expect(wrapper.text()).toContain('4');
+        expect(wrapper.text()).toContain('2');
     });
 
     it('formata NA na grade de competências quando importância e domínio forem zero', async () => {

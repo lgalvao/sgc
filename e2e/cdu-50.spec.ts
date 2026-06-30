@@ -170,7 +170,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         });
     });
 
-    test('GESTOR devolve para ajustes, exige justificativa e reabre consenso para a unidade', async ({
+    test('GESTOR devolve para ajustes, exige justificativa e reabre o consenso mantendo a autoavaliação concluída', async ({
         _resetAutomatico,
         page,
         request,
@@ -211,7 +211,7 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
         await login(page, TITULO_CHEFE, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE_SUBORDINADA}`);
         await expect(page.getByText('Situação de capacitação', {exact: true})).toBeVisible();
-        await expect(page.getByTestId('tbl-servidores-diagnostico')).toContainText('Autoavaliação não iniciada');
+        await expect(page.getByTestId('tbl-servidores-diagnostico')).toContainText('Autoavaliação concluída');
 
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
         await verificarNotificacaoAdmin(page, {

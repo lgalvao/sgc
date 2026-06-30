@@ -348,8 +348,8 @@ class DiagnosticoConsultaServiceTest {
     }
 
     @Test
-    @DisplayName("obterDiagnosticoUnidade deve ocultar consenso espelhado da autoavaliação antes do preenchimento da chefia")
-    void obterDiagnosticoUnidade_deveOcultarConsensoEspelhadoDaAutoavaliacao() {
+    @DisplayName("obterDiagnosticoUnidade deve exibir autoavaliação concluída antes do preenchimento da chefia")
+    void obterDiagnosticoUnidade_deveExibirAutoavaliacaoConcluidaAntesDoPreenchimentoDaChefia() {
         Long codSubprocesso = 400L;
         Long codDiagnostico = 900L;
         Unidade unidade = unidade(12L, "ASSESSORIA_12", "Assessoria 12");
@@ -374,8 +374,8 @@ class DiagnosticoConsultaServiceTest {
 
         assertThat(dto.servidores()).singleElement().satisfies(item ->
                 assertThat(item.consenso()).singleElement().satisfies(consenso -> {
-                    assertThat(consenso.importancia()).isNull();
-                    assertThat(consenso.dominio()).isNull();
+                    assertThat(consenso.importancia()).isEqualTo(4);
+                    assertThat(consenso.dominio()).isEqualTo(3);
                 }));
     }
 

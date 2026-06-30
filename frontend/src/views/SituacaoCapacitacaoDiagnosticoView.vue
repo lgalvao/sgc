@@ -55,7 +55,7 @@
               <small class="text-muted">Título {{ servidorSelecionado.servidorTitulo }}</small>
             </BCard>
 
-            <div v-if="servidorSelecionado.situacaoServidor === 'CONSENSO_APROVADO'">
+            <div v-if="possuiDadosCompetenciasServidorSelecionado">
               <div class="table-responsive scroll-container-competencias">
                 <table class="table table-sm table-hover align-middle mb-0">
                   <thead class="sticky-top bg-white shadow-sm">
@@ -206,6 +206,10 @@ const competenciasServidorSelecionado = computed(() => {
     };
   });
 });
+
+const possuiDadosCompetenciasServidorSelecionado = computed(() =>
+  competenciasServidorSelecionado.value.some((item) => item.importancia !== null || item.dominio !== null),
+);
 
 // « Opções de capacitação »
 const opcoesCapacitacao = [

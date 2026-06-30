@@ -61,7 +61,7 @@ Se o usuário acionar `Devolver para ajustes`:
     - `Justificativa`: [Justificativa fornecida]
 
    8.2. Muda a situação de todos os servidores da unidade que **nao estejam** na situação 'Avaliação impossibilitada',
-   para 'Avaliação de consenso criada'. (Isso faz com o sistema volte a habilitar a edição das avaliações de consenso.)
+   para 'Autoavaliação concluída'. (Isso faz com o sistema volte a habilitar a edição das avaliações de consenso.)
 
 9. O sistema envia notificação por e-mail para a unidade de origem da última movimentação do subprocesso
    (:SIGLA_UNIDADE_DEVOLUCAO:):
