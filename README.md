@@ -10,20 +10,6 @@ O SGC opera sobre a hierarquia organizacional do órgão e trata cada unidade pa
 - **Revisão**: reaproveita o mapa vigente e conduz ajustes/homologações em novo ciclo.
 - **Diagnóstico**: prepara a jornada de autoavaliação/monitoramento sobre competências já estruturadas.
 
-Do ponto de vista arquitetural, o sistema é um **monólito modular no backend** com contratos REST e um **frontend SPA modular** que consome respostas já orientadas à interface.
-
-```mermaid
-graph LR
-    Usuario[Usuário autenticado] --> Frontend[SPA Vue 3 + TypeScript]
-    Frontend --> API[API REST Spring Boot]
-    API --> Dominios[Domínios de negócio]
-    Dominios --> Banco[(Oracle ou H2)]
-    API --> Actuator[Actuator / métricas]
-    E2E[Playwright + lifecycle] --> Frontend
-    E2E --> API
-    Scripts[toolkit] --> Repo[Qualidade e automação do repositório]
-```
-
 ## Mapa do repositório
 
 ```text

@@ -59,6 +59,7 @@ public class AvaliacaoServidor extends EntidadeBase {
     @Column(name = "gap")
     private @Nullable Integer gap;
 
+    @Lob
     @Column(name = "observacoes")
     private String observacao;
 
