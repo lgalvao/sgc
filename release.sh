@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ -z "${BASH_VERSION:-}" ]; then
+  echo "ERRO: Este script requer o interpretador bash. Execute como './release.sh' ou 'bash release.sh'." >&2
+  exit 1
+fi
+
 DIRETORIO_SCRIPT="$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]:-.}")")" && pwd)"
 cd "$DIRETORIO_SCRIPT"
 
@@ -203,7 +208,7 @@ if [[ "$SEM_IMAGEM" == false ]]; then
   echo "==> Construindo imagem multi-stage com $CONTAINER_CLI: $TAG_VERSAO"
   
   ARGS_BUILD=(build -t "$TAG_VERSAO" -t "$TAG_LATEST")
-  ARGS_BUILD+=(--build-arg "FRONTEND_BUILD_MODE=hom)
+  ARGS_BUILD+=(--build-arg "FRONTEND_BUILD_MODE=hom")
   if [[ "$SEM_CACHE" == true ]]; then
     ARGS_BUILD+=(--no-cache)
   fi
