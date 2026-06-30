@@ -32,10 +32,10 @@ public class LoginAplicacaoService {
     private final UsuarioService usuarioService;
 
     public LoginAplicacaoService(UsuarioAplicacaoService usuarioAplicacaoService,
-                       GerenciadorJwt gerenciadorJwt,
-                       @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
-                       UnidadeService unidadeService,
-                       UsuarioService usuarioService) {
+                                 GerenciadorJwt gerenciadorJwt,
+                                 @Autowired(required = false) @Nullable ClienteAcessoAd clienteAcessoAd,
+                                 UnidadeService unidadeService,
+                                 UsuarioService usuarioService) {
 
         this.usuarioAplicacaoService = usuarioAplicacaoService;
         this.gerenciadorJwt = gerenciadorJwt;

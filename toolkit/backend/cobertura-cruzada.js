@@ -22,13 +22,13 @@ async function main() {
             const missed = Number(c.$.missed || 0);
             const total = covered + missed;
             const percentual = total > 0 ? Number(((covered / total) * 100).toFixed(2)) : 0;
-            contadoresBrutos[type] = { covered, missed, total, percentual };
+            contadoresBrutos[type] = {covered, missed, total, percentual};
         });
 
         console.log(pc.cyan("\n=================================================================="));
         console.log(pc.bold("1. CONTADORES GLOBAIS DIRETOS DO REPORT JACOCO (SEM EXCLUSÕES)"));
         console.log(pc.cyan("=================================================================="));
-        
+
         const metricas = ["INSTRUCTION", "BRANCH", "LINE", "COMPLEXITY", "METHOD", "CLASS"];
         metricas.forEach(m => {
             const val = contadoresBrutos[m];
@@ -150,7 +150,7 @@ async function main() {
         console.log(pc.cyan("\n=================================================================="));
         console.log(pc.bold("3. AUDITORIA DOS SCRIPTS DO TOOLKIT (VALIDAÇÃO DE VERACIDADE)"));
         console.log(pc.cyan("=================================================================="));
-        
+
         const diffLinhas = Math.abs(contadoresBrutos.LINE.percentual - calcPct(linhasCobertasGeral, totalLinhasGeral - linhasCobertasGeral));
         const diffBranches = Math.abs(contadoresBrutos.BRANCH.percentual - calcPct(branchesCobertosGeral, totalBranchesGeral - branchesCobertosGeral));
 

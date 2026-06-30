@@ -30,10 +30,10 @@ const mockEditorInstance: MockEditor = {
     },
     chain: vi.fn().mockReturnValue({
         focus: vi.fn().mockReturnValue({
-            toggleBold: vi.fn().mockReturnValue({ run: vi.fn() }),
-            toggleItalic: vi.fn().mockReturnValue({ run: vi.fn() }),
-            toggleBulletList: vi.fn().mockReturnValue({ run: vi.fn() }),
-            toggleOrderedList: vi.fn().mockReturnValue({ run: vi.fn() }),
+            toggleBold: vi.fn().mockReturnValue({run: vi.fn()}),
+            toggleItalic: vi.fn().mockReturnValue({run: vi.fn()}),
+            toggleBulletList: vi.fn().mockReturnValue({run: vi.fn()}),
+            toggleOrderedList: vi.fn().mockReturnValue({run: vi.fn()}),
         })
     }),
     setEditable: vi.fn(),
@@ -49,7 +49,9 @@ function obterOnUpdateMock() {
 }
 
 vi.mock('@tiptap/vue-3', () => ({
-    Editor: vi.fn().mockImplementation(function() { return mockEditorInstance }),
+    Editor: vi.fn().mockImplementation(function () {
+        return mockEditorInstance
+    }),
     EditorContent: {
         name: 'EditorContent',
         template: '<div><slot /></div>',
@@ -70,7 +72,7 @@ describe('EditorTextoRico.vue', () => {
 
     it('renders and destroys editor', () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '<p>test</p>' }
+            props: {modelValue: '<p>test</p>'}
         });
         expect(wrapper.exists()).toBe(true);
         wrapper.unmount();
@@ -79,16 +81,16 @@ describe('EditorTextoRico.vue', () => {
 
     it('handles disabled state', async () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '', desabilitado: true }
+            props: {modelValue: '', desabilitado: true}
         });
 
-        await wrapper.setProps({ desabilitado: false });
+        await wrapper.setProps({desabilitado: false});
         expect(mockEditorInstance.setEditable).toHaveBeenCalledWith(true);
     });
 
     it('triggers actions when buttons are clicked', async () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '' }
+            props: {modelValue: ''}
         });
         const buttons = wrapper.findAll('button');
         await buttons[0].trigger('click'); // Bold
@@ -97,22 +99,22 @@ describe('EditorTextoRico.vue', () => {
 
     it('sincronizarPorDom sets modelValue', async () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: 'initial' }
+            props: {modelValue: 'initial'}
         });
-        
+
         const div = document.createElement('div');
         div.innerHTML = '<p>new content</p>';
-        
+
         // Access private method via any
         const vm = wrapper.vm as any;
-        vm.sincronizarPorDom({ target: div } as any);
-        
+        vm.sincronizarPorDom({target: div} as any);
+
         expect(wrapper.emitted('update:modelValue')![0]).toEqual(['<p>new content</p>']);
     });
 
     it('handles attrs properly (data-testid, class, style, id, aria)', () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '', id: 'custom-id' },
+            props: {modelValue: '', id: 'custom-id'},
             attrs: {
                 'data-testid': 'custom-editor',
                 'class': 'custom-class',
@@ -120,10 +122,10 @@ describe('EditorTextoRico.vue', () => {
                 'aria-required': 'true'
             }
         });
-        
+
         expect(wrapper.classes()).toContain('custom-class');
         expect(wrapper.attributes('style')).toContain('color: red');
-        
+
         const vm = wrapper.vm as any;
         expect(vm.dataTestid).toBe('custom-editor');
         expect(vm.ariaRequired).toBe('true');
@@ -133,7 +135,7 @@ describe('EditorTextoRico.vue', () => {
 
     it('onUpdate handles empty editor and exceeding limit', async () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '', maximoCaracteres: 5 }
+            props: {modelValue: '', maximoCaracteres: 5}
         });
         await flushPromises();
         mockEditorInstance.commands.setContent.mockClear();
@@ -142,83 +144,83 @@ describe('EditorTextoRico.vue', () => {
         mockEditorInstance.isEmpty = true;
         mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p></p>');
         const onUpdate = obterOnUpdateMock();
-        onUpdate({ editor: mockEditorInstance });
+        onUpdate({editor: mockEditorInstance});
         expect(wrapper.emitted('update:modelValue')![0]).toEqual(['']);
 
         // Exceed limit
         mockEditorInstance.isEmpty = false;
         mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p>123456</p>');
-        onUpdate({ editor: mockEditorInstance });
-        
+        onUpdate({editor: mockEditorInstance});
+
         // Use last emitted value for invalido
         const invalidoEmits = wrapper.emitted('update:invalido');
         expect(invalidoEmits![invalidoEmits!.length - 1]).toEqual([true]);
         expect(mockEditorInstance.commands.setContent).toHaveBeenCalled();
     });
-it('onUpdate handles reducing content when over limit', async () => {
-    const wrapper = mount(EditorTextoRico, {
-        props: { modelValue: '<p>1234567</p>', maximoCaracteres: 5 }
+    it('onUpdate handles reducing content when over limit', async () => {
+        const wrapper = mount(EditorTextoRico, {
+            props: {modelValue: '<p>1234567</p>', maximoCaracteres: 5}
+        });
+        await flushPromises();
+
+        // Initial call from watch happens here
+        expect(mockEditorInstance.commands.setContent).toHaveBeenCalled();
+
+        mockEditorInstance.isEmpty = false;
+        mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p>123456</p>');
+
+        const onUpdate = obterOnUpdateMock();
+
+        // Clear here to be absolutely sure we only track calls from onUpdate
+        mockEditorInstance.commands.setContent.mockClear();
+
+        onUpdate({editor: mockEditorInstance});
+
+        expect(wrapper.emitted('update:invalido')).toBeDefined();
+        // Should not trigger setContent loop when reducing, even if still over limit
+        expect(mockEditorInstance.commands.setContent).not.toHaveBeenCalled();
+        expect(wrapper.emitted('update:modelValue')![0]).toEqual(['<p>123456</p>']);
     });
-    await flushPromises();
-
-    // Initial call from watch happens here
-    expect(mockEditorInstance.commands.setContent).toHaveBeenCalled();
-
-    mockEditorInstance.isEmpty = false;
-    mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p>123456</p>');
-
-    const onUpdate = obterOnUpdateMock();
-
-    // Clear here to be absolutely sure we only track calls from onUpdate
-    mockEditorInstance.commands.setContent.mockClear();
-
-    onUpdate({ editor: mockEditorInstance });
-
-    expect(wrapper.emitted('update:invalido')).toBeDefined();
-    // Should not trigger setContent loop when reducing, even if still over limit
-    expect(mockEditorInstance.commands.setContent).not.toHaveBeenCalled();
-    expect(wrapper.emitted('update:modelValue')![0]).toEqual(['<p>123456</p>']);
-});
     it('watch modelValue ignores same content', async () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '<p>test</p>' }
+            props: {modelValue: '<p>test</p>'}
         });
-        
+
         mockEditorInstance.getHTML = vi.fn().mockReturnValue('<p>test</p>');
-        await wrapper.setProps({ modelValue: '<p>test</p>' });
-        
+        await wrapper.setProps({modelValue: '<p>test</p>'});
+
         expect(mockEditorInstance.commands.setContent).toHaveBeenCalledTimes(1); // Only from immediate watch
     });
 
     it('executarAcao respects desabilitado prop', async () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '', desabilitado: true }
+            props: {modelValue: '', desabilitado: true}
         });
         const vm = wrapper.vm as any;
         const spy = vi.fn();
-        
+
         vm.executarAcao(spy);
         expect(spy).not.toHaveBeenCalled();
 
-        await wrapper.setProps({ desabilitado: false });
+        await wrapper.setProps({desabilitado: false});
         vm.executarAcao(spy);
         expect(spy).toHaveBeenCalled();
     });
 
     it('sincronizarPorDom ignores same content and non-div elements', async () => {
         const wrapper = mount(EditorTextoRico, {
-            props: { modelValue: '<p>test</p>' }
+            props: {modelValue: '<p>test</p>'}
         });
         const vm = wrapper.vm as any;
 
         // Non-div
-        vm.sincronizarPorDom({ target: document.createElement('span') } as any);
+        vm.sincronizarPorDom({target: document.createElement('span')} as any);
         expect(wrapper.emitted('update:modelValue')).toBeUndefined();
 
         // Same content
         const div = document.createElement('div');
         div.innerHTML = '<p>test</p>';
-        vm.sincronizarPorDom({ target: div } as any);
+        vm.sincronizarPorDom({target: div} as any);
         expect(wrapper.emitted('update:modelValue')).toBeUndefined();
     });
 });

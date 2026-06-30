@@ -12,7 +12,7 @@ import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
 import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 import {normalizarErro} from '@/utils/apiError';
 
-type RetornoFluxo = {mensagem: string; variante: 'danger'};
+type RetornoFluxo = { mensagem: string; variante: 'danger' };
 
 interface AutoavaliacaoDiagnosticoViewProps {
     codSubprocesso: number;
@@ -121,10 +121,10 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
                         codProcesso: contexto.value.processoCodigo,
                         siglaUnidade: props.siglaUnidade,
                     },
-            query: {
-                codSubprocesso: String(props.codSubprocesso),
-            },
-        });
+                    query: {
+                        codSubprocesso: String(props.codSubprocesso),
+                    },
+                });
             }
         } catch (err) {
             modalConcluirAberto.value = false;

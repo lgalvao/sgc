@@ -198,7 +198,10 @@ function criarMutacoesConsenso(params: CriarMutacoesConsensoParams) {
         onSuccess: () => {
             atualizarCacheAposConcluir(params);
             invalidarQueriesConsenso(params);
-            void params.cache.invalidateQueries({key: chaveAutoavaliacao(params.codSubprocesso, params.contextoSessao), exact: true});
+            void params.cache.invalidateQueries({
+                key: chaveAutoavaliacao(params.codSubprocesso, params.contextoSessao),
+                exact: true
+            });
         },
     });
 
@@ -293,12 +296,18 @@ function clonarCompetencias(competencias: ConsensoCompetenciaDetalhada[]) {
 }
 
 function invalidarQueriesConsenso(ctx: InvalidaQueriesContext) {
-    void ctx.cache.invalidateQueries({key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.servidorTitulo), exact: true});
+    void ctx.cache.invalidateQueries({
+        key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.servidorTitulo),
+        exact: true
+    });
     void ctx.cache.invalidateQueries({key: chaveEquipe(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
 }
 
 function invalidarQueriesAprovar(ctx: InvalidaQueriesContext) {
-    void ctx.cache.invalidateQueries({key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.chaveConsultaConsenso ?? ctx.servidorTitulo), exact: true});
+    void ctx.cache.invalidateQueries({
+        key: chaveConsenso(ctx.codSubprocesso, ctx.contextoSessao, ctx.chaveConsultaConsenso ?? ctx.servidorTitulo),
+        exact: true
+    });
     void ctx.cache.invalidateQueries({key: chaveEquipe(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
     void ctx.cache.invalidateQueries({key: chaveAutoavaliacao(ctx.codSubprocesso, ctx.contextoSessao), exact: true});
 }

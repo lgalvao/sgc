@@ -137,44 +137,44 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             Long codigoIgnorar = 1L;
             when(processoRepo.listarUnidadesEmSituacoesExcetoProcesso(anyList(), eq(codigoIgnorar)))
                     .thenReturn(List.of(10L, 20L));
-Set<Long> resultado = processoService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
+            Set<Long> resultado = processoService.buscarIdsUnidadesComProcessosAtivos(codigoIgnorar);
 
-assertThat(resultado).containsExactlyInAnyOrder(10L, 20L);
-}
+            assertThat(resultado).containsExactlyInAnyOrder(10L, 20L);
+        }
 
-@Test
-@DisplayName("Deve identificar corretamente situações de cadastro para processamento em bloco")
-void deveIdentificarSituacoesCadastroParaProcessamentoEmBloco() {
-Long codProcesso = 1L;
-ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
-        List.of(10L, 20L, 30L),
-        ACEITAR
-);
+        @Test
+        @DisplayName("Deve identificar corretamente situações de cadastro para processamento em bloco")
+        void deveIdentificarSituacoesCadastroParaProcessamentoEmBloco() {
+            Long codProcesso = 1L;
+            ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(
+                    List.of(10L, 20L, 30L),
+                    ACEITAR
+            );
 
-Usuario usuario = new Usuario();
-usuario.setPerfilAtivo(Perfil.ADMIN);
-when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
+            Usuario usuario = new Usuario();
+            usuario.setPerfilAtivo(Perfil.ADMIN);
+            when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
 
-Subprocesso s1 = Subprocesso.builder().codigo(101L).situacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(Unidade.builder().codigo(10L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
-Subprocesso s2 = Subprocesso.builder().codigo(102L).situacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(Unidade.builder().codigo(20L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
-Subprocesso s3 = Subprocesso.builder().codigo(103L).situacao(MAPEAMENTO_MAPA_CRIADO).unidade(Unidade.builder().codigo(30L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
+            Subprocesso s1 = Subprocesso.builder().codigo(101L).situacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(Unidade.builder().codigo(10L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
+            Subprocesso s2 = Subprocesso.builder().codigo(102L).situacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO).unidade(Unidade.builder().codigo(20L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
+            Subprocesso s3 = Subprocesso.builder().codigo(103L).situacao(MAPEAMENTO_MAPA_CRIADO).unidade(Unidade.builder().codigo(30L).build()).processo(criarProcessoTeste(MAPEAMENTO)).build();
 
-when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
-        .thenReturn(List.of(s1, s2, s3));
-when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(true);
+            when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList()))
+                    .thenReturn(List.of(s1, s2, s3));
+            when(permissionEvaluator.verificarPermissao(any(), anyList(), any())).thenReturn(true);
 
-processoService.executarAcaoEmBloco(codProcesso, req);
+            processoService.executarAcaoEmBloco(codProcesso, req);
 
 // s1 e s2 são de cadastro
-verify(cadastroFluxoService).aceitarCadastroEmBloco(argThat(list -> list.containsAll(List.of(101L, 102L))));
+            verify(cadastroFluxoService).aceitarCadastroEmBloco(argThat(list -> list.containsAll(List.of(101L, 102L))));
 // s3 é de validação (não cadastro)
-verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(103L)));
-}
-}
+            verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(103L)));
+        }
+    }
 
 
-@Nested
-@DisplayName("Workflow e Inicialização")
+    @Nested
+    @DisplayName("Workflow e Inicialização")
     class Workflow {
         @Test
         @DisplayName("Deve iniciar mapeamento com sucesso e salvar")
@@ -546,7 +546,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
 
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList()))
                     .thenReturn(List.of(sCad, sVal));
-            
+
             when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
             // Teste ACEITAR
@@ -601,7 +601,6 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
                     .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
     }
-
 
 
     @Nested
@@ -1077,7 +1076,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
 
             verify(notificacaoService).enfileirar(argThat(cmd ->
                     cmd.destinatario().equals("usuario@tre-pe.jus.br") &&
-                    cmd.chaveIdempotencia().endsWith(":copia-admin")
+                            cmd.chaveIdempotencia().endsWith(":copia-admin")
             ));
         }
 
@@ -1107,7 +1106,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
             Usuario usuarioLogado = new Usuario();
             usuarioLogado.setTituloEleitoral("12345");
             usuarioLogado.setEmail("usuario@tre-pe.jus.br");
-            
+
             Unidade uniSedoc = new Unidade();
             uniSedoc.setSigla("SEDOC");
             usuarioLogado.setUnidadeLotacao(uniSedoc);
@@ -1248,7 +1247,6 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
     }
 
 
-
     @Test
     @DisplayName("iniciar deve suportar tipo DIAGNOSTICO")
     void iniciarDiagnostico() {
@@ -1300,7 +1298,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         Usuario usuario = new Usuario();
         usuario.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-        
+
         when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
         processoService.executarAcaoEmBloco(codProc, req);
@@ -1335,8 +1333,8 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
                         && cmd.tipoNotificacao() == TipoNotificacao.LEMBRETE_PRAZO
                         && "U1".equals(cmd.unidadeDestinoSigla())
                         && cmd.chaveIdempotencia().startsWith("processo:1:lembrete:unidade:10:dia:")
-            ));
-        }
+        ));
+    }
 
     @Test
     @DisplayName("enviarLembrete para unidade ADMIN deve enviar para SEDOC quando ADMIN estiver lotado na SEDOC")
@@ -1460,7 +1458,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         Usuario usuario = new Usuario();
         usuario.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
-        
+
         when(permissionEvaluator.verificarPermissao(eq(usuario), anyList(), any())).thenReturn(true);
 
         processoService.executarAcaoEmBloco(codProc, req);
@@ -1759,7 +1757,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
     @DisplayName("iniciarSubprocessos deve exercitar switch de tipos de processo")
     void iniciarSubprocessos_DeveExercitarSwitchDeTiposDeProcesso() {
         Long codProcesso = 1L;
-        
+
         Processo p1 = new Processo();
         p1.setCodigo(codProcesso);
         p1.setTipo(DIAGNOSTICO);
@@ -1792,7 +1790,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
     @DisplayName("podeDisponibilizarEmBloco deve exercitar todas as combinações de situações de subprocesso")
     void podeDisponibilizarEmBloco_DeveExercitarTodasAsCombinacoesDeSituacoes() {
         Long codProcesso = 1L;
-        
+
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.GESTOR);
         usuario.setUnidadeAtivaCodigo(10L);
@@ -1996,7 +1994,7 @@ verify(transicaoService).aceitarValidacaoEmBloco(argThat(list -> list.contains(1
         when(repo.buscar(Processo.class, 77L)).thenReturn(processo);
 
         assertThatThrownBy(() -> processoService.finalizar(77L))
-            .isInstanceOf(ErroValidacao.class)
-            .hasMessageContaining(Mensagens.SITUACAO_INVALIDA);
-        }
-        }
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessageContaining(Mensagens.SITUACAO_INVALIDA);
+    }
+}

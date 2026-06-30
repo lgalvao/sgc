@@ -90,7 +90,7 @@
     <div class="d-flex gap-2 flex-wrap mb-4">
       <BButton
           v-if="podeConcluir && exibirBotaoConcluirDiagnostico"
-           :disabled="concluindo || !habilitarConcluir"
+          :disabled="concluindo || !habilitarConcluir"
           data-testid="btn-concluir-diagnostico"
           variant="success"
           @click="abrirModalConcluir"
@@ -334,8 +334,8 @@ async function confirmarImpossibilitar() {
   if (!servidorSelecionado.value) return;
   try {
     await impossibilitarAvaliacao(
-      servidorSelecionado.value.servidorTitulo,
-      justificativaImpossibilidade.value,
+        servidorSelecionado.value.servidorTitulo,
+        justificativaImpossibilidade.value,
     );
     modalImpossibilitarAberto.value = false;
   } catch {
@@ -350,8 +350,8 @@ async function abrirModalValidar() {
     modalValidarAberto.value = true;
   } catch (erro) {
     registrarErro(normalizarErro(erro).mensagem
-      ?? erroValidacaoValidar.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        ?? erroValidacaoValidar.value?.message
+        ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -362,8 +362,8 @@ async function abrirModalConcluir() {
     modalConcluirAberto.value = true;
   } catch (erro) {
     registrarErro(normalizarErro(erro).mensagem
-      ?? erroValidacaoConcluir.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        ?? erroValidacaoConcluir.value?.message
+        ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -375,8 +375,8 @@ async function abrirModalDevolver() {
     modalDevolverAberto.value = true;
   } catch (erro) {
     registrarErro(normalizarErro(erro).mensagem
-      ?? erroValidacaoDevolver.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        ?? erroValidacaoDevolver.value?.message
+        ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -387,8 +387,8 @@ async function abrirModalHomologar() {
     modalHomologarAberto.value = true;
   } catch (erro) {
     registrarErro(normalizarErro(erro).mensagem
-      ?? erroValidacaoHomologar.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        ?? erroValidacaoHomologar.value?.message
+        ?? TEXTOS.diagnostico.ERRO_SALVAR);
   }
 }
 
@@ -400,8 +400,8 @@ async function confirmarConcluir() {
     await router.push({name: 'Painel'});
   } catch (erro) {
     erroConcluirModal.value = normalizarErro(erro).mensagem
-      ?? erroConcluir.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+        ?? erroConcluir.value?.message
+        ?? TEXTOS.diagnostico.ERRO_SALVAR;
   }
 }
 

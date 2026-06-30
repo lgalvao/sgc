@@ -201,7 +201,7 @@ describe("useUnidadeTela", () => {
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadePdf).mockResolvedValue(undefined);
 
         const {exportarMapaVigentePdf, loadingExportacaoPdf} = useUnidadeTela({codUnidade: 10});
-        
+
         const promessa = exportarMapaVigentePdf();
         expect(loadingExportacaoPdf.value).toBe(true);
         await promessa;
@@ -216,7 +216,7 @@ describe("useUnidadeTela", () => {
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadePdf).mockRejectedValue(new Error("Erro PDF"));
 
         const {exportarMapaVigentePdf, loadingExportacaoPdf} = useUnidadeTela({codUnidade: 10});
-        
+
         await exportarMapaVigentePdf();
         expect(loadingExportacaoPdf.value).toBe(false);
         expect(mockNotify).toHaveBeenCalledWith(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
@@ -235,7 +235,7 @@ describe("useUnidadeTela", () => {
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv).mockResolvedValue(undefined);
 
         const {exportarMapaVigenteCsv, loadingExportacaoCsv} = useUnidadeTela({codUnidade: 10});
-        
+
         const promessa = exportarMapaVigenteCsv();
         expect(loadingExportacaoCsv.value).toBe(true);
         await promessa;
@@ -250,7 +250,7 @@ describe("useUnidadeTela", () => {
         vi.mocked(relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv).mockRejectedValue(new Error("Erro CSV"));
 
         const {exportarMapaVigenteCsv, loadingExportacaoCsv} = useUnidadeTela({codUnidade: 10});
-        
+
         await exportarMapaVigenteCsv();
         expect(loadingExportacaoCsv.value).toBe(false);
         expect(mockNotify).toHaveBeenCalledWith(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
@@ -273,7 +273,7 @@ describe("useUnidadeTela", () => {
 
     it("deve navegar para criar atribuicao e para subordinada", () => {
         const {irParaCriarAtribuicao, navegarParaUnidadeSubordinada} = useUnidadeTela({codUnidade: 10});
-        
+
         irParaCriarAtribuicao();
         expect(pushMock).toHaveBeenCalledWith({path: "/unidade/10/atribuicao"});
 

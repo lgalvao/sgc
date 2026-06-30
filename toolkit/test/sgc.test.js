@@ -1242,7 +1242,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("lista com sucesso test-ids do frontend em recorte controlado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-listar-"));
-        
+
         // Criar arquivos .vue de teste com test-ids
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteA.vue"),
@@ -1264,7 +1264,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("detecta corretamente test-ids duplicados e falha com codigo 1", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-duplicados-"));
-        
+
         // Criar dois arquivos com o mesmo test-id
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteX.vue"),
@@ -1287,7 +1287,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("passa com sucesso se nao houver test-ids duplicados", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-unicos-"));
-        
+
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteUnico.vue"),
             "<template><button data-testid=\"btn-unico\">Ação Única</button></template>"

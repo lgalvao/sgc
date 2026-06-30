@@ -333,6 +333,7 @@ button:disabled,
   border-color: var(--bs-success-border-subtle) !important;
   opacity: 1 !important;
 }
+
 .toast.text-bg-success .toast-body {
   color: var(--bs-success-text-emphasis) !important;
 }
@@ -342,6 +343,7 @@ button:disabled,
   border-color: var(--bs-danger-border-subtle) !important;
   opacity: 1 !important;
 }
+
 .toast.text-bg-danger .toast-body {
   color: var(--bs-danger-text-emphasis) !important;
 }

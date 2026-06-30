@@ -70,7 +70,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Não deve finalizar quando houver subprocesso não homologado")
     void naoDeveFinalizarQuandoSubprocessosNaoHomologados() throws Exception {
-                mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
+        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableContent())
@@ -91,7 +91,7 @@ class CDU21IntegrationTest extends BaseIntegrationTest {
         subprocesso.setSituacaoForcada(SituacaoSubprocesso.REVISAO_CADASTRO_HOMOLOGADA);
         subprocessoRepo.save(subprocesso);
 
-                mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
+        mockMvc.perform(post("/api/processos/{codigo}/finalizar", processo.getCodigo())
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnprocessableContent())

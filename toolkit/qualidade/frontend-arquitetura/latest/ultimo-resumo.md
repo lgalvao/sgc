@@ -20,37 +20,38 @@
 ## Hotspots
 
 1. `frontend/src/composables/useFluxoDiagnostico.ts` [composable]
-   - score: 15
-   - sinais: invalidacaoExplicita
-   - fan-out: 2 categorias / 2 imports arquiteturais
+    - score: 15
+    - sinais: invalidacaoExplicita
+    - fan-out: 2 categorias / 2 imports arquiteturais
 2. `frontend/src/composables/useConsensoDiagnostico.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 3 categorias / 3 imports arquiteturais
+    - score: 9
+    - sinais: superficieAmpla
+    - fan-out: 3 categorias / 3 imports arquiteturais
 3. `frontend/src/composables/useAutoavaliacaoDiagnostico.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 3 categorias / 3 imports arquiteturais
+    - score: 9
+    - sinais: superficieAmpla
+    - fan-out: 3 categorias / 3 imports arquiteturais
 4. `frontend/src/composables/useOcupacoesCriticasDiagnostico.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 3 categorias / 3 imports arquiteturais
+    - score: 9
+    - sinais: superficieAmpla
+    - fan-out: 3 categorias / 3 imports arquiteturais
 5. `frontend/src/composables/useMonitoramentoDiagnostico.ts` [composable]
-   - score: 9
-   - sinais: superficieAmpla
-   - fan-out: 3 categorias / 3 imports arquiteturais
+    - score: 9
+    - sinais: superficieAmpla
+    - fan-out: 3 categorias / 3 imports arquiteturais
 6. `frontend/src/views/AutoavaliacaoDiagnosticoView.vue` [view]
-   - score: 6
-   - sinais: fanoutAlto
-   - fan-out: 1 categorias / 6 imports arquiteturais
+    - score: 6
+    - sinais: fanoutAlto
+    - fan-out: 1 categorias / 6 imports arquiteturais
 7. `frontend/src/composables/useDiagnosticoPermissoes.ts` [composable]
-   - score: 1
-   - sinais: arquivoMinusculo
-   - fan-out: 2 categorias / 2 imports arquiteturais
+    - score: 1
+    - sinais: arquivoMinusculo
+    - fan-out: 2 categorias / 2 imports arquiteturais
 
 ## Famílias de composables pulverizadas
 
 ### Fluxo (6 arquivos, 518 linhas)
+
 - `frontend/src/composables/useFluxoAdministrativoSubprocesso.ts`
 - `frontend/src/composables/useFluxoCadastroSubprocesso.ts`
 - `frontend/src/composables/useFluxoDiagnostico.ts`
@@ -59,6 +60,7 @@
 - `frontend/src/composables/useFluxoSubprocessoExecucao.ts`
 
 ### Diagnostico (5 arquivos, 320 linhas)
+
 - `frontend/src/composables/useDiagnosticoCache.ts`
 - `frontend/src/composables/useDiagnosticoContexto.ts`
 - `frontend/src/composables/useDiagnosticoOrganizacionalAlert.ts`
@@ -66,6 +68,7 @@
 - `frontend/src/composables/useDiagnosticoPermissoes.ts`
 
 ### Mapa (5 arquivos, 955 linhas)
+
 - `frontend/src/composables/useMapaCompetenciasMutacoes.ts`
 - `frontend/src/composables/useMapaOrquestracao.ts`
 - `frontend/src/composables/useMapaQuery.ts`
@@ -73,6 +76,7 @@
 - `frontend/src/composables/useMapaTela.ts`
 
 ### Processo (5 arquivos, 601 linhas)
+
 - `frontend/src/composables/useProcessoCadastroCarga.ts`
 - `frontend/src/composables/useProcessoCadastroTela.ts`
 - `frontend/src/composables/useProcessoForm.ts`
@@ -80,52 +84,58 @@
 - `frontend/src/composables/useProcessoQuery.ts`
 
 ### Cadastro (4 arquivos, 918 linhas)
+
 - `frontend/src/composables/useCadastroAtividadesMutacoes.ts`
 - `frontend/src/composables/useCadastroOrquestracao.ts`
 - `frontend/src/composables/useCadastroRevisaoSemMudancas.ts`
 - `frontend/src/composables/useCadastroTela.ts`
-
 
 ## Exceções documentadas
 
 Arquivos com sinais suprimidos via `@sgc-auditoria ignorar:` com motivo explícito:
 
 - `frontend/src/composables/useBuscadorUsuarios.ts`
-  - sinais ignorados: superficieAmpla
-  - motivo: Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue, extraído para testabilidade
+    - sinais ignorados: superficieAmpla
+    - motivo: Autocomplete com navegação por teclado; contrato coeso consumido exclusivamente por BuscadorUsuarios.vue,
+      extraído para testabilidade
 - `frontend/src/composables/useDiagnosticoOrganizacionalQuery.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+    - sinais ignorados: arquivoMinusculo
+    - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 - `frontend/src/composables/useFeedbacksAdminQuery.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query — pequeno por design
+    - sinais ignorados: arquivoMinusculo
+    - motivo: padrão Pinia Colada: arquivo de domínio com chave de query — pequeno por design
 - `frontend/src/composables/useFluxoSubprocesso.ts`
-  - sinais ignorados: fachadaPura, arquivoMinusculo
-  - motivo: Fachada de coordenação deliberada: injeta `execucao` como dependência em useFluxoCadastroSubprocesso e useFluxoAdministrativoSubprocesso, isolando os consumers desse detalhe
+    - sinais ignorados: fachadaPura, arquivoMinusculo
+    - motivo: Fachada de coordenação deliberada: injeta `execucao` como dependência em useFluxoCadastroSubprocesso e
+      useFluxoAdministrativoSubprocesso, isolando os consumers desse detalhe
 - `frontend/src/composables/useHistoricoQuery.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+    - sinais ignorados: arquivoMinusculo
+    - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 - `frontend/src/composables/useMapaSugestoes.ts`
-  - sinais ignorados: superficieAmpla
-  - motivo: Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por useMapaTela
+    - sinais ignorados: superficieAmpla
+    - motivo: Dois modais relacionados (visualizar + enviar sugestões); contrato coeso consumido integralmente por
+      useMapaTela
 - `frontend/src/composables/usePainelQuery.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+    - sinais ignorados: arquivoMinusculo
+    - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 - `frontend/src/composables/useProcessoQuery.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+    - sinais ignorados: arquivoMinusculo
+    - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 - `frontend/src/composables/useRelatorioAndamentoTela.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: Composable de tela simples — funcionalidade de relatório de andamento não tem complexidade que justifique mais código
+    - sinais ignorados: arquivoMinusculo
+    - motivo: Composable de tela simples — funcionalidade de relatório de andamento não tem complexidade que justifique
+      mais código
 - `frontend/src/composables/useUnidadeAtual.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: Abstração deliberada: fornece acesso reativo + setter para unidadeAtualDetalhes; dois consumidores (useBreadcrumbs, useUnidadeTela) tornam o inline inadequado
+    - sinais ignorados: arquivoMinusculo
+    - motivo: Abstração deliberada: fornece acesso reativo + setter para unidadeAtualDetalhes; dois consumidores
+      (useBreadcrumbs, useUnidadeTela) tornam o inline inadequado
 - `frontend/src/composables/useUnidadesQuery.ts`
-  - sinais ignorados: arquivoMinusculo
-  - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
+    - sinais ignorados: arquivoMinusculo
+    - motivo: padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 - `frontend/src/stores/subprocesso/index.ts`
-  - sinais ignorados: superficieAmpla
-  - motivo: Store dual-context (edicao + cadastro) com três níveis de invalidação (limpar, invalidar, resetar); 14 exports são inerentes ao contrato mínimo de dois contextos independentes
+    - sinais ignorados: superficieAmpla
+    - motivo: Store dual-context (edicao + cadastro) com três níveis de invalidação (limpar, invalidar, resetar); 14
+      exports são inerentes ao contrato mínimo de dois contextos independentes
 
 ## Diretrizes acompanhadas
 

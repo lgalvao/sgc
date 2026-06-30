@@ -115,7 +115,7 @@ async function limparSessaoNavegador(page: Page) {
     }
 
     // 2. Desmonta a página atual para abortar requests pendentes antes de trocar a sessão.
-    await page.goto('about:blank', { waitUntil: 'commit' });
+    await page.goto('about:blank', {waitUntil: 'commit'});
 
     // 3. Limpa cookies de autenticação
     await page.context().clearCookies();

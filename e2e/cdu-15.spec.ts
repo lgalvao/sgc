@@ -34,10 +34,10 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('Cenários CDU-15: CT-00 a CT-02 - Criar competência', async ({
-                                                                      _resetAutomatico,
-                                                                      page,
-                                                                      _autenticadoComoAdmin
-                                                                  }) => {
+                                                                          _resetAutomatico,
+                                                                          page,
+                                                                          _autenticadoComoAdmin
+                                                                      }) => {
         // CT-00 e CT-01: Acessar edição e verificar elementos
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
@@ -85,10 +85,10 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('Cenários CDU-15: CT-02b a CT-03 - Editar competência', async ({
-                                                                        _resetAutomatico,
-                                                                        page,
-                                                                        _autenticadoComoAdmin
-                                                                    }) => {
+                                                                            _resetAutomatico,
+                                                                            page,
+                                                                            _autenticadoComoAdmin
+                                                                        }) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 
@@ -124,10 +124,10 @@ test.describe.serial('CDU-15 - Manter mapa de competências', () => {
     });
 
     test('Cenários CDU-15: CT-04 a CT-06 - Excluir e disponibilizar mapa', async ({
-                                                                                  _resetAutomatico,
-                                                                                  page,
-                                                                                  _autenticadoComoAdmin
-                                                                              }) => {
+                                                                                      _resetAutomatico,
+                                                                                      page,
+                                                                                      _autenticadoComoAdmin
+                                                                                  }) => {
         await acessarSubprocessoAdmin(page, descProcesso, UNIDADE_ALVO);
         await navegarParaMapa(page);
 

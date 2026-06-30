@@ -21,7 +21,7 @@ interface TelaCadastroRefs {
 
 export function useProcessoCadastroTela({formFieldsRef, modalUnidadesComEquipePropriaRef}: TelaCadastroRefs) {
     const formulario = useProcessoForm();
-    
+
     // Estado local da tela
     const unidades = ref<Unidade[]>([]);
     const isLoadingUnidades = ref(false);

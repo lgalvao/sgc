@@ -527,13 +527,13 @@ describe("SubprocessoCards.vue", () => {
         });
 
         const card = wrapper.find('[data-testid="card-subprocesso-consenso"]');
-        
+
         await card.trigger("keydown", {key: "Escape"});
         expect(pushMock).not.toHaveBeenCalled();
 
         await card.trigger("keydown", {key: "Enter"});
         expect(pushMock).toHaveBeenCalled();
-        
+
         pushMock.mockClear();
         await card.trigger("keydown", {key: " "});
         expect(pushMock).toHaveBeenCalled();

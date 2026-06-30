@@ -84,7 +84,7 @@ describe('useEquipeDiagnostico', () => {
         expect(diagnosticoContexto.chaveEquipe).toHaveBeenCalledWith(CODIGO_SUBPROCESSO_VALIDO, 'contexto-sessao-mock');
 
         // Testa a query function
-        vi.mocked(diagnosticoService.obterEquipe).mockResolvedValue({ servidores: [] } as any);
+        vi.mocked(diagnosticoService.obterEquipe).mockResolvedValue({servidores: []} as any);
         await queryOptions.query();
         expect(diagnosticoService.obterEquipe).toHaveBeenCalledWith(CODIGO_SUBPROCESSO_VALIDO);
 
@@ -111,11 +111,11 @@ describe('useEquipeDiagnostico', () => {
     it('deve calcular corretamente a quantidade de servidores e pendências', async () => {
         mockQueryData.value = {
             servidores: [
-                { servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA' },
-                { servidorTitulo: '2', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA' },
-                { servidorTitulo: '3', situacaoServidor: 'CONSENSO_CRIADO' },
-                { servidorTitulo: '4', situacaoServidor: 'CONSENSO_APROVADO' },
-                { servidorTitulo: '5', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA' },
+                {servidorTitulo: '1', situacaoServidor: 'AUTOAVALIACAO_NAO_INICIADA'},
+                {servidorTitulo: '2', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
+                {servidorTitulo: '3', situacaoServidor: 'CONSENSO_CRIADO'},
+                {servidorTitulo: '4', situacaoServidor: 'CONSENSO_APROVADO'},
+                {servidorTitulo: '5', situacaoServidor: 'AVALIACAO_IMPOSSIBILITADA'},
             ],
         };
 

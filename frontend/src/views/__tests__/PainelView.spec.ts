@@ -148,7 +148,7 @@ describe('PainelView', () => {
         vm.ordenarPor('descricao');
         expect(vm.asc).toBe(false);
         // Ordenação é local — não chama o backend
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1); 
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(1);
 
         // Mudar critério
         vm.ordenarPor('codigo');
@@ -259,7 +259,7 @@ describe('PainelView', () => {
         vm.show = true;
         await flushPromises();
         // Permanece 2 pois o refresh() no onActivated respeita o cache válido
-        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2); 
+        expect(painelService.obterBootstrap).toHaveBeenCalledTimes(2);
     });
 
     it('deve recarregar em foreground ao reativar quando o painel foi invalidado pela SPA', async () => {
@@ -340,26 +340,26 @@ describe('PainelView', () => {
         await flushPromises();
         expect(wrapper.find('[data-testid="btn-painel-criar-processo"]').exists()).toBe(false);
     });
-it('deve redirecionar para CadProcesso ao emitir evento cta-vazio', async () => {
-    const opcoesCtaVazio = {
-        ...createMountOptions(),
-        global: {
-            ...createMountOptions().global,
-            stubs: {
-                ...createMountOptions().global.stubs,
-                TabelaProcessos: {
-                    name: 'TabelaProcessos',
-                    template: '<div data-testid="tbl-processos"></div>',
-                    emits: ['cta-vazio'],
+    it('deve redirecionar para CadProcesso ao emitir evento cta-vazio', async () => {
+        const opcoesCtaVazio = {
+            ...createMountOptions(),
+            global: {
+                ...createMountOptions().global,
+                stubs: {
+                    ...createMountOptions().global.stubs,
+                    TabelaProcessos: {
+                        name: 'TabelaProcessos',
+                        template: '<div data-testid="tbl-processos"></div>',
+                        emits: ['cta-vazio'],
+                    },
                 },
             },
-        },
-    };
-    const wrapper = mount(PainelView, opcoesCtaVazio);
-    await flushPromises();
+        };
+        const wrapper = mount(PainelView, opcoesCtaVazio);
+        await flushPromises();
 
-    mockRouterPush.mockClear();
-    await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('cta-vazio');
-    expect(mockRouterPush).toHaveBeenCalledWith({name: 'CadProcesso'});
-});
+        mockRouterPush.mockClear();
+        await wrapper.findComponent({name: 'TabelaProcessos'}).vm.$emit('cta-vazio');
+        expect(mockRouterPush).toHaveBeenCalledWith({name: 'CadProcesso'});
+    });
 });

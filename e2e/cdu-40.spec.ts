@@ -2,11 +2,11 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 
 test.describe('CDU-40 - Consultar feedbacks enviados', () => {
     test('ADMIN consulta feedbacks, visualiza detalhes, metadados e captura ampliada', async ({
-        _resetAutomatico,
-        page,
-        request,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                  _resetAutomatico,
+                                                                                                  page,
+                                                                                                  request,
+                                                                                                  _autenticadoComoAdmin
+                                                                                              }) => {
         const resposta = await request.post('/e2e/fixtures/feedback', {
             data: {
                 tipo: 'SUGESTAO',

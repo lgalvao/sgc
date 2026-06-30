@@ -125,7 +125,9 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
           </p>
           <p v-if="subprocesso.prazoEtapaAtual" class="mb-0">
             <span class="fw-bold me-1">{{ TEXTOS.subprocesso.LABEL_PRAZO_ETAPA }}:</span>
-            <span data-testid="subprocesso-header__txt-prazo">{{ formatDataSimples(subprocesso.prazoEtapaAtual) }}</span>
+            <span data-testid="subprocesso-header__txt-prazo">{{
+                formatDataSimples(subprocesso.prazoEtapaAtual)
+              }}</span>
           </p>
         </BCard>
       </BCol>

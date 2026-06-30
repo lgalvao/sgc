@@ -18,8 +18,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DiagnosticoValidacaoServiceTest {
 
-    @Mock AvaliacaoServidorRepo avaliacaoRepo;
-    @Mock SubprocessoVisualizacaoService subprocessoVisualizacaoService;
+    @Mock
+    AvaliacaoServidorRepo avaliacaoRepo;
+    @Mock
+    SubprocessoVisualizacaoService subprocessoVisualizacaoService;
 
     @InjectMocks
     DiagnosticoValidacaoService service;

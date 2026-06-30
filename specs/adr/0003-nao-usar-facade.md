@@ -17,7 +17,8 @@ Na prática, esse nome passou a agrupar classes de naturezas distintas:
 
 Isso criou ambiguidade sem ganho estrutural correspondente.
 
-No estado atual do sistema, não existe uma camada separada e coerente que justifique `Facade` como categoria arquitetural própria.
+No estado atual do sistema, não existe uma camada separada e coerente que justifique `Facade` como categoria
+arquitetural própria.
 
 ## Decisão
 

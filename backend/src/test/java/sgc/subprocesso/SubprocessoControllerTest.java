@@ -880,8 +880,8 @@ class SubprocessoControllerTest {
                     .build();
 
             when(subprocessoApresentacaoService.criarAnalise(eq(1L), any(), eq(TipoAnalise.VALIDACAO))).thenReturn(new AnaliseHistoricoDto(
-                TipoAnalise.VALIDACAO.name(),
-                TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
+                    TipoAnalise.VALIDACAO.name(),
+                    TipoAcaoAnalise.ACEITE_MAPEAMENTO.name(),
                     "Aceite",
                     "123456789012",
                     "Usuário Teste",

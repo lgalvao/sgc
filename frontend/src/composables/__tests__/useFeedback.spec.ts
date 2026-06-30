@@ -41,12 +41,12 @@ describe('useFeedback', () => {
         setActivePinia(createPinia())
         vi.clearAllMocks()
         mockPost.mockResolvedValue({data: {id: 'uuid-123'}})
-        
+
         mockPerfilStore.usuarioCodigo = '12345';
         mockPerfilStore.usuarioNome = 'João Testador';
         mockPerfilStore.perfilSelecionado = 'CHEFE';
         mockPerfilStore.unidadeSelecionadaSigla = 'SENIC';
-        
+
         mockRoute.name = 'painel';
         mockRoute.fullPath = '/painel';
         mockRoute.query = {};
@@ -75,7 +75,7 @@ describe('useFeedback', () => {
         mockPerfilStore.perfilSelecionado = null;
         mockPerfilStore.unidadeSelecionadaSigla = null;
         mockRoute.name = null;
-        
+
         const {enviarFeedback} = useFeedback()
 
         await enviarFeedback('sugestao', 'Sugestao anonima')

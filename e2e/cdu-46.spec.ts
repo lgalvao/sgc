@@ -10,10 +10,10 @@ const UNIDADE = 'ASSESSORIA_12';
 
 test.describe('CDU-46 - Aprovar avaliação de consenso', () => {
     test('SERVIDOR aprova o consenso criado pela chefia', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                     _resetAutomatico,
+                                                                     page,
+                                                                     request
+                                                                 }) => {
         const descricao = `Diagnóstico CDU-46 ${Date.now()}`;
         const processo = await criarProcessoDiagnosticoComConsensoCriadoFixture(request, {
             descricao,

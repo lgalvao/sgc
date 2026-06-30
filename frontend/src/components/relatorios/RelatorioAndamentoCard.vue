@@ -49,8 +49,8 @@
                   <span class="relatorio-andamento__info-valor">
                     {{ item.dataLimiteEtapa2 }}
                     <small
-v-if="item.mostraPrazoAjustado"
-                           class="text-muted fst-italic fw-normal">(Prazo ajustado)</small>
+                        v-if="item.mostraPrazoAjustado"
+                        class="text-muted fst-italic fw-normal">(Prazo ajustado)</small>
                   </span>
                 </div>
                 <div class="relatorio-andamento__info-item">

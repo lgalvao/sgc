@@ -252,7 +252,6 @@ class SubprocessoConsultaServiceTest {
     }
 
 
-
     @Nested
     @DisplayName("Cobertura extra - visualização e contexto")
     class CoberturaConsultaTest {

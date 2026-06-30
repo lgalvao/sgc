@@ -44,10 +44,10 @@ async function preencherTodosOsCamposDeConsenso(page: import('@playwright/test')
 
 test.describe('CDU-45 - Manter avaliação de consenso', () => {
     test('CHEFE salva rascunho por autosave, valida na conclusão e só então libera o consenso para o servidor', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                                                           _resetAutomatico,
+                                                                                                                           page,
+                                                                                                                           request
+                                                                                                                       }) => {
         const descricao = `Diagnóstico CDU-45 ${Date.now()}`;
         const processo = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(request, {
             descricao,

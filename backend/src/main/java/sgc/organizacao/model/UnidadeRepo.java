@@ -61,7 +61,7 @@ public interface UnidadeRepo extends JpaRepository<Unidade, Long> {
                 u.situacao,
                 u.unidadeSuperior.codigo
             )
-
+            
             FROM Unidade u
             WHERE u.situacao = sgc.organizacao.model.SituacaoUnidade.ATIVA
             """)

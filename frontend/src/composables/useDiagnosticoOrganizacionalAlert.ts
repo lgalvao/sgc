@@ -55,13 +55,13 @@ export function useDiagnosticoOrganizacionalAlert(
     });
 
     const exibirAlertaDiagnostico = computed(() =>
-        mostrarDiagnosticoOrganizacional.value
-        && (
-            carregandoDiagnosticoOrganizacional.value
-            || !!erroDiagnosticoOrganizacional.value
-            || !!diagnosticoOrganizacional.value?.possuiViolacoes
-        )
-        && !alertaDiagnosticoDispensado.value
+            mostrarDiagnosticoOrganizacional.value
+            && (
+                carregandoDiagnosticoOrganizacional.value
+                || !!erroDiagnosticoOrganizacional.value
+                || !!diagnosticoOrganizacional.value?.possuiViolacoes
+            )
+            && !alertaDiagnosticoDispensado.value
     );
 
     // Watcher para carregar unidades de referência de forma reativa sob demanda

@@ -66,10 +66,10 @@ test.describe.serial('CDU-29 - Consultar histórico de processos', () => {
     });
 
     test('Cenario 5: Histórico exibe apenas processos finalizados inativos', async ({
-                                                                                         _resetAutomatico,
-                                                                                         page,
-                                                                                         _autenticadoComoAdmin
-                                                                                     }) => {
+                                                                                        _resetAutomatico,
+                                                                                        page,
+                                                                                        _autenticadoComoAdmin
+                                                                                    }) => {
         await page.getByRole('link', {name: /Histórico/i}).click();
         await expect(page).toHaveURL(/\/historico/);
 

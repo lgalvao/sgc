@@ -18,7 +18,8 @@
         <template #label>
           Selecione as unidades
         </template>
-        <div class="border rounded p-3 relatorio-diagnostico-filtros__arvore" data-testid="container-arvore-unidades-diagnostico">
+        <div class="border rounded p-3 relatorio-diagnostico-filtros__arvore"
+             data-testid="container-arvore-unidades-diagnostico">
           <ArvoreUnidades
               id="arvore-unidades-diagnostico"
               :model-value="unidadesSelecionadas"

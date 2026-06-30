@@ -190,10 +190,10 @@ const {
   limparSelecaoAtividades,
   importar,
 } = useImportarAtividadesTela({
-    mostrar: toRef(props, "mostrar"),
-    codSubprocessoDestino: toRef(props, "codSubprocessoDestino"),
-    onFechar: () => emit("fechar"),
-    onImportar: (resultado) => emit("importar", resultado),
+  mostrar: toRef(props, "mostrar"),
+  codSubprocessoDestino: toRef(props, "codSubprocessoDestino"),
+  onFechar: () => emit("fechar"),
+  onImportar: (resultado) => emit("importar", resultado),
 });
 
 const mostrarComputado = computed({

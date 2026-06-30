@@ -52,4 +52,5 @@
     `sgc-rel-gaps-diagnostico-YYYY-MM-DD.pdf`.
 
 ## Observações
+
 - O relatório oficial de gaps deve ser agregado e sem nomes de servidores.

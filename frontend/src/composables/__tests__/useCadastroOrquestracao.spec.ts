@@ -11,7 +11,7 @@ const storeMock = {
     obterContextoCadastroAtividadesPorProcessoEUnidade: vi.fn(),
     atualizarStatusLocal: vi.fn(),
     dadosCadastroValidos: vi.fn(),
-    erroIntegracaoContexto: null as {codigo?: string} | null,
+    erroIntegracaoContexto: null as { codigo?: string } | null,
 };
 
 const atualizarFluxoCadastroMock = vi.fn();
@@ -46,7 +46,13 @@ describe("useCadastroOrquestracao", () => {
     });
 
     it("deve carregar contexto inicial por processo e unidade", async () => {
-        const {carregarContextoInicial, codigoSubprocesso, unidade, codMapa, atividadesSnapshotInicial} = useCadastroOrquestracao(props, atividades);
+        const {
+            carregarContextoInicial,
+            codigoSubprocesso,
+            unidade,
+            codMapa,
+            atividadesSnapshotInicial
+        } = useCadastroOrquestracao(props, atividades);
         vi.mocked(storeMock.obterContextoCadastroAtividadesPorProcessoEUnidade).mockResolvedValue({
             detalhes: {codigo: 123, situacao: "S", permissoes: PERMISSOES_SUBPROCESSO_VAZIAS},
             atividadesDisponiveis: [{codigo: 1, descricao: "Atividade"}],

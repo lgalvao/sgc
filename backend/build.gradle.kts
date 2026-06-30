@@ -323,13 +323,13 @@ tasks.register("fuzz") {
         val buildDirFile = layout.buildDirectory.get().asFile
         val logFuzz = File(buildDirFile, "tmp/sgc-fuzz-backend.log")
         logFuzz.parentFile.mkdirs()
-        
+
         println("-----------------------------------------------------------------")
         println("Iniciando backend do SGC em background (perfil 'e2e')...")
         println("Logs do servidor serão salvos em: ${logFuzz.absolutePath}")
-        
+
         val jarFile = tasks.named<BootJar>("bootJar").get().archiveFile.get().asFile
-        
+
         // Comando para levantar o JAR
         val processoBuilder = ProcessBuilder(
             "java",
@@ -337,20 +337,20 @@ tasks.register("fuzz") {
             "-jar",
             jarFile.absolutePath
         )
-        
+
         // Define o diretório de trabalho como o diretório do subprojeto 'backend' para resolver caminhos relativos corretamente
         processoBuilder.directory(project.projectDir)
-        
+
         processoBuilder.redirectOutput(logFuzz)
         processoBuilder.redirectError(logFuzz)
-        
+
         val backendProcess = processoBuilder.start()
         println("Backend iniciado. Aguardando a porta 10000 ficar disponível...")
-        
+
         var conectado = false
         val timeoutMs = 45000L
         val startTime = System.currentTimeMillis()
-        
+
         while (System.currentTimeMillis() - startTime < timeoutMs) {
             try {
                 val url = URI("http://localhost:10000/swagger-ui.html").toURL()
@@ -367,62 +367,68 @@ tasks.register("fuzz") {
             }
             Thread.sleep(1500)
         }
-        
+
         if (!conectado) {
             backendProcess.destroyForcibly()
             throw GradleException("Erro: O backend do SGC nao ficou disponivel na porta 10000 dentro de 45 segundos. Verifique os logs em: ${logFuzz.absolutePath}")
         }
-        
+
         println("Backend pronto! Executando o script para obter token JWT de teste...")
-        
+
         val isWindows = System.getProperty("os.name").lowercase().contains("win")
         val scriptComando = if (isWindows) {
-            listOf("powershell", "-ExecutionPolicy", "Bypass", "-File", "${project.rootDir}/etc/fuzzing/obter-token.ps1")
+            listOf(
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${project.rootDir}/etc/fuzzing/obter-token.ps1"
+            )
         } else {
             listOf("bash", "${project.rootDir}/etc/fuzzing/obter-token.sh")
         }
-        
+
         val processoToken = ProcessBuilder(scriptComando).start()
         val saidaToken = processoToken.inputStream.bufferedReader().readText()
         processoToken.waitFor()
-        
+
         val regexJwt = Regex("Authorization: Bearer (\\S+)")
         val matchToken = regexJwt.find(saidaToken)
-        
+
         if (matchToken == null) {
             backendProcess.destroyForcibly()
             println(saidaToken)
             throw GradleException("Erro: Falha ao obter o token JWT de teste a partir dos scripts utilitarios.")
         }
-        
+
         val tokenJwt = matchToken.groupValues[1]
         println("Token JWT de teste obtido com sucesso.")
-        
+
         val pastaResultados = File(buildDirFile, "reports/fuzz")
         pastaResultados.mkdirs()
-        
+
         println("Iniciando o WuppieFuzz contra a API local...")
         println("Diretorio de destino dos relatorios: ${pastaResultados.absolutePath}")
-        
+
         val comandoFuzzer = listOf(
             "wuppiefuzz",
             "-o", "http://localhost:10000/api-docs",
             "-h", "Authorization: Bearer $tokenJwt",
             "-d", pastaResultados.absolutePath
         )
-        
+
         try {
             println("Tentando executar o WuppieFuzz nativo...")
             val processoFuzz = ProcessBuilder(comandoFuzzer)
                 .inheritIO()
                 .start()
-            
+
             val exitCode = processoFuzz.waitFor()
             println("WuppieFuzz finalizado com codigo de saida: $exitCode")
         } catch (e: Exception) {
             println("\n[Aviso] Nao foi possivel executar o comando 'wuppiefuzz' nativo: ${e.message}")
             println("Tentando executar o WuppieFuzz via Docker (imagem 'wuppiefuzz')...")
-            
+
             // Se o WuppieFuzz não estiver nativo, tenta rodar o contêiner docker usando a rede host
             val comandoDocker = listOf(
                 "docker", "run", "--rm",
@@ -433,12 +439,12 @@ tasks.register("fuzz") {
                 "-h", "Authorization: Bearer $tokenJwt",
                 "-d", "/reports"
             )
-            
+
             try {
                 val processoDocker = ProcessBuilder(comandoDocker)
                     .inheritIO()
                     .start()
-                
+
                 val exitCode = processoDocker.waitFor()
                 println("WuppieFuzz (via Docker) finalizado com codigo de saida: $exitCode")
             } catch (dockerEx: Exception) {

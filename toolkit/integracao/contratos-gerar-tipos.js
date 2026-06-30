@@ -22,10 +22,10 @@ function lerOpcao(args, nome, padrao) {
 }
 
 async function gerarTiposContrato({
-    entrada = CAMINHO_OPENAPI_LATEST,
-    saida = CAMINHO_TIPOS_FRONTEND,
-    url = URL_OPENAPI_PADRAO
-}) {
+                                      entrada = CAMINHO_OPENAPI_LATEST,
+                                      saida = CAMINHO_TIPOS_FRONTEND,
+                                      url = URL_OPENAPI_PADRAO
+                                  }) {
     try {
         await fs.access(entrada);
     } catch {

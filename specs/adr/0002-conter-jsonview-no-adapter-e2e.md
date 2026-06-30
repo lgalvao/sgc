@@ -6,9 +6,11 @@ Aceita
 
 ## Contexto
 
-`JsonView` foi usado no SGC como mecanismo de reaproveitamento de estruturas entre múltiplos contratos. Isso reduziu a clareza da borda HTTP e espalhou dependência de serialização condicional por DTOs, controllers e entidades.
+`JsonView` foi usado no SGC como mecanismo de reaproveitamento de estruturas entre múltiplos contratos. Isso reduziu a
+clareza da borda HTTP e espalhou dependência de serialização condicional por DTOs, controllers e entidades.
 
-Após a migração dos contratos principais para DTOs explícitos, o uso restante de `JsonView` ficou concentrado quase todo em:
+Após a migração dos contratos principais para DTOs explícitos, o uso restante de `JsonView` ficou concentrado quase todo
+em:
 
 - entidades/modelos legados;
 - adapter técnico de `e2e`.
@@ -48,4 +50,5 @@ Fora dessa ilha:
 
 ## Próximo passo natural
 
-Quando as fixtures E2E deixarem de depender de retorno serializado de entidades, a próxima etapa é eliminar `JsonView` também dos modelos legados que ainda o carregam.
+Quando as fixtures E2E deixarem de depender de retorno serializado de entidades, a próxima etapa é eliminar `JsonView`
+também dos modelos legados que ainda o carregam.

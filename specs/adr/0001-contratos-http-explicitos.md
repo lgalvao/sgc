@@ -11,7 +11,8 @@ O backend do SGC acumulou duas direções concorrentes ao longo do tempo:
 - contratos HTTP explícitos com DTOs dedicados;
 - reaproveitamento de entidades, enums e serialização condicional para compor respostas.
 
-Essa convivência aumentou o acoplamento entre backend e frontend, dificultou refatorações internas e tornou a borda HTTP menos previsível.
+Essa convivência aumentou o acoplamento entre backend e frontend, dificultou refatorações internas e tornou a borda HTTP
+menos previsível.
 
 ## Decisão
 

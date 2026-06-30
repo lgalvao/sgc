@@ -16,5 +16,6 @@ public record DiagnosticoEquipeDto(
             boolean podeManterConsenso,
             boolean podeImpossibilitar,
             boolean podePermitirAvaliacao
-    ) {}
+    ) {
+    }
 }

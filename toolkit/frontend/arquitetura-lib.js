@@ -359,7 +359,10 @@ function analisarArquivoAst(project, caminhoRelativo, conteudoOriginal, camada) 
         return {analiseAst, sourceFile: null};
     }
 
-    const sourceFile = project.createSourceFile(caminhoRelativo, codigo, {overwrite: true, scriptKind: ts.ScriptKind.TS});
+    const sourceFile = project.createSourceFile(caminhoRelativo, codigo, {
+        overwrite: true,
+        scriptKind: ts.ScriptKind.TS
+    });
     const ehComposableDeView = camada === "composable"
         && (caminhoRelativo ?? "").startsWith("frontend/src/views/");
 
@@ -880,7 +883,14 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
             && analiseAst.importsPorCategoria.composable.size === 0
             && analiseAst.importsPorCategoria.service.size === 0;
         const arquivoMinusculo = !fachadaPura && !ehFacadeDeStore && !sinaisExcetos.has("arquivoMinusculo") && detectarArquivoMinusculo(caminhoRelativo, linhas, hubCentral);
-        const score = calcularScoreArquivo({camada, sinaisLexicais, analiseAst, hubCentral, fachadaPura, arquivoMinusculo});
+        const score = calcularScoreArquivo({
+            camada,
+            sinaisLexicais,
+            analiseAst,
+            hubCentral,
+            fachadaPura,
+            arquivoMinusculo
+        });
         const sinaisAtivos = obterSinaisAtivos(camada, sinaisLexicais, analiseAst, categoriasAcoplamento, importacoesArquiteturais, hubCentral, fachadaPura, arquivoMinusculo);
         const temSinal = sinaisAtivos.length > 0;
         const serverStateCaseiro = detectarServerStateCaseiro({camada, analiseAst});

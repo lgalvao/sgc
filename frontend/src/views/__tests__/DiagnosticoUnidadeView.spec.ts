@@ -126,7 +126,19 @@ vi.mock('@/composables/useDiagnosticoUnidade', () => ({
         servidores: servidoresVal,
         situacoesCapacitacao: situacoesCapacitacaoVal,
         movimentacoes: ref([
-            {codigo: 1, dataHora: '2026-06-06 09:00', unidadeOrigemCodigo: 1, unidadeOrigemSigla: 'A', unidadeOrigemNome: 'Unidade A', unidadeDestinoCodigo: 2, unidadeDestinoSigla: 'B', unidadeDestinoNome: 'Unidade B', usuarioTitulo: '1234567890', usuarioNome: 'Usuário Teste', descricao: 'Diagnóstico concluído'},
+            {
+                codigo: 1,
+                dataHora: '2026-06-06 09:00',
+                unidadeOrigemCodigo: 1,
+                unidadeOrigemSigla: 'A',
+                unidadeOrigemNome: 'Unidade A',
+                unidadeDestinoCodigo: 2,
+                unidadeDestinoSigla: 'B',
+                unidadeDestinoNome: 'Unidade B',
+                usuarioTitulo: '1234567890',
+                usuarioNome: 'Usuário Teste',
+                descricao: 'Diagnóstico concluído'
+            },
         ]),
         carregando: ref(false),
         situacao: situacaoDiagnostico,
@@ -395,7 +407,11 @@ describe('DiagnosticoUnidadeView', () => {
         ];
         situacoesCapacitacaoVal.value = [
             {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'EC'},
-            {servidorTitulo: outroServidorTitulo, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'AC'},
+            {
+                servidorTitulo: outroServidorTitulo,
+                competenciaCodigo: CODIGO_COMPETENCIA_BASE,
+                situacaoCapacitacao: 'AC'
+            },
         ];
 
         const wrapper = montar();
@@ -578,8 +594,16 @@ describe('DiagnosticoUnidadeView', () => {
         ];
         situacoesCapacitacaoVal.value = [
             {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE, situacaoCapacitacao: 'NA'},
-            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1, situacaoCapacitacao: 'AC'},
-            {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 2, situacaoCapacitacao: 'EC'},
+            {
+                servidorTitulo: TITULO_SERVIDOR,
+                competenciaCodigo: CODIGO_COMPETENCIA_BASE + 1,
+                situacaoCapacitacao: 'AC'
+            },
+            {
+                servidorTitulo: TITULO_SERVIDOR,
+                competenciaCodigo: CODIGO_COMPETENCIA_BASE + 2,
+                situacaoCapacitacao: 'EC'
+            },
             {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 3, situacaoCapacitacao: 'C'},
             {servidorTitulo: TITULO_SERVIDOR, competenciaCodigo: CODIGO_COMPETENCIA_BASE + 4, situacaoCapacitacao: 'I'},
         ];

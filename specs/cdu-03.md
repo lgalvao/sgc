@@ -66,28 +66,28 @@
 10. O usuário escolhe o botão `Salvar`.
 
 11. O sistema valida os dados depois de editados, de acordo com as mesmas regras aplicadas no momento do primeiro
-   cadastro.
+    cadastro.
 
 12. O sistema atualiza o processo e mostra a mensagem "Processo alterado.".
 
 ### Remoção de processo
 
 13. Se usuário quiser remover o processo, clica na linha do processo na listagem de processos do `Painel` (apenas
-   processos na situação 'Criado' podem ser removidos). Além dos botões `Cancelar`, `Salvar` e `Iniciar processo`,
-   também será exibido o botão `Remover`.
+    processos na situação 'Criado' podem ser removidos). Além dos botões `Cancelar`, `Salvar` e `Iniciar processo`,
+    também será exibido o botão `Remover`.
 
 14. O sistema abre a tela `Cadastro de processo`, preenchida com os dados atuais do processo.
 
 15. O usuário escolhe o botão `Remover`.
 
 16. O sistema mostra o diálogo de confirmação "Remover o processo '[Descrição do processo]'? Esta ação não poderá ser
-   desfeita.", com botões `Remover` e `Cancelar`.
+    desfeita.", com botões `Remover` e `Cancelar`.
 
-   4.1. Se escolher `Cancelar` no diálogo: sistema fecha o diálogo e permanece na tela `Cadastro de processo`, sem
-   efetuar alterações.
+4.1. Se escolher `Cancelar` no diálogo: sistema fecha o diálogo e permanece na tela `Cadastro de processo`, sem efetuar
+alterações.
 
-   4.2. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente e redireciona para o Painel,
-   mostrando a mensagem "Processo :DESCRICAO_PROCESSO: removido".
+4.2. Ao escolher `Remover` no diálogo: sistema remove o processo permanentemente e redireciona para o Painel, mostrando
+a mensagem "Processo :DESCRICAO_PROCESSO: removido".
 
 ## Fluxo alternativo
 

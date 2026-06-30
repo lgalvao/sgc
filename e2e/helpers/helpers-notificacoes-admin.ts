@@ -136,12 +136,12 @@ export async function verificarNotificacaoAdmin(page: Page, criterios: Criterios
     } catch {
         const notificacoes = await listarNotificacoesApi();
         const resumo = notificacoes
-                .slice(0, 10)
-                .map(item => {
-                    const destino = item.usuarioDestinoTitulo || item.destinatario || item.unidadeSigla || 'sem-destino';
-                    return `${item.tipoNotificacao} | ${destino} | ${item.assunto}`;
-                })
-                .join(' || ');
+            .slice(0, 10)
+            .map(item => {
+                const destino = item.usuarioDestinoTitulo || item.destinatario || item.unidadeSigla || 'sem-destino';
+                return `${item.tipoNotificacao} | ${destino} | ${item.assunto}`;
+            })
+            .join(' || ');
 
         throw new Error(
             `Notificação não encontrada para assunto ${String(criterios.assunto)}. ` +

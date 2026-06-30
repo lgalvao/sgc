@@ -9,10 +9,10 @@ const UNIDADE = 'ASSESSORIA_12';
 
 test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
     test('CHEFE informa justificativa e impossibilita a avaliação do servidor', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                           _resetAutomatico,
+                                                                                           page,
+                                                                                           request
+                                                                                       }) => {
         const descricao = `Diagnóstico CDU-47 ${Date.now()}`;
         const processo = await criarProcessoFixture(request, {
             descricao,

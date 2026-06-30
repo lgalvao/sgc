@@ -15,7 +15,13 @@ describe("SubprocessoModal", () => {
 
     it("não deve renderizar o modal quando mostrarModal for falso", () => {
         context.wrapper = mount(SubprocessoModal, {
-            props: {mostrarModal: false, dataLimiteAtual, dataFimEtapaAnterior: null, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
+            props: {
+                mostrarModal: false,
+                dataLimiteAtual,
+                dataFimEtapaAnterior: null,
+                ultimaDataLimiteSubprocesso: dataLimiteAtual,
+                etapaAtual: 1
+            },
         });
         expect(
             context.wrapper.find('[data-testid="input-nova-data-limite"]').exists(),
@@ -24,7 +30,13 @@ describe("SubprocessoModal", () => {
 
     it("deve inicializar o campo de data com a data limite atual", () => {
         context.wrapper = mount(SubprocessoModal, {
-            props: {mostrarModal: true, dataLimiteAtual, dataFimEtapaAnterior: null, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
+            props: {
+                mostrarModal: true,
+                dataLimiteAtual,
+                dataFimEtapaAnterior: null,
+                ultimaDataLimiteSubprocesso: dataLimiteAtual,
+                etapaAtual: 1
+            },
         });
         const input = context.wrapper.find('[data-testid="input-nova-data-limite"]');
         expect((input.element as HTMLInputElement).value).toBe("2024-10-10");
@@ -33,7 +45,13 @@ describe("SubprocessoModal", () => {
     it("deve mostrar erro ao confirmar se a data for inválida", async () => {
         vi.spyOn(utils, "ehDataEstritamenteFutura").mockReturnValue(false);
         context.wrapper = mount(SubprocessoModal, {
-            props: {mostrarModal: true, dataLimiteAtual, dataFimEtapaAnterior: null, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
+            props: {
+                mostrarModal: true,
+                dataLimiteAtual,
+                dataFimEtapaAnterior: null,
+                ultimaDataLimiteSubprocesso: dataLimiteAtual,
+                etapaAtual: 1
+            },
         });
 
         const confirmButton = context.wrapper.find('[data-testid="btn-modal-confirmar"]');
@@ -47,7 +65,13 @@ describe("SubprocessoModal", () => {
     it("deve habilitar o botão de confirmar se a data for válida", async () => {
         vi.spyOn(utils, "ehDataEstritamenteFutura").mockReturnValue(true);
         context.wrapper = mount(SubprocessoModal, {
-            props: {mostrarModal: true, dataLimiteAtual, dataFimEtapaAnterior: null, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
+            props: {
+                mostrarModal: true,
+                dataLimiteAtual,
+                dataFimEtapaAnterior: null,
+                ultimaDataLimiteSubprocesso: dataLimiteAtual,
+                etapaAtual: 1
+            },
         });
 
         await context.wrapper
@@ -96,7 +120,13 @@ describe("SubprocessoModal", () => {
 
     it('deve emitir "fecharModal" ao clicar no botão de cancelar', async () => {
         context.wrapper = mount(SubprocessoModal, {
-            props: {mostrarModal: true, dataLimiteAtual, dataFimEtapaAnterior: null, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
+            props: {
+                mostrarModal: true,
+                dataLimiteAtual,
+                dataFimEtapaAnterior: null,
+                ultimaDataLimiteSubprocesso: dataLimiteAtual,
+                etapaAtual: 1
+            },
         });
         await context.wrapper.find('[data-testid="subprocesso-modal__btn-modal-cancelar"]').trigger("click");
         expect(context.wrapper.emitted("fecharModal")).toBeDefined();
@@ -105,7 +135,13 @@ describe("SubprocessoModal", () => {
     it('deve emitir "confirmarAlteracao" com a nova data', async () => {
         vi.spyOn(utils, "ehDataEstritamenteFutura").mockReturnValue(true);
         context.wrapper = mount(SubprocessoModal, {
-            props: {mostrarModal: true, dataLimiteAtual, dataFimEtapaAnterior: null, ultimaDataLimiteSubprocesso: dataLimiteAtual, etapaAtual: 1},
+            props: {
+                mostrarModal: true,
+                dataLimiteAtual,
+                dataFimEtapaAnterior: null,
+                ultimaDataLimiteSubprocesso: dataLimiteAtual,
+                etapaAtual: 1
+            },
         });
 
         const novaData = utils.obterAmanhaFormatado();

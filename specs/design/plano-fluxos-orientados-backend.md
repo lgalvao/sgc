@@ -2,8 +2,8 @@
 
 ## Objetivo
 
-Reduzir a centralidade acidental de `SubprocessoController` e `SubprocessoService` na camada de aplicação, reorganizando o
-backend em torno dos fluxos principais do sistema:
+Reduzir a centralidade acidental de `SubprocessoController` e `SubprocessoService` na camada de aplicação, reorganizando
+o backend em torno dos fluxos principais do sistema:
 
 - mapeamento-cadastro
 - mapeamento-mapa
@@ -22,16 +22,20 @@ Hoje há um desbalanceamento entre:
 
 Na prática:
 
-- [SubprocessoController.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/SubprocessoController.java) concentra uma superfície HTTP muito ampla e heterogênea.
-- [SubprocessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java) mistura:
-  - CRUD administrativo
-  - criação de subprocessos por tipo de processo
-  - manutenção de mapa
-  - importação de atividades
-  - atualização de situação
-  - orquestração transversal
-- [DiagnosticoController.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/DiagnosticoController.java) já é uma exceção parcial, mas ainda ancorada em `/api/subprocessos/{codSubprocesso}/diagnostico/...`.
-- [ProcessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/service/ProcessoService.java) continua conhecendo explicitamente múltiplas trilhas operacionais.
+- [SubprocessoController.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/SubprocessoController.java)
+  concentra uma superfície HTTP muito ampla e heterogênea.
+- [SubprocessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoService.java)
+  mistura:
+    - CRUD administrativo
+    - criação de subprocessos por tipo de processo
+    - manutenção de mapa
+    - importação de atividades
+    - atualização de situação
+    - orquestração transversal
+- [DiagnosticoController.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/DiagnosticoController.java) já
+  é uma exceção parcial, mas ainda ancorada em `/api/subprocessos/{codSubprocesso}/diagnostico/...`.
+- [ProcessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/service/ProcessoService.java) continua
+  conhecendo explicitamente múltiplas trilhas operacionais.
 
 O resultado é:
 
@@ -87,7 +91,8 @@ Substituir progressivamente a borda unificada por controllers orientados a fluxo
 
 Observações:
 
-- `DiagnosticoController` já existe, mas precisa ser incorporado ao mesmo modelo de organização e deixar de parecer uma exceção acoplada a `/api/subprocessos`.
+- `DiagnosticoController` já existe, mas precisa ser incorporado ao mesmo modelo de organização e deixar de parecer uma
+  exceção acoplada a `/api/subprocessos`.
 - os endpoints ainda podem continuar aceitando `codSubprocesso`, porque ele é a identidade operacional real do fluxo;
 - o ganho não está em esconder o subprocesso, e sim em explicitar a intenção do fluxo.
 
@@ -164,12 +169,12 @@ Ações:
 
 - revisar a documentação do módulo `subprocesso`;
 - registrar a nova taxonomia de serviços:
-  - estrutural
-  - consulta transversal
-  - transição compartilhada
-  - fluxo de cadastro
-  - fluxo de mapa
-  - fluxo de diagnóstico
+    - estrutural
+    - consulta transversal
+    - transição compartilhada
+    - fluxo de cadastro
+    - fluxo de mapa
+    - fluxo de diagnóstico
 
 Critério de sucesso:
 
@@ -185,7 +190,8 @@ Objetivo:
 Ações:
 
 - extrair os endpoints de cadastro para um controller próprio;
-- extrair os endpoints de revisão de cadastro para outro controller ou para o mesmo controller de cadastro com nome explícito de fluxo;
+- extrair os endpoints de revisão de cadastro para outro controller ou para o mesmo controller de cadastro com nome
+  explícito de fluxo;
 - extrair os endpoints de mapa/validação;
 - manter diagnóstico com controller próprio, mas alinhar sua posição no conjunto.
 
@@ -232,33 +238,33 @@ Objetivo:
 Ações sugeridas:
 
 - `MapeamentoCadastroAppService`
-  - disponibilizar
-  - devolver
-  - aceitar
-  - homologar
-  - ações em bloco correlatas
+    - disponibilizar
+    - devolver
+    - aceitar
+    - homologar
+    - ações em bloco correlatas
 - `RevisaoCadastroAppService`
-  - iniciar
-  - cancelar início
-  - disponibilizar
-  - devolver
-  - aceitar
-  - homologar
+    - iniciar
+    - cancelar início
+    - disponibilizar
+    - devolver
+    - aceitar
+    - homologar
 - `MapeamentoMapaAppService`
-  - disponibilizar mapa
-  - apresentar sugestões
-  - validar
-  - devolver validação
-  - aceitar validação
-  - homologar validação
+    - disponibilizar mapa
+    - apresentar sugestões
+    - validar
+    - devolver validação
+    - aceitar validação
+    - homologar validação
 - `RevisaoMapaAppService`
-  - mesmas operações com regras próprias de revisão
+    - mesmas operações com regras próprias de revisão
 - `DiagnosticoAppService`
-  - concluir
-  - devolver
-  - validar
-  - homologar
-  - ações em bloco
+    - concluir
+    - devolver
+    - validar
+    - homologar
+    - ações em bloco
 
 Observação:
 

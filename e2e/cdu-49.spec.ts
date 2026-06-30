@@ -14,10 +14,10 @@ const UNIDADE = 'ASSESSORIA_12';
 
 test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
     test('CHEFE recebe mensagem quando ainda houver pendências no diagnóstico', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                           _resetAutomatico,
+                                                                                           page,
+                                                                                           request
+                                                                                       }) => {
         const descricao = `Diagnóstico CDU-49 pendências ${Date.now()}`;
         const processo = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(request, {
             descricao,
@@ -42,10 +42,10 @@ test.describe('CDU-49 - Concluir diagnóstico da unidade', () => {
     });
 
     test('CHEFE conclui o diagnóstico pronto e o submete para análise', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                   _resetAutomatico,
+                                                                                   page,
+                                                                                   request
+                                                                               }) => {
         const descricao = `Diagnóstico CDU-49 ${Date.now()}`;
         const processo = await criarProcessoDiagnosticoProntoParaConcluirFixture(request, {
             descricao,

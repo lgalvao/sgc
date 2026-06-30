@@ -61,8 +61,8 @@
 
 5. Se usuário clicar em **Validar**:
 
-   5.1. O sistema mostra diálogo de confirmação, com título `Validação do mapa` e mensagem "Confirma a validação do
-   mapa de competências? Essa ação habilita a análise por unidades superiores''/ Botões `Cancelar` e `Validar`.
+   5.1. O sistema mostra diálogo de confirmação, com título `Validação do mapa` e mensagem "Confirma a validação do mapa
+   de competências? Essa ação habilita a análise por unidades superiores''/ Botões `Cancelar` e `Validar`.
 
    5.1.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação de validação, permanecendo na mesma tela.
 

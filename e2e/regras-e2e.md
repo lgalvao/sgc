@@ -3,7 +3,8 @@
 > [!IMPORTANT]
 > **PROIBIDO: RESILIÊNCIA ARTIFICIAL**
 > Nunca use blocos `if`, operadores lógicos `OR` (`||`), ou capturas de erro (`.catch()`) dentro de asserções para fazer
-> um teste passar forçosamente. Se um teste está instável ou falhando, investigue a causa raiz (estado do banco, lógica do
+> um teste passar forçosamente. Se um teste está instável ou falhando, investigue a causa raiz (estado do banco, lógica
+do
 > backend ou seletor ambíguo). Asserções devem ser determinísticas e inequívocas.
 
 Se um testes end to end falhar, geralmente será por uma dessas causas:
@@ -32,7 +33,8 @@ esses arquivos.
 
 ## Como Executar os Testes E2E
 
-Os testes E2E podem ser executados de forma simplificada a partir da raiz do projeto utilizando o gerenciador de pacotes npm:
+Os testes E2E podem ser executados de forma simplificada a partir da raiz do projeto utilizando o gerenciador de pacotes
+npm:
 
 * **Todos os testes**:
   ```bash
@@ -68,8 +70,6 @@ npm run test:e2e e2e/cdu-28.spec.ts > /tmp/sgc-e2e-cdu28.log 2>&1
 tail -n 40 /tmp/sgc-e2e-cdu28.log
 ```
 
-
-
 ## Fixtures e preparação de estado (State-Jumping)
 
 - **Prefira fixtures de backend para preparar estados profundos**: Se o teste precisa chegar a `MAPA_DISPONIBILIZADO`,
@@ -97,15 +97,15 @@ tail -n 40 /tmp/sgc-e2e-cdu28.log
 
 Os helpers estão organizados em arquivos especializados no diretório `e2e/helpers/`:
 
-| Arquivo                 | Responsabilidade                                                                                                                                                                                                                                                                                                                                                                                                                            |
-|-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `helpers-auth.ts`       | Login e credenciais (`login`, `loginComPerfil`, `autenticar`, `USUARIOS`)                                                                                                                                                                                                                                                                                                                                                                   |
-| `helpers-navegacao.ts`  | Navegação entre páginas (`fazerLogout`, `limparNotificacoes`, `verificarPaginaPainel`, `navegarParaSubprocesso`)                                                                                                                                                                                                                                                                                                                            |
-| `helpers-processos.ts`  | Criar e verificar processos (`criarProcesso`, `extrairProcessoId`, `verificarProcessoNaTabela`, `verificarDetalhesProcesso`, `verificarDetalhesSubprocesso`)                                                                                                                                                                                                                                                                                |
-| `helpers-atividades.ts` | Atividades, conhecimentos e impactos (`adicionarAtividade`, `adicionarConhecimento`, `editarAtividade`, `removerAtividade`, `disponibilizarCadastro`, `abrirModalImpacto`, `verificarBotaoImpactoAusenteEdicao`, `verificarBotaoImpactoAusenteDireto`)                                                                                                                                                                                      |
-| `helpers-mapas.ts`      | Competências e mapas (`navegarParaMapa`, `criarCompetencia`, `editarCompetencia`, `excluirCompetenciaConfirmando`, `disponibilizarMapa`)                                                                                                                                                                                                                                                                                                    |
-| `helpers-analise.ts`    | Análise de cadastro — navegação (`acessarSubprocessoGestor`, `acessarSubprocessoChefeDireto`, `acessarSubprocessoAdmin`), aceite (`aceitarCadastroMapeamento`, `aceitarRevisao`), devolução (`devolverCadastroMapeamento`, `devolverRevisao`, `cancelarDevolucao`), homologação (`homologarCadastroMapeamento`, `homologarCadastroRevisaoComImpacto`, `cancelarHomologacao`), histórico (`abrirHistoricoAnalise`, `fecharHistoricoAnalise`) |
-| `helpers-notificacoes-admin.ts` | Verificação de notificações pela view administrativa (`abrirNotificacoesAdmin`, `verificarNotificacaoAdmin`) |
+| Arquivo                         | Responsabilidade                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|---------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `helpers-auth.ts`               | Login e credenciais (`login`, `loginComPerfil`, `autenticar`, `USUARIOS`)                                                                                                                                                                                                                                                                                                                                                                   |
+| `helpers-navegacao.ts`          | Navegação entre páginas (`fazerLogout`, `limparNotificacoes`, `verificarPaginaPainel`, `navegarParaSubprocesso`)                                                                                                                                                                                                                                                                                                                            |
+| `helpers-processos.ts`          | Criar e verificar processos (`criarProcesso`, `extrairProcessoId`, `verificarProcessoNaTabela`, `verificarDetalhesProcesso`, `verificarDetalhesSubprocesso`)                                                                                                                                                                                                                                                                                |
+| `helpers-atividades.ts`         | Atividades, conhecimentos e impactos (`adicionarAtividade`, `adicionarConhecimento`, `editarAtividade`, `removerAtividade`, `disponibilizarCadastro`, `abrirModalImpacto`, `verificarBotaoImpactoAusenteEdicao`, `verificarBotaoImpactoAusenteDireto`)                                                                                                                                                                                      |
+| `helpers-mapas.ts`              | Competências e mapas (`navegarParaMapa`, `criarCompetencia`, `editarCompetencia`, `excluirCompetenciaConfirmando`, `disponibilizarMapa`)                                                                                                                                                                                                                                                                                                    |
+| `helpers-analise.ts`            | Análise de cadastro — navegação (`acessarSubprocessoGestor`, `acessarSubprocessoChefeDireto`, `acessarSubprocessoAdmin`), aceite (`aceitarCadastroMapeamento`, `aceitarRevisao`), devolução (`devolverCadastroMapeamento`, `devolverRevisao`, `cancelarDevolucao`), homologação (`homologarCadastroMapeamento`, `homologarCadastroRevisaoComImpacto`, `cancelarHomologacao`), histórico (`abrirHistoricoAnalise`, `fecharHistoricoAnalise`) |
+| `helpers-notificacoes-admin.ts` | Verificação de notificações pela view administrativa (`abrirNotificacoesAdmin`, `verificarNotificacaoAdmin`)                                                                                                                                                                                                                                                                                                                                |
 
 **IMPORTANTE**: Sempre use os helpers centralizados ao invés de definir funções locais nos arquivos de teste.
 
@@ -113,10 +113,10 @@ Os helpers estão organizados em arquivos especializados no diretório `e2e/help
 
 - **Quando o requisito especificar e-mail, prefira validar pela view admin de notificações**.
 - **E2E deve confirmar o contrato do requisito, não apenas repetir a integração**.
-- **Use a API admin apenas como apoio de localização**, nunca como substituta da validação visual final da linha/modal na
-  própria tela.
-- **Ao voltar da view admin, reancore o fluxo explicitamente**: se o helper terminar em `/administracao/notificacoes`,
-  o teste deve navegar de volta para a tela do caso de uso antes de continuar.
+- **Use a API admin apenas como apoio de localização**, nunca como substituta da validação visual final da linha/modal
+  na própria tela.
+- **Ao voltar da view admin, reancore o fluxo explicitamente**: se o helper terminar em `/administracao/notificacoes`, o
+  teste deve navegar de volta para a tela do caso de uso antes de continuar.
 
 ### Estratégias de Espera
 

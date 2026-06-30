@@ -22,9 +22,15 @@ const mockUnidadeSelecionada = ref<number | undefined>(10);
 
 vi.mock("@/stores/perfil", () => ({
     usePerfilStore: () => ({
-        get usuarioCodigo() { return mockUsuarioCodigo.value; },
-        get perfilSelecionado() { return mockPerfilSelecionado.value; },
-        get unidadeSelecionada() { return mockUnidadeSelecionada.value; },
+        get usuarioCodigo() {
+            return mockUsuarioCodigo.value;
+        },
+        get perfilSelecionado() {
+            return mockPerfilSelecionado.value;
+        },
+        get unidadeSelecionada() {
+            return mockUnidadeSelecionada.value;
+        },
     }),
 }));
 
@@ -33,7 +39,8 @@ function withSetup<T>(composable: () => T) {
     const app = createApp({
         setup() {
             result = composable();
-            return () => {};
+            return () => {
+            };
         },
     });
     const pinia = createPinia();

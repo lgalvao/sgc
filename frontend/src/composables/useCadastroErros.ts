@@ -7,7 +7,7 @@ interface UseCadastroErrosParams {
     erroAtualFluxo: Ref<{
         tipo?: string;
         mensagem?: string;
-        erros?: Array<{campo?: string | null; mensagem?: string}>;
+        erros?: Array<{ campo?: string | null; mensagem?: string }>;
     } | null>;
 }
 

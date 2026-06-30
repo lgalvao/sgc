@@ -14,7 +14,8 @@
             @keydown="habilitarAcessoCadastro && aoPressionarTecla($event, 'SubprocessoCadastro')"
         >
           <div class="card-click-area">
-            <BCardTitle :class="['d-flex align-items-start gap-3 mb-3', habilitarAcessoCadastro ? undefined : 'text-muted']">
+            <BCardTitle
+                :class="['d-flex align-items-start gap-3 mb-3', habilitarAcessoCadastro ? undefined : 'text-muted']">
               <i aria-hidden="true" class="bi bi-card-checklist text-primary flex-shrink-0 mt-1"></i>
               <span class="lh-sm">{{ TEXTOS.subprocesso.cards.ATUALIZACAO_CADASTRO_TITULO }}</span>
             </BCardTitle>
@@ -114,7 +115,8 @@
             @keydown="habilitarCardSituacaoCapacitacao && aoPressionarTeclaDiagnostico($event, 'SituacaoCapacitacaoDiagnostico')"
         >
           <div class="card-click-area">
-            <BCardTitle :class="['d-flex align-items-start gap-3 mb-3', habilitarCardSituacaoCapacitacao ? undefined : 'text-muted']">
+            <BCardTitle
+                :class="['d-flex align-items-start gap-3 mb-3', habilitarCardSituacaoCapacitacao ? undefined : 'text-muted']">
               <i aria-hidden="true" class="bi bi-people text-primary flex-shrink-0 mt-1"></i>
               <span class="lh-sm">{{ TEXTOS.subprocesso.cards.SITUACAO_CAPACITACAO_TITULO }}</span>
             </BCardTitle>
@@ -154,7 +156,12 @@ const perfilStore = usePerfilStore();
 const subprocesso = computed(() => props.subprocesso ?? null);
 const permissoesDiagnostico = computed(() => subprocesso.value?.permissoes ?? null);
 
-const {habilitarAcessoCadastro, habilitarAcessoMapa, habilitarCardConsenso, habilitarCardSituacaoCapacitacao} = useAcesso(subprocesso);
+const {
+  habilitarAcessoCadastro,
+  habilitarAcessoMapa,
+  habilitarCardConsenso,
+  habilitarCardSituacaoCapacitacao
+} = useAcesso(subprocesso);
 const mapaHabilitado = computed(() => habilitarAcessoMapa.value);
 
 function navegarPara(routeName: string) {
@@ -258,6 +265,7 @@ defineExpose({
   border-color: #e4e4e7 !important;
   background-color: transparent !important;
 }
+
 .card-disabled :deep(.card-title),
 .card-disabled :deep(.card-text),
 .card-disabled :deep(.bi) {
@@ -269,6 +277,7 @@ defineExpose({
   border-color: #334155 !important;
   background-color: transparent !important;
 }
+
 [data-bs-theme="dark"] .card-disabled :deep(.card-title),
 [data-bs-theme="dark"] .card-disabled :deep(.card-text),
 [data-bs-theme="dark"] .card-disabled :deep(.bi) {

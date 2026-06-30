@@ -194,6 +194,7 @@ public class DiagnosticoAvaliacaoService {
 
         avaliacaoRepo.saveAll(avaliacoes);
     }
+
     public void salvarSituacoesCapacitacao(Long codSubprocesso, SituacoesCapacitacaoRequest request) {
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(codSubprocesso)
                 .orElseThrow(() -> new ErroEntidadeNaoEncontrada("Diagnostico", codSubprocesso));

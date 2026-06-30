@@ -75,11 +75,11 @@ const modelValueComputed = computed({
 const variantAcao = computed((): "primary" | "secondary" | "success" | "danger" => {
   const variantCandidata = props.okVariant || props.variant || "primary";
   return variantCandidata === "primary"
-    || variantCandidata === "secondary"
-    || variantCandidata === "success"
-    || variantCandidata === "danger"
-    ? variantCandidata
-    : "primary";
+  || variantCandidata === "secondary"
+  || variantCandidata === "success"
+  || variantCandidata === "danger"
+      ? variantCandidata
+      : "primary";
 });
 
 function confirmar() {

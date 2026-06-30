@@ -26,7 +26,9 @@ vi.mock('@/stores/relatorios', () => ({
 
 vi.mock('@/composables/useRelatorioAndamentoTela', () => ({
     useRelatorioAndamentoTela: () => ({
-        get processosDisponiveis() { return processosDisponiveis; },
+        get processosDisponiveis() {
+            return processosDisponiveis;
+        },
         carregarProcessos,
     })
 }));
@@ -200,10 +202,10 @@ describe('RelatorioAndamentoView', () => {
         const wrapper = mount(RelatorioAndamentoView, {global: {stubs}});
         const vm = wrapper.vm as any;
         vm.codProcessoSelecionado = 1;
-        
+
         buscarRelatorioAndamento.mockRejectedValueOnce(new Error('Network Error'));
         await vm.gerarRelatorio();
-        
+
         expect(notify).toHaveBeenCalledWith(TEXTOS_RELATORIOS.ERRO_BUSCA, 'danger');
     });
 });

@@ -225,17 +225,22 @@ async function carregarInventario(caminhoInventario, base) {
 }
 
 async function executarAuditoriaNomes({
-    base = DIRETORIO_RAIZ,
-    json = false,
-    semGravar = false,
-    inventario = ARQUIVO_SIMBOLOS_PADRAO,
-    saidaJson = ARQUIVO_JSON_AUDITORIA_PADRAO
-} = {}) {
+                                          base = DIRETORIO_RAIZ,
+                                          json = false,
+                                          semGravar = false,
+                                          inventario = ARQUIVO_SIMBOLOS_PADRAO,
+                                          saidaJson = ARQUIVO_JSON_AUDITORIA_PADRAO
+                                      } = {}) {
     const baseResolvida = path.resolve(base);
     const dadosInventario = await carregarInventario(inventario, baseResolvida);
     const formatosArquivos = coletarFormatosArquivos(dadosInventario);
     const formatosDiretorios = coletarSegmentosDiretorio(dadosInventario);
-    const {tiposForaPadrao, membrosForaPadrao, parametrosForaPadrao, parametrosComId} = filtrarSimbolosForaPadrao(dadosInventario);
+    const {
+        tiposForaPadrao,
+        membrosForaPadrao,
+        parametrosForaPadrao,
+        parametrosComId
+    } = filtrarSimbolosForaPadrao(dadosInventario);
     const pacotesJavaForaPadrao = auditarPacotesJava(dadosInventario);
 
     const auditoria = {

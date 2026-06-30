@@ -2,10 +2,10 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 
 test.describe('CDU-39 - Enviar feedback contextual', () => {
     test('usuário autenticado valida a descrição e envia feedback pela tela atual', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                               _resetAutomatico,
+                                                                                               page,
+                                                                                               _autenticadoComoAdmin
+                                                                                           }) => {
         await page.goto('/painel');
 
         await page.getByTestId('feedback-btn').click();

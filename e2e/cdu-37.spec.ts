@@ -11,10 +11,10 @@ import {expect, test} from './fixtures/complete-fixtures.js';
 test.describe.serial('CDU-37 - Gerar relatório de unidades sem mapas vigentes', () => {
 
     test('Cenários CDU-37: ADMIN visualiza árvore de unidades sem mapa vigente e exporta PDF', async ({
-                                                                                                         _resetAutomatico,
-                                                                                                         page,
-                                                                                                         _autenticadoComoAdmin
-                                                                                                     }) => {
+                                                                                                          _resetAutomatico,
+                                                                                                          page,
+                                                                                                          _autenticadoComoAdmin
+                                                                                                      }) => {
         test.slow();
 
         // 1. O usuário acessa Relatórios na barra de navegação.

@@ -10,10 +10,10 @@ const VALOR_CAPACITACAO = 'EC';
 
 test.describe('CDU-48 - Preencher situações de capacitação', () => {
     test('CHEFE preenche a situação de capacitação do servidor selecionado com autosave e reencontra o valor salvo ao reabrir', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                                                                           _resetAutomatico,
+                                                                                                                                           page,
+                                                                                                                                           request
+                                                                                                                                       }) => {
         const descricao = `Diagnóstico CDU-48 ${Date.now()}`;
         const processo = await criarProcessoDiagnosticoComConsensoCriadoFixture(request, {
             descricao,

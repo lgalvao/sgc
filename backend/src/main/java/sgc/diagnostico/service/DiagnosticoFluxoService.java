@@ -323,7 +323,7 @@ public class DiagnosticoFluxoService {
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
         Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeAnalise.getCodigo());
         if (unidadeSuperior == null) {
-            return new Unidade[] {unidadeAnalise, unidadeAnalise};
+            return new Unidade[]{unidadeAnalise, unidadeAnalise};
         }
 
         transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
@@ -339,7 +339,7 @@ public class DiagnosticoFluxoService {
                 .observacoes(null)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
-        return new Unidade[] {unidadeAnalise, unidadeSuperior};
+        return new Unidade[]{unidadeAnalise, unidadeSuperior};
     }
 
     private void homologarDiagnosticoEmBloco(Subprocesso subprocesso) {

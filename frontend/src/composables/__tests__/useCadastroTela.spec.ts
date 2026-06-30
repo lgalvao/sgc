@@ -128,7 +128,8 @@ function withSetup<T>(composable: () => T) {
     const app = createApp({
         setup() {
             result = composable();
-            return () => {};
+            return () => {
+            };
         },
     });
     const pinia = createPinia();
@@ -162,12 +163,12 @@ describe("useCadastroTela", () => {
     describe("Validação e Disponibilização", () => {
         it("deve aplicar erros de pré-validação local se cadastro estiver incompleto", async () => {
             const [tela, app] = withSetup(() => useCadastroTela(defaultProps));
-            
+
             // Simula cadastro sem atividades
             tela.atividades.value = [];
-            
+
             await tela.disponibilizarCadastro();
-            
+
             expect(tela.errosValidacao.value).toHaveLength(1);
             expect(tela.errosValidacao.value[0].mensagem).toContain("incompleto");
             app.unmount();
@@ -175,13 +176,13 @@ describe("useCadastroTela", () => {
 
         it("deve exibir erro global se situação for inválida", async () => {
             const [tela, app] = withSetup(() => useCadastroTela(defaultProps));
-            
+
             tela.atividades.value = [{codigo: 1, conhecimentos: [{}]} as any];
             subprocessoState.contextoCadastro.detalhes.situacao = "OUTRA" as any;
-            
+
             await nextTick();
             await tela.disponibilizarCadastro();
-            
+
             expect(tela.erroGlobal.value).not.toBeNull();
             expect(tela.erroGlobal.value).toContain("Ação permitida apenas");
             app.unmount();
@@ -198,10 +199,10 @@ describe("useCadastroTela", () => {
         it("deve permitir validar quando dados estão corretos", async () => {
             const [tela, app] = withSetup(() => useCadastroTela(defaultProps));
             tela.atividades.value = [{codigo: 1, conhecimentos: [{}]} as any];
-            
+
             await nextTick();
             await tela.disponibilizarCadastro();
-            
+
             expect(fluxoSubprocessoMock.validarCadastro).toHaveBeenCalledWith(1);
             app.unmount();
         });
@@ -234,24 +235,24 @@ describe("useCadastroTela", () => {
         it("deve tratar erro na revisão sem alterações", async () => {
             subprocessoState.contextoCadastro.detalhes.tipoProcesso = TipoProcesso.REVISAO;
             subprocessoState.contextoCadastro.detalhes.situacao = SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO;
-            
+
             const [tela, app] = withSetup(() => useCadastroTela(defaultProps));
             tela.atividades.value = [{codigo: 1, conhecimentos: [{}]} as any];
-            
+
             // Simula SEM alteração (assinatura igual ao snapshot)
-            orquestracaoMock.atividadesSnapshotInicial.value = "ASSINATURA_MOCK"; 
+            orquestracaoMock.atividadesSnapshotInicial.value = "ASSINATURA_MOCK";
             // Precisamos que calcularAssinaturaCadastro retorne isso. 
             // Mas no teste usamos o valor real de calcularAssinaturaCadastro.
             // Se as atividades forem vazias ou as mesmas do snapshot, houveAlteracaoCadastro será false.
-            
+
             app.unmount();
         });
 
         it("deve realizar disponibilização com sucesso", async () => {
             const [tela, app] = withSetup(() => useCadastroTela(defaultProps));
-            
+
             await tela.confirmarDisponibilizacao();
-            
+
             expect(fluxoSubprocessoMock.disponibilizarCadastro).toHaveBeenCalledWith(1);
             expect(tela.mostrarModalConfirmacao.value).toBe(false);
             app.unmount();
@@ -260,9 +261,9 @@ describe("useCadastroTela", () => {
         it("deve realizar disponibilização de revisão com sucesso", async () => {
             subprocessoState.contextoCadastro.detalhes.tipoProcesso = TipoProcesso.REVISAO;
             const [tela, app] = withSetup(() => useCadastroTela(defaultProps));
-            
+
             await tela.confirmarDisponibilizacao();
-            
+
             expect(fluxoSubprocessoMock.disponibilizarRevisaoCadastro).toHaveBeenCalledWith(1);
             app.unmount();
         });
@@ -291,9 +292,9 @@ describe("useCadastroTela", () => {
 
             // 2. Ordenação de atividades
             tela.atividades.value = [
-                { codigo: 1, conhecimentos: [] },
-                { codigo: 3, conhecimentos: [] },
-                { codigo: 2, conhecimentos: [] },
+                {codigo: 1, conhecimentos: []},
+                {codigo: 3, conhecimentos: []},
+                {codigo: 2, conhecimentos: []},
             ] as any;
             expect(tela.atividadesOrdenadas.value[0].codigo).toBe(3);
             expect(tela.atividadesOrdenadas.value[1].codigo).toBe(2);
@@ -301,8 +302,8 @@ describe("useCadastroTela", () => {
 
             // 3. mapaErros computed, obterErroParaAtividade e limparErrosValidacao
             tela.errosValidacao.value = [
-                { tipo: "DADOS_INCORRETOS", atividadeCodigo: 1, mensagem: "Erro Atividade 1" },
-                { tipo: "DADOS_INCORRETOS", atividadeCodigo: 2, mensagem: "Erro Atividade 2" },
+                {tipo: "DADOS_INCORRETOS", atividadeCodigo: 1, mensagem: "Erro Atividade 1"},
+                {tipo: "DADOS_INCORRETOS", atividadeCodigo: 2, mensagem: "Erro Atividade 2"},
             ];
             expect(tela.obterErroParaAtividade(1)).toBe("Erro Atividade 1");
 
@@ -314,15 +315,15 @@ describe("useCadastroTela", () => {
             expect(tela.erroNovaAtividade.value).toBeNull();
 
             // Modifica assinatura para limpar erros
-            tela.atividades.value = [{ codigo: 1, conhecimentos: [{}] }] as any;
+            tela.atividades.value = [{codigo: 1, conhecimentos: [{}]}] as any;
             await nextTick();
             expect(tela.errosValidacao.value).toHaveLength(0);
 
             // 5. Importação de atividades
-            await tela.aoImportarAtividades({ aviso: true } as any);
+            await tela.aoImportarAtividades({aviso: true} as any);
             expect(tela.mostrarModalImportar.value).toBe(false);
 
-            await tela.aoImportarAtividades({ aviso: false } as any);
+            await tela.aoImportarAtividades({aviso: false} as any);
             expect(tela.mostrarModalImportar.value).toBe(false);
 
             // 6. adicionarNovaAtividade
@@ -331,14 +332,14 @@ describe("useCadastroTela", () => {
             // 7. setAtividadeRef e scrollParaPrimeiroErro
             const dummyEl = document.createElement("div");
             tela.setAtividadeRef(1, dummyEl);
-            tela.errosValidacao.value = [{ tipo: "DADOS_INCORRETOS", atividadeCodigo: 1, mensagem: "Erro Scroll" }];
+            tela.errosValidacao.value = [{tipo: "DADOS_INCORRETOS", atividadeCodigo: 1, mensagem: "Erro Scroll"}];
             tela.scrollParaPrimeiroErro();
 
             // 8. erroFluxoCadastro com erro de validação
             fluxoSubprocessoMock.ultimoErro.value = {
                 tipo: "validacao",
                 mensagem: "Erro validação fluxo",
-                erros: [{ campo: "justificativa", mensagem: "Erro justificativa" }]
+                erros: [{campo: "justificativa", mensagem: "Erro justificativa"}]
             } as any;
             expect(tela.erroFluxoCadastro.value).toBeUndefined();
             expect(tela.mensagemErroObservacaoDevolucao.value).toBe("Erro justificativa");

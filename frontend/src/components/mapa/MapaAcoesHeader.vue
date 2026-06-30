@@ -138,7 +138,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
               role="menuitem"
               @click="$emit('exportar-csv')"
           >
-                {{ TEXTOS_RELATORIOS.BOTAO_CSV }}
+            {{ TEXTOS_RELATORIOS.BOTAO_CSV }}
           </BDropdownItemButton>
         </BDropdown>
 

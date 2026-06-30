@@ -29,7 +29,7 @@ function montarComponente() {
     const pinia = createPinia();
     const perfilStore = usePerfilStore(pinia);
     perfilStore.perfilSelecionado = "ADMIN" as any;
-    
+
     return mount(FeedbacksAdminView, {
         global: {
             plugins: [pinia, [PiniaColada, {}], router],
@@ -37,7 +37,10 @@ function montarComponente() {
                 LayoutPadrao: {template: "<div><slot/></div>"},
                 PageHeader: {template: "<div><slot name='actions'/></div>", props: ["title"]},
                 EmptyState: {template: "<div class='empty-state-stub'></div>", props: ["title", "description", "icon"]},
-                BButton: {template: "<button v-bind=\"$attrs\" @click=\"$emit('click')\"><slot/></button>", props: ["disabled", "variant", "size"]},
+                BButton: {
+                    template: "<button v-bind=\"$attrs\" @click=\"$emit('click')\"><slot/></button>",
+                    props: ["disabled", "variant", "size"]
+                },
                 BAlert: {template: "<div><slot/></div>", props: ["modelValue", "variant"]},
                 BSpinner: true,
                 BBadge: {template: "<span><slot/></span>", props: ["variant"]},
@@ -141,18 +144,18 @@ describe("FeedbacksAdminView", () => {
                 codigo: "abc",
                 tipo: "SUGESTAO",
                 nota: "Melhorar <strong>contraste</strong>",
-        metadataJson: JSON.stringify({
-            userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-            rotaNome: "Painel",
-            rotaCaminho: "/subprocesso/123",
-            rotaQuery: JSON.stringify({tab: "atividades"}),
-            dataHora: "2026-05-04T10:00:00Z",
-            larguraTela: 1920,
-            alturaTela: 1080,
-            fusoHorario: -180,
-            perfilAtivo: "ADMIN",
-            unidadeAtiva: "SESEL"
-        }),
+                metadataJson: JSON.stringify({
+                    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+                    rotaNome: "Painel",
+                    rotaCaminho: "/subprocesso/123",
+                    rotaQuery: JSON.stringify({tab: "atividades"}),
+                    dataHora: "2026-05-04T10:00:00Z",
+                    larguraTela: 1920,
+                    alturaTela: 1080,
+                    fusoHorario: -180,
+                    perfilAtivo: "ADMIN",
+                    unidadeAtiva: "SESEL"
+                }),
                 caminhoScreenshot: "c:/tmp/a.webp",
                 screenshotDisponivel: true,
                 usuarioCodigo: "123",
@@ -170,7 +173,7 @@ describe("FeedbacksAdminView", () => {
         const modal = wrapper.find("[data-testid='modal-detalhes-feedback']");
         expect(modal.exists()).toBe(true);
         expect(modal.html()).toContain("Melhorar <strong>contraste</strong>");
-        
+
         expect(modal.text()).not.toContain("Mozilla/5.0");
         expect(modal.text()).not.toContain("rotaNome");
         expect(modal.text()).toContain("Rota");
@@ -183,12 +186,12 @@ describe("FeedbacksAdminView", () => {
         expect(modal.text()).not.toContain("Data do evento");
         expect(modal.text()).toContain(formatarDataHoraBR("2026-05-04T10:00:00Z")); // Formato BR (do campo Enviado em)
         expect(modal.text()).not.toContain("2026-05-04T10:00:00Z");
-        
+
         // Clica na thumbnail para ampliar
         const thumbnailBtn = modal.find("button");
         expect(thumbnailBtn.exists()).toBe(true);
         await thumbnailBtn.trigger("click");
-        
+
         const modalImagem = wrapper.find("[data-testid='modal-imagem-ampliada']");
         expect(modalImagem.exists()).toBe(true);
         expect(modalImagem.find("img").attributes("src")).toBe("http://localhost:8080/api/feedback/abc/screenshot");

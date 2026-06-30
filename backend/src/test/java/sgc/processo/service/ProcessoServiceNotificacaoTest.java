@@ -73,10 +73,13 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         processo.setDataLimite(LocalDateTime.now().plusDays(30));
 
         // Lacuna E: RAIZ, INTEROPERACIONAL, OPERACIONAL, INTERMEDIARIA
-        Unidade uRaiz = criarUnidadeValida(1L); uRaiz.setTipo(TipoUnidade.RAIZ);
-        Unidade uInterop = criarUnidadeValida(2L); uInterop.setTipo(TipoUnidade.INTEROPERACIONAL);
+        Unidade uRaiz = criarUnidadeValida(1L);
+        uRaiz.setTipo(TipoUnidade.RAIZ);
+        Unidade uInterop = criarUnidadeValida(2L);
+        uInterop.setTipo(TipoUnidade.INTEROPERACIONAL);
         Unidade uOper = criarUnidadeValida(3L);
-        Unidade uIntermed = criarUnidadeValida(4L); uIntermed.setTipo(TipoUnidade.INTERMEDIARIA);
+        Unidade uIntermed = criarUnidadeValida(4L);
+        uIntermed.setTipo(TipoUnidade.INTERMEDIARIA);
 
         when(repo.buscar(Processo.class, id)).thenReturn(processo);
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uRaiz, uInterop, uOper, uIntermed));

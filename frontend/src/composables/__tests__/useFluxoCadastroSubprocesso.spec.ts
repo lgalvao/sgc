@@ -19,7 +19,7 @@ vi.mock('vue-router', () => ({
 }));
 
 vi.mock('@/composables/useNotification', () => ({
-    useNotification: () => ({ notify: vi.fn() }),
+    useNotification: () => ({notify: vi.fn()}),
 }));
 
 vi.mock('@/stores/perfil', () => ({
@@ -39,65 +39,65 @@ describe('useFluxoCadastroSubprocesso', () => {
 
     it('deve usar mensagem customizada no aceitarCadastro se fornecida', async () => {
         vi.mocked(cadastroService.aceitarCadastro).mockResolvedValue({} as any);
-        const { aceitarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await aceitarCadastro(1, { observacoes: 'TESTE' }, { mensagemSucesso: 'Custom Aceite' });
+        const {aceitarCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await aceitarCadastro(1, {observacoes: 'TESTE'}, {mensagemSucesso: 'Custom Aceite'});
         expect(cadastroService.aceitarCadastro).toHaveBeenCalled();
     });
 
     it('deve usar mensagem padrao no aceitarCadastro se nao fornecida', async () => {
         vi.mocked(cadastroService.aceitarCadastro).mockResolvedValue({} as any);
-        const { aceitarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await aceitarCadastro(1, { observacoes: 'TESTE' });
+        const {aceitarCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await aceitarCadastro(1, {observacoes: 'TESTE'});
         expect(cadastroService.aceitarCadastro).toHaveBeenCalled();
     });
 
     it('deve usar mensagem customizada no aceitarRevisaoCadastro se fornecida', async () => {
         vi.mocked(cadastroService.aceitarRevisaoCadastro).mockResolvedValue({} as any);
-        const { aceitarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await aceitarRevisaoCadastro(1, { observacoes: 'TESTE' }, { mensagemSucesso: 'Custom Aceite Revisao' });
+        const {aceitarRevisaoCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await aceitarRevisaoCadastro(1, {observacoes: 'TESTE'}, {mensagemSucesso: 'Custom Aceite Revisao'});
         expect(cadastroService.aceitarRevisaoCadastro).toHaveBeenCalled();
     });
 
     it('deve usar mensagem padrao no aceitarRevisaoCadastro se nao fornecida', async () => {
         vi.mocked(cadastroService.aceitarRevisaoCadastro).mockResolvedValue({} as any);
-        const { aceitarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await aceitarRevisaoCadastro(1, { observacoes: 'TESTE' });
+        const {aceitarRevisaoCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await aceitarRevisaoCadastro(1, {observacoes: 'TESTE'});
         expect(cadastroService.aceitarRevisaoCadastro).toHaveBeenCalled();
     });
 
     it('deve usar mensagem customizada no homologarCadastro se fornecida', async () => {
         vi.mocked(cadastroService.homologarCadastro).mockResolvedValue({} as any);
-        const { homologarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await homologarCadastro(1, { observacoes: '' }, { mensagemSucesso: 'Custom Homologacao' });
+        const {homologarCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await homologarCadastro(1, {observacoes: ''}, {mensagemSucesso: 'Custom Homologacao'});
         expect(cadastroService.homologarCadastro).toHaveBeenCalled();
     });
 
     it('deve usar mensagem padrao no homologarCadastro se nao fornecida', async () => {
         vi.mocked(cadastroService.homologarCadastro).mockResolvedValue({} as any);
-        const { homologarCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await homologarCadastro(1, { observacoes: '' });
+        const {homologarCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await homologarCadastro(1, {observacoes: ''});
         expect(cadastroService.homologarCadastro).toHaveBeenCalled();
     });
-    
+
     it('deve usar mensagem customizada no homologarRevisaoCadastro se fornecida', async () => {
         vi.mocked(cadastroService.homologarRevisaoCadastro).mockResolvedValue({} as any);
-        const { homologarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await homologarRevisaoCadastro(1, { observacoes: '' }, { mensagemSucesso: 'Custom Homologacao Revisao' });
+        const {homologarRevisaoCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await homologarRevisaoCadastro(1, {observacoes: ''}, {mensagemSucesso: 'Custom Homologacao Revisao'});
         expect(cadastroService.homologarRevisaoCadastro).toHaveBeenCalled();
     });
 
     it('deve usar mensagem padrao no homologarRevisaoCadastro se nao fornecida', async () => {
         vi.mocked(cadastroService.homologarRevisaoCadastro).mockResolvedValue({} as any);
-        const { homologarRevisaoCadastro } = useFluxoCadastroSubprocesso(execucaoMock as any);
-        
-        await homologarRevisaoCadastro(1, { observacoes: '' });
+        const {homologarRevisaoCadastro} = useFluxoCadastroSubprocesso(execucaoMock as any);
+
+        await homologarRevisaoCadastro(1, {observacoes: ''});
         expect(cadastroService.homologarRevisaoCadastro).toHaveBeenCalled();
     });
 });

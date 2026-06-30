@@ -168,7 +168,6 @@ public class AtividadeService {
         }
 
 
-
         return AtividadeOperacaoResponse.builder()
                 .atividade(atividadeVis)
                 .subprocesso(situacaoDto)

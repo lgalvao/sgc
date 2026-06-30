@@ -105,7 +105,9 @@ export function useImportarAtividadesTela(params: {
         processosParaImportacao.value = [];
         await executarComTratamentoErro(
             () => processoService.buscarProcessosParaImportacao(),
-            (processos) => { processosParaImportacao.value = processos; },
+            (processos) => {
+                processosParaImportacao.value = processos;
+            },
         );
     }
 
@@ -125,7 +127,9 @@ export function useImportarAtividadesTela(params: {
         if (processo) {
             await executarComTratamentoErro(
                 () => processoService.buscarUnidadesParaImportacao(processo.codigo),
-                (unidades) => { unidadesParticipantes.value = unidades; },
+                (unidades) => {
+                    unidadesParticipantes.value = unidades;
+                },
             );
         }
         unidadeSelecionada.value = null;
@@ -141,7 +145,9 @@ export function useImportarAtividadesTela(params: {
         if (codSubprocesso) {
             await executarComTratamentoErro(
                 () => subprocessoService.listarAtividadesParaImportacao(codSubprocesso),
-                (atividadesDaOutraUnidade) => { atividadesParaImportar.value = [...atividadesDaOutraUnidade]; },
+                (atividadesDaOutraUnidade) => {
+                    atividadesParaImportar.value = [...atividadesDaOutraUnidade];
+                },
             );
         }
     }
@@ -167,7 +173,9 @@ export function useImportarAtividadesTela(params: {
                     codSubOrigem,
                     idsAtividades,
                 ),
-                (erro) => { registrarErroImportacao(erro.mensagem); },
+                (erro) => {
+                    registrarErroImportacao(erro.mensagem);
+                },
             );
             onImportar(resultadoImportacao.value);
             onFechar();

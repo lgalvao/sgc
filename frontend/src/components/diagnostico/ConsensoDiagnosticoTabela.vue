@@ -14,8 +14,13 @@
         <thead>
         <tr>
           <th class="coluna-competencia" rowspan="2">{{ TEXTOS.diagnostico.COLUNA_COMPETENCIA }}</th>
-          <th class="text-center grupo grupo-servidor divisor-grupo" colspan="3">{{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}</th>
-          <th class="text-center grupo grupo-chefia divisor-grupo" colspan="3">{{ TEXTOS.diagnostico.COLUNA_DOMINIO }}</th>
+          <th class="text-center grupo grupo-servidor divisor-grupo" colspan="3">
+            {{ TEXTOS.diagnostico.COLUNA_IMPORTANCIA }}
+          </th>
+          <th class="text-center grupo grupo-chefia divisor-grupo" colspan="3">{{
+              TEXTOS.diagnostico.COLUNA_DOMINIO
+            }}
+          </th>
         </tr>
         <tr>
           <th class="text-center subcoluna grupo-servidor divisor-grupo">{{ TEXTOS.diagnostico.COLUNA_SERVIDOR }}</th>
@@ -119,11 +124,15 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'atualizarNota', competenciaCodigo: number, atualizacao: { origem: 'chefia' | 'consenso'; campo: 'importancia' | 'dominio'; valor: number | null }): void;
+  (e: 'atualizarNota', competenciaCodigo: number, atualizacao: {
+    origem: 'chefia' | 'consenso';
+    campo: 'importancia' | 'dominio';
+    valor: number | null
+  }): void;
 }>();
 
 const permiteEdicao = computed(() =>
-  props.podeEditar && props.habilitarConcluirAvaliacao && !props.ehConsensoAprovado,
+    props.podeEditar && props.habilitarConcluirAvaliacao && !props.ehConsensoAprovado,
 );
 
 const opcoesNota = [
@@ -151,8 +160,8 @@ function normalizarValorNota(valor: unknown): number | null {
 }
 
 function campoConsensoHabilitado(
-  item: ConsensoCompetenciaDetalhada,
-  campo: 'importancia' | 'dominio',
+    item: ConsensoCompetenciaDetalhada,
+    campo: 'importancia' | 'dominio',
 ): boolean {
   if (campo === 'importancia') {
     return item.servidorImportancia !== null && item.chefiaImportancia !== null;

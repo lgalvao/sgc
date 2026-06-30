@@ -142,7 +142,7 @@ describe('ModalAcaoBloco.vue', () => {
                 unidadesPreSelecionadas: [1]
             }
         });
-        
+
         const vm = wrapper.vm as any;
         expect(vm.todosSelecionados).toBe(false);
 
@@ -178,7 +178,7 @@ describe('ModalAcaoBloco.vue', () => {
             }
         });
         const vm = wrapper.vm as any;
-        
+
         vm.abrir();
         await wrapper.vm.$nextTick();
 
@@ -213,7 +213,7 @@ describe('ModalAcaoBloco.vue', () => {
         // ultimaDataLimiteSelecionada deve ignorar e retornar '' se nao tiver data valida
         const vm = wrapper.vm as any;
         expect(vm.ultimaDataLimiteSelecionada).toBe("");
-        
+
         // extrairData com length invalida (menos de 10) testa watch short circuit
         vm.dataLimite = "202";
         expect(vm.erroLocalDataLimite).toBe(""); // Retorna cedo

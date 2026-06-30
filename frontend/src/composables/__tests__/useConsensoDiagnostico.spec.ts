@@ -76,15 +76,15 @@ describe('useConsensoDiagnostico', () => {
         mutacaoAprovarOptions = null;
         podeCriarConsensoMock.value = false;
         statusPermissoesMock.value = 'success';
-        
+
         invalidateQueriesMock = vi.fn();
-        
+
         // Mock default behavior for useQuery
         vi.mocked(useQuery).mockReturnValue({
             data: ref(null),
             status: ref('pending'),
         } as any);
-        
+
         vi.mocked(useQueryCache).mockReturnValue({
             getQueryData: vi.fn(),
             setQueryData: vi.fn(),
@@ -106,7 +106,7 @@ describe('useConsensoDiagnostico', () => {
     }
 
     it('deve inicializar com listas vazias', () => {
-        const { competenciasLocais } = useConsensoDiagnostico(1);
+        const {competenciasLocais} = useConsensoDiagnostico(1);
         expect(competenciasLocais.value).toEqual([]);
     });
 
@@ -166,15 +166,15 @@ describe('useConsensoDiagnostico', () => {
             status: ref('success'),
         } as any);
 
-        const { competenciasLocais } = useConsensoDiagnostico(1);
-        
+        const {competenciasLocais} = useConsensoDiagnostico(1);
+
         queryData.value = {
-            competencias: [{ competenciaCodigo: 1, consensoImportancia: 3, consensoDominio: 2 }],
+            competencias: [{competenciaCodigo: 1, consensoImportancia: 3, consensoDominio: 2}],
             situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'
         };
 
         await nextTick();
-        
+
         expect(competenciasLocais.value).toHaveLength(1);
         expect(competenciasLocais.value[0].consensoImportancia).toBe(3);
     });
@@ -186,7 +186,7 @@ describe('useConsensoDiagnostico', () => {
             status: ref('success'),
         } as any);
 
-        const { competenciasLocais } = useConsensoDiagnostico(1);
+        const {competenciasLocais} = useConsensoDiagnostico(1);
 
         queryData.value = {
             competencias: [{
@@ -214,7 +214,7 @@ describe('useConsensoDiagnostico', () => {
             status: ref('success'),
         } as any);
 
-        const { competenciasLocais } = useConsensoDiagnostico(1);
+        const {competenciasLocais} = useConsensoDiagnostico(1);
 
         queryData.value = {
             competencias: [{
@@ -236,7 +236,7 @@ describe('useConsensoDiagnostico', () => {
     });
 
     it('deve disparar autosave e executar onSettled', async () => {
-        const { salvarConsenso } = await import('@/services/diagnosticoService');
+        const {salvarConsenso} = await import('@/services/diagnosticoService');
         const queryData = ref<any>({
             situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
             competencias: [],
@@ -250,54 +250,54 @@ describe('useConsensoDiagnostico', () => {
             data: queryData,
             status: ref('success'),
         } as any);
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1, 'servidor1');
-        
-        competenciasLocais.value = [{ competenciaCodigo: 1, consensoImportancia: 1, consensoDominio: 1 }] as any;
-        
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1, 'servidor1');
+
+        competenciasLocais.value = [{competenciaCodigo: 1, consensoImportancia: 1, consensoDominio: 1}] as any;
+
         atualizarNotaDetalhada(1, {origem: 'consenso', campo: 'importancia', valor: 5});
-        
+
         vi.advanceTimersByTime(800);
         expect(salvarConsenso).toHaveBeenCalledWith(1, 'servidor1', expect.anything());
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveConsenso' }));
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveEquipe' }));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveConsenso'}));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveEquipe'}));
     });
 
     it('nao deve salvar se o consenso ja estiver aprovado', async () => {
-        const { salvarConsenso } = await import('@/services/diagnosticoService');
-        const queryData = ref<any>({ situacaoServidor: 'CONSENSO_APROVADO', competencias: [] });
+        const {salvarConsenso} = await import('@/services/diagnosticoService');
+        const queryData = ref<any>({situacaoServidor: 'CONSENSO_APROVADO', competencias: []});
         vi.mocked(useQuery).mockReturnValue({
             data: queryData,
             status: ref('success'),
         } as any);
-        
-        const { atualizarNotaDetalhada, competenciasLocais } = useConsensoDiagnostico(1, 'servidor1');
-        competenciasLocais.value = [{ competenciaCodigo: 1, consensoImportancia: 1, consensoDominio: 1 }] as any;
+
+        const {atualizarNotaDetalhada, competenciasLocais} = useConsensoDiagnostico(1, 'servidor1');
+        competenciasLocais.value = [{competenciaCodigo: 1, consensoImportancia: 1, consensoDominio: 1}] as any;
 
         atualizarNotaDetalhada(1, {origem: 'consenso', campo: 'importancia', valor: 5});
-        
+
         vi.advanceTimersByTime(800);
         expect(salvarConsenso).not.toHaveBeenCalled();
     });
 
     it('deve atualizar nota detalhada', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
-        
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
+
         competenciasLocais.value = [{
             competenciaCodigo: 1,
             consensoImportancia: 1,
             consensoDominio: 1,
         }] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'consenso', campo: 'importancia', valor: 4 });
+        atualizarNotaDetalhada(1, {origem: 'consenso', campo: 'importancia', valor: 4});
 
         expect(competenciasLocais.value[0].consensoImportancia).toBe(4);
     });
 
     it('deve chamar mutacao de aprovacao e executar onSuccess', async () => {
-        const { aprovarConsenso } = await import('@/services/diagnosticoService');
+        const {aprovarConsenso} = await import('@/services/diagnosticoService');
         const cacheMock = {
             getQueryData: vi.fn().mockReturnValue({
-                competencias: [{ competenciaCodigo: 1 }],
+                competencias: [{competenciaCodigo: 1}],
                 situacaoServidor: 'CONSENSO_CRIADO',
                 podeEditar: true,
                 podeConcluirAvaliacao: false,
@@ -310,9 +310,9 @@ describe('useConsensoDiagnostico', () => {
         };
         vi.mocked(useQueryCache).mockReturnValue(cacheMock as any);
 
-        const { aprovarConsenso: aprovar } = useConsensoDiagnostico(1);
+        const {aprovarConsenso: aprovar} = useConsensoDiagnostico(1);
         await aprovar();
-        
+
         expect(aprovarConsenso).toHaveBeenCalledWith(1);
         expect(cacheMock.setQueryData).toHaveBeenCalledWith('chaveConsenso', expect.objectContaining({
             situacaoServidor: 'CONSENSO_APROVADO',
@@ -322,16 +322,16 @@ describe('useConsensoDiagnostico', () => {
             podeAprovarConsenso: true,
             habilitarAprovarConsenso: false,
         }));
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveConsenso' }));
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveEquipe' }));
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveAuto' }));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveConsenso'}));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveEquipe'}));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveAuto'}));
     });
 
     it('deve chamar mutacao de conclusao e invalidar as queries relevantes', async () => {
-        const { concluirConsenso } = await import('@/services/diagnosticoService');
+        const {concluirConsenso} = await import('@/services/diagnosticoService');
         const cacheMock = {
             getQueryData: vi.fn().mockReturnValue({
-                competencias: [{ competenciaCodigo: 1 }],
+                competencias: [{competenciaCodigo: 1}],
                 situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
                 podeEditar: true,
                 podeConcluirAvaliacao: true,
@@ -344,7 +344,7 @@ describe('useConsensoDiagnostico', () => {
         };
         vi.mocked(useQueryCache).mockReturnValue(cacheMock as any);
 
-        const { concluirAvaliacao } = useConsensoDiagnostico(1, 'servidor1');
+        const {concluirAvaliacao} = useConsensoDiagnostico(1, 'servidor1');
         await concluirAvaliacao();
 
         expect(concluirConsenso).toHaveBeenCalledWith(1, 'servidor1');
@@ -354,14 +354,14 @@ describe('useConsensoDiagnostico', () => {
             podeConcluirAvaliacao: true,
             habilitarConcluirAvaliacao: false,
         }));
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveConsenso' }));
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveEquipe' }));
-        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({ key: 'chaveAuto' }));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveConsenso'}));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveEquipe'}));
+        expect(invalidateQueriesMock).toHaveBeenCalledWith(expect.objectContaining({key: 'chaveAuto'}));
     });
 
     it('deve autopreencher consenso de importancia quando servidor e chefe forem iguais e nao nulos', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
-        
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
+
         competenciasLocais.value = [{
             competenciaCodigo: 1,
             servidorImportancia: 5,
@@ -372,14 +372,14 @@ describe('useConsensoDiagnostico', () => {
             consensoDominio: null,
         }] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 5 });
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'importancia', valor: 5});
 
         expect(competenciasLocais.value[0].consensoImportancia).toBe(5);
         expect(competenciasLocais.value[0].consensoDominio).toBeNull();
     });
 
     it('deve autopreencher consenso de dominio quando servidor e chefe forem iguais e nao nulos', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
 
         competenciasLocais.value = [{
             competenciaCodigo: 1,
@@ -391,14 +391,14 @@ describe('useConsensoDiagnostico', () => {
             consensoDominio: null,
         }] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'dominio', valor: 4 });
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'dominio', valor: 4});
 
         expect(competenciasLocais.value[0].consensoDominio).toBe(4);
         expect(competenciasLocais.value[0].consensoImportancia).toBeNull();
     });
 
     it('deve autopreencher apenas o campo igual e manter nulo o campo sem igualdade valida', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
 
         competenciasLocais.value = [{
             competenciaCodigo: 1,
@@ -410,15 +410,15 @@ describe('useConsensoDiagnostico', () => {
             consensoDominio: null,
         }] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 5 });
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'dominio', valor: null });
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'importancia', valor: 5});
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'dominio', valor: null});
 
         expect(competenciasLocais.value[0].consensoImportancia).toBe(5);
         expect(competenciasLocais.value[0].consensoDominio).toBeNull();
     });
 
     it('deve limpar o consenso quando a chefia alterar o campo para vazio', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
 
         competenciasLocais.value = [criarCompetenciaConsenso({
             servidorImportancia: 5,
@@ -429,7 +429,7 @@ describe('useConsensoDiagnostico', () => {
             consensoDominio: 4,
         })] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: null });
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'importancia', valor: null});
 
         expect(competenciasLocais.value[0].chefiaImportancia).toBeNull();
         expect(competenciasLocais.value[0].consensoImportancia).toBeNull();
@@ -437,7 +437,7 @@ describe('useConsensoDiagnostico', () => {
     });
 
     it('deve preservar consenso anterior quando a chefia divergir do servidor na importancia', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
 
         competenciasLocais.value = [criarCompetenciaConsenso({
             servidorImportancia: 2,
@@ -445,14 +445,14 @@ describe('useConsensoDiagnostico', () => {
             consensoImportancia: 2,
         })] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 4 });
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'importancia', valor: 4});
 
         expect(competenciasLocais.value[0].chefiaImportancia).toBe(4);
         expect(competenciasLocais.value[0].consensoImportancia).toBe(2);
     });
 
     it('deve preservar consenso anterior quando a chefia divergir do servidor no dominio', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
 
         competenciasLocais.value = [criarCompetenciaConsenso({
             servidorDominio: 2,
@@ -460,14 +460,14 @@ describe('useConsensoDiagnostico', () => {
             consensoDominio: 5,
         })] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'dominio', valor: 4 });
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'dominio', valor: 4});
 
         expect(competenciasLocais.value[0].chefiaDominio).toBe(4);
         expect(competenciasLocais.value[0].consensoDominio).toBe(5);
     });
 
     it('deve preservar consenso diferente mesmo quando servidor e chefia forem iguais', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
 
         competenciasLocais.value = [criarCompetenciaConsenso({
             servidorImportancia: 1,
@@ -475,24 +475,24 @@ describe('useConsensoDiagnostico', () => {
             consensoImportancia: 2,
         })] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'chefia', campo: 'importancia', valor: 1 });
+        atualizarNotaDetalhada(1, {origem: 'chefia', campo: 'importancia', valor: 1});
 
         expect(competenciasLocais.value[0].consensoImportancia).toBe(2);
     });
 
     it('nao deve atualizar nota detalhada se competencia nao existir', () => {
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1);
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1);
         competenciasLocais.value = [];
-        
-        atualizarNotaDetalhada(999, { origem: 'chefia', campo: 'importancia', valor: 5 });
+
+        atualizarNotaDetalhada(999, {origem: 'chefia', campo: 'importancia', valor: 5});
         expect(competenciasLocais.value).toEqual([]);
     });
 
     it('deve gerar payload para salvar no formato detalhado', async () => {
-        const { salvarConsenso } = await import('@/services/diagnosticoService');
-        
-        const { competenciasLocais, atualizarNotaDetalhada } = useConsensoDiagnostico(1, 'servidor1');
-        
+        const {salvarConsenso} = await import('@/services/diagnosticoService');
+
+        const {competenciasLocais, atualizarNotaDetalhada} = useConsensoDiagnostico(1, 'servidor1');
+
         competenciasLocais.value = [criarCompetenciaConsenso({
             servidorImportancia: 3,
             servidorDominio: 2,
@@ -500,10 +500,10 @@ describe('useConsensoDiagnostico', () => {
             consensoDominio: 4,
         })] as any;
 
-        atualizarNotaDetalhada(1, { origem: 'consenso', campo: 'importancia', valor: 5 });
-        
+        atualizarNotaDetalhada(1, {origem: 'consenso', campo: 'importancia', valor: 5});
+
         vi.advanceTimersByTime(800);
-        
+
         expect(salvarConsenso).toHaveBeenCalledWith(1, 'servidor1', expect.objectContaining({
             competencias: [expect.objectContaining({
                 competenciaCodigo: 1,

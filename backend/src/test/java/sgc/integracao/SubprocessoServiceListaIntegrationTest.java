@@ -167,7 +167,6 @@ class SubprocessoServiceListaIntegrationTest extends BaseIntegrationTest {
     }
 
 
-
     @Test
     @DisplayName("obterSugestoes: deve retornar sugestões do mapa")
     void obterSugestoes() {

@@ -14,9 +14,9 @@
 
 1. No `Painel`, o usuário acessa um processo de diagnóstico em andamento.
 
-2. O sistema navega **diretamente** para a tela `Detalhes do subprocesso` da unidade do usuário, a qual mostra dados
-   do subprocesso e da unidade, como detalhado em [CDU-07](cdu-07.md), além de cards acionáveis e outros elementos,
-   os quais variam de acordo com o perfil:
+2. O sistema navega **diretamente** para a tela `Detalhes do subprocesso` da unidade do usuário, a qual mostra dados do
+   subprocesso e da unidade, como detalhado em [CDU-07](cdu-07.md), além de cards acionáveis e outros elementos, os
+   quais variam de acordo com o perfil:
 
    2.1. Para o perfil CHEFE:
     - botões `Histórico de análise` e `Concluir diagnóstico` no cabeçalho;

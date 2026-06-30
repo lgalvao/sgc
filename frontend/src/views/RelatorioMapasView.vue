@@ -81,7 +81,9 @@ async function exportarPdf() {
   acaoCarregando.value = true;
   await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value)
       .catch(() => notify(TEXTOS_RELATORIOS.ERRO_GERAR, "danger"))
-      .finally(() => { acaoCarregando.value = false; });
+      .finally(() => {
+        acaoCarregando.value = false;
+      });
 }
 
 async function gerarRelatorio() {
@@ -89,7 +91,9 @@ async function gerarRelatorio() {
   acaoCarregando.value = true;
   await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value)
       .catch(() => notify(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"))
-      .finally(() => { acaoCarregando.value = false; });
+      .finally(() => {
+        acaoCarregando.value = false;
+      });
 }
 
 onMounted(() => {

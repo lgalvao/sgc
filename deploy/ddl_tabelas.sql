@@ -165,8 +165,8 @@ COMMENT
 CREATE TABLE DIAGNOSTICO
 (
     codigo             NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    subprocesso_codigo NUMBER      NOT NULL,
-    data_conclusao     TIMESTAMP   NULL,
+    subprocesso_codigo NUMBER    NOT NULL,
+    data_conclusao     TIMESTAMP NULL,
     CONSTRAINT pk_diagnostico PRIMARY KEY (codigo),
     CONSTRAINT fk_diagnostico_subprocesso FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo),
     CONSTRAINT uk_diagnostico_subprocesso UNIQUE (subprocesso_codigo)
@@ -362,23 +362,23 @@ COMMENT
 -- 15. Tabela AVALIACAO_SERVIDOR
 CREATE TABLE AVALIACAO_SERVIDOR
 (
-    codigo                    NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    diagnostico_codigo        NUMBER       NOT NULL,
-    servidor_titulo           VARCHAR2(12) NOT NULL,
-    servidor_nome_snapshot    VARCHAR2(255) NULL,
-    competencia_codigo        NUMBER       NOT NULL,
-    autoimportancia           NUMBER(1)    NULL,
-    autodominio               NUMBER(1)    NULL,
-    chefia_importancia        NUMBER(1)    NULL,
-    chefia_dominio            NUMBER(1)    NULL,
-    consenso_importancia      NUMBER(1)    NULL,
-    consenso_dominio          NUMBER(1)    NULL,
-    importancia               NUMBER(1)    NULL,
-    dominio                   NUMBER(1)    NULL,
-    gap                       NUMBER       NULL,
-    observacoes               CLOB         NULL,
-    situacao_servidor         VARCHAR2(50) NOT NULL,
-    situacao_servidor_anterior VARCHAR2(50) NULL,
+    codigo                     NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
+    diagnostico_codigo         NUMBER        NOT NULL,
+    servidor_titulo            VARCHAR2(12)  NOT NULL,
+    servidor_nome_snapshot     VARCHAR2(255) NULL,
+    competencia_codigo         NUMBER        NOT NULL,
+    autoimportancia            NUMBER(1)     NULL,
+    autodominio                NUMBER(1)     NULL,
+    chefia_importancia         NUMBER(1)     NULL,
+    chefia_dominio             NUMBER(1)     NULL,
+    consenso_importancia       NUMBER(1)     NULL,
+    consenso_dominio           NUMBER(1)     NULL,
+    importancia                NUMBER(1)     NULL,
+    dominio                    NUMBER(1)     NULL,
+    gap                        NUMBER        NULL,
+    observacoes                CLOB          NULL,
+    situacao_servidor          VARCHAR2(50)  NOT NULL,
+    situacao_servidor_anterior VARCHAR2(50)  NULL,
     CONSTRAINT pk_avaliacao_servidor PRIMARY KEY (codigo),
     CONSTRAINT fk_avaliacao_diagnostico FOREIGN KEY (diagnostico_codigo) REFERENCES DIAGNOSTICO (codigo),
     CONSTRAINT fk_avaliacao_competencia FOREIGN KEY (competencia_codigo) REFERENCES COMPETENCIA (codigo),
@@ -392,19 +392,19 @@ CREATE TABLE AVALIACAO_SERVIDOR
     CONSTRAINT ck_avaliacao_importancia CHECK (importancia BETWEEN 0 AND 6),
     CONSTRAINT ck_avaliacao_dominio CHECK (dominio BETWEEN 0 AND 6),
     CONSTRAINT ck_avaliacao_situacao CHECK (situacao_servidor IN (
-        'AUTOAVALIACAO_NAO_INICIADA',
-        'AUTOAVALIACAO_CONCLUIDA',
-        'CONSENSO_CRIADO',
-        'CONSENSO_APROVADO',
-        'AVALIACAO_IMPOSSIBILITADA'
-    )),
+                                                                  'AUTOAVALIACAO_NAO_INICIADA',
+                                                                  'AUTOAVALIACAO_CONCLUIDA',
+                                                                  'CONSENSO_CRIADO',
+                                                                  'CONSENSO_APROVADO',
+                                                                  'AVALIACAO_IMPOSSIBILITADA'
+        )),
     CONSTRAINT ck_avaliacao_situacao_anterior CHECK (situacao_servidor_anterior IN (
-        'AUTOAVALIACAO_NAO_INICIADA',
-        'AUTOAVALIACAO_CONCLUIDA',
-        'CONSENSO_CRIADO',
-        'CONSENSO_APROVADO',
-        'AVALIACAO_IMPOSSIBILITADA'
-    ))
+                                                                                    'AUTOAVALIACAO_NAO_INICIADA',
+                                                                                    'AUTOAVALIACAO_CONCLUIDA',
+                                                                                    'CONSENSO_CRIADO',
+                                                                                    'CONSENSO_APROVADO',
+                                                                                    'AVALIACAO_IMPOSSIBILITADA'
+        ))
 );
 
 COMMENT
@@ -446,15 +446,15 @@ COMMENT
 -- 16. Tabela SITUACAO_CAPACITACAO
 CREATE TABLE SITUACAO_CAPACITACAO
 (
-    codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    diagnostico_codigo     NUMBER       NOT NULL,
-    servidor_titulo        VARCHAR2(12) NOT NULL,
-    competencia_codigo     NUMBER       NOT NULL,
-    situacao_capacitacao   VARCHAR2(2)  NULL,
-    servidor_nome_snapshot VARCHAR2(255) NULL,
-    unidade_codigo_snapshot NUMBER      NULL,
-    unidade_sigla_snapshot VARCHAR2(20) NULL,
-    unidade_nome_snapshot  VARCHAR2(255) NULL,
+    codigo                  NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
+    diagnostico_codigo      NUMBER        NOT NULL,
+    servidor_titulo         VARCHAR2(12)  NOT NULL,
+    competencia_codigo      NUMBER        NOT NULL,
+    situacao_capacitacao    VARCHAR2(2)   NULL,
+    servidor_nome_snapshot  VARCHAR2(255) NULL,
+    unidade_codigo_snapshot NUMBER        NULL,
+    unidade_sigla_snapshot  VARCHAR2(20)  NULL,
+    unidade_nome_snapshot   VARCHAR2(255) NULL,
     CONSTRAINT pk_situacao_capacitacao PRIMARY KEY (codigo),
     CONSTRAINT fk_sit_cap_diagnostico FOREIGN KEY (diagnostico_codigo) REFERENCES DIAGNOSTICO (codigo),
     CONSTRAINT fk_sit_cap_competencia FOREIGN KEY (competencia_codigo) REFERENCES COMPETENCIA (codigo),
@@ -554,31 +554,31 @@ COMMENT
 CREATE TABLE NOTIFICACAO_EMAIL
 (
     codigo                 NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1 NOT NULL,
-    destinatario           VARCHAR2(255)  NOT NULL,
-    assunto                VARCHAR2(500)  NOT NULL,
-    corpo_html             CLOB           NOT NULL,
-    subprocesso_codigo     NUMBER         NULL,
-    tipo_notificacao       VARCHAR2(80)   NULL,
-    usuario_destino_titulo VARCHAR2(12)   NULL,
-    unidade_destino_sigla  VARCHAR2(20)   NULL,
-    situacao               VARCHAR2(30)   DEFAULT 'PENDENTE' NOT NULL,
-    tentativas             NUMBER(5)      DEFAULT 0 NOT NULL,
-    proxima_tentativa_em   TIMESTAMP      NULL,
-    data_hora_criacao      TIMESTAMP      DEFAULT SYSTIMESTAMP NOT NULL,
-    data_hora_envio        TIMESTAMP      NULL,
-    ultimo_erro            VARCHAR2(2000) NULL,
-    chave_idempotencia     VARCHAR2(255)  NOT NULL,
+    destinatario           VARCHAR2(255)                     NOT NULL,
+    assunto                VARCHAR2(500)                     NOT NULL,
+    corpo_html             CLOB                              NOT NULL,
+    subprocesso_codigo     NUMBER                            NULL,
+    tipo_notificacao       VARCHAR2(80)                      NULL,
+    usuario_destino_titulo VARCHAR2(12)                      NULL,
+    unidade_destino_sigla  VARCHAR2(20)                      NULL,
+    situacao               VARCHAR2(30) DEFAULT 'PENDENTE'   NOT NULL,
+    tentativas             NUMBER(5)    DEFAULT 0            NOT NULL,
+    proxima_tentativa_em   TIMESTAMP                         NULL,
+    data_hora_criacao      TIMESTAMP    DEFAULT SYSTIMESTAMP NOT NULL,
+    data_hora_envio        TIMESTAMP                         NULL,
+    ultimo_erro            VARCHAR2(2000)                    NULL,
+    chave_idempotencia     VARCHAR2(255)                     NOT NULL,
     CONSTRAINT pk_notif_email PRIMARY KEY (codigo),
     CONSTRAINT uk_notif_email_chave UNIQUE (chave_idempotencia),
     CONSTRAINT ck_notif_email_situacao CHECK (
         situacao IN (
-            'PENDENTE',
-            'ENVIANDO',
-            'ENVIADO',
-            'FALHA_TEMPORARIA',
-            'FALHA_DEFINITIVA'
-        )
-    ),
+                     'PENDENTE',
+                     'ENVIANDO',
+                     'ENVIADO',
+                     'FALHA_TEMPORARIA',
+                     'FALHA_DEFINITIVA'
+            )
+        ),
     CONSTRAINT ck_notif_email_tentativas CHECK (tentativas >= 0),
     CONSTRAINT fk_notif_email_subproc FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
 );
@@ -644,15 +644,15 @@ CREATE INDEX idx_unidade_processo_unidade ON UNIDADE_PROCESSO (unidade_codigo);
 -- 17. Tabela FEEDBACK
 CREATE TABLE FEEDBACK
 (
-    id                 RAW(16)                   NOT NULL,
-    tipo               VARCHAR2(20)             NOT NULL,
-    nota               VARCHAR2(2000)           NOT NULL,
-    metadata_json      CLOB                     NULL,
-    caminho_screenshot VARCHAR2(500)            NULL,
-    usuario_id         VARCHAR2(100)            NOT NULL,
-    usuario_nome       VARCHAR2(200)            NOT NULL,
-    enviado_em         TIMESTAMP WITH TIME ZONE NOT NULL,
-    rota               VARCHAR2(500)            NOT NULL,
+    id                 RAW(16)                     NOT NULL,
+    tipo               VARCHAR2(20)                NOT NULL,
+    nota               VARCHAR2(2000)              NOT NULL,
+    metadata_json      CLOB                        NULL,
+    caminho_screenshot VARCHAR2(500)               NULL,
+    usuario_id         VARCHAR2(100)               NOT NULL,
+    usuario_nome       VARCHAR2(200)               NOT NULL,
+    enviado_em         TIMESTAMP WITH TIME ZONE    NOT NULL,
+    rota               VARCHAR2(500)               NOT NULL,
     status             VARCHAR2(20) DEFAULT 'NOVO' NOT NULL,
     CONSTRAINT pk_feedback PRIMARY KEY (id),
     CONSTRAINT ck_feedback_tipo CHECK (tipo IN ('BUG', 'SUGESTAO', 'QUESTAO', 'ELOGIO')),

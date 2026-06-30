@@ -7,7 +7,7 @@
 ## Pré-condições
 
 - Usuário logado com perfil GESTOR
-- Existência de processo de mapeamento/revisão em andamento, com pelo menos uma unidade subordinada com subprocesso 
+- Existência de processo de mapeamento/revisão em andamento, com pelo menos uma unidade subordinada com subprocesso
 - localizado na unidade do usuário e com situação:
     - 'Cadastro disponibilizado' (mapeamento) ou 'Revisão do cadastro disponibilizada' (revisão).
 
@@ -48,14 +48,15 @@
 
    7.3. Registra um alerta:
     - `Data/hora`: [Data/hora atual]
-    - `Descrição`: 
-      - para mapeamento, "Cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetido para análise"
-      - para revisão, "Revisão do cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise"
+    - `Descrição`:
+        - para mapeamento, "Cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetido para análise"
+        - para revisão, "Revisão do cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise"
     - `Processo`: [DESCRIÇÃO_PROCESSO]
     - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 
-   7.4. Envia notificação por e-mail para a unidade do subprocesso, seguindo o modelo correspondente ao tipo do processo:
+   7.4. Envia notificação por e-mail para a unidade do subprocesso, seguindo o modelo correspondente ao tipo do
+   processo:
 
    Para processos de **mapeamento**:
     ```text

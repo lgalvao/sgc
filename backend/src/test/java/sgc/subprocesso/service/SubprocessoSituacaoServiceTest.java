@@ -26,7 +26,6 @@ class SubprocessoSituacaoServiceTest {
     private SubprocessoSituacaoService service;
 
 
-
     @Test
     @DisplayName("atualizarSituacaoPorMapa deve iniciar revisao quando estiver nao iniciado")
     void atualizarSituacaoPorMapaDeveIniciarRevisaoQuandoEstiverNaoIniciado() {

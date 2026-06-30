@@ -70,7 +70,8 @@ Aumentar a efetividade dos testes preservando:
    `assertThatCode`, `hasMessageContaining`, encadeamento fluente.
 
 7. **Remover importações órfãs.**
-   Quando um teste que usava `ReflectionTestUtils` ou `assertThrows` for removido, remova também o import correspondente.
+   Quando um teste que usava `ReflectionTestUtils` ou `assertThrows` for removido, remova também o import
+   correspondente.
 
 8. **Reflexão persistente sinaliza lacuna de design.**
    Se após classificar uma ocorrência de reflexão você concluir que não existe caminho público para exercitá-la E o
@@ -114,8 +115,8 @@ Aumentar a efetividade dos testes preservando:
 ## Alterações em código de produção para testabilidade
 
 Às vezes o problema não está no teste, mas no código de produção que não foi projetado para ser testado sem reflexão.
-Quando a classificação de uma ocorrência de reflexão resultar em "Privado com lacuna real e sem caminho público
-viável", considere aplicar um dos padrões abaixo antes de aceitar a perda de cobertura.
+Quando a classificação de uma ocorrência de reflexão resultar em "Privado com lacuna real e sem caminho público viável",
+considere aplicar um dos padrões abaixo antes de aceitar a perda de cobertura.
 
 ### Critérios para alterar o código de produção
 
@@ -147,8 +148,8 @@ LimitadorTentativasLogin(Environment environment, int maxCacheEntries, Clock clo
 LimitadorTentativasLogin limitador = new LimitadorTentativasLogin(environment, 5, clock);
 ```
 
-Use este padrão para: `Clock`, limites numéricos, tamanhos de cache, timeouts.
-Não use para: substituir beans Spring inteiros, simular infraestrutura (banco, fila).
+Use este padrão para: `Clock`, limites numéricos, tamanhos de cache, timeouts. Não use para: substituir beans Spring
+inteiros, simular infraestrutura (banco, fila).
 
 ### Padrão 2 — Propriedade externalizável via `@TestPropertySource`
 
@@ -157,12 +158,14 @@ Quando `ReflectionTestUtils.setField(bean, "propriedade", valor)` é usado para 
 `@SpringBootTest(properties = "...")` no teste.
 
 **Antes (reflexão):**
+
 ```java
 ReflectionTestUtils.setField(loginController, "cookieSecure", true);
 invokeMethod(loginController, "adicionarCookieJwt", response, "token");
 ```
 
 **Depois (propriedade externalizável + MockMvc):**
+
 ```java
 @WebMvcTest(LoginController.class)
 @TestPropertySource(properties = "aplicacao.cookies.secure=true")
@@ -176,8 +179,8 @@ Não use quando: a propriedade é apenas detalhe operacional sem impacto em comp
 
 ### Padrão 3 — Método package-private observável
 
-Quando um estado interno precisa ser observado para verificar um invariante de negócio (ex: tamanho de cache, número
-de conexões abertas), adicione um método package-private **somente leitura** que exponha esse estado.
+Quando um estado interno precisa ser observado para verificar um invariante de negócio (ex: tamanho de cache, número de
+conexões abertas), adicione um método package-private **somente leitura** que exponha esse estado.
 
 **Exemplo do SGC — `LimitadorTentativasLogin`:**
 
@@ -194,6 +197,7 @@ assertThat(limitador.getCacheSize()).isEqualTo(5);
 ```
 
 **Guardrails:**
+
 - Só exponha estado que representa um invariante verificável de fora (tamanho, contagem).
 - Nunca exponha o estado interno diretamente (não retorne `Map<String, Deque<...>>`).
 - Não adicione setters package-private — setters tornam o estado mutável por testes, que é pior que reflexão.
@@ -203,8 +207,8 @@ assertThat(limitador.getCacheSize()).isEqualTo(5);
 Quando um método privado contém lógica com efeitos colaterais observáveis mas não testáveis via API pública, extraia
 esse comportamento como um collaborator injetável via construtor.
 
-**Quando usar:** a classe tem lógica de "envio" ou "remoção" que só pode ser verificada inspecionando estado interno
-com reflexão (ex: `RegistroSseEmitter.transmitir` remover emitters com falha).
+**Quando usar:** a classe tem lógica de "envio" ou "remoção" que só pode ser verificada inspecionando estado interno com
+reflexão (ex: `RegistroSseEmitter.transmitir` remover emitters com falha).
 
 **Exemplo conceitual:**
 
@@ -227,8 +231,8 @@ interface SseSender {
 RegistroSseEmitter(SseSender sender) { this.sender = sender; }
 ```
 
-Use este padrão com moderação: só quando o comportamento é relevante E não existe outra forma. Evite criar interfaces
-só para satisfazer testes se o design de produção não se beneficiar da abstração.
+Use este padrão com moderação: só quando o comportamento é relevante E não existe outra forma. Evite criar interfaces só
+para satisfazer testes se o design de produção não se beneficiar da abstração.
 
 ### O que NÃO fazer para aumentar testabilidade
 
@@ -253,6 +257,7 @@ grep -rn "import static org.junit.jupiter.api.Assertions" \
 ```
 
 Para frontend:
+
 ```bash
 grep -rn "spyOn.*_\|__esModule\|toBeTruthy\|toBeFalsy" \
   frontend/src/**/*.spec.ts
@@ -264,14 +269,14 @@ Para cada ocorrência encontrada, classifique:
 
 - **Privado sem substituto**: método privado que só seria exercitado via reflexão, sem caminho público equivalente →
   **remover**
-- **Privado com substituto**: método privado cujo comportamento já é coberto por teste via API pública →
-  **remover o teste de reflexão, manter o comportamental**
-- **Privado com lacuna real e caminho público viável**: método privado com lógica não coberta, mas exercitável pela
-  API pública → **adicionar teste via API pública que exercite o caminho**
+- **Privado com substituto**: método privado cujo comportamento já é coberto por teste via API pública → **remover o
+  teste de reflexão, manter o comportamental**
+- **Privado com lacuna real e caminho público viável**: método privado com lógica não coberta, mas exercitável pela API
+  pública → **adicionar teste via API pública que exercite o caminho**
 - **Privado com lacuna real e sem caminho público**: comportamento relevante (segurança/negócio) que não pode ser
   exercitado sem reflexão → **avaliar alteração no código de produção** (ver seção acima)
-- **Configuração via `setField`**: `ReflectionTestUtils.setField` para variar propriedade `@Value` →
-  **converter para `@TestPropertySource` ou propriedade nomeada**
+- **Configuração via `setField`**: `ReflectionTestUtils.setField` para variar propriedade `@Value` → **converter para
+  `@TestPropertySource` ou propriedade nomeada**
 - **Assertion fraca**: `assertNotNull` / `assertTrue(x != null)` / `toBeTruthy()` → **fortalecer assertion**
 - **Cenário impossível**: setup que não pode ser alcançado via API pública → **remover**
 - **Import órfão**: import de `Assertions.*` ou `ReflectionTestUtils` sem uso restante → **remover**
@@ -279,6 +284,7 @@ Para cada ocorrência encontrada, classifique:
 ### 3. Executar a refatoração
 
 Por arquivo, na ordem:
+
 1. Remover testes de método privado (e identificar se geram lacuna)
 2. Se lacuna real sem caminho público: avaliar alteração em produção primeiro
 3. Adicionar testes comportamentais para cobrir lacunas identificadas
@@ -308,6 +314,7 @@ npm run lint
 ### 5. Registrar
 
 Ao final da rodada, registre:
+
 - quantos testes foram removidos e por qual razão;
 - quantos testes comportamentais foram adicionados;
 - se alguma lacuna de cobertura real foi identificada e coberta;
@@ -318,10 +325,10 @@ Ao final da rodada, registre:
 
 ### `RegistroSseEmitter` — estado interno não acessível sem reflexão
 
-**Problema:** os testes originais usavam `ReflectionTestUtils.getField(registroSseEmitter, "emissores")` para
-injetar mocks na lista interna e verificar remoções. Ao tentar substituir por testes comportamentais, descobriu-se
-que `SseEmitter.complete()` e `completeWithError()` lançam `IllegalStateException` sem backing HTTP real —
-impossibilitando exercitar o callback `onError` em testes unitários puros.
+**Problema:** os testes originais usavam `ReflectionTestUtils.getField(registroSseEmitter, "emissores")` para injetar
+mocks na lista interna e verificar remoções. Ao tentar substituir por testes comportamentais, descobriu-se que
+`SseEmitter.complete()` e `completeWithError()` lançam `IllegalStateException` sem backing HTTP real — impossibilitando
+exercitar o callback `onError` em testes unitários puros.
 
 **Decisão tomada:** os testes de remoção foram simplificados para verificar apenas que `transmitir()` não lança
 exceção — aceitando perda parcial de cobertura por não haver alteração de produção no momento.
@@ -336,8 +343,8 @@ sem precisar de `SseEmitter` real com backing HTTP.
 para testar os dois branches do flag de segurança dos cookies. Via MockMvc, o campo assume sempre o valor do
 `application.properties` (ou o default `false`), não sendo possível testar `cookieSecure=true` sem reflexão.
 
-**Decisão tomada:** o teste de `cookieSecure=false` foi mantido via MockMvc (verifica `cookie.getSecure() == false`).
-O teste de `cookieSecure=true` foi deixado como lacuna a cobrir com `@TestPropertySource`.
+**Decisão tomada:** o teste de `cookieSecure=false` foi mantido via MockMvc (verifica `cookie.getSecure() == false`). O
+teste de `cookieSecure=true` foi deixado como lacuna a cobrir com `@TestPropertySource`.
 
 **Alternativa preferível:** criar uma classe `@WebMvcTest` separada anotada com
 `@TestPropertySource(properties = "aplicacao.cookies.secure=true")` para cobrir o branch `true` sem reflexão.
@@ -345,26 +352,26 @@ O teste de `cookieSecure=true` foi deixado como lacuna a cobrir com `@TestProper
 ### `LimitadorTentativasLogin` — `ReflectionTestUtils.setField` para trocar `Environment`
 
 **Problema:** `SecurityVulnerabilityIntegrationTest` usava reflexão para substituir o bean `environment` do
-`LimitadorTentativasLogin` e forçar o limitador a funcionar em perfil de integração. Isso acoplava o teste à
-estrutura interna do componente.
+`LimitadorTentativasLogin` e forçar o limitador a funcionar em perfil de integração. Isso acoplava o teste à estrutura
+interna do componente.
 
-**Decisão tomada:** o teste de integração foi removido porque o mesmo comportamento (cache cheio + novo IP) já
-estava coberto por `LimitadorTentativasLoginTest` em nível unitário, usando o construtor package-private com
+**Decisão tomada:** o teste de integração foi removido porque o mesmo comportamento (cache cheio + novo IP) já estava
+coberto por `LimitadorTentativasLoginTest` em nível unitário, usando o construtor package-private com
 `maxCacheEntries` configurável.
 
-**Lição:** quando um teste de integração usa reflexão para simular condições de ambiente, verifique primeiro se um
-teste unitário com construtor package-private não cobre o mesmo invariante de forma mais simples e confiável.
+**Lição:** quando um teste de integração usa reflexão para simular condições de ambiente, verifique primeiro se um teste
+unitário com construtor package-private não cobre o mesmo invariante de forma mais simples e confiável.
 
 ### `E2eControllerTest` — `getDeclaredMethod` em método privado de fixture
 
-**Problema:** dois testes usavam `getDeclaredMethod("criarProcessoFixture")` + `setAccessible(true)` para exercitar
-um método privado de infraestrutura de testes (não de produção). O comportamento já era coberto indiretamente pelos
-testes públicos `deveCriarProcessoMapeamentoFixtureIniciado` e `deveCriarProcessoRevisaoFixture`.
+**Problema:** dois testes usavam `getDeclaredMethod("criarProcessoFixture")` + `setAccessible(true)` para exercitar um
+método privado de infraestrutura de testes (não de produção). O comportamento já era coberto indiretamente pelos testes
+públicos `deveCriarProcessoMapeamentoFixtureIniciado` e `deveCriarProcessoRevisaoFixture`.
 
 **Decisão tomada:** testes removidos — eram redundantes com os testes via API pública do controller.
 
-**Lição:** verifique se o método privado que está sendo testado via reflexão é de produção ou de fixture de teste.
-Se for de fixture, a cobertura extra não tem valor e pode ser removida sem reservas.
+**Lição:** verifique se o método privado que está sendo testado via reflexão é de produção ou de fixture de teste. Se
+for de fixture, a cobertura extra não tem valor e pode ser removida sem reservas.
 
 ## Padrões AssertJ para o SGC
 
@@ -435,8 +442,8 @@ verify(analiseRepo).save(argThat(a -> a.getUnidadeCodigo().equals(1L)));
 - Há um teste comportamental que já cobre o mesmo caminho? (se sim, o teste de reflexão é redundante)
 - Ao remover este teste, qual comportamento real fica sem cobertura?
 - O comportamento sem cobertura é relevante o suficiente para justificar alterar o código de produção?
-- Se sim, qual dos padrões de testabilidade (construtor package-private, `@TestPropertySource`, collaborator) é o
-  menos invasivo para o código de produção?
+- Se sim, qual dos padrões de testabilidade (construtor package-private, `@TestPropertySource`, collaborator) é o menos
+  invasivo para o código de produção?
 - O arquivo resultado da consolidação ficou legível com `@Nested` por cenário?
 - Todos os imports inutilizados foram removidos?
 

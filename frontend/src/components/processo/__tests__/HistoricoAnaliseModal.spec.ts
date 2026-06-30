@@ -109,7 +109,7 @@ describe('HistoricoAnaliseModal.vue', () => {
 
         // formatarAcaoAnalise other cases
         expect(vm.formatarAcaoAnalise(null)).toBe('-');
-        
+
         // Interaction
         await wrapper.find('[data-testid="btn-ver-observacao-0"]').trigger('click');
         expect(vm.mostrarObservacao).toBe(true);

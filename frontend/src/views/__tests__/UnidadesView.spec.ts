@@ -482,7 +482,7 @@ describe("Unidades.vue", () => {
 
         const arvore = wrapper.findComponent({name: 'TreeTable'});
         const data = arvore.props("data") as any[];
-        
+
         expect(data).toHaveLength(1);
         expect(data[0].sigla).toBe("PAI");
         // Se o bug existir, children estará vazio porque FILHO1 e FILHO2 não contêm "pai"

@@ -324,10 +324,10 @@ test.describe('CDU-02 - Visualizar painel', () => {
         });
 
         test('Alerta expirado pelo prazo configurado não deve aparecer destacado', async ({
-                                                                                               _resetAutomatico,
-                                                                                               page,
-                                                                                               _autenticadoComoAdmin
-                                                                                           }) => {
+                                                                                              _resetAutomatico,
+                                                                                              page,
+                                                                                              _autenticadoComoAdmin
+                                                                                          }) => {
             const linhaAlertaAntigo = page.getByTestId('tbl-alertas')
                 .locator('tr', {hasText: 'Alerta antigo seed 201'})
                 .first();

@@ -177,7 +177,7 @@ describe('apiError utils', () => {
             expect(normalized.tipo).toBe('validacao');
             expect(normalized.mensagem).toBe('Erro 400: O servidor não retornou uma mensagem detalhada.');
         });
-        
+
         it('deve testar typeof erro === number', () => {
             const normalized = normalizarErro(123);
             expect(normalized.mensagem).toBe('Erro desconhecido ou não mapeado pela aplicação.');

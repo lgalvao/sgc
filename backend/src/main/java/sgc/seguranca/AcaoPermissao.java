@@ -77,7 +77,9 @@ public enum AcaoPermissao {
         this.perfisPermitidos = perfis.length == 0 ? Set.of() : Set.of(perfis);
     }
 
-    /** Indica se a ação exige que a unidade do usuário seja igual à localização do subprocesso. */
+    /**
+     * Indica se a ação exige que a unidade do usuário seja igual à localização do subprocesso.
+     */
     public boolean dependeLocalizacao() {
         return Tipo.ESCRITA == tipo;
     }
@@ -90,11 +92,17 @@ public enum AcaoPermissao {
         return perfisPermitidos.isEmpty() || perfisPermitidos.contains(perfil);
     }
 
-    /** Classifica a ação quanto à dependência de localização. */
+    /**
+     * Classifica a ação quanto à dependência de localização.
+     */
     public enum Tipo {
-        /** Ações que alteram dados — exigem localização do subprocesso na unidade do usuário. */
+        /**
+         * Ações que alteram dados — exigem localização do subprocesso na unidade do usuário.
+         */
         ESCRITA,
-        /** Ações de consulta — verificam apenas hierarquia organizacional. */
+        /**
+         * Ações de consulta — verificam apenas hierarquia organizacional.
+         */
         LEITURA
     }
 }

@@ -28,15 +28,15 @@ interface UseProcessoMutacoesParams {
 }
 
 export function useProcessoMutacoes({
-    formulario,
-    processoEditando,
-    unidadesComEquipePropriaSelecionadas,
-    idsUnidadesComEquipePropriaSelecionadas,
-    mostrarModalConfirmacao,
-    mostrarModalRemocao,
-    modalUnidadesComEquipePropriaRef,
-    tratarErrosApi
-}: UseProcessoMutacoesParams) {
+                                        formulario,
+                                        processoEditando,
+                                        unidadesComEquipePropriaSelecionadas,
+                                        idsUnidadesComEquipePropriaSelecionadas,
+                                        mostrarModalConfirmacao,
+                                        mostrarModalRemocao,
+                                        modalUnidadesComEquipePropriaRef,
+                                        tratarErrosApi
+                                    }: UseProcessoMutacoesParams) {
     const router = useRouter();
     const {registrarPendente} = useToast();
     const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();

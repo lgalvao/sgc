@@ -83,7 +83,7 @@ async function auditarAcessibilidadeNosTemas(page: Page): Promise<void> {
 
 async function auditarAcessibilidade(page: Page): Promise<void> {
     // Executa auditoria do Axe-core cobrindo até WCAG 2.2
-    const accessibilityScanResults = await new AxeBuilder({ page })
+    const accessibilityScanResults = await new AxeBuilder({page})
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
         .disableRules(['list'])
         .analyze();
@@ -1564,7 +1564,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByTestId('btn-visualizar-unidades-sem-mapa').click();
             await expect(page.locator('.arvore-unidades-sem-mapa').first()).toBeVisible();
-            await capturarTela(page, 'relatorios', 'relatorio-unidades-sem-mapas-vigentes-arvore', {fullPage: true, tags: ['arvore', 'unidades-sem-mapas']});
+            await capturarTela(page, 'relatorios', 'relatorio-unidades-sem-mapas-vigentes-arvore', {
+                fullPage: true,
+                tags: ['arvore', 'unidades-sem-mapas']
+            });
         });
     });
 
@@ -1781,7 +1784,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await expect(page.getByTestId('btn-mapa-acoes')).toBeVisible();
             await page.getByTestId('btn-mapa-acoes').click();
             // Garantir que a animação de abertura do menu dropdown foi concluída e o menu está visível
-            await page.locator('.dropdown-menu.show').waitFor({ state: 'visible' });
+            await page.locator('.dropdown-menu.show').waitFor({state: 'visible'});
 
             const btnSugestoes = page.getByTestId('btn-mapa-acao-sugestoes');
             if (await btnSugestoes.isVisible()) {

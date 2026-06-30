@@ -2,7 +2,8 @@
 
 ## Papel do módulo
 
-`frontend/` implementa a SPA do SGC. Ele traduz os fluxos de processo/subprocesso em telas, componentes e stores, consumindo contratos REST do backend e aplicando regras de navegação, cache local e renderização por permissão.
+`frontend/` implementa a SPA do SGC. Ele traduz os fluxos de processo/subprocesso em telas, componentes e stores,
+consumindo contratos REST do backend e aplicando regras de navegação, cache local e renderização por permissão.
 
 ## Stack técnica
 
@@ -19,17 +20,17 @@
 
 `src/` está dividido em camadas orientadas ao uso da UI:
 
-| Pasta | Papel |
-|---|---|
-| `views/` | telas de caso de uso (`PainelView`, `SubprocessoView`, `MapaView`, `RelatoriosView`...) |
-| `components/` | componentes de domínio e infraestrutura visual |
-| `stores/` | estado global de processos, mapas, painel, sessão, organização, toasts e subprocessos |
-| `services/` | chamadas HTTP segmentadas por contexto |
-| `composables/` | lógica reutilizável de fluxo, formulário, cache, sessão e erros |
-| `router/` | montagem das rotas modulares |
-| `types/` | DTOs e tipos de negócio |
-| `utils/` | logger, normalização de erro e utilitários transversais |
-| `test-utils/` / `test/` | apoio de testes |
+| Pasta                   | Papel                                                                                   |
+|-------------------------|-----------------------------------------------------------------------------------------|
+| `views/`                | telas de caso de uso (`PainelView`, `SubprocessoView`, `MapaView`, `RelatoriosView`...) |
+| `components/`           | componentes de domínio e infraestrutura visual                                          |
+| `stores/`               | estado global de processos, mapas, painel, sessão, organização, toasts e subprocessos   |
+| `services/`             | chamadas HTTP segmentadas por contexto                                                  |
+| `composables/`          | lógica reutilizável de fluxo, formulário, cache, sessão e erros                         |
+| `router/`               | montagem das rotas modulares                                                            |
+| `types/`                | DTOs e tipos de negócio                                                                 |
+| `utils/`                | logger, normalização de erro e utilitários transversais                                 |
+| `test-utils/` / `test/` | apoio de testes                                                                         |
 
 ### Organização dos componentes
 
@@ -73,17 +74,17 @@ graph TD
 
 ### Stores principais
 
-| Store | Responsabilidade |
-|---|---|
-| `usePerfilStore` | login, seleção de perfil/unidade, sessão e invalidação global de caches |
-| `usePainelStore` | processos e alertas do painel |
-| `useProcessoStore` | dados de processo e contexto da tela macro |
+| Store                 | Responsabilidade                                                         |
+|-----------------------|--------------------------------------------------------------------------|
+| `usePerfilStore`      | login, seleção de perfil/unidade, sessão e invalidação global de caches  |
+| `usePainelStore`      | processos e alertas do painel                                            |
+| `useProcessoStore`    | dados de processo e contexto da tela macro                               |
 | `useSubprocessoStore` | cache de contexto de edição/cadastro por subprocesso ou processo+unidade |
-| `useMapasStore` | operações de mapa |
-| `useUnidadeStore` | consulta e estado de unidades |
-| `useOrganizacaoStore` | dados organizacionais auxiliares |
-| `useRelatoriosStore` | relatórios |
-| `useToastStore` | notificações visuais |
+| `useMapasStore`       | operações de mapa                                                        |
+| `useUnidadeStore`     | consulta e estado de unidades                                            |
+| `useOrganizacaoStore` | dados organizacionais auxiliares                                         |
+| `useRelatoriosStore`  | relatórios                                                               |
+| `useToastStore`       | notificações visuais                                                     |
 
 ### Padrões importantes
 
@@ -124,7 +125,8 @@ sequenceDiagram
 
 ## Widget de feedback
 
-O `main.ts` carrega dinamicamente `FeedbackWidget.vue` quando `VITE_FEEDBACK_WIDGET=true`. Isso permite habilitar o widget em ambientes específicos sem acoplar a experiência padrão.
+O `main.ts` carrega dinamicamente `FeedbackWidget.vue` quando `VITE_FEEDBACK_WIDGET=true`. Isso permite habilitar o
+widget em ambientes específicos sem acoplar a experiência padrão.
 
 ## Execução local
 

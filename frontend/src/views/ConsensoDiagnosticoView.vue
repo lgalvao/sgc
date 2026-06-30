@@ -4,50 +4,50 @@
 
     <template v-else>
       <div :class="{'cursor-salvando': salvandoAutomaticamente}">
-      <PageHeader
-          :subtitle="subtituloServidor"
-          :title="TEXTOS.diagnostico.TITULO_CONSENSO"
-      >
-        <template #alerta>
-          <Alerta
-              v-if="erroMensagem"
-              :chave="erroMensagemChave"
-              :mensagem="erroMensagem"
-              variante="danger"
-              @dismissed="erroMensagem = ''"
-          />
+        <PageHeader
+            :subtitle="subtituloServidor"
+            :title="TEXTOS.diagnostico.TITULO_CONSENSO"
+        >
+          <template #alerta>
+            <Alerta
+                v-if="erroMensagem"
+                :chave="erroMensagemChave"
+                :mensagem="erroMensagem"
+                variante="danger"
+                @dismissed="erroMensagem = ''"
+            />
 
-          <Alerta
-              v-if="ehConsensoAprovado"
-              :dispensavel="false"
-              data-testid="alert-consenso-aprovado"
-              mensagem="A avaliação de consenso já foi aprovada."
-              variante="success"
-          />
-        </template>
-        <template #actions>
-          <ConsensoDiagnosticoAcoes
-              :aprovando="aprovando"
-              :concluindo-avaliacao="concluindoAvaliacao"
-              :habilitar-aprovar-consenso="habilitarAprovarConsenso"
-              :habilitar-concluir-avaliacao="habilitarConcluirAvaliacao"
-              :pode-aprovar-consenso="podeAprovarConsenso"
-              :pode-concluir-avaliacao="podeConcluirAvaliacao"
-              :servidor-eh-usuario-logado="servidorEhUsuarioLogado"
-              @aprovar-consenso="abrirModalAprovarConsenso"
-              @concluir-avaliacao="confirmarConcluirAvaliacao"
-              @voltar="voltar"
-          />
-        </template>
-      </PageHeader>
+            <Alerta
+                v-if="ehConsensoAprovado"
+                :dispensavel="false"
+                data-testid="alert-consenso-aprovado"
+                mensagem="A avaliação de consenso já foi aprovada."
+                variante="success"
+            />
+          </template>
+          <template #actions>
+            <ConsensoDiagnosticoAcoes
+                :aprovando="aprovando"
+                :concluindo-avaliacao="concluindoAvaliacao"
+                :habilitar-aprovar-consenso="habilitarAprovarConsenso"
+                :habilitar-concluir-avaliacao="habilitarConcluirAvaliacao"
+                :pode-aprovar-consenso="podeAprovarConsenso"
+                :pode-concluir-avaliacao="podeConcluirAvaliacao"
+                :servidor-eh-usuario-logado="servidorEhUsuarioLogado"
+                @aprovar-consenso="abrirModalAprovarConsenso"
+                @concluir-avaliacao="confirmarConcluirAvaliacao"
+                @voltar="voltar"
+            />
+          </template>
+        </PageHeader>
 
-      <ConsensoDiagnosticoTabela
-          :competencias="competenciasDetalhadasComDescricao"
-          :eh-consenso-aprovado="ehConsensoAprovado"
-          :habilitar-concluir-avaliacao="habilitarConcluirAvaliacao"
-          :pode-editar="podeEditar"
-          @atualizar-nota="atualizarNotaDetalhada"
-      />
+        <ConsensoDiagnosticoTabela
+            :competencias="competenciasDetalhadasComDescricao"
+            :eh-consenso-aprovado="ehConsensoAprovado"
+            :habilitar-concluir-avaliacao="habilitarConcluirAvaliacao"
+            :pode-editar="podeEditar"
+            @atualizar-nota="atualizarNotaDetalhada"
+        />
       </div>
 
       <DiagnosticoFluxoModais
@@ -98,7 +98,7 @@ const router = useRouter();
 const perfilStore = usePerfilStore();
 const {registrarPendente} = useToast();
 const servidorEhUsuarioLogado = computed(() =>
-  String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? ''),
+    String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? ''),
 );
 
 const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
@@ -123,9 +123,9 @@ const {
 } = useConsensoDiagnostico(props.codSubprocesso, props.servidorTitulo);
 const nomeServidorQuery = computed(() => query.data.value?.servidorNome ?? null);
 const nomeServidorSubtitulo = computed(() =>
-  servidorEhUsuarioLogado.value
-    ? (perfilStore.usuarioNome ?? nomeServidorQuery.value ?? props.servidorNome ?? props.servidorTitulo)
-    : (nomeServidorQuery.value ?? props.servidorNome ?? props.servidorTitulo),
+    servidorEhUsuarioLogado.value
+        ? (perfilStore.usuarioNome ?? nomeServidorQuery.value ?? props.servidorNome ?? props.servidorTitulo)
+        : (nomeServidorQuery.value ?? props.servidorNome ?? props.servidorTitulo),
 );
 const subtituloServidor = computed(() => `${nomeServidorSubtitulo.value} - ${props.servidorTitulo}`);
 
@@ -175,9 +175,9 @@ async function confirmarAprovarConsenso() {
 
 function consensoCompleto(item: ConsensoCompetenciaDetalhada): boolean {
   return item.chefiaImportancia !== null
-    && item.chefiaDominio !== null
-    && item.consensoImportancia !== null
-    && item.consensoDominio !== null;
+      && item.chefiaDominio !== null
+      && item.consensoImportancia !== null
+      && item.consensoDominio !== null;
 }
 
 const modalConcluirAberto = ref(false);

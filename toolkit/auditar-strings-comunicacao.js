@@ -14,12 +14,12 @@ const arquivos = [
     path.join(raiz, 'backend/src/main/java/sgc/alerta/EmailModelosService.java'),
     path.join(raiz, 'backend/src/main/java/sgc/processo/service/ProcessoService.java'),
     path.join(raiz, 'backend/src/main/java/sgc/organizacao/service/ResponsavelUnidadeService.java'),
-    ...(await globby(path.join(raiz, 'backend/src/test/java/sgc/integracao/**/*').replace(/\\/g, '/'), { absolute: true }))
+    ...(await globby(path.join(raiz, 'backend/src/test/java/sgc/integracao/**/*').replace(/\\/g, '/'), {absolute: true}))
         .filter(c => /(CDU\d+IntegrationTest\.java|EmailModelosRenderIntegrationTest\.java)$/.test(c)),
     path.join(raiz, 'backend/src/test/java/sgc/alerta/notificacao/EmailModelosServiceTest.java'),
-    ...(await globby(path.join(raiz, 'e2e/**/*').replace(/\\/g, '/'), { absolute: true }))
+    ...(await globby(path.join(raiz, 'e2e/**/*').replace(/\\/g, '/'), {absolute: true}))
         .filter(c => /cdu-\d+\.spec\.ts$/.test(c)),
-    ...(await globby(path.join(raiz, 'etc/reqs/**/*').replace(/\\/g, '/'), { absolute: true }))
+    ...(await globby(path.join(raiz, 'etc/reqs/**/*').replace(/\\/g, '/'), {absolute: true}))
         .filter(c => /^cdu-\d+\.md$/.test(c))
 ].filter(caminho => !caminho.includes(`${path.sep}etc${path.sep}reqs${path.sep}diagnostico${path.sep}`));
 
@@ -56,7 +56,6 @@ for (const grupo of saida) {
         console.log(`  suspeitas: ${grupo.suspeitas.join('; ')}`);
     }
 }
-
 
 
 function extrairEntradasArquivo(caminho) {
@@ -137,7 +136,7 @@ function pareceComunicacao(valor) {
     return /(SGC:|cadastro.+(analise|ajustes|reabert|homolog|disponibil)|revis(?:[aã]o|[õo]es).+(analise|ajustes|reabert|disponibil)|mapa.+(analise|ajustes|homolog|disponibil|sugest|valida)|lembrete de prazo|finaliza[cç][aã]o do processo|in[ií]cio de processo|atribui[cç][aã]o de perfil|submetid[oa]s? para an[aá]lise|devolvid[oa]s? para ajustes|reabert[oa]s? para ajustes)/i.test(valor);
 }
 
- 
+
 function criarEntrada(arquivo, linha, origem, tipo, valor, chave = null) {
     return {
         arquivo,

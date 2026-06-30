@@ -68,9 +68,9 @@ class CDU41IntegrationTest extends BaseIntegrationTest {
 
         Diagnostico diagnostico = diagnosticoRepo.findBySubprocessoCodigo(subprocesso.getCodigo()).orElseThrow();
         assertThat(entityManager.createQuery(
-                "select count(sp) from ServidorProcesso sp where sp.processo.codigo = :codigoProcesso and sp.unidadeCodigo = :codigoUnidade",
-                Long.class
-        ).setParameter("codigoProcesso", codigoProcesso)
+                        "select count(sp) from ServidorProcesso sp where sp.processo.codigo = :codigoProcesso and sp.unidadeCodigo = :codigoUnidade",
+                        Long.class
+                ).setParameter("codigoProcesso", codigoProcesso)
                 .setParameter("codigoUnidade", subprocesso.getUnidade().getCodigo())
                 .getSingleResult()).isGreaterThan(0);
         assertThat(entityManager.createQuery(

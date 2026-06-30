@@ -2,7 +2,9 @@
 
 ## Papel do módulo
 
-`backend/` concentra a API REST do SGC, a implementação das regras de negócio, a segurança, a persistência e a observabilidade da aplicação. O módulo é um **monólito modular**: os domínios convivem no mesmo deploy, mas mantêm fronteiras explícitas por pacote, DTO e testes arquiteturais.
+`backend/` concentra a API REST do SGC, a implementação das regras de negócio, a segurança, a persistência e a
+observabilidade da aplicação. O módulo é um **monólito modular**: os domínios convivem no mesmo deploy, mas mantêm
+fronteiras explícitas por pacote, DTO e testes arquiteturais.
 
 ## Stack técnica
 
@@ -18,19 +20,19 @@
 
 Código principal em `src/main/java/sgc`:
 
-| Pacote | Responsabilidade |
-|---|---|
-| `processo` | CRUD de processos, painel, inicialização/finalização e ações em bloco |
-| `subprocesso` | workflow por unidade, contexto para tela, histórico, permissões e validações |
-| `mapa` | mapas, atividades, conhecimentos, impactos e manutenção do conteúdo técnico |
-| `organizacao` | unidades, usuários, hierarquia, contexto autenticado e atribuições temporárias |
-| `seguranca` | login, JWT, permission evaluator, sanitização e config de segurança |
-| `alerta` | alertas exibidos no frontend, notificações e worker de e-mail |
-| `relatorio` | relatórios PDF/exportações de andamento e mapas |
-| `configuracaos` | parâmetros/configurações editáveis |
-| `feedback` | recebimento e gestão de feedbacks administrativos |
-| `comum` | config, erros, monitoramento, tipos base e utilidades compartilhadas |
-| `e2e` | suporte exclusivo para automação de testes ponta a ponta |
+| Pacote          | Responsabilidade                                                               |
+|-----------------|--------------------------------------------------------------------------------|
+| `processo`      | CRUD de processos, painel, inicialização/finalização e ações em bloco          |
+| `subprocesso`   | workflow por unidade, contexto para tela, histórico, permissões e validações   |
+| `mapa`          | mapas, atividades, conhecimentos, impactos e manutenção do conteúdo técnico    |
+| `organizacao`   | unidades, usuários, hierarquia, contexto autenticado e atribuições temporárias |
+| `seguranca`     | login, JWT, permission evaluator, sanitização e config de segurança            |
+| `alerta`        | alertas exibidos no frontend, notificações e worker de e-mail                  |
+| `relatorio`     | relatórios PDF/exportações de andamento e mapas                                |
+| `configuracaos` | parâmetros/configurações editáveis                                             |
+| `feedback`      | recebimento e gestão de feedbacks administrativos                              |
+| `comum`         | config, erros, monitoramento, tipos base e utilidades compartilhadas           |
+| `e2e`           | suporte exclusivo para automação de testes ponta a ponta                       |
 
 ## Organização interna dos pacotes
 
@@ -147,12 +149,12 @@ Veja também: [regras de acesso](../etc/reqs/acesso.md).
 
 O `bootRun` carrega `.env.<perfil>` e `.env.<perfil>.local` automaticamente.
 
-| Perfil | Uso | Banco |
-|---|---|---|
-| `local` | desenvolvimento backend | H2 |
-| `e2e` | automação com fixtures e Swagger ligado | H2 + `seed.sql` |
-| `hom` | homologação | Oracle |
-| `prod` | produção | Oracle |
+| Perfil  | Uso                                     | Banco           |
+|---------|-----------------------------------------|-----------------|
+| `local` | desenvolvimento backend                 | H2              |
+| `e2e`   | automação com fixtures e Swagger ligado | H2 + `seed.sql` |
+| `hom`   | homologação                             | Oracle          |
+| `prod`  | produção                                | Oracle          |
 
 Execução a partir da raiz:
 

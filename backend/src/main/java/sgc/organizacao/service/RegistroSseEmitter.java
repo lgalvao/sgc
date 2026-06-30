@@ -17,7 +17,9 @@ import java.util.concurrent.*;
 @Slf4j
 public class RegistroSseEmitter {
 
-    /** Timeout zero indica conexão permanente (sem expiração automática). */
+    /**
+     * Timeout zero indica conexão permanente (sem expiração automática).
+     */
     private static final long SEM_TIMEOUT = 0L;
 
     private final CopyOnWriteArrayList<SseEmitter> emissores = new CopyOnWriteArrayList<>();

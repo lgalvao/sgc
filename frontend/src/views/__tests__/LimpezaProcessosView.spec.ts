@@ -68,7 +68,10 @@ describe('LimpezaProcessosView', () => {
                     },
                     BCard: {template: '<div><slot/></div>'},
                     BFormGroup: {template: '<div><slot/><slot name="label"/></div>', props: ['state']},
-                    BFormInput: {template: '<input data-testid="input-codigo-processo" type="number" @keydown.enter="$emit(\'keydown\', $event)" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />', props: ['state', 'modelValue']},
+                    BFormInput: {
+                        template: '<input data-testid="input-codigo-processo" type="number" @keydown.enter="$emit(\'keydown\', $event)" :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+                        props: ['state', 'modelValue']
+                    },
                     BFormInvalidFeedback: {template: '<div><slot/></div>', props: ['state']}
                 }
             }
@@ -106,7 +109,7 @@ describe('LimpezaProcessosView', () => {
     it('handles exclusion success using template events', async () => {
         vi.mocked(excluirProcessoCompleto).mockResolvedValue({} as any);
         const wrapper = mountComponent();
-        
+
         // Define o valor pelo DOM para cobrir v-model e events
         const input = wrapper.find('[data-testid="input-codigo-processo"]');
         await input.setValue('123'); // trigger update:modelValue
@@ -130,11 +133,11 @@ describe('LimpezaProcessosView', () => {
     it('handles exclusion error', async () => {
         vi.mocked(excluirProcessoCompleto).mockRejectedValue(new Error('Erro feio'));
         const wrapper = mountComponent();
-        
+
         await wrapper.find('[data-testid="input-codigo-processo"]').setValue('123');
         await wrapper.find('[data-testid="btn-excluir-processo-completo"]').trigger('click');
         await flushPromises();
-        
+
         await wrapper.find('.modal-stub button').trigger('click');
         await flushPromises();
 
@@ -158,7 +161,7 @@ describe('LimpezaProcessosView', () => {
         await wrapper.vm.$nextTick();
         // mensagemErroCodigo should be truthy because !codigoConfirmacao is true
         expect(vm.mensagemErroCodigo).toBeTruthy();
-        
+
         // With valid value
         vm.codigoProcesso = '999';
         await wrapper.vm.$nextTick();
@@ -169,7 +172,7 @@ describe('LimpezaProcessosView', () => {
     it('triggers abrirConfirmacao on enter keypress', async () => {
         const wrapper = mountComponent();
         const input = wrapper.find('[data-testid="input-codigo-processo"]');
-        
+
         // Simulate enter press
         await input.trigger('keydown.enter');
         // Validates form

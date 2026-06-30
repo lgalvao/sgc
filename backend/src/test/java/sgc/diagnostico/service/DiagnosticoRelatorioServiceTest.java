@@ -18,10 +18,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DiagnosticoRelatorioServiceTest {
 
-    @Mock DiagnosticoRepo diagnosticoRepo;
-    @Mock AvaliacaoServidorRepo avaliacaoServidorRepo;
-    @Mock SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
-    @Mock UnidadeService unidadeService;
+    @Mock
+    DiagnosticoRepo diagnosticoRepo;
+    @Mock
+    AvaliacaoServidorRepo avaliacaoServidorRepo;
+    @Mock
+    SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
+    @Mock
+    UnidadeService unidadeService;
 
     @InjectMocks
     DiagnosticoRelatorioService service;

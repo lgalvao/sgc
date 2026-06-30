@@ -9,27 +9,27 @@ import {
 } from "@/utils/textoFormatado";
 
 defineOptions({
-    inheritAttrs: false,
+  inheritAttrs: false,
 });
 
 const props = withDefaults(defineProps<{
-    modelValue: string;
-    id?: string;
-    desabilitado?: boolean;
-    rotulo?: string;
-    minimoAltura?: string;
-    maximoCaracteres?: number;
+  modelValue: string;
+  id?: string;
+  desabilitado?: boolean;
+  rotulo?: string;
+  minimoAltura?: string;
+  maximoCaracteres?: number;
 }>(), {
-    id: undefined,
-    desabilitado: false,
-    rotulo: "Editor de texto",
-    minimoAltura: "12rem",
-    maximoCaracteres: LIMITE_PADRAO_TEXTO_FORMATADO,
+  id: undefined,
+  desabilitado: false,
+  rotulo: "Editor de texto",
+  minimoAltura: "12rem",
+  maximoCaracteres: LIMITE_PADRAO_TEXTO_FORMATADO,
 });
 
 const emit = defineEmits<{
-    "update:modelValue": [valor: string];
-    "update:invalido": [valor: boolean];
+  "update:modelValue": [valor: string];
+  "update:invalido": [valor: boolean];
 }>();
 
 const attrs = useAttrs();
@@ -46,166 +46,166 @@ const ultimoConteudoValido = ref(normalizarHtmlEditor(props.modelValue));
 const comprimentoExibido = ref(obterComprimentoHtmlFormatado(props.modelValue));
 
 const editor = new Editor({
-    extensions: [
-        StarterKit.configure({
-            heading: false,
-            blockquote: false,
-            code: false,
-            codeBlock: false,
-            horizontalRule: false,
-        }),
-    ],
-    editorProps: {
-        attributes: {
-            class: "editor-texto-rico__conteudo form-control",
-            ...(props.id ? {id: props.id} : {}),
-            "data-testid": dataTestid,
-            ...(ariaRequired ? {"aria-required": ariaRequired} : {}),
-            role: "textbox",
-            "aria-label": props.rotulo,
-        },
+  extensions: [
+    StarterKit.configure({
+      heading: false,
+      blockquote: false,
+      code: false,
+      codeBlock: false,
+      horizontalRule: false,
+    }),
+  ],
+  editorProps: {
+    attributes: {
+      class: "editor-texto-rico__conteudo form-control",
+      ...(props.id ? {id: props.id} : {}),
+      "data-testid": dataTestid,
+      ...(ariaRequired ? {"aria-required": ariaRequired} : {}),
+      role: "textbox",
+      "aria-label": props.rotulo,
     },
-    content: normalizarHtmlEditor(props.modelValue),
-    editable: !props.desabilitado,
-    onUpdate: ({editor: editorAtual}) => {
-        const htmlNormalizado = editorAtual.isEmpty ? "" : normalizarHtmlEditor(editorAtual.getHTML());
-        const comprimentoAnterior = obterComprimentoHtmlFormatado(props.modelValue);
-        const comprimentoAtual = htmlNormalizado.length;
-        const excedeuLimite = comprimentoAtual > props.maximoCaracteres;
-        const estaReduzindoConteudoExistente = comprimentoAnterior > props.maximoCaracteres
-            && comprimentoAtual < comprimentoAnterior;
+  },
+  content: normalizarHtmlEditor(props.modelValue),
+  editable: !props.desabilitado,
+  onUpdate: ({editor: editorAtual}) => {
+    const htmlNormalizado = editorAtual.isEmpty ? "" : normalizarHtmlEditor(editorAtual.getHTML());
+    const comprimentoAnterior = obterComprimentoHtmlFormatado(props.modelValue);
+    const comprimentoAtual = htmlNormalizado.length;
+    const excedeuLimite = comprimentoAtual > props.maximoCaracteres;
+    const estaReduzindoConteudoExistente = comprimentoAnterior > props.maximoCaracteres
+        && comprimentoAtual < comprimentoAnterior;
 
-        comprimentoExibido.value = comprimentoAtual;
+    comprimentoExibido.value = comprimentoAtual;
 
-        if (excedeuLimite && !estaReduzindoConteudoExistente) {
-            erroComprimento.value = `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`;
-            atualizarEstadoInvalido(true);
-            editorAtual.commands.setContent(ultimoConteudoValido.value, {emitUpdate: false});
-            return;
-        }
+    if (excedeuLimite && !estaReduzindoConteudoExistente) {
+      erroComprimento.value = `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`;
+      atualizarEstadoInvalido(true);
+      editorAtual.commands.setContent(ultimoConteudoValido.value, {emitUpdate: false});
+      return;
+    }
 
-        ultimoConteudoValido.value = htmlNormalizado;
-        erroComprimento.value = excedeuLimite
-            ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
-            : "";
-        atualizarEstadoInvalido(excedeuLimite);
-        emit("update:modelValue", htmlNormalizado);
-    },
+    ultimoConteudoValido.value = htmlNormalizado;
+    erroComprimento.value = excedeuLimite
+        ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
+        : "";
+    atualizarEstadoInvalido(excedeuLimite);
+    emit("update:modelValue", htmlNormalizado);
+  },
 });
 
 watch(() => props.modelValue, (valorAtual) => {
-    const proximoConteudo = normalizarHtmlEditor(valorAtual);
-    const conteudoAtual = normalizarHtmlEditor(editor.getHTML());
-    if (conteudoAtual === proximoConteudo) {
-        return;
-    }
-    ultimoConteudoValido.value = proximoConteudo;
-    comprimentoExibido.value = proximoConteudo.length;
-    erroComprimento.value = proximoConteudo.length > props.maximoCaracteres
-        ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
-        : "";
-    atualizarEstadoInvalido(proximoConteudo.length > props.maximoCaracteres);
-    editor.commands.setContent(proximoConteudo, {emitUpdate: false});
+  const proximoConteudo = normalizarHtmlEditor(valorAtual);
+  const conteudoAtual = normalizarHtmlEditor(editor.getHTML());
+  if (conteudoAtual === proximoConteudo) {
+    return;
+  }
+  ultimoConteudoValido.value = proximoConteudo;
+  comprimentoExibido.value = proximoConteudo.length;
+  erroComprimento.value = proximoConteudo.length > props.maximoCaracteres
+      ? `Máximo de ${props.maximoCaracteres} caracteres, incluindo a formatação.`
+      : "";
+  atualizarEstadoInvalido(proximoConteudo.length > props.maximoCaracteres);
+  editor.commands.setContent(proximoConteudo, {emitUpdate: false});
 }, {immediate: true});
 
 watch(() => props.desabilitado, (desabilitado) => {
-    editor.setEditable(!desabilitado);
+  editor.setEditable(!desabilitado);
 });
 
 onBeforeUnmount(() => {
-    editor.destroy();
+  editor.destroy();
 });
 
 const acoes = computed(() => ([
-    {
-        codigo: "bold",
-        icone: "bi-type-bold",
-        rotulo: "Negrito",
-        ativa: () => editor.isActive("bold"),
-        executar: () => editor.chain().focus().toggleBold().run(),
-    },
-    {
-        codigo: "italic",
-        icone: "bi-type-italic",
-        rotulo: "Itálico",
-        ativa: () => editor.isActive("italic"),
-        executar: () => editor.chain().focus().toggleItalic().run(),
-    },
-    {
-        codigo: "bulletList",
-        icone: "bi-list-ul",
-        rotulo: "Lista",
-        ativa: () => editor.isActive("bulletList"),
-        executar: () => editor.chain().focus().toggleBulletList().run(),
-    },
-    {
-        codigo: "orderedList",
-        icone: "bi-list-ol",
-        rotulo: "Lista numerada",
-        ativa: () => editor.isActive("orderedList"),
-        executar: () => editor.chain().focus().toggleOrderedList().run(),
-    },
+  {
+    codigo: "bold",
+    icone: "bi-type-bold",
+    rotulo: "Negrito",
+    ativa: () => editor.isActive("bold"),
+    executar: () => editor.chain().focus().toggleBold().run(),
+  },
+  {
+    codigo: "italic",
+    icone: "bi-type-italic",
+    rotulo: "Itálico",
+    ativa: () => editor.isActive("italic"),
+    executar: () => editor.chain().focus().toggleItalic().run(),
+  },
+  {
+    codigo: "bulletList",
+    icone: "bi-list-ul",
+    rotulo: "Lista",
+    ativa: () => editor.isActive("bulletList"),
+    executar: () => editor.chain().focus().toggleBulletList().run(),
+  },
+  {
+    codigo: "orderedList",
+    icone: "bi-list-ol",
+    rotulo: "Lista numerada",
+    ativa: () => editor.isActive("orderedList"),
+    executar: () => editor.chain().focus().toggleOrderedList().run(),
+  },
 ]));
 
 const classesEditor = computed(() => ({
-    "is-invalid": Boolean(erroComprimento.value),
+  "is-invalid": Boolean(erroComprimento.value),
 }));
 
 const contadorCaracteres = computed(() => comprimentoExibido.value);
 
 function executarAcao(executar: () => boolean) {
-    if (!props.desabilitado) {
-        executar();
-    }
+  if (!props.desabilitado) {
+    executar();
+  }
 }
 
 function atualizarEstadoInvalido(estaInvalido: boolean) {
-    emit("update:invalido", estaInvalido);
+  emit("update:invalido", estaInvalido);
 }
 
 function sincronizarPorDom(event: Event) {
-    const alvo = event.target;
-    if (!(alvo instanceof HTMLDivElement)) {
-        return;
-    }
+  const alvo = event.target;
+  if (!(alvo instanceof HTMLDivElement)) {
+    return;
+  }
 
-    const html = normalizarHtmlEditor(alvo.innerHTML);
-    if (html === normalizarHtmlEditor(props.modelValue)) {
-        return;
-    }
+  const html = normalizarHtmlEditor(alvo.innerHTML);
+  if (html === normalizarHtmlEditor(props.modelValue)) {
+    return;
+  }
 
-    emit("update:modelValue", html);
+  emit("update:modelValue", html);
 }
 </script>
 
 <template>
-    <div :class="['editor-texto-rico', classeRaiz]" :style="estiloRaiz">
-        <div class="editor-texto-rico__barra" role="toolbar">
-            <button
-                v-for="acao in acoes"
-                :key="acao.codigo"
-                :aria-label="acao.rotulo"
-                :class="['btn btn-sm', acao.ativa() ? 'btn-secondary' : 'btn-outline-secondary']"
-                :disabled="desabilitado"
-                :title="acao.rotulo"
-                type="button"
-                @click="executarAcao(acao.executar)"
-            >
-                <i :class="['bi', acao.icone]" aria-hidden="true"/>
-            </button>
-        </div>
+  <div :class="['editor-texto-rico', classeRaiz]" :style="estiloRaiz">
+    <div class="editor-texto-rico__barra" role="toolbar">
+      <button
+          v-for="acao in acoes"
+          :key="acao.codigo"
+          :aria-label="acao.rotulo"
+          :class="['btn btn-sm', acao.ativa() ? 'btn-secondary' : 'btn-outline-secondary']"
+          :disabled="desabilitado"
+          :title="acao.rotulo"
+          type="button"
+          @click="executarAcao(acao.executar)"
+      >
+        <i :class="['bi', acao.icone]" aria-hidden="true"/>
+      </button>
+    </div>
 
-        <EditorContent
-            :editor="editor"
-            :aria-invalid="erroComprimento ? 'true' : 'false'"
-            :class="['editor-texto-rico__editor', classesEditor]"
-            :style="{ '--editor-minimo-altura': minimoAltura }"
-            @input.capture="sincronizarPorDom"
-        />
-        <div
-            class="editor-texto-rico__rodape"
-            :class="{'editor-texto-rico__rodape--erro': erroComprimento}"
-        >
+    <EditorContent
+        :editor="editor"
+        :aria-invalid="erroComprimento ? 'true' : 'false'"
+        :class="['editor-texto-rico__editor', classesEditor]"
+        :style="{ '--editor-minimo-altura': minimoAltura }"
+        @input.capture="sincronizarPorDom"
+    />
+    <div
+        class="editor-texto-rico__rodape"
+        :class="{'editor-texto-rico__rodape--erro': erroComprimento}"
+    >
             <span
                 v-if="erroComprimento"
                 class="invalid-feedback d-block m-0"
@@ -213,66 +213,66 @@ function sincronizarPorDom(event: Event) {
             >
                 {{ erroComprimento }}
             </span>
-            <span class="editor-texto-rico__contador" data-testid="editor-texto-rico-contador">
+      <span class="editor-texto-rico__contador" data-testid="editor-texto-rico-contador">
                 {{ contadorCaracteres }}/{{ maximoCaracteres }}
             </span>
-        </div>
     </div>
+  </div>
 </template>
 
 <style scoped>
 .editor-texto-rico {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    border: 1px solid var(--bs-border-color-translucent);
-    border-radius: 0.75rem;
-    background: var(--bs-body-bg);
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--bs-border-color-translucent);
+  border-radius: 0.75rem;
+  background: var(--bs-body-bg);
+  overflow: hidden;
 }
 
 .editor-texto-rico__barra {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    padding: 0.6rem 0.75rem;
-    border-bottom: 1px solid var(--bs-border-color-translucent);
-    background: var(--bs-tertiary-bg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+  background: var(--bs-tertiary-bg);
 }
 
 .editor-texto-rico__barra .btn {
-    width: 2rem;
-    height: 2rem;
-    padding: 0;
-    border-radius: 0.55rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 0.55rem;
 }
 
 .editor-texto-rico :deep(.editor-texto-rico__conteudo) {
-    flex: 1 1 auto;
-    min-height: var(--editor-minimo-altura);
-    border: 0;
-    border-radius: 0;
-    padding: 1rem;
-    line-height: 1.6;
-    overflow-y: auto;
-    background: var(--bs-body-bg);
-    overflow-wrap: anywhere;
-    word-break: normal;
+  flex: 1 1 auto;
+  min-height: var(--editor-minimo-altura);
+  border: 0;
+  border-radius: 0;
+  padding: 1rem;
+  line-height: 1.6;
+  overflow-y: auto;
+  background: var(--bs-body-bg);
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .editor-texto-rico :deep(.editor-texto-rico__conteudo:focus) {
-    box-shadow: none;
-    outline: none;
+  box-shadow: none;
+  outline: none;
 }
 
 .editor-texto-rico :deep(.editor-texto-rico__conteudo p) {
-    margin-bottom: 0.65rem;
+  margin-bottom: 0.65rem;
 }
 
 .editor-texto-rico :deep(.editor-texto-rico__conteudo ul),
 .editor-texto-rico :deep(.editor-texto-rico__conteudo ol) {
-    margin-bottom: 0.75rem;
-    padding-left: 1.3rem;
+  margin-bottom: 0.75rem;
+  padding-left: 1.3rem;
 }
 
 .editor-texto-rico :deep(.editor-texto-rico__conteudo p:last-child),

@@ -34,9 +34,11 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 
 ### Situações de subprocessos de Revisão
 
-- **Não iniciado**: Unidade foi notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de atividades.
+- **Não iniciado**: Unidade foi notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de
+  atividades.
 - **Revisão do cadastro em andamento**: Foi iniciada a revisão do cadastro de atividades da unidade.
-- **Revisão do cadastro disponibilizada**: Foi concluída a revisão do cadastro de atividades da unidade, aguardando validação.
+- **Revisão do cadastro disponibilizada**: Foi concluída a revisão do cadastro de atividades da unidade, aguardando
+  validação.
 - **Revisão do cadastro homologada**: Foi concluída a validação da revisão do cadastro de atividades da unidade.
 - **Mapa ajustado**: Perfil ADMIN criou o mapa ajustado para a unidade, mas ainda não o disponibilizou.
 - **Mapa disponibilizado**: Perfil ADMIN disponibilizou o mapa ajustado para validação.
@@ -46,20 +48,21 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 
 ### Situações de subprocessos de Diagnóstico
 
-- **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhuma autoavaliação foi
-  concluída e nenhuma informação de capacitação foi registrada.
-- **Em andamento**: Há autoavaliações, consensos, ocupações críticas ou ajustes do diagnóstico em elaboração na
-  unidade.
+- **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhuma autoavaliação foi concluída e
+  nenhuma informação de capacitação foi registrada.
+- **Em andamento**: Há autoavaliações, consensos, ocupações críticas ou ajustes do diagnóstico em elaboração na unidade.
 - **Concluído**: A unidade concluiu o diagnóstico e o encaminhou para análise da unidade superior.
 - **Homologado**: O diagnóstico da unidade foi aceito em toda a cadeia hierárquica e homologado pela unidade ADMIN.
 
 ### Situações de avaliações individuais de diagnóstico
 
 - **Autoavaliação não iniciada**: Servidor ainda não concluiu sua autoavaliação.
-- **Autoavaliação concluída**: Servidor concluiu a autoavaliação e chefe/responsável já pode iniciar a avaliação de consenso para aquele servidor.
+- **Autoavaliação concluída**: Servidor concluiu a autoavaliação e chefe/responsável já pode iniciar a avaliação de
+  consenso para aquele servidor.
 - **Avaliação de consenso criada**: Chefe/responsável iniciou uma avaliação de consenso para o servidor.
 - **Avaliação de consenso aprovada**: O servidor aprovou a avaliação de consenso.
-- **Avaliação impossibilitada**: Chefe/responsável registrou impossibilidade de realização da avaliação daquele servidor no processo atual.
+- **Avaliação impossibilitada**: Chefe/responsável registrou impossibilidade de realização da avaliação daquele servidor
+  no processo atual.
 
 ```mermaid
 ---

@@ -64,7 +64,7 @@ async function buscarComRegistro<T extends ContextoSubprocesso>(
 async function garantirContextoPorCodigo<T extends ContextoSubprocesso>(
     estado: EstadoOrquestrador,
     codigoSubprocesso: number,
-    opcoes: {limparAntes: boolean; config: ConfiguracaoContexto<T>},
+    opcoes: { limparAntes: boolean; config: ConfiguracaoContexto<T> },
 ): Promise<T | null> {
     const {limparAntes, config} = opcoes;
     limparSeNecessario(limparAntes, estado.limparContextoAtual);
@@ -102,7 +102,7 @@ async function garantirContextoPorProcessoEUnidade<T extends ContextoSubprocesso
         limparAntes: boolean;
         config: ConfiguracaoContexto<T>;
     },
-): Promise<{codigo: number; contexto: T} | null> {
+): Promise<{ codigo: number; contexto: T } | null> {
     const {codProcesso, siglaUnidade, limparAntes, config} = opcoes;
     limparSeNecessario(limparAntes, estado.limparContextoAtual);
 
@@ -150,7 +150,10 @@ export function usarOrquestradorContexto(
     return {
         garantirContextoPorCodigo: <T extends ContextoSubprocesso>(codigoSubprocesso: number, limparAntes: boolean, config: ConfiguracaoContexto<T>) =>
             garantirContextoPorCodigo(estado, codigoSubprocesso, {limparAntes, config}),
-        garantirContextoPorProcessoEUnidade: <T extends ContextoSubprocesso>(codProcesso: number, siglaUnidade: string, opcoes: {limparAntes: boolean; config: ConfiguracaoContexto<T>}) =>
+        garantirContextoPorProcessoEUnidade: <T extends ContextoSubprocesso>(codProcesso: number, siglaUnidade: string, opcoes: {
+            limparAntes: boolean;
+            config: ConfiguracaoContexto<T>
+        }) =>
             garantirContextoPorProcessoEUnidade(estado, {codProcesso, siglaUnidade, ...opcoes}),
     };
 }

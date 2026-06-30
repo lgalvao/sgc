@@ -29,7 +29,7 @@ public class WithMockServidorSecurityContextFactory
         });
 
         principal.setPerfilAtivo(Perfil.SERVIDOR);
-        
+
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(Perfil.SERVIDOR.toGrantedAuthority());
         principal.setAuthorities(authorities);

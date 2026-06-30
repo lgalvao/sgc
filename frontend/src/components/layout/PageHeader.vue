@@ -1,6 +1,7 @@
 <template>
   <div class="page-header mb-3">
-    <div class="page-header__principal d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+    <div
+        class="page-header__principal d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
       <div class="page-header__heading">
         <h2 :data-testid="titleTestId" class="page-header__title mb-0">{{ title }}</h2>
         <p v-if="subtitle || $slots.default" class="page-header__subtitle text-muted mb-0 mt-1">

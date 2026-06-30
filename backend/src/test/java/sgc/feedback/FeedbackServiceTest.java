@@ -114,7 +114,7 @@ class FeedbackServiceTest {
         ArgumentCaptor<FeedbackRegistro> captor = ArgumentCaptor.forClass(FeedbackRegistro.class);
         verify(repo).save(captor.capture());
         String nomeArquivo = captor.getValue().getCaminhoScreenshot();
-        
+
         assertThat(nomeArquivo).isNotNull().endsWith(".webp");
         Path caminhoCompleto = Path.of(propriedades.screenshotDir()).resolve(nomeArquivo);
         assertThat(caminhoCompleto).exists();

@@ -50,7 +50,7 @@ public class AvaliacaoServidor extends EntidadeBase {
     @Column(name = "consenso_dominio")
     private Integer consensoDominio;
 
-    @Column(name ="importancia")
+    @Column(name = "importancia")
     private Integer importancia;
 
     @Column(name = "dominio")

@@ -964,7 +964,7 @@ public class RelatorioService {
         return ehTextoSecretaria(nome);
     }
 
-    private static final java.util.regex.Pattern PADRAO_SIGLA_ZE = 
+    private static final java.util.regex.Pattern PADRAO_SIGLA_ZE =
             java.util.regex.Pattern.compile("(?i)^Z\\.?\\s*E\\.?$");
 
     private boolean ehTextoZonaEleitoral(@Nullable String valor) {

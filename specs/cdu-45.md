@@ -63,8 +63,8 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
 
    8.1. Se houver campos não preenchidos o sistema mostra a mensagem "Preencha todos os campos" e interrompe a operação.
 
-   8.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão de avaliação de consenso?",
-   com botões `Cancelar` e `Concluir consenso`
+   8.2. Caso tudo esteja preenchido, o sistema mostra uma tela de confirmação: "Confirma a conclusão de avaliação de
+   consenso?", com botões `Cancelar` e `Concluir consenso`
 
    8.3. feita a confirmação,o sistema muda a situação do servidor para 'Avaliação de consenso criada',
 
@@ -88,5 +88,5 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
     - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 
-11. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de consenso
-   criada".
+11. O sistema redireciona para a tela `Detalhes do subprocesso` e mostra um *toast* com a mensagem "Avaliação de
+    consenso criada".

@@ -183,14 +183,16 @@ public class AlertaAplicacaoService {
         List<Alerta> alertasCriados = new ArrayList<>();
         for (Long cod : codsOperacionais) {
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && "ADMIN".equalsIgnoreCase(unidadeDestino.getSigla())) continue;
+            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && "ADMIN".equalsIgnoreCase(unidadeDestino.getSigla()))
+                continue;
             alertasCriados.add(criarAlertaEntidade(processo, unidadeRaiz(),
                     unidadeDestino, "Início do processo"));
         }
 
         for (Long cod : codsIntermediarias) {
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && "ADMIN".equalsIgnoreCase(unidadeDestino.getSigla())) continue;
+            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && "ADMIN".equalsIgnoreCase(unidadeDestino.getSigla()))
+                continue;
             alertasCriados.add(criarAlertaEntidade(processo, unidadeRaiz(),
                     unidadeDestino, "Início do processo em unidade(s) subordinada(s)"));
         }

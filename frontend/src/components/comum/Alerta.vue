@@ -11,7 +11,7 @@
       @dismissed="emit('dismissed')"
   >
     <template v-if="slots.default">
-      <slot />
+      <slot/>
     </template>
 
     <!-- Modo simples -->

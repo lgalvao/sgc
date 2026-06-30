@@ -61,7 +61,7 @@ function normalizarErroSemResposta(erro: AxiosError): ErroNormalizado {
 function normalizarErroComResposta(erro: AxiosError): ErroNormalizado {
     const response = erro.response;
     if (!response) return normalizarErroSemResposta(erro);
-    
+
     const {status, data} = response;
     const payload = comoPayload(data && typeof data === 'object' ? data : null);
 

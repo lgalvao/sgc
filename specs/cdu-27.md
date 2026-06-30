@@ -18,11 +18,11 @@
 
 3. O usuário aciona `Alterar data limite`.
 
-4. O sistema abre um modal com título "Alterar data limite", campo de data preenchido com a data limite da
-   etapa atual, e botões `Cancelar` e `Alterar`.
+4. O sistema abre um modal com título "Alterar data limite", campo de data preenchido com a data limite da etapa atual,
+   e botões `Cancelar` e `Alterar`.
 
-5. O usuário fornece a nova data limite e aciona `Alterar`. 
-   - A data limite deve ser estritamente no futuro.
+5. O usuário fornece a nova data limite e aciona `Alterar`.
+    - A data limite deve ser estritamente no futuro.
 
 6. O sistema atualiza a data limite do subprocesso e envia notificação por e-mail para a unidade do subprocesso:
 

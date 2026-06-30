@@ -29,16 +29,22 @@ quase paralela para:
 
 Estes pontos parecem ser domínio real, não duplicação acidental:
 
-- [DiagnosticoAvaliacaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoAvaliacaoService.java): regras de autoavaliação, consenso, impossibilitação e situação de capacitação.
-- [DiagnosticoValidacaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoValidacaoService.java): validações específicas de preenchimento e conclusão do diagnóstico.
-- [DiagnosticoConsultaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoConsultaService.java): montagem de DTOs específicos das telas de diagnóstico.
-- [Diagnostico.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/model/Diagnostico.java) e agregados relacionados: estado próprio do domínio.
+- [DiagnosticoAvaliacaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoAvaliacaoService.java):
+  regras de autoavaliação, consenso, impossibilitação e situação de capacitação.
+- [DiagnosticoValidacaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoValidacaoService.java):
+  validações específicas de preenchimento e conclusão do diagnóstico.
+- [DiagnosticoConsultaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoConsultaService.java):
+  montagem de DTOs específicos das telas de diagnóstico.
+- [Diagnostico.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/model/Diagnostico.java) e agregados
+  relacionados: estado próprio do domínio.
 
 ## Onde há duplicação estrutural
 
 ### 1. Workflow de análise paralelo
 
-[DiagnosticoFluxoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoFluxoService.java) reimplementa o mesmo formato geral já presente em [CadastroFluxoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/service/CadastroFluxoService.java):
+[DiagnosticoFluxoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoFluxoService.java)
+reimplementa o mesmo formato geral já presente
+em [CadastroFluxoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/service/CadastroFluxoService.java):
 
 - validar situação atual
 - descobrir unidade de análise
@@ -53,13 +59,17 @@ Sinais concretos:
 - `devolverDiagnostico(...)` repete o mesmo esqueleto de `executarDevolucao(...)`.
 - `validarDiagnostico(...)` repete o papel de `executarAceite(...)`.
 - `homologarDiagnostico(...)` repete a estrutura de `executarHomologacao(...)`.
-- `aceitarDiagnosticosEmBloco(...)` e `homologarDiagnosticosEmBloco(...)` repetem o mesmo padrão das ações em bloco do cadastro/validação.
+- `aceitarDiagnosticosEmBloco(...)` e `homologarDiagnosticosEmBloco(...)` repetem o mesmo padrão das ações em bloco do
+  cadastro/validação.
 
-O diagnóstico usa [SubprocessoTransicaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java), mas continua precisando saber demais sobre a coreografia.
+O diagnóstico
+usa [SubprocessoTransicaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/subprocesso/service/SubprocessoTransicaoService.java),
+mas continua precisando saber demais sobre a coreografia.
 
 ### 2. Descoberta de contexto repetida
 
-[DiagnosticoFluxoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoFluxoService.java) repete utilitários que já existem em outros fluxos:
+[DiagnosticoFluxoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoFluxoService.java)
+repete utilitários que já existem em outros fluxos:
 
 - `buscarSuperiorImediato(...)`
 - `obterUnidadeDevolucao(...)`
@@ -73,7 +83,8 @@ Isso espalha a regra operacional de hierarquia/localização entre múltiplos se
 
 ### 3. ProcessoService conhece ramos demais
 
-[ProcessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/service/ProcessoService.java) ainda separa explicitamente:
+[ProcessoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/processo/service/ProcessoService.java) ainda separa
+explicitamente:
 
 - cadastro
 - validação de mapa
@@ -89,7 +100,9 @@ Isso obriga o serviço de processo a conhecer detalhes de três trilhas operacio
 
 ### 4. Notificação própria para diagnóstico
 
-[DiagnosticoNotificacaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoNotificacaoService.java) é justificável em parte, porque há eventos exclusivos do diagnóstico. Mas ele também assume responsabilidades genéricas que já existem em notificações de subprocesso:
+[DiagnosticoNotificacaoService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoNotificacaoService.java)
+é justificável em parte, porque há eventos exclusivos do diagnóstico. Mas ele também assume responsabilidades genéricas
+que já existem em notificações de subprocesso:
 
 - resolução de destinatário
 - construção de idempotência
@@ -97,11 +110,13 @@ Isso obriga o serviço de processo a conhecer detalhes de três trilhas operacio
 - envio individual e em bloco
 
 Hoje ele está menos problemático do que antes, porque os assuntos já foram centralizados em
-[AssuntosNotificacao.java](/Users/leonardo/sgc/backend/src/main/java/sgc/alerta/AssuntosNotificacao.java), mas continua sendo uma segunda trilha operacional.
+[AssuntosNotificacao.java](/Users/leonardo/sgc/backend/src/main/java/sgc/alerta/AssuntosNotificacao.java), mas continua
+sendo uma segunda trilha operacional.
 
 ### 5. Leitura específica demais de contexto
 
-[DiagnosticoConsultaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoConsultaService.java) concentra DTOs legítimos do domínio, mas também reimplementa pedaços de leitura transversal:
+[DiagnosticoConsultaService.java](/Users/leonardo/sgc/backend/src/main/java/sgc/diagnostico/service/DiagnosticoConsultaService.java)
+concentra DTOs legítimos do domínio, mas também reimplementa pedaços de leitura transversal:
 
 - resolução de unidade snapshot
 - resolução do mapa vigente da unidade
@@ -112,13 +127,13 @@ Parte disso poderia vir de uma borda mais compartilhada de leitura de subprocess
 
 ## Mapa de duplicações
 
-| Tema | Trilha “geral” | Trilha “diagnóstico” | Observação |
-|---|---|---|---|
-| Aceite/devolução/homologação | `CadastroFluxoService`, `SubprocessoTransicaoService` | `DiagnosticoFluxoService` | Mesmo esqueleto de workflow |
-| Descoberta de superior/devolução | `CadastroFluxoService`, `SubprocessoTransicaoService` | `DiagnosticoFluxoService` | Regra operacional espalhada |
-| Notificação de transição | `SubprocessoNotificacaoService` | `DiagnosticoNotificacaoService` | Infra paralela, ainda que com eventos próprios |
-| Ações em bloco | `ProcessoService` + fluxos de cadastro/validação | `DiagnosticoFluxoService` | Orquestração condicional duplicada |
-| Leitura agregada para UI | `SubprocessoVisualizacaoService` e leitura de subprocesso | `DiagnosticoConsultaService` | Parte é domínio; parte é borda compartilhável |
+| Tema                             | Trilha “geral”                                            | Trilha “diagnóstico”            | Observação                                     |
+|----------------------------------|-----------------------------------------------------------|---------------------------------|------------------------------------------------|
+| Aceite/devolução/homologação     | `CadastroFluxoService`, `SubprocessoTransicaoService`     | `DiagnosticoFluxoService`       | Mesmo esqueleto de workflow                    |
+| Descoberta de superior/devolução | `CadastroFluxoService`, `SubprocessoTransicaoService`     | `DiagnosticoFluxoService`       | Regra operacional espalhada                    |
+| Notificação de transição         | `SubprocessoNotificacaoService`                           | `DiagnosticoNotificacaoService` | Infra paralela, ainda que com eventos próprios |
+| Ações em bloco                   | `ProcessoService` + fluxos de cadastro/validação          | `DiagnosticoFluxoService`       | Orquestração condicional duplicada             |
+| Leitura agregada para UI         | `SubprocessoVisualizacaoService` e leitura de subprocesso | `DiagnosticoConsultaService`    | Parte é domínio; parte é borda compartilhável  |
 
 ## O que não deve ser feito
 

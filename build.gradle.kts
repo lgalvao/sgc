@@ -24,11 +24,11 @@ tasks.named<DependencyUpdatesTask>("dependencyUpdates").configure {
         val regex = "^[0-9,.v-]+(-r)?$".toRegex()
         val isStable = stableKeyword || regex.matches(candidate.version)
         val candidateIsNonStable = !isStable
-        
+
         val currentStableKeyword = listOf("RELEASE", "FINAL", "GA").any { currentVersion.uppercase().contains(it) }
         val currentIsStable = currentStableKeyword || regex.matches(currentVersion)
         val currentIsNonStable = !currentIsStable
-        
+
         candidateIsNonStable && !currentIsNonStable
     }
 }

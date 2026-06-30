@@ -57,8 +57,8 @@ function aplicarEscopoPerfil(unidades: Unidade[], perfilSelecionado: Perfil | nu
 export function useRelatorioUnidadesComMapaQuery() {
     const perfilStore = usePerfilStore();
     const chave = computed(() => [
-        "relatorios", 
-        "unidades-com-mapa", 
+        "relatorios",
+        "unidades-com-mapa",
         perfilStore.usuarioCodigo ?? "anon",
         String(perfilStore.perfilSelecionado ?? "sem-perfil"),
         String(perfilStore.unidadeSelecionada ?? "sem-unidade")

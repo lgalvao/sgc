@@ -148,10 +148,10 @@ test.describe.serial('CDU-21 - Processo com mapas não homologados', () => {
     });
 
     test('Cenario 5: ADMIN recebe alerta quando mapas não estão todos homologados', async ({
-                                                                                                         _resetAutomatico,
-                                                                                                         page,
-                                                                                                         _autenticadoComoAdmin
-                                                                                                     }) => {
+                                                                                               _resetAutomatico,
+                                                                                               page,
+                                                                                               _autenticadoComoAdmin
+                                                                                           }) => {
         // CDU-21 Passos 4-5: sistema verifica situação dos subprocessos e bloqueia finalização
         await acessarDetalhesProcesso(page, descProcessoErro);
         await expect(page.getByTestId('processo-info')).toBeVisible();

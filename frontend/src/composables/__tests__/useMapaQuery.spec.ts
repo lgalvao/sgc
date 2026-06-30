@@ -20,7 +20,8 @@ function withSetup<T>(composable: () => T) {
     const app = createApp({
         setup() {
             result = composable();
-            return () => {};
+            return () => {
+            };
         },
     });
     const pinia = createPinia();
@@ -88,7 +89,7 @@ describe("useMapaQuery", () => {
             // @ts-ignore - acessando propriedade privada para verificação de chave se possível,
             // ou verificando o comportamento do cache.
             // No Pinia Colada, a chave é usada internamente.
-            
+
             appNum.unmount();
             appNull.unmount();
         });
@@ -142,7 +143,7 @@ describe("useMapaQuery", () => {
             const mockMapa = {codigo: 1};
             cache.sincronizarMapa(1, mockMapa as any);
             cache.sincronizarImpacto(1, {temImpactos: true} as any);
-            
+
             cache.invalidarMapa(1);
             // Agora limpamos o mapa também (após ajuste no código de produção)
             expect(cache.obterMapa(1)).toBeNull();
@@ -153,7 +154,7 @@ describe("useMapaQuery", () => {
         it("deve invalidar todos os mapas (prefixo)", () => {
             const [cache, app] = withSetup(() => useCacheMapa());
             cache.sincronizarMapa(1, {codigo: 1} as any);
-            
+
             cache.invalidarMapa();
             // Invalidação por prefixo não limpa getQueryData imediatamente no Colada 
             // sem o exato match, mas podemos verificar que o processo não falha.
@@ -186,10 +187,10 @@ describe("useMapaQuery", () => {
             vi.mocked(usePerfilStore).mockReturnValue(session as any);
 
             const [cache, app] = withSetup(() => useCacheMapa());
-            
+
             cache.sincronizarMapa(1, {codigo: 1} as any);
             expect(cache.obterMapa(1)).not.toBeNull();
-            
+
             // Simula mudança de sessão alterando os valores que o mock retorna
             session.usuarioCodigo = "outro";
             // Agora o obterMapa(1) deve gerar uma chave diferente e não achar o dado

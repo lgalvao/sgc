@@ -6,11 +6,11 @@
       <PageHeader :title="TEXTOS.comum.MENU_NOTIFICACOES">
         <template #actions>
           <div class="d-flex flex-wrap justify-content-end gap-2">
-              <a
-                  v-if="mostrarLinkLeitorEmailTestes"
-                  :href="urlLeitorEmailTestes"
-                  class="btn btn-outline-secondary"
-                  data-testid="link-leitor-email-testes"
+            <a
+                v-if="mostrarLinkLeitorEmailTestes"
+                :href="urlLeitorEmailTestes"
+                class="btn btn-outline-secondary"
+                data-testid="link-leitor-email-testes"
                 rel="noopener noreferrer"
                 target="_blank"
             >

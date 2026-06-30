@@ -18,10 +18,10 @@ test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
     });
 
     test('Cenários CDU-53: ADMIN finaliza processo de diagnóstico', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                               _resetAutomatico,
+                                                                               page,
+                                                                               _autenticadoComoAdmin
+                                                                           }) => {
         await acessarDetalhesProcesso(page, DESCRICAO_PROCESSO);
         await expect(page.getByTestId('btn-processo-finalizar')).toBeVisible();
         await expect(page.getByTestId('btn-processo-finalizar')).toBeEnabled();
@@ -52,11 +52,11 @@ test.describe.serial('CDU-53 - Finalizar processo de diagnóstico', () => {
 
 test.describe('CDU-53 - Processo de diagnóstico ainda não homologado', () => {
     test('ADMIN não consegue finalizar processo apenas concluído', async ({
-        _resetAutomatico,
-        request,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                              _resetAutomatico,
+                                                                              request,
+                                                                              page,
+                                                                              _autenticadoComoAdmin
+                                                                          }) => {
         const descricaoProcesso = `Diagnóstico CDU-52 pendente ${Date.now()}`;
         await criarProcessoDiagnosticoConcluidoFixture(request, {
             descricao: descricaoProcesso,

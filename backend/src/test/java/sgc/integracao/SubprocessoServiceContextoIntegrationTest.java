@@ -283,12 +283,12 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(permissoes.podeHomologarCadastro()).isTrue();
         assertThat(permissoes.podeEditarMapa()).isTrue();
         assertThat(permissoes.podeHomologarMapa()).isTrue();
-        
+
         // Porém, as ações devem estar desabilitadas por estar FINALIZADO
         assertThat(permissoes.habilitarHomologarCadastro()).isFalse();
         assertThat(permissoes.habilitarEditarMapa()).isFalse();
         assertThat(permissoes.habilitarHomologarMapa()).isFalse();
-        
+
         assertThat(permissoes.podeReabrirCadastro()).isTrue();
         assertThat(permissoes.habilitarReabrirCadastro()).isFalse();
     }

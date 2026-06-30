@@ -51,7 +51,11 @@ describe('mapaDisponibilizacao.ts', () => {
         it('deve mostrar erro se não puder confirmar', () => {
             const deps = criarDependencias()
             deps.competencias.value = []
-            const {abrirModalDisponibilizar, erroValidacaoMapa, erroValidacaoMapaTick} = useMapaDisponibilizacao(deps as any)
+            const {
+                abrirModalDisponibilizar,
+                erroValidacaoMapa,
+                erroValidacaoMapaTick
+            } = useMapaDisponibilizacao(deps as any)
             abrirModalDisponibilizar()
             expect(erroValidacaoMapa.value).toBe(TEXTOS.mapa.ERRO_MAPA_SEM_COMPETENCIAS)
             expect(erroValidacaoMapaTick.value).toBe(1)
@@ -95,10 +99,10 @@ describe('mapaDisponibilizacao.ts', () => {
     it('não deve iniciar nova disponibilização se loading for true', async () => {
         const deps = criarDependencias()
         const {disponibilizarMapa, loadingDisponibilizacao} = useMapaDisponibilizacao(deps as any)
-        
+
         loadingDisponibilizacao.value = true;
         await disponibilizarMapa({dataLimite: '2026-12-31', observacoes: 'teste'})
-        
+
         expect(deps.disponibilizarMapaFluxo).not.toHaveBeenCalled()
     })
 

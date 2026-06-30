@@ -17,10 +17,10 @@ test.describe.serial('CDU-52 - homologar diagnósticos em bloco', () => {
     });
 
     test('Cenários CDU-52: ADMIN homologa diagnósticos em bloco', async ({
-        _resetAutomatico,
-        page,
-        _autenticadoComoAdmin
-    }) => {
+                                                                             _resetAutomatico,
+                                                                             page,
+                                                                             _autenticadoComoAdmin
+                                                                         }) => {
         await acessarDetalhesProcesso(page, DESCRICAO_PROCESSO);
         await expect(page.getByTestId('processo-info')).toBeVisible();
 

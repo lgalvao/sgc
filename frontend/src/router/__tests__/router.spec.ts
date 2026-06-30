@@ -98,7 +98,10 @@ describe('Router', () => {
         const subprocesso = processoRoutes.find((rota) => rota.name === 'Subprocesso');
         expect(subprocesso).toBeDefined();
         const propsSubprocesso = subprocesso?.props as (rota: RotaComProps) => unknown;
-        expect(propsSubprocesso({params: {codProcesso: '10', siglaUnidade: 'TIC'}, query: {codSubprocesso: '55'}})).toEqual({
+        expect(propsSubprocesso({
+            params: {codProcesso: '10', siglaUnidade: 'TIC'},
+            query: {codSubprocesso: '55'}
+        })).toEqual({
             codProcesso: 10,
             siglaUnidade: 'TIC',
             codSubprocesso: 55,
@@ -116,7 +119,10 @@ describe('Router', () => {
         const cadastro = processoRoutes.find((rota) => rota.name === 'SubprocessoCadastro');
         expect(cadastro).toBeDefined();
         const propsCadastro = cadastro?.props as (rota: RotaComProps) => unknown;
-        expect(propsCadastro({params: {codProcesso: '13', siglaUnidade: 'XYZ'}, query: {codSubprocesso: '77'}})).toEqual({
+        expect(propsCadastro({
+            params: {codProcesso: '13', siglaUnidade: 'XYZ'},
+            query: {codSubprocesso: '77'}
+        })).toEqual({
             codProcesso: 13,
             sigla: 'XYZ',
             codSubprocesso: 77,
@@ -125,7 +131,10 @@ describe('Router', () => {
         const mapaUnidade = unidadeRoutes.find((rota) => rota.name === 'Mapa');
         expect(mapaUnidade).toBeDefined();
         const propsMapaUnidade = mapaUnidade?.props as (rota: RotaComProps) => unknown;
-        expect(propsMapaUnidade({params: {codUnidade: '10'}, query: {codProcesso: '99'}})).toEqual({codUnidade: 10, codProcesso: 99});
+        expect(propsMapaUnidade({params: {codUnidade: '10'}, query: {codProcesso: '99'}})).toEqual({
+            codUnidade: 10,
+            codProcesso: 99
+        });
 
         const atribuicao = unidadeRoutes.find((rota) => rota.name === 'AtribuicaoTemporariaForm');
         expect(atribuicao).toBeDefined();

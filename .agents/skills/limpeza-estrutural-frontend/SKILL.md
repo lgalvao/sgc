@@ -52,27 +52,23 @@ Reduzir complexidade acidental no frontend preservando:
 
 ## Princípios
 
-1. Escolher a menor fronteira segura.
-   Comece por blocos visuais ou fluxos locais coesos: header, ações, filtros, modais, seções de tela, helpers privados.
+1. Escolher a menor fronteira segura. Comece por blocos visuais ou fluxos locais coesos: header, ações, filtros, modais,
+   seções de tela, helpers privados.
 
-2. Não deslocar o problema de camada.
-   Se a lógica é local de uma view, prefira componente da própria feature ou helper local da view antes de criar um novo
-   composable/store que só muda a violação de lugar.
+2. Não deslocar o problema de camada. Se a lógica é local de uma view, prefira componente da própria feature ou helper
+   local da view antes de criar um novo composable/store que só muda a violação de lugar.
 
-3. Preservar contratos úteis.
-   Não renomeie `data-testid`, props públicas, barrels ou rotas sem evidência de que o contrato antigo realmente ficou
-   sem uso.
+3. Preservar contratos úteis. Não renomeie `data-testid`, props públicas, barrels ou rotas sem evidência de que o
+   contrato antigo realmente ficou sem uso.
 
-4. Remover compatibilidade artificial.
-   Se a decisão da rodada for simplificar, não mantenha alias, nomes paralelos, branches legados ou defaults silenciosos
-   só para acomodar código velho.
+4. Remover compatibilidade artificial. Se a decisão da rodada for simplificar, não mantenha alias, nomes paralelos,
+   branches legados ou defaults silenciosos só para acomodar código velho.
 
-5. Apagar sobra imediatamente.
-   Remova waiver obsoleto, teste sem sentido, helper órfão e código morto na mesma rodada em que eles deixarem de ser
-   necessários.
+5. Apagar sobra imediatamente. Remova waiver obsoleto, teste sem sentido, helper órfão e código morto na mesma rodada em
+   que eles deixarem de ser necessários.
 
-6. Validar em passos pequenos.
-   Faça um corte curto, rode validação focada, estabilize, só então passe ao próximo hotspot.
+6. Validar em passos pequenos. Faça um corte curto, rode validação focada, estabilize, só então passe ao próximo
+   hotspot.
 
 ## Loop padrão
 
@@ -168,7 +164,8 @@ Não deixe:
 - Evite overengineering: menos camadas, mas só quando a leitura realmente melhora.
 - Não tente "recuperar" erro irrecuperável de backend no frontend; preserve o padrão fail-fast.
 - Não duplique regra de acesso no frontend se o backend já decide habilitação.
-- Não introduza cálculos locais de `pode*`, `habilitar*`, `mostrar*` ou `exibir*` para botões, cards ou ações. Use flags/action models vindos do backend; o gate `frontend arquitetura validar` bloqueia regressões novas.
+- Não introduza cálculos locais de `pode*`, `habilitar*`, `mostrar*` ou `exibir*` para botões, cards ou ações. Use
+  flags/action models vindos do backend; o gate `frontend arquitetura validar` bloqueia regressões novas.
 - Não mantenha código marcado como legado/depreciado se a dependência interna sumiu.
 
 ## Validação mínima por rodada

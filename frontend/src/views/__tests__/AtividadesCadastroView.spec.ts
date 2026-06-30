@@ -63,7 +63,7 @@ vi.mock("@/composables/useMapas", () => ({
     useMapas: vi.fn(() => ({
         mapaCompleto: mockMapaCompleto,
         impactoMapa: mockImpactoMapa,
-        carregando: { value: false },
+        carregando: {value: false},
         erro: mockErroMapas,
         carregarMapa: vi.fn(),
         carregarImpacto: vi.fn(async (cod: number) => {
@@ -1160,8 +1160,8 @@ describe("CadastroView.vue", () => {
 
         // aoImportarAtividades branches (success case without warning)
         await vm.aoImportarAtividades({
-            aviso: null, 
-            atividadesAtualizadas: [], 
+            aviso: null,
+            atividadesAtualizadas: [],
             subprocesso: {codigo: 123, situacao: SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO},
             permissoes: PERMISSOES_SUBPROCESSO_VAZIAS
         });
@@ -1171,7 +1171,7 @@ describe("CadastroView.vue", () => {
     it("deve calcular assinatura e ordenar atividades corretamente", async () => {
         const wrapper = createWrapper();
         const vm = wrapper.vm as any;
-        
+
         vm.atividades = [
             {codigo: 1, descricao: 'B'},
             {codigo: 2, descricao: 'A'},
@@ -1181,7 +1181,7 @@ describe("CadastroView.vue", () => {
         expect(vm.atividadesOrdenadas[0].codigo).toBe(2);
         expect(vm.atividadesOrdenadas[1].codigo).toBe(1);
         expect(vm.atividadesOrdenadas[2].codigo).toBe(null);
-        
+
         expect(vm.houveAlteracaoCadastro).toBe(true);
     });
 

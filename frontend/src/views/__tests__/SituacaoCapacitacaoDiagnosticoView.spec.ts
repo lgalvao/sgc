@@ -20,13 +20,31 @@ vi.mock('@/composables/useDiagnosticoContexto', () => ({
 }));
 
 const situacoesLocaisVal = ref<any[]>([
-    {servidorTitulo: '242426', servidorNome: 'João Guilherme de Albuquerque Maranhão', competenciaCodigo: 10, situacaoCapacitacao: null},
-    {servidorTitulo: '242427', servidorNome: 'Maria Eduarda Cavalcanti de Alencar', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
+    {
+        servidorTitulo: '242426',
+        servidorNome: 'João Guilherme de Albuquerque Maranhão',
+        competenciaCodigo: 10,
+        situacaoCapacitacao: null
+    },
+    {
+        servidorTitulo: '242427',
+        servidorNome: 'Maria Eduarda Cavalcanti de Alencar',
+        competenciaCodigo: 10,
+        situacaoCapacitacao: 'EC'
+    },
 ]);
 
 const servidoresVal = ref<any[]>([
-    {servidorTitulo: '242426', servidorNome: 'João Guilherme de Albuquerque Maranhão', situacaoServidor: 'CONSENSO_APROVADO'},
-    {servidorTitulo: '242427', servidorNome: 'Maria Eduarda Cavalcanti de Alencar', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'},
+    {
+        servidorTitulo: '242426',
+        servidorNome: 'João Guilherme de Albuquerque Maranhão',
+        situacaoServidor: 'CONSENSO_APROVADO'
+    },
+    {
+        servidorTitulo: '242427',
+        servidorNome: 'Maria Eduarda Cavalcanti de Alencar',
+        situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA'
+    },
 ]);
 
 const carregandoVal = ref(false);
@@ -54,12 +72,32 @@ vi.mock('@/composables/useSituacaoCapacitacaoDiagnostico', () => ({
 describe('SituacaoCapacitacaoDiagnosticoView', () => {
     beforeEach(() => {
         situacoesLocaisVal.value = [
-            {servidorTitulo: '242426', servidorNome: 'João Guilherme de Albuquerque Maranhão', competenciaCodigo: 10, situacaoCapacitacao: null},
-            {servidorTitulo: '242427', servidorNome: 'Maria Eduarda Cavalcanti de Alencar', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
+            {
+                servidorTitulo: '242426',
+                servidorNome: 'João Guilherme de Albuquerque Maranhão',
+                competenciaCodigo: 10,
+                situacaoCapacitacao: null
+            },
+            {
+                servidorTitulo: '242427',
+                servidorNome: 'Maria Eduarda Cavalcanti de Alencar',
+                competenciaCodigo: 10,
+                situacaoCapacitacao: 'EC'
+            },
         ];
         servidoresVal.value = [
-            {servidorTitulo: '242426', servidorNome: 'João Guilherme de Albuquerque Maranhão', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]},
-            {servidorTitulo: '242427', servidorNome: 'Maria Eduarda Cavalcanti de Alencar', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', consenso: []},
+            {
+                servidorTitulo: '242426',
+                servidorNome: 'João Guilherme de Albuquerque Maranhão',
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]
+            },
+            {
+                servidorTitulo: '242427',
+                servidorNome: 'Maria Eduarda Cavalcanti de Alencar',
+                situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+                consenso: []
+            },
         ];
         carregandoVal.value = false;
         salvandoAutomaticamenteVal.value = false;
@@ -113,12 +151,32 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
 
     it('troca o servidor selecionado e reaproveita a mesma lista de competências', async () => {
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Ana Beatriz de Albuquerque e Souza', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]},
-            {servidorTitulo: '2', servidorNome: 'Luiz Fernando Cavalcanti de Moura', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 4, dominio: 2}]},
+            {
+                servidorTitulo: '1',
+                servidorNome: 'Ana Beatriz de Albuquerque e Souza',
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]
+            },
+            {
+                servidorTitulo: '2',
+                servidorNome: 'Luiz Fernando Cavalcanti de Moura',
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [{competenciaCodigo: 10, importancia: 4, dominio: 2}]
+            },
         ];
         situacoesLocaisVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Ana Beatriz de Albuquerque e Souza', competenciaCodigo: 10, situacaoCapacitacao: 'AC'},
-            {servidorTitulo: '2', servidorNome: 'Luiz Fernando Cavalcanti de Moura', competenciaCodigo: 10, situacaoCapacitacao: 'I'},
+            {
+                servidorTitulo: '1',
+                servidorNome: 'Ana Beatriz de Albuquerque e Souza',
+                competenciaCodigo: 10,
+                situacaoCapacitacao: 'AC'
+            },
+            {
+                servidorTitulo: '2',
+                servidorNome: 'Luiz Fernando Cavalcanti de Moura',
+                competenciaCodigo: 10,
+                situacaoCapacitacao: 'I'
+            },
         ];
 
         const wrapper = mount(SituacaoCapacitacaoDiagnosticoView, {
@@ -183,7 +241,12 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
             {servidorTitulo: '1', servidorNome: 'Axl', competenciaCodigo: 10, situacaoCapacitacao: null},
         ];
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Axl', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]},
+            {
+                servidorTitulo: '1',
+                servidorNome: 'Axl',
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]
+            },
         ];
         const wrapperSelect = mount(SituacaoCapacitacaoDiagnosticoView, {
             props: {
@@ -246,7 +309,12 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
     it('renderiza a situacao de capacitacao como texto plano span quando habilitarCriarConsenso for falso', async () => {
         habilitarCriarConsensoVal.value = false;
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Servidor A', situacaoServidor: 'CONSENSO_APROVADO', consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]},
+            {
+                servidorTitulo: '1',
+                servidorNome: 'Servidor A',
+                situacaoServidor: 'CONSENSO_APROVADO',
+                consenso: [{competenciaCodigo: 10, importancia: 5, dominio: 3}]
+            },
         ];
         situacoesLocaisVal.value = [
             {servidorTitulo: '1', servidorNome: 'Servidor A', competenciaCodigo: 10, situacaoCapacitacao: 'EC'},
@@ -285,7 +353,12 @@ describe('SituacaoCapacitacaoDiagnosticoView', () => {
 
     it('ordena servidores com consenso aprovado no topo', () => {
         servidoresVal.value = [
-            {servidorTitulo: '1', servidorNome: 'Servidor B', situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA', consenso: []},
+            {
+                servidorTitulo: '1',
+                servidorNome: 'Servidor B',
+                situacaoServidor: 'AUTOAVALIACAO_CONCLUIDA',
+                consenso: []
+            },
             {servidorTitulo: '2', servidorNome: 'Servidor A', situacaoServidor: 'CONSENSO_APROVADO', consenso: []},
         ];
 

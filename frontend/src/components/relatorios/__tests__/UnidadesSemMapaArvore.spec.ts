@@ -33,7 +33,7 @@ describe('UnidadesSemMapaArvore.vue', () => {
         ];
 
         const wrapper = mount(UnidadesSemMapaArvore, {
-            props: { unidades: unidades as any }
+            props: {unidades: unidades as any}
         });
 
         expect(wrapper.text()).toContain('U1');
@@ -42,12 +42,12 @@ describe('UnidadesSemMapaArvore.vue', () => {
         expect(wrapper.text()).toContain('Unidade 2');
         expect(wrapper.text()).toContain('U3');
         expect(wrapper.text()).toContain('Unidade 4');
-        
+
         // Check for separator logic
         // U1 has sigla and name -> separator should exist
         const items = wrapper.findAll('li');
         expect(items[0].find('.arvore-unidades-sem-mapa__separador').exists()).toBe(true);
-        
+
         // U3 has sigla but no name -> separator should NOT exist
         expect(items[2].find('.arvore-unidades-sem-mapa__separador').exists()).toBe(false);
 

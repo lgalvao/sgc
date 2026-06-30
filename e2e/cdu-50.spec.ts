@@ -59,10 +59,10 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
     const descricaoHomologacao = `Diagnóstico CDU-50 homologação ${Date.now()}`;
 
     test('Setup: ADMIN cria processo de diagnóstico com unidades em hierarquias distintas', async ({
-        _resetAutomatico,
-        page,
-        request,
-    }) => {
+                                                                                                       _resetAutomatico,
+                                                                                                       page,
+                                                                                                       request,
+                                                                                                   }) => {
         await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE_FORA_HIERARQUIA,
             iniciar: true,
@@ -80,9 +80,9 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
     });
 
     test('GESTOR vê apenas sua hierarquia e a tela de análise completa da unidade subordinada', async ({
-        _resetAutomatico,
-        page,
-    }) => {
+                                                                                                           _resetAutomatico,
+                                                                                                           page,
+                                                                                                       }) => {
         await loginComPerfil(
             page,
             USUARIOS.GESTOR_SECRETARIA_1.titulo,
@@ -110,9 +110,9 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
     });
 
     test('ADMIN vê todas as unidades participantes na árvore do processo', async ({
-        _resetAutomatico,
-        page,
-    }) => {
+                                                                                      _resetAutomatico,
+                                                                                      page,
+                                                                                  }) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
         await acessarDetalhesProcesso(page, descricaoArvore);
@@ -124,10 +124,10 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
     });
 
     test('GESTOR registra aceite, gera histórico e notificação para a unidade superior', async ({
-        _resetAutomatico,
-        page,
-        request,
-    }) => {
+                                                                                                    _resetAutomatico,
+                                                                                                    page,
+                                                                                                    request,
+                                                                                                }) => {
         await resetDatabase(request);
         const processo = await prepararDiagnosticoConcluido(request, descricaoAceite);
 
@@ -171,10 +171,10 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
     });
 
     test('GESTOR devolve para ajustes, exige justificativa e reabre o consenso mantendo a autoavaliação concluída', async ({
-        _resetAutomatico,
-        page,
-        request,
-    }) => {
+                                                                                                                               _resetAutomatico,
+                                                                                                                               page,
+                                                                                                                               request,
+                                                                                                                           }) => {
         await resetDatabase(request);
         const processo = await prepararDiagnosticoConcluido(request, descricaoDevolucao);
 
@@ -223,10 +223,10 @@ test.describe.serial('CDU-50 - Analisar diagnóstico', () => {
     });
 
     test('ADMIN homologa após o aceite do gestor e registra histórico/notificação', async ({
-        _resetAutomatico,
-        page,
-        request,
-    }) => {
+                                                                                               _resetAutomatico,
+                                                                                               page,
+                                                                                               request,
+                                                                                           }) => {
         await resetDatabase(request);
         const processo = await prepararDiagnosticoConcluido(request, descricaoHomologacao);
 

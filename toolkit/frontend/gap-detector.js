@@ -13,7 +13,10 @@ async function main() {
 
     let output;
     try {
-        output = execSync(`cd frontend && npx vitest run src/composables/__tests__/$(basename ${file} .ts).spec.ts --coverage --reporter=dot --no-color --coverage.reporter=text --coverage.include="${file}"`, {encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe']});
+        output = execSync(`cd frontend && npx vitest run src/composables/__tests__/$(basename ${file} .ts).spec.ts --coverage --reporter=dot --no-color --coverage.reporter=text --coverage.include="${file}"`, {
+            encoding: 'utf8',
+            stdio: ['pipe', 'pipe', 'pipe']
+        });
     } catch (e) {
         // Vitest retorna exit code 1 se thresholds falharem
         output = e.stdout || e.message;
@@ -21,7 +24,7 @@ async function main() {
 
     const lines = output.split('\n');
     const fileLine = lines.find(l => l.includes(file.split('/').pop()));
-    
+
     if (!fileLine) {
         console.log(pc.red("Não foi possível encontrar dados de cobertura para o arquivo especificado."));
         console.log(output);
@@ -47,11 +50,11 @@ async function main() {
             const [start, end] = range.split('-').map(Number);
             console.log(pc.bold(`\n--- Bloco ${start}-${end} ---`));
             for (let i = start; i <= end; i++) {
-                console.log(`${i.toString().padStart(4)}: ${contentLines[i-1]}`);
+                console.log(`${i.toString().padStart(4)}: ${contentLines[i - 1]}`);
             }
         } else if (range.trim()) {
             const line = Number(range);
-            console.log(`${line.toString().padStart(4)}: ${contentLines[line-1]}`);
+            console.log(`${line.toString().padStart(4)}: ${contentLines[line - 1]}`);
         }
     }
 }

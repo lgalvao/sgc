@@ -20,19 +20,19 @@ reduzindo o uso direto de `BAlert` nas views e concentrando decisões de comport
 ### O principal problema
 
 - O frontend usa `BAlert` diretamente em muitos pontos diferentes, com responsabilidades distintas:
-  - erro global de tela
-  - erro global de formulário ou modal
-  - aviso ou erro contextual de ação
-  - sucesso persistente
-  - banner informativo de estado
+    - erro global de tela
+    - erro global de formulário ou modal
+    - aviso ou erro contextual de ação
+    - sucesso persistente
+    - banner informativo de estado
 - Hoje essas responsabilidades estão misturadas entre `BAlert`, `AppAlert`, strings locais como `erroGlobal`,
   `retornoFluxo`, `alertaSucesso` e `useToastStore`.
 - O resultado é que casos parecidos são implementados de formas diferentes, com regras diferentes de:
-  - exibição
-  - limpeza
-  - dismiss
-  - reapresentação
-  - localização da mensagem
+    - exibição
+    - limpeza
+    - dismiss
+    - reapresentação
+    - localização da mensagem
 
 ### Números do checkout atual
 
@@ -142,21 +142,20 @@ Direção:
 
 `BAlert` não deve ser o primitive de domínio do app.
 
-`BAlert` continua sendo a base visual oferecida por `BootstrapVueNext`, mas deve ficar encapsulado em components do
-SGC.
+`BAlert` continua sendo a base visual oferecida por `BootstrapVueNext`, mas deve ficar encapsulado em components do SGC.
 
 ### Superfície alvo
 
 O frontend deve convergir para uma pequena família de primitives:
 
 - `AppAlert`
-  - feedback persistente de ação ou de tela
+    - feedback persistente de ação ou de tela
 - `AppAlertaFormulario`
-  - erro global de formulário ou modal
+    - erro global de formulário ou modal
 - `AppAlertaStatus`
-  - banner informativo de estado, sem semântica de erro de ação
+    - banner informativo de estado, sem semântica de erro de ação
 - `useToast`
-  - fachada única para sucesso transitório
+    - fachada única para sucesso transitório
 
 Observação:
 
@@ -212,10 +211,10 @@ Objetivo:
 Ações:
 
 - Atualizar `specs/design/ux.md` com uma regra curta:
-  - evitar `BAlert` direto em view
-  - preferir primitive do app para feedback persistente
+    - evitar `BAlert` direto em view
+    - preferir primitive do app para feedback persistente
 - Registrar no review checklist do time:
-  - novo uso de `BAlert` em view deve ser excepcional e justificado
+    - novo uso de `BAlert` em view deve ser excepcional e justificado
 
 Critério de aceite:
 
@@ -240,10 +239,10 @@ Ações:
 - introduzir `AppAlertaFormulario` ou ampliar `AppAlert` para suportar o caso
 - trocar `BAlert` direto desses modais pelo primitive
 - alinhar props mínimas:
-  - `mensagem`
-  - `variante`
-  - `dispensavel`
-  - `data-testid`
+    - `mensagem`
+    - `variante`
+    - `dispensavel`
+    - `data-testid`
 
 Critério de aceite:
 
@@ -281,8 +280,8 @@ Critério de aceite:
 Objetivo:
 
 - Eliminar alertas persistentes de sucesso local e substituir por:
-  - nenhuma mensagem, quando a UI já comunicar o resultado;
-  - toast breve, quando a confirmação ainda agregar valor.
+    - nenhuma mensagem, quando a UI já comunicar o resultado;
+    - toast breve, quando a confirmação ainda agregar valor.
 
 Escopo inicial sugerido:
 
@@ -296,9 +295,9 @@ Ações:
 - remover estados ad hoc como `alertaSucesso` quando eles servirem apenas para sucesso local
 - revisar `retornoFluxo` e equivalentes para que carreguem erro local, não sucesso persistente
 - separar claramente:
-  - erro local persistente
-  - sucesso local sem mensagem
-  - sucesso transitório pós-navegação
+    - erro local persistente
+    - sucesso local sem mensagem
+    - sucesso transitório pós-navegação
 
 Critério de aceite:
 

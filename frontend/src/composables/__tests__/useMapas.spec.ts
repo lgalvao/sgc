@@ -55,8 +55,12 @@ vi.mock("@/composables/useMapaQuery", () => {
         criarChaveMapa: vi.fn(),
         criarChaveImpactoMapa: vi.fn(),
         useMapaQuery: (codigoSubprocesso: any) => ({
-            get data() { return mapaQueryState.data; },
-            get status() { return mapaQueryState.status; },
+            get data() {
+                return mapaQueryState.data;
+            },
+            get status() {
+                return mapaQueryState.status;
+            },
             // refetch: sempre busca (ignora cache)
             refetch: vi.fn(async () => {
                 const codigo = toValue(codigoSubprocesso);
@@ -83,8 +87,12 @@ vi.mock("@/composables/useMapaQuery", () => {
             }),
         }),
         useImpactoMapaQuery: (codigoSubprocesso: any) => ({
-            get data() { return impactoQueryState.data; },
-            get status() { return impactoQueryState.status; },
+            get data() {
+                return impactoQueryState.data;
+            },
+            get status() {
+                return impactoQueryState.status;
+            },
             // refetch: sempre busca
             refetch: vi.fn(async () => {
                 const codigo = toValue(codigoSubprocesso);

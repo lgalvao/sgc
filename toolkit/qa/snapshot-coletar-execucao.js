@@ -27,7 +27,7 @@ function formatarTimestampArquivo(data = new Date()) {
     return data.toISOString().replaceAll(":", "-").replace(/\.\d{3}Z$/, "Z");
 }
 
- 
+
 function criarExecucao(codigo, nome, categoria, comando, diretorio) {
     return {
         codigo,

@@ -38,8 +38,8 @@ Todo CDU deve conter, nesta ordem:
 - Mensagens literais exibidas ao usuário e textos completos de confirmação devem ser escritos entre aspas duplas, por
   exemplo: "Preencha a descrição", "Confirma a homologação?".
 - Perfis não devem ser escritos entre aspas simples. Use `ADMIN`, `GESTOR`, `CHEFE` e `SERVIDOR`.
-- Rótulos e elementos de interface não devem ser escritos entre aspas duplas quando o item for um elemento observável
-  da interface. Nesses casos, use crases.
+- Rótulos e elementos de interface não devem ser escritos entre aspas duplas quando o item for um elemento observável da
+  interface. Nesses casos, use crases.
 - Perfis devem ser escritos em maiúsculas: `ADMIN`, `GESTOR`, `CHEFE`, `SERVIDOR`.
 - Placeholders devem usar caixa alta entre dois `:`, por exemplo: `:SIGLA_UNIDADE:`, `:DATA_LIMITE:`,
   `:URL_SISTEMA:`.

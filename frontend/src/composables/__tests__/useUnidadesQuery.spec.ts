@@ -23,7 +23,9 @@ const mockPerfilSelecionado = ref<string | undefined>("SERVIDOR");
 
 vi.mock("@/stores/perfil", () => ({
     usePerfilStore: () => ({
-        get perfilSelecionado() { return mockPerfilSelecionado.value; },
+        get perfilSelecionado() {
+            return mockPerfilSelecionado.value;
+        },
     }),
 }));
 

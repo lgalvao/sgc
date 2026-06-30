@@ -1,10 +1,13 @@
 # SGC - Sistema de Gestão de Competências
 
-Sistema corporativo para conduzir ciclos de **mapeamento**, **revisão** e **diagnóstico** de competências nas unidades organizacionais. O repositório reúne uma API Spring Boot, uma SPA Vue, uma suíte E2E Playwright e um toolkit de automação usado no desenvolvimento e na governança técnica do projeto.
+Sistema corporativo para conduzir ciclos de **mapeamento**, **revisão** e **diagnóstico** de competências nas unidades
+organizacionais. O repositório reúne uma API Spring Boot, uma SPA Vue, uma suíte E2E Playwright e um toolkit de
+automação usado no desenvolvimento e na governança técnica do projeto.
 
 ## Visão executiva
 
-O SGC opera sobre a hierarquia organizacional do órgão e trata cada unidade participante como um **subprocesso** dentro de um **processo** maior.
+O SGC opera sobre a hierarquia organizacional do órgão e trata cada unidade participante como um **subprocesso** dentro
+de um **processo** maior.
 
 - **Mapeamento**: coleta atividades, conhecimentos e consolida o mapa inicial da unidade.
 - **Revisão**: reaproveita o mapa vigente e conduz ajustes/homologações em novo ciclo.
@@ -31,19 +34,19 @@ sgc/
 
 O backend está em `backend/src/main/java/sgc` e é organizado por domínio:
 
-| Domínio | Responsabilidade principal |
-|---|---|
-| `processo` | ciclo macro do processo: criação, início, finalização, painel e ações em bloco |
-| `subprocesso` | execução por unidade, workflow, contexto de tela, histórico, permissões estruturadas e validações |
-| `mapa` | manutenção de mapas, atividades, conhecimentos, impactos e sugestões |
-| `organizacao` | usuários, unidades, hierarquia, contexto autenticado e atribuições temporárias |
-| `seguranca` | login, JWT, sanitização de entrada e `SgcPermissionEvaluator` |
-| `alerta` | alertas da UI, notificações e fila/worker de e-mail |
-| `relatorio` | relatórios de andamento e mapas vigentes |
-| `configuracaos` | parâmetros/configurações dinâmicas |
-| `feedback` | recebimento e gestão de feedbacks com screenshot |
-| `comum` | infraestrutura compartilhada, exceções, config, monitoramento e modelo base |
-| `e2e` | endpoints e adaptações exclusivas do perfil de testes E2E |
+| Domínio         | Responsabilidade principal                                                                        |
+|-----------------|---------------------------------------------------------------------------------------------------|
+| `processo`      | ciclo macro do processo: criação, início, finalização, painel e ações em bloco                    |
+| `subprocesso`   | execução por unidade, workflow, contexto de tela, histórico, permissões estruturadas e validações |
+| `mapa`          | manutenção de mapas, atividades, conhecimentos, impactos e sugestões                              |
+| `organizacao`   | usuários, unidades, hierarquia, contexto autenticado e atribuições temporárias                    |
+| `seguranca`     | login, JWT, sanitização de entrada e `SgcPermissionEvaluator`                                     |
+| `alerta`        | alertas da UI, notificações e fila/worker de e-mail                                               |
+| `relatorio`     | relatórios de andamento e mapas vigentes                                                          |
+| `configuracaos` | parâmetros/configurações dinâmicas                                                                |
+| `feedback`      | recebimento e gestão de feedbacks com screenshot                                                  |
+| `comum`         | infraestrutura compartilhada, exceções, config, monitoramento e modelo base                       |
+| `e2e`           | endpoints e adaptações exclusivas do perfil de testes E2E                                         |
 
 Padrões estruturais importantes:
 
@@ -58,16 +61,16 @@ Padrões estruturais importantes:
 
 O frontend está em `frontend/src` e espelha os principais domínios do backend:
 
-| Área | Papel |
-|---|---|
-| `views/` | telas dos casos de uso |
-| `components/` | componentes reutilizáveis por domínio (`cadastro`, `mapa`, `processo`, `layout`, `administracao`...) |
-| `stores/` | estado global com Pinia setup stores |
-| `services/` | integração HTTP com a API |
-| `composables/` | orquestração de fluxo, formulários, cache e tratamento de erro |
-| `router/` | rotas modulares (`main.routes.ts`, `processo.routes.ts`, `unidade.routes.ts`) |
-| `types/` | contratos TypeScript |
-| `utils/` | utilitários transversais, incluindo logger e normalização de erros |
+| Área           | Papel                                                                                                |
+|----------------|------------------------------------------------------------------------------------------------------|
+| `views/`       | telas dos casos de uso                                                                               |
+| `components/`  | componentes reutilizáveis por domínio (`cadastro`, `mapa`, `processo`, `layout`, `administracao`...) |
+| `stores/`      | estado global com Pinia setup stores                                                                 |
+| `services/`    | integração HTTP com a API                                                                            |
+| `composables/` | orquestração de fluxo, formulários, cache e tratamento de erro                                       |
+| `router/`      | rotas modulares (`main.routes.ts`, `processo.routes.ts`, `unidade.routes.ts`)                        |
+| `types/`       | contratos TypeScript                                                                                 |
+| `utils/`       | utilitários transversais, incluindo logger e normalização de erros                                   |
 
 ### Regra de acesso do sistema
 
@@ -76,7 +79,8 @@ A segurança funcional segue dois eixos centrais, implementados no backend e ref
 - **leitura**: baseada na **hierarquia** da unidade responsável;
 - **escrita**: baseada na **localização atual** do subprocesso.
 
-Essa regra é centralizada no `SgcPermissionEvaluator` e complementada por serviços especializados de contexto e permissão.
+Essa regra é centralizada no `SgcPermissionEvaluator` e complementada por serviços especializados de contexto e
+permissão.
 
 ## Fluxo conceitual do domínio
 
@@ -223,7 +227,6 @@ Comandos de execução:
   ```bash
   npm run test:e2e e2e/cdu-28.spec.ts
   ```
-
 
 ## Observabilidade e operação
 

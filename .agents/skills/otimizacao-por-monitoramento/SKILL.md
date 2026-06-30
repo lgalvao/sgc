@@ -71,8 +71,8 @@ fidelidade, rode o recorte mínimo suficiente.
 
 ### 1.1 Ativar telemetria do frontend quando o alvo inclui navegação/round-trip do navegador
 
-No lifecycle E2E atual do SGC, o frontend pode subir com `VITE_MONITORAMENTO_MODO='off'`.
-Se a hipótese envolver custo percebido no frontend, sequência de chamadas, navegação SPA ou round-trips redundantes, *
+No lifecycle E2E atual do SGC, o frontend pode subir com `VITE_MONITORAMENTO_MODO='off'`. Se a hipótese envolver custo
+percebido no frontend, sequência de chamadas, navegação SPA ou round-trips redundantes, *
 *não aceite isso como limitação do cenário**.
 
 Antes de tirar conclusões:
@@ -170,8 +170,7 @@ Depois de cada rodada:
 ### Toasts e Persistência em Navegação
 
 Se a ação do usuário dispara um redirecionamento (ex: `router.push('/painel')`), a mensagem de sucesso disparada na View
-original será destruída com ela.
-No SGC, use o `ToastStore` para mensagens que devem sobreviver à navegação:
+original será destruída com ela. No SGC, use o `ToastStore` para mensagens que devem sobreviver à navegação:
 
 - ✅ USE: `toastStore.setPending(mensagem)` antes do redirecionamento.
 - ✅ VERIFIQUE: A View de destino (ex: `PainelView`) deve consumir isso no `onMounted/onActivated` via
@@ -179,8 +178,8 @@ No SGC, use o `ToastStore` para mensagens que devem sobreviver à navegação:
 
 ### Compatibilidade E2E (BOrchestrator)
 
-O sistema de testes Playwright do SGC utiliza seletores semânticos para toasts.
-O componente `BOrchestrator` no `App.vue` **DEVE** ter a classe `.orchestrator-container`. Se for removida, o helper
+O sistema de testes Playwright do SGC utiliza seletores semânticos para toasts. O componente `BOrchestrator` no
+`App.vue` **DEVE** ter a classe `.orchestrator-container`. Se for removida, o helper
 `verificarToast` falhará com "element not found".
 
 ### Otimização de Payload (Bloat e Redundância)

@@ -99,17 +99,17 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         assertThat(buscarAvaliacoes("50003")).allSatisfy(avaliacao ->
-                {
-                    assertThat(avaliacao.getSituacaoServidor())
-                            .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
-                    assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
-                });
+        {
+            assertThat(avaliacao.getSituacaoServidor())
+                    .isEqualTo(SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+            assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
+        });
         assertThat(buscarAvaliacoes("50004")).allSatisfy(avaliacao ->
-                {
-                    assertThat(avaliacao.getSituacaoServidor())
-                            .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
-                    assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
-                });
+        {
+            assertThat(avaliacao.getSituacaoServidor())
+                    .isEqualTo(SituacaoAvaliacaoServidor.AVALIACAO_IMPOSSIBILITADA);
+            assertThat(avaliacao.getSituacaoServidorAnterior()).isNull();
+        });
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()))
                 .anySatisfy(analise -> assertThat(analise.getAcao().name()).isEqualTo("DEVOLUCAO_DIAGNOSTICO"));
     }

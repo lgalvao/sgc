@@ -302,7 +302,7 @@ describe("axios-setup", () => {
         (router.currentRoute.value as any).path = '/not-login';
         vi.mocked(router.push).mockRejectedValueOnce(new Error('Push failed'));
         const error = {isAxiosError: true, response: {status: 401, data: {}}};
-        
+
         await expect(responseErrorInterceptor(error)).rejects.toEqual(error);
         expect(logger.error).toHaveBeenCalledWith("Erro ao redirecionar:", expect.any(Error));
     });

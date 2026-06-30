@@ -47,45 +47,38 @@ Reduzir complexidade acidental preservando:
 
 ## Princípios
 
-1. Simplificar a menor fronteira segura.
-   Prefira começar por duplicação interna, helpers privados, comandos ou fluxos concentrados antes de mexer em contratos
-   externos.
+1. Simplificar a menor fronteira segura. Prefira começar por duplicação interna, helpers privados, comandos ou fluxos
+   concentrados antes de mexer em contratos externos.
 
-2. Tornar dependências explícitas.
-   Uma regra, tela ou serviço não deve funcionar por contexto herdado ou efeito colateral implícito.
+2. Tornar dependências explícitas. Uma regra, tela ou serviço não deve funcionar por contexto herdado ou efeito
+   colateral implícito.
 
-3. Reduzir superfícies.
-   Se um service, facade, store ou composable expõe mais estado ou mais operações do que o uso real exige, estreite essa
-   interface.
+3. Reduzir superfícies. Se um service, facade, store ou composable expõe mais estado ou mais operações do que o uso real
+   exige, estreite essa interface.
 
-4. Eliminar efeitos colaterais escondidos.
-   Prefira retorno explícito de dados, comandos claros e sincronização feita no ponto de uso.
+4. Eliminar efeitos colaterais escondidos. Prefira retorno explícito de dados, comandos claros e sincronização feita no
+   ponto de uso.
 
-5. Preservar fronteiras úteis.
-   DTO, facade, service, composable ou store só devem sumir quando forem redundantes de verdade, não apenas porque
-   parecem "finos".
+5. Preservar fronteiras úteis. DTO, facade, service, composable ou store só devem sumir quando forem redundantes de
+   verdade, não apenas porque parecem "finos".
 
-6. Apagar código morto assim que ele ficar órfão.
-   Depois de remover um acoplamento, procure métodos, campos, mocks, stubs e testes sem uso real.
+6. Apagar código morto assim que ele ficar órfão. Depois de remover um acoplamento, procure métodos, campos, mocks,
+   stubs e testes sem uso real.
 
-7. Validar em passos pequenos.
-   Faça uma mudança curta, valide, registre aprendizado, então siga.
+7. Validar em passos pequenos. Faça uma mudança curta, valide, registre aprendizado, então siga.
 
-8. Preferir simplificação local antes de abstração compartilhada.
-   Se a lógica ainda pertence claramente a uma única tela ou fluxo, prefira helper local de view ou componente local de
-   apresentação antes de inventar camada genérica.
+8. Preferir simplificação local antes de abstração compartilhada. Se a lógica ainda pertence claramente a uma única tela
+   ou fluxo, prefira helper local de view ou componente local de apresentação antes de inventar camada genérica.
 
-9. Corrigir o ponto de verdade mais próximo da regra.
-   Se a inconsistência nasce no backend, não estabilize isso com heurística no frontend. Se a regra é de borda, trate a
-   borda. Se a dor é recorrente, transforme a auditoria em ferramenta.
+9. Corrigir o ponto de verdade mais próximo da regra. Se a inconsistência nasce no backend, não estabilize isso com
+   heurística no frontend. Se a regra é de borda, trate a borda. Se a dor é recorrente, transforme a auditoria em
+   ferramenta.
 
-10. Usar o toolkit como mecanismo de recorrência.
-    Quando uma simplificação revela um problema estrutural repetível, avalie se ele deve virar comando no `sgc.js`,
-    budget, auditoria ou snapshot.
+10. Usar o toolkit como mecanismo de recorrência. Quando uma simplificação revela um problema estrutural repetível,
+    avalie se ele deve virar comando no `sgc.js`, budget, auditoria ou snapshot.
 
-11. Preferir integração de ferramenta OSS à reinvenção.
-    Se o problema já é bem resolvido por ferramenta madura do ecossistema, o papel do SGC é orquestrar, calibrar e
-    consolidar no toolkit, não reconstruir o motor do zero.
+11. Preferir integração de ferramenta OSS à reinvenção. Se o problema já é bem resolvido por ferramenta madura do
+    ecossistema, o papel do SGC é orquestrar, calibrar e consolidar no toolkit, não reconstruir o motor do zero.
 
 ## Guardrails do SGC
 
@@ -309,7 +302,8 @@ node etc/scripts/sgc.js codigo smells auditar
 1. Registrar aprendizado.
 
 - Atualize `plano-simplificacao.md` quando a rodada gerar critério novo ou novo mapa de risco.
-- Atualize `plano-qualidade.md` quando a rodada alterar direção estrutural, critério de integração ou evolução do toolkit.
+- Atualize `plano-qualidade.md` quando a rodada alterar direção estrutural, critério de integração ou evolução do
+  toolkit.
 - Se a rodada revelou problema repetível, proponha comando, budget, waiver ou snapshot correspondente.
 
 ## Perguntas de decisão

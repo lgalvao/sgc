@@ -9,10 +9,10 @@ const UNIDADE = 'ASSESSORIA_12';
 
 test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEFE e SERVIDOR', () => {
     test('CHEFE e SERVIDOR visualizam a tela de detalhes com elements e permissões adequadas ao perfil', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                                                    _resetAutomatico,
+                                                                                                                    page,
+                                                                                                                    request
+                                                                                                                }) => {
         const descricao = `Diagnóstico CDU-42 ${Date.now()}`;
         const processo = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(request, {
             descricao,

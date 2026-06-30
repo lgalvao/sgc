@@ -28,13 +28,13 @@ function scanA11y() {
     const INTERACTIVE_BASE = [
         'button', 'a', 'input', 'select', 'textarea', 'label', 'summary', 'router-link'
     ];
-    
+
     // Explicit interactive components
     const INTERACTIVE_COMPONENTS = [
         // BootstrapVueNext
-        'BButton', 'b-button', 'b-btn', 'BLink', 'b-link', 
+        'BButton', 'b-button', 'b-btn', 'BLink', 'b-link',
         'BDropdownItem', 'b-dropdown-item', 'BDropdownItemButton', 'b-dropdown-item-button',
-        'BFormInput', 'b-form-input', 'BFormSelect', 'b-form-select', 
+        'BFormInput', 'b-form-input', 'BFormSelect', 'b-form-select',
         'BFormCheckbox', 'b-form-checkbox', 'BFormRadio', 'b-form-radio',
         'BFormTextarea', 'b-form-textarea', 'BFormTag', 'b-form-tag',
         // Vuetify
@@ -55,11 +55,11 @@ function scanA11y() {
     files.forEach(file => {
         try {
             const content = fs.readFileSync(file, 'utf-8');
-            
+
             // Extract tags using a regex that handles multi-line
             const tagRegex = /<([a-zA-Z0-9-]+)([^>]*?)(\/?>)/gs;
             let match;
-            
+
             while ((match = tagRegex.exec(content)) !== null) {
                 const tagName = match[1];
                 const attributes = match[2];
@@ -82,7 +82,7 @@ function scanA11y() {
                 // 2. Botões com ícones apenas
                 if (['button', 'BButton', 'v-btn', 'VBtn', 'b-button', 'loadingbutton', 'LoadingButton'].includes(tagName)) {
                     const hasLabel = attributes.includes('aria-label') || attributes.includes(':aria-label') || attributes.includes('title=') || attributes.includes(':title=') || attributes.includes('label=') || attributes.includes(':label=') || attributes.includes('text=') || attributes.includes(':text=');
-                    
+
                     if (!hasLabel) {
                         const closingTag = `</${tagName}>`;
                         const startOfClosing = content.indexOf(closingTag, offset);
@@ -130,7 +130,7 @@ function scanA11y() {
                 // 5. Cliques em elementos não interativos
                 if (attributes.includes('@click=') || attributes.includes('v-on:click=')) {
                     if (!isInteractive(tagName) && !attributes.includes('tabindex=') && !attributes.includes('role=')) {
-                         results.push({
+                        results.push({
                             file: file,
                             line: line,
                             type: 'click_on_non_interactive',
@@ -159,7 +159,7 @@ function generateReport(data) {
         data.forEach(item => {
             let content = item.content;
             if (content.length > 100) content = content.substring(0, 100) + '...';
-            content = content.replace(/\|/g, '\\|'); 
+            content = content.replace(/\|/g, '\\|');
             md += "| " + path.basename(item.file) + " | " + item.line + " | " + item.type + " | `" + content + "` |\n";
         });
     }

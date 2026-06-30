@@ -22,17 +22,17 @@ export type CriarConfigsParams = {
 };
 
 export function criarConfigs({
-    contextoEdicao,
-    contextoEdicaoInvalido,
-    contextoEdicaoSessao,
-    codigosEdicaoPorProcessoUnidade,
-    registrarContextoEdicao,
-    contextoCadastro,
-    contextoCadastroInvalido,
-    contextoCadastroSessao,
-    codigosCadastroPorProcessoUnidade,
-    registrarContextoCadastro,
-}: CriarConfigsParams) {
+                                 contextoEdicao,
+                                 contextoEdicaoInvalido,
+                                 contextoEdicaoSessao,
+                                 codigosEdicaoPorProcessoUnidade,
+                                 registrarContextoEdicao,
+                                 contextoCadastro,
+                                 contextoCadastroInvalido,
+                                 contextoCadastroSessao,
+                                 codigosCadastroPorProcessoUnidade,
+                                 registrarContextoCadastro,
+                             }: CriarConfigsParams) {
     const configEdicao: ConfiguracaoContexto<ContextoEdicaoSubprocesso> = {
         tipoCodigo: "EDICAO_CODIGO",
         tipoProcessoUnidade: "EDICAO_PROCESSO_UNIDADE",

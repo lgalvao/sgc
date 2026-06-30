@@ -119,7 +119,7 @@ public class SubprocessoAcessoService {
                 .habilitarCardSituacaoCapacitacao(verificarHabilitacaoCardSituacaoCapacitacao(contexto))
                 .habilitarCriarConsenso(contexto.isChefe() && mesmaUnidade)
                 .habilitarConcluirDiagnostico(contexto.isChefe()
-                && situacao == DIAGNOSTICO_EM_ANDAMENTO
+                        && situacao == DIAGNOSTICO_EM_ANDAMENTO
                         && mesmaUnidade)
                 .habilitarValidarDiagnostico(contexto.isGestor() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)
                 .habilitarDevolverDiagnostico(contexto.isGestorOuAdmin() && situacao == DIAGNOSTICO_CONCLUIDO && mesmaUnidade)

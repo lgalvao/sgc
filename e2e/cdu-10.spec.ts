@@ -244,7 +244,10 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
         await verificarPaginaPainel(page);
     });
 
-    test('5. Cenário 4: Histórico retém as análises após nova disponibilização, inclusive em reentrada quente', async ({_resetAutomatico, page}) => {
+    test('5. Cenário 4: Histórico retém as análises após nova disponibilização, inclusive em reentrada quente', async ({
+                                                                                                                           _resetAutomatico,
+                                                                                                                           page
+                                                                                                                       }) => {
         await login(page, USUARIOS.GESTOR_COORD_22.titulo, USUARIOS.GESTOR_COORD_22.senha);
         await acessarSubprocessoGestor(page, descProcessoRevisao, UNIDADE_ALVO);
         await navegarParaCadastro(page);

@@ -135,7 +135,9 @@ export function useCadastroTela(props: CadastroTelaProps) {
         erroAtualFluxo,
     });
 
-    async function executarAcaoComErroGlobal<T>(acao: () => Promise<T>): Promise<{sucesso: true; resultado: T} | {sucesso: false}> {
+    async function executarAcaoComErroGlobal<T>(acao: () => Promise<T>): Promise<{ sucesso: true; resultado: T } | {
+        sucesso: false
+    }> {
         try {
             return {
                 sucesso: true,
@@ -441,26 +443,32 @@ export function useCadastroTela(props: CadastroTelaProps) {
 }
 
 type ResultadoValidacaoLocal =
-    | {tipo: "pode-validar"}
-    | {tipo: "erro-validacao"; erros: ErroValidacao[]}
-    | {tipo: "acao-nao-permitida"; mensagem: string};
+    | { tipo: "pode-validar" }
+    | { tipo: "erro-validacao"; erros: ErroValidacao[] }
+    | { tipo: "acao-nao-permitida"; mensagem: string };
 
 function validarLocalmente(params: {
-    atividades: {value: Atividade[]};
-    isRevisao: {value: boolean};
-    houveAlteracaoCadastro: {value: boolean};
-    disponibilizacaoSemMudancas: {value: boolean};
-    situacaoAtual: {value: SituacaoSubprocesso | string | undefined};
+    atividades: { value: Atividade[] };
+    isRevisao: { value: boolean };
+    houveAlteracaoCadastro: { value: boolean };
+    disponibilizacaoSemMudancas: { value: boolean };
+    situacaoAtual: { value: SituacaoSubprocesso | string | undefined };
 }): ResultadoValidacaoLocal {
     const {atividades, isRevisao, houveAlteracaoCadastro, disponibilizacaoSemMudancas, situacaoAtual} = params;
     const cadastroIncompleto = atividades.value.length === 0
         || atividades.value.some((atividade) => !atividade.conhecimentos || atividade.conhecimentos.length === 0);
 
     if (cadastroIncompleto) {
-        return {tipo: "erro-validacao", erros: [{tipo: "PRE_VALIDACAO", mensagem: TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO}]};
+        return {
+            tipo: "erro-validacao",
+            erros: [{tipo: "PRE_VALIDACAO", mensagem: TEXTOS.atividades.ERRO_CADASTRO_INCOMPLETO}]
+        };
     }
     if (isRevisao.value && !houveAlteracaoCadastro.value && !disponibilizacaoSemMudancas.value) {
-        return {tipo: "erro-validacao", erros: [{tipo: "PRE_VALIDACAO", mensagem: TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO}]};
+        return {
+            tipo: "erro-validacao",
+            erros: [{tipo: "PRE_VALIDACAO", mensagem: TEXTOS.atividades.ERRO_REVISAO_SEM_ALTERACAO}]
+        };
     }
 
     const situacaoReferencia = isRevisao.value

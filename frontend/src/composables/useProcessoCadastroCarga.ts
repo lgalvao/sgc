@@ -27,14 +27,14 @@ interface UseProcessoCargaParams {
 }
 
 export function useProcessoCadastroCarga({
-    formulario,
-    formFieldsRef,
-    unidades,
-    isLoadingUnidades,
-    isLoadingData,
-    processoEditando,
-    notify
-}: UseProcessoCargaParams) {
+                                             formulario,
+                                             formFieldsRef,
+                                             unidades,
+                                             isLoadingUnidades,
+                                             isLoadingData,
+                                             processoEditando,
+                                             notify
+                                         }: UseProcessoCargaParams) {
     const route = useRoute();
     const router = useRouter();
     const tipoRef = ref<string | null>(null);

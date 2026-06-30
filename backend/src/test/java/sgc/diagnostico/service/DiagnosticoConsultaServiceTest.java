@@ -24,15 +24,24 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DiagnosticoConsultaServiceTest {
 
-    @Mock ComumRepo repo;
-    @Mock AvaliacaoServidorRepo avaliacaoRepo;
-    @Mock SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
-    @Mock SubprocessoConsultaService subprocessoConsultaService;
-    @Mock SubprocessoDtoMapper subprocessoDtoMapper;
-    @Mock DiagnosticoUsuarioContextoService usuarioContextoService;
-    @Mock SubprocessoVisualizacaoService subprocessoVisualizacaoService;
-    @Mock ResponsavelUnidadeService responsavelUnidadeService;
-    @Mock UnidadeService unidadeService;
+    @Mock
+    ComumRepo repo;
+    @Mock
+    AvaliacaoServidorRepo avaliacaoRepo;
+    @Mock
+    SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
+    @Mock
+    SubprocessoConsultaService subprocessoConsultaService;
+    @Mock
+    SubprocessoDtoMapper subprocessoDtoMapper;
+    @Mock
+    DiagnosticoUsuarioContextoService usuarioContextoService;
+    @Mock
+    SubprocessoVisualizacaoService subprocessoVisualizacaoService;
+    @Mock
+    ResponsavelUnidadeService responsavelUnidadeService;
+    @Mock
+    UnidadeService unidadeService;
 
     @InjectMocks
     DiagnosticoConsultaService service;

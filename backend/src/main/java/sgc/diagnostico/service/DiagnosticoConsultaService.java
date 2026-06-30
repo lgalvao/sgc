@@ -275,7 +275,8 @@ public class DiagnosticoConsultaService {
             ) ? "VALIDADO" : "CONCLUIDO";
             case DIAGNOSTICO_HOMOLOGADO -> "HOMOLOGADO";
             case NAO_INICIADO, DIAGNOSTICO_EM_ANDAMENTO -> "EM_ANDAMENTO";
-            default -> throw new IllegalStateException("Situação de subprocesso incompatível com diagnóstico: " + subprocesso.getSituacao());
+            default ->
+                    throw new IllegalStateException("Situação de subprocesso incompatível com diagnóstico: " + subprocesso.getSituacao());
         };
     }
 

@@ -2,9 +2,12 @@
 
 ## Papel no domínio
 
-`sgc.subprocesso` representa a execução do processo por unidade organizacional. Se `processo` é o ciclo macro, `subprocesso` é o workflow operacional real: onde cadastro, mapa, análises, movimentações, permissões e transições acontecem.
+`sgc.subprocesso` representa a execução do processo por unidade organizacional. Se `processo` é o ciclo macro,
+`subprocesso` é o workflow operacional real: onde cadastro, mapa, análises, movimentações, permissões e transições
+acontecem.
 
-É o módulo mais importante para a leitura do produto, porque nele convergem contexto do usuário, situação do workflow e conteúdo do mapa.
+É o módulo mais importante para a leitura do produto, porque nele convergem contexto do usuário, situação do workflow e
+conteúdo do mapa.
 
 ## Responsabilidades centrais
 
@@ -19,29 +22,29 @@
 
 ## Estrutura do pacote
 
-| Área | Papel |
-|---|---|
-| `SubprocessoController` | endpoints REST do domínio |
-| `dto/` | contratos HTTP e respostas orientadas à UI |
-| `model/` | entidades, enums e repositórios do módulo |
-| `service/` | serviços especializados por responsabilidade |
+| Área                    | Papel                                        |
+|-------------------------|----------------------------------------------|
+| `SubprocessoController` | endpoints REST do domínio                    |
+| `dto/`                  | contratos HTTP e respostas orientadas à UI   |
+| `model/`                | entidades, enums e repositórios do módulo    |
+| `service/`              | serviços especializados por responsabilidade |
 
 ## Serviços principais
 
-| Serviço | Responsabilidade |
-|---|---|
-| `SubprocessoConsultaService` | leitura de detalhes, contexto, permissões, histórico, atividades e mapas para visualização |
-| `SubprocessoService` | operações administrativas e orquestrações amplas do módulo |
-| `SubprocessoTransicaoService` | aceite, devolução, homologação, disponibilização, reabertura e mudanças de status |
-| `SubprocessoValidacaoService` | pré-condições e consistência do fluxo |
-| `SubprocessoAcessoService` | cálculo das permissões estruturadas consumidas pela UI |
-| `SubprocessoVisualizacaoService` | montagem de respostas ricas para detalhe, contexto e histórico |
-| `SubprocessoContextoConsultaService` | composição do contexto-base (perfil, hierarquia, localização, mapa vigente...) |
-| `SubprocessoSituacaoService` | reconciliação da situação conforme o estado do mapa |
-| `SubprocessoNotificacaoService` | notificações e efeitos colaterais de transição |
-| `LocalizacaoSubprocessoService` | localização atual do subprocesso |
-| `AnaliseHistoricoService` | histórico analítico do workflow |
-| `CadastroFluxoService` | regras do fluxo de cadastro/revisão de cadastro |
+| Serviço                              | Responsabilidade                                                                           |
+|--------------------------------------|--------------------------------------------------------------------------------------------|
+| `SubprocessoConsultaService`         | leitura de detalhes, contexto, permissões, histórico, atividades e mapas para visualização |
+| `SubprocessoService`                 | operações administrativas e orquestrações amplas do módulo                                 |
+| `SubprocessoTransicaoService`        | aceite, devolução, homologação, disponibilização, reabertura e mudanças de status          |
+| `SubprocessoValidacaoService`        | pré-condições e consistência do fluxo                                                      |
+| `SubprocessoAcessoService`           | cálculo das permissões estruturadas consumidas pela UI                                     |
+| `SubprocessoVisualizacaoService`     | montagem de respostas ricas para detalhe, contexto e histórico                             |
+| `SubprocessoContextoConsultaService` | composição do contexto-base (perfil, hierarquia, localização, mapa vigente...)             |
+| `SubprocessoSituacaoService`         | reconciliação da situação conforme o estado do mapa                                        |
+| `SubprocessoNotificacaoService`      | notificações e efeitos colaterais de transição                                             |
+| `LocalizacaoSubprocessoService`      | localização atual do subprocesso                                                           |
+| `AnaliseHistoricoService`            | histórico analítico do workflow                                                            |
+| `CadastroFluxoService`               | regras do fluxo de cadastro/revisão de cadastro                                            |
 
 ## Como o módulo se organiza
 
@@ -94,7 +97,8 @@ O frontend depende fortemente deste módulo para:
 - histórico de análise
 - visualização do mapa e de impactos
 
-Isso explica por que o módulo possui serviços explícitos de contexto e visualização, em vez de retornar entidades ou estados crus.
+Isso explica por que o módulo possui serviços explícitos de contexto e visualização, em vez de retornar entidades ou
+estados crus.
 
 ## Regras arquiteturais importantes
 
@@ -114,7 +118,9 @@ O módulo é coberto por:
 
 - `SubprocessoControllerTest`
 - testes de integração específicos do pacote `sgc.subprocesso.service`
-- vários cenários do diretório `src/test/java/sgc/integracao`, como `SubprocessoFluxoIntegrationTest`, `SubprocessoServiceContextoIntegrationTest`, `SubprocessoServiceValidacaoIntegrationTest` e CDU-13/14/20/22/23/24/25/26/32/33
+- vários cenários do diretório `src/test/java/sgc/integracao`, como `SubprocessoFluxoIntegrationTest`,
+  `SubprocessoServiceContextoIntegrationTest`, `SubprocessoServiceValidacaoIntegrationTest` e
+  CDU-13/14/20/22/23/24/25/26/32/33
 
 Comando principal:
 

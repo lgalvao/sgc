@@ -113,7 +113,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             }
         });
         expect(response.ok()).toBeTruthy();
-        const processo = await response.json() as {codigo: number};
+        const processo = await response.json() as { codigo: number };
         return processo.codigo;
     };
 
@@ -729,7 +729,10 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await expect(page.getByText(DESC_COMPETENCIA_INICIAL, {exact: true}).first()).toBeVisible();
     });
 
-    test('Fase 8 - ADMIN inicia processo de diagnóstico e os perfis executam o fluxo funcional novo', async ({page, request}) => {
+    test('Fase 8 - ADMIN inicia processo de diagnóstico e os perfis executam o fluxo funcional novo', async ({
+                                                                                                                 page,
+                                                                                                                 request
+                                                                                                             }) => {
         await test.step('CHEFE acompanha o diagnóstico concluído pelo servidor e registra impossibilidade', async () => {
             codigoProcessoDiagnosticoMonitoramento = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture(request);
             await login(page, ADMIN.titulo, ADMIN.senha);

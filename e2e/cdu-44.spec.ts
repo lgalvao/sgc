@@ -10,10 +10,10 @@ const UNIDADE = 'ASSESSORIA_12';
 
 test.describe('CDU-44 - Realizar autoavaliação', () => {
     test('SERVIDOR tenta concluir sem preencher todas as competências, recebe erro, depois preenche e conclui com sucesso', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                                                                       _resetAutomatico,
+                                                                                                                                       page,
+                                                                                                                                       request
+                                                                                                                                   }) => {
         const descricao = `Diagnóstico CDU-44 ${Date.now()}`;
         const processo = await criarProcessoFixture(request, {
             descricao,
@@ -39,7 +39,7 @@ test.describe('CDU-44 - Realizar autoavaliação', () => {
         // 2. Tentar concluir sem preencher nenhuma competência
         await page.getByTestId('btn-concluir-autoavaliacao').click();
         await expect(page.getByRole('dialog')).toContainText(TEXTOS.diagnostico.MODAL_CONCLUIR_MENSAGEM);
-        
+
         await Promise.all([
             page.waitForResponse(res => res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/autoavaliacao/concluir`) && res.status() === 422),
             page.getByTestId('btn-confirmar-concluir').click()

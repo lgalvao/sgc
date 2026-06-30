@@ -13,7 +13,7 @@ console.log(`🔍 Buscando por test-ids em: ${searchDir}\n`);
 
 try {
     const padraoVue = path.join(searchDir, '**/*.vue').replace(/\\/g, '/');
-    const files = await globby(padraoVue, { absolute: true });
+    const files = await globby(padraoVue, {absolute: true});
 
     const findings = [];
     for (const file of files) {

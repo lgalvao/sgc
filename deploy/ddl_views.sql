@@ -1,4 +1,5 @@
-CREATE OR REPLACE VIEW VW_VINCULACAO_UNIDADE
+CREATE
+OR REPLACE VIEW VW_VINCULACAO_UNIDADE
             (unidade_atual_codigo, unidade_anterior_codigo, demais_unidades_historicas) AS
 WITH hierarquia AS (SELECT CONNECT_BY_ROOT u.cd               AS unidade_atual_codigo,
                            CONNECT_BY_ROOT u.cod_unid_tse_ant AS unidade_anterior_codigo,
@@ -17,7 +18,8 @@ SELECT unidade_atual_codigo,
 FROM hierarquia
 GROUP BY unidade_atual_codigo, unidade_anterior_codigo;
 
-CREATE OR REPLACE VIEW VW_ZONA_RESP_CENTRAL
+CREATE
+OR REPLACE VIEW VW_ZONA_RESP_CENTRAL
             (codigo_central, sigla_central, codigo_zona_resp, sigla_zona_resp, data_inicio_resp, data_fim_resp) AS
 SELECT uni_c.cd             AS codigo_central,
        uni_c.sigla_unid_tse AS sigla_central,
@@ -49,7 +51,8 @@ FROM (SELECT cd, sigla_unid_tse
                       AND sit_unid NOT LIKE 'E%') uni_z
                    ON z.numero = uni_z.num_ze;
 
-CREATE OR REPLACE VIEW VW_UNIDADE
+CREATE
+OR REPLACE VIEW VW_UNIDADE
             (codigo, nome, sigla, matricula_titular, titulo_titular, data_inicio_titularidade, tipo, situacao,
              unidade_superior_codigo)
 AS
@@ -171,7 +174,8 @@ FROM (SELECT u.cd                                                           AS c
       FROM dual);
 
 
-CREATE OR REPLACE VIEW VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
+CREATE
+OR REPLACE VIEW VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo) AS
 WITH unidade AS (SELECT codigo,
                         sigla,
                         tipo,
@@ -204,8 +208,7 @@ FROM srh2.servidor s
                   AND l.dt_fim_lotacao IS NULL
          LEFT JOIN unidade u
                    ON u.codigo = l.cod_unid_tse
-         CROSS JOIN unidade_apoio ua
-         OUTER APPLY (SELECT ramal_servidor
+         CROSS JOIN unidade_apoio ua OUTER APPLY (SELECT ramal_servidor
                       FROM (SELECT ramal_servidor
                             FROM srh2.lot_ramais_servidores
                             WHERE mat_servidor = s.mat_servidor
@@ -214,7 +217,8 @@ FROM srh2.servidor s
                             ORDER BY dt_ini_lotacao DESC)
                       WHERE ROWNUM = 1) r;
 
-CREATE OR REPLACE VIEW VW_RESPONSABILIDADE
+CREATE
+OR REPLACE VIEW VW_RESPONSABILIDADE
             (unidade_codigo, usuario_matricula, usuario_titulo, tipo, data_inicio, data_fim) AS
 SELECT u.codigo                                                                AS unidade_codigo,
        COALESCE(a.usuario_matricula, s.mat_serv_com_subs, u.matricula_titular) AS usuario_matricula,
@@ -257,7 +261,8 @@ FROM (SELECT codigo, matricula_titular, titulo_titular, data_inicio_titularidade
                    ON u.codigo = a.unidade_codigo;
 
 
-CREATE OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) AS
+CREATE
+OR REPLACE VIEW VW_USUARIO_PERFIL_UNIDADE (usuario_titulo, perfil, unidade_codigo) AS
 SELECT usuario_titulo, perfil, unidade_codigo
 FROM (SELECT a.usuario_titulo, 'ADMIN' AS perfil, 1 AS unidade_codigo
       FROM administrador a

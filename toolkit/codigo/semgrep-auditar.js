@@ -89,10 +89,10 @@ function criarResumo(resultadoJson, regra) {
 }
 
 async function executarSemgrep({
-    regra = CAMINHO_REGRA_PADRAO,
-    diretorios = DIRETORIOS_PADRAO,
-    auto = false
-}) {
+                                   regra = CAMINHO_REGRA_PADRAO,
+                                   diretorios = DIRETORIOS_PADRAO,
+                                   auto = false
+                               }) {
     const comando = obterComandoSemgrep();
     const configs = auto ? ["--config", "auto", "--config", regra] : ["--config", regra];
     const resultado = await execa(comando, [

@@ -35,7 +35,8 @@
     ```
 
 8. O sistema cria internamente um alerta para a unidade:
-  - `Descrição`: "Lembrete: Prazo do processo :DESCRICAO_PROCESSO: encerra em :DATA_LIMITE:"
+
+- `Descrição`: "Lembrete: Prazo do processo :DESCRICAO_PROCESSO: encerra em :DATA_LIMITE:"
     - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: [Data/hora atual]
     - `Unidade de origem`: ADMIN

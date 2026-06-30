@@ -36,19 +36,19 @@ export default defineConfig({
     projects: [
         {
             name: 'chromium',
-            use: { ...devices['Desktop chrome'], channel: 'chromium-headless-shell' },
+            use: {...devices['Desktop chrome'], channel: 'chromium-headless-shell'},
         },
         {
             name: 'firefox',
-            use: { ...devices['Desktop Firefox'] },
+            use: {...devices['Desktop Firefox']},
         },
         {
             name: 'android',
-            use: { ...devices['Pixel 10'] },
+            use: {...devices['Pixel 10']},
         },
         {
             name: 'ios',
-            use: { ...devices['iPhone 17'] },
+            use: {...devices['iPhone 17']},
         },
     ],
 });

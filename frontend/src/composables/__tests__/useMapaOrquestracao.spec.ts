@@ -22,7 +22,11 @@ vi.mock("@/composables/useMapaQuery", () => ({
 }));
 
 describe("useMapaOrquestracao", () => {
-    const criarComponenteTeste = (props: {codProcesso: number; sigla: string; codSubprocesso?: number}) => defineComponent({
+    const criarComponenteTeste = (props: {
+        codProcesso: number;
+        sigla: string;
+        codSubprocesso?: number
+    }) => defineComponent({
         setup() {
             return useMapaOrquestracao(props);
         },
@@ -96,7 +100,10 @@ describe("useMapaOrquestracao", () => {
 
     it("deve recarregar ao reativar quando o contexto estiver inválido", async () => {
         subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade
-            .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
+            .mockResolvedValue({
+                codigo: 123,
+                contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any
+            });
 
         const wrapper = mount(criarComponenteTeste({codProcesso: 1, sigla: "TEST"}));
         await wrapper.vm.carregarContextoInicial();
@@ -112,7 +119,10 @@ describe("useMapaOrquestracao", () => {
 
     it("não deve recarregar ao reativar quando o contexto ainda for válido", async () => {
         subprocessoStoreMock.obterContextoEdicaoPorProcessoEUnidade
-            .mockResolvedValue({codigo: 123, contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any});
+            .mockResolvedValue({
+                codigo: 123,
+                contexto: {detalhes: {codigo: 123}, unidade: {sigla: "TEST"}, mapa: {codigo: 77}} as any
+            });
 
         const wrapper = mount(criarComponenteTeste({codProcesso: 1, sigla: "TEST"}));
         await wrapper.vm.carregarContextoInicial();

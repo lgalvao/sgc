@@ -35,5 +35,5 @@ CDU.
 
 - O CDU descreve o comportamento do caso de uso.
 - Este documento descreve a estratégia e os padrões de teste.
-- Regras transversais adicionais de design, acesso e terminologia ficam em documentos centrais de `specs/design/` ou
-  de apoio em `specs/`.
+- Regras transversais adicionais de design, acesso e terminologia ficam em documentos centrais de `specs/design/` ou de
+  apoio em `specs/`.

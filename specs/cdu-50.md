@@ -41,13 +41,13 @@
 Se o usuário acionar `Histórico de análise`:
 
 - O sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e
-   observação/justificativa.
+  observação/justificativa.
 
 ---
 Se o usuário acionar `Devolver para ajustes`:
 
 - O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso
-   (referida como :SIGLA_UNIDADE_DEVOLUCAO:).
+  (referida como :SIGLA_UNIDADE_DEVOLUCAO:).
 
 7. O sistema mostra um modal com título `Devolução de diagnóstico` e texto "Confirma a devolução do diagnóstico da
    unidade :SIGLA_UNIDADE_SUBPROCESSO:?", campo `Justificativa` obrigatório e botões `Cancelar` e `Devolver`.
@@ -63,8 +63,8 @@ Se o usuário acionar `Devolver para ajustes`:
    8.2. Muda a situação de todos os servidores da unidade que **nao estejam** na situação 'Avaliação impossibilitada',
    para 'Autoavaliação concluída'. (Isso faz com o sistema volte a habilitar a edição das avaliações de consenso.)
 
-9. O sistema envia notificação por e-mail para a unidade de origem da última movimentação do subprocesso
-   (:SIGLA_UNIDADE_DEVOLUCAO:):
+9. O sistema envia notificação por e-mail para a unidade de origem da última movimentação do subprocesso (:
+   SIGLA_UNIDADE_DEVOLUCAO:):
     ```text
     Assunto: SGC: Diagnóstico devolvido para ajustes
     
@@ -96,8 +96,8 @@ Se o usuário acionar `Devolver para ajustes`:
 
 Se o usuário acionar `Registrar aceite`:
 
-13. O sistema abre um modal, com título `Aceitar diagnóstico` e texto "Confirma o aceite do diagnóstico da
-    unidade :SIGLA_UNIDADE_SUBPROCESSO:?" e os botões `Cancelar` e `Aceitar`.
+13. O sistema abre um modal, com título `Aceitar diagnóstico` e texto "Confirma o aceite do diagnóstico da unidade :
+    SIGLA_UNIDADE_SUBPROCESSO:?" e os botões `Cancelar` e `Aceitar`.
 
 14. O usuário aciona `Aceitar`.
 

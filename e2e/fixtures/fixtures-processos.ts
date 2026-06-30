@@ -95,7 +95,7 @@ export async function criarProcessoFixture(
 
 export async function criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(
     request: APIRequestContext,
-    options: ProcessoFixtureOptions & {servidorTitulo: string}
+    options: ProcessoFixtureOptions & { servidorTitulo: string }
 ): Promise<ProcessoFixture> {
     const response = await request.post('/e2e/fixtures/processo-diagnostico-com-autoavaliacao-concluida', {
         data: {
@@ -119,7 +119,7 @@ export async function criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(
 
 export async function criarProcessoDiagnosticoComConsensoCriadoFixture(
     request: APIRequestContext,
-    options: ProcessoFixtureOptions & {servidorTitulo: string}
+    options: ProcessoFixtureOptions & { servidorTitulo: string }
 ): Promise<ProcessoFixture> {
     const response = await request.post('/e2e/fixtures/processo-diagnostico-com-consenso-criado', {
         data: {
@@ -166,7 +166,7 @@ export async function criarProcessoDiagnosticoConcluidoFixture(
 
 export async function criarProcessoDiagnosticoProntoParaConcluirFixture(
     request: APIRequestContext,
-    options: ProcessoFixtureOptions & {servidorTitulo: string}
+    options: ProcessoFixtureOptions & { servidorTitulo: string }
 ): Promise<ProcessoFixture> {
     const response = await request.post('/e2e/fixtures/processo-diagnostico-pronto-para-concluir', {
         data: {

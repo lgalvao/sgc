@@ -66,13 +66,13 @@ public class ConfigSeguranca {
                                                    CorsConfigurationSource corsConfigurationSource,
                                                    FiltroJwt filtroJwt,
                                                    FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
-        http.authorizeHttpRequests(auth ->         auth.dispatcherTypeMatchers(
-                DispatcherType.ASYNC)
+        http.authorizeHttpRequests(auth -> auth.dispatcherTypeMatchers(
+                                DispatcherType.ASYNC)
                         .permitAll()
                         .requestMatchers(
-                "/api/usuarios/login",
-                "/api/usuarios/entrar",
-                "/api/usuarios/logout")                        .permitAll()
+                                "/api/usuarios/login",
+                                "/api/usuarios/entrar",
+                                "/api/usuarios/logout").permitAll()
                         .requestMatchers("/actuator/**")
                         .hasRole("ADMIN")
                         .requestMatchers("/api/**")

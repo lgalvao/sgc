@@ -13,10 +13,10 @@ const UNIDADE = 'SECAO_111';
 
 test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GESTOR e ADMIN', () => {
     test('GESTOR e ADMIN visualizam a tabela hierárquica de unidades com restrições e analisam os detalhes da unidade', async ({
-        _resetAutomatico,
-        page,
-        request
-    }) => {
+                                                                                                                                   _resetAutomatico,
+                                                                                                                                   page,
+                                                                                                                                   request
+                                                                                                                               }) => {
         const descricao = `Diagnóstico CDU-43 ${Date.now()}`;
 
         // Garante mapa vigente prévio para SECAO_111, obrigatório para processos de diagnóstico
@@ -60,7 +60,7 @@ test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GEST
         // Verifica a exibição da tela de análise do diagnóstico da unidade
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE);
         await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
-        
+
         // Deve mostrar a tabela de Servidores e Consenso
         const listaServidores = page.getByTestId('lista-servidores-diagnostico-unidade');
         await expect(listaServidores).toContainText(NOME_SERVIDOR_SECAO_111);

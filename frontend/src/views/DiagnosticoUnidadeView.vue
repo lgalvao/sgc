@@ -131,18 +131,18 @@
                       data-testid="tbl-competencias-servidor-diagnostico-unidade"
                       hover
                       small
-                    >
-                      <template #cell(importancia)="{ item }">
+                  >
+                    <template #cell(importancia)="{ item }">
                       <div class="text-center">{{ formatarNota(item.importancia) }}</div>
-                      </template>
-                      <template #cell(dominio)="{ item }">
+                    </template>
+                    <template #cell(dominio)="{ item }">
                       <div class="text-center">{{ formatarNota(item.dominio) }}</div>
-                      </template>
-                      <template #cell(situacaoCapacitacao)="{ item }">
+                    </template>
+                    <template #cell(situacaoCapacitacao)="{ item }">
                       <span :title="formatarSituacaoCapacitacao(item.situacaoCapacitacao)">
                         {{ formatarSituacaoCapacitacaoResumida(item.situacaoCapacitacao) }}
                       </span>
-                      </template>
+                    </template>
                   </BTable>
                 </div>
               </BCard>

@@ -1,10 +1,10 @@
 import {describe, expect, it, vi} from 'vitest';
 import diagnosticoRoutes from '../diagnostico.routes';
 
-vi.mock('@/views/AutoavaliacaoDiagnosticoView.vue', () => ({ default: {} }));
-vi.mock('@/views/SituacaoCapacitacaoDiagnosticoView.vue', () => ({ default: {} }));
-vi.mock('@/views/ConsensoDiagnosticoView.vue', () => ({ default: {} }));
-vi.mock('@/views/DiagnosticoUnidadeView.vue', () => ({ default: {} }));
+vi.mock('@/views/AutoavaliacaoDiagnosticoView.vue', () => ({default: {}}));
+vi.mock('@/views/SituacaoCapacitacaoDiagnosticoView.vue', () => ({default: {}}));
+vi.mock('@/views/ConsensoDiagnosticoView.vue', () => ({default: {}}));
+vi.mock('@/views/DiagnosticoUnidadeView.vue', () => ({default: {}}));
 
 describe('diagnostico.routes', () => {
     it('deve expor as rotas do fluxo de diagnóstico com props normalizadas', async () => {

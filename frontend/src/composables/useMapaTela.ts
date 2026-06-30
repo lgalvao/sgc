@@ -220,12 +220,12 @@ export function useMapaTela(props: MapaTelaProps) {
     }
 
     async function executarExportacao({
-        estadoLoading,
-        mensagemPadrao,
-        descricaoLog,
-        acao,
-    }: {
-        estadoLoading: {value: boolean};
+                                          estadoLoading,
+                                          mensagemPadrao,
+                                          descricaoLog,
+                                          acao,
+                                      }: {
+        estadoLoading: { value: boolean };
         mensagemPadrao: string;
         descricaoLog: string;
         acao: () => Promise<void>;

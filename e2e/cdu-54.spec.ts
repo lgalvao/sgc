@@ -4,11 +4,11 @@ import {TEXTOS_RELATORIOS} from '../frontend/src/constants/textos-relatorios.js'
 
 test.describe('CDU-54 - Gerar relatório de gaps de diagnóstico', () => {
     test('ADMIN visualiza o relatório e exporta PDF', async ({
-        _resetAutomatico,
-        page,
-        request,
-        _autenticadoComoAdmin
-    }) => {
+                                                                 _resetAutomatico,
+                                                                 page,
+                                                                 request,
+                                                                 _autenticadoComoAdmin
+                                                             }) => {
         test.slow();
         const descricaoProcesso = `Relatório CDU-53 ${Date.now()}`;
         await criarProcessoDiagnosticoHomologadoFixture(request, {

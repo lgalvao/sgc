@@ -209,7 +209,6 @@ class SubprocessoValidacaoServiceTest {
     class ValidarSituacaoPermitida {
 
 
-
         @Test
         @DisplayName("deve lançar erro de validacao se situacao nao permitida")
         void erroSituacaoNaoPermitida() {

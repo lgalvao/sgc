@@ -47,14 +47,14 @@ watch(() => props.visivel, (aberto) => {
 })
 
 const notaTextoPlano = computed(() =>
-  nota.value
-      .replaceAll(/<br\s*\/?>/gi, '\n')
-      .replaceAll(/<\/(p|div|li)>/gi, '\n')
-      .replaceAll(/<[^>]+>/g, ' ')
-      .replaceAll(/&nbsp;/gi, ' ')
-      .replaceAll(/\s+\n/g, '\n')
-      .replaceAll(/\n{3,}/g, '\n\n')
-      .trim()
+    nota.value
+        .replaceAll(/<br\s*\/?>/gi, '\n')
+        .replaceAll(/<\/(p|div|li)>/gi, '\n')
+        .replaceAll(/<[^>]+>/g, ' ')
+        .replaceAll(/&nbsp;/gi, ' ')
+        .replaceAll(/\s+\n/g, '\n')
+        .replaceAll(/\n{3,}/g, '\n\n')
+        .trim()
 )
 
 const notaValida = computed(() => notaTextoPlano.value.length >= 10)
@@ -98,7 +98,7 @@ function submeter() {
           type="button"
           @click="submeter"
       >
-        <output v-if="enviando" aria-hidden="true" class="spinner-border spinner-border-sm me-1" />
+        <output v-if="enviando" aria-hidden="true" class="spinner-border spinner-border-sm me-1"/>
         Enviar feedback
       </button>
     </template>

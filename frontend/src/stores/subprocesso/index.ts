@@ -48,7 +48,6 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
     }
 
 
-
     function resetar(): void {
         carregamentos.clear();
         codigosEdicaoPorProcessoUnidade.clear();
@@ -91,14 +90,14 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         registrarContextoCadastro,
     });
 
-    function obterContextoEdicao(codigoSubprocesso: number, {recarregar = false}: {recarregar?: boolean} = {}) {
+    function obterContextoEdicao(codigoSubprocesso: number, {recarregar = false}: { recarregar?: boolean } = {}) {
         return orquestrador.garantirContextoPorCodigo(codigoSubprocesso, recarregar, configEdicao);
     }
 
     function obterContextoEdicaoPorProcessoEUnidade(
         codigoProcesso: number,
         siglaUnidade: string,
-        {recarregar = false}: {recarregar?: boolean} = {},
+        {recarregar = false}: { recarregar?: boolean } = {},
     ) {
         return orquestrador.garantirContextoPorProcessoEUnidade(codigoProcesso, siglaUnidade, {
             limparAntes: recarregar,
@@ -106,14 +105,16 @@ export const useSubprocessoStore = defineStore("subprocesso", () => {
         });
     }
 
-    function obterContextoCadastroAtividades(codigoSubprocesso: number, {recarregar = false}: {recarregar?: boolean} = {}) {
+    function obterContextoCadastroAtividades(codigoSubprocesso: number, {recarregar = false}: {
+        recarregar?: boolean
+    } = {}) {
         return orquestrador.garantirContextoPorCodigo(codigoSubprocesso, recarregar, configCadastro);
     }
 
     async function obterContextoCadastroAtividadesPorProcessoEUnidade(
         codigoProcesso: number,
         siglaUnidade: string,
-        {recarregar = false}: {recarregar?: boolean} = {},
+        {recarregar = false}: { recarregar?: boolean } = {},
     ) {
         return (await orquestrador.garantirContextoPorProcessoEUnidade(codigoProcesso, siglaUnidade, {
             limparAntes: recarregar,

@@ -399,7 +399,7 @@ describe("ImportarAtividadesModal.vue", () => {
         const vm = obterVm(wrapper) as any;
         vm.erroImportacao = "Erro";
         await wrapper.vm.$nextTick();
-        
+
         vm.limparErroImportacao();
         expect(vm.erroImportacao).toBeNull();
     });
@@ -410,7 +410,7 @@ describe("ImportarAtividadesModal.vue", () => {
         vm.unidadeSelecionada = {codUnidade: 10, sigla: "U1", codSubprocesso: 100, nome: "Unidade 1"};
         vm.atividadesParaImportar = [];
         await wrapper.vm.$nextTick();
-        
+
         expect(wrapper.text()).toContain("Nenhuma atividade encontrada");
     });
 });

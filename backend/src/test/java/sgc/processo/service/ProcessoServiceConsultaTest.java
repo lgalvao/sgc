@@ -793,7 +793,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
     @DisplayName("podeDisponibilizarEmBloco deve exercitar todas as combinações de situações de subprocesso")
     void podeDisponibilizarEmBloco_DeveExercitarTodasAsCombinacoesDeSituacoes() {
         Long codProcesso = 1L;
-        
+
         Usuario usuario = new Usuario();
         usuario.setPerfilAtivo(Perfil.GESTOR);
         usuario.setUnidadeAtivaCodigo(10L);
@@ -945,12 +945,20 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
         lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
-        Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
+        Usuario admin = new Usuario();
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
-        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setSituacao(EM_ANDAMENTO);
+        p.setTipo(MAPEAMENTO);
         p.adicionarParticipantes(Set.of(uni));
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(uni);
+        sp.setProcesso(p);
         sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
@@ -964,17 +972,25 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
         lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
-        Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
+        Usuario admin = new Usuario();
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
-        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(SituacaoProcesso.FINALIZADO); p.setTipo(MAPEAMENTO);
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setSituacao(SituacaoProcesso.FINALIZADO);
+        p.setTipo(MAPEAMENTO);
         p.adicionarParticipantes(Set.of(uni));
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(uni);
+        sp.setProcesso(p);
         sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
         ProcessoDetalheDto res = processoService.obterDetalhesCompleto(cod, true);
-        
+
         // Se o processo está FINALIZADO, nenhuma ação é permitida, então elegiveis deve ser vazio
         assertThat(res.getElegiveis()).isEmpty();
     }
@@ -985,12 +1001,20 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Long cod = 1L;
         Unidade uni = criarUnidadeValida(10L);
         lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
-        Usuario admin = new Usuario(); admin.setPerfilAtivo(Perfil.ADMIN); admin.setUnidadeAtivaCodigo(10L);
+        Usuario admin = new Usuario();
+        admin.setPerfilAtivo(Perfil.ADMIN);
+        admin.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(admin);
-        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setSituacao(EM_ANDAMENTO);
+        p.setTipo(MAPEAMENTO);
         p.adicionarParticipantes(Set.of(uni));
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(uni);
+        sp.setProcesso(p);
         sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
@@ -1005,12 +1029,20 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Unidade uni = criarUnidadeValida(10L);
         lenient().when(validacaoService.validarSubprocessosParaFinalizacao(anyLong(), any())).thenReturn(ResultadoValidacao.ofValido());
         lenient().when(unidadeHierarquiaService.buscarIdsDescendentes(anyLong())).thenReturn(List.of(10L));
-        Usuario gestor = new Usuario(); gestor.setPerfilAtivo(Perfil.GESTOR); gestor.setUnidadeAtivaCodigo(10L);
+        Usuario gestor = new Usuario();
+        gestor.setPerfilAtivo(Perfil.GESTOR);
+        gestor.setUnidadeAtivaCodigo(10L);
         when(usuarioService.usuarioAutenticado()).thenReturn(gestor);
-        Processo p = new Processo(); p.setCodigo(cod); p.setSituacao(EM_ANDAMENTO); p.setTipo(MAPEAMENTO);
+        Processo p = new Processo();
+        p.setCodigo(cod);
+        p.setSituacao(EM_ANDAMENTO);
+        p.setTipo(MAPEAMENTO);
         p.adicionarParticipantes(Set.of(uni));
         when(repo.buscar(Processo.class, cod)).thenReturn(p);
-        Subprocesso sp = new Subprocesso(); sp.setCodigo(100L); sp.setUnidade(uni); sp.setProcesso(p); 
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(100L);
+        sp.setUnidade(uni);
+        sp.setProcesso(p);
         sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.REVISAO_MAPA_COM_SUGESTOES);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(100L, uni));
@@ -1046,7 +1078,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         p.setSituacao(EM_ANDAMENTO);
         when(consultaService.listarEntidadesPorProcesso(cod)).thenReturn(List.of(sp));
         when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), uni));
-        
+
         ProcessoDetalheDto res1 = processoService.obterDetalhesCompleto(cod, true);
         assertThat(res1.getAcoesBloco()).filteredOn(a -> a.getCodigo().contains("homologar"))
                 .allSatisfy(a -> assertThat(a.isHabilitar()).isFalse());

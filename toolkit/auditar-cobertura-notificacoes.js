@@ -16,9 +16,9 @@ function lerSeExistir(caminho) {
 }
 
 async function listarCdusComEmail() {
-    const arquivos = await globby(path.join(dirRequisitos, 'cdu-*.md').replace(/\\/g, '/'), { absolute: true });
+    const arquivos = await globby(path.join(dirRequisitos, 'cdu-*.md').replace(/\\/g, '/'), {absolute: true});
     const cdus = [];
-    
+
     for (const caminho of arquivos) {
         const nome = path.basename(caminho);
         const texto = fs.readFileSync(caminho, 'utf8');
@@ -26,7 +26,7 @@ async function listarCdusComEmail() {
         const mencionaEmail = assuntos.length > 0
             || /envia(?:r)? notifica(?:ç|c)(?:ões|ao) por e-?mail/i.test(texto)
             || /envia(?:r)? e-?mails?/i.test(texto);
-        
+
         cdus.push({
             numero: nome.match(/\d+/)?.[0] ?? '?',
             nome,
@@ -49,14 +49,14 @@ function detectarTemplates(renderTexto) {
 }
 
 async function listarTemplatesEmail() {
-    const arquivos = await globby(path.join(dirTemplates, '*.html').replace(/\\/g, '/'), { absolute: true });
+    const arquivos = await globby(path.join(dirTemplates, '*.html').replace(/\\/g, '/'), {absolute: true});
     return arquivos
         .map(caminho => path.basename(caminho))
         .filter(nome => nome !== '_layout.html')
         .map(nome => nome.replace(/\.html$/, ''));
 }
 
- 
+
 function resumirCobertura(cdu, renderTemplates, templatesEmail, analisarTemplates) {
     const numero = cdu.numero.padStart(2, '0');
     const arquivoIntegracao = path.join(dirIntegracao, `CDU${numero}IntegrationTest.java`);

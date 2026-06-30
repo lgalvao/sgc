@@ -440,7 +440,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             await expect(page.getByTestId('header-subprocesso')).toBeVisible();
             await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText(/Revisão do cadastro homologada/i);
             const cardMapa = page.getByTestId('card-subprocesso-mapa');
-            await cardMapa.waitFor({ state: 'visible' });
+            await cardMapa.waitFor({state: 'visible'});
             await expect(cardMapa).toContainText('Mapa de competências técnicas da unidade');
             await expect(page.getByTestId('card-subprocesso-atividades')).toBeVisible();
             await expect(page.getByTestId('card-subprocesso-atividades')).toContainText('Cadastro de atividades e conhecimentos da unidade');
@@ -472,7 +472,7 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
             }
         });
         expect(response.ok()).toBeTruthy();
-        const processo = await response.json() as {codigo: number};
+        const processo = await response.json() as { codigo: number };
         codigoProcessoDiagnostico = processo.codigo;
     };
 

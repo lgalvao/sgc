@@ -4,11 +4,11 @@ import {TEXTOS_RELATORIOS} from '../frontend/src/constants/textos-relatorios.js'
 
 test.describe('CDU-55 - Gerar relatório de situação de capacitação', () => {
     test('ADMIN visualiza o relatório e exporta PDF', async ({
-        _resetAutomatico,
-        page,
-        request,
-        _autenticadoComoAdmin
-    }) => {
+                                                                 _resetAutomatico,
+                                                                 page,
+                                                                 request,
+                                                                 _autenticadoComoAdmin
+                                                             }) => {
         test.slow();
         const descricaoProcesso = `Relatório CDU-54 ${Date.now()}`;
         await criarProcessoDiagnosticoHomologadoFixture(request, {

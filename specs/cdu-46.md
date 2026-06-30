@@ -24,7 +24,7 @@
    Abaixo um exemplo de grade:
 
    | Competência | Importância | Domínio | Consenso 
-                        | :---- | :---: | :---: | :---:
+                           | :---- | :---: | :---: | :---:
    | Desc. competência 1 | 4 | 1 | 3
    | Desc. competência 2 | NA | NA | NA
    | Desc. competência 3 | 3 | 2 | 3
@@ -36,7 +36,7 @@
 
    5.1. O sistema mostra uma tela de confirmação: "Confirma a aprovação do cosenso?"
    com botões `Cancelar` e `Aprovar consenso`
-   
+
    5.2. Feita a confirmação, o sistema altera a situação do servidor para 'Avaliação de consenso aprovada'.
 
 6. O sistema envia uma notificação por e-mail ao responsável pela unidade do subprocesso, com este modelo:

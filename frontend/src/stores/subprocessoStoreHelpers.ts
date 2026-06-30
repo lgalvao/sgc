@@ -33,12 +33,12 @@ export type EstadoContextoRef<T extends ContextoSubprocesso> = {
 };
 
 export function registrarContexto<T extends ContextoSubprocesso>({
-    contextoRef,
-    contextoInvalidoRef,
-    contextoSessaoRef,
-    contexto,
-    limparErroIntegracao,
-}: RegistrarContextoParams<T>): void {
+                                                                     contextoRef,
+                                                                     contextoInvalidoRef,
+                                                                     contextoSessaoRef,
+                                                                     contexto,
+                                                                     limparErroIntegracao,
+                                                                 }: RegistrarContextoParams<T>): void {
     contextoRef.value = contexto;
     contextoInvalidoRef.value = false;
     contextoSessaoRef.value = serializarContextoSessaoSubprocesso(criarContextoSessaoSubprocessoAtual());

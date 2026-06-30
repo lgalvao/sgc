@@ -56,9 +56,9 @@ class RelatorioServiceTest {
 
     private void mockContextoAdmin() {
         when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
-            "111111111111",
-            999L,
-            Perfil.ADMIN
+                "111111111111",
+                999L,
+                Perfil.ADMIN
         ));
     }
 
@@ -582,9 +582,9 @@ class RelatorioServiceTest {
 
     private void mockContextoUsuario(Perfil perfil, Long unidadeAtivaCodigo) {
         when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new ContextoUsuarioAutenticado(
-            "111111111111",
-            unidadeAtivaCodigo,
-            perfil
+                "111111111111",
+                unidadeAtivaCodigo,
+                perfil
         ));
     }
 
@@ -847,7 +847,6 @@ class RelatorioServiceTest {
 
         verify(document, atLeastOnce()).add(any());
     }
-
 
 
     @Test
@@ -1393,7 +1392,9 @@ class RelatorioServiceTest {
         // Subprocesso 1: Descrição com underscores consecutivos (Lacuna linha 880)
         Subprocesso sp1 = mock(Subprocesso.class);
         Unidade u1 = new Unidade();
-        u1.setCodigo(101L); u1.setSigla("U1"); u1.setNome("Unidade 1");
+        u1.setCodigo(101L);
+        u1.setSigla("U1");
+        u1.setNome("Unidade 1");
         when(sp1.getUnidade()).thenReturn(u1);
         when(sp1.getCodigo()).thenReturn(101L);
         SituacaoSubprocesso sit1 = mock(SituacaoSubprocesso.class);
@@ -1403,7 +1404,9 @@ class RelatorioServiceTest {
         // Subprocesso 2: Descrição vazia (Lacuna linha 873 - isBlank)
         Subprocesso sp2 = mock(Subprocesso.class);
         Unidade u2 = new Unidade();
-        u2.setCodigo(102L); u2.setSigla("U2"); u2.setNome("Unidade 2");
+        u2.setCodigo(102L);
+        u2.setSigla("U2");
+        u2.setNome("Unidade 2");
         when(sp2.getUnidade()).thenReturn(u2);
         when(sp2.getCodigo()).thenReturn(102L);
         SituacaoSubprocesso sit2 = mock(SituacaoSubprocesso.class);
@@ -1413,7 +1416,9 @@ class RelatorioServiceTest {
         // Subprocesso 3: Descrição nula (Lacuna linha 873 - null)
         Subprocesso sp3 = mock(Subprocesso.class);
         Unidade u3 = new Unidade();
-        u3.setCodigo(103L); u3.setSigla("U3"); u3.setNome("Unidade 3");
+        u3.setCodigo(103L);
+        u3.setSigla("U3");
+        u3.setNome("Unidade 3");
         when(sp3.getUnidade()).thenReturn(u3);
         when(sp3.getCodigo()).thenReturn(103L);
         SituacaoSubprocesso sit3 = mock(SituacaoSubprocesso.class);
@@ -1495,22 +1500,24 @@ class RelatorioServiceTest {
         void deveCobrirIOExceptionNoRelatorio() throws Exception {
             RelatorioService spyService = spy(relatorioService);
             when(pdfFactory.createDocument()).thenReturn(document);
-            
+
             // Força IOException no cabeçalho para atingir o catch de IOException em gerarRelatorioUnidadesSemMapasVigentes
             when(unidadeService.buscarCodigosUnidadesSemMapaVigente()).thenReturn(List.of(1L));
             doThrow(new IOException("Erro de IO")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
             assertThatThrownBy(() -> spyService.gerarRelatorioUnidadesSemMapasVigentes(new ByteArrayOutputStream()))
-                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                .hasMessageContaining("Erro ao gerar PDF")
-                .hasCauseInstanceOf(IOException.class);
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                    .hasMessageContaining("Erro ao gerar PDF")
+                    .hasCauseInstanceOf(IOException.class);
 
             // Força DocumentException em gerarRelatorioAndamento
-            Processo p = new Processo(); p.setDescricao("P1"); p.setTipo(TipoProcesso.MAPEAMENTO);
+            Processo p = new Processo();
+            p.setDescricao("P1");
+            p.setTipo(TipoProcesso.MAPEAMENTO);
             when(processoService.buscarPorCodigo(1L)).thenReturn(p);
             doThrow(new DocumentException("Erro PDF")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
             assertThatThrownBy(() -> spyService.gerarRelatorioAndamento(1L, new ByteArrayOutputStream()))
-                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                .hasCauseInstanceOf(DocumentException.class);
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                    .hasCauseInstanceOf(DocumentException.class);
         }
 
         @Test
@@ -1518,14 +1525,16 @@ class RelatorioServiceTest {
         void deveCobrirIOExceptionNoRelatorioAndamento() throws Exception {
             RelatorioService spyService = spy(relatorioService);
             when(pdfFactory.createDocument()).thenReturn(document);
-            Processo p = new Processo(); p.setDescricao("P1"); p.setTipo(TipoProcesso.MAPEAMENTO);
+            Processo p = new Processo();
+            p.setDescricao("P1");
+            p.setTipo(TipoProcesso.MAPEAMENTO);
             when(processoService.buscarPorCodigo(1L)).thenReturn(p);
             doThrow(new IOException("Erro de IO")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
 
             assertThatThrownBy(() -> spyService.gerarRelatorioAndamento(1L, new ByteArrayOutputStream()))
-                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                .hasMessageContaining("Erro ao gerar PDF")
-                .hasCauseInstanceOf(IOException.class);
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                    .hasMessageContaining("Erro ao gerar PDF")
+                    .hasCauseInstanceOf(IOException.class);
         }
 
         @Test
@@ -1538,9 +1547,9 @@ class RelatorioServiceTest {
             doThrow(new IOException("Erro de IO")).when(spyService).adicionarCabecalhoRelatorio(any(), any());
 
             assertThatThrownBy(() -> spyService.gerarRelatorioMapas(List.of(1L), new ByteArrayOutputStream()))
-                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                .hasMessageContaining("Erro ao gerar PDF")
-                .hasCauseInstanceOf(IOException.class);
+                    .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
+                    .hasMessageContaining("Erro ao gerar PDF")
+                    .hasCauseInstanceOf(IOException.class);
         }
 
         @Test

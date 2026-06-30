@@ -96,6 +96,7 @@ a {
   color: #0056b3;
   text-decoration: underline;
 }
+
 a:hover {
   color: #004085;
 }

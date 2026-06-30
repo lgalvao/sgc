@@ -511,8 +511,8 @@ class ValidadorDadosOrganizacionaisTest {
             Map<?, ?> parametros = invocacao.getArgument(1);
             if (parametros.containsKey("codigos")) {
                 return List.of(
-                    Map.of("usuario_titulo", "222", "perfil", "SERVIDOR", "unidade_codigo", 1L),
-                    Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L)
+                        Map.of("usuario_titulo", "222", "perfil", "SERVIDOR", "unidade_codigo", 1L),
+                        Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L)
                 );
             }
             return List.of();
@@ -543,9 +543,9 @@ class ValidadorDadosOrganizacionaisTest {
             Map<?, ?> parametros = invocacao.getArgument(1);
             if (parametros.containsKey("codigos")) {
                 return List.of(
-                    Map.of("usuario_titulo", "111", "perfil", "SERVIDOR", "unidade_codigo", 1L),
-                    Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L),
-                    Map.of("usuario_titulo", "222", "perfil", "GESTOR", "unidade_codigo", 1L)
+                        Map.of("usuario_titulo", "111", "perfil", "SERVIDOR", "unidade_codigo", 1L),
+                        Map.of("usuario_titulo", "111", "perfil", "GESTOR", "unidade_codigo", 1L),
+                        Map.of("usuario_titulo", "222", "perfil", "GESTOR", "unidade_codigo", 1L)
                 );
             }
             return List.of();

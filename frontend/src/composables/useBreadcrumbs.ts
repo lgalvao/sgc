@@ -39,11 +39,11 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     }
 
     const getProcessoBreadcrumbs = ({
-        codProcesso,
-        isProcessoRoute,
-        isSubprocessoRoute,
-        perfilUsuario
-    }: ProcessoBreadcrumbsParams): Breadcrumb[] => {
+                                        codProcesso,
+                                        isProcessoRoute,
+                                        isSubprocessoRoute,
+                                        perfilUsuario
+                                    }: ProcessoBreadcrumbsParams): Breadcrumb[] => {
         const crumbs: Breadcrumb[] = [];
         if (codProcesso && (isProcessoRoute || isSubprocessoRoute)) {
             const shouldShowProcessoCrumb = perfilUsuario !== Perfil.CHEFE && perfilUsuario !== Perfil.SERVIDOR;
@@ -65,11 +65,11 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
     }
 
     const getSubprocessoBreadcrumbs = ({
-        codProcesso,
-        siglaUnidade,
-        isSubprocessoRoute,
-        routeName
-    }: SubprocessoBreadcrumbsParams): Breadcrumb[] => {
+                                           codProcesso,
+                                           siglaUnidade,
+                                           isSubprocessoRoute,
+                                           routeName
+                                       }: SubprocessoBreadcrumbsParams): Breadcrumb[] => {
         const crumbs: Breadcrumb[] = [];
         if (siglaUnidade && isSubprocessoRoute) {
             crumbs.push({
@@ -148,8 +148,8 @@ export function useBreadcrumbs(route: RouteLocationNormalizedLoaded) {
         const isUnidadeRoute = ["Unidade", "Mapa", "AtribuicaoTemporariaForm"].includes(routeName);
 
         breadcrumbs.push(
-            ...getProcessoBreadcrumbs({ codProcesso, isProcessoRoute, isSubprocessoRoute, perfilUsuario }),
-            ...getSubprocessoBreadcrumbs({ codProcesso, siglaUnidade, isSubprocessoRoute, routeName }),
+            ...getProcessoBreadcrumbs({codProcesso, isProcessoRoute, isSubprocessoRoute, perfilUsuario}),
+            ...getSubprocessoBreadcrumbs({codProcesso, siglaUnidade, isSubprocessoRoute, routeName}),
             ...getUnidadeBreadcrumbs(codUnidade, isUnidadeRoute, routeName)
         );
 

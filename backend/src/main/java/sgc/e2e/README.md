@@ -2,7 +2,9 @@
 
 ## Papel do pacote
 
-`sgc.e2e` existe para suportar a suíte Playwright com endpoints e adaptações exclusivas de automação. Ele é parte do backend, mas **não faz parte do produto funcional**: serve como adapter de teste para reset de estado, fixtures e ajustes de segurança do ambiente E2E.
+`sgc.e2e` existe para suportar a suíte Playwright com endpoints e adaptações exclusivas de automação. Ele é parte do
+backend, mas **não faz parte do produto funcional**: serve como adapter de teste para reset de estado, fixtures e
+ajustes de segurança do ambiente E2E.
 
 ## Princípio de isolamento
 
@@ -18,11 +20,11 @@ Se essas condições não forem satisfeitas, os endpoints auxiliares não devem 
 
 ## Componentes principais
 
-| Componente | Responsabilidade |
-|---|---|
-| `E2eController` | expõe endpoints de reset, limpeza e fixtures |
-| `E2eSecurityConfig` | ajusta a segurança para `/e2e/**` sem alterar o comportamento funcional da API principal |
-| `AtribuicaoTemporariaViewsE2eAspect` | sincroniza visões auxiliares usadas em cenários de atribuição temporária |
+| Componente                           | Responsabilidade                                                                         |
+|--------------------------------------|------------------------------------------------------------------------------------------|
+| `E2eController`                      | expõe endpoints de reset, limpeza e fixtures                                             |
+| `E2eSecurityConfig`                  | ajusta a segurança para `/e2e/**` sem alterar o comportamento funcional da API principal |
+| `AtribuicaoTemporariaViewsE2eAspect` | sincroniza visões auxiliares usadas em cenários de atribuição temporária                 |
 
 ## O que a suíte usa daqui
 
@@ -35,7 +37,8 @@ Exemplos importantes:
 - `POST /e2e/processo/{codigo}/limpar-completo`
 - `POST /e2e/fixtures/*`
 
-Esses endpoints reduzem o custo dos cenários Playwright ao permitir preparação e limpeza de estado sem depender apenas da UI.
+Esses endpoints reduzem o custo dos cenários Playwright ao permitir preparação e limpeza de estado sem depender apenas
+da UI.
 
 ## Relação com a suíte Playwright
 
@@ -47,7 +50,8 @@ graph LR
     E2eController --> Backend[Domínios reais do backend]
 ```
 
-O ponto importante é que as fixtures do pacote `e2e` preparam o ambiente, mas os domínios de negócio exercitados continuam sendo os domínios reais (`processo`, `subprocesso`, `mapa`, `organizacao`...).
+O ponto importante é que as fixtures do pacote `e2e` preparam o ambiente, mas os domínios de negócio exercitados
+continuam sendo os domínios reais (`processo`, `subprocesso`, `mapa`, `organizacao`...).
 
 ## Regras operacionais
 

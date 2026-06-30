@@ -203,10 +203,10 @@ const ehServidorPuro = computed(() => {
     return false;
   }
   return !permissoes.podeCriarConsenso
-    && !permissoes.podeConcluirDiagnostico
-    && !permissoes.podeValidarDiagnostico
-    && !permissoes.podeDevolverDiagnostico
-    && !permissoes.podeHomologarDiagnostico;
+      && !permissoes.podeConcluirDiagnostico
+      && !permissoes.podeValidarDiagnostico
+      && !permissoes.podeDevolverDiagnostico
+      && !permissoes.podeHomologarDiagnostico;
 });
 const {registrarPendente} = useToast();
 const modalConcluirDiagnosticoAberto = ref(false);
@@ -222,13 +222,13 @@ const {
   concluirDiagnostico,
 } = useFluxoDiagnostico(() => codigoSubprocesso.value ?? 0);
 const mostrarHistoricoAnaliseDiagnostico = computed(() =>
-  !!subprocesso.value?.permissoes?.mostrarHistoricoAnaliseDiagnostico,
+    !!subprocesso.value?.permissoes?.mostrarHistoricoAnaliseDiagnostico,
 );
 const mostrarConcluirDiagnosticoCabecalho = computed(() =>
-  !!subprocesso.value?.permissoes?.podeConcluirDiagnostico,
+    !!subprocesso.value?.permissoes?.podeConcluirDiagnostico,
 );
 const habilitarConcluirDiagnosticoCabecalho = computed(() =>
-  !!subprocesso.value?.permissoes?.habilitarConcluirDiagnostico,
+    !!subprocesso.value?.permissoes?.habilitarConcluirDiagnostico,
 );
 
 async function abrirHistoricoAnaliseDiagnostico() {
@@ -251,8 +251,8 @@ async function abrirModalConcluirDiagnostico() {
     modalConcluirDiagnosticoAberto.value = true;
   } catch (erro) {
     const mensagemErro = normalizarErro(erro).mensagem
-      ?? erroValidacaoConcluir.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+        ?? erroValidacaoConcluir.value?.message
+        ?? TEXTOS.diagnostico.ERRO_SALVAR;
     erroConcluirDiagnostico.value = mensagemErro;
     notify(mensagemErro, 'danger', true);
   }
@@ -266,8 +266,8 @@ async function confirmarConcluirDiagnostico() {
     await router.push({name: 'Painel'});
   } catch (erro) {
     erroConcluirDiagnostico.value = normalizarErro(erro).mensagem
-      ?? erroConcluir.value?.message
-      ?? TEXTOS.diagnostico.ERRO_SALVAR;
+        ?? erroConcluir.value?.message
+        ?? TEXTOS.diagnostico.ERRO_SALVAR;
   }
 }
 

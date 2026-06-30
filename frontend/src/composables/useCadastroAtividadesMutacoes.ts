@@ -31,7 +31,7 @@ export function useCadastroAtividadesMutacoes({
                                                   notify,
                                                   processarRespostaLocal,
                                                   adicionarAtividadeAction,
-                                               }: UseCadastroAtividadesMutacoesParams) {
+                                              }: UseCadastroAtividadesMutacoesParams) {
     const erroNovaAtividade = ref<string | null>(null);
     const dadosRemocao = ref<DadosRemocaoCadastro>(null);
     const loadingRemocao = ref(false);
@@ -58,8 +58,8 @@ export function useCadastroAtividadesMutacoes({
 
     const executarAtualizacao = async (acao: () => Promise<AtividadeOperacaoResponse>, msg: string) => {
         const resultado = await executarOperacaoAtividade(async () => {
-            processarRespostaLocal(await acao());
-        },
+                processarRespostaLocal(await acao());
+            },
             () => notify(msg, "danger"),
         );
         return resultado.sucesso;

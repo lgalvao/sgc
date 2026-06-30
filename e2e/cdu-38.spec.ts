@@ -3,11 +3,11 @@ import {abrirNotificacoesAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 test.describe('CDU-38 - Acompanhar notificações por e-mail', () => {
     test('ADMIN visualiza detalhes, preview e reenfileira notificação com falha definitiva', async ({
-        _resetAutomatico,
-        page,
-        request,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                                        _resetAutomatico,
+                                                                                                        page,
+                                                                                                        request,
+                                                                                                        _autenticadoComoAdmin
+                                                                                                    }) => {
         const respostaFalha = await request.post('/e2e/fixtures/notificacao-email', {
             data: {
                 destinatario: 'falha.definitiva@tre-pe.jus.br',

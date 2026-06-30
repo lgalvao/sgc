@@ -1616,7 +1616,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
 
             await page.getByTestId('btn-visualizar-unidades-sem-mapa').click();
             await expect(page.locator('.arvore-unidades-sem-mapa').first()).toBeVisible();
-            await capturarTela(page, 'relatorios', 'relatorio-unidades-sem-mapas-vigentes-arvore', {fullPage: true, tags: ['arvore', 'unidades-sem-mapas']});
+            await capturarTela(page, 'relatorios', 'relatorio-unidades-sem-mapas-vigentes-arvore', {
+                fullPage: true,
+                tags: ['arvore', 'unidades-sem-mapas']
+            });
         });
     });
 

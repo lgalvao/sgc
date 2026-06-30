@@ -641,7 +641,6 @@ class SubprocessoNotificacaoServiceTest {
     }
 
 
-
     @Test
     @DisplayName("deve tolerar falha no envio de email e manter criacao de alerta")
     void deveTolerarFalhaNoEnvioDeEmailEManterCriacaoDeAlerta() {
@@ -699,7 +698,6 @@ class SubprocessoNotificacaoServiceTest {
         // Verifica que não enfileirou nada (não tem template email normal nem superior)
         verify(notificacaoService, never()).enfileirar(any());
     }
-
 
 
 }

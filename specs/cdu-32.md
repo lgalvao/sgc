@@ -64,18 +64,18 @@
     ```
 
 10. O sistema cria internamente alertas:
-   10.1. Para a unidade solicitante:
+    10.1. Para a unidade solicitante:
     - `Descrição`: "Cadastro reaberto"
     - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: Data/hora atual
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE:
 
-   10.2. Para a unidade superior:
-    - `Descrição`: "Cadastro reaberto"
-    - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: Data/hora atual
-    - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
+10.2. Para a unidade superior:
+- `Descrição`: "Cadastro reaberto"
+- `Processo`: :DESCRICAO_PROCESSO:
+- `Data/hora`: Data/hora atual
+- `Unidade de origem`: ADMIN
+- `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 
 11. O sistema mostra *toast* "Cadastro reaberto".

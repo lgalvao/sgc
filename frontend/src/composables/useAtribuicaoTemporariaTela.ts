@@ -134,17 +134,17 @@ function criarApresentacao(campos: EstadoCampos, atribuicoes: Ref<AtribuicaoTemp
 }
 
 function criarFluxoCarga({
-    atribuicaoVigente,
-    atribuicoes,
-    campos,
-    carregamentoInicialConcluido,
-    carregandoInicial,
-    codigoUnidade,
-    erroFormulario,
-    erroUsuario,
-    resetarValidacao,
-    unidadeQuery
-}: {
+                             atribuicaoVigente,
+                             atribuicoes,
+                             campos,
+                             carregamentoInicialConcluido,
+                             carregandoInicial,
+                             codigoUnidade,
+                             erroFormulario,
+                             erroUsuario,
+                             resetarValidacao,
+                             unidadeQuery
+                         }: {
     atribuicaoVigente: Ref<AtribuicaoTemporaria | null>;
     atribuicoes: Ref<AtribuicaoTemporaria[]>;
     campos: EstadoCampos;
@@ -196,23 +196,23 @@ function criarFluxoCarga({
 }
 
 function criarFluxoMutacao({
-    atribuicaoVigente,
-    atribuicoes,
-    campos,
-    codigoUnidade,
-    erroFormulario,
-    erroUsuario,
-    formularioValido,
-    invalidarDiagnostico,
-    carregando,
-    exibirSucesso,
-    mostrarModalRemocao,
-    resetarValidacao,
-    unidade,
-    unidadeQuery,
-    validarSubmissao,
-    focarPrimeiroErroInvalido
-}: {
+                               atribuicaoVigente,
+                               atribuicoes,
+                               campos,
+                               codigoUnidade,
+                               erroFormulario,
+                               erroUsuario,
+                               formularioValido,
+                               invalidarDiagnostico,
+                               carregando,
+                               exibirSucesso,
+                               mostrarModalRemocao,
+                               resetarValidacao,
+                               unidade,
+                               unidadeQuery,
+                               validarSubmissao,
+                               focarPrimeiroErroInvalido
+                           }: {
     atribuicaoVigente: Ref<AtribuicaoTemporaria | null>;
     atribuicoes: Ref<AtribuicaoTemporaria[]>;
     campos: EstadoCampos;

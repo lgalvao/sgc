@@ -34,8 +34,8 @@
    foram associadas a pelo menos uma competência do mapa da unidade.
 
 7. Caso negativo, o sistema interrompe a operação e permanece na tela `Detalhes do processo`, informando a mensagem de
-   erro: "Não é possível realizar a disponibilização em bloco dos mapas de competências das
-   unidades :LISTA_UNIDADES_SELECIONADAS:. Realize a disponibilização individual do mapa de cada unidade para obter mais
+   erro: "Não é possível realizar a disponibilização em bloco dos mapas de competências das unidades :
+   LISTA_UNIDADES_SELECIONADAS:. Realize a disponibilização individual do mapa de cada unidade para obter mais
    detalhes."
 
 8. Caso positivo, o sistema atua, para cada unidade selecionada, da seguinte forma:

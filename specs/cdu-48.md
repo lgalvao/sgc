@@ -31,8 +31,8 @@
 
 5.1. Se o usuário acionar um servidor com situação **diferente** de 'Avaliação de consenso aprovada'.
 
-5.2. O sistema mostra, no `Painel de competências`, um painel com título `Aguardando aprovação de consenso` e
-subtítulo "A situação de capacitação só pode ser preenchida após o servidor aprovar a avaliação de consenso."
+5.2. O sistema mostra, no `Painel de competências`, um painel com título `Aguardando aprovação de consenso` e subtítulo
+"A situação de capacitação só pode ser preenchida após o servidor aprovar a avaliação de consenso."
 
 ---
 5.3. Se o usuário acionar um servidor com situação 'Avaliação de consenso aprovada'.
@@ -56,7 +56,7 @@ uma grade com uma linha para cada competência vigente da unidade, com os itens:
 ---
 
 6. O usuário escolhe outro servidor e repete o procedimento.
-   
+
 7. O usuário aciona `Voltar`.
 
 8. O sistema mostra a tela `Detalhes do subprocesso`. 

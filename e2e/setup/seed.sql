@@ -167,7 +167,8 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('141414', 'CHEFE', 18);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('151515', '00151515', 'Ana Beatriz de Albuquerque e Souza', 'ana.beatriz.albuquerque@tre-pe.jus.br', '2004', 4, 4);
+VALUES ('151515', '00151515', 'Ana Beatriz de Albuquerque e Souza', 'ana.beatriz.albuquerque@tre-pe.jus.br', '2004', 4,
+        4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('151515', 'CHEFE', 4);
 
@@ -214,18 +215,21 @@ INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codig
 VALUES ('242424', 'SERVIDOR', 4);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('242425', '00242425', 'Luiz Fernando Cavalcanti de Moura', 'luiz.fernando.cavalcanti@tre-pe.jus.br', '2025', 4, 4);
+VALUES ('242425', '00242425', 'Luiz Fernando Cavalcanti de Moura', 'luiz.fernando.cavalcanti@tre-pe.jus.br', '2025', 4,
+        4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('242425', 'SERVIDOR', 4);
 
 -- Servidores adicionais para ASSESSORIA_12 (Unidade 4)
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('242426', '00242426', 'João Guilherme de Albuquerque Maranhão', 'joao.guilherme.albuquerque@tre-pe.jus.br', '2026', 4, 4);
+VALUES ('242426', '00242426', 'João Guilherme de Albuquerque Maranhão', 'joao.guilherme.albuquerque@tre-pe.jus.br',
+        '2026', 4, 4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('242426', 'SERVIDOR', 4);
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
-VALUES ('242427', '00242427', 'Maria Eduarda Cavalcanti de Alencar', 'maria.eduarda.cavalcanti@tre-pe.jus.br', '2027', 4, 4);
+VALUES ('242427', '00242427', 'Maria Eduarda Cavalcanti de Alencar', 'maria.eduarda.cavalcanti@tre-pe.jus.br', '2027',
+        4, 4);
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('242427', 'SERVIDOR', 4);
 
@@ -263,7 +267,8 @@ VALUES ('999998', 'SERVIDOR', 14);
 -- Garantia de contrato para notificações e fluxos de diagnóstico.
 UPDATE sgc.VW_USUARIO
 SET email = 'usuario.' || titulo || '@tre-pe.jus.br'
-WHERE email IS NULL OR TRIM(email) = '';
+WHERE email IS NULL
+   OR TRIM(email) = '';
 
 INSERT INTO sgc.VW_USUARIO (titulo, matricula, nome, email, ramal, unidade_lot_codigo, unidade_comp_codigo)
 VALUES ('131314', '00131314', 'Keith Richards', 'keith.richards@tre-pe.jus.br', '2177', 17, 17);
@@ -795,38 +800,38 @@ VALUES (2, 302, 'MAPA_DISPONIBILIZADO', 'SECAO_321', NULL, 'chefe_sec3@tre-pe.ju
 -- Reset identity sequences to prevent ID conflicts with test data
 -- This ensures auto-generated IDs start above the manually inserted ones
 ALTER TABLE sgc.processo
-ALTER
-COLUMN codigo RESTART
-WITH 400;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 400;
 ALTER TABLE sgc.subprocesso
-ALTER
-COLUMN codigo RESTART
-WITH 400;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 400;
 ALTER TABLE sgc.mapa
-ALTER
-COLUMN codigo RESTART
-WITH 400;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 400;
 ALTER TABLE sgc.atividade
-ALTER
-COLUMN codigo RESTART
-WITH 4000;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 4000;
 ALTER TABLE sgc.conhecimento
-ALTER
-COLUMN codigo RESTART
-WITH 400000;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 400000;
 ALTER TABLE sgc.competencia
-ALTER
-COLUMN codigo RESTART
-WITH 4000;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 4000;
 ALTER TABLE sgc.movimentacao
-ALTER
-COLUMN codigo RESTART
-WITH 50;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 50;
 ALTER TABLE sgc.alerta
-ALTER
-COLUMN codigo RESTART
-WITH 10;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 10;
 ALTER TABLE sgc.notificacao_email
-ALTER
-COLUMN codigo RESTART
-WITH 10;
+    ALTER
+        COLUMN codigo RESTART
+        WITH 10;

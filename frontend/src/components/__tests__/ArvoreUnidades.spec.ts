@@ -966,22 +966,22 @@ describe("ArvoreUnidades.vue", () => {
 
         it("deve expandir todas as unidades ao clicar no botão expandir tudo", async () => {
             const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
-            
+
             expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(false);
-            
+
             await wrapper.find('[data-testid="btn-arvore-expandir-tudo"]').trigger("click");
-            
+
             expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(true);
             expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0].filhas![0])).toBe(true);
         });
 
         it("deve recolher todas as unidades ao clicar no botão recolher tudo", async () => {
             const wrapper = createWrapper({unidades: mockUnidadesBusca, ocultarRaiz: false});
-            
+
             // Expandir primeiro
             await wrapper.find('[data-testid="btn-arvore-expandir-tudo"]').trigger("click");
             expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(true);
-            
+
             // Recolher
             await wrapper.find('[data-testid="btn-arvore-recolher-tudo"]').trigger("click");
             expect((wrapper.vm as any).isExpanded(mockUnidadesBusca[0])).toBe(false);
@@ -1019,7 +1019,7 @@ describe("ArvoreUnidades.vue", () => {
     describe("watchers", () => {
         it("deve atualizar unidades expandidas quando a prop unidades muda", async () => {
             const wrapper = createWrapper({unidades: [], modelValue: []});
-            const vm = wrapper.vm as unknown as {expandedUnits: Set<number>};
+            const vm = wrapper.vm as unknown as { expandedUnits: Set<number> };
             expect(vm.expandedUnits.size).toBe(0);
 
             await wrapper.setProps({
@@ -1034,7 +1034,7 @@ describe("ArvoreUnidades.vue", () => {
                 unidades: [{codigo: 1, sigla: "A", nome: "A", isElegivel: true, filhas: []}],
                 modelValue: []
             });
-            const vm = wrapper.vm as unknown as {unidadesSelecionadasLocal: number[]};
+            const vm = wrapper.vm as unknown as { unidadesSelecionadasLocal: number[] };
             expect(vm.unidadesSelecionadasLocal).toEqual([]);
 
             await wrapper.setProps({modelValue: [1]});
@@ -1046,7 +1046,7 @@ describe("ArvoreUnidades.vue", () => {
                 unidades: [{codigo: 1, sigla: "A", nome: "A", isElegivel: true, filhas: []}],
                 modelValue: [1]
             });
-            const vm = wrapper.vm as unknown as {unidadesSelecionadasLocal: number[]};
+            const vm = wrapper.vm as unknown as { unidadesSelecionadasLocal: number[] };
             const localAntes = vm.unidadesSelecionadasLocal;
 
             await wrapper.setProps({modelValue: [1]});

@@ -11,7 +11,7 @@ vi.mock('vue-router', () => ({
 
 const notifyMock = vi.fn();
 vi.mock('@/composables/useNotification', () => ({
-    useNotification: () => ({ notify: notifyMock }),
+    useNotification: () => ({notify: notifyMock}),
 }));
 
 const registrarPendenteMock = vi.fn();
@@ -30,7 +30,9 @@ const erroIntegracaoContextoRef = ref<any>(null);
 vi.mock('@/stores/subprocesso', () => ({
     useSubprocessoStore: () => ({
         contextoEdicao: contextoEdicaoRef.value,
-        get erroIntegracaoContexto() { return erroIntegracaoContextoRef.value; },
+        get erroIntegracaoContexto() {
+            return erroIntegracaoContextoRef.value;
+        },
     }),
 }));
 
@@ -57,7 +59,7 @@ vi.mock('@/composables/useMapaOrquestracao', () => ({
     }),
 }));
 
-const mapaCompletoRef = ref<any>({ atividades: [], competencias: [] });
+const mapaCompletoRef = ref<any>({atividades: [], competencias: []});
 vi.mock('@/composables/useMapas', () => ({
     useMapas: () => ({
         mapaCompleto: mapaCompletoRef,
@@ -69,7 +71,7 @@ vi.mock('@/composables/useMapas', () => ({
 
 vi.mock('@/composables/useAcesso', () => ({
     useAcesso: () => ({
-        acaoPrincipalMapa: ref({ mostrar: true, habilitar: true, rotuloBotao: 'Homologar' }),
+        acaoPrincipalMapa: ref({mostrar: true, habilitar: true, rotuloBotao: 'Homologar'}),
     }),
 }));
 
@@ -91,8 +93,8 @@ vi.mock('@/composables/useMapaCompetenciasMutacoes', () => ({
     useMapaCompetenciasMutacoes: () => ({}),
 }));
 
-const { useMapaDisponibilizacaoArgs } = vi.hoisted(() => ({
-    useMapaDisponibilizacaoArgs: { value: null as any }
+const {useMapaDisponibilizacaoArgs} = vi.hoisted(() => ({
+    useMapaDisponibilizacaoArgs: {value: null as any}
 }));
 
 vi.mock('@/views/mapaDisponibilizacao', () => ({
@@ -111,9 +113,9 @@ vi.mock('@/views/mapaDisponibilizacao', () => ({
 
 vi.mock('@/utils/apiError', () => ({
     normalizarErro: (err: any) => {
-        if (err.message === 'Network Error') return { tipo: 'inesperado', mensagem: 'Erro de rede', status: 0 };
-        if (err.message === 'Inesperado 500') return { tipo: 'inesperado', mensagem: 'Erro Servidor', status: 500 };
-        return { tipo: 'erro', mensagem: err.message || 'Erro' };
+        if (err.message === 'Network Error') return {tipo: 'inesperado', mensagem: 'Erro de rede', status: 0};
+        if (err.message === 'Inesperado 500') return {tipo: 'inesperado', mensagem: 'Erro Servidor', status: 500};
+        return {tipo: 'erro', mensagem: err.message || 'Erro'};
     },
 }));
 
@@ -131,43 +133,43 @@ describe('useMapaTela', () => {
         contextoEdicaoRef.value = null;
         erroIntegracaoContextoRef.value = null;
         carregarContextoInicialMock.mockResolvedValue(true);
-        mapaCompletoRef.value = { atividades: [], competencias: [] };
+        mapaCompletoRef.value = {atividades: [], competencias: []};
         useMapaDisponibilizacaoArgs.value = null;
     });
 
     it('notificar erro de exportacao com fallback', async () => {
-        const { exportarMapaAtualPdf } = useMapaTela({ codProcesso: 1, sigla: 'TEST' }) as any;
-        const { relatoriosService } = await import('@/services/relatoriosService');
+        const {exportarMapaAtualPdf} = useMapaTela({codProcesso: 1, sigla: 'TEST'}) as any;
+        const {relatoriosService} = await import('@/services/relatoriosService');
         vi.mocked(relatoriosService.downloadRelatorioMapaAtualPdf).mockRejectedValueOnce(new Error('Network Error'));
-        
+
         await exportarMapaAtualPdf();
-        
+
         expect(notifyMock).toHaveBeenCalledWith('Erro ao exportar PDF', 'danger');
     });
 
     it('notificar erro de exportacao com erro inesperado e status', async () => {
-        const { exportarMapaAtualCsv } = useMapaTela({ codProcesso: 1, sigla: 'TEST' }) as any;
-        const { relatoriosService } = await import('@/services/relatoriosService');
+        const {exportarMapaAtualCsv} = useMapaTela({codProcesso: 1, sigla: 'TEST'}) as any;
+        const {relatoriosService} = await import('@/services/relatoriosService');
         vi.mocked(relatoriosService.downloadRelatorioMapaAtualCsv).mockRejectedValueOnce(new Error('Inesperado 500'));
-        
+
         await exportarMapaAtualCsv();
-        
+
         expect(notifyMock).toHaveBeenCalledWith('Erro Servidor', 'danger');
     });
 
     it('notificar erro de exportacao com mensagem do erro', async () => {
-        const { exportarMapaAtualPdf } = useMapaTela({ codProcesso: 1, sigla: 'TEST' }) as any;
-        const { relatoriosService } = await import('@/services/relatoriosService');
+        const {exportarMapaAtualPdf} = useMapaTela({codProcesso: 1, sigla: 'TEST'}) as any;
+        const {relatoriosService} = await import('@/services/relatoriosService');
         vi.mocked(relatoriosService.downloadRelatorioMapaAtualPdf).mockRejectedValueOnce(new Error('Erro especifico'));
-        
+
         await exportarMapaAtualPdf();
-        
+
         expect(notifyMock).toHaveBeenCalledWith('Erro especifico', 'danger');
     });
 
     it('deve notificar erro se carregarContextoInicial falhar', async () => {
         carregarContextoInicialMock.mockResolvedValueOnce(false);
-        
+
         // Simula montagem do componente sem mockar o onMounted globalmente,
         // apenas avaliando a função que foi passada para onMounted.
         let mountedCb: any = null;
@@ -175,52 +177,54 @@ describe('useMapaTela', () => {
             const actual = await importOriginal<any>();
             return {
                 ...actual,
-                onMounted: (cb: any) => { mountedCb = cb; }
+                onMounted: (cb: any) => {
+                    mountedCb = cb;
+                }
             };
         });
-        
+
         // Reimport the module so the new mock is used
-        const { useMapaTela: reloadedUseMapaTela } = await import('../useMapaTela');
-        reloadedUseMapaTela({ codProcesso: 1, sigla: 'TEST' });
-        
+        const {useMapaTela: reloadedUseMapaTela} = await import('../useMapaTela');
+        reloadedUseMapaTela({codProcesso: 1, sigla: 'TEST'});
+
         if (mountedCb) {
             await mountedCb();
             expect(notifyMock).toHaveBeenCalledWith('Falha grave ao resolver subprocesso para o mapa. A ocorrência deve ser auditada.', 'danger');
         }
-        
+
         vi.doUnmock('vue');
     });
 
     it('computa atividadesSemCompetencia corretamente', () => {
-        useMapaTela({ codProcesso: 1, sigla: 'TEST' });
-        
+        useMapaTela({codProcesso: 1, sigla: 'TEST'});
+
         mapaCompletoRef.value = {
-            atividades: [{ codigo: 1 }, { codigo: 2 }],
-            competencias: [{ atividades: [{ codigo: 1 }] }]
+            atividades: [{codigo: 1}, {codigo: 2}],
+            competencias: [{atividades: [{codigo: 1}]}]
         };
-        
-        expect(useMapaDisponibilizacaoArgs.value.atividadesSemCompetencia.value).toEqual([{ codigo: 2 }]);
+
+        expect(useMapaDisponibilizacaoArgs.value.atividadesSemCompetencia.value).toEqual([{codigo: 2}]);
     });
 
     it('computa atividadesSemCompetencia vazio se nao houver atividades', () => {
-        useMapaTela({ codProcesso: 1, sigla: 'TEST' });
-        
+        useMapaTela({codProcesso: 1, sigla: 'TEST'});
+
         mapaCompletoRef.value = {
             atividades: [],
             competencias: []
         };
-        
+
         expect(useMapaDisponibilizacaoArgs.value.atividadesSemCompetencia.value).toEqual([]);
     });
 
     it('computa existeCompetenciaSemAtividade corretamente', () => {
-        useMapaTela({ codProcesso: 1, sigla: 'TEST' });
-        
+        useMapaTela({codProcesso: 1, sigla: 'TEST'});
+
         mapaCompletoRef.value = {
             atividades: [],
-            competencias: [{ atividades: [] }]
+            competencias: [{atividades: []}]
         };
-        
+
         expect(useMapaDisponibilizacaoArgs.value.existeCompetenciaSemAtividade.value).toBe(true);
     });
 });

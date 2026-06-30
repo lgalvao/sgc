@@ -13,8 +13,7 @@ const meta: Meta<typeof CarregamentoPagina> = {
 export default meta;
 type Story = StoryObj<typeof CarregamentoPagina>;
 
-export const Default: Story = {
-};
+export const Default: Story = {};
 
 export const ComMensagemPersonalizada: Story = {
     args: {

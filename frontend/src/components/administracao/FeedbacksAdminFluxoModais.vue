@@ -52,23 +52,26 @@
 
         <dt class="col-sm-3 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.NOTA }}</dt>
         <!-- eslint-disable-next-line vue/no-v-html -->
-        <dd class="col-sm-9 mt-3 text-break shadow-none bg-light p-3 border rounded" v-html="feedbackSelecionado.nota"></dd>
+        <dd class="col-sm-9 mt-3 text-break shadow-none bg-light p-3 border rounded"
+            v-html="feedbackSelecionado.nota"></dd>
 
-        <dt v-if="feedbackSelecionado.metadataJson" class="col-sm-12 mt-3">{{ TEXTOS.administracao.FEEDBACKS_CAMPOS.METADADOS }}</dt>
+        <dt v-if="feedbackSelecionado.metadataJson" class="col-sm-12 mt-3">
+          {{ TEXTOS.administracao.FEEDBACKS_CAMPOS.METADADOS }}
+        </dt>
         <dd v-if="feedbackSelecionado.metadataJson" class="col-sm-12">
           <div class="table-responsive border rounded mt-2">
             <table class="table table-sm mb-0">
               <thead class="table-light">
-                <tr>
-                  <th class="ps-2">Chave</th>
-                  <th>Valor</th>
-                </tr>
+              <tr>
+                <th class="ps-2">Chave</th>
+                <th>Valor</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="(valor, chave) in formatarMetadados(feedbackSelecionado.metadataJson)" :key="chave">
-                  <td class="small fw-semibold ps-2" style="width: 30%">{{ chave }}</td>
-                  <td class="small text-break">{{ valor }}</td>
-                </tr>
+              <tr v-for="(valor, chave) in formatarMetadados(feedbackSelecionado.metadataJson)" :key="chave">
+                <td class="small fw-semibold ps-2" style="width: 30%">{{ chave }}</td>
+                <td class="small text-break">{{ valor }}</td>
+              </tr>
               </tbody>
             </table>
           </div>

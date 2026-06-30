@@ -71,9 +71,9 @@
 13. O usuário que recebe a atribuição temporária passa a ter os mesmos direitos do perfil CHEFE durante o período
     especificado, para a unidade da atribuição. Em um próximo login, o novo par `CHEFE-:UNIDADE_ATRIBUICAO:` será
     mostrado pra o usuário entre as opções de login.
-    - O novo perfil será incluído automaticamente através de cálculos das views no banco de dados. O sistema não
-    precisa realizar nenhuma operação, além das especificadas neste caso de uso, para que o novo perfil se torne
-    disponível ao usuário.
+    - O novo perfil será incluído automaticamente através de cálculos das views no banco de dados. O sistema não precisa
+      realizar nenhuma operação, além das especificadas neste caso de uso, para que o novo perfil se torne disponível ao
+      usuário.
 
 14. Se houver atribuição temporária vigente, o usuário altera os dados e aciona `Salvar`.
 

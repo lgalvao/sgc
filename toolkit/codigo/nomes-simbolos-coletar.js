@@ -403,11 +403,11 @@ function montarResumoMarkdown(inventario) {
 }
 
 async function executarColeta({
-    base = DIRETORIO_RAIZ,
-    json = false,
-    semGravar = false,
-    arquivoSaida = ARQUIVO_JSON_PADRAO
-} = {}) {
+                                  base = DIRETORIO_RAIZ,
+                                  json = false,
+                                  semGravar = false,
+                                  arquivoSaida = ARQUIVO_JSON_PADRAO
+                              } = {}) {
     const baseResolvida = path.resolve(base);
     const arquivos = await listarArquivos(baseResolvida);
     const resultadoArquivos = [];

@@ -12,8 +12,8 @@ Para fins de classificação estrutural (detalhada no [Glossário](_intro-glossa
 - **Unidade intermediária**: Unidade de chefia/gestão, com unidades subordinadas mas apenas um servidor (o titular)
   lotado.
 
-- **Unidade interoperacional**: Unidade híbrida (atua tanto como chefia quanto "ponta"), que possui unidades subordinadas
-  e também mais de um servidor lotado.
+- **Unidade interoperacional**: Unidade híbrida (atua tanto como chefia quanto "ponta"), que possui unidades
+  subordinadas e também mais de um servidor lotado.
 
 Os elementos essenciais do sistema incluem:
 
@@ -49,7 +49,8 @@ do login.
 
 - **ADMIN**: Administrador do sistema. Esse perfil, que será geralmente exercido por servidores da unidade SEDOC, é
   responsável por criar, configurar e monitorar processos (dos três tipos). Usuários que logarem com este perfil estarão
-  associados à unidade raiz 'ADMIN'. O perfil ADMIN é responsável exclusivo por criar e ajustar os mapas de competências.
+  associados à unidade raiz 'ADMIN'. O perfil ADMIN é responsável exclusivo por criar e ajustar os mapas de
+  competências.
 
 - **GESTOR**: Responsável por uma unidade intermediária ou interoperacional (geralmente será um Coordenador ou
   Secretário). Pode visualizar e validar as informações cadastradas pelas unidades sob sua gestão, submetendo para

@@ -96,7 +96,7 @@ describe('useAutoavaliacaoDiagnostico', () => {
     });
 
     it('não deve quebrar ou alterar competenciasLocais se novas for undefined', async () => {
-        mockQueryData.value = { situacaoServidor: 'CONCLUIDA', competencias: undefined };
+        mockQueryData.value = {situacaoServidor: 'CONCLUIDA', competencias: undefined};
         const scope = effectScope();
         let composable: ReturnType<typeof useAutoavaliacaoDiagnostico> | undefined;
 
@@ -147,7 +147,7 @@ describe('useAutoavaliacaoDiagnostico', () => {
     });
 
     it('deve usar a situacaoServidor da query se estiver disponivel', async () => {
-        mockQueryData.value = { situacaoServidor: 'CONSENSO_CRIADO', competencias: [] };
+        mockQueryData.value = {situacaoServidor: 'CONSENSO_CRIADO', competencias: []};
         const scope = effectScope();
         let composable: ReturnType<typeof useAutoavaliacaoDiagnostico> | undefined;
 

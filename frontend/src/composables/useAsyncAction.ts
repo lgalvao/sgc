@@ -50,7 +50,7 @@ export function useAsyncAction() {
     async function executar<T>(
         acao: () => Promise<T>,
         mensagemErro: string | undefined,
-        opcoes: {relancarErro: false}
+        opcoes: { relancarErro: false }
     ): Promise<T | undefined>;
     async function executar<T>(
         acao: () => Promise<T>,

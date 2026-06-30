@@ -19,13 +19,13 @@ function generateMarkdown(results) {
 
     results.forEach(result => {
         md += `### ${result.name} (\`${result.route}\`)\n`;
-        
+
         if (result.violations.length === 0) {
             md += "✅ Nenhuma violação detectada.\n\n";
         } else {
             md += "| Impacto | Problema | Elementos Afetados |\n";
             md += "|:---:|:---|:---|\n";
-            
+
             result.violations.forEach(v => {
                 const elementos = v.nodes.map(n => `\`${n.target.join(' ')}\``).join('<br>');
                 md += `| ${v.impact} | **${v.id}**: ${v.help} | ${elementos} |\n`;
@@ -36,7 +36,7 @@ function generateMarkdown(results) {
 
     md += `## Recomendações Técnicas Baseadas no Axe-core\n\n`;
     md += `Para cada violação listada acima, o Axe-core recomenda:\n\n`;
-    
+
     // De-duplicate recommendations
     const recommendations = new Set();
     results.forEach(r => {

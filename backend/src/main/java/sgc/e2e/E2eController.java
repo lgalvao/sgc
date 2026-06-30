@@ -429,12 +429,12 @@ public class E2eController {
         String chaveIdempotencia = "e2e:notificacao:" + codigo + ":" + UUID.randomUUID();
 
         jdbcTemplate.update("""
-                INSERT INTO sgc.notificacao_email (
-                    codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, unidade_destino_sigla,
-                    destinatario, assunto, corpo_html, situacao, tentativas, proxima_tentativa_em,
-                    data_hora_criacao, data_hora_envio, ultimo_erro, chave_idempotencia
-                ) VALUES (?, NULL, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
+                        INSERT INTO sgc.notificacao_email (
+                            codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, unidade_destino_sigla,
+                            destinatario, assunto, corpo_html, situacao, tentativas, proxima_tentativa_em,
+                            data_hora_criacao, data_hora_envio, ultimo_erro, chave_idempotencia
+                        ) VALUES (?, NULL, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
                 codigo,
                 tipo,
                 request.unidadeDestinoSigla(),
@@ -472,11 +472,11 @@ public class E2eController {
         }
 
         jdbcTemplate.update("""
-                INSERT INTO sgc.feedback (
-                    id, tipo, nota, metadata_json, caminho_screenshot,
-                    usuario_id, usuario_nome, enviado_em, rota, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
+                        INSERT INTO sgc.feedback (
+                            id, tipo, nota, metadata_json, caminho_screenshot,
+                            usuario_id, usuario_nome, enviado_em, rota, status
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
                 codigo,
                 request.tipo(),
                 nota,

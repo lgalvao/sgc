@@ -21,7 +21,7 @@ import type {
     ValorSituacaoCapacitacao,
 } from '@/types/diagnostico-competencias';
 
-type RetornoFluxo = {mensagem: string; variante: 'danger'};
+type RetornoFluxo = { mensagem: string; variante: 'danger' };
 
 interface DiagnosticoUnidadeViewProps {
     codSubprocesso: number;
@@ -279,10 +279,14 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
 
     const varianteSituacao = computed<ColorVariant>(() => {
         switch (situacao.value) {
-            case 'CONCLUIDO': return 'success';
-            case 'VALIDADO': return 'info';
-            case 'HOMOLOGADO': return 'primary';
-            default: return 'warning';
+            case 'CONCLUIDO':
+                return 'success';
+            case 'VALIDADO':
+                return 'info';
+            case 'HOMOLOGADO':
+                return 'primary';
+            default:
+                return 'warning';
         }
     });
 
@@ -348,7 +352,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             )?.dominio ?? null,
             situacaoCapacitacao: servidorSelecionado.value
                 ? mapaSituacaoCapacitacao.value[
-                    `${servidorSelecionado.value.servidorTitulo}:${competencia.competenciaCodigo}`
+                `${servidorSelecionado.value.servidorTitulo}:${competencia.competenciaCodigo}`
                 ] ?? null
                 : null,
         })),
@@ -369,22 +373,33 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
 
     function formatarSituacaoCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
         switch (situacaoCapacitacao) {
-            case 'NA': return TEXTOS.diagnostico.CAPACITACAO_NA;
-            case 'AC': return TEXTOS.diagnostico.CAPACITACAO_AC;
-            case 'EC': return TEXTOS.diagnostico.CAPACITACAO_EC;
-            case 'C': return TEXTOS.diagnostico.CAPACITACAO_C;
-            case 'I': return TEXTOS.diagnostico.CAPACITACAO_I;
-            default: return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
+            case 'NA':
+                return TEXTOS.diagnostico.CAPACITACAO_NA;
+            case 'AC':
+                return TEXTOS.diagnostico.CAPACITACAO_AC;
+            case 'EC':
+                return TEXTOS.diagnostico.CAPACITACAO_EC;
+            case 'C':
+                return TEXTOS.diagnostico.CAPACITACAO_C;
+            case 'I':
+                return TEXTOS.diagnostico.CAPACITACAO_I;
+            default:
+                return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
         }
     }
 
     function varianteSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): ColorVariant {
         switch (situacaoServidor) {
-            case 'CONSENSO_APROVADO': return 'success';
-            case 'AVALIACAO_IMPOSSIBILITADA': return 'secondary';
-            case 'CONSENSO_CRIADO': return 'warning';
-            case 'AUTOAVALIACAO_CONCLUIDA': return 'info';
-            default: return 'light';
+            case 'CONSENSO_APROVADO':
+                return 'success';
+            case 'AVALIACAO_IMPOSSIBILITADA':
+                return 'secondary';
+            case 'CONSENSO_CRIADO':
+                return 'warning';
+            case 'AUTOAVALIACAO_CONCLUIDA':
+                return 'info';
+            default:
+                return 'light';
         }
     }
 
@@ -403,7 +418,12 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
 
     const colunasCompetenciasServidor = [
         {key: 'competenciaDescricao', label: TEXTOS.diagnostico.COLUNA_COMPETENCIA},
-        {key: 'importancia', label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA, thClass: 'text-center', tdClass: 'text-center'},
+        {
+            key: 'importancia',
+            label: TEXTOS.diagnostico.COLUNA_IMPORTANCIA,
+            thClass: 'text-center',
+            tdClass: 'text-center'
+        },
         {key: 'dominio', label: TEXTOS.diagnostico.COLUNA_DOMINIO, thClass: 'text-center', tdClass: 'text-center'},
         {key: 'situacaoCapacitacao', label: TEXTOS.diagnostico.COLUNA_CAPACITACAO},
     ];

@@ -509,6 +509,7 @@ class SubprocessoTransicaoServiceTest {
 
             assertThat(sp.getSituacao()).isEqualTo(MAPEAMENTO_MAPA_DISPONIBILIZADO);
         }
+
         @Test
         @DisplayName("executarAceiteValidacaoEmBloco - deve aceitar múltiplos subprocessos")
         void executarAceiteValidacaoEmBloco() {

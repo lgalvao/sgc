@@ -450,37 +450,46 @@ describe('MapaView', () => {
     });
 
     it('lida com erro na exportacao de PDF', async () => {
-        const pinia = createTestingPinia({ createSpy: vi.fn, stubActions: false });
-        const wrapper = mount(MapaView, { global: { plugins: [pinia], stubs: commonStubs }, props: { codProcesso: 1, sigla: "TESTE" } });
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
+        const wrapper = mount(MapaView, {
+            global: {plugins: [pinia], stubs: commonStubs},
+            props: {codProcesso: 1, sigla: "TESTE"}
+        });
         const vm = wrapper.vm as any;
         vm.codigoSubprocesso = 123;
         vi.mocked(relatoriosService.downloadRelatorioMapaAtualPdf).mockRejectedValueOnce(new Error('fail'));
-        
+
         await vm.exportarMapaAtualPdf();
         expect(notifyMock).toHaveBeenCalledWith(expect.any(String), 'danger');
     });
 
     it('lida com erro na exportacao de CSV', async () => {
-        const pinia = createTestingPinia({ createSpy: vi.fn, stubActions: false });
-        const wrapper = mount(MapaView, { global: { plugins: [pinia], stubs: commonStubs }, props: { codProcesso: 1, sigla: "TESTE" } });
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
+        const wrapper = mount(MapaView, {
+            global: {plugins: [pinia], stubs: commonStubs},
+            props: {codProcesso: 1, sigla: "TESTE"}
+        });
         const vm = wrapper.vm as any;
         vm.codigoSubprocesso = 123;
         vi.mocked(relatoriosService.downloadRelatorioMapaAtualCsv).mockRejectedValueOnce(new Error('fail'));
-        
+
         await vm.exportarMapaAtualCsv();
         expect(notifyMock).toHaveBeenCalledWith(expect.any(String), 'danger');
     });
 
     it('dispensarErroMapa limpa o erro', async () => {
-        const pinia = createTestingPinia({ createSpy: vi.fn, stubActions: false });
-        const wrapper = mount(MapaView, { global: { plugins: [pinia], stubs: commonStubs }, props: { codProcesso: 1, sigla: "TESTE" } });
+        const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
+        const wrapper = mount(MapaView, {
+            global: {plugins: [pinia], stubs: commonStubs},
+            props: {codProcesso: 1, sigla: "TESTE"}
+        });
         const vm = wrapper.vm as any;
         vm.dispensarErroMapa();
     });
 
     it('renderiza o template completo com unidade e competencias em modo edicao', async () => {
         const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
-        
+
         // Configura permissões para habilitar edição no modo de acesso
         subprocessoStoreMock.contextoEdicao = {
             detalhes: {
@@ -492,19 +501,19 @@ describe('MapaView', () => {
             },
         } as any;
 
-        unidadeRef.value = { codigo: 10, nome: 'Unidade 10', sigla: 'U10' };
+        unidadeRef.value = {codigo: 10, nome: 'Unidade 10', sigla: 'U10'};
         codigoSubprocessoRef.value = 123;
         mapasMockState.mapaCompleto.value = {
-            competencias: [{ codigo: 1, descricao: 'Competência 1', atividades: [{ codigo: 10 }] }],
-            atividades: [{ codigo: 10, descricao: 'Atividade 10' }],
+            competencias: [{codigo: 1, descricao: 'Competência 1', atividades: [{codigo: 10}]}],
+            atividades: [{codigo: 10, descricao: 'Atividade 10'}],
         };
-        
+
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: {
                     ...commonStubs,
-                    CompetenciaCard: { template: '<div class="competencia-card" />' },
+                    CompetenciaCard: {template: '<div class="competencia-card" />'},
                 }
             },
             props: {
@@ -512,7 +521,7 @@ describe('MapaView', () => {
                 sigla: "TESTE"
             }
         });
-        
+
         expect(wrapper.find('.competencia-card').exists()).toBe(true);
         expect(wrapper.find('[data-testid="btn-abrir-criar-competencia"]').exists()).toBe(true);
     });
@@ -520,13 +529,13 @@ describe('MapaView', () => {
     it('renderiza tela de carregamento inicial', () => {
         const pinia = createTestingPinia({createSpy: vi.fn, stubActions: false});
         carregandoInicialRef.value = true;
-        
+
         const wrapper = mount(MapaView, {
             global: {
                 plugins: [pinia],
                 stubs: {
                     ...commonStubs,
-                    CarregamentoPagina: { template: '<div class="loading-page" />' },
+                    CarregamentoPagina: {template: '<div class="loading-page" />'},
                 }
             },
             props: {
@@ -534,7 +543,7 @@ describe('MapaView', () => {
                 sigla: "TESTE"
             }
         });
-        
+
         expect(wrapper.find('.loading-page').exists()).toBe(true);
     });
 });

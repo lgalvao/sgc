@@ -85,7 +85,9 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     const dispararSalvamento = () => {
         if (!habilitarCriarConsenso.value) return;
         if (timer !== null) clearTimeout(timer);
-        timer = setTimeout(() => { mutacaoSalvar.mutate(situacoesLocais.value); }, DEBOUNCE_AUTOSAVE_PADRAO_MS);
+        timer = setTimeout(() => {
+            mutacaoSalvar.mutate(situacoesLocais.value);
+        }, DEBOUNCE_AUTOSAVE_PADRAO_MS);
     };
 
     function atualizarCapacitacao(

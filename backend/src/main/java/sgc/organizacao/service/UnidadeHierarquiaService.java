@@ -265,13 +265,13 @@ public class UnidadeHierarquiaService {
         UnidadeDto copia = copiarArvore(dto);
         Unidade unidadeCompleta = unidadeService.buscarPorCodigo(codigo);
         UnidadeDto dtoCompleto = organizacaoDtoMapper.paraUnidadeDtoObrigatoria(unidadeCompleta);
-        
+
         copia.setResponsavel(dtoCompleto.getResponsavel());
         copia.setTitular(dtoCompleto.getTitular());
         copia.setTipoResponsabilidade(dtoCompleto.getTipoResponsabilidade());
         copia.setDataInicioResponsabilidade(dtoCompleto.getDataInicioResponsabilidade());
         copia.setDataFimResponsabilidade(dtoCompleto.getDataFimResponsabilidade());
-        
+
         return copia;
     }
 

@@ -13,9 +13,9 @@ Gerado em: 2026-06-01T01:29:13.797Z
 
 ## Hotspots
 
-| Arquivo | Métodos | Categorias | Distribuição | Severidade |
-|---------|---------|------------|-------------|-----------|
-| `ProcessoService.java` | 21 | 4 | consulta/leitura (14), mutação/escrita (3), workflow/transição (3), notificação/comunicação (1) | 🔴 crítico |
+| Arquivo                | Métodos | Categorias | Distribuição                                                                                    | Severidade |
+|------------------------|---------|------------|-------------------------------------------------------------------------------------------------|------------|
+| `ProcessoService.java` | 21      | 4          | consulta/leitura (14), mutação/escrita (3), workflow/transição (3), notificação/comunicação (1) | 🔴 crítico |
 
 ## Detalhes dos hotspots
 
@@ -25,7 +25,10 @@ Gerado em: 2026-06-01T01:29:13.797Z
 - Total de métodos públicos: 21
 - Categorias detectadas: 4
 
-**consulta/leitura** (14): `buscarPorCodigo`, `buscarPorCodigoComParticipantes`, `buscarOpt`, `listarFinalizados`, `listarParaImportacao`, `listarAtivos`, `listarTodos`, `listarIniciadosPorParticipantes`, `listarIniciadosPorSubprocessos`, `listarUnidadesBloqueadasPorTipo`, `buscarIdsUnidadesComProcessosAtivos`, `listarSubprocessosElegiveis`, `obterDetalhesCompleto`, `checarAcesso`
+**consulta/leitura** (14): `buscarPorCodigo`, `buscarPorCodigoComParticipantes`, `buscarOpt`, `listarFinalizados`,
+`listarParaImportacao`, `listarAtivos`, `listarTodos`, `listarIniciadosPorParticipantes`,
+`listarIniciadosPorSubprocessos`, `listarUnidadesBloqueadasPorTipo`, `buscarIdsUnidadesComProcessosAtivos`,
+`listarSubprocessosElegiveis`, `obterDetalhesCompleto`, `checarAcesso`
 **mutação/escrita** (3): `criar`, `atualizar`, `apagar`
 **workflow/transição** (3): `iniciar`, `finalizar`, `executarAcaoEmBloco`
 **notificação/comunicação** (1): `enviarLembrete`
@@ -33,6 +36,7 @@ Gerado em: 2026-06-01T01:29:13.797Z
 ## Por que isso importa
 
 Um service com muitas categorias de responsabilidade:
+
 - acumula dependências de domínios diferentes;
 - torna difícil testar cada responsabilidade em isolamento;
 - aumenta o risco de efeito colateral entre fluxos distintos;
@@ -40,6 +44,5 @@ Um service com muitas categorias de responsabilidade:
 
 ## Primeiro corte sugerido
 
-Começar por `ProcessoService.java`.
-Separar os métodos por categoria e verificar quais dependências cada grupo realmente precisa.
-Extrair apenas quando a fronteira representar um conceito real — não por contagem de linhas.
+Começar por `ProcessoService.java`. Separar os métodos por categoria e verificar quais dependências cada grupo realmente
+precisa. Extrair apenas quando a fronteira representar um conceito real — não por contagem de linhas.

@@ -66,15 +66,15 @@ public class E2eSecurityConfig {
     public SecurityFilterChain e2eSecurityFilterChain(HttpSecurity http,
                                                       FiltroJwt filtroJwt,
                                                       FiltroMonitoramentoHttp filtroMonitoramentoHttp) {
-        http.authorizeHttpRequests(auth ->         auth.dispatcherTypeMatchers(
-                DispatcherType.ASYNC)
+        http.authorizeHttpRequests(auth -> auth.dispatcherTypeMatchers(
+                                DispatcherType.ASYNC)
                         .permitAll()
                         .requestMatchers(
-                "/api/usuarios/login",
-                "/api/usuarios/entrar",
-                "/api/usuarios/logout",
-                "/actuator/**",
-                "/e2e/**")                        .permitAll()
+                                "/api/usuarios/login",
+                                "/api/usuarios/entrar",
+                                "/api/usuarios/logout",
+                                "/actuator/**",
+                                "/e2e/**").permitAll()
                         .requestMatchers("/api/**")
                         .authenticated()
                         .anyRequest()

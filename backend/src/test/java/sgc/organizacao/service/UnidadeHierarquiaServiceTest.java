@@ -324,7 +324,6 @@ class UnidadeHierarquiaServiceTest {
         }
 
 
-
         @Test
         @DisplayName("Deve filtrar unidades na árvore de acordo com elegibilidade complexa")
         void deveFiltrarComElegibilidadeComplexa() {

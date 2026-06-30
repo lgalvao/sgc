@@ -27,8 +27,8 @@ export interface SincronizarMapaContextoParams {
 }
 
 type ResultadoChecklistDisponibilizacao =
-    | {tipo: "pode-disponibilizar"}
-    | {tipo: "erro-validacao"; mensagem: string};
+    | { tipo: "pode-disponibilizar" }
+    | { tipo: "erro-validacao"; mensagem: string };
 
 type EstadoMapaDisponibilizacao = ReturnType<typeof criarEstado>;
 
@@ -122,11 +122,11 @@ export function useMapaDisponibilizacao(dependencias: DependenciasMapaDisponibil
             loadingDisponibilizacao,
         }, erroMapa),
         sincronizarMapaContexto: ({
-            mapaAtualizado,
-            codigoSubprocesso,
-            sincronizarMapa,
-            mapaContextoAtual,
-        }: SincronizarMapaContextoParams) => {
+                                      mapaAtualizado,
+                                      codigoSubprocesso,
+                                      sincronizarMapa,
+                                      mapaContextoAtual,
+                                  }: SincronizarMapaContextoParams) => {
             if (!mapaAtualizado || !codigoSubprocesso) {
                 return;
             }

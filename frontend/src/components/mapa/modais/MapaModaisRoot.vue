@@ -78,52 +78,52 @@ defineEmits<{
 <template>
   <template v-if="!modoSomenteLeitura">
     <CompetenciaEdicaoModal
-:atividades="atividades" :competencia-para-editar="competenciaSendoEditada"
-                            :field-errors="fieldErrors" :loading="loadingCompetencia"
-                            :mostrar="mostrarModalCriarNovaCompetencia" @fechar="$emit('fechar-criar-competencia')"
-                            @salvar="$emit('salvar-competencia', $event)"/>
+        :atividades="atividades" :competencia-para-editar="competenciaSendoEditada"
+        :field-errors="fieldErrors" :loading="loadingCompetencia"
+        :mostrar="mostrarModalCriarNovaCompetencia" @fechar="$emit('fechar-criar-competencia')"
+        @salvar="$emit('salvar-competencia', $event)"/>
     <MapaDisponibilizacaoModal
- :field-errors="fieldErrors" :loading="loadingDisponibilizacao"
-                                :mostrar="mostrarModalDisponibilizar" :notificacao="notificacaoDisponibilizacao"
-                                :data-fim-etapa-anterior="dataFimEtapa1 ?? undefined"
-                                :ultima-data-limite-subprocesso="ultimaDataLimiteSubprocesso ?? undefined"
-                                @disponibilizar="$emit('disponibilizar', $event)"
-                                @fechar="$emit('fechar-disponibilizar')"/>
+        :field-errors="fieldErrors" :loading="loadingDisponibilizacao"
+        :mostrar="mostrarModalDisponibilizar" :notificacao="notificacaoDisponibilizacao"
+        :data-fim-etapa-anterior="dataFimEtapa1 ?? undefined"
+        :ultima-data-limite-subprocesso="ultimaDataLimiteSubprocesso ?? undefined"
+        @disponibilizar="$emit('disponibilizar', $event)"
+        @fechar="$emit('fechar-disponibilizar')"/>
     <CompetenciaExclusaoModal
-:descricao="competenciaParaExcluir?.descricao || ''" :loading="loadingExclusao"
-                              :model-value="mostrarModalExcluirCompetencia"
-                              @confirmar="$emit('confirmar-exclusao-competencia')"
-                              @update:model-value="$emit('update:mostrarModalExcluirCompetencia', $event)"/>
+        :descricao="competenciaParaExcluir?.descricao || ''" :loading="loadingExclusao"
+        :model-value="mostrarModalExcluirCompetencia"
+        @confirmar="$emit('confirmar-exclusao-competencia')"
+        @update:model-value="$emit('update:mostrarModalExcluirCompetencia', $event)"/>
   </template>
   <MapaAceitacaoModal
-:homologacao="homologacao" :loading="carregandoFluxoMapa" :mostrar-modal="mostrarModalAceitar"
-                      @fechar-modal="$emit('fechar-aceite')"
-                      @confirmar-aceitacao="$emit('confirmar-aceitacao', $event)"/>
+      :homologacao="homologacao" :loading="carregandoFluxoMapa" :mostrar-modal="mostrarModalAceitar"
+      @fechar-modal="$emit('fechar-aceite')"
+      @confirmar-aceitacao="$emit('confirmar-aceitacao', $event)"/>
   <MapaValidacaoModal
-:loading="carregandoFluxoMapa" :model-value="mostrarModalValidar"
-                      @confirmar="$emit('confirmar-validacao')"
-                      @update:model-value="$emit('update:mostrarModalValidar', $event)"/>
+      :loading="carregandoFluxoMapa" :model-value="mostrarModalValidar"
+      @confirmar="$emit('confirmar-validacao')"
+      @update:model-value="$emit('update:mostrarModalValidar', $event)"/>
   <MapaDevolucaoModal
-:erro="mensagemErroDevolucao" :loading="carregandoFluxoMapa"
-                      :model-value="mostrarModalDevolucao" :observacao="observacaoDevolucao"
-                      @confirmar="$emit('confirmar-devolucao')"
-                      @update:model-value="$emit('update:mostrarModalDevolucao', $event)"
-                      @update:observacao="$emit('update:observacaoDevolucao', $event)"/>
+      :erro="mensagemErroDevolucao" :loading="carregandoFluxoMapa"
+      :model-value="mostrarModalDevolucao" :observacao="observacaoDevolucao"
+      @confirmar="$emit('confirmar-devolucao')"
+      @update:model-value="$emit('update:mostrarModalDevolucao', $event)"
+      @update:observacao="$emit('update:observacaoDevolucao', $event)"/>
   <MapaSugestoesEnvioModal
-:erro="mensagemErroSugestoes" :loading="loadingSugestoesEnvio" :model-value="mostrarModalSugestoes"
-                           :sugestoes="sugestoes"
-                           @confirmar="$emit('confirmar-sugestoes')"
-                           @update:model-value="$emit('update:mostrarModalSugestoes', $event)"
-                           @update:sugestoes="$emit('update:sugestoes', $event)"/>
+      :erro="mensagemErroSugestoes" :loading="loadingSugestoesEnvio" :model-value="mostrarModalSugestoes"
+      :sugestoes="sugestoes"
+      @confirmar="$emit('confirmar-sugestoes')"
+      @update:model-value="$emit('update:mostrarModalSugestoes', $event)"
+      @update:sugestoes="$emit('update:sugestoes', $event)"/>
   <MapaSugestoesVisualizacaoModal
-:model-value="mostrarModalVerSugestoes" :pode-editar="podeApresentarSugestoes"
-                                  :sugestoes="sugestoesVisualizacao"
-                                  @fechar="$emit('fechar-ver-sugestoes')"
-                                  @update:model-value="$emit('update:mostrarModalVerSugestoes', $event)"/>
+      :model-value="mostrarModalVerSugestoes" :pode-editar="podeApresentarSugestoes"
+      :sugestoes="sugestoesVisualizacao"
+      @fechar="$emit('fechar-ver-sugestoes')"
+      @update:model-value="$emit('update:mostrarModalVerSugestoes', $event)"/>
   <ImpactoMapaModal
-v-if="codigoSubprocesso" :impacto="impactos" :loading="loadingImpacto"
-                    :mostrar="mostrarModalImpacto" @fechar="$emit('fechar-impacto')"/>
+      v-if="codigoSubprocesso" :impacto="impactos" :loading="loadingImpacto"
+      :mostrar="mostrarModalImpacto" @fechar="$emit('fechar-impacto')"/>
   <HistoricoAnaliseModal
-:historico="historicoAnalise" :mostrar="mostrarModalHistorico"
-                         @fechar="$emit('fechar-historico')"/>
+      :historico="historicoAnalise" :mostrar="mostrarModalHistorico"
+      @fechar="$emit('fechar-historico')"/>
 </template>

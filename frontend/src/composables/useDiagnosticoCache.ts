@@ -34,7 +34,10 @@ export function useCacheDiagnostico() {
     }
 
     function invalidarConsenso(codSubprocesso: number, servidorTitulo?: string) {
-        void cache.invalidateQueries({key: chaveConsenso(codSubprocesso, contextoSessao(), servidorTitulo), exact: true});
+        void cache.invalidateQueries({
+            key: chaveConsenso(codSubprocesso, contextoSessao(), servidorTitulo),
+            exact: true
+        });
     }
 
     function invalidarPermissoes(codSubprocesso: number) {

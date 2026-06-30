@@ -1,6 +1,7 @@
 <template>
   <div class="d-flex flex-column gap-3">
-    <BCard v-for="item in itens" :key="item.codigoUnidade" class="shadow-sm" data-testid="card-relatorio-gaps-diagnostico">
+    <BCard v-for="item in itens" :key="item.codigoUnidade" class="shadow-sm"
+           data-testid="card-relatorio-gaps-diagnostico">
       <BCardTitle class="mb-1 relatorio-diagnostico__titulo">{{ item.siglaUnidade }}</BCardTitle>
       <BCardText class="text-muted mb-3">{{ item.nomeUnidade }}</BCardText>
 

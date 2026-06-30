@@ -2,7 +2,8 @@
 
 ## Papel do módulo
 
-`toolkit/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para qualidade, setup, diagnóstico do projeto, utilidades de backend/frontend e geração de dashboards de QA.
+`toolkit/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para
+qualidade, setup, diagnóstico do projeto, utilidades de backend/frontend e geração de dashboards de QA.
 
 Ponto de entrada principal:
 
@@ -32,19 +33,19 @@ graph TD
 
 ## Estrutura do diretório
 
-| Caminho | Papel |
-|---|---|
-| `sgc.js` | roteador principal da CLI |
-| `*.js` (raiz) | auditorias transversais de comunicação, templates e notificações |
-| `lib/` | infraestrutura compartilhada, execução, paths, saída e utilidades |
-| `backend/` | comandos de cobertura, testes e higiene Java |
-| `frontend/` | comandos de cobertura, mensagens, validações, test ids e cruft |
-| `codigo/` | auditorias transversais de smells |
-| `e2e/` | automações relacionadas à suíte E2E |
-| `qa/` | snapshot, resumo e dashboard de qualidade |
-| `projeto/` | setup, doctor, limpeza e qualidade do repositório |
-| `legado/` | aliases de compatibilidade para scripts renomeados |
-| `test/` | testes do toolkit |
+| Caminho       | Papel                                                             |
+|---------------|-------------------------------------------------------------------|
+| `sgc.js`      | roteador principal da CLI                                         |
+| `*.js` (raiz) | auditorias transversais de comunicação, templates e notificações  |
+| `lib/`        | infraestrutura compartilhada, execução, paths, saída e utilidades |
+| `backend/`    | comandos de cobertura, testes e higiene Java                      |
+| `frontend/`   | comandos de cobertura, mensagens, validações, test ids e cruft    |
+| `codigo/`     | auditorias transversais de smells                                 |
+| `e2e/`        | automações relacionadas à suíte E2E                               |
+| `qa/`         | snapshot, resumo e dashboard de qualidade                         |
+| `projeto/`    | setup, doctor, limpeza e qualidade do repositório                 |
+| `legado/`     | aliases de compatibilidade para scripts renomeados                |
+| `test/`       | testes do toolkit                                                 |
 
 ## Comandos por domínio
 
@@ -192,7 +193,8 @@ O diretório `test/` contém:
 - `sgc.test.js`: testes da CLI principal
 - `fixtures/`: dados auxiliares para simular cenários de execução
 
-Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e respeitando contratos básicos de operação.
+Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e respeitando contratos básicos de
+operação.
 
 ## Relação com o restante do repositório
 

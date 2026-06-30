@@ -14,5 +14,6 @@ public record DiagnosticoMonitoramentoDto(
             String situacaoSubprocesso,
             LocalDateTime dataLimite,
             Long localizacaoAtualCodigo
-    ) {}
+    ) {
+    }
 }

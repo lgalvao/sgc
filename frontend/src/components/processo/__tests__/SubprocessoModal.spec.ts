@@ -33,10 +33,10 @@ describe('SubprocessoModal.vue', () => {
                 ultimaDataLimiteSubprocesso: null,
                 etapaAtual: 1
             },
-            global: { stubs }
+            global: {stubs}
         });
-        
-        await wrapper.setProps({ mostrarModal: true });
+
+        await wrapper.setProps({mostrarModal: true});
         const vm = wrapper.vm as any;
         expect(vm.novaDataLimite).toBe('2026-06-01');
     });
@@ -53,11 +53,11 @@ describe('SubprocessoModal.vue', () => {
                 ultimaDataLimiteSubprocesso: ultimaDataLimite,
                 etapaAtual: 2
             },
-            global: { stubs }
+            global: {stubs}
         });
-        
+
         const vm = wrapper.vm as any;
-        
+
         // Minima should be 2026-05-25 (max of amanha, dataFimEtapaAnterior+1, ultimaDataLimite)
         expect(vm.dataLimiteMinima).toBe('2026-05-25');
 
@@ -68,19 +68,19 @@ describe('SubprocessoModal.vue', () => {
 
         // Test invalid data (equal to dataFimEtapaAnterior)
         // Adjust ultimaDataLimite to be before dataFimEtapaAnterior to test this specific branch
-        await wrapper.setProps({ ultimaDataLimiteSubprocesso: new Date('2026-05-15T12:00:00') });
+        await wrapper.setProps({ultimaDataLimiteSubprocesso: new Date('2026-05-15T12:00:00')});
         vm.novaDataLimite = '2026-05-20';
         await wrapper.vm.$nextTick();
         expect(vm.mensagemErroDataLimite).toContain('maior que a data de fim da etapa anterior');
-        
+
         // Test empty
         await wrapper.find('button').trigger('click');
         vm.novaDataLimite = '';
         await wrapper.vm.$nextTick();
         expect(vm.mensagemErroDataLimite).toContain('obrigatória');
-        
+
         // Test in the past
-        await wrapper.setProps({ ultimaDataLimiteSubprocesso: null });
+        await wrapper.setProps({ultimaDataLimiteSubprocesso: null});
         vm.novaDataLimite = '2026-05-12';
         await wrapper.vm.$nextTick();
         expect(vm.mensagemErroDataLimite).toContain('data futura');
@@ -95,13 +95,13 @@ describe('SubprocessoModal.vue', () => {
                 ultimaDataLimiteSubprocesso: null,
                 etapaAtual: 1
             },
-            global: { stubs }
+            global: {stubs}
         });
-        
+
         const vm = wrapper.vm as any;
         vm.novaDataLimite = '2026-06-01';
         await wrapper.vm.$nextTick();
-        
+
         await wrapper.find('button').trigger('click');
         expect(wrapper.emitted('confirmarAlteracao')![0]).toEqual(['2026-06-01']);
     });

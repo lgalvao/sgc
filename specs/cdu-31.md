@@ -15,8 +15,8 @@
 2. O sistema mostra a tela `Configurações` com o valor atual das seguintes configurações, permitindo edição:
     - `Dias para inativação de processos`: Dias depois da finalização de um processo para que seja considerado inativo.
       Com valor inteiro >= 1. Referenciado nos requisitos como `DIAS_INATIVACAO_PROCESSO`.
-    - `Dias para indicação de alerta como não lido`: Quantidade de dias após o envio de um alerta para que 
-      passe a ser considerado lido pelo sistema. Referenciado nos requisitos como `DIAS_ALERTA_NOVO`.
+    - `Dias para indicação de alerta como não lido`: Quantidade de dias após o envio de um alerta para que passe a ser
+      considerado lido pelo sistema. Referenciado nos requisitos como `DIAS_ALERTA_NOVO`.
 
 3. O usuário altera os valores das configurações e aciona `Salvar`.
 

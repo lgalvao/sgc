@@ -2,8 +2,8 @@
 
 ## Visão geral
 
-A barra de navegação exibe breadcrumbs contextuais que indicam a localização atual do usuário na hierarquia de
-navegação do sistema. Inclui também um botão de voltar para facilitar a navegação.
+A barra de navegação exibe breadcrumbs contextuais que indicam a localização atual do usuário na hierarquia de navegação
+do sistema. Inclui também um botão de voltar para facilitar a navegação.
 
 ## Componentes da Barra
 

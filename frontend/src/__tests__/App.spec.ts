@@ -135,9 +135,9 @@ describe("App.vue", () => {
             carregarConfiguracoes: mockCarregarConfiguracoes,
         } as any);
 
-        const pinia = createTestingPinia({ stubActions: false });
+        const pinia = createTestingPinia({stubActions: false});
         const store = usePerfilStore(pinia);
-        
+
         (useRoute as any).mockReturnValue({path: "/painel", fullPath: "/painel"});
 
         const wrapper = mount(App, {
@@ -151,7 +151,7 @@ describe("App.vue", () => {
         });
 
         store.usuarioCodigo = "USER_123";
-        store.permissoesSessao = { mostrarMenuConfiguracoes: true } as any;
+        store.permissoesSessao = {mostrarMenuConfiguracoes: true} as any;
 
         await nextTick();
 

@@ -12,7 +12,7 @@ function calcularScoreImpacto(classe) {
     // Fatores de risco: 
     // Classes complexas com lacunas são os verdadeiros hotspots.
     // Se não há lacunas (100% de cobertura), o score deve ser 0.
-    
+
     if (classe.linhasPerdidas === 0 && classe.branchesPerdidos === 0) {
         return 0;
     }
@@ -22,7 +22,7 @@ function calcularScoreImpacto(classe) {
     const fatorComplexidade = 1 + (classe.complexidade / 50); // Multiplicador baseado na complexidade
 
     const scoreLacunas = (classe.linhasPerdidas * pesoLinhas) +
-                         (classe.branchesPerdidos * pesoBranches);
+        (classe.branchesPerdidos * pesoBranches);
 
     return scoreLacunas * fatorComplexidade;
 }

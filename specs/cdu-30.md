@@ -51,5 +51,5 @@
     dos administradores do sistema?", com botões `Cancelar` e `Remover`.
 
 12. O usuário confirma acionando `Remover`.
-    
+
 13. O sistema remove o usuário, mostra *toast* "Administrador removido", e atualiza a tabela de administradores na tela.

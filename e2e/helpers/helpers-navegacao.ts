@@ -23,7 +23,7 @@ export async function limparNotificacoes(page: Page): Promise<void> {
             }
 
             try {
-                await btn.click({ force: true, timeout: 1000 });
+                await btn.click({force: true, timeout: 1000});
                 // Small delay to allow the element to be removed from the DOM
                 await page.waitForTimeout(100);
             } catch (e: any) {

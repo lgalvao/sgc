@@ -5,11 +5,11 @@ import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js
 
 test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
     test('ADMIN inicia diagnóstico, cria subprocesso e notificação inicial', async ({
-        _resetAutomatico,
-        page,
-        request,
-        _autenticadoComoAdmin
-    }) => {
+                                                                                        _resetAutomatico,
+                                                                                        page,
+                                                                                        request,
+                                                                                        _autenticadoComoAdmin
+                                                                                    }) => {
         const descricao = `Diagnóstico CDU-41 ${Date.now()}`;
         const processo = await criarProcessoFixture(request, {
             descricao,

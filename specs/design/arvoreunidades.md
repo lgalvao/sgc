@@ -2,8 +2,8 @@
 
 ## Visão geral
 
-A árvore de unidades permite selecionar unidades participantes de um processo usando checkboxes com **três estados** (
-marcado, desmarcado, indeterminado). O comportamento deve ser intuitivo e consistente em todos os níveis da hierarquia.
+A árvore de unidades permite selecionar unidades participantes de um processo usando checkboxes com **três estados**
+(marcado, desmarcado, indeterminado). O comportamento deve ser intuitivo e consistente em todos os níveis da hierarquia.
 
 ## Tipos de Unidades
 

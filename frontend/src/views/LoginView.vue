@@ -258,11 +258,10 @@ const performProfileSelection = async () => {
 
 .login-autorizacao-enter-active,
 .login-autorizacao-leave-active {
-  transition:
-      max-height 0.28s ease,
-      opacity 0.22s ease,
-      transform 0.22s ease,
-      margin-bottom 0.22s ease;
+  transition: max-height 0.28s ease,
+  opacity 0.22s ease,
+  transform 0.22s ease,
+  margin-bottom 0.22s ease;
 }
 
 .login-autorizacao-enter-from,
