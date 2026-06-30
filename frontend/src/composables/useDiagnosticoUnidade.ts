@@ -1,9 +1,11 @@
 import {useQuery} from '@pinia/colada';
 import {computed} from 'vue';
+import {STALE_TIME_LEITURA_AUXILIAR} from '@/composables/cachePolicy';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade} from '@/services/diagnosticoService';
 import type {DiagnosticoUnidade, SituacaoDiagnostico} from '@/types/diagnostico-competencias';
 import {
+    habilitarQueryDiagnostico,
     chaveUnidade,
     criarContextoSessaoDiagnostico,
     useDiagnosticoContexto
@@ -21,8 +23,8 @@ export function useDiagnosticoUnidade(codSubprocesso: number) {
     const query = useQuery<DiagnosticoUnidade>({
         key: () => chaveUnidade(codSubprocesso, contextoSessao),
         query: () => obterDiagnosticoUnidade(codSubprocesso),
-        enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
-        staleTime: 30_000,
+        enabled: () => habilitarQueryDiagnostico(perfilStore, codSubprocesso),
+        staleTime: STALE_TIME_LEITURA_AUXILIAR,
     });
 
     const unidade = computed(() => query.data.value?.unidade);

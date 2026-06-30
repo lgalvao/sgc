@@ -5,7 +5,7 @@ import {useFluxoDiagnostico} from '../useFluxoDiagnostico';
 
 const invalidateQueriesMock = vi.fn();
 const pushMock = vi.fn();
-const invalidarSubprocessoMock = vi.fn();
+const atualizarFluxoSubprocessoMock = vi.fn();
 
 vi.mock('@pinia/colada', () => ({
     useQueryCache: () => ({
@@ -51,9 +51,9 @@ vi.mock('@/stores/perfil', () => ({
     }),
 }));
 
-vi.mock('@/stores/subprocesso', () => ({
-    useSubprocessoStore: () => ({
-        invalidar: invalidarSubprocessoMock,
+vi.mock('@/composables/useInvalidacaoNavegacao', () => ({
+    useInvalidacaoNavegacao: () => ({
+        atualizarFluxoSubprocesso: atualizarFluxoSubprocessoMock,
     }),
 }));
 
@@ -93,7 +93,7 @@ describe('useFluxoDiagnostico', () => {
             key: ['diagnostico-competencias', 'unidade', '151515', 'CHEFE', '12', 41],
             exact: true,
         });
-        expect(invalidarSubprocessoMock).toHaveBeenCalled();
+        expect(atualizarFluxoSubprocessoMock).toHaveBeenCalled();
     });
 
     it('deve enviar payload correto ao validar, devolver e homologar', async () => {

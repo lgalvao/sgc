@@ -186,23 +186,27 @@ const servidorSelecionado = computed(() =>
   servidores.value.find((item) => item.servidorTitulo === servidorSelecionadoTitulo.value) ?? null,
 );
 
-const competenciasServidorSelecionado = computed(() => {
-  const situacoesPorChave = new Map(
-    situacoesLocais.value.map((o) => [`${o.competenciaCodigo}-${o.servidorTitulo}`, o]),
-  );
+const situacoesLocaisPorChave = computed(() =>
+  new Map(
+    situacoesLocais.value.map((item) => [`${item.competenciaCodigo}-${item.servidorTitulo}`, item.situacaoCapacitacao]),
+  ),
+);
 
-  const consensoPorCompetencia = new Map(
+const consensoServidorSelecionadoPorCompetencia = computed(() =>
+  new Map(
     (servidorSelecionado.value?.consenso ?? []).map((item) => [item.competenciaCodigo, item]),
-  );
+  ),
+);
 
+const competenciasServidorSelecionado = computed(() => {
   return (contexto.value?.competencias ?? []).map((competencia) => {
-    const consenso = consensoPorCompetencia.get(competencia.competenciaCodigo);
+    const consenso = consensoServidorSelecionadoPorCompetencia.value.get(competencia.competenciaCodigo);
     return {
       competenciaCodigo: competencia.competenciaCodigo,
       competenciaDescricao: competencia.descricao,
       importancia: consenso?.importancia ?? null,
       dominio: consenso?.dominio ?? null,
-      situacaoCapacitacao: situacoesPorChave.get(`${competencia.competenciaCodigo}-${servidorSelecionadoTitulo.value}`)?.situacaoCapacitacao ?? null,
+      situacaoCapacitacao: situacoesLocaisPorChave.value.get(`${competencia.competenciaCodigo}-${servidorSelecionadoTitulo.value}`) ?? null,
     };
   });
 });

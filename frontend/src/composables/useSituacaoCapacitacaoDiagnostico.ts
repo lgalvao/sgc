@@ -1,5 +1,9 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, ref, watch} from 'vue';
+import {
+    DEBOUNCE_AUTOSAVE_PADRAO_MS,
+    STALE_TIME_CONTROLADO_POR_INVALIDACAO,
+} from '@/composables/cachePolicy';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterDiagnosticoUnidade, salvarSituacoesCapacitacao} from '@/services/diagnosticoService';
 import type {
@@ -8,7 +12,7 @@ import type {
     SituacaoCapacitacaoItem,
     ValorSituacaoCapacitacao
 } from '@/types/diagnostico-competencias';
-import {chaveUnidade, criarContextoSessaoDiagnostico} from '@/composables/useDiagnosticoContexto';
+import {chaveUnidade, criarContextoSessaoDiagnostico, habilitarQueryDiagnostico} from '@/composables/useDiagnosticoContexto';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 
 /**
@@ -25,8 +29,8 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     const query = useQuery<DiagnosticoUnidade>({
         key: () => chaveUnidade(codSubprocesso, contextoSessao),
         query: () => obterDiagnosticoUnidade(codSubprocesso),
-        enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
-        staleTime: Infinity,
+        enabled: () => habilitarQueryDiagnostico(perfilStore, codSubprocesso),
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 
     const situacoesLocais = ref<SituacaoCapacitacaoItem[]>([]);
@@ -55,7 +59,23 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
             salvandoAutomaticamente.value = false;
         },
         onSuccess: () => {
-            void cache.invalidateQueries({key: chaveUnidade(codSubprocesso, contextoSessao), exact: true});
+            const diagnosticoAtual = query.data.value;
+            if (!diagnosticoAtual) {
+                return;
+            }
+
+            cache.setQueryData(
+                chaveUnidade(codSubprocesso, contextoSessao),
+                {
+                    ...diagnosticoAtual,
+                    situacoesCapacitacao: situacoesLocais.value.map((item) => ({
+                        servidorTitulo: item.servidorTitulo,
+                        servidorNome: item.servidorNome,
+                        competenciaCodigo: item.competenciaCodigo,
+                        situacaoCapacitacao: item.situacaoCapacitacao,
+                    })),
+                } satisfies DiagnosticoUnidade,
+            );
         },
     });
 
@@ -64,7 +84,7 @@ export function useSituacaoCapacitacaoDiagnostico(codSubprocesso: number) {
     const dispararSalvamento = () => {
         if (!habilitarCriarConsenso.value) return;
         if (timer !== null) clearTimeout(timer);
-        timer = setTimeout(() => { mutacaoSalvar.mutate(situacoesLocais.value); }, 800);
+        timer = setTimeout(() => { mutacaoSalvar.mutate(situacoesLocais.value); }, DEBOUNCE_AUTOSAVE_PADRAO_MS);
     };
 
     function atualizarCapacitacao(

@@ -38,7 +38,7 @@ export function useCacheDiagnostico() {
     }
 
     function invalidarPermissoes(codSubprocesso: number) {
-        void cache.invalidateQueries({key: ['subprocesso-contexto-edicao-diagnostico', codSubprocesso], exact: true});
+        void cache.invalidateQueries({key: ['subprocesso-permissoes-diagnostico'], exact: false});
     }
 
     function invalidarFluxoCompleto(codSubprocesso: number) {

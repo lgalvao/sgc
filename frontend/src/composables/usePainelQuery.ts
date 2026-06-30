@@ -1,6 +1,7 @@
 // @sgc-auditoria ignorar: arquivoMinusculo | padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 import {computed} from "vue";
 import {useQuery, useQueryCache} from "@pinia/colada";
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 import {usePerfilStore} from "@/stores/perfil";
 import {usePainelStore} from "@/stores/painel";
 import {obterBootstrap} from "@/services/painelService";
@@ -23,7 +24,7 @@ export function usePainelQuery() {
         key: () => [...chave.value],
         query: () => obterBootstrap(),
         enabled: false,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 

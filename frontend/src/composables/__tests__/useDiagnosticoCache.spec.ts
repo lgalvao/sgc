@@ -73,8 +73,8 @@ describe('useDiagnosticoCache', () => {
             exact: true,
         });
         expect(invalidateQueriesMock).toHaveBeenNthCalledWith(4, {
-            key: ['subprocesso-contexto-edicao-diagnostico', 20],
-            exact: true,
+            key: ['subprocesso-permissoes-diagnostico'],
+            exact: false,
         });
     });
 });

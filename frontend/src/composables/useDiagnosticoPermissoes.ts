@@ -1,22 +1,32 @@
 import {computed} from 'vue';
 import {useQuery} from '@pinia/colada';
-import {buscarContextoEdicao} from '@/services/subprocessoServiceContexto';
-import {useAcesso} from '@/composables/acesso';
+import {criarAcessosPermissao} from '@/composables/acessoPermissoes';
+import {STALE_TIME_LEITURA_AUXILIAR} from '@/composables/cachePolicy';
+import {
+    criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico,
+} from '@/composables/diagnosticoQueryUtils';
+import {buscarPermissoesSubprocesso} from '@/services/subprocessoServiceContexto';
+import {usePerfilStore} from '@/stores/perfil';
+import {PERMISSOES_SUBPROCESSO_VAZIAS} from '@/utils/permissoesSubprocesso';
+import type {PermissoesSubprocesso} from '@/types/tipos';
 
 export function useDiagnosticoPermissoes(codSubprocesso: number) {
-    const queryContextoEdicao = useQuery({
-        key: () => ['subprocesso-contexto-edicao-diagnostico', codSubprocesso] as const,
-        query: () => buscarContextoEdicao(codSubprocesso),
-        enabled: () => codSubprocesso > 0,
-        staleTime: 60_000,
+    const perfilStore = usePerfilStore();
+    const contextoSessao = computed(() => criarContextoSessaoDiagnostico(perfilStore));
+
+    const queryPermissoes = useQuery({
+        key: () => ['subprocesso-permissoes-diagnostico', ...contextoSessao.value, codSubprocesso] as const,
+        query: () => buscarPermissoesSubprocesso(codSubprocesso),
+        enabled: () => habilitarQueryDiagnostico(perfilStore, codSubprocesso),
+        staleTime: STALE_TIME_LEITURA_AUXILIAR,
     });
 
-    const subprocesso = computed(() => queryContextoEdicao.data.value?.detalhes ?? null);
-    const acesso = useAcesso(subprocesso);
+    const permissoes = computed<PermissoesSubprocesso>(() => queryPermissoes.data.value ?? PERMISSOES_SUBPROCESSO_VAZIAS);
+    const acesso = criarAcessosPermissao(permissoes);
 
     return {
-        queryContextoEdicao,
-        subprocesso,
+        queryPermissoes,
         ...acesso,
     };
 }

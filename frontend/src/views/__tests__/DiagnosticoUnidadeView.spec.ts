@@ -112,6 +112,14 @@ const subprocessoDetalheVal = ref<any>({
     permissoes: {},
 });
 
+vi.mock('@pinia/colada', () => ({
+    useQuery: vi.fn(() => ({
+        data: subprocessoDetalheVal,
+        isPending: ref(false),
+        isLoading: ref(false),
+    })),
+}));
+
 vi.mock('@/composables/useDiagnosticoUnidade', () => ({
     useDiagnosticoUnidade: () => ({
         unidade: unidadeVal,
@@ -148,11 +156,10 @@ vi.mock('@/composables/useFluxoDiagnostico', () => ({
 
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     useDiagnosticoPermissoes: () => ({
-        queryContextoEdicao: {
+        queryPermissoes: {
             isPending: ref(false),
             isLoading: ref(false),
         },
-        subprocesso: subprocessoDetalheVal,
         podeValidarDiagnostico: computed(() => perfilSelecionado.value === Perfil.GESTOR),
         podeDevolverDiagnostico: computed(() => perfilSelecionado.value === Perfil.GESTOR || perfilSelecionado.value === Perfil.ADMIN),
         podeHomologarDiagnostico: computed(() => perfilSelecionado.value === Perfil.ADMIN),
@@ -160,6 +167,10 @@ vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
         habilitarDevolverDiagnostico: computed(() => situacaoDiagnostico.value === 'CONCLUIDO'),
         habilitarHomologarDiagnostico: computed(() => perfilSelecionado.value === Perfil.ADMIN && situacaoDiagnostico.value === 'VALIDADO'),
     }),
+}));
+
+vi.mock('@/services/subprocessoServiceContexto', () => ({
+    buscarSubprocessoDetalhe: vi.fn(),
 }));
 
 vi.mock('@/composables/useToast', () => ({

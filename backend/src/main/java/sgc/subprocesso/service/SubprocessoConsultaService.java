@@ -168,7 +168,7 @@ public class SubprocessoConsultaService {
     }
 
     public PermissoesSubprocessoDto obterPermissoesUI(Long codSubprocesso) {
-        Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
+        Subprocesso subprocesso = buscarSubprocessoComMapa(codSubprocesso);
         return obterPermissoesUI(subprocesso);
     }
 

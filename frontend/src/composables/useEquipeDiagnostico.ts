@@ -1,9 +1,10 @@
 import {useQuery} from '@pinia/colada';
 import {computed, type MaybeRefOrGetter, toValue} from 'vue';
+import {STALE_TIME_LEITURA_AUXILIAR} from '@/composables/cachePolicy';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterEquipe} from '@/services/diagnosticoService';
 import type {DiagnosticoEquipe} from '@/types/diagnostico-competencias';
-import {chaveEquipe, criarContextoSessaoDiagnostico} from '@/composables/useDiagnosticoContexto';
+import {chaveEquipe, criarContextoSessaoDiagnostico, habilitarQueryDiagnostico} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de acompanhamento da equipe no diagnóstico.
@@ -20,8 +21,8 @@ export function useEquipeDiagnostico(
     const query = useQuery<DiagnosticoEquipe>({
         key: () => chaveEquipe(codSubprocesso, contextoSessao),
         query: () => obterEquipe(codSubprocesso),
-        enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0 && toValue(habilitado),
-        staleTime: 30_000,
+        enabled: () => habilitarQueryDiagnostico(perfilStore, codSubprocesso, toValue(habilitado)),
+        staleTime: STALE_TIME_LEITURA_AUXILIAR,
     });
 
     const itens = computed(() => query.data.value?.servidores ?? []);

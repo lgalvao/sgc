@@ -1,6 +1,7 @@
 // @sgc-auditoria ignorar: arquivoMinusculo | padrão Pinia Colada: arquivo de domínio com chave de query + hook de invalidação — pequeno por design
 import {useQuery, useQueryCache} from "@pinia/colada";
 import {computed} from "vue";
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 
 import {buscarContextoCompleto} from "@/services/processo";
 import type {Processo} from "@/types/tipos";
@@ -15,7 +16,7 @@ export function useProcessoQuery(codigoProcesso: number) {
         key: () => [...chave.value],
         query: async () => buscarContextoCompleto(codigoProcesso),
         enabled: false,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 

@@ -5,6 +5,9 @@ import type {
     ContextoCadastroAtividadesSubprocessoResponse,
     ContextoEdicaoSubprocesso,
     ContextoEdicaoSubprocessoResponse,
+    PermissoesSubprocesso,
+    SubprocessoDetalhe,
+    SubprocessoDetalheResponse,
     ValidacaoCadastro,
 } from "@/types/tipos";
 import apiClient from "../axios-setup";
@@ -12,6 +15,7 @@ import {
     CAMINHO_SUBPROCESSOS,
     caminhoSubprocesso,
     type ImportarAtividadesRequest,
+    mapearDetalheSubprocesso,
     mapearContextoComDetalhes,
 } from "./subprocessoServiceBase";
 
@@ -59,6 +63,14 @@ export async function reabrirRevisaoCadastro(codSubprocesso: number, justificati
 
 export async function buscarContextoEdicao(codSubprocesso: number): Promise<ContextoEdicaoSubprocesso> {
     return mapearContextoComDetalhes(await obter<ContextoEdicaoSubprocessoResponse>(caminhoSubprocesso(codSubprocesso, "/contexto-edicao")));
+}
+
+export async function buscarSubprocessoDetalhe(codSubprocesso: number): Promise<SubprocessoDetalhe> {
+    return mapearDetalheSubprocesso(await obter<SubprocessoDetalheResponse>(caminhoSubprocesso(codSubprocesso, "")));
+}
+
+export async function buscarPermissoesSubprocesso(codSubprocesso: number): Promise<PermissoesSubprocesso> {
+    return obter<PermissoesSubprocesso>(caminhoSubprocesso(codSubprocesso, "/permissoes-ui"));
 }
 
 export async function buscarContextoEdicaoPorProcessoEUnidade(

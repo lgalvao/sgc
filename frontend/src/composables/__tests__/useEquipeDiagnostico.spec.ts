@@ -38,6 +38,8 @@ vi.mock('@/services/diagnosticoService', () => ({
 vi.mock('@/composables/useDiagnosticoContexto', () => ({
     criarContextoSessaoDiagnostico: vi.fn(() => 'contexto-sessao-mock'),
     chaveEquipe: vi.fn((cod, ctx) => ['chave-equipe-mock', cod, ctx]),
+    habilitarQueryDiagnostico: vi.fn((perfilStore, codSubprocesso, condicaoExtra = true) =>
+        !!perfilStore.usuarioCodigo && codSubprocesso > 0 && condicaoExtra),
 }));
 
 describe('useEquipeDiagnostico', () => {

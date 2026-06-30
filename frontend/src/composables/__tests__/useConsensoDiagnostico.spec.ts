@@ -39,12 +39,12 @@ vi.mock('@/stores/perfil', () => ({
 }));
 
 const podeCriarConsensoMock = ref(false);
-const statusContextoEdicaoMock = ref<'pending' | 'success'>('success');
+const statusPermissoesMock = ref<'pending' | 'success'>('success');
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     useDiagnosticoPermissoes: () => ({
         podeCriarConsenso: podeCriarConsensoMock,
-        queryContextoEdicao: {
-            status: statusContextoEdicaoMock,
+        queryPermissoes: {
+            status: statusPermissoesMock,
         },
     }),
 }));
@@ -62,6 +62,8 @@ vi.mock('@/composables/useDiagnosticoContexto', () => ({
     chaveEquipe: vi.fn(() => 'chaveEquipe'),
     chaveAutoavaliacao: vi.fn(() => 'chaveAuto'),
     criarContextoSessaoDiagnostico: vi.fn(),
+    habilitarQueryDiagnostico: vi.fn((perfilStore, codSubprocesso, condicaoExtra = true) =>
+        !!perfilStore.usuarioCodigo && codSubprocesso > 0 && condicaoExtra),
 }));
 
 describe('useConsensoDiagnostico', () => {
@@ -73,7 +75,7 @@ describe('useConsensoDiagnostico', () => {
         mutacaoSalvarOptions = null;
         mutacaoAprovarOptions = null;
         podeCriarConsensoMock.value = false;
-        statusContextoEdicaoMock.value = 'success';
+        statusPermissoesMock.value = 'success';
         
         invalidateQueriesMock = vi.fn();
         
@@ -127,7 +129,7 @@ describe('useConsensoDiagnostico', () => {
     });
 
     it('deve aguardar permissoes antes de habilitar consulta com servidor na rota de consenso', () => {
-        statusContextoEdicaoMock.value = 'pending';
+        statusPermissoesMock.value = 'pending';
         podeCriarConsensoMock.value = true;
 
         useConsensoDiagnostico(1, '242424');
@@ -135,7 +137,7 @@ describe('useConsensoDiagnostico', () => {
 
         expect(queryOptions.enabled()).toBe(false);
 
-        statusContextoEdicaoMock.value = 'success';
+        statusPermissoesMock.value = 'success';
 
         expect(queryOptions.enabled()).toBe(true);
     });

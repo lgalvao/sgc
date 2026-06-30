@@ -1,5 +1,6 @@
 import {useMutation, useQuery, useQueryCache} from "@pinia/colada";
 import {computed} from "vue";
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 import type {Parametro} from "@/services/configuracaoService";
 import {
     buscarConfiguracoes as serviceBuscarConfiguracoes,
@@ -34,7 +35,7 @@ export function useConfiguracoes() {
         key: () => [...chaveConfiguracoes.value],
         query: () => serviceBuscarConfiguracoes(),
         enabled: false,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
     const salvarConfiguracoesMutation = useMutation<Parametro[], Parametro[]>({
         mutation: (novosParametros) => serviceSalvarConfiguracoes(novosParametros),

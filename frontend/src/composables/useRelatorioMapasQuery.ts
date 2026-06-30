@@ -1,5 +1,6 @@
 import {computed} from "vue";
 import {useQuery, useQueryCache} from "@pinia/colada";
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 import {usePerfilStore} from "@/stores/perfil";
 import {buscarCodigosUnidadesComMapaVigente, buscarTodasUnidades} from "@/services/unidadeService";
 import type {Unidade} from "@/types/tipos";
@@ -75,7 +76,7 @@ export function useRelatorioUnidadesComMapaQuery() {
             return aplicarEscopoPerfil(filtrada, perfilStore.perfilSelecionado, perfilStore.unidadeSelecionada);
         },
         enabled: () => !!perfilStore.perfilSelecionado,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 
     return {

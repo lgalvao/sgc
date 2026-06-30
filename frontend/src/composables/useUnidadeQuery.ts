@@ -1,5 +1,6 @@
 import {computed, type MaybeRefOrGetter, toValue} from "vue";
 import {useQuery, useQueryCache} from "@pinia/colada";
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 import {usePerfilStore} from "@/stores/perfil";
 import {
     buscarArvoreComElegibilidade,
@@ -52,7 +53,7 @@ export function useUnidadeQuery(codigoUnidade: MaybeRefOrGetter<number>) {
             const cod = toValue(codigoUnidade);
             return Number.isFinite(cod) && cod > 0 && !!perfilStore.perfilSelecionado;
         },
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 
@@ -80,7 +81,7 @@ export function useDadosTelaUnidadeQuery(codigoUnidade: MaybeRefOrGetter<number>
             const cod = toValue(codigoUnidade);
             return Number.isFinite(cod) && cod > 0 && !!perfilStore.perfilSelecionado;
         },
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 
@@ -98,7 +99,7 @@ export function useArvoreElegibilidadeQuery(
         },
         enabled: () => !!toValue(tipoProcesso) && !!perfilStore.perfilSelecionado,
         initialData: () => [],
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 

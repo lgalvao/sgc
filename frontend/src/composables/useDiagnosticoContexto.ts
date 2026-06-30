@@ -2,19 +2,20 @@ import {useQuery, useQueryCache} from '@pinia/colada';
 import {usePerfilStore} from '@/stores/perfil';
 import {obterContextoDiagnostico} from '@/services/diagnosticoService';
 import type {DiagnosticoContexto} from '@/types/diagnostico-competencias';
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from '@/composables/cachePolicy';
+import {
+    CHAVE_DIAGNOSTICO,
+    criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico,
+} from '@/composables/diagnosticoQueryUtils';
 
-/** Prefixo de chave compartilhado entre todos os composables de diagnóstico. */
-export const CHAVE_DIAGNOSTICO = 'diagnostico-competencias';
+export {
+    CHAVE_DIAGNOSTICO,
+    criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico,
+};
 
-type ContextoSessaoDiagnostico = readonly [string, string, string];
-
-export function criarContextoSessaoDiagnostico(perfilStore: ReturnType<typeof usePerfilStore>): ContextoSessaoDiagnostico {
-    return [
-        perfilStore.usuarioCodigo ?? 'anon',
-        String(perfilStore.perfilSelecionado ?? 'sem-perfil'),
-        String(perfilStore.unidadeSelecionada ?? 'sem-unidade'),
-    ] as const;
-}
+type ContextoSessaoDiagnostico = ReturnType<typeof criarContextoSessaoDiagnostico>;
 
 export function chaveContexto(codSubprocesso: number, contextoSessao: ContextoSessaoDiagnostico) {
     return [CHAVE_DIAGNOSTICO, 'contexto', ...contextoSessao, codSubprocesso] as const;
@@ -50,8 +51,8 @@ export function useDiagnosticoContexto(codSubprocesso: number) {
     return useQuery<DiagnosticoContexto>({
         key: () => chaveContexto(codSubprocesso, contextoSessao),
         query: () => obterContextoDiagnostico(codSubprocesso),
-        enabled: () => !!perfilStore.usuarioCodigo && codSubprocesso > 0,
-        staleTime: Infinity,
+        enabled: () => habilitarQueryDiagnostico(perfilStore, codSubprocesso),
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 

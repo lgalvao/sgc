@@ -15,7 +15,7 @@ import {
     validarDiagnostico,
 } from '@/services/diagnosticoService';
 import {useCacheDiagnostico} from '@/composables/useDiagnosticoCache';
-import {useSubprocessoStore} from '@/stores/subprocesso';
+import {useInvalidacaoNavegacao} from '@/composables/useInvalidacaoNavegacao';
 
 /**
  * Composable de fluxo do diagnóstico.
@@ -25,12 +25,12 @@ import {useSubprocessoStore} from '@/stores/subprocesso';
 export function useFluxoDiagnostico(codSubprocesso: MaybeRefOrGetter<number>) {
     const router = useRouter();
     const cacheDiagnostico = useCacheDiagnostico();
-    const subprocessoStore = useSubprocessoStore();
+    const {atualizarFluxoSubprocesso} = useInvalidacaoNavegacao();
     const obterCodSubprocesso = () => toValue(codSubprocesso);
 
     function invalidarTudo() {
         cacheDiagnostico.invalidarFluxoCompleto(obterCodSubprocesso());
-        subprocessoStore.invalidar();
+        atualizarFluxoSubprocesso();
     }
 
     const mutacaoConcluir = useMutation({

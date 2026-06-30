@@ -107,6 +107,12 @@ public class SubprocessoController {
         return ResponseEntity.ok(consultaService.obterContextoEdicao(codSubprocesso));
     }
 
+    @GetMapping("/{codSubprocesso}/permissoes-ui")
+    @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'VISUALIZAR_SUBPROCESSO')")
+    public ResponseEntity<PermissoesSubprocessoDto> obterPermissoesUI(@PathVariable Long codSubprocesso) {
+        return ResponseEntity.ok(consultaService.obterPermissoesUI(codSubprocesso));
+    }
+
     @GetMapping("/contexto-edicao/buscar")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ContextoEdicaoResponse> obterContextoEdicaoPorProcessoEUnidade(

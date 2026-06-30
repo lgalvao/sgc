@@ -1,11 +1,15 @@
 import {computed, ref, watch} from 'vue';
+import {useQuery} from '@pinia/colada';
 import type {ColorVariant} from 'bootstrap-vue-next';
+import {STALE_TIME_LEITURA_AUXILIAR} from '@/composables/cachePolicy';
+import {possuiCodSubprocessoValido} from '@/composables/diagnosticoQueryUtils';
 import {normalizarErro} from '@/utils/apiError/normalizer';
 import {useDiagnosticoUnidade} from '@/composables/useDiagnosticoUnidade';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {listarAnalisesDiagnostico} from '@/services/analiseService';
+import {buscarSubprocessoDetalhe} from '@/services/subprocessoServiceContexto';
 import {formatarDataBR} from '@/utils';
 import {formatSituacaoSubprocesso} from '@/utils/formatters';
 import {TEXTOS} from '@/constants/textos';
@@ -37,8 +41,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     const contextoQuery = useDiagnosticoContexto(props.codSubprocesso);
     const {data: contexto} = contextoQuery;
     const {
-        queryContextoEdicao,
-        subprocesso: subprocessoDetalhe,
+        queryPermissoes,
         podeValidarDiagnostico,
         podeDevolverDiagnostico,
         podeHomologarDiagnostico,
@@ -46,6 +49,13 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         habilitarDevolverDiagnostico,
         habilitarHomologarDiagnostico,
     } = useDiagnosticoPermissoes(props.codSubprocesso);
+    const querySubprocessoDetalhe = useQuery({
+        key: () => ['subprocesso-detalhes-diagnostico', props.codSubprocesso] as const,
+        query: () => buscarSubprocessoDetalhe(props.codSubprocesso),
+        enabled: () => possuiCodSubprocessoValido(props.codSubprocesso),
+        staleTime: STALE_TIME_LEITURA_AUXILIAR,
+    });
+    const subprocessoDetalhe = computed(() => querySubprocessoDetalhe.data.value ?? null);
 
     const {
         unidade,
@@ -96,8 +106,10 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         carregandoUnidade.value
         || contextoQuery.isPending.value
         || contextoQuery.isLoading.value
-        || queryContextoEdicao.isPending.value
-        || queryContextoEdicao.isLoading.value,
+        || queryPermissoes.isPending.value
+        || queryPermissoes.isLoading.value
+        || querySubprocessoDetalhe.isPending.value
+        || querySubprocessoDetalhe.isLoading.value,
     );
     const contextoObrigatorio = computed<DiagnosticoContexto>(() => {
         const valor = contexto.value;
@@ -318,15 +330,21 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         ),
     );
 
+    const consensoServidorSelecionadoPorCompetencia = computed(() =>
+        new Map(
+            (servidorSelecionado.value?.consenso ?? []).map((item) => [item.competenciaCodigo, item]),
+        ),
+    );
+
     const competenciasServidorSelecionado = computed<CompetenciaServidorSelecionado[]>(() =>
         contextoObrigatorio.value.competencias.map((competencia) => ({
             competenciaCodigo: competencia.competenciaCodigo,
             competenciaDescricao: competencia.descricao,
-            importancia: servidorSelecionado.value?.consenso.find(
-                (item) => item.competenciaCodigo === competencia.competenciaCodigo,
+            importancia: consensoServidorSelecionadoPorCompetencia.value.get(
+                competencia.competenciaCodigo,
             )?.importancia ?? null,
-            dominio: servidorSelecionado.value?.consenso.find(
-                (item) => item.competenciaCodigo === competencia.competenciaCodigo,
+            dominio: consensoServidorSelecionadoPorCompetencia.value.get(
+                competencia.competenciaCodigo,
             )?.dominio ?? null,
             situacaoCapacitacao: servidorSelecionado.value
                 ? mapaSituacaoCapacitacao.value[

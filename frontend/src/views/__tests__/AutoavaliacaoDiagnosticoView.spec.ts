@@ -62,31 +62,36 @@ vi.mock('@/composables/useDiagnosticoContexto', () => ({
     }),
 }));
 
-const queryContextoEdicaoDataVal = ref<any>({
-    mapa: {
-        competencias: [
-            {
-                codigo: 10,
-                atividades: [
-                    {
-                        codigo: 100,
-                        descricao: 'Atividade A',
-                        conhecimentos: [
-                            {codigo: 1, descricao: 'Conhecimento A'},
-                        ],
-                    },
-                ],
-            },
-        ],
-    },
+const mapaDataVal = ref<any>({
+    competencias: [
+        {
+            codigo: 10,
+            atividades: [
+                {
+                    codigo: 100,
+                    descricao: 'Atividade A',
+                    conhecimentos: [
+                        {codigo: 1, descricao: 'Conhecimento A'},
+                    ],
+                },
+            ],
+        },
+    ],
 });
 
 vi.mock('@/composables/useDiagnosticoPermissoes', () => ({
     useDiagnosticoPermissoes: () => ({
-        queryContextoEdicao: {
-            data: queryContextoEdicaoDataVal,
+        queryPermissoes: {
+            status: ref('success'),
         },
         podeCriarConsenso: computed(() => podeCriarConsenso.value),
+    }),
+}));
+
+vi.mock('@/composables/useMapaQuery', () => ({
+    useMapaQuery: () => ({
+        data: mapaDataVal,
+        status: ref('success'),
     }),
 }));
 

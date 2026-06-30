@@ -1,5 +1,6 @@
 package sgc.integracao;
 
+import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.security.authentication.*;
@@ -46,6 +47,12 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
 
     private Usuario admin;
     private Subprocesso subprocesso;
@@ -114,6 +121,56 @@ class SubprocessoServiceContextoIntegrationTest extends BaseIntegrationTest {
         assertThat(contexto.detalhes()).isNotNull();
         assertThat(contexto.mapa()).isNotNull();
         assertThat(contexto.mapa().atividades()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("obterPermissoesUI deve ser mais leve que obterContextoEdicao quando a tela só precisa de permissões")
+    void obterPermissoesUIDeveSerMaisLeveQueContextoEdicao() {
+        atividadeRepo.saveAndFlush(Atividade.builder()
+                .mapa(subprocesso.getMapa())
+                .descricao("Atividade 1")
+                .build());
+        atividadeRepo.saveAndFlush(Atividade.builder()
+                .mapa(subprocesso.getMapa())
+                .descricao("Atividade 2")
+                .build());
+
+        MetricasExecucaoTeste.ResultadoMedicao medicaoContexto = MetricasExecucaoTeste.medir(
+                entityManager,
+                entityManagerFactory,
+                "subprocesso-contexto-edicao",
+                () -> consultaService.obterContextoEdicao(subprocesso.getCodigo()),
+                "ATIVIDADE",
+                "CONHECIMENTO",
+                "MOVIMENTACAO",
+                "VW_USUARIO"
+        );
+        MetricasExecucaoTeste.ResultadoMedicao medicaoPermissoes = MetricasExecucaoTeste.medir(
+                entityManager,
+                entityManagerFactory,
+                "subprocesso-permissoes-ui",
+                () -> consultaService.obterPermissoesUI(subprocesso.getCodigo()),
+                "ATIVIDADE",
+                "CONHECIMENTO",
+                "MOVIMENTACAO",
+                "VW_USUARIO"
+        );
+
+        assertThat(medicaoPermissoes.preparedStatements())
+                .as("""
+                        O endpoint leve de permissões deve preparar menos statements do que o contexto completo,
+                        pois não precisa carregar mapa nem detalhes completos.
+                        Contexto: %s
+                        Permissões: %s
+                        """.formatted(medicaoContexto.resumo(), medicaoPermissoes.resumo()))
+                .isLessThan(medicaoContexto.preparedStatements());
+        assertThat(medicaoPermissoes.contagensPorTrecho().get("ATIVIDADE"))
+                .as("""
+                        A leitura de permissões não deve tocar na carga de atividades do mapa.
+                        Contexto: %s
+                        Permissões: %s
+                        """.formatted(medicaoContexto.resumo(), medicaoPermissoes.resumo()))
+                .isZero();
     }
 
     @Test

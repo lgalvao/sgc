@@ -1,9 +1,18 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, onUnmounted, ref, watch} from 'vue';
+import {
+    DEBOUNCE_AUTOSAVE_PADRAO_MS,
+    STALE_TIME_CONTROLADO_POR_INVALIDACAO,
+} from '@/composables/cachePolicy';
 import {usePerfilStore} from '@/stores/perfil';
 import {concluirAutoavaliacao, obterAutoavaliacao, salvarAutoavaliacao,} from '@/services/diagnosticoService';
 import type {Autoavaliacao, AvaliacaoCompetencia} from '@/types/diagnostico-competencias';
-import {chaveAutoavaliacao, chaveEquipe, criarContextoSessaoDiagnostico,} from '@/composables/useDiagnosticoContexto';
+import {
+    chaveAutoavaliacao,
+    chaveEquipe,
+    criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico,
+} from '@/composables/useDiagnosticoContexto';
 
 /**
  * Composable de autoavaliação do servidor logado.
@@ -19,8 +28,8 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
     const query = useQuery<Autoavaliacao>({
         key: () => chaveAutoavaliacao(codSubprocesso, contextoSessao),
         query: () => obterAutoavaliacao(codSubprocesso),
-        enabled: () => codSubprocesso > 0,
-        staleTime: Infinity,
+        enabled: () => habilitarQueryDiagnostico(perfilStore, codSubprocesso),
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 
     // Estado local de edição para evitar chamadas de rede a cada keypress
@@ -64,7 +73,7 @@ export function useAutoavaliacaoDiagnostico(codSubprocesso: number) {
         timer = setTimeout(() => {
             timer = null;
             mutacaoSalvar.mutate(competenciasLocais.value);
-        }, 800);
+        }, DEBOUNCE_AUTOSAVE_PADRAO_MS);
     }
 
     onUnmounted(() => {

@@ -115,6 +115,16 @@ class SubprocessoControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("CHEFE deve obter apenas as permissões de UI do seu subprocesso")
+    @WithMockChefe
+    void obterPermissoesUI_chefe_sucesso() throws Exception {
+        mockMvc.perform(get("/api/subprocessos/{codSubprocesso}/permissoes-ui", subprocesso.getCodigo()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.habilitarAcessoCadastro").isBoolean())
+                .andExpect(jsonPath("$.habilitarAcessoMapa").isBoolean());
+    }
+
+    @Test
     @DisplayName("CHEFE deve obter o contexto de cadastro de atividades")
     @WithMockChefe
     void obterContextoCadastroAtividades_chefe_sucesso() throws Exception {

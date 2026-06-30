@@ -1,5 +1,6 @@
 import {computed} from "vue";
 import {useMutation, useQuery, useQueryCache} from "@pinia/colada";
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 import {
     buscarUrlLeitorEmailTestes,
     compararNotificacoes,
@@ -20,7 +21,7 @@ export function useNotificacoesAdminQuery() {
         key: CHAVE_QUERY_NOTIFICACOES_ADMIN,
         query: () => listarNotificacoesAdmin(),
         enabled: () => !!perfilStore.perfilSelecionado,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 
     const itensOrdenados = computed(() => (query.data.value ?? []).toSorted(compararNotificacoes));
@@ -37,7 +38,7 @@ export function useUrlLeitorEmailTestesQuery() {
         key: CHAVE_QUERY_LEITOR_EMAIL_TESTES,
         query: () => buscarUrlLeitorEmailTestes(),
         enabled: () => !ehModoProducao() && !!perfilStore.perfilSelecionado,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 

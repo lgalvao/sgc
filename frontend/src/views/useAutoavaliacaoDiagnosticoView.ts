@@ -1,5 +1,6 @@
 import {computed, ref} from 'vue';
 import {useRouter} from 'vue-router';
+import {useMapaQuery} from '@/composables/useMapaQuery';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useAutoavaliacaoDiagnostico} from '@/composables/useAutoavaliacaoDiagnostico';
@@ -23,7 +24,8 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     const {registrarPendente} = useToast();
 
     const {data: contexto} = useDiagnosticoContexto(props.codSubprocesso);
-    const {queryContextoEdicao, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
+    const {queryPermissoes, podeCriarConsenso} = useDiagnosticoPermissoes(props.codSubprocesso);
+    const queryMapa = useMapaQuery(props.codSubprocesso);
     const {
         competenciasLocais,
         situacaoServidor,
@@ -227,7 +229,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
 
     const competenciasComDescricao = computed(() => {
         const mapaAtividades = new Map<number, Atividade[]>(
-            (queryContextoEdicao.data.value?.mapa.competencias ?? []).map((competencia) => [competencia.codigo, competencia.atividades ?? []]),
+            (queryMapa.data.value?.competencias ?? []).map((competencia) => [competencia.codigo, competencia.atividades ?? []]),
         );
         return competenciasLocais.value.map((competencia) => ({
             ...competencia,
@@ -247,7 +249,11 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
 
     return {
         contexto,
-        carregando,
+        carregando: computed(() =>
+            carregando.value
+            || queryPermissoes.status.value === 'pending'
+            || queryMapa.status.value === 'pending',
+        ),
         retornoFluxo,
         limparRetornoFluxo,
         salvandoAutomaticamente,

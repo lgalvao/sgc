@@ -1,5 +1,9 @@
 import {useMutation, useQuery, useQueryCache} from '@pinia/colada';
 import {computed, ref, watch} from 'vue';
+import {
+    DEBOUNCE_AUTOSAVE_PADRAO_MS,
+    STALE_TIME_CONTROLADO_POR_INVALIDACAO,
+} from '@/composables/cachePolicy';
 import {usePerfilStore} from '@/stores/perfil';
 import {
     aprovarConsenso,
@@ -15,6 +19,7 @@ import {
     chaveConsenso,
     chaveEquipe,
     criarContextoSessaoDiagnostico,
+    habilitarQueryDiagnostico,
 } from '@/composables/useDiagnosticoContexto';
 
 /**
@@ -28,8 +33,8 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
     const perfilStore = usePerfilStore();
     const cache = useQueryCache();
     const contextoSessao = criarContextoSessaoDiagnostico(perfilStore);
-    const {podeCriarConsenso, queryContextoEdicao} = useDiagnosticoPermissoes(codSubprocesso);
-    const carregandoPermissoes = computed(() => queryContextoEdicao.status.value === 'pending');
+    const {podeCriarConsenso, queryPermissoes} = useDiagnosticoPermissoes(codSubprocesso);
+    const carregandoPermissoes = computed(() => queryPermissoes.status.value === 'pending');
     const deveConsultarConsensoServidor = computed(() =>
         Boolean(servidorTitulo) && podeCriarConsenso.value
     );
@@ -38,9 +43,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         : 'usuario-logado',
     );
     const podeCarregarConsenso = computed(() =>
-        codSubprocesso > 0
-        && !!perfilStore.usuarioCodigo
-        && (!servidorTitulo || !carregandoPermissoes.value),
+        habilitarQueryDiagnostico(perfilStore, codSubprocesso, !servidorTitulo || !carregandoPermissoes.value),
     );
 
     const query = useQuery<Consenso>({
@@ -49,7 +52,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
             ? obterConsensoServidor(codSubprocesso, servidorTitulo!)
             : obterConsenso(codSubprocesso),
         enabled: () => podeCarregarConsenso.value,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 
     // Estado local editável pela chefia
@@ -101,7 +104,7 @@ export function useConsensoDiagnostico(codSubprocesso: number, servidorTitulo?: 
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
             void salvarConsensoAgora();
-        }, 800);
+        }, DEBOUNCE_AUTOSAVE_PADRAO_MS);
     }
 
     async function salvarConsensoAgora() {

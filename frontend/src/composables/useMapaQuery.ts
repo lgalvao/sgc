@@ -1,5 +1,6 @@
 import {computed, type MaybeRefOrGetter, toValue} from "vue";
 import {useQuery, useQueryCache} from "@pinia/colada";
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 import {usePerfilStore} from "@/stores/perfil";
 import type {ImpactoMapa, MapaCompleto} from "@/types/tipos";
 import {
@@ -50,7 +51,7 @@ export function useMapaQuery(codigoSubprocesso: MaybeRefOrGetter<number | null |
             const codigoAtual = toValue(codigoSubprocesso);
             return typeof codigoAtual === "number" && codigoAtual > 0 && !!perfilStore.perfilSelecionado;
         },
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 
@@ -73,7 +74,7 @@ export function useImpactoMapaQuery(codigoSubprocesso: MaybeRefOrGetter<number |
             return serviceVerificarImpactosMapa(codigoAtual);
         },
         enabled: false,
-        staleTime: Infinity,
+        staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 }
 

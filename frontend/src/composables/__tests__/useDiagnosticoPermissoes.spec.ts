@@ -6,15 +6,7 @@ import * as contextoService from '@/services/subprocessoServiceContexto';
 import {useDiagnosticoPermissoes} from '../useDiagnosticoPermissoes';
 
 vi.mock('@/services/subprocessoServiceContexto', () => ({
-    buscarContextoEdicao: vi.fn(),
-}));
-
-vi.mock('@/composables/acesso', () => ({
-    useAcesso: () => ({
-        podeCriarConsenso: true,
-        habilitarConcluirDiagnostico: false,
-        habilitarValidarDiagnostico: true,
-    }),
+    buscarPermissoesSubprocesso: vi.fn(),
 }));
 
 function withSetup<T>(composable: () => T) {
@@ -33,19 +25,20 @@ function withSetup<T>(composable: () => T) {
 }
 
 describe('useDiagnosticoPermissoes', () => {
-    it('deve consultar contexto de edição e expor acesso consolidado', async () => {
-        vi.mocked(contextoService.buscarContextoEdicao).mockResolvedValue({
-            detalhes: {codigo: 77},
+    it('deve consultar permissões e expor acesso consolidado', async () => {
+        vi.mocked(contextoService.buscarPermissoesSubprocesso).mockResolvedValue({
+            podeCriarConsenso: true,
+            habilitarConcluirDiagnostico: false,
+            habilitarValidarDiagnostico: true,
         } as any);
 
         const [composable, app] = withSetup(() => useDiagnosticoPermissoes(77));
-        const res = await composable.queryContextoEdicao.refetch();
+        const res = await composable.queryPermissoes.refetch();
 
-        expect(contextoService.buscarContextoEdicao).toHaveBeenCalledWith(77);
-        expect(res.data?.detalhes.codigo).toBe(77);
-        expect(composable.subprocesso.value).toEqual({codigo: 77});
-        expect(composable.podeCriarConsenso).toBe(true);
-        expect(composable.habilitarValidarDiagnostico).toBe(true);
+        expect(contextoService.buscarPermissoesSubprocesso).toHaveBeenCalledWith(77);
+        expect(res.data?.podeCriarConsenso).toBe(true);
+        expect(composable.podeCriarConsenso.value).toBe(true);
+        expect(composable.habilitarValidarDiagnostico.value).toBe(true);
         app.unmount();
     });
 });
