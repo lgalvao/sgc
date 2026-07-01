@@ -29,24 +29,26 @@ public class SubprocessoDtoMapper {
         LocalDateTime dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
         LocalDateTime dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
 
-        return SubprocessoResumoDto.builder()
-                .codigo(subprocesso.getCodigo())
-                .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()))
-                .situacao(subprocesso.getSituacao().name())
-                .dataLimiteEtapa1(dataLimiteEtapa1)
-                .dataFimEtapa1(subprocesso.getDataFimEtapa1())
-                .dataLimiteEtapa2(dataLimiteEtapa2)
-                .dataFimEtapa2(subprocesso.getDataFimEtapa2())
-                .ultimaDataLimite(calcularUltimaDataLimite(dataLimiteEtapa1, dataLimiteEtapa2))
-                .codProcesso(processo.getCodigo())
-                .codUnidade(subprocesso.getUnidade().getCodigo())
-                .codMapa(subprocesso.getCodMapa())
-                .processoDescricao(processo.getDescricao())
-                .dataCriacaoProcesso(processo.getDataCriacao())
-                .tipoProcesso(processo.getTipo() != null ? processo.getTipo().name() : null)
-                .isEmAndamento(subprocesso.isEmAndamento())
-                .etapaAtual(subprocesso.getEtapaAtual())
-                .build();
+        if (subprocesso.getDataFimEtapa1() != null) {
+            return SubprocessoResumoDto.builder()
+                    .codigo(subprocesso.getCodigo())
+                    .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()))
+                    .situacao(subprocesso.getSituacao().name())
+                    .dataLimiteEtapa1(dataLimiteEtapa1)
+                    .dataFimEtapa1(subprocesso.getDataFimEtapa1())
+                    .dataLimiteEtapa2(dataLimiteEtapa2)
+                    .dataFimEtapa2(subprocesso.getDataFimEtapa2())
+                    .ultimaDataLimite(calcularUltimaDataLimite(dataLimiteEtapa1, dataLimiteEtapa2))
+                    .codProcesso(processo.getCodigo())
+                    .codUnidade(subprocesso.getUnidade().getCodigo())
+                    .codMapa(subprocesso.getCodMapa())
+                    .processoDescricao(processo.getDescricao())
+                    .dataCriacaoProcesso(processo.getDataCriacao())
+                    .tipoProcesso(processo.getTipo() != null ? processo.getTipo().name() : null)
+                    .isEmAndamento(subprocesso.isEmAndamento())
+                    .etapaAtual(subprocesso.getEtapaAtual())
+                    .build();
+        }
     }
 
     public SubprocessoListagemDto paraListagem(Subprocesso subprocesso) {

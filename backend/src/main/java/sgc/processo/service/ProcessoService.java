@@ -1344,10 +1344,6 @@ public class ProcessoService {
                 ));
     }
 
-    private TipoNotificacao tipoNotificacaoFinalizacao() {
-        return TipoNotificacao.PROCESSO_FINALIZADO;
-    }
-
     private String assuntoFinalizacaoDireta(Processo processo) {
         return emailModelosService.criarAssuntoProcessoFinalizado(processo.getTipo());
     }
@@ -1447,7 +1443,7 @@ public class ProcessoService {
     private void criarNotificacaoFinalizacaoDireta(Processo processo, Unidade unidade) {
         enfileirarNotificacaoUnidade(
                 unidade,
-                tipoNotificacaoFinalizacao(),
+                TipoNotificacao.PROCESSO_FINALIZADO,
                 assuntoFinalizacaoDireta(processo),
                 corpoFinalizacaoDireta(processo, unidade),
                 chaveFinalizacaoProcesso(processo, unidade, true),
@@ -1458,7 +1454,7 @@ public class ProcessoService {
     private void criarNotificacaoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
         enfileirarNotificacaoUnidade(
                 unidade,
-                tipoNotificacaoFinalizacao(),
+                TipoNotificacao.PROCESSO_FINALIZADO,
                 assuntoFinalizacaoConsolidada(processo),
                 corpoFinalizacaoConsolidada(processo, unidade, subordinadas),
                 chaveFinalizacaoProcesso(processo, unidade, false),

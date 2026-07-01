@@ -30,7 +30,7 @@ import {
     navegarParaMapa
 } from '../helpers/helpers-mapas.js';
 import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
-import {capturarCheckpointA11y, type OpcoesCapturaTela} from './helpers-a11y.js';
+import {aguardarPinturaEstavel, capturarCheckpointA11y, type OpcoesCapturaTela} from './helpers-a11y.js';
 
 type ProcessoCleanup = ReturnType<typeof useProcessoCleanup>;
 

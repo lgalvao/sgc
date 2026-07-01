@@ -50,22 +50,18 @@ public final class AssuntosNotificacao {
             case CADASTRO_REABERTO -> "Reabertura de cadastro de atividades";
             case MAPA_HOMOLOGADO -> "Mapa de competências homologado";
             case MAPA_DISPONIBILIZADO -> "Mapa de competências disponibilizado";
-            case MAPA_SUGESTOES_APRESENTADAS -> "Sugestões apresentadas para o mapa de competências da %s"
-                    .formatted(siglaUnidade);
+            case MAPA_SUGESTOES_APRESENTADAS ->
+                    "Sugestões apresentadas para o mapa de competências da %s".formatted(siglaUnidade);
             case MAPA_VALIDADO, MAPA_VALIDACAO_ACEITA ->
-                    "Validação do mapa de competências da %s submetida para análise"
-                            .formatted(siglaUnidade);
+                    "Validação do mapa de competências da %s submetida para análise".formatted(siglaUnidade);
             case MAPA_VALIDACAO_DEVOLVIDA -> "Validação do mapa da %s devolvida para ajustes"
                     .formatted(siglaUnidade);
             case REVISAO_CADASTRO_ACEITA ->
-                    "Revisão do cadastro de atividades e conhecimentos da %s submetido para análise"
-                            .formatted(siglaUnidade);
+                    "Revisão do cadastro de atividades e conhecimentos da %s submetido para análise".formatted(siglaUnidade);
             case REVISAO_CADASTRO_DEVOLVIDA ->
-                    "Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes"
-                            .formatted(siglaUnidade);
+                    "Revisão do cadastro de atividades e conhecimentos da %s devolvida para ajustes".formatted(siglaUnidade);
             case REVISAO_CADASTRO_DISPONIBILIZADA ->
-                    "Revisão do cadastro de atividades e conhecimentos disponibilizada: %s"
-                            .formatted(siglaUnidade);
+                    "Revisão do cadastro de atividades e conhecimentos disponibilizada: %s".formatted(siglaUnidade);
             case REVISAO_CADASTRO_REABERTA -> "Reabertura de revisão de cadastro";
             default -> tipo.getDescMovimentacao();
         };

@@ -15,7 +15,6 @@ import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 @Service
 @RequiredArgsConstructor
