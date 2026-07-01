@@ -84,5 +84,4 @@ test-results/.last-run.json
 
 # Documento de acesso HOM
 specs/docs/como_logar_hom.md
-/etc/qualidade/
 /e2e/test-results/.last-run.json

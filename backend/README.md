@@ -115,13 +115,6 @@ Implementa autenticação e autorização. O ponto central é `SgcPermissionEval
 - módulos já migrados não devem usar `@JsonView` em DTOs de contrato HTTP explícito;
 - pacotes com services/controllers devem permanecer `@NullMarked`.
 
-Diretriz de referência da borda HTTP:
-
-- [Borda HTTP do backend](../etc/docs/backend-borda-http.md)
-- [ADR 0001 - Contratos HTTP Explícitos no Backend](../etc/docs/adr/0001-contratos-http-explicitos.md)
-- [ADR 0002 - Conter JsonView no Legado de Model e no Adapter E2E](../etc/docs/adr/0002-conter-jsonview-no-adapter-e2e.md)
-- [Plano de Qualidade - Diretrizes](/Users/leonardo/sgc/etc/docs/plano-qualidade-diretrizes.md)
-
 ## Segurança e modelo de autorização
 
 A aplicação usa `@PreAuthorize` nos controllers e o avaliador central de permissão para o contexto fino.
@@ -143,7 +136,7 @@ Resumo funcional:
 - **CHEFE** atua sobre cadastro/validação quando o subprocesso está em sua unidade ativa;
 - **SERVIDOR** atua no que o domínio de diagnóstico exigir, sem receber privilégios de gestão.
 
-Veja também: [regras de acesso](../etc/reqs/acesso.md).
+Veja também: [regras de acesso](../specs/design/acesso.md).
 
 ## Perfis de execução
 
@@ -228,10 +221,3 @@ Comandos mais usados:
 ./gradlew :backend:qualityCheck
 ./gradlew :backend:qualityCheckFast
 ```
-
-## Referências internas
-
-- [README raiz](../README.md)
-- [Pacote comum](src/main/java/sgc/comum/README.md)
-- [Módulo de subprocesso](src/main/java/sgc/subprocesso/README.md)
-- [Suporte E2E no backend](src/main/java/sgc/e2e/README.md)

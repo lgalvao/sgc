@@ -12,8 +12,8 @@ evidência de execução, não de inspeção estática isolada.
 
 Antes de otimizar, confirme as restrições nestas fontes:
 
-- `etc/reqs`
-- `etc/docs/acesso.md`
+- `specs`
+- `specs/design/acesso.md`
 - `AGENTS.md`
 - o cenário E2E relacionado
 
@@ -45,7 +45,7 @@ Encontrar o menor corte seguro que reduz:
 Preserve:
 
 - comportamento funcional;
-- contratos exigidos por `etc/reqs`;
+- contratos exigidos por `specs`;
 - regras de acesso;
 - textos e navegação relevantes;
 - estabilidade de testes.

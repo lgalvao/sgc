@@ -20,7 +20,7 @@
     "test:unit": "vitest --run --reporter=dot --no-color",
     "coverage:unit": "vitest --run --coverage --reporter=dot --no-color",
     "coverage:unit:collect": "vitest --run --coverage --reporter=dot --no-color --coverage.thresholds.lines=0 --coverage.thresholds.functions=0 --coverage.thresholds.statements=0 --coverage.thresholds.branches=0",
-    "diagnostico:cache:audit": "node scripts/auditar-cache-diagnostico.mjs",
+    "diagnostico:cache:audit": "node ../toolkit/auditar-cache-diagnostico.mjs",
     "cruft:audit": "node ../toolkit/sgc.js frontend cruft auditar",
     "arquitetura:audit": "node ../toolkit/sgc.js frontend arquitetura auditar",
     "arquitetura:gate": "node ../toolkit/sgc.js frontend arquitetura validar",

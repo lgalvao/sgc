@@ -262,7 +262,7 @@ public class ProcessoService {
         if (processo.getSituacao() != CRIADO) {
             throw new ErroValidacao(Mensagens.PROCESSO_SO_REMOVIVEL_EM_CRIADO);
         }
-        processoRepo.deleteById(codigo);
+        processoRepo.delete(processo);
         log.info("Processo {} removido.", codigo);
     }
 

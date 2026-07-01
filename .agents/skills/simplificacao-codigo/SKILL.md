@@ -22,11 +22,9 @@ problema real está em uma destas fronteiras:
 
 Antes de simplificar, confirme as restrições nestas fontes:
 
-- `etc/reqs`
-- `etc/docs/acesso.md`
+- `specs`
+- `specs/design/acesso.md`
 - `AGENTS.md`
-- `plano-qualidade.md`, se existir
-- `plano-simplificacao.md`, se existir
 
 No SGC, requisitos e regras de acesso têm precedência sobre preferência de refatoração.
 
@@ -35,7 +33,7 @@ No SGC, requisitos e regras de acesso têm precedência sobre preferência de re
 Reduzir complexidade acidental preservando:
 
 - comportamento funcional;
-- aderência aos requisitos em `etc/reqs`;
+- aderência aos requisitos em `specs`;
 - contratos HTTP;
 - contratos de integração entre backend e frontend;
 - DTOs externos;
@@ -89,7 +87,7 @@ Reduzir complexidade acidental preservando:
 - Não colapsar camadas só porque parecem verbosas.
 - Não mover controller para acesso direto a repositório quando houver regra de negócio, segurança, transação ou montagem
   de resposta.
-- Não simplificar permissão sem confronto explícito com `etc/docs/acesso.md`.
+- Não simplificar permissão sem confronto explícito com `specs/design/acesso.md`.
 - Não manter DTO público importando `model.*` quando o endpoint é parte da aplicação e não fixture técnica de E2E.
 - Em `subprocesso`, simplifique antes duplicações de busca, validação e contexto; evite fusões amplas de serviço.
 - Prefira helpers privados, `command`/DTO interno e centralização de leitura antes de criar abstrações novas.
@@ -125,7 +123,7 @@ Reduzir complexidade acidental preservando:
   entrega permissões estruturadas.
 - Não manter API pública de store, composable ou view apenas para sustentar testes antigos; ajuste ou apague os testes
   quando a superfície de produção encolher.
-- Preserve textos, navegação e comportamento exigidos por `etc/reqs`.
+- Preserve textos, navegação e comportamento exigidos por `specs`.
 
 ### Integração Backend/Frontend
 
@@ -285,7 +283,7 @@ Backend:
 ./gradlew :backend:compileTestJava
 ./gradlew :backend:test --tests "sgc.algum.pacote.AlgumTeste"
 ./gradlew --no-configuration-cache :backend:compileTestJava
-node etc/scripts/sgc.js backend contratos auditar
+node toolkit/sgc.js backend contratos auditar
 ```
 
 Frontend:
@@ -294,9 +292,9 @@ Frontend:
 npx vitest run <arquivos> --reporter=dot --no-color
 npm run typecheck
 npm run lint
-node etc/scripts/sgc.js frontend arquitetura auditar
-node etc/scripts/sgc.js frontend cruft auditar
-node etc/scripts/sgc.js codigo smells auditar
+node toolkit/sgc.js frontend arquitetura auditar
+node toolkit/sgc.js frontend cruft auditar
+node toolkit/sgc.js codigo smells auditar
 ```
 
 1. Registrar aprendizado.

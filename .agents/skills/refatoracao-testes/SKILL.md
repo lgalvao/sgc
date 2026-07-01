@@ -13,8 +13,8 @@ qualidade de teste como propriedade de primeiro nível — não como efeito cola
 Antes de refatorar, confirme:
 
 - `AGENTS.md` — convenções do projeto (idioma, nomenclatura, limites de parâmetros)
-- `etc/reqs` — comportamentos exigidos que os testes devem continuar cobrindo
-- `etc/docs/acesso.md` — regras de acesso que precisam de cobertura comportamental
+- `specs` — comportamentos exigidos que os testes devem continuar cobrindo
+- `specs/design/acesso.md` — regras de acesso que precisam de cobertura comportamental
 
 No SGC, um teste que cobre comportamento real vale mais que dez que testam detalhes de implementação.
 
