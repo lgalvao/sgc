@@ -660,14 +660,14 @@ class SubprocessoTransicaoServiceTest {
     }
 
     @Test
-    @DisplayName("registrarTransicaoSemEmail não deve criar alerta quando o tipo não gerar alerta")
-    void registrarTransicaoSemEmailNaoDeveCriarAlertaQuandoOTipoNaoGerarAlerta() {
+    @DisplayName("registrarTransicaoSemComunicacoes não deve criar alerta")
+    void registrarTransicaoSemComunicacoesNaoDeveCriarAlerta() {
         Unidade origem = criarUnidade(10L, "ORIG", "Origem");
         Unidade destino = criarUnidade(20L, "DEST", "Destino");
         Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, origem);
         Usuario usuario = criarUsuario();
 
-        service.registrarTransicaoSemEmail(RegistrarTransicaoCommand.builder()
+        service.registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(CADASTRO_HOMOLOGADO)
                 .origem(origem)
@@ -679,8 +679,8 @@ class SubprocessoTransicaoServiceTest {
     }
 
     @Test
-    @DisplayName("aceitarValidacaoEmBloco não deve registrar workflow sem e-mail quando não houver superior e o usuário não for ADMIN")
-    void aceitarValidacaoEmBlocoNaoDeveRegistrarWorkflowSemEmailQuandoNaoHouverSuperiorEUsuarioNaoForAdmin() {
+    @DisplayName("aceitarValidacaoEmBloco não deve registrar workflow sem comunicações quando não houver superior e o usuário não for ADMIN")
+    void aceitarValidacaoEmBlocoNaoDeveRegistrarWorkflowSemComunicacoesQuandoNaoHouverSuperiorEUsuarioNaoForAdmin() {
         Unidade unidade = criarUnidade(10L, "U10", "Unidade 10");
         Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_MAPA_VALIDADO, unidade);
         Usuario usuario = criarUsuario();

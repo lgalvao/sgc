@@ -153,7 +153,7 @@ public class DiagnosticoFluxoService {
             unidadeDestino = unidadeOrigem;
         }
 
-        transicaoService.registrarTransicaoSemEmail(RegistrarTransicaoCommand.builder()
+        transicaoService.registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.DIAGNOSTICO_CONCLUIDO)
                 .origem(unidadeOrigem)
@@ -206,7 +206,7 @@ public class DiagnosticoFluxoService {
                 .usuario(usuario)
                 .motivoAnalise(null)
                 .observacoes(observacao)
-                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 
         notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, observacao);
@@ -242,7 +242,7 @@ public class DiagnosticoFluxoService {
                 .usuario(usuario)
                 .motivoAnalise(null)
                 .observacoes(observacao)
-                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 
         notificacaoService.notificarDiagnosticoAceito(subprocesso, unidadeAnalise, unidadeSuperior);
@@ -295,7 +295,7 @@ public class DiagnosticoFluxoService {
                 .tipoAcaoAnalise(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO)
                 .usuario(usuario)
                 .observacoes(observacao)
-                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
+                .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 
         notificacaoService.notificarDiagnosticoHomologado(subprocesso);

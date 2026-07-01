@@ -22,7 +22,6 @@ public record RegistrarWorkflowAnaliseCommand(
 
     public enum ModoComunicacaoWorkflow {
         PADRAO,
-        SEM_EMAIL,
         SEM_COMUNICACOES
     }
 }

@@ -73,8 +73,9 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()))
                 .anySatisfy(analise -> assertThat(analise.getAcao().name()).isEqualTo("ACEITE_DIAGNOSTICO"));
-        assertThat(alertaRepo.findAll()).anySatisfy(alerta ->
-                assertThat(alerta.getDescricao()).isEqualTo("Diagnóstico da unidade SEDIA aceito"));
+        assertThat(alertaRepo.findByProcessoCodigo(processo.getCodigo()))
+                .filteredOn(alerta -> alerta.getDescricao().equals("Diagnóstico da unidade SEDIA aceito"))
+                .hasSize(1);
         assertThat(notificacaoEmailRepo.findAll()).anySatisfy(notificacao ->
                 assertThat(notificacao.getAssunto()).contains("Diagnóstico da unidade SEDIA aceito"));
     }
@@ -112,6 +113,9 @@ class CDU50IntegrationTest extends DiagnosticoCduIntegrationTestBase {
         });
         assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo()))
                 .anySatisfy(analise -> assertThat(analise.getAcao().name()).isEqualTo("DEVOLUCAO_DIAGNOSTICO"));
+        assertThat(alertaRepo.findByProcessoCodigo(processo.getCodigo()))
+                .filteredOn(alerta -> alerta.getDescricao().equals("Diagnóstico da unidade SEDIA devolvido para ajustes"))
+                .hasSize(1);
     }
 
     @Test

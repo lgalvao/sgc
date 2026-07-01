@@ -71,8 +71,9 @@ class CDU49IntegrationTest extends DiagnosticoCduIntegrationTestBase {
                     assertThat(movimentacao.getUnidadeOrigem().getSigla()).isEqualTo("SEDIA");
                     assertThat(movimentacao.getUnidadeDestino().getSigla()).isEqualTo("COSIS");
                 });
-        assertThat(alertaRepo.findAll()).anySatisfy(alerta ->
-                assertThat(alerta.getDescricao()).isEqualTo("Diagnóstico da unidade SEDIA submetido para análise"));
+        assertThat(alertaRepo.findByProcessoCodigo(processo.getCodigo()))
+                .filteredOn(alerta -> alerta.getDescricao().equals("Diagnóstico da unidade SEDIA submetido para análise"))
+                .hasSize(1);
         assertThat(notificacaoEmailRepo.findAll()).anySatisfy(notificacao -> {
             assertThat(notificacao.getAssunto()).contains("Diagnóstico da unidade SEDIA submetido para análise");
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");

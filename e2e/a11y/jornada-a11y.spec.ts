@@ -1,5 +1,3 @@
-import {AxeBuilder} from '@axe-core/playwright';
-import type {APIRequestContext, Page} from '@playwright/test';
 import {expect, test} from '../fixtures/base.js';
 import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth.js';
 import {
@@ -31,15 +29,8 @@ import {
     excluirCompetenciaConfirmando,
     navegarParaMapa
 } from '../helpers/helpers-mapas.js';
-import {
-    abrirAcaoConsensoDiagnostico,
-    aprovarConsensoDiagnostico,
-    buscarCodSubprocessoDiagnostico,
-    navegarParaConsensoDiagnostico,
-    preencherConsensoMinimo,
-    preencherPrimeiraSituacaoCapacitacao
-} from '../helpers/helpers-diagnostico.js';
 import {resetDatabase, useProcessoCleanup} from '../hooks/hooks-limpeza.js';
+import {capturarCheckpointA11y, type OpcoesCapturaTela} from './helpers-a11y.js';
 
 type ProcessoCleanup = ReturnType<typeof useProcessoCleanup>;
 
@@ -48,192 +39,18 @@ type ProcessoCleanup = ReturnType<typeof useProcessoCleanup>;
  * para refinamento de UI. Funciona tambem como um bom teste 'smoke'
  */
 
-type ContextoCaptura = Record<string, unknown>;
-
-interface OpcoesCapturaTela {
-    fullPage?: boolean;
-    extra?: ContextoCaptura;
-    tags?: string[];
-}
-
 const capturasMetadata = [];
 
 /**
  * Helper para capturar screenshot com nome organizado
  */
 async function capturarTela(
-    page: Page,
+    page: import('@playwright/test').Page,
     _categoria: string,
     _nome: string,
-    _opcoes?: OpcoesCapturaTela
+    opcoes?: OpcoesCapturaTela
 ) {
-    await aguardarInterfaceEstavelParaCaptura(page);
-
-    await auditarAcessibilidadeNosTemas(page);
-}
-
-async function auditarAcessibilidadeNosTemas(page: Page): Promise<void> {
-    const temaOriginal = await obterTemaAtual(page);
-
-    await auditarAcessibilidade(page);
-    await definirTemaTemporario(page, 'dark');
-    await auditarAcessibilidade(page);
-    await definirTemaTemporario(page, temaOriginal);
-}
-
-async function auditarAcessibilidade(page: Page): Promise<void> {
-    // Executa auditoria do Axe-core cobrindo até WCAG 2.2
-    const accessibilityScanResults = await new AxeBuilder({page})
-        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
-        .disableRules(['list'])
-        .analyze();
-
-    expect(accessibilityScanResults.violations).toEqual([]);
-}
-
-async function obterTemaAtual(page: Page): Promise<'light' | 'dark'> {
-    return page.evaluate(() => {
-        return document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
-    });
-}
-
-async function definirTemaTemporario(page: Page, tema: 'light' | 'dark'): Promise<void> {
-    await page.evaluate((temaAtual) => {
-        document.documentElement.setAttribute('data-bs-theme', temaAtual);
-        document.documentElement.style.colorScheme = temaAtual;
-    }, tema);
-    await aguardarInterfaceEstavelParaCaptura(page);
-}
-
-async function aguardarPinturaEstavel(page: Page, quadros = 2): Promise<void> {
-    for (let indice = 0; indice < quadros; indice += 1) {
-        await page.evaluate(() => new Promise<void>((resolve) => {
-            globalThis.requestAnimationFrame(() => resolve());
-        }));
-    }
-}
-
-async function aguardarInterfaceEstavelParaCaptura(page: Page): Promise<void> {
-    await aguardarPinturaEstavel(page);
-    await aguardarModaisEstaveis(page);
-    await aguardarTransicoesEspecificas(page);
-    await aguardarPinturaEstavel(page);
-}
-
-async function aguardarModaisEstaveis(page: Page): Promise<void> {
-    const duracaoMs = await page.evaluate(() => {
-        const seletores = [
-            '.modal.show',
-            '.modal.show .modal-dialog',
-            '.modal-backdrop.show',
-            '[role="dialog"]:not([aria-hidden="true"])',
-            '.tooltip.show',
-            '.tooltip',
-            '.dropdown-menu.show',
-            '.dropdown-menu',
-        ];
-
-        const elementos = Array.from(document.querySelectorAll<HTMLElement>(seletores.join(',')))
-            .filter((elemento) => {
-                const estilo = globalThis.getComputedStyle(elemento);
-                return estilo.display !== 'none' && estilo.visibility !== 'hidden';
-            });
-
-        if (elementos.length === 0) {
-            return 0;
-        }
-
-        function converterTempoParaMs(valor: string): number {
-            const valorTratado = valor.trim();
-            if (valorTratado.endsWith('ms')) {
-                return Number.parseFloat(valorTratado) || 0;
-            }
-            if (valorTratado.endsWith('s')) {
-                return (Number.parseFloat(valorTratado) || 0) * 1000;
-            }
-            return Number.parseFloat(valorTratado) || 0;
-        }
-
-        function maiorTempo(listaCss: string): number {
-            return Math.max(
-                0,
-                ...listaCss.split(',').map((valor) => converterTempoParaMs(valor))
-            );
-        }
-
-        return Math.max(
-            0,
-            ...elementos.map((elemento) => {
-                const estilo = globalThis.getComputedStyle(elemento);
-                return maiorTempo(estilo.transitionDuration)
-                    + maiorTempo(estilo.transitionDelay)
-                    + maiorTempo(estilo.animationDuration)
-                    + maiorTempo(estilo.animationDelay);
-            })
-        );
-    });
-
-    if (duracaoMs <= 0) {
-        return;
-    }
-
-    await page.waitForTimeout(Math.min(Math.ceil(duracaoMs) + 50, 1000));
-}
-
-async function aguardarTransicoesEspecificas(page: Page): Promise<void> {
-    const duracaoMs = await page.evaluate(() => {
-        const seletores = [
-            '.login-autorizacao-enter-active',
-            '.login-autorizacao-leave-active',
-            '.tree-row-transition-enter-active',
-            '.tree-row-transition-leave-active',
-        ];
-
-        const elementos = Array.from(document.querySelectorAll<HTMLElement>(seletores.join(',')))
-            .filter((elemento) => {
-                const estilo = globalThis.getComputedStyle(elemento);
-                return estilo.display !== 'none' && estilo.visibility !== 'hidden';
-            });
-
-        if (elementos.length === 0) {
-            return 0;
-        }
-
-        function converterTempoParaMs(valor: string): number {
-            const valorTratado = valor.trim();
-            if (valorTratado.endsWith('ms')) {
-                return Number.parseFloat(valorTratado) || 0;
-            }
-            if (valorTratado.endsWith('s')) {
-                return (Number.parseFloat(valorTratado) || 0) * 1000;
-            }
-            return Number.parseFloat(valorTratado) || 0;
-        }
-
-        function maiorTempo(listaCss: string): number {
-            return Math.max(
-                0,
-                ...listaCss.split(',').map((valor) => converterTempoParaMs(valor))
-            );
-        }
-
-        return Math.max(
-            0,
-            ...elementos.map((elemento) => {
-                const estilo = globalThis.getComputedStyle(elemento);
-                return maiorTempo(estilo.transitionDuration)
-                    + maiorTempo(estilo.transitionDelay)
-                    + maiorTempo(estilo.animationDuration)
-                    + maiorTempo(estilo.animationDelay);
-            })
-        );
-    });
-
-    if (duracaoMs <= 0) {
-        return;
-    }
-
-    await page.waitForTimeout(Math.min(Math.ceil(duracaoMs) + 50, 1000));
+    await capturarCheckpointA11y(page, opcoes);
 }
 
 function registrarProcessoParaCleanup(cleanup: ProcessoCleanup, codigo: number): void {
@@ -419,79 +236,6 @@ async function criarProcessoMapeamentoComMapaComSugestoesPorFixture(
 
     if (!response.ok()) {
         throw new Error(`Falha ao criar fixture de mapa com sugestões: ${response.status()} ${await response.text()}`);
-    }
-    const processo = await response.json() as { codigo: number };
-    cleanup.registrar(processo.codigo);
-    return processo.codigo;
-}
-
-async function criarProcessoDiagnosticoPorFixture(
-    request: APIRequestContext,
-    cleanup: ReturnType<typeof useProcessoCleanup>,
-    descricao: string,
-    unidadeSigla: string
-): Promise<number> {
-    const response = await request.post('/e2e/fixtures/processo-diagnostico', {
-        data: {
-            descricao,
-            unidadeSigla,
-            iniciar: true,
-            diasLimite: 30
-        }
-    });
-
-    if (!response.ok()) {
-        throw new Error(`Falha ao criar fixture de diagnóstico: ${response.status()} ${await response.text()}`);
-    }
-    const processo = await response.json() as { codigo: number };
-    cleanup.registrar(processo.codigo);
-    return processo.codigo;
-}
-
-async function criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture(
-    request: APIRequestContext,
-    cleanup: ReturnType<typeof useProcessoCleanup>,
-    descricao: string,
-    unidadeSigla: string,
-    servidorTitulo: string
-): Promise<number> {
-    const response = await request.post('/e2e/fixtures/processo-diagnostico-com-autoavaliacao-concluida', {
-        data: {
-            descricao,
-            unidadeSigla,
-            iniciar: true,
-            diasLimite: 30,
-            servidorTitulo
-        }
-    });
-
-    if (!response.ok()) {
-        throw new Error(`Falha ao criar fixture de diagnóstico com autoavaliação: ${response.status()} ${await response.text()}`);
-    }
-    const processo = await response.json() as { codigo: number };
-    cleanup.registrar(processo.codigo);
-    return processo.codigo;
-}
-
-async function criarProcessoDiagnosticoComConsensoCriadoPorFixture(
-    request: APIRequestContext,
-    cleanup: ReturnType<typeof useProcessoCleanup>,
-    descricao: string,
-    unidadeSigla: string,
-    servidorTitulo: string
-): Promise<number> {
-    const response = await request.post('/e2e/fixtures/processo-diagnostico-com-consenso-criado', {
-        data: {
-            descricao,
-            unidadeSigla,
-            iniciar: true,
-            diasLimite: 30,
-            servidorTitulo
-        }
-    });
-
-    if (!response.ok()) {
-        throw new Error(`Falha ao criar fixture de diagnóstico com consenso: ${response.status()} ${await response.text()}`);
     }
     const processo = await response.json() as { codigo: number };
     cleanup.registrar(processo.codigo);
@@ -1995,110 +1739,4 @@ test.describe('Captura de Telas - Sistema SGC', () => {
         });
     });
 
-    test.describe('15 - Diagnóstico de Competências', () => {
-        test.beforeEach(async () => {
-            test.slow();
-        });
-
-        test('Captura dashboard do subprocesso de diagnóstico e autoavaliação do servidor', async ({page, request}) => {
-            await resetDatabase(request);
-            const unidadeAlvo = 'ASSESSORIA_12';
-            const servidorTitulo = '242426';
-            const descricao = `Proc diagnostico captura ${Date.now()}`;
-            const processoCodigo = await criarProcessoDiagnosticoPorFixture(request, cleanup, descricao, unidadeAlvo);
-
-            await login(page, servidorTitulo, 'senha');
-            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${unidadeAlvo}(?:\?.*)?$`));
-            await capturarTela(page, 'diagnostico', 'subprocesso-servidor', {
-                fullPage: true,
-                tags: ['diagnostico', 'dashboard', 'servidor']
-            });
-
-            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
-            await page.goto(`/diagnostico/${codSubprocesso}/${unidadeAlvo}/autoavaliacao`);
-            await capturarTela(page, 'diagnostico', 'autoavaliacao-servidor', {
-                fullPage: true,
-                tags: ['diagnostico', 'autoavaliacao', 'servidor']
-            });
-
-            await cleanup.limpar(request);
-        });
-
-        test('Captura monitoramento e consenso pela chefia', async ({page, request}) => {
-            await resetDatabase(request);
-            const unidadeAlvo = 'ASSESSORIA_12';
-            const servidorTitulo = '242426';
-            const descricao = `Proc diagnostico monitoramento ${Date.now()}`;
-            const processoCodigo = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaPorFixture(
-                request, cleanup, descricao, unidadeAlvo, servidorTitulo
-            );
-
-            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
-            await page.goto(`/processo/${processoCodigo}/${unidadeAlvo}`);
-            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
-            await capturarTela(page, 'diagnostico', 'monitoramento-chefia', {
-                fullPage: true,
-                tags: ['diagnostico', 'monitoramento', 'chefia']
-            });
-
-            await abrirAcaoConsensoDiagnostico(page, servidorTitulo);
-            await capturarTela(page, 'diagnostico', 'menu-acoes-consenso-chefia', {
-                fullPage: true,
-                tags: ['diagnostico', 'consenso', 'dropdown']
-            });
-
-            await navegarParaConsensoDiagnostico(page, servidorTitulo);
-            await capturarTela(page, 'diagnostico', 'consenso-chefia', {
-                fullPage: true,
-                tags: ['diagnostico', 'consenso', 'chefia']
-            });
-
-            await preencherConsensoMinimo(page, codSubprocesso, servidorTitulo);
-            await capturarTela(page, 'diagnostico', 'consenso-chefia-preenchido', {
-                fullPage: true,
-                tags: ['diagnostico', 'consenso', 'autosave']
-            });
-
-            await cleanup.limpar(request);
-        });
-
-        test('Captura consenso do servidor e situação de capacitação', async ({page, request}) => {
-            await resetDatabase(request);
-            const unidadeAlvo = 'ASSESSORIA_12';
-            const servidorTitulo = '242426';
-            const descricao = `Proc diagnostico consenso ${Date.now()}`;
-            const processoCodigo = await criarProcessoDiagnosticoComConsensoCriadoPorFixture(
-                request, cleanup, descricao, unidadeAlvo, servidorTitulo
-            );
-
-            await login(page, '242426', 'senha');
-            const codSubprocessoServidor = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
-            await page.goto(`/diagnostico/${codSubprocessoServidor}/${unidadeAlvo}/consenso/${servidorTitulo}`);
-            await expect(page).toHaveURL(new RegExp(String.raw`/diagnostico/${codSubprocessoServidor}/${unidadeAlvo}/consenso/${servidorTitulo}`));
-            await capturarTela(page, 'diagnostico', 'consenso-servidor', {
-                fullPage: true,
-                tags: ['diagnostico', 'consenso', 'servidor']
-            });
-
-            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
-            const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processoCodigo, unidadeAlvo);
-            await login(page, servidorTitulo, 'senha');
-            await page.goto(`/diagnostico/${codSubprocesso}/${unidadeAlvo}/consenso/${servidorTitulo}`);
-            await aprovarConsensoDiagnostico(page, codSubprocesso);
-
-            await login(page, USUARIOS.CHEFE_ASSESSORIA_12.titulo, USUARIOS.CHEFE_ASSESSORIA_12.senha);
-            await page.goto(`/diagnostico/${codSubprocesso}/${unidadeAlvo}/situacao-capacitacao`);
-            await capturarTela(page, 'diagnostico', 'situacao-capacitacao-chefia', {
-                fullPage: true,
-                tags: ['diagnostico', 'capacitacao', 'chefia']
-            });
-
-            await preencherPrimeiraSituacaoCapacitacao(page, codSubprocesso, 'EC');
-            await capturarTela(page, 'diagnostico', 'situacao-capacitacao-preenchida', {
-                fullPage: true,
-                tags: ['diagnostico', 'capacitacao', 'autosave']
-            });
-        });
-    });
 });

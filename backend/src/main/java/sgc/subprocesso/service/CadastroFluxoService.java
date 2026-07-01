@@ -209,7 +209,7 @@ public class CadastroFluxoService {
                 .observacoes(obs)
                 .modoComunicacao(enviarEmails
                         ? RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO
-                        : RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
+                        : RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build();
         transicaoService.registrarWorkflowParaSuperiorAtual(cmd);
     }

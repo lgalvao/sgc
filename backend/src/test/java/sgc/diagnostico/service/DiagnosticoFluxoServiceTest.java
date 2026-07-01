@@ -216,7 +216,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(subprocesso.getSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
         assertThat(subprocesso.getDataFimEtapa1()).isNotNull();
 
-        verify(transicaoService).registrarTransicaoSemEmail(any(RegistrarTransicaoCommand.class));
+        verify(transicaoService).registrarTransicaoSemComunicacoes(any(RegistrarTransicaoCommand.class));
         verify(notificacaoService).notificarDiagnosticoConcluido(subprocesso, unidadeSuperior);
     }
 
@@ -344,7 +344,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_HOMOLOGADO);
         assertThat(captor.getValue().tipoAnalise()).isEqualTo(TipoAnalise.DIAGNOSTICO);
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.HOMOLOGACAO_DIAGNOSTICO);
-        assertThat(captor.getValue().modoComunicacao()).isEqualTo(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL);
+        assertThat(captor.getValue().modoComunicacao()).isEqualTo(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES);
         verify(notificacaoService).notificarDiagnosticoHomologado(subprocesso);
     }
 

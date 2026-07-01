@@ -72,17 +72,8 @@ public class SubprocessoTransicaoService {
         registrarComunicacoesTransicao(cmd);
     }
 
-    public void registrarTransicaoSemEmail(RegistrarTransicaoCommand cmd) {
+    public void registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand cmd) {
         persistirTransicao(cmd);
-        if (cmd.tipo().geraAlerta()) {
-            notificacaoService.registrarAlertaTransicao(NotificacaoCommand.builder()
-                    .subprocesso(cmd.sp())
-                    .tipoTransicao(cmd.tipo())
-                    .unidadeOrigem(cmd.origem())
-                    .unidadeDestino(cmd.destino())
-                    .observacoes(cmd.observacoes())
-                    .build());
-        }
     }
 
     private void persistirTransicao(RegistrarTransicaoCommand cmd) {
@@ -130,29 +121,6 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(cmd.novaSituacao());
 
         registrarTransicao(RegistrarTransicaoCommand.builder()
-                .sp(sp)
-                .tipo(cmd.tipoTransicao())
-                .origem(cmd.unidadeOrigemTransicao())
-                .destino(cmd.unidadeDestinoTransicao())
-                .usuario(usuario)
-                .observacoes(cmd.observacoes())
-                .build());
-    }
-
-    public void registrarAnaliseSemEmail(RegistrarWorkflowCommand cmd) {
-        Subprocesso sp = cmd.sp();
-        Usuario usuario = cmd.usuario();
-
-        CriarAnaliseRequest request = CriarAnaliseRequest.builder()
-                .observacoes(cmd.observacoes())
-                .acao(cmd.tipoAcaoAnalise())
-                .motivo(cmd.motivoAnalise())
-                .build();
-
-        criarAnalise(sp, request, cmd.tipoAnalise());
-        sp.setSituacao(cmd.novaSituacao());
-
-        registrarTransicaoSemEmail(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(cmd.tipoTransicao())
                 .origem(cmd.unidadeOrigemTransicao())
@@ -423,7 +391,7 @@ public class SubprocessoTransicaoService {
                 .observacoes(normalizarTexto(observacoes))
                 .modoComunicacao(enviarEmails
                         ? RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO
-                        : RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL)
+                        : RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 
         log.info("Validação aceita para mapa do SP {}", sp.getCodigo());
@@ -511,12 +479,11 @@ public class SubprocessoTransicaoService {
                 .usuario(cmd.usuario())
                 .motivoAnalise(cmd.motivoAnalise())
                 .observacoes(cmd.observacoes())
-                .notificarSuperior(cmd.modoComunicacao() == RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_EMAIL ? Boolean.FALSE : null)
+                .notificarSuperior(cmd.modoComunicacao() == RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES ? Boolean.FALSE : null)
                 .build();
 
         switch (cmd.modoComunicacao()) {
             case PADRAO -> registrarAnalise(comando);
-            case SEM_EMAIL -> registrarAnaliseSemEmail(comando);
             case SEM_COMUNICACOES -> registrarAnaliseSemComunicacoes(comando);
         }
     }
