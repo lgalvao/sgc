@@ -146,7 +146,7 @@ defineEmits<{
       input-data-testid="textarea-homologar-diagnostico"
       label="Observações"
       :test-id-confirmar="testIdConfirmarHomologar || 'btn-confirmar-homologar-diagnostico'"
-      variant-acao="primary"
+      variant-acao="success"
       @confirmar="$emit('confirmarHomologar')"
       @update:model-value="$emit('update:modalHomologarAberto', $event)"
       @update:observacao="$emit('update:observacoesHomologar', $event)"
