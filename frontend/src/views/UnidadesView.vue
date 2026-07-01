@@ -67,16 +67,7 @@
           :description="TEXTOS.unidades.EMPTY_DESCRIPTION"
           :title="TEXTOS.unidades.EMPTY_TITLE"
           icon="bi-diagram-3"
-      >
-        <BButton
-            data-testid="btn-unidades-recarregar"
-            size="sm"
-            variant="outline-primary"
-            @click="carregarUnidades"
-        >
-          {{ TEXTOS.unidades.BOTAO_ATUALIZAR }}
-        </BButton>
-      </EmptyState>
+      />
     </template>
   </LayoutPadrao>
 </template>

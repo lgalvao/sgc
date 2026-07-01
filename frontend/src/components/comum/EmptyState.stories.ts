@@ -1,6 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/vue3-vite';
 import EmptyState from './EmptyState.vue';
-import {BButton} from 'bootstrap-vue-next';
 
 const meta: Meta<typeof EmptyState> = {
     title: 'Comum/EmptyState',
@@ -44,15 +43,4 @@ export const FullContent: Story = {
         description: 'Comece adicionando um novo item.',
         icon: 'bi-plus-circle',
     },
-    render: (args) => ({
-        components: {EmptyState, BButton},
-        setup() {
-            return {args};
-        },
-        template: `
-      <EmptyState v-bind="args">
-        <BButton variant="primary">Adicionar novo</BButton>
-      </EmptyState>
-    `,
-    }),
 };

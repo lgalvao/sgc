@@ -273,22 +273,19 @@ describe("TabelaProcessos.vue", () => {
         expect(context.wrapper.text()).toContain(TEXTOS.tabelaProcessos.EMPTY_TITLE);
     });
 
-    it("deve exibir CTA no estado vazio e emitir evento ao clicar", async () => {
+    it("deve exibir apenas o estado vazio quando não houver processos", async () => {
         context.wrapper = mount(TabelaProcessos, {
             ...getCommonMountOptions(),
             props: {
                 processos: [],
                 criterioOrdenacao: "descricao",
                 direcaoOrdenacaoAsc: true,
-                mostrarCtaVazio: true,
             },
         });
 
         await context.wrapper.vm.$nextTick();
-        const botaoCta = context.wrapper.find('[data-testid="btn-empty-state-criar-processo"]');
-        expect(botaoCta.exists()).toBe(true);
-        await botaoCta.trigger("click");
-        expect(context.wrapper.emitted("ctaVazio")).toBeDefined();
+        expect(context.wrapper.find('[data-testid="btn-empty-state-criar-processo"]').exists()).toBe(false);
+        expect(context.wrapper.emitted("ctaVazio")).toBeUndefined();
     });
 
     describe("Modo compacto", () => {

@@ -27,10 +27,6 @@
       {{ description }}
     </p>
 
-    <!-- Slot para botões de ação -->
-    <div class="empty-state-actions d-flex justify-content-center gap-2">
-      <slot/>
-    </div>
   </section>
 </template>
 
@@ -66,21 +62,4 @@ defineProps<{
   line-height: 1.45;
 }
 
-:deep(.btn) {
-  padding: 0.5rem 1.5rem;
-  font-weight: 500;
-  border-radius: 0.5rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-:deep(.btn-outline-primary) {
-  color: var(--bs-primary-text-emphasis) !important;
-  border-color: var(--bs-primary-border-subtle) !important;
-}
-
-:deep(.btn-outline-primary:hover) {
-  background-color: var(--bs-primary) !important;
-  color: var(--bs-white) !important;
-  transform: scale(1.02);
-}
 </style>

@@ -14,8 +14,6 @@ const meta: Meta<typeof TabelaProcessos> = {
         direcaoOrdenacaoAsc: {control: 'boolean'},
         showDataFinalizacao: {control: 'boolean'},
         compacto: {control: 'boolean'},
-        mostrarCtaVazio: {control: 'boolean'},
-        textoCtaVazio: {control: 'text'},
     },
 };
 
@@ -90,7 +88,5 @@ export const Vazio: Story = {
         processos: [],
         criterioOrdenacao: 'descricao',
         direcaoOrdenacaoAsc: true,
-        mostrarCtaVazio: true,
-        textoCtaVazio: 'Criar novo processo',
     },
 };

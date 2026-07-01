@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {BBadge, BButton, BTable, type BTableSortBy, type ColorVariant} from "bootstrap-vue-next";
+import {BBadge, BTable, type BTableSortBy, type ColorVariant} from "bootstrap-vue-next";
 import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
@@ -17,13 +17,10 @@ const props = withDefaults(defineProps<{
   showDataFinalizacao?: boolean;
   showSituacao?: boolean;
   compacto?: boolean;
-  mostrarCtaVazio?: boolean;
-  textoCtaVazio?: string;
   emptyTitle?: string;
   emptyDescription?: string;
 }>(), {
   showSituacao: true,
-  textoCtaVazio: "",
   emptyTitle: "",
   emptyDescription: "",
 });
@@ -31,7 +28,6 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: "ordenar", campo: CampoOrdenacaoProcesso): void;
   (e: "selecionarProcesso", processo: ProcessoResumo): void;
-  (e: "ctaVazio"): void;
 }>();
 
 const fields = computed(() => {
@@ -147,14 +143,5 @@ defineExpose({fields});
       class="mb-0"
       data-testid="empty-state-processos"
       icon="bi-folder2-open"
-  >
-    <BButton
-        v-if="mostrarCtaVazio"
-        variant="outline-primary"
-        data-testid="btn-empty-state-criar-processo"
-        @click="emit('ctaVazio')"
-    >
-      {{ textoCtaVazio || TEXTOS.comum.BOTAO_CRIAR }}
-    </BButton>
-  </EmptyState>
+  />
 </template>

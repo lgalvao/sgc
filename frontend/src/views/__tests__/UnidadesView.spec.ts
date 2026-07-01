@@ -222,15 +222,10 @@ describe("Unidades.vue", () => {
         expect(unidadeService.buscarTodasUnidades).not.toHaveBeenCalled();
     });
 
-    it("deve recarregar unidades apenas por ação explícita do usuário", async () => {
+    it("não deve oferecer recarga explícita no estado vazio", async () => {
         const wrapper = createWrapper();
         await flushPromises();
-        vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
-
-        await wrapper.find('[data-testid="btn-unidades-recarregar"]').trigger("click");
-        await flushPromises();
-
-        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
+        expect(wrapper.find('[data-testid="btn-unidades-recarregar"]').exists()).toBe(false);
     });
 
     it("não deve disparar uma segunda carga durante a primeira busca pendente", async () => {
@@ -506,14 +501,10 @@ describe("Unidades.vue", () => {
         expect(wrapper.text()).toContain("Erro desconhecido ou não mapeado pela aplicação.");
     });
 
-    it("deve recarregar ao clicar no botão de recarregar", async () => {
+    it("não deve renderizar botão de recarregar quando não houver unidades", async () => {
         const wrapper = createWrapper({unidades: []});
         await flushPromises();
-        const recarregarBtn = wrapper.find('[data-testid="btn-unidades-recarregar"]');
-
-        vi.mocked(unidadeService.buscarTodasUnidades).mockClear();
-        await recarregarBtn.trigger("click");
-        expect(unidadeService.buscarTodasUnidades).toHaveBeenCalled();
+        expect(wrapper.find('[data-testid="btn-unidades-recarregar"]').exists()).toBe(false);
     });
 
     it("deve navegar para o detalhe da unidade ao clicar em uma linha", async () => {

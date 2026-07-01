@@ -41,16 +41,6 @@ describe('EmptyState.vue', () => {
         expect(iconEl.classes()).toContain(icon)
     })
 
-    it('renderiza conteúdo do slot', () => {
-        const slotContent = '<button>Ação</button>'
-        const wrapper = mount(EmptyState, {
-            slots: {
-                default: slotContent
-            }
-        })
-        expect(wrapper.html()).toContain(slotContent)
-    })
-
     it('não renderiza elementos se as props forem strings vazias', () => {
         const wrapper = mount(EmptyState, {
             props: {title: '', description: '', icon: ''}
