@@ -414,7 +414,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
 
         assertThat(html)
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
-                .contains("foi aceito e submetido para análise pela unidade superior imediata")
+                .containsIgnoringWhitespaces("foi aceito e submetido para análise pela unidade superior imediata")
                 .contains("Processo cadastro bloco 2026");
     }
 
@@ -431,7 +431,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         assertThat(html)
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("SESEL, SEDESENV")
-                .contains("foram submetidos para análise por essa unidade");
+                .containsIgnoringWhitespaces("foram submetidos para análise por essa unidade");
     }
 
     @Test
@@ -463,7 +463,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
 
         assertThat(html)
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
-                .contains("foi aceita e submetida para análise pela unidade superior imediata")
+                .containsIgnoringWhitespaces("foi aceita e submetida para análise pela unidade superior imediata")
                 .contains("Processo validacao bloco 2026");
     }
 
