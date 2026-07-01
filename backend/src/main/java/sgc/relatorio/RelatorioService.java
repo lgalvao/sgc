@@ -475,21 +475,19 @@ public class RelatorioService {
             ultimaMov = sp.getDataFimEtapa2();
         }
 
-        if (sp.getDataLimiteEtapa2() != null) {
-            return RelatorioAndamentoDto.builder()
-                    .siglaUnidade(unidade.getSigla())
-                    .nomeUnidade(unidade.getNome())
-                    .situacaoAtual(sp.getSituacao().getDescricao())
-                    .localizacao(localizacao)
-                    .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
-                    .dataLimiteEtapa2(sp.getDataLimiteEtapa2())
-                    .dataFimEtapa1(sp.getDataFimEtapa1())
-                    .dataFimEtapa2(sp.getDataFimEtapa2())
-                    .dataUltimaMovimentacao(ultimaMov)
-                    .responsavel(responsavel)
-                    .titular(titular)
-                    .build();
-        }
+        return RelatorioAndamentoDto.builder()
+                .siglaUnidade(unidade.getSigla())
+                .nomeUnidade(unidade.getNome())
+                .situacaoAtual(sp.getSituacao().getDescricao())
+                .localizacao(localizacao)
+                .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
+                .dataLimiteEtapa2(sp.getDataLimiteEtapa2())
+                .dataFimEtapa1(sp.getDataFimEtapa1())
+                .dataFimEtapa2(sp.getDataFimEtapa2())
+                .dataUltimaMovimentacao(ultimaMov)
+                .responsavel(responsavel)
+                .titular(titular)
+                .build();
     }
 
     private void gerarRelatorioMapasPdf(
