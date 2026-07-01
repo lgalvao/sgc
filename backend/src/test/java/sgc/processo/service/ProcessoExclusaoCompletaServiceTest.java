@@ -68,6 +68,7 @@ class ProcessoExclusaoCompletaServiceTest {
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.situacao_capacitacao"), eq(10L), eq(10L));
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.diagnostico"), eq(10L));
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.mapa"), eq(10L));
+        inOrder.verify(jdbcTemplate).update(eq("DELETE FROM sgc.servidor_processo WHERE processo_codigo = ?"), eq(10L));
         inOrder.verify(jdbcTemplate).update(eq("DELETE FROM sgc.processo WHERE codigo = ?"), eq(10L));
 
         verify(cacheA).clear();
