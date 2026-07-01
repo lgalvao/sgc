@@ -47,40 +47,5 @@
     "fsevents@2.3.3": true,
     "vue-demi@0.14.10": true,
     "esbuild@0.28.1": true
-  },
-  "overrides": {
-    "z-schema": "^12.3.1",
-    "json-schema-ref-parser": "npm:@apidevtools/json-schema-ref-parser@^9.0.9",
-    "glob": "$glob",
-    "vue-tsc": {
-      "typescript": "^6.0.3"
-    },
-    "typescript-eslint": {
-      "typescript": "^6.0.3"
-    },
-    "@typescript-eslint/parser": {
-      "typescript": "^6.0.3"
-    },
-    "js-yaml": "^5.2.0",
-    "undici": "^7.28.0",
-    "nodemailer": "^9.0.1",
-    "openapi-typescript": {
-      "@redocly/openapi-core": {
-        "js-yaml": "^5.2.0"
-      }
-    },
-    "sgc-scripts": {
-      "openapi-typescript": {
-        "@redocly/openapi-core": {
-          "js-yaml": "^5.2.0"
-        }
-      }
-    },
-    "@redocly/openapi-core": {
-      "js-yaml": "^5.2.0"
-    }
-  },
-  "dependencies": {
-    "oxlint-tsgolint": "^0.24.0"
   }
 }

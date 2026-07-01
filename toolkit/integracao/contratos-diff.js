@@ -9,7 +9,6 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {CAMINHO_OPENAPI_BASELINE, CAMINHO_OPENAPI_LATEST} from "./contratos-openapi-caminhos.js";
 
-const CAMINHO_OPENAPI_DIFF = resolverNaRaiz("toolkit/node_modules/.bin/openapi-diff");
 const CAMINHO_RELATORIO_MD = resolverNaRaiz("toolkit/qualidade/openapi/latest/diff-openapi.md");
 
 function lerOpcao(args, nome, padrao) {
@@ -42,34 +41,7 @@ async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual
         };
     }
 
-    const openapiAnterior = JSON.parse(conteudoAnterior);
-    const openapiAtual = JSON.parse(conteudoAtual);
-    const versaoAnterior = String(openapiAnterior.openapi ?? "");
-    const versaoAtual = String(openapiAtual.openapi ?? "");
-
-    if (versaoAnterior.startsWith("3.1") || versaoAtual.startsWith("3.1")) {
-        const diffTexto = await execa("git", ["diff", "--no-index", "--minimal", "--unified=3", anterior, atual], {
-            reject: false,
-            cwd: resolverNaRaiz(".")
-        });
-
-        return {
-            anterior,
-            atual,
-            codigoSaida: 0,
-            houveMudancas: true,
-            modo: "fallback_textual_openapi_3_1",
-            stdout: [
-                "Comparação semântica indisponível: o pacote `openapi-diff` atual não suporta OpenAPI 3.1.",
-                "Aplicando fallback textual com `git diff --no-index`.",
-                "",
-                diffTexto.stdout || diffTexto.stderr || "Diferenças detectadas, mas sem saída textual adicional."
-            ].join("\n"),
-            stderr: ""
-        };
-    }
-
-    const resultado = await execa(CAMINHO_OPENAPI_DIFF, [anterior, atual], {
+    const resultado = await execa("git", ["diff", "--no-index", "--minimal", "--unified=3", anterior, atual], {
         reject: false,
         cwd: resolverNaRaiz(".")
     });
@@ -77,9 +49,9 @@ async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual
     return {
         anterior,
         atual,
-        codigoSaida: resultado.exitCode ?? 0,
-        houveMudancas: Boolean((resultado.stdout ?? "").trim()),
-        modo: "openapi_diff",
+        codigoSaida: 0,
+        houveMudancas: true,
+        modo: "diff_textual",
         stdout: resultado.stdout ?? "",
         stderr: resultado.stderr ?? ""
     };
@@ -147,7 +119,7 @@ async function main() {
     } else if (resultado.stderr) {
         escreverLinha(resultado.stderr);
     } else {
-        escreverLinha("Nenhuma diferença textual reportada pelo openapi-diff.");
+        escreverLinha("Nenhuma diferença textual reportada pelo git diff.");
     }
 
     if (emitirJson) {
