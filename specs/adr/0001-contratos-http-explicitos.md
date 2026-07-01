@@ -41,9 +41,7 @@ O padrão oficial do backend passa a ser:
 - a migração do legado exige rodadas incrementais em módulos antigos.
 
 ## Guardrails
-
 - [ArchConsistencyTest.java](/Users/leonardo/sgc/backend/src/test/java/sgc/arquitetura/ArchConsistencyTest.java)
-- [backend-borda-http.md](/Users/leonardo/sgc/etc/docs/backend-borda-http.md)
 
 ## Não fazer
 

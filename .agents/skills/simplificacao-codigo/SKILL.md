@@ -190,7 +190,7 @@ Reduzir complexidade acidental preservando:
 - compensar DTO fraco com heurística local de perfil, situação ou localização no frontend em vez de corrigir a borda;
 - extração para helper/composable compartilhado quando o código continua com um único consumidor claro;
 - mover blocos grandes para outro arquivo sem reduzir superfície, acoplamento ou responsabilidade real;
-- simplificação que muda textos, navegação ou permissões fora do que `etc/reqs` permite.
+- simplificação que muda textos, navegação ou permissões fora do que `specs` permite.
 
 ### Integração: bons alvos
 
@@ -322,7 +322,7 @@ node toolkit/sgc.js codigo smells auditar
 - Existe código morto liberado por esta simplificação?
 - Esta auditoria deveria virar comando do `sgc.js`?
 - Existe ferramenta OSS melhor do que heurística local para este problema?
-- A mudança continua alinhada com `etc/reqs` e `etc/docs/acesso.md`?
+- A mudança continua alinhada com `specs` e `specs/design/acesso.md`?
 
 ## Saída esperada
 

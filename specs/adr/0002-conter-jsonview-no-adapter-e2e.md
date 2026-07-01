@@ -46,7 +46,6 @@ Fora dessa ilha:
 ## Guardrails
 
 - [ArchConsistencyTest.java](/Users/leonardo/sgc/backend/src/test/java/sgc/arquitetura/ArchConsistencyTest.java)
-- [plano-qualidade-diretrizes.md](/Users/leonardo/sgc/etc/docs/plano-qualidade-diretrizes.md)
 
 ## Próximo passo natural
 

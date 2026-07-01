@@ -108,12 +108,7 @@ estados crus.
 - autorização baseada em `@PreAuthorize` + `SgcPermissionEvaluator`;
 - ações de workflow expostas por endpoints `POST` com verbo explícito.
 
-Referência geral do padrão:
-
-- [Borda HTTP do backend](../../../../../../etc/docs/backend-borda-http.md)
-
 ## Testes relacionados
-
 O módulo é coberto por:
 
 - `SubprocessoControllerTest`
@@ -127,8 +122,3 @@ Comando principal:
 ```bash
 ./gradlew :backend:test
 ```
-
-## Referências
-
-- [Backend do SGC](../../../../../../backend/README.md)
-- [Regras de acesso](../../../../../../etc/reqs/acesso.md)
