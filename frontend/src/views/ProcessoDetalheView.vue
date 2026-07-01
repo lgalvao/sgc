@@ -72,6 +72,7 @@ import {TipoProcesso} from "@/types/comum";
 import type {Processo} from "@/types/tipos";
 import {type ErroNormalizado, normalizarErro} from "@/utils/apiError";
 import {TEXTOS} from "@/constants/textos";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 type LinhaCliqueSubprocesso = {
   clickable?: boolean;
@@ -85,6 +86,7 @@ const {notificacao, notify, clear} = useNotification();
 const {ehAdmin} = usePerfil();
 const codProcesso = Number(route.params.codProcesso || route.query.codProcesso);
 const processoQuery = useProcessoQuery(codProcesso);
+const acaoCarregamento = useAsyncAction();
 const processo = ref<Processo | null>(null);
 const ultimoErro = ref<ErroNormalizado | null>(null);
 const carregamentoInicialConcluido = ref(false);
@@ -101,20 +103,24 @@ function registrarErro(error: unknown) {
 async function carregarContextoCompleto() {
   limparErro();
   const processoAnterior = processo.value;
-
-  try {
-    const resultado = await processoQuery.refetch();
-    const data = resultado.data;
-    if (data) {
-      processo.value = data;
-    }
-    return data;
-  } catch (error) {
-    // Em recargas em background, mantemos o último processo carregado até que haja sucesso ou usuário decida sair
-    processo.value = processoAnterior;
-    ultimoErro.value = normalizarErro(error);
-    return null;
-  }
+  const resultado = await acaoCarregamento.executar(
+      () => processoQuery.refetch(),
+      TEXTOS.processo.ERRO_PADRAO,
+      {
+        relancarErro: false,
+        aoSucesso: ({data}) => {
+          if (data) {
+            processo.value = data;
+          }
+        },
+        aoOcorrerErro: (erro) => {
+          // Em recargas em background, mantemos o último processo carregado até que haja sucesso ou usuário decida sair
+          processo.value = processoAnterior;
+          ultimoErro.value = erro;
+        },
+      },
+  );
+  return resultado?.data ?? null;
 }
 
 const participantesHierarquia = computed(() => processo.value ? processo.value.unidades : []);
@@ -194,14 +200,21 @@ onActivated(async () => {
   if (!codProcesso || !carregamentoInicialConcluido.value) {
     return;
   }
-  try {
-    const {data} = await processoQuery.refresh();
-    if (data) {
-      processo.value = data;
-    }
-  } catch (error) {
-    ultimoErro.value = normalizarErro(error);
-  }
+  await acaoCarregamento.executar(
+      () => processoQuery.refresh(),
+      TEXTOS.processo.ERRO_PADRAO,
+      {
+        relancarErro: false,
+        aoSucesso: ({data}) => {
+          if (data) {
+            processo.value = data;
+          }
+        },
+        aoOcorrerErro: (erro) => {
+          ultimoErro.value = erro;
+        },
+      },
+  );
 });
 
 defineExpose({

@@ -10,6 +10,7 @@ import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useNotification} from "@/composables/useNotification";
 import {relatoriosService} from "@/services/relatoriosService";
 import {useDadosTelaUnidadeQuery} from "@/composables/useUnidadeQuery";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 interface UnidadeTelaProps {
     codUnidade: number;
@@ -20,10 +21,10 @@ export function useUnidadeTela(props: UnidadeTelaProps) {
     const {mostrarCriarAtribuicaoTemporaria} = usePerfil();
     const {notify} = useNotification();
     const {definirUnidadeAtual} = useUnidadeAtual();
+    const exportacaoPdf = useAsyncAction();
+    const exportacaoCsv = useAsyncAction();
 
     const dadosTelaQuery = useDadosTelaUnidadeQuery(() => props.codUnidade);
-    const loadingExportacaoPdf = ref(false);
-    const loadingExportacaoCsv = ref(false);
     const erroDispensado = ref(false);
 
     const unidade = computed(() => dadosTelaQuery.data.value?.unidade ?? null);
@@ -60,15 +61,17 @@ export function useUnidadeTela(props: UnidadeTelaProps) {
             return;
         }
 
-        loadingExportacaoPdf.value = true;
-        try {
-            await relatoriosService.downloadRelatorioMapaVigenteUnidadePdf(props.codUnidade);
-        } catch (error) {
-            logger.error("Falha ao exportar PDF do mapa vigente:", error);
-            notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
-        } finally {
-            loadingExportacaoPdf.value = false;
-        }
+        await exportacaoPdf.executar(
+            () => relatoriosService.downloadRelatorioMapaVigenteUnidadePdf(props.codUnidade),
+            TEXTOS_RELATORIOS.ERRO_EXPORTAR,
+            {
+                relancarErro: false,
+                aoOcorrerErro: (_erro, causa) => {
+                    logger.error("Falha ao exportar PDF do mapa vigente:", causa);
+                    notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR, "danger");
+                },
+            },
+        );
     }
 
     async function exportarMapaVigenteCsv() {
@@ -76,15 +79,17 @@ export function useUnidadeTela(props: UnidadeTelaProps) {
             return;
         }
 
-        loadingExportacaoCsv.value = true;
-        try {
-            await relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv(props.codUnidade);
-        } catch (error) {
-            logger.error("Falha ao exportar CSV do mapa vigente:", error);
-            notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
-        } finally {
-            loadingExportacaoCsv.value = false;
-        }
+        await exportacaoCsv.executar(
+            () => relatoriosService.downloadRelatorioMapaVigenteUnidadeCsv(props.codUnidade),
+            TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV,
+            {
+                relancarErro: false,
+                aoOcorrerErro: (_erro, causa) => {
+                    logger.error("Falha ao exportar CSV do mapa vigente:", causa);
+                    notify(TEXTOS_RELATORIOS.ERRO_EXPORTAR_CSV, "danger");
+                },
+            },
+        );
     }
 
     const colunasTabela = [{key: "nome", label: TEXTOS.unidade.CAMPO_UNIDADE}];
@@ -180,8 +185,8 @@ export function useUnidadeTela(props: UnidadeTelaProps) {
         carregandoPagina,
         ultimoErro,
         erroDispensado,
-        loadingExportacaoPdf,
-        loadingExportacaoCsv,
+        loadingExportacaoPdf: exportacaoPdf.carregando,
+        loadingExportacaoCsv: exportacaoCsv.carregando,
         podeExportarMapaVigente,
         mostrarCriarAtribuicaoTemporaria,
         textoBotaoAtribuicao,

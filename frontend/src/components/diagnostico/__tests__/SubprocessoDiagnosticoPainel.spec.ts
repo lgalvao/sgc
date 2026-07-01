@@ -631,10 +631,10 @@ describe('SubprocessoDiagnosticoPainel', () => {
         await wrapper.get('[data-testid="btn-confirmar-devolver"]').trigger('click');
         await nextTick();
 
-        expect(wrapper.text()).toContain('Não foi possível salvar.');
+        expect(wrapper.text()).toContain('Erro de rede');
         await wrapper.get('[data-testid="btn-dismiss-alert"]').trigger('click');
         await nextTick();
-        expect(wrapper.text()).not.toContain('Não foi possível salvar.');
+        expect(wrapper.text()).not.toContain('Erro de rede');
 
         // Em sucesso local, a UI deve comunicar a mudanca sem alerta persistente adicional
         devolverDiagnosticoMock.mockResolvedValue(undefined);

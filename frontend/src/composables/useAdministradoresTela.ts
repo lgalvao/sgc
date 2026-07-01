@@ -5,7 +5,6 @@ import {
     listarAdministradores,
     removerAdministrador,
 } from "@/services/administradorService";
-import {normalizarErro} from "@/utils/apiError";
 import {useValidacaoFormulario} from "@/composables/useValidacaoFormulario";
 import {TEXTOS} from "@/constants/textos";
 import {useAsyncAction} from "@/composables/useAsyncAction";
@@ -13,6 +12,8 @@ import type BuscadorUsuarios from "@/components/comum/BuscadorUsuarios.vue";
 
 export function useAdministradoresTela() {
     const {carregando: carregandoAdmins, erro: erroAdmins, executar} = useAsyncAction();
+    const acaoAdicionar = useAsyncAction();
+    const acaoRemover = useAsyncAction();
     const {validarSubmissao, resetarValidacao, deveExibirErro, focarPrimeiroErroInvalido} =
         useValidacaoFormulario();
 
@@ -26,7 +27,6 @@ export function useAdministradoresTela() {
     const termoUsuario = ref("");
     const erroAdicionarAdmin = ref("");
     const erroRemoverAdmin = ref("");
-    const adicionandoAdmin = ref(false);
     const inputTituloRef = ref<InstanceType<typeof BuscadorUsuarios> | null>(null);
 
     const mensagemErroNovoAdmin = computed(() =>
@@ -66,16 +66,20 @@ export function useAdministradoresTela() {
             return;
         }
         erroAdicionarAdmin.value = "";
-        adicionandoAdmin.value = true;
-        try {
-            await adicionarAdministrador(adminId);
-            fecharModalAdicionarAdmin();
-            await carregarAdministradores();
-        } catch (error) {
-            erroAdicionarAdmin.value = normalizarErro(error).mensagem;
-        } finally {
-            adicionandoAdmin.value = false;
-        }
+        await acaoAdicionar.executar(
+            () => adicionarAdministrador(adminId),
+            TEXTOS.comum.ERRO_OPERACAO,
+            {
+                relancarErro: false,
+                aoOcorrerErro: (erro) => {
+                    erroAdicionarAdmin.value = erro.mensagem;
+                },
+                aoSucesso: async () => {
+                    fecharModalAdicionarAdmin();
+                    await carregarAdministradores();
+                },
+            },
+        );
     }
 
     async function confirmarRemocao(admin: AdministradorDto) {
@@ -89,12 +93,21 @@ export function useAdministradoresTela() {
         erroRemoverAdmin.value = "";
         removendoAdmin.value = adminParaRemover.value.tituloEleitoral;
         try {
-            await removerAdministrador(adminParaRemover.value.tituloEleitoral);
-            await carregarAdministradores();
-            mostrarModalRemoverAdmin.value = false;
-            adminParaRemover.value = null;
-        } catch (error) {
-            erroRemoverAdmin.value = normalizarErro(error).mensagem;
+            await acaoRemover.executar(
+                () => removerAdministrador(adminParaRemover.value!.tituloEleitoral),
+                TEXTOS.comum.ERRO_OPERACAO,
+                {
+                    relancarErro: false,
+                    aoOcorrerErro: (erro) => {
+                        erroRemoverAdmin.value = erro.mensagem;
+                    },
+                    aoSucesso: async () => {
+                        await carregarAdministradores();
+                        mostrarModalRemoverAdmin.value = false;
+                        adminParaRemover.value = null;
+                    },
+                },
+            );
         } finally {
             removendoAdmin.value = null;
         }
@@ -118,7 +131,7 @@ export function useAdministradoresTela() {
         termoUsuario,
         erroAdicionarAdmin,
         erroRemoverAdmin,
-        adicionandoAdmin,
+        adicionandoAdmin: acaoAdicionar.carregando,
         inputTituloRef,
         mensagemErroNovoAdmin,
         abrirModalAdicionarAdmin,

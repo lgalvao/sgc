@@ -91,13 +91,21 @@ export function useImportarAtividadesTela(params: {
         erroImportacao.value = mensagem;
     }
 
-    async function executarComTratamentoErro<T>(acao: () => Promise<T>, aplicarResultado: (resultado: T) => void) {
-        try {
-            aplicarResultado(await executarComTratamentoDeErros(acao, (erro) => {
+    async function executarComTratamentoErro<T>(
+        acao: () => Promise<T>,
+        aplicarResultado: (resultado: T) => void,
+        mensagemLog: string,
+    ) {
+        const resultado = await executarComTratamentoDeErros(acao, {
+            relancarErro: false,
+            aoOcorrerErro: (erro, causa) => {
                 registrarErroImportacao(erro.mensagem);
-            }));
-        } catch (error) {
-            logger.error("Erro ao carregar dados de importação de atividades", error);
+                logger.error(mensagemLog, causa);
+            },
+        });
+
+        if (resultado !== undefined) {
+            aplicarResultado(resultado);
         }
     }
 
@@ -108,6 +116,7 @@ export function useImportarAtividadesTela(params: {
             (processos) => {
                 processosParaImportacao.value = processos;
             },
+            "Erro ao carregar dados de importação de atividades",
         );
     }
 
@@ -130,6 +139,7 @@ export function useImportarAtividadesTela(params: {
                 (unidades) => {
                     unidadesParticipantes.value = unidades;
                 },
+                "Erro ao carregar unidades para importação de atividades",
             );
         }
         unidadeSelecionada.value = null;
@@ -148,6 +158,7 @@ export function useImportarAtividadesTela(params: {
                 (atividadesDaOutraUnidade) => {
                     atividadesParaImportar.value = [...atividadesDaOutraUnidade];
                 },
+                "Erro ao carregar atividades para importação",
             );
         }
     }
@@ -167,21 +178,29 @@ export function useImportarAtividadesTela(params: {
         const idsAtividades = atividadesSelecionadas.value.map((a) => a.codigo);
         importando.value = true;
         try {
-            resultadoImportacao.value = await executarComTratamentoDeErros(
+            const resultado = await executarComTratamentoDeErros(
                 () => subprocessoService.importarAtividades(
                     codSubDestino,
                     codSubOrigem,
                     idsAtividades,
                 ),
-                (erro) => {
-                    registrarErroImportacao(erro.mensagem);
+                {
+                    relancarErro: false,
+                    aoOcorrerErro: (erro, causa) => {
+                        registrarErroImportacao(erro.mensagem);
+                        logger.error("Erro ao importar atividades", causa);
+                    },
                 },
             );
-            onImportar(resultadoImportacao.value);
+
+            if (resultado === undefined) {
+                resultadoImportacao.value = null;
+                return;
+            }
+
+            resultadoImportacao.value = resultado;
+            onImportar(resultado);
             onFechar();
-        } catch (error) {
-            resultadoImportacao.value = null;
-            logger.error("Erro ao importar atividades", error);
         } finally {
             importando.value = false;
         }

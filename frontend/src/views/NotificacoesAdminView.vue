@@ -101,12 +101,15 @@ import {ehModoProducao} from "@/utils/ambiente";
 import {normalizarErro} from "@/utils/apiError";
 import {useToast} from "@/composables/useToast";
 import {useNotification} from "@/composables/useNotification";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 const {notificacao, notify, clear} = useNotification();
 const {exibirSucesso} = useToast();
 const notificacoesQuery = useNotificacoesAdminQuery();
 const leitorEmailTestesQuery = useUrlLeitorEmailTestesQuery();
 const reenvioMutation = useReenvioNotificacaoMutation();
+const acaoCarregar = useAsyncAction();
+const acaoReenviar = useAsyncAction();
 
 const itemSelecionado = ref<Notificacao | null>(null);
 const itemParaPreview = ref<Notificacao | null>(null);
@@ -116,11 +119,13 @@ const mostrarPreview = ref(false);
 const mostrarDetalhes = ref(false);
 const erroDispensado = ref(false);
 
-const carregando = computed(() => notificacoesQuery.isPending.value || notificacoesQuery.isLoading.value);
+const carregando = computed(() =>
+    notificacoesQuery.isPending.value || notificacoesQuery.isLoading.value || acaoCarregar.carregando.value
+);
 const erro = computed(() => notificacoesQuery.error.value?.message ?? null);
 const erroTela = computed(() => erroDispensado.value ? null : erro.value);
 const itensOrdenados = notificacoesQuery.itensOrdenados;
-const reenviando = computed(() => reenvioMutation.isLoading.value);
+const reenviando = computed(() => reenvioMutation.isLoading.value || acaoReenviar.carregando.value);
 const urlLeitorEmailTestes = computed(() => leitorEmailTestesQuery.data.value ?? undefined);
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
 
@@ -192,11 +197,16 @@ function limparHtmlPreview(html: string): string {
 }
 
 async function carregar() {
-  try {
-    await notificacoesQuery.refetch();
-  } catch (error) {
-    notify(obterMensagemErro(error, TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR), "danger");
-  }
+  await acaoCarregar.executar(
+      () => notificacoesQuery.refetch(),
+      TEXTOS.administracao.NOTIFICACOES_ERRO_CARREGAR,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (erro, causa) => {
+          notify(obterMensagemErro(causa, erro.mensagem), "danger");
+        },
+      },
+  );
 }
 
 function abrirPreview(item: Notificacao) {
@@ -216,13 +226,20 @@ function confirmarReenvio(item: Notificacao) {
 
 async function reenviar() {
   if (!itemSelecionado.value) return;
-  try {
-    await reenvioMutation.mutateAsync(itemSelecionado.value.codigo);
-    exibirSucesso(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO);
-    fecharReenvio();
-  } catch (error) {
-    notify(obterMensagemErro(error, TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO), "danger");
-  }
+  await acaoReenviar.executar(
+      () => reenvioMutation.mutateAsync(itemSelecionado.value!.codigo),
+      TEXTOS.administracao.NOTIFICACOES_ERRO_REENVIO,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (erro, causa) => {
+          notify(obterMensagemErro(causa, erro.mensagem), "danger");
+        },
+        aoSucesso: () => {
+          exibirSucesso(TEXTOS.administracao.NOTIFICACOES_SUCESSO_REENVIO);
+          fecharReenvio();
+        },
+      },
+  );
 }
 </script>
 

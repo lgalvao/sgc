@@ -86,6 +86,8 @@ import {useConsensoDiagnostico} from '@/composables/useConsensoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import {usePerfilStore} from '@/stores/perfil';
 import type {ConsensoCompetenciaDetalhada} from '@/types/diagnostico-competencias';
+import {useAsyncAction} from '@/composables/useAsyncAction';
+import {normalizarErro} from '@/utils/apiError';
 
 const props = defineProps<{
   codSubprocesso: number;
@@ -97,6 +99,7 @@ const props = defineProps<{
 const router = useRouter();
 const perfilStore = usePerfilStore();
 const {registrarPendente} = useToast();
+const acaoConsenso = useAsyncAction();
 const servidorEhUsuarioLogado = computed(() =>
     String(props.servidorTitulo) === String(perfilStore.usuarioCodigo ?? ''),
 );
@@ -150,27 +153,34 @@ function abrirModalAprovarConsenso() {
 }
 
 async function confirmarAprovarConsenso() {
-  try {
-    await aprovarConsenso();
-    modalAprovarConsensoAberto.value = false;
-    registrarPendente(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
-    if (contexto.value?.processoCodigo) {
-      await router.push({
-        name: 'Subprocesso',
-        params: {
-          codProcesso: String(contexto.value.processoCodigo),
-          siglaUnidade: props.siglaUnidade,
+  await acaoConsenso.executar(
+      () => aprovarConsenso(),
+      TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: async () => {
+          modalAprovarConsensoAberto.value = false;
+          registrarPendente(TEXTOS.diagnostico.SUCESSO_CONSENSO_APROVADO);
+          if (contexto.value?.processoCodigo) {
+            await router.push({
+              name: 'Subprocesso',
+              params: {
+                codProcesso: String(contexto.value.processoCodigo),
+                siglaUnidade: props.siglaUnidade,
+              },
+              query: {
+                codSubprocesso: String(props.codSubprocesso),
+              },
+            });
+            return;
+          }
+          void router.back();
         },
-        query: {
-          codSubprocesso: String(props.codSubprocesso),
+        aoOcorrerErro: (_erro, causa) => {
+          exibirErro(erroAprovar.value?.message || normalizarErro(causa).mensagem || TEXTOS.diagnostico.ERRO_SALVAR);
         },
-      });
-      return;
-    }
-    void router.back();
-  } catch {
-    exibirErro(erroAprovar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+      },
+  );
 }
 
 function consensoCompleto(item: ConsensoCompetenciaDetalhada): boolean {
@@ -191,28 +201,39 @@ function confirmarConcluirAvaliacao() {
 }
 
 async function confirmarConcluir() {
+  concluindoAvaliacao.value = true;
   try {
-    await salvarConsensoAgora();
-    concluindoAvaliacao.value = true;
-    await concluirAvaliacao();
-    modalConcluirAberto.value = false;
-    registrarPendente(TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
-    if (contexto.value?.processoCodigo) {
-      await router.push({
-        name: 'Subprocesso',
-        params: {
-          codProcesso: String(contexto.value.processoCodigo),
-          siglaUnidade: props.siglaUnidade,
+    await acaoConsenso.executar(
+        async () => {
+          await salvarConsensoAgora();
+          await concluirAvaliacao();
         },
-        query: {
-          codSubprocesso: String(props.codSubprocesso),
+        TEXTOS.diagnostico.ERRO_SALVAR,
+        {
+          relancarErro: false,
+          aoSucesso: async () => {
+            modalConcluirAberto.value = false;
+            registrarPendente(TEXTOS.diagnostico.SUCESSO_CONSENSO_CRIADO);
+            if (contexto.value?.processoCodigo) {
+              await router.push({
+                name: 'Subprocesso',
+                params: {
+                  codProcesso: String(contexto.value.processoCodigo),
+                  siglaUnidade: props.siglaUnidade,
+                },
+                query: {
+                  codSubprocesso: String(props.codSubprocesso),
+                },
+              });
+              return;
+            }
+            void router.back();
+          },
+          aoOcorrerErro: (_erro, causa) => {
+            exibirErro(erroConcluir.value?.message || normalizarErro(causa).mensagem || TEXTOS.diagnostico.ERRO_SALVAR);
+          },
         },
-      });
-      return;
-    }
-    void router.back();
-  } catch {
-    exibirErro(erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
+    );
   } finally {
     concluindoAvaliacao.value = false;
   }

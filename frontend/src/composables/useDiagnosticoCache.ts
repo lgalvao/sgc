@@ -40,7 +40,7 @@ export function useCacheDiagnostico() {
         });
     }
 
-    function invalidarPermissoes(codSubprocesso: number) {
+    function invalidarPermissoes() {
         void cache.invalidateQueries({key: ['subprocesso-permissoes-diagnostico'], exact: false});
     }
 
@@ -48,7 +48,7 @@ export function useCacheDiagnostico() {
         invalidarContexto(codSubprocesso);
         invalidarEquipe(codSubprocesso);
         invalidarUnidade(codSubprocesso);
-        invalidarPermissoes(codSubprocesso);
+        invalidarPermissoes();
     }
 
     return {

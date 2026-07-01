@@ -10,7 +10,7 @@ import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import type {Atividade, Conhecimento} from '@/types/mapa-modelos';
 import type {ItemEquipeDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
-import {normalizarErro} from '@/utils/apiError';
+import {useAsyncAction} from '@/composables/useAsyncAction';
 
 type RetornoFluxo = { mensagem: string; variante: 'danger' };
 
@@ -48,6 +48,7 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
     const ehAutoavaliacaoConcluida = computed(() => situacaoServidor.value === 'AUTOAVALIACAO_CONCLUIDA');
     const ehConsensoAprovado = computed(() => situacaoServidor.value === 'CONSENSO_APROVADO');
     const retornoFluxo = ref<RetornoFluxo | null>(null);
+    const acaoTela = useAsyncAction();
     const modalConcluirAberto = ref(false);
     const modalImpossibilitarAberto = ref(false);
     const detalhesCompetenciaAbertos = ref<Record<number, boolean>>({});
@@ -101,35 +102,49 @@ export function useAutoavaliacaoDiagnosticoView(props: AutoavaliacaoDiagnosticoV
         acao: () => Promise<void>,
         aoSucesso?: () => void,
     ) {
-        try {
-            await acao();
-            aoSucesso?.();
-        } catch (err) {
-            registrarErro(normalizarErro(err).mensagem);
-        }
+        await acaoTela.executar(
+            acao,
+            TEXTOS.diagnostico.ERRO_SALVAR,
+            {
+                relancarErro: false,
+                aoSucesso: () => {
+                    aoSucesso?.();
+                },
+                aoOcorrerErro: (erro) => {
+                    registrarErro(erro.mensagem);
+                },
+            },
+        );
     }
 
     async function confirmarConcluir() {
-        try {
-            await concluirAutoavaliacao();
-            modalConcluirAberto.value = false;
-            registrarPendente(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
-            if (contexto.value?.processoCodigo) {
-                await router.push({
-                    name: 'Subprocesso',
-                    params: {
-                        codProcesso: contexto.value.processoCodigo,
-                        siglaUnidade: props.siglaUnidade,
-                    },
-                    query: {
-                        codSubprocesso: String(props.codSubprocesso),
-                    },
-                });
-            }
-        } catch (err) {
-            modalConcluirAberto.value = false;
-            registrarErro(normalizarErro(err).mensagem);
-        }
+        await acaoTela.executar(
+            () => concluirAutoavaliacao(),
+            TEXTOS.diagnostico.ERRO_SALVAR,
+            {
+                relancarErro: false,
+                aoSucesso: async () => {
+                    modalConcluirAberto.value = false;
+                    registrarPendente(TEXTOS.diagnostico.SUCESSO_AUTOAVALIACAO_CONCLUIDA);
+                    if (contexto.value?.processoCodigo) {
+                        await router.push({
+                            name: 'Subprocesso',
+                            params: {
+                                codProcesso: contexto.value.processoCodigo,
+                                siglaUnidade: props.siglaUnidade,
+                            },
+                            query: {
+                                codSubprocesso: String(props.codSubprocesso),
+                            },
+                        });
+                    }
+                },
+                aoOcorrerErro: (erro) => {
+                    modalConcluirAberto.value = false;
+                    registrarErro(erro.mensagem);
+                },
+            },
+        );
     }
 
     async function confirmarImpossibilitar() {

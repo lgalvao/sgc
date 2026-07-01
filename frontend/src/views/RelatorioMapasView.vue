@@ -54,18 +54,19 @@ import {useRelatorioUnidadesComMapaQuery} from "@/composables/useRelatorioMapasQ
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {Perfil} from "@/types/tipos";
 import {useNotification} from "@/composables/useNotification";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 const relatoriosStore = useRelatoriosStore();
 const perfilStore = usePerfilStore();
 const {notify} = useNotification();
+const acaoRelatorio = useAsyncAction();
 
 const unidadesSelecionadas = ref<number[]>([]);
-const acaoCarregando = ref(false);
 
 const unidadesQuery = useRelatorioUnidadesComMapaQuery();
 const unidadesDisponiveis = computed(() => unidadesQuery.data.value ?? []);
 
-const carregando = computed(() => unidadesQuery.isLoading.value || unidadesQuery.isPending.value || acaoCarregando.value);
+const carregando = computed(() => unidadesQuery.isLoading.value || unidadesQuery.isPending.value || acaoRelatorio.carregando.value);
 const relatorioMapas = computed(() => relatoriosStore.relatorioMapas);
 const temUnidadesSelecionadas = computed(() => unidadesSelecionadas.value.length > 0);
 const semMapasDisponiveis = computed(() => !carregando.value && unidadesDisponiveis.value.length === 0);
@@ -78,22 +79,26 @@ const mensagemSemMapasDisponiveis = computed(() =>
 
 async function exportarPdf() {
   if (!temUnidadesSelecionadas.value) return;
-  acaoCarregando.value = true;
-  await relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value)
-      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_GERAR, "danger"))
-      .finally(() => {
-        acaoCarregando.value = false;
-      });
+  await acaoRelatorio.executar(
+      () => relatoriosStore.exportarMapasPdf(unidadesSelecionadas.value),
+      TEXTOS_RELATORIOS.ERRO_GERAR,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (erro) => notify(erro.mensagem || TEXTOS_RELATORIOS.ERRO_GERAR, "danger"),
+      },
+  );
 }
 
 async function gerarRelatorio() {
   if (!temUnidadesSelecionadas.value) return;
-  acaoCarregando.value = true;
-  await relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value)
-      .catch(() => notify(TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"))
-      .finally(() => {
-        acaoCarregando.value = false;
-      });
+  await acaoRelatorio.executar(
+      () => relatoriosStore.buscarRelatorioMapas(unidadesSelecionadas.value),
+      TEXTOS_RELATORIOS.ERRO_BUSCA,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (erro) => notify(erro.mensagem || TEXTOS_RELATORIOS.ERRO_BUSCA, "danger"),
+      },
+  );
 }
 
 onMounted(() => {

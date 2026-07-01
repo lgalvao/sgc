@@ -60,17 +60,19 @@ import {useRelatoriosStore} from "@/stores/relatorios";
 import {buscarContextoCompleto} from "@/services/processo";
 import {type ProcessoResumo, TipoProcesso, type Unidade, type UnidadeParticipante} from "@/types/tipos";
 import {normalizarErro} from "@/utils/apiError";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 const relatoriosStore = useRelatoriosStore();
 const {processosDisponiveis, carregarProcessos} = useRelatorioAndamentoTela();
 const {notify} = useNotification();
+const acaoRelatorio = useAsyncAction();
 
 const codProcessoSelecionado = ref<number | null>(null);
 const unidadesSelecionadas = ref<number[]>([]);
 const unidadesDisponiveis = ref<Unidade[]>([]);
-const carregando = ref(false);
 
 const relatorio = computed(() => relatoriosStore.relatorioSituacaoCapacitacaoDiagnostico);
+const carregando = acaoRelatorio.carregando;
 const processosDiagnostico = computed(() => processosDisponiveis.value.filter((processo: ProcessoResumo) => processo.tipo === TipoProcesso.DIAGNOSTICO));
 const opcoesProcessos = computed(() => [
   {value: null, text: TEXTOS_RELATORIOS.SELECIONE},
@@ -113,43 +115,51 @@ async function atualizarProcessoSelecionado(codigoProcesso: number | null) {
     return;
   }
 
-  carregando.value = true;
-  try {
-    const processo = await buscarContextoCompleto(codigoProcesso);
-    unidadesDisponiveis.value = mapearUnidadesParticipantes(processo.unidades);
-  } catch (error) {
-    notify(obterMensagemErro(error, TEXTOS_RELATORIOS.ERRO_CARREGAR_PROCESSO), "danger");
-  } finally {
-    carregando.value = false;
-  }
+  await acaoRelatorio.executar(
+      () => buscarContextoCompleto(codigoProcesso),
+      TEXTOS_RELATORIOS.ERRO_CARREGAR_PROCESSO,
+      {
+        relancarErro: false,
+        aoSucesso: (processo) => {
+          unidadesDisponiveis.value = mapearUnidadesParticipantes(processo.unidades);
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          notify(obterMensagemErro(causa, TEXTOS_RELATORIOS.ERRO_CARREGAR_PROCESSO), "danger");
+        },
+      },
+  );
 }
 
 async function gerarRelatorio() {
   if (!podeGerar.value || !codProcessoSelecionado.value) {
     return;
   }
-  carregando.value = true;
-  try {
-    await relatoriosStore.buscarRelatorioSituacaoCapacitacaoDiagnostico(codProcessoSelecionado.value, unidadesSelecionadas.value);
-  } catch (error) {
-    notify(obterMensagemErro(error, TEXTOS_RELATORIOS.ERRO_BUSCA), "danger");
-  } finally {
-    carregando.value = false;
-  }
+  await acaoRelatorio.executar(
+      () => relatoriosStore.buscarRelatorioSituacaoCapacitacaoDiagnostico(codProcessoSelecionado.value!, unidadesSelecionadas.value),
+      TEXTOS_RELATORIOS.ERRO_BUSCA,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (_erro, causa) => {
+          notify(obterMensagemErro(causa, TEXTOS_RELATORIOS.ERRO_BUSCA), "danger");
+        },
+      },
+  );
 }
 
 async function exportarPdf() {
   if (!podeGerar.value || !codProcessoSelecionado.value) {
     return;
   }
-  carregando.value = true;
-  try {
-    await relatoriosStore.exportarRelatorioSituacaoCapacitacaoDiagnosticoPdf(codProcessoSelecionado.value, unidadesSelecionadas.value);
-  } catch (error) {
-    notify(obterMensagemErro(error, TEXTOS_RELATORIOS.ERRO_EXPORTAR), "danger");
-  } finally {
-    carregando.value = false;
-  }
+  await acaoRelatorio.executar(
+      () => relatoriosStore.exportarRelatorioSituacaoCapacitacaoDiagnosticoPdf(codProcessoSelecionado.value!, unidadesSelecionadas.value),
+      TEXTOS_RELATORIOS.ERRO_EXPORTAR,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (_erro, causa) => {
+          notify(obterMensagemErro(causa, TEXTOS_RELATORIOS.ERRO_EXPORTAR), "danger");
+        },
+      },
+  );
 }
 
 onMounted(() => {

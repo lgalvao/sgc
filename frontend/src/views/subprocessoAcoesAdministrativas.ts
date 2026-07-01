@@ -7,6 +7,7 @@ import {formatarDataBR} from "@/utils";
 import logger from "@/utils/logger";
 import {useToast} from "@/composables/useToast";
 import {useSubprocessoStore} from "@/stores/subprocesso";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 type TipoReabertura = "cadastro" | "revisao";
 
@@ -57,6 +58,7 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
     const {exibirSucesso} = useToast();
     const subprocessoStore = useSubprocessoStore();
     const estado = criarEstado();
+    const acaoAdministrativa = useAsyncAction();
 
     async function confirmarAlteracaoDataLimite(novaData: string) {
         const detalhe = dependencias.subprocesso.value;
@@ -66,14 +68,23 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
 
         estado.loadingDataLimite.value = true;
         try {
-            await dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData});
-            estado.mostrarModalAlterarDataLimite.value = false;
-            exibirSucesso(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
-            await atualizarFluxoSubprocessoEPainel();
-            await dependencias.atualizarSubprocessoAtual();
-        } catch (error) {
-            logger.error(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, error);
-            dependencias.notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, "danger");
+            await acaoAdministrativa.executar(
+                () => dependencias.alterarDataLimiteSubprocesso(detalhe.codigo, {novaData}),
+                TEXTOS.subprocesso.ERRO_DATA_ALTERADA,
+                {
+                    relancarErro: false,
+                    aoSucesso: async () => {
+                        estado.mostrarModalAlterarDataLimite.value = false;
+                        exibirSucesso(`${TEXTOS.subprocesso.SUCESSO_DATA_ALTERADA} para ${formatarDataBR(novaData)}.`);
+                        await atualizarFluxoSubprocessoEPainel();
+                        await dependencias.atualizarSubprocessoAtual();
+                    },
+                    aoOcorrerErro: (_erro, causa) => {
+                        logger.error(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, causa);
+                        dependencias.notify(TEXTOS.subprocesso.ERRO_DATA_ALTERADA, "danger");
+                    },
+                },
+            );
         } finally {
             estado.loadingDataLimite.value = false;
         }
@@ -118,13 +129,22 @@ export function useSubprocessoAcoesAdministrativas(dependencias: DependenciasSub
 
         estado.loadingLembrete.value = true;
         try {
-            await dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo);
-            await subprocessoStore.obterContextoEdicao(codSubprocesso, {recarregar: true});
-            estado.modalLembreteAberto.value = false;
-            exibirSucesso(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
-        } catch (error) {
-            logger.error(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, error);
-            dependencias.notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, "danger");
+            await acaoAdministrativa.executar(
+                () => dependencias.enviarLembrete(dependencias.codProcesso, detalhe.unidade.codigo),
+                TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO,
+                {
+                    relancarErro: false,
+                    aoSucesso: async () => {
+                        await subprocessoStore.obterContextoEdicao(codSubprocesso, {recarregar: true});
+                        estado.modalLembreteAberto.value = false;
+                        exibirSucesso(TEXTOS.subprocesso.SUCESSO_LEMBRETE_ENVIADO);
+                    },
+                    aoOcorrerErro: (_erro, causa) => {
+                        logger.error(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, causa);
+                        dependencias.notify(TEXTOS.subprocesso.ERRO_LEMBRETE_ENVIADO, "danger");
+                    },
+                },
+            );
         } finally {
             estado.loadingLembrete.value = false;
         }

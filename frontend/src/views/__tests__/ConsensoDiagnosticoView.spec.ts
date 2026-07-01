@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {computed, ref} from 'vue';
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import ConsensoDiagnosticoView from '../ConsensoDiagnosticoView.vue';
 
 const backMock = vi.fn();
@@ -358,6 +358,7 @@ describe('ConsensoDiagnosticoView', () => {
 
         await wrapper.get('[data-testid="btn-concluir-avaliacao"]').trigger('click');
         await wrapper.get('[data-testid="btn-confirmar-concluir"]').trigger('click');
+        await flushPromises();
 
         expect(wrapper.find('.app-alert').text()).toContain('Preencha todos os campos');
     });

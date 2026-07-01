@@ -3,23 +3,30 @@ import {useQuery} from '@pinia/colada';
 import type {ColorVariant} from 'bootstrap-vue-next';
 import {STALE_TIME_LEITURA_AUXILIAR} from '@/composables/cachePolicy';
 import {possuiCodSubprocessoValido} from '@/composables/diagnosticoQueryUtils';
-import {normalizarErro} from '@/utils/apiError/normalizer';
 import {useDiagnosticoUnidade} from '@/composables/useDiagnosticoUnidade';
 import {useDiagnosticoPermissoes} from '@/composables/useDiagnosticoPermissoes';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {useDiagnosticoContexto} from '@/composables/useDiagnosticoContexto';
 import {listarAnalisesDiagnostico} from '@/services/analiseService';
 import {buscarSubprocessoDetalhe} from '@/services/subprocessoServiceContexto';
-import {formatarDataBR} from '@/utils';
 import {formatSituacaoSubprocesso} from '@/utils/formatters';
 import {TEXTOS} from '@/constants/textos';
 import {useToast} from '@/composables/useToast';
-import type {Analise, Movimentacao, ResponsavelDto, SubprocessoDetalhe} from '@/types/tipos';
+import type {Analise, Movimentacao, SubprocessoDetalhe} from '@/types/tipos';
 import type {
     DiagnosticoContexto,
-    SituacaoAvaliacaoServidor,
     ValorSituacaoCapacitacao,
 } from '@/types/diagnostico-competencias';
+import {useAsyncAction} from '@/composables/useAsyncAction';
+import {
+    formatarNota,
+    formatarSituacaoCapacitacao,
+    formatarSituacaoCapacitacaoResumida,
+    formatarSituacaoServidor,
+    formatTipoResponsabilidade,
+    formatDataSimples,
+    varianteSituacaoServidor,
+} from '@/views/diagnosticoUnidadeViewUtils';
 
 type RetornoFluxo = { mensagem: string; variante: 'danger' };
 
@@ -85,6 +92,7 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
     } = useFluxoDiagnostico(props.codSubprocesso);
 
     const retornoFluxo = ref<RetornoFluxo | null>(null);
+    const acaoTela = useAsyncAction();
     const modalValidarAberto = ref(false);
     const modalDevolverAberto = ref(false);
     const modalHomologarAberto = ref(false);
@@ -139,50 +147,56 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         return valor;
     });
 
-    function formatDataSimples(dataStr: string | null): string {
-        return dataStr ? formatarDataBR(dataStr) : '';
-    }
-
-    function formatTipoResponsabilidade(resp: ResponsavelDto | null): string {
-        if (!resp?.tipo) return '';
-        if (resp.tipo === 'Substituição' && resp.dataFim) {
-            return `Substituição (até ${formatDataSimples(resp.dataFim)})`;
-        }
-        if (resp.tipo === 'Atribuição temporária' && resp.dataFim) {
-            return `Atrib. temporária (até ${formatDataSimples(resp.dataFim)})`;
-        }
-        return resp.tipo;
-    }
-
     async function abrirModalValidar() {
         observacoesValidar.value = '';
-        try {
-            await validarAcaoValidarDiagnostico();
-            modalValidarAberto.value = true;
-        } catch (erro) {
-            registrarErro(normalizarErro(erro).mensagem ?? erroValidacaoValidar.value?.message);
-        }
+        await acaoTela.executar(
+            () => validarAcaoValidarDiagnostico(),
+            erroValidacaoValidar.value?.message || TEXTOS.diagnostico.ERRO_SALVAR,
+            {
+                relancarErro: false,
+                aoSucesso: () => {
+                    modalValidarAberto.value = true;
+                },
+                aoOcorrerErro: (erro) => {
+                    registrarErro(erro.mensagem ?? erroValidacaoValidar.value?.message);
+                },
+            },
+        );
     }
 
     async function abrirModalDevolver() {
         justificativaDevolver.value = '';
         tentouDevolverSemJustificativa.value = false;
-        try {
-            await validarAcaoDevolverDiagnostico();
-            modalDevolverAberto.value = true;
-        } catch (erro) {
-            registrarErro(normalizarErro(erro).mensagem ?? erroValidacaoDevolver.value?.message);
-        }
+        await acaoTela.executar(
+            () => validarAcaoDevolverDiagnostico(),
+            erroValidacaoDevolver.value?.message || TEXTOS.diagnostico.ERRO_SALVAR,
+            {
+                relancarErro: false,
+                aoSucesso: () => {
+                    modalDevolverAberto.value = true;
+                },
+                aoOcorrerErro: (erro) => {
+                    registrarErro(erro.mensagem ?? erroValidacaoDevolver.value?.message);
+                },
+            },
+        );
     }
 
     async function abrirModalHomologar() {
         observacoesHomologar.value = '';
-        try {
-            await validarAcaoHomologarDiagnostico();
-            modalHomologarAberto.value = true;
-        } catch (erro) {
-            registrarErro(normalizarErro(erro).mensagem ?? erroValidacaoHomologar.value?.message);
-        }
+        await acaoTela.executar(
+            () => validarAcaoHomologarDiagnostico(),
+            erroValidacaoHomologar.value?.message || TEXTOS.diagnostico.ERRO_SALVAR,
+            {
+                relancarErro: false,
+                aoSucesso: () => {
+                    modalHomologarAberto.value = true;
+                },
+                aoOcorrerErro: (erro) => {
+                    registrarErro(erro.mensagem ?? erroValidacaoHomologar.value?.message);
+                },
+            },
+        );
     }
 
     function limparRetornoFluxo() {
@@ -193,9 +207,16 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
         carregandoHistorico.value = true;
         modalHistoricoAberto.value = true;
         try {
-            historicoAnalises.value = await listarAnalisesDiagnostico(props.codSubprocesso);
-        } catch {
-            registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
+            const resultado = await acaoTela.executar(
+                () => listarAnalisesDiagnostico(props.codSubprocesso),
+                TEXTOS.diagnostico.ERRO_SALVAR,
+                {relancarErro: false},
+            );
+            if (resultado === undefined) {
+                registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
+            } else {
+                historicoAnalises.value = resultado;
+            }
         } finally {
             carregandoHistorico.value = false;
         }
@@ -230,12 +251,19 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             mensagemErro?: string | null;
         },
     ) {
-        try {
-            await config.acao();
-            config.aoConcluir();
-        } catch {
-            registrarErro(config.mensagemErro);
-        }
+        await acaoTela.executar(
+            config.acao,
+            config.mensagemErro || TEXTOS.diagnostico.ERRO_SALVAR,
+            {
+                relancarErro: false,
+                aoSucesso: () => {
+                    config.aoConcluir();
+                },
+                aoOcorrerErro: (erro) => {
+                    registrarErro(config.mensagemErro || erro.mensagem);
+                },
+            },
+        );
     }
 
     async function confirmarValidar() {
@@ -289,12 +317,6 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
                 return 'warning';
         }
     });
-
-    function formatarNota(valor: number | null): string {
-        if (valor === null) return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
-        if (valor === 0) return TEXTOS.diagnostico.NOTA_NA;
-        return String(valor);
-    }
 
     const servidoresExibidos = computed(() => {
         const responsavelTitulo = unidade.value?.responsavelTitulo;
@@ -363,56 +385,6 @@ export function useDiagnosticoUnidadeView(props: DiagnosticoUnidadeViewProps) {
             item.importancia !== null || item.dominio !== null,
         ),
     );
-
-    function formatarSituacaoCapacitacaoResumida(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
-        if (!situacaoCapacitacao) {
-            return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
-        }
-        return `${situacaoCapacitacao} - ${formatarSituacaoCapacitacao(situacaoCapacitacao)}`;
-    }
-
-    function formatarSituacaoCapacitacao(situacaoCapacitacao: ValorSituacaoCapacitacao | null): string {
-        switch (situacaoCapacitacao) {
-            case 'NA':
-                return TEXTOS.diagnostico.CAPACITACAO_NA;
-            case 'AC':
-                return TEXTOS.diagnostico.CAPACITACAO_AC;
-            case 'EC':
-                return TEXTOS.diagnostico.CAPACITACAO_EC;
-            case 'C':
-                return TEXTOS.diagnostico.CAPACITACAO_C;
-            case 'I':
-                return TEXTOS.diagnostico.CAPACITACAO_I;
-            default:
-                return TEXTOS.diagnostico.NOTA_NAO_INFORMADA;
-        }
-    }
-
-    function varianteSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): ColorVariant {
-        switch (situacaoServidor) {
-            case 'CONSENSO_APROVADO':
-                return 'success';
-            case 'AVALIACAO_IMPOSSIBILITADA':
-                return 'secondary';
-            case 'CONSENSO_CRIADO':
-                return 'warning';
-            case 'AUTOAVALIACAO_CONCLUIDA':
-                return 'info';
-            default:
-                return 'light';
-        }
-    }
-
-    function formatarSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor): string {
-        const mapa: Record<SituacaoAvaliacaoServidor, string> = {
-            AUTOAVALIACAO_NAO_INICIADA: TEXTOS.diagnostico.SITUACAO_NAO_REALIZADA,
-            AUTOAVALIACAO_CONCLUIDA: TEXTOS.diagnostico.SITUACAO_AUTOAVALIACAO_CONCLUIDA,
-            CONSENSO_CRIADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_CRIADO,
-            CONSENSO_APROVADO: TEXTOS.diagnostico.SITUACAO_CONSENSO_APROVADO,
-            AVALIACAO_IMPOSSIBILITADA: TEXTOS.diagnostico.SITUACAO_IMPOSSIBILITADA,
-        };
-        return mapa[situacaoServidor] ?? situacaoServidor;
-    }
 
     const movimentacoesFormatadas = computed<Movimentacao[]>(() => movimentacoes.value);
 

@@ -41,6 +41,7 @@ export function useFluxoSubprocessoExecucao() {
         acao: () => Promise<unknown>,
         workflow: WorkflowSubprocesso = {},
     ): Promise<boolean> {
+        let concluiu = false;
         try {
             await executarComTratamentoDeErros(async () => {
                 await acao();
@@ -56,24 +57,28 @@ export function useFluxoSubprocessoExecucao() {
                 if (workflow.redirecionarParaPainel) {
                     limparEstadoSubprocessoAtual();
                     await router.push("/painel");
+                    concluiu = true;
                     return;
                 }
 
                 if (workflow.redirecionarPara) {
                     limparEstadoSubprocessoAtual();
                     await router.push(workflow.redirecionarPara);
+                    concluiu = true;
                     return;
                 }
 
                 if (workflow.recarregarContexto) {
                     await recarregarContextoSubprocesso(subprocessoStore, workflow.recarregarContexto);
                 }
-            });
 
-            return true;
+                concluiu = true;
+            }, {relancarErro: false});
         } catch {
             return false;
         }
+
+        return concluiu;
     }
 
     return {

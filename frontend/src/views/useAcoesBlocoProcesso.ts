@@ -8,6 +8,7 @@ import {useToast} from "@/composables/useToast";
 import type {AcaoBlocoProcesso, SubprocessoElegivel} from "@/types/tipos";
 import {obterIdBotaoAcaoProcesso, obterTestIdBotaoAcaoProcesso} from "@/components/processo/processoAcoes";
 import type {DadosAcaoBloco, DependenciasProcessoAcoes, ModalAcaoBlocoRef} from "@/views/processoDetalheTipos";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 export function useAcoesBlocoProcesso(dependencias: DependenciasProcessoAcoes) {
     const router = useRouter();
@@ -15,7 +16,7 @@ export function useAcoesBlocoProcesso(dependencias: DependenciasProcessoAcoes) {
     const {atualizarFluxoProcesso, atualizarFluxoSubprocessoEProcesso} = useInvalidacaoNavegacao();
     const modalBlocoRef = ref<ModalAcaoBlocoRef | null>(null);
     const acaoBlocoAtual = ref<AcaoBlocoProcesso | null>(null);
-    const processandoAcaoBloco = ref(false);
+    const acaoBloco = useAsyncAction();
 
     async function concluirAcaoBloco(acao: AcaoBlocoProcesso) {
         modalBlocoRef.value?.fechar();
@@ -46,19 +47,26 @@ export function useAcoesBlocoProcesso(dependencias: DependenciasProcessoAcoes) {
         }
 
         dependencias.limparErro();
-        processandoAcaoBloco.value = true;
         modalBlocoRef.value?.setProcessando(true);
         try {
-            await processoService.executarAcaoEmBloco(processo.codigo, {
-                unidadeCodigos: dados.ids,
-                acao: acao.acao,
-                dataLimite: dados.dataLimite,
-            });
-            await concluirAcaoBloco(acao);
-        } catch (error) {
-            modalBlocoRef.value?.setErro(dependencias.registrarErro(error) || TEXTOS.processo.ERRO_ACAO_BLOCO);
+            await acaoBloco.executar(
+                () => processoService.executarAcaoEmBloco(processo.codigo, {
+                    unidadeCodigos: dados.ids,
+                    acao: acao.acao,
+                    dataLimite: dados.dataLimite,
+                }),
+                TEXTOS.processo.ERRO_ACAO_BLOCO,
+                {
+                    relancarErro: false,
+                    aoSucesso: async () => {
+                        await concluirAcaoBloco(acao);
+                    },
+                    aoOcorrerErro: (_erro, causa) => {
+                        modalBlocoRef.value?.setErro(dependencias.registrarErro(causa) || TEXTOS.processo.ERRO_ACAO_BLOCO);
+                    },
+                },
+            );
         } finally {
-            processandoAcaoBloco.value = false;
             modalBlocoRef.value?.setProcessando(false);
         }
     }
@@ -77,7 +85,7 @@ export function useAcoesBlocoProcesso(dependencias: DependenciasProcessoAcoes) {
         modalBlocoRef,
         obterIdBotaoAcao: obterIdBotaoAcaoProcesso,
         obterTestIdBotaoAcao: obterTestIdBotaoAcaoProcesso,
-        processandoAcaoBloco,
+        processandoAcaoBloco: acaoBloco.carregando,
         unidadesElegiveis: computed(() => {
             const elegiveis = acaoBlocoAtual.value?.unidades;
             if (!elegiveis) {

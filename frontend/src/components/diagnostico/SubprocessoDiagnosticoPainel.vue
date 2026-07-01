@@ -198,6 +198,7 @@ import {useDiagnosticoUnidade} from '@/composables/useDiagnosticoUnidade';
 import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
+import {useAsyncAction} from '@/composables/useAsyncAction';
 
 type FeedbackAcao = {
   mensagem: string;
@@ -218,6 +219,7 @@ const props = withDefaults(defineProps<{
 
 const router = useRouter();
 const {registrarPendente, exibirSucesso} = useToast();
+const acaoPainel = useAsyncAction();
 const {
   podeCriarConsenso,
   podeConcluirDiagnostico,
@@ -318,12 +320,19 @@ function abrirModalPermitirAvaliacao(servidor: ServidorDiagnostico) {
 
 async function confirmarPermitirAvaliacao() {
   if (!servidorSelecionado.value) return;
-  try {
-    await permitirAvaliacao(servidorSelecionado.value.servidorTitulo);
-    modalPermitirAvaliacaoAberto.value = false;
-  } catch {
-    registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => permitirAvaliacao(servidorSelecionado.value!.servidorTitulo),
+      TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalPermitirAvaliacaoAberto.value = false;
+        },
+        aoOcorrerErro: () => {
+          registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function confirmarImpossibilitar() {
@@ -332,88 +341,137 @@ async function confirmarImpossibilitar() {
     return;
   }
   if (!servidorSelecionado.value) return;
-  try {
-    await impossibilitarAvaliacao(
-        servidorSelecionado.value.servidorTitulo,
-        justificativaImpossibilidade.value,
-    );
-    modalImpossibilitarAberto.value = false;
-  } catch {
-    registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => impossibilitarAvaliacao(
+          servidorSelecionado.value!.servidorTitulo,
+          justificativaImpossibilidade.value,
+      ),
+      TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalImpossibilitarAberto.value = false;
+        },
+        aoOcorrerErro: () => {
+          registrarErro(TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function abrirModalValidar() {
   observacoesValidar.value = '';
-  try {
-    await validarAcaoValidarDiagnostico();
-    modalValidarAberto.value = true;
-  } catch (erro) {
-    registrarErro(normalizarErro(erro).mensagem
-        ?? erroValidacaoValidar.value?.message
-        ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => validarAcaoValidarDiagnostico(),
+      erroValidacaoValidar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalValidarAberto.value = true;
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          registrarErro(normalizarErro(causa).mensagem
+              ?? erroValidacaoValidar.value?.message
+              ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function abrirModalConcluir() {
   erroConcluirModal.value = '';
-  try {
-    await validarConclusaoDiagnostico();
-    modalConcluirAberto.value = true;
-  } catch (erro) {
-    registrarErro(normalizarErro(erro).mensagem
-        ?? erroValidacaoConcluir.value?.message
-        ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => validarConclusaoDiagnostico(),
+      erroValidacaoConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalConcluirAberto.value = true;
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          registrarErro(normalizarErro(causa).mensagem
+              ?? erroValidacaoConcluir.value?.message
+              ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function abrirModalDevolver() {
   justificativaDevolver.value = '';
   erroJustificativaDevolver.value = '';
-  try {
-    await validarAcaoDevolverDiagnostico();
-    modalDevolverAberto.value = true;
-  } catch (erro) {
-    registrarErro(normalizarErro(erro).mensagem
-        ?? erroValidacaoDevolver.value?.message
-        ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => validarAcaoDevolverDiagnostico(),
+      erroValidacaoDevolver.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalDevolverAberto.value = true;
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          registrarErro(normalizarErro(causa).mensagem
+              ?? erroValidacaoDevolver.value?.message
+              ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function abrirModalHomologar() {
   observacoesHomologar.value = '';
-  try {
-    await validarAcaoHomologarDiagnostico();
-    modalHomologarAberto.value = true;
-  } catch (erro) {
-    registrarErro(normalizarErro(erro).mensagem
-        ?? erroValidacaoHomologar.value?.message
-        ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => validarAcaoHomologarDiagnostico(),
+      erroValidacaoHomologar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalHomologarAberto.value = true;
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          registrarErro(normalizarErro(causa).mensagem
+              ?? erroValidacaoHomologar.value?.message
+              ?? TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function confirmarConcluir() {
-  try {
-    await concluirDiagnostico();
-    modalConcluirAberto.value = false;
-    registrarPendente(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
-    await router.push({name: 'Painel'});
-  } catch (erro) {
-    erroConcluirModal.value = normalizarErro(erro).mensagem
-        ?? erroConcluir.value?.message
-        ?? TEXTOS.diagnostico.ERRO_SALVAR;
-  }
+  await acaoPainel.executar(
+      () => concluirDiagnostico(),
+      erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: async () => {
+          modalConcluirAberto.value = false;
+          registrarPendente(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
+          await router.push({name: 'Painel'});
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          erroConcluirModal.value = normalizarErro(causa).mensagem
+              ?? erroConcluir.value?.message
+              ?? TEXTOS.diagnostico.ERRO_SALVAR;
+        },
+      },
+  );
 }
 
 async function confirmarValidar() {
-  try {
-    await validarDiagnostico(observacoesValidar.value || undefined);
-    modalValidarAberto.value = false;
-    limparFeedbackAcao();
-    exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO);
-  } catch {
-    registrarErro(erroValidar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => validarDiagnostico(observacoesValidar.value || undefined),
+      erroValidar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalValidarAberto.value = false;
+          limparFeedbackAcao();
+          exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_VALIDADO);
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          registrarErro(erroValidar.value?.message || normalizarErro(causa).mensagem || TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function confirmarDevolver() {
@@ -421,25 +479,39 @@ async function confirmarDevolver() {
     erroJustificativaDevolver.value = TEXTOS.diagnostico.ERRO_JUSTIFICATIVA_OBRIGATORIA;
     return;
   }
-  try {
-    await devolverDiagnostico(justificativaDevolver.value);
-    modalDevolverAberto.value = false;
-    limparFeedbackAcao();
-    exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO);
-  } catch {
-    registrarErro(erroDevolver.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => devolverDiagnostico(justificativaDevolver.value),
+      erroDevolver.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalDevolverAberto.value = false;
+          limparFeedbackAcao();
+          exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_DEVOLVIDO);
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          registrarErro(erroDevolver.value?.message || normalizarErro(causa).mensagem || TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 async function confirmarHomologar() {
-  try {
-    await homologarDiagnostico(observacoesHomologar.value || undefined);
-    modalHomologarAberto.value = false;
-    limparFeedbackAcao();
-    exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO);
-  } catch {
-    registrarErro(erroHomologar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR);
-  }
+  await acaoPainel.executar(
+      () => homologarDiagnostico(observacoesHomologar.value || undefined),
+      erroHomologar.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalHomologarAberto.value = false;
+          limparFeedbackAcao();
+          exibirSucesso(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_HOMOLOGADO);
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          registrarErro(erroHomologar.value?.message || normalizarErro(causa).mensagem || TEXTOS.diagnostico.ERRO_SALVAR);
+        },
+      },
+  );
 }
 
 function varianteSituacaoServidor(situacaoServidor: SituacaoAvaliacaoServidor) {

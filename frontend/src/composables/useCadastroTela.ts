@@ -125,7 +125,6 @@ export function useCadastroTela(props: CadastroTelaProps) {
         erroTick,
         limparErrosValidacao,
         definirErroGlobal,
-        definirErroGlobalDoErro,
         aplicarErrosValidacao,
         obterErroParaAtividade,
         obterErroCampoFluxo,
@@ -138,15 +137,21 @@ export function useCadastroTela(props: CadastroTelaProps) {
     async function executarAcaoComErroGlobal<T>(acao: () => Promise<T>): Promise<{ sucesso: true; resultado: T } | {
         sucesso: false
     }> {
-        try {
-            return {
-                sucesso: true,
-                resultado: await acao(),
-            };
-        } catch (error) {
-            definirErroGlobalDoErro(error);
+        const resultado = await executarComTratamentoDeErros(acao, {
+            relancarErro: false,
+            aoOcorrerErro: (erro) => {
+                definirErroGlobal(erro.mensagem);
+            },
+        });
+
+        if (resultado === undefined) {
             return {sucesso: false};
         }
+
+        return {
+            sucesso: true,
+            resultado,
+        };
     }
 
     const {novaAtividade, loadingAdicionar, adicionarAtividade: adicionarAtividadeAction} = useAtividadeForm();

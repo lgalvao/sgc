@@ -5,6 +5,7 @@ import {TEXTOS_SUCESSO_MAPA} from "@/constants/textos-mapa";
 import {TEXTOS_SUCESSO_SUBPROCESSO} from "@/constants/textos-subprocesso";
 import type {VarianteAlerta} from "@/composables/useNotification";
 import logger from "@/utils/logger";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 type AcaoPrincipalMapa = {
     codigo: "ACEITAR" | "HOMOLOGAR";
@@ -52,16 +53,23 @@ export function useMapaAnaliseFluxo({
                                         aceitarMapa,
                                         devolverMapa,
                                     }: DependenciasMapaAnaliseFluxo) {
+    const acaoFluxo = useAsyncAction();
+
     async function executarComNotificacaoDeErro(
         mensagemErro: string,
         acao: () => Promise<void>
     ) {
-        try {
-            await acao();
-        } catch (error) {
-            logger.error(mensagemErro, error);
-            notify(mensagemErro, "danger");
-        }
+        await acaoFluxo.executar(
+            acao,
+            mensagemErro,
+            {
+                relancarErro: false,
+                aoOcorrerErro: (_erro, causa) => {
+                    logger.error(mensagemErro, causa);
+                    notify(mensagemErro, "danger");
+                },
+            },
+        );
     }
 
     function abrirModalAceitar() {

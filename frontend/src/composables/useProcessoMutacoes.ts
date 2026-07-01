@@ -1,4 +1,4 @@
-import {ref, type Ref} from "vue";
+import type {Ref} from "vue";
 import {useRouter} from "vue-router";
 import {useToast} from "@/composables/useToast";
 import {useInvalidacaoNavegacao} from "@/composables/useInvalidacaoNavegacao";
@@ -8,6 +8,7 @@ import type {Processo, Unidade} from "@/types/tipos";
 import {TEXTOS} from "@/constants/textos";
 import {TEXTOS_SUCESSO_PROCESSO} from "@/constants/textos-processo";
 import type {useProcessoForm} from "@/composables/useProcessoForm";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 export interface ModalUnidadesComEquipePropriaRef {
     setErro: (erro: string | null) => void;
@@ -27,47 +28,55 @@ interface UseProcessoMutacoesParams {
     tratarErrosApi: (error: unknown, titulo: string, mensagemPadrao: string) => void;
 }
 
-export function useProcessoMutacoes({
-                                        formulario,
-                                        processoEditando,
-                                        unidadesComEquipePropriaSelecionadas,
-                                        idsUnidadesComEquipePropriaSelecionadas,
-                                        mostrarModalConfirmacao,
-                                        mostrarModalRemocao,
-                                        modalUnidadesComEquipePropriaRef,
-                                        tratarErrosApi
-                                    }: UseProcessoMutacoesParams) {
+function tratarTipoAusenteNaInicializacao(params: {
+    mostrarModalConfirmacao: Ref<boolean>;
+    modalUnidadesComEquipePropriaRef: Ref<ModalUnidadesComEquipePropriaRef | null>;
+    tratarErrosApi: (error: unknown, titulo: string, mensagemPadrao: string) => void;
+}) {
+    params.mostrarModalConfirmacao.value = false;
+    params.modalUnidadesComEquipePropriaRef.value?.fechar();
+    params.tratarErrosApi(
+        new Error("Tipo de processo não informado no formulário."),
+        "Erro ao criar processo",
+        TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR,
+    );
+}
+
+export function useProcessoMutacoes({formulario, processoEditando, unidadesComEquipePropriaSelecionadas, idsUnidadesComEquipePropriaSelecionadas, mostrarModalConfirmacao, mostrarModalRemocao, modalUnidadesComEquipePropriaRef, tratarErrosApi}: UseProcessoMutacoesParams) {
     const router = useRouter();
     const {registrarPendente} = useToast();
     const {atualizarFluxoProcesso} = useInvalidacaoNavegacao();
-
-    const isSaving = ref(false);
-    const isStarting = ref(false);
-    const isRemoving = ref(false);
-
+    const acaoSalvar = useAsyncAction();
+    const acaoIniciar = useAsyncAction();
+    const acaoRemover = useAsyncAction();
     async function salvarProcesso() {
         formulario.limparErros();
-        isSaving.value = true;
-        try {
-            if (processoEditando.value) {
-                const request = formulario.construirAtualizarRequest(processoEditando.value.codigo);
-                await processoService.atualizarProcesso(processoEditando.value.codigo, request);
-                registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_ALTERADO);
-            } else {
+        await acaoSalvar.executar(
+            async () => {
+                if (processoEditando.value) {
+                    const request = formulario.construirAtualizarRequest(processoEditando.value.codigo);
+                    await processoService.atualizarProcesso(processoEditando.value.codigo, request);
+                    registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_ALTERADO);
+                    return;
+                }
                 const request = formulario.construirCriarRequest();
                 await processoService.criarProcesso(request);
                 registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_CRIADO);
-            }
-            await atualizarFluxoProcesso();
-            await router.push("/painel");
-            formulario.limpar();
-        } catch (error) {
-            tratarErrosApi(error, "Erro ao salvar processo", "Não foi possível salvar o processo.");
-        } finally {
-            isSaving.value = false;
-        }
+            },
+            "Não foi possível salvar o processo.",
+            {
+                relancarErro: false,
+                aoSucesso: async () => {
+                    await atualizarFluxoProcesso();
+                    await router.push("/painel");
+                    formulario.limpar();
+                },
+                aoOcorrerErro: (_erro, causa) => {
+                    tratarErrosApi(causa, "Erro ao salvar processo", "Não foi possível salvar o processo.");
+                },
+            },
+        );
     }
-
     async function garantirCodigoProcessoParaInicio() {
         if (processoEditando.value?.codigo) {
             return processoEditando.value.codigo;
@@ -76,45 +85,46 @@ export function useProcessoMutacoes({
         const novoProcesso = await processoService.criarProcesso(request);
         return novoProcesso.codigo;
     }
-
     async function iniciarProcessoComSelecaoDireta(codigosDiretos: number[]) {
         formulario.limparErros();
-        isStarting.value = true;
         modalUnidadesComEquipePropriaRef.value?.setErro(null);
         modalUnidadesComEquipePropriaRef.value?.setProcessando(true);
-
         try {
-            let codigoProcesso: number;
-            try {
-                codigoProcesso = await garantirCodigoProcessoParaInicio();
-            } catch (error) {
-                mostrarModalConfirmacao.value = false;
-                modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
-                tratarErrosApi(error, "Erro ao criar processo", TEXTOS.processo.cadastro.ERRO_CRIAR_PARA_INICIAR);
-                return;
-            }
-
-            if (!formulario.tipo.value) {
-                throw new Error("Tipo não definido");
-            }
-            await processoService.iniciarProcesso(codigoProcesso, formulario.tipo.value, codigosDiretos);
-
-            registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
-            await atualizarFluxoProcesso();
-            await router.push("/painel");
-            mostrarModalConfirmacao.value = false;
-            modalUnidadesComEquipePropriaRef.value?.fechar();
-        } catch (error) {
-            mostrarModalConfirmacao.value = false;
-            modalUnidadesComEquipePropriaRef.value?.fechar();
-            tratarErrosApi(error, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
+            await acaoIniciar.executar(
+                async () => {
+                    const codigoProcesso = await garantirCodigoProcessoParaInicio();
+                    await processoService.iniciarProcesso(codigoProcesso, formulario.tipo.value!, codigosDiretos);
+                    registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_INICIADO);
+                },
+                TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO,
+                {
+                    relancarErro: false,
+                    aoSucesso: async () => {
+                        await atualizarFluxoProcesso();
+                        await router.push("/painel");
+                        mostrarModalConfirmacao.value = false;
+                        modalUnidadesComEquipePropriaRef.value?.fechar();
+                    },
+                    aoOcorrerErro: (_erro, causa) => {
+                        mostrarModalConfirmacao.value = false;
+                        modalUnidadesComEquipePropriaRef.value?.fechar();
+                        tratarErrosApi(causa, "Erro ao iniciar processo", TEXTOS.processo.cadastro.ERRO_INICIAR_PROCESSO);
+                    },
+                },
+            );
         } finally {
             modalUnidadesComEquipePropriaRef.value?.setProcessando(false);
-            isStarting.value = false;
         }
     }
-
     async function confirmarIniciarProcesso() {
+        if (!formulario.tipo.value) {
+            tratarTipoAusenteNaInicializacao({
+                mostrarModalConfirmacao,
+                modalUnidadesComEquipePropriaRef,
+                tratarErrosApi,
+            });
+            return;
+        }
         if (unidadesComEquipePropriaSelecionadas.value.length > 0) {
             mostrarModalConfirmacao.value = false;
             modalUnidadesComEquipePropriaRef.value?.abrir();
@@ -122,7 +132,6 @@ export function useProcessoMutacoes({
         }
         await iniciarProcessoComSelecaoDireta(formulario.unidadesSelecionadas.value);
     }
-
     async function confirmarSelecaoUnidadesComEquipePropria(dados: { ids: number[] }) {
         const codigosDiretos = aplicarSelecaoDiretaUnidadesComEquipePropria(
             formulario.unidadesSelecionadas.value,
@@ -131,36 +140,38 @@ export function useProcessoMutacoes({
         );
         await iniciarProcessoComSelecaoDireta(codigosDiretos);
     }
-
     async function confirmarRemocao() {
         if (!processoEditando.value) {
             mostrarModalRemocao.value = false;
             return;
         }
-        isRemoving.value = true;
         const descricaoRemovida = processoEditando.value.descricao;
-        try {
-            await processoService.excluirProcesso(processoEditando.value.codigo);
-            registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_REMOVIDO(descricaoRemovida));
-            await atualizarFluxoProcesso();
-            await router.push("/painel");
-            formulario.limpar();
-            mostrarModalRemocao.value = false;
-        } catch (error) {
-            mostrarModalRemocao.value = false;
-            tratarErrosApi(error, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
-        } finally {
-            isRemoving.value = false;
-        }
+        await acaoRemover.executar(
+            () => processoService.excluirProcesso(processoEditando.value!.codigo),
+            TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO,
+            {
+                relancarErro: false,
+                aoSucesso: async () => {
+                    registrarPendente(TEXTOS_SUCESSO_PROCESSO.PROCESSO_REMOVIDO(descricaoRemovida));
+                    await atualizarFluxoProcesso();
+                    await router.push("/painel");
+                    formulario.limpar();
+                    mostrarModalRemocao.value = false;
+                },
+                aoOcorrerErro: (_erro, causa) => {
+                    mostrarModalRemocao.value = false;
+                    tratarErrosApi(causa, "Erro ao remover processo", TEXTOS.processo.cadastro.ERRO_REMOVER_PROCESSO);
+                },
+            },
+        );
     }
-
     return {
-        isSaving,
-        isStarting,
-        isRemoving,
+        isSaving: acaoSalvar.carregando,
+        isStarting: acaoIniciar.carregando,
+        isRemoving: acaoRemover.carregando,
         salvarProcesso,
         confirmarIniciarProcesso,
         confirmarSelecaoUnidadesComEquipePropria,
-        confirmarRemocao
+        confirmarRemocao,
     };
 }

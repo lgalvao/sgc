@@ -61,4 +61,36 @@ describe("useAsyncAction", () => {
 
         expect(erro.value?.mensagem).toBe("padrao");
     });
+
+    it("deve executar callback de sucesso", async () => {
+        const {executar} = useAsyncAction();
+        const aoSucesso = vi.fn();
+
+        const resultado = await executar(
+            () => Promise.resolve("ok"),
+            undefined,
+            {aoSucesso},
+        );
+
+        expect(resultado).toBe("ok");
+        expect(aoSucesso).toHaveBeenCalledWith("ok");
+    });
+
+    it("deve executar callback de erro sem relançar", async () => {
+        const {executar} = useAsyncAction();
+        const aoOcorrerErro = vi.fn();
+        const erroOriginal = new Error("falhou");
+
+        const resultado = await executar(
+            () => Promise.reject(erroOriginal),
+            "Erro padrão",
+            {relancarErro: false, aoOcorrerErro},
+        );
+
+        expect(resultado).toBeUndefined();
+        expect(aoOcorrerErro).toHaveBeenCalledWith(
+            expect.objectContaining({mensagem: "falhou"}),
+            erroOriginal,
+        );
+    });
 });

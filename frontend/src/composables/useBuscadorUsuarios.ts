@@ -4,15 +4,15 @@ import {pesquisarUsuarios} from '@/services/usuarioService';
 import type {UsuarioPesquisa} from '@/types/tipos';
 import {logger} from '@/utils';
 import {useNotification} from '@/composables/useNotification';
-import {normalizarErro} from '@/utils/apiError';
+import {useAsyncAction} from '@/composables/useAsyncAction';
 
 export function useBuscadorUsuarios(
     termo: Ref<string>,
     selecionado: Ref<string | null>
 ) {
     const {notify} = useNotification();
+    const acaoPesquisa = useAsyncAction();
     const usuariosEncontrados = ref<UsuarioPesquisa[]>([]);
-    const pesquisandoUsuarios = ref(false);
     const mostrarResultadosUsuarios = ref(false);
     const indiceUsuarioDestacado = ref(-1);
 
@@ -45,27 +45,29 @@ export function useBuscadorUsuarios(
     };
 
     const limparResultados = () => {
-        if (usuariosEncontrados.value.length === 0 && !mostrarResultadosUsuarios.value && !pesquisandoUsuarios.value) return;
+        if (usuariosEncontrados.value.length === 0 && !mostrarResultadosUsuarios.value && !acaoPesquisa.carregando.value) return;
         usuariosEncontrados.value = [];
-        pesquisandoUsuarios.value = false;
         mostrarResultadosUsuarios.value = false;
         indiceUsuarioDestacado.value = -1;
     };
 
     async function executarPesquisa() {
-        pesquisandoUsuarios.value = true;
-        try {
-            const resultados = await pesquisarUsuarios(termo.value.trim());
-            usuariosEncontrados.value = resultados;
-            atualizarUsuarioSelecionadoPorNome(termo.value);
-        } catch (error) {
-            limparResultados();
-            const erroNormalizado = normalizarErro(error);
-            logger.error("Erro ao pesquisar usuários:", error);
-            notify(erroNormalizado.mensagem || "Erro ao pesquisar usuários", 'danger');
-        } finally {
-            pesquisandoUsuarios.value = false;
-        }
+        await acaoPesquisa.executar(
+            () => pesquisarUsuarios(termo.value.trim()),
+            "Erro ao pesquisar usuários",
+            {
+                relancarErro: false,
+                aoSucesso: (resultados) => {
+                    usuariosEncontrados.value = resultados;
+                    atualizarUsuarioSelecionadoPorNome(termo.value);
+                },
+                aoOcorrerErro: (erro, causa) => {
+                    limparResultados();
+                    logger.error("Erro ao pesquisar usuários:", causa);
+                    notify(erro.mensagem || "Erro ao pesquisar usuários", 'danger');
+                },
+            },
+        );
     }
 
     const aoAlterarTermo = (valor: string | number | null) => {
@@ -113,7 +115,7 @@ export function useBuscadorUsuarios(
 
     return {
         usuariosEncontrados,
-        pesquisandoUsuarios,
+        pesquisandoUsuarios: acaoPesquisa.carregando,
         mostrarResultadosUsuarios,
         indiceUsuarioDestacado,
         termoPesquisaMinimaAtingida,

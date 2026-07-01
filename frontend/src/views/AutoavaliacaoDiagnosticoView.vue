@@ -68,8 +68,10 @@
                     />
                     Atividade
                   </BButton>
-                  <BCollapse :id="`collapse-atividades-${item.competenciaCodigo}`"
-                             :model-value="detalhesCompetenciaAbertos[item.competenciaCodigo]">
+                  <BCollapse
+                      :id="`collapse-atividades-${item.competenciaCodigo}`"
+                      :model-value="detalhesCompetenciaAbertos[item.competenciaCodigo]"
+                  >
                     <div class="mt-2">
                       <ul class="mb-0 ps-3">
                         <li v-for="atividade in item.atividades" :key="atividade.codigo" class="mb-1">

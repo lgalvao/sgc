@@ -21,8 +21,10 @@ export function useAsyncAction() {
     const carregando = ref(false);
     const erro = ref<ErroNormalizado | null>(null);
 
-    type OpcoesExecucao = {
+    type OpcoesExecucao<T> = {
         relancarErro?: boolean;
+        aoOcorrerErro?: (erro: ErroNormalizado, causa: unknown) => void | Promise<void>;
+        aoSucesso?: (resultado: T) => void | Promise<void>;
     };
 
     function normalizarErroComFallback(error: unknown, mensagemPadrao: string): ErroNormalizado {
@@ -50,19 +52,27 @@ export function useAsyncAction() {
     async function executar<T>(
         acao: () => Promise<T>,
         mensagemErro: string | undefined,
-        opcoes: { relancarErro: false }
+        opcoes: OpcoesExecucao<T>
+    ): Promise<T>;
+    async function executar<T>(
+        acao: () => Promise<T>,
+        mensagemErro: string | undefined,
+        opcoes: OpcoesExecucao<T> & { relancarErro: false }
     ): Promise<T | undefined>;
     async function executar<T>(
         acao: () => Promise<T>,
         mensagemErro = "Erro na operação",
-        opcoes: OpcoesExecucao = {}
+        opcoes: OpcoesExecucao<T> = {}
     ): Promise<T | undefined> {
         carregando.value = true;
         limparErro();
         try {
-            return await acao();
+            const resultado = await acao();
+            await opcoes.aoSucesso?.(resultado);
+            return resultado;
         } catch (error: unknown) {
             erro.value = normalizarErroComFallback(error, mensagemErro);
+            await opcoes.aoOcorrerErro?.(erro.value, error);
             if (opcoes.relancarErro === false) {
                 return undefined;
             }

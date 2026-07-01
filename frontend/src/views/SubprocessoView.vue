@@ -145,6 +145,7 @@ import {normalizarErro} from "@/utils/apiError/normalizer";
 import type {Analise} from "@/types/tipos";
 import {useSubprocessoTela} from "@/composables/useSubprocessoTela";
 import {computed, ref} from "vue";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 const props = defineProps<{ codProcesso: number; siglaUnidade: string; codSubprocesso?: number }>();
 
@@ -209,6 +210,7 @@ const ehServidorPuro = computed(() => {
       && !permissoes.podeHomologarDiagnostico;
 });
 const {registrarPendente} = useToast();
+const acaoDiagnostico = useAsyncAction();
 const modalConcluirDiagnosticoAberto = ref(false);
 const erroConcluirDiagnostico = ref('');
 const modalHistoricoDiagnosticoAberto = ref(false);
@@ -236,9 +238,16 @@ async function abrirHistoricoAnaliseDiagnostico() {
   carregandoHistoricoDiagnostico.value = true;
   modalHistoricoDiagnosticoAberto.value = true;
   try {
-    historicoAnalisesDiagnostico.value = await listarAnalisesDiagnostico(codigoSubprocesso.value);
-  } catch {
-    notify(TEXTOS.diagnostico.ERRO_SALVAR, 'danger', true);
+    const resultado = await acaoDiagnostico.executar(
+        () => listarAnalisesDiagnostico(codigoSubprocesso.value!),
+        TEXTOS.diagnostico.ERRO_SALVAR,
+        {relancarErro: false},
+    );
+    if (resultado === undefined) {
+      notify(TEXTOS.diagnostico.ERRO_SALVAR, 'danger', true);
+    } else {
+      historicoAnalisesDiagnostico.value = resultado;
+    }
   } finally {
     carregandoHistoricoDiagnostico.value = false;
   }
@@ -246,29 +255,43 @@ async function abrirHistoricoAnaliseDiagnostico() {
 
 async function abrirModalConcluirDiagnostico() {
   erroConcluirDiagnostico.value = '';
-  try {
-    await validarConclusaoDiagnostico();
-    modalConcluirDiagnosticoAberto.value = true;
-  } catch (erro) {
-    const mensagemErro = normalizarErro(erro).mensagem
-        ?? erroValidacaoConcluir.value?.message
-        ?? TEXTOS.diagnostico.ERRO_SALVAR;
-    erroConcluirDiagnostico.value = mensagemErro;
-    notify(mensagemErro, 'danger', true);
-  }
+  await acaoDiagnostico.executar(
+      () => validarConclusaoDiagnostico(),
+      erroValidacaoConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: () => {
+          modalConcluirDiagnosticoAberto.value = true;
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          const mensagemErro = normalizarErro(causa).mensagem
+              ?? erroValidacaoConcluir.value?.message
+              ?? TEXTOS.diagnostico.ERRO_SALVAR;
+          erroConcluirDiagnostico.value = mensagemErro;
+          notify(mensagemErro, 'danger', true);
+        },
+      },
+  );
 }
 
 async function confirmarConcluirDiagnostico() {
-  try {
-    await concluirDiagnostico();
-    modalConcluirDiagnosticoAberto.value = false;
-    registrarPendente(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
-    await router.push({name: 'Painel'});
-  } catch (erro) {
-    erroConcluirDiagnostico.value = normalizarErro(erro).mensagem
-        ?? erroConcluir.value?.message
-        ?? TEXTOS.diagnostico.ERRO_SALVAR;
-  }
+  await acaoDiagnostico.executar(
+      () => concluirDiagnostico(),
+      erroConcluir.value?.message ?? TEXTOS.diagnostico.ERRO_SALVAR,
+      {
+        relancarErro: false,
+        aoSucesso: async () => {
+          modalConcluirDiagnosticoAberto.value = false;
+          registrarPendente(TEXTOS.diagnostico.SUCESSO_DIAGNOSTICO_CONCLUIDO);
+          await router.push({name: 'Painel'});
+        },
+        aoOcorrerErro: (_erro, causa) => {
+          erroConcluirDiagnostico.value = normalizarErro(causa).mensagem
+              ?? erroConcluir.value?.message
+              ?? TEXTOS.diagnostico.ERRO_SALVAR;
+        },
+      },
+  );
 }
 
 defineExpose({

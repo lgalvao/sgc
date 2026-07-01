@@ -43,15 +43,17 @@ import {useRelatorioAndamentoTela} from "@/composables/useRelatorioAndamentoTela
 import {useNotification} from "@/composables/useNotification";
 import {formatarDataBR, formatarDataHoraBR} from "@/utils/date";
 import {normalizarErro} from "@/utils/apiError";
+import {useAsyncAction} from "@/composables/useAsyncAction";
 
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
 const {processosDisponiveis, carregarProcessos} = useRelatorioAndamentoTela();
+const acaoRelatorio = useAsyncAction();
 
 const codProcessoSelecionado = ref<number | null>(null);
-const carregando = ref(false);
 
 const relatorioAndamento = computed(() => relatoriosStore.relatorioAndamento);
+const carregando = acaoRelatorio.carregando;
 
 const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(item => {
   const dt1 = item.dataLimiteEtapa1;
@@ -87,26 +89,30 @@ function obterMensagemErroRelatorio(error: unknown, mensagemPadrao: string) {
 
 async function gerarRelatorio() {
   if (!codProcessoSelecionado.value) return;
-  carregando.value = true;
-  try {
-    await relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value);
-  } catch (error) {
-    notify(obterMensagemErroRelatorio(error, TEXTOS_RELATORIOS.ERRO_BUSCA), "danger");
-  } finally {
-    carregando.value = false;
-  }
+  await acaoRelatorio.executar(
+      () => relatoriosStore.buscarRelatorioAndamento(codProcessoSelecionado.value!),
+      TEXTOS_RELATORIOS.ERRO_BUSCA,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (_erro, causa) => {
+          notify(obterMensagemErroRelatorio(causa, TEXTOS_RELATORIOS.ERRO_BUSCA), "danger");
+        },
+      },
+  );
 }
 
 async function exportarPdf() {
   if (!codProcessoSelecionado.value) return;
-  carregando.value = true;
-  try {
-    await relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value);
-  } catch (error) {
-    notify(obterMensagemErroRelatorio(error, TEXTOS_RELATORIOS.ERRO_EXPORTAR), "danger");
-  } finally {
-    carregando.value = false;
-  }
+  await acaoRelatorio.executar(
+      () => relatoriosStore.exportarAndamentoPdf(codProcessoSelecionado.value!),
+      TEXTOS_RELATORIOS.ERRO_EXPORTAR,
+      {
+        relancarErro: false,
+        aoOcorrerErro: (_erro, causa) => {
+          notify(obterMensagemErroRelatorio(causa, TEXTOS_RELATORIOS.ERRO_EXPORTAR), "danger");
+        },
+      },
+  );
 }
 
 onMounted(() => {
