@@ -1,4 +1,5 @@
 import {expect, test} from '../fixtures/base.js';
+import type {APIRequestContext} from '@playwright/test';
 import {login, loginComPerfil, USUARIOS} from '../helpers/helpers-auth.js';
 import {
     confirmarInicioProcessoPeloDialogo,

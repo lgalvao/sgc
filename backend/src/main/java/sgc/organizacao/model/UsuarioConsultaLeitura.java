@@ -13,8 +13,8 @@ public record UsuarioConsultaLeitura(
         Long unidadeCodigo,
         String unidadeNome,
         String unidadeSigla,
-        @Nullable TipoUnidade unidadeTipo,
+        TipoUnidade unidadeTipo,
         @Nullable String unidadeTituloTitular,
-        @Nullable Long unidadeCompetenciaCodigo
+        Long unidadeCompetenciaCodigo
 ) {
 }
