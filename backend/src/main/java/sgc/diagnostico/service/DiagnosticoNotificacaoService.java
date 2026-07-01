@@ -228,7 +228,7 @@ public class DiagnosticoNotificacaoService {
                 .chaveIdempotencia("diagnostico:%d:aceito:bloco:superior:%d:unidades:%s".formatted(
                         base.getProcesso().getCodigo(),
                         unidadeSuperior.getCodigo(),
-                        siglasUnidades.stream().collect(Collectors.joining("-"))
+                        String.join("-", siglasUnidades)
                 ))
                 .build());
     }

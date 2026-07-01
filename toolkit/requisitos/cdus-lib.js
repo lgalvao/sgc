@@ -54,6 +54,7 @@ function localizarLinksInternosCdu(texto) {
 }
 
 function resolverDestinoMarkdown(caminhoArquivo, destino) {
+    // noinspection HttpUrlsUsage
     if (destino.startsWith("http://") || destino.startsWith("https://") || destino.startsWith("#")) {
         return null;
     }

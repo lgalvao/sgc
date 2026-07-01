@@ -173,7 +173,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
             assertThat(notificacao.getDestinatario()).isEqualTo("sedesenv@tre-pe.jus.br");
             assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos da SEDESENV submetido para análise");
-            assertThat(notificacao.getCorpoHtml()).contains("foi aceito e submetido para análise pela unidade superior imediata");
+            assertThat(notificacao.getCorpoHtml()).containsIgnoringWhitespaces("foi aceito e submetido para análise pela unidade superior imediata");
             assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
         });
         assertThat(notificacoes).anySatisfy(notificacao -> {

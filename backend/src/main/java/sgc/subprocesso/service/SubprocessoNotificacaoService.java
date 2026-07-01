@@ -8,6 +8,7 @@ import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
 import sgc.alerta.*;
 import sgc.alerta.model.*;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -104,6 +105,7 @@ public class SubprocessoNotificacaoService {
         if (subprocessos.isEmpty()) {
             return;
         }
+        subprocessos.forEach(this::criarAlertaAceiteCadastroEmBloco);
         subprocessos.forEach(this::criarNotificacaoDiretaAceiteCadastroBloco);
         agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaAceiteCadastroBloco);
     }
@@ -119,8 +121,35 @@ public class SubprocessoNotificacaoService {
         if (subprocessos.isEmpty()) {
             return;
         }
+        subprocessos.forEach(this::criarAlertaAceiteValidacaoEmBloco);
         subprocessos.forEach(this::criarNotificacaoDiretaAceiteValidacaoBloco);
         agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaAceiteValidacaoBloco);
+    }
+
+    private void criarAlertaAceiteCadastroEmBloco(Subprocesso sp) {
+        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        Unidade unidadeDestino = unidadeAnalise == null ? null : unidadeAnalise.getUnidadeSuperior();
+        if (unidadeAnalise == null || unidadeDestino == null) {
+            return;
+        }
+        String descricao = sp.getProcesso().getTipo() == TipoProcesso.REVISAO
+                ? Mensagens.ALERTA_REVISAO_ACEITA.formatted(sp.getUnidade().getSigla())
+                : Mensagens.ALERTA_CADASTRO_ACEITO.formatted(sp.getUnidade().getSigla());
+        alertaAplicacaoService.criarAlertaTransicao(sp.getProcesso(), descricao, unidadeAnalise, unidadeDestino);
+    }
+
+    private void criarAlertaAceiteValidacaoEmBloco(Subprocesso sp) {
+        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+        Unidade unidadeDestino = unidadeAnalise == null ? null : unidadeAnalise.getUnidadeSuperior();
+        if (unidadeAnalise == null || unidadeDestino == null) {
+            return;
+        }
+        alertaAplicacaoService.criarAlertaTransicao(
+                sp.getProcesso(),
+                Mensagens.ALERTA_MAPA_VALIDACAO_ACEITA.formatted(sp.getUnidade().getSigla()),
+                unidadeAnalise,
+                unidadeDestino
+        );
     }
 
     private void criarNotificacaoDireta(NotificacaoCommand cmd, Map<String, Object> variaveis) {

@@ -21,6 +21,7 @@ public record AtualizarSubprocessoRequest(
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,
         @Nullable LocalDateTime dataFimEtapa2) {
+
     public AtualizarSubprocessoCommand paraCommand() {
         return AtualizarSubprocessoCommand.builder()
                 .vinculos(paraVinculosCommand())
@@ -35,8 +36,8 @@ public record AtualizarSubprocessoRequest(
                 .build();
     }
 
-    public sgc.subprocesso.dto.AtualizarPrazosSubprocessoCommand paraPrazosCommand() {
-        return sgc.subprocesso.dto.AtualizarPrazosSubprocessoCommand.builder()
+    public AtualizarPrazosSubprocessoCommand paraPrazosCommand() {
+        return AtualizarPrazosSubprocessoCommand.builder()
                 .dataLimiteEtapa1(dataLimiteEtapa1 == null ? Optional.empty() : Optional.of(dataLimiteEtapa1))
                 .dataFimEtapa1(Optional.ofNullable(dataFimEtapa1))
                 .dataLimiteEtapa2(Optional.ofNullable(dataLimiteEtapa2))

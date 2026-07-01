@@ -139,7 +139,6 @@ public final class Mensagens {
     public static final String SELECIONE_AO_MENOS_UMA_UNIDADE = "Selecione ao menos uma unidade.";
     public static final String UNIDADE_NAO_PARTICIPA = "Unidade não participa deste processo.";
     public static final String SITUACAO_INVALIDA = "Situação inválida.";
-    public static final String SUBPROCESSOS_NAO_HOMOLOGADOS = "Subprocessos não homologados.";
     public static final String PROCESSO_FINALIZACAO_MAPAS_PENDENTES =
             "Não é possível finalizar o processo enquanto houver unidades com mapa não homologado";
     public static final String PROCESSO_FINALIZACAO_DIAGNOSTICO_PENDENTE =

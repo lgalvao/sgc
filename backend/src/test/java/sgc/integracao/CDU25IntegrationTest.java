@@ -152,7 +152,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         assertThat(notificacoes).anySatisfy(notificacao -> {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
             assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação do mapa de competências da SEDESENV submetida para análise");
-            assertThat(notificacao.getCorpoHtml()).contains("foi aceita e submetida para análise pela unidade superior imediata");
+            assertThat(notificacao.getCorpoHtml()).containsIgnoringWhitespaces("foi aceita e submetida para análise pela unidade superior imediata");
         });
         assertThat(notificacoes).anySatisfy(notificacao -> {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDIA");

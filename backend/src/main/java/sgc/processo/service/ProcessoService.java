@@ -1344,7 +1344,7 @@ public class ProcessoService {
                 ));
     }
 
-    private TipoNotificacao tipoNotificacaoFinalizacao(Processo processo) {
+    private TipoNotificacao tipoNotificacaoFinalizacao() {
         return TipoNotificacao.PROCESSO_FINALIZADO;
     }
 
@@ -1447,7 +1447,7 @@ public class ProcessoService {
     private void criarNotificacaoFinalizacaoDireta(Processo processo, Unidade unidade) {
         enfileirarNotificacaoUnidade(
                 unidade,
-                tipoNotificacaoFinalizacao(processo),
+                tipoNotificacaoFinalizacao(),
                 assuntoFinalizacaoDireta(processo),
                 corpoFinalizacaoDireta(processo, unidade),
                 chaveFinalizacaoProcesso(processo, unidade, true),
@@ -1458,7 +1458,7 @@ public class ProcessoService {
     private void criarNotificacaoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
         enfileirarNotificacaoUnidade(
                 unidade,
-                tipoNotificacaoFinalizacao(processo),
+                tipoNotificacaoFinalizacao(),
                 assuntoFinalizacaoConsolidada(processo),
                 corpoFinalizacaoConsolidada(processo, unidade, subordinadas),
                 chaveFinalizacaoProcesso(processo, unidade, false),
