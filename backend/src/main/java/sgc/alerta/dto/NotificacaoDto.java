@@ -1,25 +1,26 @@
 package sgc.alerta.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 import java.time.*;
 
 @Builder
 public record NotificacaoDto(
         Long codigo,
-        Long subprocessoCodigo,
-        String unidadeSigla,
-        String processoDescricao,
+        @Nullable Long subprocessoCodigo,
+        @Nullable String unidadeSigla,
+        @Nullable String processoDescricao,
         TipoNotificacaoDto tipoNotificacao,
-        String usuarioDestinoTitulo,
+        @Nullable String usuarioDestinoTitulo,
         String destinatario,
         String assunto,
         String corpoHtml,
         SituacaoNotificacaoEmailDto situacao,
         int tentativas,
         LocalDateTime dataHoraCriacao,
-        LocalDateTime dataHoraEnvio,
-        LocalDateTime proximaTentativaEm,
-        String ultimoErro
+        @Nullable LocalDateTime dataHoraEnvio,
+        @Nullable LocalDateTime proximaTentativaEm,
+        @Nullable String ultimoErro
 ) {
 }

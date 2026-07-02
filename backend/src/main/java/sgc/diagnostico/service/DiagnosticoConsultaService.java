@@ -1,6 +1,7 @@
 package sgc.diagnostico.service;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.comum.erros.*;
@@ -283,10 +284,14 @@ public class DiagnosticoConsultaService {
     private UnidadeProcesso resolverUnidadeSnapshot(Subprocesso subprocesso) {
         return subprocesso.getProcesso()
                 .buscarParticipante(subprocesso.getUnidade().getCodigo())
-                .orElse(null);
+                .orElseThrow(() -> new ErroInconsistenciaInterna(
+                        "Snapshot da unidade %d ausente no processo %d".formatted(
+                                subprocesso.getUnidade().getCodigo(),
+                                subprocesso.getProcesso().getCodigo()
+                        )));
     }
 
-    private String buscarResponsavelTitulo(Long unidadeCodigo) {
+    private @Nullable String buscarResponsavelTitulo(Long unidadeCodigo) {
         UnidadeResponsavelDto responsavel = responsavelUnidadeService.buscarResponsavelUnidadeOpt(unidadeCodigo)
                 .orElse(null);
         if (responsavel == null) {
@@ -297,29 +302,29 @@ public class DiagnosticoConsultaService {
                 : responsavel.titularTitulo();
     }
 
-    private Integer resolverConsensoImportancia(AvaliacaoServidor avaliacao) {
+    private @Nullable Integer resolverConsensoImportancia(AvaliacaoServidor avaliacao) {
         return consensoEspelhadoDaAutoavaliacao(avaliacao) ? null : avaliacao.getConsensoImportancia();
     }
 
-    private Integer resolverConsensoDominio(AvaliacaoServidor avaliacao) {
+    private @Nullable Integer resolverConsensoDominio(AvaliacaoServidor avaliacao) {
         return consensoEspelhadoDaAutoavaliacao(avaliacao) ? null : avaliacao.getConsensoDominio();
     }
 
-    private Integer resolverImportanciaParaDiagnosticoUnidade(AvaliacaoServidor avaliacao) {
+    private @Nullable Integer resolverImportanciaParaDiagnosticoUnidade(AvaliacaoServidor avaliacao) {
         Integer consenso = resolverConsensoImportancia(avaliacao);
         return consenso != null ? consenso : resolverImportanciaServidorParaConsenso(avaliacao);
     }
 
-    private Integer resolverDominioParaDiagnosticoUnidade(AvaliacaoServidor avaliacao) {
+    private @Nullable Integer resolverDominioParaDiagnosticoUnidade(AvaliacaoServidor avaliacao) {
         Integer consenso = resolverConsensoDominio(avaliacao);
         return consenso != null ? consenso : resolverDominioServidorParaConsenso(avaliacao);
     }
 
-    private Integer resolverImportanciaServidorParaConsenso(AvaliacaoServidor avaliacao) {
+    private @Nullable Integer resolverImportanciaServidorParaConsenso(AvaliacaoServidor avaliacao) {
         return autoavaliacaoDisponivelParaConsenso(avaliacao) ? avaliacao.getAutoimportancia() : null;
     }
 
-    private Integer resolverDominioServidorParaConsenso(AvaliacaoServidor avaliacao) {
+    private @Nullable Integer resolverDominioServidorParaConsenso(AvaliacaoServidor avaliacao) {
         return autoavaliacaoDisponivelParaConsenso(avaliacao) ? avaliacao.getAutodominio() : null;
     }
 

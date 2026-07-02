@@ -56,7 +56,8 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(u);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
             when(validacaoService.validarSubprocessosParaFinalizacao(codProcesso, TipoProcesso.MAPEAMENTO)).thenReturn(ResultadoValidacao.ofValido());
@@ -81,27 +82,30 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             // Lacuna A: REVISAO_MAPA_COM_SUGESTOES, REVISAO_MAPA_AJUSTADO, REVISAO_CADASTRO_HOMOLOGADA
             Subprocesso s1 = new Subprocesso();
             s1.setCodigo(101L);
-            s1.setSituacao(REVISAO_MAPA_COM_SUGESTOES);
             Unidade u1 = criarUnidadeValida(10L);
             s1.setUnidade(u1);
 
             Subprocesso s2 = new Subprocesso();
             s2.setCodigo(102L);
-            s2.setSituacao(REVISAO_MAPA_AJUSTADO);
             Unidade u2 = criarUnidadeValida(20L);
             s2.setUnidade(u2);
 
             Subprocesso s3 = new Subprocesso();
             s3.setCodigo(103L);
-            s3.setSituacao(REVISAO_CADASTRO_HOMOLOGADA);
             Unidade u3 = criarUnidadeValida(30L);
             s3.setUnidade(u3);
 
             Processo p = new Processo();
             p.setCodigo(codProcesso);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
-            p.setTipo(MAPEAMENTO);
+            p.setTipo(REVISAO);
             p.adicionarParticipantes(Set.of(u1, u2, u3));
+            s1.setProcesso(p);
+            s1.setSituacaoForcada(REVISAO_MAPA_COM_SUGESTOES);
+            s2.setProcesso(p);
+            s2.setSituacaoForcada(REVISAO_MAPA_AJUSTADO);
+            s3.setProcesso(p);
+            s3.setSituacaoForcada(REVISAO_CADASTRO_HOMOLOGADA);
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(s1, s2, s3));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
@@ -129,15 +133,15 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(u);
-            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO); // Garantir elegibilidade
-            sp.setDataLimiteEtapa1(null); // Lacuna linha 991 (Case 1: A=null, B=null)
-            sp.setDataLimiteEtapa2(null);
-
             Processo p = new Processo();
             p.setCodigo(codProcesso);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(MAPEAMENTO);
             p.adicionarParticipantes(Set.of(u));
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(MAPEAMENTO_MAPA_CRIADO); // Garantir elegibilidade
+            sp.setDataLimiteEtapa1(null); // Lacuna linha 991 (Case 1: A=null, B=null)
+            sp.setDataLimiteEtapa2(null);
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
@@ -160,16 +164,16 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(u);
-            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-            sp.setDataLimiteEtapa1(null);
-            LocalDateTime data2 = LocalDateTime.now();
-            sp.setDataLimiteEtapa2(data2); // Lacuna linha 991 (Case 2: A=null, B!=null)
-
             Processo p = new Processo();
             p.setCodigo(codProcesso);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(MAPEAMENTO);
             p.adicionarParticipantes(Set.of(u));
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(MAPEAMENTO_MAPA_CRIADO);
+            sp.setDataLimiteEtapa1(null);
+            LocalDateTime data2 = LocalDateTime.now();
+            sp.setDataLimiteEtapa2(data2); // Lacuna linha 991 (Case 2: A=null, B!=null)
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
@@ -192,14 +196,13 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(u);
-            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
-
             Processo p = new Processo();
             p.setCodigo(codProcesso);
             p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
             p.setTipo(MAPEAMENTO);
             p.adicionarParticipantes(Set.of(u));
             sp.setProcesso(p);
+            sp.setSituacaoForcada(MAPEAMENTO_MAPA_CRIADO);
             when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
@@ -228,9 +231,9 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(MAPEAMENTO_MAPA_CRIADO);
             sp.setUnidade(u);
             sp.setProcesso(p);
+            sp.setSituacaoForcada(MAPEAMENTO_MAPA_CRIADO);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
@@ -260,9 +263,9 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(MAPEAMENTO_MAPA_VALIDADO);
             sp.setUnidade(u);
             sp.setProcesso(p);
+            sp.setSituacaoForcada(MAPEAMENTO_MAPA_VALIDADO);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
@@ -293,9 +296,9 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             // Subprocesso não elegível para nenhuma ação em bloco
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
             sp.setUnidade(u);
             sp.setProcesso(p);
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(sp.getCodigo(), u));
@@ -316,24 +319,27 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
 
             Subprocesso s1 = new Subprocesso();
             s1.setCodigo(101L);
-            s1.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade u1 = new Unidade();
             u1.setCodigo(10L);
             s1.setUnidade(u1);
+            s1.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            s1.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
             Subprocesso s2 = new Subprocesso();
             s2.setCodigo(102L);
-            s2.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             Unidade u2 = new Unidade();
             u2.setCodigo(20L);
             s2.setUnidade(u2);
+            s2.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            s2.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             Subprocesso s3 = new Subprocesso();
             s3.setCodigo(103L);
-            s3.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO); // Não elegível
             Unidade u3 = new Unidade();
             u3.setCodigo(30L);
             s3.setUnidade(u3);
+            s3.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            s3.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO); // Não elegível
 
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProcesso), anyList())).thenReturn(List.of(s1, s2, s3));
             when(localizacaoSubprocessoService.obterLocalizacoesAtuais(anyCollection())).thenReturn(Map.of(
@@ -383,7 +389,8 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(uPai);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             // Filho não tem subprocesso para cobrir branch sp != null
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
@@ -406,8 +413,9 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             sp.setUnidade(new Unidade());
+            sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
@@ -427,8 +435,9 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
             sp.setUnidade(new Unidade());
+            sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_MAPA_CRIADO);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, DISPONIBILIZAR_MAPA)).thenReturn(false);
@@ -576,18 +585,20 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Processo p = new Processo();
             p.setCodigo(cod);
             p.setTipo(MAPEAMENTO);
+            p.setSituacao(EM_ANDAMENTO);
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             u.setUnidadeAtivaCodigo(10L);
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
             uni.setNome("Unidade 10");
             uni.setSigla("U10");
             sp.setUnidade(uni);
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             java.time.LocalDateTime now = java.time.LocalDateTime.now();
             sp.setDataLimiteEtapa1(now.plusDays(2));
             sp.setDataLimiteEtapa2(now.plusDays(1));
@@ -611,18 +622,20 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Processo p = new Processo();
             p.setCodigo(cod);
             p.setTipo(MAPEAMENTO);
+            p.setSituacao(EM_ANDAMENTO);
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             u.setUnidadeAtivaCodigo(10L);
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
             uni.setNome("Unidade 10");
             uni.setSigla("U10");
             sp.setUnidade(uni);
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             java.time.LocalDateTime d1 = java.time.LocalDateTime.now().plusDays(1);
             java.time.LocalDateTime d2 = java.time.LocalDateTime.now().plusDays(2);
             sp.setDataLimiteEtapa1(d1);
@@ -647,13 +660,13 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             Processo p = new Processo();
             p.setCodigo(cod);
             p.setTipo(MAPEAMENTO);
+            p.setSituacao(EM_ANDAMENTO);
             Usuario u = new Usuario();
             u.setPerfilAtivo(Perfil.ADMIN);
             u.setUnidadeAtivaCodigo(10L);
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Unidade uni = new Unidade();
             uni.setCodigo(10L);
             uni.setSigla("U10");
@@ -661,6 +674,8 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
             uni.setTipo(TipoUnidade.OPERACIONAL);
             uni.setSituacao(SituacaoUnidade.ATIVA);
             sp.setUnidade(uni);
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(sgc.subprocesso.model.SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             sp.setDataLimiteEtapa1(java.time.LocalDateTime.now());
             sp.setMapa(null);
 
@@ -703,7 +718,8 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
         subprocesso.setUnidade(unidade);
-        subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setProcesso(processo);
+        subprocesso.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(1));
 
         when(repo.buscar(Processo.class, cod)).thenReturn(processo);
@@ -740,6 +756,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
         processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
 
         Unidade unidade = criarUnidadeValida(10L);
         unidade.setNome(" ");
@@ -763,6 +780,7 @@ class ProcessoServiceConsultaTest extends ProcessoServiceTestBase {
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
         processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
 
         Unidade unidade = criarUnidadeValida(10L);
         unidade.setSigla("");

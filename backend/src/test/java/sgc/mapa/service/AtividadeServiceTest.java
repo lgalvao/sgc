@@ -9,6 +9,7 @@ import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -37,6 +38,19 @@ class AtividadeServiceTest {
 
     @InjectMocks
     private AtividadeService atividadeService;
+
+    private Subprocesso criarSubprocessoMapeamento(Long codigo, SituacaoSubprocesso situacao) {
+        Processo processo = new Processo();
+        processo.setCodigo(100L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(codigo);
+        subprocesso.setProcesso(processo);
+        subprocesso.setSituacaoForcada(situacao);
+        return subprocesso;
+    }
 
     @Nested
     @DisplayName("obterAtividadePorId")
@@ -344,9 +358,7 @@ class AtividadeServiceTest {
         void deveLancarErroAcessoNegado() {
             Long mapaCodigo = 1L;
             Usuario usuario = new Usuario();
-            Subprocesso subprocesso = new Subprocesso();
-            subprocesso.setCodigo(2L);
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+            Subprocesso subprocesso = criarSubprocessoMapeamento(2L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);
@@ -362,9 +374,7 @@ class AtividadeServiceTest {
         void deveLancarErroValidacaoSituacao() {
             Long mapaCodigo = 1L;
             Usuario usuario = new Usuario();
-            Subprocesso subprocesso = new Subprocesso();
-            subprocesso.setCodigo(2L);
-            subprocesso.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO); // Situacao nao permitida
+            Subprocesso subprocesso = criarSubprocessoMapeamento(2L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO); // Situacao nao permitida
 
             when(consultaService.obterEntidadePorCodigoMapa(mapaCodigo)).thenReturn(subprocesso);
             when(usuarioService.usuarioAutenticado()).thenReturn(usuario);

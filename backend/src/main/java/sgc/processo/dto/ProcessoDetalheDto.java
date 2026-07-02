@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 import java.time.*;
 import java.util.*;
@@ -27,9 +28,9 @@ public class ProcessoDetalheDto {
     private String situacao;
     private LocalDateTime dataLimite;
     private LocalDateTime dataCriacao;
-    private LocalDateTime dataFinalizacao;
+    private @Nullable LocalDateTime dataFinalizacao;
     private boolean podeFinalizar;
-    private String mensagemFinalizacao;
+    private @Nullable String mensagemFinalizacao;
     private boolean podeHomologarCadastro;
     private boolean podeHomologarMapa;
     private boolean podeAceitarCadastroBloco;
@@ -69,11 +70,11 @@ public class ProcessoDetalheDto {
         private String nome;
         private String sigla;
         private Long codUnidade;
-        private Long codUnidadeSuperior;
-        private String situacaoSubprocesso;
+        private @Nullable Long codUnidadeSuperior;
+        private @Nullable String situacaoSubprocesso;
         private LocalDateTime dataLimite;
-        private Long mapaCodigo;
-        private Long codSubprocesso;
-        private Long localizacaoAtualCodigo;
+        private @Nullable Long mapaCodigo;
+        private @Nullable Long codSubprocesso;
+        private @Nullable Long localizacaoAtualCodigo;
     }
 }

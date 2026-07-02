@@ -536,13 +536,13 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
 
             Subprocesso sCad = new Subprocesso();
             sCad.setCodigo(10L);
-            sCad.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             sCad.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            sCad.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
             Subprocesso sVal = new Subprocesso();
             sVal.setCodigo(20L);
-            sVal.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             sVal.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            sVal.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             when(consultaService.listarEntidadesPorProcessoEUnidades(eq(1L), anyList()))
                     .thenReturn(List.of(sCad, sVal));
@@ -829,7 +829,8 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(u);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             sp.setMapa(null); // Explicitly null
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
@@ -860,7 +861,8 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(u);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+            sp.setProcesso(p);
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
             Mapa mapa = new Mapa();
             mapa.setCodigo(500L);
             sp.setMapa(mapa);
@@ -893,7 +895,8 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
             sp.setUnidade(new Unidade());
-            sp.setSituacao(situacao);
+            sp.setProcesso(criarProcessoTeste(situacao.name().startsWith("REVISAO") ? REVISAO : MAPEAMENTO));
+            sp.setSituacaoForcada(situacao);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(), any(), any())).thenReturn(true);
@@ -919,7 +922,8 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
             Unidade unidade = new Unidade();
             unidade.setCodigo(10L);
             sp.setUnidade(unidade);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
+            sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_COM_SUGESTOES);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(permissionEvaluator.verificarPermissaoSilenciosa(any(), any(), any())).thenReturn(true);
@@ -941,8 +945,9 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
 
             Subprocesso sp = new Subprocesso();
             sp.setCodigo(100L);
-            sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
             sp.setUnidade(new Unidade());
+            sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
+            sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
 
             when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(sp));
             when(permissionEvaluator.verificarPermissaoSilenciosa(usuario, sp, ACEITAR_MAPA)).thenReturn(false);
@@ -1175,7 +1180,8 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
         subprocesso.setUnidade(unidade);
-        subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocesso.setProcesso(processo);
+        subprocesso.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocesso.setDataLimiteEtapa1(LocalDateTime.now().plusDays(1));
 
         when(repo.buscar(Processo.class, cod)).thenReturn(processo);
@@ -1288,11 +1294,11 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.HOMOLOGAR);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
-        sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Unidade u = new Unidade();
         u.setCodigo(10L);
         sp.setUnidade(u);
         sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
+        sp.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(sp));
         Usuario usuario = new Usuario();
@@ -1440,19 +1446,19 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
 
         Subprocesso spCadastro = new Subprocesso();
         spCadastro.setCodigo(100L);
-        spCadastro.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Unidade u1 = new Unidade();
         u1.setCodigo(10L);
         spCadastro.setUnidade(u1);
         spCadastro.setProcesso(criarProcessoTeste(MAPEAMENTO));
+        spCadastro.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         Subprocesso spValidacao = new Subprocesso();
         spValidacao.setCodigo(200L);
-        spValidacao.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
         Unidade u2 = new Unidade();
         u2.setCodigo(20L);
         spValidacao.setUnidade(u2);
         spValidacao.setProcesso(criarProcessoTeste(MAPEAMENTO));
+        spValidacao.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(eq(codProc), anyList())).thenReturn(List.of(spCadastro, spValidacao));
         Usuario usuario = new Usuario();
@@ -1474,11 +1480,11 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.DISPONIBILIZAR);
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
-        sp.setSituacao(MAPEAMENTO_MAPA_DISPONIBILIZADO);
         Unidade u = new Unidade();
         u.setCodigo(10L);
         sp.setUnidade(u);
         sp.setProcesso(criarProcessoTeste(MAPEAMENTO));
+        sp.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
         Usuario usuario = new Usuario();
 
         when(consultaService.listarEntidadesPorProcessoEUnidades(codProc, List.of(10L))).thenReturn(List.of(sp));
@@ -1539,6 +1545,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
         processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
 
         Unidade unidade = criarUnidadeValida(10L);
         unidade.setNome(" ");
@@ -1562,6 +1569,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         Processo processo = new Processo();
         processo.setCodigo(codProcesso);
         processo.setTipo(MAPEAMENTO);
+        processo.setSituacao(EM_ANDAMENTO);
 
         Unidade unidade = criarUnidadeValida(10L);
         unidade.setSigla("");
@@ -1826,11 +1834,11 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         ProcessarAnaliseEmBlocoCommand req = new ProcessarAnaliseEmBlocoCommand(List.of(10L), AcaoProcesso.ACEITAR);
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);
-        subprocesso.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         subprocesso.setUnidade(unidade);
         subprocesso.setProcesso(criarProcessoTeste(MAPEAMENTO));
+        subprocesso.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Usuario usuario = new Usuario();
 
         when(usuarioService.usuarioAutenticado()).thenReturn(usuario);

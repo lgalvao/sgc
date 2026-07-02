@@ -9,6 +9,7 @@ import org.springframework.test.context.bean.override.mockito.*;
 import org.springframework.test.web.servlet.*;
 import sgc.alerta.model.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.seguranca.*;
 import sgc.subprocesso.model.*;
 
@@ -51,7 +52,8 @@ class NotificacaoControllerTest {
 
     private NotificacaoEmail notificacao() {
         Unidade unidade = Unidade.builder().sigla("SEC").build();
-        Subprocesso subprocesso = Subprocesso.builder().codigo(60000L).unidade(unidade).build();
+        Processo processo = Processo.builder().codigo(123L).descricao("Processo teste").tipo(TipoProcesso.MAPEAMENTO).build();
+        Subprocesso subprocesso = Subprocesso.builder().codigo(60000L).unidade(unidade).processo(processo).build();
 
         return NotificacaoEmail.builder()
                 .codigo(10L)

@@ -9,6 +9,7 @@ import sgc.mapa.dto.*;
 import sgc.mapa.model.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.util.*;
@@ -39,6 +40,19 @@ class MapaVisualizacaoServiceTest {
         unidade.setNome(nome);
         unidade.setTipo(TipoUnidade.OPERACIONAL);
         return unidade;
+    }
+
+    private Subprocesso criarSubprocessoMapeamento(Long codigo, SituacaoSubprocesso situacao) {
+        Processo processo = new Processo();
+        processo.setCodigo(100L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(codigo);
+        subprocesso.setProcesso(processo);
+        subprocesso.setSituacaoForcada(situacao);
+        return subprocesso;
     }
 
     @Test
@@ -99,10 +113,8 @@ class MapaVisualizacaoServiceTest {
     @Test
     @DisplayName("Deve lançar ErroInconsistenciaInterna se situação exigir mapa mas não for encontrado")
     void deveLancarErroSeNaoEncontrarMapaNaSituacaoDeMapa() {
-        Subprocesso sub = new Subprocesso();
-        sub.setCodigo(1L);
+        Subprocesso sub = criarSubprocessoMapeamento(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         sub.setUnidade(criarUnidade(102L, "UND102", "Unidade 102"));
-        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
 
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
 
@@ -162,9 +174,7 @@ class MapaVisualizacaoServiceTest {
     @Test
     @DisplayName("Deve retornar resposta vazia se mapa não encontrado fora de etapa de mapa")
     void deveRetornarVazioSeMapaNaoEncontradoForaDeEtapaDeMapa() {
-        Subprocesso sub = new Subprocesso();
-        sub.setCodigo(1L);
-        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        Subprocesso sub = criarSubprocessoMapeamento(1L, SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         Unidade u = criarUnidade(105L, "UND105", "Unidade 105");
         sub.setUnidade(u);
@@ -180,9 +190,7 @@ class MapaVisualizacaoServiceTest {
     @Test
     @DisplayName("Deve falhar se mapa não encontrado em etapa de mapa")
     void deveFalharSeMapaNaoEncontradoEmEtapaDeMapa() {
-        Subprocesso sub = new Subprocesso();
-        sub.setCodigo(1L);
-        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
+        Subprocesso sub = criarSubprocessoMapeamento(1L, SituacaoSubprocesso.MAPEAMENTO_MAPA_DISPONIBILIZADO);
         sub.setUnidade(criarUnidade(106L, "UND106", "Unidade 106"));
         sub.setMapa(new Mapa());
         when(mapaRepo.buscarCompletoPorSubprocesso(1L)).thenReturn(Optional.empty());
@@ -195,9 +203,7 @@ class MapaVisualizacaoServiceTest {
     @Test
     @DisplayName("Deve ignorar mapa pendurado no subprocesso quando o carregamento completo nao encontrar mapa")
     void deveIgnorarMapaPenduradoQuandoCarregamentoCompletoNaoEncontrarMapa() {
-        Subprocesso sub = new Subprocesso();
-        sub.setCodigo(3L);
-        sub.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        Subprocesso sub = criarSubprocessoMapeamento(3L, SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         sub.setUnidade(criarUnidade(107L, "UND107", "Unidade 107"));
         Mapa mapaPendurado = new Mapa();
         mapaPendurado.setCodigo(300L);

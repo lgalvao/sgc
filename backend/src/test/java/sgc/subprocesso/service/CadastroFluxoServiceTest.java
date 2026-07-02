@@ -232,13 +232,10 @@ class CadastroFluxoServiceTest {
     @Test
     @DisplayName("iniciarRevisaoCadastro - com subprocesso não iniciado")
     void iniciarRevisaoCadastroComNaoIniciado() {
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = criarSubprocesso(REVISAO, NAO_INICIADO, new Unidade());
         sp.setCodigo(100L);
-        sp.setSituacao(NAO_INICIADO);
         sp.setMapa(new sgc.mapa.model.Mapa());
         sp.getMapa().setCodigo(1000L);
-        sp.setUnidade(new Unidade());
-        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
@@ -251,13 +248,10 @@ class CadastroFluxoServiceTest {
     @Test
     @DisplayName("cancelarInicioRevisaoCadastro - com subprocesso em revisão em andamento")
     void cancelarInicioRevisaoCadastroComRevisaoEmAndamento() {
-        Subprocesso sp = new Subprocesso();
+        Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_CADASTRO_EM_ANDAMENTO, new Unidade());
         sp.setCodigo(100L);
-        sp.setSituacao(REVISAO_CADASTRO_EM_ANDAMENTO);
         sp.setMapa(new sgc.mapa.model.Mapa());
         sp.getMapa().setCodigo(1000L);
-        sp.setUnidade(new Unidade());
-        sp.setProcesso(Processo.builder().tipo(TipoProcesso.REVISAO).build());
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
@@ -270,15 +264,10 @@ class CadastroFluxoServiceTest {
     @Test
     @DisplayName("executarDevolucao deve encontrar unidade de devolução subordinada")
     void executarDevolucaoEncontraSubordinada() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         Unidade uBase = new Unidade();
         uBase.setCodigo(10L);
-        sp.setUnidade(uBase);
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.MAPEAMENTO);
-        sp.setProcesso(p);
+        Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, uBase);
+        sp.setCodigo(1L);
 
         Unidade uAnalise = new Unidade();
         uAnalise.setCodigo(20L);
@@ -306,16 +295,11 @@ class CadastroFluxoServiceTest {
     @Test
     @DisplayName("executarHomologacao - com processo REVISAO")
     void executarHomologacaoComRevisao() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
-        Processo p = new Processo();
-        p.setTipo(TipoProcesso.REVISAO);
-        sp.setProcesso(p);
         Unidade unidade = new Unidade();
         unidade.setCodigo(10L);
         unidade.setSigla("U10");
-        sp.setUnidade(unidade);
+        Subprocesso sp = criarSubprocesso(REVISAO, REVISAO_CADASTRO_DISPONIBILIZADA, unidade);
+        sp.setCodigo(1L);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
         when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(new Usuario());
@@ -410,11 +394,11 @@ class CadastroFluxoServiceTest {
     }
 
     @Test
-    @DisplayName("iniciarRevisaoCadastro deve funcionar mesmo com processo nulo")
-    void iniciarRevisaoCadastroDeveFuncionarMesmoComProcessoNulo() {
+    @DisplayName("iniciarRevisaoCadastro deve exigir processo associado")
+    void iniciarRevisaoCadastroDeveExigirProcessoAssociado() {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(100L);
-        sp.setSituacao(NAO_INICIADO);
+        sp.setSituacaoForcada(NAO_INICIADO);
         sp.setMapa(new sgc.mapa.model.Mapa());
         sp.getMapa().setCodigo(1000L);
         sp.setUnidade(new Unidade());
@@ -422,10 +406,8 @@ class CadastroFluxoServiceTest {
 
         when(consultaService.buscarSubprocesso(100L)).thenReturn(sp);
 
-        service.iniciarRevisaoCadastro(100L);
-
-        assertThat(sp.getSituacao()).isEqualTo(REVISAO_CADASTRO_EM_ANDAMENTO);
-        verify(subprocessoRepo).save(sp);
+        assertThatThrownBy(() -> service.iniciarRevisaoCadastro(100L))
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -458,12 +440,13 @@ class CadastroFluxoServiceTest {
     @Test
     @DisplayName("obterContextoCadastro deve lancar excecao para tipo de processo sem fluxo de cadastro")
     void obterContextoCadastroTipoSemFluxoDeveLancarExcecao() {
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(1L);
-        sp.setSituacao(REVISAO_CADASTRO_DISPONIBILIZADA);
         Processo p = new Processo();
         p.setTipo(TipoProcesso.DIAGNOSTICO);
+        p.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(1L);
         sp.setProcesso(p);
+        sp.setSituacaoForcada(REVISAO_CADASTRO_DISPONIBILIZADA);
 
         when(consultaService.buscarSubprocesso(1L)).thenReturn(sp);
 

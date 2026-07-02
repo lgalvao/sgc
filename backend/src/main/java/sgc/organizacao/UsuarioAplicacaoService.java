@@ -98,7 +98,7 @@ public class UsuarioAplicacaoService {
     }
 
     @Transactional(readOnly = true)
-    public Usuario buscarResponsavelAtual(String sigla) {
+    public @Nullable Usuario buscarResponsavelAtual(String sigla) {
         return responsavelUnidadeService.buscarResponsavelAtual(sigla);
     }
 

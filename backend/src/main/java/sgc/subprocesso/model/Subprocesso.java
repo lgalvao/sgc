@@ -56,8 +56,8 @@ public class Subprocesso extends EntidadeBase {
         return mapa != null ? mapa.getAtividades() : Collections.emptySet();
     }
 
-    public @Nullable Long getCodProcesso() {
-        return processo != null ? processo.getCodigo() : null;
+    public Long getCodProcesso() {
+        return processo.getCodigo();
     }
 
     public @Nullable Long getCodUnidade() {
@@ -69,7 +69,7 @@ public class Subprocesso extends EntidadeBase {
     }
 
     public void setSituacao(SituacaoSubprocesso novaSituacao) {
-        if (processo != null && situacao != null && situacao != novaSituacao && !situacao.podeTransicionarPara(novaSituacao, processo.getTipo())) {
+        if (situacao != novaSituacao && !situacao.podeTransicionarPara(novaSituacao, processo.getTipo())) {
             throw new ErroValidacao(Mensagens.TRANSICAO_INVALIDA.formatted(
                     situacao.getDescricao(), novaSituacao.getDescricao())
             );

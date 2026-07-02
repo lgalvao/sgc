@@ -110,6 +110,21 @@ class E2eControllerTest {
         when(resourceLoader.getResource(path)).thenReturn(mockResource);
     }
 
+    private Processo criarProcessoValido(Long codigo) {
+        return criarProcessoValido(codigo, "Processo fixture");
+    }
+
+    private Processo criarProcessoValido(Long codigo, String descricao) {
+        Processo processo = new Processo();
+        processo.setCodigo(codigo);
+        processo.setDescricao(descricao);
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+        processo.setDataCriacao(java.time.LocalDateTime.now());
+        processo.setDataLimite(java.time.LocalDateTime.now().plusDays(30));
+        return processo;
+    }
+
     @Test
     @DisplayName("Deve limpar dados do processo e suas dependências")
     void deveLimparDadosDoProcessoComDependentes() {
@@ -260,8 +275,7 @@ class E2eControllerTest {
 
         when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
-        Processo proc = new Processo();
-        proc.setCodigo(100L);
+        Processo proc = criarProcessoValido(100L);
         when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
 
         ProcessoResumoDto result = controller.criarProcessoMapeamento(req);
@@ -300,8 +314,7 @@ class E2eControllerTest {
                 """);
 
         when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(999L);
-        Processo processoNovo = new Processo();
-        processoNovo.setCodigo(101L);
+        Processo processoNovo = criarProcessoValido(101L, "Novo processo");
         when(processoService.criar(any())).thenReturn(processoNovo);
 
         E2eController.ProcessoFixtureRequest req = new E2eController.ProcessoFixtureRequest(
@@ -325,8 +338,7 @@ class E2eControllerTest {
 
         when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
-        Processo proc = new Processo();
-        proc.setCodigo(100L);
+        Processo proc = criarProcessoValido(100L, "Desc");
         when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
 
@@ -343,8 +355,7 @@ class E2eControllerTest {
                 "   ", "SIGLA", false, 10);
 
         when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
-        Processo proc = new Processo();
-        proc.setCodigo(100L);
+        Processo proc = criarProcessoValido(100L);
         when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
 
         controller.criarProcessoRevisao(req);
@@ -363,8 +374,7 @@ class E2eControllerTest {
 
         when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(1L);
 
-        Processo proc = new Processo();
-        proc.setCodigo(100L);
+        Processo proc = criarProcessoValido(100L, "Desc");
         when(processoService.criar(any(CriarProcessoRequest.class))).thenReturn(proc);
         when(processoService.buscarPorCodigo(100L)).thenReturn(proc);
 
@@ -507,7 +517,7 @@ class E2eControllerTest {
 
             when(unidadeServiceMock.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
 
-            Processo dto = Processo.builder().codigo(100L).build();
+            Processo dto = criarProcessoValido(100L);
             when(processoServiceMock.criar(any())).thenReturn(dto);
             when(usuarioAplicacaoServiceMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
@@ -526,7 +536,7 @@ class E2eControllerTest {
 
             when(unidadeServiceMock.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
 
-            Processo dto = Processo.builder().codigo(100L).build();
+            Processo dto = criarProcessoValido(100L);
             when(processoServiceMock.criar(any())).thenReturn(dto);
             when(usuarioAplicacaoServiceMock.buscarPorLogin(anyString())).thenReturn(new Usuario());
 
@@ -655,7 +665,7 @@ class E2eControllerTest {
             unidade.setSigla("SIGLA");
             when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
             when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
-            Processo processo = Processo.builder().codigo(100L).build();
+            Processo processo = criarProcessoValido(100L);
             when(processoService.criar(any())).thenReturn(processo);
             when(processoService.buscarPorCodigo(anyLong())).thenReturn(processo);
 
@@ -677,7 +687,7 @@ class E2eControllerTest {
             unidade.setUnidadeSuperior(superior);
             when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
 
-            Processo processo = Processo.builder().codigo(100L).build();
+            Processo processo = criarProcessoValido(100L);
             when(processoService.criar(any())).thenReturn(processo);
             when(processoService.buscarPorCodigo(anyLong())).thenReturn(processo);
 
@@ -748,7 +758,7 @@ class E2eControllerTest {
 
             when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
 
-            Processo dto = Processo.builder().codigo(100L).build();
+            Processo dto = criarProcessoValido(100L, "Desc");
             when(processoService.criar(any())).thenReturn(dto);
             when(processoService.buscarPorCodigo(100L)).thenReturn(dto);
 
@@ -761,7 +771,7 @@ class E2eControllerTest {
             mapa.setCodigo(300L);
             when(mapaRepo.buscarPorSubprocesso(200L)).thenReturn(Optional.of(mapa));
 
-            when(processoRepo.findById(100L)).thenReturn(Optional.of(new Processo()));
+            when(processoRepo.findById(100L)).thenReturn(Optional.of(criarProcessoValido(100L, "Desc")));
             when(jdbcTemplate.queryForObject(anyString(), eq(Long.class), any(Object[].class))).thenReturn(400L);
 
             ProcessoResumoDto result = controller.criarProcessoFinalizadoComAtividades(req);
@@ -783,7 +793,7 @@ class E2eControllerTest {
             unidade.setUnidadeSuperior(superior);
             when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
 
-            Processo dto = Processo.builder().codigo(100L).build();
+            Processo dto = criarProcessoValido(100L, "Desc");
             when(processoService.criar(any())).thenReturn(dto);
             when(processoService.buscarPorCodigo(100L)).thenReturn(dto);
 
@@ -820,7 +830,7 @@ class E2eControllerTest {
             unidade.setUnidadeSuperior(superior);
             when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
 
-            Processo dto = Processo.builder().codigo(100L).build();
+            Processo dto = criarProcessoValido(100L, "Desc");
             when(processoService.criar(any())).thenReturn(dto);
             when(processoService.buscarPorCodigo(anyLong())).thenReturn(dto);
 
@@ -835,7 +845,7 @@ class E2eControllerTest {
             when(jdbcTemplate.queryForObject(startsWith("SELECT codigo FROM sgc.atividade"), eq(Long.class), any(), any()))
                     .thenReturn(400L);
 
-            when(processoRepo.findById(anyLong())).thenReturn(Optional.of(new Processo()));
+            when(processoRepo.findById(anyLong())).thenReturn(Optional.of(criarProcessoValido(100L, "Desc")));
 
             ProcessoResumoDto result = controller.criarProcessoRevisaoComCadastroDisponibilizado(req);
 
@@ -856,7 +866,7 @@ class E2eControllerTest {
             unidade.setUnidadeSuperior(superior);
             when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
 
-            Processo dto = Processo.builder().codigo(100L).build();
+            Processo dto = criarProcessoValido(100L, "Desc");
             when(processoService.criar(any())).thenReturn(dto);
             when(processoService.buscarPorCodigo(anyLong())).thenReturn(dto);
 
@@ -1007,7 +1017,7 @@ class E2eControllerTest {
             return mapa;
         });
         when(jdbcTemplateMock.update(anyString(), any(), any(), any(), any(), any(), any())).thenReturn(1);
-        Processo processoRecarregado = Processo.builder().codigo(100L).descricao("Descrição customizada").build();
+        Processo processoRecarregado = criarProcessoValido(100L, "Descrição customizada");
         when(processoService.buscarPorCodigo(100L)).thenReturn(processoRecarregado);
 
         ProcessoResumoDto resultado = controllerComMocks.criarProcessoRevisaoComMapaHomologado(
@@ -1027,7 +1037,7 @@ class E2eControllerTest {
         superior.setCodigo(5L);
         unidade.setUnidadeSuperior(superior);
 
-        Processo processo = Processo.builder().codigo(100L).build();
+        Processo processo = criarProcessoValido(100L, "Desc");
         when(unidadeService.buscarPorSigla("SIGLA")).thenReturn(unidade);
         when(unidadeService.buscarCodigoPorSigla("SIGLA")).thenReturn(10L);
         when(processoService.criar(any())).thenReturn(processo);
@@ -1078,7 +1088,7 @@ class E2eControllerTest {
             return mapa;
         });
         when(jdbcTemplateMock.update(anyString(), any(), any(), any(), any(), any(), any())).thenReturn(1);
-        Processo processoRecarregado = Processo.builder().codigo(101L).descricao("Processo padrão").build();
+        Processo processoRecarregado = criarProcessoValido(101L, "Processo padrão");
         when(processoService.buscarPorCodigo(101L)).thenReturn(processoRecarregado);
 
         controllerComMocks.criarProcessoRevisaoComMapaHomologado(
@@ -1129,7 +1139,7 @@ class E2eControllerTest {
             return mapa;
         });
         when(jdbcTemplateMock.update(anyString(), any(), any(), any(), any(), any(), any())).thenReturn(1);
-        when(processoService.buscarPorCodigo(102L)).thenReturn(Processo.builder().codigo(102L).build());
+        when(processoService.buscarPorCodigo(102L)).thenReturn(criarProcessoValido(102L, "Processo padrão"));
 
         controllerComMocks.criarProcessoRevisaoComMapaHomologado(
                 new E2eController.ProcessoFixtureRequest(null, "SIGLA", false, 30));

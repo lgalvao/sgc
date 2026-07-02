@@ -65,6 +65,19 @@ class SubprocessoServiceTest {
     @InjectMocks
     private SubprocessoService service;
 
+    private Subprocesso criarSubprocessoComMapa(Long codigo) {
+        return criarSubprocessoComMapa(codigo, TipoProcesso.MAPEAMENTO);
+    }
+
+    private Subprocesso criarSubprocessoComMapa(Long codigo, TipoProcesso tipo) {
+        Subprocesso sp = new Subprocesso();
+        sp.setCodigo(codigo);
+        sp.setMapa(new Mapa());
+        sp.setSituacaoForcada(NAO_INICIADO);
+        sp.setProcesso(Processo.builder().tipo(tipo).situacao(SituacaoProcesso.EM_ANDAMENTO).build());
+        return sp;
+    }
+
 
     @Test
     @DisplayName("criarEntidade deve persistir subprocesso e mapa associado")
@@ -121,9 +134,8 @@ class SubprocessoServiceTest {
         Long codCompetencia = 10L;
         Long codMapa = 100L;
 
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(codSubprocesso);
-        sp.setSituacao(situacaoInicial);
+        Subprocesso sp = criarSubprocessoComMapa(codSubprocesso, situacaoInicial.name().startsWith("REVISAO") ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO);
+        sp.setSituacaoForcada(situacaoInicial);
         Mapa mapa = new Mapa();
         mapa.setCodigo(codMapa);
         sp.setMapa(mapa);
@@ -152,9 +164,8 @@ class SubprocessoServiceTest {
                 .atividadesCodigos(List.of(10L))
                 .build();
 
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(codSubprocesso);
-        sp.setSituacao(situacaoInicial);
+        Subprocesso sp = criarSubprocessoComMapa(codSubprocesso, situacaoInicial.name().startsWith("REVISAO") ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO);
+        sp.setSituacaoForcada(situacaoInicial);
         Mapa mapa = new Mapa();
         mapa.setCodigo(codMapa);
         sp.setMapa(mapa);
@@ -185,9 +196,8 @@ class SubprocessoServiceTest {
                         .build()))
                 .build();
 
-        Subprocesso sp = new Subprocesso();
-        sp.setCodigo(codSubprocesso);
-        sp.setSituacao(situacaoInicial);
+        Subprocesso sp = criarSubprocessoComMapa(codSubprocesso, situacaoInicial.name().startsWith("REVISAO") ? TipoProcesso.REVISAO : TipoProcesso.MAPEAMENTO);
+        sp.setSituacaoForcada(situacaoInicial);
         Mapa mapa = new Mapa();
         mapa.setCodigo(codMapa);
         sp.setMapa(mapa);
@@ -637,15 +647,14 @@ class SubprocessoServiceTest {
         Long codDestino = 2L;
         List<Long> itens = List.of(10L);
 
-        Subprocesso spOrigem = new Subprocesso();
-        spOrigem.setCodigo(codOrigem);
-        spOrigem.setMapa(new Mapa()); // Mapa sem codigo (null) - Lacuna linha 451
-        spOrigem.setSituacao(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        Subprocesso spOrigem = criarSubprocessoComMapa(codOrigem);
+        spOrigem.setMapa(new Mapa()); // Mapa sem codigo (null)
+        spOrigem.setSituacaoForcada(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         spOrigem.setUnidade(new Unidade());
+        spOrigem.getProcesso().setSituacao(SituacaoProcesso.FINALIZADO);
 
-        Subprocesso spDestino = new Subprocesso();
-        spDestino.setCodigo(codDestino);
-        spDestino.setSituacao(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
+        Subprocesso spDestino = criarSubprocessoComMapa(codDestino);
+        spDestino.setSituacaoForcada(MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         spDestino.setUnidade(new Unidade());
         Mapa mapaDestino = new Mapa();
         mapaDestino.setCodigo(200L);

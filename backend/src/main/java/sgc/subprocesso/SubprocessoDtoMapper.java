@@ -11,6 +11,7 @@ import sgc.subprocesso.model.*;
 
 import java.time.*;
 import java.util.*;
+import java.util.Objects;
 
 @Component
 public class SubprocessoDtoMapper {
@@ -21,17 +22,15 @@ public class SubprocessoDtoMapper {
     }
 
     public SubprocessoResumoDto paraResumo(Subprocesso subprocesso) {
-        Processo processo = subprocesso.getProcesso();
-        if (processo == null || subprocesso.getUnidade() == null) {
-            throw new ErroInconsistenciaInterna("Subprocesso deve possuir processo e unidade associados");
-        }
+        Processo processo = Objects.requireNonNull(subprocesso.getProcesso(), "Subprocesso deve possuir processo associado");
+        Unidade unidade = Objects.requireNonNull(subprocesso.getUnidade(), "Subprocesso deve possuir unidade associada");
 
         LocalDateTime dataLimiteEtapa1 = subprocesso.getDataLimiteEtapa1();
         LocalDateTime dataLimiteEtapa2 = subprocesso.getDataLimiteEtapa2();
 
         return SubprocessoResumoDto.builder()
                 .codigo(subprocesso.getCodigo())
-                .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(subprocesso.getUnidade()))
+                .unidade(organizacaoDtoMapper.paraUnidadeResumoObrigatoria(unidade))
                 .situacao(subprocesso.getSituacao().name())
                 .dataLimiteEtapa1(dataLimiteEtapa1)
                 .dataFimEtapa1(subprocesso.getDataFimEtapa1())
@@ -39,7 +38,7 @@ public class SubprocessoDtoMapper {
                 .dataFimEtapa2(subprocesso.getDataFimEtapa2())
                 .ultimaDataLimite(calcularUltimaDataLimite(dataLimiteEtapa1, dataLimiteEtapa2))
                 .codProcesso(processo.getCodigo())
-                .codUnidade(subprocesso.getUnidade().getCodigo())
+                .codUnidade(unidade.getCodigo())
                 .codMapa(subprocesso.getCodMapa())
                 .processoDescricao(processo.getDescricao())
                 .dataCriacaoProcesso(processo.getDataCriacao())

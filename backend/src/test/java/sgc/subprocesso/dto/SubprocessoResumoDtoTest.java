@@ -63,8 +63,8 @@ class SubprocessoResumoDtoTest {
         Subprocesso subprocesso = new Subprocesso();
 
         assertThatThrownBy(() -> mapper.paraResumo(subprocesso))
-                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                .hasMessage("Subprocesso deve possuir processo e unidade associados");
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Subprocesso deve possuir processo associado");
     }
 
     @Test
@@ -81,8 +81,8 @@ class SubprocessoResumoDtoTest {
         subprocesso.setProcesso(processo);
 
         assertThatThrownBy(() -> mapper.paraResumo(subprocesso))
-                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                .hasMessage("Subprocesso deve possuir processo e unidade associados");
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Subprocesso deve possuir unidade associada");
     }
 
     @Test

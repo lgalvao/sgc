@@ -69,22 +69,24 @@ class SubprocessoTest {
     }
 
     @Test
-    @DisplayName("Deve permitir mudar situação se processo for nulo")
-    void devePermitirMudarSituacaoSeProcessoNulo() {
+    @DisplayName("Deve lançar erro ao mudar situação sem processo associado")
+    void deveLancarErroAoMudarSituacaoSemProcessoAssociado() {
         Subprocesso sp = new Subprocesso();
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+
+        assertThatThrownBy(() -> sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO))
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
-    @DisplayName("Deve permitir mudar situação se situação atual for nula")
-    void devePermitirMudarSituacaoSeSituacaoAtualNula() {
+    @DisplayName("Deve lançar erro ao mudar situação se situação atual for nula")
+    void deveLancarErroAoMudarSituacaoSeSituacaoAtualNula() {
         Processo p = Processo.builder().tipo(TipoProcesso.MAPEAMENTO).build();
         Subprocesso sp = new Subprocesso();
         sp.setProcesso(p);
         sp.setSituacaoForcada(null);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
-        assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO);
+
+        assertThatThrownBy(() -> sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_MAPA_HOMOLOGADO))
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -189,8 +191,8 @@ class SubprocessoTest {
     }
 
     @Test
-    @DisplayName("Deve retornar codigos quando existem e lidar com nulos")
-    void deveRetornarCodigosApenasQuandoDisponiveis() {
+    @DisplayName("Deve retornar codigos quando existem")
+    void deveRetornarCodigosQuandoExistem() {
         Processo p = new Processo();
         p.setCodigo(1L);
         Unidade u = new Unidade();
@@ -208,11 +210,5 @@ class SubprocessoTest {
         assertThat(spCheio.getCodUnidade()).isEqualTo(2L);
         assertThat(spCheio.getCodMapa()).isEqualTo(3L);
         assertThat(spCheio.getAtividades()).isEmpty(); // mock do mapa ou mapa recem criado
-
-        Subprocesso spVazio = new Subprocesso();
-        assertThat(spVazio.getCodProcesso()).isNull();
-        assertThat(spVazio.getCodUnidade()).isNull();
-        assertThat(spVazio.getCodMapa()).isNull();
-        assertThat(spVazio.getAtividades()).isEmpty();
     }
 }

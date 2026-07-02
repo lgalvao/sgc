@@ -1,6 +1,7 @@
 package sgc.processo.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 import java.time.*;
 
@@ -15,10 +16,10 @@ public record ProcessoResumoDto(
         String tipo,
         LocalDateTime dataLimite,
         LocalDateTime dataCriacao,
-        LocalDateTime dataFinalizacao,
-        Long unidadeCodigo,
-        String unidadeNome,
-        String unidadesParticipantes,
-        String linkDestino
+        @Nullable LocalDateTime dataFinalizacao,
+        @Nullable Long unidadeCodigo,
+        @Nullable String unidadeNome,
+        @Nullable String unidadesParticipantes,
+        @Nullable String linkDestino
 ) {
 }

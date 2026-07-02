@@ -16,8 +16,8 @@ public class ProcessoDtoMapper {
         return ProcessoResumoDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
-                .situacao(processo.getSituacao() != null ? processo.getSituacao().name() : null)
-                .tipo(processo.getTipo() != null ? processo.getTipo().name() : null)
+                .situacao(processo.getSituacao().name())
+                .tipo(processo.getTipo().name())
                 .dataLimite(processo.getDataLimite())
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
@@ -38,8 +38,8 @@ public class ProcessoDtoMapper {
         return ProcessoDetalheDto.builder()
                 .codigo(processo.getCodigo())
                 .descricao(processo.getDescricao())
-                .situacao(processo.getSituacao() != null ? processo.getSituacao().name() : null)
-                .tipo(processo.getTipo() != null ? processo.getTipo().name() : null)
+                .situacao(processo.getSituacao().name())
+                .tipo(processo.getTipo().name())
                 .dataCriacao(processo.getDataCriacao())
                 .dataFinalizacao(processo.getDataFinalizacao())
                 .dataLimite(processo.getDataLimite())
@@ -78,7 +78,7 @@ public class ProcessoDtoMapper {
             Subprocesso subprocesso,
             Unidade localizacaoAtual
     ) {
-        dto.setSituacaoSubprocesso(subprocesso.getSituacao() != null ? subprocesso.getSituacao().name() : null);
+        dto.setSituacaoSubprocesso(subprocesso.getSituacao().name());
         dto.setDataLimite(subprocesso.getDataLimiteEtapa1());
         dto.setCodSubprocesso(subprocesso.getCodigo());
         dto.setMapaCodigo(subprocesso.getMapa() != null ? subprocesso.getMapa().getCodigo() : null);

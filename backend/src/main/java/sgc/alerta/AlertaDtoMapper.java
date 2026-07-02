@@ -23,7 +23,7 @@ public class AlertaDtoMapper {
 
     public NotificacaoDto paraNotificacaoDto(NotificacaoEmail notificacao) {
         Long subprocessoCodigo = notificacao.getSubprocesso() != null ? notificacao.getSubprocesso().getCodigo() : null;
-        String processoDescricao = notificacao.getSubprocesso() != null && notificacao.getSubprocesso().getProcesso() != null
+        String processoDescricao = notificacao.getSubprocesso() != null
                 ? notificacao.getSubprocesso().getProcesso().getDescricao()
                 : null;
 

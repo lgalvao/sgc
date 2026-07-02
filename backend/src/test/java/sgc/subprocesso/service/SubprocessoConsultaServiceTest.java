@@ -177,9 +177,10 @@ class SubprocessoConsultaServiceTest {
         sp.setUnidade(unidade);
         sp.setMapa(mapa);
         mapa.setSubprocesso(sp);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
         sp.setProcesso(new sgc.processo.model.Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
         sp.getProcesso().setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_EM_ANDAMENTO);
 
         when(subprocessoRepo.buscarPorCodigoComMapa(codSubprocesso)).thenReturn(Optional.of(sp));
         when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new sgc.organizacao.ContextoUsuarioAutenticado("123", 100L, sgc.organizacao.model.Perfil.ADMIN));
@@ -208,9 +209,10 @@ class SubprocessoConsultaServiceTest {
         Subprocesso sp = new Subprocesso();
         sp.setCodigo(codSubprocesso);
         sp.setUnidade(unidadeAlvo);
-        sp.setSituacao(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         sp.setProcesso(new sgc.processo.model.Processo());
+        sp.getProcesso().setTipo(TipoProcesso.MAPEAMENTO);
         sp.getProcesso().setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+        sp.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
 
         when(usuarioAplicacaoService.contextoAutenticado()).thenReturn(new sgc.organizacao.ContextoUsuarioAutenticado("admin", 999L, sgc.organizacao.model.Perfil.ADMIN));
         when(unidadeService.buscarPorCodigoComSuperior(999L)).thenReturn(unidadeAdmin);
@@ -1177,12 +1179,12 @@ class SubprocessoConsultaServiceTest {
             }
 
             @Test
-            @DisplayName("deve lancar erro se processo for null")
+            @DisplayName("deve falhar imediatamente se processo estiver ausente")
             void processoNull() {
                 Subprocesso sp = new Subprocesso();
                 sp.setProcesso(null);
                 when(subprocessoRepo.buscarPorCodigoComMapaEAtividades(1L)).thenReturn(Optional.of(sp));
-                assertThatThrownBy(() -> service.listarAtividadesParaImportacao(1L)).isInstanceOf(ErroValidacao.class);
+                assertThatThrownBy(() -> service.listarAtividadesParaImportacao(1L)).isInstanceOf(NullPointerException.class);
             }
 
             @Test

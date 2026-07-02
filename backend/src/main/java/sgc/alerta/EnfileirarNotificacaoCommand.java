@@ -8,7 +8,7 @@ import sgc.subprocesso.model.*;
 @Builder
 public record EnfileirarNotificacaoCommand(
         @Nullable Subprocesso subprocesso,
-        @Nullable TipoNotificacao tipoNotificacao,
+        TipoNotificacao tipoNotificacao,
         @Nullable String usuarioDestinoTitulo,
         @Nullable String unidadeDestinoSigla,
         String destinatario,

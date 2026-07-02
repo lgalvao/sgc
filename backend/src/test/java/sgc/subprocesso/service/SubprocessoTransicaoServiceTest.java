@@ -428,13 +428,8 @@ class SubprocessoTransicaoServiceTest {
         void disponibilizarMapa_DataIgual() {
             Unidade u = new Unidade();
             u.setCodigo(1L);
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, u);
             sp.setCodigo(1L);
-            sp.setUnidade(u);
-            sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            Processo p = new Processo();
-            p.setTipo(MAPEAMENTO);
-            sp.setProcesso(p);
             sp.setMapa(new sgc.mapa.model.Mapa());
             sp.getMapa().setCodigo(100L);
             sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
@@ -460,13 +455,8 @@ class SubprocessoTransicaoServiceTest {
         void disponibilizarMapaComObservacaoEmBranco() {
             Unidade u = new Unidade();
             u.setCodigo(1L);
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, u);
             sp.setCodigo(1L);
-            sp.setUnidade(u);
-            sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            Processo p = new Processo();
-            p.setTipo(MAPEAMENTO);
-            sp.setProcesso(p);
             sp.setMapa(new sgc.mapa.model.Mapa());
             sp.getMapa().setCodigo(100L);
             sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
@@ -489,11 +479,8 @@ class SubprocessoTransicaoServiceTest {
         void disponibilizarMapaEmBloco_ComListaDeSubprocessos() {
             Unidade u = new Unidade();
             u.setCodigo(1L);
-            Subprocesso sp = new Subprocesso();
+            Subprocesso sp = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_HOMOLOGADO, u);
             sp.setCodigo(1L);
-            sp.setUnidade(u);
-            sp.setSituacao(MAPEAMENTO_CADASTRO_HOMOLOGADO);
-            sp.setProcesso(Processo.builder().tipo(MAPEAMENTO).build());
             sp.setMapa(new sgc.mapa.model.Mapa());
             sp.setDataLimiteEtapa1(LocalDateTime.of(2026, 1, 1, 0, 0));
             sp.setDataLimiteEtapa2(LocalDateTime.of(2026, 1, 10, 0, 0));

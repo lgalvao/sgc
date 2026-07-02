@@ -1,6 +1,7 @@
 package sgc.mapa.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 
 import java.time.*;
 
@@ -8,8 +9,8 @@ import java.time.*;
 public record MapaResumoDto(
         Long codigo,
         Long subprocessoCodigo,
-        LocalDateTime dataHoraDisponibilizado,
-        String observacoesDisponibilizacao,
-        String sugestoes,
-        LocalDateTime dataHoraHomologado) {
+        @Nullable LocalDateTime dataHoraDisponibilizado,
+        @Nullable String observacoesDisponibilizacao,
+        @Nullable String sugestoes,
+        @Nullable LocalDateTime dataHoraHomologado) {
 }

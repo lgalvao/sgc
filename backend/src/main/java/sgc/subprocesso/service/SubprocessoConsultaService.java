@@ -186,7 +186,7 @@ public class SubprocessoConsultaService {
 
     public List<AtividadeDto> listarAtividadesParaImportacao(Long codSubprocesso) {
         Subprocesso subprocesso = buscarSubprocesso(codSubprocesso);
-        if (subprocesso.getProcesso() == null || subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
+        if (subprocesso.getProcesso().getSituacao() != SituacaoProcesso.FINALIZADO) {
             throw new ErroValidacao("SGC-MSG-100230");
         }
         return listarAtividadesSubprocesso(subprocesso);

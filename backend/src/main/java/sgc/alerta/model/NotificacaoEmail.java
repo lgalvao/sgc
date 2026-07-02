@@ -23,8 +23,8 @@ public class NotificacaoEmail extends EntidadeBase {
     private @Nullable Subprocesso subprocesso;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_notificacao", length = 80)
-    private @Nullable TipoNotificacao tipoNotificacao;
+    @Column(name = "tipo_notificacao", nullable = false, length = 80)
+    private TipoNotificacao tipoNotificacao;
 
     @Column(name = "usuario_destino_titulo", length = 12)
     private @Nullable String usuarioDestinoTitulo;
