@@ -233,5 +233,5 @@ export async function aceitarOuHomologarMapa(page: Page, observacao: string) {
     await page.getByTestId('btn-aceite-mapa-confirmar').click();
     await expect(modal).toBeHidden();
     await verificarPaginaPainel(page);
-    await verificarToast(page, new RegExp(`${TEXTOS.sucesso.ACEITE_REGISTRADO}|${TEXTOS.mapa.SUCESSO_HOMOLOGACAO}`, 'i'));
+    await verificarToast(page, /Aceite registrado|Mapa homologado/i);
 }

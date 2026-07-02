@@ -38,7 +38,7 @@ public record AtualizarSubprocessoRequest(
 
     public AtualizarPrazosSubprocessoCommand paraPrazosCommand() {
         return AtualizarPrazosSubprocessoCommand.builder()
-                .dataLimiteEtapa1(dataLimiteEtapa1 == null ? Optional.empty() : Optional.of(dataLimiteEtapa1))
+                .dataLimiteEtapa1(Optional.of(dataLimiteEtapa1))
                 .dataFimEtapa1(Optional.ofNullable(dataFimEtapa1))
                 .dataLimiteEtapa2(Optional.ofNullable(dataLimiteEtapa2))
                 .dataFimEtapa2(Optional.ofNullable(dataFimEtapa2))

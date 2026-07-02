@@ -37,8 +37,6 @@ class AssuntosNotificacaoTest {
                 .isEqualTo("SGC: Lembrete de prazo - Processo X");
         assertThat(AssuntosNotificacao.atribuicaoPerfilChefe("SEC"))
                 .isEqualTo("SGC: Atribuição de perfil CHEFE na unidade SEC");
-        assertThat(AssuntosNotificacao.disponibilizacaoMapaBloco())
-                .isEqualTo("SGC: Mapas de competências disponibilizados");
         assertThat(AssuntosNotificacao.aceiteValidacaoBlocoDireto("SEC"))
                 .isEqualTo("SGC: Validação do mapa de competências da SEC submetida para análise");
         assertThat(AssuntosNotificacao.aceiteValidacaoBlocoSuperior())

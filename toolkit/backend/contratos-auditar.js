@@ -138,7 +138,7 @@ function extrairCamposExpostos(conteudo, nomeTipo) {
         if (!limpa || limpa.startsWith("@")) {
             continue;
         }
-        const correspondencia = limpa.match(/^(?:private|protected|public)\s+(?:static\s+)?(?:final\s+)?([\w.<>?]+)\s+([a-zA-Z0-9_]+)\s*(?:=|;)/);
+        const correspondencia = limpa.match(/^(?:private|protected|public)\s+(?:static\s+)?(?:final\s+)?([\w.<>?]+)\s+([a-zA-Z0-9_]+)\s*[=;]/);
         if (!correspondencia) {
             continue;
         }

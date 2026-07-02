@@ -33,7 +33,7 @@ function contarLinhas(conteudo) {
 }
 
 function contarMetodosPublicos(conteudo) {
-    const regex = /^\s+public\s+(?:static\s+)?(?!class|interface|enum|record\b)(?:(?:@\w+(?:\([^)]*\))?\s+)*)(?:[\w<>[\],\s]+)\s+[a-z]\w*\s*\(/gm;
+    const regex = /^\s+public\s+(?:static\s+)?(?!class|interface|enum|record\b)(?:@\w+(?:\([^)]*\))?\s+)*[\w<>[\],\s]+\s+[a-z]\w*\s*\(/gm;
     return (conteudo.match(regex) ?? []).length;
 }
 

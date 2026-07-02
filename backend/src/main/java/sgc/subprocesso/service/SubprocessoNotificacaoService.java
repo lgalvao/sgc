@@ -330,7 +330,7 @@ public class SubprocessoNotificacaoService {
                 .observacoes("Disponibilização em bloco")
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
-        String assunto = AssuntosNotificacao.disponibilizacaoMapaBloco();
+        String assunto = AssuntosNotificacao.disponibilizacaoMapaBloco;
         String corpo = processarTemplate("mapa-disponibilizado-bloco-superior", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
         criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, TipoNotificacao.MAPA_DISPONIBILIZADO, "bloco-superior"));

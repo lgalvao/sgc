@@ -87,7 +87,7 @@ public class OrganizacaoDtoMapper {
                 usuario.unidadeCodigo(),
                 usuario.unidadeNome(),
                 usuario.unidadeSigla(),
-                usuario.unidadeTipo() != null ? usuario.unidadeTipo().name() : null,
+                usuario.unidadeTipo().name(),
                 usuario.unidadeTituloTitular()
         );
 

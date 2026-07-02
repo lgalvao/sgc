@@ -82,9 +82,7 @@ public final class AssuntosNotificacao {
                 : "SGC: Cadastros de atividades e conhecimentos submetidos para análise";
     }
 
-    public static String disponibilizacaoMapaBloco() {
-        return "SGC: Mapas de competências disponibilizados";
-    }
+    public final static String disponibilizacaoMapaBloco = "SGC: Mapas de competências disponibilizados";
 
     private static String descricaoTipoProcessoFinalizacao(TipoProcesso tipoProcesso) {
         return switch (tipoProcesso) {

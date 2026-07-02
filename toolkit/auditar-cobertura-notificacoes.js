@@ -24,7 +24,7 @@ async function listarCdusComEmail() {
         const texto = fs.readFileSync(caminho, 'utf8');
         const assuntos = [...texto.matchAll(/^\s*Assunto:\s*(.+)$/gm)].map(match => match[1].trim());
         const mencionaEmail = assuntos.length > 0
-            || /envia(?:r)? notifica(?:ç|c)(?:ões|ao) por e-?mail/i.test(texto)
+            || /enviar? notifica(?:ç|c)(?:ões|ao) por e-?mail/i.test(texto)
             || /envia(?:r)? e-?mails?/i.test(texto);
 
         cdus.push({
