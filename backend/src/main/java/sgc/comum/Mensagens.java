@@ -149,7 +149,7 @@ public final class Mensagens {
     public static final String UNIDADES_SEM_MAPA = "Unidades sem mapa.";
     public static final String UNIDADES_EM_PROCESSO_ATIVO = "Unidades já em processo ativo.";
     public static final String SERVIDOR_PARTICIPANTE_SEM_EMAIL = "Servidor participante sem e-mail na unidade %s: %s";
-    public static final String USUARIO_SEM_EMAIL = "Usuário sem e-mail cadastrado: %s";
+    public static final String USUARIO_SEM_EMAIL = "Usuário(a) não tem e-mail cadastrado e não pode receber uma atribuição temporária.";
     public static final String TRANSICAO_INVALIDA = "Transição de situação inválida: %s -> %s";
     public static final String SITUACAO_NAO_PERMITE = "Situação do subprocesso não permite esta operação. Situação atual: %s. Situações permitidas: %s";
     public static final String SITUACAO_ATUAL = "Situação do subprocesso não permite esta operação. Situação atual: %s";

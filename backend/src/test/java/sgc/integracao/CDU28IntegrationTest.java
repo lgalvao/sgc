@@ -153,7 +153,7 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                        Mensagens.USUARIO_SEM_EMAIL.formatted(usuario.getNome()))));
+                        Mensagens.USUARIO_SEM_EMAIL)));
 
         assertThat(alertaRepo.buscarAlertasExclusivosDoUsuario(usuario.getTituloEleitoral())).isEmpty();
         assertThat(notificacaoEmailRepo.findAll().stream()
