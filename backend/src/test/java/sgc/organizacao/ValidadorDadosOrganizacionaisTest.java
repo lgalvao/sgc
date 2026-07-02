@@ -356,6 +356,36 @@ class ValidadorDadosOrganizacionaisTest {
     }
 
     @Test
+    @DisplayName("diagnosticar acusa usuario participante sem e-mail na view de usuarios")
+    void diagnosticarAcusaUsuarioParticipanteSemEmail() {
+        when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(
+                unidade(10L, "OPER10", TipoUnidade.OPERACIONAL, "111")
+        ));
+        when(cacheViewsOrganizacaoService.listarTodasResponsabilidades()).thenReturn(List.of(
+                new ResponsabilidadeLeitura(10L, "111")
+        ));
+        when(usuarioRepo.findAllById(anyCollection())).thenReturn(List.of(usuario("111")));
+        when(cacheViewsOrganizacaoService.listarTodosUsuarios()).thenReturn(List.of(
+                UsuarioConsultaLeitura.builder()
+                        .tituloEleitoral("111")
+                        .nome("Servidor sem email")
+                        .email(" ")
+                        .unidadeCodigo(10L)
+                        .unidadeSigla("OPER10")
+                        .build()
+        ));
+        when(namedParameterJdbcTemplate.queryForList(anyString(), anyMap())).thenReturn(List.of());
+
+        DiagnosticoOrganizacionalDto diagnostico = validador.diagnosticar();
+
+        assertThat(diagnostico.grupos())
+                .filteredOn(grupo -> grupo.tipo().equals("Usuario sem e-mail na VW_USUARIO"))
+                .singleElement()
+                .satisfies(grupo -> assertThat(grupo.ocorrencias())
+                        .containsExactly("sigla=OPER10, titulo=111, nome=Servidor sem email"));
+    }
+
+    @Test
     @DisplayName("diagnosticar resolve conflito de chaves ao carregar responsabilidades duplicadas na mesma unidade")
     void diagnosticarResponsabilidadeDuplicadaMesmaUnidade() {
         when(cacheViewsOrganizacaoService.listarTodasUnidades()).thenReturn(List.of(

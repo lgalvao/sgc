@@ -43,6 +43,7 @@ public class ValidadorDadosOrganizacionais {
         Map<String, List<String>> violacoesPorTipo = new LinkedHashMap<>();
         ResultadoCargaUsuarios resultadoUsuarios = carregarUsuarios(unidadesParticipantes, responsabilidadesPorUnidade);
         Map<String, Usuario> usuariosPorTitulo = resultadoUsuarios.usuariosPorTitulo();
+        Map<Long, List<UsuarioConsultaLeitura>> usuariosConsultaPorUnidade = carregarUsuariosConsultaPorUnidade(unidadesParticipantes);
         ResultadoCargaPerfis resultadoPerfis = carregarPerfis(unidadesParticipantes);
         Map<Long, Set<PerfilUsuarioUnidade>> perfisPorUnidade = resultadoPerfis.perfisPorUnidade();
         Set<Long> unidadesSemResponsavel = obterUnidadesSemResponsavel(unidadesParticipantes, responsabilidadesPorUnidade);
@@ -51,6 +52,7 @@ public class ValidadorDadosOrganizacionais {
         validarIntegridadePerfis(resultadoPerfis.perfisInvalidos(), unidadesSemResponsavel, violacoesPorTipo);
         validarResponsabilidade(unidadesParticipantes, responsabilidadesPorUnidade, violacoesPorTipo);
         validarUsuariosReferenciados(unidadesParticipantes, responsabilidadesPorUnidade, usuariosPorTitulo, violacoesPorTipo);
+        validarUsuariosSemEmail(unidadesParticipantes, usuariosConsultaPorUnidade, violacoesPorTipo);
         validarUnidadesIntermediarias(unidadesParticipantes, responsabilidadesPorUnidade, perfisPorUnidade, violacoesPorTipo);
 
         if (violacoesPorTipo.isEmpty()) {
@@ -235,6 +237,24 @@ public class ValidadorDadosOrganizacionais {
         return new ResultadoCargaPerfis(perfisPorUnidade, perfisInvalidos);
     }
 
+    private Map<Long, List<UsuarioConsultaLeitura>> carregarUsuariosConsultaPorUnidade(List<UnidadeHierarquiaLeitura> unidades) {
+        Set<Long> codigos = unidades.stream()
+                .map(UnidadeHierarquiaLeitura::codigo)
+                .collect(Collectors.toSet());
+
+        if (codigos.isEmpty()) {
+            return Map.of();
+        }
+
+        return cacheViewsOrganizacaoService.listarTodosUsuarios().stream()
+                .filter(usuario -> usuario.unidadeCodigo() != null && codigos.contains(usuario.unidadeCodigo()))
+                .collect(Collectors.groupingBy(
+                        UsuarioConsultaLeitura::unidadeCodigo,
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+    }
+
     private Set<String> diagnosticarTitulosDuplicados(List<String> titulos) {
         List<Map<String, Object>> result = namedParameterJdbcTemplate.queryForList("""
                 SELECT titulo, COUNT(*) AS quantidade
@@ -359,6 +379,29 @@ public class ValidadorDadosOrganizacionais {
     private void validarDuplicidadeUsuarios(Set<String> titulosDuplicados, Map<String, List<String>> violacoesPorTipo) {
         for (String titulo : titulosDuplicados) {
             adicionarViolacao(violacoesPorTipo, "VW_USUARIO com titulo duplicado", "titulo=%s".formatted(titulo));
+        }
+    }
+
+    private void validarUsuariosSemEmail(
+            List<UnidadeHierarquiaLeitura> unidades,
+            Map<Long, List<UsuarioConsultaLeitura>> usuariosConsultaPorUnidade,
+            Map<String, List<String>> violacoesPorTipo
+    ) {
+        for (UnidadeHierarquiaLeitura unidade : unidades) {
+            List<UsuarioConsultaLeitura> usuarios = usuariosConsultaPorUnidade.getOrDefault(unidade.codigo(), List.of());
+            for (UsuarioConsultaLeitura usuario : usuarios) {
+                if (estaVazio(usuario.email())) {
+                    adicionarViolacao(
+                            violacoesPorTipo,
+                            "Usuario sem e-mail na VW_USUARIO",
+                            "sigla=%s, titulo=%s, nome=%s".formatted(
+                                    unidade.sigla(),
+                                    usuario.tituloEleitoral(),
+                                    usuario.nome()
+                            )
+                    );
+                }
+            }
         }
     }
 
