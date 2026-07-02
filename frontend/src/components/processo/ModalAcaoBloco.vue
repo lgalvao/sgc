@@ -9,7 +9,7 @@
       tamanho="lg"
       test-id-cancelar="btn-acao-bloco-cancelar"
       test-id-confirmar="btn-acao-bloco-confirmar"
-      variant-acao="success"
+      :variant-acao="variantAcao"
       @confirmar="confirmar"
       @fechar="fechar"
   >
@@ -98,6 +98,7 @@ const props = withDefaults(defineProps<{
   mostrarDataLimite?: boolean;
   mostrarSituacao?: boolean;
   permitirVazio?: boolean;
+  variantAcao?: "primary" | "secondary" | "success" | "danger";
 }>(), {
   titulo: "",
   texto: "",
@@ -105,6 +106,7 @@ const props = withDefaults(defineProps<{
   mostrarDataLimite: false,
   mostrarSituacao: true,
   permitirVazio: false,
+  variantAcao: "success",
 });
 
 const emit = defineEmits<{
