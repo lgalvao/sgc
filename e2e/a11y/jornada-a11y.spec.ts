@@ -418,7 +418,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const timestamp = Date.now();
-            const UNIDADE_ALVO = 'ASSESSORIA_12';
+            const UNIDADE_ALVO = 'ASSESSORIA_21';
             const descricao = `Processo detalhado ${timestamp}`;
 
             await criarProcesso(page, {
@@ -426,7 +426,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
                 unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_1']
+                expandir: ['SECRETARIA_2']
             });
 
             // Capturar ID para cleanup
@@ -1026,7 +1026,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.describe('07 - Estados e Situações', () => {
-        test('Captura diferentes estados de processo', async ({page}) => {
+        test('Captura diferentes estados de processo', async ({page, request}) => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
 
             const processosCriado = `Proc CRIADO ${Date.now()}`;
@@ -1047,14 +1047,9 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             await capturarTela(page, 'estados', 'processo-criado', {extra: {estado: 'CRIADO'}});
 
             const processosAndamento = `Proc ANDAMENTO ${Date.now()}`;
-            await criarProcesso(page, {
-                descricao: processosAndamento,
-                tipo: 'REVISAO',
-                diasLimite: 30,
-                unidade: 'ASSESSORIA_12',
-                expandir: ['SECRETARIA_1'],
-                iniciar: true
-            });
+            const codProcesso2 = await criarProcessoMapeamentoIniciadoPorFixture(request, cleanup, processosAndamento, 'SECAO_212');
+            registrarProcessoParaCleanup(cleanup, codProcesso2);
+            await page.goto('/painel');
 
 
             await capturarTela(page, 'estados', 'processo-em-andamento', {extra: {estado: 'EM_ANDAMENTO'}});
@@ -1178,9 +1173,10 @@ test.describe('Captura de Telas - Sistema SGC', () => {
                 descricao,
                 tipo: 'MAPEAMENTO',
                 diasLimite: 30,
-                unidade: 'SECAO_121',
-                expandir: ['SECRETARIA_1', 'COORD_12'],
-                iniciar: true
+                unidade: 'ASSESSORIA_22',
+                expandir: ['SECRETARIA_2'],
+                iniciar: true,
+                unidadesComEquipePropriaParticipantes: []
             });
 
             // Navegar para a página de detalhes do processo (estamos em /painel após criar)
@@ -1191,8 +1187,8 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             const codProcesso = await extrairProcessoCodigo(page);
             registrarProcessoParaCleanup(cleanup, codProcesso);
 
-            await page.getByRole('row', {name: /SECAO_121/i}).click();
-            await expect(page).toHaveURL(/\/processo\/\d+\/SECAO_121/);
+            await page.getByRole('row', {name: /ASSESSORIA_22/i}).click();
+            await expect(page).toHaveURL(/\/processo\/\d+\/ASSESSORIA_22/);
             await capturarTela(page, 'gestao-subprocessos', 'detalhes-subprocesso-admin', {
                 fullPage: true,
                 extra: {perfil: 'ADMIN'}

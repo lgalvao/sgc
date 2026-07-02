@@ -242,7 +242,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             tipo: 'REVISAO',
             unidade: SIGLA_SECAO,
             expandir: [SIGLA_SECRETARIA, SIGLA_COORDENADORIA],
-            iniciar: true
+            iniciar: true,
+            unidadesComEquipePropriaParticipantes: []
         });
 
         await verificarProcessoTabela(page, {
@@ -468,7 +469,9 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await acessarDetalhesProcesso(page, descProcesso);
 
         // O ADMIN inicia o processo.
-        await iniciarProcesso(page, descProcesso);
+        await iniciarProcesso(page, descProcesso, {
+            unidadesComEquipePropriaParticipantes: []
+        });
 
         // Depois da iniciação, o sistema retorna ao Painel.
         await expect(page).toHaveURL(/\/painel/);

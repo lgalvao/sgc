@@ -136,7 +136,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
                 tipo: 'MAPEAMENTO',
                 unidade: [siglaUnidade],
                 expandir: ['SECRETARIA_1'],
-                iniciar: true
+                iniciar: true,
+                unidadesComEquipePropriaParticipantes: []
             });
         });
         await expect(page).toHaveURL(/\/login/);
@@ -365,7 +366,8 @@ test.describe.serial('Jornada do Ciclo de Vida Completo do SGC', () => {
                 tipo: 'REVISAO',
                 unidade: [siglaUnidade],
                 expandir: ['SECRETARIA_1'],
-                iniciar: true
+                iniciar: true,
+                unidadesComEquipePropriaParticipantes: []
             });
         });
         await expect(page).toHaveURL(/\/login/);
