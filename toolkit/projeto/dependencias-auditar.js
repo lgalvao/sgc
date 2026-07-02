@@ -14,7 +14,7 @@ const ESCOPOS_AUDITORIA = [
     },
     {
         titulo: "Auditar dependencias do toolkit",
-        diretorio: resolverNaRaiz("etc", "scripts")
+        diretorio: resolverNaRaiz("toolkit")
     }
 ];
 

@@ -8,7 +8,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "release-it": "^20.2.1",
     "smtp-server": "^3.19.0"
   },
   "devDependencies": {

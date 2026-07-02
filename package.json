@@ -9,6 +9,7 @@
     "e2e"
   ],
   "scripts": {
+    "knip": "knip",
     "test": "npm --prefix frontend run test",
     "test:e2e": "playwright test --config=e2e/playwright.config.ts --project=chromium",
     "test:unit": "npm --prefix frontend run test:unit",
@@ -29,19 +30,13 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.0.1",
-    "esbuild": "^0.28.1",
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-playwright": "^2.10.4",
-    "form-data": "^4.0.6",
-    "glob": "^13.0.6",
     "globals": "^17.7.0",
-    "js-yaml": "^5.2.0",
-    "knip": "^6.23.0",
+    "knip": "^6.24.0",
     "oxlint": "^1.72.0",
     "release-it": "^20.2.1",
-    "typescript": "^6.0.3",
-    "vite": "^8.1.1"
+    "typescript": "^6.0.3"
   },
   "allowScripts": {
     "fsevents@2.3.3": true,

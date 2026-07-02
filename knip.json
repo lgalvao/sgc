@@ -1,14 +1,51 @@
 {
-  "entry": [
-    "e2e/**/*.ts",
-    "e2e/lifecycle.js"
-  ],
-  "project": [
-    "e2e/**/*.ts",
-    "e2e/**/*.js"
-  ],
-  "ignoreDependencies": [
-    "commander",
-    "picocolors"
-  ]
+  "workspaces": {
+    ".": {
+      "ignoreBinaries": [
+        "playwright"
+      ]
+    },
+    "e2e": {
+      "entry": [
+        "**/*.ts",
+        "lifecycle.js"
+      ],
+      "project": [
+        "**/*.ts",
+        "**/*.js"
+      ]
+    },
+    "frontend": {
+      "entry": [
+        "src/**/*.{ts,vue}",
+        "src/**/*.stories.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        ".storybook/*.ts",
+        ".dependency-cruiser.cjs"
+      ],
+      "project": [
+        "src/**/*.{ts,vue}",
+        "src/**/*.stories.ts",
+        "src/**/*.spec.ts",
+        "src/**/*.d.ts",
+        ".storybook/*.ts"
+      ],
+      "ignoreDependencies": [
+        "dependency-cruiser"
+      ]
+    },
+    "toolkit": {
+      "entry": [
+        "**/*.js",
+        "**/*.mjs",
+        "**/*.cjs"
+      ],
+      "project": [
+        "**/*.js",
+        "**/*.mjs",
+        "**/*.cjs"
+      ]
+    }
+  }
 }
