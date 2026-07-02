@@ -201,14 +201,14 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         }
 
         @Test
-        @DisplayName("Deve falhar ao iniciar processo quando houver servidor participante sem e-mail")
-        void deveFalharAoIniciarProcessoQuandoHouverServidorParticipanteSemEmail() {
+        @DisplayName("Deve falhar ao iniciar diagnostico quando houver servidor participante sem e-mail")
+        void deveFalharAoIniciarDiagnosticoQuandoHouverServidorParticipanteSemEmail() {
             Long id = 100L;
 
             Processo processo = new Processo();
             processo.setCodigo(id);
             processo.setSituacao(SituacaoProcesso.CRIADO);
-            processo.setTipo(TipoProcesso.MAPEAMENTO);
+            processo.setTipo(TipoProcesso.DIAGNOSTICO);
             processo.setDataLimite(LocalDateTime.now().plusDays(30));
 
             Unidade unidade = criarUnidadeValida(10L);
@@ -221,7 +221,6 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
 
             when(repo.buscar(Processo.class, id)).thenReturn(processo);
             when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
-            when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
             when(usuarioService.buscarPorUnidadeLotacao(10L)).thenReturn(List.of(usuario));
 
             assertThatThrownBy(() -> processoService.iniciar(id, List.of(10L)))
@@ -229,7 +228,33 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                     .hasMessage("Servidor participante sem e-mail na unidade U10: Servidor sem email");
 
             verify(processoRepo, never()).save(any());
-            verify(subprocessoService, never()).criarParaMapeamento(any());
+            verify(subprocessoService, never()).criarParaDiagnostico(any());
+        }
+
+        @Test
+        @DisplayName("Deve iniciar mapeamento sem consultar servidores participantes da unidade")
+        void deveIniciarMapeamentoSemConsultarServidoresParticipantes() {
+            Long id = 101L;
+
+            Processo processo = new Processo();
+            processo.setCodigo(id);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
+            processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+            Unidade unidade = criarUnidadeValida(10L);
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
+            when(unidadeService.buscarAdmin()).thenReturn(criarUnidadeValida(999L));
+            mockarResponsaveisEfetivos();
+
+            processoService.iniciar(id, List.of(10L));
+
+            verify(usuarioService, never()).buscarPorUnidadeLotacao(anyLong());
+            verify(processoRepo).save(any(Processo.class));
         }
 
         @Test
@@ -266,6 +291,37 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                             && command.unidade() == uni
                             && command.unidadeMapa() == um
                             && command.unidadeOrigem() == uniAdmin));
+        }
+
+        @Test
+        @DisplayName("Deve iniciar revisao sem consultar servidores participantes da unidade")
+        void deveIniciarRevisaoSemConsultarServidoresParticipantes() {
+            Long id = 1002L;
+
+            Processo processo = new Processo();
+            processo.setCodigo(id);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.REVISAO);
+            processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+            Unidade unidade = criarUnidadeValida(10L);
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            UnidadeMapa mapa = new UnidadeMapa();
+            mapa.setUnidadeCodigo(10L);
+
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
+            when(unidadeService.buscarTodosCodigosUnidadesComMapa()).thenReturn(List.of(10L));
+            when(unidadeService.buscarMapasPorUnidades(List.of(10L))).thenReturn(List.of(mapa));
+            when(unidadeService.buscarAdmin()).thenReturn(criarUnidadeValida(999L));
+            mockarResponsaveisEfetivos();
+
+            processoService.iniciar(id, List.of(10L));
+
+            verify(usuarioService, never()).buscarPorUnidadeLotacao(anyLong());
+            verify(subprocessoService).criarParaRevisao(any());
         }
 
         @Test
@@ -357,7 +413,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         }
 
         @Test
-        @DisplayName("Deve iniciar revisao sem subprocesso direto para unidade com equipe própria não confirmada")
+        @DisplayName("Deve iniciar revisao sem incluir unidade com equipe própria não confirmada")
         void deveIniciarRevisaoSemSubprocessoDiretoParaUnidadeComEquipePropriaNaoConfirmada() {
             Long id = 1021L;
             Processo processo = new Processo();
@@ -395,7 +451,7 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                             && command.unidadeMapa() == mapaFilha
             ));
             assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigoPersistido).toList())
-                    .containsExactlyInAnyOrder(10L, 20L);
+                    .containsExactly(20L);
         }
 
         @Test

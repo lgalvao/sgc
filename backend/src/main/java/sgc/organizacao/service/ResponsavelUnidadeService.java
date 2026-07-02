@@ -173,6 +173,7 @@ public class ResponsavelUnidadeService {
     }
 
     private void criarNotificacoesAtribuicaoTemporaria(AtribuicaoTemporaria atribuicao, Usuario usuario) {
+        validarUsuarioComEmail(usuario);
         String siglaUnidade = atribuicao.getUnidade().getSigla();
         String assunto = AssuntosNotificacao.atribuicaoPerfilChefe(siglaUnidade);
         criarAlertaSemInterromperNotificacao(usuario, siglaUnidade);
@@ -198,6 +199,12 @@ public class ResponsavelUnidadeService {
                 .corpoHtml(corpoHtml)
                 .chaveIdempotencia(chaveIdempotenciaAtribuicaoTemporaria(atribuicao))
                 .build());
+    }
+
+    private void validarUsuarioComEmail(Usuario usuario) {
+        if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
+            throw new ErroValidacao(Mensagens.USUARIO_SEM_EMAIL.formatted(usuario.getNome()));
+        }
     }
 
     private void criarAlertaSemInterromperNotificacao(Usuario usuario, String siglaUnidade) {

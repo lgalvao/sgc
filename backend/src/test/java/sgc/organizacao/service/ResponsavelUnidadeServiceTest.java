@@ -332,6 +332,36 @@ class ResponsavelUnidadeServiceTest {
         }
 
         @Test
+        @DisplayName("Deve rejeitar atribuição temporária para usuário sem e-mail")
+        void deveRejeitarAtribuicaoTemporariaParaUsuarioSemEmail() {
+            Long codUnidade = 1L;
+            LocalDate dataTermino = LocalDate.now().plusDays(5);
+            CriarAtribuicaoRequest request = new CriarAtribuicaoRequest("123", null, dataTermino, "Justificativa");
+
+            Unidade unidade = new Unidade();
+            unidade.setCodigo(codUnidade);
+            unidade.setSigla("UNIT");
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123");
+            usuario.setNome("Usuario Teste");
+            usuario.setEmail(" ");
+
+            when(repo.buscar(Unidade.class, codUnidade)).thenReturn(unidade);
+            when(repo.buscar(Usuario.class, "123")).thenReturn(usuario);
+            when(atribuicaoTemporariaRepo.save(any(AtribuicaoTemporaria.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessage("Usuário sem e-mail cadastrado: Usuario Teste");
+
+            verifyNoInteractions(alertaAplicacaoService);
+            verifyNoInteractions(emailModelosService);
+            verifyNoInteractions(notificacaoService);
+        }
+
+        @Test
         @DisplayName("Deve rejeitar atribuição quando dataTermino for anterior ao inicio")
         void deveRejeitarAtribuicaoComDataTerminoAnteriorAoInicio() {
             Long codUnidade = 1L;

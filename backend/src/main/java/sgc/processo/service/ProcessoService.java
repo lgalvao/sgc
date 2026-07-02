@@ -543,20 +543,6 @@ public class ProcessoService {
         unidadeService.definirMapasVigentesEmBloco(mapasPorUnidade);
     }
 
-    private Set<Unidade> carregarArvoreUnidades(Set<Unidade> participantes) {
-        Set<Unidade> arvore = new HashSet<>(participantes);
-        Set<Long> codigosSuperiores = new HashSet<>();
-        for (Unidade u : participantes) {
-            codigosSuperiores.addAll(unidadeHierarquiaService.buscarCodigosSuperiores(u.getCodigo()));
-        }
-        if (!codigosSuperiores.isEmpty()) {
-            unidadeService.buscarPorCodigos(new ArrayList<>(codigosSuperiores)).stream()
-                    .filter(u -> u.getTipo() != TipoUnidade.RAIZ)
-                    .forEach(arvore::add);
-        }
-        return arvore;
-    }
-
     private void efetivarInicioSubprocessos(InicioSubprocessosContexto contexto) {
         if (contexto.tipo() == MAPEAMENTO) {
             iniciarSubprocessosMapeamento(contexto);
@@ -1590,11 +1576,12 @@ public class ProcessoService {
                 : validarCodigosParticipantes(codsUnidadesParam);
 
         Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
-        Set<Unidade> arvoreUnidades = carregarArvoreUnidades(unidadesParaProcessar);
-        Map<Long, List<Usuario>> servidoresPorUnidade = mapearServidoresPorUnidade(arvoreUnidades);
-        validarServidoresParticipantes(arvoreUnidades, servidoresPorUnidade);
-        processo.sincronizarParticipantes(arvoreUnidades);
-        processo.sincronizarServidoresParticipantes(servidoresPorUnidade);
+        processo.sincronizarParticipantes(unidadesParaProcessar);
+        if (tipo == DIAGNOSTICO) {
+            Map<Long, List<Usuario>> servidoresPorUnidade = mapearServidoresPorUnidade(unidadesParaProcessar);
+            validarServidoresParticipantes(unidadesParaProcessar, servidoresPorUnidade);
+            processo.sincronizarServidoresParticipantes(servidoresPorUnidade);
+        }
 
         return new ContextoInicioProcesso(tipo, codigosUnidades, unidadesParaProcessar);
     }
