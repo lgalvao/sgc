@@ -201,6 +201,38 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         }
 
         @Test
+        @DisplayName("Deve falhar ao iniciar processo quando houver servidor participante sem e-mail")
+        void deveFalharAoIniciarProcessoQuandoHouverServidorParticipanteSemEmail() {
+            Long id = 100L;
+
+            Processo processo = new Processo();
+            processo.setCodigo(id);
+            processo.setSituacao(SituacaoProcesso.CRIADO);
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
+            processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+            Unidade unidade = criarUnidadeValida(10L);
+            processo.adicionarParticipantes(Set.of(unidade));
+
+            Usuario usuario = new Usuario();
+            usuario.setTituloEleitoral("123456789012");
+            usuario.setNome("Servidor sem email");
+            usuario.setEmail(null);
+
+            when(repo.buscar(Processo.class, id)).thenReturn(processo);
+            when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(unidade));
+            when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
+            when(usuarioService.buscarPorUnidadeLotacao(10L)).thenReturn(List.of(usuario));
+
+            assertThatThrownBy(() -> processoService.iniciar(id, List.of(10L)))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessage("Servidor participante sem e-mail na unidade U10: Servidor sem email");
+
+            verify(processoRepo, never()).save(any());
+            verify(subprocessoService, never()).criarParaMapeamento(any());
+        }
+
+        @Test
         @DisplayName("Deve iniciar revisao com sucesso e salvar")
         void deveIniciarRevisaoComSucesso() {
             Long id = 100L;

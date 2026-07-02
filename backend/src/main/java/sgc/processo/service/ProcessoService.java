@@ -1591,8 +1591,10 @@ public class ProcessoService {
 
         Set<Unidade> unidadesParaProcessar = new HashSet<>(unidadeService.buscarPorCodigos(codigosUnidades));
         Set<Unidade> arvoreUnidades = carregarArvoreUnidades(unidadesParaProcessar);
+        Map<Long, List<Usuario>> servidoresPorUnidade = mapearServidoresPorUnidade(arvoreUnidades);
+        validarServidoresParticipantes(arvoreUnidades, servidoresPorUnidade);
         processo.sincronizarParticipantes(arvoreUnidades);
-        processo.sincronizarServidoresParticipantes(mapearServidoresPorUnidade(arvoreUnidades));
+        processo.sincronizarServidoresParticipantes(servidoresPorUnidade);
 
         return new ContextoInicioProcesso(tipo, codigosUnidades, unidadesParaProcessar);
     }
@@ -1603,6 +1605,25 @@ public class ProcessoService {
                         Unidade::getCodigo,
                         unidade -> usuarioService.buscarPorUnidadeLotacao(unidade.getCodigo())
                 ));
+    }
+
+    private void validarServidoresParticipantes(Set<Unidade> unidades, Map<Long, List<Usuario>> servidoresPorUnidade) {
+        Map<Long, Unidade> unidadesPorCodigo = unidades.stream()
+                .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
+
+        servidoresPorUnidade.forEach((codigoUnidade, usuarios) -> usuarios.stream()
+                .filter(usuario -> usuario.getEmail() == null || usuario.getEmail().isBlank())
+                .findFirst()
+                .ifPresent(usuario -> {
+                    Unidade unidade = Objects.requireNonNull(
+                            unidadesPorCodigo.get(codigoUnidade),
+                            "Unidade obrigatória ao validar servidores participantes"
+                    );
+                    throw new ErroValidacao(Mensagens.SERVIDOR_PARTICIPANTE_SEM_EMAIL.formatted(
+                            unidade.getSigla(),
+                            usuario.getNome()
+                    ));
+                }));
     }
 
     private List<Long> validarCodigosRevisao(List<Long> codsUnidadesParam) {
