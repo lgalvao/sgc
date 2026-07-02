@@ -203,7 +203,7 @@ public class ResponsavelUnidadeService {
 
     private void validarUsuarioComEmail(Usuario usuario) {
         if (usuario.getEmail() == null || usuario.getEmail().isBlank()) {
-            throw new ErroValidacao(Mensagens.USUARIO_SEM_EMAIL.formatted(usuario.getNome()));
+            throw new ErroValidacao(Mensagens.USUARIO_SEM_EMAIL);
         }
     }
 
