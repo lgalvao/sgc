@@ -26,6 +26,7 @@
               id="arvore-unidades-diagnostico"
               :model-value="unidadesSelecionadas"
               :mostrar-superiores-nao-elegiveis-como-indeterminados="true"
+              :ocultar-raiz="false"
               :unidades="unidadesDisponiveis"
               @update:model-value="$emit('update:unidadesSelecionadas', $event)"
           />

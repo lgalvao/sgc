@@ -130,7 +130,8 @@ test.describe('CDU-06 - Detalhar processo', () => {
             diasLimite: 30,
             unidade: 'ASSESSORIA_12',
             expandir: ['SECRETARIA_1'],
-            iniciar: true
+            iniciar: true,
+            unidadesComEquipePropriaParticipantes: []
         });
 
         await acessarDetalhesProcesso(page, descricao);

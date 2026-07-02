@@ -37,6 +37,7 @@ export async function criarProcesso(page: Page, options: {
     unidade: string | string[];
     expandir?: string[];
     iniciar?: boolean;
+    unidadesComEquipePropriaParticipantes?: string[];
 }): Promise<void> {
     const dias = options.diasLimite ?? 30;
     await page.getByTestId('btn-painel-criar-processo').click();
@@ -67,7 +68,8 @@ export async function criarProcesso(page: Page, options: {
     if (options.iniciar) {
         await iniciarProcessoPeloCadastro(page, {
             descricao: options.descricao,
-            tipo: options.tipo
+            tipo: options.tipo,
+            unidadesComEquipePropriaParticipantes: options.unidadesComEquipePropriaParticipantes
         });
     } else {
         const botaoSalvar = page.getByTestId('btn-processo-salvar-rodape');

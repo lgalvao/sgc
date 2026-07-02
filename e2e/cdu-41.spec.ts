@@ -1,5 +1,6 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
+import {confirmarInicioProcessoPeloDialogo} from './helpers/helpers-processos.js';
 import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
@@ -29,12 +30,10 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
         await expect(modal).toBeHidden();
 
         await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await Promise.all([
-            page.waitForResponse(res => res.url().includes(`/api/processos/${processo.codigo}/iniciar`) && res.ok()),
-            page.getByTestId('btn-iniciar-processo-confirmar').click()
-        ]);
-
-        await expect(page).toHaveURL(/\/painel/);
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao,
+            tipo: 'DIAGNOSTICO'
+        });
 
         await page.goto(`/processo/${processo.codigo}`);
         await navegarParaDiagnosticoUnidade(page, 'ASSESSORIA_12');
@@ -55,7 +54,7 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
 
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECRETARIA_1',
-            assunto: 'Início de processo de diagnóstico em unidades subordinadas',
+            assunto: 'Início de processo de diagnóstico',
             tipo: 'Início do processo',
             trechoCorpo: descricao
         });

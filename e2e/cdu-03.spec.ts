@@ -1,6 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {
     acessarDetalhesProcesso,
+    confirmarInicioProcessoPeloDialogo,
     criarProcesso,
     extrairProcessoCodigo,
     verificarProcessoTabela
@@ -276,9 +277,11 @@ test.describe('CDU-03 - Manter processo', () => {
         await page.getByTestId('btn-arvore-expand-SECRETARIA_1').click();
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').click();
         await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao: descricaoAlt,
+            tipo: 'MAPEAMENTO'
+        });
 
-        await esperarPaginaPainel(page);
         await verificarProcessoTabela(page, {
             descricao: descricaoAlt,
             situacao: 'Em andamento',

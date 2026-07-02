@@ -32,6 +32,7 @@ test.describe('CDU-55 - Gerar relatório de situação de capacitação', () => 
         await expect(page.getByTestId('container-arvore-unidades-diagnostico')).toBeVisible();
 
         const busca = page.getByRole('searchbox', {name: 'Buscar unidade por sigla'});
+        await expect(busca).toBeVisible();
         await busca.fill('ASSESSORIA_12');
         await page.getByTestId('chk-arvore-unidade-ASSESSORIA_12').check();
 

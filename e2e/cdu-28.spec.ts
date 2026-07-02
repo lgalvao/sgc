@@ -212,7 +212,7 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
             await page.getByTestId('textarea-justificativa').fill('Cobertura temporária sem e-mail');
             await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
 
-            await expect(page.getByText(`Usuário sem e-mail cadastrado: ${NOME_USUARIO_ALVO}`)).toBeVisible();
+            await expect(page.getByText('Usuário(a) não tem e-mail cadastrado e não pode receber uma atribuição temporária.')).toBeVisible();
             await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
         } finally {
             const respostaComEmail = await request.post('/e2e/fixtures/usuario-email', {

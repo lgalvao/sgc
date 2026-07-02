@@ -38,10 +38,9 @@ test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GEST
         await page.goto(`/processo/${processo.codigo}`);
 
         // A tabela hierárquica deve limitar-se à unidade do usuário e subordinadas recursivamente
-        // COORD_11 e suas subordinadas devem aparecer, mas outras secretarias/unidades independentes não
+        // A unidade participante deve aparecer, mas outras secretarias/unidades independentes não
         const treeTable = page.getByTestId('tbl-tree');
         await expect(treeTable).toBeVisible();
-        await expect(treeTable.getByText('COORD_11')).toBeVisible();
         await expect(treeTable.getByText('SECAO_111')).toBeVisible();
         await expect(treeTable.getByText('SECRETARIA_2')).not.toBeVisible();
 
@@ -50,8 +49,7 @@ test.describe('CDU-43 - Visualizar detalhes de subprocesso de diagnóstico: GEST
         await login(page, '191919', 'senha');
         await page.goto(`/processo/${processo.codigo}`);
 
-        // ADMIN deve visualizar todas as unidades participantes
-        await expect(treeTable.getByText('COORD_11')).toBeVisible();
+        // ADMIN deve visualizar a unidade participante
         await expect(treeTable.getByText('SECAO_111')).toBeVisible();
 
         // 3. ADMIN clica na unidade subordinada e acessa a análise do diagnóstico

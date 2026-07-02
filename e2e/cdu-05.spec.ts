@@ -70,10 +70,12 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
 
         await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await page.getByTestId('btn-iniciar-processo-confirmar').click();
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao,
+            tipo: 'MAPEAMENTO',
+            unidadesComEquipePropriaParticipantes: []
+        });
 
-        // Validação: Processo iniciado
-        await verificarPaginaPainel(page);
         await verificarProcessoTabela(page, {
             descricao,
             situacao: 'Em andamento',
@@ -252,7 +254,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await expect(modal).toBeVisible();
         await confirmarInicioProcessoPeloDialogo(page, {
             descricao: descProcRevisao,
-            tipo: 'REVISAO'
+            tipo: 'REVISAO',
+            unidadesComEquipePropriaParticipantes: []
         });
 
         await verificarProcessoTabela(page, {
@@ -397,7 +400,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await page.getByTestId('btn-processo-iniciar-rodape').click();
         await confirmarInicioProcessoPeloDialogo(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
-            tipo: 'REVISAO'
+            tipo: 'REVISAO',
+            unidadesComEquipePropriaParticipantes: []
         });
         await verificarProcessoTabela(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
