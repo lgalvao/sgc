@@ -77,7 +77,7 @@ public class DiagnosticoNotificacaoService {
         Usuario servidor = servidorOpt.get();
         Unidade unidade = sp.getUnidade();
 
-        String assunto = AssuntosNotificacao.diagnosticoConsensoDisponivel();
+        String assunto = AssuntosNotificacao.DIAGNOSTICO_CONSENSO_DISPONIVEL;
         String corpo = emailModelosService.criarEmailDiagnosticoConsensoDisponivel(
                 servidor.getNome(),
                 unidade.getSigla(),
@@ -209,7 +209,7 @@ public class DiagnosticoNotificacaoService {
                 .distinct()
                 .sorted()
                 .toList();
-        String assunto = AssuntosNotificacao.diagnosticosAceitosEmBloco();
+        String assunto = AssuntosNotificacao.DIAGNOSTICOS_ACEITOS_EM_BLOCO;
         String corpo = emailModelosService.criarEmailDiagnosticoAceitoEmBloco(
                 unidadeSuperior.getSigla(),
                 base.getProcesso().getDescricao(),

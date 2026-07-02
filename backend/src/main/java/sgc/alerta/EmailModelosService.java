@@ -139,7 +139,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoConsensoDisponivel(String nomeServidor, String siglaUnidade, String nomeProcesso, String urlSistema) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoConsensoDisponivel());
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.DIAGNOSTICO_CONSENSO_DISPONIVEL);
         ctx.setVariable("nomeServidor", nomeServidor);
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidade);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
@@ -188,7 +188,7 @@ public class EmailModelosService {
 
     public String criarEmailDiagnosticoAceitoEmBloco(String siglaUnidadeDestino, String nomeProcesso, List<String> siglasUnidades) {
         Context ctx = new Context();
-        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticosAceitosEmBloco());
+        ctx.setVariable(VAR_TITULO, AssuntosNotificacao.DIAGNOSTICOS_ACEITOS_EM_BLOCO);
         ctx.setVariable("siglaUnidadeSuperior", siglaUnidadeDestino);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
         ctx.setVariable("siglasUnidades", siglasUnidades);

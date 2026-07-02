@@ -363,7 +363,7 @@ public class SubprocessoNotificacaoService {
                 .unidadeDestino(superior)
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
-        String assunto = AssuntosNotificacao.aceiteValidacaoBlocoSuperior();
+        String assunto = AssuntosNotificacao.ACEITE_VALIDACAO_BLOCO_SUPERIOR;
         String corpo = processarTemplate("validacao-mapa-aceita-bloco-superior", variaveis);
         EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
         criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-superior"));

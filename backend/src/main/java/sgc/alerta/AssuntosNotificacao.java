@@ -34,6 +34,9 @@ public final class AssuntosNotificacao {
     }
 
     public static final String dataLimiteAlterada = "SGC: Data limite alterada";
+    public static final String ACEITE_VALIDACAO_BLOCO_SUPERIOR = "SGC: Validação de mapas de competências submetida para análise";
+    public static final String DIAGNOSTICO_CONSENSO_DISPONIVEL = "SGC: Avaliação de consenso criada";
+    public static final String DIAGNOSTICOS_ACEITOS_EM_BLOCO = "SGC: Diagnósticos submetidos para análise";
 
     public static String atribuicaoPerfilChefe(String siglaUnidade) {
         return "SGC: Atribuição de perfil CHEFE na unidade %s".formatted(siglaUnidade);
@@ -96,16 +99,8 @@ public final class AssuntosNotificacao {
         return "SGC: Validação do mapa de competências da %s submetida para análise".formatted(siglaUnidade);
     }
 
-    public static String aceiteValidacaoBlocoSuperior() {
-        return "SGC: Validação de mapas de competências submetida para análise";
-    }
-
     public static String diagnosticoAutoavaliacaoConcluida(String nomeServidor) {
         return "SGC: Autoavaliação concluída: %s".formatted(nomeServidor);
-    }
-
-    public static String diagnosticoConsensoDisponivel() {
-        return "SGC: Avaliação de consenso criada";
     }
 
     public static String diagnosticoConsensoAprovado(String nomeServidor) {
@@ -122,10 +117,6 @@ public final class AssuntosNotificacao {
 
     public static String diagnosticoAceito(String siglaUnidade) {
         return "SGC: Diagnóstico da unidade %s aceito".formatted(siglaUnidade);
-    }
-
-    public static String diagnosticosAceitosEmBloco() {
-        return "SGC: Diagnósticos submetidos para análise";
     }
 
     public static String diagnosticoHomologado(String siglaUnidade) {
