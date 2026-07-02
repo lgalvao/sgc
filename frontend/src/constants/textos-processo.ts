@@ -28,7 +28,7 @@ export const TEXTOS_PROCESSO = {
     INFO_UNIDADES: "Unidades participantes",
     cadastro: {
         TITULO: "Cadastro de processo",
-        BOTAO_INICIAR: "Iniciar",
+        BOTAO_INICIAR: "Iniciar processo",
         BOTAO_SALVAR: "Salvar",
         BOTAO_REMOVER: "Remover",
         BOTAO_CANCELAR: "Cancelar",
