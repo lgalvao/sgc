@@ -130,6 +130,36 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Não deve permitir criar atribuição temporária para usuário sem e-mail")
+    @WithMockAdmin
+    void criarAtribuicaoTemporaria_usuarioSemEmail_erro() throws Exception {
+        usuario.setEmail(" ");
+        usuarioRepo.saveAndFlush(usuario);
+        entityManager.clear();
+
+        CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
+                usuario.getTituloEleitoral(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(30),
+                "Sem e-mail"
+        );
+
+        mockMvc.perform(
+                        post("/api/unidades/{codUnidade}/atribuicoes-temporarias", unidade.getCodigo())
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        Mensagens.USUARIO_SEM_EMAIL.formatted(usuario.getNome()))));
+
+        assertThat(alertaRepo.buscarAlertasExclusivosDoUsuario(usuario.getTituloEleitoral())).isEmpty();
+        assertThat(notificacaoEmailRepo.findAll().stream()
+                .filter(item -> usuario.getTituloEleitoral().equals(item.getUsuarioDestinoTitulo())))
+                .isEmpty();
+    }
+
+    @Test
     @DisplayName("Deve atualizar uma atribuição temporária com sucesso")
     @WithMockAdmin
     void atualizarAtribuicaoTemporaria_sucesso() throws Exception {

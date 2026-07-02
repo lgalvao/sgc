@@ -455,6 +455,18 @@ public class E2eController {
         return new NotificacaoFixtureResponse(codigo, destinatario, assunto, tipo, situacao);
     }
 
+    @PostMapping("/fixtures/usuario-email")
+    @Transactional
+    public UsuarioEmailFixtureResponse atualizarEmailUsuarioFixture(@RequestBody UsuarioEmailFixtureRequest request) {
+        String email = request.email() == null ? null : request.email().trim();
+        jdbcTemplate.update(
+                "UPDATE sgc.vw_usuario SET email = ? WHERE titulo = ?",
+                email,
+                request.usuarioTitulo()
+        );
+        return new UsuarioEmailFixtureResponse(request.usuarioTitulo(), email);
+    }
+
     @PostMapping("/fixtures/feedback")
     @Transactional
     public FeedbackFixtureResponse criarFeedbackFixture(@RequestBody FeedbackFixtureRequest request) {
@@ -1284,6 +1296,18 @@ public class E2eController {
             String assunto,
             String tipoNotificacao,
             String situacao
+    ) {
+    }
+
+    public record UsuarioEmailFixtureRequest(
+            String usuarioTitulo,
+            String email
+    ) {
+    }
+
+    public record UsuarioEmailFixtureResponse(
+            String usuarioTitulo,
+            String email
     ) {
     }
 

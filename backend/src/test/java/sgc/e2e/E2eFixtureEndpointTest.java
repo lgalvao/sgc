@@ -104,6 +104,22 @@ class E2eFixtureEndpointTest {
     }
 
     @Test
+    @DisplayName("Deve permitir atualizar e limpar o email de um usuário via fixture")
+    void devePermitirAtualizarEmailDeUsuarioViaFixture() throws Exception {
+        mockMvc.perform(post("/e2e/fixtures/usuario-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "usuarioTitulo": "232323",
+                                  "email": "   "
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.usuarioTitulo").value("232323"))
+                .andExpect(jsonPath("$.email").isEmpty());
+    }
+
+    @Test
     @DisplayName("Deve gerar descrição automática quando não fornecida")
     void deveGerarDescricaoAutomaticaQuandoNaoFornecida() throws Exception {
         // Preparar requisição sem descrição
