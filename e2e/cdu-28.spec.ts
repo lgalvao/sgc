@@ -194,25 +194,35 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
                                                                                                       page,
                                                                                                       request
                                                                                                   }) => {
-        const resposta = await request.post('/e2e/fixtures/usuario-email', {
+        const respostaSemEmail = await request.post('/e2e/fixtures/usuario-email', {
             data: {
                 usuarioTitulo: TITULO_USUARIO_ALVO,
                 email: '   '
             }
         });
-        expect(resposta.ok()).toBeTruthy();
+        expect(respostaSemEmail.ok()).toBeTruthy();
 
-        await abrirTelaCriacaoAtribuicao(page);
-        await selecionarUsuarioAlvo(page);
+        try {
+            await abrirTelaCriacaoAtribuicao(page);
+            await selecionarUsuarioAlvo(page);
 
-        const {dataInicio, dataTermino} = obterPeriodoVigente();
-        await page.getByTestId('input-data-inicio').fill(dataInicio);
-        await page.getByTestId('input-data-termino').fill(dataTermino);
-        await page.getByTestId('textarea-justificativa').fill('Cobertura temporária sem e-mail');
-        await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
+            const {dataInicio, dataTermino} = obterPeriodoVigente();
+            await page.getByTestId('input-data-inicio').fill(dataInicio);
+            await page.getByTestId('input-data-termino').fill(dataTermino);
+            await page.getByTestId('textarea-justificativa').fill('Cobertura temporária sem e-mail');
+            await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
 
-        await expect(page.getByText(`Usuário sem e-mail cadastrado: ${NOME_USUARIO_ALVO}`)).toBeVisible();
-        await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
+            await expect(page.getByText(`Usuário sem e-mail cadastrado: ${NOME_USUARIO_ALVO}`)).toBeVisible();
+            await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
+        } finally {
+            const respostaComEmail = await request.post('/e2e/fixtures/usuario-email', {
+                data: {
+                    usuarioTitulo: TITULO_USUARIO_ALVO,
+                    email: EMAIL_USUARIO_ALVO
+                }
+            });
+            expect(respostaComEmail.ok()).toBeTruthy();
+        }
     });
 
     test('Cenario 4: ADMIN cancela criação e retorna para detalhes da unidade', async ({

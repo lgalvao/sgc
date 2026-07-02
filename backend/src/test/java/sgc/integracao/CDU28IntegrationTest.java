@@ -133,8 +133,10 @@ class CDU28IntegrationTest extends BaseIntegrationTest {
     @DisplayName("Não deve permitir criar atribuição temporária para usuário sem e-mail")
     @WithMockAdmin
     void criarAtribuicaoTemporaria_usuarioSemEmail_erro() throws Exception {
-        usuario.setEmail(" ");
-        usuarioRepo.saveAndFlush(usuario);
+        entityManager.createNativeQuery("UPDATE sgc.vw_usuario SET email = ' ' WHERE titulo = :titulo")
+                .setParameter("titulo", usuario.getTituloEleitoral())
+                .executeUpdate();
+        entityManager.flush();
         entityManager.clear();
 
         CriarAtribuicaoRequest request = new CriarAtribuicaoRequest(
