@@ -140,10 +140,12 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
             },
             global: {stubs}
         });
-        expect(wrapper.text()).toContain("Foram encontradas inconsistências nos dados organizacionais");
-        expect(wrapper.text()).toContain("Usuários sem e-mail:");
-        expect(wrapper.text()).toContain("TEREZA CRISTINA DE MEDEIROS (117ª Z.E.)");
-        expect(wrapper.text()).toContain("ELISIE MARIA JUNQUEIRA AYRES ROCHA (SGP)");
+        const texto = wrapper.text().replace(/\s+/g, " ");
+        const ocorrenciasMensagem = texto.match(/Foram encontradas inconsistências nos dados organizacionais/g) ?? [];
+        expect(ocorrenciasMensagem).toHaveLength(1);
+        expect(texto).toContain("Usuários sem e-mail:");
+        expect(texto).toContain("TEREZA CRISTINA DE MEDEIROS (117ª Z.E.)");
+        expect(texto).toContain("ELISIE MARIA JUNQUEIRA AYRES ROCHA (SGP)");
     });
 
     it("emite dismiss quando o alerta é fechado", async () => {

@@ -86,8 +86,10 @@ const tituloDiagnostico = computed(() =>
         ? "Há inconsistências nos dados organizacionais"
         : "Foram encontradas inconsistências nos dados organizacionais"
 );
+const resumoNormalizado = computed(() => normalizarMensagem(props.resumo));
+const tituloNormalizado = computed(() => normalizarMensagem(tituloDiagnostico.value));
 const mensagemApoio = computed(() =>
-    props.resumo && props.resumo !== tituloDiagnostico.value ? props.resumo : ""
+    props.resumo && resumoNormalizado.value !== tituloNormalizado.value ? props.resumo : ""
 );
 const gruposFormatados = computed<GrupoDiagnosticoFormatado[]>(() =>
     props.grupos.map((grupo) => ({
@@ -139,6 +141,10 @@ function formatarUsuarioSemEmail(ocorrencia: string): OcorrenciaFormatada {
 function extrairCampo(ocorrencia: string, chave: string): string | null {
   const correspondencia = new RegExp(`${chave}=([^,]+?)(?:,\\s|$)`).exec(ocorrencia);
   return correspondencia?.[1]?.trim() || null;
+}
+
+function normalizarMensagem(mensagem: string): string {
+  return mensagem.trim().replace(/[.!?]+$/, "");
 }
 </script>
 
