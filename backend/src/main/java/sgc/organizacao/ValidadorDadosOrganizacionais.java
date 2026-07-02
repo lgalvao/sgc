@@ -90,10 +90,7 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private String construirResumo(int quantidadeTiposViolacao, int quantidadeOcorrencias) {
-        String tipos = quantidadeTiposViolacao == 1 ? "tipo de inconsistencia" : "tipos de inconsistencias";
-        String ocorrencias = quantidadeOcorrencias == 1 ? "ocorrencia" : "ocorrencias";
-        return "Foram encontradas %d %s, totalizando %d %s organizacionais que podem impactar operacoes administrativas."
-                .formatted(quantidadeTiposViolacao, tipos, quantidadeOcorrencias, ocorrencias);
+        return "Foram encontradas inconsistências nos dados organizacionais.";
     }
 
     private String construirResumo(Map<String, List<String>> violacoesPorTipo) {
@@ -110,15 +107,12 @@ public class ValidadorDadosOrganizacionais {
                 .toList();
 
         if (!unidadesSemResponsavel.isEmpty() && violacoesPorTipo.size() == 1) {
-            return "Há unidades atualmente sem responsável efetivo: %s. Essas unidades só poderão participar de processos do SGC quando a responsabilidade for definida, externamente ou via atribuição temporária no próprio sistema."
-                    .formatted(String.join(", ", unidadesSemResponsavel));
+            return "Foram encontradas inconsistências nos dados organizacionais.";
         }
 
-        int quantidadeOcorrencias = violacoesPorTipo.values().stream()
+        return construirResumo(violacoesPorTipo.size(), violacoesPorTipo.values().stream()
                 .mapToInt(List::size)
-                .sum();
-
-        return construirResumo(violacoesPorTipo.size(), quantidadeOcorrencias);
+                .sum());
     }
 
     @Nullable

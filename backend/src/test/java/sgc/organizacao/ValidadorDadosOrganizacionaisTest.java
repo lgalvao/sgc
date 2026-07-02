@@ -58,7 +58,7 @@ class ValidadorDadosOrganizacionaisTest {
         assertThat(diagnostico.possuiViolacoes()).isTrue();
         assertThat(diagnostico.quantidadeTiposViolacao()).isEqualTo(1);
         assertThat(diagnostico.quantidadeOcorrencias()).isEqualTo(2);
-        assertThat(diagnostico.resumo()).contains("Há unidades atualmente sem responsável efetivo", "OPER1", "OPER2");
+        assertThat(diagnostico.resumo()).isEqualTo("Foram encontradas inconsistências nos dados organizacionais.");
         assertThat(diagnostico.grupos())
                 .singleElement()
                 .satisfies(grupo -> {

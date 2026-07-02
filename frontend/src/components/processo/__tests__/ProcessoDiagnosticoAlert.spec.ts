@@ -43,13 +43,19 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
             props: {
                 exibir: true,
                 resumo: "",
-                grupos: [],
+                grupos: [{
+                    tipo: "Unidade sem responsável",
+                    quantidadeOcorrencias: 1,
+                    ocorrencias: ["sigla=UNIT1"]
+                }],
                 unidadesSemResponsavel: [{codigo: 1, sigla: "UNIT1"}]
             },
             global: {stubs}
         });
         const text = wrapper.text().replace(/\s+/g, ' ');
-        expect(text).toContain("A unidade UNIT1 está atualmente sem responsável.");
+        expect(text).toContain("Há inconsistências nos dados organizacionais");
+        expect(text).toContain("Unidades sem titular ou responsável:");
+        expect(text).toContain("UNIT1");
         expect(wrapper.find("a").attributes("href")).toBe("/unidade/1");
     });
 
@@ -58,7 +64,11 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
             props: {
                 exibir: true,
                 resumo: "",
-                grupos: [],
+                grupos: [{
+                    tipo: "Unidade sem responsável",
+                    quantidadeOcorrencias: 2,
+                    ocorrencias: ["sigla=UNIT1", "sigla=UNIT2"]
+                }],
                 unidadesSemResponsavel: [
                     {codigo: 1, sigla: "UNIT1"},
                     {codigo: 2, sigla: "UNIT2"}
@@ -67,7 +77,8 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
             global: {stubs}
         });
         const text = wrapper.text().replace(/\s+/g, ' ');
-        expect(text).toContain("As unidades UNIT1 e UNIT2 estão atualmente sem responsável.");
+        expect(text).toContain("UNIT1");
+        expect(text).toContain("UNIT2");
     });
 
     it("renderiza lista de unidades sem responsável (plural com 3+)", () => {
@@ -75,7 +86,11 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
             props: {
                 exibir: true,
                 resumo: "",
-                grupos: [],
+                grupos: [{
+                    tipo: "Unidade sem responsável",
+                    quantidadeOcorrencias: 3,
+                    ocorrencias: ["sigla=UNIT1", "sigla=UNIT2", "sigla=UNIT3"]
+                }],
                 unidadesSemResponsavel: [
                     {codigo: 1, sigla: "UNIT1"},
                     {codigo: 2, sigla: "UNIT2"},
@@ -84,8 +99,8 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
             },
             global: {stubs}
         });
-        const text = wrapper.text().replace(/\s+/g, ' ');
-        expect(text).toContain("As unidades UNIT1, UNIT2, e UNIT3 estão atualmente sem responsável.");
+        const itens = wrapper.findAll("li").map((item) => item.text());
+        expect(itens).toEqual(["UNIT1", "UNIT2", "UNIT3"]);
     });
 
     it("renderiza unidade sem código como texto em vez de link", () => {
@@ -93,7 +108,11 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
             props: {
                 exibir: true,
                 resumo: "",
-                grupos: [],
+                grupos: [{
+                    tipo: "Unidade sem responsável",
+                    quantidadeOcorrencias: 1,
+                    ocorrencias: ["sigla=UNIT_NULL"]
+                }],
                 unidadesSemResponsavel: [{codigo: null, sigla: "UNIT_NULL"}]
             },
             global: {stubs}
@@ -102,19 +121,29 @@ describe("ProcessoDiagnosticoAlert.vue", () => {
         expect(wrapper.find("a").exists()).toBe(false);
     });
 
-    it("renderiza resumo e grupos quando não há unidades sem responsável", () => {
+    it("renderiza grupos formatados quando não há unidades sem responsável", () => {
         const wrapper = mount(ProcessoDiagnosticoAlert, {
             props: {
                 exibir: true,
-                resumo: "Resumo do diagnóstico",
-                grupos: [{tipo: "Erro Tipo A", quantidadeOcorrencias: 5}],
+                resumo: "Foram encontradas inconsistências nos dados organizacionais.",
+                grupos: [
+                    {
+                        tipo: "Usuario sem e-mail na VW_USUARIO",
+                        quantidadeOcorrencias: 2,
+                        ocorrencias: [
+                            "sigla=117ª Z.E., titulo=1, nome=TEREZA CRISTINA DE MEDEIROS",
+                            "sigla=SGP, titulo=2, nome=ELISIE MARIA JUNQUEIRA AYRES ROCHA"
+                        ]
+                    }
+                ],
                 unidadesSemResponsavel: []
             },
             global: {stubs}
         });
-        expect(wrapper.text()).toContain("Há unidades sem responsável atual.");
-        expect(wrapper.text()).toContain("Resumo do diagnóstico");
-        expect(wrapper.text()).toContain("Erro Tipo A: 5 ocorrência(s)");
+        expect(wrapper.text()).toContain("Foram encontradas inconsistências nos dados organizacionais");
+        expect(wrapper.text()).toContain("Usuários sem e-mail:");
+        expect(wrapper.text()).toContain("TEREZA CRISTINA DE MEDEIROS (117ª Z.E.)");
+        expect(wrapper.text()).toContain("ELISIE MARIA JUNQUEIRA AYRES ROCHA (SGP)");
     });
 
     it("emite dismiss quando o alerta é fechado", async () => {

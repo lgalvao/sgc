@@ -544,6 +544,51 @@ describe('ProcessoCadastroView.vue', () => {
         expect(processoService.iniciarProcesso).not.toHaveBeenCalled();
     });
 
+    it('abre modal complementar quando a interoperacional superior estiver coberta pela seleção da folha', async () => {
+        mockRoute.query = {codProcesso: '123'};
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            situacao: 'CRIADO',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2024-12-31',
+            unidades: []
+        };
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
+            {
+                codigo: 10,
+                sigla: 'SGP',
+                nome: 'Secretaria',
+                tipo: 'INTEROPERACIONAL',
+                isElegivel: false,
+                filhas: [
+                    {
+                        codigo: 11,
+                        sigla: 'COEDE',
+                        nome: 'Coordenadoria',
+                        tipo: 'INTERMEDIARIA',
+                        isElegivel: false,
+                        filhas: [
+                            {codigo: 12, sigla: 'SEDOC', nome: 'Seção', tipo: 'OPERACIONAL', isElegivel: true, filhas: []}
+                        ]
+                    }
+                ]
+            }
+        ] as any);
+
+        const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
+        await flushPromises();
+        wrapper.vm.unidadesSelecionadas = [12];
+        await nextTick();
+
+        await wrapper.vm.confirmarIniciarProcesso();
+
+        const modal = wrapper.findComponent({name: 'ModalAcaoBloco'});
+        expect((modal.vm as any).aberto).toBe(true);
+        expect(modal.props('unidadesPreSelecionadas')).toEqual([10]);
+        expect(processoService.iniciarProcesso).not.toHaveBeenCalled();
+    });
+
     it('inicia com subconjunto confirmado de unidades com equipe própria', async () => {
         mockRoute.query = {codProcesso: '123'};
         const mockProcesso = {
@@ -577,6 +622,50 @@ describe('ProcessoCadastroView.vue', () => {
         await flushPromises();
 
         expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', [11]);
+    });
+
+    it('inicia incluindo interoperacional superior confirmada mesmo quando só a folha estava selecionada', async () => {
+        mockRoute.query = {codProcesso: '123'};
+        const mockProcesso = {
+            codigo: 123,
+            descricao: 'P1',
+            situacao: 'CRIADO',
+            tipo: 'MAPEAMENTO',
+            dataLimite: '2024-12-31',
+            unidades: []
+        };
+        unidadeStoreMock.garantirArvoreElegibilidade.mockResolvedValue([
+            {
+                codigo: 10,
+                sigla: 'SGP',
+                nome: 'Secretaria',
+                tipo: 'INTEROPERACIONAL',
+                isElegivel: false,
+                filhas: [
+                    {
+                        codigo: 11,
+                        sigla: 'COEDE',
+                        nome: 'Coordenadoria',
+                        tipo: 'INTERMEDIARIA',
+                        isElegivel: false,
+                        filhas: [
+                            {codigo: 12, sigla: 'SEDOC', nome: 'Seção', tipo: 'OPERACIONAL', isElegivel: true, filhas: []}
+                        ]
+                    }
+                ]
+            }
+        ] as any);
+
+        const {wrapper} = createWrapper({processos: {processoDetalhe: mockProcesso}});
+        await flushPromises();
+        vi.mocked(processoService.iniciarProcesso).mockResolvedValue({} as any);
+        wrapper.vm.unidadesSelecionadas = [12];
+        await nextTick();
+
+        await wrapper.vm.confirmarSelecaoUnidadesComEquipePropria({ids: [10]});
+        await flushPromises();
+
+        expect(processoService.iniciarProcesso).toHaveBeenCalledWith(123, 'MAPEAMENTO', [12, 10]);
     });
 
     it('resets units when type changes to REVISAO and no units were previously selected', async () => {

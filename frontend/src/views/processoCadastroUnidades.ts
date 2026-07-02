@@ -31,8 +31,12 @@ export function listarUnidadesComEquipePropriaSelecionadas(
     const codigosSelecionadosSet = new Set(codigosSelecionados);
     const selecionadas: UnidadeSelecao[] = [];
 
-    const visitar = (unidade: Unidade) => {
-        if (unidade.tipo === "INTEROPERACIONAL" && codigosSelecionadosSet.has(unidade.codigo)) {
+    const visitar = (unidade: Unidade): boolean => {
+        const filhaSelecionada = (unidade.filhas ?? []).some(visitar);
+        const unidadeSelecionada = codigosSelecionadosSet.has(unidade.codigo);
+        const subarvoreSelecionada = unidadeSelecionada || filhaSelecionada;
+
+        if (unidade.tipo === "INTEROPERACIONAL" && subarvoreSelecionada) {
             selecionadas.push({
                 codigo: unidade.codigo,
                 sigla: unidade.sigla,
@@ -41,7 +45,7 @@ export function listarUnidadesComEquipePropriaSelecionadas(
             });
         }
 
-        (unidade.filhas ?? []).forEach(visitar);
+        return subarvoreSelecionada;
     };
 
     unidadesArvore.forEach(visitar);
@@ -55,8 +59,15 @@ export function aplicarSelecaoDiretaUnidadesComEquipePropria(
 ): number[] {
     const codigosComEquipePropriaSet = new Set(codigosComEquipePropria);
     const codigosConfirmadosSet = new Set(codigosConfirmados);
-
-    return codigosSelecionados.filter((codigo) =>
+    const codigosDiretos = codigosSelecionados.filter((codigo) =>
         !codigosComEquipePropriaSet.has(codigo) || codigosConfirmadosSet.has(codigo)
     );
+
+    for (const codigoConfirmado of codigosConfirmados) {
+        if (!codigosDiretos.includes(codigoConfirmado)) {
+            codigosDiretos.push(codigoConfirmado);
+        }
+    }
+
+    return codigosDiretos;
 }

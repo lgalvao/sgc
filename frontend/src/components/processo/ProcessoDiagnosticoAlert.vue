@@ -11,33 +11,28 @@
         <i v-else class="bi bi-exclamation-triangle-fill fs-5 mt-1"></i>
         <div>
           <strong v-if="carregando">Validando informações organizacionais...</strong>
-          <template v-else-if="unidadesSemResponsavel.length > 0">
-            <div class="mt-1">
-              {{ prefixoMensagemUnidadesSemResponsavel }}
-              <template v-for="(unidade, indice) in unidadesSemResponsavel" :key="unidade.sigla">
-                <span v-if="indice > 0">{{ separadorListaUnidades(indice, unidadesSemResponsavel.length) }}</span>
-                <RouterLink
-                    v-if="unidade.codigo !== null"
-                    :to="`/unidade/${unidade.codigo}`"
-                    :data-testid="`link-unidade-sem-responsavel-${indice}`"
-                >
-                  <strong>{{ unidade.sigla }}</strong>
-                </RouterLink>
-                <strong v-else>{{ unidade.sigla }}</strong>
-              </template>
-              {{ sufixoMensagemUnidadesSemResponsavel }} A responsabilidade
-              deve ser definida externamente, no SGRH, ou por atribuição temporária no próprio sistema.
+          <template v-else>
+            <strong>{{ tituloDiagnostico }}</strong>
+            <div v-if="mensagemApoio" class="mt-1">{{ mensagemApoio }}</div>
+            <div v-for="grupo in gruposFormatados" :key="grupo.tipo" class="mt-3">
+              <strong>{{ grupo.rotulo }}:</strong>
+              <ul class="mb-0 mt-1 ps-3">
+                <li v-for="(ocorrencia, indice) in grupo.ocorrencias" :key="`${grupo.tipo}-${indice}`">
+                  <template v-if="ocorrencia.siglaUnidade && ocorrencia.linkUnidade">
+                    <RouterLink
+                        :to="ocorrencia.linkUnidade"
+                        :data-testid="`link-unidade-sem-responsavel-${indice}`"
+                    >
+                      {{ ocorrencia.texto }}
+                    </RouterLink>
+                  </template>
+                  <template v-else>
+                    {{ ocorrencia.texto }}
+                  </template>
+                </li>
+              </ul>
             </div>
           </template>
-          <template v-else>
-            <strong>Há unidades sem responsável atual.</strong>
-            <div class="mt-1">{{ resumo }}</div>
-          </template>
-          <ul v-if="!carregando && unidadesSemResponsavel.length === 0" class="mb-0 mt-2 ps-3 small">
-            <li v-for="grupo in grupos" :key="grupo.tipo">
-              {{ grupo.tipo }}: {{ grupo.quantidadeOcorrencias }} ocorrência(s)
-            </li>
-          </ul>
         </div>
       </div>
     </Alerta>
@@ -53,11 +48,24 @@ import {RouterLink} from "vue-router";
 interface GrupoDiagnostico {
   tipo: string;
   quantidadeOcorrencias: number;
+  ocorrencias?: string[];
 }
 
 interface UnidadeSemResponsavel {
   codigo: number | null;
   sigla: string;
+}
+
+interface OcorrenciaFormatada {
+  texto: string;
+  siglaUnidade?: string;
+  linkUnidade?: string;
+}
+
+interface GrupoDiagnosticoFormatado {
+  tipo: string;
+  rotulo: string;
+  ocorrencias: OcorrenciaFormatada[];
 }
 
 const props = defineProps<{
@@ -73,21 +81,64 @@ defineEmits<{
 }>();
 
 const unidadesSemResponsavel = computed(() => props.unidadesSemResponsavel ?? []);
-const prefixoMensagemUnidadesSemResponsavel = computed(() =>
-    unidadesSemResponsavel.value.length > 1 ? "As unidades " : "A unidade "
+const tituloDiagnostico = computed(() =>
+    unidadesSemResponsavel.value.length > 0
+        ? "Há inconsistências nos dados organizacionais"
+        : "Foram encontradas inconsistências nos dados organizacionais"
 );
-const sufixoMensagemUnidadesSemResponsavel = computed(() =>
-    unidadesSemResponsavel.value.length > 1
-        ? " estão atualmente sem responsável. Enquanto isso, não poderão participar de processos."
-        : " está atualmente sem responsável. Enquanto isso, não poderá participar de processos."
+const mensagemApoio = computed(() =>
+    props.resumo && props.resumo !== tituloDiagnostico.value ? props.resumo : ""
+);
+const gruposFormatados = computed<GrupoDiagnosticoFormatado[]>(() =>
+    props.grupos.map((grupo) => ({
+      tipo: grupo.tipo,
+      rotulo: obterRotuloGrupo(grupo.tipo),
+      ocorrencias: formatarOcorrenciasGrupo(grupo.tipo, grupo.ocorrencias ?? [], unidadesSemResponsavel.value),
+    }))
 );
 
-function separadorListaUnidades(indice: number, total: number): string {
-  if (indice === total - 1) {
-    return total === 2 ? " e " : ", e ";
+function obterRotuloGrupo(tipo: string): string {
+  switch (tipo) {
+    case "Unidade sem responsável":
+      return "Unidades sem titular ou responsável";
+    case "Usuario sem e-mail na VW_USUARIO":
+      return "Usuários sem e-mail";
+    default:
+      return tipo;
   }
+}
 
-  return ", ";
+function formatarOcorrenciasGrupo(
+    tipo: string,
+    ocorrencias: string[],
+    unidadesSemResponsavelAtuais: UnidadeSemResponsavel[],
+): OcorrenciaFormatada[] {
+  switch (tipo) {
+    case "Unidade sem responsável":
+      return unidadesSemResponsavelAtuais.map((unidade) => ({
+        texto: unidade.sigla,
+        siglaUnidade: unidade.sigla,
+        linkUnidade: unidade.codigo !== null ? `/unidade/${unidade.codigo}` : undefined,
+      }));
+    case "Usuario sem e-mail na VW_USUARIO":
+      return ocorrencias.map(formatarUsuarioSemEmail);
+    default:
+      return ocorrencias.map((ocorrencia) => ({texto: ocorrencia}));
+  }
+}
+
+function formatarUsuarioSemEmail(ocorrencia: string): OcorrenciaFormatada {
+  const nome = extrairCampo(ocorrencia, "nome");
+  const sigla = extrairCampo(ocorrencia, "sigla");
+  if (nome && sigla) {
+    return {texto: `${nome} (${sigla})`};
+  }
+  return {texto: ocorrencia};
+}
+
+function extrairCampo(ocorrencia: string, chave: string): string | null {
+  const correspondencia = new RegExp(`${chave}=([^,]+?)(?:,\\s|$)`).exec(ocorrencia);
+  return correspondencia?.[1]?.trim() || null;
 }
 </script>
 
