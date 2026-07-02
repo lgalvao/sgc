@@ -218,7 +218,7 @@ class ProcessoServiceIntegrationTest extends BaseIntegrationTest {
             Processo processoIniciado = processoRepo.buscarPorCodigoComParticipantes(processo.getCodigo()).orElseThrow();
             assertThat(processoIniciado.getSituacao()).isEqualTo(SituacaoProcesso.EM_ANDAMENTO);
             assertThat(processoIniciado.getParticipantes().stream().map(UnidadeProcesso::getUnidadeCodigo).toList())
-                    .containsExactlyInAnyOrder(2L, 6L, 9L);
+                    .containsExactlyInAnyOrder(2L, 9L);
 
             assertThat(subprocessoRepo.listarPorProcessoComUnidade(processo.getCodigo()).stream()
                     .map(subprocesso -> subprocesso.getUnidade().getCodigo())

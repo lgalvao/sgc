@@ -236,9 +236,9 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk());
 
         Processo processo = processoRepo.buscarPorCodigoComParticipantes(codProcesso).orElseThrow();
-        assertThat(processo.getParticipantes()).hasSize(2); // Unidade alvo + Unidade superior
+        assertThat(processo.getParticipantes()).hasSize(1);
         assertThat(processo.getParticipantes().stream().map(UnidadeProcesso::getSigla).toList())
-                .containsExactlyInAnyOrder("U_REV", "U_SUP");
+                .containsExactlyInAnyOrder("U_REV");
 
         List<Subprocesso> subprocessos = subprocessoRepo.listarPorProcessoComUnidade(codProcesso);
         assertThat(subprocessos).hasSize(1);

@@ -68,7 +68,7 @@ COPY --from=build-env /build/backend/build/libs/*.jar aplicacao.jar
 RUN mkdir extraido && java -Djarmode=tools -jar aplicacao.jar extract --layers --launcher --destination extraido
 
 # Estágio 3: Imagem Final (Runtime)
-FROM docker.io/library/amazoncorretto:25-al2023-headless
+FROM docker.io/library/amazoncorretto:26-al2023-headless
 
 LABEL description="Sistema de Gestao de Competencias - SGC" \
       maintainer="SESEL <sesel@tre-pe.jus.br>" \

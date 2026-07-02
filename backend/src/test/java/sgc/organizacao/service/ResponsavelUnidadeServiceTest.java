@@ -354,7 +354,7 @@ class ResponsavelUnidadeServiceTest {
 
             assertThatThrownBy(() -> service.criarAtribuicaoTemporaria(codUnidade, request))
                     .isInstanceOf(ErroValidacao.class)
-                    .hasMessage("Usuário sem e-mail cadastrado: Usuario Teste");
+                    .hasMessage(Mensagens.USUARIO_SEM_EMAIL);
 
             verifyNoInteractions(alertaAplicacaoService);
             verifyNoInteractions(emailModelosService);
