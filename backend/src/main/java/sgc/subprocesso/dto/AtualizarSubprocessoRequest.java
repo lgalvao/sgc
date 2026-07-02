@@ -1,5 +1,6 @@
 package sgc.subprocesso.dto;
 
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.jspecify.annotations.*;
 
@@ -17,7 +18,7 @@ import java.util.*;
 public record AtualizarSubprocessoRequest(
         Long codUnidade,
         Long codMapa,
-        LocalDateTime dataLimiteEtapa1,
+        @NotNull LocalDateTime dataLimiteEtapa1,
         @Nullable LocalDateTime dataFimEtapa1,
         @Nullable LocalDateTime dataLimiteEtapa2,
         @Nullable LocalDateTime dataFimEtapa2) {

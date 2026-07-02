@@ -364,6 +364,7 @@ class SubprocessoServiceIntegrationTest {
 
             AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
                     .codMapa(mapaNovo.getCodigo())
+                    .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
                     .build();
 
             Subprocesso atualizado = subprocessoService.atualizarEntidade(sp.getCodigo(), request.paraCommand());
@@ -396,6 +397,7 @@ class SubprocessoServiceIntegrationTest {
 
             AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
                     .codMapa(mapaAntigo.getCodigo())
+                    .dataLimiteEtapa1(sp.getDataLimiteEtapa1())
                     .build();
 
             Subprocesso atualizado = subprocessoService.atualizarEntidade(sp.getCodigo(), request.paraCommand());

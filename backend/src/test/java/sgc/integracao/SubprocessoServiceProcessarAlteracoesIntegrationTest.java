@@ -72,6 +72,7 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
                 .codUnidade(unidade.getCodigo())
                 .codMapa(novoMapa.getCodigo())
+                .dataLimiteEtapa1(subprocesso.getDataLimiteEtapa1())
                 .build();
 
         Subprocesso atualizado = subprocessoService.atualizarEntidade(subprocesso.getCodigo(), request.paraCommand());
@@ -90,6 +91,7 @@ class SubprocessoServiceProcessarAlteracoesIntegrationTest extends BaseIntegrati
         AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
                 .codUnidade(unidade.getCodigo())
                 .codMapa(mapa.getCodigo())
+                .dataLimiteEtapa1(subprocesso.getDataLimiteEtapa1())
                 .build();
 
         Subprocesso atualizado = subprocessoService.atualizarEntidade(subprocesso.getCodigo(), request.paraCommand());

@@ -522,6 +522,7 @@ class SubprocessoServiceTest {
                 AtualizarSubprocessoRequest request = AtualizarSubprocessoRequest.builder()
                         .codUnidade(10L)
                         .codMapa(100L)
+                        .dataLimiteEtapa1(d1)
                         .build();
 
                 when(subprocessoRepo.save(any())).thenReturn(sp);
