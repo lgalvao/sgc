@@ -105,3 +105,15 @@ defineEmits<{
     </p>
   </ModalConfirmacao>
 </template>
+
+<style scoped>
+.email-content-preview {
+  display: block;
+  width: 100%;
+  min-height: 420px;
+  max-height: 60vh;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.5rem;
+  background: var(--bs-body-bg);
+}
+</style>

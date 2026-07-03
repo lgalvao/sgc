@@ -176,6 +176,16 @@ function montarPreviewHtml(corpoHtml?: string): string {
         background: var(--bs-body-bg, #fff);
         overflow-wrap: anywhere;
       }
+      .container {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+      }
+      .content,
+      .footer {
+        box-sizing: border-box;
+      }
       img, table, pre {
         max-width: 100%;
       }
@@ -250,14 +260,5 @@ async function reenviar() {
 
 .detalhes-notificacao dt {
   font-weight: 600;
-}
-
-.email-content-preview {
-  width: 100%;
-  min-height: 420px;
-  max-height: 60vh;
-  border: 1px solid var(--bs-border-color);
-  border-radius: 0.5rem;
-  background: var(--bs-body-bg);
 }
 </style>

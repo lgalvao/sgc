@@ -314,4 +314,12 @@ describe('NotificacoesAdminView', () => {
         const html = vm.montarPreviewHtml('');
         expect(html).toContain('Conteúdo indisponível');
     });
+
+    it('montarPreviewHtml remove a largura fixa do layout de e-mail no preview', () => {
+        const wrapper = mountComponent();
+        const vm = wrapper.vm as any;
+        const html = vm.montarPreviewHtml('<div class="container"><div class="content">Teste</div></div>');
+        expect(html).toContain('max-width: none !important;');
+        expect(html).toContain('width: 100% !important;');
+    });
 });
