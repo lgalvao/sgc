@@ -434,6 +434,35 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
     }
 
     @Test
+    @DisplayName("finalizar não deve criar alerta nem notificação para a unidade virtual ADMIN")
+    void finalizarNaoDeveCriarAlertaNemNotificacaoParaUnidadeAdmin() {
+        Long codigo = 206L;
+        Processo processo = new Processo();
+        processo.setCodigo(codigo);
+        processo.setDescricao("Processo admin");
+        processo.setSituacao(EM_ANDAMENTO);
+        processo.setTipo(DIAGNOSTICO);
+
+        Unidade admin = criarUnidadeValida(1L);
+        admin.setSigla("ADMIN");
+        admin.setTipo(TipoUnidade.RAIZ);
+        processo.adicionarParticipantes(Set.of(admin));
+
+        when(repo.buscar(Processo.class, codigo)).thenReturn(processo);
+        when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(admin));
+        when(validacaoService.validarSubprocessosParaFinalizacao(codigo, TipoProcesso.DIAGNOSTICO))
+                .thenReturn(ResultadoValidacao.ofValido());
+
+        processoService.finalizar(codigo);
+
+        verify(servicoAlertas, never()).criarAlertaAdmin(eq(processo), eq(admin), anyString());
+        verify(notificacaoService, never()).enfileirar(argThat(cmd ->
+                "ADMIN".equals(cmd.unidadeDestinoSigla())
+        ));
+        verify(processoRepo).save(processo);
+    }
+
+    @Test
     @DisplayName("finalizar deve carregar unidades consolidadas ausentes antes de notificar")
     void finalizarDeveCarregarUnidadesConsolidadasAusentesAntesDeNotificar() {
         Long codigoProcesso = 205L;
@@ -480,6 +509,54 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         verify(unidadeService, atLeastOnce()).buscarPorCodigos(argThat(codigos -> codigos.size() == 1 && codigos.contains(30L)));
         verify(notificacaoService).enfileirar(argThat(cmd ->
                 "SUP".equals(cmd.unidadeDestinoSigla()) && "<html>consolidado</html>".equals(cmd.corpoHtml())
+        ));
+    }
+
+    @Test
+    @DisplayName("Não deve criar notificacao consolidada de inicio para a unidade virtual ADMIN")
+    void naoDeveCriarNotificacaoConsolidadaDeInicioParaUnidadeAdmin() {
+        Long id = 300L;
+        Processo processo = new Processo();
+        processo.setCodigo(id);
+        processo.setSituacao(CRIADO);
+        processo.setTipo(MAPEAMENTO);
+        processo.setDescricao("Processo sem agregacao admin");
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+        Unidade admin = criarUnidadeValida(1L);
+        admin.setSigla("ADMIN");
+        admin.setTipo(TipoUnidade.RAIZ);
+        Unidade operacional = criarUnidadeValida(10L);
+        operacional.setSigla("OPER");
+        operacional.setTipo(TipoUnidade.OPERACIONAL);
+        processo.adicionarParticipantes(Set.of(operacional));
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(501L);
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(operacional);
+
+        when(repo.buscar(Processo.class, id)).thenReturn(processo);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(operacional));
+        when(consultaService.listarEntidadesPorProcesso(id)).thenReturn(List.of(subprocesso));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of(1L));
+        when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(admin));
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
+                .thenReturn("<html>inicio</html>");
+        mockarResponsaveisEfetivos();
+
+        processoService.iniciar(id, List.of(10L));
+
+        verify(notificacaoService, times(1)).enfileirar(any());
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
+                        && "OPER".equals(cmd.unidadeDestinoSigla())
+        ));
+        verify(notificacaoService, never()).enfileirar(argThat(cmd ->
+                "ADMIN".equals(cmd.unidadeDestinoSigla())
+                        && cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
         ));
     }
 }

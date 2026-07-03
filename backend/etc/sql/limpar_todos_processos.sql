@@ -5,10 +5,10 @@
 DECLARE
 v_count INTEGER;
 BEGIN
-    -- 1. Notificações de e-mail vinculadas a subprocessos
+-- 1. Notificações de e-mail vinculadas a subprocessos
 DELETE
 FROM sgc.notificacao_email
-WHERE subprocesso_codigo IS NOT NULL;
+;
 
 -- 2. Alertas vinculados a processos
 DELETE
@@ -70,6 +70,8 @@ DELETE
 FROM sgc.movimentacao;
 DELETE
 FROM sgc.subprocesso;
+DELETE
+FROM sgc.servidor_processo;
 DELETE
 FROM sgc.unidade_processo;
 DELETE

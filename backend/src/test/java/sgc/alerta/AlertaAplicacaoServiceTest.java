@@ -497,6 +497,38 @@ class AlertaAplicacaoServiceTest {
                 .anyMatch(a -> a.getUnidadeDestino().equals(intermediaria) && a.getDescricao().contains("Início do processo em unidade(s) subordinada(s)"));
     }
 
+    @Test
+    @DisplayName("Não deve criar alerta consolidado para a unidade virtual ADMIN")
+    void naoDeveCriarAlertaConsolidadoParaUnidadeAdmin() {
+        Processo processo = new Processo();
+        processo.setCodigo(10L);
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
+
+        Unidade raizAdmin = new Unidade();
+        raizAdmin.setCodigo(1L);
+        raizAdmin.setTipo(TipoUnidade.RAIZ);
+        raizAdmin.setSigla("ADMIN");
+
+        Unidade operacional = new Unidade();
+        operacional.setCodigo(4L);
+        operacional.setTipo(TipoUnidade.OPERACIONAL);
+        operacional.setSigla("OPER");
+
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(raizAdmin);
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(4L)).thenReturn(List.of(1L));
+        when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(raizAdmin));
+        when(alertaService.salvarTodos(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        List<Alerta> alertas = alertaAplicacaoService.criarAlertasProcessoIniciado(processo, List.of(operacional));
+
+        assertThat(alertas)
+                .singleElement()
+                .satisfies(alerta -> {
+                    assertThat(alerta.getUnidadeDestino()).isEqualTo(operacional);
+                    assertThat(alerta.getDescricao()).isEqualTo("Início do processo");
+                });
+    }
+
 
 }
 

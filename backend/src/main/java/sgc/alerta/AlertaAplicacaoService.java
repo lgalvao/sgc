@@ -22,6 +22,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AlertaAplicacaoService {
+    private static final String SIGLA_UNIDADE_ADMIN = "ADMIN";
+
     private final AlertaService alertaService;
     private final UsuarioService usuarioService;
     private final UnidadeService unidadeService;
@@ -175,6 +177,9 @@ public class AlertaAplicacaoService {
         if (!codigosSuperiores.isEmpty()) {
             List<Unidade> unidadesSuperiores = unidadeService.buscarPorCodigos(new java.util.ArrayList<>(codigosSuperiores));
             unidadesSuperiores.forEach(u -> {
+                if (isUnidadeAdmin(u)) {
+                    return;
+                }
                 todasUnidadesMap.put(u.getCodigo(), u);
                 codsIntermediarias.add(u.getCodigo());
             });
@@ -224,6 +229,10 @@ public class AlertaAplicacaoService {
 
     private Unidade obterUnidadeObrigatoria(Map<Long, Unidade> unidadesPorCodigo, Long codigoUnidade) {
         return unidadesPorCodigo.get(codigoUnidade);
+    }
+
+    private boolean isUnidadeAdmin(Unidade unidade) {
+        return unidade != null && SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidade.getSigla());
     }
 
     @Transactional

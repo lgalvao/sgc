@@ -1135,6 +1135,9 @@ public class ProcessoService {
         if (!codigosSuperiores.isEmpty()) {
             List<Unidade> unidadesSuperiores = unidadeService.buscarPorCodigos(new ArrayList<>(codigosSuperiores));
             unidadesSuperiores.forEach(u -> {
+                if (isUnidadeAdmin(u)) {
+                    return;
+                }
                 todasUnidadesMap.put(u.getCodigo(), u);
                 codsIntermediarias.add(u.getCodigo());
             });
@@ -1224,6 +1227,10 @@ public class ProcessoService {
         Map<Long, List<String>> subordinadasPorSuperior = new HashMap<>();
         for (Unidade participante : participantes) {
             for (Long codigoSuperior : unidadeHierarquiaService.buscarCodigosSuperiores(participante.getCodigo())) {
+                Unidade unidadeSuperior = unidadeService.buscarPorCodigo(codigoSuperior);
+                if (isUnidadeAdmin(unidadeSuperior)) {
+                    continue;
+                }
                 subordinadasPorSuperior
                         .computeIfAbsent(codigoSuperior, ignored -> new ArrayList<>())
                         .add(participante.getSigla());
@@ -1290,7 +1297,7 @@ public class ProcessoService {
     }
 
     private boolean isUnidadeAdmin(Unidade unidadeDestino) {
-        return SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
+        return unidadeDestino != null && SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
     }
 
     private String chaveInicioProcesso(Processo processo, Unidade unidadeDestino, boolean participante) {
@@ -1356,11 +1363,17 @@ public class ProcessoService {
     }
 
     private boolean isUnidadeDiretaFinalizacao(Unidade participante) {
+        if (isUnidadeAdmin(participante)) {
+            return false;
+        }
         TipoUnidade tipo = participante.getTipo();
         return tipo == TipoUnidade.OPERACIONAL || tipo == TipoUnidade.INTEROPERACIONAL;
     }
 
     private boolean isUnidadeConsolidadaFinalizacao(Unidade participante) {
+        if (isUnidadeAdmin(participante)) {
+            return false;
+        }
         TipoUnidade tipo = participante.getTipo();
         return tipo == TipoUnidade.INTERMEDIARIA || tipo == TipoUnidade.INTEROPERACIONAL;
     }
