@@ -712,6 +712,21 @@ describe('SubprocessoView.vue', () => {
         expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(true);
     });
 
+    it('não exibe botão de concluir diagnóstico em subprocesso de mapeamento', async () => {
+        const {wrapper} = mountComponent({
+            tipoProcesso: TipoProcesso.MAPEAMENTO,
+            permissoes: {
+                podeCriarConsenso: false,
+                podeConcluirDiagnostico: false,
+                habilitarConcluirDiagnostico: false,
+            }
+        });
+        await flushPromises();
+
+        expect(wrapper.find('[data-testid="btn-concluir-diagnostico-cabecalho"]').exists()).toBe(false);
+        expect(wrapper.find('[data-testid="diagnostico-equipe-painel"]').exists()).toBe(false);
+    });
+
     it('mantém a visão restrita do servidor após concluir a autoavaliação no diagnóstico', async () => {
         const {wrapper} = mountComponent({
             tipoProcesso: TipoProcesso.DIAGNOSTICO,

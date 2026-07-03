@@ -63,6 +63,7 @@ public class SubprocessoAcessoService {
     private PermissoesSubprocessoDto construirPermissoes(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         SituacaoSubprocesso situacao = contexto.situacao();
         boolean mesmaUnidade = contexto.mesmaUnidade();
+        boolean ehSubprocessoDiagnostico = isSituacaoDiagnostico(situacao);
 
         PermissoesSubprocessoDto.PermissoesSubprocessoDtoBuilder builder = PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(contexto.isChefe())
@@ -85,12 +86,12 @@ public class SubprocessoAcessoService {
                 .podeEnviarLembrete(contexto.isAdmin())
                 .mostrarExportacaoMapa(contexto.isChefe())
                 .mostrarHistoricoAnaliseDiagnostico(verificarExibicaoHistoricoAnaliseDiagnostico(contexto))
-                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR)
-                .podeCriarConsenso(contexto.isChefe())
-                .podeConcluirDiagnostico(contexto.isChefe())
-                .podeValidarDiagnostico(contexto.isGestor())
-                .podeDevolverDiagnostico(contexto.isGestorOuAdmin())
-                .podeHomologarDiagnostico(contexto.isAdmin())
+                .podePreencherAutoavaliacao(ehSubprocessoDiagnostico && contexto.perfil() == Perfil.SERVIDOR)
+                .podeCriarConsenso(ehSubprocessoDiagnostico && contexto.isChefe())
+                .podeConcluirDiagnostico(ehSubprocessoDiagnostico && contexto.isChefe())
+                .podeValidarDiagnostico(ehSubprocessoDiagnostico && contexto.isGestor())
+                .podeDevolverDiagnostico(ehSubprocessoDiagnostico && contexto.isGestorOuAdmin())
+                .podeHomologarDiagnostico(ehSubprocessoDiagnostico && contexto.isAdmin())
                 .mesmaUnidade(mesmaUnidade)
                 .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(contexto))
                 .habilitarAcessoMapa(verificarAcessoMapaHabilitado(contexto))
@@ -133,6 +134,7 @@ public class SubprocessoAcessoService {
     }
 
     private PermissoesSubprocessoDto construirPermissoesProcessoFinalizado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        boolean ehSubprocessoDiagnostico = isSituacaoDiagnostico(contexto.situacao());
         return PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(contexto.isChefe())
                 .podeDisponibilizarCadastro(contexto.isChefe())
@@ -154,12 +156,12 @@ public class SubprocessoAcessoService {
                 .podeEnviarLembrete(contexto.isAdmin())
                 .mostrarExportacaoMapa(contexto.isChefe())
                 .mostrarHistoricoAnaliseDiagnostico(verificarExibicaoHistoricoAnaliseDiagnostico(contexto))
-                .podePreencherAutoavaliacao(contexto.perfil() == Perfil.SERVIDOR)
-                .podeCriarConsenso(contexto.isChefe())
-                .podeConcluirDiagnostico(contexto.isChefe())
-                .podeValidarDiagnostico(contexto.isGestor())
-                .podeDevolverDiagnostico(contexto.isGestorOuAdmin())
-                .podeHomologarDiagnostico(contexto.isAdmin())
+                .podePreencherAutoavaliacao(ehSubprocessoDiagnostico && contexto.perfil() == Perfil.SERVIDOR)
+                .podeCriarConsenso(ehSubprocessoDiagnostico && contexto.isChefe())
+                .podeConcluirDiagnostico(ehSubprocessoDiagnostico && contexto.isChefe())
+                .podeValidarDiagnostico(ehSubprocessoDiagnostico && contexto.isGestor())
+                .podeDevolverDiagnostico(ehSubprocessoDiagnostico && contexto.isGestorOuAdmin())
+                .podeHomologarDiagnostico(ehSubprocessoDiagnostico && contexto.isAdmin())
                 .mesmaUnidade(contexto.mesmaUnidade())
                 .habilitarAcessoCadastro(verificarAcessoCadastroHabilitado(contexto))
                 .habilitarAcessoMapa(verificarAcessoMapaHabilitado(contexto))
@@ -192,7 +194,7 @@ public class SubprocessoAcessoService {
     }
 
     private boolean verificarAcessoDiagnosticoHabilitado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
-        if (!contexto.situacao().name().startsWith("DIAGNOSTICO")) {
+        if (!isSituacaoDiagnostico(contexto.situacao())) {
             return false;
         }
         return switch (contexto.perfil()) {
@@ -200,6 +202,10 @@ public class SubprocessoAcessoService {
             case GESTOR -> contexto.isUnidadeAlvoNaHierarquiaUsuario();
             case CHEFE, Perfil.SERVIDOR -> contexto.isMesmaUnidadeAlvo();
         };
+    }
+
+    private boolean isSituacaoDiagnostico(SituacaoSubprocesso situacao) {
+        return situacao.name().startsWith("DIAGNOSTICO");
     }
 
     private boolean verificarAcessoCadastroHabilitado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {

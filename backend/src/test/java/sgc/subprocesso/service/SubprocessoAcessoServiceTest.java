@@ -275,6 +275,22 @@ class SubprocessoAcessoServiceTest {
     }
 
     @Test
+    void naoDeveExibirPermissoesDeDiagnosticoEmProcessoDeMapeamento() {
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_DISPONIBILIZADO);
+
+        PermissoesSubprocessoDto permissoes = acessoService.resolverPermissoes(
+                createContexto(subprocesso, Perfil.CHEFE, true, true, false, false));
+
+        assertThat(permissoes.podeCriarConsenso()).isFalse();
+        assertThat(permissoes.podeConcluirDiagnostico()).isFalse();
+        assertThat(permissoes.podeValidarDiagnostico()).isFalse();
+        assertThat(permissoes.podeDevolverDiagnostico()).isFalse();
+        assertThat(permissoes.podeHomologarDiagnostico()).isFalse();
+        assertThat(permissoes.habilitarConcluirDiagnostico()).isFalse();
+    }
+
+    @Test
     void deveDesabilitarEscritaEmProcessoFinalizadoMasPermitirComandosAdmin() {
         Subprocesso subprocesso = new Subprocesso();
         subprocesso.setSituacaoForcada(MAPEAMENTO_MAPA_HOMOLOGADO);
