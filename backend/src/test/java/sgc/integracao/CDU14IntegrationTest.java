@@ -198,12 +198,17 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_EM_ANDAMENTO);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
             List<Alerta> alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
-            assertThat(alertas).hasSize(6);
             assertThat(alertas).anySatisfy(alerta -> {
                 assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo(unidadeChefe.getSigla());
                 assertThat(alerta.getDescricao())
                         .isEqualTo(Mensagens.ALERTA_REVISAO_DEVOLVIDA.formatted(unidadeChefe.getSigla()));
             });
+            assertThat(alertas.stream()
+                    .filter(alerta -> Mensagens.ALERTA_REVISAO_DEVOLVIDA.formatted(unidadeChefe.getSigla())
+                            .equals(alerta.getDescricao()))
+                    .map(alerta -> alerta.getUnidadeDestino().getSigla())
+                    .toList())
+                    .containsExactly(unidadeChefe.getSigla());
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
             List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
@@ -248,11 +253,16 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
             assertThat(sp.getSituacao()).isEqualTo(SituacaoSubprocesso.REVISAO_CADASTRO_DISPONIBILIZADA);
             assertThat(analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(subprocessoId)).hasSize(1);
             List<Alerta> alertas = alertaRepo.findByProcessoCodigo(sp.getProcesso().getCodigo());
-            assertThat(alertas).hasSize(6);
             assertThat(alertas.stream()
                     .map(Alerta::getDescricao)
                     .toList())
                     .contains(Mensagens.ALERTA_REVISAO_ACEITA.formatted(unidadeChefe.getSigla()));
+            assertThat(alertas.stream()
+                    .filter(alerta -> Mensagens.ALERTA_REVISAO_ACEITA.formatted(unidadeChefe.getSigla())
+                            .equals(alerta.getDescricao()))
+                    .map(alerta -> alerta.getUnidadeDestino().getSigla())
+                    .toList())
+                    .containsExactly("STIC");
             assertThat(movimentacaoRepo.findBySubprocessoCodigo(subprocessoId)).hasSize(3);
 
             // Esperamos pelo menos 2 e-mails: Início de Processo e Aceite
