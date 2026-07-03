@@ -147,11 +147,7 @@ public class DiagnosticoFluxoService {
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Unidade unidadeOrigem = subprocesso.getUnidade();
-        Unidade unidadeDestino = fluxoContextoService.buscarSuperiorImediato(unidadeOrigem.getCodigo());
-        if (unidadeDestino == null) {
-            // Caso ocorra na unidade ADMIN (topo da hierarquia), que não possui superior imediato
-            unidadeDestino = unidadeOrigem;
-        }
+        Unidade unidadeDestino = obterSuperiorImediatoObrigatorio(unidadeOrigem, "conclusão de diagnóstico");
 
         transicaoService.registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
@@ -162,9 +158,7 @@ public class DiagnosticoFluxoService {
                 .observacoes(null)
                 .build());
 
-        if (!Objects.equals(unidadeDestino.getCodigo(), unidadeOrigem.getCodigo())) {
-            notificacaoService.notificarDiagnosticoConcluido(subprocesso, unidadeDestino);
-        }
+        notificacaoService.notificarDiagnosticoConcluido(subprocesso, unidadeDestino);
     }
 
     public void validarConclusaoDiagnosticoUnidade(Long codSubprocesso) {
@@ -225,10 +219,7 @@ public class DiagnosticoFluxoService {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
-        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeAnalise.getCodigo());
-        if (unidadeSuperior == null) {
-            return;
-        }
+        Unidade unidadeSuperior = obterSuperiorImediatoObrigatorio(unidadeAnalise, "aceite de diagnóstico");
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
@@ -321,10 +312,7 @@ public class DiagnosticoFluxoService {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
-        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeAnalise.getCodigo());
-        if (unidadeSuperior == null) {
-            return new Unidade[]{unidadeAnalise, unidadeAnalise};
-        }
+        Unidade unidadeSuperior = obterSuperiorImediatoObrigatorio(unidadeAnalise, "aceite em bloco de diagnóstico");
 
         transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
@@ -340,6 +328,17 @@ public class DiagnosticoFluxoService {
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
         return new Unidade[]{unidadeAnalise, unidadeSuperior};
+    }
+
+    private Unidade obterSuperiorImediatoObrigatorio(Unidade unidadeOrigem, String contexto) {
+        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeOrigem.getCodigo());
+        if (unidadeSuperior == null) {
+            throw new ErroInconsistenciaInterna(
+                    "Unidade superior imediata obrigatória ausente para %s da unidade %s"
+                            .formatted(contexto, unidadeOrigem.getSigla())
+            );
+        }
+        return unidadeSuperior;
     }
 
     private void homologarDiagnosticoEmBloco(Subprocesso subprocesso) {

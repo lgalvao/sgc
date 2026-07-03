@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.*;
 import org.mockito.*;
 import org.mockito.junit.jupiter.*;
+import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.diagnostico.model.*;
 import sgc.mapa.model.*;
@@ -221,6 +222,27 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
+    @DisplayName("concluirDiagnosticoUnidade deve falhar sem unidade superior imediata")
+    void concluirDiagnosticoUnidade_deveFalharSemUnidadeSuperiorImediata() {
+        Long codSubprocesso = 90L;
+        Diagnostico diagnostico = new Diagnostico();
+        diagnostico.setCodigo(700L);
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
+        subprocesso.setCodigo(codSubprocesso);
+
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
+        when(fluxoContextoService.buscarSuperiorImediato(unidadeOrigem.getCodigo())).thenReturn(null);
+
+        assertThatThrownBy(() -> service.concluirDiagnosticoUnidade(codSubprocesso))
+                .isInstanceOf(ErroInconsistenciaInterna.class)
+                .hasMessageContaining("Unidade superior imediata obrigatória ausente");
+
+        verify(notificacaoService, never()).notificarDiagnosticoConcluido(any(), any());
+    }
+
+    @Test
     @DisplayName("devolverDiagnostico deve retornar para autoavaliação concluída quando devolvido à unidade dona")
     void devolverDiagnostico_deveRetornarParaAutoavaliacaoDaUnidade() {
         Long codSubprocesso = 91L;
@@ -298,6 +320,25 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
+    @DisplayName("validarDiagnostico deve falhar sem unidade superior imediata")
+    void validarDiagnostico_deveFalharSemUnidadeSuperiorImediata() {
+        Long codSubprocesso = 92L;
+        Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocesso.setCodigo(codSubprocesso);
+
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
+        when(fluxoContextoService.buscarSuperiorImediato(unidadeGestora.getCodigo())).thenReturn(null);
+
+        assertThatThrownBy(() -> service.validarDiagnostico(codSubprocesso, "Pode seguir"))
+                .isInstanceOf(ErroInconsistenciaInterna.class)
+                .hasMessageContaining("Unidade superior imediata obrigatória ausente");
+
+        verify(notificacaoService, never()).notificarDiagnosticoAceito(any(), any(), any());
+    }
+
+    @Test
     @DisplayName("aceitarDiagnosticosEmBloco deve registrar aceite e consolidar notificações")
     void aceitarDiagnosticosEmBloco_deveRegistrarAceiteEConsolidarNotificacoes() {
         Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
@@ -320,6 +361,25 @@ class DiagnosticoFluxoServiceTest {
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_ACEITO);
         assertThat(captor.getValue().observacoes()).isNull();
         verify(notificacaoService).notificarDiagnosticosAceitosEmBloco(List.of(subprocesso), unidadeDestino);
+    }
+
+    @Test
+    @DisplayName("aceitarDiagnosticosEmBloco deve falhar sem unidade superior imediata")
+    void aceitarDiagnosticosEmBloco_deveFalharSemUnidadeSuperiorImediata() {
+        Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
+        Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
+        subprocesso.setCodigo(94L);
+
+        when(subprocessoConsultaService.buscarSubprocesso(94L)).thenReturn(subprocesso);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
+        when(fluxoContextoService.buscarSuperiorImediato(unidadeGestora.getCodigo())).thenReturn(null);
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
+
+        assertThatThrownBy(() -> service.aceitarDiagnosticosEmBloco(List.of(94L)))
+                .isInstanceOf(ErroInconsistenciaInterna.class)
+                .hasMessageContaining("Unidade superior imediata obrigatória ausente");
+
+        verify(notificacaoService, never()).notificarDiagnosticosAceitosEmBloco(anyList(), any());
     }
 
     @Test
