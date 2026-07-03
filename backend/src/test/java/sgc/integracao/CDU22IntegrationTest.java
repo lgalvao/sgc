@@ -194,4 +194,80 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         assertThat(algumEmailPara("cosis@tre-pe.jus.br")).isTrue();
         assertThat(algumEmailComAssunto("[SGC-TEST] Cadastros de atividades e conhecimentos submetidos para análise")).isTrue();
     }
+
+    @Test
+    @DisplayName("Deve aceitar cadastro em bloco no último nível e notificar a ADMIN")
+    void aceitarCadastroEmBlocoNoUltimoNivel_deveNotificarAdmin() throws Exception {
+        Unidade unidadeAnalise = unidadeRepo.findById(2L)
+                .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
+        Unidade unidadeOrigem = unidadeRepo.findById(6L)
+                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+
+        Processo processoFinal = ProcessoFixture.processoPadrao();
+        processoFinal.setCodigo(null);
+        processoFinal.setTipo(TipoProcesso.MAPEAMENTO);
+        processoFinal.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processoFinal.setDescricao("Processo bloco final CDU-22");
+        processoFinal = processoRepo.save(processoFinal);
+
+        Subprocesso subprocessoFinal = SubprocessoFixture.subprocessoPadrao(processoFinal, unidadeOrigem);
+        subprocessoFinal.setCodigo(null);
+        subprocessoFinal.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
+        subprocessoFinal.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
+        subprocessoFinal = subprocessoRepo.save(subprocessoFinal);
+
+        Usuario usuarioGestorNivelFinal = usuarioRepo.findById("666666666666").orElseThrow();
+        usuarioGestorNivelFinal.setPerfilAtivo(Perfil.GESTOR);
+        usuarioGestorNivelFinal.setUnidadeAtivaCodigo(unidadeAnalise.getCodigo());
+        usuarioGestorNivelFinal.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocessoFinal)
+                .unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(unidadeAnalise)
+                .descricao(Mensagens.HIST_CADASTRO_DISPONIBILIZADO)
+                .usuario(usuarioGestorNivelFinal)
+                .build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
+                .subprocessos(List.of(subprocessoFinal.getCodigo()))
+                .build();
+
+        mockMvc.perform(
+                        post("/api/subprocessos/aceitar-cadastro-bloco")
+                                .with(user(usuarioGestorNivelFinal))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoFinal.getCodigo());
+        assertThat(movimentacoes).isNotEmpty();
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getCodigo()).isEqualTo(unidadeAnalise.getCodigo());
+        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
+
+        assertThat(alertaRepo.findByProcessoCodigo(processoFinal.getCodigo()))
+                .anySatisfy(alerta -> {
+                    assertThat(alerta.getDescricao()).isEqualTo(Mensagens.ALERTA_CADASTRO_ACEITO.formatted("COSIS"));
+                    assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
+                });
+
+        assertThat(notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_ACEITO)
+                .toList())
+                .anySatisfy(notificacao -> {
+                    assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("ADMIN");
+                    assertThat(notificacao.getDestinatario()).isEqualTo("admin@tre-pe.jus.br");
+                });
+        assertThat(notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_ACEITO)
+                .map(NotificacaoEmail::getUnidadeDestinoSigla)
+                .toList())
+                .doesNotContain("STIC");
+    }
 }

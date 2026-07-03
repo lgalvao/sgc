@@ -1,11 +1,10 @@
 ## Bugs
 
-- Config. de dias para historico nao esta sendo atualizado.
-- Alerta indevido para admin
-- Notificações:
-    - Nots. indevidas para admin
-    - Formato de preview quebrado
-    - Cade as msgs de submetido para analise
+- Notificações
+  - Tirar tipo
+  - Adicionar processo
+  - Adicionar origem
+  - Destino parece errado
 
 ## Melhorias
 
@@ -13,3 +12,4 @@
   finalização
 - Apagar alertas/notificaçoes fisicamente, quando o processo é 'arquivado' no historico
 - Funcionalidade de apagamento de processos
+- Clique na tabela mostra detalhes 

@@ -143,6 +143,76 @@ class CDU51IntegrationTest extends BaseIntegrationTest {
         assertThat(algumEmailComAssunto("[SGC-TEST] Diagnósticos submetidos para análise")).isTrue();
     }
 
+    @Test
+    @DisplayName("GESTOR deve aceitar diagnósticos em bloco no último nível e notificar a ADMIN")
+    void gestorDeveAceitarDiagnosticosEmBlocoNoUltimoNivel() throws Exception {
+        Unidade unidadeAnaliseFinal = unidadeRepo.findById(2L).orElseThrow();
+        Unidade unidadeOrigem = unidadeRepo.findById(6L).orElseThrow();
+        Usuario usuarioGestor = usuarioRepo.findById("666666666666").orElseThrow();
+        usuarioGestor.setPerfilAtivo(Perfil.GESTOR);
+        usuarioGestor.setUnidadeAtivaCodigo(unidadeAnaliseFinal.getCodigo());
+        usuarioGestor.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
+
+        Processo processoFinal = ProcessoFixture.processoPadrao();
+        processoFinal.setCodigo(null);
+        processoFinal.setTipo(TipoProcesso.DIAGNOSTICO);
+        processoFinal.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processoFinal.setDescricao("Processo diagnóstico final CDU-51");
+        processoFinal.adicionarParticipantes(Set.of(unidadeOrigem));
+        processoFinal = processoRepo.saveAndFlush(processoFinal);
+
+        Subprocesso subprocessoFinal = criarSubprocessoConcluido(processoFinal, unidadeOrigem);
+        movimentacaoRepo.saveAndFlush(Movimentacao.builder()
+                .subprocesso(subprocessoFinal)
+                .unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(unidadeAnaliseFinal)
+                .usuario(usuarioGestor)
+                .descricao("Conclusão de diagnóstico")
+                .build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(post("/api/processos/{codigo}/acao-em-bloco", processoFinal.getCodigo())
+                        .with(user(usuarioGestor))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "unidadeCodigos": [6],
+                                  "acao": "ACEITAR"
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        Subprocesso subprocessoRecarregado = subprocessoRepo.findById(subprocessoFinal.getCodigo()).orElseThrow();
+        assertThat(movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoRecarregado.getCodigo()))
+                .anySatisfy(movimentacao -> {
+                    assertThat(movimentacao.getDescricao()).isEqualTo(Mensagens.HIST_DIAGNOSTICO_ACEITO);
+                    assertThat(movimentacao.getUnidadeOrigem().getCodigo()).isEqualTo(unidadeAnaliseFinal.getCodigo());
+                    assertThat(movimentacao.getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
+                });
+
+        assertThat(alertaRepo.findByProcessoCodigo(processoFinal.getCodigo()))
+                .anySatisfy(alerta -> {
+                    assertThat(alerta.getDescricao()).isEqualTo(Mensagens.ALERTA_DIAGNOSTICO_ACEITO_BLOCO);
+                    assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
+                });
+
+        assertThat(notificacaoEmailRepo.findAll().stream()
+                .filter(notificacao -> notificacao.getSubprocesso().getCodigo().equals(subprocessoRecarregado.getCodigo()))
+                .filter(notificacao -> notificacao.getTipoNotificacao() == TipoNotificacao.DIAGNOSTICO_ACEITO))
+                .singleElement()
+                .satisfies(notificacao -> {
+                    assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("ADMIN");
+                    assertThat(notificacao.getDestinatario()).isEqualTo("admin@tre-pe.jus.br");
+                    assertThat(notificacao.getAssunto()).isEqualTo("SGC: Diagnósticos submetidos para análise");
+                });
+    }
+
     private Subprocesso criarSubprocessoConcluido(Processo processo, Unidade unidade) {
         Subprocesso subprocesso = SubprocessoFixture.novoSubprocesso(processo, unidade);
         subprocesso.setCodigo(null);

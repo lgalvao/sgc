@@ -219,4 +219,74 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[?(@.descricao =~ /.*SEDESENV.*/)]").exists());
     }
+
+    @Test
+    @DisplayName("Deve aceitar validação em bloco no último nível e notificar a ADMIN")
+    void aceitarValidacaoEmBlocoNoUltimoNivel_deveNotificarAdmin() throws Exception {
+        Unidade unidadeAnalise = unidadeRepo.findById(2L)
+                .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
+        Unidade unidadeOrigem = unidadeRepo.findById(6L)
+                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+
+        Processo processoFinal = ProcessoFixture.processoPadrao();
+        processoFinal.setCodigo(null);
+        processoFinal.setTipo(TipoProcesso.MAPEAMENTO);
+        processoFinal.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
+        processoFinal.setDescricao("Processo validação final CDU-25");
+        processoFinal = processoRepo.save(processoFinal);
+
+        Subprocesso subprocessoFinal = SubprocessoFixture.subprocessoPadrao(processoFinal, unidadeOrigem);
+        subprocessoFinal.setCodigo(null);
+        subprocessoFinal.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
+        subprocessoFinal = subprocessoRepo.save(subprocessoFinal);
+
+        Usuario usuarioGestorNivelFinal = usuarioRepo.findById("666666666666").orElseThrow();
+        usuarioGestorNivelFinal.setPerfilAtivo(Perfil.GESTOR);
+        usuarioGestorNivelFinal.setUnidadeAtivaCodigo(unidadeAnalise.getCodigo());
+        usuarioGestorNivelFinal.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocessoFinal)
+                .unidadeOrigem(unidadeOrigem)
+                .unidadeDestino(unidadeAnalise)
+                .descricao(Mensagens.HIST_MAPA_VALIDADO)
+                .dataHora(LocalDateTime.now())
+                .usuario(usuarioGestorNivelFinal)
+                .build());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        ProcessarEmBlocoRequest request = ProcessarEmBlocoRequest.builder()
+                .subprocessos(List.of(subprocessoFinal.getCodigo()))
+                .build();
+
+        mockMvc.perform(
+                        post("/api/subprocessos/aceitar-validacao-bloco")
+                                .with(user(usuarioGestorNivelFinal))
+                                .with(csrf())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoFinal.getCodigo());
+        assertThat(movimentacoes).isNotEmpty();
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getCodigo()).isEqualTo(unidadeAnalise.getCodigo());
+        assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
+
+        assertThat(notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_ACEITA)
+                .toList())
+                .anySatisfy(notificacao -> {
+                    assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("ADMIN");
+                    assertThat(notificacao.getDestinatario()).isEqualTo("admin@tre-pe.jus.br");
+                });
+        assertThat(notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_ACEITA)
+                .map(NotificacaoEmail::getUnidadeDestinoSigla)
+                .toList())
+                .doesNotContain("STIC");
+    }
 }

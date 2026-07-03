@@ -300,6 +300,7 @@ public class SubprocessoNotificacaoService {
     private void criarNotificacaoConsolidadaAceiteCadastroBloco(Unidade superior, List<Subprocesso> subprocessos) {
         Subprocesso base = subprocessos.getFirst();
         Unidade admin = unidadeService.buscarAdmin();
+        Unidade destinoConsolidado = resolverDestinoConsolidadoAceiteBloco(superior);
         boolean revisao = base.getProcesso().getTipo() == TipoProcesso.REVISAO;
         TipoTransicao tipoTransicao = revisao ? TipoTransicao.REVISAO_CADASTRO_ACEITA : TipoTransicao.CADASTRO_ACEITO;
         TipoNotificacao tipoNotificacao = revisao ? TipoNotificacao.REVISAO_CADASTRO_ACEITA : TipoNotificacao.CADASTRO_ACEITO;
@@ -307,15 +308,22 @@ public class SubprocessoNotificacaoService {
                 .subprocesso(base)
                 .tipoTransicao(tipoTransicao)
                 .unidadeOrigem(admin)
-                .unidadeDestino(superior)
+                .unidadeDestino(destinoConsolidado)
                 .build();
-        Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
+        Map<String, Object> variaveis = criarVariaveisConsolidacao(destinoConsolidado, subprocessos);
         String assunto = AssuntosNotificacao.cadastroAceitoBloco(revisao);
         String corpo = processarTemplate(
                 revisao ? "revisao-cadastro-aceita-bloco-superior" : "cadastro-aceito-bloco-superior",
                 variaveis
         );
-        EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
+        EmailGerado email = new EmailGerado(
+                getEmailUnidade(destinoConsolidado),
+                assunto,
+                corpo,
+                OrigemNotificacao.SUPERIOR,
+                destinoConsolidado.getSigla(),
+                null
+        );
         criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, tipoNotificacao, "bloco-superior"));
     }
 
@@ -356,17 +364,37 @@ public class SubprocessoNotificacaoService {
     private void criarNotificacaoConsolidadaAceiteValidacaoBloco(Unidade superior, List<Subprocesso> subprocessos) {
         Subprocesso base = subprocessos.getFirst();
         Unidade admin = unidadeService.buscarAdmin();
+        Unidade destinoConsolidado = resolverDestinoConsolidadoAceiteBloco(superior);
         NotificacaoCommand cmd = NotificacaoCommand.builder()
                 .subprocesso(base)
                 .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
                 .unidadeOrigem(admin)
-                .unidadeDestino(superior)
+                .unidadeDestino(destinoConsolidado)
                 .build();
-        Map<String, Object> variaveis = criarVariaveisConsolidacao(superior, subprocessos);
+        Map<String, Object> variaveis = criarVariaveisConsolidacao(destinoConsolidado, subprocessos);
         String assunto = AssuntosNotificacao.ACEITE_VALIDACAO_BLOCO_SUPERIOR;
         String corpo = processarTemplate("validacao-mapa-aceita-bloco-superior", variaveis);
-        EmailGerado email = new EmailGerado(getEmailUnidade(superior), assunto, corpo, OrigemNotificacao.SUPERIOR, superior.getSigla(), null);
+        EmailGerado email = new EmailGerado(
+                getEmailUnidade(destinoConsolidado),
+                assunto,
+                corpo,
+                OrigemNotificacao.SUPERIOR,
+                destinoConsolidado.getSigla(),
+                null
+        );
         criarNotificacaoComChave(new NotificacaoComChaveCommand(cmd, email, TipoNotificacao.MAPA_VALIDACAO_ACEITA, "bloco-superior"));
+    }
+
+    private Unidade resolverDestinoConsolidadoAceiteBloco(Unidade unidadeAnalise) {
+        Long codigoSuperior = unidadeHierarquiaService.buscarCodigoPai(unidadeAnalise.getCodigo());
+        if (codigoSuperior == null) {
+            return unidadeAnalise;
+        }
+        Unidade admin = unidadeService.buscarAdmin();
+        if (Objects.equals(codigoSuperior, admin.getCodigo())) {
+            return admin;
+        }
+        return unidadeAnalise;
     }
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {
