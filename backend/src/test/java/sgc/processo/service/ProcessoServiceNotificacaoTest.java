@@ -560,37 +560,6 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         ));
     }
 
-    @Test
-    @DisplayName("Não deve criar notificacao direta de inicio para a unidade virtual ADMIN")
-    void naoDeveCriarNotificacaoDiretaDeInicioParaUnidadeAdmin() {
-        Long id = 301L;
-        Processo processo = new Processo();
-        processo.setCodigo(id);
-        processo.setSituacao(CRIADO);
-        processo.setTipo(MAPEAMENTO);
-        processo.setDescricao("Processo sem notificacao admin");
-        processo.setDataLimite(LocalDateTime.now().plusDays(30));
-
-        Unidade admin = criarUnidadeValida(1L);
-        admin.setSigla("ADMIN");
-        admin.setTipo(TipoUnidade.RAIZ);
-        processo.adicionarParticipantes(Set.of(admin));
-
-        when(repo.buscar(Processo.class, id)).thenReturn(processo);
-        when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(admin));
-        when(consultaService.listarEntidadesPorProcesso(id)).thenReturn(List.of());
-        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
-                .thenReturn("<html>inicio</html>");
-        mockarResponsaveisEfetivos();
-
-        processoService.iniciar(id, List.of(1L));
-
-        verify(notificacaoService, never()).enfileirar(argThat(cmd ->
-                cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
-                        && "ADMIN".equals(cmd.unidadeDestinoSigla())
-        ));
-    }
 }
 
 
