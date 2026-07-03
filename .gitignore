@@ -85,3 +85,8 @@ test-results/.last-run.json
 # Documento de acesso HOM
 specs/docs/como_logar_hom.md
 /e2e/test-results/.last-run.json
+
+# Arquivos locais e relatórios de homologação (E2E)
+e2e/homologacao/usuarios.local.json
+playwright-report-hom/
+
