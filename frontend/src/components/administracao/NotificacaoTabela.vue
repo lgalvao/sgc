@@ -23,8 +23,12 @@
         </div>
       </template>
 
-      <template #cell(tipoNotificacao)="{ item }">
-        <span>{{ formatarTipoNotificacao(item.tipoNotificacao) }}</span>
+      <template #cell(processoDescricao)="{ item }">
+        <span>{{ item.processoDescricao || "-" }}</span>
+      </template>
+
+      <template #cell(unidadeOrigemSigla)="{ item }">
+        <span>{{ item.unidadeOrigemSigla || "-" }}</span>
       </template>
 
       <template #cell(assunto)="{ item }">
@@ -89,12 +93,7 @@ import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
 import type {Notificacao} from "@/services/notificacaoService";
 import {obterStatusNotificacao} from "@/services/notificacaoService";
-import {
-  formatarAssunto,
-  formatarDestinatario,
-  formatarQuando,
-  formatarTipoNotificacao
-} from "@/utils/notificacaoFormatters";
+import {formatarAssunto, formatarDestinatario, formatarQuando} from "@/utils/notificacaoFormatters";
 
 defineProps<{
   items: Notificacao[];
@@ -115,15 +114,18 @@ const camposTabela = [
     sortable: true
   },
   {
-    key: "tipoNotificacao",
-    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.TIPO,
-    thClass: "col-tipo",
-    tdClass: "col-tipo",
+    key: "processoDescricao",
+    label: "Processo",
+    thClass: "col-processo",
+    tdClass: "col-processo",
     sortable: true,
-    formatter: ({value, item}: {
-      value: unknown,
-      item: Notificacao
-    }) => formatarTipoNotificacao(typeof value === "string" ? value : item?.tipoNotificacao)
+  },
+  {
+    key: "unidadeOrigemSigla",
+    label: "Origem",
+    thClass: "col-origem",
+    tdClass: "col-origem",
+    sortable: true,
   },
   {
     key: "assunto",
@@ -155,8 +157,12 @@ const camposTabela = [
   width: 12rem;
 }
 
-:deep(.col-tipo) {
+:deep(.col-processo) {
   width: 14rem;
+}
+
+:deep(.col-origem) {
+  width: 9rem;
 }
 
 :deep(.col-status) {

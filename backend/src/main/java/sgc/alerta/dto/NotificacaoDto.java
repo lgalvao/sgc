@@ -10,6 +10,7 @@ public record NotificacaoDto(
         Long codigo,
         @Nullable Long subprocessoCodigo,
         @Nullable String unidadeSigla,
+        @Nullable String unidadeOrigemSigla,
         @Nullable String processoDescricao,
         TipoNotificacaoDto tipoNotificacao,
         @Nullable String usuarioDestinoTitulo,

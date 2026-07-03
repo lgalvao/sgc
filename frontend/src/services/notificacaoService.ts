@@ -13,6 +13,7 @@ export interface Notificacao {
     subprocessoCodigo?: number;
     unidadeSigla?: string;
     unidadeDestinoSigla?: string;
+    unidadeOrigemSigla?: string;
     processoDescricao?: string;
     tipoNotificacao?: string;
     usuarioDestinoTitulo?: string;

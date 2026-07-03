@@ -1158,7 +1158,7 @@ public class ProcessoService {
 
         for (Long cod : codsOperacionais) {
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && isUnidadeAdmin(unidadeDestino)) continue;
+            if (isUnidadeAdmin(unidadeDestino)) continue;
             Subprocesso sp = subprocessoPorUnidade.get(unidadeDestino.getCodigo());
             criarNotificacaoInicio(
                     processo,
@@ -1177,7 +1177,7 @@ public class ProcessoService {
             // Se já foi notificada como operacional, não notifica como intermediária
             if (codsOperacionais.contains(cod)) continue;
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
-            if (processo.getTipo() == TipoProcesso.DIAGNOSTICO && isUnidadeAdmin(unidadeDestino)) continue;
+            if (isUnidadeAdmin(unidadeDestino)) continue;
             criarNotificacaoInicio(
                     processo,
                     unidadeDestino,

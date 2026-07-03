@@ -26,11 +26,13 @@ public class AlertaDtoMapper {
         String processoDescricao = notificacao.getSubprocesso() != null
                 ? notificacao.getSubprocesso().getProcesso().getDescricao()
                 : null;
+        String unidadeOrigemSigla = inferirUnidadeOrigemSigla(notificacao);
 
         return NotificacaoDto.builder()
                 .codigo(notificacao.getCodigo())
                 .subprocessoCodigo(subprocessoCodigo)
                 .unidadeSigla(notificacao.getUnidadeDestinoSigla())
+                .unidadeOrigemSigla(unidadeOrigemSigla)
                 .processoDescricao(processoDescricao)
                 .tipoNotificacao(TipoNotificacaoDto.valueOf(notificacao.getTipoNotificacao().name()))
                 .usuarioDestinoTitulo(notificacao.getUsuarioDestinoTitulo())
@@ -44,6 +46,13 @@ public class AlertaDtoMapper {
                 .proximaTentativaEm(notificacao.getProximaTentativaEm())
                 .ultimoErro(notificacao.getUltimoErro())
                 .build();
+    }
+
+    private String inferirUnidadeOrigemSigla(NotificacaoEmail notificacao) {
+        if (notificacao.getSubprocesso() == null) {
+            return "ADMIN";
+        }
+        return notificacao.getSubprocesso().getUnidade().getSigla();
     }
 
     public NotificacaoSubprocessoResumoDto paraNotificacaoSubprocessoResumo(NotificacaoSubprocessoResumoQuery query) {

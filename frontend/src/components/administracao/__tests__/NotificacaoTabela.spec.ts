@@ -9,7 +9,6 @@ vi.mock("@/utils/notificacaoFormatters", () => ({
     formatarAssunto: vi.fn((v) => `Assunto: ${v}`),
     formatarDestinatario: vi.fn((i) => i.destinatario),
     formatarQuando: vi.fn(() => "Hoje"),
-    formatarTipoNotificacao: vi.fn((v) => `Tipo: ${v}`),
     resumirContexto: vi.fn(() => "Resumo do contexto")
 }));
 
@@ -18,6 +17,8 @@ describe("NotificacaoTabela.vue", () => {
         {
             codigo: 1,
             destinatario: "usuario@teste.com",
+            processoDescricao: "Processo teste",
+            unidadeOrigemSigla: "SECAO_221",
             tipoNotificacao: "PROCESSO_INICIADO",
             assunto: "Teste",
             situacao: "ENVIADO",
@@ -46,6 +47,8 @@ describe("NotificacaoTabela.vue", () => {
         });
         expect(wrapper.find('[data-testid="tbl-notificacoes"]').exists()).toBe(true);
         expect(wrapper.text()).toContain("usuario@teste.com");
+        expect(wrapper.text()).toContain("Processo teste");
+        expect(wrapper.text()).toContain("SECAO_221");
     });
 
     it("deve emitir 'detalhes' ao clicar no botão de info", async () => {
