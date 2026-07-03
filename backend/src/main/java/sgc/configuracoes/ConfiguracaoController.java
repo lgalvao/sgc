@@ -20,6 +20,16 @@ public class ConfiguracaoController {
     private final ConfiguracaoService configuracaoService;
     private final ConfiguracaoMapper configuracaoMapper;
 
+    public record DiasInativacaoProcessoResponse(int dias) {
+    }
+
+    @GetMapping("/dias-inativacao-processo")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Consultar quantidade de dias para inativação de processos")
+    public DiasInativacaoProcessoResponse consultarDiasInativacaoProcesso() {
+        return new DiasInativacaoProcessoResponse(configuracaoService.buscarDiasInativacaoProcesso());
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas as configurações")

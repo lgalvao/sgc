@@ -29,23 +29,19 @@ import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
 import {usePerfilStore} from '@/stores/perfil';
-import {useConfiguracoes} from '@/composables/useConfiguracoes';
 import {useHistoricoQuery} from '@/composables/useHistoricoQuery';
+import {buscarDiasInativacaoProcesso} from '@/services/configuracaoService';
 import {TEXTOS} from '@/constants/textos';
 import type {ProcessoResumo} from "@/types/tipos";
 
 const router = useRouter();
 const perfilStore = usePerfilStore();
-const {carregarConfiguracoes, obterDiasInativacaoProcesso} = useConfiguracoes();
 const historicoQuery = useHistoricoQuery();
 
 const loading = computed(() => historicoQuery.isPending.value || historicoQuery.isLoading.value);
-const podeCarregarConfiguracoes = computed(() => perfilStore.permissoesSessao?.mostrarMenuConfiguracoes === true);
-
 const criterio = ref<keyof ProcessoResumo>("dataFinalizacao");
 const asc = ref(false);
-
-const diasInativacao = computed(() => obterDiasInativacaoProcesso());
+const diasInativacao = ref(10);
 
 const processosOrdenados = computed(() => {
   const campo = criterio.value;
@@ -90,15 +86,17 @@ async function carregarDadosTela(deveRecarregarHistorico: boolean) {
   if (deveRecarregarHistorico) {
     promessas.push(void historicoQuery.refetch());
   }
-  if (podeCarregarConfiguracoes.value) {
-    promessas.push(carregarConfiguracoes());
-  }
+  promessas.push(carregarDiasInativacaoProcesso());
 
   try {
     await Promise.all(promessas);
   } catch (erro) {
     logger.error('Erro ao carregar dados da tela de histórico', erro);
   }
+}
+
+async function carregarDiasInativacaoProcesso() {
+  diasInativacao.value = await buscarDiasInativacaoProcesso();
 }
 
 onMounted(async () => {

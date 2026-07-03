@@ -33,6 +33,18 @@ class ConfiguracaoControllerTest {
     private ConfiguracaoService configuracaoService;
 
     @Test
+    @DisplayName("GET /api/configuracoes/dias-inativacao-processo - Deve permitir consulta autenticada")
+    @WithMockUser(roles = "CHEFE")
+    void deveConsultarDiasInativacaoProcesso() throws Exception {
+        when(configuracaoService.buscarDiasInativacaoProcesso()).thenReturn(17);
+
+        mockMvc.perform(get("/api/configuracoes/dias-inativacao-processo")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dias").value(17));
+    }
+
+    @Test
     @DisplayName("GET /api/configuracoes - Deve listar configurações com sucesso")
     @WithMockUser(roles = "ADMIN")
     void deveListarConfiguracoes() throws Exception {

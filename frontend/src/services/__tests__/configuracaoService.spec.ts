@@ -1,6 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
 import apiClient from '@/axios-setup';
-import {buscarConfiguracoes, salvarConfiguracoes} from '../configuracaoService';
+import {buscarConfiguracoes, buscarDiasInativacaoProcesso, salvarConfiguracoes} from '../configuracaoService';
 
 vi.mock('@/axios-setup', () => ({
     default: {
@@ -30,5 +30,13 @@ describe('configuracaoService', () => {
         const result = await salvarConfiguracoes(mockData);
         expect(apiClient.post).toHaveBeenCalledWith('/configuracoes', mockData);
         expect(result).toEqual(mockData);
+    });
+
+    it('deve buscar dias de inativacao de processo', async () => {
+        (apiClient.get as any).mockResolvedValue({data: {dias: 17}});
+
+        const result = await buscarDiasInativacaoProcesso();
+        expect(apiClient.get).toHaveBeenCalledWith('/configuracoes/dias-inativacao-processo');
+        expect(result).toBe(17);
     });
 });

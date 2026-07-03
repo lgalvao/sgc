@@ -20,6 +20,7 @@ vi.mock('@/services/processo', () => ({
 
 vi.mock('@/services/configuracaoService', () => ({
     buscarConfiguracoes: vi.fn(),
+    buscarDiasInativacaoProcesso: vi.fn(),
     salvarConfiguracoes: vi.fn(),
 }));
 
@@ -51,6 +52,7 @@ describe('HistoricoView.vue', () => {
         vi.clearAllMocks();
         vi.mocked(processoService.buscarProcessosFinalizados).mockResolvedValue([...mockProcessosFinalizados] as any);
         vi.mocked(configuracaoService.buscarConfiguracoes).mockResolvedValue([]);
+        vi.mocked(configuracaoService.buscarDiasInativacaoProcesso).mockResolvedValue(10);
         mockRouter = {push: vi.fn()};
         (useRouter as any).mockReturnValue(mockRouter);
     });
@@ -88,12 +90,12 @@ describe('HistoricoView.vue', () => {
         expect(processoService.buscarProcessosFinalizados).toHaveBeenCalled();
     });
 
-    it('nao deve carregar configuracoes sem permissao', async () => {
+    it('deve carregar dias de inativacao mesmo sem permissao administrativa', async () => {
         wrapper = createWrapper();
 
         await flushPromises();
 
-        expect(configuracaoService.buscarConfiguracoes).not.toHaveBeenCalled();
+        expect(configuracaoService.buscarDiasInativacaoProcesso).toHaveBeenCalledTimes(1);
     });
 
     it('deve carregar configuracoes quando a permissao existir', async () => {
@@ -107,7 +109,7 @@ describe('HistoricoView.vue', () => {
 
         await flushPromises();
 
-        expect(configuracaoService.buscarConfiguracoes).toHaveBeenCalledTimes(1);
+        expect(configuracaoService.buscarDiasInativacaoProcesso).toHaveBeenCalledTimes(1);
     });
 
     it('deve lidar com erro ao carregar historico', async () => {
