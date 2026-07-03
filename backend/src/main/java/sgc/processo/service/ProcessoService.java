@@ -450,6 +450,7 @@ public class ProcessoService {
 
     private void validarUnidadesParaProcesso(TipoProcesso tipo, Map<Long, Unidade> unidadesPorCodigo) {
         List<Unidade> entidades = new ArrayList<>(unidadesPorCodigo.values());
+        validarAusenciaUnidadeAdminNosParticipantes(entidades);
         List<String> invalidas = entidades.stream()
                 .filter(u -> u.getTipo() == TipoUnidade.INTERMEDIARIA)
                 .map(Unidade::getSigla).toList();
@@ -474,6 +475,9 @@ public class ProcessoService {
     private List<String> validarUnidadesInicio(TipoProcesso tipo, List<Long> cods, Collection<Unidade> unidadesCarregadas) {
         List<String> erros = new ArrayList<>();
         List<Unidade> unidades = new ArrayList<>(unidadesCarregadas);
+        if (unidades.stream().anyMatch(this::isUnidadeAdmin)) {
+            erros.add(Mensagens.OPERACAO_NAO_PERMITIDA);
+        }
         if (possuiUnidadeSemResponsavelEfetivo(unidades)) {
             erros.add(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
@@ -487,6 +491,12 @@ public class ProcessoService {
         List<Long> bloqueadas = processoRepo.listarUnidadesEmProcessoAtivo(EM_ANDAMENTO, cods);
         if (!bloqueadas.isEmpty()) erros.add(Mensagens.UNIDADES_EM_PROCESSO_ATIVO);
         return erros;
+    }
+
+    private void validarAusenciaUnidadeAdminNosParticipantes(Collection<Unidade> unidades) {
+        if (unidades.stream().anyMatch(this::isUnidadeAdmin)) {
+            throw new ErroValidacao(Mensagens.OPERACAO_NAO_PERMITIDA);
+        }
     }
 
     private void validarInicioSemErros(ContextoInicioProcesso contexto) {

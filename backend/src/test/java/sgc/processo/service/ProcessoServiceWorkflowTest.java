@@ -688,6 +688,20 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
                     .isInstanceOf(ErroValidacao.class)
                     .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
         }
+
+        @Test
+        @DisplayName("Deve falhar ao criar processo com a unidade ADMIN como participante")
+        void deveFalharCriacaoComUnidadeAdminComoParticipante() {
+            CriarProcessoRequest req = new CriarProcessoRequest(
+                    "Teste", TipoProcesso.MAPEAMENTO, LocalDateTime.now(), List.of(1L));
+            Unidade unidadeAdmin = criarUnidadeValida(1L);
+            unidadeAdmin.setSigla("ADMIN");
+            when(unidadeService.buscarPorCodigos(List.of(1L))).thenReturn(List.of(unidadeAdmin));
+
+            assertThatThrownBy(() -> processoService.criar(req))
+                    .isInstanceOf(ErroValidacao.class)
+                    .hasMessageContaining(Mensagens.OPERACAO_NAO_PERMITIDA);
+        }
     }
 
 
@@ -1129,90 +1143,6 @@ class ProcessoServiceWorkflowTest extends ProcessoServiceTestBase {
         }
 
 
-        @Test
-        @DisplayName("Deve enfileirar e-mail de cópia de admin quando iniciar processo para unidade ADMIN e usuário logado tem lotação que não seja SEDOC")
-        void deveEnfileirarEmailCopiaAdminQuandoUsuarioComLotacaoNaoSedoc() {
-            Long id = 100L;
-            Processo p = new Processo();
-            p.setCodigo(id);
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            p.setDataLimite(LocalDateTime.now().plusDays(30));
-            p.setDescricao("Processo Admin Teste");
-
-            Unidade uniAdmin = criarUnidadeValida(1L);
-            uniAdmin.setSigla("ADMIN");
-            p.adicionarParticipantes(Set.of(uniAdmin));
-
-            when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uniAdmin));
-
-            UnidadeMapa um = new UnidadeMapa();
-            um.setUnidadeCodigo(1L);
-            when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
-            mockarResponsaveisEfetivos();
-
-            Unidade lotacaoComum = new Unidade();
-            lotacaoComum.setCodigo(2L);
-            lotacaoComum.setSigla("COMUM");
-            lotacaoComum.setTipo(TipoUnidade.OPERACIONAL);
-
-            Usuario usuarioLogado = new Usuario();
-            usuarioLogado.setTituloEleitoral("12345");
-            usuarioLogado.setEmail("usuario@tre-pe.jus.br");
-            usuarioLogado.setUnidadeLotacao(lotacaoComum);
-
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuarioLogado);
-            when(usuarioService.buscarUsuarioComUnidadeLotacao("12345")).thenReturn(usuarioLogado);
-
-            processoService.iniciar(id, List.of(1L));
-
-            verify(notificacaoService).enfileirar(argThat(cmd ->
-                    cmd.destinatario().equals("usuario@tre-pe.jus.br") &&
-                            cmd.chaveIdempotencia().endsWith(":copia-admin")
-            ));
-        }
-
-        @Test
-        @DisplayName("Não deve enviar e-mail de cópia de admin quando usuário logado tem lotação SEDOC")
-        void naoDeveEnviarEmailCopiaAdminQuandoUsuarioComLotacaoSedoc() {
-            Long id = 100L;
-            Processo p = new Processo();
-            p.setCodigo(id);
-            p.setSituacao(SituacaoProcesso.CRIADO);
-            p.setTipo(TipoProcesso.MAPEAMENTO);
-            p.setDataLimite(LocalDateTime.now().plusDays(30));
-            p.setDescricao("Processo Admin Teste");
-
-            Unidade uniAdmin = criarUnidadeValida(1L);
-            uniAdmin.setSigla("ADMIN");
-            p.adicionarParticipantes(Set.of(uniAdmin));
-
-            when(repo.buscar(Processo.class, id)).thenReturn(p);
-            when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(uniAdmin));
-
-            UnidadeMapa um = new UnidadeMapa();
-            um.setUnidadeCodigo(1L);
-            when(unidadeService.buscarAdmin()).thenReturn(uniAdmin);
-            mockarResponsaveisEfetivos();
-
-            Usuario usuarioLogado = new Usuario();
-            usuarioLogado.setTituloEleitoral("12345");
-            usuarioLogado.setEmail("usuario@tre-pe.jus.br");
-
-            Unidade uniSedoc = new Unidade();
-            uniSedoc.setSigla("SEDOC");
-            usuarioLogado.setUnidadeLotacao(uniSedoc);
-
-            when(usuarioService.usuarioAutenticado()).thenReturn(usuarioLogado);
-            when(usuarioService.buscarUsuarioComUnidadeLotacao("12345")).thenReturn(usuarioLogado);
-
-            processoService.iniciar(id, List.of(1L));
-
-            verify(notificacaoService, never()).enfileirar(argThat(cmd ->
-                    cmd.chaveIdempotencia().endsWith(":copia-admin")
-            ));
-        }
     }
 
     @Test
