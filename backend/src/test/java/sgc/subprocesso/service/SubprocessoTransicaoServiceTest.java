@@ -506,15 +506,18 @@ class SubprocessoTransicaoServiceTest {
             Usuario usuario = criarUsuario();
             usuario.setUnidadeAtivaCodigo(10L);
             usuario.setPerfilAtivo(Perfil.ADMIN);
+            Unidade unidadeAnalise = criarUnidade(10L, "U1", "Unidade 1");
 
             when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(1L))).thenReturn(List.of(sp));
             when(localizacaoSubprocessoService.obterLocalizacaoAtual(sp)).thenReturn(u);
             when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
             when(fluxoContextoService.buscarSuperiorImediato(10L)).thenReturn(null); // Admin na raiz
+            when(unidadeService.buscarPorCodigoComSuperior(10L)).thenReturn(unidadeAnalise);
 
             service.aceitarValidacaoEmBloco(List.of(1L));
 
             verify(analiseRepo).save(any());
+            verify(notificacaoService).notificarAceiteValidacaoEmBloco(List.of(sp), unidadeAnalise);
         }
 
         @Test
@@ -682,5 +685,6 @@ class SubprocessoTransicaoServiceTest {
         service.aceitarValidacaoEmBloco(List.of(1L));
 
         verify(analiseRepo, never()).save(any());
+        verify(notificacaoService, never()).notificarAceiteValidacaoEmBloco(anyList(), any());
     }
 }

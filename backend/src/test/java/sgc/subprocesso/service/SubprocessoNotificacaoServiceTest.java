@@ -465,9 +465,9 @@ class SubprocessoNotificacaoServiceTest {
     @Test
     @DisplayName("não deve gerar notificações em bloco quando a lista estiver vazia")
     void naoDeveGerarNotificacoesEmBlocoQuandoAListaEstiverVazia() {
-        service.notificarAceiteCadastroEmBloco(List.of());
+        service.notificarAceiteCadastroEmBloco(List.of(), criarUnidade(1L, "ANA", "Analise"));
         service.notificarDisponibilizacaoMapaEmBloco(List.of());
-        service.notificarAceiteValidacaoEmBloco(List.of());
+        service.notificarAceiteValidacaoEmBloco(List.of(), criarUnidade(1L, "ANA", "Analise"));
 
         verifyNoInteractions(notificacaoService, templateEngine, unidadeService, usuarioService, responsavelService);
     }
@@ -585,7 +585,7 @@ class SubprocessoNotificacaoServiceTest {
                         .titularNome("Titular")
                         .build()));
 
-        service.notificarAceiteCadastroEmBloco(List.of(subprocesso));
+        service.notificarAceiteCadastroEmBloco(List.of(subprocesso), null);
 
         verify(notificacaoService, times(1)).enfileirar(any());
     }
@@ -622,7 +622,7 @@ class SubprocessoNotificacaoServiceTest {
                         .titularNome("Titular")
                         .build()));
 
-        service.notificarAceiteCadastroEmBloco(List.of(subprocesso));
+        service.notificarAceiteCadastroEmBloco(List.of(subprocesso), superior);
 
         verify(templateEngine, times(2)).process(templateCaptor.capture(), any(IContext.class));
         assertThat(templateCaptor.getAllValues())

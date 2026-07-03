@@ -101,13 +101,14 @@ public class SubprocessoNotificacaoService {
         criarNotificacaoHomologacao(sp, TipoTransicao.MAPA_HOMOLOGADO, TipoNotificacao.MAPA_HOMOLOGADO, "mapa-homologado");
     }
 
-    public void notificarAceiteCadastroEmBloco(List<Subprocesso> subprocessos) {
+    public void notificarAceiteCadastroEmBloco(List<Subprocesso> subprocessos, Unidade unidadeAnalise) {
         if (subprocessos.isEmpty()) {
             return;
         }
-        subprocessos.forEach(this::criarAlertaAceiteCadastroEmBloco);
+        subprocessos.forEach(sp -> criarAlertaAceiteCadastroEmBloco(sp, unidadeAnalise));
         subprocessos.forEach(this::criarNotificacaoDiretaAceiteCadastroBloco);
-        agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaAceiteCadastroBloco);
+        agruparPorUnidadeConsolidacaoAceiteBloco(subprocessos, unidadeAnalise)
+                .forEach(this::criarNotificacaoConsolidadaAceiteCadastroBloco);
     }
 
     public void notificarDisponibilizacaoMapaEmBloco(List<Subprocesso> subprocessos) {
@@ -117,17 +118,17 @@ public class SubprocessoNotificacaoService {
         agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaDisponibilizacaoMapaBloco);
     }
 
-    public void notificarAceiteValidacaoEmBloco(List<Subprocesso> subprocessos) {
+    public void notificarAceiteValidacaoEmBloco(List<Subprocesso> subprocessos, Unidade unidadeAnalise) {
         if (subprocessos.isEmpty()) {
             return;
         }
-        subprocessos.forEach(this::criarAlertaAceiteValidacaoEmBloco);
+        subprocessos.forEach(sp -> criarAlertaAceiteValidacaoEmBloco(sp, unidadeAnalise));
         subprocessos.forEach(this::criarNotificacaoDiretaAceiteValidacaoBloco);
-        agruparPorSuperiorImediata(subprocessos).forEach(this::criarNotificacaoConsolidadaAceiteValidacaoBloco);
+        agruparPorUnidadeConsolidacaoAceiteBloco(subprocessos, unidadeAnalise)
+                .forEach(this::criarNotificacaoConsolidadaAceiteValidacaoBloco);
     }
 
-    private void criarAlertaAceiteCadastroEmBloco(Subprocesso sp) {
-        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+    private void criarAlertaAceiteCadastroEmBloco(Subprocesso sp, Unidade unidadeAnalise) {
         Unidade unidadeDestino = unidadeAnalise == null ? null : unidadeAnalise.getUnidadeSuperior();
         if (unidadeAnalise == null || unidadeDestino == null) {
             return;
@@ -138,8 +139,7 @@ public class SubprocessoNotificacaoService {
         alertaAplicacaoService.criarAlertaTransicao(sp.getProcesso(), descricao, unidadeAnalise, unidadeDestino);
     }
 
-    private void criarAlertaAceiteValidacaoEmBloco(Subprocesso sp) {
-        Unidade unidadeAnalise = sp.getUnidade().getUnidadeSuperior();
+    private void criarAlertaAceiteValidacaoEmBloco(Subprocesso sp, Unidade unidadeAnalise) {
         Unidade unidadeDestino = unidadeAnalise == null ? null : unidadeAnalise.getUnidadeSuperior();
         if (unidadeAnalise == null || unidadeDestino == null) {
             return;
@@ -395,6 +395,14 @@ public class SubprocessoNotificacaoService {
             return admin;
         }
         return unidadeAnalise;
+    }
+
+    private Map<Unidade, List<Subprocesso>> agruparPorUnidadeConsolidacaoAceiteBloco(List<Subprocesso> subprocessos, Unidade unidadeAnalise) {
+        if (subprocessos.isEmpty() || unidadeAnalise == null) {
+            return Map.of();
+        }
+        Unidade destinoConsolidado = resolverDestinoConsolidadoAceiteBloco(unidadeAnalise);
+        return Map.of(destinoConsolidado, subprocessos);
     }
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {

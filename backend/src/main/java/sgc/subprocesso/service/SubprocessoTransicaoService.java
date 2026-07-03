@@ -363,8 +363,18 @@ public class SubprocessoTransicaoService {
     public void aceitarValidacaoEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarAceiteValidacao(sp, null, usuario, false));
-        notificacaoService.notificarAceiteValidacaoEmBloco(subprocessos);
+        List<Subprocesso> subprocessosProcessados = new ArrayList<>();
+        subprocessos.forEach(sp -> {
+            if (deveProcessarAceiteValidacaoEmBloco(sp, usuario)) {
+                executarAceiteValidacao(sp, null, usuario, false);
+                subprocessosProcessados.add(sp);
+            }
+        });
+        if (subprocessosProcessados.isEmpty()) {
+            return;
+        }
+        Unidade unidadeAnalise = unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo());
+        notificacaoService.notificarAceiteValidacaoEmBloco(subprocessosProcessados, unidadeAnalise);
     }
 
     private void executarAceiteValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
@@ -486,6 +496,12 @@ public class SubprocessoTransicaoService {
             case PADRAO -> registrarAnalise(comando);
             case SEM_COMUNICACOES -> registrarAnaliseSemComunicacoes(comando);
         }
+    }
+
+    private boolean deveProcessarAceiteValidacaoEmBloco(Subprocesso sp, Usuario usuario) {
+        Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
+        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeAtual.getCodigo());
+        return unidadeSuperior != null || usuario.getPerfilAtivo() == Perfil.ADMIN;
     }
 
     public void registrarWorkflowDentroDoAdmin(RegistrarWorkflowAnaliseCommand cmd) {

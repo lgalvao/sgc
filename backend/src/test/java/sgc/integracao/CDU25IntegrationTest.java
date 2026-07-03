@@ -27,6 +27,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-25: Aceitar validação de mapas em bloco")
 class CDU25IntegrationTest extends BaseIntegrationTest {
+    private static final Long codAdmin = 1L;
+    private static final Long codSecretaria = 2L;
+    private static final Long codCoordenadoria = 6L;
+    private static final Long codSecaoDesenvolvimento = 8L;
+    private static final Long codSecaoDados = 9L;
+
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
@@ -47,16 +53,10 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use existing 3-level hierarchy from data.sql:
-        // Unit 2 (STIC - INTEROPERACIONAL) - top level
-        // Unit 6 (COSIS - INTERMEDIARIA) - subordinate to 2, user '666666666666' is GESTOR
-        // Unit 8 (SEDESENV - OPERACIONAL) - subordinate to 6
-        // Unit 9 (SEDIA - OPERACIONAL) - subordinate to 6
-
-        Unidade unidade1 = unidadeRepo.findById(8L)
-                .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
-        Unidade unidade2 = unidadeRepo.findById(9L)
-                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
+        Unidade unidade1 = unidadeRepo.findById(codSecaoDesenvolvimento)
+                .orElseThrow(() -> new RuntimeException("Seção de desenvolvimento não encontrada no data.sql"));
+        Unidade unidade2 = unidadeRepo.findById(codSecaoDados)
+                .orElseThrow(() -> new RuntimeException("Seção de dados não encontrada no data.sql"));
         Usuario usuarioGestor = usuarioRepo.findById("666666666666").orElseThrow();
 
         // Create test process
@@ -78,8 +78,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         subprocesso2.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocesso2 = subprocessoRepo.save(subprocesso2);
 
-        // Subprocessos devem estar na unidade superior (6) para o Gestor aceitar
-        Unidade unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        Unidade unidadeSuperior = unidadeRepo.findById(codCoordenadoria).orElseThrow();
         Movimentacao m1 = Movimentacao.builder()
                 .subprocesso(subprocesso1)
                 .unidadeOrigem(unidade1)
@@ -173,9 +172,9 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Gestor da secretaria superior deve visualizar alerta no painel após aceite de validação")
     void gestorSecretariaSuperiorDeveVisualizarAlertaNoPainel() throws Exception {
-        Unidade secaoDesenvolvimento = unidadeRepo.findById(8L).orElseThrow();
-        Unidade coordenadoriaSistemas = unidadeRepo.findById(6L).orElseThrow();
-        Unidade secretariaInformatica = unidadeRepo.findById(2L).orElseThrow();
+        Unidade secaoDesenvolvimento = unidadeRepo.findById(codSecaoDesenvolvimento).orElseThrow();
+        Unidade coordenadoriaSistemas = unidadeRepo.findById(codCoordenadoria).orElseThrow();
+        Unidade secretariaInformatica = unidadeRepo.findById(codSecretaria).orElseThrow();
 
         Processo processoPainel = ProcessoFixture.processoPadrao();
         processoPainel.setCodigo(null);
@@ -223,10 +222,12 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve aceitar validação em bloco no último nível e notificar a ADMIN")
     void aceitarValidacaoEmBlocoNoUltimoNivel_deveNotificarAdmin() throws Exception {
-        Unidade unidadeAnalise = unidadeRepo.findById(2L)
-                .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
-        Unidade unidadeOrigem = unidadeRepo.findById(6L)
-                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+        Unidade secretaria = unidadeRepo.findById(codSecretaria)
+                .orElseThrow(() -> new RuntimeException("Secretaria não encontrada no data.sql"));
+        Unidade coordenadoria = unidadeRepo.findById(codCoordenadoria)
+                .orElseThrow(() -> new RuntimeException("Coordenadoria não encontrada no data.sql"));
+        Unidade secao = unidadeRepo.findById(codSecaoDesenvolvimento)
+                .orElseThrow(() -> new RuntimeException("Seção não encontrada no data.sql"));
 
         Processo processoFinal = ProcessoFixture.processoPadrao();
         processoFinal.setCodigo(null);
@@ -235,19 +236,27 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
         processoFinal.setDescricao("Processo validação final CDU-25");
         processoFinal = processoRepo.save(processoFinal);
 
-        Subprocesso subprocessoFinal = SubprocessoFixture.subprocessoPadrao(processoFinal, unidadeOrigem);
+        Subprocesso subprocessoFinal = SubprocessoFixture.subprocessoPadrao(processoFinal, secao);
         subprocessoFinal.setCodigo(null);
         subprocessoFinal.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_MAPA_VALIDADO);
         subprocessoFinal = subprocessoRepo.save(subprocessoFinal);
 
         Usuario usuarioGestorNivelFinal = usuarioRepo.findById("666666666666").orElseThrow();
         usuarioGestorNivelFinal.setPerfilAtivo(Perfil.GESTOR);
-        usuarioGestorNivelFinal.setUnidadeAtivaCodigo(unidadeAnalise.getCodigo());
+        usuarioGestorNivelFinal.setUnidadeAtivaCodigo(secretaria.getCodigo());
         usuarioGestorNivelFinal.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocessoFinal)
-                .unidadeOrigem(unidadeOrigem)
-                .unidadeDestino(unidadeAnalise)
+                .unidadeOrigem(secao)
+                .unidadeDestino(coordenadoria)
+                .descricao(Mensagens.HIST_MAPA_VALIDADO)
+                .dataHora(LocalDateTime.now())
+                .usuario(usuarioGestorNivelFinal)
+                .build());
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocessoFinal)
+                .unidadeOrigem(coordenadoria)
+                .unidadeDestino(secretaria)
                 .descricao(Mensagens.HIST_MAPA_VALIDADO)
                 .dataHora(LocalDateTime.now())
                 .usuario(usuarioGestorNivelFinal)
@@ -273,7 +282,7 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoFinal.getCodigo());
         assertThat(movimentacoes).isNotEmpty();
-        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getCodigo()).isEqualTo(unidadeAnalise.getCodigo());
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getCodigo()).isEqualTo(secretaria.getCodigo());
         assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
 
         assertThat(notificacaoEmailRepo.findAll().stream()
@@ -282,6 +291,8 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .anySatisfy(notificacao -> {
                     assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("ADMIN");
                     assertThat(notificacao.getDestinatario()).isEqualTo("admin@tre-pe.jus.br");
+                    assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação de mapas de competências submetida para análise");
+                    assertThat(notificacao.getCorpoHtml()).contains("SEDESENV");
                 });
         assertThat(notificacaoEmailRepo.findAll().stream()
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_ACEITA)

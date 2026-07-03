@@ -96,16 +96,28 @@ class CadastroFluxoServiceTest {
     @Test
     @DisplayName("Deve aceitar cadastro em bloco para diferentes tipos de processo")
     void deveAceitarCadastroEmBlocoDiferentesTipos() {
-        Subprocesso spMap = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, new Unidade());
-        Subprocesso spRev = criarSubprocesso(REVISAO, REVISAO_CADASTRO_DISPONIBILIZADA, new Unidade());
+        Unidade unidadeMap = new Unidade();
+        unidadeMap.setCodigo(20L);
+        Unidade unidadeRev = new Unidade();
+        unidadeRev.setCodigo(20L);
+        Subprocesso spMap = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_DISPONIBILIZADO, unidadeMap);
+        Subprocesso spRev = criarSubprocesso(REVISAO, REVISAO_CADASTRO_DISPONIBILIZADA, unidadeRev);
 
         when(subprocessoRepo.buscarPorCodigosComMapaEAtividades(List.of(10L, 20L))).thenReturn(List.of(spMap, spRev));
-        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(criarUsuario());
+        Usuario usuario = criarUsuario();
+        Unidade unidadeAnalise = new Unidade();
+        unidadeAnalise.setCodigo(usuario.getUnidadeAtivaCodigo());
+        when(usuarioAplicacaoService.usuarioAutenticado()).thenReturn(usuario);
+        when(unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo())).thenReturn(unidadeAnalise);
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(spMap)).thenReturn(spMap.getUnidade());
+        when(localizacaoSubprocessoService.obterLocalizacaoAtual(spRev)).thenReturn(spRev.getUnidade());
+        when(fluxoContextoService.buscarSuperiorImediato(20L)).thenReturn(unidadeAnalise);
 
         service.aceitarCadastroEmBloco(List.of(10L, 20L));
 
         assertThat(spMap.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         assertThat(spRev.getSituacao()).isEqualTo(REVISAO_CADASTRO_DISPONIBILIZADA);
+        verify(notificacaoService).notificarAceiteCadastroEmBloco(List.of(spMap, spRev), unidadeAnalise);
     }
 
     @Test

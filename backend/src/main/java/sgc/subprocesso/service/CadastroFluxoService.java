@@ -113,8 +113,18 @@ public class CadastroFluxoService {
     public void aceitarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarAceite(sp, usuario, "Avaliação em bloco", false));
-        notificacaoService.notificarAceiteCadastroEmBloco(subprocessos);
+        List<Subprocesso> subprocessosProcessados = new ArrayList<>();
+        subprocessos.forEach(sp -> {
+            if (deveProcessarAceiteEmBloco(sp, usuario)) {
+                executarAceite(sp, usuario, "Avaliação em bloco", false);
+                subprocessosProcessados.add(sp);
+            }
+        });
+        if (subprocessosProcessados.isEmpty()) {
+            return;
+        }
+        Unidade unidadeAnalise = unidadeService.buscarPorCodigoComSuperior(usuario.getUnidadeAtivaCodigo());
+        notificacaoService.notificarAceiteCadastroEmBloco(subprocessosProcessados, unidadeAnalise);
     }
 
     public void homologar(Long codSubprocesso, @Nullable String observacoes) {
@@ -230,6 +240,12 @@ public class CadastroFluxoService {
                 .usuario(usuario)
                 .observacoes(normalizarTexto(observacoes))
                 .build());
+    }
+
+    private boolean deveProcessarAceiteEmBloco(Subprocesso sp, Usuario usuario) {
+        Unidade unidadeAtual = localizacaoSubprocessoService.obterLocalizacaoAtual(sp);
+        Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeAtual.getCodigo());
+        return unidadeSuperior != null || usuario.getPerfilAtivo() == Perfil.ADMIN;
     }
 
     private void executarReabertura(ReaberturaCommand cmd) {

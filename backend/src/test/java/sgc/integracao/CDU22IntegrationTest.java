@@ -26,6 +26,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @DisplayName("CDU-22: Aceitar cadastros em bloco")
 class CDU22IntegrationTest extends BaseIntegrationTest {
+    private static final Long codAdmin = 1L;
+    private static final Long codSecretaria = 2L;
+    private static final Long codCoordenadoria = 6L;
+    private static final Long codSecaoDesenvolvimento = 8L;
+    private static final Long codSecaoDados = 9L;
+
     @Autowired
     private MovimentacaoRepo movimentacaoRepo;
 
@@ -48,17 +54,12 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Use existing units from data.sql:
-        // Unit 6 (COSIS - INTERMEDIARIA) is the parent
-        // Unit 8 (SEDESENV - OPERACIONAL) subordinate to 6
-        // Unit 9 (SEDIA - OPERACIONAL) subordinate to 6
-        // User '666666666666' is GESTOR of unit 6
-        unidadeSuperior = unidadeRepo.findById(6L)
-                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
-        Unidade unidade1 = unidadeRepo.findById(8L)
-                .orElseThrow(() -> new RuntimeException("Unit 8 not found in data.sql"));
-        Unidade unidade2 = unidadeRepo.findById(9L)
-                .orElseThrow(() -> new RuntimeException("Unit 9 not found in data.sql"));
+        unidadeSuperior = unidadeRepo.findById(codCoordenadoria)
+                .orElseThrow(() -> new RuntimeException("Coordenadoria não encontrada no data.sql"));
+        Unidade unidade1 = unidadeRepo.findById(codSecaoDesenvolvimento)
+                .orElseThrow(() -> new RuntimeException("Seção de desenvolvimento não encontrada no data.sql"));
+        Unidade unidade2 = unidadeRepo.findById(codSecaoDados)
+                .orElseThrow(() -> new RuntimeException("Seção de dados não encontrada no data.sql"));
         Usuario usuarioGestor = usuarioRepo.findById("666666666666").orElseThrow();
 
         // Create test process
@@ -82,7 +83,6 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         subprocesso2.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
         subprocesso2 = subprocessoRepo.save(subprocesso2);
 
-        // Subprocessos devem estar na unidade superior (6) para o Gestor aceitar
         Movimentacao m1 = Movimentacao.builder()
                 .subprocesso(subprocesso1)
                 .unidadeOrigem(unidade1)
@@ -108,7 +108,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         processoRepo.findById(processo.getCodigo()).orElseThrow();
         subprocesso1 = subprocessoRepo.findById(subprocesso1.getCodigo()).orElseThrow();
         subprocesso2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
-        unidadeSuperior = unidadeRepo.findById(6L).orElseThrow();
+        unidadeSuperior = unidadeRepo.findById(codCoordenadoria).orElseThrow();
     }
 
     @Test
@@ -143,8 +143,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
         assertThat(movs1.getFirst().getDescricao()).contains("aceito");
-        // O aceite envia para a unidade superior da unidade atual (6 -> 2)
-        assertThat(movs1.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(2L);
+        assertThat(movs1.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(codSecretaria);
 
         // Verify subprocesso 2
         Subprocesso s2 = subprocessoRepo.findById(subprocesso2.getCodigo()).orElseThrow();
@@ -154,7 +153,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movs2 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s2.getCodigo());
         assertThat(movs2).isNotEmpty();
-        assertThat(movs2.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(2L);
+        assertThat(movs2.getFirst().getUnidadeDestino().getCodigo()).isEqualTo(codSecretaria);
 
         List<Alerta> alertas = alertaRepo.findByProcessoCodigo(processo.getCodigo());
         assertThat(alertas).anySatisfy(alerta -> {
@@ -198,10 +197,12 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Deve aceitar cadastro em bloco no último nível e notificar a ADMIN")
     void aceitarCadastroEmBlocoNoUltimoNivel_deveNotificarAdmin() throws Exception {
-        Unidade unidadeAnalise = unidadeRepo.findById(2L)
-                .orElseThrow(() -> new RuntimeException("Unit 2 not found in data.sql"));
-        Unidade unidadeOrigem = unidadeRepo.findById(6L)
-                .orElseThrow(() -> new RuntimeException("Unit 6 not found in data.sql"));
+        Unidade secretaria = unidadeRepo.findById(codSecretaria)
+                .orElseThrow(() -> new RuntimeException("Secretaria não encontrada no data.sql"));
+        Unidade coordenadoria = unidadeRepo.findById(codCoordenadoria)
+                .orElseThrow(() -> new RuntimeException("Coordenadoria não encontrada no data.sql"));
+        Unidade secao = unidadeRepo.findById(codSecaoDesenvolvimento)
+                .orElseThrow(() -> new RuntimeException("Seção não encontrada no data.sql"));
 
         Processo processoFinal = ProcessoFixture.processoPadrao();
         processoFinal.setCodigo(null);
@@ -210,7 +211,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         processoFinal.setDescricao("Processo bloco final CDU-22");
         processoFinal = processoRepo.save(processoFinal);
 
-        Subprocesso subprocessoFinal = SubprocessoFixture.subprocessoPadrao(processoFinal, unidadeOrigem);
+        Subprocesso subprocessoFinal = SubprocessoFixture.subprocessoPadrao(processoFinal, secao);
         subprocessoFinal.setCodigo(null);
         subprocessoFinal.setSituacaoForcada(SituacaoSubprocesso.MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         subprocessoFinal.setDataLimiteEtapa1(LocalDateTime.now().plusDays(10));
@@ -218,12 +219,19 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
         Usuario usuarioGestorNivelFinal = usuarioRepo.findById("666666666666").orElseThrow();
         usuarioGestorNivelFinal.setPerfilAtivo(Perfil.GESTOR);
-        usuarioGestorNivelFinal.setUnidadeAtivaCodigo(unidadeAnalise.getCodigo());
+        usuarioGestorNivelFinal.setUnidadeAtivaCodigo(secretaria.getCodigo());
         usuarioGestorNivelFinal.setAuthorities(Set.of(Perfil.GESTOR.toGrantedAuthority()));
         movimentacaoRepo.save(Movimentacao.builder()
                 .subprocesso(subprocessoFinal)
-                .unidadeOrigem(unidadeOrigem)
-                .unidadeDestino(unidadeAnalise)
+                .unidadeOrigem(secao)
+                .unidadeDestino(coordenadoria)
+                .descricao(Mensagens.HIST_CADASTRO_DISPONIBILIZADO)
+                .usuario(usuarioGestorNivelFinal)
+                .build());
+        movimentacaoRepo.save(Movimentacao.builder()
+                .subprocesso(subprocessoFinal)
+                .unidadeOrigem(coordenadoria)
+                .unidadeDestino(secretaria)
                 .descricao(Mensagens.HIST_CADASTRO_DISPONIBILIZADO)
                 .usuario(usuarioGestorNivelFinal)
                 .build());
@@ -248,12 +256,12 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(subprocessoFinal.getCodigo());
         assertThat(movimentacoes).isNotEmpty();
-        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getCodigo()).isEqualTo(unidadeAnalise.getCodigo());
+        assertThat(movimentacoes.getFirst().getUnidadeOrigem().getCodigo()).isEqualTo(secretaria.getCodigo());
         assertThat(movimentacoes.getFirst().getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
 
         assertThat(alertaRepo.findByProcessoCodigo(processoFinal.getCodigo()))
                 .anySatisfy(alerta -> {
-                    assertThat(alerta.getDescricao()).isEqualTo(Mensagens.ALERTA_CADASTRO_ACEITO.formatted("COSIS"));
+                    assertThat(alerta.getDescricao()).isEqualTo(Mensagens.ALERTA_CADASTRO_ACEITO.formatted("SEDESENV"));
                     assertThat(alerta.getUnidadeDestino().getSigla()).isEqualTo("ADMIN");
                 });
 
@@ -263,6 +271,8 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .anySatisfy(notificacao -> {
                     assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("ADMIN");
                     assertThat(notificacao.getDestinatario()).isEqualTo("admin@tre-pe.jus.br");
+                    assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastros de atividades e conhecimentos submetidos para análise");
+                    assertThat(notificacao.getCorpoHtml()).contains("SEDESENV");
                 });
         assertThat(notificacaoEmailRepo.findAll().stream()
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_ACEITO)
