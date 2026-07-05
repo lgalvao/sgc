@@ -32,12 +32,12 @@
 6. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
    6.1. Registra uma análise de validação para o subprocesso da unidade:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: "Aceite"
 
    6.2. Registra uma movimentação para o subprocesso da unidade:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
     - `Descrição`: "Aceite"
@@ -59,7 +59,7 @@
 8. O sistema registra um alerta para a unidade superior:
     - `Descrição`: "Diagnóstico aceito para unidades subordinadas"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 

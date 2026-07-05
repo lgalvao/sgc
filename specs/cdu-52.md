@@ -32,12 +32,12 @@
 6. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
    6.1. Registra uma análise de validação para o subprocesso da unidade:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: "Homologação"
 
    6.2. Registra uma movimentação para o subprocesso da unidade:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: ADMIN
     - `Unidade destino`: ADMIN
     - `Descrição`: "Homologação"

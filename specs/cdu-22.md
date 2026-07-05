@@ -35,19 +35,19 @@
 7. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
    7.1. Registra uma análise de cadastro para o subprocesso:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: "Aceite"
     - `Observação`: "De acordo com o cadastro de atividades da unidade"
 
    7.2. Registra uma movimentação para o subprocesso:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
     - `Descrição`: "Cadastro aceito"
 
    7.3. Registra um alerta:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Descrição`:
         - para mapeamento, "Cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetido para análise"
         - para revisão, "Revisão do cadastro da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise"

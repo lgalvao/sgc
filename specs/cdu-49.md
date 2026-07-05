@@ -35,7 +35,7 @@
 
 6. O sistema registra uma movimentação para o subprocesso com estes campos/valores:
     - `Descrição`: "Conclusão de diagnóstico".
-    - `Data/hora`: [Data/hora atual];
+    - `Data/hora`: :DATA_HORA:;
     - `Unidade origem`: :SIGLA_UNIDADE_SUBPROCESSO:;
     - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:;
 
@@ -54,7 +54,7 @@
 8. O sistema cria internamente um alerta:
     - `Descrição`: "Diagnóstico da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetido para análise"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 

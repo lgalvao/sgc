@@ -35,12 +35,12 @@
 7. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
    7.1. Registra uma análise de validação para o subprocesso:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: "Aceite de mapa"
 
    7.2. Registra uma movimentação para o subprocesso:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
     - `Descrição`: "Validação do mapa aceita"
@@ -48,7 +48,7 @@
    7.3. Registra um alerta:
     - `Descrição`: "Validação do mapa da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 

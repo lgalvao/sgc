@@ -55,7 +55,7 @@ Se o usuário acionar `Devolver para ajustes`:
 8. O usuário aciona `Devolver`, e o sistema realiza estas ações:
 
    8.1. Registra uma análise de validação para o subprocesso:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: 'Devolução para ajustes'
     - `Justificativa`: [Justificativa fornecida]
@@ -78,13 +78,13 @@ Se o usuário acionar `Devolver para ajustes`:
 10. O sistema cria um alerta:
     - `Descrição`: "Diagnóstico devolvido para ajustes"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade de destino`: :SIGLA_UNIDADE_DEVOLUCAO:
 
 11. O sistema cria uma movimentação para o subprocesso:
     - `Descrição`: 'Devolução para ajustes'
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade destino`: :SIGLA_UNIDADE_DEVOLUCAO:
 
@@ -103,13 +103,13 @@ Se o usuário acionar `Registrar aceite`:
 
 15. O sistema registra uma análise de validação para o subprocesso:
     - `Resultado`: 'Aceite'
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
 
 16. O sistema cria um alerta:
     - `Descrição`: "Diagnóstico da unidade :SIGLA_UNIDADE_SUBPROCESSO: aceito"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 
@@ -147,12 +147,12 @@ Se o usuário acionar `Homologar` (apenas perfil ADMIN):
 
 22. O sistema registra uma análise de validação para o subprocesso:
     - `Resultado`: 'Homologação'
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
 
 23. O sistema cria uma movimentação para o subprocesso com estes campos:
     - `Descrição`: 'Homologação'
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: ADMIN
     - `Unidade destino`: ADMIN
 

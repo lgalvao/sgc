@@ -23,9 +23,7 @@ consultar detalhes operacionais e reenfileirar notificações com falha definiti
 
 4. O sistema apresenta a listagem com as colunas:
     - `Destinatário`
-    - `Tipo`
     - `Assunto`
-    - `Situação`
     - `Quando`
     - ações da linha
 
@@ -38,17 +36,17 @@ consultar detalhes operacionais e reenfileirar notificações com falha definiti
     - `Reenviar`, apenas quando a situação for `Falha definitiva`.
     - Estas são as situações de notificação: `Pendente`, `Enviando`, `Enviado`, `Falha temporária` e `Falha definitiva`.
 
-7. Ao acionar `Detalhes`, o sistema abre um modal `Detalhes da notificação`, exibindo:
-    - destinatário;
-    - tipo;
-    - situação;
-    - criado em;
-    - enviado em;
-    - próxima tentativa;
-    - falhas anteriores;
-    - último erro.
+7. Ao acionar o ícone `Detalhes`, o sistema abre um modal `Detalhes da notificação`, exibindo:
+    - destinatário
+    - tipo
+    - situação
+    - criado em
+    - enviado em
+    - próxima tentativa
+    - falhas anteriores
+    - último erro
 
-8. Ao acionar `Preview`, o sistema abre um modal com o assunto da notificação e mostra:
+8. Ao acionar o ícone `Pré-visualizar`, o sistema abre um modal com o assunto da notificação e mostra:
     - destinatário;
     - data/hora de criação;
     - conteúdo HTML do e-mail renderizado em visualização isolada.

@@ -72,7 +72,7 @@ metadados automáticos da navegação e captura de tela opcional.
     - perfil e unidade ativos
     - data/hora da captura do contexto
     - fuso horário
-    - `userAgent`
+    - *userAgent*
     - largura e altura da janela
     - idioma do navegador
 
@@ -87,15 +87,7 @@ metadados automáticos da navegação e captura de tela opcional.
 
 19. Se o envio for concluído com sucesso, o sistema:
     - fecha o modal;
-    - mostra o toast `Feedback enviado`;
+    - mostra o *toast* "Feedback enviado";
     - muda temporariamente o botão flutuante para estado de sucesso.
 
 20. Após o intervalo curto de confirmação visual, o botão flutuante volta ao estado normal.
-
-21. Se o envio falhar, o sistema:
-    - mantém ou retorna o botão flutuante para estado de erro temporário;
-    - mostra o toast `Não foi possível enviar o feedback. Tente novamente.`
-
-22. Após o intervalo curto de erro, o botão flutuante volta ao estado normal.
-
-23. O usuário pode fechar o modal a qualquer momento por `Cancelar`, sem enviar o feedback.

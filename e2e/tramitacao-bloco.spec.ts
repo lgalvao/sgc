@@ -15,7 +15,6 @@ import {
 } from './helpers/helpers-navegacao.js';
 import {adicionarAtividade, adicionarConhecimento, disponibilizarCadastro, navegarParaCadastro} from './helpers/helpers-atividades.js';
 import {
-    abrirAcaoMapa,
     abrirValidacaoMapa,
     criarCompetencia,
     navegarParaMapa

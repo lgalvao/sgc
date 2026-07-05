@@ -5129,7 +5129,6 @@
     <pattern value="sgc.diagnostico.DiagnosticoController" method="validarDiagnostico" />
     <pattern value="sgc.diagnostico.dto.ValidarDiagnosticosEmBlocoRequest" />
     <pattern value="sgc.diagnostico.dto.ValidarDiagnosticosEmBlocoRequest" method="ValidarDiagnosticosEmBlocoRequest" />
-    <pattern value="sgc.subprocesso.dto.RegistrarWorkflowAnaliseCommand" method="RegistrarWorkflowAnaliseCommand" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

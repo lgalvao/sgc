@@ -1,4 +1,4 @@
-## Situações
+# Situações do SGC
 
 Os processos e subprocessos mantidos pelo sistema seguem um fluxo que passa por situações que variam de acordo com o
 tipo de processo/subprocesso. Essas situações são referenciadas entre aspas simples (por exemplo, 'Não iniciado') nas
@@ -12,7 +12,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
   informações submetidas pelas unidades a ela subordinadas.
 - **ADMIN**: Unidade raiz administradora (geralmente um servidor da SEDOC).
 
-### Situações de Processos (todos os tipos)
+## Situações de Processos (todos os tipos)
 
 - **Criado**: Processo cadastrado, mas não iniciado.
 - **Em andamento**: Processo foi iniciado e todas as unidades participantes foram notificadas.
@@ -20,7 +20,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
   os mapas homologados se tornaram vigentes. Em diagnóstico, indica que todas as unidades tiveram seus diagnósticos
   homologados e que os relatórios consolidados foram liberados.
 
-### Situações de subprocessos de Mapeamento
+## Situações de subprocessos de Mapeamento
 
 - **Não iniciado**: Unidade notificada do início do processo, mas sem nenhum cadastro de atividades salvo.
 - **Cadastro em andamento**: Cadastro salvo pela unidade, mas não marcado como finalizado.
@@ -32,7 +32,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 - **Mapa validado**: Toda a hierarquia aprovou o mapa disponibilizado.
 - **Mapa homologado**: Perfil ADMIN homologou o mapa após a sua validação pela hierarquia.
 
-### Situações de subprocessos de Revisão
+## Situações de subprocessos de Revisão
 
 - **Não iniciado**: Unidade foi notificada do início do processo, mas ainda não iniciou a revisão do seu cadastro de
   atividades.
@@ -46,7 +46,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 - **Mapa validado**: Toda a hierarquia aprovou o mapa disponibilizado.
 - **Mapa homologado**: Perfil ADMIN homologou o mapa após a sua validação por toda a hierarquia.
 
-### Situações de subprocessos de Diagnóstico
+## Situações de subprocessos de Diagnóstico
 
 - **Não iniciado**: Unidade notificada do início do processo de diagnóstico, mas nenhuma autoavaliação foi concluída e
   nenhuma informação de capacitação foi registrada.
@@ -54,7 +54,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 - **Concluído**: A unidade concluiu o diagnóstico e o encaminhou para análise da unidade superior.
 - **Homologado**: O diagnóstico da unidade foi aceito em toda a cadeia hierárquica e homologado pela unidade ADMIN.
 
-### Situações de avaliações individuais de diagnóstico
+## Situações de avaliações individuais de diagnóstico
 
 - **Autoavaliação não iniciada**: Servidor ainda não concluiu sua autoavaliação.
 - **Autoavaliação concluída**: Servidor concluiu a autoavaliação e chefe/responsável já pode iniciar a avaliação de

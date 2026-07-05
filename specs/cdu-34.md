@@ -38,7 +38,7 @@
 
 - `Descrição`: "Lembrete: Prazo do processo :DESCRICAO_PROCESSO: encerra em :DATA_LIMITE:"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE_SUBPRROCESSO:
 

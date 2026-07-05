@@ -21,7 +21,7 @@
 4. O sistema mostra uma tela de confirmação, com texto "Ao iniciar o processo, não será mais possível editá-lo ou
    removê-lo e todas as unidades participantes serão notificadas por e-mail.", além de botões `Iniciar` e `Cancelar`.
 
-5. O usuário clica em `Iniciar`, dentro da tela de confirmação.
+5. O usuário aciona em `Iniciar processo`, dentro da tela de confirmação.
 
 6. O sistema armazena internamente uma cópia (*snapshot*) da árvore de unidades participantes, incluindo todos os
    servidores lotados em cada unidade participante; depois vincula essa cópia com o processo.
@@ -38,68 +38,65 @@
    mapa vigente da unidade, no momento do início do processo.
 
 9. O sistema registra uma movimentação para cada subprocesso criado, com estes campos/valores:
-    - `Data/hora`: [data/hora atual];
-    - `Unidade origem`: `ADMIN`;
+    - `Descrição`: "Processo iniciado".
+    - `Data/hora`: :DATA_HORA:;
+    - `Unidade origem`: ADMIN;
     - `Unidade destino`: :SIGLA_UNIDADE_SUBPROCESSO:;
-    - `Descrição`: 'Processo iniciado'.
 
-1O. O sistema envia notificações por e-mail para todas as unidades participantes.
+10. O sistema envia notificações por e-mail para todas as unidades participantes.
 
-10.1. Unidades operacionais e interoperacionais deverão receber um e-mail segundo este modelo:
+- Unidades operacionais e interoperacionais deverão receber este e-mail
 
-```text
-Assunto: SGC: Início de processo de diagnóstico de competências
+   ```text
+   Assunto: SGC: Início de processo de diagnóstico de competências
+   
+   Prezado(a) responsável pela :SIGLA_UNIDADE:,
+   
+   Comunicamos o início do processo :DESCRICAO_PROCESSO: para a sua unidade.
+   
+   Já é possível realizar o diagnóstico de competências no Sistema de Gestão de Competências (SGC) (:URL_SISTEMA:).
+   
+   O prazo para conclusão do diagnóstico é :DATA_LIMITE:.
+   ```
 
-Prezado(a) responsável pela :SIGLA_UNIDADE:,
-
-Comunicamos o início do processo :DESCRICAO_PROCESSO: para a sua unidade.
-
-Já é possível realizar o diagnóstico de competências no Sistema de Gestão de Competências (SGC) (:URL_SISTEMA:).
-
-O prazo para conclusão do diagnóstico é :DATA_LIMITE:.
-```
-
-10.2. Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das unidades
-operacionais e interoperacionais subordinadas a elas, segundo o modelo:
-
-```text
-Assunto: SGC: Início de processo de diagnóstico de competências em unidades subordinadas
-
-Prezado(a) responsável pela :SIGLA_UNIDADE:,
-
-Comunicamos o início do processo :DESCRICAO_PROCESSO: nas unidades :SIGLAS_UNIDADES_SUBORDINADAS:. 
-Essas unidades já podem iniciar o diagnóstico de competências. À medida que os diagnósticos forem sendo 
-concluídos, será possível acompanhar e realizar a análise.
-
-O prazo para conclusão do processo é :DATA_LIMITE:.
-
-Acompanhe o processo no Sistema de Gestão de Competências (SGC):(:URL_SISTEMA:).
-```
+- Unidades intermediárias e interoperacionais deverão receber um e-mail com informações consolidadas das unidades
+  operacionais e interoperacionais subordinadas a elas, segundo o modelo:
+    ```text
+    Assunto: SGC: Início de processo de diagnóstico de competências em unidades subordinadas
+    
+    Prezado(a) responsável pela :SIGLA_UNIDADE:,
+    
+    Comunicamos o início do processo :DESCRICAO_PROCESSO: nas unidades :SIGLAS_UNIDADES_SUBORDINADAS:. 
+    Essas unidades já podem iniciar o diagnóstico de competências. À medida que os diagnósticos forem sendo concluídos, será possível acompanhar e realizar a análise.
+    
+    O prazo para conclusão do processo é :DATA_LIMITE:.
+    
+    Acompanhe o processo no Sistema de Gestão de Competências (SGC):(:URL_SISTEMA:).
+    ```
 
 13. O sistema cria internamente alertas para todas as unidades participantes.
 
-13.1. Para cada unidade operacional será criado um alerta com:
+- Para cada unidade operacional será criado um alerta com:
+    - `Descrição`: "Início do processo"
+    - `Processo`: :DESCRICAO_PROCESSO:
+    - `Data/hora`: :DATA_HORA:
+    - `Unidade de origem`: ADMIN
+    - `Unidade de destino`: :SIGLA_UNIDADE:
 
-- `Descrição`: "Início do processo"
-- `Processo`: :DESCRICAO_PROCESSO:
-- `Data/hora`: [Data/hora atual]
-- `Unidade de origem`: `ADMIN` - `Unidade de destino`: :SIGLA_UNIDADE:
+- Para a unidade intermediária imediatamente superior à unidade participante, será criado também um alerta com:
+    - `Descrição`: "Início do processo"
+    - `Processo`: :DESCRICAO_PROCESSO:
+    - `Data/hora`: :DATA_HORA:
+    - `Unidade de origem`: ADMIN
+    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 
-13.2. Para a unidade intermediária imediatamente superior à unidade participante, será criado também um alerta com:
-
-- `Descrição`: "Início do processo"
-- `Processo`: :DESCRICAO_PROCESSO:
-- `Data/hora`: [Data/hora atual]
-- `Unidade de origem`: `ADMIN` - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
-
-13.3. Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade
-intermediária, como especificado acima.
+- Para cada unidade interoperacional serão criados dois alertas: um de unidade operacional e outro de unidade
+  intermediária, como especificado acima.
 
 14. O sistema cria alertas individuais para todos os servidores de todas as unidades participantes, com exceção dos
     servidores responsáveis pelas unidades, com os campos/valores:
-
-- `Descrição`: "Início do processo"
-- `Processo`: :DESCRICAO_PROCESSO:
-- `Data/hora`: [Data/hora atual]
-- `Unidade de origem`: `ADMIN`
-- `Usuário de destino`: :TITULO_USUARIO:
+    - `Descrição`: "Início do processo"
+    - `Processo`: :DESCRICAO_PROCESSO:
+    - `Data/hora`: :DATA_HORA:
+    - `Unidade de origem`: ADMIN
+    - `Usuário de destino`: :TITULO_USUARIO:

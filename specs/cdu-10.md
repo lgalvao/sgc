@@ -81,7 +81,7 @@ tela.
     - Descrição: "Cadastro de atividades e conhecimentos da unidade :SIGLA_UNIDADE_SUBPROCESSO: disponibilizado para
       análise"
     - Processo: :DESCRICAO_PROCESSO:
-    - Data/hora: [Data/hora atual]
+    - Data/hora: :DATA_HORA:
     - Unidade de origem: :SIGLA_UNIDADE_SUBPROCESSO:
     - Unidade de destino: :SIGLA_UNIDADE_SUPERIOR:.
 

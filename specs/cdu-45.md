@@ -83,7 +83,7 @@ na unidade do usuário, o sistema mostra os elementos acima apenas em modo somen
 10. O sistema cria internamente um alerta com estes campos/valores:
     - `Descrição`: "Avaliação de consenso criada"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Usuário de destino`: :TITULO_SERVIDOR:
     - `Unidade de origem`: :SIGLA_UNIDADE_SUBPROCESSO:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:

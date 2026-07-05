@@ -84,14 +84,14 @@
     13.1. Para cada unidade **operacional** será criado um alerta com estes campos:
     - `Descrição`: "Início do processo"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE:.
 
     13.2. Para cada unidade **intermediária** será criado um alerta com estes campos:
     - `Descrição`: "Início do processo"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE:.
 

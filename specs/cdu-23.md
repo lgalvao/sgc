@@ -33,7 +33,7 @@
 7. O sistema atua, para cada unidade marcada, da seguinte forma:
 
    7.1. Registra uma movimentação para o subprocesso da unidade:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: ADMIN
     - `Unidade destino`: ADMIN
     - `Descrição`: "Cadastro homologado"

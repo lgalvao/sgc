@@ -67,7 +67,7 @@
    9.2. Cria um alerta voltado à unidade, consolidando as unidades subordinadas:
     - `Descrição`: "Processo finalizado em unidades subordinadas"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE_INTERMEDIARIA:
 

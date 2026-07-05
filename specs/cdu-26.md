@@ -44,7 +44,7 @@
    relevante do subprocesso.
 
    9.1. O sistema registra uma movimentação para o subprocesso:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: "ADMIN"
     - `Unidade destino`: "ADMIN"
     - `Descrição`: "Mapa homologado"
@@ -54,7 +54,7 @@
    9.3. O sistema cria internamente um alerta:
     - `Descrição`: "Mapa de competências da unidade :SIGLA_UNIDADE_SUBPROCESSO: homologado"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: ADMIN
     - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
 

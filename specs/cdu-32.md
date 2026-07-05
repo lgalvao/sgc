@@ -27,7 +27,7 @@
 7. O sistema altera a situação do subprocesso para 'Cadastro em andamento'.
 
 8. O sistema registra uma movimentação para o subprocesso, com os campos:
-    - `Data/hora`: [Data/hora atual]
+    - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: ADMIN
     - `Unidade destino`: :SIGLA_UNIDADE_SUBPROCESSO:
     - `Descrição`: "Cadastro reaberto"
