@@ -15,7 +15,9 @@ export interface Notificacao {
     unidadeDestinoSigla?: string;
     unidadeOrigemSigla?: string;
     processoDescricao?: string;
+    processoFinalizado: boolean;
     tipoNotificacao?: string;
+    notificacaoFinalizacaoProcesso: boolean;
     usuarioDestinoTitulo?: string;
     destinatario: string;
     assunto: string;

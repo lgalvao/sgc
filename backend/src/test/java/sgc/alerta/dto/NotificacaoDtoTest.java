@@ -22,7 +22,10 @@ class NotificacaoDtoTest {
         LocalDateTime now = LocalDateTime.now();
 
         Unidade unidade = Unidade.builder().sigla("SIGLA").build();
-        Processo processo = Processo.builder().descricao("Descricao Processo").build();
+        Processo processo = Processo.builder()
+                .descricao("Descricao Processo")
+                .situacao(SituacaoProcesso.EM_ANDAMENTO)
+                .build();
         Subprocesso subprocesso = Subprocesso.builder()
                 .codigo(123L)
                 .unidade(unidade)
@@ -54,7 +57,9 @@ class NotificacaoDtoTest {
         assertThat(dto.subprocessoCodigo()).isEqualTo(123L);
         assertThat(dto.unidadeSigla()).isEqualTo("SIGLA");
         assertThat(dto.processoDescricao()).isEqualTo("Descricao Processo");
+        assertThat(dto.processoFinalizado()).isFalse();
         assertThat(dto.tipoNotificacao()).isEqualTo(TipoNotificacaoDto.MAPA_DISPONIBILIZADO);
+        assertThat(dto.notificacaoFinalizacaoProcesso()).isFalse();
         assertThat(dto.usuarioDestinoTitulo()).isEqualTo(entity.getUsuarioDestinoTitulo());
         assertThat(dto.destinatario()).isEqualTo(entity.getDestinatario());
         assertThat(dto.assunto()).isEqualTo(entity.getAssunto());
@@ -65,5 +70,37 @@ class NotificacaoDtoTest {
         assertThat(dto.dataHoraEnvio()).isEqualTo(entity.getDataHoraEnvio());
         assertThat(dto.proximaTentativaEm()).isNull();
         assertThat(dto.ultimoErro()).isNull();
+    }
+
+    @Test
+    void shouldFlagFinalizedProcessNotification() {
+        Unidade unidade = Unidade.builder().sigla("SIGLA").build();
+        Processo processo = Processo.builder()
+                .descricao("Descricao Processo")
+                .situacao(SituacaoProcesso.FINALIZADO)
+                .build();
+        Subprocesso subprocesso = Subprocesso.builder()
+                .codigo(123L)
+                .unidade(unidade)
+                .processo(processo)
+                .build();
+
+        NotificacaoEmail entity = NotificacaoEmail.builder()
+                .codigo(1L)
+                .subprocesso(subprocesso)
+                .unidadeDestinoSigla("SIGLA")
+                .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
+                .destinatario("test@example.com")
+                .assunto("Test Subject")
+                .corpoHtml("<p>corpo</p>")
+                .situacao(SituacaoNotificacao.ENVIADO)
+                .tentativas(1)
+                .dataHoraCriacao(LocalDateTime.now())
+                .build();
+
+        NotificacaoDto dto = mapper.paraNotificacaoDto(entity);
+
+        assertThat(dto.processoFinalizado()).isTrue();
+        assertThat(dto.notificacaoFinalizacaoProcesso()).isTrue();
     }
 }

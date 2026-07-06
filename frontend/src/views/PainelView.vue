@@ -96,6 +96,7 @@ defineExpose({
   ordenarPor: tela.ordenarPor,
   asc: tela.asc,
   criterio: tela.criterio,
+  alertas: tela.alertas,
   abrirDetalhesProcesso: tela.abrirDetalhesProcesso,
   rowClassAlerta: tela.rowClassAlerta,
   rowAttrAlerta: tela.rowAttrAlerta,

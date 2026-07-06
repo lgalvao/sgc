@@ -97,7 +97,7 @@ describe('PainelView', () => {
         vi.clearAllMocks();
         vi.mocked(painelService.obterBootstrap).mockResolvedValue({
             processos: [{codigo: 1, descricao: 'Proc 1'}],
-            alertas: [{codigo: 1, mensagem: 'Alerta 1'}],
+            alertas: [{codigo: 1, mensagem: 'Alerta 1', processoFinalizado: false, alertaFinalizacaoProcesso: false}],
         } as any);
     });
 
@@ -125,7 +125,7 @@ describe('PainelView', () => {
 
         bootstrapPromise.resolve({
             processos: [{codigo: 1, descricao: 'Proc 1'}],
-            alertas: [{codigo: 1, mensagem: 'Alerta 1'}],
+            alertas: [{codigo: 1, mensagem: 'Alerta 1', processoFinalizado: false, alertaFinalizacaoProcesso: false}],
         });
         await flushPromises();
 
@@ -316,6 +316,8 @@ describe('PainelView', () => {
             mensagem: 'Processo pendente',
             origem: 'Secretaria',
             processo: 'Processo 10',
+            processoFinalizado: false,
+            alertaFinalizacaoProcesso: false,
         };
         vi.mocked(painelService.obterBootstrap).mockResolvedValueOnce({
             processos: [],
@@ -325,6 +327,25 @@ describe('PainelView', () => {
         const wrapper = mount(PainelView, createMountOptions());
         await flushPromises();
 
+        expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(true);
+        expect(wrapper.find('[data-testid="empty-state-alertas"]').exists()).toBe(false);
+    });
+
+    it('oculta alertas de processos finalizados e mantém o alerta da finalização', async () => {
+        vi.mocked(painelService.obterBootstrap).mockResolvedValueOnce({
+            processos: [],
+            alertas: [
+                {codigo: 1, mensagem: 'Mapa pendente', processoFinalizado: true, alertaFinalizacaoProcesso: false},
+                {codigo: 2, mensagem: 'Processo finalizado', processoFinalizado: true, alertaFinalizacaoProcesso: true},
+            ],
+        } as any);
+
+        const wrapper = mount(PainelView, createMountOptions());
+        await flushPromises();
+
+        expect((wrapper.vm as any).alertas).toEqual([
+            expect.objectContaining({codigo: 2})
+        ]);
         expect(wrapper.find('[data-testid="tbl-alertas"]').exists()).toBe(true);
         expect(wrapper.find('[data-testid="empty-state-alertas"]').exists()).toBe(false);
     });

@@ -24,7 +24,9 @@ export function useNotificacoesAdminQuery() {
         staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 
-    const itensOrdenados = computed(() => (query.data.value ?? []).toSorted(compararNotificacoes));
+    const itensOrdenados = computed(() => (query.data.value ?? [])
+        .filter((item) => !item.processoFinalizado || item.notificacaoFinalizacaoProcesso)
+        .toSorted(compararNotificacoes));
 
     return {
         ...query,

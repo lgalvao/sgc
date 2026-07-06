@@ -36,7 +36,8 @@ export function usePainelTela() {
         });
     });
 
-    const alertas = computed(() => painelQuery.data.value?.alertas ?? []);
+    const alertas = computed(() => (painelQuery.data.value?.alertas ?? [])
+        .filter((alerta: Alerta) => !alerta.processoFinalizado || alerta.alertaFinalizacaoProcesso));
     const carregamentoInicialConcluido = ref(false);
 
     function registrarFalhaBackground(contexto: string, error: unknown) {

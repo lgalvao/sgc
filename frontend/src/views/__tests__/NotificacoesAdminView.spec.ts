@@ -130,7 +130,9 @@ describe('NotificacoesAdminView', () => {
                 unidadeSigla: 'U1',
                 unidadeOrigemSigla: 'ADMIN',
                 processoDescricao: 'Processo Alfa',
+                processoFinalizado: false,
                 tipoNotificacao: 'PROCESSO_INICIADO',
+                notificacaoFinalizacaoProcesso: false,
                 destinatario: 'u1@tre-pe.jus.br',
                 assunto: 'SGC: Assunto Enviado',
                 situacao: 'ENVIADO',
@@ -144,7 +146,9 @@ describe('NotificacoesAdminView', () => {
                 unidadeSigla: 'U2',
                 unidadeOrigemSigla: 'SECAO_221',
                 processoDescricao: 'Processo Beta',
+                processoFinalizado: false,
                 tipoNotificacao: 'MAPA_HOMOLOGADO',
+                notificacaoFinalizacaoProcesso: false,
                 destinatario: 'u2@tre-pe.jus.br',
                 assunto: 'SGC: Assunto Pendente',
                 situacao: 'FALHA_DEFINITIVA',
@@ -165,6 +169,42 @@ describe('NotificacoesAdminView', () => {
         expect(wrapper.text()).toContain('ADMIN');
         expect(wrapper.text()).toContain('SECAO_221');
         expect(wrapper.text()).toContain('SGC: Assunto Enviado');
+    });
+
+    it('oculta notificações de processo finalizado e mantém a de finalização', async () => {
+        vi.mocked(listarNotificacoesAdmin).mockResolvedValue([
+            {
+                codigo: 1,
+                processoDescricao: 'Processo Alfa',
+                processoFinalizado: true,
+                tipoNotificacao: 'MAPA_HOMOLOGADO',
+                notificacaoFinalizacaoProcesso: false,
+                destinatario: 'u1@tre-pe.jus.br',
+                assunto: 'SGC: Mapa homologado',
+                situacao: 'ENVIADO',
+                tentativas: 0,
+                dataHoraCriacao: '2023-01-01T10:00:00Z',
+            },
+            {
+                codigo: 2,
+                processoDescricao: 'Processo Alfa',
+                processoFinalizado: true,
+                tipoNotificacao: 'PROCESSO_FINALIZADO',
+                notificacaoFinalizacaoProcesso: true,
+                destinatario: 'u1@tre-pe.jus.br',
+                assunto: 'SGC: Processo finalizado',
+                situacao: 'ENVIADO',
+                tentativas: 0,
+                dataHoraCriacao: '2023-01-01T11:00:00Z',
+            }
+        ] as any);
+
+        const wrapper = mountComponent();
+        await flushPromises();
+
+        const tabela = wrapper.find('[data-testid="tbl-notificacoes"]');
+        expect(tabela.text()).toContain('SGC: Processo finalizado');
+        expect(tabela.text()).not.toContain('SGC: Mapa homologado');
     });
 
     it('exibe link do leitor de e-mail de testes quando configurado', async () => {

@@ -3,11 +3,19 @@ package sgc.alerta;
 import org.springframework.stereotype.*;
 import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
+import sgc.processo.model.*;
 
 @Component
 public class AlertaDtoMapper {
+    private static final String DESCRICAO_PROCESSO_FINALIZADO = "Processo finalizado";
+    private static final String DESCRICAO_PROCESSO_FINALIZADO_SUBORDINADAS = "Processo finalizado em unidades subordinadas";
 
     public AlertaDto paraAlertaDto(Alerta alerta) {
+        boolean processoFinalizado = alerta.getProcesso() != null
+                && alerta.getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO;
+        boolean alertaFinalizacaoProcesso = DESCRICAO_PROCESSO_FINALIZADO.equals(alerta.getDescricao())
+                || DESCRICAO_PROCESSO_FINALIZADO_SUBORDINADAS.equals(alerta.getDescricao());
+
         return AlertaDto.builder()
                 .codigo(alerta.getCodigo())
                 .codProcesso(alerta.getCodProcessoSintetico())
@@ -16,6 +24,8 @@ public class AlertaDtoMapper {
                 .unidadeDestino(alerta.getUnidadeDestinoSigla())
                 .descricao(alerta.getDescricao())
                 .mensagem(alerta.getMensagemSintetica())
+                .processoFinalizado(processoFinalizado)
+                .alertaFinalizacaoProcesso(alertaFinalizacaoProcesso)
                 .dataHora(alerta.getDataHora())
                 .dataHoraLeitura(alerta.getDataHoraLeitura())
                 .build();
@@ -27,6 +37,9 @@ public class AlertaDtoMapper {
                 ? notificacao.getSubprocesso().getProcesso().getDescricao()
                 : null;
         String unidadeOrigemSigla = inferirUnidadeOrigemSigla(notificacao);
+        boolean processoFinalizado = notificacao.getSubprocesso() != null
+                && notificacao.getSubprocesso().getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO;
+        boolean notificacaoFinalizacaoProcesso = notificacao.getTipoNotificacao() == TipoNotificacao.PROCESSO_FINALIZADO;
 
         return NotificacaoDto.builder()
                 .codigo(notificacao.getCodigo())
@@ -34,7 +47,9 @@ public class AlertaDtoMapper {
                 .unidadeSigla(notificacao.getUnidadeDestinoSigla())
                 .unidadeOrigemSigla(unidadeOrigemSigla)
                 .processoDescricao(processoDescricao)
+                .processoFinalizado(processoFinalizado)
                 .tipoNotificacao(TipoNotificacaoDto.valueOf(notificacao.getTipoNotificacao().name()))
+                .notificacaoFinalizacaoProcesso(notificacaoFinalizacaoProcesso)
                 .usuarioDestinoTitulo(notificacao.getUsuarioDestinoTitulo())
                 .destinatario(notificacao.getDestinatario())
                 .assunto(notificacao.getAssunto())

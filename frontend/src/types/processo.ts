@@ -61,6 +61,8 @@ export interface Alerta {
     mensagem: string;
     origem: string;
     processo: string;
+    processoFinalizado: boolean;
+    alertaFinalizacaoProcesso: boolean;
 }
 
 export type AcaoProcessoBloco = "ACEITAR" | "HOMOLOGAR" | "DISPONIBILIZAR";

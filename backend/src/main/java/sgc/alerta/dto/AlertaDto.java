@@ -14,6 +14,8 @@ public record AlertaDto(
         @Nullable String unidadeDestino,
         String descricao,
         String mensagem,
+        boolean processoFinalizado,
+        boolean alertaFinalizacaoProcesso,
         LocalDateTime dataHora,
         @Nullable LocalDateTime dataHoraLeitura) {
 }

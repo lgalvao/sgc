@@ -28,6 +28,8 @@ class AlertaDtoTest {
         assertThat(dto.origem()).isEqualTo("ORG");
         assertThat(dto.unidadeDestino()).isEqualTo("DST");
         assertThat(dto.mensagem()).isEqualTo("Mensagem");
+        assertThat(dto.processoFinalizado()).isFalse();
+        assertThat(dto.alertaFinalizacaoProcesso()).isFalse();
         assertThat(dto.dataHoraLeitura()).isEqualTo(LocalDateTime.of(2025, 1, 1, 11, 0));
     }
 
@@ -52,6 +54,21 @@ class AlertaDtoTest {
         assertThat(dto.origem()).isEqualTo("ADM");
         assertThat(dto.unidadeDestino()).isNull();
         assertThat(dto.mensagem()).isEqualTo("Alerta pessoal");
+        assertThat(dto.processoFinalizado()).isFalse();
+        assertThat(dto.alertaFinalizacaoProcesso()).isFalse();
+    }
+
+    @Test
+    @DisplayName("deve sinalizar alerta de finalização de processo finalizado")
+    void deveSinalizarAlertaDeFinalizacaoDeProcessoFinalizado() {
+        Alerta alerta = criarAlerta();
+        alerta.getProcesso().setSituacao(SituacaoProcesso.FINALIZADO);
+        alerta.setDescricao("Processo finalizado");
+
+        AlertaDto dto = mapper.paraAlertaDto(alerta);
+
+        assertThat(dto.processoFinalizado()).isTrue();
+        assertThat(dto.alertaFinalizacaoProcesso()).isTrue();
     }
 
 
@@ -59,6 +76,7 @@ class AlertaDtoTest {
         Processo processo = new Processo();
         processo.setCodigo(10L);
         processo.setDescricao("Processo X");
+        processo.setSituacao(SituacaoProcesso.EM_ANDAMENTO);
 
         Unidade origem = new Unidade();
         origem.setSigla("ORG");
