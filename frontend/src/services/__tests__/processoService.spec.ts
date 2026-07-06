@@ -106,6 +106,16 @@ describe('processoService', () => {
         expect(result).toEqual(responseData);
     });
 
+    it('buscarProcessosAtivos deve fazer requisição GET', async () => {
+        const responseData = [{codigo: 2, descricao: 'Em andamento'}];
+        vi.mocked(apiClient.get).mockResolvedValue({data: responseData});
+
+        const result = await processoService.buscarProcessosAtivos();
+
+        expect(apiClient.get).toHaveBeenCalledWith('/processos/ativos');
+        expect(result).toEqual(responseData);
+    });
+
     it('iniciarProcesso deve fazer requisição POST', async () => {
         const codProcesso = 1;
         const tipo = TipoProcesso.MAPEAMENTO;

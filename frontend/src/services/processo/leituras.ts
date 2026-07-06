@@ -21,6 +21,13 @@ export async function buscarProcessosFinalizados(): Promise<ProcessoResumo[]> {
     return response.data;
 }
 
+export async function buscarProcessosAtivos(): Promise<ProcessoResumo[]> {
+    const response = await apiClient.get<ProcessoResumo[]>(
+        caminhoProcesso(undefined, "/ativos"),
+    );
+    return response.data;
+}
+
 export async function buscarProcessosParaImportacao(): Promise<ProcessoResumo[]> {
     const response = await apiClient.get<ProcessoResumo[]>(
         caminhoProcesso(undefined, "/finalizados?elegivelImportacao=true"),

@@ -21,28 +21,40 @@
 
     <BCard class="mt-3">
       <BFormGroup
-          :state="mensagemErroCodigo ? false : null"
-          label-for="codigoProcesso"
+          :state="mensagemErroProcesso ? false : null"
+          label-for="processoSelecionado"
       >
         <template #label>
-          {{ TEXTOS.administracao.LIMPEZA_LABEL_CODIGO }} <span aria-hidden="true" class="text-danger">*</span>
+          {{ TEXTOS.administracao.LIMPEZA_LABEL_PROCESSO }} <span aria-hidden="true" class="text-danger">*</span>
         </template>
-        <BFormInput
-            id="codigoProcesso"
-            v-model="codigoProcesso"
-            :state="mensagemErroCodigo ? false : null"
-            data-testid="input-codigo-processo"
-            min="1"
-            type="number"
+        <BFormSelect
+            id="processoSelecionado"
+            v-model="codigoProcessoSelecionado"
+            :disabled="carregandoProcessos || excluindo"
+            :options="processos"
+            :state="mensagemErroProcesso ? false : null"
+            data-testid="select-processo"
+            text-field="descricao"
+            value-field="codigo"
             @keydown.enter.prevent="abrirConfirmacao"
-        />
-        <BFormInvalidFeedback :state="mensagemErroCodigo ? false : null">
-          {{ mensagemErroCodigo }}
+        >
+          <template #first>
+            <BFormSelectOption :value="null" disabled>
+              {{ TEXTOS.administracao.LIMPEZA_PLACEHOLDER_PROCESSO }}
+            </BFormSelectOption>
+          </template>
+        </BFormSelect>
+        <BFormInvalidFeedback :state="mensagemErroProcesso ? false : null">
+          {{ mensagemErroProcesso }}
         </BFormInvalidFeedback>
+        <div v-if="!carregandoProcessos && !processos.length" class="mt-2 text-muted">
+          {{ TEXTOS.administracao.LIMPEZA_NENHUM_PROCESSO }}
+        </div>
       </BFormGroup>
 
       <div class="d-flex justify-content-end mt-3">
         <LoadingButton
+            :disabled="carregandoProcessos || !processoSelecionado"
             :loading="excluindo"
             :text="TEXTOS.administracao.LIMPEZA_BOTAO_ABRIR"
             data-testid="btn-excluir-processo-completo"
@@ -55,6 +67,7 @@
 
     <LimpezaProcessosFluxoModais
         :codigo-confirmacao="codigoConfirmacao ?? null"
+        :descricao-confirmacao="descricaoConfirmacao"
         :excluindo="excluindo"
         :mostrar-confirmacao="mostrarConfirmacao"
         @confirmar-exclusao="confirmarExclusao"
@@ -64,7 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import {BCard, BFormGroup, BFormInput} from 'bootstrap-vue-next';
+import {BCard, BFormGroup, BFormInvalidFeedback, BFormSelect, BFormSelectOption} from 'bootstrap-vue-next';
 import Alerta from '@/components/comum/Alerta.vue';
 import LimpezaProcessosFluxoModais from '@/components/administracao/LimpezaProcessosFluxoModais.vue';
 import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
@@ -74,10 +87,14 @@ import {TEXTOS} from '@/constants/textos';
 import {useLimpezaProcessosTela} from '@/composables/useLimpezaProcessosTela';
 
 const {
-  codigoProcesso,
+  processos,
+  carregandoProcessos,
+  codigoProcessoSelecionado,
+  processoSelecionado,
   codigoConfirmacao,
+  descricaoConfirmacao,
   excluindo,
-  mensagemErroCodigo,
+  mensagemErroProcesso,
   mostrarConfirmacao,
   notificacao,
   clear,
