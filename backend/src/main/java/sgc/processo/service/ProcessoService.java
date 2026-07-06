@@ -640,8 +640,15 @@ public class ProcessoService {
                     mapDto.put(codigoUnidadeParticipante, uDto);
                 });
 
+        // Mapa de toda a cadeia hierarquica dos snapshots do processo (inclui unidades sem acesso):
+        // codUnidade -> codUnidadeSuperior. Permite percorrer ancestrais nao-participantes (ex: INTERMEDIARIA).
+        Map<Long, Long> cadeiaSuperior = new HashMap<>();
+        processo.getParticipantes().forEach(p ->
+                cadeiaSuperior.put(p.getUnidadeCodigoPersistido(), p.getUnidadeSuperiorCodigo())
+        );
+
         mapDto.values().forEach(u -> {
-            UnidadeParticipanteDto pai = mapDto.get(u.getCodUnidadeSuperior());
+            UnidadeParticipanteDto pai = buscarPaiParticipante(u.getCodUnidadeSuperior(), mapDto, cadeiaSuperior);
             if (pai != null) pai.getFilhos().add(u);
             else dto.getUnidades().add(u);
         });
@@ -658,6 +665,26 @@ public class ProcessoService {
                     "Snapshot inconsistente de unidade participante no processo %d para unidade %d"
                             .formatted(codigoProcesso, unidadeDto.getCodUnidade()));
         }
+    }
+
+    /**
+     * Percorre a cadeia de ancestrais a partir de codSuperior ate encontrar o primeiro
+     * participante presente no mapDto. Resolve o caso de unidades intermediarias
+     * (nao-participantes do processo) entre dois participantes na hierarquia real do orgao.
+     */
+    private @Nullable UnidadeParticipanteDto buscarPaiParticipante(
+            @Nullable Long codSuperior,
+            Map<Long, UnidadeParticipanteDto> mapDto,
+            Map<Long, Long> cadeiaSuperior
+    ) {
+        Long atual = codSuperior;
+        int limite = 20; // protecao contra ciclos improvaveis
+        while (atual != null && limite-- > 0) {
+            UnidadeParticipanteDto encontrado = mapDto.get(atual);
+            if (encontrado != null) return encontrado;
+            atual = cadeiaSuperior.get(atual);
+        }
+        return null;
     }
 
     private Unidade obterLocalizacao(Subprocesso sp) {
