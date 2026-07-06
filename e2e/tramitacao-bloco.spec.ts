@@ -93,9 +93,9 @@ test.describe.serial('Tramitação ponta a ponta em bloco', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await verificarNotificacaoAdmin(page, {
                 destinatario: 'ADMIN',
-                assunto: `Cadastro de atividades e conhecimentos da ${siglaUnidade} submetido para análise`,
+                assunto: 'Cadastros de atividades e conhecimentos submetidos para análise',
                 tipo: 'Cadastro aceito',
-                trechoCorpo: `O cadastro de atividades e conhecimentos da sua unidade no processo ${descricaoProcesso} foi aceito e submetido para análise pela unidade superior imediata.`
+                trechoCorpo: `Os cadastros de atividades e conhecimentos das unidades ${siglaUnidade} no processo ${descricaoProcesso} foram submetidos para análise por essa unidade.`
             });
             await page.getByTestId('nav-link-painel').click();
             await verificarAlertaPainel(page, new RegExp(`Cadastro da unidade ${siglaUnidade} submetido para análise`, 'i'));

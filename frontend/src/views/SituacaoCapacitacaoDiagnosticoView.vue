@@ -9,7 +9,12 @@
             :title="TEXTOS.diagnostico.TITULO_SITUACAO_CAPACITACAO"
         >
           <template #actions>
-            <BButton variant="outline-secondary" @click="void router.back()">
+            <BButton
+                class="btn-voltar-situacao-capacitacao"
+                variant="light"
+                :style="estiloBotaoVoltar"
+                @click="void router.back()"
+            >
               <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
               {{ TEXTOS.diagnostico.BTN_VOLTAR }}
             </BButton>
@@ -225,6 +230,13 @@ const opcoesCapacitacao = [
   {value: 'I', text: `I - ${TEXTOS.diagnostico.CAPACITACAO_I}`},
 ];
 
+const estiloBotaoVoltar = {
+  '--bs-btn-color': '#f8fafc',
+  '--bs-btn-border-color': '#f8fafc',
+  color: '#f8fafc',
+  borderColor: '#f8fafc'
+};
+
 function formatarSituacaoCapacitacao(valor: ValorSituacaoCapacitacao | null): string {
   const opcao = opcoesCapacitacao.find((o) => o.value === valor);
   return opcao ? opcao.text : '-';
@@ -297,5 +309,9 @@ function formatarNota(valor: number | null): string {
 .cursor-salvando,
 .cursor-salvando * {
   cursor: wait !important;
+}
+
+:global([data-bs-theme="dark"] .btn-voltar-situacao-capacitacao .bi) {
+  color: inherit !important;
 }
 </style>

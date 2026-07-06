@@ -36,7 +36,7 @@
               <BSpinner v-if="concluindo" aria-hidden="true" class="me-1" small/>
               {{ TEXTOS.diagnostico.BTN_CONCLUIR_AUTOAVALIACAO }}
             </BButton>
-            <BButton variant="outline-secondary" @click="voltar">
+            <BButton variant="light" @click="voltar">
               <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
               {{ TEXTOS.diagnostico.BTN_VOLTAR }}
             </BButton>

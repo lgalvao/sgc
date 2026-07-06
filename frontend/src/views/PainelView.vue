@@ -10,8 +10,9 @@
             <BButton
                 v-if="perfil.mostrarCriarProcesso.value"
                 :to="{ name: 'CadProcesso' }"
+                class="btn-painel-criar-processo"
                 data-testid="btn-painel-criar-processo"
-                variant="outline-primary"
+                variant="primary"
             >
               <i aria-hidden="true" class="bi bi-plus-lg"/> Criar processo
             </BButton>
@@ -101,3 +102,15 @@ defineExpose({
   processosOrdenados: tela.processosOrdenados,
 });
 </script>
+
+<style scoped>
+:global([data-bs-theme="dark"] .btn-painel-criar-processo) {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #f8fafc !important;
+}
+
+:global([data-bs-theme="dark"] .btn-painel-criar-processo .bi) {
+  color: inherit !important;
+}
+</style>

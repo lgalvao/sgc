@@ -1,5 +1,5 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoFixture} from './fixtures/index.js';
+import {criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture, criarProcessoFinalizadoFixture} from './fixtures/index.js';
 import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {login} from './helpers/helpers-auth.js';
 
@@ -13,20 +13,26 @@ test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
                                                                                            page,
                                                                                            request
                                                                                        }) => {
-        const descricao = `Diagnóstico CDU-47 ${Date.now()}`;
-        const processo = await criarProcessoFixture(request, {
-            descricao,
-            tipo: 'DIAGNOSTICO',
+        await criarProcessoFinalizadoFixture(request, {
             unidade: UNIDADE,
             iniciar: true
         });
 
+        const descricao = `Diagnóstico CDU-47 ${Date.now()}`;
+        const processo = await criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture(request, {
+            descricao,
+            unidade: UNIDADE,
+            iniciar: true,
+            servidorTitulo: TITULO_SERVIDOR_ASSESSORIA_12
+        });
+
         await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
         await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
-        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE);
-        await page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`).getByRole('button', {name: 'Ações'}).click();
-
-        await page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
+        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
+        const dropdownAcoes = page.getByTestId(`dropdown-acoes-${TITULO_SERVIDOR_ASSESSORIA_12}`);
+        await expect(dropdownAcoes).toBeVisible();
+        await dropdownAcoes.getByRole('button', {name: 'Ações'}).click();
+        await page.locator('[role="menu"]:visible').getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`).click();
         const modal = page.getByRole('dialog');
         await expect(modal).toContainText('Indicar impossibilidade de avaliação');
         await expect(modal).toContainText('João Guilherme de Albuquerque Maranhão');
@@ -35,7 +41,6 @@ test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
         await expect(modal).toContainText('A justificativa é obrigatória.');
 
         await page.getByTestId('textarea-justificativa-impossibilidade').fill('Servidor afastado durante todo o período da avaliação.');
-        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, UNIDADE);
         await Promise.all([
             page.waitForResponse(res =>
                 res.url().includes(`/api/subprocessos/${codSubprocesso}/diagnostico/avaliacoes/${TITULO_SERVIDOR_ASSESSORIA_12}/impossibilitar`)
@@ -45,7 +50,9 @@ test.describe('CDU-47 - Indicar impossibilidade de avaliação', () => {
         ]);
 
         await expect(page.getByText('Avaliação impossibilitada', {exact: true})).toBeVisible();
-        await expect(page.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeDisabled();
-        await expect(page.getByTestId(`btn-desfazer-impossibilidade-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeEnabled();
+        await dropdownAcoes.getByRole('button', {name: 'Ações'}).click();
+        const menuAcoes = page.locator('[role="menu"]:visible');
+        await expect(menuAcoes.getByTestId(`btn-impossibilitar-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeDisabled();
+        await expect(menuAcoes.getByTestId(`btn-desfazer-impossibilidade-${TITULO_SERVIDOR_ASSESSORIA_12}`)).toBeEnabled();
     });
 });

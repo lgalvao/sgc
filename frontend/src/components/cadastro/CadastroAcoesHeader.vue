@@ -65,7 +65,7 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         <BButton
             v-if="codSubprocesso"
             data-testid="btn-cad-atividades-historico"
-            variant="outline-secondary"
+            variant="light"
             @click="$emit('abrir-historico')"
         >
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.atividades.BOTAO_HISTORICO_ANALISE }}
@@ -73,7 +73,7 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
         <BButton
             v-if="codSubprocesso && podeVisualizarImpacto"
             data-testid="cad-atividades__btn-impactos-mapa-edicao"
-            variant="outline-secondary"
+            variant="light"
             @click="$emit('abrir-impacto')"
         >
           <i aria-hidden="true" class="bi bi-arrow-right-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPACTO }}
@@ -134,7 +134,7 @@ const usarDropdownAcoes = computed(() => quantidadeAcoesWorkflow.value > 1);
             v-if="codSubprocesso && mostrarImportarAtividades"
             :disabled="!permissoes.habilitarEditarCadastro"
             data-testid="btn-cad-atividades-importar"
-            variant="outline-secondary"
+            variant="light"
             @click="$emit('abrir-importar')"
         >
           <i aria-hidden="true" class="bi bi-arrow-down-circle me-1"/> {{ TEXTOS.atividades.BOTAO_IMPORTAR }}

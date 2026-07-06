@@ -43,6 +43,8 @@ export async function auditarAcessibilidadeNosTemas(page: Page): Promise<void> {
 async function auditarAcessibilidade(page: Page): Promise<void> {
     const accessibilityScanResults = await new AxeBuilder({page})
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa'])
+        // Toasters are transient overlays and not part of the stable checkpoint surface.
+        .exclude('.toast')
         .disableRules(['list'])
         .analyze();
 

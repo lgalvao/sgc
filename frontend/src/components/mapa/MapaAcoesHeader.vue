@@ -92,7 +92,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
             data-testid="btn-mapa-ver-sugestoes"
             loading-text="Carregando..."
             text="Ver sugestões"
-            variant="outline-secondary"
+            variant="light"
             @click="$emit('ver-sugestoes')"
         >
           {{ TEXTOS.mapa.BOTAO_VER_SUGESTOES }}
@@ -101,7 +101,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
         <BButton
             v-if="exibirAcoes"
             data-testid="btn-mapa-historico"
-            variant="outline-secondary"
+            variant="light"
             @click="$emit('abrir-historico')"
         >
           <i aria-hidden="true" class="bi bi-clock-history me-1"/> {{ TEXTOS.mapa.BOTAO_HISTORICO_ANALISE }}
@@ -113,7 +113,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
             :text="TEXTOS.mapa.BOTAO_IMPACTO"
             data-testid="cad-mapa__btn-impactos-mapa"
             icon="arrow-right-circle"
-            variant="outline-secondary"
+            variant="light"
             @click="$emit('abrir-impacto')"
         />
 
@@ -122,7 +122,7 @@ const exibirAcoes = computed(() => Boolean(props.codigoSubprocesso));
             :text="TEXTOS.mapa.BOTAO_EXPORTAR"
             data-testid="btn-mapa-exportar"
             toggle-class="text-nowrap"
-            variant="outline-secondary"
+            variant="light"
         >
           <BDropdownItemButton
               :disabled="loadingExportacaoPdf"

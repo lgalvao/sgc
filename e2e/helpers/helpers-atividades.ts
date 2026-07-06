@@ -300,6 +300,8 @@ async function preencherFormularioImportacao(page: Page, processoOrigemDescricao
     for (const desc of atividadesDescricoes) {
         const checkbox = modal.getByLabel(desc, {exact: true}).first();
         await expect(checkbox).toBeVisible();
+        await checkbox.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(100);
         await checkbox.check();
     }
 }

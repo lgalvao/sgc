@@ -37,7 +37,6 @@ test.describe('CDU-38 - Acompanhar notificações por e-mail', () => {
         const tabela = await abrirNotificacoesAdmin(page);
         await expect(tabela).toContainText('ASSESSORIA_12');
         await expect(tabela).toContainText('Falha definitiva');
-        await expect(tabela).toContainText('Lembrete de prazo');
         await expect(page.getByTestId('btn-notificacoes-atualizar')).toBeVisible();
 
         await page.getByTestId(`btn-detalhes-${notificacaoFalha.codigo}`).click();

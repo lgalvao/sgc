@@ -42,7 +42,7 @@
             <BButton
                 v-if="mostrarCriarAtribuicaoTemporaria"
                 data-testid="unidade-view__btn-criar-atribuicao"
-                variant="outline-secondary"
+                variant="light"
                 @click="irParaCriarAtribuicao"
             >
               <span data-testid="unidade-view__btn-atribuicao-texto">{{ textoBotaoAtribuicao }}</span>

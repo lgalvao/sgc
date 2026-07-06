@@ -8,8 +8,9 @@
       <template #actions>
         <BButton
             v-if="exibirBotaoVoltar"
+            class="btn-subprocesso-diagnostico-secundaria"
             size="sm"
-            variant="outline-secondary"
+            variant="light"
             @click="void router.back()"
         >
           <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
@@ -53,10 +54,11 @@
               :data-testid="`dropdown-acoes-${item.servidorTitulo}`"
               right
               size="sm"
+              class="btn-subprocesso-diagnostico-secundaria"
               :text="TEXTOS.diagnostico.COLUNA_ACOES"
               teleport-to="body"
               toggle-class="text-nowrap"
-              variant="outline-secondary"
+              variant="light"
           >
             <BDropdownItemButton
                 :data-testid="`btn-manter-consenso-${item.servidorTitulo}`"
@@ -546,3 +548,15 @@ const colunasServidores = computed(() => [
   ...(ehChefe.value ? [{key: 'acoes', label: TEXTOS.diagnostico.COLUNA_ACOES}] : []),
 ]);
 </script>
+
+<style scoped>
+:global([data-bs-theme="dark"] .btn-subprocesso-diagnostico-secundaria.btn-outline-secondary),
+:global([data-bs-theme="dark"] .btn-subprocesso-diagnostico-secundaria .btn-outline-secondary) {
+  color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+:global([data-bs-theme="dark"] .btn-subprocesso-diagnostico-secundaria .bi) {
+  color: inherit !important;
+}
+</style>

@@ -180,8 +180,10 @@ const chaveRotaAtual = computed(() => {
 }
 
 [data-bs-theme="dark"] .btn-outline-primary {
-  --bs-btn-color: #818cf8;
-  --bs-btn-border-color: #818cf8;
+  --bs-btn-color: #a5b4fc;
+  --bs-btn-border-color: #a5b4fc;
+  color: #c7d2fe !important;
+  border-color: #c7d2fe !important;
   --bs-btn-hover-color: #ffffff;
   --bs-btn-hover-bg: #6366f1;
   --bs-btn-hover-border-color: #6366f1;
@@ -192,8 +194,10 @@ const chaveRotaAtual = computed(() => {
 }
 
 [data-bs-theme="dark"] .btn-outline-secondary {
-  --bs-btn-color: #94a3b8;
-  --bs-btn-border-color: #475569;
+  --bs-btn-color: #cbd5e1;
+  --bs-btn-border-color: #94a3b8;
+  color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
   --bs-btn-hover-color: #ffffff;
   --bs-btn-hover-bg: #334155;
   --bs-btn-hover-border-color: #334155;
@@ -201,6 +205,11 @@ const chaveRotaAtual = computed(() => {
   --bs-btn-active-color: #ffffff;
   --bs-btn-active-bg: #334155;
   --bs-btn-active-border-color: #334155;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary .bi,
+[data-bs-theme="dark"] .btn-outline-secondary .bi {
+  color: inherit !important;
 }
 
 [data-bs-theme="dark"] .btn-outline-danger {
@@ -303,6 +312,10 @@ button:disabled,
   transition: color 0.15s ease;
 }
 
+[data-bs-theme="dark"] .link-discreto {
+  color: #bfdbfe;
+}
+
 .link-discreto:hover,
 .link-discreto:focus {
   color: var(--bs-emphasis-color);
@@ -346,6 +359,23 @@ button:disabled,
 
 .toast.text-bg-danger .toast-body {
   color: var(--bs-danger-text-emphasis) !important;
+}
+
+html[data-bs-theme="dark"] .toast.text-bg-success .toast-body {
+  color: #f8fafc !important;
+}
+
+html[data-bs-theme="dark"] .toast.text-bg-success {
+  background-color: #166534 !important;
+  border-color: #166534 !important;
+  color: #f8fafc !important;
+}
+
+html:not([data-bs-theme="dark"]) .btn-outline-secondary {
+  --bs-btn-color: #495057;
+  --bs-btn-border-color: #6c757d;
+  color: #495057 !important;
+  border-color: #6c757d !important;
 }
 
 html:not([data-bs-theme="dark"]) .btn-outline-secondary:hover,

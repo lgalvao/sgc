@@ -136,4 +136,21 @@ const shouldShowBreadcrumbs = computed(
   color: var(--bs-secondary-color);
   font-size: 0.9rem;
 }
+
+:global([data-bs-theme="dark"] .barra-navegacao .btn-voltar) {
+  color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+:global([data-bs-theme="dark"] .barra-navegacao .breadcrumb-item > a) {
+  color: #e2e8f0 !important;
+}
+
+:global([data-bs-theme="dark"] .barra-navegacao .breadcrumb-item.active) {
+  color: #f8fafc !important;
+}
+
+:global([data-bs-theme="dark"] .barra-navegacao .bi-house-door) {
+  color: #e2e8f0 !important;
+}
 </style>

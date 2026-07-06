@@ -20,7 +20,12 @@
       <BSpinner v-if="aprovando" aria-hidden="true" class="me-1" small/>
       {{ TEXTOS.diagnostico.BTN_APROVAR_CONSENSO }}
     </BButton>
-    <BButton variant="outline-secondary" @click="$emit('voltar')">
+    <BButton
+        class="btn-voltar-diagnostico"
+        variant="light"
+        :style="estiloBotaoVoltar"
+        @click="$emit('voltar')"
+    >
       <i aria-hidden="true" class="bi bi-arrow-left me-1"/>
       {{ TEXTOS.diagnostico.BTN_VOLTAR }}
     </BButton>
@@ -41,9 +46,22 @@ defineProps<{
   servidorEhUsuarioLogado: boolean;
 }>();
 
+const estiloBotaoVoltar = {
+  '--bs-btn-color': '#f8fafc',
+  '--bs-btn-border-color': '#f8fafc',
+  color: '#f8fafc',
+  borderColor: '#f8fafc'
+};
+
 defineEmits<{
   (e: 'aprovarConsenso'): void;
   (e: 'concluirAvaliacao'): void;
   (e: 'voltar'): void;
 }>();
 </script>
+
+<style scoped>
+:global([data-bs-theme="dark"] .btn-voltar-diagnostico .bi) {
+  color: inherit !important;
+}
+</style>

@@ -56,4 +56,13 @@ defineProps<Props>()
 .page-header__actions :deep(.btn) {
   white-space: nowrap;
 }
+
+:global([data-bs-theme="dark"] .page-header__actions .btn-outline-secondary) {
+  color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+:global([data-bs-theme="dark"] .page-header__actions .btn-outline-secondary .bi) {
+  color: inherit !important;
+}
 </style>

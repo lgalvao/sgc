@@ -59,8 +59,10 @@ export async function criarProcesso(page: Page, options: {
         const checkbox = page.getByTestId(`chk-arvore-unidade-${u}`);
         await expect(checkbox).toBeVisible();
         await expect(checkbox).toBeEnabled();
+        await checkbox.scrollIntoViewIfNeeded();
         // Só marca se não estiver marcado (pode já estar marcado se o pai foi selecionado)
         if (!await checkbox.isChecked()) {
+            await page.waitForTimeout(100);
             await checkbox.check();
         }
     }
@@ -108,8 +110,10 @@ export async function criarProcessoSimples(page: Page, options: {
         const checkbox = page.getByTestId(`chk-arvore-unidade-${siglaUnidade}`);
         await expect(checkbox).toBeVisible();
         await expect(checkbox).toBeEnabled();
+        await checkbox.scrollIntoViewIfNeeded();
 
         if (!await checkbox.isChecked()) {
+            await page.waitForTimeout(100);
             await checkbox.check();
         }
     }
@@ -260,7 +264,12 @@ async function confirmarSelecaoComplementarUnidadesComEquipePropria(
         }
     }
 
-    await modal.getByTestId('btn-acao-bloco-confirmar').click();
+    const botaoConfirmar = modal.getByTestId('btn-acao-bloco-confirmar');
+    await expect(botaoConfirmar).toBeVisible();
+    await expect(botaoConfirmar).toBeEnabled();
+    await botaoConfirmar.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(150);
+    await botaoConfirmar.click();
 }
 
 export interface UnidadeParticipante {

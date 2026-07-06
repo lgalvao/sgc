@@ -65,7 +65,7 @@ const habilitarEnviarLembreteNormalizado = computed(() => normalizarFlag(props.h
             :text="TEXTOS.mapa.BOTAO_ACOES"
             data-testid="btn-subprocesso-acoes"
             toggle-class="text-nowrap"
-            variant="outline-secondary"
+            variant="light"
         >
           <BDropdownItemButton
               v-if="mostrarAlterarDataLimiteNormalizado"
