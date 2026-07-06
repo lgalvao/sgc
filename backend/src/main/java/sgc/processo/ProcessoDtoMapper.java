@@ -116,10 +116,10 @@ public class ProcessoDtoMapper {
     }
 
     /**
-     * Cria um DTO de unidade participante virtual (sem subprocesso) para ancestrais
-     * nao-participantes que aparecem como agrupadores na hierarquia do processo.
+     * Cria um DTO de unidade participante agrupadora (sem subprocesso) para ancestrais
+     * nao-participantes que aparecem na hierarquia do processo.
      */
-    public UnidadeParticipanteDto paraUnidadeParticipanteVirtual(UnidadeHierarquiaLeitura info) {
+    public UnidadeParticipanteDto paraUnidadeParticipanteAgrupadora(UnidadeHierarquiaLeitura info) {
         return criarUnidadeParticipanteBase(
                 info.nome(),
                 info.sigla(),

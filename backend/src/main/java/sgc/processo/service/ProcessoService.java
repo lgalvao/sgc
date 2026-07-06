@@ -644,9 +644,9 @@ public class ProcessoService {
         // Permite percorrer ancestrais nao-participantes ao montar a arvore.
         Map<Long, Long> hierarquiaOrganograma = unidadeHierarquiaService.buscarMapaFilhoPai();
 
-        // Adiciona nos virtuais (sem subprocesso) para ancestrais diretos nao-participantes,
-        // como unidades do tipo INTERMEDIARIA. Isso garante que COSIS apareca como agrupador
-        // mesmo nao sendo participante do processo.
+        // Adiciona nos agrupadores (sem subprocesso) para ancestrais diretos nao-participantes,
+        // como unidades do tipo INTERMEDIARIA. Isso garante que a hierarquia apareca correta
+        // mesmo que o ancestral nao seja participante do processo.
         Map<Long, UnidadeHierarquiaLeitura> infoUnidades = unidadeHierarquiaService.buscarMapaCodigoParaUnidade();
         Set<Long> participantesOriginais = new HashSet<>(mapDto.keySet());
         for (Long codParticipante : participantesOriginais) {
@@ -656,7 +656,7 @@ public class ProcessoService {
                 if (info == null || info.tipo() == TipoUnidade.RAIZ || "ADMIN".equals(info.sigla())) {
                     break;
                 }
-                mapDto.put(codAtual, processoDtoMapper.paraUnidadeParticipanteVirtual(info));
+                mapDto.put(codAtual, processoDtoMapper.paraUnidadeParticipanteAgrupadora(info));
                 codAtual = info.unidadeSuperiorCodigo();
             }
         }
