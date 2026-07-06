@@ -405,6 +405,7 @@ public class ProcessoService {
         String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
                 .formatted(codProcesso, unidadeCodigo, LocalDate.now());
         enfileirarNotificacaoUnidade(
+                unidadeService.buscarAdmin(),
                 unidade,
                 TipoNotificacao.LEMBRETE_PRAZO,
                 assunto,
@@ -1224,6 +1225,7 @@ public class ProcessoService {
         );
 
         enfileirarNotificacaoUnidade(
+                unidadeService.buscarAdmin(),
                 unidadeDestino,
                 TipoNotificacao.PROCESSO_INICIADO,
                 assunto,
@@ -1255,6 +1257,7 @@ public class ProcessoService {
     }
 
     private void enfileirarNotificacaoUnidade(
+            Unidade unidadeOrigem,
             Unidade unidadeDestino,
             TipoNotificacao tipoNotificacao,
             String assunto,
@@ -1275,6 +1278,7 @@ public class ProcessoService {
                 .subprocesso(subprocesso)
                 .tipoNotificacao(tipoNotificacao)
                 .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .unidadeOrigemSigla(unidadeOrigem.getSigla())
                 .destinatario(destinatarioPrincipal)
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)
@@ -1286,6 +1290,7 @@ public class ProcessoService {
                 .subprocesso(subprocesso)
                 .tipoNotificacao(tipoNotificacao)
                 .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .unidadeOrigemSigla(unidadeOrigem.getSigla())
                 .destinatario(s)
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)
@@ -1446,6 +1451,7 @@ public class ProcessoService {
 
     private void criarNotificacaoFinalizacaoDireta(Processo processo, Unidade unidade) {
         enfileirarNotificacaoUnidade(
+                unidadeService.buscarAdmin(),
                 unidade,
                 TipoNotificacao.PROCESSO_FINALIZADO,
                 assuntoFinalizacaoDireta(processo),
@@ -1457,6 +1463,7 @@ public class ProcessoService {
 
     private void criarNotificacaoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
         enfileirarNotificacaoUnidade(
+                unidadeService.buscarAdmin(),
                 unidade,
                 TipoNotificacao.PROCESSO_FINALIZADO,
                 assuntoFinalizacaoConsolidada(processo),

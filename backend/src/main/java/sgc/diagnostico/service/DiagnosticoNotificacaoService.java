@@ -57,7 +57,7 @@ public class DiagnosticoNotificacaoService {
                 urlSistema()
         );
 
-        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA, assunto, corpo,
+        enfileirarNotificacao(sp, unidade, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_AUTOAVALIACAO_CONCLUIDA, assunto, corpo,
                 "diagnostico:%d:autoavaliacao:%s".formatted(sp.getCodigo(), servidorTitulo));
 
         alertaService.criarAlertaTransicao(
@@ -85,7 +85,7 @@ public class DiagnosticoNotificacaoService {
                 urlSistema()
         );
 
-        enfileirarNotificacao(sp, unidade,
+        enfileirarNotificacao(sp, unidade, unidade,
                 new DestinatarioNotificacao(servidor.getEmail(), servidor.getTituloEleitoral(), servidor.getNome()),
                 TipoNotificacao.DIAGNOSTICO_CONSENSO_DISPONIVEL,
                 assunto,
@@ -115,7 +115,7 @@ public class DiagnosticoNotificacaoService {
                 urlSistema()
         );
 
-        enfileirarNotificacao(sp, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_CONSENSO_APROVADO, assunto, corpo,
+        enfileirarNotificacao(sp, unidade, unidade, destinatario, TipoNotificacao.DIAGNOSTICO_CONSENSO_APROVADO, assunto, corpo,
                 "diagnostico:%d:consenso-aprovado:%s".formatted(sp.getCodigo(), servidorTitulo));
 
         alertaService.criarAlertaTransicao(
@@ -137,7 +137,7 @@ public class DiagnosticoNotificacaoService {
                 urlSistema()
         );
 
-        enfileirarNotificacao(sp, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_CONCLUIDO, assunto, corpo,
+        enfileirarNotificacao(sp, unidadeSubprocesso, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_CONCLUIDO, assunto, corpo,
                 "diagnostico:%d:concluido:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
 
         alertaService.criarAlertaTransicao(
@@ -164,7 +164,7 @@ public class DiagnosticoNotificacaoService {
                 observacao
         );
 
-        enfileirarNotificacao(sp, unidadeDevolucao, destinatario, TipoNotificacao.DIAGNOSTICO_DEVOLVIDO, assunto, corpo,
+        enfileirarNotificacao(sp, unidadeAnalise, unidadeDevolucao, destinatario, TipoNotificacao.DIAGNOSTICO_DEVOLVIDO, assunto, corpo,
                 "diagnostico:%d:devolvido:destino:%d".formatted(sp.getCodigo(), unidadeDevolucao.getCodigo()));
 
         alertaService.criarAlertaTransicao(
@@ -185,7 +185,7 @@ public class DiagnosticoNotificacaoService {
                 sp.getProcesso().getDescricao()
         );
 
-        enfileirarNotificacao(sp, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_ACEITO, assunto, corpo,
+        enfileirarNotificacao(sp, unidadeAnalise, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_ACEITO, assunto, corpo,
                 "diagnostico:%d:aceito:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
 
         alertaService.criarAlertaTransicao(
@@ -196,7 +196,11 @@ public class DiagnosticoNotificacaoService {
         );
     }
 
-    public void notificarDiagnosticosAceitosEmBloco(java.util.List<Subprocesso> subprocessos, Unidade unidadeSuperior) {
+    public void notificarDiagnosticosAceitosEmBloco(
+            java.util.List<Subprocesso> subprocessos,
+            Unidade unidadeAnalise,
+            Unidade unidadeSuperior
+    ) {
         if (subprocessos.isEmpty()) {
             return;
         }
@@ -221,6 +225,7 @@ public class DiagnosticoNotificacaoService {
                 .tipoNotificacao(TipoNotificacao.DIAGNOSTICO_ACEITO)
                 .usuarioDestinoTitulo(destinatario.usuarioTitulo())
                 .unidadeDestinoSigla(unidadeSuperior.getSigla())
+                .unidadeOrigemSigla(unidadeAnalise.getSigla())
                 .destinatario(destinatario.email())
                 .assunto(assunto)
                 .corpoHtml(corpo)
@@ -252,7 +257,7 @@ public class DiagnosticoNotificacaoService {
                 sp.getProcesso().getDescricao()
         );
 
-        enfileirarNotificacao(sp, unidadeSubprocesso, destinatario, TipoNotificacao.DIAGNOSTICO_HOMOLOGADO, assunto, corpo,
+        enfileirarNotificacao(sp, admin, unidadeSubprocesso, destinatario, TipoNotificacao.DIAGNOSTICO_HOMOLOGADO, assunto, corpo,
                 "diagnostico:%d:homologado".formatted(sp.getCodigo()));
 
         alertaService.criarAlertaTransicao(
@@ -269,6 +274,7 @@ public class DiagnosticoNotificacaoService {
 
     private void enfileirarNotificacao(
             Subprocesso sp,
+            Unidade unidadeOrigem,
             Unidade unidadeDestino,
             DestinatarioNotificacao destinatario,
             TipoNotificacao tipo,
@@ -281,6 +287,7 @@ public class DiagnosticoNotificacaoService {
                 .tipoNotificacao(tipo)
                 .usuarioDestinoTitulo(destinatario.usuarioTitulo())
                 .unidadeDestinoSigla(unidadeDestino.getSigla())
+                .unidadeOrigemSigla(unidadeOrigem.getSigla())
                 .destinatario(destinatario.email())
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)

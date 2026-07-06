@@ -256,7 +256,7 @@ public class DiagnosticoFluxoService {
         }
 
         if (!subprocessos.isEmpty() && unidadeAnalise != null && unidadeSuperior != null) {
-            notificacaoService.notificarDiagnosticosAceitosEmBloco(subprocessos, unidadeSuperior);
+            notificacaoService.notificarDiagnosticosAceitosEmBloco(subprocessos, unidadeAnalise, unidadeSuperior);
             notificacaoService.criarAlertaDiagnosticosAceitosEmBloco(
                     subprocessos.getFirst().getProcesso(),
                     unidadeAnalise,

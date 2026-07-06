@@ -278,6 +278,7 @@ class E2eFixtureEndpointTest {
                         "DIAGNOSTICO_CONSENSO_APROVADO",
                         "FALHA_DEFINITIVA",
                         "ASSESSORIA_22",
+                        "ASSESSORIA_22",
                         null,
                         "SMTP indisponível");
 

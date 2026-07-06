@@ -194,6 +194,7 @@ public class ResponsavelUnidadeService {
                 .tipoNotificacao(TipoNotificacao.ATRIBUICAO_TEMPORARIA)
                 .usuarioDestinoTitulo(usuario.getTituloEleitoral())
                 .unidadeDestinoSigla(siglaUnidade)
+                .unidadeOrigemSigla(siglaUnidade)
                 .destinatario(usuario.getEmail())
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)

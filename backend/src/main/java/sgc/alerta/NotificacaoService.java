@@ -37,6 +37,7 @@ public class NotificacaoService {
                 .tipoNotificacao(cmd.tipoNotificacao())
                 .usuarioDestinoTitulo(cmd.usuarioDestinoTitulo())
                 .unidadeDestinoSigla(cmd.unidadeDestinoSigla())
+                .unidadeOrigemSigla(cmd.unidadeOrigemSigla())
                 .destinatario(cmd.destinatario())
                 .assunto(cmd.assunto())
                 .corpoHtml(cmd.corpoHtml())

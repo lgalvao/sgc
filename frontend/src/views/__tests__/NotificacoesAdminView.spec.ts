@@ -101,13 +101,13 @@ describe('NotificacoesAdminView', () => {
                     },
                     BAlert: {template: '<div><slot/></div>', props: ['modelValue', 'variant']},
                     BTable: {
-                        template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(destinatario)" :item="item" /><slot name="cell(processoDescricao)" :item="item" /><slot name="cell(unidadeOrigemSigla)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(quando)" :item="item" /><slot name="cell(acoes)" :item="item" /></tr></table>',
+                        template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(destinatario)" :item="item" /><slot name="cell(unidadeOrigemSigla)" :item="item" /><slot name="cell(unidadeDestino)" :item="item" /><slot name="cell(processoDescricao)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(quando)" :item="item" /><slot name="cell(acoes)" :item="item" /></tr></table>',
                         props: ['fields', 'items']
                     },
                     BSpinner: true,
                     BBadge: true,
                     NotificacaoTabela: {
-                        template: '<div data-testid="tbl-notificacoes"><div v-for="item in items" :key="item.codigo" class="row-stub"><span>{{ item.assunto }}</span><span>{{ item.processoDescricao }}</span><span>{{ item.unidadeOrigemSigla }}</span><button :data-testid="\'btn-detalhes-\' + item.codigo" @click="$emit(\'detalhes\', item)"></button><button :data-testid="\'btn-preview-\' + item.codigo" @click="$emit(\'preview\', item)"></button><button :data-testid="\'btn-notificacoes-reenviar-\' + item.codigo" @click="$emit(\'reenviar\', item)"></button></div></div>',
+                        template: '<div data-testid="tbl-notificacoes"><div v-for="item in items" :key="item.codigo" class="row-stub"><span>{{ item.assunto }}</span><span>{{ item.unidadeOrigemSigla }}</span><span>{{ item.unidadeDestinoSigla || item.unidadeSigla }}</span><span>{{ item.processoDescricao }}</span><button :data-testid="\'btn-detalhes-\' + item.codigo" @click="$emit(\'detalhes\', item)"></button><button :data-testid="\'btn-preview-\' + item.codigo" @click="$emit(\'preview\', item)"></button><button :data-testid="\'btn-notificacoes-reenviar-\' + item.codigo" @click="$emit(\'reenviar\', item)"></button></div></div>',
                         props: ['items']
                     }
                 }

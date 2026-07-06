@@ -433,13 +433,15 @@ public class E2eController {
         jdbcTemplate.update("""
                         INSERT INTO sgc.notificacao_email (
                             codigo, subprocesso_codigo, tipo_notificacao, usuario_destino_titulo, unidade_destino_sigla,
+                            unidade_origem_sigla,
                             destinatario, assunto, corpo_html, situacao, tentativas, proxima_tentativa_em,
                             data_hora_criacao, data_hora_envio, ultimo_erro, chave_idempotencia
-                        ) VALUES (?, NULL, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ) VALUES (?, NULL, ?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                 codigo,
                 tipo,
                 request.unidadeDestinoSigla(),
+                request.unidadeOrigemSigla(),
                 destinatario,
                 assunto,
                 corpoHtml,
@@ -1285,6 +1287,7 @@ public class E2eController {
             String tipoNotificacao,
             String situacao,
             String unidadeDestinoSigla,
+            String unidadeOrigemSigla,
             Integer tentativas,
             String ultimoErro
     ) {

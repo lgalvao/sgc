@@ -634,6 +634,10 @@ create table if not exists sgc.notificacao_email
 (
     20
 ),
+    unidade_origem_sigla varchar
+(
+    20
+),
     usuario_destino_titulo varchar
 (
     12

@@ -360,7 +360,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.ACEITE_DIAGNOSTICO);
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_ACEITO);
         assertThat(captor.getValue().observacoes()).isNull();
-        verify(notificacaoService).notificarDiagnosticosAceitosEmBloco(List.of(subprocesso), unidadeDestino);
+        verify(notificacaoService).notificarDiagnosticosAceitosEmBloco(List.of(subprocesso), unidadeGestora, unidadeDestino);
     }
 
     @Test
@@ -379,7 +379,7 @@ class DiagnosticoFluxoServiceTest {
                 .isInstanceOf(ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Unidade superior imediata obrigatória ausente");
 
-        verify(notificacaoService, never()).notificarDiagnosticosAceitosEmBloco(anyList(), any());
+        verify(notificacaoService, never()).notificarDiagnosticosAceitosEmBloco(anyList(), any(), any());
     }
 
     @Test

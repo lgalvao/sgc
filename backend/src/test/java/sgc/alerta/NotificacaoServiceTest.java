@@ -42,6 +42,7 @@ class NotificacaoServiceTest {
 
         service.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
+                .unidadeOrigemSigla("ADMIN")
                 .destinatario("destino@tre-pe.jus.br")
                 .assunto("Assunto")
                 .corpoHtml("<p>corpo</p>")
@@ -55,6 +56,7 @@ class NotificacaoServiceTest {
             assertThat(notificacao.getProximaTentativaEm()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0));
             assertThat(notificacao.getDataHoraCriacao()).isEqualTo(LocalDateTime.of(2026, 4, 21, 9, 0));
             assertThat(notificacao.getChaveIdempotencia()).isEqualTo("chave-1");
+            assertThat(notificacao.getUnidadeOrigemSigla()).isEqualTo("ADMIN");
         });
     }
 

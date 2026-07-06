@@ -36,6 +36,7 @@ class NotificacaoDtoTest {
                 .codigo(1L)
                 .subprocesso(subprocesso)
                 .unidadeDestinoSigla("SIGLA")
+                .unidadeOrigemSigla("ORIGEM")
                 .tipoNotificacao(TipoNotificacao.MAPA_DISPONIBILIZADO)
                 .usuarioDestinoTitulo("123456789012")
                 .destinatario("test@example.com")
@@ -56,6 +57,7 @@ class NotificacaoDtoTest {
         assertThat(dto.codigo()).isEqualTo(entity.getCodigo());
         assertThat(dto.subprocessoCodigo()).isEqualTo(123L);
         assertThat(dto.unidadeSigla()).isEqualTo("SIGLA");
+        assertThat(dto.unidadeOrigemSigla()).isEqualTo("ORIGEM");
         assertThat(dto.processoDescricao()).isEqualTo("Descricao Processo");
         assertThat(dto.processoFinalizado()).isFalse();
         assertThat(dto.tipoNotificacao()).isEqualTo(TipoNotificacaoDto.MAPA_DISPONIBILIZADO);
@@ -89,6 +91,7 @@ class NotificacaoDtoTest {
                 .codigo(1L)
                 .subprocesso(subprocesso)
                 .unidadeDestinoSigla("SIGLA")
+                .unidadeOrigemSigla("ADMIN")
                 .tipoNotificacao(TipoNotificacao.PROCESSO_FINALIZADO)
                 .destinatario("test@example.com")
                 .assunto("Test Subject")

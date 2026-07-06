@@ -11,6 +11,7 @@ public record EnfileirarNotificacaoCommand(
         TipoNotificacao tipoNotificacao,
         @Nullable String usuarioDestinoTitulo,
         @Nullable String unidadeDestinoSigla,
+        @Nullable String unidadeOrigemSigla,
         String destinatario,
         String assunto,
         String corpoHtml,

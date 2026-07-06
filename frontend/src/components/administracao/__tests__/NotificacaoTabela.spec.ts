@@ -3,6 +3,7 @@ import {mount} from "@vue/test-utils";
 import NotificacaoTabela from "../NotificacaoTabela.vue";
 import {createTestingPinia} from "@pinia/testing";
 import type {Notificacao} from "@/services/notificacaoService";
+import {BTable} from "bootstrap-vue-next";
 
 // Mock das utilidades de formatação
 vi.mock("@/utils/notificacaoFormatters", () => ({
@@ -19,6 +20,7 @@ describe("NotificacaoTabela.vue", () => {
             destinatario: "usuario@teste.com",
             processoDescricao: "Processo teste",
             unidadeOrigemSigla: "SECAO_221",
+            unidadeSigla: "DEST_10",
             tipoNotificacao: "PROCESSO_INICIADO",
             assunto: "Teste",
             situacao: "ENVIADO",
@@ -49,6 +51,27 @@ describe("NotificacaoTabela.vue", () => {
         expect(wrapper.text()).toContain("usuario@teste.com");
         expect(wrapper.text()).toContain("Processo teste");
         expect(wrapper.text()).toContain("SECAO_221");
+        expect(wrapper.text()).toContain("DEST_10");
+    });
+
+    it("deve ordenar as colunas como origem, destino e processo", () => {
+        const wrapper = mount(NotificacaoTabela, {
+            props: {items},
+            global: {
+                plugins: [createTestingPinia({createSpy: vi.fn})],
+            }
+        });
+
+        const campos = wrapper.findComponent(BTable).props("fields") as Array<{ key: string }>;
+        const indiceOrigem = campos.findIndex((campo) => campo.key === "unidadeOrigemSigla");
+        const indiceDestino = campos.findIndex((campo) => campo.key === "unidadeDestino");
+        const indiceProcesso = campos.findIndex((campo) => campo.key === "processoDescricao");
+
+        expect(indiceOrigem).toBeGreaterThanOrEqual(0);
+        expect(indiceDestino).toBeGreaterThanOrEqual(0);
+        expect(indiceProcesso).toBeGreaterThanOrEqual(0);
+        expect(indiceOrigem).toBeLessThan(indiceDestino);
+        expect(indiceDestino).toBeLessThan(indiceProcesso);
     });
 
     it("deve emitir 'detalhes' ao clicar no botão de info", async () => {

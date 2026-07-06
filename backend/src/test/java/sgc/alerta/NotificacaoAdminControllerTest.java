@@ -39,6 +39,7 @@ class NotificacaoAdminControllerTest {
                 .codigo(123L)
                 .assunto("Teste")
                 .destinatario("teste@teste.com")
+                .unidadeOrigemSigla("ADMIN")
                 .tipoNotificacao(TipoNotificacao.PROCESSO_INICIADO)
                 .situacao(SituacaoNotificacao.ENVIADO)
                 .dataHoraCriacao(LocalDateTime.now())
@@ -51,6 +52,7 @@ class NotificacaoAdminControllerTest {
                 .andExpect(jsonPath("$[0].codigo").value(123))
                 .andExpect(jsonPath("$[0].assunto").value("Teste"))
                 .andExpect(jsonPath("$[0].destinatario").value("teste@teste.com"))
+                .andExpect(jsonPath("$[0].unidadeOrigemSigla").value("ADMIN"))
                 .andExpect(jsonPath("$[0].situacao").value("ENVIADO"));
     }
 

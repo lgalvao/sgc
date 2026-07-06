@@ -552,19 +552,21 @@ VALUES (950002, '1', CURRENT_TIMESTAMP - INTERVAL '12' HOUR);
 -- Outbox de notificações do mapa SESEL
 -- -------------------------------------------------------------------------------------------------
 INSERT INTO SGC.NOTIFICACAO_EMAIL (CODIGO, SUBPROCESSO_CODIGO, TIPO_NOTIFICACAO, UNIDADE_DESTINO_SIGLA,
+                                   UNIDADE_ORIGEM_SIGLA,
                                    USUARIO_DESTINO_TITULO, DESTINATARIO, ASSUNTO, CORPO_HTML, SITUACAO, TENTATIVAS,
                                    PROXIMA_TENTATIVA_EM, DATA_HORA_CRIACAO, DATA_HORA_ENVIO, ULTIMO_ERRO,
                                    CHAVE_IDEMPOTENCIA)
-VALUES (960001, 60003, 'MAPA_DISPONIBILIZADO', 'SESEL', '1', 'ana.souza@tre-pe.jus.br',
+VALUES (960001, 60003, 'MAPA_DISPONIBILIZADO', 'SESEL', 'ADMIN', '1', 'ana.souza@tre-pe.jus.br',
         'SGC: Mapa de competências disponibilizado - SESEL',
         '<p>Mapa disponibilizado para validação da unidade SESEL.</p>', 'ENVIADO', 1, NULL,
         CURRENT_TIMESTAMP - INTERVAL '2' DAY, CURRENT_TIMESTAMP - INTERVAL '1' DAY, NULL,
         'mapa-sesel-60003-disponibilizado');
 INSERT INTO SGC.NOTIFICACAO_EMAIL (CODIGO, SUBPROCESSO_CODIGO, TIPO_NOTIFICACAO, UNIDADE_DESTINO_SIGLA,
+                                   UNIDADE_ORIGEM_SIGLA,
                                    USUARIO_DESTINO_TITULO, DESTINATARIO, ASSUNTO, CORPO_HTML, SITUACAO, TENTATIVAS,
                                    PROXIMA_TENTATIVA_EM, DATA_HORA_CRIACAO, DATA_HORA_ENVIO, ULTIMO_ERRO,
                                    CHAVE_IDEMPOTENCIA)
-VALUES (960002, 60003, 'MAPA_HOMOLOGADO', 'SESEL', '1', 'ana.souza@tre-pe.jus.br',
+VALUES (960002, 60003, 'MAPA_HOMOLOGADO', 'SESEL', 'ADMIN', '1', 'ana.souza@tre-pe.jus.br',
         'SGC: Mapa de competências homologado - SESEL', '<p>Mapa homologado com sucesso.</p>', 'FALHA_DEFINITIVA', 5,
         NULL, CURRENT_TIMESTAMP - INTERVAL '1' DAY, NULL, 'Falha simulada no H2: caixa postal indisponível',
         'mapa-sesel-60003-homologado');

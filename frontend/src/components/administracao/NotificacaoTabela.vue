@@ -31,6 +31,10 @@
         <span>{{ item.unidadeOrigemSigla || "-" }}</span>
       </template>
 
+      <template #cell(unidadeDestino)="{ item }">
+        <span>{{ item.unidadeDestinoSigla || item.unidadeSigla || "-" }}</span>
+      </template>
+
       <template #cell(assunto)="{ item }">
         <div :title="item.assunto" class="linha-assunto">
           <div class="fw-semibold">{{ formatarAssunto(item.assunto) }}</div>
@@ -114,17 +118,24 @@ const camposTabela = [
     sortable: true
   },
   {
-    key: "processoDescricao",
-    label: "Processo",
-    thClass: "col-processo",
-    tdClass: "col-processo",
-    sortable: true,
-  },
-  {
     key: "unidadeOrigemSigla",
     label: "Origem",
     thClass: "col-origem",
     tdClass: "col-origem",
+    sortable: true,
+  },
+  {
+    key: "unidadeDestino",
+    label: "Destino",
+    thClass: "col-destino",
+    tdClass: "col-destino",
+    sortable: false,
+  },
+  {
+    key: "processoDescricao",
+    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROCESSO,
+    thClass: "col-processo",
+    tdClass: "col-processo",
     sortable: true,
   },
   {
@@ -162,6 +173,10 @@ const camposTabela = [
 }
 
 :deep(.col-origem) {
+  width: 9rem;
+}
+
+:deep(.col-destino) {
   width: 9rem;
 }
 
