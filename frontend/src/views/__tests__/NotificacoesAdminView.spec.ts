@@ -101,7 +101,7 @@ describe('NotificacoesAdminView', () => {
                     },
                     BAlert: {template: '<div><slot/></div>', props: ['modelValue', 'variant']},
                     BTable: {
-                        template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(destinatario)" :item="item" /><slot name="cell(unidadeOrigemSigla)" :item="item" /><slot name="cell(unidadeDestino)" :item="item" /><slot name="cell(processoDescricao)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(quando)" :item="item" /><slot name="cell(acoes)" :item="item" /></tr></table>',
+                        template: '<table><tr v-for="item in items" :key="item.codigo"><slot name="cell(unidadeOrigemSigla)" :item="item" /><slot name="cell(destino)" :item="item" /><slot name="cell(processoDescricao)" :item="item" /><slot name="cell(assunto)" :item="item" /><slot name="cell(situacao)" :item="item" /><slot name="cell(quando)" :item="item" /><slot name="cell(acoes)" :item="item" /></tr></table>',
                         props: ['fields', 'items']
                     },
                     BSpinner: true,

@@ -222,6 +222,7 @@ public class DiagnosticoNotificacaoService {
 
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(base)
+                .processo(base.getProcesso())
                 .tipoNotificacao(TipoNotificacao.DIAGNOSTICO_ACEITO)
                 .usuarioDestinoTitulo(destinatario.usuarioTitulo())
                 .unidadeDestinoSigla(unidadeSuperior.getSigla())
@@ -284,6 +285,7 @@ public class DiagnosticoNotificacaoService {
     ) {
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(sp)
+                .processo(sp.getProcesso())
                 .tipoNotificacao(tipo)
                 .usuarioDestinoTitulo(destinatario.usuarioTitulo())
                 .unidadeDestinoSigla(unidadeDestino.getSigla())

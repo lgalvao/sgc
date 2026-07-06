@@ -17,7 +17,7 @@
         small
         sort-icon-left
     >
-      <template #cell(destinatario)="{ item }">
+      <template #cell(destino)="{ item }">
         <div :title="item.destinatario" class="fw-semibold">
           {{ formatarDestinatario(item) }}
         </div>
@@ -29,10 +29,6 @@
 
       <template #cell(unidadeOrigemSigla)="{ item }">
         <span>{{ item.unidadeOrigemSigla || "-" }}</span>
-      </template>
-
-      <template #cell(unidadeDestino)="{ item }">
-        <span>{{ item.unidadeDestinoSigla || item.unidadeSigla || "-" }}</span>
       </template>
 
       <template #cell(assunto)="{ item }">
@@ -111,13 +107,6 @@ defineEmits<{
 
 const camposTabela = [
   {
-    key: "destinatario",
-    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.DESTINATARIO,
-    thClass: "col-destinatario",
-    tdClass: "col-destinatario",
-    sortable: true
-  },
-  {
     key: "unidadeOrigemSigla",
     label: "Origem",
     thClass: "col-origem",
@@ -125,11 +114,11 @@ const camposTabela = [
     sortable: true,
   },
   {
-    key: "unidadeDestino",
+    key: "destino",
     label: "Destino",
-    thClass: "col-destino",
-    tdClass: "col-destino",
-    sortable: false,
+    thClass: "col-destino-principal",
+    tdClass: "col-destino-principal",
+    sortable: true
   },
   {
     key: "processoDescricao",
@@ -164,7 +153,7 @@ const camposTabela = [
 </script>
 
 <style scoped>
-:deep(.col-destinatario) {
+:deep(.col-destino-principal) {
   width: 12rem;
 }
 
@@ -173,10 +162,6 @@ const camposTabela = [
 }
 
 :deep(.col-origem) {
-  width: 9rem;
-}
-
-:deep(.col-destino) {
   width: 9rem;
 }
 

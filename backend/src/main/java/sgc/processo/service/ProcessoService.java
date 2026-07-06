@@ -405,12 +405,13 @@ public class ProcessoService {
         String chave = "processo:%d:lembrete:unidade:%d:dia:%s"
                 .formatted(codProcesso, unidadeCodigo, LocalDate.now());
         enfileirarNotificacaoUnidade(
-                unidadeService.buscarAdmin(),
+                SIGLA_UNIDADE_ADMIN,
                 unidade,
                 TipoNotificacao.LEMBRETE_PRAZO,
                 assunto,
                 corpoHtml,
                 chave,
+                processo,
                 null
         );
     }
@@ -1225,12 +1226,13 @@ public class ProcessoService {
         );
 
         enfileirarNotificacaoUnidade(
-                unidadeService.buscarAdmin(),
+                SIGLA_UNIDADE_ADMIN,
                 unidadeDestino,
                 TipoNotificacao.PROCESSO_INICIADO,
                 assunto,
                 corpoHtml,
                 chaveInicioProcesso(processo, unidadeDestino, participante),
+                processo,
                 subprocessoDestino
         );
     }
@@ -1257,12 +1259,13 @@ public class ProcessoService {
     }
 
     private void enfileirarNotificacaoUnidade(
-            Unidade unidadeOrigem,
+            String unidadeOrigemSigla,
             Unidade unidadeDestino,
             TipoNotificacao tipoNotificacao,
             String assunto,
             String corpoHtml,
             String chaveIdempotencia,
+            Processo processo,
             @Nullable Subprocesso subprocesso
     ) {
         if (isUnidadeAdmin(unidadeDestino)
@@ -1276,9 +1279,10 @@ public class ProcessoService {
 
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(subprocesso)
+                .processo(processo)
                 .tipoNotificacao(tipoNotificacao)
                 .unidadeDestinoSigla(unidadeDestino.getSigla())
-                .unidadeOrigemSigla(unidadeOrigem.getSigla())
+                .unidadeOrigemSigla(unidadeOrigemSigla)
                 .destinatario(destinatarioPrincipal)
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)
@@ -1288,9 +1292,10 @@ public class ProcessoService {
         Optional<String> destinatarioCopia = emailCopiaAdmin(unidadeDestino);
         destinatarioCopia.ifPresent(s -> notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(subprocesso)
+                .processo(processo)
                 .tipoNotificacao(tipoNotificacao)
                 .unidadeDestinoSigla(unidadeDestino.getSigla())
-                .unidadeOrigemSigla(unidadeOrigem.getSigla())
+                .unidadeOrigemSigla(unidadeOrigemSigla)
                 .destinatario(s)
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)
@@ -1451,24 +1456,26 @@ public class ProcessoService {
 
     private void criarNotificacaoFinalizacaoDireta(Processo processo, Unidade unidade) {
         enfileirarNotificacaoUnidade(
-                unidadeService.buscarAdmin(),
+                SIGLA_UNIDADE_ADMIN,
                 unidade,
                 TipoNotificacao.PROCESSO_FINALIZADO,
                 assuntoFinalizacaoDireta(processo),
                 corpoFinalizacaoDireta(processo, unidade),
                 chaveFinalizacaoProcesso(processo, unidade, true),
+                processo,
                 null
         );
     }
 
     private void criarNotificacaoFinalizacaoConsolidada(Processo processo, Unidade unidade, List<String> subordinadas) {
         enfileirarNotificacaoUnidade(
-                unidadeService.buscarAdmin(),
+                SIGLA_UNIDADE_ADMIN,
                 unidade,
                 TipoNotificacao.PROCESSO_FINALIZADO,
                 assuntoFinalizacaoConsolidada(processo),
                 corpoFinalizacaoConsolidada(processo, unidade, subordinadas),
                 chaveFinalizacaoProcesso(processo, unidade, false),
+                processo,
                 null
         );
     }

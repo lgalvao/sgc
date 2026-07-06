@@ -465,6 +465,61 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         ));
     }
 
+    @Test
+    @DisplayName("Deve associar subprocesso na notificação consolidada de início para unidade superior participante")
+    void deveAssociarSubprocessoNaNotificacaoConsolidadaDeInicioParaUnidadeSuperiorParticipante() {
+        Long codigoProcesso = 301L;
+        Processo processo = new Processo();
+        processo.setCodigo(codigoProcesso);
+        processo.setSituacao(CRIADO);
+        processo.setTipo(MAPEAMENTO);
+        processo.setDescricao("Processo com superior participante");
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+        Unidade admin = criarUnidadeValida(1L);
+        admin.setSigla("ADMIN");
+        admin.setTipo(TipoUnidade.RAIZ);
+        Unidade superior = criarUnidadeValida(20L);
+        superior.setSigla("COSIS");
+        superior.setTipo(TipoUnidade.INTERMEDIARIA);
+        Unidade operacional = criarUnidadeValida(10L);
+        operacional.setSigla("OPER");
+        operacional.setTipo(TipoUnidade.OPERACIONAL);
+        processo.adicionarParticipantes(Set.of(superior, operacional));
+
+        Subprocesso subprocessoSuperior = new Subprocesso();
+        subprocessoSuperior.setCodigo(520L);
+        subprocessoSuperior.setProcesso(processo);
+        subprocessoSuperior.setUnidade(superior);
+
+        Subprocesso subprocessoOperacional = new Subprocesso();
+        subprocessoOperacional.setCodigo(510L);
+        subprocessoOperacional.setProcesso(processo);
+        subprocessoOperacional.setUnidade(operacional);
+
+        when(repo.buscar(Processo.class, codigoProcesso)).thenReturn(processo);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(unidadeService.buscarPorCodigos(List.of(10L, 20L))).thenReturn(List.of(operacional, superior));
+        when(consultaService.listarEntidadesPorProcesso(codigoProcesso)).thenReturn(List.of(subprocessoOperacional, subprocessoSuperior));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of(20L, 1L));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(20L)).thenReturn(List.of(1L));
+        when(unidadeService.buscarPorCodigos(List.of(1L, 20L))).thenReturn(List.of(admin, superior));
+        when(unidadeService.buscarPorCodigo(20L)).thenReturn(superior);
+        when(unidadeService.buscarPorCodigo(1L)).thenReturn(admin);
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
+                .thenReturn("<html>inicio</html>");
+        mockarResponsaveisEfetivos();
+
+        processoService.iniciar(codigoProcesso, List.of(10L, 20L));
+
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
+                        && "COSIS".equals(cmd.unidadeDestinoSigla())
+                        && cmd.subprocesso() != null
+                        && Objects.equals(cmd.subprocesso().getCodigo(), 520L)
+        ));
+    }
+
 }
 
 

@@ -88,6 +88,7 @@ public class SubprocessoNotificacaoService {
 
         executarNotificacaoSemInterromperAlerta(() -> notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(sp)
+                .processo(sp.getProcesso())
                 .tipoNotificacao(TipoNotificacao.DATA_LIMITE_ALTERADA)
                 .unidadeDestinoSigla(sp.getUnidade().getSigla())
                 .unidadeOrigemSigla(sp.getUnidade().getSigla())
@@ -216,6 +217,7 @@ public class SubprocessoNotificacaoService {
     private void criarNotificacao(NotificacaoCommand cmd, EmailGerado email, TipoNotificacao tipoNotificacao) {
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(cmd.subprocesso())
+                .processo(cmd.subprocesso().getProcesso())
                 .tipoNotificacao(tipoNotificacao)
                 .unidadeDestinoSigla(email.unidadeSigla())
                 .unidadeOrigemSigla(cmd.unidadeOrigem().getSigla())
@@ -232,6 +234,7 @@ public class SubprocessoNotificacaoService {
         EmailGerado email = notificacaoComChave.email();
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(cmd.subprocesso())
+                .processo(cmd.subprocesso().getProcesso())
                 .tipoNotificacao(notificacaoComChave.tipoNotificacao())
                 .unidadeDestinoSigla(email.unidadeSigla())
                 .unidadeOrigemSigla(cmd.unidadeOrigem().getSigla())

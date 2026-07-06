@@ -558,6 +558,7 @@ CREATE TABLE NOTIFICACAO_EMAIL
     assunto                VARCHAR2(500)                     NOT NULL,
     corpo_html             CLOB                              NOT NULL,
     subprocesso_codigo     NUMBER                            NULL,
+    processo_codigo        NUMBER                            NULL,
     tipo_notificacao       VARCHAR2(80)                      NULL,
     usuario_destino_titulo VARCHAR2(12)                      NULL,
     unidade_destino_sigla  VARCHAR2(20)                      NULL,
@@ -580,7 +581,8 @@ CREATE TABLE NOTIFICACAO_EMAIL
             )
         ),
     CONSTRAINT ck_notif_email_tentativas CHECK (tentativas >= 0),
-    CONSTRAINT fk_notif_email_subproc FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo)
+    CONSTRAINT fk_notif_email_subproc FOREIGN KEY (subprocesso_codigo) REFERENCES SUBPROCESSO (codigo),
+    CONSTRAINT fk_notif_email_processo FOREIGN KEY (processo_codigo) REFERENCES PROCESSO (codigo)
 );
 
 COMMENT
@@ -589,6 +591,8 @@ COMMENT
     ON COLUMN NOTIFICACAO_EMAIL.codigo IS 'Identificador unico do e-mail.';
 COMMENT
     ON COLUMN NOTIFICACAO_EMAIL.subprocesso_codigo IS 'Subprocesso associado ao evento que gerou o e-mail.';
+COMMENT
+    ON COLUMN NOTIFICACAO_EMAIL.processo_codigo IS 'Processo associado ao evento que gerou o e-mail quando não houver subprocesso próprio da unidade destinatária.';
 COMMENT
     ON COLUMN NOTIFICACAO_EMAIL.tipo_notificacao IS 'Tipo de notificacao que originou o e-mail.';
 COMMENT

@@ -59,7 +59,7 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
 
     List<NotificacaoEmail> findBySubprocesso_CodigoOrderByDataHoraCriacaoDesc(Long subprocessoCodigo, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"subprocesso", "subprocesso.processo", "subprocesso.unidade"})
+    @EntityGraph(attributePaths = {"processo", "subprocesso", "subprocesso.processo", "subprocesso.unidade"})
     @Query("""
             select n
               from NotificacaoEmail n
@@ -75,7 +75,7 @@ public interface NotificacaoEmailRepo extends JpaRepository<NotificacaoEmail, Lo
             """)
     List<NotificacaoEmail> listarTodasOrdenadas(Pageable pageable);
 
-    @EntityGraph(attributePaths = {"subprocesso", "subprocesso.processo", "subprocesso.unidade"})
+    @EntityGraph(attributePaths = {"processo", "subprocesso", "subprocesso.processo", "subprocesso.unidade"})
     List<NotificacaoEmail> findAllByOrderByDataHoraCriacaoDesc(Pageable pageable);
 
     @Query("""

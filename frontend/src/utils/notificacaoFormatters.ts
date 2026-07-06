@@ -24,6 +24,9 @@ export function formatarDestinatario(item: Partial<Notificacao> & { destinatario
     if (item.usuarioDestinoTitulo?.trim()) {
         return item.destinatario.trim();
     }
+    if (item.unidadeDestinoSigla?.trim()) {
+        return item.unidadeDestinoSigla.trim().toUpperCase();
+    }
     if (item.unidadeSigla?.trim()) {
         return item.unidadeSigla.trim().toUpperCase();
     }

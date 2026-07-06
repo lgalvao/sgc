@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.*;
 import org.jspecify.annotations.*;
 import sgc.comum.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.model.*;
 
 import java.time.*;
@@ -21,6 +22,10 @@ public class NotificacaoEmail extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subprocesso_codigo")
     private @Nullable Subprocesso subprocesso;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "processo_codigo")
+    private @Nullable Processo processo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_notificacao", nullable = false, length = 80)

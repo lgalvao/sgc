@@ -33,11 +33,12 @@ public class AlertaDtoMapper {
 
     public NotificacaoDto paraNotificacaoDto(NotificacaoEmail notificacao) {
         Long subprocessoCodigo = notificacao.getSubprocesso() != null ? notificacao.getSubprocesso().getCodigo() : null;
-        String processoDescricao = notificacao.getSubprocesso() != null
-                ? notificacao.getSubprocesso().getProcesso().getDescricao()
-                : null;
-        boolean processoFinalizado = notificacao.getSubprocesso() != null
-                && notificacao.getSubprocesso().getProcesso().getSituacao() == SituacaoProcesso.FINALIZADO;
+        Processo processo = notificacao.getSubprocesso() != null
+                ? notificacao.getSubprocesso().getProcesso()
+                : notificacao.getProcesso();
+        String processoDescricao = processo != null ? processo.getDescricao() : null;
+        boolean processoFinalizado = processo != null
+                && processo.getSituacao() == SituacaoProcesso.FINALIZADO;
         boolean notificacaoFinalizacaoProcesso = notificacao.getTipoNotificacao() == TipoNotificacao.PROCESSO_FINALIZADO;
 
         return NotificacaoDto.builder()

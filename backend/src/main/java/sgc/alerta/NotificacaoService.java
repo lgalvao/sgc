@@ -9,6 +9,7 @@ import sgc.alerta.dto.*;
 import sgc.alerta.model.*;
 import sgc.alerta.model.SituacaoNotificacao;
 import sgc.comum.erros.*;
+import sgc.processo.model.*;
 
 import java.time.*;
 import java.util.*;
@@ -32,8 +33,13 @@ public class NotificacaoService {
                             "Notificação idempotente ausente para chave %s".formatted(cmd.chaveIdempotencia())));
         }
 
+        Processo processo = cmd.processo() != null
+                ? cmd.processo()
+                : cmd.subprocesso() != null ? cmd.subprocesso().getProcesso() : null;
+
         NotificacaoEmail notificacao = NotificacaoEmail.builder()
                 .subprocesso(cmd.subprocesso())
+                .processo(processo)
                 .tipoNotificacao(cmd.tipoNotificacao())
                 .usuarioDestinoTitulo(cmd.usuarioDestinoTitulo())
                 .unidadeDestinoSigla(cmd.unidadeDestinoSigla())

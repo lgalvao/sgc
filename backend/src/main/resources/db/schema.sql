@@ -625,6 +625,8 @@ create table if not exists sgc.notificacao_email
     identity,
     subprocesso_codigo
     bigint,
+    processo_codigo
+    bigint,
     tipo_notificacao
     varchar
 (
@@ -867,6 +869,8 @@ alter table if exists sgc.movimentacao
     add constraint fk_movimentacao_usuario foreign key (usuario_titulo) references sgc.vw_usuario;
 alter table if exists sgc.notificacao_email
     add constraint fk_notif_email_subprocesso foreign key (subprocesso_codigo) references sgc.subprocesso;
+alter table if exists sgc.notificacao_email
+    add constraint fk_notif_email_processo foreign key (processo_codigo) references sgc.processo;
 alter table if exists sgc.subprocesso
     add constraint fk_subprocesso_processo foreign key (processo_codigo) references sgc.processo;
 alter table if exists sgc.subprocesso
