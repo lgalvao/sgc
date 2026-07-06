@@ -12,6 +12,7 @@ import sgc.organizacao.model.*;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 import static sgc.organizacao.model.TipoUnidade.*;
 
@@ -95,13 +96,23 @@ public class UnidadeHierarquiaService {
     }
 
     /**
+     * Retorna mapa de codigoUnidade para UnidadeHierarquiaLeitura para todas as unidades ativas.
+     * Usa a mesma fonte cacheada de listarTodasUnidades, sem cache proprio.
+     */
+    public Map<Long, UnidadeHierarquiaLeitura> buscarMapaCodigoParaUnidade() {
+        return cacheViewsOrganizacaoService.listarTodasUnidades().stream()
+                .collect(Collectors.toMap(UnidadeHierarquiaLeitura::codigo, u -> u, (u1, u2) -> u1));
+    }
+
+    /**
      * Retorna a lista de códigos dos ancestores de uma unidade, do pai imediato até a raiz.
      */
     public List<Long> buscarCodigosSuperiores(Long codigoInicial) {
         Map<Long, Long> mapFilhoPai = self().buscarMapaFilhoPai();
         List<Long> superiores = new ArrayList<>();
+        Set<Long> visitados = new HashSet<>();
         Long atual = mapFilhoPai.get(codigoInicial);
-        while (atual != null) {
+        while (atual != null && visitados.add(atual)) {
             superiores.add(atual);
             atual = mapFilhoPai.get(atual);
         }

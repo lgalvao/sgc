@@ -115,6 +115,19 @@ public class ProcessoDtoMapper {
                 .build();
     }
 
+    /**
+     * Cria um DTO de unidade participante virtual (sem subprocesso) para ancestrais
+     * nao-participantes que aparecem como agrupadores na hierarquia do processo.
+     */
+    public UnidadeParticipanteDto paraUnidadeParticipanteVirtual(UnidadeHierarquiaLeitura info) {
+        return criarUnidadeParticipanteBase(
+                info.nome(),
+                info.sigla(),
+                info.codigo(),
+                info.unidadeSuperiorCodigo()
+        );
+    }
+
     private UnidadeParticipanteDto criarUnidadeParticipanteBase(
             String nome,
             String sigla,

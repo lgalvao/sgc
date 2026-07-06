@@ -640,15 +640,29 @@ public class ProcessoService {
                     mapDto.put(codigoUnidadeParticipante, uDto);
                 });
 
-        // Mapa de toda a cadeia hierarquica dos snapshots do processo (inclui unidades sem acesso):
-        // codUnidade -> codUnidadeSuperior. Permite percorrer ancestrais nao-participantes (ex: INTERMEDIARIA).
-        Map<Long, Long> cadeiaSuperior = new HashMap<>();
-        processo.getParticipantes().forEach(p ->
-                cadeiaSuperior.put(p.getUnidadeCodigoPersistido(), p.getUnidadeSuperiorCodigo())
-        );
+        // Hierarquia real do organograma (filhoCodigo -> codigoPai).
+        // Permite percorrer ancestrais nao-participantes ao montar a arvore.
+        Map<Long, Long> hierarquiaOrganograma = unidadeHierarquiaService.buscarMapaFilhoPai();
+
+        // Adiciona nos virtuais (sem subprocesso) para ancestrais diretos nao-participantes,
+        // como unidades do tipo INTERMEDIARIA. Isso garante que COSIS apareca como agrupador
+        // mesmo nao sendo participante do processo.
+        Map<Long, UnidadeHierarquiaLeitura> infoUnidades = unidadeHierarquiaService.buscarMapaCodigoParaUnidade();
+        Set<Long> participantesOriginais = new HashSet<>(mapDto.keySet());
+        for (Long codParticipante : participantesOriginais) {
+            Long codAtual = mapDto.get(codParticipante).getCodUnidadeSuperior();
+            while (codAtual != null && !mapDto.containsKey(codAtual)) {
+                UnidadeHierarquiaLeitura info = infoUnidades.get(codAtual);
+                if (info == null || info.tipo() == TipoUnidade.RAIZ || "ADMIN".equals(info.sigla())) {
+                    break;
+                }
+                mapDto.put(codAtual, processoDtoMapper.paraUnidadeParticipanteVirtual(info));
+                codAtual = info.unidadeSuperiorCodigo();
+            }
+        }
 
         mapDto.values().forEach(u -> {
-            UnidadeParticipanteDto pai = buscarPaiParticipante(u.getCodUnidadeSuperior(), mapDto, cadeiaSuperior);
+            UnidadeParticipanteDto pai = buscarPaiParticipante(u.getCodUnidadeSuperior(), mapDto, hierarquiaOrganograma);
             if (pai != null) pai.getFilhos().add(u);
             else dto.getUnidades().add(u);
         });
@@ -675,14 +689,14 @@ public class ProcessoService {
     private @Nullable UnidadeParticipanteDto buscarPaiParticipante(
             @Nullable Long codSuperior,
             Map<Long, UnidadeParticipanteDto> mapDto,
-            Map<Long, Long> cadeiaSuperior
+            Map<Long, Long> hierarquiaOrganograma
     ) {
         Long atual = codSuperior;
         int limite = 20; // protecao contra ciclos improvaveis
         while (atual != null && limite-- > 0) {
             UnidadeParticipanteDto encontrado = mapDto.get(atual);
             if (encontrado != null) return encontrado;
-            atual = cadeiaSuperior.get(atual);
+            atual = hierarquiaOrganograma.get(atual);
         }
         return null;
     }
