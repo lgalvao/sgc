@@ -19,8 +19,8 @@
 
 3. O usuário aciona o card `Atividades e conhecimentos`.
 
-4. O sistema apresenta a tela `Cadastro de atividades e conhecimentos` da unidade. Se o mapa de competências da unidade
-   já tiver atividades cadastradas, a tela virá preenchida com as informações atuais do mapa.
+4. O sistema mostra a tela `Cadastro de atividades e conhecimentos` da unidade. Se o mapa de competências da unidade já
+   tiver atividades cadastradas, a tela virá preenchida com as informações atuais do mapa.
 
 5. Se o processo for de **Revisão**, deverá ser exibido o botão `Impacto no mapa`, a partir do qual será possível
    avaliar o efeito das alterações realizadas nas atividades/conhecimentos sobre o mapa da unidade (ver caso de uso
@@ -50,8 +50,6 @@
     11.1.1. Se o usuário acionar `Salvar`, o sistema salva a alteração e retorna ao estado de visualização com as opções
     de edição e remoção disponíveis.
 
-    11.1.2. Se o usuário acionar `Cancelar`, o sistema descarta as alterações e restaura o conteúdo anterior.
-
     11.2. Se o usuário acionar `Remover`, o sistema solicita confirmação. Se confirmado, a atividade e seus
     conhecimentos são removidos.
 
@@ -62,7 +60,8 @@
 
     13.1. O sistema exibe um modal com uma lista dos processos com tipo Mapeamento ou Revisão que estejam com situação '
     Finalizado'.
-    - **IMPORTANTE**: Todos os processos finalizados, de **todas as unidades**, devem ser mostrados para importação.
+    > [!NOTE]
+    > Todos os processos finalizados, de **todas as unidades**, devem ser mostrados para importação.
 
     13.2. O usuário escolhe um processo da lista.
 
@@ -78,23 +77,16 @@
 
     13.7. O sistema faz uma cópia das atividades selecionadas e seus respectivos conhecimentos para o cadastro de
     atividades da unidade atual.
-
-    13.7.1. Deverão ser importadas apenas as atividades cujas descrições não corresponderem a nenhuma atividade
-    atualmente cadastrada na unidade.
-
-    13.7.2. Caso haja coincidência entre a descrição de uma atividade selecionada com a de alguma atividade cadastrada
-    na unidade, o sistema informa que uma ou mais atividades não puderam ser importadas por já existirem no cadastro,
-    mas procede sem levantar erros.
+    - Deverão ser importadas apenas as atividades cujas descrições não corresponderem a nenhuma atividade atualmente
+      cadastrada na unidade.
+    - Caso haja coincidência entre a descrição de uma atividade selecionada com a de alguma atividade cadastrada na
+      unidade, o sistema informa que uma ou mais atividades não puderam ser importadas por já existirem no cadastro, mas
+      procede sem levantar erros.
 
 14. Se, no momento da criação/edição/importação de qualquer informação, a situação do subprocesso da unidade ainda
-    estiver 'Não iniciado', o sistema altera a situação para 'Cadastro em andamento', no caso de processo de mapeamento;
-    ou a situação 'Revisão do cadastro em andamento', no caso de processo de revisão.
+    estiver 'Não iniciado', o sistema altera a situação para 'Cadastro em andamento' (mapeamento); ou 'Revisão do
+    cadastro em andamento' (revisão).
 
-15. Após finalizar o cadastro de atividades e conhecimentos, o usuário poderá clicar em `Disponibilizar` (ver caso de
-    uso `Disponibilizar cadastro de atividades e conhecimentos`, ou o caso de uso `Disponibilizar revisão do cadastro`);
-    o usuário pode também simplesmente navegar para outra área do sistema, sem a necessidade de gravar as informações de
-    alguma maneira, pois a gravação do cadastro é feita automaticamente, a cada mudança.
-
-    15.1. Após cada ação de criação, edição ou exclusão, as informações deverão ser salvas automaticamente e vinculadas
-    ao mapa de competências do subprocesso, não sendo necessária nenhuma ação adicional para garantir a persistência
-    dessa informação.
+15. Após finalizar o cadastro de atividades e conhecimentos, o usuário poderá acionar `Disponibilizar`. Após cada ação
+    de criação, edição ou exclusão, as informações deverão ser salvas automaticamente e vinculadas ao mapa de
+    competências do subprocesso.

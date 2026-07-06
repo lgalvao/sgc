@@ -108,11 +108,12 @@ test.describe.serial('Tramitação ponta a ponta em bloco', () => {
             await botaoHomologar.click();
             await page.locator('#modal-acao-bloco').getByRole('button', {name: TEXTOS.acaoBloco.homologar.BOTAO}).click();
             await verificarToast(page, TEXTOS.sucesso.CADASTROS_HOMOLOGADOS_EM_BLOCO);
-            await verificarPaginaPainel(page);
+            await expect(page).toHaveURL(/\/processo\/\d+(?:\?.*)?$/);
+            await expect(page.getByTestId('processo-info')).toBeVisible();
+            await expect(page.getByRole('row', {name: new RegExp(`${siglaUnidade}.*Cadastro homologado`, 'i')})).toBeVisible();
         });
 
         await test.step('ADMIN cria o mapa e disponibiliza em bloco', async () => {
-            await acessarDetalhesProcesso(page, descricaoProcesso);
             await navegarParaSubprocesso(page, siglaUnidade);
             await navegarParaMapa(page);
             await criarCompetencia(page, competencia, [atividade]);
@@ -173,9 +174,9 @@ test.describe.serial('Tramitação ponta a ponta em bloco', () => {
             await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
             await verificarNotificacaoAdmin(page, {
                 destinatario: 'ADMIN',
-                assunto: `Validação do mapa de competências da ${siglaUnidade} submetida para análise`,
+                assunto: 'Validação de mapas de competências submetida para análise',
                 tipo: 'Validação do mapa aceita',
-                trechoCorpo: `A validação do mapa de competências da sua unidade no processo ${descricaoProcesso} foi aceita e submetida para análise pela unidade superior imediata.`
+                trechoCorpo: siglaUnidade
             });
             await page.getByTestId('nav-link-painel').click();
             await verificarAlertaPainel(page, new RegExp(`Validação do mapa da unidade ${siglaUnidade} submetida para análise`, 'i'));

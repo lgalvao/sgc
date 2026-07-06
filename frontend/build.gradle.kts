@@ -31,7 +31,6 @@ tasks.register<NpmTask>("buildVue") {
     description = "Gera o build de produção do frontend Vue"
     dependsOn("install")
 
-    // Otimização: Só roda se houver mudanças nestes arquivos/pastas
     inputs.dir("src")
     inputs.file("index.html")
     inputs.file("package.json")
@@ -72,17 +71,14 @@ tasks.register<NpmTask>("test") {
     ignoreExitValue.set(true)
 }
 
-// Estende a task padrão 'clean' do Gradle
 tasks.named<Delete>("clean") {
     delete("dist", "coverage")
 }
 
-// Faz com que o 'build' padrão do Gradle execute o 'buildVue'
 tasks.named("build") {
     dependsOn("buildVue")
 }
 
-// Faz com que o 'check' padrão do Gradle execute o 'quality'
 tasks.named("check") {
     dependsOn("quality")
 }

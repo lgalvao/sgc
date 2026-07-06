@@ -11,7 +11,7 @@
   "scripts": {
     "knip": "knip",
     "test": "npm --prefix frontend run test",
-    "test:e2e": "playwright test --config=e2e/playwright.config.ts --project=chromium",
+    "test:e2e": "playwright test --config=e2e/playwright.config.ts",
     "test:unit": "npm --prefix frontend run test:unit",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "sgc": "node toolkit/sgc.js",
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^26.0.1",
+    "@types/node": "^26.1.0",
     "eslint": "^10.6.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.7.0",
