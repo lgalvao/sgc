@@ -45,7 +45,7 @@ export const TEXTOS_ADMINISTRACAO = {
     SUCESSO_REMOVIDO: "Administrador removido",
     BOTAO_LIMPEZA_PROCESSOS: "Limpeza de processos",
     LIMPEZA_TITULO: "Limpeza de processos",
-    LIMPEZA_ALERTA: "Esta operação remove o processo e todos os seus dependentes. Use somente em homologação e apenas para dados de teste.",
+    LIMPEZA_ALERTA: "Cuidado! Esta operação remove o processo e todos os seus dependentes.",
     LIMPEZA_LABEL_CODIGO: "Código do processo",
     LIMPEZA_PLACEHOLDER_CODIGO: "Digite o código do processo",
     LIMPEZA_BOTAO_ABRIR: "Excluir processo",

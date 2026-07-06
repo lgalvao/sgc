@@ -1262,6 +1262,13 @@ public class ProcessoService {
             String chaveIdempotencia,
             @Nullable Subprocesso subprocesso
     ) {
+        if (isUnidadeAdmin(unidadeDestino)
+                && (tipoNotificacao == TipoNotificacao.PROCESSO_INICIADO
+                || tipoNotificacao == TipoNotificacao.PROCESSO_FINALIZADO)) {
+            log.info("Ignorando notificação {} para a unidade virtual ADMIN", tipoNotificacao);
+            return;
+        }
+
         String destinatarioPrincipal = emailDestinoPrincipal(unidadeDestino);
 
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
@@ -1287,23 +1294,11 @@ public class ProcessoService {
     }
 
     private String emailDestinoPrincipal(Unidade unidadeDestino) {
-        if (isUnidadeAdmin(unidadeDestino)) {
-            return "%s@tre-pe.jus.br".formatted(SIGLA_UNIDADE_SEDOC.toLowerCase(Locale.ROOT));
-        }
         return emailUnidade(unidadeDestino);
     }
 
     private Optional<String> emailCopiaAdmin(Unidade unidadeDestino) {
-        if (!isUnidadeAdmin(unidadeDestino)) return Optional.empty();
-
-        Usuario usuarioPrincipal = usuarioService.usuarioAutenticado();
-        Usuario usuario = usuarioService.buscarUsuarioComUnidadeLotacao(usuarioPrincipal.getTituloEleitoral());
-        Unidade unidadeLotacao = usuario.getUnidadeLotacao();
-        if (SIGLA_UNIDADE_SEDOC.equalsIgnoreCase(unidadeLotacao.getSigla())) {
-            return Optional.empty();
-        }
-
-        return Optional.of(usuario.getEmail());
+        return Optional.empty();
     }
 
     private boolean isUnidadeAdmin(Unidade unidadeDestino) {
