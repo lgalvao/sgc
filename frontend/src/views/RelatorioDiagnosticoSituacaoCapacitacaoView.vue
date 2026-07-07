@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="carregando && relatorio.length === 0"/>
+    <CarregamentoPagina v-if="carregandoProcessos || (carregando && relatorio.length === 0)"/>
 
     <template v-else>
       <PageHeader :title="TEXTOS_RELATORIOS.SITUACAO_CAPACITACAO_DIAGNOSTICO">
@@ -11,37 +11,45 @@
         </template>
       </PageHeader>
 
-      <RelatorioDiagnosticoFiltros
-          :carregando="carregando"
-          :cod-processo-selecionado="codProcessoSelecionado"
-          :opcoes-processos="opcoesProcessos"
-          :pode-gerar="podeGerar"
-          :unidades-disponiveis="unidadesDisponiveis"
-          :unidades-selecionadas="unidadesSelecionadas"
-          @exportar="exportarPdf"
-          @gerar="gerarRelatorio"
-          @update:cod-processo-selecionado="atualizarProcessoSelecionado"
-          @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
+      <EmptyState
+          v-if="processosDiagnostico.length === 0"
+          title="Não há processos de diagnóstico."
+          icon="bi-journal-check"
+      />
 
-      <div v-if="relatorio.length > 0" class="d-flex flex-column gap-3">
-        <BCard
-            v-for="item in relatorio"
-            :key="item.codigoUnidade"
-            class="shadow-sm"
-            data-testid="card-relatorio-situacao-capacitacao-diagnostico"
-        >
-          <BCardTitle class="mb-1 relatorio-diagnostico__titulo">{{ item.siglaUnidade }}</BCardTitle>
-          <BCardText class="text-muted mb-3">{{ item.nomeUnidade }}</BCardText>
+      <template v-else>
+        <RelatorioDiagnosticoFiltros
+            :carregando="carregando"
+            :cod-processo-selecionado="codProcessoSelecionado"
+            :opcoes-processos="opcoesProcessos"
+            :pode-gerar="podeGerar"
+            :unidades-disponiveis="unidadesDisponiveis"
+            :unidades-selecionadas="unidadesSelecionadas"
+            @exportar="exportarPdf"
+            @gerar="gerarRelatorio"
+            @update:cod-processo-selecionado="atualizarProcessoSelecionado"
+            @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
 
-          <BTable
-              :fields="campos"
-              :items="item.competencias"
-              bordered
-              responsive
-              small
-          />
-        </BCard>
-      </div>
+        <div v-if="relatorio.length > 0" class="d-flex flex-column gap-3">
+          <BCard
+              v-for="item in relatorio"
+              :key="item.codigoUnidade"
+              class="shadow-sm"
+              data-testid="card-relatorio-situacao-capacitacao-diagnostico"
+          >
+            <BCardTitle class="mb-1 relatorio-diagnostico__titulo">{{ item.siglaUnidade }}</BCardTitle>
+            <BCardText class="text-muted mb-3">{{ item.nomeUnidade }}</BCardText>
+
+            <BTable
+                :fields="campos"
+                :items="item.competencias"
+                bordered
+                responsive
+                small
+            />
+          </BCard>
+        </div>
+      </template>
     </template>
   </LayoutPadrao>
 </template>
@@ -52,6 +60,7 @@ import {BButton, BCard, BCardText, BCardTitle, BTable} from "bootstrap-vue-next"
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import RelatorioDiagnosticoFiltros from "@/components/relatorios/RelatorioDiagnosticoFiltros.vue";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useRelatorioAndamentoTela} from "@/composables/useRelatorioAndamentoTela";
@@ -70,6 +79,7 @@ const acaoRelatorio = useAsyncAction();
 const codProcessoSelecionado = ref<number | null>(null);
 const unidadesSelecionadas = ref<number[]>([]);
 const unidadesDisponiveis = ref<Unidade[]>([]);
+const carregandoProcessos = ref(true);
 
 const relatorio = computed(() => relatoriosStore.relatorioSituacaoCapacitacaoDiagnostico);
 const carregando = acaoRelatorio.carregando;
@@ -162,9 +172,13 @@ async function exportarPdf() {
   );
 }
 
-onMounted(() => {
+onMounted(async () => {
   relatoriosStore.limparRelatorio();
-  carregarProcessos();
+  try {
+    await carregarProcessos();
+  } finally {
+    carregandoProcessos.value = false;
+  }
 });
 </script>
 

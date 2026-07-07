@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="carregando && relatorioAndamento.length === 0"/>
+    <CarregamentoPagina v-if="carregandoProcessos || (carregando && relatorioAndamento.length === 0)"/>
 
     <template v-else>
       <PageHeader :title="TEXTOS_RELATORIOS.ANDAMENTO_PROCESSO">
@@ -11,20 +11,28 @@
         </template>
       </PageHeader>
 
-      <RelatorioAndamentoFiltros
-          :carregando="carregando"
-          :cod-processo-selecionado="codProcessoSelecionado"
-          :opcoes-processos="opcoesProcessos"
-          @exportar="exportarPdf"
-          @gerar="gerarRelatorio"
-          @update:cod-processo-selecionado="codProcessoSelecionado = $event"/>
+      <EmptyState
+          v-if="processosMapeamentoRevisao.length === 0"
+          title="Não há processos de mapeamento ou revisão."
+          icon="bi-bar-chart-steps"
+      />
 
-      <div v-if="relatorioAndamento.length > 0" class="d-flex flex-column gap-3">
-        <RelatorioAndamentoCard
-            v-for="(item, index) in linhasRelatorioAndamento"
-            :key="index"
-            :item="item"/>
-      </div>
+      <template v-else>
+        <RelatorioAndamentoFiltros
+            :carregando="carregando"
+            :cod-processo-selecionado="codProcessoSelecionado"
+            :opcoes-processos="opcoesProcessos"
+            @exportar="exportarPdf"
+            @gerar="gerarRelatorio"
+            @update:cod-processo-selecionado="codProcessoSelecionado = $event"/>
+
+        <div v-if="relatorioAndamento.length > 0" class="d-flex flex-column gap-3">
+          <RelatorioAndamentoCard
+              v-for="(item, index) in linhasRelatorioAndamento"
+              :key="index"
+              :item="item"/>
+        </div>
+      </template>
     </template>
   </LayoutPadrao>
 </template>
@@ -37,6 +45,7 @@ import RelatorioAndamentoFiltros from "@/components/relatorios/RelatorioAndament
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import {useRelatoriosStore} from "@/stores/relatorios";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
 import {useRelatorioAndamentoTela} from "@/composables/useRelatorioAndamentoTela";
@@ -44,6 +53,7 @@ import {useNotification} from "@/composables/useNotification";
 import {formatarDataBR, formatarDataHoraBR} from "@/utils/date";
 import {normalizarErro} from "@/utils/apiError";
 import {useAsyncAction} from "@/composables/useAsyncAction";
+import {TipoProcesso, type ProcessoResumo} from "@/types/tipos";
 
 const relatoriosStore = useRelatoriosStore();
 const {notify} = useNotification();
@@ -51,9 +61,11 @@ const {processosDisponiveis, carregarProcessos} = useRelatorioAndamentoTela();
 const acaoRelatorio = useAsyncAction();
 
 const codProcessoSelecionado = ref<number | null>(null);
+const carregandoProcessos = ref(true);
 
 const relatorioAndamento = computed(() => relatoriosStore.relatorioAndamento);
 const carregando = acaoRelatorio.carregando;
+const processosMapeamentoRevisao = computed(() => processosDisponiveis.value.filter((processo: ProcessoResumo) => processo.tipo !== TipoProcesso.DIAGNOSTICO));
 
 const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(item => {
   const dt1 = item.dataLimiteEtapa1;
@@ -76,7 +88,7 @@ const linhasRelatorioAndamento = computed(() => relatorioAndamento.value.map(ite
 
 const opcoesProcessos = computed(() => [
   {value: null, text: TEXTOS_RELATORIOS.SELECIONE},
-  ...processosDisponiveis.value.map(p => ({value: p.codigo, text: p.descricao}))
+  ...processosMapeamentoRevisao.value.map(p => ({value: p.codigo, text: p.descricao}))
 ]);
 
 function obterMensagemErroRelatorio(error: unknown, mensagemPadrao: string) {
@@ -115,8 +127,12 @@ async function exportarPdf() {
   );
 }
 
-onMounted(() => {
+onMounted(async () => {
   relatoriosStore.limparRelatorio();
-  carregarProcessos();
+  try {
+    await carregarProcessos();
+  } finally {
+    carregandoProcessos.value = false;
+  }
 });
 </script>

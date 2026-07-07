@@ -1,6 +1,6 @@
 <template>
   <LayoutPadrao>
-    <CarregamentoPagina v-if="carregando && relatorio.length === 0"/>
+    <CarregamentoPagina v-if="carregandoProcessos || (carregando && relatorio.length === 0)"/>
 
     <template v-else>
       <PageHeader :title="TEXTOS_RELATORIOS.GAPS_DIAGNOSTICO">
@@ -11,23 +11,31 @@
         </template>
       </PageHeader>
 
-      <RelatorioDiagnosticoFiltros
-          :carregando="carregando"
-          :cod-processo-selecionado="codProcessoSelecionado"
-          :opcoes-processos="opcoesProcessos"
-          :pode-gerar="podeGerar"
-          :unidades-disponiveis="unidadesDisponiveis"
-          :unidades-selecionadas="unidadesSelecionadas"
-          @exportar="exportarPdf"
-          @gerar="gerarRelatorio"
-          @update:cod-processo-selecionado="atualizarProcessoSelecionado"
-          @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
-
-      <RelatorioDiagnosticoGapsResultado
-          v-if="relatorio.length > 0"
-          :campos="campos"
-          :itens="relatorio"
+      <EmptyState
+          v-if="processosDiagnostico.length === 0"
+          title="Não há processos de diagnóstico."
+          icon="bi-graph-up-arrow"
       />
+
+      <template v-else>
+        <RelatorioDiagnosticoFiltros
+            :carregando="carregando"
+            :cod-processo-selecionado="codProcessoSelecionado"
+            :opcoes-processos="opcoesProcessos"
+            :pode-gerar="podeGerar"
+            :unidades-disponiveis="unidadesDisponiveis"
+            :unidades-selecionadas="unidadesSelecionadas"
+            @exportar="exportarPdf"
+            @gerar="gerarRelatorio"
+            @update:cod-processo-selecionado="atualizarProcessoSelecionado"
+            @update:unidades-selecionadas="unidadesSelecionadas = $event"/>
+
+        <RelatorioDiagnosticoGapsResultado
+            v-if="relatorio.length > 0"
+            :campos="campos"
+            :itens="relatorio"
+        />
+      </template>
     </template>
   </LayoutPadrao>
 </template>
@@ -38,6 +46,7 @@ import {BButton} from "bootstrap-vue-next";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
 import PageHeader from "@/components/layout/PageHeader.vue";
 import CarregamentoPagina from "@/components/comum/CarregamentoPagina.vue";
+import EmptyState from "@/components/comum/EmptyState.vue";
 import RelatorioDiagnosticoGapsResultado from "@/components/relatorios/RelatorioDiagnosticoGapsResultado.vue";
 import RelatorioDiagnosticoFiltros from "@/components/relatorios/RelatorioDiagnosticoFiltros.vue";
 import {TEXTOS_RELATORIOS} from "@/constants/textos-relatorios";
@@ -57,6 +66,7 @@ const acaoRelatorio = useAsyncAction();
 const codProcessoSelecionado = ref<number | null>(null);
 const unidadesSelecionadas = ref<number[]>([]);
 const unidadesDisponiveis = ref<Unidade[]>([]);
+const carregandoProcessos = ref(true);
 
 const relatorio = computed(() => relatoriosStore.relatorioGapsDiagnostico);
 const carregando = acaoRelatorio.carregando;
@@ -146,8 +156,12 @@ async function exportarPdf() {
   );
 }
 
-onMounted(() => {
+onMounted(async () => {
   relatoriosStore.limparRelatorio();
-  carregarProcessos();
+  try {
+    await carregarProcessos();
+  } finally {
+    carregandoProcessos.value = false;
+  }
 });
 </script>
