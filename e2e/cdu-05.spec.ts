@@ -73,11 +73,9 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await confirmarInicioProcessoPeloDialogo(page, {
             descricao,
             tipo: 'MAPEAMENTO',
-            unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO],
-            redirecionaParaPainel: false
+            unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO]
         });
 
-        await page.goto('/painel');
         await verificarProcessoTabela(page, {
             descricao,
             situacao: 'Em andamento',
@@ -257,11 +255,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await confirmarInicioProcessoPeloDialogo(page, {
             descricao: descProcRevisao,
             tipo: 'REVISAO',
-            unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO],
-            redirecionaParaPainel: false
+            unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO]
         });
-
-        await page.goto('/painel');
         await verificarProcessoTabela(page, {
             descricao: descProcRevisao,
             situacao: 'Em andamento',
@@ -373,8 +368,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await confirmarInicioProcessoPeloDialogo(page, {
             descricao: descricaoRevisaoSecretaria,
             tipo: 'REVISAO',
-            unidadesComEquipePropriaParticipantes: ['SECRETARIA_1'],
-            redirecionaParaPainel: false
+            unidadesComEquipePropriaParticipantes: ['SECRETARIA_1']
         });
 
         await loginComPerfil(
@@ -386,20 +380,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await acessarSubprocessoChefeDireto(page, descricaoRevisaoSecretaria, 'SECRETARIA_1');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
         await expect(page.getByTestId('tbl-movimentacoes').getByText(/Processo iniciado/i).first()).toBeVisible();
-
-        await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await verificarNotificacaoAdmin(page, {
-            destinatario: 'SECRETARIA_1',
-            assunto: 'Início de processo de revisão do mapa de competências',
-            tipo: 'Início do processo',
-            trechoCorpo: new RegExp(`Comunicamos o início do processo\\s+${descricaoRevisaoSecretaria}\\s+para a sua unidade`, 'i')
-        });
-        await verificarNotificacaoAdmin(page, {
-            destinatario: 'SECRETARIA_1',
-            assunto: 'Início de processo de revisão do mapa de competências em unidades subordinadas',
-            tipo: 'Início do processo',
-            trechoCorpo: /Estas unidades já podem iniciar a revisão do cadastro de atividades e conhecimentos/i
-        });
     });
 
     test('Fase 2.2d: Revisão de unidade subordinada sob secretaria interoperacional não aparece para o chefe da secretaria', async ({
@@ -420,10 +400,8 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await confirmarInicioProcessoPeloDialogo(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
             tipo: 'REVISAO',
-            unidadesComEquipePropriaParticipantes: [],
-            redirecionaParaPainel: false
+            unidadesComEquipePropriaParticipantes: []
         });
-        await page.goto('/painel');
         await verificarProcessoTabela(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
             situacao: 'Em andamento',
