@@ -220,11 +220,15 @@ export async function confirmarInicioProcessoPeloDialogo(page: Page, options: {
     tipo: TipoProcesso;
     unidadesParticipantes?: string[];
     unidadesComEquipePropriaParticipantes?: string[];
+    redirecionaParaPainel?: boolean;
 }): Promise<void> {
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();
     await dialog.getByTestId('btn-iniciar-processo-confirmar').click();
     await confirmarSelecaoComplementarUnidadesComEquipePropria(page, options.unidadesComEquipePropriaParticipantes);
+    if (options.redirecionaParaPainel === false) {
+        return;
+    }
     await aguardarProcessoNoPainel(page, {
         descricao: options.descricao,
         situacao: 'Em andamento',

@@ -589,8 +589,6 @@ VALUES ('123456789012', '56789012', 'Usuario Diagnostico Mock', 'mock.diagnostic
 INSERT INTO sgc.vw_usuario_perfil_unidade (usuario_titulo, perfil, unidade_codigo)
 VALUES ('123456789012', 'CHEFE', 99);
 
--- Phase 1 & 2 (Removed because they were locking units used in E2E tests)
-
 -- -------------------------------------------------------------------------------------------------
 -- VW_RESPONSABILIDADE (Inserido ao final para garantir integridade referencial)
 -- -------------------------------------------------------------------------------------------------

@@ -368,6 +368,33 @@ class CDU05IntegrationTest extends BaseIntegrationTest {
         assertThat(subprocessos).hasSize(2);
         assertThat(subprocessos.stream().map(subprocesso -> subprocesso.getUnidade().getCodigo()).toList())
                 .containsExactlyInAnyOrder(unidadeInteroperacional.getCodigo(), unidade.getCodigo());
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(notificacao -> notificacao.getTipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO)
+                .filter(notificacao -> Objects.equals(notificacao.getProcesso().getCodigo(), codProcesso))
+                .toList();
+        assertThat(notificacoes).hasSize(3);
+
+        assertThat(notificacoes)
+                .filteredOn(notificacao -> "u_rev@tre-pe.jus.br".equals(notificacao.getDestinatario()))
+                .singleElement()
+                .satisfies(notificacao -> {
+                    assertThat(notificacao.getAssunto()).isEqualTo("SGC: Início de processo de revisão do mapa de competências");
+                    assertThat(notificacao.getCorpoHtml()).contains("para a sua unidade");
+                });
+
+        assertThat(notificacoes)
+                .filteredOn(notificacao -> "stic@tre-pe.jus.br".equals(notificacao.getDestinatario()))
+                .hasSize(2)
+                .extracting(NotificacaoEmail::getAssunto)
+                .containsExactlyInAnyOrder(
+                        "SGC: Início de processo de revisão do mapa de competências",
+                        "SGC: Início de processo de revisão do mapa de competências em unidades subordinadas"
+                );
+        assertThat(notificacoes)
+                .filteredOn(notificacao -> "stic@tre-pe.jus.br".equals(notificacao.getDestinatario()))
+                .anySatisfy(notificacao -> assertThat(notificacao.getCorpoHtml()).contains("para a sua unidade"))
+                .anySatisfy(notificacao -> assertThat(notificacao.getCorpoHtml()).contains("Estas unidades já podem iniciar a revisão do cadastro de atividades e conhecimentos"));
     }
 
     @Test

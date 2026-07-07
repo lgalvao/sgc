@@ -16,6 +16,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static sgc.organizacao.model.TipoUnidade.*;
 import static sgc.processo.model.SituacaoProcesso.*;
 import static sgc.processo.model.TipoProcesso.*;
 
@@ -92,6 +93,75 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
 
         // Verifica se notificou as unidades (operacionais/raiz e intermediárias/interoperacionais)
         verify(notificacaoService, atLeast(4)).enfileirar(any());
+    }
+
+    @Test
+    @DisplayName("Deve separar notificações direta e consolidada para unidade interoperacional")
+    void deveSepararNotificacoesDiretaEConsolidadaParaUnidadeInteroperacional() {
+        Long codProcesso = 200L;
+        Processo processo = new Processo();
+        processo.setCodigo(codProcesso);
+        processo.setSituacao(CRIADO);
+        processo.setTipo(MAPEAMENTO);
+        processo.setDescricao("Mapeamento da COSIS");
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+        Unidade superior = criarUnidadeValida(10L);
+        superior.setTipo(INTEROPERACIONAL);
+        superior.setSigla("STIC");
+
+        Unidade subordinada = criarUnidadeValida(11L);
+        subordinada.setTipo(OPERACIONAL);
+        subordinada.setSigla("SEDIA");
+        subordinada.setUnidadeSuperior(superior);
+
+        processo.adicionarParticipantes(Set.of(superior, subordinada));
+
+        Subprocesso subprocessoSuperior = new Subprocesso();
+        subprocessoSuperior.setCodigo(601L);
+        subprocessoSuperior.setProcesso(processo);
+        subprocessoSuperior.setUnidade(superior);
+
+        Subprocesso subprocessoSubordinada = new Subprocesso();
+        subprocessoSubordinada.setCodigo(602L);
+        subprocessoSubordinada.setProcesso(processo);
+        subprocessoSubordinada.setUnidade(subordinada);
+
+        when(repo.buscar(Processo.class, codProcesso)).thenReturn(processo);
+        when(unidadeService.buscarPorCodigos(argThat(codigos -> codigos.containsAll(List.of(10L, 11L)))))
+                .thenReturn(List.of(superior, subordinada));
+        when(consultaService.listarEntidadesPorProcesso(codProcesso)).thenReturn(List.of(subprocessoSuperior, subprocessoSubordinada));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of());
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(11L)).thenReturn(List.of(10L));
+        when(unidadeService.buscarPorCodigo(10L)).thenReturn(superior);
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(eq("STIC"), eq("Mapeamento da COSIS"), any(), eq("MAPEAMENTO"), eq(true), eq(List.of())))
+                .thenReturn("<html>direto-stic</html>");
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(eq("STIC"), eq("Mapeamento da COSIS"), any(), eq("MAPEAMENTO"), eq(false), eq(List.of("SEDIA"))))
+                .thenReturn("<html>consolidado-stic</html>");
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(eq("SEDIA"), eq("Mapeamento da COSIS"), any(), eq("MAPEAMENTO"), eq(true), eq(List.of())))
+                .thenReturn("<html>direto-sedia</html>");
+        when(emailModelosService.criarAssuntoInicioProcesso("MAPEAMENTO", true))
+                .thenReturn("SGC: Início de processo de mapeamento de competências");
+        when(emailModelosService.criarAssuntoInicioProcesso("MAPEAMENTO", false))
+                .thenReturn("SGC: Início de processo de mapeamento de competências em unidades subordinadas");
+        mockarResponsaveisEfetivos();
+
+        processoService.iniciar(codProcesso, List.of(10L, 11L));
+
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
+                        && "stic@tre-pe.jus.br".equals(cmd.destinatario())
+                        && "SGC: Início de processo de mapeamento de competências".equals(cmd.assunto())
+                        && "<html>direto-stic</html>".equals(cmd.corpoHtml())
+                        && "processo:200:inicio:unidade:10:direto".equals(cmd.chaveIdempotencia())
+        ));
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
+                        && "stic@tre-pe.jus.br".equals(cmd.destinatario())
+                        && "SGC: Início de processo de mapeamento de competências em unidades subordinadas".equals(cmd.assunto())
+                        && "<html>consolidado-stic</html>".equals(cmd.corpoHtml())
+                        && "processo:200:inicio:unidade:10:subordinada".equals(cmd.chaveIdempotencia())
+        ));
     }
 
     @Test

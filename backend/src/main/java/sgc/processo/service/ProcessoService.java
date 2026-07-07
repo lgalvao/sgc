@@ -1217,8 +1217,6 @@ public class ProcessoService {
         }
 
         for (Long cod : codsIntermediarias) {
-            // Se já foi notificada como operacional, não notifica como intermediária
-            if (codsOperacionais.contains(cod)) continue;
             Unidade unidadeDestino = obterUnidadeObrigatoria(todasUnidadesMap, cod);
             if (isUnidadeAdmin(unidadeDestino)) continue;
             criarNotificacaoInicio(
@@ -1252,7 +1250,9 @@ public class ProcessoService {
     private void criarNotificacaoInicio(Processo processo, Unidade unidadeDestino, boolean participante,
                                         Map<Long, List<String>> subordinadasPorSuperior, LocalDateTime dataLimite,
                                         @Nullable Subprocesso subprocessoDestino) {
-        List<String> subordinadas = subordinadasPorSuperior.getOrDefault(unidadeDestino.getCodigo(), List.of());
+        List<String> subordinadas = participante
+                ? List.of()
+                : subordinadasPorSuperior.getOrDefault(unidadeDestino.getCodigo(), List.of());
         String corpoHtml = emailModelosService.criarEmailInicioProcessoConsolidado(
                 unidadeDestino.getSigla(),
                 processo.getDescricao(),
