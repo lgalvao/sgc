@@ -59,7 +59,10 @@ class ProcessoExclusaoCompletaServiceTest {
 
         InOrder inOrder = inOrder(jdbcTemplate);
         inOrder.verify(jdbcTemplate).update(
-                argThat(sql -> sql.contains("DELETE FROM sgc.notificacao_email") && sql.contains("subprocesso_codigo")),
+                argThat(sql -> sql.contains("DELETE FROM sgc.notificacao_email")
+                        && sql.contains("subprocesso_codigo")
+                        && sql.contains("processo_codigo")),
+                eq(10L),
                 eq(10L)
         );
         inOrder.verify(jdbcTemplate).update(contains("DELETE FROM sgc.alerta_usuario"), eq(10L));

@@ -66,7 +66,6 @@
     </BCard>
 
     <LimpezaProcessosFluxoModais
-        :codigo-confirmacao="codigoConfirmacao ?? null"
         :descricao-confirmacao="descricaoConfirmacao"
         :excluindo="excluindo"
         :mostrar-confirmacao="mostrarConfirmacao"
@@ -91,7 +90,6 @@ const {
   carregandoProcessos,
   codigoProcessoSelecionado,
   processoSelecionado,
-  codigoConfirmacao,
   descricaoConfirmacao,
   excluindo,
   mensagemErroProcesso,

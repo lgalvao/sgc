@@ -1,4 +1,4 @@
-import {expect, test} from './fixtures/complete-fixtures.js';
+import {test} from './fixtures/complete-fixtures.js';
 import {login, USUARIOS} from './helpers/helpers-auth.js';
 import {criarProcesso} from './helpers/helpers-processos.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';

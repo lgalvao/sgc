@@ -19,6 +19,7 @@ const mockNotifyStructured = vi.fn();
 const mockClear = vi.fn();
 const mockExibirSucesso = vi.fn();
 const mockValidarSubmissao = vi.fn((v) => v);
+const mockResetarValidacao = vi.fn();
 const mockDeveExibirErro = vi.fn((v) => v);
 const mockFocarPrimeiroErroInvalido = vi.fn();
 
@@ -34,6 +35,7 @@ vi.mock('@/composables/useNotification', () => ({
 vi.mock('@/composables/useValidacaoFormulario', () => ({
     useValidacaoFormulario: vi.fn(() => ({
         validarSubmissao: mockValidarSubmissao,
+        resetarValidacao: mockResetarValidacao,
         deveExibirErro: mockDeveExibirErro,
         focarPrimeiroErroInvalido: mockFocarPrimeiroErroInvalido,
     })),
@@ -81,7 +83,7 @@ describe('LimpezaProcessosView', () => {
                 },
                 LimpezaProcessosFluxoModais: {
                     template: '<div v-if="mostrarConfirmacao" class="modal-stub"><button @click="$emit(\'confirmarExclusao\')">Confirmar</button></div>',
-                    props: ['mostrarConfirmacao', 'codigoConfirmacao', 'descricaoConfirmacao'],
+                    props: ['mostrarConfirmacao', 'descricaoConfirmacao'],
                 },
                 BCard: {template: '<div><slot/></div>'},
                 BFormGroup: {template: '<div><slot name="label"/><slot/></div>', props: ['state']},
@@ -178,6 +180,7 @@ describe('LimpezaProcessosView', () => {
 
         expect(excluirProcessoCompleto).toHaveBeenCalledWith(123);
         expect(mockExibirSucesso).toHaveBeenCalledWith(expect.any(String));
+        expect(mockResetarValidacao).toHaveBeenCalled();
         expect((wrapper.vm as any).codigoProcessoSelecionado).toBeNull();
         expect((wrapper.vm as any).processos.some((processo: any) => processo.codigo === 123)).toBe(false);
         expect((wrapper.vm as any).mostrarConfirmacao).toBe(false);

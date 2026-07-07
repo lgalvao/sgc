@@ -171,6 +171,15 @@ describe('NotificacoesAdminView', () => {
         expect(wrapper.text()).toContain('SGC: Assunto Enviado');
     });
 
+    it('recarrega notificações ao entrar na view', async () => {
+        vi.mocked(listarNotificacoesAdmin).mockResolvedValue([] as any);
+
+        mountComponent();
+        await flushPromises();
+
+        expect(listarNotificacoesAdmin).toHaveBeenCalledTimes(2);
+    });
+
     it('oculta notificações de processo finalizado e mantém a de finalização', async () => {
         vi.mocked(listarNotificacoesAdmin).mockResolvedValue([
             {

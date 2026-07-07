@@ -201,6 +201,7 @@ import {useFluxoDiagnostico} from '@/composables/useFluxoDiagnostico';
 import {TEXTOS} from '@/constants/textos';
 import type {ServidorDiagnostico, SituacaoAvaliacaoServidor} from '@/types/diagnostico-competencias';
 import {useAsyncAction} from '@/composables/useAsyncAction';
+import type {PermissoesSubprocesso} from '@/types/subprocesso-contexto';
 
 type FeedbackAcao = {
   mensagem: string;
@@ -210,6 +211,7 @@ type FeedbackAcao = {
 const props = withDefaults(defineProps<{
   codSubprocesso: number;
   siglaUnidade: string;
+  permissoesSubprocesso?: PermissoesSubprocesso | null;
   exibirCabecalho?: boolean;
   exibirBotaoVoltar?: boolean;
   exibirBotaoConcluirDiagnostico?: boolean;
@@ -229,7 +231,7 @@ const {
   habilitarValidarDiagnostico,
   habilitarDevolverDiagnostico,
   habilitarHomologarDiagnostico,
-} = useDiagnosticoPermissoes(props.codSubprocesso);
+} = useDiagnosticoPermissoes(props.codSubprocesso, props.permissoesSubprocesso);
 const {unidade, servidores} = useDiagnosticoUnidade(props.codSubprocesso);
 const {
   concluindo,

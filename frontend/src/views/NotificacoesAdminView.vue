@@ -80,7 +80,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from "vue";
+import {computed, onActivated, onMounted, ref, watch} from "vue";
 import {BButton} from "bootstrap-vue-next";
 import NotificacoesAdminFluxoModais from "@/components/administracao/NotificacoesAdminFluxoModais.vue";
 import LayoutPadrao from "@/components/layout/LayoutPadrao.vue";
@@ -128,6 +128,7 @@ const itensOrdenados = notificacoesQuery.itensOrdenados;
 const reenviando = computed(() => reenvioMutation.isLoading.value || acaoReenviar.carregando.value);
 const urlLeitorEmailTestes = computed(() => leitorEmailTestesQuery.data.value ?? undefined);
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
+let montadoUmaVez = false;
 
 watch(erro, (novoErro) => {
   if (novoErro) {
@@ -219,6 +220,14 @@ async function carregar() {
   );
 }
 
+async function atualizarAoEntrarNaTela() {
+  try {
+    await notificacoesQuery.refetch();
+  } catch {
+    // A tela já expõe o erro da query; aqui evitamos rejeição não tratada ao entrar na rota.
+  }
+}
+
 function abrirPreview(item: Notificacao) {
   itemParaPreview.value = item;
   mostrarPreview.value = true;
@@ -251,6 +260,16 @@ async function reenviar() {
       },
   );
 }
+
+onMounted(async () => {
+  await atualizarAoEntrarNaTela();
+  montadoUmaVez = true;
+});
+
+onActivated(async () => {
+  if (!montadoUmaVez) return;
+  await atualizarAoEntrarNaTela();
+});
 </script>
 
 <style scoped>

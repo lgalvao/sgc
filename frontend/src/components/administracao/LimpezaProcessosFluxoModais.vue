@@ -9,8 +9,8 @@
       @confirmar="$emit('confirmarExclusao')"
       @update:model-value="$emit('update:mostrarConfirmacao', $event)"
   >
-    <p v-if="codigoConfirmacao && descricaoConfirmacao">
-      {{ TEXTOS.administracao.LIMPEZA_MODAL_TEXTO(descricaoConfirmacao, codigoConfirmacao) }}
+    <p v-if="descricaoConfirmacao">
+      {{ TEXTOS.administracao.LIMPEZA_MODAL_TEXTO(descricaoConfirmacao) }}
     </p>
   </ModalConfirmacao>
 </template>
@@ -20,7 +20,6 @@ import ModalConfirmacao from '@/components/comum/ModalConfirmacao.vue';
 import {TEXTOS} from '@/constants/textos';
 
 defineProps<{
-  codigoConfirmacao: number | null;
   descricaoConfirmacao: string | null;
   excluindo: boolean;
   mostrarConfirmacao: boolean;

@@ -11,7 +11,7 @@ import type {ProcessoResumo} from '@/types/tipos';
 export function useLimpezaProcessosTela() {
     const {notificacao, notify, clear} = useNotification();
     const {exibirSucesso} = useToast();
-    const {validarSubmissao, deveExibirErro, focarPrimeiroErroInvalido} = useValidacaoFormulario();
+    const {validarSubmissao, resetarValidacao, deveExibirErro, focarPrimeiroErroInvalido} = useValidacaoFormulario();
     const acaoExclusao = useAsyncAction();
 
     const processos = ref<ProcessoResumo[]>([]);
@@ -71,6 +71,7 @@ export function useLimpezaProcessosTela() {
                     mostrarConfirmacao.value = false;
                     processos.value = processos.value.filter((processo) => processo.codigo !== codigo);
                     codigoProcessoSelecionado.value = null;
+                    resetarValidacao();
                     clear();
                     exibirSucesso(TEXTOS.administracao.LIMPEZA_SUCESSO);
                 },

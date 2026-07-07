@@ -1,18 +1,18 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {effectScope, nextTick, ref} from 'vue';
 import {useDiagnosticoUnidade} from '../useDiagnosticoUnidade';
+import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from '../cachePolicy';
 
 const mockQueryData = ref<any>(null);
 const mockQueryStatus = ref<'pending' | 'success'>('success');
 const mockQueryError = ref<Error | null>(null);
 const contextoData = ref<any>(null);
+const {useQueryMock} = vi.hoisted(() => ({
+    useQueryMock: vi.fn(),
+}));
 
 vi.mock('@pinia/colada', () => ({
-    useQuery: vi.fn(() => ({
-        data: mockQueryData,
-        status: mockQueryStatus,
-        error: mockQueryError,
-    })),
+    useQuery: useQueryMock,
 }));
 
 vi.mock('@/stores/perfil', () => ({
@@ -40,6 +40,11 @@ vi.mock('@/composables/useDiagnosticoContexto', async () => {
 describe('useDiagnosticoUnidade', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        useQueryMock.mockImplementation(() => ({
+            data: mockQueryData,
+            status: mockQueryStatus,
+            error: mockQueryError,
+        }));
         mockQueryStatus.value = 'success';
         mockQueryError.value = null;
         contextoData.value = null;
@@ -75,6 +80,9 @@ describe('useDiagnosticoUnidade', () => {
         expect(composable!.situacoesCapacitacao.value).toHaveLength(1);
         expect(composable!.movimentacoes.value).toHaveLength(1);
         expect(composable!.totalPendentes.value).toBe(1);
+        expect(useQueryMock).toHaveBeenCalledWith(expect.objectContaining({
+            staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
+        }));
 
         scope.stop();
     });

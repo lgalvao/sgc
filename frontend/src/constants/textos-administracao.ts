@@ -50,8 +50,8 @@ export const TEXTOS_ADMINISTRACAO = {
     LIMPEZA_PLACEHOLDER_PROCESSO: "Selecione",
     LIMPEZA_BOTAO_ABRIR: "Excluir processo",
     LIMPEZA_MODAL_TITULO: "Confirmar exclusão completa",
-    LIMPEZA_MODAL_TEXTO: (descricao: string, codigo: number) =>
-        `Confirma a exclusão completa do processo "${descricao}" (código ${codigo}) e de todos os seus dependentes?`,
+    LIMPEZA_MODAL_TEXTO: (descricao: string) =>
+        `Confirma a exclusão completa do processo "${descricao}" e de todos os seus dependentes?`,
     LIMPEZA_SUCESSO: "Processo removido com sucesso",
     LIMPEZA_ERRO_PROCESSO: "Selecione um processo",
     LIMPEZA_NENHUM_PROCESSO: "Nenhum processo disponível para limpeza",

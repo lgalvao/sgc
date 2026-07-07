@@ -70,6 +70,7 @@
           :exibir-botao-voltar="false"
           :exibir-cabecalho="false"
           :exibir-botao-concluir-diagnostico="false"
+          :permissoes-subprocesso="subprocesso.permissoes ?? null"
           :sigla-unidade="props.siglaUnidade"
       />
 

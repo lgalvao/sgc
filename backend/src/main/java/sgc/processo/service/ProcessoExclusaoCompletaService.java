@@ -32,7 +32,10 @@ public class ProcessoExclusaoCompletaService {
     public void excluirCompleto(Long codigo) {
         comumRepo.buscar(Processo.class, codigo);
 
-        jdbcTemplate.update("DELETE FROM sgc.notificacao_email WHERE subprocesso_codigo IN " + SUBQUERY_SUBPROCESSOS, codigo);
+        jdbcTemplate.update("""
+                DELETE FROM sgc.notificacao_email
+                WHERE subprocesso_codigo IN """ + SUBQUERY_SUBPROCESSOS +
+                " OR processo_codigo = ?", codigo, codigo);
 
         jdbcTemplate.update("""
                 DELETE FROM sgc.alerta_usuario

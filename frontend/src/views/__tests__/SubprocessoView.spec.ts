@@ -64,7 +64,7 @@ const SubprocessoCardsStub = {
 };
 const SubprocessoDiagnosticoPainelStub = {
     template: '<div data-testid="diagnostico-equipe-painel"></div>',
-    props: ['codSubprocesso', 'siglaUnidade', 'exibirCabecalho', 'exibirBotaoVoltar', 'exibirBotaoConcluirDiagnostico']
+    props: ['codSubprocesso', 'siglaUnidade', 'permissoesSubprocesso', 'exibirCabecalho', 'exibirBotaoVoltar', 'exibirBotaoConcluirDiagnostico']
 };
 const SubprocessoModalStub = {
     template: '<div data-testid="subprocesso-modal"></div>',
@@ -710,6 +710,22 @@ describe('SubprocessoView.vue', () => {
         expect(wrapper.find('[data-testid="diagnostico-equipe-painel"]').exists()).toBe(true);
         expect(wrapper.findComponent(SubprocessoCardsStub).exists()).toBe(true);
         expect(wrapper.find('[data-testid="tbl-movimentacoes"]').exists()).toBe(true);
+    });
+
+    it('reaproveita as permissões do contexto no painel de diagnóstico embutido', async () => {
+        const permissoes = {
+            podeCriarConsenso: true,
+            podeConcluirDiagnostico: true,
+            habilitarConcluirDiagnostico: true,
+        };
+        const {wrapper} = mountComponent({
+            tipoProcesso: TipoProcesso.DIAGNOSTICO,
+            permissoes,
+        });
+        await flushPromises();
+
+        const painel = wrapper.findComponent(SubprocessoDiagnosticoPainelStub);
+        expect(painel.props('permissoesSubprocesso')).toEqual(expect.objectContaining(permissoes));
     });
 
     it('não exibe botão de concluir diagnóstico em subprocesso de mapeamento', async () => {
