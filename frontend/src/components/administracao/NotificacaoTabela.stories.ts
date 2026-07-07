@@ -24,6 +24,8 @@ const notificacoesMock: Notificacao[] = [
         corpoHtml: '<p>Conteúdo do e-mail.</p>',
         subprocessoCodigo: 101,
         unidadeSigla: 'PROEN',
+        processoFinalizado: false,
+        notificacaoFinalizacaoProcesso: false,
     },
     {
         codigo: 2,
@@ -34,6 +36,8 @@ const notificacoesMock: Notificacao[] = [
         dataHoraCriacao: '2025-03-28T08:00:00',
         tentativas: 3,
         unidadeSigla: 'CF',
+        processoFinalizado: false,
+        notificacaoFinalizacaoProcesso: false,
     },
     {
         codigo: 3,
@@ -47,6 +51,8 @@ const notificacoesMock: Notificacao[] = [
         corpoHtml: '<p>Seu cadastro foi homologado.</p>',
         subprocessoCodigo: 103,
         unidadeSigla: 'PROEX',
+        processoFinalizado: false,
+        notificacaoFinalizacaoProcesso: false,
     },
 ];
 
