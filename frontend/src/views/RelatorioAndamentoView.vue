@@ -13,7 +13,7 @@
 
       <EmptyState
           v-if="processosMapeamentoRevisao.length === 0"
-          title="Não há processos de mapeamento ou revisão."
+          title="Não há processos de mapeamento ou revisão em andamento."
           icon="bi-bar-chart-steps"
       />
 

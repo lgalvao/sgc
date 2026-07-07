@@ -13,7 +13,7 @@
 
       <EmptyState
           v-if="processosDiagnostico.length === 0"
-          title="Não há processos de diagnóstico."
+          title="Não há processos de diagnóstico finalizados."
           icon="bi-graph-up-arrow"
       />
 

@@ -1,4 +1,5 @@
 Empty states para relatórios.
+
 Alertas duplicados para interoperacional
 
 Limpeza de processos:
@@ -11,9 +12,6 @@ Limpeza de processos:
        ```
 
 Atualizar notificações ao navegar para a view
-
-Tempo para carregar dados de unidades. Exemplo:
-- https://seseldev05.tre-pe.gov.br/processo/498/SEDESENV?codSubprocesso=1007
 
 Email internamente duplicado:
 
@@ -34,3 +32,6 @@ Email internamente duplicado:
     
     Acompanhe o processo no Sistema de Gestão de Competências: https://sgc.tre-pe.jus.br.
 ``` 
+
+Tempo para carregar dados de unidades. Exemplo:
+- https://seseldev05.tre-pe.gov.br/processo/498/SEDESENV?codSubprocesso=1007
