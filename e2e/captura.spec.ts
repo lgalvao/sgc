@@ -1039,9 +1039,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
-
-            await page.getByTestId('tbl-processos').getByText(descricao).first().click();
-            await navegarParaSubprocesso(page, UNIDADE_ALVO);
+            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
             await navegarParaCadastro(page);
 
             // Capturar tela inicial vazia com label "Conhecimentos *"

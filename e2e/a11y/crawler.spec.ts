@@ -32,10 +32,9 @@ const ROUTES = [
     {name: 'Detalhes da Unidade', path: '/unidade/4'},
     {name: 'Mapa da Unidade', path: '/unidade/4/mapa?codProcesso=99'},
     {name: 'Atribuição Temporária', path: '/unidade/4/atribuicao'},
-    {name: 'Autoavaliação de Diagnóstico', path: '/diagnostico/99/ASSESSORIA_12/autoavaliacao'},
-    {name: 'Situação de Capacitação de Diagnóstico', path: '/diagnostico/99/ASSESSORIA_12/situacao-capacitacao'},
-    {name: 'Consenso de Diagnóstico', path: '/diagnostico/99/ASSESSORIA_12/consenso/ADMIN_1_PERFIL'},
-    {name: 'Análise da Unidade no Diagnóstico', path: '/diagnostico/99/ASSESSORIA_12/unidade'}
+    // As rotas de diagnóstico ficam fora do crawler por enquanto.
+    // O seed E2E atual não possui um subprocesso de diagnóstico válido para esse cenário,
+    // e usar o subprocesso 99 gera chamadas de backend sabidamente inválidas.
 ];
 
 test.describe('Accessibility Crawler (Axe-core)', () => {

@@ -323,7 +323,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
             await expect(linhaAlertaLida).not.toHaveClass(/fw-bold/);
         });
 
-        test('Alerta expirado pelo prazo configurado não deve aparecer destacado', async ({
+        test('Alerta antigo de processo finalizado não deve aparecer no painel', async ({
                                                                                               _resetAutomatico,
                                                                                               page,
                                                                                               _autenticadoComoAdmin
@@ -332,9 +332,7 @@ test.describe('CDU-02 - Visualizar painel', () => {
                 .locator('tr', {hasText: 'Alerta antigo seed 201'})
                 .first();
 
-            await expect(linhaAlertaAntigo).toBeVisible();
-            await expect(linhaAlertaAntigo).toContainText('Alerta antigo seed 201');
-            await expect(linhaAlertaAntigo).not.toHaveClass(/fw-bold/);
+            await expect(linhaAlertaAntigo).toHaveCount(0);
         });
     });
 

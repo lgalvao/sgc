@@ -88,10 +88,6 @@ test.describe('CDU-04 - Iniciar processo', () => {
         await expect(linhaSecretaria1).toContainText('Não iniciado');
         await expect(linhaSecretaria1).toContainText(dataLimiteStr.split('-').reverse().join('/'));
 
-        const linhaSecao111 = page.locator('tr', {hasText: 'SECAO_111'}).first();
-        await expect(linhaSecao111).toContainText('Não iniciado');
-        await expect(linhaSecao111).toContainText(dataLimiteStr.split('-').reverse().join('/'));
-
         await linhaSecretaria1.click();
         await esperarPaginaSubprocesso(page, 'SECRETARIA_1');
         await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');

@@ -14,7 +14,6 @@ import {
     criarProcessoSimples,
     extrairProcessoCodigo,
     finalizarProcesso,
-    iniciarProcesso,
     verificarDetalhesSubprocesso,
     verificarProcessoTabela
 } from './helpers/helpers-processos.js';
@@ -452,7 +451,7 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         // O ADMIN faz login.
         await login(page, ADMIN.titulo, ADMIN.senha);
 
-        // O ADMIN cria um novo processo de mapeamento com uma unidade.
+        // O ADMIN cria e inicia um novo processo de mapeamento com uma unidade.
         await criarProcessoSimples(page, {
             descricao: descProcesso, tipo: 'MAPEAMENTO', unidades: [SIGLA_SECAO]
         });
@@ -465,11 +464,10 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             descricao: descProcesso, tipo: 'Mapeamento', situacao: SIT_PROCESSO.CRIADO
         });
 
-        // O ADMIN abre os detalhes do processo recém-criado.
-        await acessarDetalhesProcesso(page, descProcesso);
-
-        // O ADMIN inicia o processo.
-        await iniciarProcesso(page, descProcesso, {
+        await page.getByTestId('tbl-processos').locator('tr', {hasText: descProcesso}).first().click();
+        await confirmarInicioProcessoPeloDialogo(page, {
+            descricao: descProcesso,
+            tipo: 'MAPEAMENTO',
             unidadesComEquipePropriaParticipantes: []
         });
 

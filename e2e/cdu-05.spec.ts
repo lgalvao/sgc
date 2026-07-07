@@ -55,25 +55,9 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2']
-        });
-
-        // Validação: Processo foi criado e está na tela de cadastro
-        await verificarProcessoTabela(page, {
-            descricao,
-            situacao: 'Criado',
-            tipo: 'Mapeamento'
-        });
-
-        await acessarDetalhesProcesso(page, descricao);
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
-        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descricao);
-
-        await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await confirmarInicioProcessoPeloDialogo(page, {
-            descricao,
-            tipo: 'MAPEAMENTO',
-            unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO]
+            expandir: ['SECRETARIA_2'],
+            unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO],
+            iniciar: true
         });
 
         await verificarProcessoTabela(page, {
@@ -90,7 +74,6 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
                                                                             _autenticadoComoAdmin
                                                                         }) => {
         await passo1_AdminCriaEIniciaProcessoMapeamento(page, descProcMapeamento);
-        // Capturar ID do processo para cleanup
         await page.goto('/painel');
         await acessarDetalhesProcesso(page, descProcMapeamento);
         await expect(page).toHaveURL(/\/processo\/\d+/);

@@ -1,7 +1,7 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
 import {confirmarInicioProcessoPeloDialogo} from './helpers/helpers-processos.js';
-import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
+import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
@@ -35,8 +35,8 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
             tipo: 'DIAGNOSTICO'
         });
 
-        await page.goto(`/processo/${processo.codigo}`);
-        await navegarParaDiagnosticoUnidade(page, 'ASSESSORIA_12');
+        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, 'ASSESSORIA_12');
+        await page.goto(`/diagnostico/${codSubprocesso}/ASSESSORIA_12/unidade`);
         await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText('ASSESSORIA_12');
         await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
         await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
