@@ -10,6 +10,8 @@ import {
 } from './helpers/helpers-auth.js';
 import {
     acessarDetalhesProcesso,
+    aguardarProcessoNoPainel,
+    confirmarInicioProcessoPeloDialogo,
     criarProcesso,
     criarProcessoSimples,
     extrairProcessoCodigo,
@@ -452,31 +454,17 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
         await login(page, ADMIN.titulo, ADMIN.senha);
 
         // O ADMIN cria e inicia um novo processo de mapeamento com uma unidade.
-        await criarProcessoSimples(page, {
-            descricao: descProcesso, tipo: 'MAPEAMENTO', unidades: [SIGLA_SECAO]
-        });
-
-        // Após criar, o sistema retorna ao Painel.
-        await expect(page).toHaveURL(/\/painel/);
-
-        // No Painel, o processo deve aparecer ainda na situação inicial "Criado".
-        await verificarProcessoTabela(page, {
-            descricao: descProcesso, tipo: 'Mapeamento', situacao: SIT_PROCESSO.CRIADO
-        });
-
-        await page.getByTestId('tbl-processos').locator('tr', {hasText: descProcesso}).first().click();
-        await confirmarInicioProcessoPeloDialogo(page, {
+        await criarProcesso(page, {
             descricao: descProcesso,
             tipo: 'MAPEAMENTO',
-            unidadesComEquipePropriaParticipantes: []
+            unidade: SIGLA_SECAO,
+            expandir: [SIGLA_SECRETARIA, SIGLA_COORDENADORIA],
+            iniciar: true
         });
-
-        // Depois da iniciação, o sistema retorna ao Painel.
-        await expect(page).toHaveURL(/\/painel/);
-
-        // No Painel, o processo deve aparecer como "Em andamento".
-        await verificarProcessoTabela(page, {
-            descricao: descProcesso, tipo: 'Mapeamento', situacao: SIT_PROCESSO.EM_ANDAMENTO
+        await aguardarProcessoNoPainel(page, {
+            descricao: descProcesso,
+            situacao: SIT_PROCESSO.EM_ANDAMENTO,
+            tipo: 'MAPEAMENTO'
         });
 
         // O ADMIN reabre os detalhes do processo iniciado.

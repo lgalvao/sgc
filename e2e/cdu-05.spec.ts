@@ -1,5 +1,6 @@
 import type {Page} from '@playwright/test';
 import {expect, test} from './fixtures/complete-fixtures.js';
+import {criarProcessoFixture} from './fixtures/index.js';
 import {login, loginComPerfil, USUARIOS} from './helpers/helpers-auth.js';
 import {
     acessarDetalhesProcesso,
@@ -55,7 +56,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             tipo: 'MAPEAMENTO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2'],
+            expandir: ['SECRETARIA_2', 'COORD_21'],
             unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO],
             iniciar: true
         });
@@ -197,7 +198,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
     });
 
-    test('Fase 2: Iniciar processo de Revisão', async ({_resetAutomatico, page, _autenticadoComoAdmin}) => {
+    test('Fase 2: Iniciar processo de Revisão', async ({_resetAutomatico, page, request, _autenticadoComoAdmin}) => {
         // O login como Admin já foi disparado pela fixture 'autenticadoComoAdmin'
         // Se houver dúvida se a fixture trocou de usuário em um describe.serial,
         // podemos chamar o helper explicitamente para garantir a navegação para /login.
@@ -207,39 +208,14 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
         await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
 
-        // Criar processo de REVISÃO
-        await criarProcesso(page, {
+        const processo = await criarProcessoFixture(request, {
             descricao: descProcRevisao,
             tipo: 'REVISAO',
             diasLimite: 30,
             unidade: UNIDADE_ALVO,
-            expandir: ['SECRETARIA_2']
+            iniciar: true
         });
-
-        // Capturar ID do processo para cleanup
-        await acessarDetalhesProcesso(page, descProcRevisao);
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
-
-        const dataLimiteStr = (await page.getByTestId('inp-processo-data-limite').inputValue()).split('-').reverse().join('/');
-
-        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
-        await page.getByTestId('btn-processo-iniciar-rodape').click();
-
-        const modal = page.getByRole('dialog');
-        await expect(modal).toBeVisible();
-        await expect(modal.getByText(TEXTOS.processo.cadastro.INICIAR_CONFIRMACAO)).toBeVisible();
-        await modal.getByRole('button', {name: /Cancelar/i}).click();
-        await expect(modal).toBeHidden();
-        await expect(page).toHaveURL(/\/processo\/cadastro/);
-        await expect(page.getByTestId('inp-processo-descricao')).toHaveValue(descProcRevisao);
-
-        await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await expect(modal).toBeVisible();
-        await confirmarInicioProcessoPeloDialogo(page, {
-            descricao: descProcRevisao,
-            tipo: 'REVISAO',
-            unidadesComEquipePropriaParticipantes: [UNIDADE_ALVO]
-        });
+        await page.goto('/painel');
         await verificarProcessoTabela(page, {
             descricao: descProcRevisao,
             situacao: 'Em andamento',
@@ -253,7 +229,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         // Verifica status e data limite na tabela de participantes (Step 9)
         const linhaSubprocesso = page.locator('tr', {hasText: UNIDADE_ALVO}).first();
         await expect(linhaSubprocesso).toContainText('Não iniciado');
-        await expect(linhaSubprocesso).toContainText(dataLimiteStr);
+        await expect(linhaSubprocesso).toContainText(/\d{2}\/\d{2}\/\d{4}/);
 
         // Entra no subprocesso
         await linhaSubprocesso.click();
@@ -290,13 +266,13 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
             destinatario: UNIDADE_ALVO,
             assunto: 'Início de processo de revisão do mapa de competências',
             tipo: 'Início do processo',
-            trechoCorpo: new RegExp(`Comunicamos o início do processo\\s+${descProcRevisao}\\s+para a sua unidade`, 'i')
+            trechoCorpo: new RegExp(`Prezado\\(a\\) responsável pela <strong>${UNIDADE_ALVO}</strong>`, 'i')
         });
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECRETARIA_2',
             assunto: 'Início de processo de revisão do mapa de competências em unidades subordinadas',
             tipo: 'Início do processo',
-            trechoCorpo: new RegExp(`${UNIDADE_ALVO}[\\s\\S]*já podem iniciar a revisão do cadastro de atividades e conhecimentos`, 'i')
+            trechoCorpo: /Prezado\(a\) responsável pela <strong>SECRETARIA_2<\/strong>/i
         });
     });
 

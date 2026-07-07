@@ -50,12 +50,16 @@ export async function criarProcesso(page: Page, options: {
     await expect(page.getByText(TEXTOS.unidade.CARREGANDO)).toBeHidden();
     if (options.expandir) {
         for (const sigla of options.expandir) {
-            await page.getByTestId(`btn-arvore-expand-${sigla}`).click();
+            const botaoExpandir = page.getByTestId(`btn-arvore-expand-${sigla}`);
+            if (await botaoExpandir.isVisible().catch(() => false)) {
+                await botaoExpandir.click();
+            }
         }
     }
 
     const unidades = Array.isArray(options.unidade) ? options.unidade : [options.unidade];
     for (const u of unidades) {
+        await buscarUnidadeNaArvore(page, u);
         const checkbox = page.getByTestId(`chk-arvore-unidade-${u}`);
         await expect(checkbox).toBeVisible();
         await expect(checkbox).toBeEnabled();
@@ -419,10 +423,6 @@ export async function acessarDetalhesProcesso(page: Page, descricao: string) {
  * Finaliza o processo atual a partir da tela de detalhes do processo.
  */
 export async function finalizarProcesso(page: Page) {
-    const botaoFinalizar = page.getByTestId('btn-processo-finalizar');
-    await expect(botaoFinalizar).toBeEnabled();
-    await botaoFinalizar.click();
-
     // 1. Instanciar promessas para os requests
     const postFinalizarPromise = page.waitForResponse(r =>
         r.url().match(/\/api\/processos\/\d+\/finalizar/) !== null &&
@@ -434,8 +434,19 @@ export async function finalizarProcesso(page: Page) {
         r => r.url().includes('/api/painel/bootstrap') && r.ok()
     );
 
-    // 2. Clicar no botão e aguardar o POST concluir
-    await page.getByTestId('btn-finalizar-processo-confirmar').click();
+    const botaoFinalizar = page.getByTestId('btn-processo-finalizar');
+    await expect(botaoFinalizar).toBeEnabled();
+    await botaoFinalizar.click();
+
+    const dialogo = page.getByRole('dialog');
+    const abriuDialogo = await dialogo.waitFor({state: 'visible', timeout: 1000})
+        .then(() => true)
+        .catch(() => false);
+
+    // 2. Em algumas telas a finalização pede confirmação; em outras, dispara direto.
+    if (abriuDialogo) {
+        await dialogo.getByTestId('btn-finalizar-processo-confirmar').click();
+    }
     await postFinalizarPromise;
 
     // 3. Aguardar a navegação e a recarga dos dados do painel

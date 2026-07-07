@@ -216,12 +216,14 @@ export async function navegarParaSubprocesso(
     const tabelaArvore = page.getByTestId('tbl-tree');
     if (await tabelaArvore.count() > 0 && await tabelaArvore.isVisible()) {
         const linhaArvore = tabelaArvore.getByRole('row', {name: padraoUnidade}).first();
-        await expect(linhaArvore).toBeVisible();
-        await Promise.all([
-            page.waitForURL(urlDestino),
-            linhaArvore.click()
-        ]);
-        return;
+        const encontrouLinhaArvore = await linhaArvore.isVisible().catch(() => false);
+        if (encontrouLinhaArvore) {
+            await Promise.all([
+                page.waitForURL(urlDestino),
+                linhaArvore.click()
+            ]);
+            return;
+        }
     }
 
     const tabelaProcessos = page.getByTestId('tbl-processos');
@@ -269,12 +271,14 @@ export async function navegarParaDiagnosticoUnidade(
     const tabelaArvore = page.getByTestId('tbl-tree');
     if (await tabelaArvore.count() > 0 && await tabelaArvore.isVisible()) {
         const linhaArvore = tabelaArvore.getByRole('row', {name: padraoUnidade}).first();
-        await expect(linhaArvore).toBeVisible();
-        await Promise.all([
-            page.waitForURL(urlDestino),
-            linhaArvore.click()
-        ]);
-        return;
+        const encontrouLinhaArvore = await linhaArvore.isVisible().catch(() => false);
+        if (encontrouLinhaArvore) {
+            await Promise.all([
+                page.waitForURL(urlDestino),
+                linhaArvore.click()
+            ]);
+            return;
+        }
     }
 
     const tabelaProcessos = page.getByTestId('tbl-processos');

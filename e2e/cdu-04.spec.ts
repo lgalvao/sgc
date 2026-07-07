@@ -129,7 +129,7 @@ test.describe('CDU-04 - Iniciar processo', () => {
             destinatario: 'SECRETARIA_1',
             assunto: 'Início de processo de mapeamento de competências',
             tipo: 'Início do processo',
-            trechoCorpo: new RegExp(`Comunicamos o início do processo\\s+${descricao}\\s+para a sua unidade`, 'i')
+            trechoCorpo: /Prezado\(a\) responsável pela <strong>SECRETARIA_1<\/strong>/i
         });
     });
 });

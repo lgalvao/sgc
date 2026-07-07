@@ -20,7 +20,12 @@ import {
     disponibilizarCadastro,
     navegarParaCadastro
 } from '../helpers/helpers-atividades.js';
-import {abrirAcaoCadastroPrincipal, abrirHistoricoAnalise, fecharHistoricoAnalise} from '../helpers/helpers-analise.js';
+import {
+    acessarSubprocessoChefeDireto,
+    abrirAcaoCadastroPrincipal,
+    abrirHistoricoAnalise,
+    fecharHistoricoAnalise
+} from '../helpers/helpers-analise.js';
 import {TEXTOS} from '../../frontend/src/constants/textos.js';
 import * as MapaHelpers from '../helpers/helpers-mapas.js';
 import {
@@ -725,7 +730,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
 
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
-            await page.goto(`/processo/${codProcesso}/${UNIDADE_ALVO}`);
+            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
             await navegarParaCadastro(page);
 
             // Capturar tela inicial vazia com label "Conhecimentos *"

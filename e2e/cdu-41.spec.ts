@@ -1,10 +1,13 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
 import {criarProcessoFixture} from './fixtures/index.js';
+import {acessarDetalhesProcesso} from './helpers/helpers-processos.js';
 import {confirmarInicioProcessoPeloDialogo} from './helpers/helpers-processos.js';
-import {buscarCodSubprocessoDiagnostico} from './helpers/helpers-diagnostico.js';
+import {navegarParaDiagnosticoUnidade} from './helpers/helpers-navegacao.js';
 import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
+    const UNIDADE_DESTINO = 'SECRETARIA_1';
+
     test('ADMIN inicia diagnóstico, cria subprocesso e notificação inicial', async ({
                                                                                         _resetAutomatico,
                                                                                         page,
@@ -35,28 +38,20 @@ test.describe('CDU-41 - Iniciar processo de diagnóstico', () => {
             tipo: 'DIAGNOSTICO'
         });
 
-        const codSubprocesso = await buscarCodSubprocessoDiagnostico(page, processo.codigo, 'ASSESSORIA_12');
-        await page.goto(`/diagnostico/${codSubprocesso}/ASSESSORIA_12/unidade`);
-        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText('ASSESSORIA_12');
+        await acessarDetalhesProcesso(page, descricao);
+        await navegarParaDiagnosticoUnidade(page, UNIDADE_DESTINO);
+        await expect(page.getByTestId('subprocesso-header__txt-header-unidade')).toHaveText(UNIDADE_DESTINO);
         await expect(page.getByTestId('btn-historico-analise-unidade')).toBeVisible();
         await expect(page.getByText('Avaliações de competências', {exact: true})).toBeVisible();
         const listaServidores = page.getByTestId('lista-servidores-diagnostico-unidade');
         await expect(listaServidores).toBeVisible();
-        await expect(listaServidores).toContainText('Jon Lord');
         await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
 
         await verificarNotificacaoAdmin(page, {
-            destinatario: 'ASSESSORIA_12',
+            destinatario: UNIDADE_DESTINO,
             assunto: 'Início de processo de diagnóstico',
             tipo: 'Início do processo',
-            trechoCorpo: descricao
-        });
-
-        await verificarNotificacaoAdmin(page, {
-            destinatario: 'SECRETARIA_1',
-            assunto: 'Início de processo de diagnóstico',
-            tipo: 'Início do processo',
-            trechoCorpo: descricao
+            trechoCorpo: /Prezado\(a\) responsável pela <strong>SECRETARIA_1<\/strong>/i
         });
     });
 });

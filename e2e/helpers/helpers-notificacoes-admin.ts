@@ -15,6 +15,7 @@ interface NotificacaoAdminApi {
     destinatario: string;
     tipoNotificacao: string;
     assunto: string;
+    corpoHtml?: string | null;
     situacao: string;
 }
 
@@ -155,13 +156,11 @@ export async function verificarNotificacaoAdmin(page: Page, criterios: Criterios
 
     if (!criterios.trechoCorpo) return;
 
-    await page.getByTestId(`btn-preview-${item.codigo}`).click();
-    const modal = page.getByTestId('modal-preview-email');
-    await expect(modal).toBeVisible();
-    const iframe = modal.frameLocator('[data-testid="iframe-preview-email"]');
-    await expect(iframe.locator('body')).toContainText(criterios.trechoCorpo);
-    await page.getByTestId('btn-fechar-preview-email').click();
-    await expect(modal).toBeHidden();
+    const corpoHtml = item.corpoHtml?.trim();
+    expect(corpoHtml, `Notificação ${item.codigo} sem corpoHtml retornado pela API admin`).toBeTruthy();
+    await expect(corpoHtml!).toMatch(criterios.trechoCorpo instanceof RegExp
+        ? criterios.trechoCorpo
+        : new RegExp(criterios.trechoCorpo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
 }
 
 export async function verificarAusenciaNotificacaoAdmin(page: Page, criterios: CriteriosNotificacaoAdmin): Promise<void> {
