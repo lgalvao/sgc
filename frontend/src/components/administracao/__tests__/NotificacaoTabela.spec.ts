@@ -61,7 +61,7 @@ describe("NotificacaoTabela.vue", () => {
             }
         });
 
-        const campos = wrapper.findComponent(BTable).props("fields") as Array<{ key: string }>;
+        const campos = (wrapper.findComponent(BTable as any) as any).props("fields") as Array<{ key: string }>;
         const indiceOrigem = campos.findIndex((campo) => campo.key === "unidadeOrigemSigla");
         const indiceDestino = campos.findIndex((campo) => campo.key === "destino");
         const indiceProcesso = campos.findIndex((campo) => campo.key === "processoDescricao");
