@@ -1255,11 +1255,11 @@ public class E2eController {
      */
     public record ProcessoFixtureRequest(
             @Nullable String descricao, String unidadeSigla, Boolean iniciar, @Nullable Integer diasLimite) {
-        private static ProcessoFixtureRequest iniciado(String descricao, String unidadeSigla, Integer diasLimite) {
+        private static ProcessoFixtureRequest iniciado(@Nullable String descricao, String unidadeSigla, @Nullable Integer diasLimite) {
             return new ProcessoFixtureRequest(descricao, unidadeSigla, true, diasLimite);
         }
 
-        private static ProcessoFixtureRequest mapaBase(String unidadeSigla, Integer diasLimite) {
+        private static ProcessoFixtureRequest mapaBase(String unidadeSigla, @Nullable Integer diasLimite) {
             return iniciado("Mapa base fixture " + System.currentTimeMillis(), unidadeSigla, diasLimite);
         }
 

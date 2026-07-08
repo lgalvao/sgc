@@ -196,7 +196,7 @@ public class ResponsavelUnidadeService {
                 .usuarioDestinoTitulo(usuario.getTituloEleitoral())
                 .unidadeDestinoSigla(siglaUnidade)
                 .unidadeOrigemSigla(siglaUnidade)
-                .destinatario(usuario.getEmail())
+                .destinatario(Objects.requireNonNull(usuario.getEmail(), "Usuário sem e-mail após validação"))
                 .assunto(assunto)
                 .corpoHtml(corpoHtml)
                 .chaveIdempotencia(chaveIdempotenciaAtribuicaoTemporaria(atribuicao))
@@ -204,7 +204,7 @@ public class ResponsavelUnidadeService {
     }
 
     private void validarUsuarioComEmail(Usuario usuario) {
-        if (usuario.getEmail().isBlank()) {
+        if (usuario.getEmail() == null) {
             throw new ErroValidacao(Mensagens.USUARIO_SEM_EMAIL);
         }
     }
