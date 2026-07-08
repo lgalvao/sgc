@@ -46,7 +46,10 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     // ── Interface Spring Security ───────────────────────────────────
 
     @Override
-    public boolean hasPermission(Authentication authentication, Object alvo, Object permissao) {
+    public boolean hasPermission(@Nullable Authentication authentication, @Nullable Object alvo, @Nullable Object permissao) {
+        if (authentication == null || permissao == null) {
+            return false;
+        }
         if (!(authentication.getPrincipal() instanceof Usuario usuario)) {
             return false;
         }
@@ -66,7 +69,15 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     }
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable codigoAlvo, String tipoAlvo, Object permissao) {
+    public boolean hasPermission(
+            @Nullable Authentication authentication,
+            @Nullable Serializable codigoAlvo,
+            @Nullable String tipoAlvo,
+            @Nullable Object permissao
+    ) {
+        if (authentication == null || codigoAlvo == null || tipoAlvo == null || permissao == null) {
+            return false;
+        }
         if (!(authentication.getPrincipal() instanceof Usuario usuario)) {
             return false;
         }

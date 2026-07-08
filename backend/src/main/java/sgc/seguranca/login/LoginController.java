@@ -215,10 +215,7 @@ public class LoginController {
     }
 
     private Instant obterExpiracaoLogout(GerenciadorJwt.JwtClaims claims) {
-        if (claims.expiracao() != null) {
-            return claims.expiracao();
-        }
-        return Instant.now().plus(Duration.ofMinutes(jwtProperties.expiracaoMinutos()));
+        return claims.expiracao();
     }
 
     @SuppressWarnings("ConstantConditions")

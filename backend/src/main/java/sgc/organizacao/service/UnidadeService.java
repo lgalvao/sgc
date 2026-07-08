@@ -134,7 +134,10 @@ public class UnidadeService {
         }
         List<UnidadeMapa> existentes = unidadeMapaRepo.findAllById(mapasPorUnidade.keySet());
         Map<Long, UnidadeMapa> existentesPorCodigo = existentes.stream()
-                .collect(java.util.stream.Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, um -> um));
+                .collect(java.util.stream.Collectors.toMap(
+                        um -> Objects.requireNonNull(um.getUnidadeCodigoPersistido(), "UnidadeMapa sem unidadeCodigo"),
+                        um -> um
+                ));
 
         List<UnidadeMapa> paraAtualizar = mapasPorUnidade.entrySet().stream()
                 .map(entry -> {

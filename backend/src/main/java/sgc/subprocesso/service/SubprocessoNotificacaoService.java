@@ -131,8 +131,8 @@ public class SubprocessoNotificacaoService {
     }
 
     private void criarAlertaAceiteCadastroEmBloco(Subprocesso sp, Unidade unidadeAnalise) {
-        Unidade unidadeDestino = unidadeAnalise == null ? null : unidadeAnalise.getUnidadeSuperior();
-        if (unidadeAnalise == null || unidadeDestino == null) {
+        Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior();
+        if (unidadeDestino == null) {
             return;
         }
         String descricao = sp.getProcesso().getTipo() == TipoProcesso.REVISAO
@@ -142,8 +142,8 @@ public class SubprocessoNotificacaoService {
     }
 
     private void criarAlertaAceiteValidacaoEmBloco(Subprocesso sp, Unidade unidadeAnalise) {
-        Unidade unidadeDestino = unidadeAnalise == null ? null : unidadeAnalise.getUnidadeSuperior();
-        if (unidadeAnalise == null || unidadeDestino == null) {
+        Unidade unidadeDestino = unidadeAnalise.getUnidadeSuperior();
+        if (unidadeDestino == null) {
             return;
         }
         alertaAplicacaoService.criarAlertaTransicao(
@@ -404,7 +404,7 @@ public class SubprocessoNotificacaoService {
     }
 
     private Map<Unidade, List<Subprocesso>> agruparPorUnidadeConsolidacaoAceiteBloco(List<Subprocesso> subprocessos, Unidade unidadeAnalise) {
-        if (subprocessos.isEmpty() || unidadeAnalise == null) {
+        if (subprocessos.isEmpty()) {
             return Map.of();
         }
         Unidade destinoConsolidado = resolverDestinoConsolidadoAceiteBloco(unidadeAnalise);

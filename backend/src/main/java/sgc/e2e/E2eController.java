@@ -1,13 +1,12 @@
 package sgc.e2e;
 
-import jakarta.annotation.*;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.cache.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.*;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.jdbc.datasource.init.*;
@@ -16,6 +15,7 @@ import org.springframework.security.core.authority.*;
 import org.springframework.security.core.context.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
+import org.jspecify.annotations.Nullable;
 import sgc.alerta.model.*;
 import sgc.comum.erros.*;
 import sgc.diagnostico.model.*;
@@ -56,9 +56,9 @@ public class E2eController {
     private final DiagnosticoRepo diagnosticoRepo;
     private final AvaliacaoServidorRepo avaliacaoServidorRepo;
     private final SituacaoCapacitacaoRepo situacaoCapacitacaoRepo;
-    private final AnaliseRepo analiseRepo;
-    private final MovimentacaoRepo movimentacaoRepo;
-    private final UsuarioRepo usuarioRepo;
+    private final @Nullable AnaliseRepo analiseRepo;
+    private final @Nullable MovimentacaoRepo movimentacaoRepo;
+    private final @Nullable UsuarioRepo usuarioRepo;
     private final UnidadeService unidadeService;
     private final ResourceLoader resourceLoader;
     private final CacheManager cacheManager;
@@ -75,9 +75,9 @@ public class E2eController {
             DiagnosticoRepo diagnosticoRepo,
             AvaliacaoServidorRepo avaliacaoServidorRepo,
             SituacaoCapacitacaoRepo situacaoCapacitacaoRepo,
-            AnaliseRepo analiseRepo,
-            MovimentacaoRepo movimentacaoRepo,
-            UsuarioRepo usuarioRepo,
+            @Nullable AnaliseRepo analiseRepo,
+            @Nullable MovimentacaoRepo movimentacaoRepo,
+            @Nullable UsuarioRepo usuarioRepo,
             UnidadeService unidadeService,
             ResourceLoader resourceLoader,
             CacheManager cacheManager
@@ -934,7 +934,7 @@ public class E2eController {
 
     private String descricaoFixture(ProcessoFixtureRequest request, TipoProcesso tipo) {
         String descReq = request.descricao();
-        if (descReq != null && !descReq.isBlank()) {
+        if (!descReq.isBlank()) {
             return descReq;
         }
         return "Processo fixture E2E " + tipo.name() + " " + System.currentTimeMillis();
@@ -1288,8 +1288,8 @@ public class E2eController {
             String situacao,
             String unidadeDestinoSigla,
             String unidadeOrigemSigla,
-            Integer tentativas,
-            String ultimoErro
+            @Nullable Integer tentativas,
+            @Nullable String ultimoErro
     ) {
     }
 
@@ -1304,7 +1304,7 @@ public class E2eController {
 
     public record UsuarioEmailFixtureRequest(
             String usuarioTitulo,
-            String email
+            @Nullable String email
     ) {
     }
 

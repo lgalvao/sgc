@@ -1,6 +1,7 @@
 package sgc.processo;
 
 import org.springframework.stereotype.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.model.*;
 import sgc.processo.dto.*;
 import sgc.processo.dto.ProcessoDetalheDto.*;
@@ -28,7 +29,7 @@ public class ProcessoDtoMapper {
     public ProcessoDetalheDto criarDetalheBase(
             Processo processo,
             boolean podeFinalizar,
-            String mensagemFinalizacao,
+            @Nullable String mensagemFinalizacao,
             boolean podeHomologarCadastro,
             boolean podeHomologarMapa,
             boolean podeAceitarCadastroBloco,
@@ -132,7 +133,7 @@ public class ProcessoDtoMapper {
             String nome,
             String sigla,
             Long codUnidade,
-            Long codUnidadeSuperior
+            @Nullable Long codUnidadeSuperior
     ) {
         return UnidadeParticipanteDto.builder()
                 .nome(nome)

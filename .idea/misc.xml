@@ -5130,6 +5130,7 @@
     <pattern value="sgc.diagnostico.dto.ValidarDiagnosticosEmBlocoRequest" />
     <pattern value="sgc.diagnostico.dto.ValidarDiagnosticosEmBlocoRequest" method="ValidarDiagnosticosEmBlocoRequest" />
     <pattern value="sgc.subprocesso.dto.RegistrarWorkflowAnaliseCommand" method="RegistrarWorkflowAnaliseCommand" />
+    <pattern value="sgc.e2e.E2eController.UsuarioEmailFixtureRequest" method="UsuarioEmailFixtureRequest" />
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">

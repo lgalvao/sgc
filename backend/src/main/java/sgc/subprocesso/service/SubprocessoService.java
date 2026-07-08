@@ -214,7 +214,7 @@ public class SubprocessoService {
 
     @SuppressWarnings("unused")
     private Long obterCodigoMapaVigenteObrigatorio(UnidadeMapa unidadeMapa, Unidade ignorado) {
-        return unidadeMapa.getMapaVigente().getCodigo();
+        return Objects.requireNonNull(unidadeMapa.getMapaVigente(), "UnidadeMapa sem mapa vigente").getCodigo();
     }
 
     private Movimentacao criarMovimentacaoInicial(Subprocesso subprocesso, Unidade unidadeOrigem, Usuario usuario, String descricao) {

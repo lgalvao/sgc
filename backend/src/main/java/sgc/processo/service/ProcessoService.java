@@ -527,7 +527,9 @@ public class ProcessoService {
     private void validarFinalizacao(Long codProcesso, Processo processo) {
         if (processo.getSituacao() != EM_ANDAMENTO) throw new ErroValidacao(Mensagens.SITUACAO_INVALIDA);
         ResultadoValidacao resultado = validacaoService.validarSubprocessosParaFinalizacao(codProcesso, processo.getTipo());
-        if (!resultado.valido()) throw new ErroValidacao(resultado.mensagem());
+        if (!resultado.valido()) {
+            throw new ErroValidacao(Objects.requireNonNull(resultado.mensagem(), "Mensagem obrigatória para validação inválida"));
+        }
     }
 
     private void tornarMapasVigentes(Long codProcesso) {
@@ -604,7 +606,10 @@ public class ProcessoService {
 
     private Map<Long, UnidadeMapa> mapearMapasPorUnidade(List<UnidadeMapa> unidadesMapas) {
         return unidadesMapas.stream()
-                .collect(Collectors.toMap(UnidadeMapa::getUnidadeCodigoPersistido, mapa -> mapa));
+                .collect(Collectors.toMap(
+                        mapa -> Objects.requireNonNull(mapa.getUnidadeCodigoPersistido(), "UnidadeMapa sem unidadeCodigo"),
+                        mapa -> mapa
+                ));
     }
 
     private Map<Long, Unidade> mapearUnidadesPorCodigo(Collection<Unidade> unidades) {
@@ -1335,7 +1340,7 @@ public class ProcessoService {
     }
 
     private boolean isUnidadeAdmin(Unidade unidadeDestino) {
-        return unidadeDestino != null && SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
+        return SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
     }
 
     private String chaveInicioProcesso(Processo processo, Unidade unidadeDestino, boolean participante) {
@@ -1612,7 +1617,8 @@ public class ProcessoService {
                 case DIAGNOSTICO -> HOMOLOGAR_DIAGNOSTICO;
                 case MAPEAMENTO, REVISAO -> HOMOLOGAR_MAPA;
             };
-            case DISPONIBILIZAR -> null;
+            case DISPONIBILIZAR ->
+                    throw new ErroInconsistenciaInterna("Ação DISPONIBILIZAR não deve ser convertida em ação de bloco");
         };
     }
 
@@ -1654,7 +1660,7 @@ public class ProcessoService {
                 .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
 
         servidoresPorUnidade.forEach((codigoUnidade, usuarios) -> usuarios.stream()
-                .filter(usuario -> usuario.getEmail() == null || usuario.getEmail().isBlank())
+                .filter(usuario -> usuario.getEmail().isBlank())
                 .findFirst()
                 .ifPresent(usuario -> {
                     Unidade unidade = Objects.requireNonNull(

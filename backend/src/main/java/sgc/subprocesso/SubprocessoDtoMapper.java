@@ -42,7 +42,7 @@ public class SubprocessoDtoMapper {
                 .codMapa(subprocesso.getCodMapa())
                 .processoDescricao(processo.getDescricao())
                 .dataCriacaoProcesso(processo.getDataCriacao())
-                .tipoProcesso(processo.getTipo() != null ? processo.getTipo().name() : null)
+                .tipoProcesso(Objects.requireNonNull(processo.getTipo(), "Processo sem tipo").name())
                 .isEmAndamento(subprocesso.isEmAndamento())
                 .etapaAtual(subprocesso.getEtapaAtual())
                 .build();
@@ -106,13 +106,6 @@ public class SubprocessoDtoMapper {
 
     private LocalDateTime calcularUltimaDataLimite(LocalDateTime dataLimiteEtapa1,
                                                    @Nullable LocalDateTime dataLimiteEtapa2) {
-
-        if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
-            return null;
-        }
-        if (dataLimiteEtapa1 == null) {
-            return dataLimiteEtapa2;
-        }
         if (dataLimiteEtapa2 == null) {
             return dataLimiteEtapa1;
         }

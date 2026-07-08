@@ -88,10 +88,6 @@ public class ValidadorDadosOrganizacionais {
         );
     }
 
-    private String construirResumo(int quantidadeTiposViolacao, int quantidadeOcorrencias) {
-        return "Foram encontradas inconsistências nos dados organizacionais.";
-    }
-
     private String construirResumo(Map<String, List<String>> violacoesPorTipo) {
         List<String> unidadesSemResponsavel = violacoesPorTipo
                 .getOrDefault("Unidade sem responsável", List.of())
@@ -105,13 +101,7 @@ public class ValidadorDadosOrganizacionais {
                 .distinct()
                 .toList();
 
-        if (!unidadesSemResponsavel.isEmpty() && violacoesPorTipo.size() == 1) {
-            return "Foram encontradas inconsistências nos dados organizacionais.";
-        }
-
-        return construirResumo(violacoesPorTipo.size(), violacoesPorTipo.values().stream()
-                .mapToInt(List::size)
-                .sum());
+        return "Foram encontradas inconsistências nos dados organizacionais.";
     }
 
     @Nullable
@@ -184,14 +174,14 @@ public class ValidadorDadosOrganizacionais {
 
         if (codigos.isEmpty()) return new ResultadoCargaPerfis(Map.of(), List.of());
 
-        List<Map<String, Object>> result = namedParameterJdbcTemplate.queryForList("""
+        List<Map<String, @Nullable Object>> result = namedParameterJdbcTemplate.queryForList("""
                 SELECT usuario_titulo, perfil, unidade_codigo
                 FROM sgc.vw_usuario_perfil_unidade
                 WHERE unidade_codigo IN (:codigos)
                    OR unidade_codigo IS NULL
                 """, Map.of("codigos", codigos));
 
-        List<Map<String, Object>> linhas = new ArrayList<>(result);
+        List<Map<String, @Nullable Object>> linhas = new ArrayList<>(result);
 
         List<PerfilInvalido> perfisInvalidos = new ArrayList<>();
         Map<Long, Set<PerfilUsuarioUnidade>> perfisPorUnidade = new LinkedHashMap<>();
@@ -224,7 +214,7 @@ public class ValidadorDadosOrganizacionais {
         if (codigos.isEmpty()) return Map.of();
 
         return cacheViewsOrganizacaoService.listarTodosUsuarios().stream()
-                .filter(usuario -> usuario.unidadeCodigo() != null && codigos.contains(usuario.unidadeCodigo()))
+                .filter(usuario -> codigos.contains(usuario.unidadeCodigo()))
                 .collect(groupingBy(
                         UsuarioConsultaLeitura::unidadeCodigo,
                         LinkedHashMap::new,
@@ -233,14 +223,14 @@ public class ValidadorDadosOrganizacionais {
     }
 
     private Set<String> diagnosticarTitulosDuplicados(List<String> titulos) {
-        List<Map<String, Object>> result = namedParameterJdbcTemplate.queryForList("""
+        List<Map<String, @Nullable Object>> result = namedParameterJdbcTemplate.queryForList("""
                 SELECT titulo, COUNT(*) AS quantidade
                 FROM sgc.VW_USUARIO
                 WHERE titulo IN (:titulos)
                 GROUP BY titulo
                 HAVING COUNT(*) > 1
                 """, Map.of("titulos", titulos));
-        List<Map<String, Object>> linhas = new ArrayList<>(result);
+        List<Map<String, @Nullable Object>> linhas = new ArrayList<>(result);
 
         Set<String> titulosDuplicados = new TreeSet<>();
         for (Map<String, Object> linha : linhas) {
@@ -253,7 +243,7 @@ public class ValidadorDadosOrganizacionais {
     }
 
     @Nullable
-    private String lerString(Map<String, Object> linha, String coluna) {
+    private String lerString(Map<String, @Nullable Object> linha, String coluna) {
         Object valor = linha.get(coluna);
         if (valor == null) {
             valor = linha.get(coluna.toUpperCase(Locale.ROOT));
@@ -262,7 +252,7 @@ public class ValidadorDadosOrganizacionais {
     }
 
     @Nullable
-    private Long lerLong(Map<String, Object> linha) {
+    private Long lerLong(Map<String, @Nullable Object> linha) {
         Object valor = linha.get("unidade_codigo");
         if (valor == null) {
             valor = linha.get("unidade_codigo".toUpperCase(Locale.ROOT));
@@ -421,7 +411,7 @@ public class ValidadorDadosOrganizacionais {
         violacoesPorTipo.computeIfAbsent(tipo, chave -> new ArrayList<>()).add(detalhe);
     }
 
-    private void processarLinhaPerfil(Map<String, Object> linha, ContextoCargaPerfis contexto) {
+    private void processarLinhaPerfil(Map<String, @Nullable Object> linha, ContextoCargaPerfis contexto) {
         String titulo = lerString(linha, "usuario_titulo");
         String perfilBruto = lerString(linha, "perfil");
         Long unidadeCodigo = lerLong(linha);

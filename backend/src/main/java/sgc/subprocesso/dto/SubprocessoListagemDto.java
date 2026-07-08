@@ -17,10 +17,10 @@ public record SubprocessoListagemDto(
         @Nullable LocalDateTime dataFimEtapa2,
         Long codProcesso,
         Long codUnidade,
-        Long codMapa,
+        @Nullable Long codMapa,
         String processoDescricao,
         LocalDateTime dataCriacaoProcesso,
         String tipoProcesso,
         boolean isEmAndamento,
-        Integer etapaAtual) {
+        @Nullable Integer etapaAtual) {
 }
