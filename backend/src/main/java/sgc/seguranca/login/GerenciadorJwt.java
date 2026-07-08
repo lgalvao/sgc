@@ -143,7 +143,7 @@ public class GerenciadorJwt {
                 .getPayload();
     }
 
-    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo, String jti, Instant expiracao) {
+    public record JwtClaims(String tituloEleitoral, Perfil perfil, Long unidadeCodigo, String jti, @jakarta.annotation.Nullable Instant expiracao) {
     }
 
     public record JwtPreAuthClaims(String tituloEleitoral, String jti, Instant expiracao) {

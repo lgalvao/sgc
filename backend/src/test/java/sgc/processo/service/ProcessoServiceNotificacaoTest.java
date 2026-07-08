@@ -349,6 +349,7 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
 
         when(repo.buscar(Processo.class, codProcesso)).thenReturn(p);
         when(unidadeService.buscarPorCodigos(anyList())).thenReturn(List.of(unidadeInter, unidadeOper));
+        when(unidadeService.buscarPorCodigo(30L)).thenReturn(unidadeInter);
         when(unidadeHierarquiaService.buscarCodigosSuperiores(30L)).thenReturn(List.of());
         when(unidadeHierarquiaService.buscarCodigosSuperiores(31L)).thenReturn(List.of(30L));
         when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString(), any()))
@@ -474,6 +475,7 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
             }
             return List.of();
         });
+        when(unidadeService.buscarPorCodigo(30L)).thenReturn(unidadeSuperior);
         when(unidadeHierarquiaService.buscarCodigosSuperiores(31L)).thenReturn(List.of(30L));
         when(emailModelosService.criarEmailProcessoFinalizadoPorUnidade(anyString(), anyString(), any())).thenReturn("<html>direto</html>");
         when(emailModelosService.criarEmailProcessoFinalizadoUnidadesSubordinadas(eq("SUP"), eq("Processo consolidado"), eq(List.of("OPER")), eq(TipoProcesso.MAPEAMENTO)))

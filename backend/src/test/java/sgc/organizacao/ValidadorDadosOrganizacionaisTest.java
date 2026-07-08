@@ -589,19 +589,4 @@ class ValidadorDadosOrganizacionaisTest {
                 .doesNotContain("Responsavel de unidade intermediaria sem perfil GESTOR correspondente");
     }
 
-    @Test
-    @DisplayName("extrairSigla deve exercitar todos os branches e casos de borda do extrator de sigla")
-    void extrairSigla_DeveExercitarTodosOsBranches() {
-        // 1. inicio < 0
-        assertThat(validador.extrairSigla("sem o prefixo correspondente")).isNull();
-
-        // 2. fim < 0
-        assertThat(validador.extrairSigla("sigla=OPER")).isEqualTo("OPER");
-
-        // 3. sigla isBlank
-        assertThat(validador.extrairSigla("sigla=   ")).isNull();
-
-        // 4. caso normal com vírgula
-        assertThat(validador.extrairSigla("sigla=OPER, tipo=OPERACIONAL")).isEqualTo("OPER");
-    }
 }

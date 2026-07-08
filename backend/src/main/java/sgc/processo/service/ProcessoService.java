@@ -1340,7 +1340,7 @@ public class ProcessoService {
     }
 
     private boolean isUnidadeAdmin(Unidade unidadeDestino) {
-        return SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
+        return unidadeDestino != null && SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
     }
 
     private String chaveInicioProcesso(Processo processo, Unidade unidadeDestino, boolean participante) {
@@ -1660,7 +1660,7 @@ public class ProcessoService {
                 .collect(Collectors.toMap(Unidade::getCodigo, unidade -> unidade));
 
         servidoresPorUnidade.forEach((codigoUnidade, usuarios) -> usuarios.stream()
-                .filter(usuario -> usuario.getEmail().isBlank())
+                .filter(usuario -> usuario.getEmail() == null || usuario.getEmail().isBlank())
                 .findFirst()
                 .ifPresent(usuario -> {
                     Unidade unidade = Objects.requireNonNull(

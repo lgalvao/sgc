@@ -40,6 +40,7 @@ class SubprocessoVisualizacaoServiceTest {
         Processo processo = new Processo();
         processo.setCodigo(1L);
         processo.setDescricao("Processo");
+        processo.setTipo(TipoProcesso.MAPEAMENTO);
 
         subprocesso = new Subprocesso();
         subprocesso.setCodigo(100L);

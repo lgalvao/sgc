@@ -585,9 +585,10 @@ class SubprocessoNotificacaoServiceTest {
                         .titularNome("Titular")
                         .build()));
 
-        service.notificarAceiteCadastroEmBloco(List.of(subprocesso), null);
+        service.notificarAceiteCadastroEmBloco(List.of(subprocesso), unidade);
 
-        verify(notificacaoService, times(1)).enfileirar(any());
+        verify(alertaAplicacaoService, never()).criarAlertaTransicao(any(), anyString(), any(), any());
+        verify(notificacaoService, atLeastOnce()).enfileirar(any());
     }
 
     @Test

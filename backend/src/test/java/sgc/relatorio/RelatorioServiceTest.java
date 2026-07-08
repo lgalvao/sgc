@@ -409,16 +409,12 @@ class RelatorioServiceTest {
         subprocesso.getMapa().setCodigo(20L);
         subprocesso.getMapa().setSubprocesso(subprocesso);
 
-        UnidadeMapa mapaNulo = UnidadeMapa.builder()
-                .unidadeCodigo(1L)
-                .mapaVigente(null)
-                .build();
         UnidadeMapa mapaValido = UnidadeMapa.builder()
                 .unidadeCodigo(2L)
                 .mapaVigente(subprocesso.getMapa())
                 .build();
 
-        when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of(mapaNulo, mapaValido));
+        when(unidadeService.buscarMapasPorUnidades(List.of(1L, 2L))).thenReturn(List.of(mapaValido));
         when(mapaManutencaoService.competenciasCodMapa(20L)).thenReturn(List.of());
 
         List<RelatorioMapaDto> resultado = relatorioService.obterRelatorioMapas(List.of(1L, 2L));

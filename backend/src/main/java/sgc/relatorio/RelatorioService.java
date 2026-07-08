@@ -354,7 +354,9 @@ public class RelatorioService {
         Set<Long> codigosNormalizados = validarEscopoRelatorioMapas(codigosUnidades);
 
         return unidadeService.buscarMapasPorUnidades(new ArrayList<>(codigosNormalizados)).stream()
+                .filter(unidadeMapa -> unidadeMapa.getMapaVigente() != null)
                 .map(UnidadeMapa::getMapaVigente)
+                .filter(mapa -> mapa.getSubprocesso() != null)
                 .map(Mapa::getSubprocesso)
                 .toList();
     }
