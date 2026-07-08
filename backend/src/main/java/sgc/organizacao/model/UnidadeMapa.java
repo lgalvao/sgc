@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
 import org.jspecify.annotations.*;
-import sgc.comum.erros.*;
 import sgc.mapa.model.*;
 
 @Entity
@@ -13,7 +12,6 @@ import sgc.mapa.model.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
 public class UnidadeMapa {
     @Id
     @Column(name = "unidade_codigo", nullable = false)
@@ -23,10 +21,7 @@ public class UnidadeMapa {
     @JoinColumn(name = "mapa_vigente_codigo", nullable = false)
     private @Nullable Mapa mapaVigente;
 
-    public Long getUnidadeCodigoPersistido() {
-        if (unidadeCodigo == null) {
-            throw new ErroInconsistenciaInterna("UnidadeMapa sem unidadeCodigo persistido");
-        }
+    public @Nullable Long getUnidadeCodigoPersistido() {
         return unidadeCodigo;
     }
 }

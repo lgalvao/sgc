@@ -34,7 +34,7 @@ public class ProcessoExclusaoCompletaService {
 
         jdbcTemplate.update("""
                 DELETE FROM sgc.notificacao_email
-                WHERE subprocesso_codigo IN """ + SUBQUERY_SUBPROCESSOS +
+                WHERE subprocesso_codigo IN""" + SUBQUERY_SUBPROCESSOS +
                 " OR processo_codigo = ?", codigo, codigo);
 
         jdbcTemplate.update("""

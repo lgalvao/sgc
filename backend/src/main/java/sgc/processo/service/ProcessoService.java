@@ -48,7 +48,6 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Transactional
 public class ProcessoService {
     private static final String SIGLA_UNIDADE_ADMIN = "ADMIN";
-    private static final String SIGLA_UNIDADE_SEDOC = "SEDOC";
 
     private final ProcessoRepo processoRepo;
     private final ComumRepo repo;
@@ -1329,27 +1328,10 @@ public class ProcessoService {
                 .corpoHtml(corpoHtml)
                 .chaveIdempotencia(chaveIdempotencia)
                 .build());
-
-        Optional<String> destinatarioCopia = emailCopiaAdmin(unidadeDestino);
-        destinatarioCopia.ifPresent(s -> notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
-                .subprocesso(subprocesso)
-                .processo(processo)
-                .tipoNotificacao(tipoNotificacao)
-                .unidadeDestinoSigla(unidadeDestino.getSigla())
-                .unidadeOrigemSigla(unidadeOrigemSigla)
-                .destinatario(s)
-                .assunto(assunto)
-                .corpoHtml(corpoHtml)
-                .chaveIdempotencia(chaveIdempotencia + ":copia-admin")
-                .build()));
     }
 
     private String emailDestinoPrincipal(Unidade unidadeDestino) {
         return emailUnidade(unidadeDestino);
-    }
-
-    private Optional<String> emailCopiaAdmin(Unidade unidadeDestino) {
-        return Optional.empty();
     }
 
     private boolean isUnidadeAdmin(Unidade unidadeDestino) {

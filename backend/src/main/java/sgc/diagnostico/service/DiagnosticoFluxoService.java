@@ -249,13 +249,13 @@ public class DiagnosticoFluxoService {
 
         for (Subprocesso subprocesso : subprocessos) {
             Unidade[] contexto = validarDiagnosticoEmBloco(subprocesso, usuario);
-            if (unidadeAnalise == null && unidadeSuperior == null) {
+            if (unidadeAnalise == null) {
                 unidadeAnalise = contexto[0];
                 unidadeSuperior = contexto[1];
             }
         }
 
-        if (!subprocessos.isEmpty() && unidadeAnalise != null && unidadeSuperior != null) {
+        if (!subprocessos.isEmpty()) {
             notificacaoService.notificarDiagnosticosAceitosEmBloco(subprocessos, unidadeAnalise, unidadeSuperior);
             notificacaoService.criarAlertaDiagnosticosAceitosEmBloco(
                     subprocessos.getFirst().getProcesso(),

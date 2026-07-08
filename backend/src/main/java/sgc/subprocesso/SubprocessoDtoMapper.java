@@ -1,5 +1,6 @@
 package sgc.subprocesso;
 
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import sgc.comum.erros.*;
 import sgc.mapa.dto.*;
@@ -11,7 +12,6 @@ import sgc.subprocesso.model.*;
 
 import java.time.*;
 import java.util.*;
-import java.util.Objects;
 
 @Component
 public class SubprocessoDtoMapper {
@@ -104,7 +104,9 @@ public class SubprocessoDtoMapper {
                 .build();
     }
 
-    private LocalDateTime calcularUltimaDataLimite(LocalDateTime dataLimiteEtapa1, LocalDateTime dataLimiteEtapa2) {
+    private LocalDateTime calcularUltimaDataLimite(LocalDateTime dataLimiteEtapa1,
+                                                   @Nullable LocalDateTime dataLimiteEtapa2) {
+
         if (dataLimiteEtapa1 == null && dataLimiteEtapa2 == null) {
             return null;
         }

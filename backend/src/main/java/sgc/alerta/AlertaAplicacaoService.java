@@ -232,7 +232,7 @@ public class AlertaAplicacaoService {
     }
 
     private boolean isUnidadeAdmin(Unidade unidade) {
-        return unidade != null && SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidade.getSigla());
+        return SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidade.getSigla());
     }
 
     @Transactional

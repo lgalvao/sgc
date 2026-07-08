@@ -1,6 +1,7 @@
 package sgc.subprocesso.dto;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import sgc.organizacao.dto.*;
 
 import java.time.*;
@@ -11,9 +12,9 @@ public record SubprocessoListagemDto(
         UnidadeResumoDto unidade,
         String situacao,
         LocalDateTime dataLimiteEtapa1,
-        LocalDateTime dataFimEtapa1,
-        LocalDateTime dataLimiteEtapa2,
-        LocalDateTime dataFimEtapa2,
+        @Nullable LocalDateTime dataFimEtapa1,
+        @Nullable LocalDateTime dataLimiteEtapa2,
+        @Nullable LocalDateTime dataFimEtapa2,
         Long codProcesso,
         Long codUnidade,
         Long codMapa,

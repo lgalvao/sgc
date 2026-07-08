@@ -1,6 +1,7 @@
 package sgc.alerta;
 
 import lombok.*;
+import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.thymeleaf.context.*;
 import org.thymeleaf.spring6.*;
@@ -167,7 +168,12 @@ public class EmailModelosService {
         return templateEngine.process("diagnostico-concluido", ctx);
     }
 
-    public String criarEmailDiagnosticoDevolvido(String siglaUnidadeDestino, String siglaUnidadeOrigem, String nomeProcesso, String observacoes) {
+    public String criarEmailDiagnosticoDevolvido(
+            String siglaUnidadeDestino,
+            String siglaUnidadeOrigem,
+            String nomeProcesso,
+            @Nullable String observacoes) {
+
         Context ctx = new Context();
         ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoDevolvido(siglaUnidadeOrigem));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);

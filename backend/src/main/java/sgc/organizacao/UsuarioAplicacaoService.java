@@ -54,12 +54,6 @@ public class UsuarioAplicacaoService {
     }
 
     @Transactional(readOnly = true)
-    public Usuario buscarUsuarioComUnidadeLotacao(String titulo) {
-        return usuarioService.buscarOptComUnidadeLotacao(titulo)
-                .orElseThrow(() -> new ErroEntidadeNaoEncontrada(Usuario.class.getSimpleName(), titulo));
-    }
-
-    @Transactional(readOnly = true)
     public @Nullable Usuario carregarUsuarioSemAtribuicoesParaAutenticacao(String titulo) {
         return usuarioService.buscarOpt(titulo).orElse(null);
     }
