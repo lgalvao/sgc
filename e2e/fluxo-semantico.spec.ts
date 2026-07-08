@@ -457,7 +457,8 @@ test.describe.serial('Jornada geral semântica - mapeamento e revisão ponta a p
             tipo: 'MAPEAMENTO',
             unidade: SIGLA_SECAO,
             expandir: [SIGLA_SECRETARIA, SIGLA_COORDENADORIA],
-            iniciar: true
+            iniciar: true,
+            unidadesComEquipePropriaParticipantes: []
         });
         await aguardarProcessoNoPainel(page, {
             descricao: descProcesso,

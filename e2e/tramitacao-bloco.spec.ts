@@ -95,7 +95,10 @@ test.describe.serial('Tramitação ponta a ponta em bloco', () => {
                 destinatario: 'ADMIN',
                 assunto: 'Cadastros de atividades e conhecimentos submetidos para análise',
                 tipo: 'Cadastro aceito',
-                trechoCorpo: `Os cadastros de atividades e conhecimentos das unidades ${siglaUnidade} no processo ${descricaoProcesso} foram submetidos para análise por essa unidade.`
+                trechoCorpo: new RegExp(
+                    `Os cadastros de atividades e conhecimentos das unidades\\s*<strong>\\s*${siglaUnidade}\\s*</strong>\\s*no processo\\s*<strong>\\s*${descricaoProcesso}\\s*</strong>\\s*foram submetidos para análise por essa\\s*unidade\\.`,
+                    'i'
+                )
             });
             await page.getByTestId('nav-link-painel').click();
             await verificarAlertaPainel(page, new RegExp(`Cadastro da unidade ${siglaUnidade} submetido para análise`, 'i'));

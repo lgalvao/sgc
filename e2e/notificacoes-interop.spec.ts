@@ -26,14 +26,20 @@ test.describe('Regressão - notificações de início para unidade interoperacio
             destinatario: 'ASSESSORIA_21',
             assunto: /^Início de processo de mapeamento de competências$/i,
             tipo: 'Início do processo',
-            trechoCorpo: new RegExp(`Comunicamos o início do processo\\s+${descricao}\\s+para a sua unidade`, 'i')
+            trechoCorpo: new RegExp(
+                `Comunicamos o início do processo\\s*<strong>\\s*${descricao}\\s*</strong>\\s*para a sua unidade`,
+                'i'
+            )
         });
 
         await verificarNotificacaoAdmin(page, {
             destinatario: 'SECRETARIA_2',
             assunto: /^Início de processo de mapeamento de competências$/i,
             tipo: 'Início do processo',
-            trechoCorpo: new RegExp(`Comunicamos o início do processo\\s+${descricao}\\s+para a sua unidade`, 'i')
+            trechoCorpo: new RegExp(
+                `Comunicamos o início do processo\\s*<strong>\\s*${descricao}\\s*</strong>\\s*para a sua unidade`,
+                'i'
+            )
         });
 
         await verificarNotificacaoAdmin(page, {
