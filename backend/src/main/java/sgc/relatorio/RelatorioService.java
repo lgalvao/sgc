@@ -355,7 +355,7 @@ public class RelatorioService {
 
         return unidadeService.buscarMapasPorUnidades(new ArrayList<>(codigosNormalizados)).stream()
                 .map(UnidadeMapa::getMapaVigente)
-                .filter(Objects::nonNull)
+                .filter(obj -> true)
                 .map(Mapa::getSubprocesso)
                 .toList();
     }

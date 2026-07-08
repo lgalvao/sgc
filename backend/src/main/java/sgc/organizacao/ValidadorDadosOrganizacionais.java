@@ -31,6 +31,7 @@ import static sgc.organizacao.model.TipoUnidade.*;
 @RequiredArgsConstructor
 @Slf4j
 public class ValidadorDadosOrganizacionais {
+    private static final String RESUMO_INCONSISTENCIAS = "Foram encontradas inconsistências nos dados organizacionais.";
     private static final Set<TipoUnidade> TIPOS_PARTICIPANTES = Set.of(OPERACIONAL, INTERMEDIARIA, INTEROPERACIONAL);
     private final UsuarioRepo usuarioRepo;
     private final CacheViewsOrganizacaoService cacheViewsOrganizacaoService;
@@ -78,43 +79,13 @@ public class ValidadorDadosOrganizacionais {
                 ))
                 .toList();
 
-        String resumo = construirResumo(violacoesPorTipo);
         return new DiagnosticoOrganizacionalDto(
                 true,
-                resumo,
+                RESUMO_INCONSISTENCIAS,
                 violacoesPorTipo.size(),
                 quantidadeOcorrencias,
                 grupos
         );
-    }
-
-    private String construirResumo(Map<String, List<String>> violacoesPorTipo) {
-        List<String> unidadesSemResponsavel = violacoesPorTipo
-                .getOrDefault("Unidade sem responsável", List.of())
-                .stream()
-                .<String>mapMulti((detalhe, consumer) -> {
-                    String sigla = extrairSigla(detalhe);
-                    if (sigla != null) {
-                        consumer.accept(sigla);
-                    }
-                })
-                .distinct()
-                .toList();
-
-        return "Foram encontradas inconsistências nos dados organizacionais.";
-    }
-
-    @Nullable
-    String extrairSigla(String detalhe) {
-        String prefixo = "sigla=";
-        int inicio = detalhe.indexOf(prefixo);
-        if (inicio < 0) return null;
-
-        int fim = detalhe.indexOf(",", inicio);
-        if (fim < 0) fim = detalhe.length();
-
-        String sigla = detalhe.substring(inicio + prefixo.length(), fim).trim();
-        return sigla.isBlank() ? null : sigla;
     }
 
     private List<UnidadeHierarquiaLeitura> carregarUnidadesParticipantes() {

@@ -73,7 +73,9 @@ public class GerenciadorJwt {
             String perfilStr = claims.get("perfil", String.class);
             Long unidadeCodigo = claims.get("unidade", Long.class);
             String jti = claims.getId();
-            Date expiracao = claims.getExpiration();
+            Instant expiracao = Optional.ofNullable(claims.getExpiration())
+                    .map(Date::toInstant)
+                    .orElse(null);
 
             @SuppressWarnings("ConstantConditions")
             boolean incompleto = tituloEleitoral == null || perfilStr == null || unidadeCodigo == null || jti == null || expiracao == null;
@@ -83,7 +85,7 @@ public class GerenciadorJwt {
             }
 
             Perfil perfil = Perfil.valueOf(perfilStr);
-            return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo, jti, expiracao.toInstant()));
+            return Optional.of(new JwtClaims(tituloEleitoral, perfil, unidadeCodigo, jti, expiracao));
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Falha na validação do JWT: {}", e.getMessage());
             return Optional.empty();
@@ -118,13 +120,15 @@ public class GerenciadorJwt {
 
             String tituloEleitoral = claims.getSubject();
             String jti = claims.getId();
-            Date expiracao = claims.getExpiration();
+            Instant expiracao = Optional.ofNullable(claims.getExpiration())
+                    .map(Date::toInstant)
+                    .orElse(null);
             if (tituloEleitoral == null || jti == null || expiracao == null) {
                 log.warn("Token pré-auth com claims obrigatórios ausentes");
                 return Optional.empty();
             }
 
-            return Optional.of(new JwtPreAuthClaims(tituloEleitoral, jti, expiracao.toInstant()));
+            return Optional.of(new JwtPreAuthClaims(tituloEleitoral, jti, expiracao));
         } catch (JwtException | IllegalArgumentException e) {
             log.warn("Falha na validação do token pré-auth: {}", e.getMessage());
             return Optional.empty();

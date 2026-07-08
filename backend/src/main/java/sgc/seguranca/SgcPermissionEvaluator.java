@@ -57,6 +57,9 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
         if (alvo instanceof Collection<?> colecao) {
             return colecao.stream().allMatch(item -> hasPermission(authentication, item, permissao));
         }
+        if (alvo == null) {
+            return false;
+        }
 
         AcaoPermissao acao = resolverAcao((String) permissao);
         return switch (alvo) {

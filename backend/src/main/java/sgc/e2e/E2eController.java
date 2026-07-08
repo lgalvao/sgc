@@ -1152,11 +1152,11 @@ public class E2eController {
         Unidade admin = unidadeService.buscarAdmin();
         String tituloTitular = Optional.ofNullable(unidadeSuperior.getTituloTitular())
                 .orElseThrow(() -> new IllegalStateException("Unidade superior da fixture sem titular"));
-        Usuario usuarioGestor = usuarioRepo.findById(tituloTitular)
+        Usuario usuarioGestor = Objects.requireNonNull(usuarioRepo, "UsuarioRepo indisponível para fixture").findById(tituloTitular)
                 .orElseThrow(() -> new IllegalStateException("Titular da unidade superior da fixture não encontrado"));
         Subprocesso subprocesso = subprocessoRepo.findById(codSubprocesso).orElseThrow();
 
-        analiseRepo.saveAndFlush(Analise.builder()
+        Objects.requireNonNull(analiseRepo, "AnaliseRepo indisponível para fixture").saveAndFlush(Analise.builder()
                 .tipo(TipoAnalise.DIAGNOSTICO)
                 .subprocesso(subprocesso)
                 .acao(TipoAcaoAnalise.ACEITE_DIAGNOSTICO)
@@ -1165,7 +1165,7 @@ public class E2eController {
                 .usuarioTitulo(usuarioGestor.getTituloEleitoral())
                 .build());
 
-        movimentacaoRepo.saveAndFlush(Movimentacao.builder()
+        Objects.requireNonNull(movimentacaoRepo, "MovimentacaoRepo indisponível para fixture").saveAndFlush(Movimentacao.builder()
                 .subprocesso(subprocesso)
                 .unidadeOrigem(unidadeSuperior)
                 .unidadeDestino(admin)
@@ -1310,7 +1310,7 @@ public class E2eController {
 
     public record UsuarioEmailFixtureResponse(
             String usuarioTitulo,
-            String email
+            @Nullable String email
     ) {
     }
 
