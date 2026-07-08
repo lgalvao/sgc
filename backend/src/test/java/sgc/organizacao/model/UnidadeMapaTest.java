@@ -15,14 +15,4 @@ class UnidadeMapaTest {
 
         assertThat(unidadeMapa.getUnidadeCodigoPersistido()).isEqualTo(8L);
     }
-
-    @Test
-    @DisplayName("deve falhar quando codigo persistido estiver ausente")
-    void deveFalharQuandoCodigoPersistidoEstiverAusente() {
-        UnidadeMapa unidadeMapa = new UnidadeMapa();
-
-        assertThatThrownBy(unidadeMapa::getUnidadeCodigoPersistido)
-                .isInstanceOf(sgc.comum.erros.ErroInconsistenciaInterna.class)
-                .hasMessage("UnidadeMapa sem unidadeCodigo persistido");
-    }
 }

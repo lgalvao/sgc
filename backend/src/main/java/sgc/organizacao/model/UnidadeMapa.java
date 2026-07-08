@@ -3,7 +3,6 @@ package sgc.organizacao.model;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.*;
-import sgc.comum.erros.ErroInconsistenciaInterna;
 import sgc.mapa.model.*;
 
 @Entity
@@ -23,9 +22,6 @@ public class UnidadeMapa {
     private Mapa mapaVigente;
 
     public Long getUnidadeCodigoPersistido() {
-        if (unidadeCodigo == null) {
-            throw new ErroInconsistenciaInterna("UnidadeMapa sem unidadeCodigo persistido");
-        }
         return unidadeCodigo;
     }
 }

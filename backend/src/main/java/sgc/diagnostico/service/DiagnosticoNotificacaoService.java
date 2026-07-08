@@ -70,7 +70,7 @@ public class DiagnosticoNotificacaoService {
 
     public void notificarConsensoDisponivel(Subprocesso sp, String servidorTitulo) {
         Optional<Usuario> servidorOpt = usuarioService.buscarOpt(servidorTitulo);
-        if (servidorOpt.isEmpty() || servidorOpt.get().getEmail().isBlank()) {
+        if (servidorOpt.isEmpty() || servidorOpt.get().getEmail() == null) {
             log.warn("Servidor {} sem email para notificação de consenso disponível.", servidorTitulo);
             return;
         }
@@ -303,7 +303,7 @@ public class DiagnosticoNotificacaoService {
             String substitutoTitulo = responsavel.substitutoTitulo();
             if (substitutoTitulo != null && !substitutoTitulo.isBlank()) {
                 Usuario usuario = usuarioService.buscarOpt(substitutoTitulo).orElse(null);
-                if (usuario != null && !usuario.getEmail().isBlank()) {
+                if (usuario != null && usuario.getEmail() != null) {
                     return new DestinatarioNotificacao(usuario.getEmail(), usuario.getTituloEleitoral(), usuario.getNome());
                 }
             }
