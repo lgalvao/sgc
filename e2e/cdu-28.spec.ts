@@ -210,8 +210,13 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
             await page.getByTestId('input-data-inicio').fill(dataInicio);
             await page.getByTestId('input-data-termino').fill(dataTermino);
             await page.getByTestId('textarea-justificativa').fill('Cobertura temporária sem e-mail');
+            const respostaCriacaoPromise = page.waitForResponse(response =>
+                /\/api\/unidades\/\d+\/atribuicoes-temporarias$/.test(response.url())
+                && response.request().method() === 'POST'
+            );
             await page.getByTestId('cad-atribuicao__btn-salvar-atribuicao').click();
-
+            const respostaCriacao = await respostaCriacaoPromise;
+            expect(respostaCriacao.status()).toBe(422);
             await expect(page.getByText('Usuário(a) não tem e-mail cadastrado e não pode receber uma atribuição temporária.')).toBeVisible();
             await expect(page).toHaveURL(/\/unidade\/\d+\/atribuicao(?:\?.*)?$/);
         } finally {
@@ -247,7 +252,10 @@ test.describe.serial('CDU-28 - Manter atribuição temporária', () => {
             destinatario: EMAIL_USUARIO_ALVO,
             assunto: `Atribuição de perfil CHEFE na unidade ${SIGLA_UNIDADE}`,
             tipo: 'Atribuição temporária',
-            trechoCorpo: `Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade ${SIGLA_UNIDADE}.`
+            trechoCorpo: new RegExp(
+                `Foi registrada uma atribuição temporária de perfil de CHEFE para você na unidade\\s*<strong>\\s*${SIGLA_UNIDADE}\\s*</strong>\\.`,
+                'i'
+            )
         });
         await page.getByTestId('nav-link-painel').click();
         await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);

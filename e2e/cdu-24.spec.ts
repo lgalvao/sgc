@@ -132,7 +132,10 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
             destinatario: UNIDADE_1,
             assunto: 'Mapa de competências disponibilizado',
             tipo: 'Mapa disponibilizado',
-            trechoCorpo: `O mapa de competências de sua unidade foi disponibilizado no contexto do processo ${descProcesso}.`
+            trechoCorpo: new RegExp(
+                `O mapa de competências de sua unidade foi disponibilizado no contexto do processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
+                'i'
+            )
         });
         await verificarNotificacaoAdmin(page, {
             destinatario: 'COORD_22',

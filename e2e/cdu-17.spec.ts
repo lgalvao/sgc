@@ -111,7 +111,7 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
             assunto: `Mapa de competências disponibilizado - ${UNIDADE_ALVO}`,
             tipo: 'Mapa disponibilizado',
             trechoCorpo: new RegExp(
-                `O mapa de competências da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*foi disponibilizado no contexto do processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
+                `O mapa de competências da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*foi disponibilizado no\\s*contexto do processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
                 'i'
             )
         });

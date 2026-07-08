@@ -153,7 +153,10 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
             destinatario: UNIDADE_1,
             assunto: `Cadastro de atividades e conhecimentos da ${UNIDADE_1} submetido para análise`,
             tipo: 'Cadastro aceito',
-            trechoCorpo: `O cadastro de atividades e conhecimentos da sua unidade no processo ${descIsolada} foi aceito e submetido para análise pela unidade superior imediata.`
+            trechoCorpo: new RegExp(
+                `O cadastro de atividades e conhecimentos da sua unidade no processo\\s*<strong>\\s*${descIsolada}\\s*</strong>\\s*foi aceito e submetido para análise pela unidade\\s*superior imediata\\.`,
+                'i'
+            )
         });
         await verificarNotificacaoAdmin(page, {
             destinatario: 'COORD_22',
@@ -225,7 +228,10 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
             destinatario: UNIDADE_REVISAO,
             assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_REVISAO} submetido para análise`,
             tipo: 'Revisão de cadastro aceita',
-            trechoCorpo: `A revisão do cadastro de atividades e conhecimentos da sua unidade no processo ${descProcessoRevisao} foi aceita e submetida para análise pela unidade superior imediata.`
+            trechoCorpo: new RegExp(
+                `A revisão do cadastro de atividades e conhecimentos da sua unidade no processo\\s*<strong>\\s*${descProcessoRevisao}\\s*</strong>\\s*foi aceita e submetida para análise pela unidade\\s*superior imediata\\.`,
+                'i'
+            )
         });
         await verificarNotificacaoAdmin(page, {
             destinatario: 'COORD_22',

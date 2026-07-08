@@ -120,7 +120,10 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
             destinatario: UNIDADE_1,
             assunto: 'Mapa de competências homologado',
             tipo: 'Mapa homologado',
-            trechoCorpo: `O mapa de competências da sua unidade foi homologado no processo ${descProcesso}.`
+            trechoCorpo: new RegExp(
+                `O mapa de competências da sua unidade foi homologado no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
+                'i'
+            )
         });
     });
 

@@ -102,7 +102,10 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             destinatario: UNIDADE_1,
             assunto: `Validação do mapa de competências da ${UNIDADE_1} submetida para análise`,
             tipo: 'Validação do mapa aceita',
-            trechoCorpo: `A validação do mapa de competências da sua unidade no processo ${descIsolada} foi aceita e submetida para análise pela unidade superior imediata.`
+            trechoCorpo: new RegExp(
+                `A validação do mapa de competências da sua unidade no processo\\s*<strong>\\s*${descIsolada}\\s*</strong>\\s*foi aceita e submetida para análise pela unidade\\s*superior imediata\\.`,
+                'i'
+            )
         });
         await verificarNotificacaoAdmin(page, {
             destinatario: 'COORD_21',

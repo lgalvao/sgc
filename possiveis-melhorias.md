@@ -4,7 +4,7 @@
 
 ### Situação observada
 
-Quando a unidade é do tipo `INTEROPERACIONAL`, um mesmo usuário pode atuar com os perfis `CHEFE` e `GESTOR` na mesma
+Quando a unidade é **interoperacional**, um usuário pode atuar com os perfis `CHEFE` e `GESTOR` na mesma
 unidade. Hoje, ao acessar o painel com qualquer um desses perfis, ele pode ver ao mesmo tempo (por exemplo):
 
 - "Início do processo"

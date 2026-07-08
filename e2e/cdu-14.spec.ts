@@ -134,7 +134,7 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} submetido para análise`,
             tipo: 'Revisão de cadastro aceita',
             trechoCorpo: new RegExp(
-                `A revisão do cadastro de atividades e conhecimentos da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*foi submetida para análise\\.`,
+                `A revisão do cadastro de atividades e conhecimentos da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*foi submetida para análise(?: por essa unidade)?\\.`,
                 'i'
             )
         });

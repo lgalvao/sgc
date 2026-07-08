@@ -157,7 +157,10 @@ test.describe.serial('CDU-27 - Alterar data limite de subprocesso', () => {
             destinatario: UNIDADE_1,
             assunto: 'Data limite alterada',
             tipo: 'Alteração da data limite',
-            trechoCorpo: `A data limite da etapa atual no processo ${descProcesso} foi alterada para ${d}/${m}/${y}.`
+            trechoCorpo: new RegExp(
+                `A data limite da etapa atual no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*foi alterada para\\s*<strong>\\s*${d}/${m}/${y}\\s*</strong>\\.`,
+                'i'
+            )
         });
         await page.getByTestId('nav-link-painel').click();
         await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);

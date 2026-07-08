@@ -243,7 +243,10 @@ test.describe.serial('CDU-20 - Aceite de mapa com sugestões', () => {
             destinatario: UNIDADE_ALVO,
             assunto: `Validação do mapa da ${UNIDADE_ALVO} devolvida para ajustes`,
             tipo: 'Validação do mapa devolvida',
-            trechoCorpo: new RegExp(`A validação do mapa de competências da\\s+${UNIDADE_ALVO}[\\s\\S]*foi devolvida para ajustes`, 'i')
+            trechoCorpo: new RegExp(
+                `A validação do mapa de competências da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*no\\s*processo\\s*<strong>\\s*${processo.descricao}\\s*</strong>\\s*foi devolvida para ajustes\\.`,
+                'i'
+            )
         });
 
         await login(page, USUARIOS.CHEFE_ASSESSORIA_11.titulo, USUARIOS.CHEFE_ASSESSORIA_11.senha);

@@ -89,7 +89,10 @@ test.describe.serial('CDU-34 - Enviar lembrete de prazo', () => {
             destinatario: UNIDADE_1,
             assunto: `Lembrete de prazo - ${descProcesso}`,
             tipo: 'Lembrete de prazo',
-            trechoCorpo: `Este é um lembrete de que o prazo para a conclusão da etapa atual do processo ${descProcesso} encerra em ${prazo}.`
+            trechoCorpo: new RegExp(
+                `Este é um lembrete de que o prazo para a conclusão da etapa atual do processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*encerra em\\s*<strong>\\s*${prazo}\\s*</strong>\\.`,
+                'i'
+            )
         });
     });
 
