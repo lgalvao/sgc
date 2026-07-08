@@ -5,7 +5,6 @@ import {
     confirmarInicioProcessoPeloDialogo,
     criarProcesso,
     extrairProcessoCodigo,
-    iniciarProcessoPeloCadastro,
     obterAcaoBloco
 } from './helpers/helpers-processos.js';
 import {
