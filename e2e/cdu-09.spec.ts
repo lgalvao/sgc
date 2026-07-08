@@ -104,7 +104,7 @@ test.describe.serial('CDU-09 - Disponibilizar cadastro de atividades e conhecime
             destinatario: 'COORD_22',
             assunto: `Cadastro de atividades e conhecimentos disponibilizado - ${UNIDADE_ALVO}`,
             tipo: 'Cadastro disponibilizado',
-            trechoCorpo: new RegExp(`A unidade\\s+${UNIDADE_ALVO}\\s+disponibilizou o cadastro de atividades e`, 'i')
+            trechoCorpo: new RegExp(`A unidade\\s*<strong>\\s*${UNIDADE_ALVO}\\s*<\\/strong>\\s*disponibilizou o cadastro de atividades e`, 'i')
         });
     });
 

@@ -343,24 +343,18 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
 
     test('Fase 2.2d: Revisão de unidade subordinada sob secretaria interoperacional não aparece para o chefe da secretaria', async ({
                                                                                                                                         _resetAutomatico,
-                                                                                                                                        page
+                                                                                                                                        page,
+                                                                                                                                        request
                                                                                                                                     }) => {
         await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-        await criarProcesso(page, {
+        await criarProcessoFixture(request, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
             tipo: 'REVISAO',
             diasLimite: 30,
             unidade: 'ASSESSORIA_12',
-            expandir: ['SECRETARIA_1']
+            iniciar: true
         });
-
-        await acessarDetalhesProcesso(page, descProcRevisaoHierarquiaInteroperacional);
-        await page.getByTestId('btn-processo-iniciar-rodape').click();
-        await confirmarInicioProcessoPeloDialogo(page, {
-            descricao: descProcRevisaoHierarquiaInteroperacional,
-            tipo: 'REVISAO',
-            unidadesComEquipePropriaParticipantes: []
-        });
+        await page.goto('/painel');
         await verificarProcessoTabela(page, {
             descricao: descProcRevisaoHierarquiaInteroperacional,
             situacao: 'Em andamento',

@@ -18,14 +18,14 @@ de um **processo** maior.
 ```text
 sgc/
 ├── backend/                 # API REST, regras de negócio, segurança, persistência e testes Java
-├── frontend/                # SPA Vue 3, stores Pinia, componentes e testes Vitest
+├── frontend/                # SPA Vue 3.5, stores Pinia, componentes e testes Vitest
 ├── e2e/                     # Suíte Playwright, fixtures, helpers e lifecycle local
 ├── toolkit/                 # CLI de automação, qualidade e governança técnica
 ├── specs/                   # Regras de acesso, requisitos e CDUs de referência
 ├── deploy/                  # Artefatos auxiliares de implantação
 ├── compose.hom.yaml         # Stack de homologação
 ├── build.gradle.kts         # Orquestração Gradle raiz
-└── package.json             # Comandos raiz para lint, typecheck, Vitest e Playwright
+└── package.json             # Comandos de raiz para lint, typecheck, Vitest e Playwright
 ```
 
 ## Arquitetura em alto nível
