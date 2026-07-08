@@ -1254,7 +1254,7 @@ public class E2eController {
      * DTO para requisição de criação de processo fixture.
      */
     public record ProcessoFixtureRequest(
-            String descricao, String unidadeSigla, Boolean iniciar, Integer diasLimite) {
+            @Nullable String descricao, String unidadeSigla, Boolean iniciar, @Nullable Integer diasLimite) {
         private static ProcessoFixtureRequest iniciado(String descricao, String unidadeSigla, Integer diasLimite) {
             return new ProcessoFixtureRequest(descricao, unidadeSigla, true, diasLimite);
         }

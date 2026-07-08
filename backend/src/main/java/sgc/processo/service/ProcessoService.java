@@ -1340,7 +1340,7 @@ public class ProcessoService {
     }
 
     private boolean isUnidadeAdmin(Unidade unidadeDestino) {
-        return unidadeDestino != null && SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
+        return SIGLA_UNIDADE_ADMIN.equalsIgnoreCase(unidadeDestino.getSigla());
     }
 
     private String chaveInicioProcesso(Processo processo, Unidade unidadeDestino, boolean participante) {

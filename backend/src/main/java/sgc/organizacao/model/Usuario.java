@@ -46,7 +46,7 @@ public class Usuario implements UserDetails {
 
     @JsonView(OrganizacaoViews.Publica.class)
     @Column(name = "email")
-    private String email;
+    private @Nullable String email;
 
     @Column(name = "ramal", length = 20, nullable = false)
     private String ramal;
