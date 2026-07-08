@@ -173,7 +173,8 @@ public class SubprocessoNotificacaoService {
                     String titulo = responsavel.substitutoTitulo();
                     if (titulo != null) {
                         usuarioService.buscarOpt(titulo).ifPresent(u -> {
-                            if (u.getEmail() != null) {
+                            String email = u.getEmail();
+                            if (email != null && !email.isBlank()) {
                                 criarNotificacao(cmd, new EmailGerado(u.getEmail(), emailDireto.assunto(), emailDireto.corpo(), OrigemNotificacao.RESPONSAVEL, unidade.getSigla(), titulo));
                             }
                         });
