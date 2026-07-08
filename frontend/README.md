@@ -11,6 +11,7 @@ consumindo contratos REST do backend e aplicando regras de navegação, cache lo
 - **TypeScript 6**
 - **Vite 8**
 - **Pinia 3** em setup stores
+- **Pinia Colada** para caching e recuperação de dados
 - **Vue Router 5**
 - **BootstrapVueNext + Bootstrap 5**
 - **Axios** para integração HTTP
@@ -113,14 +114,13 @@ sequenceDiagram
     participant Service
     participant Axios
     participant API
-
-    View->>Store: ação da tela
-    Store->>Service: chamar operação
-    Service->>Axios: requisição HTTP
-    Axios->>API: /api/*
-    API-->>Axios: resposta/erro
-    Axios-->>Store: dados ou erro normalizado
-    Store-->>View: estado reativo atualizado
+    View ->> Store: ação da tela
+    Store ->> Service: chamar operação
+    Service ->> Axios: requisição HTTP
+    Axios ->> API: /api/*
+    API -->> Axios: resposta/erro
+    Axios -->> Store: dados ou erro normalizado
+    Store -->> View: estado reativo atualizado
 ```
 
 ## Widget de feedback
@@ -149,23 +149,6 @@ No build integrado via Gradle, `:frontend:buildVue` gera `dist/` e a raiz copia 
 
 ## Estratégia de testes do frontend
 
-Os testes se distribuem entre diretórios centrais e testes co-localizados.
-
-### Onde os testes vivem
-
-- `src/__tests__/`: testes de infraestrutura e views globais (`App`, router, axios, logger...)
-- `src/views/__tests__/`: testes de telas e fluxos de caso de uso
-- `src/components/__tests__/`: testes de componentes reutilizáveis
-- `src/router/__tests__/`: testes específicos de roteamento
-
-### O que é coberto
-
-- resolução de rotas e títulos;
-- login, painel, histórico, relatórios e telas administrativas;
-- infraestrutura HTTP e fluxo de sessão;
-- comportamento de componentes-chave;
-- cenários de cobertura complementar em arquivos `*Coverage.spec.ts`.
-
 Comandos principais:
 
 ```bash
@@ -185,9 +168,6 @@ npm run lint
 
 ## Convenções do módulo
 
-- componentes em `PascalCase`
-- arquivos TS em `camelCase`
-- stores no padrão `use{Nome}Store`
 - UI deve consumir permissões estruturadas vindas do backend
 - preferir erro inline e foco no campo em validações, em vez de bloquear submissão antecipadamente
 - evitar recuperação local de erros irrecuperáveis do backend

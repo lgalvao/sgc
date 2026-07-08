@@ -11,9 +11,7 @@ import {
 import {
     acessarDetalhesProcesso,
     aguardarProcessoNoPainel,
-    confirmarInicioProcessoPeloDialogo,
     criarProcesso,
-    criarProcessoSimples,
     extrairProcessoCodigo,
     finalizarProcesso,
     verificarDetalhesSubprocesso,

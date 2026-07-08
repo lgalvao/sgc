@@ -208,7 +208,7 @@ test.describe.serial('CDU-05 - Iniciar processo de revisao', () => {
         await verificarPaginaPainel(page);
         await expect(page.getByTestId('btn-painel-criar-processo')).toBeVisible();
 
-        const processo = await criarProcessoFixture(request, {
+        await criarProcessoFixture(request, {
             descricao: descProcRevisao,
             tipo: 'REVISAO',
             diasLimite: 30,
