@@ -587,7 +587,7 @@ class SubprocessoNotificacaoServiceTest {
 
         service.notificarAceiteCadastroEmBloco(List.of(subprocesso), unidade);
 
-        verify(alertaAplicacaoService, never()).criarAlertaTransicao(any(), anyString(), any(), any());
+        verify(alertaService, never()).criarAlertaTransicao(any(), anyString(), any(), any());
         verify(notificacaoService, atLeastOnce()).enfileirar(any());
     }
 

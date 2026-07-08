@@ -19,7 +19,6 @@ import java.util.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
 public class Usuario implements UserDetails {
     @Transient
     @JsonIgnore
@@ -46,7 +45,7 @@ public class Usuario implements UserDetails {
     private String nome;
 
     @JsonView(OrganizacaoViews.Publica.class)
-    @Column(name = "email", nullable = false)
+    @Column(name = "email")
     private String email;
 
     @Column(name = "ramal", length = 20, nullable = false)

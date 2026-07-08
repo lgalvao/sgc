@@ -331,6 +331,7 @@ class SubprocessoConsultaServiceTest {
             processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
             processo.setTipo(TipoProcesso.MAPEAMENTO);
             processo.setTipo(TipoProcesso.MAPEAMENTO);
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
 
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(100L);
@@ -382,6 +383,7 @@ class SubprocessoConsultaServiceTest {
             Processo processo = new Processo();
             processo.setCodigo(1L);
             processo.setSituacao(sgc.processo.model.SituacaoProcesso.EM_ANDAMENTO);
+            processo.setTipo(TipoProcesso.MAPEAMENTO);
 
             Subprocesso subprocesso = new Subprocesso();
             subprocesso.setCodigo(100L);
