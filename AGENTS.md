@@ -44,7 +44,7 @@ Para detalhes técnicos, consulte:
 * **Frontend:** `npm run typecheck` (inclui e2e), `npm run lint` (inclui e2e), `npm run test:unit` (Vitest).
 * **E2E:** Playwright `npm run test:e2e`.
     * Sempre redirecione a saída para arquivo: `npm run test:e2e e2e/cdu-28.spec.ts > sgc-e2e.log 2>&1`
-    * Não leia o log inteiro. Comece com `tail -n 40 /tmp/sgc-e2e.log` e só depois use `rg`/`sed -n` no trecho do erro.
+    * Não leia o log inteiro. Comece com `tail -n 40 sgc-e2e.log` e só depois use `rg` no trecho do erro.
     * Logs detalhados de backend/frontend ficam em `e2e/server.log`; leia apenas recortes mínimos.
     * Se o arquivo usar `test.describe.serial()`, rode o spec inteiro, não um cenário isolado.
     * Quando o requisito envolver e-mail, prefira confirmar o contrato pela view admin de notificações usando os helpers

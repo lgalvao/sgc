@@ -75,7 +75,10 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             destinatario: UNIDADE_ALVO,
             assunto: `Cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} devolvido para ajustes`,
             tipo: 'Cadastro devolvido para ajustes',
-            trechoCorpo: `O cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+            trechoCorpo: new RegExp(
+                `O cadastro de atividades e conhecimentos da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*foi devolvido para ajustes\\.`,
+                'i'
+            )
         });
         await page.getByTestId('nav-link-painel').click();
         await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
@@ -138,7 +141,10 @@ test.describe.serial('CDU-13 - Analisar cadastro de atividades e conhecimentos',
             destinatario: 'ADMIN',
             assunto: `Cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} submetido para análise`,
             tipo: 'Cadastro aceito',
-            trechoCorpo: `O cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+            trechoCorpo: new RegExp(
+                `O cadastro de atividades e conhecimentos da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*foi submetido para análise\\.`,
+                'i'
+            )
         });
         await page.getByTestId('nav-link-painel').click();
         await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);

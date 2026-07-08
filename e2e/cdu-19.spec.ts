@@ -66,7 +66,10 @@ test.describe.serial('CDU-19 - Validar mapa de competências', () => {
             destinatario: 'COORD_22',
             assunto: `Validação do mapa de competências da ${UNIDADE_ALVO} submetida para análise`,
             tipo: 'Mapa validado',
-            trechoCorpo: `A unidade ${UNIDADE_ALVO} validou o mapa de competências elaborado no processo ${descProcesso}.`
+            trechoCorpo: new RegExp(
+                `A unidade\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*validou o mapa de competências\\s*elaborado no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
+                'i'
+            )
         });
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarDetalhesProcesso(page, descProcesso);
@@ -129,7 +132,10 @@ test.describe.serial('CDU-19 - Apresentar sugestões e pré-preenchimento', () =
             destinatario: 'COORD_22',
             assunto: `Sugestões apresentadas para o mapa de competências da ${UNIDADE_ALVO}`,
             tipo: 'Sugestões apresentadas para o mapa',
-            trechoCorpo: `A unidade ${UNIDADE_ALVO} apresentou sugestões para o mapa de competências elaborado no processo ${descProcesso}.`
+            trechoCorpo: new RegExp(
+                `A unidade\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*apresentou sugestões para o mapa de\\s*competências elaborado no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
+                'i'
+            )
         });
         await login(page, USUARIOS.CHEFE_SECAO_221.titulo, USUARIOS.CHEFE_SECAO_221.senha);
         await acessarDetalhesProcesso(page, descProcesso);

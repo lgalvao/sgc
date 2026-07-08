@@ -87,7 +87,10 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             destinatario: UNIDADE_ALVO,
             assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} devolvida para ajustes`,
             tipo: 'Revisão de cadastro devolvida',
-            trechoCorpo: `A revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+            trechoCorpo: new RegExp(
+                `A revisão do cadastro de atividades e conhecimentos da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*foi devolvida para ajustes\\.`,
+                'i'
+            )
         });
         await page.getByTestId('nav-link-painel').click();
         await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);
@@ -130,7 +133,10 @@ test.describe.serial('CDU-14 - Analisar revisão de cadastro de atividades e con
             destinatario: 'SECRETARIA_2',
             assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO} submetido para análise`,
             tipo: 'Revisão de cadastro aceita',
-            trechoCorpo: `A revisão do cadastro de atividades e conhecimentos da ${UNIDADE_ALVO}`
+            trechoCorpo: new RegExp(
+                `A revisão do cadastro de atividades e conhecimentos da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\s*foi submetida para análise\\.`,
+                'i'
+            )
         });
         await page.getByTestId('nav-link-painel').click();
         await expect(page).toHaveURL(/\/painel(?:\?.*)?$/);

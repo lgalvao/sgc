@@ -202,7 +202,10 @@ test.describe.serial('CDU-10 - Disponibilizar revisão do cadastro de atividades
             destinatario: 'COORD_22',
             assunto: `Revisão do cadastro de atividades e conhecimentos disponibilizada: ${UNIDADE_ALVO}`,
             tipo: 'Revisão de cadastro disponibilizada',
-            trechoCorpo: `A unidade ${UNIDADE_ALVO} concluiu a revisão e disponibilizou seu cadastro de atividades e conhecimentos do processo ${descProcessoRevisao}.`
+            trechoCorpo: new RegExp(
+                `A unidade\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*concluiu a revisão e\\s*disponibilizou seu cadastro de atividades e conhecimentos do processo\\s*<strong>\\s*${descProcessoRevisao}\\s*</strong>\\.`,
+                'i'
+            )
         });
 
         // Verificar alerta para o gestor superior
