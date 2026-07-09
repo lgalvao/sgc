@@ -12,7 +12,7 @@
     "knip": "knip",
     "test": "npm --prefix frontend run test",
     "test:e2e": "playwright test --config=e2e/playwright.config.ts --project=chromium",
-    "test:e2e:hom": "playwright test --config=e2e/playwright.homologacao.config.ts",
+    "test:e2e:hom": "playwright test --config=e2e/playwright.homologacao.config.ts --ui",
     "test:unit": "npm --prefix frontend run test:unit",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "sgc": "node toolkit/sgc.js",

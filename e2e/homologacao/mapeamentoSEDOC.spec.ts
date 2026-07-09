@@ -1,5 +1,5 @@
-import { test } from "@playwright/test";
-import { ROTAS, NOTIFICACOES } from "./funcoesGerais/constantes.js";
+import {test} from "@playwright/test";
+import {ROTAS, NOTIFICACOES} from "./funcoesGerais/constantes.js";
 import {
     acessarURL,
     login,
@@ -31,22 +31,20 @@ import {
     verificarProcessoTabela,
 } from "./funcoesGerais/auxil.js";
 
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({mode: 'serial'});
 
 test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
     const descricaoProcesso = 'Processo Mapeamento SEDOC E2E';
     const siglaUnidade = 'SEDOC';
-    const credenciaisAdmin      = obterCredenciaisUsuario('ADMIN');
-    const credenciaisChefe      = obterCredenciaisUsuario('ADMIN-CHEFE-SEDOC');
+    const credenciaisAdmin = obterCredenciaisUsuario('ADMIN');
+    const credenciaisChefe = obterCredenciaisUsuario('ADMIN-CHEFE-SEDOC');
     const credenciaisGestorCoede = obterCredenciaisUsuario('GESTOR-COEDE');
-    const credenciaisGestorSGP  = obterCredenciaisUsuario('GESTOR-SGP');
+    const credenciaisGestorSGP = obterCredenciaisUsuario('GESTOR-SGP');
     const dataLimiteFormatada = calcularDataLimiteFormatada(15);
-    const atividadeDesc  = `Atividade Automática SEDOC ${Date.now()}`;
+    const atividadeDesc = `Atividade Automática SEDOC ${Date.now()}`;
     const conhecimentoDesc = `Conhecimento Automático SEDOC ${Date.now()}`;
 
-
-
-    test('1. ADMIN: Cria e inicia o processo de mapeamento', async ({ page }) => {
+    test('1. ADMIN: Cria e inicia o processo de mapeamento', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisAdmin);
         await aguardarPainelCarregado(page);
@@ -89,7 +87,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('2. CHEFE-SEDOC: Cadastrar atividades/conhecimentos e disponibilizar o cadastro', async ({ page }) => {
+    test('2. CHEFE-SEDOC: Cadastrar atividades/conhecimentos e disponibilizar o cadastro', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisChefe);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
@@ -113,7 +111,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('3. GESTOR-COEDE: Realiza o aceite do cadastro enviado pela SEDOC', async ({ page }) => {
+    test('3. GESTOR-COEDE: Realiza o aceite do cadastro enviado pela SEDOC', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisGestorCoede);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
@@ -135,7 +133,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('4. GESTOR-SGP: Realiza o aceite do cadastro enviado pela SEDOC', async ({ page }) => {
+    test('4. GESTOR-SGP: Realiza o aceite do cadastro enviado pela SEDOC', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisGestorSGP);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
@@ -157,7 +155,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('5. ADMIN: Homologa o cadastro', async ({ page }) => {
+    test('5. ADMIN: Homologa o cadastro', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisAdmin);
         await aguardarPainelCarregado(page);
@@ -169,7 +167,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('6. ADMIN: Disponibiliza o mapa de competências', async ({ page }) => {
+    test('6. ADMIN: Disponibiliza o mapa de competências', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisAdmin);
         await aguardarPainelCarregado(page);
@@ -190,7 +188,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         });
     });
 
-    test('7. CHEFE-SEDOC: Valida o mapa de competências', async ({ page }) => {
+    test('7. CHEFE-SEDOC: Valida o mapa de competências', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisChefe);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
@@ -212,7 +210,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('8. GESTOR-COEDE: Valida o mapa de competências', async ({ page }) => {
+    test('8. GESTOR-COEDE: Valida o mapa de competências', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisGestorCoede);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
@@ -234,7 +232,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('9. GESTOR-SGP: Valida o mapa de competências', async ({ page }) => {
+    test('9. GESTOR-SGP: Valida o mapa de competências', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisGestorSGP);
         await aguardarProcessoNoPainel(page, descricaoProcesso);
@@ -255,7 +253,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('10. ADMIN: Homologar o mapa de competências', async ({ page }) => {
+    test('10. ADMIN: Homologar o mapa de competências', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisAdmin);
         await aguardarPainelCarregado(page);
@@ -267,7 +265,7 @@ test.describe('Mapeamento - SEDOC - Caminho feliz', () => {
         await efetuarLogout(page);
     });
 
-    test('11. ADMIN: Finalizar o processo de mapeamento', async ({ page }) => {
+    test('11. ADMIN: Finalizar o processo de mapeamento', async ({page}) => {
         await acessarURL(page, ROTAS.LOGIN);
         await login(page, credenciaisAdmin);
         await aguardarPainelCarregado(page);
