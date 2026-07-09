@@ -7,67 +7,35 @@
 ## Pré-condições
 
 - Usuário logado com perfil ADMIN.
-- Processo de mapeamento ou de revisão iniciado que tenha a unidade como participante.
-- Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões' e com localização atual na unidade do usuário.
+- Subprocesso nas situações 'Mapa validado' ou 'Mapa com sugestões' e com localização na unidade ADMIN.
 
 ## Fluxo principal
 
-1. No painel, o usuário acessa um processo de mapeamento ou de revisão, que esteja em andamento.
+1. No `Painel`, o usuário acessa um processo de mapeamento/revisão em andamento.
 
-2. O sistema mostra tela `Detalhes do processo`.
+2. O sistema mostra a tela `Detalhes do processo`, que inclui no cabeçalho o botão `Homologar mapas em bloco`.
 
-3. O sistema identifica que existem unidades subordinadas com subprocessos elegíveis para homologação em bloco do mapa
-   de competências (de acordo com as pré-condições do caso de uso).
+3. O usuário aciona `Homologar mapas em bloco`.
 
-4. Na seção de unidades participantes, abaixo da árvore de unidades, sistema mostra o botão
-   `Homologar mapas em bloco`.
+4. O sistema identifica as unidades aptas à homologação do mapa; ou seja, unidades subordinadas com subprocesso nas
+   situações 'Mapa validado' ou 'Mapa com sugestões'.
 
-5. O usuário clica no botão `Homologar mapas em bloco`.
+5. O sistema abre um modal de confirmação com título "Homologação de mapa em bloco" e texto "Selecione as unidades cujos
+   mapas deverão ser homologados:", além dos elementos a seguir:
+    - lista das unidades aptas, sendo apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o
+      nome da unidade;
+    - botões `Cancelar` e `Homologar em bloco`.
 
-6. O sistema abre modal de confirmação, com os elementos a seguir:
+6. O usuário aciona `Homologar em bloco`.
 
-    - Título `Homologação de mapa em bloco`;
-    - Texto "Selecione as unidades cujos mapas deverão ser homologados:";
-    - Lista das unidades operacionais ou interoperacionais subordinadas cujos mapas poderão ser homologados, sendo
-      apresentados, para cada unidade, um checkbox (selecionado por padrão), a sigla e o nome;
-    - Botão `Cancelar` e botão `Homologar`.
+7. Para cada unidade selecionada o sistema:
 
-7. Caso o usuário escolha o botão `Cancelar`, o sistema interrompe a operação, permanecendo na tela Detalhes do
-   processo.
-
-8. O usuário clica em `Homologar`.
-
-9. O sistema atua, para cada unidade selecionada, da seguinte forma:
-
-   Observação: embora a homologação não altere a localização atual do subprocesso (a movimentação permanece interna à
-   unidade `ADMIN`), neste caso o sistema ainda deve comunicar a unidade participante, por se tratar de marco terminal e
-   relevante do subprocesso.
-
-   9.1. O sistema registra uma movimentação para o subprocesso:
-    - `Data/hora`: :DATA_HORA:
-    - `Unidade origem`: "ADMIN"
-    - `Unidade destino`: "ADMIN"
+   7.1. Registra uma movimentação para o subprocesso:
     - `Descrição`: "Mapa homologado"
-
-   9.2. O sistema altera a situação do subprocesso da unidade para 'Mapa homologado'.
-
-   9.3. O sistema cria internamente um alerta:
-    - `Descrição`: "Mapa de competências da unidade :SIGLA_UNIDADE_SUBPROCESSO: homologado"
-    - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: :DATA_HORA:
-    - `Unidade de origem`: ADMIN
-    - `Unidade de destino`: :SIGLA_UNIDADE_SUBPROCESSO:
+    - `Unidade origem`: ADMIN
+    - `Unidade destino`: ADMIN
 
-   9.4. O sistema envia notificação por e-mail para a unidade do subprocesso:
+   7.2. Altera a situação do subprocesso da unidade para 'Mapa homologado'.
 
-    ```text
-    Assunto: SGC: Mapa de competências homologado
-
-    Prezado(a) responsável pela :SIGLA_UNIDADE_SUBPROCESSO:,
-
-    O mapa de competências da sua unidade foi homologado no processo :DESCRICAO_PROCESSO:.
-
-    Acompanhe o processo no Sistema de Gestão de Competências (:URL_SISTEMA:).
-    ```
-
-10. O sistema mostra mensagem de confirmação: "Mapas de competências homologados em bloco" e redireciona para o Painel.
+8. O sistema redireciona para o `Painel` e mostra *toast* "Mapas homologados em bloco".
