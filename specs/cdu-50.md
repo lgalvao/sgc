@@ -8,7 +8,7 @@
 ## Pré-condições
 
 - Usuário logado com perfil GESTOR ou ADMIN
-- Existência de processo de diagnóstico em andamento
+- Existência de processo de diagnóstico em andamento localizado na unidade do usuário
 
 ## Fluxo principal
 
@@ -40,80 +40,78 @@
 ---
 Se o usuário acionar `Histórico de análise`:
 
-- O sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e
-  observação/justificativa.
+7. O sistema mostra os registros prévios de análise do subprocesso, contendo data/hora, unidade, resultado e
+   observação/justificativa.
 
 ---
-Se o usuário acionar `Devolver para ajustes`:
+Se o usuário acionar `Devolver para ajustes` (perfis GESTOR e ADMIN)
 
-- O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso
-  (referida como :SIGLA_UNIDADE_DEVOLUCAO:).
+8. O sistema identifica a unidade de devolução como sendo a unidade de origem da última movimentação do subprocesso
+   (referida como :UNIDADE_DEVOLUCAO:).
 
-7. O sistema mostra um modal com título `Devolução de diagnóstico` e texto "Confirma a devolução do diagnóstico da
+9. O sistema mostra um modal com título `Devolução de diagnóstico` e texto "Confirma a devolução do diagnóstico da
    unidade :SIGLA_UNIDADE_SUBPROCESSO:?", campo `Justificativa` obrigatório e botões `Cancelar` e `Devolver`.
 
-8. O usuário aciona `Devolver`, e o sistema realiza estas ações:
+10. O Usuário aciona `Devolver`.
 
-   8.1. Registra uma análise de validação para o subprocesso:
+11. O sistema registra uma análise de validação para o subprocesso:
     - `Data/hora`: :DATA_HORA:
-    - `Unidade`: :SIGLA_UNIDADE_ATUAL:
+    - `Unidade`: :UNIDADE_ANALISE:
     - `Resultado`: 'Devolução para ajustes'
-    - `Justificativa`: [Justificativa fornecida]
+    - `Justificativa`
 
-   8.2. Muda a situação de todos os servidores da unidade que **nao estejam** na situação 'Avaliação impossibilitada',
-   para 'Autoavaliação concluída'. (Isso faz com o sistema volte a habilitar a edição das avaliações de consenso.)
+12. O sistema muda a situação dos servidores da unidade que **não estejam** na situação 'Avaliação impossibilitada' para
+    'Autoavaliação concluída'. (Isso faz com o sistema volte a habilitar a edição das avaliações de consenso.)
 
-9. O sistema envia notificação por e-mail para a unidade de origem da última movimentação do subprocesso (:
-   SIGLA_UNIDADE_DEVOLUCAO:):
+13. O sistema envia notificação por e-mail para a unidade de origem da última movimentação do subprocesso (:UNIDADE_DEVOLUCAO:), neste modelo:
     ```text
-    Assunto: SGC: Diagnóstico devolvido para ajustes
+        Assunto: SGC: Diagnóstico devolvido para ajustes
     
-    Prezado(a) responsável pela :SIGLA_UNIDADE_DEVOLUCAO:,
-    
-    O diagnóstico da sua unidade, no processo :DESCRICAO_PROCESSO:, foi devolvido para ajustes.
-    
-    Realize as mudanças solicitadas no Sistema de Gestão de Competências (SGC): :URL_SISTEMA:.
+        Prezado(a) responsável pela :SIGLA_UNIDADE_DEVOLUCAO:,
+     
+        O diagnóstico da sua unidade, no processo :DESCRICAO_PROCESSO:, foi devolvido para ajustes.
+     
+        Realize as mudanças solicitadas no Sistema de Gestão de Competências (SGC): :URL_SISTEMA:.
     ```
 
-10. O sistema cria um alerta:
+14. O sistema cria um alerta:
     - `Descrição`: "Diagnóstico devolvido para ajustes"
     - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: :DATA_HORA:
-    - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
-    - `Unidade de destino`: :SIGLA_UNIDADE_DEVOLUCAO:
+    - `Unidade de origem`: :UNIDADE_ANALISE:
+    - `Unidade de destino`: :UNIDADE_DEVOLUCAO:
 
-11. O sistema cria uma movimentação para o subprocesso:
-    - `Descrição`: 'Devolução para ajustes'
+15. O sistema cria uma movimentação para o subprocesso:
+    - `Descrição`: "Devolução para ajustes"
     - `Data/hora`: :DATA_HORA:
-    - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
-    - `Unidade destino`: :SIGLA_UNIDADE_DEVOLUCAO:
+    - `Unidade origem`: :UNIDADE_ANALISE:
+    - `Unidade destino`: :UNIDADE_DEVOLUCAO:
 
     Isso muda a localização do subprocesso para a unidade de devolução.
 
-12. O sistema mostra o *toast* "Devolução realizada".
+16. O sistema redireciona para `Painel` e mostra o *toast* "Devolução realizada".
 
 ---
+Se o usuário acionar `Registrar aceite` (apenas perfil GESTOR):
 
-Se o usuário acionar `Registrar aceite`:
-
-13. O sistema abre um modal, com título `Aceitar diagnóstico` e texto "Confirma o aceite do diagnóstico da unidade :
+17. O sistema abre um modal, com título `Aceitar diagnóstico` e texto "Confirma o aceite do diagnóstico da unidade :
     SIGLA_UNIDADE_SUBPROCESSO:?" e os botões `Cancelar` e `Aceitar`.
 
-14. O usuário aciona `Aceitar`.
+18. O usuário aciona `Aceitar`.
 
-15. O sistema registra uma análise de validação para o subprocesso:
+19. O sistema registra uma análise de validação para o subprocesso:
     - `Resultado`: 'Aceite'
     - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
 
-16. O sistema cria um alerta:
+20. O sistema cria um alerta:
     - `Descrição`: "Diagnóstico da unidade :SIGLA_UNIDADE_SUBPROCESSO: aceito"
     - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: :DATA_HORA:
     - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
     - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
 
-17. O sistema cria uma movimentação para o subprocesso com estes campos:
+21. O sistema cria uma movimentação para o subprocesso:
     - `Descrição`: 'Aceite'
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
@@ -121,7 +119,7 @@ Se o usuário acionar `Registrar aceite`:
 
     Isso muda a localização do subprocesso para a unidade superior.
 
-18. O sistema envia notificação por e-mail para a unidade superior:
+22. O sistema envia notificação por e-mail para a unidade superior:
 
    ```text
    Assunto: SGC: Diagnóstico da unidade :SIGLA_UNIDADE_SUBPROCESSO: aceito
@@ -134,23 +132,22 @@ Se o usuário acionar `Registrar aceite`:
    Realize a análise acessando o Sistema de Gestão de Competências (SGC): :URL_SISTEMA:.
    ```
 
-19. O sistema mostra o *toast* "Aceite registrado".
+23. O sistema redireciona ao `Painel` e mostra o *toast* "Aceite registrado".
 
 ---
-
 Se o usuário acionar `Homologar` (apenas perfil ADMIN):
 
-20. O sistema mostra um modal com título `Homologar diagnóstico` e texto "Confirma a homologação diagnóstico da
+24. O sistema mostra um modal com título `Homologar diagnóstico` e texto "Confirma a homologação diagnóstico da
     unidade :SIGLA_UNIDADE_SUBPROCESSO:?" e botões `Cancelar` e `Homologar`.
 
-21. O usuário aciona `Homologar`.
+25. O usuário aciona `Homologar`.
 
-22. O sistema registra uma análise de validação para o subprocesso:
+26. O sistema registra uma análise de validação para o subprocesso:
     - `Resultado`: 'Homologação'
     - `Data/hora`: :DATA_HORA:
     - `Unidade`: :SIGLA_UNIDADE_ATUAL:
 
-23. O sistema cria uma movimentação para o subprocesso com estes campos:
+27. O sistema cria uma movimentação para o subprocesso:
     - `Descrição`: 'Homologação'
     - `Data/hora`: :DATA_HORA:
     - `Unidade origem`: ADMIN
@@ -158,4 +155,4 @@ Se o usuário acionar `Homologar` (apenas perfil ADMIN):
 
     A localização do subprocesso não é alterada.
 
-24. O sistema mostra o *toast* "Diagnóstico homologado".
+28. O sistema redireciona para o `Painel`e mostra o *toast* "Diagnóstico homologado".

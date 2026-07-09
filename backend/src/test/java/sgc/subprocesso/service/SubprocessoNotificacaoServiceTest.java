@@ -568,6 +568,66 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
+    @DisplayName("aceite de cadastro deve enviar email apenas para a unidade superior quando o destino da transição for a própria unidade de análise")
+    void aceiteDeCadastroDeveEnviarEmailApenasParaUnidadeSuperior() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade superiorImediato = criarUnidade(20L, "SUP", "Superior imediato");
+        Unidade unidadeAnalise = criarUnidade(10L, "COSIS", "Coordenadoria");
+        unidadeAnalise.setUnidadeSuperior(superiorImediato);
+        Unidade unidadeSubprocesso = criarUnidade(30L, "SESEL", "Subordinada");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidadeSubprocesso, processo);
+
+        when(unidadeHierarquiaService.buscarCodigoPai(unidadeSubprocesso.getCodigo())).thenReturn(superiorImediato.getCodigo());
+        when(unidadeService.buscarResumosPorCodigos(List.of(superiorImediato.getCodigo()))).thenReturn(List.of(
+                new UnidadeResumoLeitura(superiorImediato.getCodigo(), "Superior imediato", superiorImediato.getSigla(), TipoUnidade.INTEROPERACIONAL)
+        ));
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.CADASTRO_ACEITO)
+                .unidadeOrigem(unidadeAnalise)
+                .unidadeDestino(unidadeAnalise)
+                .build());
+
+        verify(notificacaoService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().unidadeDestinoSigla()).isEqualTo("SUP");
+        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("sup@tre-pe.jus.br");
+        verify(responsavelService, never()).buscarResponsavelUnidadeOpt(unidadeAnalise.getCodigo());
+    }
+
+    @Test
+    @DisplayName("aceite de validacao do mapa deve enviar email apenas para a unidade superior quando o destino da transição for a própria unidade de análise")
+    void aceiteDeValidacaoDoMapaDeveEnviarEmailApenasParaUnidadeSuperior() {
+        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
+
+        Unidade superiorImediato = criarUnidade(20L, "STIC", "Superior imediato");
+        Unidade unidadeAnalise = criarUnidade(10L, "COSIS", "Coordenadoria");
+        unidadeAnalise.setUnidadeSuperior(superiorImediato);
+        Unidade unidadeSubprocesso = criarUnidade(30L, "SESEL", "Subordinada");
+        Processo processo = criarProcesso();
+        Subprocesso subprocesso = criarSubprocesso(unidadeSubprocesso, processo);
+
+        when(unidadeHierarquiaService.buscarCodigoPai(unidadeSubprocesso.getCodigo())).thenReturn(superiorImediato.getCodigo());
+        when(unidadeService.buscarResumosPorCodigos(List.of(superiorImediato.getCodigo()))).thenReturn(List.of(
+                new UnidadeResumoLeitura(superiorImediato.getCodigo(), "Superior imediato", superiorImediato.getSigla(), TipoUnidade.INTEROPERACIONAL)
+        ));
+
+        service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
+                .subprocesso(subprocesso)
+                .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
+                .unidadeOrigem(unidadeAnalise)
+                .unidadeDestino(unidadeAnalise)
+                .build());
+
+        verify(notificacaoService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
+        assertThat(notificacaoEmailCaptor.getValue().unidadeDestinoSigla()).isEqualTo("STIC");
+        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("stic@tre-pe.jus.br");
+        verify(responsavelService, never()).buscarResponsavelUnidadeOpt(unidadeAnalise.getCodigo());
+    }
+
+    @Test
     @DisplayName("notificarAceiteCadastroEmBloco deve ignorar subprocessos sem superior imediato")
     void notificarAceiteCadastroEmBlocoDeveIgnorarSubprocessosSemSuperiorImediato() {
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");

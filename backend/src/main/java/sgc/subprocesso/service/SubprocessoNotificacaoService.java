@@ -57,12 +57,18 @@ public class SubprocessoNotificacaoService {
 
     private void criarNotificacoesTransicao(NotificacaoCommand cmd) {
         Map<String, Object> variaveis = criarVariaveisTemplateDireto(cmd);
-        criarNotificacaoDireta(cmd, variaveis);
+        if (!deveIgnorarNotificacaoDireta(cmd)) {
+            criarNotificacaoDireta(cmd, variaveis);
+        }
 
         if (Boolean.FALSE.equals(cmd.notificarSuperior())) {
             return;
         }
         criarNotificacaoSuperior(cmd, variaveis);
+    }
+
+    private boolean deveIgnorarNotificacaoDireta(NotificacaoCommand cmd) {
+        return Objects.equals(cmd.unidadeOrigem().getCodigo(), cmd.unidadeDestino().getCodigo());
     }
 
     public String getEmailUnidade(Unidade unidade) {
