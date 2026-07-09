@@ -154,7 +154,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros em bloco', () => {
             assunto: `Cadastro de atividades e conhecimentos da ${UNIDADE_1} submetido para análise`,
             tipo: 'Cadastro aceito',
             trechoCorpo: new RegExp(
-                `O cadastro de atividades e conhecimentos da sua unidade no processo\\s*<strong>\\s*${descIsolada}\\s*</strong>\\s*foi aceito e submetido para análise pela unidade\\s*superior imediata\\.`,
+                `O cadastro de atividades e conhecimentos da sua unidade no processo\\s*<strong>\\s*${descIsolada}\\s*</strong>\\s*foi aceito e submetido para análise pela unidade\\s*superior\\.`,
                 'i'
             )
         });
@@ -229,7 +229,7 @@ test.describe.serial('CDU-22 - Aceitar cadastros de revisão em bloco', () => {
             assunto: `Revisão do cadastro de atividades e conhecimentos da ${UNIDADE_REVISAO} submetido para análise`,
             tipo: 'Revisão de cadastro aceita',
             trechoCorpo: new RegExp(
-                `A revisão do cadastro de atividades e conhecimentos da sua unidade no processo\\s*<strong>\\s*${descProcessoRevisao}\\s*</strong>\\s*foi aceita e submetida para análise pela unidade\\s*superior imediata\\.`,
+                `A revisão do cadastro de atividades e conhecimentos da sua unidade no processo\\s*<strong>\\s*${descProcessoRevisao}\\s*</strong>\\s*foi aceita e submetida para análise pela unidade\\s*superior\\.`,
                 'i'
             )
         });

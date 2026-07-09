@@ -222,7 +222,7 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
-    @DisplayName("concluirDiagnosticoUnidade deve falhar sem unidade superior imediata")
+    @DisplayName("concluirDiagnosticoUnidade deve falhar sem unidade superior")
     void concluirDiagnosticoUnidade_deveFalharSemUnidadeSuperiorImediata() {
         Long codSubprocesso = 90L;
         Diagnostico diagnostico = new Diagnostico();
@@ -237,7 +237,7 @@ class DiagnosticoFluxoServiceTest {
 
         assertThatThrownBy(() -> service.concluirDiagnosticoUnidade(codSubprocesso))
                 .isInstanceOf(ErroInconsistenciaInterna.class)
-                .hasMessageContaining("Unidade superior imediata obrigatória ausente");
+                .hasMessageContaining("Unidade superior obrigatória ausente");
 
         verify(notificacaoService, never()).notificarDiagnosticoConcluido(any(), any());
     }
@@ -320,7 +320,7 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
-    @DisplayName("validarDiagnostico deve falhar sem unidade superior imediata")
+    @DisplayName("validarDiagnostico deve falhar sem unidade superior")
     void validarDiagnostico_deveFalharSemUnidadeSuperiorImediata() {
         Long codSubprocesso = 92L;
         Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
@@ -333,7 +333,7 @@ class DiagnosticoFluxoServiceTest {
 
         assertThatThrownBy(() -> service.validarDiagnostico(codSubprocesso, "Pode seguir"))
                 .isInstanceOf(ErroInconsistenciaInterna.class)
-                .hasMessageContaining("Unidade superior imediata obrigatória ausente");
+                .hasMessageContaining("Unidade superior obrigatória ausente");
 
         verify(notificacaoService, never()).notificarDiagnosticoAceito(any(), any(), any());
     }
@@ -364,7 +364,7 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
-    @DisplayName("aceitarDiagnosticosEmBloco deve falhar sem unidade superior imediata")
+    @DisplayName("aceitarDiagnosticosEmBloco deve falhar sem unidade superior")
     void aceitarDiagnosticosEmBloco_deveFalharSemUnidadeSuperiorImediata() {
         Unidade unidadeGestora = unidade(5L, "COORD_11", "Coordenadoria 11", TipoUnidade.INTERMEDIARIA);
         Subprocesso subprocesso = subprocessoDiagnostico(unidadeOrigem, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -377,7 +377,7 @@ class DiagnosticoFluxoServiceTest {
 
         assertThatThrownBy(() -> service.aceitarDiagnosticosEmBloco(List.of(94L)))
                 .isInstanceOf(ErroInconsistenciaInterna.class)
-                .hasMessageContaining("Unidade superior imediata obrigatória ausente");
+                .hasMessageContaining("Unidade superior obrigatória ausente");
 
         verify(notificacaoService, never()).notificarDiagnosticosAceitosEmBloco(anyList(), any(), any());
     }

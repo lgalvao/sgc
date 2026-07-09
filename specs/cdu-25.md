@@ -13,61 +13,44 @@
 
 ## Fluxo principal
 
-1. No `Painel`, o usuário acessa um processo de mapeamento ou de revisão, que esteja na situação em andamento.
+1. No `Painel`, o usuário acessa um processo de mapeamento ou de revisão, que esteja em andamento.
 
-2. O sistema mostra a tela `Detalhes do processo`, exibindo apenas os subprocessos das unidades que compõem a hierarquia
-   do usuário (sua própria unidade e subordinadas recursivamente).
-
-3. O sistema verifica se existem unidades subordinadas com subprocessos elegíveis para aceite do mapa em bloco; se
-   houver habilita a ação `Aceitar mapas em bloco`.
+2. O sistema mostra a tela `Detalhes do processo`, mostrando apenas as unidades subordinadas à unidade do usuário, além
+   do botão `Aceitar mapas em bloco`.
 
 4. O usuário aciona `Aceitar mapas em bloco`.
 
-5. O sistema abre um modal de confirmação, com:
-    - Título: `Aceite de mapas em bloco`;
-    - Texto: "Selecione as unidades para aceite dos mapas correspondentes";
-    - Lista das unidades cujos mapas poderão ser aceitos; devem ser apresentados para cada unidade um checkbox
-      (selecionado por padrão) ao lado da sigla e nome da unidade;
-    - Botões `Cancelar` e `Registrar aceite`.
+5. O sistema verifica se há unidades subordinadas com subprocessos nas situações 'Mapa validado' ou 'Mapa com
+   sugestões', e abre um modal com título "Aceite de mapas em bloco" e texto "Selecione as unidades para aceite dos
+   mapas correspondentes", além dos elementos:
+    - lista das unidades aptas, com um checkbox (selecionado por padrão) por unidade, além de sigla e nome da unidade;
+    - botões `Cancelar` e `Aceitar em bloco`.
 
-6. O usuário clica em `Registrar aceite`.
+6. O usuário aciona `Aceitar em bloco`.
 
 7. O sistema atua, para cada unidade selecionada, da seguinte forma:
 
    7.1. Registra uma análise de validação para o subprocesso:
-    - `Data/hora`: :DATA_HORA:
-    - `Unidade`: :SIGLA_UNIDADE_ATUAL:
     - `Resultado`: "Aceite de mapa"
+    - `Data/hora`: :DATA_HORA:
+    - `Unidade`: :UNIDADE_ANALISE:
 
    7.2. Registra uma movimentação para o subprocesso:
-    - `Data/hora`: :DATA_HORA:
-    - `Unidade origem`: :SIGLA_UNIDADE_ATUAL:
-    - `Unidade destino`: :SIGLA_UNIDADE_SUPERIOR:
     - `Descrição`: "Validação do mapa aceita"
+    - `Data/hora`: :DATA_HORA:
+    - `Unidade origem`: :UNIDADE_ANALISE:
+    - `Unidade destino`: :UNIDADE_SUPERIOR:
 
    7.3. Registra um alerta:
     - `Descrição`: "Validação do mapa da unidade :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise"
     - `Processo`: :DESCRICAO_PROCESSO:
     - `Data/hora`: :DATA_HORA:
-    - `Unidade de origem`: :SIGLA_UNIDADE_ATUAL:
-    - `Unidade de destino`: :SIGLA_UNIDADE_SUPERIOR:
+    - `Unidade de origem`: :UNIDADE_ANALISE:
+    - `Unidade de destino`: :UNIDADE_SUPERIOR:
 
-   7.4. Envia notificação por e-mail individual para a própria unidade do subprocesso, com o modelo a seguir:
-
-    ```text
-    Assunto: SGC: Validação do mapa de competências da :SIGLA_UNIDADE_SUBPROCESSO: submetida para análise
-
-    Prezado(a) responsável pela :SIGLA_UNIDADE_SUBPROCESSO:,
-
-    A validação do mapa de competências da sua unidade no processo :DESCRICAO_PROCESSO: foi aceita e submetida
-    para análise pela unidade superior imediata.
-
-    Acompanhe o processo no Sistema de Gestão de Competências (:URL_SISTEMA:).
-    ```
-
-   7.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e envia, para cada unidade superior
-   imediata que tenha ao menos uma subordinada direta selecionada, uma única notificação consolidada por e-mail, com o
-   modelo a seguir:
+   7.4. O sistema agrupa as unidades selecionadas por unidade superior e envia, para cada unidade superior que tenha ao
+   menos uma subordinada direta selecionada (referenciada como :LISTA_UNIDADES_SUBORDINADAS_SELECIONADAS:), uma única
+   notificação consolidada por e-mail, com o modelo a seguir:
 
     ```text
     Assunto: SGC: Validação de mapas de competências submetida para análise
@@ -80,7 +63,6 @@
     As análises já podem ser realizadas no Sistema de Gestão de Competências (:URL_SISTEMA:).
     ```
 
-   7.6. O agrupamento do passo anterior considera apenas a unidade superior imediata de cada subprocesso selecionado. O
-   sistema não propaga automaticamente a consolidação para níveis hierárquicos acima.
+   NOTA: O agrupamento do passo anterior considera apenas a unidade superior *imediata* de cada subprocesso selecionado.
 
-8. O sistema redireciona para o Painel e mostra *toast*: "Mapas aceitos em bloco".
+8. O sistema redireciona para o `Painel` e mostra um *toast* "Mapas aceitos em bloco".

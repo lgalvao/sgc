@@ -103,7 +103,7 @@ test.describe.serial('CDU-25 - Aceitar validação de mapas em bloco', () => {
             assunto: `Validação do mapa de competências da ${UNIDADE_1} submetida para análise`,
             tipo: 'Validação do mapa aceita',
             trechoCorpo: new RegExp(
-                `A validação do mapa de competências da sua unidade no processo\\s*<strong>\\s*${descIsolada}\\s*</strong>\\s*foi aceita e submetida para análise pela unidade\\s*superior imediata\\.`,
+                `A validação do mapa de competências da sua unidade no processo\\s*<strong>\\s*${descIsolada}\\s*</strong>\\s*foi aceita e submetida para análise pela unidade\\s*superior\\.`,
                 'i'
             )
         });

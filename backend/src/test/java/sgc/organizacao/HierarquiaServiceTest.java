@@ -161,7 +161,7 @@ class HierarquiaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar true quando é superior imediata")
+    @DisplayName("Deve retornar true quando é superior")
     void deveRetornarTrueQuandoSuperiorImediata() {
         Unidade superior = criarUnidade(1L, null);
         Unidade alvo = criarUnidade(2L, superior);
@@ -171,7 +171,7 @@ class HierarquiaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar false quando não é superior imediata")
+    @DisplayName("Deve retornar false quando não é superior")
     void deveRetornarFalseQuandoNaoSuperiorImediata() {
         Unidade raiz = criarUnidade(1L, null);
         Unidade intermediaria = criarUnidade(2L, raiz);
@@ -188,7 +188,7 @@ class HierarquiaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar false se alvo não tem superior ao verificar superior imediata")
+    @DisplayName("Deve retornar false se alvo não tem superior ao verificar superior")
     void deveRetornarFalsoSeAlvoNaoTemSuperiorAoVerificarImediata() {
         Unidade alvo = criarUnidade(1L, null);
         Unidade superior = criarUnidade(2L, null);
@@ -207,7 +207,7 @@ class HierarquiaServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar false quando superior imediata não tem código")
+    @DisplayName("Deve retornar false quando superior não tem código")
     void deveRetornarFalseQuandoSuperiorNaoTemCodigo() {
         Unidade superior = criarUnidade(null, null);
         Unidade alvo = criarUnidade(3L, null);

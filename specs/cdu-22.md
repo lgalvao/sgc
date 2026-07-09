@@ -82,7 +82,7 @@
     Acompanhe o processo no Sistema de Gestão de Competências (:URL_SISTEMA:).
     ```
 
-   8.5. O sistema agrupa as unidades selecionadas por unidade superior imediata e, para cada unidade superior imediata
+   8.5. O sistema agrupa as unidades selecionadas por unidade superior e, para cada unidade superior
    que tenha ao menos subordinada direta selecionada, envia uma única notificação consolidada por e-mail, seguindo o
    modelo correspondente ao tipo do processo:
 

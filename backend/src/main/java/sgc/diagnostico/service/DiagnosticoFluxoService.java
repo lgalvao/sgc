@@ -334,7 +334,7 @@ public class DiagnosticoFluxoService {
         Unidade unidadeSuperior = fluxoContextoService.buscarSuperiorImediato(unidadeOrigem.getCodigo());
         if (unidadeSuperior == null) {
             throw new ErroInconsistenciaInterna(
-                    "Unidade superior imediata obrigatória ausente para %s da unidade %s"
+                    "Unidade superior obrigatória ausente para %s da unidade %s"
                             .formatted(contexto, unidadeOrigem.getSigla())
             );
         }
