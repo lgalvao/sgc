@@ -294,11 +294,15 @@ public class SubprocessoNotificacaoService {
 
     private String chaveIdempotencia(NotificacaoCommand cmd, EmailGerado email) {
         String destinatario = email.destinatario().trim().toLowerCase(Locale.ROOT);
-        return "subprocesso:%s:transicao:%s:destinatario:%s:origem:%s".formatted(
+        String movimentacao = cmd.codigoMovimentacao() == null
+                ? ""
+                : ":movimentacao:%s".formatted(cmd.codigoMovimentacao());
+        return "subprocesso:%s:transicao:%s:destinatario:%s:origem:%s%s".formatted(
                 cmd.subprocesso().getCodigo(),
                 cmd.tipoTransicao().name(),
                 destinatario,
-                email.origem().name()
+                email.origem().name(),
+                movimentacao
         );
     }
 

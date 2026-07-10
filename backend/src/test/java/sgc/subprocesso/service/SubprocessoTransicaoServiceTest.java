@@ -69,6 +69,12 @@ class SubprocessoTransicaoServiceTest {
         Subprocesso subprocesso = criarSubprocesso(MAPEAMENTO, MAPEAMENTO_CADASTRO_EM_ANDAMENTO, origem);
         Usuario usuario = criarUsuario();
 
+        when(movimentacaoRepo.save(any(Movimentacao.class))).thenAnswer(invocation -> {
+            Movimentacao movimentacao = invocation.getArgument(0);
+            movimentacao.setCodigo(42L);
+            return movimentacao;
+        });
+
         service.registrarTransicao(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(CADASTRO_DISPONIBILIZADO)
@@ -90,7 +96,8 @@ class SubprocessoTransicaoServiceTest {
                         && cmd.tipoTransicao() == CADASTRO_DISPONIBILIZADO
                         && cmd.unidadeOrigem().equals(origem)
                         && cmd.unidadeDestino().equals(destino)
-                        && "Observacao".equals(cmd.observacoes())));
+                        && "Observacao".equals(cmd.observacoes())
+                        && cmd.codigoMovimentacao().equals(42L)));
     }
 
     @Test

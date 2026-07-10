@@ -229,7 +229,10 @@ class CDU10IntegrationTest extends BaseIntegrationTest {
         List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.REVISAO_CADASTRO_DISPONIBILIZADA)
                 .toList();
-        assertThat(notificacoes).hasSize(1);
+        assertThat(notificacoes).hasSize(2);
+        assertThat(notificacoes)
+                .extracting(NotificacaoEmail::getChaveIdempotencia)
+                .doesNotHaveDuplicates();
 
         NotificacaoEmail notificacao = notificacoes.getFirst();
         assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");

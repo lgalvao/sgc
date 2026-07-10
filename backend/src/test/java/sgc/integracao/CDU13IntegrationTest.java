@@ -16,6 +16,7 @@ import sgc.organizacao.model.*;
 import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
+import sgc.subprocesso.service.*;
 import tools.jackson.core.type.*;
 
 import java.time.*;
@@ -50,6 +51,9 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private NotificacaoEmailRepo notificacaoEmailRepo;
+
+    @Autowired
+    private SubprocessoTransicaoService transicaoService;
 
     private Unidade unidade;
     private Unidade unidadeSuperior;
@@ -425,5 +429,33 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .getFirst();
         assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
         assertThat(analiseRegistrada.getMotivo()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve notificar novamente quando o cadastro for disponibilizado em nova movimentação")
+    void redisponibilizarCadastro_deveCriarNovaNotificacao() {
+        Subprocesso sp = subprocessoRepo.findById(subprocesso.getCodigo()).orElseThrow();
+        Usuario usuario = usuarioRepo.findById("101010101010").orElseThrow();
+
+        RegistrarTransicaoCommand comando = RegistrarTransicaoCommand.builder()
+                .sp(sp)
+                .tipo(TipoTransicao.CADASTRO_DISPONIBILIZADO)
+                .origem(unidade)
+                .destino(unidadeSuperior)
+                .usuario(usuario)
+                .build();
+
+        transicaoService.registrarTransicao(comando);
+        transicaoService.registrarTransicao(comando);
+
+        entityManager.flush();
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_DISPONIBILIZADO)
+                .toList();
+        assertThat(notificacoes).hasSize(2);
+        assertThat(notificacoes)
+                .extracting(NotificacaoEmail::getChaveIdempotencia)
+                .doesNotHaveDuplicates();
     }
 }

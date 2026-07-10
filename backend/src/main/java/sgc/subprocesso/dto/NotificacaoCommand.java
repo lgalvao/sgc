@@ -12,6 +12,7 @@ public record NotificacaoCommand(
         Unidade unidadeOrigem,
         Unidade unidadeDestino,
         @Nullable String observacoes,
-        @Nullable Boolean enviarEmail
+        @Nullable Boolean enviarEmail,
+        @Nullable Long codigoMovimentacao
 ) {
 }

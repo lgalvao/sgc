@@ -66,15 +66,15 @@ public class SubprocessoTransicaoService {
     }
 
     public void registrarTransicao(RegistrarTransicaoCommand cmd) {
-        persistirTransicao(cmd);
-        registrarComunicacoesTransicao(cmd);
+        Movimentacao movimentacao = persistirTransicao(cmd);
+        registrarComunicacoesTransicao(cmd, movimentacao.getCodigo());
     }
 
     public void registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand cmd) {
         persistirTransicao(cmd);
     }
 
-    private void persistirTransicao(RegistrarTransicaoCommand cmd) {
+    private Movimentacao persistirTransicao(RegistrarTransicaoCommand cmd) {
         Subprocesso sp = cmd.sp();
         String desc = cmd.tipo().getDescMovimentacao();
         if (desc.contains("%s")) {
@@ -87,12 +87,13 @@ public class SubprocessoTransicaoService {
                 .descricao(desc)
                 .usuario(cmd.usuario())
                 .build();
-        movimentacaoRepo.save(movimentacao);
+        Movimentacao movimentacaoSalva = movimentacaoRepo.save(movimentacao);
 
         subprocessoRepo.save(sp);
+        return movimentacaoSalva != null ? movimentacaoSalva : movimentacao;
     }
 
-    private void registrarComunicacoesTransicao(RegistrarTransicaoCommand cmd) {
+    private void registrarComunicacoesTransicao(RegistrarTransicaoCommand cmd, @Nullable Long codigoMovimentacao) {
         Subprocesso sp = cmd.sp();
         notificacaoService.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(sp)
@@ -101,6 +102,7 @@ public class SubprocessoTransicaoService {
                 .unidadeDestino(cmd.destino())
                 .observacoes(cmd.observacoes())
                 .enviarEmail(cmd.enviarEmail())
+                .codigoMovimentacao(codigoMovimentacao)
                 .build());
     }
 
