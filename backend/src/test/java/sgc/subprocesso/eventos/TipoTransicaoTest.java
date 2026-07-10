@@ -29,14 +29,12 @@ class TipoTransicaoTest {
     }
 
     @Test
-    @DisplayName("Deve verificar os métodos enviaEmail e notificacaoSuperior corretamente")
+    @DisplayName("Deve verificar o método enviaEmail corretamente")
     void deveVerificarMetodosDeEnvioDeEmail() {
         TipoTransicao comEmail = TipoTransicao.CADASTRO_DISPONIBILIZADO;
         assertThat(comEmail.enviaEmail()).isTrue();
-        assertThat(comEmail.notificacaoSuperior()).isTrue();
 
         TipoTransicao semEmail = TipoTransicao.CADASTRO_HOMOLOGADO;
         assertThat(semEmail.enviaEmail()).isFalse();
-        assertThat(semEmail.notificacaoSuperior()).isFalse();
     }
 }

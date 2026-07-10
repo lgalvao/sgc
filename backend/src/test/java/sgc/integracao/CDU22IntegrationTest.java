@@ -167,30 +167,20 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.CADASTRO_ACEITO)
                 .filter(n -> n.getUsuarioDestinoTitulo() == null)
                 .toList();
-        assertThat(notificacoes).hasSize(3);
+        assertThat(notificacoes).hasSize(1);
         assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
-            assertThat(notificacao.getDestinatario()).isEqualTo("sedesenv@tre-pe.jus.br");
-            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos da SEDESENV submetido para análise");
-            assertThat(notificacao.getCorpoHtml()).containsIgnoringWhitespaces("foi aceito e submetido para análise pela unidade superior");
-            assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
-        });
-        assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDIA");
-            assertThat(notificacao.getDestinatario()).isEqualTo("sedia@tre-pe.jus.br");
-            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastro de atividades e conhecimentos da SEDIA submetido para análise");
-        });
-        assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
-            assertThat(notificacao.getDestinatario()).isEqualTo("cosis@tre-pe.jus.br");
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("STIC");
+            assertThat(notificacao.getDestinatario()).isEqualTo("stic@tre-pe.jus.br");
             assertThat(notificacao.getAssunto()).isEqualTo("SGC: Cadastros de atividades e conhecimentos submetidos para análise");
             assertThat(notificacao.getCorpoHtml()).contains("SEDESENV, SEDIA");
+            assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
         });
+        assertThat(notificacoes)
+                .extracting(NotificacaoEmail::getUnidadeDestinoSigla)
+                .doesNotContain("SEDESENV", "SEDIA", "COSIS");
 
-        aguardarEmail(3);
-        assertThat(algumEmailPara("sedesenv@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailPara("sedia@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailPara("cosis@tre-pe.jus.br")).isTrue();
+        aguardarEmail(1);
+        assertThat(algumEmailPara("stic@tre-pe.jus.br")).isTrue();
         assertThat(algumEmailComAssunto("[SGC-TEST] Cadastros de atividades e conhecimentos submetidos para análise")).isTrue();
     }
 

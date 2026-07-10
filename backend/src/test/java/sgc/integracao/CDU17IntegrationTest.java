@@ -195,7 +195,7 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                     .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_DISPONIBILIZADO)
                     .filter(n -> n.getUsuarioDestinoTitulo() == null)
                     .toList();
-            assertThat(notificacoes).hasSizeGreaterThanOrEqualTo(2);
+            assertThat(notificacoes).hasSize(1);
 
             NotificacaoEmail notificacaoUnidade = notificacoes.stream()
                     .filter(n -> unidade.getSigla().equals(n.getUnidadeDestinoSigla()))
@@ -210,23 +210,13 @@ class CDU17IntegrationTest extends BaseIntegrationTest {
                     .contains("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências");
             assertThat(notificacaoUnidade.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
 
-            NotificacaoEmail notificacaoSuperior = notificacoes.stream()
-                    .filter(n -> unidadeSuperior.getSigla().equals(n.getUnidadeDestinoSigla()))
-                    .findFirst()
-                    .orElseThrow();
-            assertThat(notificacaoSuperior.getDestinatario()).isEqualTo("u17sup@tre-pe.jus.br");
-            assertThat(notificacaoSuperior.getAssunto()).isEqualTo("SGC: Mapa de competências disponibilizado - U17");
-            assertThat(notificacaoSuperior.getCorpoHtml())
-                    .contains("Prezado(a) responsável pela <strong>U17SUP</strong>")
-                    .contains("O mapa de competências da <strong>U17</strong> foi disponibilizado no")
-                    .contains("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências");
-            assertThat(notificacaoSuperior.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
+            assertThat(notificacoes)
+                    .extracting(NotificacaoEmail::getUnidadeDestinoSigla)
+                    .doesNotContain(unidadeSuperior.getSigla());
 
-            aguardarEmail(2);
+            aguardarEmail(1);
             assertThat(algumEmailPara(notificacaoUnidade.getDestinatario())).isTrue();
-            assertThat(algumEmailPara(notificacaoSuperior.getDestinatario())).isTrue();
             assertThat(algumEmailComAssunto("[SGC-TEST] Mapa de competências disponibilizado")).isTrue();
-            assertThat(algumEmailComAssunto("[SGC-TEST] Mapa de competências disponibilizado - U17")).isTrue();
             assertThat(algumEmailContem("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências")).isTrue();
 
             List<Analise> analisesRestantes = analiseRepo.findBySubprocessoCodigo(subprocesso.getCodigo());

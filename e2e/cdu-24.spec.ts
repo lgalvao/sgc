@@ -137,12 +137,6 @@ test.describe.serial('CDU-24 - Disponibilizar mapas em bloco', () => {
                 'i'
             )
         });
-        await verificarNotificacaoAdmin(page, {
-            destinatario: 'COORD_22',
-            assunto: 'Mapas de competências disponibilizados',
-            tipo: 'Mapa disponibilizado',
-            trechoCorpo: UNIDADE_1
-        });
     });
 
     test('Cenario 4: Disponibilização em bloco registra movimentação e alerta com data/hora', async ({

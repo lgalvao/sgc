@@ -3,7 +3,7 @@ import {criarProcessoMapaValidadoFixture, validarProcessoFixture} from './fixtur
 import {navegarParaSubprocesso} from './helpers/helpers-navegacao.js';
 import {acessarDetalhesProcesso, obterAcaoBloco} from './helpers/helpers-processos.js';
 import {loginComPerfil} from './helpers/helpers-auth.js';
-import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
+import {verificarAusenciaNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js';
 
 /**
  * CDU-26 - Homologar validação de mapas de competências em bloco
@@ -116,14 +116,10 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
 
         await page.waitForURL(/\/painel/);
         await expect(page.getByTestId('tbl-processos')).toBeVisible();
-        await verificarNotificacaoAdmin(page, {
+        await verificarAusenciaNotificacaoAdmin(page, {
             destinatario: UNIDADE_1,
             assunto: 'Mapa de competências homologado',
-            tipo: 'Mapa homologado',
-            trechoCorpo: new RegExp(
-                `O mapa de competências da sua unidade foi homologado no processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
-                'i'
-            )
+            tipo: 'Mapa homologado'
         });
     });
 
@@ -165,7 +161,7 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await expect(linhaMovimentacao).toContainText('ADMIN');
     });
 
-    test('Cenario 6: Homologação em bloco registra alerta com data/hora para unidade do subprocesso', async ({
+    test('Cenario 6: Homologação em bloco não registra alerta para unidade do subprocesso', async ({
                                                                                                                  _resetAutomatico,
                                                                                                                  request,
                                                                                                                  page,
@@ -192,8 +188,9 @@ test.describe.serial('CDU-26 - Homologar validação de mapas em bloco', () => {
         await loginComPerfil(page, '300001', 'senha', 'GESTOR - SECRETARIA_3');
 
         const tabelaAlertas = page.getByTestId('tbl-alertas');
-        const linhaAlerta = tabelaAlertas.locator('tr', {hasText: descIsolada}).first();
-        await expect(linhaAlerta).toBeVisible();
-        await expect(linhaAlerta).toContainText(/\d{2}\/\d{2}\/\d{4}/);
+        const linhaAlertaHomologacao = tabelaAlertas
+            .locator('tr', {hasText: descIsolada})
+            .filter({hasText: /homologad/i});
+        await expect(linhaAlertaHomologacao).toHaveCount(0);
     });
 });

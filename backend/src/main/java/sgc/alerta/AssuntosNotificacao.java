@@ -85,18 +85,12 @@ public final class AssuntosNotificacao {
                 : "SGC: Cadastros de atividades e conhecimentos submetidos para análise";
     }
 
-    public final static String disponibilizacaoMapaBloco = "SGC: Mapas de competências disponibilizados";
-
     private static String descricaoTipoProcessoFinalizacao(TipoProcesso tipoProcesso) {
         return switch (tipoProcesso) {
             case MAPEAMENTO -> "mapeamento";
             case REVISAO -> "revisão";
             case DIAGNOSTICO -> "diagnóstico";
         };
-    }
-
-    public static String aceiteValidacaoBlocoDireto(String siglaUnidade) {
-        return "SGC: Validação do mapa de competências da %s submetida para análise".formatted(siglaUnidade);
     }
 
     public static String diagnosticoAutoavaliacaoConcluida(String nomeServidor) {

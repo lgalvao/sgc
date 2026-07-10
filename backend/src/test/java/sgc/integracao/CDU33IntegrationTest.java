@@ -158,12 +158,10 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
                 .as("CDU-33 deve criar alerta apenas para a superior direta")
                 .isEqualTo(1);
 
-        Unidade unidadeSuperior = Optional.ofNullable(spReaberto.getUnidade().getUnidadeSuperior()).orElseThrow();
-
         List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.REVISAO_CADASTRO_REABERTA)
                 .toList();
-        assertThat(notificacoes).hasSize(2);
+        assertThat(notificacoes).hasSize(1);
 
         NotificacaoEmail notificacaoUnidade = notificacoes.stream()
                 .filter(n -> spReaberto.getUnidade().getSigla().equals(n.getUnidadeDestinoSigla()))
@@ -178,24 +176,8 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
                 .contains(request.justificativa());
         assertThat(notificacaoUnidade.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
 
-        NotificacaoEmail notificacaoSuperior = notificacoes.stream()
-                .filter(n -> unidadeSuperior.getSigla().equals(n.getUnidadeDestinoSigla()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Notificação da unidade superior não encontrada"));
-        assertThat(notificacaoSuperior.getAssunto())
-                .isEqualTo("SGC: Reabertura de revisão de cadastro - %s".formatted(spReaberto.getUnidade().getSigla()));
-        assertThat(notificacaoSuperior.getCorpoHtml())
-                .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidadeSuperior.getSigla()))
-                .contains("revisão do cadastro de atividades da unidade <strong>%s</strong> foi reaberta para ajustes"
-                        .formatted(spReaberto.getUnidade().getSigla()))
-                .contains("Processo CDU-33")
-                .contains(request.justificativa());
-        assertThat(notificacaoSuperior.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
-
-        aguardarEmail(2);
+        aguardarEmail(1);
         assertThat(algumEmailPara(notificacaoUnidade.getDestinatario())).isTrue();
-        assertThat(algumEmailPara(notificacaoSuperior.getDestinatario())).isTrue();
-        assertThat(algumEmailComAssunto("[SGC-TEST] Reabertura de revisão de cadastro - %s".formatted(spReaberto.getUnidade().getSigla()))).isTrue();
         assertThat(algumEmailComAssunto("[SGC-TEST] Reabertura de revisão de cadastro - %s".formatted(spReaberto.getUnidade().getSigla()))).isTrue();
     }
 

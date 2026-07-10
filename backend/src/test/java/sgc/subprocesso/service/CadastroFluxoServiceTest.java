@@ -146,6 +146,16 @@ class CadastroFluxoServiceTest {
     }
 
     @Test
+    @DisplayName("devolver deve exigir justificativa")
+    void devolverDeveExigirJustificativa() {
+        assertThatThrownBy(() -> service.devolver(1L, "   "))
+                .isInstanceOf(sgc.comum.erros.ErroValidacao.class)
+                .hasMessage("A justificativa é obrigatória");
+
+        verifyNoInteractions(consultaService, usuarioAplicacaoService, transicaoService);
+    }
+
+    @Test
     @DisplayName("executarDevolucao deve falhar sem movimentações compativeis")
     void executarDevolucaoSemMovimentacoesCompativeisDeveFalhar() {
         Unidade u = criarUnidade(1L, "U", "Unid");

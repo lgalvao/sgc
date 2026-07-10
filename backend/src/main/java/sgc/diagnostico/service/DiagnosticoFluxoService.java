@@ -4,6 +4,7 @@ import lombok.*;
 import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
+import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.comum.model.*;
 import sgc.diagnostico.model.*;
@@ -169,6 +170,7 @@ public class DiagnosticoFluxoService {
     }
 
     public void devolverDiagnostico(Long codSubprocesso, @Nullable String observacao) {
+        String justificativa = normalizarJustificativaObrigatoria(observacao);
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, java.util.Map.of("subprocesso.codigo", codSubprocesso));
         var subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
@@ -199,11 +201,18 @@ public class DiagnosticoFluxoService {
                 .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
                 .motivoAnalise(null)
-                .observacoes(observacao)
+                .observacoes(justificativa)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 
-        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, observacao);
+        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, justificativa);
+    }
+
+    private static String normalizarJustificativaObrigatoria(@Nullable String justificativa) {
+        if (justificativa == null || justificativa.isBlank()) {
+            throw new ErroValidacao(Mensagens.JUSTIFICATIVA_OBRIGATORIA);
+        }
+        return justificativa.trim();
     }
 
     public void validarDevolucaoDiagnostico(Long codSubprocesso) {

@@ -593,6 +593,16 @@ class SubprocessoTransicaoServiceTest {
     }
 
     @Test
+    @DisplayName("devolverValidacao deve exigir justificativa")
+    void devolverValidacaoDeveExigirJustificativa() {
+        assertThatThrownBy(() -> service.devolverValidacao(1L, null))
+                .isInstanceOf(sgc.comum.erros.ErroValidacao.class)
+                .hasMessage("A justificativa é obrigatória");
+
+        verifyNoInteractions(consultaService, usuarioAplicacaoService, analiseRepo, notificacaoService);
+    }
+
+    @Test
     @DisplayName("devolverValidacao deve validar apenas situações com sugestões para ADMIN")
     void devolverValidacaoDeveValidarApenasSituacoesComSugestoesParaAdmin() {
         Unidade unidadeSubprocesso = criarUnidade(1L, "U1", "Unidade 1");

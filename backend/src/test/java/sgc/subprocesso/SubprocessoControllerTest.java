@@ -672,6 +672,22 @@ class SubprocessoControllerTest {
         }
 
         @Test
+        @DisplayName("deve rejeitar devolver validação sem justificativa")
+        @WithMockUser(roles = "GESTOR")
+        void deveRejeitarDevolverValidacaoSemJustificativa() throws Exception {
+            JustificativaRequest request = new JustificativaRequest(" ");
+
+            mockMvc.perform(post("/api/subprocessos/1/devolver-validacao")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.details").exists());
+
+            verify(transicaoService, never()).devolverValidacao(anyLong(), anyString());
+        }
+
+        @Test
         @DisplayName("deve aceitar validação (pelo gestor)")
         @WithMockUser(roles = "GESTOR")
         void deveAceitarValidacao() throws Exception {

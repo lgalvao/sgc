@@ -12,6 +12,6 @@ public record NotificacaoCommand(
         Unidade unidadeOrigem,
         Unidade unidadeDestino,
         @Nullable String observacoes,
-        @Nullable Boolean notificarSuperior
+        @Nullable Boolean enviarEmail
 ) {
 }

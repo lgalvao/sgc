@@ -6,7 +6,6 @@ import org.jspecify.annotations.*;
 import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import org.springframework.util.*;
-import sgc.alerta.*;
 import sgc.comum.*;
 import sgc.comum.erros.*;
 import sgc.mapa.model.*;
@@ -58,7 +57,6 @@ public class SubprocessoTransicaoService {
     private final UnidadeService unidadeService;
     private final UsuarioAplicacaoService usuarioAplicacaoService;
     private final MapaManutencaoService mapaManutencaoService;
-    private final AlertaAplicacaoService alertaAplicacaoService;
 
     private static @Nullable String normalizarTexto(@Nullable String texto) {
         if (!StringUtils.hasText(texto)) {
@@ -102,7 +100,7 @@ public class SubprocessoTransicaoService {
                 .unidadeOrigem(cmd.origem())
                 .unidadeDestino(cmd.destino())
                 .observacoes(cmd.observacoes())
-                .notificarSuperior(cmd.notificarSuperior())
+                .enviarEmail(cmd.enviarEmail())
                 .build());
     }
 
@@ -238,7 +236,7 @@ public class SubprocessoTransicaoService {
                 .destino(sp.getUnidade())
                 .usuario(usuario)
                 .observacoes(normalizarTexto(observacoes))
-                .notificarSuperior(enviarEmails ? null : Boolean.FALSE)
+                .enviarEmail(enviarEmails ? null : Boolean.FALSE)
                 .build());
     }
 
@@ -310,6 +308,7 @@ public class SubprocessoTransicaoService {
     }
 
     public void devolverValidacao(Long codSubprocesso, @Nullable String justificativa) {
+        String justificativaNormalizada = normalizarJustificativaObrigatoria(justificativa);
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         validarLocalizacaoEscrita(sp, usuario);
@@ -333,11 +332,19 @@ public class SubprocessoTransicaoService {
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
-                .motivoAnalise(normalizarTexto(justificativa))
-                .observacoes(normalizarTexto(justificativa))
+                .motivoAnalise(justificativaNormalizada)
+                .observacoes(justificativaNormalizada)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO)
                 .build());
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);
+    }
+
+    private static String normalizarJustificativaObrigatoria(@Nullable String justificativa) {
+        String texto = normalizarTexto(justificativa);
+        if (texto == null) {
+            throw new ErroValidacao(Mensagens.JUSTIFICATIVA_OBRIGATORIA);
+        }
+        return texto;
     }
 
     private void validarSituacaoPermitidaParaDevolucao(Usuario usuario, Subprocesso sp) {
@@ -417,14 +424,10 @@ public class SubprocessoTransicaoService {
     public void homologarValidacaoEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarHomologacaoValidacao(sp, null, usuario, true));
+        subprocessos.forEach(sp -> executarHomologacaoValidacao(sp, null, usuario));
     }
 
     private void executarHomologacaoValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario) {
-        executarHomologacaoValidacao(sp, observacoes, usuario, false);
-    }
-
-    private void executarHomologacaoValidacao(Subprocesso sp, @Nullable String observacoes, Usuario usuario, boolean notificarUnidade) {
         log.info("Homologando validação do mapa do subprocesso {}", sp.getCodigo());
         validacaoService.validarSituacaoPermitida(sp,
                 MAPEAMENTO_MAPA_VALIDADO,
@@ -433,15 +436,6 @@ public class SubprocessoTransicaoService {
         sp.setSituacao(obterSituacaoObrigatoria(SITUACAO_MAPA_HOMOLOGADO, sp, "homologação de validação"));
 
         registrarTransicaoDentroDoAdmin(sp, TipoTransicao.MAPA_HOMOLOGADO, usuario, normalizarTexto(observacoes));
-        if (notificarUnidade) {
-            alertaAplicacaoService.criarAlertaTransicao(
-                    sp.getProcesso(),
-                    Mensagens.ALERTA_MAPA_HOMOLOGADO.formatted(sp.getUnidade().getSigla()),
-                    obterUnidadeAdmin(),
-                    sp.getUnidade()
-            );
-            notificacaoService.notificarHomologacaoMapa(sp);
-        }
     }
 
     private void registrarTransicaoParaSuperiorDaUnidade(
@@ -489,7 +483,6 @@ public class SubprocessoTransicaoService {
                 .usuario(cmd.usuario())
                 .motivoAnalise(cmd.motivoAnalise())
                 .observacoes(cmd.observacoes())
-                .notificarSuperior(cmd.modoComunicacao() == RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES ? Boolean.FALSE : null)
                 .build();
 
         switch (cmd.modoComunicacao()) {
@@ -554,7 +547,7 @@ public class SubprocessoTransicaoService {
                 .destino(admin)
                 .usuario(usuario)
                 .observacoes(observacoes)
-                .notificarSuperior(null)
+                .enviarEmail(null)
                 .build());
     }
 

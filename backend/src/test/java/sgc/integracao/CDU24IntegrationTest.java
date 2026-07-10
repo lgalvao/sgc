@@ -174,7 +174,7 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_DISPONIBILIZADO)
                 .filter(n -> n.getUsuarioDestinoTitulo() == null)
                 .toList();
-        assertThat(notificacoes).hasSize(3);
+        assertThat(notificacoes).hasSize(2);
         assertThat(notificacoes).anySatisfy(notificacao -> {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
             assertThat(notificacao.getAssunto()).isEqualTo("SGC: Mapa de competências disponibilizado");
@@ -184,16 +184,13 @@ class CDU24IntegrationTest extends BaseIntegrationTest {
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDIA");
             assertThat(notificacao.getAssunto()).isEqualTo("SGC: Mapa de competências disponibilizado");
         });
-        assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
-            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Mapas de competências disponibilizados");
-            assertThat(notificacao.getCorpoHtml()).contains("SEDESENV, SEDIA");
-        });
+        assertThat(notificacoes)
+                .extracting(NotificacaoEmail::getUnidadeDestinoSigla)
+                .doesNotContain("COSIS");
 
-        aguardarEmail(3);
+        aguardarEmail(2);
         assertThat(algumEmailPara("sedesenv@tre-pe.jus.br")).isTrue();
         assertThat(algumEmailPara("sedia@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailPara("cosis@tre-pe.jus.br")).isTrue();
     }
 
     @Test

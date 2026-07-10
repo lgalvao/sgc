@@ -7,6 +7,7 @@ import org.springframework.stereotype.*;
 import org.springframework.transaction.annotation.*;
 import sgc.alerta.*;
 import sgc.comum.*;
+import sgc.comum.erros.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
@@ -98,9 +99,10 @@ public class CadastroFluxoService {
     }
 
     public void devolver(Long codSubprocesso, @Nullable String observacoes) {
+        String justificativa = normalizarJustificativaObrigatoria(observacoes);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
-        executarDevolucao(sp, usuario, observacoes);
+        executarDevolucao(sp, usuario, justificativa);
     }
 
     public void aceitar(Long codSubprocesso, @Nullable String observacoes) {
@@ -167,7 +169,7 @@ public class CadastroFluxoService {
         }
     }
 
-    private void executarDevolucao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {
+    private void executarDevolucao(Subprocesso sp, Usuario usuario, String observacoes) {
         FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
@@ -180,7 +182,6 @@ public class CadastroFluxoService {
             sp.setDataFimEtapa1(null);
         }
 
-        String obs = normalizarTexto(observacoes);
         transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(sp)
                 .novaSituacao(novaSituacao)
@@ -191,7 +192,7 @@ public class CadastroFluxoService {
                 .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
                 .motivoAnalise(null)
-                .observacoes(obs)
+                .observacoes(observacoes)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO)
                 .build());
 
@@ -222,6 +223,14 @@ public class CadastroFluxoService {
                         : RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build();
         transicaoService.registrarWorkflowParaSuperiorAtual(cmd);
+    }
+
+    private static String normalizarJustificativaObrigatoria(@Nullable String justificativa) {
+        String texto = normalizarTexto(justificativa);
+        if (texto == null) {
+            throw new ErroValidacao(Mensagens.JUSTIFICATIVA_OBRIGATORIA);
+        }
+        return texto;
     }
 
     private void executarHomologacao(Subprocesso sp, Usuario usuario, @Nullable String observacoes) {

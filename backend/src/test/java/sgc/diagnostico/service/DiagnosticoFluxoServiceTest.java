@@ -243,6 +243,16 @@ class DiagnosticoFluxoServiceTest {
     }
 
     @Test
+    @DisplayName("devolverDiagnostico deve exigir justificativa")
+    void devolverDiagnostico_deveExigirJustificativa() {
+        assertThatThrownBy(() -> service.devolverDiagnostico(91L, " "))
+                .isInstanceOf(ErroValidacao.class)
+                .hasMessage("A justificativa é obrigatória");
+
+        verifyNoInteractions(repo, subprocessoConsultaService, transicaoService, notificacaoService);
+    }
+
+    @Test
     @DisplayName("devolverDiagnostico deve retornar para autoavaliação concluída quando devolvido à unidade dona")
     void devolverDiagnostico_deveRetornarParaAutoavaliacaoDaUnidade() {
         Long codSubprocesso = 91L;

@@ -147,26 +147,19 @@ class CDU25IntegrationTest extends BaseIntegrationTest {
                 .filter(n -> n.getTipoNotificacao() == TipoNotificacao.MAPA_VALIDACAO_ACEITA)
                 .filter(n -> n.getUsuarioDestinoTitulo() == null)
                 .toList();
-        assertThat(notificacoes).hasSize(3);
+        assertThat(notificacoes).hasSize(1);
         assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDESENV");
-            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação do mapa de competências da SEDESENV submetida para análise");
-            assertThat(notificacao.getCorpoHtml()).containsIgnoringWhitespaces("foi aceita e submetida para análise pela unidade superior");
-        });
-        assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("SEDIA");
-            assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação do mapa de competências da SEDIA submetida para análise");
-        });
-        assertThat(notificacoes).anySatisfy(notificacao -> {
-            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
+            assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("STIC");
+            assertThat(notificacao.getDestinatario()).isEqualTo("stic@tre-pe.jus.br");
             assertThat(notificacao.getAssunto()).isEqualTo("SGC: Validação de mapas de competências submetida para análise");
             assertThat(notificacao.getCorpoHtml()).contains("SEDESENV, SEDIA");
         });
+        assertThat(notificacoes)
+                .extracting(NotificacaoEmail::getUnidadeDestinoSigla)
+                .doesNotContain("SEDESENV", "SEDIA", "COSIS");
 
-        aguardarEmail(3);
-        assertThat(algumEmailPara("sedesenv@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailPara("sedia@tre-pe.jus.br")).isTrue();
-        assertThat(algumEmailPara("cosis@tre-pe.jus.br")).isTrue();
+        aguardarEmail(1);
+        assertThat(algumEmailPara("stic@tre-pe.jus.br")).isTrue();
     }
 
     @Test

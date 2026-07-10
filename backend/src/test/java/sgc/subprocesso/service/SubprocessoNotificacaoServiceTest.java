@@ -112,8 +112,8 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("deve notificar apenas o superior imediato quando diferente do destino")
-    void deveNotificarApenasSuperiorImediatoQuandoDiferenteDoDestino() {
+    @DisplayName("deve notificar apenas a unidade destino da transição")
+    void deveNotificarApenasUnidadeDestinoDaTransicao() {
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
 
         Unidade superiorImediato = criarUnidade(20L, "SUP1", "Superior imediato");
@@ -126,17 +126,6 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(destino.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
-        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(
-                new UnidadeResumoLeitura(20L, "Superior imediato", "SUP1", TipoUnidade.INTERMEDIARIA)
-        ));
-
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
@@ -144,20 +133,19 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(destino)
                 .build());
 
-        verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getAllValues())
                 .extracting(EnfileirarNotificacaoCommand::destinatario)
-                .containsExactly("dest@tre-pe.jus.br", "sup1@tre-pe.jus.br");
-        assertThat(notificacaoEmailCaptor.getAllValues().get(1).assunto()).contains(" - ORIG");
+                .containsExactly("dest@tre-pe.jus.br");
 
-        verify(templateEngine, times(2)).process(templateCaptor.capture(), contextCaptor.capture());
-        assertThat(templateCaptor.getAllValues()).containsExactly("cadastro-devolvido", "cadastro-devolvido-superior");
-        assertThat(contextCaptor.getAllValues().get(1).getVariable("siglaUnidadeSuperior")).isEqualTo("SUP1");
+        verify(templateEngine).process(templateCaptor.capture(), contextCaptor.capture());
+        assertThat(templateCaptor.getValue()).isEqualTo("cadastro-devolvido");
+        assertThat(contextCaptor.getValue().getVariable("siglaUnidadeDestino")).isEqualTo("DEST");
     }
 
     @Test
-    @DisplayName("nao deve reenviar email superior quando o destino ja for o superior imediato")
-    void naoDeveReenviarEmailSuperiorQuandoDestinoJaForSuperiorImediato() {
+    @DisplayName("deve enviar apenas um email para a unidade destino")
+    void deveEnviarApenasUmEmailParaUnidadeDestino() {
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
 
         Unidade destino = criarUnidade(20L, "DEST", "Unidade destino");
@@ -166,14 +154,6 @@ class SubprocessoNotificacaoServiceTest {
 
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
-
-        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(destino.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
@@ -184,12 +164,11 @@ class SubprocessoNotificacaoServiceTest {
 
         verify(notificacaoService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("dest@tre-pe.jus.br");
-        verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
     }
 
     @Test
-    @DisplayName("deve notificar superior direto da unidade do subprocesso na reabertura")
-    void deveNotificarSuperiorDiretoDaUnidadeDoSubprocessoNaReabertura() {
+    @DisplayName("deve notificar apenas a unidade do subprocesso na reabertura")
+    void deveNotificarApenasUnidadeDoSubprocessoNaReabertura() {
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
 
         Unidade admin = criarUnidade(1L, "ADMIN", "Administracao");
@@ -197,17 +176,6 @@ class SubprocessoNotificacaoServiceTest {
         Unidade destino = criarUnidade(10L, "ORIG", "Unidade origem");
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
-
-        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(destino.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
-        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of(
-                new UnidadeResumoLeitura(20L, "Superior direto", "SUP", TipoUnidade.INTERMEDIARIA)
-        ));
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
@@ -218,10 +186,10 @@ class SubprocessoNotificacaoServiceTest {
                 .build());
 
         verify(alertaService, never()).criarAlertaTransicao(any(), anyString(), any(), any());
-        verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getAllValues())
                 .extracting(EnfileirarNotificacaoCommand::destinatario)
-                .containsExactly("orig@tre-pe.jus.br", "sup@tre-pe.jus.br");
+                .containsExactly("orig@tre-pe.jus.br");
     }
 
     @Test
@@ -411,15 +379,6 @@ class SubprocessoNotificacaoServiceTest {
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(destino.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
-        when(unidadeHierarquiaService.buscarCodigoPai(10L)).thenReturn(20L);
-        when(unidadeService.buscarResumosPorCodigos(List.of(20L))).thenReturn(List.of());
-
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
@@ -488,8 +447,6 @@ class SubprocessoNotificacaoServiceTest {
                         .titularTitulo("titular")
                         .titularNome("Titular")
                         .build()));
-        when(unidadeHierarquiaService.buscarCodigoPai(unidade.getCodigo())).thenReturn(null);
-
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.REVISAO_CADASTRO_REABERTA)
@@ -499,30 +456,6 @@ class SubprocessoNotificacaoServiceTest {
 
         verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getValue().assunto()).isEqualTo("SGC: Reabertura de revisão de cadastro - ORIG");
-    }
-
-    @Test
-    @DisplayName("notificarHomologacaoMapa deve usar o assunto padrão do tipo de transição")
-    void notificarHomologacaoMapaDeveUsarOAssuntoPadraoDoTipoDeTransicao() {
-        when(templateEngine.process(eq("mapa-homologado"), any(IContext.class))).thenReturn("<html>homologado</html>");
-
-        Unidade admin = criarUnidade(1L, "ADMIN", "Administracao");
-        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
-        Processo processo = criarProcesso();
-        Subprocesso subprocesso = criarSubprocesso(unidade, processo);
-
-        when(unidadeService.buscarAdmin()).thenReturn(admin);
-        when(responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(unidade.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
-
-        service.notificarHomologacaoMapa(subprocesso);
-
-        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
-        assertThat(notificacaoEmailCaptor.getValue().assunto()).isEqualTo("SGC: Mapa de competências homologado");
     }
 
     @Test
@@ -538,51 +471,35 @@ class SubprocessoNotificacaoServiceTest {
     }
 
     @Test
-    @DisplayName("não deve notificar superior quando o comando desabilitar explicitamente essa notificação")
-    void naoDeveNotificarSuperiorQuandoOComandoDesabilitarExplicitamenteEssaNotificacao() {
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
-
+    @DisplayName("não deve enviar e-mail quando o comando desabilitar explicitamente esse envio")
+    void naoDeveEnviarEmailQuandoOComandoDesabilitarExplicitamenteEsseEnvio() {
         Unidade origem = criarUnidade(10L, "ORIG", "Origem");
         Unidade destino = criarUnidade(20L, "DEST", "Destino");
         destino.setUnidadeSuperior(criarUnidade(30L, "SUP", "Superior"));
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(origem, processo);
 
-        when(responsavelService.buscarResponsavelUnidadeOpt(destino.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(destino.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
-
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
                 .tipoTransicao(TipoTransicao.CADASTRO_DEVOLVIDO)
                 .unidadeOrigem(origem)
                 .unidadeDestino(destino)
-                .notificarSuperior(Boolean.FALSE)
+                .enviarEmail(Boolean.FALSE)
                 .build());
 
-        verify(notificacaoService, times(1)).enfileirar(any());
-        verify(unidadeService, never()).buscarResumosPorCodigos(anyList());
+        verify(notificacaoService, never()).enfileirar(any());
+        verify(templateEngine, never()).process(anyString(), any(IContext.class));
     }
 
     @Test
-    @DisplayName("aceite de cadastro deve enviar email apenas para a unidade superior quando o destino da transição for a própria unidade de análise")
-    void aceiteDeCadastroDeveEnviarEmailApenasParaUnidadeSuperior() {
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
-
+    @DisplayName("aceite de cadastro não deve gerar comunicação quando origem e destino forem a mesma unidade")
+    void aceiteDeCadastroNaoDeveGerarComunicacaoParaPropriaUnidade() {
         Unidade superiorImediato = criarUnidade(20L, "SUP", "Superior imediato");
         Unidade unidadeAnalise = criarUnidade(10L, "COSIS", "Coordenadoria");
         unidadeAnalise.setUnidadeSuperior(superiorImediato);
         Unidade unidadeSubprocesso = criarUnidade(30L, "SESEL", "Subordinada");
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(unidadeSubprocesso, processo);
-
-        when(unidadeHierarquiaService.buscarCodigoPai(unidadeSubprocesso.getCodigo())).thenReturn(superiorImediato.getCodigo());
-        when(unidadeService.buscarResumosPorCodigos(List.of(superiorImediato.getCodigo()))).thenReturn(List.of(
-                new UnidadeResumoLeitura(superiorImediato.getCodigo(), "Superior imediato", superiorImediato.getSigla(), TipoUnidade.INTEROPERACIONAL)
-        ));
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
@@ -591,28 +508,18 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(unidadeAnalise)
                 .build());
 
-        verify(notificacaoService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
-        assertThat(notificacaoEmailCaptor.getValue().unidadeDestinoSigla()).isEqualTo("SUP");
-        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("sup@tre-pe.jus.br");
-        verify(responsavelService, never()).buscarResponsavelUnidadeOpt(unidadeAnalise.getCodigo());
+        verifyNoInteractions(alertaService, notificacaoService, responsavelService, templateEngine);
     }
 
     @Test
-    @DisplayName("aceite de validacao do mapa deve enviar email apenas para a unidade superior quando o destino da transição for a própria unidade de análise")
-    void aceiteDeValidacaoDoMapaDeveEnviarEmailApenasParaUnidadeSuperior() {
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
-
+    @DisplayName("aceite de validação não deve gerar comunicação quando origem e destino forem a mesma unidade")
+    void aceiteDeValidacaoDoMapaNaoDeveGerarComunicacaoParaPropriaUnidade() {
         Unidade superiorImediato = criarUnidade(20L, "STIC", "Superior imediato");
         Unidade unidadeAnalise = criarUnidade(10L, "COSIS", "Coordenadoria");
         unidadeAnalise.setUnidadeSuperior(superiorImediato);
         Unidade unidadeSubprocesso = criarUnidade(30L, "SESEL", "Subordinada");
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(unidadeSubprocesso, processo);
-
-        when(unidadeHierarquiaService.buscarCodigoPai(unidadeSubprocesso.getCodigo())).thenReturn(superiorImediato.getCodigo());
-        when(unidadeService.buscarResumosPorCodigos(List.of(superiorImediato.getCodigo()))).thenReturn(List.of(
-                new UnidadeResumoLeitura(superiorImediato.getCodigo(), "Superior imediato", superiorImediato.getSigla(), TipoUnidade.INTEROPERACIONAL)
-        ));
 
         service.registrarComunicacoesTransicao(NotificacaoCommand.builder()
                 .subprocesso(subprocesso)
@@ -621,34 +528,21 @@ class SubprocessoNotificacaoServiceTest {
                 .unidadeDestino(unidadeAnalise)
                 .build());
 
-        verify(notificacaoService, times(1)).enfileirar(notificacaoEmailCaptor.capture());
-        assertThat(notificacaoEmailCaptor.getValue().unidadeDestinoSigla()).isEqualTo("STIC");
-        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("stic@tre-pe.jus.br");
-        verify(responsavelService, never()).buscarResponsavelUnidadeOpt(unidadeAnalise.getCodigo());
+        verifyNoInteractions(alertaService, notificacaoService, responsavelService, templateEngine);
     }
 
     @Test
     @DisplayName("notificarAceiteCadastroEmBloco deve ignorar subprocessos sem superior imediato")
     void notificarAceiteCadastroEmBlocoDeveIgnorarSubprocessosSemSuperiorImediato() {
-        when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
-
         Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
         unidade.setUnidadeSuperior(null);
         Processo processo = criarProcesso();
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
-        when(unidadeService.buscarAdmin()).thenReturn(criarUnidade(1L, "ADMIN", "Administracao"));
-        when(responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(unidade.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
-
         service.notificarAceiteCadastroEmBloco(List.of(subprocesso), unidade);
 
         verify(alertaService, never()).criarAlertaTransicao(any(), anyString(), any(), any());
-        verify(notificacaoService, atLeastOnce()).enfileirar(any());
+        verify(notificacaoService, never()).enfileirar(any());
     }
 
     @Test
@@ -669,36 +563,29 @@ class SubprocessoNotificacaoServiceTest {
         when(templateEngine.process(anyString(), any(IContext.class))).thenReturn("<html>corpo</html>");
 
         Unidade superior = criarUnidade(20L, "SUP", "Superior");
-        Unidade unidade = criarUnidade(10L, "ORIG", "Origem");
-        unidade.setUnidadeSuperior(superior);
+        Unidade unidadeAnalise = criarUnidade(10L, "ANA", "Analise");
+        unidadeAnalise.setUnidadeSuperior(superior);
+        Unidade unidade = criarUnidade(30L, "ORIG", "Origem");
         Processo processo = criarProcesso();
         processo.setTipo(TipoProcesso.REVISAO);
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
         when(unidadeService.buscarAdmin()).thenReturn(criarUnidade(1L, "ADMIN", "Administracao"));
-        when(responsavelService.buscarResponsavelUnidadeOpt(unidade.getCodigo()))
-                .thenReturn(Optional.of(UnidadeResponsavelDto.builder()
-                        .unidadeCodigo(unidade.getCodigo())
-                        .titularTitulo("titular")
-                        .titularNome("Titular")
-                        .build()));
 
-        service.notificarAceiteCadastroEmBloco(List.of(subprocesso), superior);
+        service.notificarAceiteCadastroEmBloco(List.of(subprocesso), unidadeAnalise);
 
-        verify(templateEngine, times(2)).process(templateCaptor.capture(), any(IContext.class));
+        verify(templateEngine).process(templateCaptor.capture(), any(IContext.class));
         assertThat(templateCaptor.getAllValues())
-                .containsExactly("revisao-cadastro-aceita-bloco-unidade", "revisao-cadastro-aceita-bloco-superior");
+                .containsExactly("revisao-cadastro-aceita-bloco-superior");
 
-        verify(notificacaoService, times(2)).enfileirar(notificacaoEmailCaptor.capture());
+        verify(notificacaoService).enfileirar(notificacaoEmailCaptor.capture());
         assertThat(notificacaoEmailCaptor.getAllValues())
                 .extracting(EnfileirarNotificacaoCommand::tipoNotificacao)
                 .containsOnly(TipoNotificacao.REVISAO_CADASTRO_ACEITA);
         assertThat(notificacaoEmailCaptor.getAllValues())
                 .extracting(EnfileirarNotificacaoCommand::assunto)
-                .containsExactly(
-                        "SGC: Revisão do cadastro de atividades e conhecimentos da ORIG submetido para análise",
-                        "SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise"
-                );
+                .containsExactly("SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise");
+        assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("sup@tre-pe.jus.br");
     }
 
 
