@@ -189,7 +189,7 @@ Localização: `backend/src/test/java/sgc`
 Comando principal:
 
 ```bash
-./gradlew --no-daemon --no-configuration-cache :backend:test
+./gradlew :backend:test
 ```
 
 ### Frontend
@@ -247,7 +247,6 @@ Comandos de execução:
 
 - [backend/README.md](backend/README.md)
 - [frontend/README.md](frontend/README.md)
-- [e2e/README.md](e2e/README.md)
 - [toolkit/README.md](toolkit/README.md)
 - [specs/design/acesso.md](specs/design/acesso.md)
 - [e2e/regras-e2e.md](e2e/regras-e2e.md)

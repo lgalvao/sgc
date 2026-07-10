@@ -282,7 +282,7 @@ Backend:
 ```bash
 ./gradlew :backend:compileTestJava
 ./gradlew :backend:test --tests "sgc.algum.pacote.AlgumTeste"
-./gradlew --no-configuration-cache :backend:compileTestJava
+./gradlew :backend:compileTestJava
 node toolkit/sgc.js backend contratos auditar
 ```
 

@@ -296,14 +296,14 @@ Por arquivo, na ordem:
 
 ```bash
 # Backend — compilar apenas os testes primeiro (mais rápido)
-./gradlew --no-configuration-cache :backend:compileTestJava
+./gradlew :backend:compileTestJava
 
 # Backend — rodar só os arquivos alterados
-./gradlew --no-daemon --no-configuration-cache :backend:test \
+./gradlew :backend:test \
   --tests "sgc.pacote.AlgumTesteAlterado"
 
 # Backend — rodar suite completa ao final
-./gradlew --no-daemon --no-configuration-cache :backend:test
+./gradlew :backend:test
 
 # Frontend
 npx vitest run <arquivos-alterados> --reporter=dot --no-color

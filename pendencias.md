@@ -1,0 +1,1 @@
+Remover coluna 'MOTIVO'. Nao esta sendo usada.
