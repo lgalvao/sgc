@@ -118,7 +118,7 @@ public class CadastroFluxoService {
         List<Subprocesso> subprocessosProcessados = new ArrayList<>();
         subprocessos.forEach(sp -> {
             if (deveProcessarAceiteEmBloco(sp, usuario)) {
-                executarAceite(sp, usuario, "Avaliação em bloco", false);
+                executarAceite(sp, usuario, null, false);
                 subprocessosProcessados.add(sp);
             }
         });
@@ -138,7 +138,7 @@ public class CadastroFluxoService {
     public void homologarCadastroEmBloco(List<Long> subprocessoCodigos) {
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         List<Subprocesso> subprocessos = subprocessoRepo.buscarPorCodigosComMapaEAtividades(subprocessoCodigos);
-        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, "Homologação em bloco"));
+        subprocessos.forEach(sp -> executarHomologacao(sp, usuario, null));
     }
 
     public void reabrirCadastro(Long codigo, String justificativa) {

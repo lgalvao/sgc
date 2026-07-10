@@ -139,6 +139,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         assertThat(analises1).isNotEmpty();
         assertThat(analises1.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
         assertThat(analises1.getFirst().getUnidadeCodigo()).isEqualTo(unidadeSuperior.getCodigo());
+        assertThat(analises1.getFirst().getObservacoes()).isNull();
 
         List<Movimentacao> movs1 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s1.getCodigo());
         assertThat(movs1).isNotEmpty();
@@ -150,6 +151,7 @@ class CDU22IntegrationTest extends BaseIntegrationTest {
         List<Analise> analises2 = analiseRepo.findBySubprocessoCodigoOrderByDataHoraDesc(s2.getCodigo());
         assertThat(analises2).isNotEmpty();
         assertThat(analises2.getFirst().getAcao()).isEqualTo(TipoAcaoAnalise.ACEITE_MAPEAMENTO);
+        assertThat(analises2.getFirst().getObservacoes()).isNull();
 
         List<Movimentacao> movs2 = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(s2.getCodigo());
         assertThat(movs2).isNotEmpty();

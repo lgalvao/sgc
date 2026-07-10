@@ -117,6 +117,7 @@ class CadastroFluxoServiceTest {
 
         assertThat(spMap.getSituacao()).isEqualTo(MAPEAMENTO_CADASTRO_DISPONIBILIZADO);
         assertThat(spRev.getSituacao()).isEqualTo(REVISAO_CADASTRO_DISPONIBILIZADA);
+        verify(transicaoService, times(2)).registrarWorkflowParaSuperiorAtual(argThat(cmd -> cmd.observacoes() == null));
         verify(notificacaoService).notificarAceiteCadastroEmBloco(List.of(spMap, spRev), unidadeAnalise);
     }
 
