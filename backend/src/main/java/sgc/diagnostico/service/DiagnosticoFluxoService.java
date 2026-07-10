@@ -205,7 +205,7 @@ public class DiagnosticoFluxoService {
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 
-        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao);
+        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, justificativa);
     }
 
     private static String normalizarJustificativaObrigatoria(@Nullable String justificativa) {

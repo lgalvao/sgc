@@ -173,6 +173,7 @@ class CDU33IntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(spReaberto.getUnidade().getSigla()))
                 .contains("A revisão do cadastro de atividades da sua unidade foi reaberta para ajustes")
                 .contains("Processo CDU-33")
+                .contains("Justificativa:")
                 .contains(request.justificativa());
         assertThat(notificacaoUnidade.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
 

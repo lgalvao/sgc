@@ -8,7 +8,7 @@
     <th:block th:fragment="conteudo">
         <p>Prezado(a) responsável pela <strong th:text="${siglaUnidade}">UNIDADE</strong>,</p>
         <p>O cadastro de atividades da sua unidade foi reaberto para ajustes.</p>
-        <p><strong>Justificativa:</strong> <span th:text="${observacoes}">Motivo da reabertura</span></p>
+        <th:block th:replace="~{fragments :: textoComplementar}"/>
         <p>Acesse o Sistema de Gestão de Competências para realizar as alterações necessárias: <a
                 href="https://sgc.tre-pe.jus.br">https://sgc.tre-pe.jus.br</a>.</p>
     </th:block>

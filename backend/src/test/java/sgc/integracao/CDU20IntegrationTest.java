@@ -170,7 +170,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(unidade.getSigla()))
                 .contains("foi devolvida para ajustes")
                 .contains("Processo de Teste")
-                .doesNotContain("Observações da análise")
+                .contains("Justificativa:")
+                .contains("Justificativa da devolução")
                 .contains("Acompanhe o processo no Sistema de Gestão de Competências");
         assertThat(notificacaoDevolucao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
 

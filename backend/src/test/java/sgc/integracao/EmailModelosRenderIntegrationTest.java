@@ -163,6 +163,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("siglaUnidadeDestino", "SESEL");
         context.setVariable("nomeProcesso", "Processo devolucao 2026");
+        context.setVariable("rotuloTextoComplementar", "Justificativa");
+        context.setVariable("textoComplementar", "Favor revisar as atividades cadastradas.");
         context.setVariable("observacoes", "Favor revisar as atividades cadastradas.");
 
         String html = templateEngine.process("cadastro-devolvido", context);
@@ -171,7 +173,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("O cadastro de atividades e conhecimentos da <strong>SESEL</strong> no processo")
                 .contains("Processo devolucao 2026")
-                .doesNotContain("Observações da análise")
+                .contains("Justificativa:")
+                .contains("Favor revisar as atividades cadastradas.")
                 .contains("Acompanhe o processo no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
@@ -221,6 +224,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("siglaUnidadeDestino", "SESEL");
         context.setVariable("nomeProcesso", "Processo revisao 2026");
+        context.setVariable("rotuloTextoComplementar", "Justificativa");
+        context.setVariable("textoComplementar", "Favor ajustar o cadastro revisado.");
 
         String html = templateEngine.process("devolucao-revisao-cadastro", context);
 
@@ -228,7 +233,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A revisão do cadastro de atividades e conhecimentos da")
                 .contains("Processo revisao 2026")
-                .doesNotContain("Observações da análise")
+                .contains("Justificativa:")
+                .contains("Favor ajustar o cadastro revisado.")
                 .contains("Acompanhe o processo no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
@@ -314,6 +320,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         Context context = new Context();
         context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("nomeProcesso", "Processo mapa 2026");
+        context.setVariable("rotuloTextoComplementar", "Justificativa");
+        context.setVariable("textoComplementar", "Favor revisar a validação apresentada.");
 
         String html = templateEngine.process("devolucao-validacao", context);
 
@@ -321,7 +329,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A validação do mapa de competências da <strong>SESEL</strong>")
                 .contains("Processo mapa 2026")
-                .doesNotContain("Observações da análise")
+                .contains("Justificativa:")
+                .contains("Favor revisar a validação apresentada.")
                 .contains("Acompanhe o processo no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
@@ -362,6 +371,48 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @DisplayName("Deve exibir observação opcional somente quando informada")
+    void deveExibirObservacaoOpcionalSomenteQuandoInformada() {
+        Context comObservacao = new Context();
+        comObservacao.setVariable("siglaUnidade", "SESEL");
+        comObservacao.setVariable("siglaUnidadeDestino", "COSIS");
+        comObservacao.setVariable("nomeProcesso", "Processo aceite 2026");
+        comObservacao.setVariable("rotuloTextoComplementar", "Observações");
+        comObservacao.setVariable("textoComplementar", "<p>Cadastro revisado.</p>");
+
+        String htmlComObservacao = templateEngine.process("aceite-cadastro", comObservacao);
+
+        assertThat(htmlComObservacao)
+                .contains("Observações:")
+                .contains("Cadastro revisado.")
+                .doesNotContain("&lt;p&gt;");
+
+        Context semObservacao = new Context();
+        semObservacao.setVariable("siglaUnidade", "SESEL");
+        semObservacao.setVariable("siglaUnidadeDestino", "COSIS");
+        semObservacao.setVariable("nomeProcesso", "Processo aceite 2026");
+
+        String htmlSemObservacao = templateEngine.process("aceite-cadastro", semObservacao);
+
+        assertThat(htmlSemObservacao).doesNotContain("Observações:");
+    }
+
+    @Test
+    @DisplayName("Deve incluir justificativa no e-mail de diagnóstico devolvido")
+    void deveIncluirJustificativaNoEmailDiagnosticoDevolvido() {
+        String html = emailModelosService.criarEmailDiagnosticoDevolvido(
+                "SESEL",
+                "SESEL",
+                "Processo diagnóstico 2026",
+                "Ajustar consenso e rever observações."
+        );
+
+        assertThat(html)
+                .contains("Justificativa:")
+                .contains("Ajustar consenso e rever observações.");
+    }
+
+    @Test
     @DisplayName("Deve renderizar aceite de validação em bloco consolidado conforme CDU-25")
     void deveRenderizarAceiteValidacaoBlocoSuperior() {
         Context context = new Context();
@@ -382,7 +433,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     void deveRenderizarCadastroReaberto() {
         Context context = new Context();
         context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("observacoes", "Ajustar atividades duplicadas.");
+        context.setVariable("rotuloTextoComplementar", "Justificativa");
+        context.setVariable("textoComplementar", "Ajustar atividades duplicadas.");
 
         String html = templateEngine.process("cadastro-reaberto", context);
 
@@ -400,7 +452,8 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         Context context = new Context();
         context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("nomeProcesso", "Revisão 2026");
-        context.setVariable("observacoes", "Ajustar descrições das atividades.");
+        context.setVariable("rotuloTextoComplementar", "Justificativa");
+        context.setVariable("textoComplementar", "Ajustar descrições das atividades.");
 
         String html = templateEngine.process("revisao-cadastro-reaberta", context);
 

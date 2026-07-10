@@ -163,6 +163,7 @@ class CDU32IntegrationTest extends BaseIntegrationTest {
         assertThat(notificacaoUnidade.getCorpoHtml())
                 .contains("Prezado(a) responsável pela <strong>%s</strong>".formatted(reaberto.getUnidade().getSigla()))
                 .contains("foi reaberto para ajustes")
+                .contains("Justificativa:")
                 .contains("Necessário ajustar informações do cadastro");
         assertThat(notificacaoUnidade.getSituacao()).isEqualTo(SituacaoNotificacao.PENDENTE);
 

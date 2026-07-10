@@ -13,6 +13,7 @@ import sgc.comum.erros.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
+import sgc.seguranca.sanitizacao.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -337,12 +338,23 @@ public class SubprocessoNotificacaoService {
             variaveis.put("dataLimiteValidacao", dataLimiteEtapa2.format(FORMATO_DATA));
         }
 
-        String observacoes = Objects.requireNonNullElse(cmd.observacoes(), "-");
-        if (!"-".equals(observacoes)) {
-            variaveis.put("observacoes", observacoes);
+        String observacoes = cmd.observacoes();
+        if (observacoes != null && !observacoes.isBlank()) {
+            variaveis.put("textoComplementar", UtilSanitizacao.sanitizarFormatado(observacoes));
+            variaveis.put("rotuloTextoComplementar", ehJustificativa(cmd.tipoTransicao())
+                    ? "Justificativa"
+                    : "Observações");
         }
 
         return variaveis;
+    }
+
+    private boolean ehJustificativa(TipoTransicao tipoTransicao) {
+        return switch (tipoTransicao) {
+            case CADASTRO_DEVOLVIDO, REVISAO_CADASTRO_DEVOLVIDA, MAPA_VALIDACAO_DEVOLVIDA,
+                    DIAGNOSTICO_DEVOLVIDO, CADASTRO_REABERTO, REVISAO_CADASTRO_REABERTA -> true;
+            default -> false;
+        };
     }
 
     private Map<String, Object> criarVariaveisConsolidacao(Unidade superior, List<Subprocesso> subprocessos) {

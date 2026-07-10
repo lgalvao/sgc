@@ -108,7 +108,8 @@ class SubprocessoNotificacaoServiceTest {
         assertThat(contexto.getVariable("dataLimiteEtapa1")).isEqualTo("10/04/2026");
         assertThat(contexto.getVariable("dataLimiteEtapa2")).isEqualTo("20/04/2026");
         assertThat(contexto.getVariable("dataLimiteValidacao")).isEqualTo("20/04/2026");
-        assertThat(contexto.getVariable("observacoes")).isEqualTo("Observacao importante");
+        assertThat(contexto.getVariable("textoComplementar")).isEqualTo("Observacao importante");
+        assertThat(contexto.getVariable("rotuloTextoComplementar")).isEqualTo("Observações");
     }
 
     @Test

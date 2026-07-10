@@ -204,7 +204,8 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>SEDESENV-TEST</strong>")
                 .contains("foi devolvido para ajustes")
                 .contains("Processo de Teste CDU-13")
-                .doesNotContain("Observações da análise")
+                .contains("Justificativa:")
+                .contains(observacoes)
                 .doesNotContain("<p>" + observacoes + "</p>");
         assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
 

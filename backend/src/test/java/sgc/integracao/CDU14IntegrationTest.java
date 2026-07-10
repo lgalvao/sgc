@@ -223,7 +223,8 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                 assertThat(notificacao.getCorpoHtml())
                         .contains("foi devolvida para ajustes")
                         .contains("Processo revisão CDU-14")
-                        .doesNotContain("Observações da análise");
+                        .contains("Justificativa:")
+                        .contains("Ajustar");
                 assertThat(notificacao.getSituacao()).isIn(SituacaoNotificacao.PENDENTE, SituacaoNotificacao.ENVIADO);
             });
         }
