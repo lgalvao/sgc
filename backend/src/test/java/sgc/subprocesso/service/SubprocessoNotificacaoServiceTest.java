@@ -570,8 +570,6 @@ class SubprocessoNotificacaoServiceTest {
         processo.setTipo(TipoProcesso.REVISAO);
         Subprocesso subprocesso = criarSubprocesso(unidade, processo);
 
-        when(unidadeService.buscarAdmin()).thenReturn(criarUnidade(1L, "ADMIN", "Administracao"));
-
         service.notificarAceiteCadastroEmBloco(List.of(subprocesso), unidadeAnalise);
 
         verify(templateEngine).process(templateCaptor.capture(), any(IContext.class));
@@ -586,6 +584,7 @@ class SubprocessoNotificacaoServiceTest {
                 .extracting(EnfileirarNotificacaoCommand::assunto)
                 .containsExactly("SGC: Revisões de cadastro de atividades e conhecimentos submetidas para análise");
         assertThat(notificacaoEmailCaptor.getValue().destinatario()).isEqualTo("sup@tre-pe.jus.br");
+        assertThat(notificacaoEmailCaptor.getValue().unidadeOrigemSigla()).isEqualTo("ANA");
     }
 
 

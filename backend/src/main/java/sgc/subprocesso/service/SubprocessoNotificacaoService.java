@@ -102,7 +102,7 @@ public class SubprocessoNotificacaoService {
         }
         subprocessos.forEach(sp -> criarAlertaAceiteCadastroEmBloco(sp, unidadeAnalise));
         agruparPorUnidadeConsolidacaoAceiteBloco(subprocessos, unidadeAnalise)
-                .forEach(this::criarNotificacaoConsolidadaAceiteCadastroBloco);
+                .forEach((destino, itens) -> criarNotificacaoConsolidadaAceiteCadastroBloco(unidadeAnalise, destino, itens));
     }
 
     public void notificarDisponibilizacaoMapaEmBloco(List<Subprocesso> subprocessos) {
@@ -118,7 +118,7 @@ public class SubprocessoNotificacaoService {
         }
         subprocessos.forEach(sp -> criarAlertaAceiteValidacaoEmBloco(sp, unidadeAnalise));
         agruparPorUnidadeConsolidacaoAceiteBloco(subprocessos, unidadeAnalise)
-                .forEach(this::criarNotificacaoConsolidadaAceiteValidacaoBloco);
+                .forEach((destino, itens) -> criarNotificacaoConsolidadaAceiteValidacaoBloco(unidadeAnalise, destino, itens));
     }
 
     private void criarAlertaAceiteCadastroEmBloco(Subprocesso sp, Unidade unidadeAnalise) {
@@ -209,16 +209,15 @@ public class SubprocessoNotificacaoService {
                 .build());
     }
 
-    private void criarNotificacaoConsolidadaAceiteCadastroBloco(Unidade destinoConsolidado, List<Subprocesso> subprocessos) {
+    private void criarNotificacaoConsolidadaAceiteCadastroBloco(Unidade unidadeAnalise, Unidade destinoConsolidado, List<Subprocesso> subprocessos) {
         Subprocesso base = subprocessos.getFirst();
-        Unidade admin = unidadeService.buscarAdmin();
         boolean revisao = base.getProcesso().getTipo() == TipoProcesso.REVISAO;
         TipoTransicao tipoTransicao = revisao ? TipoTransicao.REVISAO_CADASTRO_ACEITA : TipoTransicao.CADASTRO_ACEITO;
         TipoNotificacao tipoNotificacao = revisao ? TipoNotificacao.REVISAO_CADASTRO_ACEITA : TipoNotificacao.CADASTRO_ACEITO;
         NotificacaoCommand cmd = NotificacaoCommand.builder()
                 .subprocesso(base)
                 .tipoTransicao(tipoTransicao)
-                .unidadeOrigem(admin)
+                .unidadeOrigem(unidadeAnalise)
                 .unidadeDestino(destinoConsolidado)
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(destinoConsolidado, subprocessos);
@@ -255,13 +254,12 @@ public class SubprocessoNotificacaoService {
         notificarResponsavelPessoal(cmd, sp.getUnidade(), email);
     }
 
-    private void criarNotificacaoConsolidadaAceiteValidacaoBloco(Unidade destinoConsolidado, List<Subprocesso> subprocessos) {
+    private void criarNotificacaoConsolidadaAceiteValidacaoBloco(Unidade unidadeAnalise, Unidade destinoConsolidado, List<Subprocesso> subprocessos) {
         Subprocesso base = subprocessos.getFirst();
-        Unidade admin = unidadeService.buscarAdmin();
         NotificacaoCommand cmd = NotificacaoCommand.builder()
                 .subprocesso(base)
                 .tipoTransicao(TipoTransicao.MAPA_VALIDACAO_ACEITA)
-                .unidadeOrigem(admin)
+                .unidadeOrigem(unidadeAnalise)
                 .unidadeDestino(destinoConsolidado)
                 .build();
         Map<String, Object> variaveis = criarVariaveisConsolidacao(destinoConsolidado, subprocessos);
