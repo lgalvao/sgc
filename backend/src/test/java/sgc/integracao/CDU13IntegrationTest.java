@@ -174,8 +174,8 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         assertThat(analises).hasSize(1);
         Analise analiseRegistrada = analises.getFirst();
         assertThat(analiseRegistrada.getAcao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO);
-        assertThat(analiseRegistrada.getObservacoes()).isNull();
-        assertThat(analiseRegistrada.getMotivo()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getMotivo()).isNull();
         assertThat(analiseRegistrada.getUnidadeCodigo()).isEqualTo(unidadeSuperior.getCodigo());
 
         List<Movimentacao> movimentacoes = movimentacaoRepo.listarPorSubprocessoOrdenadasPorDataHoraDesc(
@@ -394,14 +394,13 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
 
         AnaliseHistoricoDto devolucao = historico.get(1);
         assertThat(devolucao.acao()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO.name());
-        assertThat(devolucao.observacoes()).isNull();
-        assertThat(devolucao.motivo()).isEqualTo(obsDevolucao);
+        assertThat(devolucao.observacoes()).isEqualTo(obsDevolucao);
         assertThat(devolucao.unidadeSigla()).isEqualTo(unidadeSuperior.getSigla());
     }
 
     @Test
-    @DisplayName("Deve devolver cadastro com justificativa acima de 200 caracteres")
-    void devolverCadastro_justificativaLongaDevePersistirComoMotivo() throws Exception {
+    @DisplayName("Deve devolver cadastro com justificativa acima de 200 caracteres usando observações")
+    void devolverCadastro_justificativaLongaDevePersistirEmObservacoes() throws Exception {
         Usuario gestor = usuarioRepo.findById("132313231323").orElseThrow();
         gestor.setPerfilAtivo(Perfil.GESTOR);
         gestor.setUnidadeAtivaCodigo(unidadeSuperior.getCodigo());
@@ -423,7 +422,7 @@ class CDU13IntegrationTest extends BaseIntegrationTest {
         Analise analiseRegistrada = analiseRepo
                 .findBySubprocessoCodigoOrderByDataHoraDesc(subprocesso.getCodigo())
                 .getFirst();
-        assertThat(analiseRegistrada.getObservacoes()).isNull();
-        assertThat(analiseRegistrada.getMotivo()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getObservacoes()).isEqualTo(observacoes);
+        assertThat(analiseRegistrada.getMotivo()).isNull();
     }
 }

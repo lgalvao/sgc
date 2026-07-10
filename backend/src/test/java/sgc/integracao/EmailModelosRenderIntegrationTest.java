@@ -221,7 +221,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("siglaUnidadeDestino", "SESEL");
         context.setVariable("nomeProcesso", "Processo revisao 2026");
-        context.setVariable("observacoes", "Favor ajustar o cadastro revisado.");
 
         String html = templateEngine.process("devolucao-revisao-cadastro", context);
 
@@ -315,7 +314,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
         Context context = new Context();
         context.setVariable("siglaUnidade", "SESEL");
         context.setVariable("nomeProcesso", "Processo mapa 2026");
-        context.setVariable("observacoes", "Favor revisar a validação apresentada.");
 
         String html = templateEngine.process("devolucao-validacao", context);
 

@@ -124,7 +124,7 @@ public class SubprocessoCadastroController {
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_CADASTRO')")
     @Operation(summary = "Devolve o cadastro de atividades para o responsável")
     public void devolverCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody JustificativaRequest request) {
-        cadastroFluxoService.devolver(codSubprocesso, sanitizar(request.justificativa()));
+        cadastroFluxoService.devolver(codSubprocesso, sanitizarTexto(request.justificativa()));
     }
 
     @PostMapping("/{codSubprocesso}/aceitar-cadastro")
@@ -145,7 +145,7 @@ public class SubprocessoCadastroController {
     @Operation(summary = "Devolve a revisão do cadastro de atividades para o responsável")
     @PreAuthorize("hasPermission(#codSubprocesso, 'Subprocesso', 'DEVOLVER_REVISAO_CADASTRO')")
     public void devolverRevisaoCadastro(@PathVariable Long codSubprocesso, @Valid @RequestBody JustificativaRequest request) {
-        cadastroFluxoService.devolver(codSubprocesso, sanitizar(request.justificativa()));
+        cadastroFluxoService.devolver(codSubprocesso, sanitizarTexto(request.justificativa()));
     }
 
     @PostMapping("/{codSubprocesso}/aceitar-revisao-cadastro")
@@ -177,6 +177,12 @@ public class SubprocessoCadastroController {
     }
 
     private String sanitizar(@Nullable String texto) {
+        return Optional.ofNullable(texto)
+                .map(UtilSanitizacao::sanitizarFormatado)
+                .orElse("");
+    }
+
+    private String sanitizarTexto(@Nullable String texto) {
         return Optional.ofNullable(texto)
                 .map(UtilSanitizacao::sanitizar)
                 .orElse("");

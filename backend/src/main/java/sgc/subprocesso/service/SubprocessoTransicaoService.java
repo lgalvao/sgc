@@ -332,8 +332,8 @@ public class SubprocessoTransicaoService {
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
-                .motivoAnalise(justificativaNormalizada)
-                .observacoes(null)
+                .motivoAnalise(null)
+                .observacoes(justificativaNormalizada)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO)
                 .build());
         log.info("Devolvida validação do mapa do SP {}", codSubprocesso);

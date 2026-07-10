@@ -200,8 +200,8 @@ public class DiagnosticoFluxoService {
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
-                .motivoAnalise(justificativa)
-                .observacoes(null)
+                .motivoAnalise(null)
+                .observacoes(justificativa)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 

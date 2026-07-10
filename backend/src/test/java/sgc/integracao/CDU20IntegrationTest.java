@@ -129,7 +129,8 @@ class CDU20IntegrationTest extends BaseIntegrationTest {
         assertThat(historicoDevolucao.getFirst().acao())
                 .isEqualTo(TipoAcaoAnalise.DEVOLUCAO_MAPEAMENTO.name());
         assertThat(historicoDevolucao.getFirst().unidadeSigla()).isNotNull();
-        assertThat(historicoDevolucao.getFirst().observacoes()).isNull();
+        assertThat(historicoDevolucao.getFirst().observacoes())
+                .isEqualTo("Justificativa da devolução");
 
         // Adicionar verificação de Movimentacao e Alerta após devolução
         List<Movimentacao> movimentacoesDevolucao =

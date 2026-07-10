@@ -373,8 +373,7 @@ class CDU14IntegrationTest extends BaseIntegrationTest {
                                     .with(user(gestor)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$", hasSize(1)))
-                    .andExpect(jsonPath("$[0].observacoes").doesNotExist())
-                    .andExpect(jsonPath("$[0].motivo", is("Registrando análise")));
+                    .andExpect(jsonPath("$[0].observacoes", is("Registrando análise")));
         }
 
         @Test
