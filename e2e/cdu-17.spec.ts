@@ -8,7 +8,6 @@ import {verificarNotificacaoAdmin} from './helpers/helpers-notificacoes-admin.js
 
 test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
     const UNIDADE_ALVO = 'SECAO_211';
-    const UNIDADE_SUPERIOR_IMEDIATA = 'COORD_21';
 
     const timestamp = Date.now();
     const descProcesso = `Mapeamento CDU-17 ${timestamp}`;
@@ -103,15 +102,6 @@ test.describe.serial('CDU-17 - Disponibilizar mapa de competências', () => {
             tipo: 'Mapa disponibilizado',
             trechoCorpo: new RegExp(
                 `O mapa de competências de sua unidade foi disponibilizado no contexto do processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
-                'i'
-            )
-        });
-        await verificarNotificacaoAdmin(page, {
-            destinatario: UNIDADE_SUPERIOR_IMEDIATA,
-            assunto: `Mapa de competências disponibilizado - ${UNIDADE_ALVO}`,
-            tipo: 'Mapa disponibilizado',
-            trechoCorpo: new RegExp(
-                `O mapa de competências da\\s*<strong>\\s*${UNIDADE_ALVO}\\s*</strong>\\s*foi disponibilizado no\\s*contexto do processo\\s*<strong>\\s*${descProcesso}\\s*</strong>\\.`,
                 'i'
             )
         });

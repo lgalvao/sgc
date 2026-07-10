@@ -75,7 +75,7 @@ toolkit/qualidade/semgrep/latest/
 frontend/src/generated/
 
 # Playwright E2E test results
-test-results/
+!test-results/
 playwright-report/
 .playwright/
 e2e/server.log
@@ -84,7 +84,6 @@ test-results/.last-run.json
 
 # Documento de acesso HOM
 specs/docs/como_logar_hom.md
-e2e/test-results/
 /e2e/test-results/.last-run.json
 
 # Arquivos locais e relatórios de homologação (E2E)
