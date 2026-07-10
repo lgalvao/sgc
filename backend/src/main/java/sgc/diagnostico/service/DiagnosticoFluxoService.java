@@ -200,12 +200,12 @@ public class DiagnosticoFluxoService {
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
-                .motivoAnalise(null)
-                .observacoes(justificativa)
+                .motivoAnalise(justificativa)
+                .observacoes(null)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
                 .build());
 
-        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, justificativa);
+        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao);
     }
 
     private static String normalizarJustificativaObrigatoria(@Nullable String justificativa) {

@@ -151,8 +151,7 @@ public class DiagnosticoNotificacaoService {
     public void notificarDiagnosticoDevolvido(
             Subprocesso sp,
             Unidade unidadeAnalise,
-            Unidade unidadeDevolucao,
-            @Nullable String observacao
+            Unidade unidadeDevolucao
     ) {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeDevolucao);
@@ -160,8 +159,7 @@ public class DiagnosticoNotificacaoService {
         String corpo = emailModelosService.criarEmailDiagnosticoDevolvido(
                 unidadeDevolucao.getSigla(),
                 unidadeSubprocesso.getSigla(),
-                sp.getProcesso().getDescricao(),
-                observacao
+                sp.getProcesso().getDescricao()
         );
 
         enfileirarNotificacao(sp, unidadeAnalise, unidadeDevolucao, destinatario, TipoNotificacao.DIAGNOSTICO_DEVOLVIDO, assunto, corpo,

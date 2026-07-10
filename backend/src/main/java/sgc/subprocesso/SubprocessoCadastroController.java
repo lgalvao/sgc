@@ -178,7 +178,7 @@ public class SubprocessoCadastroController {
 
     private String sanitizar(@Nullable String texto) {
         return Optional.ofNullable(texto)
-                .map(UtilSanitizacao::sanitizarFormatado)
+                .map(UtilSanitizacao::sanitizar)
                 .orElse("");
     }
 }

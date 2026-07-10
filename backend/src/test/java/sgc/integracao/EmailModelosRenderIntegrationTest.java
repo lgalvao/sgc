@@ -171,8 +171,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("O cadastro de atividades e conhecimentos da <strong>SESEL</strong> no processo")
                 .contains("Processo devolucao 2026")
-                .contains("Observações da análise")
-                .contains("Favor revisar as atividades cadastradas.")
+                .doesNotContain("Observações da análise")
                 .contains("Acompanhe o processo no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
@@ -230,7 +229,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A revisão do cadastro de atividades e conhecimentos da")
                 .contains("Processo revisao 2026")
-                .contains("Favor ajustar o cadastro revisado.")
+                .doesNotContain("Observações da análise")
                 .contains("Acompanhe o processo no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }
@@ -324,7 +323,7 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
                 .contains("A validação do mapa de competências da <strong>SESEL</strong>")
                 .contains("Processo mapa 2026")
-                .contains("Favor revisar a validação apresentada.")
+                .doesNotContain("Observações da análise")
                 .contains("Acompanhe o processo no Sistema de Gestão de Competências")
                 .contains("https://sgc.tre-pe.jus.br");
     }

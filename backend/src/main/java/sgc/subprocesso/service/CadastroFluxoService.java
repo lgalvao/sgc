@@ -98,8 +98,8 @@ public class CadastroFluxoService {
         disponibilizar(sp, REVISAO_CADASTRO_DISPONIBILIZADA, TipoTransicao.REVISAO_CADASTRO_DISPONIBILIZADA, usuario, observacoes);
     }
 
-    public void devolver(Long codSubprocesso, @Nullable String observacoes) {
-        String justificativa = normalizarJustificativaObrigatoria(observacoes);
+    public void devolver(Long codSubprocesso, @Nullable String justificativa) {
+        justificativa = normalizarJustificativaObrigatoria(justificativa);
         Subprocesso sp = consultaService.buscarSubprocesso(codSubprocesso);
         Usuario usuario = usuarioAplicacaoService.usuarioAutenticado();
         executarDevolucao(sp, usuario, justificativa);
@@ -169,7 +169,7 @@ public class CadastroFluxoService {
         }
     }
 
-    private void executarDevolucao(Subprocesso sp, Usuario usuario, String observacoes) {
+    private void executarDevolucao(Subprocesso sp, Usuario usuario, String justificativa) {
         FluxoCadastroContexto contexto = obterContextoCadastro(sp);
         validacaoService.validarSituacaoPermitida(sp, contexto.situacaoDisponibilizada());
 
@@ -191,8 +191,8 @@ public class CadastroFluxoService {
                 .unidadeAnalise(unidadeAnalise)
                 .unidadeDestino(unidadeDevolucao)
                 .usuario(usuario)
-                .motivoAnalise(null)
-                .observacoes(observacoes)
+                .motivoAnalise(justificativa)
+                .observacoes(null)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.PADRAO)
                 .build());
 

@@ -171,15 +171,13 @@ public class EmailModelosService {
     public String criarEmailDiagnosticoDevolvido(
             String siglaUnidadeDestino,
             String siglaUnidadeOrigem,
-            String nomeProcesso,
-            @Nullable String observacoes) {
+            String nomeProcesso) {
 
         Context ctx = new Context();
         ctx.setVariable(VAR_TITULO, AssuntosNotificacao.diagnosticoDevolvido(siglaUnidadeOrigem));
         ctx.setVariable(VAR_SIGLA_UNIDADE, siglaUnidadeDestino);
         ctx.setVariable("siglaUnidadeSubordinada", siglaUnidadeOrigem);
         ctx.setVariable(VAR_NOME_PROCESSO, nomeProcesso);
-        ctx.setVariable("observacoes", observacoes);
         return templateEngine.process("diagnostico-devolvido", ctx);
     }
 
