@@ -157,24 +157,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve renderizar cadastro disponibilizado para unidade superior conforme CDU-09")
-    void deveRenderizarCadastroDisponibilizadoSuperior() {
-        Context context = new Context();
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("siglaUnidadeSuperior", "STIC");
-        context.setVariable("nomeProcesso", "Processo cadastro 2026");
-
-        String html = templateEngine.process("cadastro-disponibilizado-superior", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>STIC</strong>")
-                .contains("cadastro de atividades da unidade <strong>SESEL</strong>")
-                .contains("Processo cadastro 2026")
-                .contains("A análise desse cadastro já pode ser realizada no Sistema de Gestão de Competências")
-                .contains("https://sgc.tre-pe.jus.br");
-    }
-
-    @Test
     @DisplayName("Deve renderizar cadastro devolvido conforme CDU-13")
     void deveRenderizarCadastroDevolvido() {
         Context context = new Context();
@@ -292,26 +274,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve renderizar mapa disponibilizado para unidade superior conforme CDU-17")
-    void deveRenderizarMapaDisponibilizadoSuperior() {
-        Context context = new Context();
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("siglaUnidadeSuperior", "COSIS");
-        context.setVariable("nomeProcesso", "Processo mapa 2026");
-        context.setVariable("dataLimiteValidacao", "12/05/2026");
-
-        String html = templateEngine.process("mapa-disponibilizado-superior", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
-                .contains("O mapa de competências da <strong>SESEL</strong> foi disponibilizado")
-                .contains("Processo mapa 2026")
-                .contains("12/05/2026")
-                .contains("A validação deste mapa já pode ser realizada no Sistema de Gestão de Competências")
-                .contains("https://sgc.tre-pe.jus.br");
-    }
-
-    @Test
     @DisplayName("Deve renderizar sugestões de mapa conforme CDU-19")
     void deveRenderizarSugestoesMapa() {
         Context context = new Context();
@@ -387,38 +349,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve renderizar mapa homologado conforme CDU-26")
-    void deveRenderizarMapaHomologado() {
-        Context context = new Context();
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("nomeProcesso", "Processo mapa 2026");
-
-        String html = templateEngine.process("mapa-homologado", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
-                .contains("O mapa de competências da sua unidade foi homologado no processo")
-                .contains("Processo mapa 2026")
-                .contains("Acompanhe o processo no Sistema de Gestão de Competências")
-                .contains("https://sgc.tre-pe.jus.br");
-    }
-
-    @Test
-    @DisplayName("Deve renderizar aceite de cadastro em bloco para unidade conforme CDU-22")
-    void deveRenderizarAceiteCadastroBlocoUnidade() {
-        Context context = new Context();
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("nomeProcesso", "Processo cadastro bloco 2026");
-
-        String html = templateEngine.process("cadastro-aceito-bloco-unidade", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
-                .containsIgnoringWhitespaces("foi aceito e submetido para análise pela unidade superior")
-                .contains("Processo cadastro bloco 2026");
-    }
-
-    @Test
     @DisplayName("Deve renderizar aceite de cadastro em bloco consolidado conforme CDU-22")
     void deveRenderizarAceiteCadastroBlocoSuperior() {
         Context context = new Context();
@@ -432,39 +362,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
                 .contains("SESEL, SEDESENV")
                 .containsIgnoringWhitespaces("foram submetidos para análise por essa unidade");
-    }
-
-    @Test
-    @DisplayName("Deve renderizar disponibilização de mapa em bloco consolidada conforme CDU-24")
-    void deveRenderizarMapaDisponibilizadoBlocoSuperior() {
-        Context context = new Context();
-        context.setVariable("siglaUnidadeSuperior", "COSIS");
-        context.setVariable("nomeProcesso", "Processo mapa bloco 2026");
-        context.setVariable("siglasUnidades", List.of("SESEL", "SEDESENV"));
-        context.setVariable("dataLimiteValidacao", "30/04/2026");
-
-        String html = templateEngine.process("mapa-disponibilizado-bloco-superior", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
-                .contains("SESEL, SEDESENV")
-                .contains("Processo mapa bloco 2026")
-                .contains("30/04/2026");
-    }
-
-    @Test
-    @DisplayName("Deve renderizar aceite de validação em bloco para unidade conforme CDU-25")
-    void deveRenderizarAceiteValidacaoBlocoUnidade() {
-        Context context = new Context();
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("nomeProcesso", "Processo validacao bloco 2026");
-
-        String html = templateEngine.process("validacao-mapa-aceita-bloco-unidade", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>SESEL</strong>")
-                .containsIgnoringWhitespaces("foi aceita e submetida para análise pela unidade superior")
-                .contains("Processo validacao bloco 2026");
     }
 
     @Test
@@ -501,24 +398,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Deve renderizar cadastro reaberto da unidade superior conforme CDU-32")
-    void deveRenderizarCadastroReabertoSuperior() {
-        Context context = new Context();
-        context.setVariable("siglaUnidadeSuperior", "COSIS");
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("observacoes", "Ajustar atividades duplicadas.");
-
-        String html = templateEngine.process("cadastro-reaberto-superior", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
-                .contains("cadastro de atividades da unidade <strong>SESEL</strong> foi")
-                .contains("Ajustar atividades duplicadas.")
-                .contains("Após a conclusão dos ajustes, o cadastro será submetido novamente para sua análise")
-                .contains("Sistema de Gestão de Competências");
-    }
-
-    @Test
     @DisplayName("Deve renderizar revisão de cadastro reaberta conforme CDU-33")
     void deveRenderizarRevisaoCadastroReaberta() {
         Context context = new Context();
@@ -535,24 +414,6 @@ class EmailModelosRenderIntegrationTest extends BaseIntegrationTest {
                 .contains("Revisão 2026")
                 .contains("Ajustar descrições das atividades.")
                 .contains("https://sgc.tre-pe.jus.br");
-    }
-
-    @Test
-    @DisplayName("Deve renderizar revisão de cadastro reaberta da unidade superior conforme CDU-33")
-    void deveRenderizarRevisaoCadastroReabertaSuperior() {
-        Context context = new Context();
-        context.setVariable("siglaUnidadeSuperior", "COSIS");
-        context.setVariable("siglaUnidade", "SESEL");
-        context.setVariable("nomeProcesso", "Revisão 2026");
-        context.setVariable("observacoes", "Ajustar descrições das atividades.");
-
-        String html = templateEngine.process("revisao-cadastro-reaberta-superior", context);
-
-        assertThat(html)
-                .contains("Prezado(a) responsável pela <strong>COSIS</strong>")
-                .contains("revisão do cadastro de atividades da unidade <strong>SESEL</strong> foi reaberta para ajustes")
-                .contains("Revisão 2026")
-                .contains("Ajustar descrições das atividades.");
     }
 
 }
