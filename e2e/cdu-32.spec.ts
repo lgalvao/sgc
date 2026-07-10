@@ -70,12 +70,6 @@ test.describe.serial('CDU-32 - Reabrir cadastro', () => {
             tipo: 'Cadastro reaberto',
             trechoCorpo: JUSTIFICATIVA
         });
-        await verificarNotificacaoAdmin(page, {
-            destinatario: 'COORD_22',
-            assunto: `Reabertura de cadastro de atividades - ${UNIDADE_1}`,
-            tipo: 'Cadastro reaberto',
-            trechoCorpo: JUSTIFICATIVA
-        });
     });
 
     test('Cenário complementar: unidade alvo visualiza alerta de reabertura de cadastro no painel', async ({

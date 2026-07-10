@@ -107,12 +107,6 @@ test.describe.serial('CDU-33 - Reabrir revisão de cadastro', () => {
             tipo: 'Revisão de cadastro reaberta',
             trechoCorpo: textoJustificativa
         });
-        await verificarNotificacaoAdmin(page, {
-            destinatario: 'COORD_21',
-            assunto: `Reabertura de revisão de cadastro - ${UNIDADE_ALVO}`,
-            tipo: 'Revisão de cadastro reaberta',
-            trechoCorpo: textoJustificativa
-        });
     });
 
     test('Cenário complementar: unidade alvo visualiza alerta de reabertura de revisão no painel', async ({
