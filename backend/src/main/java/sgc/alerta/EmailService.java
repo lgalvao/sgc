@@ -36,7 +36,7 @@ public class EmailService {
     }
 
     public void enviarEmailHtml(String para, String assunto, String corpoHtml) {
-        processarEnvioEmail(para, assunto, corpoHtml, true);
+        processarEnvioEmail(para, assunto, InlinerCss.inlinar(corpoHtml), true);
     }
 
     private void processarEnvioEmail(String para, String assunto, String corpo, boolean html) {

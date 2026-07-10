@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import { ROTAS } from './funcoesGerais/constantes.js';
-import { verifPerfil,acessarURL, login, efetuarLogout, verificarTelaLogin, obterUsuariosPorPerfil } from "./funcoesGerais/auxil.js";
+import { verifPerfil, acessarURL } from "./funcoesGerais/auxil.js";
+
 
 test.describe('Homologação - Testes de Acesso por Perfil', () => {
     test.beforeEach(async ({ page }) => {

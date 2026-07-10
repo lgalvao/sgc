@@ -23,7 +23,6 @@ class EmailTemplatesPadraoVisualTest {
         assertThat(conteudo)
                 .contains("th:fragment=\"email(cabecalho, conteudo)\"")
                 .contains(".container")
-                .contains(".header")
                 .contains(".content")
                 .contains(".footer")
                 .contains("Sistema de Gestão de Competências - SGC")

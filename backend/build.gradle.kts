@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.jjwt.api)
     implementation(libs.rhino)
     implementation(libs.caffeine)
+    implementation(libs.jsoup)
     runtimeOnly(libs.h2)
     implementation(libs.springdoc.openapi)
 

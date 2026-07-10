@@ -4,34 +4,15 @@
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <style>
-        body {
-            margin: 0;
-            padding: 24px 16px;
-            background-color: #f5f7fa;
-            color: #1f2933;
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 640px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border: 1px solid #d9e2ec;
-            overflow: hidden;
-        }
-
-        .header {
-            display: none;
-        }
-
-        .header h1 {
-            margin: 0;
-        }
-
-        .content {
-            padding: 24px;
-        }
+        /*
+         * Estilos de conteúdo — serão convertidos para atributos style inline automaticamente
+         * pelo InlinerCss antes do envio, garantindo compatibilidade com Gmail e Outlook.
+         *
+         * Regras preservadas no <style> (não podem ser inlinadas):
+         *   - :hover / :focus  → progressive enhancement para clientes modernos
+         *   - :last-child      → não suportado em todos os clientes
+         *   - @media           → responsividade para clientes que suportam
+         */
 
         .content p {
             margin: 0 0 12px;
@@ -77,6 +58,7 @@
             text-decoration: none;
         }
 
+        /* Mantido no <style>: progressive enhancement para clientes modernos */
         .btn:hover,
         .btn:focus {
             background-color: #bcccdc;
@@ -86,36 +68,58 @@
             color: #0b69a3;
         }
 
-        .footer {
-            padding: 16px 24px 24px;
-            border-top: 1px solid #d9e2ec;
-            background-color: #fafbfc;
-            color: #52606d;
-            font-size: 12px;
-            text-align: left;
-        }
-
-        .footer p {
-            margin: 4px 0;
-        }
-
         .assinatura-automatica {
             margin-top: 10px;
             font-style: italic;
         }
+
+        /* Responsividade para clientes com suporte a @media */
+        @media only screen and (max-width: 640px) {
+            .container {
+                width: 100% !important;
+            }
+        }
     </style>
     <title>E-mail SGC</title>
 </head>
-<body>
-<div class="container">
-    <div class="content">
-        <th:block th:replace="${conteudo}"/>
-    </div>
-    <div class="footer">
-        <p><strong>Sistema de Gestão de Competências - SGC</strong></p>
-        <p>TRE-PE - Tribunal Regional Eleitoral de Pernambuco</p>
-        <p class="assinatura-automatica">Este é um e-mail automático. Não responda.</p>
-    </div>
-</div>
+<!--
+  Layout baseado em tabelas para compatibilidade máxima com clientes de e-mail.
+  Substitui div+max-width+margin:auto (não funciona no Outlook) por
+  table+align="center"+width fixo (suportado universalmente).
+-->
+<body style="margin:0; padding:0; background-color:#f5f7fa; font-family:Arial,sans-serif; line-height:1.6;">
+
+<!-- Wrapper externo: centraliza o container e aplica o fundo da página -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f7fa"
+       style="background-color:#f5f7fa;">
+    <tr>
+        <td align="center" style="padding:24px 16px;">
+
+            <!-- Container principal (640px) — usa width fixo + align para Outlook -->
+            <table class="container" align="center" width="640" cellpadding="0" cellspacing="0" border="0"
+                   style="width:640px; background-color:#ffffff; border:1px solid #d9e2ec;">
+
+                <!-- Área de conteúdo -->
+                <tr>
+                    <td class="content"
+                        style="padding:24px; color:#1f2933; font-family:Arial,sans-serif; font-size:14px; line-height:1.6;">
+                        <th:block th:replace="${conteudo}"/>
+                    </td>
+                </tr>
+
+                <!-- Rodapé -->
+                <tr>
+                    <td style="padding:16px 24px 24px; border-top:1px solid #d9e2ec; background-color:#fafbfc; color:#52606d; font-size:12px; text-align:left;">
+                        <p style="margin:4px 0;"><strong>Sistema de Gestão de Competências - SGC</strong></p>
+                        <p style="margin:4px 0;">TRE-PE - Tribunal Regional Eleitoral de Pernambuco</p>
+                        <p class="assinatura-automatica" style="margin:10px 0 0; font-style:italic;">Este é um e-mail automático. Não responda.</p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
 </body>
 </html>

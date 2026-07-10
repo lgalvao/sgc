@@ -23,6 +23,7 @@ lombok = "1.18.46"
 openpdf = "3.0.5"
 rhino = "1.9.1"
 caffeine = "3.1.8"
+jsoup = "1.18.3"
 h2 = "2.3.232"
 ojdbc = "23.26.1.0.0"
 
@@ -68,6 +69,7 @@ jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api" }
 openpdf = { module = "com.github.librepdf:openpdf", version.ref = "openpdf" }
 rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 h2 = { module = "com.h2database:h2", version.ref = "h2" }
 ojdbc11 = { module = "com.oracle.database.jdbc:ojdbc11", version.ref = "ojdbc" }
 springdoc-openapi = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springDoc" }
