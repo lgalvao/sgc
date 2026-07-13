@@ -1,5 +1,8 @@
 import {expect, test} from './fixtures/complete-fixtures.js';
-import {criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture} from './fixtures/index.js';
+import {
+    criarProcessoDiagnosticoComAutoavaliacaoConcluidaFixture,
+    criarProcessoFixture
+} from './fixtures/index.js';
 import {login} from './helpers/helpers-auth.js';
 
 const TITULO_CHEFE_ASSESSORIA_12 = '151515';
@@ -8,6 +11,28 @@ const NOME_SERVIDOR_ASSESSORIA_12 = 'João Guilherme de Albuquerque Maranhão';
 const UNIDADE = 'ASSESSORIA_12';
 
 test.describe('CDU-42 - Visualizar detalhes de subprocesso de diagnóstico: CHEFE e SERVIDOR', () => {
+    test('CHEFE visualiza os elementos do diagnóstico logo após o início, antes da primeira autoavaliação', async ({
+                                                                                                                   _resetAutomatico,
+                                                                                                                   page,
+                                                                                                                   request
+                                                                                                               }) => {
+        const descricao = `Diagnóstico CDU-42 não iniciado ${Date.now()}`;
+        const processo = await criarProcessoFixture(request, {
+            descricao,
+            unidade: UNIDADE,
+            tipo: 'DIAGNOSTICO',
+            iniciar: true
+        });
+
+        await login(page, TITULO_CHEFE_ASSESSORIA_12, 'senha');
+        await page.goto(`/processo/${processo.codigo}/${UNIDADE}`);
+
+        await expect(page.getByTestId('subprocesso-header__txt-situacao')).toHaveText('Não iniciado');
+        await expect(page.getByTestId('tbl-servidores-diagnostico')).toBeVisible();
+        await expect(page.getByTestId('tbl-movimentacoes')).toBeVisible();
+        await expect(page.getByTestId('btn-concluir-diagnostico-cabecalho')).toBeVisible();
+    });
+
     test('CHEFE e SERVIDOR visualizam a tela de detalhes com elements e permissões adequadas ao perfil', async ({
                                                                                                                     _resetAutomatico,
                                                                                                                     page,
