@@ -89,7 +89,7 @@ export async function preencherConsensoMinimo(
             if ((await itens.nth(i).inputValue()) === '4') continue;
             await Promise.all([
                 page.waitForResponse(res =>
-                    res.url().includes(caminhoDiagnosticoApi(codSubprocesso, `/consenso/${servidorTitulo}`))
+                    res.url().includes(caminhoDiagnosticoApi(codSubprocesso, `/consenso/${encodeURIComponent(servidorTitulo)}`))
                     && res.request().method() === 'POST'
                     && res.ok()
                 ),

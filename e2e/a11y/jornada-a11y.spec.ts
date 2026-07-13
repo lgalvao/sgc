@@ -705,32 +705,15 @@ test.describe('Captura de Telas - Sistema SGC', () => {
             });
         });
 
-        test('Captura estados de validação inline de atividades', async ({page}) => {
+        test('Captura estados de validação inline de atividades', async ({page, request}) => {
             const descricao = `Proc validação ${Date.now()}`;
             const UNIDADE_ALVO = 'SECAO_212';
 
-            await login(page, USUARIOS.ADMIN_1_PERFIL.titulo, USUARIOS.ADMIN_1_PERFIL.senha);
-
-            await criarProcesso(page, {
-                descricao,
-                tipo: 'MAPEAMENTO',
-                diasLimite: 30,
-                unidade: UNIDADE_ALVO,
-                expandir: ['SECRETARIA_2', 'COORD_21']
-            });
-
-            const linhaProcesso = page.getByTestId('tbl-processos').locator('tr').filter({has: page.getByText(descricao)});
-            await linhaProcesso.click();
-            const codProcesso = await extrairProcessoCodigo(page);
-            registrarProcessoParaCleanup(cleanup, codProcesso);
-
-            await iniciarProcessoPeloCadastro(page, {
-                descricao,
-                tipo: 'MAPEAMENTO'
-            });
+            const processoCodigo = await criarProcessoMapeamentoIniciadoPorFixture(request, cleanup, descricao, UNIDADE_ALVO);
 
             await login(page, USUARIOS.CHEFE_SECAO_212.titulo, USUARIOS.CHEFE_SECAO_212.senha);
-            await acessarSubprocessoChefeDireto(page, descricao, UNIDADE_ALVO);
+            await page.goto(`/processo/${processoCodigo}/${UNIDADE_ALVO}`);
+            await expect(page).toHaveURL(new RegExp(String.raw`/processo/${processoCodigo}/${UNIDADE_ALVO}(?:\?.*)?$`));
             await navegarParaCadastro(page);
 
             // Capturar tela inicial vazia com label "Conhecimentos *"
