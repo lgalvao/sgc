@@ -79,7 +79,7 @@
         O prazo para conclusão desta etapa do processo é :DATA_LIMITE:. Acompanhe o processo no O sistema de Gestão de Competências: :URL_SISTEMA:.
      ```
 
-15. sistema cria internamente alertas para todas as unidades participantes.
+15. O sistema cria internamente alertas para todas as unidades participantes.
 
     13.1. Para cada unidade **operacional** será criado um alerta com estes campos:
     - `Descrição`: "Início do processo"

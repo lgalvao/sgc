@@ -10,6 +10,7 @@ import sgc.diagnostico.service.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -32,6 +33,25 @@ class SubprocessoAcessoServiceTest {
 
     @InjectMocks
     private SubprocessoAcessoService acessoService;
+
+    @Test
+    void deveHabilitarAcessoAoDiagnosticoParaChefeComSubprocessoNaoIniciado() {
+        Processo processo = Processo.builder()
+                .tipo(TipoProcesso.DIAGNOSTICO)
+                .build();
+        Subprocesso subprocesso = Subprocesso.builder()
+                .processo(processo)
+                .situacao(SituacaoSubprocesso.NAO_INICIADO)
+                .build();
+
+        PermissoesSubprocessoDto dto = acessoService.resolverPermissoes(createContexto(
+                subprocesso, Perfil.CHEFE, true, true, false, false));
+
+        assertThat(dto.podeCriarConsenso()).isTrue();
+        assertThat(dto.podeConcluirDiagnostico()).isTrue();
+        assertThat(dto.habilitarAcessoDiagnostico()).isTrue();
+        assertThat(dto.habilitarCriarConsenso()).isTrue();
+    }
 
     @Test
     void shouldResolverPermissoesForFinalizado() {

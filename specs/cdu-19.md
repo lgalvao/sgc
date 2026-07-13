@@ -32,7 +32,7 @@
     - Se já houver um registro de sugestões para o mapa no subprocesso da unidade, o sistema traz o campo preenchido com
       essa informação.
 
-   4.2. Usuário fornece as sugestões e clica em `Confirmar`.
+   4.2. O usuário fornece as sugestões e clica em `Confirmar`.
 
    4.3. O sistema armazena as sugestões registradas no mapa do subprocesso da unidade e altera a situação do subprocesso
    para 'Mapa com sugestões'.

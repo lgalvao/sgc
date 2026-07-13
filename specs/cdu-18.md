@@ -21,7 +21,7 @@
 
    2.1. O sistema exibe a tela `Detalhes do processo`.
 
-   2.2. Usuário clica em uma unidade subordinada que seja operacional ou interoperacional.
+   2.2. O usuário clica em uma unidade subordinada que seja operacional ou interoperacional.
 
    2.3. O sistema exibe a tela `Detalhes do subprocesso` com os dados do subprocesso da unidade selecionada.
 

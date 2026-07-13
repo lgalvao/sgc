@@ -199,21 +199,21 @@ A árvore disponibiliza um campo de busca para localização rápida de unidades
 
 ### Cenário 1: Selecionar coordenadoria inteira
 
-1. Usuário clica em COORD_11 (INTERMEDIARIA)
+1. O usuário clica em COORD_11 (INTERMEDIARIA)
 2. Todas as filhas elegíveis são marcadas (SECAO_111, SECAO_112, SECAO_113)
 3. COORD_11 fica **marcada** (todas filhas marcadas)
 4. Ao salvar, apenas as SECAOs são enviadas ao backend
 
 ### Cenário 2: Selecionar parcialmente
 
-1. Usuário marca SECAO_111 e SECAO_112
+1. O usuário marca SECAO_111 e SECAO_112
 2. COORD_11 fica **indeterminada** (nem todas filhas marcadas)
 3. Ao salvar, apenas SECAO_111 e SECAO_112 são enviadas
 
 ### Cenário 3: Desmarcar coordenadoria
 
 1. COORD_11 está marcada (todas filhas marcadas)
-2. Usuário clica em COORD_11 para desmarcar
+2. O usuário clica em COORD_11 para desmarcar
 3. Todas as filhas são desmarcadas
 4. COORD_11 fica **desmarcada**
 
@@ -221,13 +221,13 @@ A árvore disponibiliza um campo de busca para localização rápida de unidades
 
 1. COORD_11 tem 3 filhas, mas apenas 1 é elegível (tem mapa vigente)
 2. COORD_11 está **habilitada** (tem pelo menos uma filha elegível)
-3. Usuário clica em COORD_11
+3. O usuário clica em COORD_11
 4. Apenas a filha elegível é marcada
 5. COORD_11 fica **indeterminada** (nem todas filhas marcadas)
 
 ### Cenário 5: Unidade interoperacional
 
-1. Usuário marca uma unidade interoperacional
+1. O usuário marca uma unidade interoperacional
 2. Todas as unidades elegíveis abaixo dela são marcadas recursivamente
 3. O nó fica **marcado** apenas se toda a subárvore elegível estiver marcada
 4. Ao iniciar o processo, o sistema pode pedir confirmação separada sobre a participação direta da própria unidade

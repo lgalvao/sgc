@@ -125,7 +125,7 @@ Para rotas de unidade, a hierarquia é:
 
 ### Cenário 3: Visualizando unidade
 
-1. Usuário navega para `/unidade/1`
+1. O usuário navega para `/unidade/1`
 2. Store de unidades carrega a unidade com sigla "SEDOC"
 3. Breadcrumbs exibidos: 🏠 > SEDOC
 4. Se a unidade não estivesse carregada, mostraria: 🏠 > Unidade 1

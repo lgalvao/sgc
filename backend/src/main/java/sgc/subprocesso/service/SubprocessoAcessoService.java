@@ -7,6 +7,7 @@ import sgc.diagnostico.service.*;
 import sgc.mapa.service.*;
 import sgc.organizacao.*;
 import sgc.organizacao.model.*;
+import sgc.processo.model.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
 
@@ -63,7 +64,7 @@ public class SubprocessoAcessoService {
     private PermissoesSubprocessoDto construirPermissoes(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
         SituacaoSubprocesso situacao = contexto.situacao();
         boolean mesmaUnidade = contexto.mesmaUnidade();
-        boolean ehSubprocessoDiagnostico = isSituacaoDiagnostico(situacao);
+        boolean ehSubprocessoDiagnostico = ehProcessoDiagnostico(contexto);
 
         PermissoesSubprocessoDto.PermissoesSubprocessoDtoBuilder builder = PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(contexto.isChefe())
@@ -134,7 +135,7 @@ public class SubprocessoAcessoService {
     }
 
     private PermissoesSubprocessoDto construirPermissoesProcessoFinalizado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
-        boolean ehSubprocessoDiagnostico = isSituacaoDiagnostico(contexto.situacao());
+        boolean ehSubprocessoDiagnostico = ehProcessoDiagnostico(contexto);
         return PermissoesSubprocessoDto.builder()
                 .podeEditarCadastro(contexto.isChefe())
                 .podeDisponibilizarCadastro(contexto.isChefe())
@@ -194,7 +195,7 @@ public class SubprocessoAcessoService {
     }
 
     private boolean verificarAcessoDiagnosticoHabilitado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
-        if (!isSituacaoDiagnostico(contexto.situacao())) {
+        if (!ehProcessoDiagnostico(contexto)) {
             return false;
         }
         return switch (contexto.perfil()) {
@@ -204,8 +205,9 @@ public class SubprocessoAcessoService {
         };
     }
 
-    private boolean isSituacaoDiagnostico(SituacaoSubprocesso situacao) {
-        return situacao.name().startsWith("DIAGNOSTICO");
+    private boolean ehProcessoDiagnostico(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {
+        return contexto.subprocesso().getProcesso() != null
+                && contexto.subprocesso().getProcesso().getTipo() == TipoProcesso.DIAGNOSTICO;
     }
 
     private boolean verificarAcessoCadastroHabilitado(SubprocessoConsultaService.ContextoConsultaSubprocesso contexto) {

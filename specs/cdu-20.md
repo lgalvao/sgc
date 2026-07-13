@@ -18,7 +18,7 @@
 
 2. O sistema mostra a tela `Detalhes do subprocesso`.
 
-3. Usuário aciona o card `Mapa de competências`.
+3. O usuário aciona o card `Mapa de competências`.
 
 4. O sistema apresenta o mapa de competências da unidade na tela `Mapa de competências`, com os botões:
     - `Histórico de análise`;
@@ -38,7 +38,7 @@
 
 8. Se optar por **devolver para ajustes**:
 
-   8.1. Usuário clica em `Devolver para ajustes`.
+   8.1. O usuário clica em `Devolver para ajustes`.
 
    8.2. O sistema abre um modal (título `Devolver mapa`) com a pergunta "Confirma a devolução da validação do mapa para
    ajustes?", um campo de observação (opcional) e os botões `Devolver` e `Cancelar`.
@@ -92,7 +92,7 @@
 
 9. Se optar por *aceitar* (perfil GESTOR):
 
-   9.1. Usuário clica em `Registrar aceite`.
+   9.1. O usuário clica em `Registrar aceite`.
 
    9.2. O sistema abre um modal (título `Aceitar mapa`) com o texto "Confirma o aceite da validação do mapa?", um campo
    de observação opcional e os botões `Aceitar` e `Cancelar`.
@@ -140,7 +140,7 @@
 
 10. Se optar por **homologar** (perfil ADMIN):
 
-    10.1. Usuário escolhe `Homologar`.
+    10.1. O usuário escolhe `Homologar`.
 
     10.2. O sistema abre um diálogo de confirmação (título 'Homologar mapa') com a pergunta 'Confirma a homologação do
     mapa?' e os botões `Homologar` e `Cancelar`.

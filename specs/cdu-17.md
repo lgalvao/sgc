@@ -70,6 +70,6 @@
     - `Unidade de origem`: ADMIN 
     - `Unidade de destino`: :UNIDADE_SUBPROCESSO:.
 
-14. sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
+14. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
 15. O sistema redireciona para o `Painel` e mostra o *toast* "Mapa de competências disponibilizado".

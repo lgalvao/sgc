@@ -12,8 +12,8 @@
 ## Fluxo principal
 
 1. No `Painel`, o usuário clica em um processo de diagnóstico na situação 'Criado'.
-
-2. O sistema muda para a tela `Cadastro de processo`. Os campos aparecem preenchidos com os dados do processo
+   
+2. O sistema mostra a tela `Cadastro de processo`. Os campos aparecem preenchidos com os dados do processo
    selecionado.
 
 3. O usuário aciona `Iniciar`.

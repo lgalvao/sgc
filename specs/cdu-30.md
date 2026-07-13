@@ -33,7 +33,7 @@
 6. O sistema realiza o "autocompletar", filtrando pelo título ou parte do nome.
     - A lista de opções não deve incluir o usuários que já sejam administradores do sistema.
 
-7. usuário seleciona o usuário da lista e aciona `Adicionar`.
+7. O usuário seleciona o usuário da lista e aciona `Adicionar`.
 
 8. O sistema registra o usuário como administrador e mostra *toast* "Administrador adicionado".
 
