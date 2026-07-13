@@ -40,7 +40,11 @@ class SubprocessoServiceTest {
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
+    private SubprocessoValidacaoService validacaoService;
+    @Mock
     private SubprocessoRepo subprocessoRepo;
+    @Mock
+    private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private CopiaMapaService copiaMapaService;
     @Mock

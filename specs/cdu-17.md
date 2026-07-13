@@ -26,31 +26,31 @@
 7. O usuário aciona `Disponibilizar`.
 
 8. O sistema verifica se todas as competências criadas estão associadas a pelo menos uma atividade do cadastro da
-   unidade; e se todas as atividades foram associadas a pelo menos uma competência. Se alguma das validações falhar o
-   sistema mostra mensagem indicando a falha e interrompe o processo.
+   unidade, e se todas as atividades foram associadas a pelo menos uma competência. Se alguma dessas validações falhar,
+   o sistema mostra mensagem indicando a falha e interrompe o processo.
 
 9. O sistema mostra um modal com título "Disponibilização do mapa de competências" e os seguintes elementos:
     - Campo `Data limite`, obrigatório
     - Campo `Observações`, opcional
     - Botões `Disponibilizar` e `Cancelar`.
 
-10. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na tela `Edição de mapa`.
+   9.1. Caso o usuário escolha `Cancelar`, o sistema interrompe a operação e permanece na tela `Edição de mapa`.
 
-11. O usuário preenche as informações e aciona `Disponibilizar`.
+10. O usuário preenche as informações e aciona `Disponibilizar`.
 
-12. O sistema registra a data fornecida em `Data limite`, no campo `Data limite da etapa 2` do subprocesso.
+11. O sistema registra a data fornecida em `Data limite`, no campo `Data limite da etapa 2` do subprocesso.
 
-13. O sistema realiza as seguintes ações:
+12. O sistema realiza as seguintes ações:
 
-    13.1. Altera a situação do subprocesso para 'Mapa disponibilizado'.
+    12.1. Altera a situação do subprocesso para 'Mapa disponibilizado'.
 
-    13.2. Registra uma movimentação para o subprocesso:
+    12.2. Registra uma movimentação para o subprocesso:
     - `Data/hora`: Data/hora atual
     - `Unidade origem`: ADMIN
     - `Unidade destino`: :UNIDADE_SUBPROCESSO:
     - `Descrição`: 'Mapa disponibilizado para validação'
 
-    13.3. Envia notificação por e-mail à unidade do subprocesso:
+    12.3. Envia notificação por e-mail à unidade do subprocesso:
      ```text
         Assunto: SGC: Mapa de competências disponibilizado
     
@@ -63,13 +63,13 @@
         A validação já pode ser realizada no Sistema de Gestão de Competências (:URL_SISTEMA:). 
      ```
 
-    13.4. Cria um alerta:
+    12.4. Cria um alerta:
     - `Descrição`: "Mapa de competências da unidade disponibilizado para validação"
     - `Processo`: :DESCRICAO_PROCESSO:
-    - `Data/hora`: Data/hora atual 
-    - `Unidade de origem`: ADMIN 
+    - `Data/hora`: Data/hora atual
+    - `Unidade de origem`: ADMIN
     - `Unidade de destino`: :UNIDADE_SUBPROCESSO:.
 
-14. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
+13. O sistema exclui as sugestões apresentadas do mapa de competência do subprocesso da unidade.
 
-15. O sistema redireciona para o `Painel` e mostra o *toast* "Mapa de competências disponibilizado".
+14. O sistema redireciona para o `Painel` e mostra o *toast* "Mapa disponibilizado".
