@@ -592,6 +592,58 @@ class ProcessoServiceNotificacaoTest extends ProcessoServiceTestBase {
         ));
     }
 
+    @Test
+    @DisplayName("Diagnóstico deve notificar somente a unidade superior imediata")
+    void diagnosticoDeveNotificarSomenteSuperiorImediato() {
+        Long codigoProcesso = 302L;
+        Processo processo = new Processo();
+        processo.setCodigo(codigoProcesso);
+        processo.setSituacao(CRIADO);
+        processo.setTipo(TipoProcesso.DIAGNOSTICO);
+        processo.setDescricao("Diagnóstico com hierarquia");
+        processo.setDataLimite(LocalDateTime.now().plusDays(30));
+
+        Unidade admin = criarUnidadeValida(1L);
+        admin.setSigla("ADMIN");
+        admin.setTipo(TipoUnidade.RAIZ);
+        Unidade superiorImediato = criarUnidadeValida(20L);
+        superiorImediato.setSigla("IMEDIATA");
+        superiorImediato.setTipo(TipoUnidade.INTEROPERACIONAL);
+        Unidade superiorDistante = criarUnidadeValida(30L);
+        superiorDistante.setSigla("DISTANTE");
+        superiorDistante.setTipo(TipoUnidade.INTERMEDIARIA);
+        Unidade operacional = criarUnidadeValida(10L);
+        operacional.setSigla("OPER");
+        operacional.setTipo(TipoUnidade.OPERACIONAL);
+        processo.adicionarParticipantes(Set.of(operacional));
+
+        Subprocesso subprocesso = new Subprocesso();
+        subprocesso.setCodigo(530L);
+        subprocesso.setProcesso(processo);
+        subprocesso.setUnidade(operacional);
+
+        when(repo.buscar(Processo.class, codigoProcesso)).thenReturn(processo);
+        when(unidadeService.buscarAdmin()).thenReturn(admin);
+        when(unidadeService.buscarPorCodigos(List.of(10L))).thenReturn(List.of(operacional));
+        when(consultaService.listarEntidadesPorProcesso(codigoProcesso)).thenReturn(List.of(subprocesso));
+        when(unidadeHierarquiaService.buscarCodigosSuperiores(10L)).thenReturn(List.of(20L, 30L, 1L));
+        when(unidadeService.buscarPorCodigos(List.of(20L)))
+                .thenReturn(List.of(superiorImediato));
+        when(unidadeService.buscarPorCodigo(20L)).thenReturn(superiorImediato);
+        when(emailModelosService.criarEmailInicioProcessoConsolidado(anyString(), anyString(), any(), anyString(), anyBoolean(), anyList()))
+                .thenReturn("<html>inicio</html>");
+        mockarResponsaveisEfetivos();
+
+        processoService.iniciar(codigoProcesso, List.of(10L));
+
+        verify(notificacaoService).enfileirar(argThat(cmd ->
+                cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
+                        && "IMEDIATA".equals(cmd.unidadeDestinoSigla())));
+        verify(notificacaoService, never()).enfileirar(argThat(cmd ->
+                cmd.tipoNotificacao() == TipoNotificacao.PROCESSO_INICIADO
+                        && "DISTANTE".equals(cmd.unidadeDestinoSigla())));
+    }
+
 }
 
 

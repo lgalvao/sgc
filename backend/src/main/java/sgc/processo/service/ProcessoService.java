@@ -1187,7 +1187,7 @@ public class ProcessoService {
 
         Set<Long> codigosSuperiores = new HashSet<>();
         for (Unidade unidade : participantes) {
-            codigosSuperiores.addAll(unidadeHierarquiaService.buscarCodigosSuperiores(unidade.getCodigo()));
+            codigosSuperiores.addAll(codigoSuperiorImediatoParaNotificacao(unidade.getCodigo()));
         }
         if (!codigosSuperiores.isEmpty()) {
             List<Unidade> unidadesSuperiores = unidadeService.buscarPorCodigos(new ArrayList<>(codigosSuperiores));
@@ -1200,7 +1200,7 @@ public class ProcessoService {
             });
         }
 
-        Map<Long, List<String>> subordinadasPorSuperior = mapearSiglasSubordinadasPorSuperior(participantes);
+        Map<Long, List<String>> subordinadasPorSuperior = mapearSiglasSubordinadasPorSuperiorInicio(participantes);
         LocalDateTime dataLimite = obterDataLimiteObrigatoria(processo, processo.getCodigo());
 
         for (Long cod : codsOperacionais) {
@@ -1282,6 +1282,23 @@ public class ProcessoService {
         );
     }
 
+    private Map<Long, List<String>> mapearSiglasSubordinadasPorSuperiorInicio(List<Unidade> participantes) {
+        Map<Long, List<String>> subordinadasPorSuperior = new HashMap<>();
+        for (Unidade participante : participantes) {
+            for (Long codigoSuperior : codigoSuperiorImediatoParaNotificacao(participante.getCodigo())) {
+                Unidade unidadeSuperior = unidadeService.buscarPorCodigo(codigoSuperior);
+                if (isUnidadeAdmin(unidadeSuperior)) {
+                    continue;
+                }
+                subordinadasPorSuperior
+                        .computeIfAbsent(codigoSuperior, ignored -> new ArrayList<>())
+                        .add(participante.getSigla());
+            }
+        }
+        subordinadasPorSuperior.values().forEach(Collections::sort);
+        return subordinadasPorSuperior;
+    }
+
     private Map<Long, List<String>> mapearSiglasSubordinadasPorSuperior(List<Unidade> participantes) {
         Map<Long, List<String>> subordinadasPorSuperior = new HashMap<>();
         for (Unidade participante : participantes) {
@@ -1297,6 +1314,11 @@ public class ProcessoService {
         }
         subordinadasPorSuperior.values().forEach(Collections::sort);
         return subordinadasPorSuperior;
+    }
+
+    private List<Long> codigoSuperiorImediatoParaNotificacao(Long codigoUnidade) {
+        List<Long> superiores = unidadeHierarquiaService.buscarCodigosSuperiores(codigoUnidade);
+        return superiores.stream().limit(1).toList();
     }
 
     private String emailUnidade(Unidade unidade) {

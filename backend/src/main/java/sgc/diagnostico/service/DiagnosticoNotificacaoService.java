@@ -126,7 +126,7 @@ public class DiagnosticoNotificacaoService {
         );
     }
 
-    public void notificarDiagnosticoConcluido(Subprocesso sp, Unidade unidadeSuperior) {
+    public void notificarDiagnosticoConcluido(Subprocesso sp, Unidade unidadeSuperior, Long codigoMovimentacao) {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
         String assunto = AssuntosNotificacao.diagnosticoConcluido(unidadeSubprocesso.getSigla());
@@ -138,7 +138,8 @@ public class DiagnosticoNotificacaoService {
         );
 
         enfileirarNotificacao(sp, unidadeSubprocesso, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_CONCLUIDO, assunto, corpo,
-                "diagnostico:%d:concluido:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
+                "diagnostico:%d:concluido:superior:%d:movimentacao:%d".formatted(
+                        sp.getCodigo(), unidadeSuperior.getCodigo(), codigoMovimentacao));
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),

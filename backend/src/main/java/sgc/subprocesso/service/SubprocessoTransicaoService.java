@@ -70,8 +70,8 @@ public class SubprocessoTransicaoService {
         registrarComunicacoesTransicao(cmd, movimentacao.getCodigo());
     }
 
-    public void registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand cmd) {
-        persistirTransicao(cmd);
+    public Long registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand cmd) {
+        return persistirTransicao(cmd).getCodigo();
     }
 
     private Movimentacao persistirTransicao(RegistrarTransicaoCommand cmd) {

@@ -150,7 +150,7 @@ public class DiagnosticoFluxoService {
         Unidade unidadeOrigem = subprocesso.getUnidade();
         Unidade unidadeDestino = obterSuperiorImediatoObrigatorio(unidadeOrigem, "conclusão de diagnóstico");
 
-        transicaoService.registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand.builder()
+        Long codigoMovimentacao = transicaoService.registrarTransicaoSemComunicacoes(RegistrarTransicaoCommand.builder()
                 .sp(subprocesso)
                 .tipo(TipoTransicao.DIAGNOSTICO_CONCLUIDO)
                 .origem(unidadeOrigem)
@@ -159,7 +159,7 @@ public class DiagnosticoFluxoService {
                 .observacoes(null)
                 .build());
 
-        notificacaoService.notificarDiagnosticoConcluido(subprocesso, unidadeDestino);
+        notificacaoService.notificarDiagnosticoConcluido(subprocesso, unidadeDestino, codigoMovimentacao);
     }
 
     public void validarConclusaoDiagnosticoUnidade(Long codSubprocesso) {

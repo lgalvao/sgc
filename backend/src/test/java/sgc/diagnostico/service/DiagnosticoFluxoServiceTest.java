@@ -218,7 +218,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(subprocesso.getDataFimEtapa1()).isNotNull();
 
         verify(transicaoService).registrarTransicaoSemComunicacoes(any(RegistrarTransicaoCommand.class));
-        verify(notificacaoService).notificarDiagnosticoConcluido(subprocesso, unidadeSuperior);
+        verify(notificacaoService).notificarDiagnosticoConcluido(subprocesso, unidadeSuperior, 0L);
     }
 
     @Test
@@ -239,7 +239,7 @@ class DiagnosticoFluxoServiceTest {
                 .isInstanceOf(ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Unidade superior obrigatória ausente");
 
-        verify(notificacaoService, never()).notificarDiagnosticoConcluido(any(), any());
+        verify(notificacaoService, never()).notificarDiagnosticoConcluido(any(), any(), any());
     }
 
     @Test
