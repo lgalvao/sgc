@@ -32,13 +32,13 @@
 
    6.1. Registra uma análise de validação para o subprocesso da unidade:
     - `Resultado`: 'Aceite'
-    - `Data/hora`: :DATA_HORA:
-    - `Unidade`: :UNIDADE_ATUAL:
-   
+    - `Data/hora`: :DATA_HORA_ATUAL:
+    - `Unidade`: :UNIDADE_ANALISE:
+
    6.2. Registra uma movimentação para o subprocesso da unidade:
     - `Descrição`: "Aceite"
-    - `Data/hora`: :DATA_HORA:
-    - `Unidade origem`: :UNIDADE_ATUAL:
+    - `Data/hora`: :DATA_HORA_ATUAL:
+    - `Unidade origem`: :UNIDADE_ANALISE:
     - `Unidade destino`: :UNIDADE_SUPERIOR:
 
    Isso muda a localização do subprocesso para a unidade superior.
@@ -62,4 +62,4 @@
     - `Unidade de origem`: :UNIDADE_ANALISE:
     - `Unidade de destino`: :UNIDADE_SUPERIOR:
 
-9. O sistema redireciona para o `Painel`e mostra o *toast* "Diagnósticos aceitos".
+9. O sistema redireciona para o `Painel` e mostra o *toast* "Diagnósticos aceitos".
