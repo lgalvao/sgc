@@ -1,0 +1,37 @@
+{
+  "senhaPadrao": "12345678",
+  "usuario": {
+    "ADMIN": {
+      "titulo": "050062800884",
+      "perfil": "ADMIN"
+    },
+    "ADMIN-CHEFE-SEDOC": {
+      "titulo": "050062800884",
+      "perfil": "CHEFE - SEDOC"
+    },
+    "GESTOR-SGP": {
+      "titulo": "037263820809",
+      "perfil": "GESTOR - SGP"
+    },
+    "GESTOR-COEDE": {
+      "titulo": "075918400841",
+      "perfil": "GESTOR - COEDE"
+    },
+    "CHEFE-SELOG": {
+      "titulo": "002763840825",
+      "perfil": "CHEFE - SELOG"
+    },
+    "SERVIDOR-SEDOC-1": {
+      "titulo": "036408130817",
+      "perfil": "SERVIDOR - SEDOC"
+    },
+    "SERVIDOR-SEDOC-2": {
+      "titulo": "051892590868",
+      "perfil": "SERVIDOR - SEDOC"
+    },
+    "SERVIDOR-SEDOC-3": {
+      "titulo": "006739960825",
+      "perfil": "SERVIDOR - SEDOC"
+    }
+  }
+}

@@ -2,14 +2,24 @@ import { Page, expect, test } from '@playwright/test';
 import { createRequire } from 'module';
 import { IDENTIFICADORES, ROTAS } from './constantes.js';
 
-export { criarProcessoSimples, acessarDetalhesProcesso, finalizarProcesso, verificarProcessoTabela } from '../../helpers/helpers-processos.js';
-export { navegarParaSubprocesso, limparNotificacoes } from '../../helpers/helpers-navegacao.js';
-export { navegarParaCadastro, adicionarAtividade, adicionarConhecimento, disponibilizarCadastro } from '../../helpers/helpers-atividades.js';
-export { acessarSubprocessoGestor, acessarSubprocessoChefeDireto, acessarSubprocessoAdmin, aceitarCadastroMapeamento, homologarCadastroMapeamento } from '../../helpers/helpers-analise.js';
-export { verificarAusenciaNotificacaoAdmin } from '../../helpers/helpers-notificacoes-admin.js';
-export { navegarParaMapa, criarCompetencia, disponibilizarMapa, aceitarOuHomologarMapa } from '../../helpers/helpers-mapas.js';
-import { abrirValidacaoMapa } from '../../helpers/helpers-mapas.js';
-import { verificarPaginaPainel } from '../../helpers/helpers-navegacao.js';
+export { criarProcessoSimples, acessarDetalhesProcesso, finalizarProcesso, verificarProcessoTabela } from '../../e2e/helpers/helpers-processos.js';
+export { navegarParaSubprocesso, limparNotificacoes } from '../../e2e/helpers/helpers-navegacao.js';
+export { navegarParaCadastro, adicionarAtividade, adicionarConhecimento, disponibilizarCadastro } from '../../e2e/helpers/helpers-atividades.js';
+export { acessarSubprocessoGestor, acessarSubprocessoChefeDireto, acessarSubprocessoAdmin, aceitarCadastroMapeamento, homologarCadastroMapeamento } from '../../e2e/helpers/helpers-analise.js';
+export { verificarAusenciaNotificacaoAdmin } from '../../e2e/helpers/helpers-notificacoes-admin.js';
+export { navegarParaMapa, criarCompetencia, disponibilizarMapa, aceitarOuHomologarMapa } from '../../e2e/helpers/helpers-mapas.js';
+import { abrirValidacaoMapa } from '../../e2e/helpers/helpers-mapas.js';
+import { verificarPaginaPainel } from '../../e2e/helpers/helpers-navegacao.js';
+
+
+const require = createRequire(import.meta.url);
+const usuarios = require('../usuarios.local.json');
+
+export interface Usuario {
+    titulo: string;
+    senha: string;
+    perfil?: string;
+}
 
 /**
  * Realiza a validação do mapa na tela do mapa do subprocesso e aguarda retorno ao painel.
@@ -20,15 +30,6 @@ export async function validarMapa(page: Page): Promise<void> {
     await expect(btnConfirmar).toBeVisible();
     await btnConfirmar.click();
     await verificarPaginaPainel(page);
-}
-
-const require = createRequire(import.meta.url);
-const usuarios = require('../usuarios.local.json');
-
-export interface Usuario {
-    titulo: string;
-    senha: string;
-    perfil?: string;
 }
 
 
@@ -103,17 +104,20 @@ export async function verificarTelaLogin(page: Page): Promise<void> {
 
 /**
  * Realiza o login com as credenciais informadas.
- * Inclui delay para evitar bloqueio por Rate Limit (HTTP 429).
+ * Aguarda todos os componentes do formulário estarem prontos antes de interagir.
  */
 export async function login(page: Page, usuario: Usuario): Promise<void> {
-    await page.waitForTimeout(5000);
+    await expect(page.getByTestId(IDENTIFICADORES.FORM_LOGIN)).toBeVisible();
+    await expect(page.getByTestId(IDENTIFICADORES.INPUT_USUARIO)).toBeEnabled();
+    await expect(page.getByTestId(IDENTIFICADORES.INPUT_SENHA)).toBeEnabled();
+    await expect(page.getByTestId(IDENTIFICADORES.BTN_ENTRAR)).toBeEnabled();
     await page.getByTestId(IDENTIFICADORES.INPUT_USUARIO).fill(usuario.titulo);
     await page.getByTestId(IDENTIFICADORES.INPUT_SENHA).fill(usuario.senha);
     await page.getByTestId(IDENTIFICADORES.BTN_ENTRAR).click();
 
     if (usuario.perfil) {
         const seletorPerfil = page.getByTestId(IDENTIFICADORES.SELECT_PERFIL);
-        const apareceu = await seletorPerfil.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false);
+        const apareceu = await seletorPerfil.waitFor({ state: 'visible' }).then(() => true).catch(() => false);
         if (apareceu) {
             await seletorPerfil.selectOption({ label: usuario.perfil });
             await page.getByTestId(IDENTIFICADORES.BTN_ENTRAR).click();
@@ -153,7 +157,7 @@ export async function aguardarPainelCarregado(page: Page): Promise<void> {
     await page.waitForURL(/\/painel(?:\?.*)?$/);
     const carregando = page.getByTestId(IDENTIFICADORES.PAINEL_CARREGANDO);
     if (await carregando.count() > 0) {
-        await expect(carregando).toBeHidden({ timeout: 20000 });
+        await expect(carregando).toBeHidden();
     }
 }
 
@@ -165,12 +169,11 @@ export async function aguardarPainelCarregado(page: Page): Promise<void> {
  */
 export async function aguardarProcessoNoPainel(page: Page, descricaoProcesso: string): Promise<void> {
     await page.waitForURL(/\/painel(?:\?.*)?$/);
-    // Aguarda a tabela surgir no DOM (indica que o bootstrap concluiu)
+    await aguardarPainelCarregado(page);
     const tabela = page.getByTestId('tbl-processos');
-    await expect(tabela).toBeVisible({ timeout: 30000 });
-    // Aguarda a linha do processo específico aparecer na tabela
+    await expect(tabela).toBeVisible();
     const linhaProcesso = tabela.locator('tr', { hasText: descricaoProcesso });
-    await expect(linhaProcesso).toBeVisible({ timeout: 15000 });
+    await expect(linhaProcesso).toBeVisible();
 }
 
 
@@ -189,7 +192,7 @@ export async function verificarMovimentacao(
     descricao: string
 ): Promise<void> {
     const tabela = page.getByTestId('tbl-movimentacoes');
-    await expect(tabela).toBeVisible({ timeout: 10000 });
+    await expect(tabela).toBeVisible();
     const linha = tabela.locator('tr').filter({
         has: page.locator(`td:has-text("${origem}")`),
     }).filter({
@@ -197,7 +200,7 @@ export async function verificarMovimentacao(
     }).filter({
         has: page.locator(`td:has-text("${descricao}")`),
     });
-    await expect(linha).toBeVisible({ timeout: 10000 });
+    await expect(linha).toBeVisible();
 }
 
 
@@ -214,13 +217,13 @@ export async function verificarAlertaPainel(
     processo: string
 ): Promise<void> {
     const tabela = page.getByTestId('tbl-alertas');
-    await expect(tabela).toBeVisible({ timeout: 10000 });
+    await expect(tabela).toBeVisible();
     const linha = tabela.locator('tr').filter({
         has: page.locator(`td:has-text("${descricao}")`),
     }).filter({
         has: page.locator(`td:has-text("${processo}")`),
     });
-    await expect(linha).toBeVisible({ timeout: 10000 });
+    await expect(linha).toBeVisible();
 }
 
 
@@ -259,8 +262,6 @@ async function preencherFormularioProcesso(page: Page, dados: {
     await page.getByTestId(IDENTIFICADORES.INPUT_DESCRICAO).fill(dados.descricao);
     await page.getByTestId(IDENTIFICADORES.SELECT_TIPO).selectOption(dados.tipo);
     await page.getByTestId(IDENTIFICADORES.INPUT_DATA_LIMITE).fill(calcularDataLimite(dados.diasLimite));
-
-    // Aguarda que o indicador de carregamento das unidades suma
     await expect(page.getByText('Carregando unidades...')).toBeHidden();
 }
 
@@ -273,7 +274,12 @@ async function expandirNosArvore(page: Page, siglas: string[]): Promise<void> {
         await expect(botaoExpand).toBeVisible();
         await botaoExpand.click();
         await expect(botaoExpand).toHaveAttribute('aria-expanded', 'true');
-        await page.waitForTimeout(500);
+        await expect(
+            page.getByTestId(`${IDENTIFICADORES.PREFIXO_EXPAND_UNIDADE}${sigla}`)
+                .locator('xpath=../..')
+                .locator('[class*="tree-node"], [data-testid^="btn-arvore"], [data-testid^="chk-arvore"]')
+                .first()
+        ).toBeVisible();
     }
 }
 
@@ -284,12 +290,13 @@ async function expandirNosArvore(page: Page, siglas: string[]): Promise<void> {
 async function marcarUnidadesNaArvore(page: Page, siglas: string[]): Promise<void> {
     for (const sigla of siglas) {
         const checkbox = page.getByTestId(`${IDENTIFICADORES.PREFIXO_CHK_UNIDADE}${sigla}`);
-        await expect(checkbox).toBeVisible({ timeout: 15000 }); // Aguarda o Ajax carregar os filhos
+        await expect(checkbox).toBeVisible();
+        await expect(checkbox).toBeEnabled();
         await checkbox.scrollIntoViewIfNeeded();
-        await page.waitForTimeout(500); // Aguarda a árvore parar de se mover
 
         if (!await checkbox.isChecked()) {
             await checkbox.check();
+            await expect(checkbox).toBeChecked();
         }
     }
 }
@@ -312,16 +319,11 @@ async function confirmarInicioProcesso(page: Page): Promise<void> {
  */
 async function configurarUnidadesInteroperacionais(page: Page, incluir: boolean, siglas: string[]): Promise<void> {
     const modal = page.locator(IDENTIFICADORES.MODAL_INTEROPERACIONAL);
-    const abriuModal = await modal.waitFor({ state: 'visible', timeout: 2000 })
-        .then(() => true)
-        .catch(() => false);
-
+    const abriuModal = (await modal.count()) > 0 && await modal.isVisible().catch(() => false);
     if (!abriuModal) return;
-
     const siglasDesejadas = new Set(incluir ? siglas : []);
     const linhas = modal.locator('tbody tr');
     const totalLinhas = await linhas.count();
-
     for (let i = 0; i < totalLinhas; i++) {
         const linha = linhas.nth(i);
         const sigla = (await linha.locator('td').nth(1).innerText()).trim();
@@ -387,7 +389,6 @@ export async function verificarNotificacao(page: Page, options: {
     interoperacional: boolean;
     textosCorpo?: (string | RegExp)[];
 }): Promise<void> {
-    // 1. Login como admin se necessário (evita redirecionamentos se já estiver logado)
     const isLoginVisible = await page.getByTestId(IDENTIFICADORES.INPUT_USUARIO).isVisible().catch(() => false);
     if (isLoginVisible || page.url().includes(ROTAS.LOGIN)) {
         await login(page, obterCredenciaisUsuario('ADMIN'));
@@ -398,7 +399,6 @@ export async function verificarNotificacao(page: Page, options: {
         await expect(page).toHaveURL(/\/administracao\/notificacoes/);
     }
 
-    // 2. Busca a notificação via API com polling (robusto para ambientes lentos)
     interface NotificacaoApi { codigo: number; assunto: string; destinatario: string; unidadeSigla?: string | null; }
 
     const urlListagem = /\/api\/admin\/notificacoes\/listar(?:\?|$)/;
@@ -434,23 +434,19 @@ export async function verificarNotificacao(page: Page, options: {
         return codigoNotificacao ? 1 : 0;
     }, {
         message: `Notificação não encontrada — destino: "${options.destino}", assunto: "${String(options.assunto)}"`,
-        timeout: 20000,
         intervals: [1000, 2000, 3000]
     }).toBeGreaterThan(0);
 
-    // 3. Valida os dados visíveis na linha da tabela
     const tabela = page.getByTestId(IDENTIFICADORES.TABELA_NOTIFICACOES);
     const linhaNotificacao = tabela.locator('tr').filter({ hasText: options.destino }).first();
     await expect(linhaNotificacao).toBeVisible();
     await expect(linhaNotificacao).toContainText(options.origem);
 
-    // 4. Abre o modal de preview pelo código da notificação encontrada (ícone do olho)
     await page.getByTestId(`${IDENTIFICADORES.PREFIXO_BTN_PREVIEW_NOTIFICACAO}${codigoNotificacao}`).click();
 
     const modal = page.getByTestId(IDENTIFICADORES.MODAL_PREVIEW_EMAIL);
     await expect(modal).toBeVisible();
 
-    // 5. Verifica o corpo da mensagem no iframe do modal
     const corpo = modal.frameLocator(`[data-testid="${IDENTIFICADORES.IFRAME_PREVIEW_EMAIL}"]`).locator('body');
 
     await expect(corpo).toContainText(options.processo);
@@ -467,7 +463,6 @@ export async function verificarNotificacao(page: Page, options: {
         }
     }
 
-    // 6. Fecha o modal
     await page.getByTestId(IDENTIFICADORES.BTN_FECHAR_PREVIEW_EMAIL).click();
     await expect(modal).toBeHidden();
 }

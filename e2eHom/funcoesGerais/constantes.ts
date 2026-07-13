@@ -11,14 +11,6 @@ export const PERFIS = {
     SERVIDOR: 'SERVIDOR',
 } as const;
 
-// Tempos limite padrão (timeouts) para esperas explícitas
-export const TEMPOS_LIMITE = {
-    CURTO: 2000,
-    PADRAO: 5000,
-    MEDIO: 10000,
-    LONGO: 30000,
-} as const;
-
 // Caminhos comuns de navegação (URLs) do SGC
 export const ROTAS = {
     LOGIN: '/login',

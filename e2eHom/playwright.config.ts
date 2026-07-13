@@ -12,7 +12,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env.hom') });
 const baseURL = process.env.URL_ACESSO_HOM;
 
 export default defineConfig({
-    testDir: './homologacao',
+    testDir: './',
     timeout: 90_000,
     expect: {
         timeout: 10_000,
