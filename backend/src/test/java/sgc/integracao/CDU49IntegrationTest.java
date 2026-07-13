@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.*;
 import sgc.alerta.model.*;
 import sgc.comum.*;
 import sgc.diagnostico.model.*;
+import sgc.diagnostico.service.*;
 import sgc.integracao.mocks.*;
 import sgc.subprocesso.model.*;
+
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
@@ -23,6 +26,9 @@ class CDU49IntegrationTest extends DiagnosticoCduIntegrationTestBase {
 
     @Autowired
     private NotificacaoEmailRepo notificacaoEmailRepo;
+
+    @Autowired
+    private DiagnosticoFluxoService diagnosticoFluxoService;
 
     @BeforeEach
     void setUp() {
@@ -78,5 +84,26 @@ class CDU49IntegrationTest extends DiagnosticoCduIntegrationTestBase {
             assertThat(notificacao.getAssunto()).contains("Diagnóstico da unidade SEDIA submetido para análise");
             assertThat(notificacao.getUnidadeDestinoSigla()).isEqualTo("COSIS");
         });
+    }
+
+    @Test
+    @WithMockChefe("333333333333")
+    @DisplayName("Deve notificar novamente ao concluir diagnóstico após devolução")
+    void deveNotificarNovaConclusaoAposDevolucao() {
+        diagnosticoFluxoService.concluirDiagnosticoUnidade(subprocesso.getCodigo());
+        diagnosticoFluxoService.devolverDiagnostico(subprocesso.getCodigo(), "Ajustar diagnóstico");
+
+        preencherConsenso("50003", 4, 4, 4, 4, 4, 4, 4, 4, SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
+        preencherSituacoesCapacitacao("50003", ValorSituacaoCapacitacao.EC, ValorSituacaoCapacitacao.C);
+        diagnosticoFluxoService.concluirDiagnosticoUnidade(subprocesso.getCodigo());
+
+        List<NotificacaoEmail> notificacoes = notificacaoEmailRepo.findAll().stream()
+                .filter(notificacao -> notificacao.getTipoNotificacao() == TipoNotificacao.DIAGNOSTICO_CONCLUIDO)
+                .toList();
+
+        assertThat(notificacoes).hasSize(2);
+        assertThat(notificacoes)
+                .extracting(NotificacaoEmail::getChaveIdempotencia)
+                .doesNotHaveDuplicates();
     }
 }
