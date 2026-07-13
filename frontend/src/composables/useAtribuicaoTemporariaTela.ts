@@ -276,7 +276,6 @@ function criarFluxoMutacao({
                 exibirSucesso(TEXTOS.atribuicaoTemporaria.SUCESSO);
             }
         } catch (error) {
-            logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
         } finally {
             carregando.value = false;
@@ -301,7 +300,6 @@ function criarFluxoMutacao({
             resetarFormularioAtribuicao(campos, resetarValidacao);
             exibirSucesso(TEXTOS.atribuicaoTemporaria.SUCESSO_REMOCAO);
         } catch (error) {
-            logger.error(error);
             erroFormulario.value = normalizarErro(error).mensagem;
         } finally {
             carregando.value = false;
