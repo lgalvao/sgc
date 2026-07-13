@@ -5,7 +5,6 @@ import {
     confirmarInicioProcessoPeloDialogo,
     criarProcesso,
     extrairProcessoCodigo,
-    iniciarProcessoPeloCadastro,
     obterAcaoBloco
 } from './helpers/helpers-processos.js';
 import {
@@ -20,12 +19,7 @@ import {
     disponibilizarCadastro,
     navegarParaCadastro
 } from './helpers/helpers-atividades.js';
-import {
-    acessarSubprocessoChefeDireto,
-    abrirAcaoCadastroPrincipal,
-    abrirHistoricoAnalise,
-    fecharHistoricoAnalise
-} from './helpers/helpers-analise.js';
+import {abrirAcaoCadastroPrincipal, abrirHistoricoAnalise, fecharHistoricoAnalise} from './helpers/helpers-analise.js';
 import {TEXTOS} from '../frontend/src/constants/textos.js';
 import * as MapaHelpers from './helpers/helpers-mapas.js';
 import {
@@ -215,10 +209,7 @@ async function prepararPaginaParaCaptura(
     });
 }
 
-async function restaurarScrollAposCaptura(
-    page: Page,
-    scrollOriginal: { x: number; y: number } | null
-): Promise<void> {
+async function restaurarScrollAposCaptura(page: Page, scrollOriginal: { x: number; y: number } | null): Promise<void> {
     if (!scrollOriginal || (scrollOriginal.x === 0 && scrollOriginal.y === 0)) {
         await page.evaluate(() => {
             document.getElementById('sgc-captura-fullpage-style')?.remove();
@@ -261,26 +252,19 @@ async function aguardarModaisEstaveis(page: Page): Promise<void> {
                 return estilo.display !== 'none' && estilo.visibility !== 'hidden';
             });
 
-        if (elementos.length === 0) {
-            return 0;
-        }
+        if (elementos.length === 0) return 0;
 
         function converterTempoParaMs(valor: string): number {
             const valorTratado = valor.trim();
-            if (valorTratado.endsWith('ms')) {
-                return Number.parseFloat(valorTratado) || 0;
-            }
-            if (valorTratado.endsWith('s')) {
-                return (Number.parseFloat(valorTratado) || 0) * 1000;
-            }
-            return Number.parseFloat(valorTratado) || 0;
+            return valorTratado.endsWith('ms')
+                ? Number.parseFloat(valorTratado) || 0
+                : valorTratado.endsWith('s')
+                    ? (Number.parseFloat(valorTratado) || 0) * 1000
+                    : Number.parseFloat(valorTratado) || 0;
         }
 
         function maiorTempo(listaCss: string): number {
-            return Math.max(
-                0,
-                ...listaCss.split(',').map((valor) => converterTempoParaMs(valor))
-            );
+            return Math.max(0, ...listaCss.split(',').map((valor) => converterTempoParaMs(valor)));
         }
 
         return Math.max(
@@ -295,9 +279,7 @@ async function aguardarModaisEstaveis(page: Page): Promise<void> {
         );
     });
 
-    if (duracaoMs <= 0) {
-        return;
-    }
+    if (duracaoMs <= 0) return;
 
     await page.waitForTimeout(Math.min(Math.ceil(duracaoMs) + 50, 1000));
 }
@@ -394,6 +376,7 @@ async function criarProcessoMapeamentoComCadastroDisponibilizadoPorFixture(
     if (!response.ok()) {
         throw new Error(`Falha ao criar fixture de cadastro disponibilizado: ${response.status()} ${await response.text()}`);
     }
+
     const processo = await response.json() as { codigo: number };
     cleanup.registrar(processo.codigo);
     return processo.codigo;
@@ -576,9 +559,7 @@ test.describe('Captura de Telas - Sistema SGC', () => {
     });
 
     test.afterEach(async ({request}) => {
-        if (cleanup) {
-            await cleanup.limpar(request);
-        }
+        if (cleanup) await cleanup.limpar(request);
     });
 
     test.afterAll(async () => {

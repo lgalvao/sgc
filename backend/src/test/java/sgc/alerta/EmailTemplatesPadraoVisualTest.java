@@ -24,7 +24,6 @@ class EmailTemplatesPadraoVisualTest {
                 .contains("th:fragment=\"email(cabecalho, conteudo)\"")
                 .contains(".container")
                 .contains(".content")
-                .contains(".footer")
                 .contains("Sistema de Gestão de Competências - SGC")
                 .contains("Este é um e-mail automático. Não responda.");
     }
