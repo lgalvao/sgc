@@ -24,7 +24,7 @@ import static sgc.subprocesso.model.TipoTransicao.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoTransicaoService")
-@SuppressWarnings("NullAway.Init")
+
 class SubprocessoTransicaoServiceTest {
 
     @Mock

@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @EnableMethodSecurity
 @Tag("integration")
 @DisplayName("ProcessoController")
-@SuppressWarnings("NullAway.Init")
+
 class ProcessoControllerTest {
     protected static final String API_PROCESSOS = "/api/processos";
     protected static final String API_PROCESSOS_1 = "/api/processos/1";

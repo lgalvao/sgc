@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("MapaManutencaoService - Testes")
-@SuppressWarnings("NullAway.Init")
+
 class MapaManutencaoServiceTest {
 
     @Mock

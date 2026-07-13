@@ -15,7 +15,7 @@ import java.io.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@SuppressWarnings("NullAway.Init")
+
 public class UnidadeProcessoId implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

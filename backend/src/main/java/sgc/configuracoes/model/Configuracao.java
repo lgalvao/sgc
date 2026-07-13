@@ -14,7 +14,7 @@ import sgc.configuracoes.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class Configuracao extends EntidadeBase {
     @Column(name = "chave", length = 50, nullable = false)
     @NotBlank(message = Mensagens.CHAVE_OBRIGATORIA)

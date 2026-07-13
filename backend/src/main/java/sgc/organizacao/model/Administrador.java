@@ -11,7 +11,7 @@ import org.jspecify.annotations.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class Administrador {
     @Id
     @Column(name = "usuario_titulo", length = 12, nullable = false)

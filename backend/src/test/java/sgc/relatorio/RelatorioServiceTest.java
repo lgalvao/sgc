@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("RelatorioService Test")
-@SuppressWarnings("NullAway.Init")
+
 class RelatorioServiceTest {
     @Mock
     private ProcessoService processoService;

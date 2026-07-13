@@ -17,7 +17,7 @@ import java.time.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class AtribuicaoTemporaria extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "unidade_codigo", nullable = false)

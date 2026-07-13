@@ -12,7 +12,7 @@ import sgc.comum.model.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class Conhecimento extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "atividade_codigo", nullable = false)

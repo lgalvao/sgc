@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(NotificacaoController.class)
 @Import(AlertaDtoMapper.class)
 @DisplayName("NotificacaoController")
-@SuppressWarnings("NullAway.Init")
+
 class NotificacaoControllerTest {
     @Autowired
     private MockMvc mockMvc;

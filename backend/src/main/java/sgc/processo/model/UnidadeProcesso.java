@@ -19,7 +19,7 @@ import java.time.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@SuppressWarnings("NullAway.Init")
+
 public class UnidadeProcesso implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

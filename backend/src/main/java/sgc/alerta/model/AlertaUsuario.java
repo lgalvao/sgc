@@ -21,7 +21,7 @@ import java.time.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class AlertaUsuario implements Serializable {
     @EmbeddedId
     private Chave codigo;
@@ -52,7 +52,7 @@ public class AlertaUsuario implements Serializable {
     @NoArgsConstructor
     @SuperBuilder
     @EqualsAndHashCode
-    @SuppressWarnings("NullAway.Init")
+    
     public static class Chave implements Serializable {
         private Long alertaCodigo;
         private String usuarioTitulo;

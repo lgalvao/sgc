@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("NotificacaoService")
-@SuppressWarnings("NullAway.Init")
+
 class NotificacaoServiceTest {
     private static final Instant INSTANTE_FIXO = Instant.parse("2026-04-21T12:00:00Z");
     private static final ZoneId ZONA = ZoneId.of("America/Recife");

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes do Serviço de Visualização de Mapa")
-@SuppressWarnings("NullAway.Init")
+
 class MapaVisualizacaoServiceTest {
     @Spy
     private MapaDtoMapper mapaDtoMapper = new MapaDtoMapper();

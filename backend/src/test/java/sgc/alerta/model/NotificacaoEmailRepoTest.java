@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 @Tag("integration")
 @DisplayName("NotificacaoEmailRepo - Testes de Repositório")
-@SuppressWarnings("NullAway.Init")
+
 class NotificacaoEmailRepoTest {
     @Autowired
     private NotificacaoEmailRepo notificacaoEmailRepo;

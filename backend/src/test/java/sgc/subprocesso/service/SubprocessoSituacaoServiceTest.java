@@ -16,7 +16,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoSituacaoService")
-@SuppressWarnings("NullAway.Init")
+
 class SubprocessoSituacaoServiceTest {
 
     @Mock

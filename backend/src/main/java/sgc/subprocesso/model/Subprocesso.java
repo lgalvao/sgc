@@ -22,7 +22,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class Subprocesso extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "processo_codigo", nullable = false)

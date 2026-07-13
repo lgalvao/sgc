@@ -16,7 +16,7 @@ import java.time.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class NotificacaoEmail extends EntidadeBase {
 
     @ManyToOne(fetch = FetchType.LAZY)

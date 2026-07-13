@@ -5,7 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
 
-val argumentosJvmSemAvisoUnsafe = emptyList<String>()
+val argumentosJvmSemAvisoUnsafe = listOf("--sun-misc-unsafe-memory-access=allow")
 
 plugins {
     java
@@ -123,6 +123,7 @@ tasks.named<BootRun>("bootRun") {
     systemProperty("spring.profiles.active", env)
     println("Perfil Spring ativado: $env")
 
+    @Suppress("unused")
     fun carregarConfiguracoesEnv(arquivo: File, sobrescreverExistente: Boolean) {
         println("Carregando configurações de: ${arquivo.name}")
         arquivo.useLines { lines ->

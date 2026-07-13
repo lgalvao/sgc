@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SgcPermissionEvaluator - Testes")
-@SuppressWarnings("NullAway.Init")
+
 class SgcPermissionEvaluatorTest {
 
     @Mock

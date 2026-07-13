@@ -28,37 +28,23 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoService")
-@SuppressWarnings("NullAway.Init")
 class SubprocessoServiceTest {
-
     @Mock
     private ComumRepo repo;
-    @Mock
-    private AnaliseRepo analiseRepo;
     @Mock
     private UnidadeService unidadeService;
     @Mock
     private UsuarioAplicacaoService usuarioAplicacaoService;
     @Mock
-    private ImpactoMapaService impactoMapaService;
-    @Mock
     private MapaSalvamentoService mapaSalvamentoService;
     @Mock
     private SgcPermissionEvaluator permissionEvaluator;
     @Mock
-    private MapaVisualizacaoService mapaVisualizacaoService;
-    @Mock
-    private SubprocessoValidacaoService validacaoService;
-    @Mock
     private SubprocessoRepo subprocessoRepo;
-    @Mock
-    private MovimentacaoRepo movimentacaoRepo;
     @Mock
     private CopiaMapaService copiaMapaService;
     @Mock
     private MapaManutencaoService mapaManutencaoService;
-    @Mock
-    private HierarquiaService hierarquiaService;
     @Mock
     private SubprocessoConsultaService consultaService;
 
@@ -77,7 +63,6 @@ class SubprocessoServiceTest {
         sp.setProcesso(Processo.builder().tipo(tipo).situacao(SituacaoProcesso.EM_ANDAMENTO).build());
         return sp;
     }
-
 
     @Test
     @DisplayName("criarEntidade deve persistir subprocesso e mapa associado")

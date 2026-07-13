@@ -17,7 +17,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@SuppressWarnings("NullAway.Init")
+
 public class FeedbackRegistro {
 
     @Id

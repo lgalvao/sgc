@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AlertaAplicacaoService Test")
-@SuppressWarnings("NullAway.Init")
+
 class AlertaAplicacaoServiceTest {
     private static final ContextoUsuarioAutenticado CONTEXTO_GESTAO =
             new ContextoUsuarioAutenticado("123", 1L, Perfil.GESTOR);

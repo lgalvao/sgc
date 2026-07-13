@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("NullAway.Init")
+
 class EmailServiceTest {
     private static final String DESTINATARIO = "recipient@test.com";
     @Mock

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoNotificacaoService")
-@SuppressWarnings("NullAway.Init")
+
 class SubprocessoNotificacaoServiceTest {
 
     @Mock

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
  * Base para testes de unidade do ProcessoService, fornecendo mocks e utilitários comuns.
  */
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("NullAway.Init")
+
 public abstract class ProcessoServiceTestBase {
     @InjectMocks
     protected ProcessoService processoService;

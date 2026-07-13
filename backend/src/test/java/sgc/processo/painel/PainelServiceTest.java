@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PainelService Test")
-@SuppressWarnings("NullAway.Init")
+
 class PainelServiceTest {
     private static final ContextoUsuarioAutenticado CONTEXTO_ADMIN =
             new ContextoUsuarioAutenticado("123", 100L, Perfil.ADMIN);

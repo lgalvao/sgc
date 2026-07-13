@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UnidadeHierarquiaService")
-@SuppressWarnings("NullAway.Init")
+
 class UnidadeHierarquiaServiceTest {
 
     @Mock

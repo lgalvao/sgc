@@ -12,7 +12,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("NotificacaoWorker")
-@SuppressWarnings("NullAway.Init")
+
 class NotificacaoWorkerTest {
     @Mock
     private NotificacaoService notificacaoService;

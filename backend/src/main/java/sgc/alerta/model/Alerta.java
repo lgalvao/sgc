@@ -17,7 +17,7 @@ import java.time.*;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-@SuppressWarnings("NullAway.Init")
+
 public class Alerta extends EntidadeBase {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "processo_codigo")

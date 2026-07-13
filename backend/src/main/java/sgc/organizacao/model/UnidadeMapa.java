@@ -11,7 +11,7 @@ import sgc.mapa.model.*;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@SuppressWarnings("NullAway.Init")
+
 public class UnidadeMapa {
     @Id
     @Column(name = "unidade_codigo", nullable = false)

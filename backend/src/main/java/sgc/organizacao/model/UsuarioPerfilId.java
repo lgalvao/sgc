@@ -10,7 +10,7 @@ import java.io.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@SuppressWarnings("NullAway.Init")
+
 public class UsuarioPerfilId implements Serializable {
     private @Nullable String usuarioTitulo;
     private @Nullable Long unidadeCodigo;

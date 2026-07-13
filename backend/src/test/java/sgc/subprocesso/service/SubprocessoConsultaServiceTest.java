@@ -27,7 +27,7 @@ import static sgc.subprocesso.model.SituacaoSubprocesso.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("SubprocessoConsultaService")
-@SuppressWarnings("NullAway.Init")
+
 class SubprocessoConsultaServiceTest {
     private final MapaDtoMapper mapaDtoMapper = new MapaDtoMapper();
     private final OrganizacaoDtoMapper organizacaoDtoMapper = new OrganizacaoDtoMapper();
