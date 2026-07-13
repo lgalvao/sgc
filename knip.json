@@ -13,6 +13,17 @@
       "project": [
         "**/*.ts",
         "**/*.js"
+      ],
+      "ignoreBinaries": [
+        "taskkill"
+      ]
+    },
+    "e2eHom": {
+      "entry": [
+        "**/*.ts"
+      ],
+      "project": [
+        "**/*.ts"
       ]
     },
     "frontend": {

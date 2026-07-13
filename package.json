@@ -6,7 +6,8 @@
   "workspaces": [
     "frontend",
     "toolkit",
-    "e2e"
+    "e2e",
+    "e2eHom"
   ],
   "scripts": {
     "knip": "knip",
