@@ -8,7 +8,7 @@
 
 - Usuário logado com perfil GESTOR.
 - Ao menos um processo de diagnóstico em andamento.
-- Ao menos um subprocesso de unidade subordinada na situação 'Concluído', localizado na unidade do usuário.
+- Ao menos um subprocesso na situação 'Concluído' e localizado na unidade do usuário.
 
 ## Fluxo principal
 
@@ -62,4 +62,4 @@
     - `Unidade de origem`: :UNIDADE_ANALISE:
     - `Unidade de destino`: :UNIDADE_SUPERIOR:
 
-9. O sistema mostra um *toast* `Diagnósticos aceitos`. 
+9. O sistema redireciona para o `Painel`e mostra o *toast* "Diagnósticos aceitos".
