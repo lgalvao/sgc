@@ -4,6 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
+import java.net.URI
 
 val argumentosJvmSemAvisoUnsafe = listOf("--sun-misc-unsafe-memory-access=allow")
 
@@ -91,6 +92,19 @@ dependencies {
 
 tasks.named<ProcessResources>("processResources") {
     exclude("static/**")
+}
+
+tasks.register("atualizarSnapshotCaniemail") {
+    group = "verification"
+    description = "Atualiza o snapshot oficial do dataset Can I Email usado nos testes de compatibilidade."
+    doLast {
+        val destino = rootProject.file("backend/src/test/resources/caniemail/data.json")
+        destino.parentFile.mkdirs()
+        URI("https://www.caniemail.com/api/data.json").toURL().openStream().use { entrada ->
+            destino.outputStream().use { saida -> entrada.copyTo(saida) }
+        }
+        println("Snapshot Can I Email atualizado em ${destino.relativeTo(rootProject.projectDir)}")
+    }
 }
 
 val atualizarFrontend = tasks.register<Copy>("atualizarFrontend") {

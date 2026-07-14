@@ -95,14 +95,14 @@ export async function abrirNotificacoesAdmin(page: Page): Promise<Locator> {
     await linkNotificacoes.click();
     await expect(page).toHaveURL(/\/administracao\/notificacoes/);
 
-    const tabela = page.getByTestId('tbl-notificacoes');
-    await expect(tabela).toBeVisible();
+    const secaoNotificacoes = page.getByTestId('sec-notificacoes');
+    await expect(secaoNotificacoes).toBeVisible();
     await Promise.all([
         page.waitForResponse(response => urlListagem.test(response.url()) && response.ok()),
         page.getByTestId('btn-notificacoes-atualizar').click()
     ]);
-    await expect(tabela).toBeVisible();
-    return tabela;
+    await expect(secaoNotificacoes).toBeVisible();
+    return secaoNotificacoes;
 }
 
 export async function verificarNotificacaoAdmin(page: Page, criterios: CriteriosNotificacaoAdmin): Promise<void> {
