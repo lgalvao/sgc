@@ -25,7 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @DisplayName("Compatibilidade Can I Email dos e-mails")
 class EmailCaniemailCompatibilidadeTest {
-    private static final Set<String> CLIENTES_ALVO = Set.of("outlook", "gmail");
+    // Cada família é percorrida em todas as plataformas disponíveis no snapshot,
+    // incluindo explicitamente as variantes Android e iOS.
+    private static final Set<String> CLIENTES_ALVO = Set.of("outlook", "gmail", "apple-mail");
     private static final Set<String> PROPRIEDADES_IGNORADAS = Set.of(
             "font-family", "font-size", "font-style", "font-weight", "color",
             "display", "text-decoration", "mso-table-lspace", "mso-table-rspace"
