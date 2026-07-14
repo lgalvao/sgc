@@ -191,7 +191,7 @@ public class DiagnosticoFluxoService {
         }
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
-        transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
+        Long codigoMovimentacao = Objects.requireNonNull(transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(novaSituacao)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_DEVOLVIDO)
@@ -203,9 +203,10 @@ public class DiagnosticoFluxoService {
                 .motivoAnalise(null)
                 .observacoes(justificativa)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
-                .build());
+                .build()), "Movimentação obrigatória para notificação de diagnóstico devolvido");
 
-        notificacaoService.notificarDiagnosticoDevolvido(subprocesso, unidadeAnalise, unidadeDevolucao, justificativa);
+        notificacaoService.notificarDiagnosticoDevolvido(
+                subprocesso, unidadeAnalise, unidadeDevolucao, justificativa, codigoMovimentacao);
     }
 
     private static String normalizarJustificativaObrigatoria(@Nullable String justificativa) {
@@ -231,7 +232,7 @@ public class DiagnosticoFluxoService {
         Unidade unidadeSuperior = obterSuperiorImediatoObrigatorio(unidadeAnalise, "aceite de diagnóstico");
 
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
-        transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
+        Long codigoMovimentacao = Objects.requireNonNull(transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_ACEITO)
@@ -243,9 +244,9 @@ public class DiagnosticoFluxoService {
                 .motivoAnalise(null)
                 .observacoes(observacao)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
-                .build());
+                .build()), "Movimentação obrigatória para notificação de diagnóstico aceito");
 
-        notificacaoService.notificarDiagnosticoAceito(subprocesso, unidadeAnalise, unidadeSuperior);
+        notificacaoService.notificarDiagnosticoAceito(subprocesso, unidadeAnalise, unidadeSuperior, codigoMovimentacao);
     }
 
     public void aceitarDiagnosticosEmBloco(List<Long> subprocessoCodigos) {
@@ -253,23 +254,24 @@ public class DiagnosticoFluxoService {
         List<Subprocesso> subprocessos = subprocessoCodigos.stream()
                 .map(subprocessoConsultaService::buscarSubprocesso)
                 .toList();
-        Unidade unidadeAnalise = null;
-        Unidade unidadeSuperior = null;
+        List<ContextoAceiteEmBloco> contextos = new ArrayList<>();
 
         for (Subprocesso subprocesso : subprocessos) {
-            Unidade[] contexto = validarDiagnosticoEmBloco(subprocesso, usuario);
-            if (unidadeAnalise == null) {
-                unidadeAnalise = contexto[0];
-                unidadeSuperior = contexto[1];
-            }
+            contextos.add(validarDiagnosticoEmBloco(subprocesso, usuario));
         }
 
         if (!subprocessos.isEmpty()) {
-            notificacaoService.notificarDiagnosticosAceitosEmBloco(subprocessos, unidadeAnalise, unidadeSuperior);
+            ContextoAceiteEmBloco primeiroContexto = contextos.getFirst();
+            notificacaoService.notificarDiagnosticosAceitosEmBloco(
+                    subprocessos,
+                    primeiroContexto.unidadeAnalise(),
+                    primeiroContexto.unidadeSuperior(),
+                    contextos.stream().map(ContextoAceiteEmBloco::codigoMovimentacao).toList()
+            );
             notificacaoService.criarAlertaDiagnosticosAceitosEmBloco(
                     subprocessos.getFirst().getProcesso(),
-                    unidadeAnalise,
-                    unidadeSuperior
+                    primeiroContexto.unidadeAnalise(),
+                    primeiroContexto.unidadeSuperior()
             );
         }
     }
@@ -317,13 +319,13 @@ public class DiagnosticoFluxoService {
         validacaoService.validarDiagnosticoHomologavel(codSubprocesso);
     }
 
-    private Unidade[] validarDiagnosticoEmBloco(Subprocesso subprocesso, Usuario usuario) {
+    private ContextoAceiteEmBloco validarDiagnosticoEmBloco(Subprocesso subprocesso, Usuario usuario) {
         subprocessoValidacaoService.validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
         Unidade unidadeAnalise = localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso);
         Unidade unidadeSuperior = obterSuperiorImediatoObrigatorio(unidadeAnalise, "aceite em bloco de diagnóstico");
 
-        transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
+        Long codigoMovimentacao = Objects.requireNonNull(transicaoService.registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand.builder()
                 .sp(subprocesso)
                 .novaSituacao(SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO)
                 .tipoTransicao(TipoTransicao.DIAGNOSTICO_ACEITO)
@@ -335,8 +337,11 @@ public class DiagnosticoFluxoService {
                 .motivoAnalise(null)
                 .observacoes(null)
                 .modoComunicacao(RegistrarWorkflowAnaliseCommand.ModoComunicacaoWorkflow.SEM_COMUNICACOES)
-                .build());
-        return new Unidade[]{unidadeAnalise, unidadeSuperior};
+                .build()), "Movimentação obrigatória para notificação de aceite em bloco de diagnóstico");
+        return new ContextoAceiteEmBloco(unidadeAnalise, unidadeSuperior, codigoMovimentacao);
+    }
+
+    private record ContextoAceiteEmBloco(Unidade unidadeAnalise, Unidade unidadeSuperior, Long codigoMovimentacao) {
     }
 
     private Unidade obterSuperiorImediatoObrigatorio(Unidade unidadeOrigem, String contexto) {

@@ -130,7 +130,7 @@ public class SubprocessoTransicaoService {
                 .build());
     }
 
-    public void registrarAnaliseSemComunicacoes(RegistrarWorkflowCommand cmd) {
+    public Long registrarAnaliseSemComunicacoes(RegistrarWorkflowCommand cmd) {
         Subprocesso sp = cmd.sp();
         Usuario usuario = cmd.usuario();
 
@@ -143,14 +143,14 @@ public class SubprocessoTransicaoService {
         criarAnalise(sp, request, cmd.tipoAnalise());
         sp.setSituacao(cmd.novaSituacao());
 
-        persistirTransicao(RegistrarTransicaoCommand.builder()
+        return persistirTransicao(RegistrarTransicaoCommand.builder()
                 .sp(sp)
                 .tipo(cmd.tipoTransicao())
                 .origem(cmd.unidadeOrigemTransicao())
                 .destino(cmd.unidadeDestinoTransicao())
                 .usuario(usuario)
                 .observacoes(cmd.observacoes())
-                .build());
+                .build()).getCodigo();
     }
 
     public Analise criarAnalise(Subprocesso sp, CriarAnaliseRequest request, TipoAnalise tipo) {
@@ -470,7 +470,7 @@ public class SubprocessoTransicaoService {
         }
     }
 
-    public void registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand cmd) {
+    public @Nullable Long registrarWorkflowComDestino(RegistrarWorkflowAnaliseCommand cmd) {
         Unidade unidadeAnalise = Objects.requireNonNull(cmd.unidadeAnalise(), "Unidade de analise obrigatoria");
         Unidade unidadeDestino = Objects.requireNonNull(cmd.unidadeDestino(), "Unidade de destino obrigatoria");
         RegistrarWorkflowCommand comando = RegistrarWorkflowCommand.builder()
@@ -487,10 +487,13 @@ public class SubprocessoTransicaoService {
                 .observacoes(cmd.observacoes())
                 .build();
 
-        switch (cmd.modoComunicacao()) {
-            case PADRAO -> registrarAnalise(comando);
+        return switch (cmd.modoComunicacao()) {
+            case PADRAO -> {
+                registrarAnalise(comando);
+                yield null;
+            }
             case SEM_COMUNICACOES -> registrarAnaliseSemComunicacoes(comando);
-        }
+        };
     }
 
     private boolean deveProcessarAceiteValidacaoEmBloco(Subprocesso sp, Usuario usuario) {
