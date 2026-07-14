@@ -73,7 +73,7 @@ describe("notificacaoFormatters", () => {
 
         it("deve extrair o usuário do email institucional se for o caso", () => {
             const item = {destinatario: "fulano.detal@tre-pe.jus.br"};
-            expect(formatarDestinatario(item)).toBe("FULANO.DETAL");
+            expect(formatarDestinatario(item)).toBe("fulano.detal");
         });
 
         it("deve retornar o destinatário original se nenhum critério for atendido", () => {

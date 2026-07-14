@@ -50,7 +50,7 @@
         />
 
         <NotificacaoTabela
-            :items="itensOrdenados"
+            :items="notificacoesQuery.itensVisiveis()"
             @detalhes="abrirDetalhes"
             @preview="abrirPreview"
             @reenviar="confirmarReenvio"
@@ -124,7 +124,6 @@ const carregando = computed(() =>
 );
 const erro = computed(() => notificacoesQuery.error.value?.message ?? null);
 const erroTela = computed(() => erroDispensado.value ? null : erro.value);
-const itensOrdenados = notificacoesQuery.itensOrdenados;
 const reenviando = computed(() => reenvioMutation.isLoading.value || acaoReenviar.carregando.value);
 const urlLeitorEmailTestes = computed(() => leitorEmailTestesQuery.data.value ?? undefined);
 const mostrarLinkLeitorEmailTestes = computed(() => !ehModoProducao() && Boolean(urlLeitorEmailTestes.value));
