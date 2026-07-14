@@ -33,6 +33,7 @@
                 :habilitar-concluir-avaliacao="habilitarConcluirAvaliacao"
                 :pode-aprovar-consenso="podeAprovarConsenso"
                 :pode-concluir-avaliacao="podeConcluirAvaliacao"
+                :servidor-eh-usuario-logado="servidorEhUsuarioLogado"
                 @aprovar-consenso="abrirModalAprovarConsenso"
                 @concluir-avaliacao="confirmarConcluirAvaliacao"
                 @voltar="voltar"

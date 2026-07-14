@@ -11,7 +11,7 @@
       {{ TEXTOS.diagnostico.BTN_CONCLUIR_AVALIACAO }}
     </BButton>
     <BButton
-        v-if="podeAprovarConsenso"
+        v-if="podeAprovarConsenso || servidorEhUsuarioLogado"
         :disabled="aprovando || !habilitarAprovarConsenso"
         data-testid="btn-aprovar-consenso"
         variant="success"
@@ -43,6 +43,7 @@ defineProps<{
   habilitarConcluirAvaliacao: boolean;
   podeAprovarConsenso: boolean;
   podeConcluirAvaliacao: boolean;
+  servidorEhUsuarioLogado: boolean;
 }>();
 
 const estiloBotaoVoltar = {
