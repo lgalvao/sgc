@@ -14,12 +14,12 @@ unidade ativa** — incluindo o perfil ADMIN. Mas há algumas exceções, confor
 
 ## 2. Perfis de Acesso
 
-| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                     |
-|--------------|----------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| **ADMIN**    | Todo o sistema                         | Criar/editar processos, iniciar, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
-| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes, gerar relatórios de sua subarvores de unidades.                |
-| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades/conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões                  |
-| **SERVIDOR** | Apenas sua unidade                     | Participar de diagnósticos (autoavaliação)                                                                       |
+| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                             |
+|--------------|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| **ADMIN**    | Todo o sistema                         | Criar/editar/inicar/finalizar processos, homologar cadastros e mapas, criar admins, configurar sistema, gerar relatórios |
+| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes, gerar relatórios selecionados de sua subarvores de unidades.           |
+| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades e conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões em mapa                |
+| **SERVIDOR** | Apenas sua unidade                     | Participar de diagnósticos (autoavaliação e avaliação de consenso)                                                       |
 
 ## 3. Regras de Visualização
 
@@ -272,6 +272,7 @@ CRIADO → EM_ANDAMENTO → FINALIZADO
 As ações devem seguir essas diretrizes na UI:
 
 - **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar processo" para CHEFE).
+
 - **Desabilitar:** Se o perfil permite, mas a **situação** ou a **localização** atual impede (ex: botão "Disponibilizar"
   visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo). Algumas
   exceções se aplicam quando a UX seria comprometida com a aplicação das regras (ex. componentes de edição de mapas e
