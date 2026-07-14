@@ -14,12 +14,12 @@ unidade ativa** — incluindo o perfil ADMIN. Mas há algumas exceções, confor
 
 ## 2. Perfis de Acesso
 
-| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                             |
-|--------------|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| Perfil       | Escopo de visualização                 | Responsabilidades principais                                                                                                  |
+|--------------|----------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|
 | **ADMIN**    | Todo o sistema                         | Criar/editar/iniciar processos, homologar cadastros, mapas e diagnósticos, criar admins, configurar sistema, gerar relatórios |
-| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes, gerar relatórios selecionados de sua subarvores de unidades.           |
-| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades e conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões em mapa                |
-| **SERVIDOR** | Apenas sua unidade                     | Realizar a própria autoavaliação e aprovar a própria avaliação de consenso                                             |
+| **GESTOR**   | Sua unidade + subordinadas (recursivo) | Aceitar cadastros e mapas, devolver para ajustes, gerar relatórios selecionados de sua subarvores de unidades.                |
+| **CHEFE**    | Apenas sua unidade                     | Cadastrar atividades e conhecimentos, disponibilizar cadastro, validar mapa, apresentar sugestões em mapa                     |
+| **SERVIDOR** | Apenas sua unidade                     | Realizar a própria autoavaliação e aprovar a própria avaliação de consenso                                                    |
 
 ## 3. Regras de Visualização
 
@@ -65,100 +65,133 @@ localização atual do subprocesso.
 
 ### 4.1 Ações dependentes de localização
 
-Definidas na constante `ACOES_DEPENDENTES_LOCALIZACAO` do Evaluator. Para **todas** elas, a regra é:
+Definidas em `AcaoPermissao` como ações do tipo `ESCRITA`. Para ações executadas sobre subprocesso, a regra é:
 
 ```
 usuario.getUnidadeAtivaCodigo() == localizacaoAtual(subprocesso).getCodigo()
 ```
 
-Adicionalmente, o `checkPerfil` verifica se o perfil do usuário é compatível com a ação:
+O `SgcPermissionEvaluator` verifica também se o perfil ativo é compatível com a ação:
 
-| Ação                              | Perfil necessário | CDU |
-|-----------------------------------|-------------------|-----|
-| `EDITAR_CADASTRO`                 | CHEFE             | 08  |
-| `DISPONIBILIZAR_CADASTRO`         | CHEFE             | 09  |
-| `EDITAR_REVISAO_CADASTRO`         | CHEFE             | 08  |
-| `DISPONIBILIZAR_REVISAO_CADASTRO` | CHEFE             | 10  |
-| `IMPORTAR_ATIVIDADES`             | CHEFE             | 08  |
-| `DEVOLVER_CADASTRO`               | ADMIN, GESTOR     | 13  |
-| `DEVOLVER_REVISAO_CADASTRO`       | ADMIN, GESTOR     | 14  |
-| `ACEITAR_CADASTRO`                | GESTOR            | 13  |
-| `ACEITAR_REVISAO_CADASTRO`        | GESTOR            | 14  |
-| `HOMOLOGAR_CADASTRO`              | ADMIN             | 13  |
-| `HOMOLOGAR_REVISAO_CADASTRO`      | ADMIN             | 14  |
-| `EDITAR_MAPA`                     | ADMIN             | 15  |
-| `DISPONIBILIZAR_MAPA`             | ADMIN             | 17  |
-| `AJUSTAR_MAPA`                    | ADMIN             | 16  |
-| `APRESENTAR_SUGESTOES`            | CHEFE             | 19  |
-| `VALIDAR_MAPA`                    | CHEFE             | 19  |
-| `DEVOLVER_MAPA`                   | ADMIN, GESTOR     | 20  |
-| `ACEITAR_MAPA`                    | GESTOR            | 20  |
-| `HOMOLOGAR_MAPA`                  | ADMIN             | 20  |
-| `PREENCHER_AUTOAVALIACAO`         | SERVIDOR          | 42  |
-| `CRIAR_CONSENSO`                  | CHEFE             | 44  |
-| `CONCLUIR_DIAGNOSTICO`            | CHEFE             | 48  |
-| `VALIDAR_DIAGNOSTICO`             | GESTOR            | 50  |
-| `DEVOLVER_DIAGNOSTICO`            | ADMIN, GESTOR     | 51  |
-| `HOMOLOGAR_DIAGNOSTICO`           | ADMIN             | 52  |
+| Ação                              | Perfil necessário | CDU        |
+|-----------------------------------|-------------------|------------|
+| `EDITAR_CADASTRO`                 | CHEFE             | 08         |
+| `DISPONIBILIZAR_CADASTRO`         | CHEFE             | 09         |
+| `EDITAR_REVISAO_CADASTRO`         | CHEFE             | 08         |
+| `DISPONIBILIZAR_REVISAO_CADASTRO` | CHEFE             | 10         |
+| `IMPORTAR_ATIVIDADES`             | CHEFE             | 08         |
+| `DEVOLVER_CADASTRO`               | ADMIN, GESTOR     | 13         |
+| `DEVOLVER_REVISAO_CADASTRO`       | ADMIN, GESTOR     | 14         |
+| `ACEITAR_CADASTRO`                | GESTOR            | 13         |
+| `ACEITAR_REVISAO_CADASTRO`        | GESTOR            | 14         |
+| `HOMOLOGAR_CADASTRO`              | ADMIN             | 13         |
+| `HOMOLOGAR_REVISAO_CADASTRO`      | ADMIN             | 14         |
+| `EDITAR_MAPA`                     | ADMIN             | 15         |
+| `DISPONIBILIZAR_MAPA`             | ADMIN             | 17         |
+| `AJUSTAR_MAPA`                    | ADMIN             | 16         |
+| `APRESENTAR_SUGESTOES`            | CHEFE             | 19         |
+| `VALIDAR_MAPA`                    | CHEFE             | 19         |
+| `DEVOLVER_MAPA`                   | ADMIN, GESTOR     | 20         |
+| `ACEITAR_MAPA`                    | GESTOR            | 20         |
+| `HOMOLOGAR_MAPA`                  | ADMIN             | 20         |
+| `PREENCHER_AUTOAVALIACAO`         | SERVIDOR          | 44         |
+| `CRIAR_CONSENSO`                  | CHEFE             | 45, 47, 48 |
+| `CONCLUIR_DIAGNOSTICO`            | CHEFE             | 49         |
+| `VALIDAR_DIAGNOSTICO`             | GESTOR            | 50         |
+| `DEVOLVER_DIAGNOSTICO`            | ADMIN, GESTOR     | 50         |
+| `HOMOLOGAR_DIAGNOSTICO`           | ADMIN             | 50         |
 
 `VISUALIZAR_DIAGNOSTICO` é a ação de leitura usada pelas consultas do fluxo. As ações listadas acima são estruturais:
 as de escrita exigem também que a unidade ativa do usuário seja a localização atual do subprocesso.
+
+### 4.1.1 Ações de leitura e de processo do Evaluator
+
+| Ação                           | Tipo     | Perfil / regra                                                                                                           |
+|--------------------------------|----------|--------------------------------------------------------------------------------------------------------------------------|
+| `VISUALIZAR_SUBPROCESSO`       | Leitura  | ADMIN global; GESTOR pela hierarquia; CHEFE e SERVIDOR na própria unidade                                                |
+| `VISUALIZAR_DIAGNOSTICO`       | Leitura  | Mesma regra de `VISUALIZAR_SUBPROCESSO`                                                                                  |
+| `CONSULTAR_PARA_IMPORTACAO`    | Leitura  | CHEFE; permite consultar subprocesso finalizado ou da própria hierarquia para importar atividades                        |
+| `VERIFICAR_IMPACTOS`           | Leitura  | CHEFE, GESTOR ou ADMIN; situação e demais restrições são verificadas por `ImpactoMapaService`                            |
+| `VISUALIZAR_PROCESSO`          | Leitura  | Qualquer perfil autenticado; os endpoints de detalhes aplicam a checagem complementar de acesso ao processo              |
+| `FINALIZAR_PROCESSO`           | Processo | ADMIN; processo não pode estar finalizado. O serviço exige todos os subprocessos homologados conforme o tipo do processo |
+| `ACEITAR_CADASTRO_EM_BLOCO`    | Processo | GESTOR                                                                                                                   |
+| `HOMOLOGAR_CADASTRO_EM_BLOCO`  | Processo | ADMIN                                                                                                                    |
+| `ACEITAR_MAPA_EM_BLOCO`        | Processo | GESTOR                                                                                                                   |
+| `HOMOLOGAR_MAPA_EM_BLOCO`      | Processo | ADMIN                                                                                                                    |
+| `DISPONIBILIZAR_MAPA_EM_BLOCO` | Processo | ADMIN                                                                                                                    |
 
 ### 4.2 Ações administrativas (sem dependência de localização)
 
 Protegidas com `@PreAuthorize("hasRole('ADMIN')")` diretamente no controller:
 
-| Endpoint                                                   | Ação                                          | CDU   |
-|------------------------------------------------------------|-----------------------------------------------|-------|
-| `POST /api/processos`                                      | Criar processo                                | 03    |
-| `POST /api/processos/{codigo}/atualizar`                   | Editar processo                               | 03    |
-| `POST /api/processos/{codigo}/excluir`                     | Excluir processo                              | 03    |
-| `POST /api/processos/{codigo}/iniciar`                     | Iniciar processo                              | 04/05 |
-| `POST /api/processos/{codigo}/finalizar`                   | Finalizar processo                            | 21    |
-| `POST /api/processos/{codigo}/enviar-lembrete`             | Enviar lembrete de prazo                      | 34    |
-| `POST /api/subprocessos/{codigo}/data-limite`              | Alterar data limite                           | 27    |
-| `POST /api/subprocessos/{codigo}/reabrir-cadastro`         | Reabrir cadastro                              | 32    |
-| `POST /api/subprocessos/{codigo}/reabrir-revisao-cadastro` | Reabrir revisão                               | 33    |
-| `POST /api/subprocessos`                                   | Criar subprocesso                             | —     |
-| `POST /api/subprocessos/{codigo}/atualizar`                | Atualizar subprocesso                         | —     |
-| `POST /api/subprocessos/{codigo}/excluir`                  | Excluir subprocesso                           | —     |
-| `GET /api/subprocessos`                                    | Listar subprocessos                           | —     |
-| `GET /api/configuracoes`                                   | Listar configurações                          | 31    |
-| `POST /api/configuracoes`                                  | Atualizar configurações                       | 31    |
-| `GET /api/usuarios/administradores`                        | Listar administradores                        | 30    |
-| `POST /api/usuarios/administradores`                       | Adicionar administrador                       | 30    |
-| `POST /api/usuarios/administradores/{titulo}/remover`      | Remover administrador                         | 30    |
-| `POST /api/unidades/{codigo}/atribuicoes-temporarias`      | Criar atribuição temporária                   | 28    |
-| `GET /api/unidades/atribuicoes`                            | Listar atribuições                            | 28    |
-| `POST /api/mapas`                                          | Criar mapa                                    | 15    |
-| `POST /api/mapas/{codigo}/atualizar`                       | Atualizar mapa                                | 15    |
-| `POST /api/mapas/{codigo}/excluir`                         | Excluir mapa                                  | 15    |
-| `GET /api/admin/notificacoes/listar`                       | Listar notificações administrativas           | 38    |
-| `POST /api/admin/notificacoes/{codigo}/reenviar`           | Reenfileirar notificação com falha definitiva | 38    |
-| `GET /api/admin/notificacoes/leitor-email-testes`          | Consultar URL do leitor de e-mails de testes  | 38    |
-| `POST /api/feedback`                                       | Registrar feedback contextual                 | 55    |
-| `GET /api/feedback/listar`                                 | Listar feedbacks enviados                     | 54    |
-| `GET /api/feedback/{codigo}/screenshot`                    | Exibir screenshot de feedback                 | 54    |
+| Endpoint                                                                           | Ação                                          | CDU   |
+|------------------------------------------------------------------------------------|-----------------------------------------------|-------|
+| `POST /api/processos`                                                              | Criar processo                                | 03    |
+| `POST /api/processos/{codigo}/atualizar`                                           | Editar processo                               | 03    |
+| `POST /api/processos/{codigo}/excluir`                                             | Excluir processo                              | 03    |
+| `POST /api/processos/{codigo}/iniciar`                                             | Iniciar processo                              | 04/05 |
+| `POST /api/processos/{codigo}/finalizar`                                           | Finalizar processo                            | 21    |
+| `POST /api/processos/{codigo}/enviar-lembrete`                                     | Enviar lembrete de prazo                      | 34    |
+| `POST /api/subprocessos/{codigo}/data-limite`                                      | Alterar data limite                           | 27    |
+| `POST /api/subprocessos/{codigo}/reabrir-cadastro`                                 | Reabrir cadastro                              | 32    |
+| `POST /api/subprocessos/{codigo}/reabrir-revisao-cadastro`                         | Reabrir revisão                               | 33    |
+| `POST /api/subprocessos`                                                           | Criar subprocesso                             | —     |
+| `POST /api/subprocessos/{codigo}/atualizar`                                        | Atualizar subprocesso                         | —     |
+| `POST /api/subprocessos/{codigo}/excluir`                                          | Excluir subprocesso                           | —     |
+| `GET /api/subprocessos`                                                            | Listar subprocessos                           | —     |
+| `GET /api/configuracoes`                                                           | Listar configurações                          | 31    |
+| `POST /api/configuracoes`                                                          | Atualizar configurações                       | 31    |
+| `GET /api/usuarios/administradores`                                                | Listar administradores                        | 30    |
+| `POST /api/usuarios/administradores`                                               | Adicionar administrador                       | 30    |
+| `POST /api/usuarios/administradores/{titulo}/remover`                              | Remover administrador                         | 30    |
+| `POST /api/unidades/{codigo}/atribuicoes-temporarias`                              | Criar atribuição temporária                   | 28    |
+| `GET /api/unidades/atribuicoes`                                                    | Listar atribuições                            | 28    |
+| `GET /api/unidades/{codigo}/atribuicoes-temporarias`                               | Consultar atribuições temporárias             | 28    |
+| `POST /api/unidades/{codigo}/atribuicoes-temporarias/{codigoAtribuicao}/atualizar` | Atualizar atribuição temporária               | 28    |
+| `POST /api/unidades/{codigo}/atribuicoes-temporarias/{codigoAtribuicao}/excluir`   | Excluir atribuição temporária                 | 28    |
+| `POST /api/mapas`                                                                  | Criar mapa                                    | 15    |
+| `POST /api/mapas/{codigo}/atualizar`                                               | Atualizar mapa                                | 15    |
+| `POST /api/mapas/{codigo}/excluir`                                                 | Excluir mapa                                  | 15    |
+| `GET /api/admin/notificacoes/listar`                                               | Listar notificações administrativas           | 38    |
+| `POST /api/admin/notificacoes/{codigo}/reenviar`                                   | Reenfileirar notificação com falha definitiva | 38    |
+| `GET /api/admin/notificacoes/leitor-email-testes`                                  | Consultar URL do leitor de e-mails de testes  | 38    |
+| `POST /api/processos/{codigo}/excluir-completo`                                    | Excluir processo e seus dados relacionados    | —     |
+
+### 4.2.1 Feedback contextual
+
+O módulo de feedback só é disponibilizado nos perfis de ambiente `hom`, `e2e` e `test`; em produção os endpoints não
+existem. Suas permissões são:
+
+| Endpoint                                | Ação                          | Perfil / controle            | CDU |
+|-----------------------------------------|-------------------------------|------------------------------|-----|
+| `POST /api/feedback`                    | Registrar feedback contextual | Qualquer usuário autenticado | 39  |
+| `GET /api/feedback/listar`              | Listar feedbacks enviados     | ADMIN                        | 40  |
+| `GET /api/feedback/{codigo}/screenshot` | Exibir screenshot de feedback | ADMIN                        | 40  |
 
 ### 4.3 Ações de Relatórios (Acesso por ADMIN ou Hierarquia)
 
 Estes endpoints permitem a geração e exportação de relatórios, com acesso flexibilizado para administradores, gestores
 ou usuários da hierarquia do processo/unidade alvo:
 
-| Endpoint                                                   | Ação                                                   | Perfil / Controle                                     | CDU |
-|------------------------------------------------------------|--------------------------------------------------------|-------------------------------------------------------|-----|
-| `GET /api/relatorios/andamento/{codigo}`                   | Visualizar andamento do processo em JSON               | ADMIN ou Hierarquia (`@processoService.checarAcesso`) | 35  |
-| `GET /api/relatorios/andamento/{codigo}/exportar`          | Exportar relatório de andamento em PDF                 | ADMIN ou Hierarquia (`@processoService.checarAcesso`) | 35  |
-| `GET /api/relatorios/mapas`                                | Visualizar consolidado de mapas em JSON                | `hasAnyRole('ADMIN', 'GESTOR')`                       | 36  |
-| `GET /api/relatorios/mapas/exportar`                       | Exportar relatório consolidado de mapas em PDF         | `hasAnyRole('ADMIN', 'GESTOR')`                       | 36  |
-| `GET /api/relatorios/unidades-sem-mapas-vigentes/exportar` | Exportar relatório de unidades sem mapa vigente em PDF | `hasRole('ADMIN')`                                    | 37  |
-| `GET /api/relatorios/diagnostico/gaps/{codigo}`            | Visualizar relatório de gaps de Diagnóstico             | ADMIN ou GESTOR + acesso ao processo                  | 54  |
-| `GET /api/relatorios/diagnostico/gaps/{codigo}/exportar`   | Exportar relatório de gaps de Diagnóstico em PDF        | ADMIN ou GESTOR + acesso ao processo                  | 54  |
-| `GET /api/relatorios/diagnostico/situacao-capacitacao/{codigo}`          | Visualizar situação de capacitação                 | ADMIN ou GESTOR + acesso ao processo                  | 55  |
-| `GET /api/relatorios/diagnostico/situacao-capacitacao/{codigo}/exportar` | Exportar situação de capacitação em PDF             | ADMIN ou GESTOR + acesso ao processo                  | 55  |
+| Endpoint                                                                 | Ação                                                   | Perfil / Controle                                     | CDU |
+|--------------------------------------------------------------------------|--------------------------------------------------------|-------------------------------------------------------|-----|
+| `GET /api/relatorios/andamento/{codigo}`                                 | Visualizar andamento do processo em JSON               | ADMIN ou Hierarquia (`@processoService.checarAcesso`) | 35  |
+| `GET /api/relatorios/andamento/{codigo}/exportar`                        | Exportar relatório de andamento em PDF                 | ADMIN ou Hierarquia (`@processoService.checarAcesso`) | 35  |
+| `GET /api/relatorios/mapas`                                              | Visualizar consolidado de mapas em JSON                | `hasAnyRole('ADMIN', 'GESTOR')`                       | 36  |
+| `GET /api/relatorios/mapas/exportar`                                     | Exportar relatório consolidado de mapas em PDF         | `hasAnyRole('ADMIN', 'GESTOR')`                       | 36  |
+| `GET /api/relatorios/mapas/subprocessos/{codigo}`                        | Visualizar relatório do mapa atual do subprocesso      | `VISUALIZAR_SUBPROCESSO`                              | 18  |
+| `GET /api/relatorios/mapas/subprocessos/{codigo}/exportar`               | Exportar relatório do mapa atual do subprocesso em PDF | `VISUALIZAR_SUBPROCESSO`                              | 18  |
+| `GET /api/relatorios/mapas-vigentes/unidades/{codigo}`                   | Visualizar mapa vigente de uma unidade                 | ADMIN, GESTOR ou CHEFE                                | 18  |
+| `GET /api/relatorios/mapas-vigentes/unidades/{codigo}/exportar`          | Exportar mapa vigente de uma unidade em PDF            | ADMIN, GESTOR ou CHEFE                                | 18  |
+| `GET /api/relatorios/unidades-sem-mapas-vigentes/exportar`               | Exportar relatório de unidades sem mapa vigente em PDF | `hasRole('ADMIN')`                                    | 37  |
+| `GET /api/relatorios/unidades-sem-mapas-vigentes`                        | Visualizar unidades sem mapa vigente em JSON           | `hasRole('ADMIN')`                                    | 37  |
+| `GET /api/relatorios/diagnostico/gaps/{codigo}`                          | Visualizar relatório de gaps de Diagnóstico            | ADMIN ou GESTOR + acesso ao processo                  | 54  |
+| `GET /api/relatorios/diagnostico/gaps/{codigo}/exportar`                 | Exportar relatório de gaps de Diagnóstico em PDF       | ADMIN ou GESTOR + acesso ao processo                  | 54  |
+| `GET /api/relatorios/diagnostico/situacao-capacitacao/{codigo}`          | Visualizar situação de capacitação                     | ADMIN ou GESTOR + acesso ao processo                  | 55  |
+| `GET /api/relatorios/diagnostico/situacao-capacitacao/{codigo}/exportar` | Exportar situação de capacitação em PDF                | ADMIN ou GESTOR + acesso ao processo                  | 55  |
 
-Nos relatórios de Diagnóstico, o parâmetro de unidades não amplia o escopo autorizado: o **GESTOR** só pode selecionar
-a própria unidade e suas subordinadas, recursivamente; o **ADMIN** pode selecionar todas as unidades participantes. Os
+Nos relatórios de Diagnóstico, o parâmetro de unidades não amplia o escopo autorizado: o **GESTOR** só pode selecionar a
+própria unidade e suas subordinadas, recursivamente; o **ADMIN** pode selecionar todas as unidades participantes. Os
 relatórios são agregados e não expõem nomes de servidores.
 
 ### 4.4 Consultas auxiliares de Unidades
@@ -166,6 +199,21 @@ relatórios são agregados e não expõem nomes de servidores.
 | Endpoint                             | Ação                                                              | Perfil / Controle  | CDU |
 |--------------------------------------|-------------------------------------------------------------------|--------------------|-----|
 | `GET /api/unidades/sem-mapa-vigente` | Listar códigos de unidades sem mapa vigente para pré-visualização | `hasRole('ADMIN')` | 37  |
+
+### 4.5 Consultas de apoio e visibilidade de dados
+
+Os endpoints abaixo não executam transição de workflow. Quando o controlador não declara uma regra mais restritiva,
+exigem apenas autenticação; a tela consumidora ainda deve respeitar as permissões de visualização do recurso exibido.
+
+| Recurso                   | Endpoints / regra de acesso                                                                                                                                                                                                                  |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Processo                  | Detalhes, contexto completo e subprocessos de um processo: ADMIN ou `processoService.checarAcesso`; processos ativos/finalizados e unidades bloqueadas: autenticado; subprocessos elegíveis para ação em bloco: ADMIN ou GESTOR              |
+| Subprocesso               | Detalhe, status, contexto de edição, permissões de UI, mapa, sugestões e históricos: `VISUALIZAR_SUBPROCESSO`; busca do código e busca de contexto por processo/unidade: autenticado, com validação do recurso no serviço ou pós-autorização |
+| Cadastro                  | Contexto, cadastro, validações e histórico: `VISUALIZAR_SUBPROCESSO`; atividades disponíveis para importação: `CONSULTAR_PARA_IMPORTACAO`                                                                                                    |
+| Mapas e atividades        | Listagem de mapas: ADMIN, GESTOR ou CHEFE; detalhe de mapa e leitura de atividade/conhecimentos: `VISUALIZAR_SUBPROCESSO`; alterações de atividade/conhecimento: CHEFE, com validação fina em `AtividadeService` |
+| Unidades e usuários       | Consulta de usuários de unidade e de usuário por título: ADMIN, GESTOR ou CHEFE; demais consultas organizacionais e pesquisa de usuários: autenticado, salvo regra específica do endpoint                                                    |
+| Configuração operacional  | `GET /api/configuracoes/dias-inativacao-processo`: autenticado; demais leitura e alteração de configurações: ADMIN                                                                                                                           |
+| Painel, alertas e eventos | Autenticado; a resposta de alertas deve obedecer à regra específica do CDU-02 descrita nesta especificação                                                                                                                                   |
 
 ## 5. Ações em Bloco
 
@@ -202,12 +250,23 @@ O `checkProcesso` do Evaluator valida ações a nível de processo (não subproc
 | `HOMOLOGAR_MAPA_EM_BLOCO`      | ADMIN    | —                                    |
 | `DISPONIBILIZAR_MAPA_EM_BLOCO` | ADMIN    | —                                    |
 
+### 5.4 Finalização de processos
+
+`POST /api/processos/{codigo}/finalizar` exige ADMIN e processo ainda não finalizado. Antes de alterar a situação, o
+serviço valida o fluxo correspondente:
+
+- **Mapeamento e revisão (CDU-21):** todos os subprocessos das unidades participantes devem estar com mapa homologado.
+- **Diagnóstico (CDU-53):** todos os subprocessos das unidades participantes devem estar em
+  `DIAGNOSTICO_HOMOLOGADO`.
+
+A finalização é uma ação de processo; não depende da localização de um subprocesso individual.
+
 ---
 
-## 6. Atividades e Conhecimentos (AtividadeFacade)
+## 6. Atividades e Conhecimentos
 
 O `AtividadeController` usa `hasRole('CHEFE')` para CRUD de atividades e conhecimentos. A verificação fina é feita na
-`AtividadeFacade.verificarPermissaoEdicao()`:
+`AtividadeService.verificarPermissaoEdicao()`:
 
 1. **Permissão de localização:** Checa `EDITAR_CADASTRO` via `permissionEvaluator` (CHEFE + localização).
 2. **Validação de situação:** Permite edição apenas nas seguintes situações do subprocesso:
@@ -263,7 +322,7 @@ NAO_INICIADO → REVISAO_CADASTRO_EM_ANDAMENTO → REVISAO_CADASTRO_DISPONIBILIZ
 NAO_INICIADO → DIAGNOSTICO_EM_ANDAMENTO → DIAGNOSTICO_CONCLUIDO → DIAGNOSTICO_HOMOLOGADO
 ```
 
-## 8.3.1 Ações de diagnóstico por etapa
+#### 8.3.1 Ações de diagnóstico por etapa
 
 As permissões finas de diagnóstico dependem de perfil, localização atual do subprocesso e situação do subprocesso:
 
@@ -293,15 +352,15 @@ As permissões finas de diagnóstico dependem de perfil, localização atual do 
 
 Os endpoints de consulta usam `VISUALIZAR_DIAGNOSTICO`. Os endpoints de escrita usam a ação correspondente:
 
-| Operação | Permissão |
-|---|---|
-| Contexto, autoavaliação, consenso de outro servidor, diagnóstico da unidade e histórico | `VISUALIZAR_DIAGNOSTICO` |
-| Salvar/concluir autoavaliação e aprovar consenso do próprio servidor | `PREENCHER_AUTOAVALIACAO` |
-| Salvar/concluir consenso, impossibilitar/reverter avaliação e salvar situações de capacitação | `CRIAR_CONSENSO` |
-| Concluir unidade e validar pré-condição de conclusão | `CONCLUIR_DIAGNOSTICO` |
-| Validar diagnóstico e validar a ação de aceite | `VALIDAR_DIAGNOSTICO` |
-| Devolver diagnóstico e validar a devolução | `DEVOLVER_DIAGNOSTICO` |
-| Homologar diagnóstico e validar a homologação | `HOMOLOGAR_DIAGNOSTICO` |
+| Operação                                                                                      | Permissão                 |
+|-----------------------------------------------------------------------------------------------|---------------------------|
+| Contexto, autoavaliação, consenso de outro servidor, diagnóstico da unidade e histórico       | `VISUALIZAR_DIAGNOSTICO`  |
+| Salvar/concluir autoavaliação e aprovar consenso do próprio servidor                          | `PREENCHER_AUTOAVALIACAO` |
+| Salvar/concluir consenso, impossibilitar/reverter avaliação e salvar situações de capacitação | `CRIAR_CONSENSO`          |
+| Concluir unidade e validar pré-condição de conclusão                                          | `CONCLUIR_DIAGNOSTICO`    |
+| Validar diagnóstico e validar a ação de aceite                                                | `VALIDAR_DIAGNOSTICO`     |
+| Devolver diagnóstico e validar a devolução                                                    | `DEVOLVER_DIAGNOSTICO`    |
+| Homologar diagnóstico e validar a homologação                                                 | `HOMOLOGAR_DIAGNOSTICO`   |
 
 As permissões `pode...` indicam a permissão estrutural do perfil. As permissões `habilitar...` acrescentam situação do
 workflow, localização e, quando aplicável, a existência de consenso aprovado. A UI deve esconder cards que não pertencem
@@ -324,7 +383,9 @@ CRIADO → EM_ANDAMENTO → FINALIZADO
 
 ## 9. Regras de Frontend
 
-As ações devem seguir essas diretrizes na UI:
+### 9.1 Regra de apresentação
+
+As ações devem seguir estas diretrizes na UI:
 
 - **Esconder:** Se o perfil ativo **nunca** tem permissão para a ação (ex: botão "Criar processo" para CHEFE).
 
@@ -332,6 +393,21 @@ As ações devem seguir essas diretrizes na UI:
   visível mas desabilitado quando o subprocesso não está na unidade do usuário — com tooltip explicativo). Algumas
   exceções se aplicam quando a UX seria comprometida com a aplicação das regras (ex. componentes de edição de mapas e
   atividades são escondidos quando edição não é permitida, ao invés de apenas desabilitados)
+
+### 9.2 Disponibilidade contextual por fluxo
+
+Os campos `pode...` expõem a permissão estrutural do perfil; os campos `habilitar...` combinam perfil, situação e, para
+ações de subprocesso, localização atual. Eles são calculados por `SubprocessoAcessoService`.
+
+| Fluxo                          | Ações estruturais                                                                                                  | Condição para habilitar                                                                                                                                                                                                                                 |
+|--------------------------------|--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Cadastro e revisão de cadastro | CHEFE edita/disponibiliza; GESTOR aceita; ADMIN homologa; ADMIN ou GESTOR devolve                                  | Edição: `NAO_INICIADO`, cadastro em andamento ou revisão em andamento. Disponibilização: cadastro/revisão em andamento. Análise: cadastro/revisão disponibilizada. Sempre na localização do usuário.                                                    |
+| Mapa                           | ADMIN edita, disponibiliza e homologa; CHEFE valida ou apresenta sugestões; GESTOR aceita; ADMIN ou GESTOR devolve | Edição/disponibilização e análise seguem as situações específicas de mapeamento e revisão. A homologação exige mapa validado; devolução do ADMIN exige mapa com sugestões, e a do GESTOR aceita também mapa validado. Sempre na localização do usuário. |
+| Reabertura                     | ADMIN                                                                                                              | Cadastro só após mapa homologado; revisão só após revisão de mapa homologada.                                                                                                                                                                           |
+| Diagnóstico                    | Conforme seção 8.3.1                                                                                               | Conforme seção 8.3.1, incluindo consenso aprovado para habilitar o card de situação de capacitação.                                                                                                                                                     |
+
+Em processo finalizado, as permissões estruturais podem continuar sendo retornadas para a composição da tela, mas todas
+as ações de escrita ficam desabilitadas. A leitura continua sujeita às regras de hierarquia.
 
 ## 10. Implementação técnica
 
