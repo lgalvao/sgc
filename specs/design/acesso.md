@@ -23,7 +23,7 @@ unidade ativa** — incluindo o perfil ADMIN. Mas há algumas exceções, confor
 
 ## 3. Regras de Visualização
 
-Validadas no método `checkHierarquia` do `SgcPermissionEvaluator`:
+Validadas no método `verificarHierarquia` do `SgcPermissionEvaluator`:
 
 - **ADMIN:** `return true` — acesso global.
 - **GESTOR:** `hierarquiaService.ehMesmaOuSubordinada(unidadeAlvo, unidadeUsuario)` — vê sua unidade e todas as

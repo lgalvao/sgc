@@ -195,12 +195,11 @@ public class SgcPermissionEvaluator implements PermissionEvaluator {
     private boolean verificarProcesso(Usuario usuario, Processo processo, AcaoPermissao acao) {
         Perfil perfil = usuario.getPerfilAtivo();
 
-        if (acao == AcaoPermissao.VISUALIZAR_PROCESSO) return true;
-        if (acao == AcaoPermissao.FINALIZAR_PROCESSO) {
-            return perfil == ADMIN && processo.getSituacao() != FINALIZADO;
-        }
-
-        return acao.permitePerfil(perfil);
+        return switch (acao) {
+            case VISUALIZAR_PROCESSO -> true;
+            case FINALIZAR_PROCESSO -> perfil == ADMIN && processo.getSituacao() != FINALIZADO;
+            default -> false;
+        };
     }
 
     // ── Verificação de Hierarquia ───────────────────────────────────

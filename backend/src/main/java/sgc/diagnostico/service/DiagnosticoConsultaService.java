@@ -14,6 +14,7 @@ import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
+import sgc.seguranca.*;
 import sgc.subprocesso.*;
 import sgc.subprocesso.dto.*;
 import sgc.subprocesso.model.*;
@@ -34,6 +35,7 @@ public class DiagnosticoConsultaService {
     private final SubprocessoVisualizacaoService subprocessoVisualizacaoService;
     private final ResponsavelUnidadeService responsavelUnidadeService;
     private final UnidadeService unidadeService;
+    private final SgcPermissionEvaluator permissionEvaluator;
 
     public DiagnosticoContextoDto obterContexto(Long codSubprocesso) {
         Subprocesso sp = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
@@ -67,6 +69,7 @@ public class DiagnosticoConsultaService {
     public AutoavaliacaoDto obterAutoavaliacao(Long codSubprocesso) {
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
+        Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), usuario.getTituloEleitoral());
         List<AvaliacaoCompetenciaDto> competencias = avaliacoes.stream()
@@ -82,15 +85,21 @@ public class DiagnosticoConsultaService {
                 .map(a -> a.getSituacaoServidor().name())
                 .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA.name());
         SituacaoAvaliacaoServidor situacao = SituacaoAvaliacaoServidor.valueOf(situacaoServidor);
+        boolean podePreencherAutoavaliacao = AcaoPermissao.PREENCHER_AUTOAVALIACAO.permitePerfil(usuario.getPerfilAtivo());
+        boolean habilitarPreencherAutoavaliacao = podePreencherAutoavaliacao
+                && permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.PREENCHER_AUTOAVALIACAO);
         return AutoavaliacaoDto.builder()
                 .competencias(competencias)
                 .situacaoServidor(situacaoServidor)
-                .podeEditar(situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
+                .podeEditar(podePreencherAutoavaliacao
+                        && situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
                 .podeConcluirAutoavaliacao(
-                        situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA
-                                || situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA
+                        podePreencherAutoavaliacao
+                                && (situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA
+                                || situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA)
                 )
-                .habilitarConcluirAutoavaliacao(situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
+                .habilitarConcluirAutoavaliacao(habilitarPreencherAutoavaliacao
+                        && situacao == SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA)
                 .build();
     }
 
@@ -102,6 +111,7 @@ public class DiagnosticoConsultaService {
     public ConsensoDto obterConsenso(Long codSubprocesso, String servidorTitulo) {
         Usuario usuario = usuarioContextoService.usuarioAutenticado();
         Diagnostico diagnostico = repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso));
+        Subprocesso subprocesso = subprocessoConsultaService.buscarSubprocesso(codSubprocesso);
         List<AvaliacaoServidor> avaliacoes = avaliacaoRepo.buscarAvaliacoesDoServidor(
                 diagnostico.getCodigo(), servidorTitulo);
         String servidorNome = avaliacoes.stream()
@@ -126,19 +136,32 @@ public class DiagnosticoConsultaService {
                 .orElse(SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA.name());
         SituacaoAvaliacaoServidor situacao = SituacaoAvaliacaoServidor.valueOf(situacaoServidor);
         boolean usuarioEhServidorAvaliado = usuario.getTituloEleitoral().equals(servidorTitulo);
+        boolean podeCriarConsenso = AcaoPermissao.CRIAR_CONSENSO.permitePerfil(usuario.getPerfilAtivo());
+        boolean habilitarCriarConsenso = podeCriarConsenso
+                && permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.CRIAR_CONSENSO);
+        boolean podePreencherAutoavaliacao = AcaoPermissao.PREENCHER_AUTOAVALIACAO.permitePerfil(usuario.getPerfilAtivo());
+        boolean habilitarPreencherAutoavaliacao = podePreencherAutoavaliacao
+                && permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.PREENCHER_AUTOAVALIACAO);
         return ConsensoDto.builder()
                 .servidorNome(servidorNome)
                 .competencias(competencias)
                 .situacaoServidor(situacaoServidor)
-                .podeEditar(!usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
-                .podeConcluirAvaliacao(!usuarioEhServidorAvaliado)
+                .podeEditar(podeCriarConsenso
+                        && !usuarioEhServidorAvaliado
+                        && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .podeConcluirAvaliacao(podeCriarConsenso && !usuarioEhServidorAvaliado)
                 .habilitarConcluirAvaliacao(
-                        !usuarioEhServidorAvaliado
+                        habilitarCriarConsenso
+                                && !usuarioEhServidorAvaliado
                                 && situacao != SituacaoAvaliacaoServidor.CONSENSO_CRIADO
                                 && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO
                 )
-                .podeAprovarConsenso(usuarioEhServidorAvaliado && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
-                .habilitarAprovarConsenso(usuarioEhServidorAvaliado && situacao == SituacaoAvaliacaoServidor.CONSENSO_CRIADO)
+                .podeAprovarConsenso(podePreencherAutoavaliacao
+                        && usuarioEhServidorAvaliado
+                        && situacao != SituacaoAvaliacaoServidor.CONSENSO_APROVADO)
+                .habilitarAprovarConsenso(habilitarPreencherAutoavaliacao
+                        && usuarioEhServidorAvaliado
+                        && situacao == SituacaoAvaliacaoServidor.CONSENSO_CRIADO)
                 .build();
     }
 

@@ -9,9 +9,8 @@ function montar(props?: Record<string, unknown>) {
             concluindoAvaliacao: false,
             habilitarAprovarConsenso: true,
             habilitarConcluirAvaliacao: true,
-            podeAprovarConsenso: false,
+            podeAprovarConsenso: true,
             podeConcluirAvaliacao: true,
-            servidorEhUsuarioLogado: true,
             ...props,
         },
         global: {
@@ -39,10 +38,9 @@ describe('ConsensoDiagnosticoAcoes', () => {
         expect(wrapper.emitted('voltar')).toHaveLength(1);
     });
 
-    it('oculta o botao aprovar para outro servidor sem permissao de aprovar', () => {
+    it('oculta o botao aprovar sem permissao, inclusive para o servidor logado', () => {
         const wrapper = montar({
             podeAprovarConsenso: false,
-            servidorEhUsuarioLogado: false,
         });
 
         expect(wrapper.find('[data-testid="btn-aprovar-consenso"]').exists()).toBe(false);

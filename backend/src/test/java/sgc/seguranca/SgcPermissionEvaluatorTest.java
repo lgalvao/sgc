@@ -338,12 +338,12 @@ class SgcPermissionEvaluatorTest {
     }
 
     @Test
-    @DisplayName("verificarProcesso: Outras ações")
-    void verificarProcessoOutrasAcoes() {
+    @DisplayName("verificarProcesso: deve negar ação incompatível com o alvo processo")
+    void verificarProcessoDeveNegarAcaoIncompativelComAlvoProcesso() {
         Usuario usuario = Usuario.builder().perfilAtivo(Perfil.GESTOR).build();
         Processo p = Processo.builder().situacao(SituacaoProcesso.EM_ANDAMENTO).build();
 
-        assertThat(evaluator.verificarPermissao(usuario, p, AcaoPermissao.DEVOLVER_CADASTRO)).isTrue();
+        assertThat(evaluator.verificarPermissao(usuario, p, AcaoPermissao.DEVOLVER_CADASTRO)).isFalse();
     }
 
     @Test

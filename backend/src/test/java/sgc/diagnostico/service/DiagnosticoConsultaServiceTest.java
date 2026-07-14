@@ -12,6 +12,7 @@ import sgc.organizacao.dto.*;
 import sgc.organizacao.model.*;
 import sgc.organizacao.service.*;
 import sgc.processo.model.*;
+import sgc.seguranca.*;
 import sgc.subprocesso.*;
 import sgc.subprocesso.model.*;
 import sgc.subprocesso.service.*;
@@ -42,6 +43,8 @@ class DiagnosticoConsultaServiceTest {
     ResponsavelUnidadeService responsavelUnidadeService;
     @Mock
     UnidadeService unidadeService;
+    @Mock
+    SgcPermissionEvaluator permissionEvaluator;
 
     @InjectMocks
     DiagnosticoConsultaService service;
@@ -147,6 +150,7 @@ class DiagnosticoConsultaServiceTest {
         Diagnostico diagnostico = diagnostico(codDiagnostico);
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("151515");
+        usuario.setPerfilAtivo(Perfil.CHEFE);
         AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         avaliacao.setAutoimportancia(4);
         avaliacao.setAutodominio(3);
@@ -177,6 +181,7 @@ class DiagnosticoConsultaServiceTest {
         Diagnostico diagnostico = diagnostico(codDiagnostico);
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("151515");
+        usuario.setPerfilAtivo(Perfil.CHEFE);
         AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
         avaliacao.setAutoimportancia(4);
         avaliacao.setAutodominio(3);
@@ -203,6 +208,7 @@ class DiagnosticoConsultaServiceTest {
         Diagnostico diagnostico = diagnostico(codDiagnostico);
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("151515");
+        usuario.setPerfilAtivo(Perfil.CHEFE);
         AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         avaliacao.setAutoimportancia(4);
         avaliacao.setAutodominio(3);
@@ -227,6 +233,7 @@ class DiagnosticoConsultaServiceTest {
         Diagnostico diagnostico = diagnostico(codDiagnostico);
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("151515");
+        usuario.setPerfilAtivo(Perfil.CHEFE);
         AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
         avaliacao.setAutoimportancia(4);
         avaliacao.setAutodominio(3);
@@ -259,6 +266,7 @@ class DiagnosticoConsultaServiceTest {
         Diagnostico diagnostico = diagnostico(codDiagnostico);
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("151515");
+        usuario.setPerfilAtivo(Perfil.CHEFE);
         AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.CONSENSO_CRIADO);
 
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
@@ -272,6 +280,76 @@ class DiagnosticoConsultaServiceTest {
     }
 
     @Test
+    @DisplayName("obterConsenso não deve anunciar edição ou conclusão para gestor que apenas visualiza")
+    void obterConsenso_naoDeveAnunciarAcoesDeChefiaParaGestorVisualizador() {
+        Long codSubprocesso = 406L;
+        Long codDiagnostico = 906L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("151515");
+        usuario.setPerfilAtivo(Perfil.GESTOR);
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        ConsensoDto dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.podeEditar()).isFalse();
+        assertThat(dto.podeConcluirAvaliacao()).isFalse();
+        assertThat(dto.habilitarConcluirAvaliacao()).isFalse();
+    }
+
+    @Test
+    @DisplayName("obterConsenso deve separar ação estrutural de habilitação por localização")
+    void obterConsenso_deveSepararAcaoEstruturalDaHabilitacaoPorLocalizacao() {
+        Long codSubprocesso = 408L;
+        Long codDiagnostico = 908L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Unidade unidade = unidade(12L, "ASSESSORIA_12", "Assessoria 12");
+        Subprocesso subprocesso = subprocesso(codSubprocesso, unidade);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("151515");
+        usuario.setPerfilAtivo(Perfil.CHEFE);
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_CONCLUIDA);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(subprocessoConsultaService.buscarSubprocesso(codSubprocesso)).thenReturn(subprocesso);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+        when(permissionEvaluator.verificarPermissao(usuario, subprocesso, AcaoPermissao.CRIAR_CONSENSO)).thenReturn(false);
+
+        ConsensoDto dto = service.obterConsenso(codSubprocesso, "242426");
+
+        assertThat(dto.podeEditar()).isTrue();
+        assertThat(dto.podeConcluirAvaliacao()).isTrue();
+        assertThat(dto.habilitarConcluirAvaliacao()).isFalse();
+    }
+
+    @Test
+    @DisplayName("obterAutoavaliacao não deve anunciar edição para perfil diferente de servidor")
+    void obterAutoavaliacao_naoDeveAnunciarEdicaoParaPerfilDiferenteDeServidor() {
+        Long codSubprocesso = 407L;
+        Long codDiagnostico = 907L;
+        Diagnostico diagnostico = diagnostico(codDiagnostico);
+        Usuario usuario = new Usuario();
+        usuario.setTituloEleitoral("242426");
+        usuario.setPerfilAtivo(Perfil.CHEFE);
+        AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.AUTOAVALIACAO_NAO_INICIADA);
+
+        when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
+        when(repo.buscar(Diagnostico.class, Map.of("subprocesso.codigo", codSubprocesso))).thenReturn(diagnostico);
+        when(avaliacaoRepo.buscarAvaliacoesDoServidor(codDiagnostico, "242426")).thenReturn(List.of(avaliacao));
+
+        AutoavaliacaoDto dto = service.obterAutoavaliacao(codSubprocesso);
+
+        assertThat(dto.podeEditar()).isFalse();
+        assertThat(dto.podeConcluirAutoavaliacao()).isFalse();
+        assertThat(dto.habilitarConcluirAutoavaliacao()).isFalse();
+    }
+
+    @Test
     @DisplayName("obterConsenso deve negar aprovacao quando consenso ja estiver aprovado")
     void obterConsenso_deveNegarAprovacaoQuandoConsensoJaAprovado() {
         Long codSubprocesso = 405L;
@@ -279,6 +357,7 @@ class DiagnosticoConsultaServiceTest {
         Diagnostico diagnostico = diagnostico(codDiagnostico);
         Usuario usuario = new Usuario();
         usuario.setTituloEleitoral("242426");
+        usuario.setPerfilAtivo(Perfil.SERVIDOR);
         AvaliacaoServidor avaliacao = avaliacao("242426", "Servidor Avaliado", 1L, SituacaoAvaliacaoServidor.CONSENSO_APROVADO);
 
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(usuario);
