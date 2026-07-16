@@ -44,7 +44,6 @@ graph TD
 | `e2e/`        | automações relacionadas à suíte E2E                               |
 | `qa/`         | snapshot, resumo e dashboard de qualidade                         |
 | `projeto/`    | setup, doctor, limpeza e qualidade do repositório                 |
-| `legado/`     | aliases de compatibilidade para scripts renomeados                |
 | `test/`       | testes do toolkit                                                 |
 
 ## Comandos por domínio
@@ -139,14 +138,6 @@ node toolkit/sgc.js projeto setup --instalar-dependencias
 node toolkit/sgc.js projeto arvore-linhas
 node toolkit/sgc.js projeto versao-sincronizar 1.2.3
 ```
-
-### Aliases legados
-
-Os aliases abaixo foram mantidos em `toolkit/legado/` para compatibilidade de execução direta:
-
-- `frontend/views-auditar-validacoes.js` ➜ `frontend/views-validacoes-auditar.js`
-- `frontend/test-ids-duplicados.js` ➜ `frontend/test-ids-listar-duplicados.js`
-- `projeto/sincronizar-versao.js` ➜ `projeto/versao-sincronizar.js`
 
 ## Casos de uso típicos
 

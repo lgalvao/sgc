@@ -225,11 +225,6 @@ export async function disponibilizarCadastro(page: Page): Promise<string | null>
 export async function verificarBotaoDisponibilizar(page: Page, habilitado: boolean) {
     const botao = await obterBotaoDisponibilizarCadastro(page);
     await expect(botao).toBeVisible();
-    // Como a validação agora é no clique, o botão quase sempre está habilitado.
-    // O parâmetro 'habilitado' aqui passa a verificar se o fluxo seguiria ou mostraria erro.
-    // Para manter compatibilidade com testes legados que checam estado do botão,
-    // vamos apenas garantir visibilidade se o teste espera 'true',
-    // ou se o teste realmente quer checar lógica de bloqueio técnica (ex: loading).
     if (habilitado) {
         await expect(botao).toBeEnabled();
     }
