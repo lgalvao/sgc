@@ -7,24 +7,26 @@
         data-testid="alert-notificacoes-sem-registros"
         icon="bi-info-circle"
     />
-    <BTable
-        v-else
-        :fields="camposTabela"
-        :items="items"
-        data-testid="tbl-notificacoes"
-        hover
-        responsive
-        small
-        sort-icon-left
-    >
+    <div v-else class="processos-notificacoes">
+      <details
+          v-for="grupo in gruposPorProcesso"
+          :key="grupo.chave"
+          class="processo-secao"
+          open
+      >
+        <summary class="processo-titulo">{{ grupo.titulo }}</summary>
+        <BTable
+            :fields="camposTabela"
+            :items="grupo.itens"
+            data-testid="tbl-notificacoes"
+            hover
+            responsive
+            small
+        >
       <template #cell(destino)="{ item }">
-        <div :title="item.destinatario" class="fw-semibold">
+        <div :title="item.destinatario">
           {{ formatarDestinatario(item) }}
         </div>
-      </template>
-
-      <template #cell(processoDescricao)="{ item }">
-        <span>{{ item.processoDescricao || "-" }}</span>
       </template>
 
       <template #cell(unidadeOrigemSigla)="{ item }">
@@ -32,15 +34,15 @@
       </template>
 
       <template #cell(assunto)="{ item }">
-        <div :title="item.assunto" class="linha-assunto">
-          <div class="fw-semibold">{{ formatarAssunto(item.assunto) }}</div>
-        </div>
+        <div :title="item.assunto" class="linha-assunto">{{ formatarAssunto(item.assunto) }}</div>
       </template>
 
       <template #cell(situacao)="{ item }">
-        <BBadge :variant="(obterStatusNotificacao(item.situacao).variant as ColorVariant)">
-          {{ obterStatusNotificacao(item.situacao).label }}
-        </BBadge>
+        <div class="situacao-com-detalhes">
+          <BButton :data-testid="`btn-detalhes-${item.codigo}`" :title="TEXTOS.administracao.NOTIFICACOES_DETALHES" aria-label="Detalhes da notificação" class="situacao-badge-botao" variant="link" @click="$emit('detalhes', item)">
+            <BBadge :variant="(obterStatusNotificacao(item.situacao).variant as ColorVariant)">{{ obterStatusNotificacao(item.situacao).label }}</BBadge>
+          </BButton>
+        </div>
       </template>
 
       <template #cell(quando)="{ item }">
@@ -49,16 +51,6 @@
 
       <template #cell(acoes)="{ item }">
         <div class="text-end d-flex justify-content-end align-items-center gap-2">
-          <BButton
-              :data-testid="`btn-detalhes-${item.codigo}`"
-              :title="TEXTOS.administracao.NOTIFICACOES_DETALHES"
-              class="btn-acao-sutil"
-              size="sm"
-              variant="outline-secondary"
-              @click="$emit('detalhes', item)"
-          >
-            <i aria-hidden="true" class="bi bi-info-circle"></i>
-          </BButton>
           <BButton
               v-if="item.corpoHtml"
               :data-testid="`btn-preview-${item.codigo}`"
@@ -83,21 +75,20 @@
           </BButton>
         </div>
       </template>
-    </BTable>
+        </BTable>
+      </details>
+    </div>
   </section>
 </template>
 
 <script lang="ts" setup>
 import {BBadge, BButton, BTable, type ColorVariant} from "bootstrap-vue-next";
+import {computed} from "vue";
 import EmptyState from "@/components/comum/EmptyState.vue";
 import {TEXTOS} from "@/constants/textos";
 import type {Notificacao} from "@/services/notificacaoService";
 import {obterStatusNotificacao} from "@/services/notificacaoService";
 import {formatarAssunto, formatarDestinatario, formatarQuando} from "@/utils/notificacaoFormatters";
-
-defineProps<{
-  items: Notificacao[];
-}>();
 
 defineEmits<{
   detalhes: [item: Notificacao];
@@ -105,32 +96,38 @@ defineEmits<{
   reenviar: [item: Notificacao];
 }>();
 
+const props = defineProps<{
+  items: Notificacao[];
+}>();
+
+const gruposPorProcesso = computed(() => {
+  const grupos = new Map<string, {chave: string; titulo: string; itens: Notificacao[]}>();
+  for (const item of props.items) {
+    const titulo = item.processoDescricao?.trim() || "Processo não informado";
+    const chave = titulo;
+    const grupo = grupos.get(chave) ?? {chave, titulo, itens: []};
+    grupo.itens.push(item);
+    grupos.set(chave, grupo);
+  }
+  return [...grupos.values()];
+});
+
 const camposTabela = [
   {
     key: "unidadeOrigemSigla",
     label: "Origem",
     thClass: "col-origem",
     tdClass: "col-origem",
-    sortable: true,
   },
   {
     key: "destino",
     label: "Destino",
     thClass: "col-destino-principal",
     tdClass: "col-destino-principal",
-    sortable: true
-  },
-  {
-    key: "processoDescricao",
-    label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.PROCESSO,
-    thClass: "col-processo",
-    tdClass: "col-processo",
-    sortable: true,
   },
   {
     key: "assunto",
     label: "Assunto",
-    sortable: true,
     formatter: ({value}: { value: unknown }) => formatarAssunto(typeof value === "string" ? value : undefined)
   },
   {
@@ -138,14 +135,12 @@ const camposTabela = [
     label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.STATUS,
     thClass: "col-status",
     tdClass: "col-status",
-    sortable: true
   },
   {
     key: "quando",
     label: TEXTOS.administracao.NOTIFICACOES_CAMPOS.QUANDO,
     thClass: "col-data",
     tdClass: "col-data",
-    sortable: true,
     formatter: ({item}: { item: Notificacao }) => item ? formatarQuando(item) : "-"
   },
   {key: "acoes", label: "", thClass: "text-end col-acoes", tdClass: "text-end col-acoes"},
@@ -154,19 +149,26 @@ const camposTabela = [
 
 <style scoped>
 :deep(.col-destino-principal) {
-  width: 12rem;
-}
-
-:deep(.col-processo) {
-  width: 14rem;
+  width: 8rem;
 }
 
 :deep(.col-origem) {
-  width: 9rem;
+  width: 6rem;
 }
 
 :deep(.col-status) {
-  width: 10rem;
+  width: 11rem;
+}
+
+:deep(th:nth-child(3)),
+:deep(td:nth-child(3)) {
+  min-width: 24rem;
+}
+
+.situacao-com-detalhes {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 :deep(.col-data) {
@@ -179,5 +181,35 @@ const camposTabela = [
 
 .linha-assunto {
   min-width: 0;
+}
+
+.processo-secao {
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.processo-titulo {
+  padding: 0.7rem 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.processo-secao > :deep(.table-responsive) {
+  padding: 0.75rem 0.85rem;
+}
+
+.processo-secao :deep(.table) {
+  margin-bottom: 0;
+}
+
+.situacao-badge-botao {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  line-height: 1;
+  text-decoration: none;
 }
 </style>

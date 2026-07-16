@@ -48,7 +48,6 @@
         <Or>
             <Class name="sgc.mapa.service.MapaManutencaoService"/>
             <Class name="sgc.mapa.MapaFacade"/>
-            <Class name="sgc.mapa.AtividadeFacade"/>
             <Class name="sgc.subprocesso.service.crud.SubprocessoCrudService"/>
             <Class name="sgc.subprocesso.service.SubprocessoWorkflowService"/>
             <Class name="sgc.processo.service.ProcessoConsultaService"/>

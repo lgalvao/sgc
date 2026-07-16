@@ -336,7 +336,7 @@ describe('NotificacoesAdminView', () => {
     it('covers formatarDestinatario institutional email branch', () => {
         // 1. Institutional email
         const item1 = {destinatario: 'leonardo@tre-pe.jus.br'};
-        expect(formatarDestinatario(item1)).toBe('LEONARDO');
+        expect(formatarDestinatario(item1)).toBe('leonardo');
 
         // 2. Already has title
         const item2 = {destinatario: 'a@a.com', usuarioDestinoTitulo: 'TITULO'};

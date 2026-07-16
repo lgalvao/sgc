@@ -21,9 +21,6 @@ export function formatarTipoNotificacao(tipo?: string): string {
 }
 
 export function formatarDestinatario(item: Partial<Notificacao> & { destinatario: string }): string {
-    if (item.usuarioDestinoTitulo?.trim()) {
-        return item.destinatario.trim();
-    }
     if (item.unidadeDestinoSigla?.trim()) {
         return item.unidadeDestinoSigla.trim().toUpperCase();
     }
@@ -32,7 +29,10 @@ export function formatarDestinatario(item: Partial<Notificacao> & { destinatario
     }
     const correspondenciaEmailInstitucional = item.destinatario.trim().match(/^([^@]+)@tre-pe\.jus\.br$/i);
     if (correspondenciaEmailInstitucional?.[1]) {
-        return correspondenciaEmailInstitucional[1].toUpperCase();
+        return correspondenciaEmailInstitucional[1];
+    }
+    if (item.usuarioDestinoTitulo?.trim()) {
+        return item.destinatario.trim();
     }
     return item.destinatario.trim();
 }

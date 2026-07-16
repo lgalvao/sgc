@@ -10,16 +10,11 @@
          *
          * Regras preservadas no <style> (não podem ser inlinadas):
          *   - :hover / :focus  → progressive enhancement para clientes modernos
-         *   - :last-child      → não suportado em todos os clientes
          *   - @media           → responsividade para clientes que suportam
          */
 
         .content p {
             margin: 0 0 12px;
-        }
-
-        .content p:last-child {
-            margin-bottom: 0;
         }
 
         .content ul,
@@ -41,10 +36,6 @@
 
         .highlight-box p {
             margin: 0 0 6px;
-        }
-
-        .highlight-box p:last-child {
-            margin-bottom: 0;
         }
 
         .btn {
@@ -90,18 +81,18 @@
 <body style="margin:0; padding:0; background-color:#f5f7fa; font-family:Arial,sans-serif; line-height:1.6;">
 
 <!-- Wrapper externo: centraliza o container e aplica o fundo da página -->
-<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f7fa"
-       style="background-color:#f5f7fa;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5f7fa"
+       style="width:100%; background-color:#f5f7fa; border-collapse:collapse; mso-table-lspace:0; mso-table-rspace:0;">
     <tr>
         <td align="center" style="padding:24px 16px;">
 
             <!-- Container principal (640px) — usa width fixo + align para Outlook -->
-            <table class="container" align="center" width="640" cellpadding="0" cellspacing="0" border="0"
-                   style="width:640px; background-color:#ffffff; border:1px solid #d9e2ec;">
+            <table role="presentation" class="container" align="center" width="640" cellpadding="0" cellspacing="0" border="0"
+                   style="width:640px; background-color:#ffffff; border:1px solid #d9e2ec; border-collapse:collapse; mso-table-lspace:0; mso-table-rspace:0;">
 
                 <!-- Área de conteúdo -->
                 <tr>
-                    <td class="content"
+                    <td class="content" valign="top"
                         style="padding:24px; color:#1f2933; font-family:Arial,sans-serif; font-size:14px; line-height:1.6;">
                         <th:block th:replace="${conteudo}"/>
                     </td>

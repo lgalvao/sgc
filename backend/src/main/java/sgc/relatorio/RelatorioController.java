@@ -24,14 +24,14 @@ public class RelatorioController {
 
     @GetMapping("/andamento/{codProcesso}")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
-    @Operation(summary = "Gera a visualização em JSON do andamento (CDU-35)")
+    @Operation(summary = "Gera a visualização em JSON do andamento")
     public ResponseEntity<List<RelatorioAndamentoDto>> obterRelatorioAndamento(@PathVariable Long codProcesso) {
         return ResponseEntity.ok(relatorioService.obterRelatorioAndamento(codProcesso));
     }
 
     @GetMapping("/andamento/{codProcesso}/exportar")
     @PreAuthorize("hasRole('ADMIN') or @processoService.checarAcesso(authentication, #codProcesso)")
-    @Operation(summary = "Gera relatório de andamento do processo (CDU-35)")
+    @Operation(summary = "Gera relatório de andamento do processo")
     public void gerarRelatorioAndamentoPdf(@PathVariable Long codProcesso, HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=%s".formatted(nomeArquivoRelatorioAndamento()));
@@ -40,7 +40,7 @@ public class RelatorioController {
 
     @GetMapping("/mapas/exportar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
-    @Operation(summary = "Gera relatório consolidado de mapas (CDU-36)")
+    @Operation(summary = "Gera relatório consolidado de mapas")
     public void gerarRelatorioMapasPdf(@RequestParam(name = "codUnidade") List<Long> codigosUnidades,
                                        HttpServletResponse response) throws IOException {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
@@ -50,7 +50,7 @@ public class RelatorioController {
 
     @GetMapping("/mapas")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
-    @Operation(summary = "Gera a visualização em JSON do relatório consolidado de mapas (CDU-36)")
+    @Operation(summary = "Gera a visualização em JSON do relatório consolidado de mapas")
     public ResponseEntity<List<RelatorioMapaDto>> obterRelatorioMapas(@RequestParam(name = "codUnidade") List<Long> codigosUnidades) {
         return ResponseEntity.ok(relatorioService.obterRelatorioMapas(codigosUnidades));
     }
@@ -105,7 +105,7 @@ public class RelatorioController {
 
     @GetMapping("/diagnostico/gaps/{codProcesso}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
-    @Operation(summary = "Gera a visualização em JSON do relatório de gaps de diagnóstico (CDU-53)")
+    @Operation(summary = "Gera a visualização em JSON do relatório de gaps de diagnóstico")
     public ResponseEntity<List<RelatorioDiagnosticoGapDto>> obterRelatorioGapsDiagnostico(
             @PathVariable Long codProcesso,
             @RequestParam(name = "codUnidade") List<Long> codigosUnidades
@@ -115,7 +115,7 @@ public class RelatorioController {
 
     @GetMapping("/diagnostico/gaps/{codProcesso}/exportar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
-    @Operation(summary = "Gera relatório de gaps de diagnóstico em PDF (CDU-53)")
+    @Operation(summary = "Gera relatório de gaps de diagnóstico em PDF")
     public void gerarRelatorioGapsDiagnosticoPdf(
             @PathVariable Long codProcesso,
             @RequestParam(name = "codUnidade") List<Long> codigosUnidades,
@@ -128,7 +128,7 @@ public class RelatorioController {
 
     @GetMapping("/diagnostico/situacao-capacitacao/{codProcesso}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
-    @Operation(summary = "Gera a visualização em JSON do relatório de situação de capacitação (CDU-54)")
+    @Operation(summary = "Gera a visualização em JSON do relatório de situação de capacitação")
     public ResponseEntity<List<RelatorioDiagnosticoSituacaoCapacitacaoDto>> obterRelatorioSituacaoCapacitacaoDiagnostico(
             @PathVariable Long codProcesso,
             @RequestParam(name = "codUnidade") List<Long> codigosUnidades
@@ -138,7 +138,7 @@ public class RelatorioController {
 
     @GetMapping("/diagnostico/situacao-capacitacao/{codProcesso}/exportar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR') and @processoService.checarAcesso(authentication, #codProcesso)")
-    @Operation(summary = "Gera relatório de situação de capacitação em PDF (CDU-54)")
+    @Operation(summary = "Gera relatório de situação de capacitação em PDF")
     public void gerarRelatorioSituacaoCapacitacaoDiagnosticoPdf(
             @PathVariable Long codProcesso,
             @RequestParam(name = "codUnidade") List<Long> codigosUnidades,

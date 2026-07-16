@@ -53,7 +53,7 @@ describe("NotificacaoTabela.vue", () => {
         expect(wrapper.text()).toContain("SECAO_221");
     });
 
-    it("deve ordenar as colunas como origem, destino e processo", () => {
+    it("deve ordenar as colunas como origem, destino e assunto", () => {
         const wrapper = mount(NotificacaoTabela, {
             props: {items},
             global: {
@@ -64,13 +64,25 @@ describe("NotificacaoTabela.vue", () => {
         const campos = (wrapper.findComponent(BTable as any) as any).props("fields") as Array<{ key: string }>;
         const indiceOrigem = campos.findIndex((campo) => campo.key === "unidadeOrigemSigla");
         const indiceDestino = campos.findIndex((campo) => campo.key === "destino");
-        const indiceProcesso = campos.findIndex((campo) => campo.key === "processoDescricao");
+        const indiceAssunto = campos.findIndex((campo) => campo.key === "assunto");
 
         expect(indiceOrigem).toBeGreaterThanOrEqual(0);
         expect(indiceDestino).toBeGreaterThanOrEqual(0);
-        expect(indiceProcesso).toBeGreaterThanOrEqual(0);
+        expect(indiceAssunto).toBeGreaterThanOrEqual(0);
         expect(indiceOrigem).toBeLessThan(indiceDestino);
-        expect(indiceDestino).toBeLessThan(indiceProcesso);
+        expect(indiceDestino).toBeLessThan(indiceAssunto);
+    });
+
+    it("deve agrupar notificações em seção expansível por processo", () => {
+        const wrapper = mount(NotificacaoTabela, {
+            props: {items},
+            global: {
+                plugins: [createTestingPinia({createSpy: vi.fn})],
+            }
+        });
+
+        expect(wrapper.find(".processo-secao summary").text()).toBe("Processo teste");
+        expect(wrapper.find(".linha-assunto").text()).toBe("Assunto: Teste");
     });
 
     it("deve emitir 'detalhes' ao clicar no botão de info", async () => {

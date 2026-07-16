@@ -280,6 +280,7 @@ class DiagnosticoFluxoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeSuperior);
         when(fluxoContextoService.buscarUnidadeDevolucaoObrigatoria(subprocesso, unidadeSuperior)).thenReturn(unidadeOrigem);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
+        when(transicaoService.registrarWorkflowComDestino(any())).thenReturn(301L);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
@@ -299,7 +300,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(captor.getValue().novaSituacao()).isEqualTo(SituacaoSubprocesso.DIAGNOSTICO_EM_ANDAMENTO);
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.DEVOLUCAO_DIAGNOSTICO);
         assertThat(captor.getValue().unidadeDestino()).isEqualTo(unidadeOrigem);
-        verify(notificacaoService).notificarDiagnosticoDevolvido(subprocesso, unidadeSuperior, unidadeOrigem, observacao);
+        verify(notificacaoService).notificarDiagnosticoDevolvido(subprocesso, unidadeSuperior, unidadeOrigem, observacao, 301L);
     }
 
     @Test
@@ -315,6 +316,7 @@ class DiagnosticoFluxoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
         when(fluxoContextoService.buscarSuperiorImediato(unidadeGestora.getCodigo())).thenReturn(unidadeDestino);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
+        when(transicaoService.registrarWorkflowComDestino(any())).thenReturn(302L);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
@@ -326,7 +328,7 @@ class DiagnosticoFluxoServiceTest {
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.ACEITE_DIAGNOSTICO);
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_ACEITO);
         assertThat(captor.getValue().unidadeDestino()).isEqualTo(unidadeDestino);
-        verify(notificacaoService).notificarDiagnosticoAceito(subprocesso, unidadeGestora, unidadeDestino);
+        verify(notificacaoService).notificarDiagnosticoAceito(subprocesso, unidadeGestora, unidadeDestino, 302L);
     }
 
     @Test
@@ -345,7 +347,7 @@ class DiagnosticoFluxoServiceTest {
                 .isInstanceOf(ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Unidade superior obrigatória ausente");
 
-        verify(notificacaoService, never()).notificarDiagnosticoAceito(any(), any(), any());
+        verify(notificacaoService, never()).notificarDiagnosticoAceito(any(), any(), any(), any());
     }
 
     @Test
@@ -360,6 +362,7 @@ class DiagnosticoFluxoServiceTest {
         when(localizacaoSubprocessoService.obterLocalizacaoAtual(subprocesso)).thenReturn(unidadeGestora);
         when(fluxoContextoService.buscarSuperiorImediato(unidadeGestora.getCodigo())).thenReturn(unidadeDestino);
         when(usuarioContextoService.usuarioAutenticado()).thenReturn(chefe);
+        when(transicaoService.registrarWorkflowComDestino(any())).thenReturn(303L);
         doNothing().when(subprocessoValidacaoService)
                 .validarSituacaoPermitida(subprocesso, SituacaoSubprocesso.DIAGNOSTICO_CONCLUIDO);
 
@@ -370,7 +373,8 @@ class DiagnosticoFluxoServiceTest {
         assertThat(captor.getValue().tipoAcaoAnalise()).isEqualTo(TipoAcaoAnalise.ACEITE_DIAGNOSTICO);
         assertThat(captor.getValue().tipoTransicao()).isEqualTo(TipoTransicao.DIAGNOSTICO_ACEITO);
         assertThat(captor.getValue().observacoes()).isNull();
-        verify(notificacaoService).notificarDiagnosticosAceitosEmBloco(List.of(subprocesso), unidadeGestora, unidadeDestino);
+        verify(notificacaoService).notificarDiagnosticosAceitosEmBloco(
+                List.of(subprocesso), unidadeGestora, unidadeDestino, List.of(303L));
     }
 
     @Test
@@ -389,7 +393,7 @@ class DiagnosticoFluxoServiceTest {
                 .isInstanceOf(ErroInconsistenciaInterna.class)
                 .hasMessageContaining("Unidade superior obrigatória ausente");
 
-        verify(notificacaoService, never()).notificarDiagnosticosAceitosEmBloco(anyList(), any(), any());
+        verify(notificacaoService, never()).notificarDiagnosticosAceitosEmBloco(anyList(), any(), any(), anyList());
     }
 
     @Test

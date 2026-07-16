@@ -1,9 +1,7 @@
-import {computed} from "vue";
 import {useMutation, useQuery, useQueryCache} from "@pinia/colada";
 import {STALE_TIME_CONTROLADO_POR_INVALIDACAO} from "@/composables/cachePolicy";
 import {
     buscarUrlLeitorEmailTestes,
-    compararNotificacoes,
     listarNotificacoesAdmin,
     type Notificacao,
     reenviarNotificacao,
@@ -24,13 +22,12 @@ export function useNotificacoesAdminQuery() {
         staleTime: STALE_TIME_CONTROLADO_POR_INVALIDACAO,
     });
 
-    const itensOrdenados = computed(() => (query.data.value ?? [])
-        .filter((item) => !item.processoFinalizado || item.notificacaoFinalizacaoProcesso)
-        .toSorted(compararNotificacoes));
+    const itensVisiveis = () => (query.data.value ?? [])
+        .filter((item) => !item.processoFinalizado || item.notificacaoFinalizacaoProcesso);
 
     return {
         ...query,
-        itensOrdenados,
+        itensVisiveis,
     };
 }
 

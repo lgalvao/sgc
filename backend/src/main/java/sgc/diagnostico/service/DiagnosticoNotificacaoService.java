@@ -153,7 +153,8 @@ public class DiagnosticoNotificacaoService {
             Subprocesso sp,
             Unidade unidadeAnalise,
             Unidade unidadeDevolucao,
-            String justificativa
+            String justificativa,
+            Long codigoMovimentacao
     ) {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeDevolucao);
@@ -166,7 +167,8 @@ public class DiagnosticoNotificacaoService {
         );
 
         enfileirarNotificacao(sp, unidadeAnalise, unidadeDevolucao, destinatario, TipoNotificacao.DIAGNOSTICO_DEVOLVIDO, assunto, corpo,
-                "diagnostico:%d:devolvido:destino:%d".formatted(sp.getCodigo(), unidadeDevolucao.getCodigo()));
+                "diagnostico:%d:devolvido:destino:%d:movimentacao:%d".formatted(
+                        sp.getCodigo(), unidadeDevolucao.getCodigo(), codigoMovimentacao));
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
@@ -176,7 +178,12 @@ public class DiagnosticoNotificacaoService {
         );
     }
 
-    public void notificarDiagnosticoAceito(Subprocesso sp, Unidade unidadeAnalise, Unidade unidadeSuperior) {
+    public void notificarDiagnosticoAceito(
+            Subprocesso sp,
+            Unidade unidadeAnalise,
+            Unidade unidadeSuperior,
+            Long codigoMovimentacao
+    ) {
         Unidade unidadeSubprocesso = sp.getUnidade();
         DestinatarioNotificacao destinatario = obterDestinatarioResponsavel(unidadeSuperior);
         String assunto = AssuntosNotificacao.diagnosticoAceito(unidadeSubprocesso.getSigla());
@@ -187,7 +194,8 @@ public class DiagnosticoNotificacaoService {
         );
 
         enfileirarNotificacao(sp, unidadeAnalise, unidadeSuperior, destinatario, TipoNotificacao.DIAGNOSTICO_ACEITO, assunto, corpo,
-                "diagnostico:%d:aceito:superior:%d".formatted(sp.getCodigo(), unidadeSuperior.getCodigo()));
+                "diagnostico:%d:aceito:superior:%d:movimentacao:%d".formatted(
+                        sp.getCodigo(), unidadeSuperior.getCodigo(), codigoMovimentacao));
 
         alertaService.criarAlertaTransicao(
                 sp.getProcesso(),
@@ -200,7 +208,8 @@ public class DiagnosticoNotificacaoService {
     public void notificarDiagnosticosAceitosEmBloco(
             java.util.List<Subprocesso> subprocessos,
             Unidade unidadeAnalise,
-            Unidade unidadeSuperior
+            Unidade unidadeSuperior,
+            List<Long> codigosMovimentacao
     ) {
         if (subprocessos.isEmpty()) {
             return;
@@ -220,6 +229,16 @@ public class DiagnosticoNotificacaoService {
                 base.getProcesso().getDescricao(),
                 siglasUnidades
         );
+        String movimentacoes = codigosMovimentacao.stream()
+                .sorted()
+                .map(String::valueOf)
+                .collect(java.util.stream.Collectors.joining("-"));
+        String chaveIdempotencia = "diagnostico:%d:aceito:bloco:superior:%d:unidades:%s:movimentacoes:%s".formatted(
+                base.getProcesso().getCodigo(),
+                unidadeSuperior.getCodigo(),
+                String.join("-", siglasUnidades),
+                movimentacoes
+        );
 
         notificacaoService.enfileirar(EnfileirarNotificacaoCommand.builder()
                 .subprocesso(base)
@@ -231,11 +250,7 @@ public class DiagnosticoNotificacaoService {
                 .destinatario(destinatario.email())
                 .assunto(assunto)
                 .corpoHtml(corpo)
-                .chaveIdempotencia("diagnostico:%d:aceito:bloco:superior:%d:unidades:%s".formatted(
-                        base.getProcesso().getCodigo(),
-                        unidadeSuperior.getCodigo(),
-                        String.join("-", siglasUnidades)
-                ))
+                .chaveIdempotencia(chaveIdempotencia)
                 .build());
     }
 
