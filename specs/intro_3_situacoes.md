@@ -18,7 +18,7 @@ Nos fluxos e situações diagramados a seguir, adotamos as seguintes siglas para
 - **Em andamento**: Processo foi iniciado e todas as unidades participantes foram notificadas.
 - **Finalizado**: Fluxo do processo concluído para todas as unidades participantes. Em mapeamento e revisão, indica que
   os mapas homologados se tornaram vigentes. Em diagnóstico, indica que todas as unidades tiveram seus diagnósticos
-  homologados e que os relatórios consolidados foram liberados.
+  homologados.
 
 ## Situações de subprocessos de Mapeamento
 

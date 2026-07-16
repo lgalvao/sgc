@@ -55,6 +55,6 @@ Todo CDU deve conter, nesta ordem:
 
 ## Documentos complementares
 
-- Regras transversais de acesso devem ficar em [design/acesso.md](design/acesso.md).
+- Regras transversais de acesso devem ficar em [design/acesso.md](../design/acesso.md).
 - Regras transversais de design e UX devem ficar em `specs/design/`.
 - Convenções gerais de testes devem ficar em [_testes.md](_testes.md).

@@ -18,7 +18,7 @@ async function executarSgc(args, opcoes = {}) {
 
 async function criarIntroSituacoes(dirSpecs) {
     await fs.outputFile(
-        path.join(dirSpecs, "_intro_3_situacoes.md"),
+        path.join(dirSpecs, "intro_3_situacoes.md"),
         [
             "## Situações",
             "",
