@@ -11,6 +11,7 @@
     "lib/configuracao.ts",
     "lib/execucao.ts",
     "lib/saida.ts",
-    "lib/logger.ts"
+    "lib/logger.ts",
+    "lib/qualidade.ts"
   ]
 }

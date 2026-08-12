@@ -1,35 +1,58 @@
+import {access, readFile} from "node:fs/promises";
 import path from "node:path";
 import {globby} from "globby";
-import fs from "fs-extra";
 import {resolverNaRaiz} from "./caminhos.js";
 import {resolverCaminhoConfigurado} from "./configuracao.js";
 
+type FotografiaQualidade = Record<string, unknown>;
+
+interface ResultadoFotografiaQualidade {
+    caminho: string;
+    fotografia: FotografiaQualidade;
+}
+
 const NOME_ARQUIVO_FOTOGRAFIA = "fotografia.json";
 
-function obterDiretorioArtefatos(diretorioBase = resolverNaRaiz()) {
+function obterDiretorioArtefatos(diretorioBase = resolverNaRaiz()): string {
     return resolverCaminhoConfigurado("artefatosQualidade", diretorioBase);
 }
 
-function obterCaminhoUltimaFotografia(diretorioBase = resolverNaRaiz()) {
+function obterCaminhoUltimaFotografia(diretorioBase = resolverNaRaiz()): string {
     return path.join(obterDiretorioArtefatos(diretorioBase), "mais-recente", NOME_ARQUIVO_FOTOGRAFIA);
 }
 
-async function resolverFotografiaQualidade(caminhoInformado = null, diretorioBase = resolverNaRaiz()) {
+async function lerFotografia(caminho: string): Promise<FotografiaQualidade> {
+    return JSON.parse(await readFile(caminho, "utf8")) as FotografiaQualidade;
+}
+
+async function existeArquivo(caminho: string): Promise<boolean> {
+    try {
+        await access(caminho);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function resolverFotografiaQualidade(
+    caminhoInformado: string | null = null,
+    diretorioBase = resolverNaRaiz()
+): Promise<ResultadoFotografiaQualidade> {
     if (caminhoInformado) {
         const caminhoAbsoluto = path.isAbsolute(caminhoInformado)
             ? caminhoInformado
             : path.resolve(diretorioBase, caminhoInformado);
         return {
             caminho: caminhoAbsoluto,
-            fotografia: await fs.readJson(caminhoAbsoluto)
+            fotografia: await lerFotografia(caminhoAbsoluto)
         };
     }
 
     const caminhoUltimaFotografia = obterCaminhoUltimaFotografia(diretorioBase);
-    if (await fs.pathExists(caminhoUltimaFotografia)) {
+    if (await existeArquivo(caminhoUltimaFotografia)) {
         return {
             caminho: caminhoUltimaFotografia,
-            fotografia: await fs.readJson(caminhoUltimaFotografia)
+            fotografia: await lerFotografia(caminhoUltimaFotografia)
         };
     }
 
@@ -46,7 +69,7 @@ async function resolverFotografiaQualidade(caminhoInformado = null, diretorioBas
 
     return {
         caminho: maisRecente,
-        fotografia: await fs.readJson(maisRecente)
+        fotografia: await lerFotografia(maisRecente)
     };
 }
 

@@ -17,6 +17,7 @@
     "./lib/configuracao": "./lib/configuracao.ts",
     "./lib/execucao": "./lib/execucao.ts",
     "./lib/logger": "./lib/logger.ts",
+    "./lib/qualidade": "./lib/qualidade.ts",
     "./lib/saida": "./lib/saida.ts",
     "./lib/*": "./lib/*.js"
   },
