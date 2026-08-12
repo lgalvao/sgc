@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import {execa} from "execa";
-import {pathToFileURL} from "node:url";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 
 const CAMINHO_ESPECIFICACAO = "e2e/a11y/crawler.spec.ts";
 
@@ -54,13 +54,19 @@ async function executarCrawler(argumentos = []) {
     });
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    executarCrawler(process.argv.slice(2)).catch((erro) => {
-        process.stderr.write(`Erro ao executar crawler de acessibilidade: ${erro.message}\n`);
+async function principal(argumentos = process.argv.slice(2)) {
+    return executarCrawler(argumentos);
+}
+
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        process.stderr.write(`Erro ao executar crawler de acessibilidade: ${mensagem}\n`);
         process.exitCode = 1;
     });
 }
 
 export {
-    executarCrawler
+    executarCrawler,
+    principal,
 };

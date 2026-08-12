@@ -53,6 +53,10 @@ const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
     "cobertura-ramificacoes.js",
     "cobertura-ramificacoes-erros.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
+const CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND = [
+    "acessibilidade-crawler.js",
+    "acessibilidade-processar-resultados.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -242,6 +246,60 @@ describe("CLI raiz do toolkit", () => {
             expect(resultado.exitCode).toBe(0);
             expect(resultado.stdout).toBe("importacao-ok");
         }
+    });
+
+    test("pode importar comandos de acessibilidade sem executar o crawler ou ler resultados", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("processa resultados de acessibilidade em uma base externa", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-acessibilidade-processar-"));
+        const entrada = path.join(diretorioBase, "resultados.json");
+        const saida = path.join(diretorioBase, "relatorios", "acessibilidade.md");
+
+        await fs.outputJSON(entrada, [{
+            name: "Pagina inicial",
+            route: "/",
+            violations: [{
+                impact: "moderate",
+                id: "botao-com-nome",
+                help: "Botoes devem ter nome acessivel",
+                helpUrl: "https://dequeuniversity.com/rules/axe/",
+                description: "Verifique o nome acessivel do botao.",
+                nodes: [{target: ["button"]}]
+            }]
+        }]);
+
+        const resultado = await executarSgc([
+            "frontend",
+            "acessibilidade",
+            "processar",
+            "--base",
+            diretorioBase,
+            "--entrada",
+            entrada,
+            "--saida",
+            saida
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(await fs.pathExists(saida)).toBe(true);
+        expect(await fs.readFile(saida, "utf8")).toContain("botao-com-nome");
     });
 
     test("analisa cobertura frontend a partir de base e relatorio V8 externos", async () => {

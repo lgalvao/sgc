@@ -1,18 +1,12 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
-import {pathToFileURL} from "node:url";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-
-function lerOpcao(argumentos, nome, padrao) {
-    const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return padrao;
-    }
-    return argumentos[indice + 1] ?? padrao;
-}
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha} from "../lib/saida.js";
 
 function gerarRelatorioMarkdown(resultados) {
     const linhas = [
@@ -66,8 +60,7 @@ async function processarResultadosAcessibilidade({entrada, saida}) {
     return {entrada, saida, paginas: resultados.length};
 }
 
-async function main() {
-    const argumentos = process.argv.slice(2);
+async function principal(argumentos = process.argv.slice(2)) {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "frontend acessibilidade processar",
@@ -75,31 +68,36 @@ async function main() {
             descricao: "Consolida os resultados JSON do Axe em um relatorio Markdown.",
             opcoes: [
                 "--entrada <arquivo> Arquivo JSON produzido pelo crawler.",
-                "--saida <arquivo>   Relatorio Markdown de acessibilidade."
+                "--saida <arquivo>   Relatorio Markdown de acessibilidade.",
+                "--base <diretorio>   Resolve os caminhos padrao a partir de outra base."
             ]
         });
         return;
     }
 
-    const entrada = path.resolve(lerOpcao(argumentos, "--entrada", resolverNaRaiz("a11y-scan-results.json")));
-    const saida = path.resolve(lerOpcao(
-        argumentos,
-        "--saida",
-        path.join(resolverCaminhoConfigurado("artefatosQualidade"), "acessibilidade", "relatorio.md")
-    ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const entrada = path.resolve(diretorioBase, lerOpcao(argumentos, "--entrada", "a11y-scan-results.json"));
+    const saidaPadrao = path.join(
+        resolverCaminhoConfigurado("artefatosQualidade", diretorioBase),
+        "acessibilidade",
+        "relatorio.md"
+    );
+    const saida = path.resolve(diretorioBase, lerOpcao(argumentos, "--saida", saidaPadrao));
     const resultado = await processarResultadosAcessibilidade({entrada, saida});
-    process.stdout.write(`Relatorio de acessibilidade gerado em: ${resultado.saida}\n`);
+    escreverLinha(`Relatorio de acessibilidade gerado em: ${resultado.saida}`);
     return resultado;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        process.stderr.write(`Erro ao processar acessibilidade: ${erro.message}\n`);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        process.stderr.write(`Erro ao processar acessibilidade: ${mensagem}\n`);
         process.exitCode = 1;
     });
 }
 
 export {
     gerarRelatorioMarkdown,
-    processarResultadosAcessibilidade
+    processarResultadosAcessibilidade,
+    principal,
 };
