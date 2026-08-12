@@ -17,6 +17,7 @@ const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
     "cobertura-ramificacoes.js",
     "cobertura-auditoria.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
+const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.js");
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.js",
     "contratos-exportar-openapi.js",
@@ -116,6 +117,21 @@ describe("CLI raiz do toolkit", () => {
             expect(resultado.exitCode).toBe(0);
             expect(resultado.stdout).toBe("importacao-ok");
         }
+    });
+
+    test("pode importar auditoria de assuntos sem ler o backend", async () => {
+        const urlModulo = pathToFileURL(CAMINHO_AUDITORIA_ASSUNTOS).href;
+        const resultado = await execa(process.execPath, [
+            "--input-type=module",
+            "-e",
+            `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+        ], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false
+        });
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toBe("importacao-ok");
     });
 
     test("pode importar comandos de projeto sem executar efeitos", async () => {
@@ -263,7 +279,7 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(resultado.exitCode).toBe(1);
-        const corpo = JSON.parse(resultado.stdout.slice(resultado.stdout.indexOf("{")));
+        const corpo = JSON.parse(resultado.stdout);
         expect(corpo.resumo.arquivosComViolacao).toBe(1);
         expect(corpo.relatorio[0].arquivo).toBe("backend/src/main/java/sgc/diagnostico/ServicoInvalido.java");
         expect(corpo.relatorio[0].achados.some(item => item.regra === "literal_sgc")).toBe(true);

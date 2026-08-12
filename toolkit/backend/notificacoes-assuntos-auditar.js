@@ -4,8 +4,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {globby} from "globby";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 function normalizarCaminho(caminho) {
@@ -110,44 +111,49 @@ function exibirAjuda() {
     });
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    if (args.includes("--help") || args.includes("-h")) {
+async function principal(argumentos = process.argv.slice(2)) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
         return;
     }
 
-    const emitirJson = args.includes("--json");
-    const indiceBase = args.indexOf("--base");
-    const base = indiceBase >= 0 ? path.resolve(args[indiceBase + 1]) : resolverNaRaiz(".");
+    const emitirJson = argumentos.includes("--json");
+    const base = path.resolve(lerOpcao(argumentos, "--base", process.cwd()));
     const resultado = await auditarAssuntos(base);
 
-    imprimirCabecalho("AUDITORIA DE ASSUNTOS DE NOTIFICACAO");
-    escreverLinha(`Base analisada: ${pc.dim(path.join(base, "backend/src/main/java/sgc"))}`);
-    escreverLinha(`Arquivos analisados: ${resultado.resumo.arquivosAnalisados}`);
-    escreverLinha(`Arquivos com violação: ${resultado.resumo.arquivosComViolacao}`);
-    escreverLinha(`Violações: ${resultado.resumo.violacoes}`);
+    if (emitirJson) {
+        imprimirJson(resultado);
+    } else {
+        imprimirCabecalho("AUDITORIA DE ASSUNTOS DE NOTIFICACAO");
+        escreverLinha(`Base analisada: ${pc.dim(path.join(base, "backend/src/main/java/sgc"))}`);
+        escreverLinha(`Arquivos analisados: ${resultado.resumo.arquivosAnalisados}`);
+        escreverLinha(`Arquivos com violação: ${resultado.resumo.arquivosComViolacao}`);
+        escreverLinha(`Violações: ${resultado.resumo.violacoes}`);
 
-    if (resultado.relatorio.length > 0) {
-        escreverLinha("");
-        for (const item of resultado.relatorio) {
-            escreverLinha(item.arquivo);
-            for (const achado of item.achados) {
-                escreverLinha(`- [falha] ${achado.regra} (linha ${achado.linha}): ${achado.trecho}`);
+        if (resultado.relatorio.length > 0) {
+            escreverLinha("");
+            for (const item of resultado.relatorio) {
+                escreverLinha(item.arquivo);
+                for (const achado of item.achados) {
+                    escreverLinha(`- [falha] ${achado.regra} (linha ${achado.linha}): ${achado.trecho}`);
+                }
             }
         }
     }
 
-    if (emitirJson) {
-        imprimirJson(resultado);
-    }
-
     if (resultado.resumo.violacoes > 0) {
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-main().catch((erro) => {
-    escreverLinha(pc.red(`Erro ao auditar assuntos: ${erro instanceof Error ? erro.message : String(erro)}`));
-    process.exit(1);
-});
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        escreverLinha(pc.red(`Erro ao auditar assuntos: ${erro instanceof Error ? erro.message : String(erro)}`));
+        process.exitCode = 1;
+    });
+}
+
+export {
+    auditarAssuntos,
+    principal
+};
