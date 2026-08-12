@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
+import path from "node:path";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -69,38 +72,43 @@ async function gerarRelatorioMarkdown(dados, caminho) {
 
     md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;
 
+    await fs.mkdir(path.dirname(caminho), {recursive: true});
     await fs.writeFile(caminho, md, "utf8");
     return caminho;
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: 'backend cobertura auditoria',
-            scriptDireto: 'backend/cobertura-auditoria.js',
-            descricao: 'Auditoria unificada de cobertura e risco (Backend).',
+            comandoSgc: "backend cobertura auditoria",
+            scriptDireto: "backend/cobertura-auditoria.js",
+            descricao: "Auditoria unificada de cobertura e risco (Backend).",
             opcoes: [
-                '--json     Saída em formato JSON para integração com outras ferramentas.',
-                '--output=X Caminho do arquivo Markdown a ser gerado (Padrão: backend-coverage-auditoria.md).',
-                '--min=N    Falha (exit 1) se a cobertura global for menor que N.'
+                "--json              Saída em formato JSON para integração com outras ferramentas.",
+                "--output <arquivo>  Caminho do arquivo Markdown a ser gerado.",
+                "--arquivo <xml>     Usa um relatório JaCoCo específico.",
+                "--base <diretorio>   Resolve o relatório relativo a outra base.",
+                "--min <percentual>   Falha se a cobertura global for menor que a meta."
             ]
         });
-        process.exit(0);
+        return;
     }
 
-    const outputArg = args.find(a => a.startsWith("--output="))?.split("=")[1] || CAMINHO_PADRAO_OUTPUT;
-    const metaMinima = Number(args.find(a => a.startsWith("--min="))?.split("=")[1] || "0");
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()));
+    const arquivo = lerOpcao(argumentos, "--arquivo", "");
+    const caminhoSaida = lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT);
+    const metaMinima = Number(lerOpcao(argumentos, "--min", "0"));
 
-    if (!jsonMode) {
+    if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE COBERTURA BACKEND");
     }
 
     try {
-        const coleta = await extrairCoberturaJacoco(undefined, {
+        const coleta = await extrairCoberturaJacoco(arquivo || undefined, {
+            diretorioBase,
             incluirSemLacunas: true,
             aplicarExclusoes: true
         });
@@ -130,7 +138,7 @@ async function main() {
             }))
         };
 
-        if (jsonMode) {
+        if (emitirJson) {
             imprimirJson(resultado);
             return;
         }
@@ -154,23 +162,33 @@ async function main() {
             }
         });
 
-        const caminhoRelatorio = resolverNaRaiz(outputArg);
+        const caminhoRelatorio = path.isAbsolute(caminhoSaida)
+            ? caminhoSaida
+            : path.resolve(diretorioBase, caminhoSaida);
         await gerarRelatorioMarkdown(resultado, caminhoRelatorio);
-        escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(outputArg)}`);
+        escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(caminhoRelatorio)}`);
 
         if (metaMinima > 0 && coleta.instrucoes.percentual < metaMinima) {
             escreverLinha(pc.red(`\nFALHA: Cobertura global (${coleta.instrucoes.percentual}%) abaixo da meta (${metaMinima}%).`));
-            process.exit(1);
+            process.exitCode = 1;
         }
 
     } catch (erro) {
-        if (jsonMode) {
-            imprimirJson({status: "erro", mensagem: erro.message});
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        if (emitirJson) {
+            imprimirJson({status: "erro", mensagem});
         } else {
-            escreverLinha(pc.red(`Erro na auditoria: ${erro.message}`));
+            escreverLinha(pc.red(`Erro na auditoria: ${mensagem}`));
         }
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-main();
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal();
+}
+
+export {
+    calcularScoreImpacto,
+    principal
+};

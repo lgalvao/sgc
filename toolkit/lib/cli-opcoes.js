@@ -8,15 +8,25 @@
  */
 function lerOpcao(argumentos, nome, padrao) {
     const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return padrao;
+    if (indice >= 0) {
+        const valor = argumentos[indice + 1];
+        if (!valor || valor.startsWith("--")) {
+            throw new Error(`Informe um valor para ${nome}.`);
+        }
+        return valor;
     }
 
-    const valor = argumentos[indice + 1];
-    if (!valor || valor.startsWith("--")) {
-        throw new Error(`Informe um valor para ${nome}.`);
+    const prefixoAtribuicao = `${nome}=`;
+    const argumentoAtribuido = argumentos.find(argumento => argumento.startsWith(prefixoAtribuicao));
+    if (argumentoAtribuido) {
+        const valor = argumentoAtribuido.slice(prefixoAtribuicao.length);
+        if (!valor) {
+            throw new Error(`Informe um valor para ${nome}.`);
+        }
+        return valor;
     }
-    return valor;
+
+    return padrao;
 }
 
 export {

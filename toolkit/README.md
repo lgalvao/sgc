@@ -159,6 +159,11 @@ deve ser promovido a abstração horizontal antes de existir um contrato de adap
 Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json` e `idioma.json` relativos ao `--base`
 informado. Assim, a auditoria de outro projeto não lê nem grava silenciosamente no diretório de artefatos do SGC.
 
+Os comandos `backend cobertura auditoria` e `backend cobertura ramificacoes` aceitam `--base` e `--arquivo` para
+reutilizar relatórios JaCoCo de outro projeto Spring/Gradle. O comando `backend cobertura cruzada` permanece isolado por
+enquanto: ele duplica a leitura do XML, não possui saída JSON nem testes próprios e será avaliado como possível sobra
+local antes de receber mais compatibilidade.
+
 ## Dependências e execução
 
 `toolkit/package.json` define dependências próprias, separadas do restante do repositório.

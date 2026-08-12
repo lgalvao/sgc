@@ -13,6 +13,10 @@ const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.js");
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.js");
+const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
+    "cobertura-ramificacoes.js",
+    "cobertura-auditoria.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.js",
     "contratos-exportar-openapi.js",
@@ -78,6 +82,25 @@ describe("CLI raiz do toolkit", () => {
 
     test("pode importar comandos de contratos sem executar integrações", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CONTRATOS.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("pode importar comandos de cobertura backend sem ler JaCoCo", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_BACKEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
                 "--input-type=module",
@@ -1318,6 +1341,45 @@ describe("CLI raiz do toolkit", () => {
         expect(["ok", "alerta"]).toContain(json.statusGeral);
         expect(Array.isArray(json.verificacoes)).toBe(true);
         expect(json.verificacoes.some((item) => item.nome === "node")).toBe(true);
+    });
+
+    test("audita cobertura JaCoCo a partir de arquivo e base externos", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-backend-"));
+        const caminhoXml = path.join(diretorioBase, "jacoco.xml");
+        await fs.outputFile(caminhoXml, [
+            "<report name=\"exemplo\">",
+            "  <counter type=\"INSTRUCTION\" missed=\"1\" covered=\"2\"/>",
+            "  <counter type=\"BRANCH\" missed=\"1\" covered=\"1\"/>",
+            "  <counter type=\"LINE\" missed=\"1\" covered=\"1\"/>",
+            "  <counter type=\"METHOD\" missed=\"0\" covered=\"1\"/>",
+            "  <counter type=\"COMPLEXITY\" missed=\"0\" covered=\"1\"/>",
+            "  <package name=\"com.exemplo\">",
+            "    <sourcefile name=\"Servico.java\">",
+            "      <line nr=\"10\" ci=\"1\" mb=\"1\" cb=\"1\"/>",
+            "      <line nr=\"11\" ci=\"0\" mb=\"0\" cb=\"0\"/>",
+            "      <counter type=\"COMPLEXITY\" missed=\"0\" covered=\"1\"/>",
+            "    </sourcefile>",
+            "  </package>",
+            "</report>"
+        ].join("\n"));
+
+        const resultado = await executarSgc([
+            "backend",
+            "cobertura",
+            "ramificacoes",
+            "--json",
+            "--base",
+            diretorioBase,
+            "--arquivo",
+            caminhoXml
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const json = JSON.parse(resultado.stdout);
+        expect(json.totais.percentual).toBe(50);
+        expect(json.classes[0].nome).toBe("com.exemplo.Servico");
+        expect(json.classes[0].branchesPerdidos).toBe(1);
+        expect(json.classes[0].branchesPerdidosLista).toEqual(["10(1/2)"]);
     });
 
     test("simula e executa limpeza em diretório temporário", async () => {

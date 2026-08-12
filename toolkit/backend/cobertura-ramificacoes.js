@@ -1,31 +1,39 @@
 #!/usr/bin/env node
+import path from "node:path";
 import pc from "picocolors";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverNaRaiz} from "../lib/caminhos.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
-    const limite = Number.parseInt(args.find((arg) => arg.startsWith("--limite="))?.split("=")[1] ?? "20", 10);
-    const filtro = args.find((arg) => arg.startsWith("--filtro="))?.split("=")[1] ?? null;
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "backend cobertura ramificacoes",
             scriptDireto: "backend/cobertura-ramificacoes.js",
             descricao: "Lista classes backend com ramificacoes perdidas no relatorio JaCoCo.",
             opcoes: [
                 "--json            Saída estruturada em JSON.",
-                "--limite=N        Limita a quantidade de classes exibidas. Padrão: 20.",
-                "--filtro=texto    Filtra por nome de classe/pacote."
+                "--limite <n>      Limita a quantidade de classes exibidas. Padrão: 20.",
+                "--filtro <texto>  Filtra por nome de classe/pacote.",
+                "--arquivo <xml>   Usa um relatório JaCoCo específico.",
+                "--base <diretorio> Resolve o relatório relativo a outra base."
             ]
         });
-        process.exit(0);
+        return;
     }
 
-    const coleta = await extrairCoberturaJacoco(undefined, {
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()));
+    const arquivo = lerOpcao(argumentos, "--arquivo", "");
+    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20"), 10);
+    const filtro = lerOpcao(argumentos, "--filtro", "") || null;
+    const coleta = await extrairCoberturaJacoco(arquivo || undefined, {
+        diretorioBase,
         incluirSemLacunas: true,
         aplicarExclusoes: true,
         filtro
@@ -50,7 +58,7 @@ async function main() {
         classes
     };
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(resultado);
         return;
     }
@@ -74,7 +82,14 @@ async function main() {
     });
 }
 
-main().catch((erro) => {
-    console.error(pc.red(`Erro ao analisar branches do backend: ${erro.message}`));
-    process.exit(1);
-});
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        process.stderr.write(`${pc.red(`Erro ao analisar branches do backend: ${mensagem}`)}\n`);
+        process.exitCode = 1;
+    });
+}
+
+export {
+    principal
+};
