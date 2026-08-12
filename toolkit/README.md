@@ -154,10 +154,10 @@ Os diretórios variáveis do projeto podem ser sobrescritos em `configuracao-too
 cobrem o layout atual do SGC, enquanto a configuração permite reutilizar o toolkit em outros projetos sem editar os
 auditores.
 
-O toolkit ainda executa JavaScript, mas já possui `tsconfig.json`, verificação de tipos e fronteiras de módulo estáveis.
-A conversão para TypeScript deve começar pelas bibliotecas puras em `lib/` e `lib/dominios/`, seguida pelos comandos
-que apenas adaptam CLI para domínio. Isso reduz o risco de converter simultaneamente roteamento, contratos de saída e
-integrações externas.
+O toolkit executa a árvore-fonte com `tsx` e está em migração incremental para TypeScript. As bibliotecas puras de
+`lib/` já foram convertidas; os próximos recortes devem seguir pelas bibliotecas de domínio e pelos comandos que apenas
+adaptam CLI para domínio. Isso reduz o risco de converter simultaneamente roteamento, contratos de saída e integrações
+externas.
 
 Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis: só executam quando chamados diretamente
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou

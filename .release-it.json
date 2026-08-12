@@ -12,7 +12,7 @@
   },
   "hooks": {
     "after:bump": [
-      "node toolkit/projeto/versao-sincronizar.js ${version}"
+      "npx tsx toolkit/projeto/versao-sincronizar.ts ${version}"
     ]
   }
 }

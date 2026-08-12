@@ -51,7 +51,7 @@ async function executarColetaQualidade(argumentos = []) {
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.js qualidade coletar --perfil rapido",
-                "node toolkit/qualidade/coleta.js --perfil frontend"
+                "npx tsx toolkit/qualidade/coleta.js --perfil frontend"
             ]
         });
         return;
