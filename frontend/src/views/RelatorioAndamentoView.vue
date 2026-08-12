@@ -131,7 +131,7 @@ onMounted(async () => {
   relatoriosStore.limparRelatorio();
   try {
     await carregarProcessos();
-  } catch (e) {
+  } catch {
     // Erro já tratado/notificado pelo composable ou ignorado
   } finally {
     carregandoProcessos.value = false;

@@ -216,6 +216,7 @@ const props = withDefaults(defineProps<{
   exibirBotaoVoltar?: boolean;
   exibirBotaoConcluirDiagnostico?: boolean;
 }>(), {
+  permissoesSubprocesso: null,
   exibirCabecalho: true,
   exibirBotaoVoltar: true,
   exibirBotaoConcluirDiagnostico: true,

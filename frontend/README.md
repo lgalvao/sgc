@@ -17,6 +17,15 @@ consumindo contratos REST do backend e aplicando regras de navegação, cache lo
 - **Axios** para integração HTTP
 - **Vitest 4** para testes unitários
 
+## Compatibilidade de versões
+
+O frontend mantém **Pinia 3** com `@pinia/testing` 1 porque a combinação Pinia 4/testing 2 quebra o setup atual
+de testes: perde a instância ativa de Pinia durante invalidações assíncronas e interrompe os fluxos de navegação.
+Essa atualização deve ser reavaliada junto com uma migração específica do harness de testes.
+
+O projeto usa **TypeScript 6**. O TypeScript 7 permanece fora desta rodada por incompatibilidade conhecida com parte
+do ecossistema Vue/ESLint.
+
 ## Estrutura principal
 
 `src/` está dividido em camadas orientadas ao uso da UI:

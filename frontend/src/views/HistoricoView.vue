@@ -28,14 +28,12 @@ import LayoutPadrao from '@/components/layout/LayoutPadrao.vue';
 import PageHeader from '@/components/layout/PageHeader.vue';
 import CarregamentoPagina from '@/components/comum/CarregamentoPagina.vue';
 import TabelaProcessos from "@/components/processo/TabelaProcessos.vue";
-import {usePerfilStore} from '@/stores/perfil';
 import {useHistoricoQuery} from '@/composables/useHistoricoQuery';
 import {buscarDiasInativacaoProcesso} from '@/services/configuracaoService';
 import {TEXTOS} from '@/constants/textos';
 import type {ProcessoResumo} from "@/types/tipos";
 
 const router = useRouter();
-const perfilStore = usePerfilStore();
 const historicoQuery = useHistoricoQuery();
 
 const loading = computed(() => historicoQuery.isPending.value || historicoQuery.isLoading.value);

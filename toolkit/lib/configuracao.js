@@ -15,8 +15,7 @@ const CONFIGURACAO_PADRAO = {
         orcamentoResiduosFrontend: "toolkit/qualidade/politicas/frontend-residuos/orcamento.json",
         excecoesResiduosFrontend: "toolkit/qualidade/politicas/frontend-residuos/excecoes.json",
         regrasSemgrep: "toolkit/qualidade/politicas/semgrep/sgc-qualidade.yml",
-        contratosOpenapi: "toolkit/qualidade/artefatos/openapi",
-        tiposOpenapiFrontend: "frontend/src/generated/sgc-openapi.d.ts"
+        contratosOpenapi: "toolkit/qualidade/artefatos/openapi"
     }
 };
 

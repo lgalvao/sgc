@@ -89,7 +89,6 @@ criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e ca
 const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira backend/frontend.");
 const integracaoContratos = integracao.command("contratos").description("Auditorias e artefatos de contrato HTTP.");
 criarComandoScript(integracaoContratos, "exportar-openapi", "Exporta o OpenAPI atual da aplicação para arquivo local.", "toolkit/integracao/contratos-exportar-openapi.js");
-criarComandoScript(integracaoContratos, "gerar-tipos", "Gera tipos TypeScript a partir do OpenAPI da aplicação.", "toolkit/integracao/contratos-gerar-tipos.js");
 criarComandoScript(integracaoContratos, "diff", "Compara duas versões do OpenAPI e resume mudanças de contrato.", "toolkit/integracao/contratos-diff.js");
 criarComandoScript(integracaoContratos, "fixar-baseline", "Promove o OpenAPI mais recente como baseline de comparação.", "toolkit/integracao/contratos-fixar-baseline.js");
 

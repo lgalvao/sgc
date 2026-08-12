@@ -125,6 +125,13 @@ node toolkit/sgc.js projeto versao-sincronizar 1.2.3
 
 Os artefatos gerados ficam em `toolkit/qualidade/artefatos/` e são organizados por execução e fotografia mais recente.
 
+### Contrato OpenAPI
+
+O Springdoc continua no backend porque o ciclo E2E usa a documentação OpenAPI/Swagger para aguardar a aplicação nos
+ambientes `e2e` e `hom`. No toolkit, a integração mantém exportação, comparação e fixação de referência do contrato.
+O gerador de tipos TypeScript foi removido enquanto não houver consumidor de tipos gerados no frontend e enquanto a
+ferramenta de geração exigir uma versão anterior do TypeScript.
+
 ## Configuração e migração para TypeScript
 
 Os diretórios variáveis do projeto podem ser sobrescritos em `configuracao-toolkit.json` na raiz. Os valores padrão

@@ -183,15 +183,6 @@ function filtrarUnidadesPorSigla(unidadesOrigem: Unidade[], termo: string, force
   return resultado;
 }
 
-async function carregarUnidades() {
-  erroDispensado.value = false;
-  try {
-    await unidadesQuery.refetch();
-  } catch {
-    // O estado de erro já fica registrado na query.
-  }
-}
-
 function mapearUnidadeParaLinha(unidade: Unidade): LinhaUnidadeArvore {
   return {
     codigo: unidade.codigo,
