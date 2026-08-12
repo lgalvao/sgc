@@ -186,7 +186,7 @@ const ADAPTADORES = {
         return execucao;
     },
     async residuosFrontend() {
-        const execucao = criarExecucao("frontend-residuos", "Residuos do frontend", "qualidade", "node toolkit/sgc.js frontend residuos validar --json-resumido", ".");
+        const execucao = criarExecucao("frontend-residuos", "Residuos do frontend", "qualidade", "npx tsx toolkit/sgc.js frontend residuos validar --json-resumido", ".");
         const saida = await executarComando({
             comando: "node",
             args: ["toolkit/sgc.js", "frontend", "residuos", "validar", "--json-resumido"],
@@ -208,7 +208,7 @@ const ADAPTADORES = {
         return execucao;
     },
     async arquiteturaFrontend() {
-        const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "node toolkit/sgc.js frontend arquitetura auditar --json", ".");
+        const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "npx tsx toolkit/sgc.js frontend arquitetura auditar --json", ".");
         const saida = await executarComando({
             comando: "node",
             args: ["toolkit/sgc.js", "frontend", "arquitetura", "auditar", "--json"],
@@ -238,7 +238,7 @@ const ADAPTADORES = {
         return execucao;
     },
     async identificadoresTesteFrontend() {
-        const execucao = criarExecucao("frontend-identificadores-teste", "Identificadores de teste do frontend", "qualidade", "node toolkit/sgc.js frontend identificadores-teste listar-duplicados", ".");
+        const execucao = criarExecucao("frontend-identificadores-teste", "Identificadores de teste do frontend", "qualidade", "npx tsx toolkit/sgc.js frontend identificadores-teste listar-duplicados", ".");
         const saida = await executarComando({
             comando: "node",
             args: ["toolkit/sgc.js", "frontend", "identificadores-teste", "listar-duplicados"],

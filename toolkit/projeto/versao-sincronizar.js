@@ -39,8 +39,8 @@ function sincronizarVersao(novaVersao, diretorioBase = resolverNaRaiz()) {
 function principal(argumentos = process.argv.slice(2)) {
     const novaVersao = argumentos[0];
     if (!novaVersao) {
-        process.stderr.write("Uso recomendado: node toolkit/sgc.js projeto versao-sincronizar <versao>\n");
-        process.stderr.write("Execução direta: node --import=tsx toolkit/projeto/versao-sincronizar.js <versao>\n");
+        process.stderr.write("Uso recomendado: npx tsx toolkit/sgc.js projeto versao-sincronizar <versao>\n");
+        process.stderr.write("Execução direta: npx tsx toolkit/projeto/versao-sincronizar.js <versao>\n");
         process.exitCode = 1;
         return;
     }

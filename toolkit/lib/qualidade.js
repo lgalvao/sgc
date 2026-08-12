@@ -41,7 +41,7 @@ async function resolverFotografiaQualidade(caminhoInformado = null, diretorioBas
 
     const maisRecente = candidatos.toSorted((a, b) => b.localeCompare(a))[0];
     if (!maisRecente) {
-        throw new Error("Nenhuma fotografia de qualidade foi encontrada. Execute `node toolkit/sgc.js qualidade coletar --perfil rapido`.");
+        throw new Error("Nenhuma fotografia de qualidade foi encontrada. Execute `npx tsx toolkit/sgc.js qualidade coletar --perfil rapido`.");
     }
 
     return {

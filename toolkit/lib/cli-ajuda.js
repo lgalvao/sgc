@@ -23,9 +23,9 @@ function exibirAjudaComando({
                                 exemplos = []
                             }) {
     const linhas = [];
-    linhas.push(`Uso recomendado: node toolkit/sgc.js ${comandoSgc}${argumentos ? ` ${argumentos}` : ''}`);
+    linhas.push(`Uso recomendado: npx tsx toolkit/sgc.js ${comandoSgc}${argumentos ? ` ${argumentos}` : ''}`);
 
-    linhas.push(`Execucao direta: node --import=tsx toolkit/${scriptDireto}${argumentos ? ` ${argumentos}` : ''}`);
+    linhas.push(`Execucao direta: npx tsx toolkit/${scriptDireto}${argumentos ? ` ${argumentos}` : ''}`);
 
     if (descricao) {
         linhas.push('');

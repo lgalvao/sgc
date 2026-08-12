@@ -50,7 +50,7 @@ async function executarColetaQualidade(argumentos = []) {
                 "--perfil <perfil>   Perfil de execucao: rapido, completo, backend ou frontend."
             ],
             exemplos: [
-                "node toolkit/sgc.js qualidade coletar --perfil rapido",
+                "npx tsx toolkit/sgc.js qualidade coletar --perfil rapido",
                 "node toolkit/qualidade/coleta.js --perfil frontend"
             ]
         });

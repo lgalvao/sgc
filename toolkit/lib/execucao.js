@@ -1,7 +1,7 @@
 import {existsSync} from "node:fs";
 import path from "node:path";
 import {fileURLToPath, pathToFileURL} from "node:url";
-import {execa, execaNode} from "execa";
+import {execa} from "execa";
 import {DIRETORIO_RAIZ} from "./caminhos.js";
 
 const DIRETORIO_EXECUCAO_TOOLKIT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -40,15 +40,7 @@ function garantirArquivo(relativo) {
  */
 async function executarNode(relativo, argumentos = []) {
     const script = garantirArquivo(relativo);
-    const runtimeTiposAtivo = process.env.SGC_RUNTIME_TS === "sim"
-        || existsSync(path.join(DIRETORIO_RAIZ, "toolkit", "lib", "cli-opcoes.ts"));
-    if (runtimeTiposAtivo) {
-        return execa(CAMINHO_TSX, [script, ...argumentos], {
-            cwd: DIRETORIO_RAIZ,
-            stdio: "inherit"
-        });
-    }
-    return execaNode(script, argumentos, {
+    return execa(CAMINHO_TSX, [script, ...argumentos], {
         cwd: DIRETORIO_RAIZ,
         stdio: "inherit"
     });

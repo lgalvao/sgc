@@ -35,8 +35,8 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--base <diretorio>   Sobrescreve o diretorio de busca.",
             ],
             exemplos: [
-                "node toolkit/sgc.js frontend identificadores-teste listar",
-                "node toolkit/sgc.js frontend identificadores-teste listar --json --base /tmp/frontend",
+                "npx tsx toolkit/sgc.js frontend identificadores-teste listar",
+                "npx tsx toolkit/sgc.js frontend identificadores-teste listar --json --base /tmp/frontend",
             ],
         });
         return;

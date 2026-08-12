@@ -193,9 +193,9 @@ function exibirAjuda() {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "node toolkit/sgc.js backend arquitetura auditar",
-            "node toolkit/sgc.js backend arquitetura auditar --json",
-            "node toolkit/sgc.js backend arquitetura auditar --sem-gravar"
+            "npx tsx toolkit/sgc.js backend arquitetura auditar",
+            "npx tsx toolkit/sgc.js backend arquitetura auditar --json",
+            "npx tsx toolkit/sgc.js backend arquitetura auditar --sem-gravar"
         ]
     });
 }

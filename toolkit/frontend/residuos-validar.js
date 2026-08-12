@@ -157,9 +157,9 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "node toolkit/sgc.js frontend residuos validar",
-                "node toolkit/sgc.js frontend residuos validar --json",
-                "node toolkit/sgc.js frontend residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
+                "npx tsx toolkit/sgc.js frontend residuos validar",
+                "npx tsx toolkit/sgc.js frontend residuos validar --json",
+                "npx tsx toolkit/sgc.js frontend residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
             ]
         });
         return;

@@ -189,7 +189,7 @@ criarComandoScript(projeto, "versao-sincronizar", "Sincroniza a versao entre gra
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("node toolkit/sgc.js backend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js frontend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js qualidade coletar --perfil rapido")}\n  ${pc.dim("node toolkit/sgc.js qualidade resumo")}\n  ${pc.dim("node toolkit/sgc.js projeto diagnostico --json")}\n  ${pc.dim("node toolkit/sgc.js codigo cheiros auditar --json")}`
+    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.js backend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.js frontend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.js qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.js qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.js projeto diagnostico --json")}\n  ${pc.dim("npx tsx toolkit/sgc.js codigo cheiros auditar --json")}`
 );
 
 async function executar(argumentos = process.argv) {

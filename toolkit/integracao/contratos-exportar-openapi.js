@@ -45,9 +45,9 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--json               Emite o resultado em JSON."
             ],
             exemplos: [
-                "node toolkit/sgc.js integracao contratos exportar-openapi",
-                "node toolkit/sgc.js integracao contratos exportar-openapi --url http://127.0.0.1:10000/api-docs",
-                "node toolkit/sgc.js integracao contratos exportar-openapi --saida /tmp/sgc-openapi.json --json"
+                "npx tsx toolkit/sgc.js integracao contratos exportar-openapi",
+                "npx tsx toolkit/sgc.js integracao contratos exportar-openapi --url http://127.0.0.1:10000/api-docs",
+                "npx tsx toolkit/sgc.js integracao contratos exportar-openapi --saida /tmp/sgc-openapi.json --json"
             ]
         });
         return;

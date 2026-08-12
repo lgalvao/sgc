@@ -82,9 +82,9 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--sem-gravar         Não grava o resumo Markdown."
             ],
             exemplos: [
-                "node toolkit/sgc.js integracao contratos diff",
-                "node toolkit/sgc.js integracao contratos diff --anterior /tmp/old.json --atual /tmp/new.json",
-                "node toolkit/sgc.js integracao contratos diff --json"
+                "npx tsx toolkit/sgc.js integracao contratos diff",
+                "npx tsx toolkit/sgc.js integracao contratos diff --anterior /tmp/old.json --atual /tmp/new.json",
+                "npx tsx toolkit/sgc.js integracao contratos diff --json"
             ]
         });
         return;

@@ -14,8 +14,7 @@
     "./lib/*": "./lib/*.js"
   },
   "scripts": {
-    "sgc": "node ./sgc.js",
-    "sgc:ts": "tsx ./sgc-ts.js",
+    "sgc": "tsx ./sgc.js",
     "deps:audit": "knip",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",

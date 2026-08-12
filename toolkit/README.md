@@ -17,15 +17,15 @@ npm --prefix toolkit run build
 Ponto de entrada principal:
 
 ```bash
-node toolkit/sgc.js
+npx tsx toolkit/sgc.js
 ```
 
-Quando um comando importar módulos TypeScript, o toolkit carrega `tsx` automaticamente. Também é possível executar um
-script diretamente com Node:
+Quando um comando importar módulos TypeScript, o toolkit usa `tsx` automaticamente. Também é possível executar um
+script diretamente:
 
 ```bash
-node --import=tsx toolkit/sgc.js --help
-node --import=tsx toolkit/projeto/arvore-linhas.js --help
+npx tsx toolkit/sgc.js --help
+npx tsx toolkit/projeto/arvore-linhas.js --help
 ```
 
 ## Visão arquitetural
@@ -67,67 +67,67 @@ graph TD
 ### Backend
 
 ```bash
-node toolkit/sgc.js backend cobertura auditoria
-node toolkit/sgc.js backend testes analisar
-node toolkit/sgc.js backend testes priorizar
-node toolkit/sgc.js backend java corrigir-fqn
-node toolkit/sgc.js backend notificacoes auditar-assuntos
+npx tsx toolkit/sgc.js backend cobertura auditoria
+npx tsx toolkit/sgc.js backend testes analisar
+npx tsx toolkit/sgc.js backend testes priorizar
+npx tsx toolkit/sgc.js backend java corrigir-fqn
+npx tsx toolkit/sgc.js backend notificacoes auditar-assuntos
 ```
 
 ### Frontend
 
 ```bash
-node toolkit/sgc.js frontend cobertura auditoria
-node toolkit/sgc.js frontend residuos auditar
-node toolkit/sgc.js frontend residuos validar
-node toolkit/sgc.js frontend identificadores-teste listar
-node toolkit/sgc.js frontend identificadores-teste listar-duplicados
-node toolkit/sgc.js frontend acessibilidade crawler
-node toolkit/sgc.js frontend acessibilidade processar
+npx tsx toolkit/sgc.js frontend cobertura auditoria
+npx tsx toolkit/sgc.js frontend residuos auditar
+npx tsx toolkit/sgc.js frontend residuos validar
+npx tsx toolkit/sgc.js frontend identificadores-teste listar
+npx tsx toolkit/sgc.js frontend identificadores-teste listar-duplicados
+npx tsx toolkit/sgc.js frontend acessibilidade crawler
+npx tsx toolkit/sgc.js frontend acessibilidade processar
 ```
 
 ### Código transversal
 
 ```bash
-node toolkit/sgc.js codigo cheiros auditar
-node toolkit/sgc.js codigo semgrep auditar
-node toolkit/sgc.js codigo nomes coletar-simbolos
-node toolkit/sgc.js codigo nomes auditar-consistencia
+npx tsx toolkit/sgc.js codigo cheiros auditar
+npx tsx toolkit/sgc.js codigo semgrep auditar
+npx tsx toolkit/sgc.js codigo nomes coletar-simbolos
+npx tsx toolkit/sgc.js codigo nomes auditar-consistencia
 ```
 
 ### Requisitos
 
 ```bash
-node toolkit/sgc.js requisitos cdus inventariar
-node toolkit/sgc.js requisitos cdus auditar
-node toolkit/sgc.js requisitos cdus auditar-estilo
-node toolkit/sgc.js requisitos cdus inventariar-vocabulario
-node toolkit/sgc.js requisitos cdus auditar-vocabulario
-node toolkit/sgc.js requisitos cdus inventariar-mensagens
-node toolkit/sgc.js requisitos cdus auditar-mensagens
-node toolkit/sgc.js requisitos cdus auditar-mensagens-codigo
-node toolkit/sgc.js requisitos cdus inventariar-densidade
-node toolkit/sgc.js requisitos cdus inventariar-duplicacoes
+npx tsx toolkit/sgc.js requisitos cdus inventariar
+npx tsx toolkit/sgc.js requisitos cdus auditar
+npx tsx toolkit/sgc.js requisitos cdus auditar-estilo
+npx tsx toolkit/sgc.js requisitos cdus inventariar-vocabulario
+npx tsx toolkit/sgc.js requisitos cdus auditar-vocabulario
+npx tsx toolkit/sgc.js requisitos cdus inventariar-mensagens
+npx tsx toolkit/sgc.js requisitos cdus auditar-mensagens
+npx tsx toolkit/sgc.js requisitos cdus auditar-mensagens-codigo
+npx tsx toolkit/sgc.js requisitos cdus inventariar-densidade
+npx tsx toolkit/sgc.js requisitos cdus inventariar-duplicacoes
 ```
 
 ### Qualidade
 
 ```bash
-node toolkit/sgc.js qualidade coletar --perfil rapido
-node toolkit/sgc.js qualidade resumo
-node toolkit/sgc.js qualidade resumo --limite-pontos-criticos 10
+npx tsx toolkit/sgc.js qualidade coletar --perfil rapido
+npx tsx toolkit/sgc.js qualidade resumo
+npx tsx toolkit/sgc.js qualidade resumo --limite-pontos-criticos 10
 ```
 
 ### Projeto
 
 ```bash
-node toolkit/sgc.js projeto diagnostico
-node toolkit/sgc.js projeto dependencias auditar
-node toolkit/sgc.js projeto limpar --confirmar
-node toolkit/sgc.js projeto qualidade rapido
-node toolkit/sgc.js projeto preparar --instalar-dependencias
-node toolkit/sgc.js projeto arvore-linhas
-node toolkit/sgc.js projeto versao-sincronizar 1.2.3
+npx tsx toolkit/sgc.js projeto diagnostico
+npx tsx toolkit/sgc.js projeto dependencias auditar
+npx tsx toolkit/sgc.js projeto limpar --confirmar
+npx tsx toolkit/sgc.js projeto qualidade rapido
+npx tsx toolkit/sgc.js projeto preparar --instalar-dependencias
+npx tsx toolkit/sgc.js projeto arvore-linhas
+npx tsx toolkit/sgc.js projeto versao-sincronizar 1.2.3
 ```
 
 ## Casos de uso típicos
@@ -205,7 +205,7 @@ Auditoria de dependências:
 
 ```bash
 npm --prefix toolkit run deps:audit
-node toolkit/sgc.js projeto dependencias auditar
+npx tsx toolkit/sgc.js projeto dependencias auditar
 ```
 
 ## Organização dos testes

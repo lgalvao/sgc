@@ -221,9 +221,9 @@ function exibirAjuda() {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "node toolkit/sgc.js backend coesao auditar",
-            "node toolkit/sgc.js backend coesao auditar --json",
-            "node toolkit/sgc.js backend coesao auditar --sem-gravar"
+            "npx tsx toolkit/sgc.js backend coesao auditar",
+            "npx tsx toolkit/sgc.js backend coesao auditar --json",
+            "npx tsx toolkit/sgc.js backend coesao auditar --sem-gravar"
         ]
     });
 }

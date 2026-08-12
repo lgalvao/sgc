@@ -136,9 +136,9 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--sem-gravar          Não grava relatórios em disco."
             ],
             exemplos: [
-                "node toolkit/sgc.js codigo semgrep auditar",
-                "node toolkit/sgc.js codigo semgrep auditar --dir backend/src/main/java/sgc/subprocesso",
-                "node toolkit/sgc.js codigo semgrep auditar --auto --json"
+                "npx tsx toolkit/sgc.js codigo semgrep auditar",
+                "npx tsx toolkit/sgc.js codigo semgrep auditar --dir backend/src/main/java/sgc/subprocesso",
+                "npx tsx toolkit/sgc.js codigo semgrep auditar --auto --json"
             ]
         });
         return;

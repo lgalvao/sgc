@@ -136,21 +136,6 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Audita residuos estruturais do frontend.");
     });
 
-    test("entrada TypeScript experimental despacha subprocessos com tsx", async () => {
-        const resultado = await execaNode(path.join(DIRETORIO_RAIZ, "toolkit", "sgc-ts.js"), [
-            "frontend",
-            "residuos",
-            "auditar",
-            "--help"
-        ], {
-            cwd: DIRETORIO_RAIZ,
-            reject: false
-        });
-
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Audita residuos estruturais do frontend.");
-    });
-
     test("pode importar comandos de contratos sem executar integrações", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CONTRATOS.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;

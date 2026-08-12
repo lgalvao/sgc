@@ -181,8 +181,8 @@ function exibirAjuda() {
             "--help, -h          Exibe esta ajuda.",
         ],
         exemplos: [
-            "node toolkit/sgc.js backend java corrigir-fqn --dry-run",
-            "node toolkit/sgc.js backend java corrigir-fqn --base /tmp/backend",
+            "npx tsx toolkit/sgc.js backend java corrigir-fqn --dry-run",
+            "npx tsx toolkit/sgc.js backend java corrigir-fqn --base /tmp/backend",
         ],
     });
 }

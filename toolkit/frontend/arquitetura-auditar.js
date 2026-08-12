@@ -33,9 +33,9 @@ async function principal(argumentos = process.argv.slice(2)) {
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "node toolkit/sgc.js frontend arquitetura auditar",
-                "node toolkit/sgc.js frontend arquitetura auditar --json",
-                "node toolkit/sgc.js frontend arquitetura auditar --sem-gravar --base /tmp/sgc"
+                "npx tsx toolkit/sgc.js frontend arquitetura auditar",
+                "npx tsx toolkit/sgc.js frontend arquitetura auditar --json",
+                "npx tsx toolkit/sgc.js frontend arquitetura auditar --sem-gravar --base /tmp/sgc"
             ]
         });
         return;
