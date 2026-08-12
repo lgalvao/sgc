@@ -16,6 +16,7 @@
   "scripts": {
     "sgc": "node ./sgc.js",
     "deps:audit": "knip",
+    "build": "tsc --project tsconfig.build.json",
     "test": "vitest run",
     "typecheck": "npm run typecheck:nucleo && tsc --noEmit --project tsconfig.json",
     "typecheck:nucleo": "tsc --noEmit --project tsconfig.nucleo.json",

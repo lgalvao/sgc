@@ -15,6 +15,7 @@ frontend/dist/
 frontend/build/
 frontend/coverage/
 toolkit/node_modules/
+toolkit/dist/
 toolkit/coverage/
 toolkit/.vitest/
 e2e/node_modules/

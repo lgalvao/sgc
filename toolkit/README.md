@@ -5,6 +5,15 @@
 `toolkit/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para
 qualidade, preparação, diagnóstico do projeto e utilidades de backend/frontend.
 
+### Build TypeScript de transição
+
+O toolkit ainda executa a árvore-fonte JavaScript. O build abaixo verifica que a superfície executável pode ser emitida
+para `toolkit/dist/`, preparando a migração gradual para TypeScript sem trocar o runtime dos comandos nesta etapa:
+
+```bash
+npm --prefix toolkit run build
+```
+
 Ponto de entrada principal:
 
 ```bash
