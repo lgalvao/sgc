@@ -44,6 +44,11 @@ const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "residuos-auditar.js",
     "residuos-validar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
+const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
+    "cobertura-auditoria.js",
+    "cobertura-ramificacoes.js",
+    "cobertura-ramificacoes-erros.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -214,6 +219,60 @@ describe("CLI raiz do toolkit", () => {
             expect(resultado.exitCode).toBe(0);
             expect(resultado.stdout).toBe("importacao-ok");
         }
+    });
+
+    test("pode importar comandos de cobertura frontend sem ler o relatorio V8", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_FRONTEND.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("analisa cobertura frontend a partir de base e relatorio V8 externos", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-frontend-"));
+        const caminhoArquivo = path.join(diretorioBase, "frontend", "src", "exemplo.ts");
+        const caminhoRelatorio = path.join(diretorioBase, "coverage", "coverage-final.json");
+
+        await fs.outputFile(caminhoArquivo, "export function exemplo() { return true; }\n");
+        await fs.outputJSON(caminhoRelatorio, {
+            [caminhoArquivo]: {
+                s: {"1": 0, "2": 1},
+                f: {"1": 0},
+                b: {"1": [0, 1]},
+                statementMap: {"1": {}, "2": {}}
+            }
+        });
+
+        const resultado = await executarSgc([
+            "frontend",
+            "cobertura",
+            "ramificacoes",
+            "--json",
+            "--base",
+            diretorioBase,
+            "--arquivo",
+            caminhoRelatorio
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.totais.total).toBe(2);
+        expect(conteudo.arquivos[0]).toMatchObject({
+            arquivo: "frontend/src/exemplo.ts",
+            branchesPerdidos: 1,
+        });
     });
 
     test("resolve artefatos de nomenclatura relativos a uma base externa", async () => {

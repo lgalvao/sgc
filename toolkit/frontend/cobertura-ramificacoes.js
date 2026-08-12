@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 import pc from "picocolors";
+import path from "node:path";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -8,26 +12,29 @@ function calcularBranchesPerdidos(arquivo) {
     return Math.max(0, arquivo.branchesTotal - Math.round((arquivo.branchesPercentual / 100) * arquivo.branchesTotal));
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
-    const limite = Number.parseInt(args.find((arg) => arg.startsWith("--limite="))?.split("=")[1] ?? "20", 10);
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend cobertura ramificacoes",
             scriptDireto: "frontend/cobertura-ramificacoes.js",
             descricao: "Lista lacunas de cobertura de ramificacoes no frontend por arquivo.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
-                "--limite=N      Limita a quantidade de arquivos exibidos. Padrão: 20."
+                "--limite <n>    Limita a quantidade de arquivos exibidos. Padrão: 20.",
+                "--arquivo <arquivo> Usa um relatório V8 específico.",
+                "--base <diretorio> Resolve o relatório relativo a outra base."
             ]
         });
-        process.exit(0);
+        return;
     }
 
-    const coleta = await extrairCoberturaFrontend();
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
+    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20"), 10);
+    const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
     const arquivos = coleta.arquivos
         .map((arquivo) => ({
             arquivo: arquivo.arquivo,
@@ -46,7 +53,7 @@ async function main() {
         arquivos
     };
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(resultado);
         return;
     }
@@ -67,7 +74,14 @@ async function main() {
     });
 }
 
-main().catch((erro) => {
-    console.error(pc.red(`Erro ao analisar branches do frontend: ${erro.message}`));
-    process.exit(1);
-});
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro ao analisar branches do frontend: ${mensagem}`));
+        process.exitCode = 1;
+    });
+}
+
+export {
+    principal,
+};

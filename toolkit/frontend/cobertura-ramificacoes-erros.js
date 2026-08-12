@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
+import path from "node:path";
 import pc from "picocolors";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
@@ -21,8 +24,8 @@ function calcularBranchesPerdidos(arquivo) {
     return Math.max(0, arquivo.branchesTotal - Math.round((arquivo.branchesPercentual / 100) * arquivo.branchesTotal));
 }
 
-async function coletarLinhasSuspeitas(caminhoRelativo) {
-    const caminhoAbsoluto = resolverNaRaiz(caminhoRelativo);
+async function coletarLinhasSuspeitas(caminhoRelativo, diretorioBase) {
+    const caminhoAbsoluto = path.resolve(diretorioBase, caminhoRelativo);
     const conteudo = await fs.readFile(caminhoAbsoluto, "utf8");
     const linhas = conteudo.split(/\r?\n/);
     return linhas
@@ -31,26 +34,29 @@ async function coletarLinhasSuspeitas(caminhoRelativo) {
         .slice(0, 12);
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
-    const limite = Number.parseInt(args.find((arg) => arg.startsWith("--limite="))?.split("=")[1] ?? "15", 10);
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend cobertura ramificacoes-erros",
             scriptDireto: "frontend/cobertura-ramificacoes-erros.js",
             descricao: "Cruza lacunas de ramificacoes do frontend com sinais de tratamento de erro suspeito.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
-                "--limite=N      Limita a quantidade de arquivos inspecionados. Padrão: 15."
+                "--limite <n>    Limita a quantidade de arquivos inspecionados. Padrão: 15.",
+                "--arquivo <arquivo> Usa um relatório V8 específico.",
+                "--base <diretorio> Resolve o relatório relativo a outra base."
             ]
         });
-        process.exit(0);
+        return;
     }
 
-    const coleta = await extrairCoberturaFrontend();
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
+    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "15"), 10);
+    const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
     const candidatos = coleta.arquivos
         .map((arquivo) => ({
             ...arquivo,
@@ -62,7 +68,7 @@ async function main() {
 
     const arquivos = [];
     for (const candidato of candidatos) {
-        const linhasSuspeitas = await coletarLinhasSuspeitas(candidato.arquivo);
+        const linhasSuspeitas = await coletarLinhasSuspeitas(candidato.arquivo, diretorioBase);
         if (linhasSuspeitas.length === 0) {
             continue;
         }
@@ -82,7 +88,7 @@ async function main() {
         arquivos,
     };
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(resultado);
         return;
     }
@@ -106,7 +112,14 @@ async function main() {
     });
 }
 
-main().catch((erro) => {
-    console.error(pc.red(`Erro ao cruzar branches de erro suspeitos: ${erro.message}`));
-    process.exit(1);
-});
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro ao cruzar branches de erro suspeitos: ${mensagem}`));
+        process.exitCode = 1;
+    });
+}
+
+export {
+    principal,
+};

@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
+import path from "node:path";
 import pc from "picocolors";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -48,38 +51,42 @@ async function gerarRelatorioMarkdown(dados, caminho) {
 
     md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;
 
+    await fs.mkdir(path.dirname(caminho), {recursive: true});
     await fs.writeFile(caminho, md, "utf8");
     return caminho;
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: 'frontend cobertura auditoria',
             scriptDireto: 'frontend/cobertura-auditoria.js',
             descricao: 'Auditoria unificada de cobertura e risco (Frontend).',
             opcoes: [
                 '--json     Saída em formato JSON para integração com outras ferramentas.',
-                '--output=X Caminho do arquivo Markdown a ser gerado (Padrão: frontend-coverage-auditoria.md).',
-                '--min=N    Falha (exit 1) se a cobertura de linhas for menor que N.'
+                '--output <arquivo> Caminho do arquivo Markdown a ser gerado.',
+                '--arquivo <arquivo> Usa um relatório V8 específico.',
+                '--base <diretorio> Resolve o relatório relativo a outra base.',
+                '--min <percentual> Falha se a cobertura de linhas for menor que N.'
             ]
         });
-        process.exit(0);
+        return;
     }
 
-    const outputArg = args.find(a => a.startsWith("--output="))?.split("=")[1] || CAMINHO_PADRAO_OUTPUT;
-    const metaMinima = Number(args.find(a => a.startsWith("--min="))?.split("=")[1] || "0");
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const arquivo = lerOpcao(argumentos, "--arquivo", undefined);
+    const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT));
+    const metaMinima = Number(lerOpcao(argumentos, "--min", "0"));
 
-    if (!jsonMode) {
+    if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE COBERTURA FRONTEND");
     }
 
     try {
-        const coleta = await extrairCoberturaFrontend();
+        const coleta = await extrairCoberturaFrontend(arquivo, {diretorioBase});
 
         const hotspots = coleta.arquivos
             .map(a => ({
@@ -108,8 +115,9 @@ async function main() {
             }))
         };
 
-        if (jsonMode) {
+        if (emitirJson) {
             imprimirJson(resultado);
+            if (metaMinima > 0 && coleta.lines.percentual < metaMinima) process.exitCode = 1;
             return;
         }
 
@@ -126,23 +134,33 @@ async function main() {
             escreverLinha(`   Lacuna: ${h.statementsTotal - h.statementsCobertos} statements sem teste.`);
         });
 
-        const caminhoRelatorio = resolverNaRaiz(outputArg);
-        await gerarRelatorioMarkdown(resultado, caminhoRelatorio);
-        escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(outputArg)}`);
+        await gerarRelatorioMarkdown(resultado, caminhoSaida);
+        escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(path.relative(process.cwd(), caminhoSaida).replaceAll("\\", "/"))}`);
 
         if (metaMinima > 0 && coleta.lines.percentual < metaMinima) {
             escreverLinha(pc.red(`\nFALHA: Cobertura de linhas (${coleta.lines.percentual}%) abaixo da meta (${metaMinima}%).`));
-            process.exit(1);
+            process.exitCode = 1;
         }
 
     } catch (erro) {
-        if (jsonMode) {
-            imprimirJson({status: "erro", mensagem: erro.message});
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        if (emitirJson) {
+            imprimirJson({status: "erro", mensagem});
         } else {
-            escreverLinha(pc.red(`Erro na auditoria: ${erro.message}`));
+            escreverLinha(pc.red(`Erro na auditoria: ${mensagem}`));
         }
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-main();
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro na auditoria de cobertura: ${mensagem}`));
+        process.exitCode = 1;
+    });
+}
+
+export {
+    principal,
+};
