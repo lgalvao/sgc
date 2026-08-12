@@ -1,23 +1,16 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 
 const CAMINHOS_PERMITIDOS_BMODAL = new Set([
     "frontend/src/components/comum/ModalPadrao.vue",
 ]);
-
-function lerOpcao(argumentos, nome) {
-    const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return null;
-    }
-    return argumentos[indice + 1] ?? null;
-}
 
 function listarArquivosVue(diretorio) {
     const entradas = fs.readdirSync(diretorio, {withFileTypes: true});
@@ -84,12 +77,11 @@ function imprimirResultado(resultado) {
     });
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend modais validar",
             scriptDireto: "frontend/modais-validar.js",
@@ -103,31 +95,33 @@ async function main() {
                 "node toolkit/sgc.js frontend modais validar --json",
             ],
         });
-        process.exit(0);
+        return;
     }
 
     const resultado = await executarValidacaoModais({
-        base: lerOpcao(args, "--base"),
+        base: lerOpcao(argumentos, "--base", undefined),
     });
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(resultado);
     } else {
         imprimirResultado(resultado);
     }
 
     if (resultado.violacoes.length > 0) {
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        escreverLinha(pc.red(`Erro na validacao de modais: ${erro.message}`));
-        process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro na validacao de modais: ${mensagem}`));
+        process.exitCode = 1;
     });
 }
 
 export {
     executarValidacaoModais,
+    principal,
 };

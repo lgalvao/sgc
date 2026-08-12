@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 
 const EXCECOES_SEM_LAYOUT = new Set([
@@ -19,14 +20,6 @@ const MARCADORES_CABECALHO = [
     "<MapaAcoesHeader",
     "<ProcessoAcoes",
 ];
-
-function lerOpcao(argumentos, nome) {
-    const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return null;
-    }
-    return argumentos[indice + 1] ?? null;
-}
 
 function listarViews(diretorioViews) {
     return fs.readdirSync(diretorioViews)
@@ -118,12 +111,11 @@ function imprimirResultado(resultado) {
     });
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend views templates-validar",
             scriptDireto: "frontend/views-templates-validar.js",
@@ -137,31 +129,33 @@ async function main() {
                 "node toolkit/sgc.js frontend views templates-validar --json",
             ],
         });
-        process.exit(0);
+        return;
     }
 
     const resultado = await executarValidacaoTemplatesViews({
-        base: lerOpcao(args, "--base"),
+        base: lerOpcao(argumentos, "--base", undefined),
     });
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(resultado);
     } else {
         imprimirResultado(resultado);
     }
 
     if (resultado.violacoes.length > 0) {
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        escreverLinha(pc.red(`Erro na validacao de templates das views: ${erro.message}`));
-        process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro na validacao de templates das views: ${mensagem}`));
+        process.exitCode = 1;
     });
 }
 
 export {
     executarValidacaoTemplatesViews,
+    principal,
 };
