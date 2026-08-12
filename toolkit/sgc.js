@@ -126,7 +126,10 @@ qualidade
     .option("--limite-pontos-criticos <n>", "Limita a quantidade de pontos criticos exibidos.", Number.parseInt)
     .action(async (opcoes) => {
         const {executarResumoQualidade} = await import("./qualidade/resumo.js");
-        await executarResumoQualidade(opcoes);
+        const resultado = await executarResumoQualidade(opcoes);
+        if (resultado.resumo?.statusGeral === "vermelho") {
+            process.exitCode = 1;
+        }
     });
 
 const projeto = program.command("projeto").description("Ferramentas transversais do repositório.");

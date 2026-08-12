@@ -152,6 +152,10 @@ Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--b
 repositório Git, e a sincronização de versão aceita um diretório base nas funções reutilizáveis sem alterar o projeto
 atual por padrão.
 
+Na camada de qualidade, `coleta.js` e `resumo.js` têm fronteira reutilizável e não executam trabalho durante o `import`.
+Já `coleta-execucao.js` permanece específico do SGC por coordenar Gradle, npm, Playwright e os auditores locais; ele não
+deve ser promovido a abstração horizontal antes de existir um contrato de adaptadores para outro projeto.
+
 ## Dependências e execução
 
 `toolkit/package.json` define dependências próprias, separadas do restante do repositório.

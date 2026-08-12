@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import {executarNode} from "../lib/execucao.js";
-import {pathToFileURL} from "node:url";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import logger from "../lib/logger.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
@@ -61,10 +61,11 @@ async function executarColetaQualidade(argumentos = []) {
     await executarNode("toolkit/qualidade/coleta-execucao.js", argumentosNormalizados);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    executarColetaQualidade(process.argv.slice(2)).catch((error) => {
-        logger.error(`Erro ao coletar fotografia de qualidade: ${error.message}`);
-        process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    executarColetaQualidade().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        logger.error(`Erro ao coletar fotografia de qualidade: ${mensagem}`);
+        process.exitCode = 1;
     });
 }
 

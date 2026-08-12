@@ -1,12 +1,13 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import {pathToFileURL} from "node:url";
 import {execa} from "execa";
 import {resolverNaRaiz} from "../lib/caminhos.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {NOME_ARQUIVO_FOTOGRAFIA, obterDiretorioArtefatos} from "../lib/qualidade.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {extrairCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
+import {escreverLinha} from "../lib/saida.js";
 
 const DIRETORIO_RAIZ = resolverNaRaiz();
 const DIRETORIO_ARTEFATOS = obterDiretorioArtefatos(DIRETORIO_RAIZ);
@@ -272,10 +273,10 @@ async function coletarGit() {
     return {branch, commit};
 }
 
-async function main() {
-    const indicePerfil = process.argv.indexOf("--perfil");
-    const perfilPorOpcao = indicePerfil >= 0 ? process.argv[indicePerfil + 1] : null;
-    const perfilPorAtribuicao = process.argv.find(a => a.startsWith("--perfil="))?.split("=")[1] ?? null;
+async function principal(argumentos = process.argv.slice(2)) {
+    const indicePerfil = argumentos.indexOf("--perfil");
+    const perfilPorOpcao = indicePerfil >= 0 ? argumentos[indicePerfil + 1] : null;
+    const perfilPorAtribuicao = argumentos.find(argumento => argumento.startsWith("--perfil="))?.split("=")[1] ?? null;
     const perfil = perfilPorOpcao || perfilPorAtribuicao || "rapido";
     const inicio = Date.now();
     const timestamp = formatarTimestampArquivo();
@@ -290,7 +291,7 @@ async function main() {
 
     const verificacoes = [];
     for (const adaptador of PERFIS[perfil]) {
-        console.log(`Executando ${adaptador}...`);
+        escreverLinha(`Executando ${adaptador}...`);
         verificacoes.push(await ADAPTADORES[adaptador]());
     }
 
@@ -327,14 +328,15 @@ async function main() {
     const caminhoFotografia = path.join(diretorioExecucao, NOME_ARQUIVO_FOTOGRAFIA);
     await fs.writeFile(caminhoFotografia, JSON.stringify(fotografia, null, 2));
     await fs.writeFile(path.join(DIRETORIO_MAIS_RECENTE, NOME_ARQUIVO_FOTOGRAFIA), JSON.stringify(fotografia, null, 2));
-    console.log(`Fotografia gerada em ${caminhoRelativo(caminhoFotografia)}`);
+    escreverLinha(`Fotografia gerada em ${caminhoRelativo(caminhoFotografia)}`);
 
     return fotografia;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        console.error(`Erro ao coletar qualidade: ${erro.message}`);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        process.stderr.write(`Erro ao coletar qualidade: ${mensagem}\n`);
         process.exitCode = 1;
     });
 }
@@ -342,5 +344,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 export {
     ADAPTADORES,
     PERFIS,
-    main
+    principal
 };

@@ -47,10 +47,6 @@ async function executarResumoQualidade(opcoes = {}) {
         imprimirHumano(saida.caminho, resolvido.fotografia, opcoes.limitePontosCriticos ?? 5);
     }
 
-    if (resolvido.fotografia.resumo?.statusGeral === "vermelho") {
-        process.exitCode = 1;
-    }
-
     return saida;
 }
 

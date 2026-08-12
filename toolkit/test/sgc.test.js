@@ -23,6 +23,11 @@ const CAMINHOS_COMANDOS_PROJETO = [
     "diagnostico.js",
     "versao-sincronizar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
+const CAMINHOS_COMANDOS_QUALIDADE = [
+    "coleta.js",
+    "coleta-execucao.js",
+    "resumo.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -87,6 +92,25 @@ describe("CLI raiz do toolkit", () => {
 
     test("pode importar comandos de projeto sem executar efeitos", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_PROJETO.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("pode importar comandos de qualidade sem executar coleta ou resumo", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_QUALIDADE.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
                 "--input-type=module",
