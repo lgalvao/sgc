@@ -154,6 +154,22 @@ Os diretórios variáveis do projeto podem ser sobrescritos em `configuracao-too
 cobrem o layout atual do SGC, enquanto a configuração permite reutilizar o toolkit em outros projetos sem editar os
 auditores.
 
+O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhecidos pelo toolkit:
+
+```json
+{
+  "versao": 1,
+  "diretorios": {
+    "backendCodigo": "backend/src/main/java",
+    "frontendCodigo": "frontend/src",
+    "artefatosQualidade": "toolkit/qualidade/artefatos"
+  }
+}
+```
+
+Chaves desconhecidas, versões não suportadas e caminhos vazios falham na borda de configuração, antes de um auditor
+iniciar.
+
 O toolkit executa a árvore-fonte com `tsx` e está em migração incremental para TypeScript. As bibliotecas puras de
 `lib/` já foram convertidas; os próximos recortes devem seguir pelas bibliotecas de domínio e pelos comandos que apenas
 adaptam CLI para domínio. Isso reduz o risco de converter simultaneamente roteamento, contratos de saída e integrações

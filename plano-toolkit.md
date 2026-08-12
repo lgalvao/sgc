@@ -37,8 +37,8 @@ sistema auditado.
 - Identificadores novos devem usar `codigo` em vez de `id` para chaves e referências.
 - Diretórios e arquivos novos devem seguir a nomenclatura portuguesa já adotada pelo toolkit.
 - Nomes externos inevitáveis — `OpenAPI`, `Vue`, `Gradle`, `tsx`, `JSON`, `Java` — permanecem como nomes técnicos.
-- Não fazer uma renomeação massiva de uma vez. Quando um identificador público mudar, atualizar consumidores, testes,
-  documentação e eventuais aliases na mesma rodada.
+- Não fazer uma renomeação massiva de uma vez. Quando um identificador público mudar, atualizar o roteador, testes e
+  documentação na mesma rodada; não criar aliases apenas para preservar uma interface antiga sem cliente real.
 - Não remover uma regra apenas por ela ser específica do SGC. Remoção exige evidência de obsolescência e ausência de
   consumidor; caso contrário, a regra deve permanecer no perfil SGC.
 
@@ -75,14 +75,14 @@ arquivos pertencem ao comando ou a uma biblioteca de domínio, não ao roteador.
 
 - O estado final desejado é: auditorias são read-only por padrão.
 - O comportamento atual ainda não cumpre integralmente essa regra: vários comandos gravam fotografias ou relatórios por
-  padrão e alguns oferecem `--sem-gravar`. A migração deve inverter o default de forma coordenada, com teste e aviso de
-  transição para consumidores reais.
+  padrão e alguns oferecem `--sem-gravar`. Como o SGC tem um único consumidor sob nosso controle, a migração pode inverter
+  o default diretamente, atualizando o roteador, testes e documentação no mesmo recorte.
 - Gravação de fotografia, baseline, relatório ou correção deve exigir uma opção explícita e um nome de ação claro.
 - Não normalizar, renumerar ou reescrever documentos apenas durante a leitura.
 - Saída JSON deve ir para stdout sem texto decorativo; logs operacionais e diagnóstico de falha devem ir para stderr.
 - Falhas devem ter código de saída diferente de zero, mas não podem destruir o relatório estruturado que o CI precisa ler.
-- Toda exceção de compatibilidade deve ser temporária, documentada e coberta por teste; não mascarar contrato incorreto
-  com fallback silencioso.
+- Não mascarar contrato incorreto com fallback silencioso. Compatibilidade histórica só deve ser mantida quando existir
+  um segundo consumidor identificado e testado.
 
 ### 2.5 Configuração
 
@@ -111,6 +111,9 @@ frontend e para os caminhos OpenAPI.
 
 ### 2.6 Compatibilidade e dependências
 
+- O toolkit tem um único consumidor atual: este repositório, sob controle direto do projeto. Não há obrigação de manter
+  aliases, formatos de configuração ou opções legadas; mudanças podem ser breaking quando todos os consumidores internos,
+  testes e documentação forem atualizados no mesmo recorte.
 - Uma mudança de pacote não é suficiente: executar testes unitários, typecheck, lint, Knip e os smoke tests do toolkit.
 - `tsx` é runtime, não apenas ferramenta de desenvolvimento, enquanto a execução de fonte for o caminho oficial. A
   posição dele em `dependencies`/`devDependencies` deve ser corrigida quando o pacote do toolkit for tornado instalável
@@ -149,6 +152,8 @@ frontend e para os caminhos OpenAPI.
   alterada porque a suspeita de duplicação não se confirmou.
 - A auditoria de efeitos corrigiu um vazamento de `--sem-gravar` em `codigo nomes auditar-consistencia`: a geração
   automática do inventário auxiliar agora não grava nem polui o JSON final quando executada internamente.
+- A configuração externa agora exige schema versão `1`, valida estrutura, nomes de diretório e caminhos não vazios na
+  borda, antes de qualquer auditoria.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos e resíduos possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração. Isso ainda
   não equivale a portabilidade: há defaults globais resolvidos no import e caminhos `backend/src`/`frontend/src` fixos.
@@ -161,7 +166,7 @@ frontend e para os caminhos OpenAPI.
 
 No estado publicado, sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 77 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 79 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -174,8 +179,9 @@ No estado publicado, sob Node `26.7.0`:
   falha ao resolver `lib/execucao.js`, cuja implementação já é TypeScript.
 
 A contagem anterior caiu de 76 para 75 quando o teste do wrapper experimental `sgc-ts.js` foi removido junto com o
-wrapper. Uma rodada voltou a 76 com escrita e idempotência do corretor FQN; esta rodada chegou a 77 com o contrato
-`--sem-gravar` da auditoria de nomenclatura. Nenhuma dessas mudanças reintroduz o wrapper obsoleto.
+wrapper. Uma rodada voltou a 76 com escrita e idempotência do corretor FQN; outra chegou a 77 com o contrato
+`--sem-gravar` da auditoria de nomenclatura; esta chega a 79 com validação de configuração. Nenhuma dessas mudanças
+reintroduz o wrapper obsoleto.
 
 ### 3.3 Tamanho e composição atual
 
@@ -184,7 +190,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 10 arquivos TypeScript de implementação;
 - 62 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 77 cenários;
+- 2 arquivos de teste concentrando 79 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.js`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.js`.
@@ -204,9 +210,9 @@ dos arquivos de implementação rastreados são TypeScript.
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.js` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
-| Média | Configuração sem validação | `configuracao-toolkit.json` é convertido por cast e aceita chaves/tipos desconhecidos até falhar no uso. Não há versão de schema nem diagnóstico agregado. |
+| Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 77 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Testes não representam pacote externo | Os 79 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.js` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
@@ -220,7 +226,7 @@ dos arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 77 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado e 79 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -317,7 +323,7 @@ do perfil.
 ### Prioridade alta
 
 1. **Efeitos colaterais**: inverter gradualmente defaults de auditorias geradoras para read-only e exigir ação explícita
-   para persistir artefatos, usando o inventário da seção 3.6 sem quebrar consumidores existentes.
+   para persistir artefatos, usando o inventário da seção 3.6 e atualizando o único consumidor interno na mesma rodada.
 2. **Entry point e pacote**: `sgc.js` ainda é JavaScript, tem `shebang` para Node puro e é o alvo do `bin`; o caminho
    documentado usa `tsx`. Migrar o entrypoint e corrigir `bin`, `exports`, scripts, referências e smoke tests de instalação.
 3. **Raiz do consumidor**: separar diretório de instalação do toolkit, diretório de trabalho e raiz do projeto auditado.
@@ -341,7 +347,7 @@ do perfil.
 10. **Schema de resultados**: fotografias, auditorias, cobertura, diagnósticos e relatórios usam objetos sem schema
    versionado. Formalizar tipos e versões de saída antes de extrair o pacote externo.
 11. **Opções inconsistentes**: há mistura de `--input`, `--output`, `--dir`, `--arquivo`, `--saida` e defaults locais.
-   Definir opções canônicas em português, aliases de transição e mensagens uniformes sem quebrar automações existentes.
+   Definir opções canônicas em português e remover formas antigas diretamente, atualizando o catálogo e os testes.
 12. **Documentação derivada**: ainda há referências de `sgc.js`, execução direta e exemplos que precisam ser regenerados ou
    centralizados. O inventário de comandos não deve divergir do roteador.
 13. **Orquestração pesada**: `qualidade/coleta-execucao.js` mistura subprocessos, Gradle, npm, Playwright, parsing de
@@ -372,12 +378,12 @@ reuso externo e preservação de contratos.
 3. Não converter um comando mutável antes de haver teste de efeito, prévia e idempotência quando aplicável.
 4. **[concluído]** Corrigir `toolkit/knip.json`: incluir `js` e `ts`, declarar somente entrypoints reais e
    permitir que o grafo encontre módulos/exports não usados; oito exports internos órfãos foram removidos.
-5. Adicionar testes focados para configuração inválida, precedência de `--base`, defaults calculados após parsing e
-   importação sem capturar a raiz do SGC.
+5. **[concluído nesta rodada]** Adicionar testes focados para configuração inválida e combinação de defaults. A
+   precedência de `--base`, defaults calculados após parsing e importação sem capturar a raiz do SGC continuam pendentes.
 6. Registrar uma baseline de cobertura do próprio toolkit, inicialmente informativa; definir thresholds apenas depois de
    identificar quais contratos críticos ainda não têm teste.
 
-Situação: itens 1, 2 e 4 concluídos; itens 3, 5 e 6 continuam pendentes.
+Situação: itens 1, 2, 4 e 5 concluídos; itens 3 e 6 continuam pendentes.
 
 Critério de aceite: comandos mutáveis conhecidos têm testes de efeito, Knip consegue revelar código órfão real e a
 configuração externa possui testes de precedência e erro.
@@ -462,14 +468,14 @@ SGC está ativo.
 ### Fase E — padronizar CLI e resultados
 
 1. Inventariar todas as opções, defaults, mensagens e códigos de saída.
-2. Definir opções canônicas em português (`--entrada`, `--saida`, `--diretorio`, `--arquivo`, `--base`) e aliases de
-   transição para as formas antigas quando houver consumidores reais.
+2. Definir opções canônicas em português (`--entrada`, `--saida`, `--diretorio`, `--arquivo`, `--base`) e remover as
+   formas antigas que não tenham valor semântico, atualizando todos os usos internos.
 3. Definir um envelope comum de resultado: versão do schema, status, resumo, violações, métricas, artefatos e avisos.
 4. Separar stdout estruturado, stdout humano e stderr operacional.
 5. Definir quando um comando retorna falha por violação encontrada versus erro de execução.
 6. Adicionar `--json`/`--sem-gravar` de forma consistente, sem inventar opções para comandos que não precisam delas.
-7. Substituir gradualmente `--sem-gravar` por execução read-only padrão e uma opção positiva de persistência, mantendo
-   alias de transição somente onde houver consumidor comprovado.
+7. Substituir gradualmente `--sem-gravar` por execução read-only padrão e uma opção positiva de persistência; remover
+   `--sem-gravar` quando cada comando tiver sido migrado e seus testes atualizados.
 8. Separar no catálogo da CLI comandos de auditoria, geração, manutenção e orquestração para tornar efeitos explícitos.
 
 ### Fase F — testes, documentação e distribuição
@@ -482,8 +488,8 @@ SGC está ativo.
 5. Adicionar matriz de validação para Node `26.7+`, TypeScript 6 e as versões de Vitest/tsx usadas no workspace.
 6. Criar fixtures próprias do toolkit para Java/Spring, Vue e Markdown; não usar a suíte do produto SGC como validação
    rotineira da modernização do toolkit.
-7. Executar smoke tests sobre um recorte do SGC apenas quando necessário para provar retrocompatibilidade de um comando
-   do toolkit já usado por ele.
+7. Executar smoke tests sobre um recorte do SGC apenas quando necessário para provar que uma funcionalidade específica
+   do perfil continua funcionando após a mudança do toolkit.
 8. Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos.
 9. Fechar o modelo de distribuição e retirar arquivos JS, aliases e fallbacks de transição.
 
@@ -492,11 +498,12 @@ SGC está ativo.
 ### Rodada focada
 
 ```bash
-source "$HOME/.nvm/nvm.sh"
-nvm use 26.7.0
-npm --prefix toolkit run typecheck:nucleo
-npm --prefix toolkit exec vitest run test/sgc.test.js test/cdus.test.js --reporter=dot --no-color
-npm --prefix toolkit run build
+node --version
+cd toolkit
+npm run typecheck:nucleo
+npx vitest run test/sgc.test.js test/cdus.test.js --reporter=dot --no-color
+npm run build
+cd ..
 git diff --check
 ```
 
@@ -506,11 +513,13 @@ monolíticos existirem, a rodada acima é o mínimo seguro.
 ### Rodada completa do toolkit
 
 ```bash
-npm --prefix toolkit run test
-npm --prefix toolkit run typecheck
-npm --prefix toolkit run lint
-npm --prefix toolkit run deps:audit
-npm --prefix toolkit run build
+cd toolkit
+npm run test
+npm run typecheck
+npm run lint
+npm run deps:audit
+npm run build
+cd ..
 ```
 
 ### Verificações de integração de execução

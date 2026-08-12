@@ -7,6 +7,7 @@ import {execa, execaNode} from "execa";
 import {pathToFileURL} from "node:url";
 import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.ts";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
+import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
@@ -708,6 +709,7 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-codigo-backend-"));
         const codigoBackend = path.join(base, "servidor", "java");
         await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
                 artefatosQualidade: "artefatos"
@@ -740,6 +742,30 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
         expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(true);
+    });
+
+    test("carrega configuracao versionada e preserva defaults ausentes", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-valida-"));
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backendCodigo: "servidor/java"
+            }
+        });
+
+        const configuracao = carregarConfiguracao(base);
+
+        expect(configuracao.versao).toBe(VERSAO_CONFIGURACAO);
+        expect(configuracao.diretorios.backendCodigo).toBe("servidor/java");
+        expect(configuracao.diretorios.frontend).toBe("frontend");
+    });
+
+    test("rejeita configuracao com versao, chave ou caminho invalido", () => {
+        expect(() => validarConfiguracao({diretorios: {}})).toThrow("deve informar a versão");
+        expect(() => validarConfiguracao({versao: 2})).toThrow("versão 2");
+        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigoo: "servidor/java"}})).toThrow("backendCodigoo");
+        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: 42}})).toThrow("backendCodigo");
+        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: "   "}})).toThrow("não vazio");
     });
 
     test("audita residuos do frontend em um recorte controlado", async () => {
