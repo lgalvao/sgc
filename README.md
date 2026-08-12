@@ -115,7 +115,7 @@ flowchart LR
 ### Pré-requisitos
 
 - JDK 25
-- Node.js 22+
+- Node.js 26.7+
 - npm 11+
 
 ### Setup inicial

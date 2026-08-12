@@ -1,12 +1,7 @@
 /**
  * Lê uma opção que recebe valor, preservando o valor padrão quando ausente.
- *
- * @param {string[]} argumentos
- * @param {string} nome
- * @param {string} padrao
- * @returns {string}
  */
-function lerOpcao(argumentos, nome, padrao) {
+function lerOpcao(argumentos: string[], nome: string, padrao: string | undefined): string | undefined {
     const indice = argumentos.indexOf(nome);
     if (indice >= 0) {
         const valor = argumentos[indice + 1];
@@ -29,6 +24,4 @@ function lerOpcao(argumentos, nome, padrao) {
     return padrao;
 }
 
-export {
-    lerOpcao
-};
+export {lerOpcao};

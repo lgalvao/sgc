@@ -127,7 +127,7 @@ function lerOpcoes(argumentos = process.argv.slice(2)) {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escrever(`
 Uso recomendado: node toolkit/sgc.js projeto arvore-linhas [opções]
-Execução direta: node toolkit/projeto/arvore-linhas.js [opções]
+Execução direta: node --import=tsx toolkit/projeto/arvore-linhas.js [opções]
 
 Opções:
   --depth <n>          Limita a profundidade da árvore exibida (ex: --depth 2)

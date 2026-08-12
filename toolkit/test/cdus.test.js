@@ -49,6 +49,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CDU.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`

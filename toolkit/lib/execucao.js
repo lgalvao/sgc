@@ -40,7 +40,9 @@ function garantirArquivo(relativo) {
  */
 async function executarNode(relativo, argumentos = []) {
     const script = garantirArquivo(relativo);
-    if (process.env.SGC_RUNTIME_TS === "sim") {
+    const runtimeTiposAtivo = process.env.SGC_RUNTIME_TS === "sim"
+        || existsSync(path.join(DIRETORIO_RAIZ, "toolkit", "lib", "cli-opcoes.ts"));
+    if (runtimeTiposAtivo) {
         return execa(CAMINHO_TSX, [script, ...argumentos], {
             cwd: DIRETORIO_RAIZ,
             stdio: "inherit"

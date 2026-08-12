@@ -5,10 +5,10 @@
 `toolkit/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para
 qualidade, preparação, diagnóstico do projeto e utilidades de backend/frontend.
 
-### Build TypeScript de transição
+### Execução e build
 
-O toolkit ainda executa a árvore-fonte JavaScript. O build abaixo verifica que a superfície executável pode ser emitida
-para `toolkit/dist/`, preparando a migração gradual para TypeScript sem trocar o runtime dos comandos nesta etapa:
+O toolkit executa a árvore-fonte diretamente. O build é uma verificação opcional do artefato compilado e não faz parte do
+fluxo normal de desenvolvimento:
 
 ```bash
 npm --prefix toolkit run build
@@ -20,10 +20,12 @@ Ponto de entrada principal:
 node toolkit/sgc.js
 ```
 
-Durante a migração para TypeScript, a entrada experimental abaixo executa a CLI e seus subprocessos com `tsx`:
+Quando um comando importar módulos TypeScript, o toolkit carrega `tsx` automaticamente. Também é possível executar um
+script diretamente com Node:
 
 ```bash
-npm --prefix toolkit run sgc:ts -- --help
+node --import=tsx toolkit/sgc.js --help
+node --import=tsx toolkit/projeto/arvore-linhas.js --help
 ```
 
 ## Visão arquitetural

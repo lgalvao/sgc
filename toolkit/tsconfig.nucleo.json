@@ -7,7 +7,7 @@
   "include": [
     "lib/caminhos.js",
     "lib/cli-ajuda.js",
-    "lib/cli-opcoes.js",
+    "lib/cli-opcoes.ts",
     "lib/configuracao.js",
     "lib/execucao.js",
     "lib/saida.js"

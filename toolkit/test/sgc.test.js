@@ -10,6 +10,7 @@ import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
+const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.js");
 const CAMINHOS_COMANDOS_TESTES_BACKEND = [
@@ -82,7 +83,7 @@ async function executarSgc(args, opcoes = {}) {
 }
 
 async function executarScriptFrontendCobertura(args, opcoes = {}) {
-    return execaNode(CAMINHO_FRONTEND_COBERTURA_AUDITORIA, args, {
+    return execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, ...args], {
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes
@@ -90,7 +91,7 @@ async function executarScriptFrontendCobertura(args, opcoes = {}) {
 }
 
 async function executarScriptTestesPriorizar(args, opcoes = {}) {
-    return execaNode(CAMINHO_TESTES_PRIORIZAR, args, {
+    return execa(CAMINHO_TSX, [CAMINHO_TESTES_PRIORIZAR, ...args], {
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes
@@ -101,7 +102,8 @@ describe("CLI raiz do toolkit", () => {
     test("pode ser importada sem executar a CLI", async () => {
         const caminhoSgc = pathToFileURL(CAMINHO_SGC).href;
         const resultado = await execa(process.execPath, [
-            "--input-type=module",
+            "--import=tsx",
+                "--input-type=module",
             "-e",
             `process.argv.push("--help"); await import(${JSON.stringify(caminhoSgc)}); process.stdout.write("importacao-ok\\n");`
         ], {
@@ -153,6 +155,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CONTRATOS.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -172,6 +175,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_BACKEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -191,6 +195,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_AUDITORIA_BACKEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -209,7 +214,8 @@ describe("CLI raiz do toolkit", () => {
     test("pode importar o corretor de FQN sem alterar arquivos", async () => {
         const urlModulo = pathToFileURL(CAMINHO_CORRIGIR_FQN).href;
         const resultado = await execa(process.execPath, [
-            "--input-type=module",
+            "--import=tsx",
+                "--input-type=module",
             "-e",
             `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
         ], {
@@ -225,6 +231,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_TESTES_BACKEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -243,7 +250,8 @@ describe("CLI raiz do toolkit", () => {
     test("pode importar o auditor Semgrep sem executar a ferramenta externa", async () => {
         const urlModulo = pathToFileURL(CAMINHO_SEMGREP_AUDITAR).href;
         const resultado = await execa(process.execPath, [
-            "--input-type=module",
+            "--import=tsx",
+                "--input-type=module",
             "-e",
             `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
         ], {
@@ -258,7 +266,8 @@ describe("CLI raiz do toolkit", () => {
     test("pode importar o auditor de cheiros sem ler o projeto", async () => {
         const urlModulo = pathToFileURL(CAMINHO_CHEIROS_AUDITAR).href;
         const resultado = await execa(process.execPath, [
-            "--input-type=module",
+            "--import=tsx",
+                "--input-type=module",
             "-e",
             `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
         ], {
@@ -299,7 +308,8 @@ describe("CLI raiz do toolkit", () => {
     test("pode importar auditoria de assuntos sem ler o backend", async () => {
         const urlModulo = pathToFileURL(CAMINHO_AUDITORIA_ASSUNTOS).href;
         const resultado = await execa(process.execPath, [
-            "--input-type=module",
+            "--import=tsx",
+                "--input-type=module",
             "-e",
             `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
         ], {
@@ -315,6 +325,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_PROJETO.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -334,6 +345,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_QUALIDADE.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -353,6 +365,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CONSISTENCIA.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -372,6 +385,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -391,6 +405,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_FRONTEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
@@ -410,6 +425,7 @@ describe("CLI raiz do toolkit", () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
+                "--import=tsx",
                 "--input-type=module",
                 "-e",
                 `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`

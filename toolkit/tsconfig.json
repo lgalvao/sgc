@@ -12,7 +12,8 @@
   "include": [
     "**/*.js",
     "**/*.mjs",
-    "**/*.cjs"
+    "**/*.cjs",
+    "**/*.ts"
   ],
   "exclude": [
     "coverage",
