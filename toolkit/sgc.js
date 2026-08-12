@@ -111,10 +111,15 @@ qualidade
     .description("Coleta uma fotografia de qualidade do projeto.")
     .allowUnknownOption(true)
     .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, backend, frontend).", "rapido")
+    .option("--base <diretorio>", "Sobrescreve o diretorio base do projeto auditado.")
     .action(async (opcoes, comando) => {
         const {executarColetaQualidade} = await import("./qualidade/coleta.js");
         const argsExtras = comando.args ?? [];
-        const args = ["--perfil", opcoes.perfil, ...argsExtras];
+        const args = ["--perfil", opcoes.perfil];
+        if (opcoes.base) {
+            args.push("--base", opcoes.base);
+        }
+        args.push(...argsExtras);
         await executarColetaQualidade(args);
     });
 qualidade

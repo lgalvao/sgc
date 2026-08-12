@@ -39,6 +39,7 @@ async function executarNode(relativo: string, argumentos: string[] = []) {
 }
 
 export {
+    CAMINHO_TSX,
     ehEntradaPrincipal,
     executarNode,
     garantirArquivo

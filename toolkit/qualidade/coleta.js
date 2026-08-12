@@ -34,6 +34,21 @@ function normalizarArgumentosColeta(argumentos = []) {
             }
         }
 
+        if (atual === "--base") {
+            const base = argumentos[indice + 1];
+            if (!base) {
+                throw new Error("Informe um valor para --base.");
+            }
+
+            resultado.push("--base", base);
+            indice += 1;
+            continue;
+        }
+
+        if (atual.startsWith("--base=") && atual.slice("--base=".length).length === 0) {
+            throw new Error("Informe um valor para --base.");
+        }
+
         resultado.push(atual);
     }
 
@@ -47,7 +62,8 @@ async function executarColetaQualidade(argumentos = []) {
             scriptDireto: "qualidade/coleta.js",
             descricao: "Coleta uma fotografia consolidada de qualidade do projeto.",
             opcoes: [
-                "--perfil <perfil>   Perfil de execucao: rapido, completo, backend ou frontend."
+                "--perfil <perfil>   Perfil de execucao: rapido, completo, backend ou frontend.",
+                "--base <diretorio>  Sobrescreve o diretorio base do projeto auditado."
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.js qualidade coletar --perfil rapido",

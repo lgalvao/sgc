@@ -9,6 +9,7 @@ import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arv
 import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
+import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
@@ -844,6 +845,45 @@ describe("CLI raiz do toolkit", () => {
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigoo: "servidor/java"}})).toThrow("backendCodigoo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: 42}})).toThrow("backendCodigo");
         expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: "   "}})).toThrow("não vazio");
+    });
+
+    test("grava fotografia de qualidade na base externa", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-base-"));
+        const adaptadores = [...PERFIS.backend];
+        const originais = new Map(adaptadores.map((nome) => [nome, ADAPTADORES[nome]]));
+
+        try {
+            for (const nome of adaptadores) {
+                ADAPTADORES[nome] = async () => ({
+                    codigo: nome,
+                    status: "sucesso",
+                    metricas: {},
+                });
+            }
+
+            const fotografia = await coletarFotografiaQualidade([
+                "--perfil",
+                "backend",
+                "--base",
+                base,
+            ]);
+
+            const caminhoFotografia = path.join(
+                base,
+                "toolkit",
+                "qualidade",
+                "artefatos",
+                "mais-recente",
+                "fotografia.json"
+            );
+            expect(fotografia.resumo.statusGeral).toBe("verde");
+            expect(fotografia.verificacoes).toHaveLength(adaptadores.length);
+            expect(await fs.pathExists(caminhoFotografia)).toBe(true);
+        } finally {
+            for (const [nome, adaptador] of originais) {
+                ADAPTADORES[nome] = adaptador;
+            }
+        }
     });
 
     test("audita residuos do frontend em um recorte controlado", async () => {
