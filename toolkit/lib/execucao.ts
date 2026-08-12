@@ -9,21 +9,13 @@ const NOME_EXECUTAVEL_TSX = process.platform === "win32" ? "tsx.cmd" : "tsx";
 const CAMINHO_TSX = [
     path.join(DIRETORIO_EXECUCAO_TOOLKIT, "node_modules", ".bin", NOME_EXECUTAVEL_TSX),
     path.join(DIRETORIO_RAIZ, "node_modules", ".bin", NOME_EXECUTAVEL_TSX)
-].find((caminho) => existsSync(caminho)) ?? NOME_EXECUTAVEL_TSX;
+].find(caminho => existsSync(caminho)) ?? NOME_EXECUTAVEL_TSX;
 
-/**
- * @param {string} urlModulo
- * @returns {boolean}
- */
-function ehEntradaPrincipal(urlModulo) {
+function ehEntradaPrincipal(urlModulo: string): boolean {
     return Boolean(process.argv[1] && urlModulo === pathToFileURL(process.argv[1]).href);
 }
 
-/**
- * @param {string} relativo
- * @returns {string}
- */
-function garantirArquivo(relativo) {
+function garantirArquivo(relativo: string): string {
     const caminhoRelativo = relativo.startsWith("toolkit/")
         ? relativo.slice("toolkit/".length)
         : relativo;
@@ -34,11 +26,7 @@ function garantirArquivo(relativo) {
     return absoluto;
 }
 
-/**
- * @param {string} relativo
- * @param {string[]} [argumentos]
- */
-async function executarNode(relativo, argumentos = []) {
+async function executarNode(relativo: string, argumentos: string[] = []) {
     const script = garantirArquivo(relativo);
     return execa(CAMINHO_TSX, [script, ...argumentos], {
         cwd: DIRETORIO_RAIZ,

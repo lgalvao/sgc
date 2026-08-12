@@ -9,7 +9,7 @@
     "lib/cli-ajuda.ts",
     "lib/cli-opcoes.ts",
     "lib/configuracao.ts",
-    "lib/execucao.js",
+    "lib/execucao.ts",
     "lib/saida.ts"
   ]
 }
