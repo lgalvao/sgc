@@ -11,6 +11,11 @@ const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.js");
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.js");
+const CAMINHOS_COMANDOS_CONTRATOS = [
+    "contratos-diff.js",
+    "contratos-exportar-openapi.js",
+    "contratos-fixar-baseline.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "integracao", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -52,6 +57,25 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toBe("importacao-ok");
+    });
+
+    test("pode importar comandos de contratos sem executar integrações", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_CONTRATOS.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
     });
 
     test("exibe a ajuda principal", async () => {

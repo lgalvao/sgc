@@ -2,27 +2,16 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import {execa} from "execa";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {CAMINHO_OPENAPI_BASELINE, CAMINHO_OPENAPI_LATEST, CAMINHO_RELATORIO_OPENAPI} from "./contratos-openapi-caminhos.js";
 
 const CAMINHO_RELATORIO_MD = CAMINHO_RELATORIO_OPENAPI;
-
-function lerOpcao(args, nome, padrao) {
-    const indice = args.indexOf(nome);
-    if (indice === -1) {
-        return padrao;
-    }
-    const valor = args[indice + 1];
-    if (!valor || valor.startsWith("--")) {
-        throw new Error(`Informe um valor para ${nome}.`);
-    }
-    return valor;
-}
 
 async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual = CAMINHO_OPENAPI_LATEST}) {
     const [conteudoAnterior, conteudoAtual] = await Promise.all([
@@ -80,9 +69,8 @@ function criarResumoMarkdown(resultado) {
     ].join("\n");
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    if (args.includes("--help") || args.includes("-h")) {
+async function principal(argumentos = process.argv.slice(2)) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "integracao contratos diff",
             scriptDireto: "integracao/contratos-diff.js",
@@ -102,10 +90,10 @@ async function main() {
         return;
     }
 
-    const emitirJson = args.includes("--json");
-    const semGravar = args.includes("--sem-gravar");
-    const anterior = lerOpcao(args, "--anterior", CAMINHO_OPENAPI_BASELINE);
-    const atual = lerOpcao(args, "--atual", CAMINHO_OPENAPI_LATEST);
+    const emitirJson = argumentos.includes("--json");
+    const semGravar = argumentos.includes("--sem-gravar");
+    const anterior = lerOpcao(argumentos, "--anterior", CAMINHO_OPENAPI_BASELINE);
+    const atual = lerOpcao(argumentos, "--atual", CAMINHO_OPENAPI_LATEST);
 
     if (!emitirJson) {
         imprimirCabecalho("DIFF DE CONTRATO OPENAPI");
@@ -135,9 +123,14 @@ async function main() {
 
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
         process.stderr.write(`Erro ao comparar contratos OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
-        process.exit(1);
+        process.exitCode = 1;
     });
 }
+
+export {
+    executarDiffContratos,
+    principal
+};

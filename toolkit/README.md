@@ -143,8 +143,9 @@ A conversão para TypeScript deve começar pelas bibliotecas puras em `lib/` e `
 que apenas adaptam CLI para domínio. Isso reduz o risco de converter simultaneamente roteamento, contratos de saída e
 integrações externas.
 
-Os comandos de requisitos/CDUs são módulos importáveis: só executam quando chamados diretamente pela CLI. Isso permite
-reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias durante o carregamento.
+Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis: só executam quando chamados diretamente
+pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
+integrações durante o carregamento.
 `npm run typecheck:nucleo` verifica com `checkJs` os módulos compartilhados que formam a base da migração incremental.
 
 ## Dependências e execução

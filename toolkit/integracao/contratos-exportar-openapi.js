@@ -2,23 +2,12 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {CAMINHO_OPENAPI_LATEST, URL_OPENAPI_PADRAO} from "./contratos-openapi-caminhos.js";
-
-function lerOpcao(args, nome, padrao) {
-    const indice = args.indexOf(nome);
-    if (indice === -1) {
-        return padrao;
-    }
-    const valor = args[indice + 1];
-    if (!valor || valor.startsWith("--")) {
-        throw new Error(`Informe um valor para ${nome}.`);
-    }
-    return valor;
-}
 
 async function exportarOpenapi({url = URL_OPENAPI_PADRAO, saida = CAMINHO_OPENAPI_LATEST}) {
     const resposta = await fetch(url, {
@@ -44,9 +33,8 @@ async function exportarOpenapi({url = URL_OPENAPI_PADRAO, saida = CAMINHO_OPENAP
     };
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    if (args.includes("--help") || args.includes("-h")) {
+async function principal(argumentos = process.argv.slice(2)) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "integracao contratos exportar-openapi",
             scriptDireto: "integracao/contratos-exportar-openapi.js",
@@ -65,9 +53,9 @@ async function main() {
         return;
     }
 
-    const emitirJson = args.includes("--json");
-    const url = lerOpcao(args, "--url", URL_OPENAPI_PADRAO);
-    const saida = lerOpcao(args, "--saida", CAMINHO_OPENAPI_LATEST);
+    const emitirJson = argumentos.includes("--json");
+    const url = lerOpcao(argumentos, "--url", URL_OPENAPI_PADRAO);
+    const saida = lerOpcao(argumentos, "--saida", CAMINHO_OPENAPI_LATEST);
 
     if (!emitirJson) {
         imprimirCabecalho("EXPORTACAO DO OPENAPI");
@@ -88,14 +76,15 @@ async function main() {
     } catch (erro) {
         process.stderr.write(`Erro ao exportar OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
         process.stderr.write("Dica: execute o backend com perfil `e2e` ou informe `--url` para uma instância já ativa.\n");
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main();
+if (ehEntradaPrincipal(import.meta.url)) {
+    await principal();
 }
 
 export {
-    exportarOpenapi
+    exportarOpenapi,
+    principal
 };
