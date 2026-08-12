@@ -13,6 +13,8 @@ const CONFIGURACAO_PADRAO = {
     diretorios: {
         backend: "backend",
         frontend: "frontend",
+        backendCodigo: "backend/src/main/java/sgc",
+        frontendCodigo: "frontend/src",
         testesIntegracao: "e2e",
         artefatosQualidade: "toolkit/qualidade/artefatos",
         coberturaBackend: "backend/build/reports/jacoco/test/jacocoTestReport.xml",

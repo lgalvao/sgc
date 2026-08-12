@@ -4,14 +4,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {globby} from "globby";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-
-const DIRETORIO_BACKEND = resolverNaRaiz("backend/src/main/java/sgc");
-const CAMINHO_RELATORIO_MD = resolverNaRaiz("toolkit/qualidade/backend/latest/arquitetura-auditoria.md");
-const CAMINHO_RELATORIO_JSON = resolverNaRaiz("toolkit/qualidade/backend/latest/arquitetura-auditoria.json");
 
 const LIMITE_LINHAS_ALERTA = 400;
 const LIMITE_LINHAS_CRITICO = 700;
@@ -81,8 +79,8 @@ function motivosSeveridade(linhas, metodos, dependencias) {
     return motivos;
 }
 
-async function auditarArquitetura() {
-    const arquivos = await globby(path.join(DIRETORIO_BACKEND, "**/*.java").replace(/\\/g, "/"), {absolute: true});
+async function auditarArquitetura(diretorioCodigo, diretorioBase) {
+    const arquivos = await globby(path.join(diretorioCodigo, "**/*.java").replace(/\\/g, "/"), {absolute: true});
     const alvos = arquivos.filter((f) => SUFIXOS_ALVO.some((s) => f.endsWith(s)));
 
     const resultados = await Promise.all(alvos.map(async (arquivo) => {
@@ -95,7 +93,7 @@ async function auditarArquitetura() {
         const motivos = motivosSeveridade(linhas, metodos, dependencias);
         const pacote = extrairPacote(conteudo);
         const tipo = classificarTipo(nomeArquivo);
-        const caminhoRelativo = normalizarCaminho(path.relative(resolverNaRaiz("."), arquivo));
+        const caminhoRelativo = normalizarCaminho(path.relative(diretorioBase, arquivo));
 
         return {nomeArquivo, caminhoRelativo, pacote, tipo, linhas, metodos, dependencias, severidade, motivos};
     }));
@@ -175,10 +173,13 @@ function gerarMarkdown(relatorio) {
     return linhas.join("\n");
 }
 
-async function gravarRelatorios(relatorio) {
-    await fs.mkdir(path.dirname(CAMINHO_RELATORIO_MD), {recursive: true});
-    await fs.writeFile(CAMINHO_RELATORIO_MD, gerarMarkdown(relatorio), "utf-8");
-    await fs.writeFile(CAMINHO_RELATORIO_JSON, JSON.stringify(relatorio, null, 2), "utf-8");
+async function gravarRelatorios(relatorio, diretorioSaida) {
+    const caminhoMarkdown = path.join(diretorioSaida, "arquitetura-auditoria.md");
+    const caminhoJson = path.join(diretorioSaida, "arquitetura-auditoria.json");
+    await fs.mkdir(diretorioSaida, {recursive: true});
+    await fs.writeFile(caminhoMarkdown, gerarMarkdown(relatorio), "utf-8");
+    await fs.writeFile(caminhoJson, JSON.stringify(relatorio, null, 2), "utf-8");
+    return {caminhoMarkdown, caminhoJson};
 }
 
 function exibirAjuda() {
@@ -208,19 +209,22 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
+    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
 
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE ARQUITETURA DO BACKEND");
-        escreverLinha(`Base analisada: ${pc.dim(DIRETORIO_BACKEND)}`);
+        escreverLinha(`Base analisada: ${pc.dim(diretorioCodigo)}`);
     }
 
-    const relatorio = await auditarArquitetura();
+    const relatorio = await auditarArquitetura(diretorioCodigo, diretorioBase);
 
     if (!semGravar) {
-        await gravarRelatorios(relatorio);
+        const caminhosRelatorios = await gravarRelatorios(relatorio, diretorioSaida);
         if (!emitirJson) {
-            escreverLinha(`Relatório Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
-            escreverLinha(`Relatório JSON: ${pc.dim(CAMINHO_RELATORIO_JSON)}`);
+            escreverLinha(`Relatório Markdown: ${pc.dim(caminhosRelatorios.caminhoMarkdown)}`);
+            escreverLinha(`Relatório JSON: ${pc.dim(caminhosRelatorios.caminhoJson)}`);
         }
     }
 

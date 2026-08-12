@@ -4,13 +4,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {globby} from "globby";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-
-const DIRETORIO_BACKEND = resolverNaRaiz("backend/src/main/java/sgc");
-const CAMINHO_RELATORIO_MD = resolverNaRaiz("backend-contratos-auditoria.md");
 
 const TIPOS_ESCALARES = new Set([
     "Void",
@@ -155,8 +154,8 @@ function extrairTiposSimples(tipoDeclarado) {
     return [...tipoDeclarado.matchAll(/\b([A-Z][A-Za-z0-9_]+)\b/g)].map((item) => item[1]);
 }
 
-async function indexarArquivosJava() {
-    const arquivos = await globby(path.join(DIRETORIO_BACKEND, "**/*.java").replace(/\\/g, "/"), {absolute: true});
+async function indexarArquivosJava(diretorioCodigo) {
+    const arquivos = await globby(path.join(diretorioCodigo, "**/*.java").replace(/\\/g, "/"), {absolute: true});
     const porNome = new Map();
 
     for (const arquivo of arquivos) {
@@ -177,8 +176,9 @@ async function lerCacheado(cacheArquivos, arquivo) {
     return cacheArquivos.get(arquivo);
 }
 
-async function listarTiposPacoteModelo(pacoteCuringa, cacheArquivos) {
-    const diretorio = resolverNaRaiz("backend/src/main/java", ...pacoteCuringa.split("."));
+async function listarTiposPacoteModelo(pacoteCuringa, cacheArquivos, diretorioBase, diretorioCodigo) {
+    const diretorioRaizJava = path.dirname(diretorioCodigo);
+    const diretorio = path.join(diretorioRaizJava, ...pacoteCuringa.split("."));
     const candidatos = await globby(path.join(diretorio, "*.java").replace(/\\/g, "/"), {absolute: true});
     const tipos = new Map();
 
@@ -205,7 +205,7 @@ function classificarTipoModelo(conteudo) {
     return "modelo";
 }
 
-async function resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArquivos) {
+async function resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArquivos, diretorioBase, diretorioCodigo) {
     const tiposModelo = new Map();
 
     for (const [simples, fqn] of imports.exatos.entries()) {
@@ -226,7 +226,7 @@ async function resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArqu
     }
 
     for (const pacote of imports.curingas.filter((item) => item.includes(".model"))) {
-        const tiposPacote = await listarTiposPacoteModelo(pacote, cacheArquivos);
+        const tiposPacote = await listarTiposPacoteModelo(pacote, cacheArquivos, diretorioBase, diretorioCodigo);
         for (const [simples, meta] of tiposPacote.entries()) {
             if (!tiposModelo.has(simples)) {
                 tiposModelo.set(simples, meta);
@@ -237,8 +237,8 @@ async function resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArqu
     return tiposModelo;
 }
 
-async function auditarContratos() {
-    const indiceArquivos = await indexarArquivosJava();
+async function auditarContratos(diretorioCodigo, diretorioBase) {
+    const indiceArquivos = await indexarArquivosJava(diretorioCodigo);
     const cacheArquivos = new Map();
     const controladores = indiceArquivos.arquivos.filter((arquivo) => arquivo.endsWith("Controller.java"));
     const achados = [];
@@ -257,7 +257,7 @@ async function auditarContratos() {
 
             const conteudoTipo = await lerCacheado(cacheArquivos, arquivoTipo);
             const imports = extrairImports(conteudoTipo);
-            const tiposModelo = await resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArquivos);
+            const tiposModelo = await resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArquivos, diretorioBase, diretorioCodigo);
             if (tiposModelo.size === 0) {
                 continue;
             }
@@ -277,7 +277,7 @@ async function auditarContratos() {
                         controlador: nomeControlador,
                         metodo: retorno.metodo,
                         tipoRetorno: retorno.tipo,
-                        arquivoDto: normalizarCaminho(path.relative(resolverNaRaiz("."), arquivoTipo)),
+                        arquivoDto: normalizarCaminho(path.relative(diretorioBase, arquivoTipo)),
                         campo: campo.nome,
                         tipoCampo: campo.tipo,
                         categoria: meta.categoria,
@@ -290,7 +290,7 @@ async function auditarContratos() {
 
     return {
         geradoEm: new Date().toISOString(),
-        base: resolverNaRaiz("."),
+        base: diretorioBase,
         resumo: {
             totalAchados: achados.length,
             controladoresAfetados: new Set(achados.map((item) => item.controlador)).size,
@@ -323,8 +323,11 @@ function gerarMarkdown(relatorio) {
     return linhas.join("\n");
 }
 
-async function gravarRelatorio(relatorio) {
-    await fs.writeFile(CAMINHO_RELATORIO_MD, gerarMarkdown(relatorio), "utf-8");
+async function gravarRelatorio(relatorio, diretorioSaida) {
+    const caminhoMarkdown = path.join(diretorioSaida, "contratos-auditoria.md");
+    await fs.mkdir(diretorioSaida, {recursive: true});
+    await fs.writeFile(caminhoMarkdown, gerarMarkdown(relatorio), "utf-8");
+    return caminhoMarkdown;
 }
 
 function exibirAjuda() {
@@ -348,6 +351,9 @@ function exibirAjuda() {
 async function principal(argumentos = process.argv.slice(2)) {
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
+    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
@@ -356,15 +362,15 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE CONTRATOS HTTP (BACKEND)");
-        escreverLinha(`Base analisada: ${pc.dim(DIRETORIO_BACKEND)}`);
+        escreverLinha(`Base analisada: ${pc.dim(diretorioCodigo)}`);
     }
 
-    const relatorio = await auditarContratos();
+    const relatorio = await auditarContratos(diretorioCodigo, diretorioBase);
 
     if (!semGravar) {
-        await gravarRelatorio(relatorio);
+        const caminhoRelatorio = await gravarRelatorio(relatorio, diretorioSaida);
         if (!emitirJson) {
-            escreverLinha(`Relatório Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
+            escreverLinha(`Relatório Markdown: ${pc.dim(caminhoRelatorio)}`);
         }
     }
 

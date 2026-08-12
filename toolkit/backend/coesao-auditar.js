@@ -4,14 +4,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {globby} from "globby";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-
-const DIRETORIO_BACKEND = resolverNaRaiz("backend/src/main/java/sgc");
-const CAMINHO_RELATORIO_MD = resolverNaRaiz("toolkit/qualidade/backend/latest/coesao-auditoria.md");
-const CAMINHO_RELATORIO_JSON = resolverNaRaiz("toolkit/qualidade/backend/latest/coesao-auditoria.json");
 
 // Agrupamento por responsabilidade a partir de prefixos de método
 const CATEGORIAS = {
@@ -92,15 +90,15 @@ function extrairPacote(conteudo) {
     return conteudo.match(/^package\s+([\w.]+)\s*;/m)?.[1] ?? "";
 }
 
-async function auditarCoesao() {
-    const arquivos = await globby(path.join(DIRETORIO_BACKEND, "**/*Service.java").replace(/\\/g, "/"), {absolute: true});
+async function auditarCoesao(diretorioCodigo, diretorioBase) {
+    const arquivos = await globby(path.join(diretorioCodigo, "**/*Service.java").replace(/\\/g, "/"), {absolute: true});
     const resultados = [];
 
     for (const arquivo of arquivos) {
         const conteudo = await fs.readFile(arquivo, "utf-8");
         const nomeArquivo = path.basename(arquivo);
         const pacote = extrairPacote(conteudo);
-        const caminhoRelativo = normalizarCaminho(path.relative(resolverNaRaiz("."), arquivo));
+        const caminhoRelativo = normalizarCaminho(path.relative(diretorioBase, arquivo));
 
         // Ignorar interfaces e classes de teste
         if (conteudo.includes("interface ") && !conteudo.includes("class ")) continue;
@@ -203,10 +201,13 @@ function gerarMarkdown(relatorio) {
     return linhas.join("\n");
 }
 
-async function gravarRelatorios(relatorio) {
-    await fs.mkdir(path.dirname(CAMINHO_RELATORIO_MD), {recursive: true});
-    await fs.writeFile(CAMINHO_RELATORIO_MD, gerarMarkdown(relatorio), "utf-8");
-    await fs.writeFile(CAMINHO_RELATORIO_JSON, JSON.stringify(relatorio, null, 2), "utf-8");
+async function gravarRelatorios(relatorio, diretorioSaida) {
+    const caminhoMarkdown = path.join(diretorioSaida, "coesao-auditoria.md");
+    const caminhoJson = path.join(diretorioSaida, "coesao-auditoria.json");
+    await fs.mkdir(diretorioSaida, {recursive: true});
+    await fs.writeFile(caminhoMarkdown, gerarMarkdown(relatorio), "utf-8");
+    await fs.writeFile(caminhoJson, JSON.stringify(relatorio, null, 2), "utf-8");
+    return {caminhoMarkdown, caminhoJson};
 }
 
 function exibirAjuda() {
@@ -236,19 +237,22 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
+    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
 
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE COESÃO DO BACKEND");
-        escreverLinha(`Base analisada: ${pc.dim(DIRETORIO_BACKEND)}`);
+        escreverLinha(`Base analisada: ${pc.dim(diretorioCodigo)}`);
     }
 
-    const relatorio = await auditarCoesao();
+    const relatorio = await auditarCoesao(diretorioCodigo, diretorioBase);
 
     if (!semGravar) {
-        await gravarRelatorios(relatorio);
+        const caminhosRelatorios = await gravarRelatorios(relatorio, diretorioSaida);
         if (!emitirJson) {
-            escreverLinha(`Relatório Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
-            escreverLinha(`Relatório JSON: ${pc.dim(CAMINHO_RELATORIO_JSON)}`);
+            escreverLinha(`Relatório Markdown: ${pc.dim(caminhosRelatorios.caminhoMarkdown)}`);
+            escreverLinha(`Relatório JSON: ${pc.dim(caminhosRelatorios.caminhoJson)}`);
         }
     }
 

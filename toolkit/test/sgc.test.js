@@ -599,6 +599,44 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.frontend_fallback_or).toBe(1);
     });
 
+    test("auditores backend usam caminhos de codigo definidos pela configuracao do projeto", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-codigo-backend-"));
+        const codigoBackend = path.join(base, "servidor", "java");
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            diretorios: {
+                backendCodigo: "servidor/java",
+                artefatosQualidade: "artefatos"
+            }
+        });
+        await fs.outputFile(
+            path.join(codigoBackend, "exemplo", "ExemploService.java"),
+            [
+                "package exemplo;",
+                "public class ExemploService {",
+                "    public void buscar() {}",
+                "    public void criar() {}",
+                "    public void iniciar() {}",
+                "    public void notificar() {}",
+                "}"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "coesao",
+            "auditar",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo.totalAnalisados).toBe(1);
+        expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(true);
+    });
+
     test("audita residuos do frontend em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-auditar-"));
         const frontendDir = path.join(base, "frontend", "src");
