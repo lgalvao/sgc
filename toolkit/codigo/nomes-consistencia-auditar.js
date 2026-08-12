@@ -209,15 +209,16 @@ function montarResumo(auditoria) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function carregarInventario(caminhoInventario, base) {
+async function carregarInventario(caminhoInventario, base, semGravar = false) {
     const caminhoAbsoluto = path.isAbsolute(caminhoInventario) ? caminhoInventario : path.resolve(base, caminhoInventario);
     try {
         return JSON.parse(await fs.readFile(caminhoAbsoluto, "utf8"));
     } catch {
         return await executarColeta({
             base,
-            semGravar: false,
-            arquivoSaida: caminhoAbsoluto
+            semGravar,
+            arquivoSaida: caminhoAbsoluto,
+            silencioso: true
         });
     }
 }
@@ -232,7 +233,7 @@ async function executarAuditoriaNomes({
     const baseResolvida = path.resolve(base);
     const caminhoInventario = inventario ?? obterCaminhoSimbolos(baseResolvida);
     const caminhoSaida = saidaJson ?? obterCaminhoConsistencia(baseResolvida);
-    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida);
+    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida, semGravar);
     const formatosArquivos = coletarFormatosArquivos(dadosInventario);
     const formatosDiretorios = coletarSegmentosDiretorio(dadosInventario);
     const {

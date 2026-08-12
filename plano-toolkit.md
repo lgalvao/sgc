@@ -147,6 +147,8 @@ frontend e para os caminhos OpenAPI.
 - Exports de `toolkit/package.json` já distinguem módulos migrados e módulos ainda JavaScript.
 - O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; a implementação não foi
   alterada porque a suspeita de duplicação não se confirmou.
+- A auditoria de efeitos corrigiu um vazamento de `--sem-gravar` em `codigo nomes auditar-consistencia`: a geração
+  automática do inventário auxiliar agora não grava nem polui o JSON final quando executada internamente.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos e resíduos possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração. Isso ainda
   não equivale a portabilidade: há defaults globais resolvidos no import e caminhos `backend/src`/`frontend/src` fixos.
@@ -159,7 +161,7 @@ frontend e para os caminhos OpenAPI.
 
 No estado publicado, sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 76 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 77 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -172,8 +174,8 @@ No estado publicado, sob Node `26.7.0`:
   falha ao resolver `lib/execucao.js`, cuja implementação já é TypeScript.
 
 A contagem anterior caiu de 76 para 75 quando o teste do wrapper experimental `sgc-ts.js` foi removido junto com o
-wrapper. Esta rodada voltou a 76 com um cenário novo de escrita e idempotência do corretor FQN; isso aumenta cobertura
-funcional e não reintroduz o wrapper obsoleto.
+wrapper. Uma rodada voltou a 76 com escrita e idempotência do corretor FQN; esta rodada chegou a 77 com o contrato
+`--sem-gravar` da auditoria de nomenclatura. Nenhuma dessas mudanças reintroduz o wrapper obsoleto.
 
 ### 3.3 Tamanho e composição atual
 
@@ -182,7 +184,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 10 arquivos TypeScript de implementação;
 - 62 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 76 cenários;
+- 2 arquivos de teste concentrando 77 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.js`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.js`.
@@ -201,9 +203,10 @@ dos arquivos de implementação rastreados são TypeScript.
 | Alta | Base externa é parcialmente ignorada | Defaults de arquitetura, resíduos e OpenAPI são calculados durante o import usando a raiz do SGC. Um `--base` posterior não recompõe todos os caminhos. |
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.js` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
+| Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Média | Configuração sem validação | `configuracao-toolkit.json` é convertido por cast e aceita chaves/tipos desconhecidos até falhar no uso. Não há versão de schema nem diagnóstico agregado. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 76 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Testes não representam pacote externo | Os 77 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.js` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
@@ -217,9 +220,28 @@ dos arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 76 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado e 77 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
+
+### 3.6 Inventário de efeitos colaterais
+
+O inventário abaixo foi levantado por inspeção dos comandos registrados e das bibliotecas chamadas por eles. Ele descreve
+o comportamento atual; não transforma automaticamente todo comando que gera relatório em auditoria read-only.
+
+| Classe atual | Comandos ou famílias | Efeito observado e controle existente |
+|---|---|---|
+| Auditoria read-only | `requisitos cdus *`, `backend cobertura ramificacoes`, `frontend cobertura ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON; não criam artefatos próprios. Dependências externas podem fazer leitura adicional. |
+| Auditoria com geração por padrão | `backend arquitetura/coesao/contratos auditar`, `frontend arquitetura auditar`, `frontend residuos auditar/validar`, `codigo cheiros auditar`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `codigo semgrep auditar` | Gravem fotografias ou relatórios em caminhos padrão. A maioria oferece `--sem-gravar`, mas a ausência da opção ainda permite mutação de artefatos. |
+| Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--output`, `--output-json` ou defaults. São geradores explícitos, não auditores read-only. |
+| Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff grava resumo Markdown por padrão. `--sem-gravar` existe no diff, mas não é o default. |
+| Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN usa `--dry-run` opt-in; versão não possui prévia; baseline copia diretamente para o destino. |
+| Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
+| Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar`, `frontend acessibilidade crawler` | Executam Gradle, npm, Playwright, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. |
+
+Achado corrigido nesta rodada: quando `codigo nomes auditar-consistencia --sem-gravar` precisava gerar um inventário
+auxiliar ausente, ele chamava a coleta com gravação habilitada. A propagação de `semGravar` e a opção interna
+`silencioso` preservam o contrato de leitura e mantêm o stdout JSON válido.
 
 ## 4. Classificação para reuso externo
 
@@ -294,8 +316,8 @@ do perfil.
 
 ### Prioridade alta
 
-1. **Efeitos colaterais**: inventariar os demais comandos que escrevem, removem ou promovem arquivos e classificar seus
-   contratos antes de continuar conversões mecânicas.
+1. **Efeitos colaterais**: inverter gradualmente defaults de auditorias geradoras para read-only e exigir ação explícita
+   para persistir artefatos, usando o inventário da seção 3.6 sem quebrar consumidores existentes.
 2. **Entry point e pacote**: `sgc.js` ainda é JavaScript, tem `shebang` para Node puro e é o alvo do `bin`; o caminho
    documentado usa `tsx`. Migrar o entrypoint e corrigir `bin`, `exports`, scripts, referências e smoke tests de instalação.
 3. **Raiz do consumidor**: separar diretório de instalação do toolkit, diretório de trabalho e raiz do projeto auditado.
@@ -339,23 +361,23 @@ reuso externo e preservação de contratos.
 
 ### Fase 0 — estabilizar os contratos existentes
 
-1. **[concluído nesta rodada]** Criar teste que execute o modo de escrita de `backend/java-corrigir-fqn.js` sobre fixture
+1. **[concluído]** Criar teste que execute o modo de escrita de `backend/java-corrigir-fqn.js` sobre fixture
    temporária, confirme o conteúdo esperado sem linhas duplicadas e repita a execução para verificar idempotência; não
    houve alteração da implementação porque não existia falha reproduzível.
-2. Inventariar todos os comandos que escrevem, removem ou promovem arquivos e classificá-los como:
+2. **[concluído nesta rodada]** Inventariar todos os comandos que escrevem, removem ou promovem arquivos e classificá-los como:
    - auditoria read-only;
    - geração explícita de artefato;
    - manutenção mutável;
    - orquestração externa.
 3. Não converter um comando mutável antes de haver teste de efeito, prévia e idempotência quando aplicável.
-4. **[concluído nesta rodada]** Corrigir `toolkit/knip.json`: incluir `js` e `ts`, declarar somente entrypoints reais e
+4. **[concluído]** Corrigir `toolkit/knip.json`: incluir `js` e `ts`, declarar somente entrypoints reais e
    permitir que o grafo encontre módulos/exports não usados; oito exports internos órfãos foram removidos.
 5. Adicionar testes focados para configuração inválida, precedência de `--base`, defaults calculados após parsing e
    importação sem capturar a raiz do SGC.
 6. Registrar uma baseline de cobertura do próprio toolkit, inicialmente informativa; definir thresholds apenas depois de
    identificar quais contratos críticos ainda não têm teste.
 
-Situação: itens 1 e 4 concluídos; itens 2, 3, 5 e 6 continuam pendentes.
+Situação: itens 1, 2 e 4 concluídos; itens 3, 5 e 6 continuam pendentes.
 
 Critério de aceite: comandos mutáveis conhecidos têm testes de efeito, Knip consegue revelar código órfão real e a
 configuração externa possui testes de precedência e erro.

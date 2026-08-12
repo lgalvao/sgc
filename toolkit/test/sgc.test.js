@@ -572,6 +572,28 @@ describe("CLI raiz do toolkit", () => {
         ))).toBe(true);
     });
 
+    test("respeita sem-gravar ao gerar inventario auxiliar da auditoria de nomenclatura", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-sem-gravar-"));
+        await fs.outputFile(
+            path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
+            "export function carregarExemplo(codigo: string) { return codigo; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "auditar-consistencia",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(JSON.parse(resultado.stdout).base).toBe(diretorioBase);
+        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+    });
+
     test("exibe a ajuda principal", async () => {
         const resultado = await executarSgc(["--help"]);
         expect(resultado.exitCode).toBe(0);

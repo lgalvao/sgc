@@ -405,7 +405,8 @@ async function executarColeta({
                                   base = DIRETORIO_RAIZ,
                                   json = false,
                                   semGravar = false,
-                                  arquivoSaida = null
+                                  arquivoSaida = null,
+                                  silencioso = false
                               } = {}) {
     const baseResolvida = path.resolve(base);
     const caminhoSaida = arquivoSaida ?? obterCaminhoSimbolos(baseResolvida);
@@ -493,20 +494,24 @@ async function executarColeta({
     }
 
     if (json) {
-        imprimirJson(inventario);
+        if (!silencioso) {
+            imprimirJson(inventario);
+        }
         return inventario;
     }
 
-    imprimirCabecalho("Inventario de simbolos", `Base: ${inventario.base}`);
-    escreverLinha(`Arquivos analisados: ${inventario.totais.arquivos}`);
-    escreverLinha(`Pacotes Java: ${inventario.totais.pacotesJava}`);
-    escreverLinha(`Tipos catalogados: ${inventario.totais.tipos}`);
-    escreverLinha(`Membros catalogados: ${inventario.totais.membros}`);
-    if (!semGravar) {
-        const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
-        escreverLinha("");
-        escreverLinha(`Inventario salvo em ${destinoJson}`);
-        escreverLinha(`Resumo salvo em ${path.join(path.dirname(destinoJson), "simbolos-resumo.md")}`);
+    if (!silencioso) {
+        imprimirCabecalho("Inventario de simbolos", `Base: ${inventario.base}`);
+        escreverLinha(`Arquivos analisados: ${inventario.totais.arquivos}`);
+        escreverLinha(`Pacotes Java: ${inventario.totais.pacotesJava}`);
+        escreverLinha(`Tipos catalogados: ${inventario.totais.tipos}`);
+        escreverLinha(`Membros catalogados: ${inventario.totais.membros}`);
+        if (!semGravar) {
+            const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
+            escreverLinha("");
+            escreverLinha(`Inventario salvo em ${destinoJson}`);
+            escreverLinha(`Resumo salvo em ${path.join(path.dirname(destinoJson), "simbolos-resumo.md")}`);
+        }
     }
 
     return inventario;
