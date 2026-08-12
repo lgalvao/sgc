@@ -157,7 +157,7 @@ frontend e para os caminhos OpenAPI.
 
 No estado publicado, sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 75 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 76 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -168,8 +168,9 @@ No estado publicado, sob Node `26.7.0`:
 - binário do workspace: **reprovado**. `npm exec --workspace toolkit sgc -- --help` executa `sgc.js` com Node puro e
   falha ao resolver `lib/execucao.js`, cuja implementação já é TypeScript.
 
-O número caiu de 76 para 75 porque o teste do wrapper experimental `sgc-ts.js` foi removido junto com o wrapper. Isso é
-uma remoção de contrato obsoleto, não uma perda de cenário funcional.
+A contagem anterior caiu de 76 para 75 quando o teste do wrapper experimental `sgc-ts.js` foi removido junto com o
+wrapper. Esta rodada voltou a 76 com um cenário novo de escrita e idempotência do corretor FQN; isso aumenta cobertura
+funcional e não reintroduz o wrapper obsoleto.
 
 ### 3.3 Tamanho e composição atual
 
@@ -178,7 +179,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 10 arquivos TypeScript de implementação;
 - 62 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 75 cenários;
+- 2 arquivos de teste concentrando 76 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.js`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.js`.
@@ -196,10 +197,10 @@ dos arquivos de implementação rastreados são TypeScript.
 | Alta | Knip produz falso conforto | `toolkit/knip.json` cobre apenas `.js` e declara todos os módulos como `entry`; assim módulos órfãos podem continuar passando. |
 | Alta | Base externa é parcialmente ignorada | Defaults de arquitetura, resíduos e OpenAPI são calculados durante o import usando a raiz do SGC. Um `--base` posterior não recompõe todos os caminhos. |
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
-| Alta | Defeito no corretor FQN | `backend/java-corrigir-fqn.js` adiciona `novaLinha` duas vezes em `analisarLinhas`; uma execução mutável pode duplicar linhas do arquivo Java. Deve ser corrigido antes de qualquer migração desse comando. |
+| Alta | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.js` já adiciona uma única linha por entrada, mas só há teste de `--dry-run`. O modo de escrita e a idempotência precisam de teste antes da conversão. |
 | Média | Configuração sem validação | `configuracao-toolkit.json` é convertido por cast e aceita chaves/tipos desconhecidos até falhar no uso. Não há versão de schema nem diagnóstico agregado. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 75 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Testes não representam pacote externo | Os 76 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.js` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
@@ -213,8 +214,9 @@ dos arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 75 testes verdes são gates úteis, mas atualmente insuficientes para afirmar ausência de código morto,
-  segurança dos comandos mutáveis ou portabilidade.
+- Knip aprovado e 76 testes verdes são gates úteis, mas atualmente insuficientes para afirmar ausência de código morto,
+  segurança dos comandos mutáveis ou portabilidade. A suspeita de duplicação no corretor FQN não foi reproduzida na
+  inspeção do código atual; o risco confirmado é a falta de cobertura do modo de escrita.
 
 ## 4. Classificação para reuso externo
 
@@ -289,8 +291,8 @@ do perfil.
 
 ### Prioridade alta
 
-1. **Segurança de mutação**: corrigir e testar o defeito de duplicação de linhas em `java-corrigir-fqn`; inventariar os
-   demais comandos que escrevem antes de continuar conversões mecânicas.
+1. **Segurança de mutação**: testar o modo de escrita e a idempotência de `java-corrigir-fqn`; inventariar os demais
+   comandos que escrevem antes de continuar conversões mecânicas.
 2. **Entry point e pacote**: `sgc.js` ainda é JavaScript, tem `shebang` para Node puro e é o alvo do `bin`; o caminho
    documentado usa `tsx`. Migrar o entrypoint e corrigir `bin`, `exports`, scripts, referências e smoke tests de instalação.
 3. **Raiz do consumidor**: separar diretório de instalação do toolkit, diretório de trabalho e raiz do projeto auditado.
@@ -336,8 +338,9 @@ reuso externo e preservação de contratos.
 
 ### Fase 0 — estabilizar os contratos existentes
 
-1. Corrigir o defeito de duplicação de linhas de `backend/java-corrigir-fqn.js` e criar teste que execute o modo de
-   escrita sobre fixture temporária, não apenas `--dry-run`.
+1. Criar teste que execute o modo de escrita de `backend/java-corrigir-fqn.js` sobre fixture temporária, confirme o
+   conteúdo esperado sem linhas duplicadas e repita a execução para verificar idempotência; não alterar a implementação
+   sem uma falha reproduzível.
 2. Inventariar todos os comandos que escrevem, removem ou promovem arquivos e classificá-los como:
    - auditoria read-only;
    - geração explícita de artefato;

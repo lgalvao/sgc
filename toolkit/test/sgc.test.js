@@ -290,6 +290,51 @@ describe("CLI raiz do toolkit", () => {
         expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoOriginal);
     });
 
+    test("corrige FQNs no modo de escrita sem duplicar linhas e permanece idempotente", async () => {
+        const diretorioBackend = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-escrita-"));
+        const caminhoJava = path.join(diretorioBackend, "src", "main", "java", "exemplo", "Exemplo.java");
+        const conteudoOriginal = [
+            "package exemplo;",
+            "",
+            "public class Exemplo {",
+            "    com.externo.Alvo alvo;",
+            "}"
+        ].join("\n");
+        const conteudoEsperado = [
+            "package exemplo;",
+            "import com.externo.Alvo;",
+            "",
+            "public class Exemplo {",
+            "    Alvo alvo;",
+            "}"
+        ].join("\n");
+        await fs.outputFile(caminhoJava, conteudoOriginal);
+
+        const primeiraExecucao = await executarSgc([
+            "backend",
+            "java",
+            "corrigir-fqn",
+            "--base",
+            diretorioBackend
+        ]);
+
+        expect(primeiraExecucao.exitCode).toBe(0);
+        expect(primeiraExecucao.stdout).toContain("Atualizado");
+        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
+
+        const segundaExecucao = await executarSgc([
+            "backend",
+            "java",
+            "corrigir-fqn",
+            "--base",
+            diretorioBackend
+        ]);
+
+        expect(segundaExecucao.exitCode).toBe(0);
+        expect(segundaExecucao.stdout).toContain("Total de arquivos atualizados: 0");
+        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
+    });
+
     test("pode importar auditoria de assuntos sem ler o backend", async () => {
         const urlModulo = pathToFileURL(CAMINHO_AUDITORIA_ASSUNTOS).href;
         const resultado = await execa(process.execPath, [
