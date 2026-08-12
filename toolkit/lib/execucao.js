@@ -1,10 +1,15 @@
 import {existsSync} from "node:fs";
 import path from "node:path";
 import {fileURLToPath, pathToFileURL} from "node:url";
-import {execaNode} from "execa";
+import {execa, execaNode} from "execa";
 import {DIRETORIO_RAIZ} from "./caminhos.js";
 
 const DIRETORIO_EXECUCAO_TOOLKIT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const NOME_EXECUTAVEL_TSX = process.platform === "win32" ? "tsx.cmd" : "tsx";
+const CAMINHO_TSX = [
+    path.join(DIRETORIO_EXECUCAO_TOOLKIT, "node_modules", ".bin", NOME_EXECUTAVEL_TSX),
+    path.join(DIRETORIO_RAIZ, "node_modules", ".bin", NOME_EXECUTAVEL_TSX)
+].find((caminho) => existsSync(caminho)) ?? NOME_EXECUTAVEL_TSX;
 
 /**
  * @param {string} urlModulo
@@ -35,6 +40,12 @@ function garantirArquivo(relativo) {
  */
 async function executarNode(relativo, argumentos = []) {
     const script = garantirArquivo(relativo);
+    if (process.env.SGC_RUNTIME_TS === "sim") {
+        return execa(CAMINHO_TSX, [script, ...argumentos], {
+            cwd: DIRETORIO_RAIZ,
+            stdio: "inherit"
+        });
+    }
     return execaNode(script, argumentos, {
         cwd: DIRETORIO_RAIZ,
         stdio: "inherit"

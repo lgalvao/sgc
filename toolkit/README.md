@@ -20,6 +20,12 @@ Ponto de entrada principal:
 node toolkit/sgc.js
 ```
 
+Durante a migração para TypeScript, a entrada experimental abaixo executa a CLI e seus subprocessos com `tsx`:
+
+```bash
+npm --prefix toolkit run sgc:ts -- --help
+```
+
 ## Visão arquitetural
 
 O toolkit é um módulo Node.js em ESM, separado do backend/frontend, com dependências próprias e testes próprios.
