@@ -3,13 +3,16 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {CAMINHO_OPENAPI_LATEST, URL_OPENAPI_PADRAO} from "./contratos-openapi-caminhos.js";
+import {URL_OPENAPI_PADRAO, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
-async function exportarOpenapi({url = URL_OPENAPI_PADRAO, saida = CAMINHO_OPENAPI_LATEST}) {
+async function exportarOpenapi({base = DIRETORIO_RAIZ, url = URL_OPENAPI_PADRAO, saida} = {}) {
+    const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
+    const saidaResolvida = saida ?? resolverCaminhosOpenapi(baseResolvida).caminhoAtual;
     const resposta = await fetch(url, {
         headers: {
             Accept: "application/json"
@@ -21,12 +24,13 @@ async function exportarOpenapi({url = URL_OPENAPI_PADRAO, saida = CAMINHO_OPENAP
     }
 
     const json = await resposta.json();
-    await fs.mkdir(path.dirname(saida), {recursive: true});
-    await fs.writeFile(saida, `${JSON.stringify(json, null, 2)}\n`, "utf-8");
+    await fs.mkdir(path.dirname(saidaResolvida), {recursive: true});
+    await fs.writeFile(saidaResolvida, `${JSON.stringify(json, null, 2)}\n`, "utf-8");
 
     return {
+        base: baseResolvida,
         url,
-        saida,
+        saida: saidaResolvida,
         titulo: json.info?.title ?? null,
         versao: json.info?.version ?? null,
         paths: Object.keys(json.paths ?? {}).length
@@ -40,6 +44,7 @@ async function principal(argumentos = process.argv.slice(2)) {
             scriptDireto: "integracao/contratos-exportar-openapi.js",
             descricao: "Busca o documento OpenAPI da aplicação em execução e grava uma fotografia local para auditorias de contrato.",
             opcoes: [
+                "--base <diretorio>   Base do projeto que receberá os artefatos.",
                 "--url <url>          URL do endpoint OpenAPI (padrão: http://127.0.0.1:10000/api-docs).",
                 "--saida <arquivo>    Caminho do arquivo JSON a ser gerado.",
                 "--json               Emite o resultado em JSON."
@@ -54,8 +59,9 @@ async function principal(argumentos = process.argv.slice(2)) {
     }
 
     const emitirJson = argumentos.includes("--json");
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
     const url = lerOpcao(argumentos, "--url", URL_OPENAPI_PADRAO);
-    const saida = lerOpcao(argumentos, "--saida", CAMINHO_OPENAPI_LATEST);
+    const saida = lerOpcao(argumentos, "--saida", resolverCaminhosOpenapi(base).caminhoAtual);
 
     if (!emitirJson) {
         imprimirCabecalho("EXPORTACAO DO OPENAPI");
@@ -64,7 +70,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     }
 
     try {
-        const resultado = await exportarOpenapi({url, saida});
+        const resultado = await exportarOpenapi({base, url, saida});
         if (emitirJson) {
             imprimirJson(resultado);
         } else {

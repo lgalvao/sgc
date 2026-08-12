@@ -3,16 +3,20 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {CAMINHO_OPENAPI_BASELINE, CAMINHO_OPENAPI_LATEST} from "./contratos-openapi-caminhos.js";
+import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
-async function fixarBaselineContrato({origem = CAMINHO_OPENAPI_LATEST, destino = CAMINHO_OPENAPI_BASELINE}) {
-    await fs.mkdir(path.dirname(destino), {recursive: true});
-    await fs.copyFile(origem, destino);
-    return {origem, destino};
+async function fixarBaselineContrato({base = DIRETORIO_RAIZ, origem, destino} = {}) {
+    const caminhos = resolverCaminhosOpenapi(base);
+    const origemResolvida = origem ?? caminhos.caminhoAtual;
+    const destinoResolvido = destino ?? caminhos.caminhoReferencia;
+    await fs.mkdir(path.dirname(destinoResolvido), {recursive: true});
+    await fs.copyFile(origemResolvida, destinoResolvido);
+    return {base: caminhos.base, origem: origemResolvida, destino: destinoResolvido};
 }
 
 async function principal(argumentos = process.argv.slice(2)) {
@@ -22,6 +26,7 @@ async function principal(argumentos = process.argv.slice(2)) {
             scriptDireto: "integracao/contratos-fixar-baseline.js",
             descricao: "Promove a fotografia OpenAPI mais recente como referência para comparações futuras de contrato.",
             opcoes: [
+                "--base <diretorio>   Base do projeto que contém os artefatos padrão.",
                 "--origem <arquivo>   Fotografia OpenAPI atual.",
                 "--destino <arquivo>  Referência a ser atualizada.",
                 "--json               Emite o resultado em JSON."
@@ -36,8 +41,10 @@ async function principal(argumentos = process.argv.slice(2)) {
     }
 
     const emitirJson = argumentos.includes("--json");
-    const origem = lerOpcao(argumentos, "--origem", CAMINHO_OPENAPI_LATEST);
-    const destino = lerOpcao(argumentos, "--destino", CAMINHO_OPENAPI_BASELINE);
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const caminhos = resolverCaminhosOpenapi(base);
+    const origem = lerOpcao(argumentos, "--origem", caminhos.caminhoAtual);
+    const destino = lerOpcao(argumentos, "--destino", caminhos.caminhoReferencia);
 
     if (!emitirJson) {
         imprimirCabecalho("FIXAR BASELINE DO OPENAPI");
@@ -45,7 +52,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         escreverLinha(`Destino: ${pc.dim(destino)}`);
     }
 
-    const resultado = await fixarBaselineContrato({origem, destino});
+    const resultado = await fixarBaselineContrato({base, origem, destino});
 
     if (emitirJson) {
         imprimirJson(resultado);

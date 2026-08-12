@@ -4,25 +4,27 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import {execa} from "execa";
 import pc from "picocolors";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {CAMINHO_OPENAPI_BASELINE, CAMINHO_OPENAPI_LATEST, CAMINHO_RELATORIO_OPENAPI} from "./contratos-openapi-caminhos.js";
+import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
-const CAMINHO_RELATORIO_MD = CAMINHO_RELATORIO_OPENAPI;
-
-async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual = CAMINHO_OPENAPI_LATEST}) {
+async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual} = {}) {
+    const caminhos = resolverCaminhosOpenapi(base);
+    const anteriorResolvido = anterior ?? caminhos.caminhoReferencia;
+    const atualResolvido = atual ?? caminhos.caminhoAtual;
     const [conteudoAnterior, conteudoAtual] = await Promise.all([
-        fs.readFile(anterior, "utf-8"),
-        fs.readFile(atual, "utf-8")
+        fs.readFile(anteriorResolvido, "utf-8"),
+        fs.readFile(atualResolvido, "utf-8")
     ]);
 
     if (conteudoAnterior === conteudoAtual) {
         return {
-            anterior,
-            atual,
+            base: caminhos.base,
+            anterior: anteriorResolvido,
+            atual: atualResolvido,
             codigoSaida: 0,
             houveMudancas: false,
             modo: "identico",
@@ -31,9 +33,9 @@ async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual
         };
     }
 
-    const resultado = await execa("git", ["diff", "--no-index", "--minimal", "--unified=3", anterior, atual], {
+    const resultado = await execa("git", ["diff", "--no-index", "--minimal", "--unified=3", anteriorResolvido, atualResolvido], {
         reject: false,
-        cwd: resolverNaRaiz(".")
+        cwd: caminhos.base
     });
 
     if (resultado.exitCode > 1) {
@@ -41,8 +43,9 @@ async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual
     }
 
     return {
-        anterior,
-        atual,
+        base: caminhos.base,
+        anterior: anteriorResolvido,
+        atual: atualResolvido,
         codigoSaida: 0,
         houveMudancas: true,
         modo: "diff_textual",
@@ -76,6 +79,7 @@ async function principal(argumentos = process.argv.slice(2)) {
             scriptDireto: "integracao/contratos-diff.js",
             descricao: "Compara duas versões do OpenAPI e produz um resumo útil para revisão de mudanças de contrato.",
             opcoes: [
+                "--base <diretorio>   Base do projeto que contém os artefatos padrão.",
                 "--anterior <arquivo> Arquivo OpenAPI usado como baseline.",
                 "--atual <arquivo>    Arquivo OpenAPI atual.",
                 "--json               Emite o resultado em JSON.",
@@ -92,8 +96,10 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
-    const anterior = lerOpcao(argumentos, "--anterior", CAMINHO_OPENAPI_BASELINE);
-    const atual = lerOpcao(argumentos, "--atual", CAMINHO_OPENAPI_LATEST);
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const caminhos = resolverCaminhosOpenapi(base);
+    const anterior = lerOpcao(argumentos, "--anterior", caminhos.caminhoReferencia);
+    const atual = lerOpcao(argumentos, "--atual", caminhos.caminhoAtual);
 
     if (!emitirJson) {
         imprimirCabecalho("DIFF DE CONTRATO OPENAPI");
@@ -101,13 +107,13 @@ async function principal(argumentos = process.argv.slice(2)) {
         escreverLinha(`Atual: ${pc.dim(atual)}`);
     }
 
-    const resultado = await executarDiffContratos({anterior, atual});
+    const resultado = await executarDiffContratos({base, anterior, atual});
 
     if (!semGravar) {
-        await fs.mkdir(path.dirname(CAMINHO_RELATORIO_MD), {recursive: true});
-        await fs.writeFile(CAMINHO_RELATORIO_MD, criarResumoMarkdown(resultado), "utf-8");
+        await fs.mkdir(path.dirname(caminhos.caminhoRelatorio), {recursive: true});
+        await fs.writeFile(caminhos.caminhoRelatorio, criarResumoMarkdown(resultado), "utf-8");
         if (!emitirJson) {
-            escreverLinha(`Resumo Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
+            escreverLinha(`Resumo Markdown: ${pc.dim(caminhos.caminhoRelatorio)}`);
         }
     }
 
