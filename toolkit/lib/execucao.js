@@ -1,7 +1,10 @@
 import {existsSync} from "node:fs";
-import {pathToFileURL} from "node:url";
+import path from "node:path";
+import {fileURLToPath, pathToFileURL} from "node:url";
 import {execaNode} from "execa";
-import {DIRETORIO_RAIZ, resolverNaRaiz} from "./caminhos.js";
+import {DIRETORIO_RAIZ} from "./caminhos.js";
+
+const DIRETORIO_EXECUCAO_TOOLKIT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
  * @param {string} urlModulo
@@ -16,7 +19,10 @@ function ehEntradaPrincipal(urlModulo) {
  * @returns {string}
  */
 function garantirArquivo(relativo) {
-    const absoluto = resolverNaRaiz(relativo);
+    const caminhoRelativo = relativo.startsWith("toolkit/")
+        ? relativo.slice("toolkit/".length)
+        : relativo;
+    const absoluto = path.resolve(DIRETORIO_EXECUCAO_TOOLKIT, caminhoRelativo);
     if (!existsSync(absoluto)) {
         throw new Error(`Script nao encontrado: ${relativo}`);
     }

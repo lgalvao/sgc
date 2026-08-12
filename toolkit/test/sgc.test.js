@@ -10,6 +10,7 @@ import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
+const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.js");
 const CAMINHOS_COMANDOS_TESTES_BACKEND = [
     "testes-analisar.js",
@@ -110,6 +111,27 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toBe("importacao-ok");
+    });
+
+    test("CLI compilada despacha scripts compilados", async () => {
+        const compilacao = await execa("npm", ["run", "build"], {
+            cwd: path.join(DIRETORIO_RAIZ, "toolkit"),
+            reject: false
+        });
+        expect(compilacao.exitCode).toBe(0);
+
+        const resultado = await execaNode(CAMINHO_SGC_COMPILADO, [
+            "frontend",
+            "residuos",
+            "auditar",
+            "--help"
+        ], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false
+        });
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Audita residuos estruturais do frontend.");
     });
 
     test("pode importar comandos de contratos sem executar integrações", async () => {
