@@ -10,6 +10,7 @@ import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
+import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
@@ -884,6 +885,22 @@ describe("CLI raiz do toolkit", () => {
                 ADAPTADORES[nome] = adaptador;
             }
         }
+    });
+
+    test("resolve alvos padrao do Semgrep pela configuracao da base", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-base-"));
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backendCodigo: "servidor/java",
+                frontendCodigo: "aplicacao/src"
+            }
+        });
+
+        expect(resolverDiretoriosPadrao(base)).toEqual([
+            "servidor/java",
+            "aplicacao/src"
+        ]);
     });
 
     test("audita residuos do frontend em um recorte controlado", async () => {

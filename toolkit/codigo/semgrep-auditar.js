@@ -12,11 +12,6 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-const DIRETORIOS_PADRAO = [
-    "backend/src/main/java/sgc",
-    "frontend/src"
-];
-
 function extrairLista(argumentos, nome) {
     const valores = [];
     const prefixoAtribuicao = `${nome}=`;
@@ -37,6 +32,14 @@ function extrairLista(argumentos, nome) {
         }
     }
     return valores;
+}
+
+function resolverDiretoriosPadrao(diretorioBase = DIRETORIO_RAIZ) {
+    const baseResolvida = path.resolve(diretorioBase);
+    return [
+        path.relative(baseResolvida, resolverCaminhoConfigurado("backendCodigo", baseResolvida)),
+        path.relative(baseResolvida, resolverCaminhoConfigurado("frontendCodigo", baseResolvida)),
+    ];
 }
 
 function obterComandoSemgrep() {
@@ -82,19 +85,21 @@ function criarResumo(resultadoJson, regra, diretorioBase) {
 
 async function executarSemgrep({
                                    regra,
-                                   diretorios = DIRETORIOS_PADRAO,
+                                   diretorios,
                                    auto = false,
                                    diretorioBase = DIRETORIO_RAIZ,
                                }) {
+    const baseResolvida = path.resolve(diretorioBase);
+    const alvos = diretorios ?? resolverDiretoriosPadrao(baseResolvida);
     const comando = obterComandoSemgrep();
     const configs = auto ? ["--config", "auto", "--config", regra] : ["--config", regra];
     const resultado = await execa(comando, [
         "scan",
         ...configs,
         "--json",
-        ...diretorios
+        ...alvos
     ], {
-        cwd: diretorioBase,
+        cwd: baseResolvida,
         env: {
             PATH: `${path.dirname(comando)}:${process.env.PATH ?? ""}`
         },
@@ -105,7 +110,7 @@ async function executarSemgrep({
     return {
         comando,
         regra,
-        diretorios,
+        diretorios: alvos,
         auto,
         codigoSaida: resultado.exitCode ?? 0,
         resultadoJson
@@ -150,7 +155,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
     const regra = lerOpcao(argumentos, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase));
     const diretorios = extrairLista(argumentos, "--dir");
-    const alvos = diretorios.length > 0 ? diretorios : DIRETORIOS_PADRAO;
+    const alvos = diretorios.length > 0 ? diretorios : resolverDiretoriosPadrao(diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "semgrep", "mais-recente");
 
     if (!emitirJson) {
@@ -209,4 +214,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 export {
     executarSemgrep,
     principal,
+    resolverDiretoriosPadrao,
 };
