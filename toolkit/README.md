@@ -148,6 +148,10 @@ pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outr
 integrações durante o carregamento.
 `npm run typecheck:nucleo` verifica com `checkJs` os módulos compartilhados que formam a base da migração incremental.
 
+Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--base <diretorio>` para analisar outro
+repositório Git, e a sincronização de versão aceita um diretório base nas funções reutilizáveis sem alterar o projeto
+atual por padrão.
+
 ## Dependências e execução
 
 `toolkit/package.json` define dependências próprias, separadas do restante do repositório.

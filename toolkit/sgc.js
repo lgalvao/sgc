@@ -147,7 +147,10 @@ projeto
     .option("--base <diretorio>", "Sobrescreve o diretório base para diagnostico.")
     .action(async (opcoes) => {
         const {executarDiagnostico} = await import("./projeto/diagnostico.js");
-        await executarDiagnostico(opcoes);
+        const resultado = await executarDiagnostico(opcoes);
+        if (resultado.statusGeral === "falha") {
+            process.exitCode = 1;
+        }
     });
 
 projeto

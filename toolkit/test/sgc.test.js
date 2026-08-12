@@ -5,6 +5,8 @@ import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {execa, execaNode} from "execa";
 import {pathToFileURL} from "node:url";
+import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.js";
+import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
@@ -16,6 +18,11 @@ const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-exportar-openapi.js",
     "contratos-fixar-baseline.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "integracao", nome));
+const CAMINHOS_COMANDOS_PROJETO = [
+    "arvore-linhas.js",
+    "diagnostico.js",
+    "versao-sincronizar.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -61,6 +68,25 @@ describe("CLI raiz do toolkit", () => {
 
     test("pode importar comandos de contratos sem executar integrações", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CONTRATOS.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("pode importar comandos de projeto sem executar efeitos", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_PROJETO.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
                 "--input-type=module",
@@ -1169,6 +1195,40 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarSgc(["projeto", "versao-sincronizar", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Sincroniza a versao entre gradle.properties e frontend/package.json.");
+    });
+
+    test("sincroniza a versao em um diretorio informado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-sincronizar-"));
+        await fs.outputFile(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\nother=value\n");
+        await fs.outputJSON(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
+
+        const resultado = sincronizarVersao("2.3.4", diretorioBase);
+
+        expect(resultado.arquivosAtualizados).toEqual(["gradle.properties", "frontend/package.json"]);
+        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
+        expect((await fs.readJSON(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("2.3.4");
+    });
+
+    test("calcula arvore de linhas usando o diretorio base informado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-arvore-linhas-"));
+        await fs.outputFile(path.join(diretorioBase, "src", "Principal.java"), "linha 1\nlinha 2\n");
+        await fs.outputFile(path.join(diretorioBase, "README.md"), "linha 1\n");
+
+        const arvore = construirArvore(["src/Principal.java", "README.md"], diretorioBase);
+        calcularTotais(arvore);
+
+        expect(arvore.linhas).toBe(5);
+        expect(arvore.filhos.src.linhas).toBe(3);
+        expect(arvore.filhos.src.filhos["Principal.java"].linhas).toBe(3);
+    });
+
+    test("lista arquivos Git a partir do diretorio base informado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-arvore-git-"));
+        await execa("git", ["init", "--quiet"], {cwd: diretorioBase});
+        await fs.outputFile(path.join(diretorioBase, "arquivo.txt"), "conteúdo\n");
+        await execa("git", ["add", "arquivo.txt"], {cwd: diretorioBase});
+
+        expect(listarArquivosGit(diretorioBase)).toEqual(["arquivo.txt"]);
     });
 
     test("executa o diagnostico em JSON", async () => {

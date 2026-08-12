@@ -1,125 +1,131 @@
-import {execSync} from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
-import logger from '../lib/logger.js';
+import {execSync} from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import logger from "../lib/logger.js";
+import {escrever, escreverLinha} from "../lib/saida.js";
 
-function getFiles() {
-    const output = execSync('git ls-files', {encoding: 'utf-8', maxBuffer: 1024 * 1024 * 10});
-    return output.trim().split(/\r?\n/).filter(Boolean);
+function listarArquivosGit(diretorioBase = process.cwd()) {
+    const saida = execSync("git ls-files", {
+        cwd: diretorioBase,
+        encoding: "utf-8",
+        maxBuffer: 1024 * 1024 * 10
+    });
+    return saida.trim().split(/\r?\n/).filter(Boolean);
 }
 
-function countLines(filePath) {
-    if (!fs.existsSync(filePath)) return 0;
-    const content = fs.readFileSync(filePath, 'utf-8');
-    return content.split(/\r?\n/).length;
+function contarLinhas(caminhoArquivo, diretorioBase) {
+    const caminhoAbsoluto = path.resolve(diretorioBase, caminhoArquivo);
+    if (!fs.existsSync(caminhoAbsoluto)) return 0;
+    const conteudo = fs.readFileSync(caminhoAbsoluto, "utf-8");
+    return conteudo.split(/\r?\n/).length;
 }
 
-function buildTree(fileList) {
-    const root = {name: '.', count: 0, children: {}, isDir: true};
+function construirArvore(listaArquivos, diretorioBase = process.cwd()) {
+    const raiz = {nome: ".", linhas: 0, filhos: {}, ehDiretorio: true};
 
-    fileList.forEach(filePath => {
-        const normalizedPath = filePath.replaceAll('\\', '/');
-        const count = countLines(normalizedPath);
+    listaArquivos.forEach(caminhoArquivo => {
+        const caminhoNormalizado = caminhoArquivo.replaceAll("\\", "/");
+        const linhas = contarLinhas(caminhoNormalizado, diretorioBase);
 
-        const parts = normalizedPath.split('/');
-        let current = root;
+        const partes = caminhoNormalizado.split("/");
+        let atual = raiz;
 
-        parts.forEach((part, index) => {
-            const isLast = index === parts.length - 1;
+        partes.forEach((parte, indice) => {
+            const ehUltimo = indice === partes.length - 1;
 
-            if (!current.children[part]) {
-                current.children[part] = {
-                    name: part,
-                    count: 0,
-                    children: {},
-                    isDir: !isLast
+            if (!atual.filhos[parte]) {
+                atual.filhos[parte] = {
+                    nome: parte,
+                    linhas: 0,
+                    filhos: {},
+                    ehDiretorio: !ehUltimo
                 };
             }
-            current = current.children[part];
+            atual = atual.filhos[parte];
 
-            if (isLast) {
-                current.count = count;
+            if (ehUltimo) {
+                atual.linhas = linhas;
             }
         });
     });
 
-    return root;
+    return raiz;
 }
 
-function calculateTotals(node) {
-    if (!node.isDir) {
-        return node.count;
+function calcularTotais(no) {
+    if (!no.ehDiretorio) {
+        return no.linhas;
     }
 
-    let sum = 0;
-    for (const childName in node.children) {
-        sum += calculateTotals(node.children[childName]);
+    let soma = 0;
+    for (const filho of Object.values(no.filhos)) {
+        soma += calcularTotais(filho);
     }
-    node.count = sum;
-    return sum;
+    no.linhas = soma;
+    return soma;
 }
 
-function getTreeConnectors(isRoot, isLast) {
-    if (isRoot) {
-        return {connector: '', childPrefix: ''};
+function obterConectoresArvore(ehRaiz, ehUltimo) {
+    if (ehRaiz) {
+        return {conector: "", prefixoFilho: ""};
     }
     return {
-        connector: isLast ? '└── ' : '├── ',
-        childPrefix: isLast ? '    ' : '│   '
+        conector: ehUltimo ? "└── " : "├── ",
+        prefixoFilho: ehUltimo ? "    " : "│   "
     };
 }
 
-function printNode(node, prefix, connector) {
-    const reset = '\x1b[0m';
-    const blue = '\x1b[34m'; // Diretórios
-    const green = '\x1b[32m'; // Arquivos
-    const yellow = '\x1b[33m'; // Números
+function imprimirNo(no, prefixo, conector) {
+    const resetar = "\x1b[0m";
+    const azul = "\x1b[34m";
+    const verde = "\x1b[32m";
+    const amarelo = "\x1b[33m";
 
-    const color = node.isDir ? blue : green;
-    const icon = node.isDir ? '📁' : '📄';
-    const nameLine = `${prefix}${connector}${icon} ${color}${node.name}${reset} ${yellow}[${node.count.toLocaleString()}]${reset}`;
-    process.stdout.write(`${nameLine}\n`);
+    const cor = no.ehDiretorio ? azul : verde;
+    const icone = no.ehDiretorio ? "📁" : "📄";
+    const linha = `${prefixo}${conector}${icone} ${cor}${no.nome}${resetar} ${amarelo}[${no.linhas.toLocaleString()}]${resetar}`;
+    escreverLinha(linha);
 }
 
+function imprimirArvore(no, opcoes, prefixo = "", ehUltimo = true, ehRaiz = true, profundidadeAtual = 0) {
+    const {profundidadeMaxima, minimoLinhas} = opcoes;
 
-function printTree(node, options, prefix = '', isLast = true, isRoot = true, currentDepth = 0) {
-    const {maxDepth, minLines} = options;
+    if (minimoLinhas !== undefined && no.linhas < minimoLinhas) return;
 
-    if (minLines !== undefined && node.count < minLines) return;
+    const {conector, prefixoFilho} = obterConectoresArvore(ehRaiz, ehUltimo);
 
-    const {connector, childPrefix} = getTreeConnectors(isRoot, isLast);
-
-    const isRootDot = isRoot && node.name === '.';
-    if (!isRootDot) {
-        printNode(node, prefix, connector);
+    const ehRaizPonto = ehRaiz && no.nome === ".";
+    if (!ehRaizPonto) {
+        imprimirNo(no, prefixo, conector);
     }
 
-    if (!node.isDir) return;
-    if (maxDepth !== undefined && currentDepth >= maxDepth) return;
+    if (!no.ehDiretorio) return;
+    if (profundidadeMaxima !== undefined && profundidadeAtual >= profundidadeMaxima) return;
 
-    let childKeys = Object.keys(node.children);
+    let nomesFilhos = Object.keys(no.filhos);
 
-    if (minLines !== undefined) {
-        childKeys = childKeys.filter(key => node.children[key].count >= minLines);
+    if (minimoLinhas !== undefined) {
+        nomesFilhos = nomesFilhos.filter(nome => no.filhos[nome].linhas >= minimoLinhas);
     }
 
-    childKeys.sort((a, b) => {
-        const countDiff = node.children[b].count - node.children[a].count;
-        return countDiff === 0 ? a.localeCompare(b) : countDiff;
+    nomesFilhos.sort((a, b) => {
+        const diferencaLinhas = no.filhos[b].linhas - no.filhos[a].linhas;
+        return diferencaLinhas === 0 ? a.localeCompare(b) : diferencaLinhas;
     });
 
-    childKeys.forEach((key, index) => {
-        const isLastChild = index === childKeys.length - 1;
-        printTree(node.children[key], options, prefix + childPrefix, isLastChild, false, currentDepth + 1);
+    nomesFilhos.forEach((nome, indice) => {
+        const ehUltimoFilho = indice === nomesFilhos.length - 1;
+        imprimirArvore(no.filhos[nome], opcoes, prefixo + prefixoFilho, ehUltimoFilho, false, profundidadeAtual + 1);
     });
 }
 
-function parseArgs() {
-    const args = process.argv.slice(2);
-    const options = {};
+function lerOpcoes(argumentos = process.argv.slice(2)) {
+    const opcoes = {diretorioBase: lerOpcao(argumentos, "--base", process.cwd())};
 
-    if (args.includes('--help') || args.includes('-h')) {
-        process.stdout.write(`
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
+        escrever(`
 Uso recomendado: node toolkit/sgc.js projeto arvore-linhas [opções]
 Execução direta: node toolkit/projeto/arvore-linhas.js [opções]
 
@@ -127,30 +133,31 @@ Opções:
   --depth <n>          Limita a profundidade da árvore exibida (ex: --depth 2)
   --min-lines <n>      Exibe apenas itens com no mínimo n linhas
   --exclude-tests      Exclui arquivos de teste da contagem e da árvore
+  --base <diretorio>   Diretório Git analisado (padrão: diretório atual)
   --help, -h           Exibe esta mensagem de ajuda
 \n`);
-        process.exit(0);
+        return {ajuda: true};
     }
 
-    const depthIndex = args.indexOf('--depth');
-    if (depthIndex !== -1 && args[depthIndex + 1]) {
-        options.maxDepth = Number.parseInt(args[depthIndex + 1], 10);
+    const indiceProfundidade = argumentos.indexOf("--depth");
+    if (indiceProfundidade !== -1 && argumentos[indiceProfundidade + 1]) {
+        opcoes.profundidadeMaxima = Number.parseInt(argumentos[indiceProfundidade + 1], 10);
     }
 
-    const minLinesIndex = args.indexOf('--min-lines');
-    if (minLinesIndex !== -1 && args[minLinesIndex + 1]) {
-        options.minLines = Number.parseInt(args[minLinesIndex + 1], 10);
+    const indiceMinimoLinhas = argumentos.indexOf("--min-lines");
+    if (indiceMinimoLinhas !== -1 && argumentos[indiceMinimoLinhas + 1]) {
+        opcoes.minimoLinhas = Number.parseInt(argumentos[indiceMinimoLinhas + 1], 10);
     }
 
-    if (args.includes('--exclude-tests')) {
-        options.excludeTests = true;
+    if (argumentos.includes("--exclude-tests")) {
+        opcoes.excluirTestes = true;
     }
 
-    return options;
+    return opcoes;
 }
 
 // Padrões para identificar arquivos/diretórios de teste
-const testPatterns = [
+const PADROES_TESTE = [
     /\.spec\.(js|ts|vue)$/,
     /\.test\.(js|ts|vue)$/,
     /__tests__\//,
@@ -159,26 +166,44 @@ const testPatterns = [
     /backend\/src\/test\//,
 ];
 
-function isTestFile(filePath) {
+function ehArquivoTeste(caminhoArquivo) {
     // Normaliza para barras para correspondência de padrão
-    const normalizedPath = filePath.replaceAll('\\', '/');
-    return testPatterns.some(pattern => pattern.test(normalizedPath));
+    const caminhoNormalizado = caminhoArquivo.replaceAll("\\", "/");
+    return PADROES_TESTE.some(padrao => padrao.test(caminhoNormalizado));
 }
 
-const options = parseArgs();
+function principal(argumentos = process.argv.slice(2)) {
+    const opcoes = lerOpcoes(argumentos);
+    if (opcoes.ajuda) {
+        return;
+    }
 
-logger.info("Gerando árvore de contagem de linhas...");
-let fileList = getFiles();
+    logger.info("Gerando árvore de contagem de linhas...");
+    let listaArquivos = listarArquivosGit(opcoes.diretorioBase);
 
-if (options.excludeTests) {
-    const originalCount = fileList.length;
-    fileList = fileList.filter(filePath => !isTestFile(filePath));
-    logger.info(`Excluídos ${originalCount - fileList.length} arquivos de teste.`);
+    if (opcoes.excluirTestes) {
+        const quantidadeOriginal = listaArquivos.length;
+        listaArquivos = listaArquivos.filter(caminhoArquivo => !ehArquivoTeste(caminhoArquivo));
+        logger.info(`Excluídos ${quantidadeOriginal - listaArquivos.length} arquivos de teste.`);
+    }
+    const arvore = construirArvore(listaArquivos, opcoes.diretorioBase);
+    calcularTotais(arvore);
+
+    escreverLinha(`\x1b[1mProjeto: ${path.basename(path.resolve(opcoes.diretorioBase))}\x1b[0m`);
+    escreverLinha(`\x1b[1mTotal de Linhas: \x1b[33m${arvore.linhas.toLocaleString()}\x1b[0m`);
+    escreverLinha();
+
+    imprimirArvore(arvore, opcoes);
 }
-const tree = buildTree(fileList);
-calculateTotals(tree);
 
-process.stdout.write(`\x1b[1mProjeto: ${process.cwd().split(path.sep).pop()}\x1b[0m\n`);
-process.stdout.write(`\x1b[1mTotal de Linhas: \x1b[33m${tree.count.toLocaleString()}\x1b[0m\n\n`);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal();
+}
 
-printTree(tree, options);
+export {
+    construirArvore,
+    calcularTotais,
+    lerOpcoes,
+    listarArquivosGit,
+    principal
+};

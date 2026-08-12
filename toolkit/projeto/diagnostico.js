@@ -287,10 +287,6 @@ async function executarDiagnostico(opcoes = {}) {
         }
     }
 
-    if (consolidado.statusGeral === "falha") {
-        process.exitCode = 1;
-    }
-
     return saida;
 }
 
