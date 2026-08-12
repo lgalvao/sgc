@@ -1,22 +1,15 @@
 #!/usr/bin/env node
 import path from "node:path";
 import {createRequire} from "node:module";
-import {pathToFileURL} from "node:url";
 import {realpathSync} from "node:fs";
 import pc from "picocolors";
 import {cruise} from "dependency-cruiser";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {auditarAcoesBackendFrontend} from "./acoes-backend-lib.js";
-
-function lerOpcao(argumentos, nome) {
-    const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return null;
-    }
-    return argumentos[indice + 1] ?? null;
-}
 
 function carregarRegras(caminhoConfiguracao) {
     const require = createRequire(import.meta.url);
@@ -128,12 +121,11 @@ async function executarValidacaoArquiteturaFrontend(opcoes = {}) {
     };
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend arquitetura validar",
             scriptDireto: "frontend/arquitetura-validar.js",
@@ -148,33 +140,35 @@ async function main() {
                 "node toolkit/sgc.js frontend arquitetura validar --base C:/sgc",
             ],
         });
-        process.exit(0);
+        return;
     }
 
     const resultado = await executarValidacaoArquiteturaFrontend({
-        base: lerOpcao(args, "--base"),
+        base: lerOpcao(argumentos, "--base", undefined),
     });
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(resultado);
     } else {
-        const diretorioBase = path.resolve(lerOpcao(args, "--base") ?? DIRETORIO_RAIZ);
+        const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
         imprimirViolacoes(resultado.summary.violations ?? [], diretorioBase);
         imprimirViolacoesAcoesBackend(resultado.acoesBackend);
     }
 
     if ((resultado.summary.violations ?? []).length > 0 || resultado.exitCode !== 0 || (resultado.acoesBackend?.violacoes ?? []).length > 0) {
-        process.exit(1);
+        process.exitCode = 1;
     }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        escreverLinha(pc.red(`Erro na validacao arquitetural: ${erro.message}`));
-        process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro na validacao arquitetural: ${mensagem}`));
+        process.exitCode = 1;
     });
 }
 
 export {
     executarValidacaoArquiteturaFrontend,
+    principal,
 };
