@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import path from "node:path";
-import {imprimirJson} from "../lib/saida.js";
-import {lerArquivo, listarArquivosCdu, obterLinhas} from "./cdus-lib.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus-lib.js";
 
 const REGEX_ASPAS_SIMPLES = /'([^'\n]+)'/g;
 const REGEX_TITULO_UI_EM_ASPAS = /(?:título|titulo|subtítulo|subtitulo)\s*:?\s*"([^"\n]+)"/gi;
@@ -80,42 +81,49 @@ function auditarArquivo(caminhoArquivo) {
     };
 }
 
-const args = process.argv.slice(2);
-const emitirJson = args.includes("--json");
-const indiceBase = args.indexOf("--base");
-const base = indiceBase >= 0 ? path.resolve(args[indiceBase + 1]) : process.cwd();
+async function principal(argumentos = process.argv.slice(2)) {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
-const arquivos = await listarArquivosCdu(base);
-const relatorio = arquivos.map(caminhoArquivo => {
-    const resultado = auditarArquivo(caminhoArquivo);
-    return {
-        arquivo: path.relative(base, resultado.arquivo).replaceAll("\\", "/"),
-        achados: resultado.achados
+    const arquivos = await listarArquivosCdu(base);
+    const relatorio = arquivos.map(caminhoArquivo => {
+        const resultado = auditarArquivo(caminhoArquivo);
+        return {
+            arquivo: path.relative(base, resultado.arquivo).replaceAll("\\", "/"),
+            achados: resultado.achados
+        };
+    });
+
+    const resumo = {
+        base,
+        totalArquivos: relatorio.length,
+        arquivosComAviso: relatorio.filter(item => item.achados.length > 0).length,
+        avisos: relatorio.flatMap(item => item.achados).length
     };
-});
 
-const resumo = {
-    base,
-    totalArquivos: relatorio.length,
-    arquivosComAviso: relatorio.filter(item => item.achados.length > 0).length,
-    avisos: relatorio.flatMap(item => item.achados).length
-};
+    if (emitirJson) {
+        imprimirJson({resumo, relatorio});
+        return;
+    }
 
-if (emitirJson) {
-    imprimirJson({resumo, relatorio});
-    process.exit(0);
-}
+    escreverLinha(`Auditoria tipográfica read-only dos CDUs em ${path.join(base, "specs")}`);
+    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
+    escreverLinha(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
+    escreverLinha(`Avisos: ${resumo.avisos}`);
+    escreverLinha();
 
-console.log(`Auditoria tipográfica read-only dos CDUs em ${path.join(base, "specs")}`);
-console.log(`Arquivos analisados: ${resumo.totalArquivos}`);
-console.log(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
-console.log(`Avisos: ${resumo.avisos}`);
-console.log("");
-
-for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
-    console.log(item.arquivo);
-    for (const achado of item.achados) {
-        const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
-        console.log(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
+    for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
+        escreverLinha(item.arquivo);
+        for (const achado of item.achados) {
+            const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
+            escreverLinha(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
+        }
     }
 }
+
+if (ehEntradaPrincipal(import.meta.url)) {
+    await principal();
+}
+
+export {
+    principal
+};

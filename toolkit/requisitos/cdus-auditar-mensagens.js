@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import path from "node:path";
-import {imprimirJson} from "../lib/saida.js";
-import {lerArquivo, listarArquivosCdu, obterLinhas} from "./cdus-lib.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 
 function adicionarAchado(achados, severidade, regra, mensagem, linha = null) {
@@ -88,39 +89,46 @@ function auditarArquivo(caminhoArquivo) {
     return achados;
 }
 
-const args = process.argv.slice(2);
-const emitirJson = args.includes("--json");
-const indiceBase = args.indexOf("--base");
-const base = indiceBase >= 0 ? path.resolve(args[indiceBase + 1]) : process.cwd();
+async function principal(argumentos = process.argv.slice(2)) {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
-const arquivos = await listarArquivosCdu(base);
-const relatorio = arquivos.map(caminhoArquivo => ({
-    arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
-    achados: auditarArquivo(caminhoArquivo)
-}));
+    const arquivos = await listarArquivosCdu(base);
+    const relatorio = arquivos.map(caminhoArquivo => ({
+        arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
+        achados: auditarArquivo(caminhoArquivo)
+    }));
 
-const resumo = {
-    base,
-    totalArquivos: relatorio.length,
-    arquivosComAviso: relatorio.filter(item => item.achados.length > 0).length,
-    avisos: relatorio.flatMap(item => item.achados).length
-};
+    const resumo = {
+        base,
+        totalArquivos: relatorio.length,
+        arquivosComAviso: relatorio.filter(item => item.achados.length > 0).length,
+        avisos: relatorio.flatMap(item => item.achados).length
+    };
 
-if (emitirJson) {
-    imprimirJson({resumo, relatorio});
-    process.exit(0);
-}
+    if (emitirJson) {
+        imprimirJson({resumo, relatorio});
+        return;
+    }
 
-console.log(`Auditoria de mensagens dos CDUs em ${path.join(base, "specs")}`);
-console.log(`Arquivos analisados: ${resumo.totalArquivos}`);
-console.log(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
-console.log(`Avisos: ${resumo.avisos}`);
-console.log("");
+    escreverLinha(`Auditoria de mensagens dos CDUs em ${path.join(base, "specs")}`);
+    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
+    escreverLinha(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
+    escreverLinha(`Avisos: ${resumo.avisos}`);
+    escreverLinha();
 
-for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
-    console.log(item.arquivo);
-    for (const achado of item.achados) {
-        const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
-        console.log(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
+    for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
+        escreverLinha(item.arquivo);
+        for (const achado of item.achados) {
+            const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
+            escreverLinha(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
+        }
     }
 }
+
+if (ehEntradaPrincipal(import.meta.url)) {
+    await principal();
+}
+
+export {
+    principal
+};

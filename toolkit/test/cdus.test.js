@@ -3,10 +3,23 @@ import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
-import {execaNode} from "execa";
+import {execa, execaNode} from "execa";
+import {pathToFileURL} from "node:url";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
+const CAMINHOS_COMANDOS_CDU = [
+    "cdus-inventariar.js",
+    "cdus-auditar.js",
+    "cdus-auditar-estilo.js",
+    "cdus-inventariar-vocabulario.js",
+    "cdus-auditar-vocabulario.js",
+    "cdus-inventariar-mensagens.js",
+    "cdus-auditar-mensagens.js",
+    "cdus-auditar-mensagens-codigo.js",
+    "cdus-inventariar-densidade.js",
+    "cdus-inventariar-duplicacoes.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "requisitos", nome));
 
 async function executarSgc(args, opcoes = {}) {
     return execaNode(CAMINHO_SGC, args, {
@@ -32,6 +45,25 @@ async function criarIntroSituacoes(dirSpecs) {
 }
 
 describe("Ferramentas de requisitos dos CDUs", () => {
+    test("pode importar todos os comandos sem executar auditorias", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_CDU.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
     test("inventaria formatos implícitos dos CDUs", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-inventario-"));
         const dirSpecs = path.join(base, "specs");

@@ -17,6 +17,17 @@ function normalizarCaminho(caminho) {
     return caminho.replaceAll("\\", "/");
 }
 
+/**
+ * @param {string[]} [argumentos]
+ * @returns {{emitirJson: boolean, base: string}}
+ */
+function obterOpcoesCdu(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const indiceBase = argumentos.indexOf("--base");
+    const base = indiceBase >= 0 ? path.resolve(argumentos[indiceBase + 1]) : process.cwd();
+    return {emitirJson, base};
+}
+
 async function listarArquivosCdu(base = process.cwd()) {
     const padrao = normalizarCaminho(path.join(base, "specs", "cdu-*.md"));
     const arquivos = await globby(padrao, {absolute: true});
@@ -154,6 +165,7 @@ export {
     extrairLinhaAtor,
     listarArquivosCdu,
     lerArquivo,
+    obterOpcoesCdu,
     obterLinhas,
     validarLinksMarkdown
 };

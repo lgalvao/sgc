@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import path from "node:path";
-import {imprimirJson} from "../lib/saida.js";
-import {lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 import {carregarMensagensCanonicas, normalizarTextoComparacao, sugerirCanonicos} from "./cdus-mensagens-codigo-lib.js";
 
@@ -54,53 +55,60 @@ function auditarItem(item, indiceCanonicos, todosCanonicos) {
     };
 }
 
-const args = process.argv.slice(2);
-const emitirJson = args.includes("--json");
-const indiceBase = args.indexOf("--base");
-const base = indiceBase >= 0 ? path.resolve(args[indiceBase + 1]) : process.cwd();
+async function principal(argumentos = process.argv.slice(2)) {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
-const arquivos = await listarArquivosCdu(base);
-const {itens: canonicos, indice: indiceCanonicos} = carregarMensagensCanonicas(base);
+    const arquivos = await listarArquivosCdu(base);
+    const {itens: canonicos, indice: indiceCanonicos} = carregarMensagensCanonicas(base);
 
-const itens = [
-    ...consolidarOcorrencias(base, arquivos, extrairDescricoes, "descricoes"),
-    ...consolidarOcorrencias(base, arquivos, extrairAssuntos, "assuntos"),
-    ...consolidarOcorrencias(base, arquivos, extrairMensagens, "mensagens"),
-    ...consolidarOcorrencias(base, arquivos, extrairToasts, "toasts")
-].toSorted((a, b) => a.tipo.localeCompare(b.tipo, "pt-BR") || b.ocorrencias.length - a.ocorrencias.length || a.valor.localeCompare(b.valor, "pt-BR"));
+    const itens = [
+        ...consolidarOcorrencias(base, arquivos, extrairDescricoes, "descricoes"),
+        ...consolidarOcorrencias(base, arquivos, extrairAssuntos, "assuntos"),
+        ...consolidarOcorrencias(base, arquivos, extrairMensagens, "mensagens"),
+        ...consolidarOcorrencias(base, arquivos, extrairToasts, "toasts")
+    ].toSorted((a, b) => a.tipo.localeCompare(b.tipo, "pt-BR") || b.ocorrencias.length - a.ocorrencias.length || a.valor.localeCompare(b.valor, "pt-BR"));
 
-const relatorio = itens.map(item => auditarItem(item, indiceCanonicos, canonicos));
-const resumo = {
-    base,
-    totalArquivos: arquivos.length,
-    totalItens: relatorio.length,
-    itensComReferenciaExata: relatorio.filter(item => item.referenciasExatas.length > 0).length,
-    itensSemReferenciaExata: relatorio.filter(item => item.referenciasExatas.length === 0).length,
-    itensComSugestao: relatorio.filter(item => item.referenciasExatas.length === 0 && item.sugestoes.length > 0).length
-};
+    const relatorio = itens.map(item => auditarItem(item, indiceCanonicos, canonicos));
+    const resumo = {
+        base,
+        totalArquivos: arquivos.length,
+        totalItens: relatorio.length,
+        itensComReferenciaExata: relatorio.filter(item => item.referenciasExatas.length > 0).length,
+        itensSemReferenciaExata: relatorio.filter(item => item.referenciasExatas.length === 0).length,
+        itensComSugestao: relatorio.filter(item => item.referenciasExatas.length === 0 && item.sugestoes.length > 0).length
+    };
 
-if (emitirJson) {
-    imprimirJson({resumo, relatorio});
-    process.exit(0);
-}
-
-console.log(`Auditoria de mensagens dos CDUs contra o código em ${base}`);
-console.log(`Arquivos analisados: ${resumo.totalArquivos}`);
-console.log(`Itens auditados: ${resumo.totalItens}`);
-console.log(`Com referência exata: ${resumo.itensComReferenciaExata}`);
-console.log(`Sem referência exata: ${resumo.itensSemReferenciaExata}`);
-console.log(`Sem referência exata, mas com sugestão: ${resumo.itensComSugestao}`);
-console.log("");
-
-for (const item of relatorio.filter(entrada => entrada.referenciasExatas.length === 0)) {
-    console.log(`${item.tipo}: ${item.valor}`);
-    console.log(`- ocorrências: ${item.quantidade}`);
-    if (item.sugestoes.length === 0) {
-        console.log("- sugestões: nenhuma");
-    } else {
-        for (const sugestao of item.sugestoes) {
-            console.log(`- sugestão: ${sugestao.texto} (${sugestao.grupo}, ${sugestao.origem}, similaridade ${sugestao.similaridade})`);
-        }
+    if (emitirJson) {
+        imprimirJson({resumo, relatorio});
+        return;
     }
-    console.log("");
+
+    escreverLinha(`Auditoria de mensagens dos CDUs contra o código em ${base}`);
+    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
+    escreverLinha(`Itens auditados: ${resumo.totalItens}`);
+    escreverLinha(`Com referência exata: ${resumo.itensComReferenciaExata}`);
+    escreverLinha(`Sem referência exata: ${resumo.itensSemReferenciaExata}`);
+    escreverLinha(`Sem referência exata, mas com sugestão: ${resumo.itensComSugestao}`);
+    escreverLinha();
+
+    for (const item of relatorio.filter(entrada => entrada.referenciasExatas.length === 0)) {
+        escreverLinha(`${item.tipo}: ${item.valor}`);
+        escreverLinha(`- ocorrências: ${item.quantidade}`);
+        if (item.sugestoes.length === 0) {
+            escreverLinha("- sugestões: nenhuma");
+        } else {
+            for (const sugestao of item.sugestoes) {
+                escreverLinha(`- sugestão: ${sugestao.texto} (${sugestao.grupo}, ${sugestao.origem}, similaridade ${sugestao.similaridade})`);
+            }
+        }
+        escreverLinha();
+    }
 }
+
+if (ehEntradaPrincipal(import.meta.url)) {
+    await principal();
+}
+
+export {
+    principal
+};

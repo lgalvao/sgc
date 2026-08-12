@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import path from "node:path";
-import {imprimirJson} from "../lib/saida.js";
-import {lerArquivo, listarArquivosCdu} from "./cdus-lib.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 import {
     carregarSituacoesCanonicas,
     PERFIS_CANONICOS,
@@ -87,46 +88,53 @@ function auditarSituacoesETipos(texto, achados, situacoesCanonicas) {
     });
 }
 
-const args = process.argv.slice(2);
-const emitirJson = args.includes("--json");
-const indiceBase = args.indexOf("--base");
-const base = indiceBase >= 0 ? path.resolve(args[indiceBase + 1]) : process.cwd();
-const situacoesCanonicas = carregarSituacoesCanonicas(base);
+async function principal(argumentos = process.argv.slice(2)) {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const situacoesCanonicas = carregarSituacoesCanonicas(base);
 
-const arquivos = await listarArquivosCdu(base);
-const relatorio = arquivos.map(caminhoArquivo => {
-    const texto = lerArquivo(caminhoArquivo);
-    const achados = [];
-    auditarPerfis(texto, achados);
-    auditarSituacoesETipos(texto, achados, situacoesCanonicas);
-    return {
-        arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
-        achados
+    const arquivos = await listarArquivosCdu(base);
+    const relatorio = arquivos.map(caminhoArquivo => {
+        const texto = lerArquivo(caminhoArquivo);
+        const achados = [];
+        auditarPerfis(texto, achados);
+        auditarSituacoesETipos(texto, achados, situacoesCanonicas);
+        return {
+            arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
+            achados
+        };
+    });
+
+    const resumo = {
+        base,
+        totalArquivos: relatorio.length,
+        arquivosComAviso: relatorio.filter(item => item.achados.length > 0).length,
+        avisos: relatorio.flatMap(item => item.achados).length
     };
-});
 
-const resumo = {
-    base,
-    totalArquivos: relatorio.length,
-    arquivosComAviso: relatorio.filter(item => item.achados.length > 0).length,
-    avisos: relatorio.flatMap(item => item.achados).length
-};
+    if (emitirJson) {
+        imprimirJson({resumo, relatorio});
+        return;
+    }
 
-if (emitirJson) {
-    imprimirJson({resumo, relatorio});
-    process.exit(0);
-}
+    escreverLinha(`Auditoria de vocabulário dos CDUs em ${path.join(base, "specs")}`);
+    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
+    escreverLinha(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
+    escreverLinha(`Avisos: ${resumo.avisos}`);
+    escreverLinha();
 
-console.log(`Auditoria de vocabulário dos CDUs em ${path.join(base, "specs")}`);
-console.log(`Arquivos analisados: ${resumo.totalArquivos}`);
-console.log(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
-console.log(`Avisos: ${resumo.avisos}`);
-console.log("");
-
-for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
-    console.log(item.arquivo);
-    for (const achado of item.achados) {
-        const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
-        console.log(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
+    for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
+        escreverLinha(item.arquivo);
+        for (const achado of item.achados) {
+            const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
+            escreverLinha(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
+        }
     }
 }
+
+if (ehEntradaPrincipal(import.meta.url)) {
+    await principal();
+}
+
+export {
+    principal
+};

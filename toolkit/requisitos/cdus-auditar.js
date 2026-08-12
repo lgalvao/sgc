@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import path from "node:path";
-import {imprimirJson} from "../lib/saida.js";
-import {analisarArquivo, lerArquivo, listarArquivosCdu, validarLinksMarkdown} from "./cdus-lib.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha, imprimirJson} from "../lib/saida.js";
+import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu, validarLinksMarkdown} from "./cdus-lib.js";
 
 function adicionarAchado(achados, severidade, regra, mensagem) {
     achados.push({severidade, regra, mensagem});
@@ -72,44 +73,51 @@ function auditarAnalise(analise) {
     return achados;
 }
 
-const args = process.argv.slice(2);
-const emitirJson = args.includes("--json");
-const indiceBase = args.indexOf("--base");
-const base = indiceBase >= 0 ? path.resolve(args[indiceBase + 1]) : process.cwd();
+async function principal(argumentos = process.argv.slice(2)) {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
-const arquivos = await listarArquivosCdu(base);
-const relatorio = arquivos.map(caminhoArquivo => {
-    const texto = lerArquivo(caminhoArquivo);
-    const analise = analisarArquivo(caminhoArquivo, texto);
-    return {
-        arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
-        achados: auditarAnalise(analise)
+    const arquivos = await listarArquivosCdu(base);
+    const relatorio = arquivos.map(caminhoArquivo => {
+        const texto = lerArquivo(caminhoArquivo);
+        const analise = analisarArquivo(caminhoArquivo, texto);
+        return {
+            arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
+            achados: auditarAnalise(analise)
+        };
+    });
+
+    const resumo = {
+        base,
+        totalArquivos: relatorio.length,
+        arquivosComErro: relatorio.filter(item => item.achados.some(achado => achado.severidade === "erro")).length,
+        arquivosComAviso: relatorio.filter(item => item.achados.some(achado => achado.severidade === "aviso")).length,
+        erros: relatorio.flatMap(item => item.achados).filter(achado => achado.severidade === "erro").length,
+        avisos: relatorio.flatMap(item => item.achados).filter(achado => achado.severidade === "aviso").length
     };
-});
 
-const resumo = {
-    base,
-    totalArquivos: relatorio.length,
-    arquivosComErro: relatorio.filter(item => item.achados.some(achado => achado.severidade === "erro")).length,
-    arquivosComAviso: relatorio.filter(item => item.achados.some(achado => achado.severidade === "aviso")).length,
-    erros: relatorio.flatMap(item => item.achados).filter(achado => achado.severidade === "erro").length,
-    avisos: relatorio.flatMap(item => item.achados).filter(achado => achado.severidade === "aviso").length
-};
+    if (emitirJson) {
+        imprimirJson({resumo, relatorio});
+        return;
+    }
 
-if (emitirJson) {
-    imprimirJson({resumo, relatorio});
-    process.exit(0);
-}
+    escreverLinha(`Auditoria read-only dos CDUs em ${path.join(base, "specs")}`);
+    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
+    escreverLinha(`Arquivos com erro: ${resumo.arquivosComErro}`);
+    escreverLinha(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
+    escreverLinha();
 
-console.log(`Auditoria read-only dos CDUs em ${path.join(base, "specs")}`);
-console.log(`Arquivos analisados: ${resumo.totalArquivos}`);
-console.log(`Arquivos com erro: ${resumo.arquivosComErro}`);
-console.log(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
-console.log("");
-
-for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
-    console.log(item.arquivo);
-    for (const achado of item.achados) {
-        console.log(`- [${achado.severidade}] ${achado.regra}: ${achado.mensagem}`);
+    for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
+        escreverLinha(item.arquivo);
+        for (const achado of item.achados) {
+            escreverLinha(`- [${achado.severidade}] ${achado.regra}: ${achado.mensagem}`);
+        }
     }
 }
+
+if (ehEntradaPrincipal(import.meta.url)) {
+    await principal();
+}
+
+export {
+    principal
+};
