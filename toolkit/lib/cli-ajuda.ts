@@ -1,28 +1,23 @@
 import {escreverLinha} from "./saida.js";
 
-/**
- * @typedef {object} OpcoesAjudaComando
- * @property {string} comandoSgc
- * @property {string} scriptDireto
- * @property {string} [descricao]
- * @property {string|null} [argumentos]
- * @property {string[]} [opcoes]
- * @property {string[]} [exemplos]
- */
+interface OpcoesAjudaComando {
+    comandoSgc: string;
+    scriptDireto: string;
+    descricao?: string;
+    argumentos?: string | null;
+    opcoes?: string[];
+    exemplos?: string[];
+}
 
-/**
- * @param {OpcoesAjudaComando} opcoes
- * @returns {void}
- */
 function exibirAjudaComando({
-                                comandoSgc,
-                                scriptDireto,
-                                descricao,
-                                argumentos = null,
-                                opcoes = [],
-                                exemplos = []
-                            }) {
-    const linhas = [];
+    comandoSgc,
+    scriptDireto,
+    descricao,
+    argumentos = null,
+    opcoes = [],
+    exemplos = []
+}: OpcoesAjudaComando): void {
+    const linhas: string[] = [];
     linhas.push(`Uso recomendado: npx tsx toolkit/sgc.js ${comandoSgc}${argumentos ? ` ${argumentos}` : ''}`);
 
     linhas.push(`Execucao direta: npx tsx toolkit/${scriptDireto}${argumentos ? ` ${argumentos}` : ''}`);
