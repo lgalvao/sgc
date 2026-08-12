@@ -841,6 +841,36 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.producao.arquivosAcimaMeta.service).toBe(1);
     });
 
+    test("calcula a saida padrao de residuos a partir da base externa", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-saida-base-"));
+        await fs.outputFile(
+            path.join(base, "frontend", "src", "exemplo.ts"),
+            "export function carregarExemplo(codigo: string) { return codigo; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "residuos",
+            "auditar",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const fotografia = JSON.parse(resultado.stdout);
+        expect(fotografia.base).toBe(base);
+        expect(await fs.pathExists(path.join(
+            base,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "frontend-residuos",
+            "mais-recente",
+            "fotografia.json"
+        ))).toBe(true);
+    });
+
     test("audita vazamentos arquiteturais do frontend em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-auditar-"));
         const frontendDir = path.join(base, "frontend", "src");
@@ -925,6 +955,36 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
         expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
         expect(conteudo.hotspots.some((hotspot) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
+    });
+
+    test("calcula a saida padrao de arquitetura a partir da base externa", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-saida-base-"));
+        await fs.outputFile(
+            path.join(base, "frontend", "src", "exemplo.ts"),
+            "export function carregarExemplo(codigo: string) { return codigo; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "frontend",
+            "arquitetura",
+            "auditar",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const fotografia = JSON.parse(resultado.stdout);
+        expect(fotografia.base).toBe(base);
+        expect(await fs.pathExists(path.join(
+            base,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "frontend-arquitetura",
+            "mais-recente",
+            "fotografia.json"
+        ))).toBe(true);
     });
 
     test("tipos internos de store nao disparam bolsaDependenciasLarga", async () => {

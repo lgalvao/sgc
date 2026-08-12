@@ -3,9 +3,9 @@ import path from "node:path";
 import pc from "picocolors";
 import {
     analisarResiduosFrontend,
-    CAMINHO_ORCAMENTO_PADRAO,
-    DIRETORIO_SAIDA_PADRAO,
-    gravarFotografiaAuditoria
+    gravarFotografiaAuditoria,
+    resolverCaminhoOrcamentoResiduos,
+    resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -50,10 +50,11 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
+    const base = lerOpcao(argumentos, "--base", undefined);
     const fotografia = await executarAuditoriaFrontendResiduos({
-        base: lerOpcao(argumentos, "--base", undefined),
-        orcamento: lerOpcao(argumentos, "--orcamento", CAMINHO_ORCAMENTO_PADRAO),
-        saida: lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO),
+        base,
+        orcamento: lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(base)),
+        saida: lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(base)),
         semGravar: argumentos.includes("--sem-gravar"),
     });
 
@@ -83,7 +84,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     });
 
     if (!argumentos.includes("--sem-gravar")) {
-        const diretorio = lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO);
+        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(fotografia.base));
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
     }

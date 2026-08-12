@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 import path from "node:path";
 import pc from "picocolors";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {
     analisarResiduosFrontend,
-    CAMINHO_ORCAMENTO_PADRAO,
-    CAMINHO_EXCECOES_PADRAO,
     carregarExcecoes,
-    DIRETORIO_SAIDA_PADRAO,
-    gravarFotografiaAuditoria
+    gravarFotografiaAuditoria,
+    resolverCaminhoExcecoesResiduos,
+    resolverCaminhoOrcamentoResiduos,
+    resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -40,10 +41,11 @@ function resumirResultado(resultado) {
 }
 
 async function executarValidacaoFrontendResiduos(opcoes = {}) {
-    const caminhoOrcamento = path.resolve(opcoes.orcamento ?? CAMINHO_ORCAMENTO_PADRAO);
-    const caminhoExcecoes = path.resolve(opcoes.excecoes ?? CAMINHO_EXCECOES_PADRAO);
+    const base = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
+    const caminhoOrcamento = path.resolve(opcoes.orcamento ?? resolverCaminhoOrcamentoResiduos(base));
+    const caminhoExcecoes = path.resolve(opcoes.excecoes ?? resolverCaminhoExcecoesResiduos(base));
     const fotografia = await analisarResiduosFrontend({
-        base: opcoes.base,
+        base,
         caminhoOrcamento,
     });
     const excecoes = await carregarExcecoes(caminhoExcecoes);
@@ -117,7 +119,7 @@ async function executarValidacaoFrontendResiduos(opcoes = {}) {
     }
 
     if (!opcoes.semGravar) {
-        await gravarFotografiaAuditoria(fotografia, opcoes.saida);
+        await gravarFotografiaAuditoria(fotografia, opcoes.saida ?? resolverDiretorioSaidaResiduos(base));
     }
 
     return {
@@ -165,13 +167,15 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
-    const orcamento = path.resolve(lerOpcao(argumentos, "--orcamento", CAMINHO_ORCAMENTO_PADRAO));
-    const excecoes = path.resolve(lerOpcao(argumentos, "--excecoes", CAMINHO_EXCECOES_PADRAO));
+    const base = lerOpcao(argumentos, "--base", undefined);
+    const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
+    const orcamento = path.resolve(lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)));
+    const excecoes = path.resolve(lerOpcao(argumentos, "--excecoes", resolverCaminhoExcecoesResiduos(baseResolvida)));
     const resultado = await executarValidacaoFrontendResiduos({
-        base: lerOpcao(argumentos, "--base", undefined),
+        base: baseResolvida,
         orcamento,
         excecoes,
-        saida: path.resolve(lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO)),
+        saida: path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida))),
         semGravar: argumentos.includes("--sem-gravar"),
     });
 
@@ -214,7 +218,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     escreverLinha("");
     escreverLinha(`Orcamento: ${resultado.orcamento}`);
     escreverLinha(`Excecoes: ${resultado.excecoes}`);
-    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO))).replaceAll("\\", "/")}`);
+    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida)))).replaceAll("\\", "/")}`);
 
     if (resultado.status !== "ok") process.exitCode = 1;
 }

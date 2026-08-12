@@ -5,9 +5,6 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const VERSAO_SCHEMA = "3.0.0";
-const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "frontend-arquitetura", "mais-recente");
-const CAMINHO_FOTOGRAFIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "fotografia.json");
-const CAMINHO_RESUMO_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "resumo.md");
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 const EXTENSOES_RESOLUCAO = [".ts", ".vue", ".js", "/index.ts", "/index.vue", "/index.js"];
 const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"];
@@ -33,6 +30,10 @@ const PADROES = {
 const LIMITE_LINHAS_FACHADA_PURA = 25;
 const LIMITE_LINHAS_ARQUIVO_MINUSCULO = 30;
 const LIMITE_FAMILIA_PULVERIZADA = 4;
+
+function resolverDiretorioSaidaArquitetura(base = DIRETORIO_RAIZ) {
+    return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "frontend-arquitetura", "mais-recente");
+}
 
 function normalizarCaminho(caminhoArquivo) {
     return caminhoArquivo.split(path.sep).join("/");
@@ -730,10 +731,10 @@ function criarResumoMarkdown(snapshot) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function gravarFotografiaArquitetura(snapshot, diretorioSaida = DIRETORIO_SAIDA_PADRAO) {
+async function gravarFotografiaArquitetura(snapshot, diretorioSaida = resolverDiretorioSaidaArquitetura(snapshot.base)) {
     await fs.mkdir(diretorioSaida, {recursive: true});
-    await fs.writeFile(path.join(diretorioSaida, path.basename(CAMINHO_FOTOGRAFIA_PADRAO)), JSON.stringify(snapshot, null, 2));
-    await fs.writeFile(path.join(diretorioSaida, path.basename(CAMINHO_RESUMO_PADRAO)), criarResumoMarkdown(snapshot));
+    await fs.writeFile(path.join(diretorioSaida, "fotografia.json"), JSON.stringify(snapshot, null, 2));
+    await fs.writeFile(path.join(diretorioSaida, "resumo.md"), criarResumoMarkdown(snapshot));
 }
 
 function criarMetricasResumo() {
@@ -992,6 +993,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
     const scoreTotal = hotspots.reduce((total, item) => total + item.score, 0);
 
     return {
+        base: baseResolvida,
         versaoSchema: VERSAO_SCHEMA,
         geradoEm: new Date().toISOString(),
         resumo: {
@@ -1008,6 +1010,6 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
 
 export {
     analisarArquiteturaFrontend,
-    DIRETORIO_SAIDA_PADRAO,
     gravarFotografiaArquitetura,
+    resolverDiretorioSaidaArquitetura,
 };

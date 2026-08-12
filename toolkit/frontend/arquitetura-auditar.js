@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import path from "node:path";
 import pc from "picocolors";
-import {analisarArquiteturaFrontend, DIRETORIO_SAIDA_PADRAO, gravarFotografiaArquitetura} from "./arquitetura-lib.js";
+import {analisarArquiteturaFrontend, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura} from "./arquitetura-lib.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
@@ -41,9 +41,11 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
+    const base = lerOpcao(argumentos, "--base", undefined);
+    const saidaPadrao = resolverDiretorioSaidaArquitetura(base);
     const snapshot = await executarAuditoriaArquiteturaFrontend({
-        base: lerOpcao(argumentos, "--base", undefined),
-        saida: lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO),
+        base,
+        saida: lerOpcao(argumentos, "--saida", saidaPadrao),
         semGravar: argumentos.includes("--sem-gravar"),
     });
 
@@ -80,7 +82,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     });
 
     if (!argumentos.includes("--sem-gravar")) {
-        const diretorio = lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO);
+        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaArquitetura(snapshot.base));
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
     }

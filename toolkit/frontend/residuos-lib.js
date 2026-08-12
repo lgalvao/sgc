@@ -4,9 +4,6 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const VERSAO_SCHEMA = "1.0.0";
-const CAMINHO_ORCAMENTO_PADRAO = resolverCaminhoConfigurado("orcamentoResiduosFrontend");
-const CAMINHO_EXCECOES_PADRAO = resolverCaminhoConfigurado("excecoesResiduosFrontend");
-const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "frontend-residuos", "mais-recente");
 
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 
@@ -40,6 +37,18 @@ const PESOS_SCORE = {
     storageDireto: 10,
     exportacoesSuspeitas: 4,
 };
+
+function resolverCaminhoOrcamentoResiduos(base = DIRETORIO_RAIZ) {
+    return resolverCaminhoConfigurado("orcamentoResiduosFrontend", base);
+}
+
+function resolverCaminhoExcecoesResiduos(base = DIRETORIO_RAIZ) {
+    return resolverCaminhoConfigurado("excecoesResiduosFrontend", base);
+}
+
+function resolverDiretorioSaidaResiduos(base = DIRETORIO_RAIZ) {
+    return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "frontend-residuos", "mais-recente");
+}
 
 function normalizarCaminho(caminhoArquivo) {
     return caminhoArquivo.split(path.sep).join("/");
@@ -184,7 +193,7 @@ async function lerJsonOpcional(caminhoArquivo, fallback) {
     }
 }
 
-async function carregarOrcamento(caminhoOrcamento = CAMINHO_ORCAMENTO_PADRAO) {
+async function carregarOrcamento(caminhoOrcamento) {
     return lerJsonOpcional(caminhoOrcamento, {
         versaoSchema: VERSAO_SCHEMA,
         camadas: {},
@@ -194,14 +203,14 @@ async function carregarOrcamento(caminhoOrcamento = CAMINHO_ORCAMENTO_PADRAO) {
     });
 }
 
-async function carregarExcecoes(caminhoExcecoes = CAMINHO_EXCECOES_PADRAO) {
+async function carregarExcecoes(caminhoExcecoes) {
     const conteudo = await lerJsonOpcional(caminhoExcecoes, {versaoSchema: VERSAO_SCHEMA, excecoes: []});
     return Array.isArray(conteudo.excecoes) ? conteudo : {versaoSchema: VERSAO_SCHEMA, excecoes: []};
 }
 
-async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento = CAMINHO_ORCAMENTO_PADRAO} = {}) {
+async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento} = {}) {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
-    const orcamento = await carregarOrcamento(caminhoOrcamento);
+    const orcamento = await carregarOrcamento(caminhoOrcamento ?? resolverCaminhoOrcamentoResiduos(baseResolvida));
     const arquivos = await listarArquivosFrontend(baseResolvida);
     const arquivosAnalisados = [];
     const mapaExportacoes = new Map();
@@ -417,17 +426,17 @@ function gerarMarkdownAuditoria(fotografia) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function gravarFotografiaAuditoria(fotografia, diretorioSaida = DIRETORIO_SAIDA_PADRAO) {
+async function gravarFotografiaAuditoria(fotografia, diretorioSaida = resolverDiretorioSaidaResiduos(fotografia.base)) {
     await fs.mkdir(diretorioSaida, {recursive: true});
     await fs.writeFile(path.join(diretorioSaida, "fotografia.json"), JSON.stringify(fotografia, null, 2));
     await fs.writeFile(path.join(diretorioSaida, "resumo.md"), gerarMarkdownAuditoria(fotografia));
 }
 
 export {
-    CAMINHO_ORCAMENTO_PADRAO,
-    CAMINHO_EXCECOES_PADRAO,
-    DIRETORIO_SAIDA_PADRAO,
     analisarResiduosFrontend,
     carregarExcecoes,
     gravarFotografiaAuditoria,
+    resolverCaminhoExcecoesResiduos,
+    resolverCaminhoOrcamentoResiduos,
+    resolverDiretorioSaidaResiduos,
 };
