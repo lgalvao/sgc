@@ -12,7 +12,22 @@ Transformar `toolkit/` em uma ferramenta de auditoria e automação:
 - conservadora sobre o código auditado: auditores devem diagnosticar por padrão e só gravar quando a ação for explícita.
 
 O objetivo não é transformar cada regra específica do SGC em uma abstração artificial. A separação correta é entre um
-núcleo horizontal, perfis/adaptadores de projeto e regras que pertencem exclusivamente ao SGC.
+núcleo horizontal, perfis/adaptadores de projeto e regras que pertencem exclusivamente ao SGC. Reuso externo é uma
+ampliação do toolkit, não uma substituição do seu consumidor original: as funcionalidades específicas do SGC devem
+continuar disponíveis e cobertas pelo perfil SGC.
+
+### 1.1 Escopo
+
+Este plano trata exclusivamente de `toolkit/`. Backend, frontend, requisitos e E2E do SGC aparecem somente como:
+
+- entradas que o toolkit analisa;
+- consumidores de comandos do toolkit;
+- fixtures ou smoke tests necessários para provar um contrato do toolkit;
+- origem das políticas que formarão o perfil SGC.
+
+Refatorar o produto SGC, suas telas, APIs, regras de negócio ou testes não faz parte deste plano. Se uma auditoria do
+toolkit encontrar um problema no SGC, o resultado esperado aqui é melhorar a precisão do diagnóstico, não corrigir o
+sistema auditado.
 
 ## 2. Diretrizes permanentes
 
@@ -24,6 +39,8 @@ núcleo horizontal, perfis/adaptadores de projeto e regras que pertencem exclusi
 - Nomes externos inevitáveis — `OpenAPI`, `Vue`, `Gradle`, `tsx`, `JSON`, `Java` — permanecem como nomes técnicos.
 - Não fazer uma renomeação massiva de uma vez. Quando um identificador público mudar, atualizar consumidores, testes,
   documentação e eventuais aliases na mesma rodada.
+- Não remover uma regra apenas por ela ser específica do SGC. Remoção exige evidência de obsolescência e ausência de
+  consumidor; caso contrário, a regra deve permanecer no perfil SGC.
 
 ### 2.2 Fonte única e runtime
 
@@ -56,8 +73,11 @@ arquivos pertencem ao comando ou a uma biblioteca de domínio, não ao roteador.
 
 ### 2.4 Auditorias e efeitos colaterais
 
-- Auditorias são read-only por padrão.
-- Gravação de fotografia, baseline, relatório ou correção exige uma opção explícita e um nome de ação claro.
+- O estado final desejado é: auditorias são read-only por padrão.
+- O comportamento atual ainda não cumpre integralmente essa regra: vários comandos gravam fotografias ou relatórios por
+  padrão e alguns oferecem `--sem-gravar`. A migração deve inverter o default de forma coordenada, com teste e aviso de
+  transição para consumidores reais.
+- Gravação de fotografia, baseline, relatório ou correção deve exigir uma opção explícita e um nome de ação claro.
 - Não normalizar, renumerar ou reescrever documentos apenas durante a leitura.
 - Saída JSON deve ir para stdout sem texto decorativo; logs operacionais e diagnóstico de falha devem ir para stderr.
 - Falhas devem ter código de saída diferente de zero, mas não podem destruir o relatório estruturado que o CI precisa ler.
@@ -85,6 +105,10 @@ um contrato versionado, com validação e defaults explícitos. Os caminhos atua
 Novos comandos devem preferir esses pontos de configuração ou opções explícitas. Caminhos fixos só são aceitáveis dentro
 de um adaptador de perfil, nunca no núcleo horizontal.
 
+Defaults dependentes da base não podem ser calculados no carregamento do módulo. Eles devem ser resolvidos depois de
+interpretar `--base` e carregar a configuração daquele projeto. Isso vale especialmente para arquitetura e resíduos do
+frontend e para os caminhos OpenAPI.
+
 ### 2.6 Compatibilidade e dependências
 
 - Uma mudança de pacote não é suficiente: executar testes unitários, typecheck, lint, Knip e os smoke tests do toolkit.
@@ -104,7 +128,9 @@ de um adaptador de perfil, nunca no núcleo horizontal.
 - Execução de fonte padronizada em `tsx`; scripts npm, documentação, `release-it` e ADR relevante já não usam `node`
   puro para comandos fonte.
 - Build TypeScript criado e mantido como verificação opcional em `toolkit/dist/`.
-- `knip` passou a enxergar arquivos TypeScript do toolkit e os exports dos módulos migrados.
+- A configuração raiz do Knip passou a incluir TypeScript, mas a auditoria crítica mostrou que o contrato ainda não está
+  correto: `toolkit/knip.json` lista apenas JavaScript e declara praticamente todos os arquivos como entrypoints. O Knip
+  passa, porém ainda não prova ausência de módulos ou exports mortos.
 - O núcleo compartilhado foi convertido para TypeScript:
   - `lib/caminhos.ts`;
   - `lib/cli-ajuda.ts`;
@@ -119,12 +145,13 @@ de um adaptador de perfil, nunca no núcleo horizontal.
   - `projeto/versao-sincronizar.ts`.
 - `garantirArquivo` já encontra `.ts` na fonte e `.js` no build, permitindo migração incremental sem duplicar módulos.
 - Exports de `toolkit/package.json` já distinguem módulos migrados e módulos ainda JavaScript.
-- A configuração já aceita caminhos de backend/frontend diferentes do layout do SGC; auditores de cobertura, arquitetura,
-  coesão, contratos e resíduos já possuem partes parametrizadas por `--base`, `--arquivo`, `--saida` ou configuração.
+- A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
+  contratos e resíduos possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração. Isso ainda
+  não equivale a portabilidade: há defaults globais resolvidos no import e caminhos `backend/src`/`frontend/src` fixos.
 - O gerador de tipos OpenAPI foi removido. O toolkit mantém somente exportação, comparação e fixação de fotografias de
   contrato; o Springdoc permanece no backend porque o ciclo E2E usa Swagger/OpenAPI para aguardar a aplicação.
-- O histórico recente relevante está publicado na `main`, culminando em `3a6cbea24 Atualiza consumidores para
-  execucao com tsx`.
+- O histórico recente relevante está publicado na `main`, culminando, antes desta auditoria, em `a8defbe30 Documenta
+  plano de modernizacao do toolkit`.
 
 ### 3.2 Evidência de validação atual
 
@@ -137,7 +164,9 @@ No estado publicado, sob Node `26.7.0`:
 - `npm --prefix toolkit run deps:audit`: aprovado;
 - `git diff --check`: aprovado;
 - importação dos comandos sem execução acidental: coberta pelos testes;
-- execução fonte com `tsx` e smoke do artefato compilado: aprovados nas rodadas de migração.
+- execução fonte pelo script npm e smoke do artefato compilado: aprovados nas rodadas de migração;
+- binário do workspace: **reprovado**. `npm exec --workspace toolkit sgc -- --help` executa `sgc.js` com Node puro e
+  falha ao resolver `lib/execucao.js`, cuja implementação já é TypeScript.
 
 O número caiu de 76 para 75 porque o teste do wrapper experimental `sgc-ts.js` foi removido junto com o wrapper. Isso é
 uma remoção de contrato obsoleto, não uma perda de cenário funcional.
@@ -156,6 +185,36 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 
 O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda está no início: aproximadamente 14%
 dos arquivos de implementação rastreados são TypeScript.
+
+### 3.4 Achados da auditoria crítica
+
+| Severidade | Achado | Evidência e impacto |
+|---|---|---|
+| Bloqueador | Binário npm quebrado | `bin.sgc` aponta para `sgc.js`; `npm exec --workspace toolkit sgc -- --help` falha sob Node puro. O toolkit não é instalável como CLI no estado atual. |
+| Bloqueador | Pacote não pode ser empacotado | `npm pack --workspace toolkit --dry-run` falha porque `toolkit/package.json` não possui `version`. `private: true`, nome específico e ausência de `files` também mostram que a distribuição externa ainda não foi desenhada. |
+| Alta | Raiz acoplada à posição física | `lib/caminhos.ts` deriva a raiz como pai de `toolkit/`. Ao instalar o pacote em `node_modules`, a raiz calculada deixa de ser o projeto consumidor. |
+| Alta | Knip produz falso conforto | `toolkit/knip.json` cobre apenas `.js` e declara todos os módulos como `entry`; assim módulos órfãos podem continuar passando. |
+| Alta | Base externa é parcialmente ignorada | Defaults de arquitetura, resíduos e OpenAPI são calculados durante o import usando a raiz do SGC. Um `--base` posterior não recompõe todos os caminhos. |
+| Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
+| Alta | Defeito no corretor FQN | `backend/java-corrigir-fqn.js` adiciona `novaLinha` duas vezes em `analisarLinhas`; uma execução mutável pode duplicar linhas do arquivo Java. Deve ser corrigido antes de qualquer migração desse comando. |
+| Média | Configuração sem validação | `configuracao-toolkit.json` é convertido por cast e aceita chaves/tipos desconhecidos até falhar no uso. Não há versão de schema nem diagnóstico agregado. |
+| Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
+| Média | Testes não representam pacote externo | Os 75 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
+| Média | Roteador monolítico e inventário duplicado | `sgc.js` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
+| Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
+
+### 3.5 Interpretação correta do estado
+
+- O toolkit funciona como ferramenta interna executada pelo script npm ou por `npx tsx` dentro deste workspace.
+- O toolkit ainda **não** funciona como pacote CLI externo, apesar de declarar `bin` e `exports`.
+- `exports` aponta alguns subpaths diretamente para `.ts`; esse contrato serve ao workspace com loader, mas não é um
+  contrato consumível por Node puro e precisa acompanhar a decisão fonte versus pacote compilado.
+- Parametrização parcial não significa generalização concluída.
+- Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
+  resolução de raiz adequados para distribuição.
+- Knip aprovado e 75 testes verdes são gates úteis, mas atualmente insuficientes para afirmar ausência de código morto,
+  segurança dos comandos mutáveis ou portabilidade.
 
 ## 4. Classificação para reuso externo
 
@@ -210,42 +269,64 @@ Não promover diretamente ao núcleo horizontal:
 Essas regras continuam valiosas no perfil SGC. O trabalho correto é mover a regra para uma política/adaptador explícito,
 não apagá-la nem espalhá-la em condicionais genéricas.
 
+### 4.4 Contrato de preservação do perfil SGC
+
+A extração do núcleo horizontal deve preservar o comportamento observável do toolkit no SGC:
+
+- comandos, opções, códigos de saída e formatos consumidos por scripts existentes;
+- políticas de nomenclatura, CDU, acesso e arquitetura que sejam intencionais;
+- integração com Gradle, npm, Playwright, OpenAPI e diretórios de artefatos do projeto;
+- diagnósticos e exceções já documentados pelo perfil;
+- capacidade de executar o catálogo específico do SGC a partir do mesmo entrypoint, ainda que organizado em namespace
+  ou adaptador explícito.
+
+Compatibilidade não significa congelar defeitos. Correções de segurança, falsos positivos, efeitos colaterais indevidos
+e contratos inconsistentes devem ser feitas com teste que registre a mudança intencional. Antes de mover uma regra para
+o núcleo, comparar resultados sobre fixtures representativas do SGC; depois da extração, manter esse teste como regressão
+do perfil.
+
 ## 5. Lacunas e riscos conhecidos
 
 ### Prioridade alta
 
-1. **Entry point e pacote**: `sgc.js` ainda é JavaScript, tem `shebang` para Node puro e é o alvo do `bin`; o caminho
+1. **Segurança de mutação**: corrigir e testar o defeito de duplicação de linhas em `java-corrigir-fqn`; inventariar os
+   demais comandos que escrevem antes de continuar conversões mecânicas.
+2. **Entry point e pacote**: `sgc.js` ainda é JavaScript, tem `shebang` para Node puro e é o alvo do `bin`; o caminho
    documentado usa `tsx`. Migrar o entrypoint e corrigir `bin`, `exports`, scripts, referências e smoke tests de instalação.
-2. **TypeScript sem rigor uniforme**: `tsconfig.nucleo.json` cobre o núcleo, mas o `tsconfig.json` geral mantém
+3. **Raiz do consumidor**: separar diretório de instalação do toolkit, diretório de trabalho e raiz do projeto auditado.
+   `process.cwd()`, `--base` e configuração explícita devem ter precedência documentada.
+4. **Modelo de distribuição**: decidir cedo se o reuso será por pacote compilado, pacote-fonte com runtime `tsx` ou cópia
+   vendorizada. A escolha define `version`, `private`, nome, `files`, `bin`, `exports`, assets e dependências de runtime.
+5. **Auditoria de código morto**: corrigir a configuração do Knip para declarar apenas entrypoints reais e incluir JS/TS;
+   hoje o gate não consegue revelar módulos órfãos.
+6. **TypeScript sem rigor uniforme**: `tsconfig.nucleo.json` cobre o núcleo, mas o `tsconfig.json` geral mantém
    `checkJs: false` e não impõe `strict` aos próximos comandos TS. Criar uma configuração estrita por etapas, sem tentar
    tipar os 62 módulos JavaScript de uma vez.
-3. **Dependência de runtime**: `tsx` ainda está em `devDependencies` do toolkit, embora seja necessário para executar a
+7. **Dependência de runtime**: `tsx` ainda está em `devDependencies` do toolkit, embora seja necessário para executar a
    fonte. Definir o modelo de instalação externo e mover a dependência ou fornecer um launcher de pacote coerente.
-4. **Contrato `.js`/`.ts` temporário**: o fallback do despachador é útil durante a transição, mas aumenta a superfície e
+8. **Contrato `.js`/`.ts` temporário**: o fallback do despachador é útil durante a transição, mas aumenta a superfície e
    pode esconder caminhos inválidos. Medir os consumidores e removê-lo ao fim da conversão.
-5. **Hard-coding de perfil**: várias regras continuam presas ao layout e ao vocabulário SGC. Antes de declarar o toolkit
+9. **Hard-coding de perfil**: várias regras continuam presas ao layout e ao vocabulário SGC. Antes de declarar o toolkit
    reutilizável, separar engine, política e adaptador.
 
 ### Prioridade média
 
-6. **Testes concentrados**: dois arquivos de teste grandes em JavaScript dificultam localizar contratos e impedem que os
+10. **Testes concentrados**: dois arquivos de teste grandes em JavaScript dificultam localizar contratos e impedem que os
    tipos dos testes ajudem na migração. Dividir por domínio e converter para TypeScript depois de estabilizar os comandos.
-7. **Schema de resultados**: fotografias, auditorias, cobertura, diagnósticos e relatórios usam objetos sem schema
+11. **Schema de resultados**: fotografias, auditorias, cobertura, diagnósticos e relatórios usam objetos sem schema
    versionado. Formalizar tipos e versões de saída antes de extrair o pacote externo.
-8. **Opções inconsistentes**: há mistura de `--input`, `--output`, `--dir`, `--arquivo`, `--saida` e defaults locais.
+12. **Opções inconsistentes**: há mistura de `--input`, `--output`, `--dir`, `--arquivo`, `--saida` e defaults locais.
    Definir opções canônicas em português, aliases de transição e mensagens uniformes sem quebrar automações existentes.
-9. **Documentação derivada**: ainda há referências de `sgc.js`, execução direta e exemplos que precisam ser regenerados ou
+13. **Documentação derivada**: ainda há referências de `sgc.js`, execução direta e exemplos que precisam ser regenerados ou
    centralizados. O inventário de comandos não deve divergir do roteador.
-10. **Orquestração pesada**: `qualidade/coleta-execucao.js` mistura subprocessos, Gradle, npm, Playwright, parsing de
+14. **Orquestração pesada**: `qualidade/coleta-execucao.js` mistura subprocessos, Gradle, npm, Playwright, parsing de
     relatórios e schema da fotografia. Separar executor, adaptadores de ferramenta e agregador.
 
 ### Prioridade baixa
 
-11. **Distribuição**: decidir se o toolkit será copiado como diretório, instalado como pacote privado ou publicado como
-    pacote interno. Só então fechar `files`, exports compilados, licença, versão e documentação de instalação.
-12. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
+15. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
     saídas locais sejam confundidas com recursos do pacote.
-13. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
+16. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
     comparação antes/depois e sem sacrificar a legibilidade do relatório.
 
 ## 6. Próximos passos ordenados
@@ -253,15 +334,37 @@ não apagá-la nem espalhá-la em condicionais genéricas.
 Cada item abaixo deve ser uma rodada pequena, validada e publicada antes do próximo. A ordem privilegia redução de risco,
 reuso externo e preservação de contratos.
 
+### Fase 0 — estabilizar os contratos existentes
+
+1. Corrigir o defeito de duplicação de linhas de `backend/java-corrigir-fqn.js` e criar teste que execute o modo de
+   escrita sobre fixture temporária, não apenas `--dry-run`.
+2. Inventariar todos os comandos que escrevem, removem ou promovem arquivos e classificá-los como:
+   - auditoria read-only;
+   - geração explícita de artefato;
+   - manutenção mutável;
+   - orquestração externa.
+3. Não converter um comando mutável antes de haver teste de efeito, prévia e idempotência quando aplicável.
+4. Corrigir `toolkit/knip.json`: incluir `js` e `ts`, declarar somente entrypoints reais e permitir que o grafo encontre
+   módulos/exports não usados.
+5. Adicionar testes focados para configuração inválida, precedência de `--base`, defaults calculados após parsing e
+   importação sem capturar a raiz do SGC.
+6. Registrar uma baseline de cobertura do próprio toolkit, inicialmente informativa; definir thresholds apenas depois de
+   identificar quais contratos críticos ainda não têm teste.
+
+Critério de aceite: comandos mutáveis conhecidos têm testes de efeito, Knip consegue revelar código órfão real e a
+configuração externa possui testes de precedência e erro.
+
 ### Fase A — fechar a fronteira TypeScript do runtime
 
 1. Migrar `toolkit/sgc.js` para `toolkit/sgc.ts`.
 2. Tipar o registro de comandos do Commander, opções e resultado de `principal`.
 3. Atualizar scripts raiz, script do toolkit, README, ADRs, `release-it`, testes e referências internas para o novo
    entrypoint.
-4. Corrigir o `bin` do pacote e testar a execução por `npm exec`, `npx tsx` e `npm --prefix toolkit run sgc`.
-5. Decidir e implementar o modelo de instalação externo: `tsx` como dependência de runtime ou distribuição compilada.
-6. Remover o fallback `.js` → `.ts` do despachador somente depois de todos os comandos registrados terem extensões e
+4. Separar explicitamente três caminhos: diretório de instalação do toolkit, diretório atual e raiz do projeto auditado.
+5. Corrigir o `bin` do pacote e testar a execução por `npm exec`, `npx tsx` e `npm --prefix toolkit run sgc`.
+6. Decidir e implementar o modelo de instalação externo: `tsx` como dependência de runtime ou distribuição compilada.
+7. Criar teste de pacote isolado com `npm pack`, instalação em diretório temporário e projeto consumidor fixture.
+8. Remover o fallback `.js` → `.ts` do despachador somente depois de todos os comandos registrados terem extensões e
    imports consistentes.
 
 Critério de aceite: nenhum comando fonte depender de `node` puro, nenhum binário apontar para um caminho quebrado e o
@@ -275,6 +378,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
    próximos lotes.
+6. Eliminar defaults de caminho calculados durante import; expor funções que resolvam caminhos a partir da base e da
+   configuração efetivas.
 
 Critério de aceite: as bibliotecas convertidas não fazem I/O durante import, têm tipos públicos documentados e mantêm os
 mesmos fixtures e resultados JSON.
@@ -283,7 +388,8 @@ mesmos fixtures e resultados JSON.
 
 Lotes sugeridos:
 
-1. **Projeto**: diagnóstico, limpeza, preparação e perfil de qualidade; separar o que é genérico do que coordena o SGC.
+1. **Projeto**: diagnóstico, limpeza, preparação e perfil de qualidade; separar o que é genérico do perfil SGC sem
+   alterar o backend/frontend auditado.
 2. **Backend**: cobertura, análise/priorização de testes, contratos e FQN; parametrizar raiz Java, tarefas Gradle e
    categorias.
 3. **Frontend**: cobertura V8, resíduos, acessibilidade e identificadores de teste; parametrizar raiz Vue, globs e
@@ -292,6 +398,8 @@ Lotes sugeridos:
 5. **Requisitos**: converter o motor de Markdown e depois isolar o perfil CDU do SGC.
 6. **Código transversal**: converter cheiros, Semgrep e inventários de nomes/idioma por último, pois concentram mais
    políticas locais e maior volume de parsing.
+
+O corretor FQN só entra nesta fase depois do bloqueador de segurança da Fase 0 estar corrigido e publicado.
 
 Para cada comando convertido:
 
@@ -304,7 +412,7 @@ Para cada comando convertido:
 
 ### Fase D — separar núcleo horizontal e perfil SGC
 
-1. Definir uma configuração de projeto versionada, mantendo JSON como formato oficial de entrada.
+1. Definir uma configuração de projeto versionada, mantendo JSON como formato oficial de entrada e validando-a na borda.
 2. Criar uma camada de adaptadores para:
    - layout de backend Java/Spring/Gradle;
    - layout de frontend Vue;
@@ -314,9 +422,14 @@ Para cada comando convertido:
 3. Fazer o núcleo receber adaptadores por composição, sem `if (projeto === "sgc")` espalhado.
 4. Criar um projeto fixture externo mínimo com backend/frontend fictícios e executar os comandos horizontais contra ele.
 5. Documentar claramente quais comandos são `núcleo`, `perfil-sgc` ou `opcionais`.
+6. Mover políticas do SGC para um diretório de perfil explícito somente quando o motor correspondente estiver estável;
+   não reorganizar todos os arquivos antecipadamente.
+7. Criar testes de caracterização para cada funcionalidade específica antes de separar seu motor horizontal; preservar
+   o resultado no perfil SGC ou registrar explicitamente a correção de comportamento.
 
 Critério de aceite: um segundo projeto consegue configurar raiz, globs, tarefas e políticas sem editar o código do
-núcleo; as regras CDU e `AssuntosNotificacao` não aparecem nesse projeto fictício.
+núcleo; as regras CDU e `AssuntosNotificacao` não aparecem nesse projeto fictício e continuam funcionando quando o perfil
+SGC está ativo.
 
 ### Fase E — padronizar CLI e resultados
 
@@ -327,6 +440,9 @@ núcleo; as regras CDU e `AssuntosNotificacao` não aparecem nesse projeto fict�
 4. Separar stdout estruturado, stdout humano e stderr operacional.
 5. Definir quando um comando retorna falha por violação encontrada versus erro de execução.
 6. Adicionar `--json`/`--sem-gravar` de forma consistente, sem inventar opções para comandos que não precisam delas.
+7. Substituir gradualmente `--sem-gravar` por execução read-only padrão e uma opção positiva de persistência, mantendo
+   alias de transição somente onde houver consumidor comprovado.
+8. Separar no catálogo da CLI comandos de auditoria, geração, manutenção e orquestração para tornar efeitos explícitos.
 
 ### Fase F — testes, documentação e distribuição
 
@@ -336,13 +452,12 @@ núcleo; as regras CDU e `AssuntosNotificacao` não aparecem nesse projeto fict�
    implementação.
 4. Adicionar smoke test de instalação em diretório externo, incluindo `npx tsx` e o binário do pacote.
 5. Adicionar matriz de validação para Node `26.7+`, TypeScript 6 e as versões de Vitest/tsx usadas no workspace.
-6. Executar periodicamente as validações de integração do repositório:
-   - `npm --prefix frontend run typecheck`;
-   - `npm --prefix frontend run lint`;
-   - `npm --prefix frontend run test:unit`;
-   - testes E2E conforme `e2e/regras-e2e.md`, somente quando a mudança atravessar esse contrato.
-7. Atualizar `toolkit/README.md`, README raiz, ADRs e exemplos a partir de uma fonte única de comandos.
-8. Fechar o modelo de distribuição e retirar arquivos JS, aliases e fallbacks de transição.
+6. Criar fixtures próprias do toolkit para Java/Spring, Vue e Markdown; não usar a suíte do produto SGC como validação
+   rotineira da modernização do toolkit.
+7. Executar smoke tests sobre um recorte do SGC apenas quando necessário para provar retrocompatibilidade de um comando
+   do toolkit já usado por ele.
+8. Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos.
+9. Fechar o modelo de distribuição e retirar arquivos JS, aliases e fallbacks de transição.
 
 ## 7. Validação obrigatória por rodada
 
@@ -356,6 +471,9 @@ npm --prefix toolkit exec vitest run test/sgc.test.js test/cdus.test.js --report
 npm --prefix toolkit run build
 git diff --check
 ```
+
+O comando focado deve apontar para os testes do módulo alterado assim que a suíte for dividida. Enquanto os dois arquivos
+monolíticos existirem, a rodada acima é o mínimo seguro.
 
 ### Rodada completa do toolkit
 
@@ -376,6 +494,20 @@ npm --prefix toolkit run sgc -- --help
 npm exec --workspace toolkit sgc -- --help
 ```
 
+O último comando está atualmente reprovado e é critério da Fase A; não deve ser tratado como gate verde antes da correção
+do `bin`.
+
+### Verificações adicionais por classe de mudança
+
+- **Configuração/caminhos**: executar contra projeto fixture fora do repositório e verificar que nenhum artefato foi lido
+  ou gravado na raiz do SGC.
+- **Auditoria**: comparar JSON e código de saída com fixture estável; confirmar ausência de escrita sem opção explícita.
+- **Comando mutável**: testar prévia, execução, idempotência quando aplicável e preservação de conteúdo não relacionado.
+- **Empacotamento**: usar `npm pack`, instalar o tarball em diretório temporário e executar o binário sem dependências
+  hoisted do monorepo.
+- **Build**: executar ao menos um subcomando compilado que importe biblioteca e um que despache outro script; `--help` da
+  raiz isoladamente não prova o pacote.
+
 Depois de qualquer renomeação, procurar referências antigas fora de `dist` e `node_modules`:
 
 ```bash
@@ -392,6 +524,7 @@ Cada recorte deve terminar com um commit pequeno e push para `main`, conforme o 
 - Não tornar `dist` o caminho principal apenas porque o build existe.
 - Não manter uma implementação JavaScript paralela para facilitar uma migração parcial.
 - Não generalizar regras do SGC com dezenas de flags antes de existir um segundo consumidor real.
+- O projeto fixture externo é prova de portabilidade técnica, não evidência suficiente para criar abstrações de negócio.
 - Não transformar auditores read-only em formatadores ou corretores automáticos silenciosos.
 - Não trocar TS6 por TS7 antes da compatibilidade do conjunto Node/Vitest/Vue/tsx/ESLint estar comprovada.
 - Não otimizar coleta e auditorias sem medição de um cenário monitorado e comparação antes/depois.
@@ -402,10 +535,15 @@ A modernização do toolkit estará concluída quando:
 
 - todo o código de implementação e testes estiver em TypeScript;
 - o entrypoint, o binário, o `npx tsx`, os scripts npm e o build tiverem o mesmo contrato;
+- o binário passar em instalação isolada, sem depender do hoisting do workspace;
+- a raiz do projeto auditado for explícita e independente do local de instalação do toolkit;
 - não houver fallback de extensão ou wrapper de transição sem justificativa;
 - o núcleo horizontal estiver separado do perfil SGC;
 - um segundo projeto fixture executar os comandos horizontais apenas por configuração;
+- o perfil SGC preservar seu catálogo específico, com testes de caracterização e regressão;
 - schemas de saída e códigos de retorno estiverem documentados e testados;
 - os auditores mantiverem comportamento read-only por padrão;
-- as suítes do toolkit e as validações de frontend/E2E aplicáveis passarem sob Node 26.7+;
+- comandos mutáveis tiverem testes de efeito e prévia segura;
+- Knip analisar um grafo de entrypoints reais e a cobertura do toolkit possuir baseline conhecida;
+- as suítes e fixtures próprias do toolkit passarem sob Node 26.7+;
 - o pacote puder ser instalado ou copiado para outro projeto sem depender de caminhos ou `node_modules` implícitos do SGC.
