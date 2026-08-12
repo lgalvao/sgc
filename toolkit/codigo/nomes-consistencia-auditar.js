@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {executarColeta} from "./nomes-simbolos-coletar.js";
 
-const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "nomenclatura", "latest");
+const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "nomenclatura", "mais-recente");
 const ARQUIVO_SIMBOLOS_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos.json");
 const ARQUIVO_JSON_AUDITORIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "consistencia.json");
 

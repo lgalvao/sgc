@@ -50,7 +50,7 @@ async function main() {
         exibirAjudaComando({
             comandoSgc: "integracao contratos exportar-openapi",
             scriptDireto: "integracao/contratos-exportar-openapi.js",
-            descricao: "Busca o documento OpenAPI da aplicação em execução e grava um snapshot local para auditorias de contrato.",
+            descricao: "Busca o documento OpenAPI da aplicação em execução e grava uma fotografia local para auditorias de contrato.",
             opcoes: [
                 "--url <url>          URL do endpoint OpenAPI (padrão: http://127.0.0.1:10000/api-docs).",
                 "--saida <arquivo>    Caminho do arquivo JSON a ser gerado.",
@@ -69,23 +69,25 @@ async function main() {
     const url = lerOpcao(args, "--url", URL_OPENAPI_PADRAO);
     const saida = lerOpcao(args, "--saida", CAMINHO_OPENAPI_LATEST);
 
-    imprimirCabecalho("EXPORTACAO DO OPENAPI");
-    escreverLinha(`Origem: ${pc.dim(url)}`);
-    escreverLinha(`Saida: ${pc.dim(saida)}`);
+    if (!emitirJson) {
+        imprimirCabecalho("EXPORTACAO DO OPENAPI");
+        escreverLinha(`Origem: ${pc.dim(url)}`);
+        escreverLinha(`Saida: ${pc.dim(saida)}`);
+    }
 
     try {
         const resultado = await exportarOpenapi({url, saida});
-        escreverLinha(pc.green(`OpenAPI exportado com sucesso.`));
-        escreverLinha(`Titulo: ${resultado.titulo ?? "-"}`);
-        escreverLinha(`Versao: ${resultado.versao ?? "-"}`);
-        escreverLinha(`Paths: ${resultado.paths}`);
-
         if (emitirJson) {
             imprimirJson(resultado);
+        } else {
+            escreverLinha(pc.green(`OpenAPI exportado com sucesso.`));
+            escreverLinha(`Titulo: ${resultado.titulo ?? "-"}`);
+            escreverLinha(`Versao: ${resultado.versao ?? "-"}`);
+            escreverLinha(`Paths: ${resultado.paths}`);
         }
     } catch (erro) {
-        escreverLinha(pc.red(`Erro ao exportar OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}`));
-        escreverLinha("Dica: execute o backend com perfil `e2e` ou informe `--url` para uma instância já ativa.");
+        process.stderr.write(`Erro ao exportar OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        process.stderr.write("Dica: execute o backend com perfil `e2e` ou informe `--url` para uma instância já ativa.\n");
         process.exit(1);
     }
 }

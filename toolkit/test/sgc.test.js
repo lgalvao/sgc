@@ -8,7 +8,7 @@ import {execaNode} from "execa";
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.js");
-const FIXTURE_SNAPSHOT = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qa", "snapshot.json");
+const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.js");
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
@@ -42,19 +42,13 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarSgc(["--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Toolkit do SGC");
-        expect(resultado.stdout).toContain("projeto doctor");
+        expect(resultado.stdout).toContain("projeto diagnostico");
     });
 
     test("despacha ajuda de um comando de auditoria do backend", async () => {
         const resultado = await executarSgc(["backend", "cobertura", "auditoria", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Backend).");
-    });
-
-    test("despacha ajuda da jornada de cobertura do backend", async () => {
-        const resultado = await executarSgc(["backend", "cobertura", "jornada", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Executa a jornada consolidada de cobertura do backend.");
     });
 
     test("despacha ajuda da auditoria de assuntos de notificacao do backend", async () => {
@@ -108,7 +102,7 @@ describe("CLI raiz do toolkit", () => {
     });
 
     test("audita cheiros de codigo em um recorte controlado", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-smells-"));
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cheiros-"));
         const frontendDir = path.join(base, "frontend", "src");
         const backendDir = path.join(base, "backend", "src", "main", "java", "sgc", "exemplo", "dto");
 
@@ -137,7 +131,7 @@ describe("CLI raiz do toolkit", () => {
 
         const resultado = await executarSgc([
             "codigo",
-            "smells",
+            "cheiros",
             "auditar",
             "--json",
             "--sem-gravar",
@@ -154,17 +148,17 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.frontend_fallback_or).toBe(1);
     });
 
-    test("audita cruft do frontend em um recorte controlado", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cruft-auditar-"));
+    test("audita residuos do frontend em um recorte controlado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-auditar-"));
         const frontendDir = path.join(base, "frontend", "src");
-        const budget = path.join(base, "budget.json");
+        const orcamento = path.join(base, "orcamento.json");
 
-        await fs.outputJson(budget, {
+        await fs.outputJson(orcamento, {
             versaoSchema: "1.0.0",
             camadas: {
-                service: {target: 4, hard: 8},
-                component: {target: 6, hard: 10},
-                outro: {target: 6, hard: 10}
+                service: {meta: 4, limite: 8},
+                component: {meta: 6, limite: 10},
+                outro: {meta: 6, limite: 10}
             },
             metricas: {
                 maximosProducao: {
@@ -174,8 +168,8 @@ describe("CLI raiz do toolkit", () => {
                     catchBlocks: 1,
                     castsDuplos: 0,
                     storageDireto: 1,
-                    exportsSuspeitos: 1,
-                    arquivosAcimaTargetPorCamada: {
+                    exportacoesSuspeitas: 1,
+                    arquivosAcimaMetaPorCamada: {
                         service: 1,
                         component: 1,
                         outro: 0
@@ -207,14 +201,14 @@ describe("CLI raiz do toolkit", () => {
 
         const resultado = await executarSgc([
             "frontend",
-            "cruft",
+            "residuos",
             "auditar",
             "--json",
             "--sem-gravar",
             "--base",
             base,
-            "--budget",
-            budget
+            "--orcamento",
+            orcamento
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -223,8 +217,8 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.producao.checksNull).toBe(1);
         expect(conteudo.contagens.producao.fallbacksDefensivos).toBe(1);
         expect(conteudo.contagens.producao.storageDireto).toBe(1);
-        expect(conteudo.contagens.producao.exportsSuspeitos).toBe(1);
-        expect(conteudo.contagens.producao.arquivosAcimaTarget.service).toBe(1);
+        expect(conteudo.contagens.producao.exportacoesSuspeitas).toBe(1);
+        expect(conteudo.contagens.producao.arquivosAcimaMeta.service).toBe(1);
     });
 
     test("audita vazamentos arquiteturais do frontend em um recorte controlado", async () => {
@@ -623,17 +617,17 @@ describe("CLI raiz do toolkit", () => {
         expect(hotspot.sinaisAtivos).not.toContain("serviceDireto");
     });
 
-    test("valida cruft do frontend com waiver de tamanho", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cruft-validar-"));
+    test("valida residuos do frontend com excecao de tamanho", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-validar-"));
         const frontendDir = path.join(base, "frontend", "src");
-        const budget = path.join(base, "budget.json");
-        const waivers = path.join(base, "waivers.json");
+        const orcamento = path.join(base, "orcamento.json");
+        const excecoes = path.join(base, "excecoes.json");
 
-        await fs.outputJson(budget, {
+        await fs.outputJson(orcamento, {
             versaoSchema: "1.0.0",
             camadas: {
-                service: {target: 3, hard: 6},
-                outro: {target: 6, hard: 10}
+                service: {meta: 3, limite: 6},
+                outro: {meta: 6, limite: 10}
             },
             metricas: {
                 maximosProducao: {
@@ -643,17 +637,17 @@ describe("CLI raiz do toolkit", () => {
                     catchBlocks: 0,
                     castsDuplos: 0,
                     storageDireto: 0,
-                    exportsSuspeitos: 2,
-                    arquivosAcimaTargetPorCamada: {
+                    exportacoesSuspeitas: 2,
+                    arquivosAcimaMetaPorCamada: {
                         service: 1,
                         outro: 0
                     }
                 }
             }
         });
-        await fs.outputJson(waivers, {
+        await fs.outputJson(excecoes, {
             versaoSchema: "1.0.0",
-            waivers: [
+            excecoes: [
                 {
                     arquivo: "frontend/src/services/exemploService.ts",
                     camada: "service",
@@ -678,16 +672,16 @@ describe("CLI raiz do toolkit", () => {
 
         const resultado = await executarSgc([
             "frontend",
-            "cruft",
+            "residuos",
             "validar",
             "--json",
             "--sem-gravar",
             "--base",
             base,
-            "--budget",
-            budget,
-            "--waivers",
-            waivers
+            "--orcamento",
+            orcamento,
+            "--excecoes",
+            excecoes
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -1026,8 +1020,8 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo).not.toContain("MapaRuidoCommand.java");
     });
 
-    test("resume um snapshot de QA a partir de fixture", async () => {
-        const resultado = await executarSgc(["qa", "resumo", "--json", "--arquivo", FIXTURE_SNAPSHOT]);
+    test("resume uma fotografia de qualidade a partir de fixture", async () => {
+        const resultado = await executarSgc(["qualidade", "resumo", "--json", "--arquivo", FIXTURE_FOTOGRAFIA]);
         expect(resultado.exitCode).toBe(0);
 
         const json = JSON.parse(resultado.stdout);
@@ -1035,31 +1029,17 @@ describe("CLI raiz do toolkit", () => {
         expect(json.hotspots).toHaveLength(2);
     });
 
-    test("exibe ajuda de coleta de snapshot com opcao de perfil", async () => {
-        const resultado = await executarSgc(["qa", "snapshot", "coletar", "--help"]);
+    test("exibe ajuda de coleta de fotografia com opcao de perfil", async () => {
+        const resultado = await executarSgc(["qualidade", "coletar", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Perfil de execucao");
         expect(resultado.stdout).toContain("rapido");
     });
 
-    test("falha rapido para perfil invalido de snapshot", async () => {
-        const resultado = await executarSgc(["qa", "snapshot", "coletar", "--perfil", "inexistente"]);
+    test("falha rapido para perfil invalido de fotografia", async () => {
+        const resultado = await executarSgc(["qualidade", "coletar", "--perfil", "inexistente"]);
         expect(resultado.exitCode).toBe(1);
         expect(resultado.stderr).toContain("Perfil invalido");
-    });
-
-    test("despacha ajuda de um comando migrado do frontend", async () => {
-        const resultado = await executarSgc(["frontend", "mensagens", "extrair", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Extrai mensagens do projeto.");
-    });
-
-    test("exibe comando canonico e alias legado para auditoria de views", async () => {
-        const resultado = await executarSgc(["frontend", "views", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("validacoes-auditar");
-        expect(resultado.stdout).toContain("auditar-validacoes");
-        expect(resultado.stdout).toContain("templates-validar");
     });
 
     test("despacha ajuda da validacao de modais do frontend", async () => {
@@ -1145,20 +1125,14 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Frontend).");
     });
 
-    test("despacha ajuda do servidor do qa dashboard", async () => {
-        const resultado = await executarSgc(["qa", "dashboard", "servir", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Serve o dashboard de QA localmente.");
-    });
-
     test("exibe ajuda do comando de sincronizacao de versao do projeto", async () => {
         const resultado = await executarSgc(["projeto", "versao-sincronizar", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Sincroniza a versao entre gradle.properties e frontend/package.json.");
     });
 
-    test("executa o doctor em JSON", async () => {
-        const resultado = await executarSgc(["projeto", "doctor", "--json"]);
+    test("executa o diagnostico em JSON", async () => {
+        const resultado = await executarSgc(["projeto", "diagnostico", "--json"]);
         expect(resultado.exitCode).toBe(0);
 
         const json = JSON.parse(resultado.stdout);
@@ -1170,9 +1144,9 @@ describe("CLI raiz do toolkit", () => {
     test("simula e executa limpeza em diretório temporário", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-scripts-"));
         await fs.ensureDir(path.join(diretorioBase, "backend", "build"));
-        await fs.ensureDir(path.join(diretorioBase, "etc", "qa-dashboard", "latest"));
+        await fs.ensureDir(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente"));
         await fs.outputFile(path.join(diretorioBase, "backend-coverage-auditoria.md"), "# teste");
-        await fs.outputFile(path.join(diretorioBase, "etc", "qa-dashboard", "latest", "ultimo-resumo.md"), "ok");
+        await fs.outputFile(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "resumo.md"), "ok");
 
         const previa = await executarSgc(["projeto", "limpar", "--json", "--base", diretorioBase]);
         expect(previa.exitCode).toBe(0);
@@ -1200,31 +1174,11 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Auditoria de cobertura cruzada e independente (Backend).");
     });
 
-    test("exibe ajuda do alias de test-ids duplicados do frontend", async () => {
-        const resultado = await executarSgc(["frontend", "test-ids", "duplicados", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Alias legado para 'listar-duplicados'.");
-    });
+    test("projeto diagnostico identifica corretamente a ausencia de arquivos essenciais e falha com codigo 1", async () => {
+        const diretorioVazio = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-vazio-"));
 
-    test("exibe ajuda dos novos comandos de comunicacao", async () => {
-        const resultado = await executarSgc(["comunicacao", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("cobertura-notificacoes");
-        expect(resultado.stdout).toContain("strings");
-        expect(resultado.stdout).toContain("templates-email");
-    });
-
-    test("exibe ajuda do comando de auditar-null do java", async () => {
-        const resultado = await executarSgc(["backend", "java", "auditar-null", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Audita verificacoes de null no backend");
-    });
-
-    test("projeto doctor identifica corretamente a ausência de arquivos essenciais e falha com código 1", async () => {
-        const diretorioVazio = await mkdtemp(path.join(os.tmpdir(), "sgc-doctor-vazio-"));
-
-        // Executamos o doctor passando o diretório temporário vazio como base
-        const resultado = await executarSgc(["projeto", "doctor", "--json", "--base", diretorioVazio]);
+        // Executamos o diagnostico passando o diretorio temporario vazio como base
+        const resultado = await executarSgc(["projeto", "diagnostico", "--json", "--base", diretorioVazio]);
 
         // Como arquivos essenciais como gradlew e package.json estão ausentes, deve retornar código de erro 1
         expect(resultado.exitCode).toBe(1);
@@ -1240,10 +1194,10 @@ describe("CLI raiz do toolkit", () => {
         expect(falhaGradlew.detalhe).toContain("gradlew ausente");
     });
 
-    test("lista com sucesso test-ids do frontend em recorte controlado", async () => {
+    test("lista com sucesso identificadores de teste do frontend em recorte controlado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-listar-"));
 
-        // Criar arquivos .vue de teste com test-ids
+        // Criar arquivos .vue de teste com identificadores
         await fs.outputFile(
             path.join(diretorioBase, "ComponenteA.vue"),
             "<template><button data-test-codigo=\"btn-salvar\">Salvar</button></template>"
@@ -1253,7 +1207,7 @@ describe("CLI raiz do toolkit", () => {
             "<template><input data-testid=\"input-nome\" /></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "test-ids", "listar", "--base", diretorioBase]);
+        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar", "--base", diretorioBase]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("ComponenteA.vue");
@@ -1262,7 +1216,7 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("input-nome");
     });
 
-    test("detecta corretamente test-ids duplicados e falha com codigo 1", async () => {
+    test("detecta corretamente identificadores de teste duplicados e falha com codigo 1", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-duplicados-"));
 
         // Criar dois arquivos com o mesmo test-id
@@ -1275,17 +1229,17 @@ describe("CLI raiz do toolkit", () => {
             "<template><div data-testid=\"btn-acao\">Ação Y</div></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "test-ids", "listar-duplicados", "--base", diretorioBase]);
+        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--base", diretorioBase]);
 
         // O script deve falhar com exitCode 1 quando encontra duplicados
         expect(resultado.exitCode).toBe(1);
-        expect(resultado.stdout).toContain("Test-ids duplicados encontrados");
+        expect(resultado.stdout).toContain("Identificadores de teste duplicados encontrados");
         expect(resultado.stdout).toContain("btn-acao");
         expect(resultado.stdout).toContain("ComponenteX.vue");
         expect(resultado.stdout).toContain("ComponenteY.vue");
     });
 
-    test("passa com sucesso se nao houver test-ids duplicados", async () => {
+    test("passa com sucesso se nao houver identificadores de teste duplicados", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-unicos-"));
 
         await fs.outputFile(
@@ -1293,9 +1247,9 @@ describe("CLI raiz do toolkit", () => {
             "<template><button data-testid=\"btn-unico\">Ação Única</button></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "test-ids", "listar-duplicados", "--base", diretorioBase]);
+        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--base", diretorioBase]);
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Nenhum test-id duplicado encontrado.");
+        expect(resultado.stdout).toContain("Nenhum identificador de teste duplicado encontrado.");
     });
 }, 30000);

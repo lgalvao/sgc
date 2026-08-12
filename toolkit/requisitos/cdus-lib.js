@@ -20,7 +20,7 @@ function normalizarCaminho(caminho) {
 async function listarArquivosCdu(base = process.cwd()) {
     const padrao = normalizarCaminho(path.join(base, "specs", "cdu-*.md"));
     const arquivos = await globby(padrao, {absolute: true});
-    return arquivos.sort((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
+    return arquivos.toSorted((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
 }
 
 function lerArquivo(caminho) {

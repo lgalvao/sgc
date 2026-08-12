@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "nomenclatura", "latest");
+const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "nomenclatura", "mais-recente");
 const ARQUIVO_JSON_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos.json");
 
 const EXTENSOES_SUPORTADAS = new Set([".java", ".ts", ".tsx", ".js", ".jsx", ".vue"]);
@@ -355,7 +356,7 @@ async function listarArquivos(baseResolvida, caminhoAtual = baseResolvida, arqui
 }
 
 function ordenarPorNome(colecao) {
-    return [...colecao].sort((a, b) => a.localeCompare(b, "pt-BR"));
+    return [...colecao].toSorted((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
 function montarResumoMarkdown(inventario) {
@@ -394,7 +395,7 @@ function montarResumoMarkdown(inventario) {
     linhas.push("| Arquivo | Linguagem | Tipos | Membros | Pacote |");
     linhas.push("|---|---|---:|---:|---|");
     for (const arquivo of inventario.arquivos
-        .sort((a, b) => b.membros.length - a.membros.length || b.tipos.length - a.tipos.length || a.caminho.localeCompare(b.caminho, "pt-BR"))
+        .toSorted((a, b) => b.membros.length - a.membros.length || b.tipos.length - a.tipos.length || a.caminho.localeCompare(b.caminho, "pt-BR"))
         .slice(0, 20)) {
         linhas.push(`| ${arquivo.caminho} | ${arquivo.linguagem} | ${arquivo.tipos.length} | ${arquivo.membros.length} | ${arquivo.pacote ?? "-"} |`);
     }
@@ -481,7 +482,7 @@ async function executarColeta({
         },
         porLinguagem,
         pacotesJava,
-        arquivos: resultadoArquivos.sort((a, b) => a.caminho.localeCompare(b.caminho, "pt-BR"))
+        arquivos: resultadoArquivos.toSorted((a, b) => a.caminho.localeCompare(b.caminho, "pt-BR"))
     };
 
     if (!semGravar) {

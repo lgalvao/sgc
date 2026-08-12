@@ -155,7 +155,7 @@ Comandos principais:
 npm --prefix frontend run test:unit
 npm --prefix frontend run typecheck
 npm --prefix frontend run lint
-npm --prefix frontend run quality:all
+npm --prefix frontend run qualidade:completa
 ```
 
 Na raiz do repositório também existem atalhos:

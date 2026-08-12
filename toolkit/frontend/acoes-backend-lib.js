@@ -47,13 +47,13 @@ function extrairConteudoAnalise(caminhoArquivo, conteudo) {
     ].filter(Boolean).join("\n");
 }
 
-function lerWaivers(caminhoWaivers) {
-    if (!fs.existsSync(caminhoWaivers)) {
+function lerExcecoes(caminhoExcecoes) {
+    if (!fs.existsSync(caminhoExcecoes)) {
         return new Set();
     }
 
-    const conteudo = fs.readJsonSync(caminhoWaivers);
-    return new Set((conteudo.waivers ?? []).map((item) => chaveViolacao(item)));
+    const conteudo = fs.readJsonSync(caminhoExcecoes);
+    return new Set((conteudo.excecoes ?? []).map((item) => chaveViolacao(item)));
 }
 
 function chaveViolacao(item) {
@@ -195,14 +195,14 @@ function auditarConteudo({conteudo, arquivoRelativo}) {
 async function auditarAcoesBackendFrontend(opcoes = {}) {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const diretorioFrontend = path.join(diretorioBase, "frontend");
-    const caminhoWaivers = opcoes.waivers ?? path.join(
+    const caminhoExcecoes = opcoes.excecoes ?? path.join(
         diretorioBase,
         "toolkit",
         "qualidade",
         "frontend-arquitetura",
-        "acoes-backend-waivers.json",
+        "acoes-backend-excecoes.json",
     );
-    const waivers = lerWaivers(caminhoWaivers);
+    const excecoes = lerExcecoes(caminhoExcecoes);
     const arquivos = await listarArquivosFrontend(diretorioFrontend);
     const violacoes = [];
 
@@ -215,12 +215,12 @@ async function auditarAcoesBackendFrontend(opcoes = {}) {
 
     const enriquecidas = violacoes.map((violacao) => ({
         ...violacao,
-        dispensada: waivers.has(chaveViolacao(violacao)),
+        dispensada: excecoes.has(chaveViolacao(violacao)),
     }));
 
     return {
         regra: "frontend-sem-regra-local-acoes",
-        caminhoWaivers: normalizarCaminho(path.relative(diretorioBase, caminhoWaivers)),
+        caminhoExcecoes: normalizarCaminho(path.relative(diretorioBase, caminhoExcecoes)),
         total: enriquecidas.length,
         dispensadas: enriquecidas.filter((violacao) => violacao.dispensada).length,
         violacoes: enriquecidas.filter((violacao) => !violacao.dispensada),

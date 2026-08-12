@@ -13,9 +13,9 @@ async function main() {
 
     if (helpMode) {
         exibirAjudaComando({
-            comandoSgc: "backend cobertura branches",
-            scriptDireto: "backend/cobertura-branches.js",
-            descricao: "Lista classes backend com branches perdidos no relatório JaCoCo.",
+            comandoSgc: "backend cobertura ramificacoes",
+            scriptDireto: "backend/cobertura-ramificacoes.js",
+            descricao: "Lista classes backend com ramificacoes perdidas no relatorio JaCoCo.",
             opcoes: [
                 "--json            Saída estruturada em JSON.",
                 "--limite=N        Limita a quantidade de classes exibidas. Padrão: 20.",
@@ -33,7 +33,7 @@ async function main() {
 
     const classes = coleta.classes
         .filter((classe) => classe.branchesPerdidos > 0)
-        .sort((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
+        .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
         .slice(0, limite)
         .map((classe) => ({
             nome: classe.nome,

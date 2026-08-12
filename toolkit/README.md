@@ -3,7 +3,7 @@
 ## Papel do módulo
 
 `toolkit/` reúne a CLI de automação do repositório. Ela concentra comandos operacionais e de auditoria usados para
-qualidade, setup, diagnóstico do projeto, utilidades de backend/frontend e geração de dashboards de QA.
+qualidade, preparação, diagnóstico do projeto e utilidades de backend/frontend.
 
 Ponto de entrada principal:
 
@@ -20,14 +20,14 @@ graph TD
     CLI[sgc.js] --> Backend[backend/]
     CLI --> Frontend[frontend/]
     CLI --> Codigo[codigo/]
-    CLI --> E2E[e2e/]
-    CLI --> QA[qa/]
+    CLI --> Integracao[integracao/]
+    CLI --> Qualidade[qualidade/]
     CLI --> Projeto[projeto/]
     Backend --> Lib[lib/]
     Frontend --> Lib
     Codigo --> Lib
-    E2E --> Lib
-    QA --> Lib
+    Integracao --> Lib
+    Qualidade --> Lib
     Projeto --> Lib
 ```
 
@@ -36,14 +36,13 @@ graph TD
 | Caminho       | Papel                                                             |
 |---------------|-------------------------------------------------------------------|
 | `sgc.js`      | roteador principal da CLI                                         |
-| `*.js` (raiz) | auditorias transversais de comunicação, templates e notificações  |
-| `lib/`        | infraestrutura compartilhada, execução, paths, saída e utilidades |
+| `lib/`        | infraestrutura compartilhada, execução, caminhos, saída e utilidades |
 | `backend/`    | comandos de cobertura, testes e higiene Java                      |
-| `frontend/`   | comandos de cobertura, mensagens, validações, test ids e cruft    |
-| `codigo/`     | auditorias transversais de smells                                 |
-| `e2e/`        | automações relacionadas à suíte E2E                               |
-| `qa/`         | snapshot, resumo e dashboard de qualidade                         |
-| `projeto/`    | setup, doctor, limpeza e qualidade do repositório                 |
+| `frontend/`   | comandos de cobertura, resíduos, validações e acessibilidade     |
+| `codigo/`     | auditorias transversais de cheiros de código                       |
+| `integracao/` | contratos OpenAPI e fronteira backend/frontend                    |
+| `qualidade/`  | coleta e resumo de qualidade                                       |
+| `projeto/`    | preparação, diagnóstico, limpeza e qualidade do repositório        |
 | `test/`       | testes do toolkit                                                 |
 
 ## Comandos por domínio
@@ -52,14 +51,10 @@ graph TD
 
 ```bash
 node toolkit/sgc.js backend cobertura auditoria
-node toolkit/sgc.js backend cobertura jornada
 node toolkit/sgc.js backend cobertura cruzada
 node toolkit/sgc.js backend testes analisar
 node toolkit/sgc.js backend testes priorizar
-node toolkit/sgc.js backend testes gerar-stub
 node toolkit/sgc.js backend java corrigir-fqn
-node toolkit/sgc.js backend java auditar-null
-node toolkit/sgc.js backend java instalar-certificados
 node toolkit/sgc.js backend notificacoes auditar-assuntos
 ```
 
@@ -67,41 +62,21 @@ node toolkit/sgc.js backend notificacoes auditar-assuntos
 
 ```bash
 node toolkit/sgc.js frontend cobertura auditoria
-node toolkit/sgc.js frontend mensagens extrair
-node toolkit/sgc.js frontend mensagens analisar
-node toolkit/sgc.js frontend validacoes auditar
-node toolkit/sgc.js frontend cruft auditar
-node toolkit/sgc.js frontend cruft validar
-node toolkit/sgc.js frontend views validacoes-auditar
-node toolkit/sgc.js frontend test-ids listar
-node toolkit/sgc.js frontend test-ids listar-duplicados
-node toolkit/sgc.js frontend test-ids duplicados
-node toolkit/sgc.js frontend telas capturar
-node toolkit/sgc.js frontend a11y auditar
-node toolkit/sgc.js frontend a11y crawler
-node toolkit/sgc.js frontend a11y processar
+node toolkit/sgc.js frontend residuos auditar
+node toolkit/sgc.js frontend residuos validar
+node toolkit/sgc.js frontend identificadores-teste listar
+node toolkit/sgc.js frontend identificadores-teste listar-duplicados
+node toolkit/sgc.js frontend acessibilidade crawler
+node toolkit/sgc.js frontend acessibilidade processar
 ```
 
 ### Código transversal
 
 ```bash
-node toolkit/sgc.js codigo smells auditar
+node toolkit/sgc.js codigo cheiros auditar
+node toolkit/sgc.js codigo semgrep auditar
 node toolkit/sgc.js codigo nomes coletar-simbolos
 node toolkit/sgc.js codigo nomes auditar-consistencia
-```
-
-### E2E
-
-```bash
-node toolkit/sgc.js e2e limpar
-```
-
-### Comunicação
-
-```bash
-node toolkit/sgc.js comunicacao cobertura-notificacoes
-node toolkit/sgc.js comunicacao strings
-node toolkit/sgc.js comunicacao templates-email
 ```
 
 ### Requisitos
@@ -119,34 +94,47 @@ node toolkit/sgc.js requisitos cdus inventariar-densidade
 node toolkit/sgc.js requisitos cdus inventariar-duplicacoes
 ```
 
-### QA
+### Qualidade
 
 ```bash
-node toolkit/sgc.js qa snapshot coletar --perfil rapido
-node toolkit/sgc.js qa resumo
-node toolkit/sgc.js qa dashboard servir --porta 4179
+node toolkit/sgc.js qualidade coletar --perfil rapido
+node toolkit/sgc.js qualidade resumo
+node toolkit/sgc.js qualidade resumo --limite-pontos-criticos 10
 ```
 
 ### Projeto
 
 ```bash
-node toolkit/sgc.js projeto doctor
+node toolkit/sgc.js projeto diagnostico
 node toolkit/sgc.js projeto dependencias auditar
 node toolkit/sgc.js projeto limpar --confirmar
 node toolkit/sgc.js projeto qualidade rapido
-node toolkit/sgc.js projeto setup --instalar-dependencias
+node toolkit/sgc.js projeto preparar --instalar-dependencias
 node toolkit/sgc.js projeto arvore-linhas
 node toolkit/sgc.js projeto versao-sincronizar 1.2.3
 ```
 
 ## Casos de uso típicos
 
-- gerar snapshot consolidado de qualidade para revisão técnica;
-- auditar cruft/duplicidade no frontend;
+- gerar fotografia consolidada de qualidade para revisão técnica;
+- auditar residuos e duplicidade no frontend;
 - apoiar evolução da suíte de testes backend;
 - validar divergência entre Bean Validation e validação de UI;
 - preparar ambiente local de desenvolvimento;
-- servir dashboards de QA para inspeção manual.
+- produzir artefatos de qualidade para inspeção manual.
+
+Os artefatos gerados ficam em `toolkit/qualidade/artefatos/` e são organizados por execução e fotografia mais recente.
+
+## Configuração e migração para TypeScript
+
+Os diretórios variáveis do projeto podem ser sobrescritos em `configuracao-toolkit.json` na raiz. Os valores padrão
+cobrem o layout atual do SGC, enquanto a configuração permite reutilizar o toolkit em outros projetos sem editar os
+auditores.
+
+O toolkit ainda executa JavaScript, mas já possui `tsconfig.json`, verificação de tipos e fronteiras de módulo estáveis.
+A conversão para TypeScript deve começar pelas bibliotecas puras em `lib/` e `lib/dominios/`, seguida pelos comandos
+que apenas adaptam CLI para domínio. Isso reduz o risco de converter simultaneamente roteamento, contratos de saída e
+integrações externas.
 
 ## Dependências e execução
 

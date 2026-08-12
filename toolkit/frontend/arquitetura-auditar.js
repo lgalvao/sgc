@@ -2,7 +2,7 @@
 import path from "node:path";
 import {pathToFileURL} from "node:url";
 import pc from "picocolors";
-import {analisarArquiteturaFrontend, DIRETORIO_SAIDA_PADRAO, gravarSnapshotArquitetura} from "./arquitetura-lib.js";
+import {analisarArquiteturaFrontend, DIRETORIO_SAIDA_PADRAO, gravarFotografiaArquitetura} from "./arquitetura-lib.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
@@ -18,7 +18,7 @@ async function executarAuditoriaArquiteturaFrontend(opcoes = {}) {
     const snapshot = await analisarArquiteturaFrontend({base: opcoes.base});
 
     if (!opcoes.semGravar) {
-        await gravarSnapshotArquitetura(snapshot, opcoes.saida);
+        await gravarFotografiaArquitetura(snapshot, opcoes.saida);
     }
 
     return snapshot;
@@ -35,10 +35,10 @@ async function main() {
             scriptDireto: "frontend/arquitetura-auditar.js",
             descricao: "Audita vazamentos arquiteturais do frontend, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
             opcoes: [
-                "--json               Emite o snapshot em JSON.",
-                "--sem-gravar         Nao grava snapshot/resumo em disco.",
+                "--json               Emite a fotografia em JSON.",
+                "--sem-gravar         Nao grava fotografia/resumo em disco.",
                 "--base <diretorio>   Sobrescreve o diretorio base da auditoria.",
-                "--saida <diretorio>  Sobrescreve o diretorio de saida do snapshot."
+                "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
                 "node toolkit/sgc.js frontend arquitetura auditar",
@@ -90,7 +90,7 @@ async function main() {
     if (!args.includes("--sem-gravar")) {
         const diretorio = lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO;
         escreverLinha("");
-        escreverLinha(`${pc.green("✓")} Snapshot salvo em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
+        escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
     }
 }
 

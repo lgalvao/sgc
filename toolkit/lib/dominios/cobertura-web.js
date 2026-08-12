@@ -1,5 +1,7 @@
 import fs from "node:fs/promises";
-import {resolverNaRaiz} from "../caminhos.js";
+import path from "node:path";
+import {DIRETORIO_RAIZ} from "../caminhos.js";
+import {resolverCaminhoConfigurado} from "../configuracao.js";
 
 function calcularPercentualPorTotal(cobertos, total) {
     if (total <= 0) return 0;
@@ -50,13 +52,17 @@ function deveIgnorarArquivo(caminhoRelativo) {
         || caminhoRelativo.includes(".test.ts");
 }
 
-async function extrairCoberturaFrontend(caminhoRelativo = "frontend/coverage/coverage-final.json") {
-    const caminhoJson = resolverNaRaiz(caminhoRelativo);
+async function extrairCoberturaFrontend(caminhoRelativo = null, opcoes = {}) {
+    const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
+    const caminhoPadrao = resolverCaminhoConfigurado("coberturaFrontend", diretorioBase);
+    const caminhoJson = caminhoRelativo
+        ? (path.isAbsolute(caminhoRelativo) ? caminhoRelativo : path.resolve(diretorioBase, caminhoRelativo))
+        : caminhoPadrao;
     let conteudo;
     try {
         conteudo = await fs.readFile(caminhoJson, "utf-8");
     } catch {
-        throw new Error(`Relatório V8 (coverage-final.json) não encontrado em ${caminhoRelativo}`);
+        throw new Error(`Relatorio V8 (coverage-final.json) nao encontrado em ${caminhoJson}`);
     }
 
     const cobertura = JSON.parse(conteudo);
@@ -103,7 +109,7 @@ async function extrairCoberturaFrontend(caminhoRelativo = "frontend/coverage/cov
         branches: criarResumoCobertura(totais.branches.cobertos, totais.branches.total),
         functions: criarResumoCobertura(totais.functions.cobertos, totais.functions.total),
         lines: criarResumoCobertura(totais.lines.cobertos, totais.lines.total),
-        arquivos: arquivos.sort((a, b) => a.linesPercentual - b.linesPercentual)
+        arquivos: arquivos.toSorted((a, b) => a.linesPercentual - b.linesPercentual)
     };
 }
 

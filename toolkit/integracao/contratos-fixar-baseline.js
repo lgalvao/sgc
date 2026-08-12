@@ -2,6 +2,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
@@ -31,10 +32,10 @@ async function main() {
         exibirAjudaComando({
             comandoSgc: "integracao contratos fixar-baseline",
             scriptDireto: "integracao/contratos-fixar-baseline.js",
-            descricao: "Promove o snapshot OpenAPI mais recente como baseline para comparações futuras de contrato.",
+            descricao: "Promove a fotografia OpenAPI mais recente como referência para comparações futuras de contrato.",
             opcoes: [
-                "--origem <arquivo>   Snapshot OpenAPI atual.",
-                "--destino <arquivo>  Baseline a ser atualizada.",
+                "--origem <arquivo>   Fotografia OpenAPI atual.",
+                "--destino <arquivo>  Referência a ser atualizada.",
                 "--json               Emite o resultado em JSON."
             ],
             exemplos: [
@@ -50,22 +51,27 @@ async function main() {
     const origem = lerOpcao(args, "--origem", CAMINHO_OPENAPI_LATEST);
     const destino = lerOpcao(args, "--destino", CAMINHO_OPENAPI_BASELINE);
 
-    imprimirCabecalho("FIXAR BASELINE DO OPENAPI");
-    escreverLinha(`Origem: ${pc.dim(origem)}`);
-    escreverLinha(`Destino: ${pc.dim(destino)}`);
+    if (!emitirJson) {
+        imprimirCabecalho("FIXAR BASELINE DO OPENAPI");
+        escreverLinha(`Origem: ${pc.dim(origem)}`);
+        escreverLinha(`Destino: ${pc.dim(destino)}`);
+    }
 
     const resultado = await fixarBaselineContrato({origem, destino});
-    escreverLinha(pc.green("Baseline atualizada com sucesso."));
 
     if (emitirJson) {
         imprimirJson(resultado);
+    } else {
+        escreverLinha(pc.green("Baseline atualizada com sucesso."));
     }
 }
 
-main().catch((erro) => {
-    escreverLinha(pc.red(`Erro ao fixar baseline OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}`));
-    process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main().catch((erro) => {
+        process.stderr.write(`Erro ao fixar baseline OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        process.exit(1);
+    });
+}
 
 export {
     fixarBaselineContrato

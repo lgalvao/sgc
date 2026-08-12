@@ -156,7 +156,7 @@ function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
 
     if (encontradosMesmoPacote.length > 0) {
         return {
-            caminhos: [...new Set(encontradosMesmoPacote)].sort(),
+            caminhos: [...new Set(encontradosMesmoPacote)].toSorted(),
             estrategia: 'mesmo_pacote'
         };
     }
@@ -168,7 +168,7 @@ function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
 
     if (encontradosPorNome.length > 0) {
         return {
-            caminhos: [...new Set(encontradosPorNome)].sort(),
+            caminhos: [...new Set(encontradosPorNome)].toSorted(),
             estrategia: 'nome_correspondente_outro_pacote'
         };
     }
@@ -449,42 +449,42 @@ function gerarMarkdown(dados) {
                 linhas.push(`Cobertos apenas indiretamente (${indiretos.length}):`);
                 indiretos
                     .slice()
-                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
                     .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.cobertura?.cobertura_linhas_percentual.toFixed(2)}% linhas)`));
             }
             if (foraEscopo.length > 0) {
                 linhas.push(`Fora do escopo do JaCoCo (${foraEscopo.length}):`);
                 foraEscopo
                     .slice()
-                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
                     .forEach(item => linhas.push(`- \`${item.caminho_relativo}\``));
             }
             if (semEvidencia.length > 0) {
                 linhas.push(`Sem evidencia de cobertura no escopo (${semEvidencia.length}):`);
                 semEvidencia
                     .slice()
-                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
                     .forEach(item => linhas.push(`- \`${item.caminho_relativo}\``));
             }
             if (dtoRuido.length > 0) {
                 linhas.push(`Ignorados como DTO estrutural/contratual (${dtoRuido.length}):`);
                 dtoRuido
                     .slice()
-                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
                     .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_dto})`));
             }
             if (modelRuido.length > 0) {
                 linhas.push(`Ignorados como model estrutural/contratual (${modelRuido.length}):`);
                 modelRuido
                     .slice()
-                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
                     .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_model})`));
             }
             if (otherRuido.length > 0) {
                 linhas.push(`Ignorados como others estrutural/contratual (${otherRuido.length}):`);
                 otherRuido
                     .slice()
-                    .sort((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
+                    .toSorted((a, b) => a.caminho_relativo.localeCompare(b.caminho_relativo, 'pt-BR'))
                     .forEach(item => linhas.push(`- \`${item.caminho_relativo}\` (${item.perfil_other})`));
             }
         } else {

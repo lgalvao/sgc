@@ -111,7 +111,7 @@ async function main() {
                 scoreImpacto: calcularScoreImpacto(c)
             }))
             .filter(c => c.scoreImpacto > 0)
-            .sort((a, b) => b.scoreImpacto - a.scoreImpacto)
+            .toSorted((a, b) => b.scoreImpacto - a.scoreImpacto)
             .slice(0, 20);
 
         const resultado = {

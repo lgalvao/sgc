@@ -1,15 +1,20 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import pc from "picocolors";
-import {resolverNaRaiz} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {deveExcluirClasse} from "../lib/dominios/cobertura-java.js";
 import {parseStringPromise} from "xml2js";
+
+function calcularPercentual(cobertos, perdidos) {
+    const total = cobertos + perdidos;
+    return total > 0 ? Number(((cobertos / total) * 100).toFixed(2)) : 0;
+}
 
 async function main() {
     try {
         console.log(pc.bold("\nIniciando auditoria de cobertura cruzada e independente (Toolkit SGC)..."));
 
-        const xmlPathAbsoluto = resolverNaRaiz("backend/build/reports/jacoco/test/jacocoTestReport.xml");
+        const xmlPathAbsoluto = resolverCaminhoConfigurado("coberturaBackend");
         const xmlContent = await fs.readFile(xmlPathAbsoluto, "utf8");
         const parsed = await parseStringPromise(xmlContent);
 
@@ -119,13 +124,8 @@ async function main() {
             }
         }
 
-        const calcPct = (cob, perd) => {
-            const tot = cob + perd;
-            return tot > 0 ? Number(((cob / tot) * 100).toFixed(2)) : 0;
-        };
-
-        const pctMantidas = calcPct(classesMantidasCount, totalClasses - classesMantidasCount);
-        const pctExcluidas = calcPct(classesExcluidasCount, totalClasses - classesExcluidasCount);
+        const pctMantidas = calcularPercentual(classesMantidasCount, totalClasses - classesMantidasCount);
+        const pctExcluidas = calcularPercentual(classesExcluidasCount, totalClasses - classesExcluidasCount);
 
         console.log(pc.cyan("\n=================================================================="));
         console.log(pc.bold("2. COMPARAÇÃO DE CLASSES MANTIDAS VS EXCLUÍDAS PELO TOOLKIT"));
@@ -135,24 +135,24 @@ async function main() {
         console.log(`Classes Excluídas (Ruído/DTOs/etc):  ${pc.bold(classesExcluidasCount)} (${pctExcluidas}%)`);
 
         console.log(pc.bold("\n--- COBERTURA ABSOLUTA GERAL (SOMA DAS CLASSES) ---"));
-        console.log(`Linhas:    Cobertas: ${linhasCobertasGeral} / Total: ${totalLinhasGeral} (${calcPct(linhasCobertasGeral, totalLinhasGeral - linhasCobertasGeral)}%)`);
-        console.log(`Branches:  Cobertos: ${branchesCobertosGeral} / Total: ${totalBranchesGeral} (${calcPct(branchesCobertosGeral, totalBranchesGeral - branchesCobertosGeral)}%)`);
+        console.log(`Linhas:    Cobertas: ${linhasCobertasGeral} / Total: ${totalLinhasGeral} (${calcularPercentual(linhasCobertasGeral, totalLinhasGeral - linhasCobertasGeral)}%)`);
+        console.log(`Branches:  Cobertos: ${branchesCobertosGeral} / Total: ${totalBranchesGeral} (${calcularPercentual(branchesCobertosGeral, totalBranchesGeral - branchesCobertosGeral)}%)`);
 
         console.log(pc.bold("\n--- COBERTURA APENAS DAS CLASSES MANTIDAS (CORE) ---"));
-        console.log(`Linhas:    Cobertas: ${linhasCobertasMantidas} / Total: ${totalLinhasMantidas} (${calcPct(linhasCobertasMantidas, totalLinhasMantidas - linhasCobertasMantidas)}%)`);
-        console.log(`Branches:  Cobertos: ${branchesCobertosMantidas} / Total: ${totalBranchesMantidas} (${calcPct(branchesCobertosMantidas, totalBranchesMantidas - branchesCobertosMantidas)}%)`);
+        console.log(`Linhas:    Cobertas: ${linhasCobertasMantidas} / Total: ${totalLinhasMantidas} (${calcularPercentual(linhasCobertasMantidas, totalLinhasMantidas - linhasCobertasMantidas)}%)`);
+        console.log(`Branches:  Cobertos: ${branchesCobertosMantidas} / Total: ${totalBranchesMantidas} (${calcularPercentual(branchesCobertosMantidas, totalBranchesMantidas - branchesCobertosMantidas)}%)`);
 
         console.log(pc.bold("\n--- COBERTURA APENAS DAS CLASSES EXCLUÍDAS (DTOs, CONFIGS) ---"));
-        console.log(`Linhas:    Cobertas: ${linhasCobertasExcluidas} / Total: ${totalLinhasExcluidas} (${calcPct(linhasCobertasExcluidas, totalLinhasExcluidas - linhasCobertasExcluidas)}%)`);
-        console.log(`Branches:  Cobertos: ${branchesCobertosExcluidas} / Total: ${totalBranchesExcluidas} (${calcPct(branchesCobertosExcluidas, totalBranchesExcluidas - branchesCobertosExcluidas)}%)`);
+        console.log(`Linhas:    Cobertas: ${linhasCobertasExcluidas} / Total: ${totalLinhasExcluidas} (${calcularPercentual(linhasCobertasExcluidas, totalLinhasExcluidas - linhasCobertasExcluidas)}%)`);
+        console.log(`Branches:  Cobertos: ${branchesCobertosExcluidas} / Total: ${totalBranchesExcluidas} (${calcularPercentual(branchesCobertosExcluidas, totalBranchesExcluidas - branchesCobertosExcluidas)}%)`);
 
         // 3. Auditoria matemática cruzada
         console.log(pc.cyan("\n=================================================================="));
         console.log(pc.bold("3. AUDITORIA DOS SCRIPTS DO TOOLKIT (VALIDAÇÃO DE VERACIDADE)"));
         console.log(pc.cyan("=================================================================="));
 
-        const diffLinhas = Math.abs(contadoresBrutos.LINE.percentual - calcPct(linhasCobertasGeral, totalLinhasGeral - linhasCobertasGeral));
-        const diffBranches = Math.abs(contadoresBrutos.BRANCH.percentual - calcPct(branchesCobertosGeral, totalBranchesGeral - branchesCobertosGeral));
+        const diffLinhas = Math.abs(contadoresBrutos.LINE.percentual - calcularPercentual(linhasCobertasGeral, totalLinhasGeral - linhasCobertasGeral));
+        const diffBranches = Math.abs(contadoresBrutos.BRANCH.percentual - calcularPercentual(branchesCobertosGeral, totalBranchesGeral - branchesCobertosGeral));
 
         console.log(`Diferença matemática entre contadores da raiz del XML e a soma dos elementos de classes:`);
         console.log(`  - Linhas:   ${diffLinhas.toFixed(4)}%`);

@@ -2,14 +2,15 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import {pathToFileURL} from "node:url";
 import {execa} from "execa";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {CAMINHO_OPENAPI_BASELINE, CAMINHO_OPENAPI_LATEST} from "./contratos-openapi-caminhos.js";
+import {CAMINHO_OPENAPI_BASELINE, CAMINHO_OPENAPI_LATEST, CAMINHO_RELATORIO_OPENAPI} from "./contratos-openapi-caminhos.js";
 
-const CAMINHO_RELATORIO_MD = resolverNaRaiz("toolkit/qualidade/openapi/latest/diff-openapi.md");
+const CAMINHO_RELATORIO_MD = CAMINHO_RELATORIO_OPENAPI;
 
 function lerOpcao(args, nome, padrao) {
     const indice = args.indexOf(nome);
@@ -36,7 +37,7 @@ async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual
             codigoSaida: 0,
             houveMudancas: false,
             modo: "identico",
-            stdout: "Nenhuma diferença detectada entre baseline e snapshot atual.",
+            stdout: "Nenhuma diferença detectada entre a referência e a fotografia atual.",
             stderr: ""
         };
     }
@@ -45,6 +46,10 @@ async function executarDiffContratos({anterior = CAMINHO_OPENAPI_BASELINE, atual
         reject: false,
         cwd: resolverNaRaiz(".")
     });
+
+    if (resultado.exitCode > 1) {
+        throw new Error(resultado.stderr || `git diff terminou com codigo ${resultado.exitCode}.`);
+    }
 
     return {
         anterior,
@@ -102,19 +107,25 @@ async function main() {
     const anterior = lerOpcao(args, "--anterior", CAMINHO_OPENAPI_BASELINE);
     const atual = lerOpcao(args, "--atual", CAMINHO_OPENAPI_LATEST);
 
-    imprimirCabecalho("DIFF DE CONTRATO OPENAPI");
-    escreverLinha(`Anterior: ${pc.dim(anterior)}`);
-    escreverLinha(`Atual: ${pc.dim(atual)}`);
+    if (!emitirJson) {
+        imprimirCabecalho("DIFF DE CONTRATO OPENAPI");
+        escreverLinha(`Anterior: ${pc.dim(anterior)}`);
+        escreverLinha(`Atual: ${pc.dim(atual)}`);
+    }
 
     const resultado = await executarDiffContratos({anterior, atual});
 
     if (!semGravar) {
         await fs.mkdir(path.dirname(CAMINHO_RELATORIO_MD), {recursive: true});
         await fs.writeFile(CAMINHO_RELATORIO_MD, criarResumoMarkdown(resultado), "utf-8");
-        escreverLinha(`Resumo Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
+        if (!emitirJson) {
+            escreverLinha(`Resumo Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
+        }
     }
 
-    if (resultado.stdout) {
+    if (emitirJson) {
+        imprimirJson(resultado);
+    } else if (resultado.stdout) {
         escreverLinha(resultado.stdout);
     } else if (resultado.stderr) {
         escreverLinha(resultado.stderr);
@@ -122,13 +133,11 @@ async function main() {
         escreverLinha("Nenhuma diferença textual reportada pelo git diff.");
     }
 
-    if (emitirJson) {
-        imprimirJson(resultado);
-    }
-
 }
 
-main().catch((erro) => {
-    escreverLinha(pc.red(`Erro ao comparar contratos OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}`));
-    process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main().catch((erro) => {
+        process.stderr.write(`Erro ao comparar contratos OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        process.exit(1);
+    });
+}

@@ -2,6 +2,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import {pathToFileURL} from "node:url";
 import openapiTS, {astToString, COMMENT_HEADER} from "openapi-typescript";
 import pc from "picocolors";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -32,7 +33,7 @@ async function gerarTiposContrato({
         await exportarOpenapi({url, saida: entrada});
     }
 
-    const ast = await openapiTS(new URL(`file://${entrada}`), {
+    const ast = await openapiTS(pathToFileURL(entrada), {
         alphabetize: true,
         defaultNonNullable: true,
         immutable: false
@@ -80,22 +81,27 @@ async function main() {
     const saida = lerOpcao(args, "--saida", CAMINHO_TIPOS_FRONTEND);
     const url = lerOpcao(args, "--url", URL_OPENAPI_PADRAO);
 
-    imprimirCabecalho("GERACAO DE TIPOS A PARTIR DO OPENAPI");
-    escreverLinha(`Entrada: ${pc.dim(entrada)}`);
-    escreverLinha(`Saida: ${pc.dim(saida)}`);
+    if (!emitirJson) {
+        imprimirCabecalho("GERACAO DE TIPOS A PARTIR DO OPENAPI");
+        escreverLinha(`Entrada: ${pc.dim(entrada)}`);
+        escreverLinha(`Saida: ${pc.dim(saida)}`);
+    }
 
     const resultado = await gerarTiposContrato({entrada, saida, url});
-    escreverLinha(pc.green("Tipos gerados com sucesso."));
 
     if (emitirJson) {
         imprimirJson(resultado);
+    } else {
+        escreverLinha(pc.green("Tipos gerados com sucesso."));
     }
 }
 
-main().catch((erro) => {
-    escreverLinha(pc.red(`Erro ao gerar tipos de contrato: ${erro instanceof Error ? erro.message : String(erro)}`));
-    process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main().catch((erro) => {
+        process.stderr.write(`Erro ao gerar tipos de contrato: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        process.exit(1);
+    });
+}
 
 export {
     gerarTiposContrato

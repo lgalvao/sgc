@@ -11,7 +11,7 @@ function acumularMapa(mapa, chave) {
 
 function ordenarMapa(mapa) {
     return Object.fromEntries(
-        Object.entries(mapa).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"))
+        Object.entries(mapa).toSorted((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"))
     );
 }
 

@@ -11,9 +11,8 @@ const PADROES_LIMPEZA = [
     "coverage",
     "playwright-report",
     "test-results",
-    "toolkit/qa-dashboard/latest",
-    "toolkit/qa-dashboard/runs",
-    "toolkit/qa-dashboard/tmp",
+    "toolkit/qualidade/artefatos",
+    "toolkit/qualidade/semgrep/latest",
     "analise-testes.md",
     "analise-testes.json",
     "complexity-ranking.md",
@@ -56,7 +55,7 @@ async function resolverItens(base) {
         }
     }
 
-    return [...encontrados].sort((a, b) => a.localeCompare(b));
+    return [...encontrados].toSorted((a, b) => a.localeCompare(b));
 }
 
 function relativo(base, absoluto) {
@@ -65,8 +64,8 @@ function relativo(base, absoluto) {
 
 function imprimirHumano(base, itens, modo) {
     imprimirCabecalho("Limpeza do projeto", modo === "executar"
-        ? "Removendo artefatos gerados pelo toolkit e ferramentas de QA."
-        : "Prévia dos artefatos gerados pelo toolkit e ferramentas de QA.");
+        ? "Removendo artefatos gerados pelo toolkit e ferramentas de qualidade."
+        : "Prévia dos artefatos gerados pelo toolkit e ferramentas de qualidade.");
     escreverLinha("");
 
     if (itens.length === 0) {

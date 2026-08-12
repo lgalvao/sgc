@@ -2,19 +2,15 @@
 import {executarNode} from "../lib/execucao.js";
 import {pathToFileURL} from "node:url";
 import logger from "../lib/logger.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 const PERFIS_VALIDOS = new Set(["rapido", "completo", "backend", "frontend"]);
 
-function normalizarArgumentosSnapshot(argumentos = []) {
+function normalizarArgumentosColeta(argumentos = []) {
     const resultado = [];
 
     for (let indice = 0; indice < argumentos.length; indice += 1) {
         const atual = argumentos[indice];
-
-        if (atual === "--help" || atual === "-h") {
-            resultado.push("--ajuda");
-            continue;
-        }
 
         if (atual === "--perfil") {
             const perfil = argumentos[indice + 1];
@@ -44,18 +40,34 @@ function normalizarArgumentosSnapshot(argumentos = []) {
     return resultado;
 }
 
-async function executarSnapshotQa(argumentos = []) {
-    const argumentosNormalizados = normalizarArgumentosSnapshot(argumentos);
-    await executarNode("toolkit/qa/snapshot-coletar-execucao.js", argumentosNormalizados);
+async function executarColetaQualidade(argumentos = []) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
+        exibirAjudaComando({
+            comandoSgc: "qualidade coletar",
+            scriptDireto: "qualidade/coleta.js",
+            descricao: "Coleta uma fotografia consolidada de qualidade do projeto.",
+            opcoes: [
+                "--perfil <perfil>   Perfil de execucao: rapido, completo, backend ou frontend."
+            ],
+            exemplos: [
+                "node toolkit/sgc.js qualidade coletar --perfil rapido",
+                "node toolkit/qualidade/coleta.js --perfil frontend"
+            ]
+        });
+        return;
+    }
+
+    const argumentosNormalizados = normalizarArgumentosColeta(argumentos);
+    await executarNode("toolkit/qualidade/coleta-execucao.js", argumentosNormalizados);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    executarSnapshotQa(process.argv.slice(2)).catch((error) => {
-        logger.error(`Erro ao coletar snapshot de QA: ${error.message}`);
+    executarColetaQualidade(process.argv.slice(2)).catch((error) => {
+        logger.error(`Erro ao coletar fotografia de qualidade: ${error.message}`);
         process.exit(1);
     });
 }
 
 export {
-    executarSnapshotQa
+    executarColetaQualidade
 };

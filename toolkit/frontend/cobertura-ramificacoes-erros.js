@@ -39,9 +39,9 @@ async function main() {
 
     if (helpMode) {
         exibirAjudaComando({
-            comandoSgc: "frontend cobertura branches-erros",
-            scriptDireto: "frontend/cobertura-branches-erros.js",
-            descricao: "Cruza lacunas de branches do frontend com sinais de tratamento de erro suspeito.",
+            comandoSgc: "frontend cobertura ramificacoes-erros",
+            scriptDireto: "frontend/cobertura-ramificacoes-erros.js",
+            descricao: "Cruza lacunas de ramificacoes do frontend com sinais de tratamento de erro suspeito.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
                 "--limite=N      Limita a quantidade de arquivos inspecionados. Padrão: 15."
@@ -57,7 +57,7 @@ async function main() {
             branchesPerdidos: calcularBranchesPerdidos(arquivo),
         }))
         .filter((arquivo) => arquivo.branchesPerdidos > 0)
-        .sort((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
+        .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
         .slice(0, limite);
 
     const arquivos = [];

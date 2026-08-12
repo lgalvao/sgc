@@ -20,15 +20,14 @@ function criarComandoScript(pai, nome, descricao, relativo) {
 const program = new Command();
 program
     .name("sgc")
-    .description("Toolkit do SGC para backend, frontend, QA e automacoes de projeto.")
+    .description("Toolkit do SGC para backend, frontend, qualidade e automacoes de projeto.")
     .showHelpAfterError()
     .showSuggestionAfterError();
 
 const backend = program.command("backend").description("Ferramentas do backend.");
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
 criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "toolkit/backend/cobertura-auditoria.js");
-criarComandoScript(backendCobertura, "branches", "Lista classes com lacunas de branches no backend.", "toolkit/backend/cobertura-branches.js");
-criarComandoScript(backendCobertura, "jornada", "Executa a jornada consolidada de cobertura do backend.", "toolkit/backend/cobertura-jornada.js");
+criarComandoScript(backendCobertura, "ramificacoes", "Lista classes com lacunas de ramificacoes no backend.", "toolkit/backend/cobertura-ramificacoes.js");
 criarComandoScript(backendCobertura, "cruzada", "Auditoria de cobertura cruzada e independente (Backend).", "toolkit/backend/cobertura-cruzada.js");
 
 const backendArquitetura = backend.command("arquitetura").description("Auditorias de arquitetura do backend.");
@@ -43,60 +42,43 @@ criarComandoScript(backendContratos, "auditar", "Audita vazamentos de model.* em
 const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
 criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "toolkit/backend/testes-analisar.js");
 criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "toolkit/backend/testes-priorizar.js");
-criarComandoScript(backendTestes, "gerar-stub", "Gera CoverageTest inicial para uma classe.", "toolkit/backend/testes-gerar-stub.js");
 
 const backendJava = backend.command("java").description("Utilitarios Java do backend.");
 criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "toolkit/backend/java-corrigir-fqn.js");
-criarComandoScript(backendJava, "auditar-null", "Audita verificacoes de null no backend.", "toolkit/backend/java-auditar-null.js");
-criarComandoScript(backendJava, "instalar-certificados", "Importa certificados locais no cacerts.", "toolkit/backend/java-instalar-certificados.js");
 const backendNotificacoes = backend.command("notificacoes").description("Auditorias de notificacoes e assuntos do backend.");
 criarComandoScript(backendNotificacoes, "auditar-assuntos", "Audita literais de assunto de notificacao fora de AssuntosNotificacao.", "toolkit/backend/notificacoes-assuntos-auditar.js");
 
 const frontend = program.command("frontend").description("Ferramentas do frontend.");
 const frontendCobertura = frontend.command("cobertura").description("Cobertura e diagnosticos do frontend.");
 criarComandoScript(frontendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Frontend).", "toolkit/frontend/cobertura-auditoria.js");
-criarComandoScript(frontendCobertura, "branches", "Lista arquivos com lacunas de branches no frontend.", "toolkit/frontend/cobertura-branches.js");
-criarComandoScript(frontendCobertura, "branches-erros", "Cruza lacunas de branches com sinais de tratamento de erro suspeito no frontend.", "toolkit/frontend/cobertura-branches-erros.js");
+criarComandoScript(frontendCobertura, "ramificacoes", "Lista arquivos com lacunas de ramificacoes no frontend.", "toolkit/frontend/cobertura-ramificacoes.js");
+criarComandoScript(frontendCobertura, "ramificacoes-erros", "Cruza lacunas de ramificacoes com sinais de tratamento de erro suspeito no frontend.", "toolkit/frontend/cobertura-ramificacoes-erros.js");
 
-const frontendMensagens = frontend.command("mensagens").description("Analise de mensagens e strings do frontend.");
-criarComandoScript(frontendMensagens, "extrair", "Extrai mensagens do projeto.", "toolkit/frontend/mensagens-extrair.js");
-criarComandoScript(frontendMensagens, "analisar", "Analisa o JSON de mensagens extraidas.", "toolkit/frontend/mensagens-analisar.js");
-
-const frontendValidacoes = frontend.command("validacoes").description("Auditorias de validacao do frontend.");
-criarComandoScript(frontendValidacoes, "auditar", "Compara validacoes de frontend e backend.", "toolkit/frontend/validacoes-auditar.js");
-
-const frontendCruft = frontend.command("cruft").description("Auditorias de cruft e budgets do frontend.");
-criarComandoScript(frontendCruft, "auditar", "Audita cruft estrutural do frontend.", "toolkit/frontend/cruft-auditar.js");
-criarComandoScript(frontendCruft, "validar", "Valida budgets e waivers do cruft do frontend.", "toolkit/frontend/cruft-validar.js");
+const frontendResiduos = frontend.command("residuos").description("Auditorias de residuos estruturais e orcamentos do frontend.");
+criarComandoScript(frontendResiduos, "auditar", "Audita residuos estruturais do frontend.", "toolkit/frontend/residuos-auditar.js");
+criarComandoScript(frontendResiduos, "validar", "Valida orcamentos e excecoes dos residuos do frontend.", "toolkit/frontend/residuos-validar.js");
 
 const frontendArquitetura = frontend.command("arquitetura").description("Auditorias de arquitetura e vazamento de contratos no frontend.");
 criarComandoScript(frontendArquitetura, "auditar", "Audita vazamentos arquiteturais e estrategia de cache exposta no frontend.", "toolkit/frontend/arquitetura-auditar.js");
 criarComandoScript(frontendArquitetura, "validar", "Valida regras arquiteturais do frontend (gate duro).", "toolkit/frontend/arquitetura-validar.js");
 
 const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
-criarComandoScript(frontendViews, "validacoes-auditar", "Audita links e validacoes nas views.", "toolkit/frontend/views-validacoes-auditar.js");
 criarComandoScript(frontendViews, "templates-validar", "Valida previsibilidade estrutural de templates das views.", "toolkit/frontend/views-templates-validar.js");
-criarComandoScript(frontendViews, "auditar-validacoes", "Alias legado para 'validacoes-auditar'.", "toolkit/legado/frontend/views-auditar-validacoes.js");
 
 const frontendModais = frontend.command("modais").description("Auditorias especificas de modais.");
 criarComandoScript(frontendModais, "validar", "Valida o uso padronizado de ModalPadrao e proibe BModal cru fora do componente-base.", "toolkit/frontend/modais-validar.js");
 
-const frontendTestIds = frontend.command("test-ids").description("Ferramentas para atributos data-test.");
-criarComandoScript(frontendTestIds, "listar", "Lista data-test do frontend.", "toolkit/frontend/test-ids-listar.js");
-criarComandoScript(frontendTestIds, "listar-duplicados", "Lista data-test duplicados.", "toolkit/frontend/test-ids-listar-duplicados.js");
-criarComandoScript(frontendTestIds, "duplicados", "Alias legado para 'listar-duplicados'.", "toolkit/legado/frontend/test-ids-duplicados.js");
+const frontendIdentificadoresTeste = frontend.command("identificadores-teste").description("Ferramentas para identificadores de teste.");
+criarComandoScript(frontendIdentificadoresTeste, "listar", "Lista identificadores de teste do frontend.", "toolkit/frontend/identificadores-teste-listar.js");
+criarComandoScript(frontendIdentificadoresTeste, "listar-duplicados", "Lista identificadores de teste duplicados.", "toolkit/frontend/identificadores-teste-listar-duplicados.js");
 
-const frontendTelas = frontend.command("telas").description("Ferramentas de captura e apoio visual.");
-criarComandoScript(frontendTelas, "capturar", "Captura telas para documentacao ou apoio visual.", "toolkit/frontend/telas-capturar.js");
-
-const frontendA11y = frontend.command("a11y").description("Auditorias de acessibilidade do frontend.");
-criarComandoScript(frontendA11y, "auditar", "Executa auditoria estatica de acessibilidade no frontend.", "toolkit/frontend/a11y-auditar.js");
-criarComandoScript(frontendA11y, "crawler", "Executa o crawler Axe-core em todas as rotas principais.", "e2e/a11y/crawler.spec.ts");
-criarComandoScript(frontendA11y, "processar", "Processa os resultados do crawler em um relatório Markdown.", "toolkit/frontend/a11y-processar-resultados.js");
+const frontendAcessibilidade = frontend.command("acessibilidade").description("Auditorias de acessibilidade do frontend.");
+criarComandoScript(frontendAcessibilidade, "crawler", "Executa o crawler Axe-core em todas as rotas principais.", "toolkit/frontend/acessibilidade-crawler.js");
+criarComandoScript(frontendAcessibilidade, "processar", "Processa os resultados do crawler em um relatorio Markdown.", "toolkit/frontend/acessibilidade-processar-resultados.js");
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
-const codigoSmells = codigo.command("smells").description("Auditorias de cheiros de codigo.");
-criarComandoScript(codigoSmells, "auditar", "Gera snapshot de sinais de complexidade acidental e codigo defensivo.", "toolkit/codigo/smells-auditar.js");
+const codigoCheiros = codigo.command("cheiros").description("Auditorias de cheiros de codigo.");
+criarComandoScript(codigoCheiros, "auditar", "Gera fotografia de sinais de complexidade acidental e codigo defensivo.", "toolkit/codigo/cheiros-auditar.js");
 const codigoSemgrep = codigo.command("semgrep").description("Auditorias estruturais com Semgrep OSS.");
 criarComandoScript(codigoSemgrep, "auditar", "Executa regras locais de Semgrep para backend, frontend e integração.", "toolkit/codigo/semgrep-auditar.js");
 const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
@@ -104,20 +86,12 @@ criarComandoScript(codigoNomes, "coletar-simbolos", "Gera inventario de pacotes,
 criarComandoScript(codigoNomes, "auditar-consistencia", "Audita padroes e divergencias de nomenclatura.", "toolkit/codigo/nomes-consistencia-auditar.js");
 criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e campos com 'id' que deveriam usar 'codigo'.", "toolkit/codigo/idioma-consistencia-auditar.js");
 
-const e2e = program.command("e2e").description("Ferramentas auxiliares de testes end-to-end.");
-criarComandoScript(e2e, "limpar", "Aplica limpeza automatizada em especificacoes E2E.", "toolkit/e2e/limpar.js");
-
 const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira backend/frontend.");
 const integracaoContratos = integracao.command("contratos").description("Auditorias e artefatos de contrato HTTP.");
 criarComandoScript(integracaoContratos, "exportar-openapi", "Exporta o OpenAPI atual da aplicação para arquivo local.", "toolkit/integracao/contratos-exportar-openapi.js");
 criarComandoScript(integracaoContratos, "gerar-tipos", "Gera tipos TypeScript a partir do OpenAPI da aplicação.", "toolkit/integracao/contratos-gerar-tipos.js");
 criarComandoScript(integracaoContratos, "diff", "Compara duas versões do OpenAPI e resume mudanças de contrato.", "toolkit/integracao/contratos-diff.js");
 criarComandoScript(integracaoContratos, "fixar-baseline", "Promove o OpenAPI mais recente como baseline de comparação.", "toolkit/integracao/contratos-fixar-baseline.js");
-
-const comunicacao = program.command("comunicacao").description("Ferramentas de auditoria de comunicacao, templates e notificacoes.");
-criarComandoScript(comunicacao, "cobertura-notificacoes", "Audita a cobertura de testes de notificacoes e modelos de email.", "toolkit/auditar-cobertura-notificacoes.js");
-criarComandoScript(comunicacao, "strings", "Audita consistência de mensagens de comunicação entre backend e frontend.", "toolkit/auditar-strings-comunicacao.js");
-criarComandoScript(comunicacao, "templates-email", "Audita consistência de variáveis nos templates de email HTML do backend.", "toolkit/auditar-templates-email.js");
 
 const requisitos = program.command("requisitos").description("Ferramentas de inventario e auditoria de requisitos.");
 const requisitosCdus = requisitos.command("cdus").description("Inventario e auditoria read-only dos casos de uso.");
@@ -132,31 +106,28 @@ criarComandoScript(requisitosCdus, "auditar-mensagens-codigo", "Compara descriç
 criarComandoScript(requisitosCdus, "inventariar-densidade", "Inventaria densidade documental dos `specs/cdu-*.md` por palavras, passos e profundidade de listas.", "toolkit/requisitos/cdus-inventariar-densidade.js");
 criarComandoScript(requisitosCdus, "inventariar-duplicacoes", "Inventaria blocos textuais duplicados nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-duplicacoes.js");
 
-const qa = program.command("qa").description("Ferramentas de qualidade e dashboard.");
-const qaSnapshot = qa.command("snapshot").description("Coleta e consolidacao de snapshots.");
-qaSnapshot
+const qualidade = program.command("qualidade").description("Ferramentas de coleta e analise da qualidade.");
+qualidade
     .command("coletar")
-    .description("Coleta snapshot de QA.")
+    .description("Coleta uma fotografia de qualidade do projeto.")
     .allowUnknownOption(true)
     .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, backend, frontend).", "rapido")
     .action(async (opcoes, comando) => {
-        const {executarSnapshotQa} = await import("./qa/snapshot-coletar.js");
+        const {executarColetaQualidade} = await import("./qualidade/coleta.js");
         const argsExtras = comando.args ?? [];
         const args = ["--perfil", opcoes.perfil, ...argsExtras];
-        await executarSnapshotQa(args);
+        await executarColetaQualidade(args);
     });
-qa
+qualidade
     .command("resumo")
-    .description("Resume o snapshot mais recente do QA Dashboard.")
-    .option("--arquivo <caminho>", "Usa um snapshot especifico em vez do latest.")
+    .description("Resume a fotografia de qualidade mais recente.")
+    .option("--arquivo <caminho>", "Usa uma fotografia especifica em vez da mais recente.")
     .option("--json", "Emite saida estruturada em JSON.")
-    .option("--max-hotspots <n>", "Limita a quantidade de hotspots exibidos.", Number.parseInt)
+    .option("--limite-pontos-criticos <n>", "Limita a quantidade de pontos criticos exibidos.", Number.parseInt)
     .action(async (opcoes) => {
-        const {executarResumoQa} = await import("./qa/resumo.js");
-        await executarResumoQa(opcoes);
+        const {executarResumoQualidade} = await import("./qualidade/resumo.js");
+        await executarResumoQualidade(opcoes);
     });
-const qaDashboard = qa.command("dashboard").description("Ferramentas operacionais do dashboard.");
-criarComandoScript(qaDashboard, "servir", "Serve o dashboard de QA localmente.", "toolkit/qa/dashboard-servir.js");
 
 const projeto = program.command("projeto").description("Ferramentas transversais do repositório.");
 projeto
@@ -170,18 +141,18 @@ projeto
     });
 
 projeto
-    .command("doctor")
+    .command("diagnostico")
     .description("Valida comandos e arquivos essenciais do ambiente.")
     .option("--json", "Emite saida estruturada em JSON.")
     .option("--base <diretorio>", "Sobrescreve o diretório base para diagnostico.")
     .action(async (opcoes) => {
-        const {executarDoctor} = await import("./projeto/doctor.js");
-        await executarDoctor(opcoes);
+        const {executarDiagnostico} = await import("./projeto/diagnostico.js");
+        await executarDiagnostico(opcoes);
     });
 
 projeto
     .command("limpar")
-    .description("Lista ou remove artefatos transientes de QA e do toolkit.")
+    .description("Lista ou remove artefatos transientes de qualidade e do toolkit.")
     .option("--json", "Emite saida estruturada em JSON.")
     .option("--confirmar", "Remove de fato os artefatos elegiveis.")
     .option("--base <diretorio>", "Sobrescreve o diretório base para limpeza.")
@@ -199,23 +170,21 @@ projeto
     });
 
 projeto
-    .command("setup")
-    .description("Prepara o ambiente do projeto com etapas opcionais de bootstrap.")
+    .command("preparar")
+    .description("Prepara o ambiente do projeto com etapas opcionais.")
     .option("--instalar-dependencias", "Executa npm install na raiz, no frontend e no toolkit.")
     .option("--instalar-playwright", "Instala o Chromium do Playwright.")
-    .option("--importar-certificados", "Executa a importacao de certificados Java locais.")
     .action(async (opcoes) => {
-        const {executarSetup} = await import("./projeto/setup.js");
-        await executarSetup(opcoes);
+        const {executarPreparacao} = await import("./projeto/preparar.js");
+        await executarPreparacao(opcoes);
     });
 
 criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do repositório.", "toolkit/projeto/arvore-linhas.js");
 criarComandoScript(projeto, "versao-sincronizar", "Sincroniza a versao entre gradle.properties e frontend/package.json.", "toolkit/projeto/versao-sincronizar.js");
-criarComandoScript(projeto, "sincronizar-versao", "Alias legado para 'versao-sincronizar'.", "toolkit/legado/projeto/sincronizar-versao.js");
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("node toolkit/sgc.js backend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js frontend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js qa snapshot coletar --perfil rapido")}\n  ${pc.dim("node toolkit/sgc.js qa resumo")}\n  ${pc.dim("node toolkit/sgc.js projeto doctor --json")}\n  ${pc.dim("node toolkit/sgc.js codigo smells auditar --json")}`
+    `\nExemplos:\n  ${pc.dim("node toolkit/sgc.js backend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js frontend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js qualidade coletar --perfil rapido")}\n  ${pc.dim("node toolkit/sgc.js qualidade resumo")}\n  ${pc.dim("node toolkit/sgc.js projeto diagnostico --json")}\n  ${pc.dim("node toolkit/sgc.js codigo cheiros auditar --json")}`
 );
 
 try {

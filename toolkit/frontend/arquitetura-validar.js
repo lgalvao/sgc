@@ -72,8 +72,8 @@ function imprimirViolacoes(violacoes, diretorioBase) {
 function imprimirViolacoesAcoesBackend(resultado) {
     const violacoes = resultado.violacoes ?? [];
     if (violacoes.length === 0) {
-        const detalheWaivers = resultado.dispensadas > 0 ? ` (${resultado.dispensadas} dispensadas por waiver)` : "";
-        escreverLinha(`${pc.green("✓")} Nenhum calculo local novo de habilitacao/exibicao de acoes encontrado${detalheWaivers}.`);
+        const detalheExcecoes = resultado.dispensadas > 0 ? ` (${resultado.dispensadas} dispensadas por excecao)` : "";
+        escreverLinha(`${pc.green("✓")} Nenhum calculo local novo de habilitacao/exibicao de acoes encontrado${detalheExcecoes}.`);
         return;
     }
 

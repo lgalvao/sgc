@@ -7,11 +7,12 @@
  */
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {executarColeta} from "./nomes-simbolos-coletar.js";
 
-const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "nomenclatura", "latest");
+const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "nomenclatura", "mais-recente");
 const ARQUIVO_SIMBOLOS_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos.json");
 const ARQUIVO_JSON_AUDITORIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "idioma.json");
 
@@ -121,7 +122,7 @@ function analisarInventario(inventario) {
     // Top arquivos com mais membros ingleses
     const topArquivos = Object.entries(porArquivo)
         .map(([arquivo, nomes]) => ({arquivo, quantidade: nomes.length, nomes}))
-        .sort((a, b) => b.quantidade - a.quantidade)
+        .toSorted((a, b) => b.quantidade - a.quantidade)
         .slice(0, 20);
 
     // Distribuição por prefixo
@@ -158,7 +159,7 @@ function montarResumo(auditoria) {
     linhas.push("");
     linhas.push("| Prefixo/Tipo | Ocorrências |");
     linhas.push("|---|---|");
-    for (const [prefixo, qtd] of Object.entries(auditoria.porPrefixo).sort((a, b) => b[1] - a[1])) {
+    for (const [prefixo, qtd] of Object.entries(auditoria.porPrefixo).toSorted((a, b) => b[1] - a[1])) {
         linhas.push(`| ${prefixo} | ${qtd} |`);
     }
     if (Object.keys(auditoria.porPrefixo).length === 0) {

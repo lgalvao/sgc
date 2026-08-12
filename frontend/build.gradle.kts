@@ -59,7 +59,7 @@ tasks.register<NpmTask>("quality") {
     group = "verification"
     description = "Executa verificações de qualidade do frontend (lint, tests, typecheck)"
     dependsOn("install")
-    npmCommand.set(listOf("run", "quality:all"))
+    npmCommand.set(listOf("run", "qualidade:completa"))
     ignoreExitValue.set(true)
 }
 
@@ -67,7 +67,7 @@ tasks.register<NpmTask>("test") {
     group = "verification"
     description = "Executa apenas os testes do frontend"
     dependsOn("install")
-    npmCommand.set(listOf("run", "quality:test"))
+    npmCommand.set(listOf("run", "qualidade:testes"))
     ignoreExitValue.set(true)
 }
 

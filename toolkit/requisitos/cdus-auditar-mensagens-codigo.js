@@ -67,7 +67,7 @@ const itens = [
     ...consolidarOcorrencias(base, arquivos, extrairAssuntos, "assuntos"),
     ...consolidarOcorrencias(base, arquivos, extrairMensagens, "mensagens"),
     ...consolidarOcorrencias(base, arquivos, extrairToasts, "toasts")
-].sort((a, b) => a.tipo.localeCompare(b.tipo, "pt-BR") || b.ocorrencias.length - a.ocorrencias.length || a.valor.localeCompare(b.valor, "pt-BR"));
+].toSorted((a, b) => a.tipo.localeCompare(b.tipo, "pt-BR") || b.ocorrencias.length - a.ocorrencias.length || a.valor.localeCompare(b.valor, "pt-BR"));
 
 const relatorio = itens.map(item => auditarItem(item, indiceCanonicos, canonicos));
 const resumo = {

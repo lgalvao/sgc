@@ -3,13 +3,13 @@ import path from "node:path";
 import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {
-    analisarCruftFrontend,
-    CAMINHO_BUDGET_PADRAO,
-    CAMINHO_WAIVERS_PADRAO,
-    carregarWaivers,
+    analisarResiduosFrontend,
+    CAMINHO_ORCAMENTO_PADRAO,
+    CAMINHO_EXCECOES_PADRAO,
+    carregarExcecoes,
     DIRETORIO_SAIDA_PADRAO,
-    gravarSnapshotAuditoria
-} from "./cruft-lib.js";
+    gravarFotografiaAuditoria
+} from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
@@ -29,8 +29,8 @@ function criarViolacao(tipo, mensagem, detalhes = {}) {
     };
 }
 
-function indexarWaivers(waivers) {
-    return new Map(waivers.map((waiver) => [waiver.arquivo, waiver]));
+function indexarExcecoes(excecoes) {
+    return new Map(excecoes.map((excecao) => [excecao.arquivo, excecao]));
 }
 
 function resumirResultado(resultado) {
@@ -38,105 +38,107 @@ function resumirResultado(resultado) {
         status: resultado.status,
         geradoEm: resultado.geradoEm,
         resumo: resultado.resumo,
-        budget: resultado.budget,
-        waivers: resultado.waivers,
+        orcamento: resultado.orcamento,
+        excecoes: resultado.excecoes,
         violacoes: resultado.violacoes,
         avisos: resultado.avisos,
-        hotspots: resultado.snapshot.hotspots,
+        hotspots: resultado.fotografia.hotspots,
     };
 }
 
-async function executarValidacaoFrontendCruft(opcoes = {}) {
-    const snapshot = await analisarCruftFrontend({
+async function executarValidacaoFrontendResiduos(opcoes = {}) {
+    const caminhoOrcamento = path.resolve(opcoes.orcamento ?? CAMINHO_ORCAMENTO_PADRAO);
+    const caminhoExcecoes = path.resolve(opcoes.excecoes ?? CAMINHO_EXCECOES_PADRAO);
+    const fotografia = await analisarResiduosFrontend({
         base: opcoes.base,
-        caminhoBudget: opcoes.budget,
+        caminhoOrcamento,
     });
-    const waivers = await carregarWaivers(opcoes.waivers);
-    const waiversPorArquivo = indexarWaivers(waivers.waivers);
+    const excecoes = await carregarExcecoes(caminhoExcecoes);
+    const excecoesPorArquivo = indexarExcecoes(excecoes.excecoes);
     const violacoes = [];
     const avisos = [];
 
-    const maximos = snapshot.budget.metricas?.maximosProducao ?? {};
+    const maximos = fotografia.orcamento.metricas?.maximosProducao ?? {};
     for (const [chave, maximo] of Object.entries(maximos)) {
-        if (chave === "arquivosAcimaTargetPorCamada") {
+        if (chave === "arquivosAcimaMetaPorCamada") {
             continue;
         }
-        const valorAtual = snapshot.contagens.producao[chave];
+        const valorAtual = fotografia.contagens.producao[chave];
         if (typeof valorAtual !== "number" || typeof maximo !== "number") {
             continue;
         }
         if (valorAtual > maximo) {
             violacoes.push(criarViolacao(
                 "metrica_global",
-                `Metrica ${chave} acima do budget: ${valorAtual} > ${maximo}`,
+                `Metrica ${chave} acima do orcamento: ${valorAtual} > ${maximo}`,
                 {chave, valorAtual, maximo}
             ));
         }
     }
 
-    const maximosCamada = snapshot.budget.metricas?.maximosProducao?.arquivosAcimaTargetPorCamada ?? {};
+    const maximosCamada = fotografia.orcamento.metricas?.maximosProducao?.arquivosAcimaMetaPorCamada ?? {};
     for (const [camada, maximo] of Object.entries(maximosCamada)) {
-        const valorAtual = snapshot.contagens.producao.arquivosAcimaTarget[camada] ?? 0;
+        const valorAtual = fotografia.contagens.producao.arquivosAcimaMeta[camada] ?? 0;
         if (valorAtual > maximo) {
             violacoes.push(criarViolacao(
-                "quantidade_acima_target",
-                `Camada ${camada} excedeu o numero permitido de arquivos acima do target: ${valorAtual} > ${maximo}`,
+                "quantidade_acima_meta",
+                `Camada ${camada} excedeu o numero permitido de arquivos acima da meta: ${valorAtual} > ${maximo}`,
                 {camada, valorAtual, maximo}
             ));
         }
     }
 
-    for (const arquivo of snapshot.arquivos.filter((item) => item.categoriaArquivo === "producao")) {
-        const waiver = waiversPorArquivo.get(arquivo.arquivo);
-        if (arquivo.linhas > arquivo.limites.target) {
-            if (!waiver) {
+    for (const arquivo of fotografia.arquivos.filter((item) => item.categoriaArquivo === "producao")) {
+        const excecao = excecoesPorArquivo.get(arquivo.arquivo);
+        if (arquivo.linhas > arquivo.limites.meta) {
+            if (!excecao) {
                 violacoes.push(criarViolacao(
-                    "arquivo_sem_waiver",
-                    `Arquivo acima do target sem waiver: ${arquivo.arquivo} (${arquivo.linhas} linhas)`,
+                    "arquivo_sem_excecao",
+                    `Arquivo acima da meta sem excecao: ${arquivo.arquivo} (${arquivo.linhas} linhas)`,
                     {
                         arquivo: arquivo.arquivo,
                         camada: arquivo.camada,
                         linhas: arquivo.linhas,
-                        target: arquivo.limites.target
+                        meta: arquivo.limites.meta
                     }
                 ));
-            } else if (arquivo.linhas > waiver.maxLinhas) {
+            } else if (arquivo.linhas > excecao.maxLinhas) {
                 violacoes.push(criarViolacao(
                     "arquivo_cresceu",
-                    `Arquivo excedeu o waiver de tamanho: ${arquivo.arquivo} (${arquivo.linhas} > ${waiver.maxLinhas})`,
+                    `Arquivo excedeu a excecao de tamanho: ${arquivo.arquivo} (${arquivo.linhas} > ${excecao.maxLinhas})`,
                     {
                         arquivo: arquivo.arquivo,
                         camada: arquivo.camada,
                         linhas: arquivo.linhas,
-                        maxLinhas: waiver.maxLinhas
+                        maxLinhas: excecao.maxLinhas
                     }
                 ));
             }
-        } else if (waiver) {
+        } else if (excecao) {
             avisos.push(criarViolacao(
-                "waiver_obsoleto",
-                `Waiver pode ser removido: ${arquivo.arquivo} ja voltou ao target (${arquivo.linhas} <= ${arquivo.limites.target})`,
+                "excecao_obsoleta",
+                `Excecao pode ser removida: ${arquivo.arquivo} ja voltou a meta (${arquivo.linhas} <= ${arquivo.limites.meta})`,
                 {arquivo: arquivo.arquivo, camada: arquivo.camada, linhas: arquivo.linhas}
             ));
         }
     }
 
     if (!opcoes.semGravar) {
-        await gravarSnapshotAuditoria(snapshot, opcoes.saida);
+        await gravarFotografiaAuditoria(fotografia, opcoes.saida);
     }
 
     return {
         status: violacoes.length === 0 ? "ok" : "falha",
         geradoEm: new Date().toISOString(),
         resumo: {
-            scoreTotal: snapshot.resumo.scoreTotal,
-            faixa: snapshot.resumo.faixa,
+            scoreTotal: fotografia.resumo.scoreTotal,
+            faixa: fotografia.resumo.faixa,
             violacoes: violacoes.length,
             avisos: avisos.length,
         },
-        budget: path.relative(process.cwd(), opcoes.budget).replaceAll("\\", "/"),
-        waivers: path.relative(process.cwd(), opcoes.waivers).replaceAll("\\", "/"),
-        snapshot,
+        orcamento: path.relative(process.cwd(), caminhoOrcamento).replaceAll("\\", "/"),
+        excecoes: path.relative(process.cwd(), caminhoExcecoes).replaceAll("\\", "/"),
+        fotografia,
         violacoes,
         avisos,
     };
@@ -150,33 +152,33 @@ async function main() {
 
     if (helpMode) {
         exibirAjudaComando({
-            comandoSgc: "frontend cruft validar",
-            scriptDireto: "frontend/cruft-validar.js",
-            descricao: "Valida budgets e waivers do cruft do frontend para impedir regressao estrutural.",
+            comandoSgc: "frontend residuos validar",
+            scriptDireto: "frontend/residuos-validar.js",
+            descricao: "Valida orcamentos e excecoes dos residuos do frontend para impedir regressao estrutural.",
             opcoes: [
                 "--json               Emite o resultado em JSON.",
                 "--json-resumido      Emite somente status, resumo, violacoes e hotspots.",
-                "--sem-gravar         Nao atualiza o snapshot latest.",
+                "--sem-gravar         Nao atualiza a fotografia mais recente.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
-                "--budget <arquivo>   Usa um arquivo de budget alternativo.",
-                "--waivers <arquivo>  Usa um arquivo de waivers alternativo.",
-                "--saida <diretorio>  Sobrescreve o diretorio de saida do snapshot."
+                "--orcamento <arquivo> Usa um arquivo de orcamento alternativo.",
+                "--excecoes <arquivo>  Usa um arquivo de excecoes alternativo.",
+                "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "node toolkit/sgc.js frontend cruft validar",
-                "node toolkit/sgc.js frontend cruft validar --json",
-                "node toolkit/sgc.js frontend cruft validar --base /tmp/sgc --budget /tmp/budget.json --waivers /tmp/waivers.json"
+                "node toolkit/sgc.js frontend residuos validar",
+                "node toolkit/sgc.js frontend residuos validar --json",
+                "node toolkit/sgc.js frontend residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
             ]
         });
         process.exit(0);
     }
 
-    const budget = path.resolve(lerOpcao(args, "--budget") ?? CAMINHO_BUDGET_PADRAO);
-    const waivers = path.resolve(lerOpcao(args, "--waivers") ?? CAMINHO_WAIVERS_PADRAO);
-    const resultado = await executarValidacaoFrontendCruft({
+    const orcamento = path.resolve(lerOpcao(args, "--orcamento") ?? CAMINHO_ORCAMENTO_PADRAO);
+    const excecoes = path.resolve(lerOpcao(args, "--excecoes") ?? CAMINHO_EXCECOES_PADRAO);
+    const resultado = await executarValidacaoFrontendResiduos({
         base: lerOpcao(args, "--base"),
-        budget,
-        waivers,
+        orcamento,
+        excecoes,
         saida: path.resolve(lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO),
         semGravar: args.includes("--sem-gravar"),
     });
@@ -191,7 +193,7 @@ async function main() {
         process.exit(resultado.status === "ok" ? 0 : 1);
     }
 
-    imprimirCabecalho("VALIDACAO DE CRUFT DO FRONTEND");
+    imprimirCabecalho("VALIDACAO DE RESIDUOS DO FRONTEND");
     escreverLinha(`Status: ${resultado.status === "ok" ? pc.green("ok") : pc.red("falha")}`);
     escreverLinha(`Score total: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa})`);
     escreverLinha(`Violacoes: ${resultado.resumo.violacoes}`);
@@ -204,7 +206,7 @@ async function main() {
             escreverLinha(`${indice + 1}. ${violacao.mensagem}`);
         });
     } else {
-        escreverLinha(pc.green("Nenhuma violacao de budget encontrada."));
+        escreverLinha(pc.green("Nenhuma violacao de orcamento encontrada."));
     }
 
     if (resultado.avisos.length > 0) {
@@ -216,20 +218,20 @@ async function main() {
     }
 
     escreverLinha("");
-    escreverLinha(`Budget: ${resultado.budget}`);
-    escreverLinha(`Waivers: ${resultado.waivers}`);
-    escreverLinha(`Snapshot latest: ${path.relative(process.cwd(), path.resolve(lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO)).replaceAll("\\", "/")}`);
+    escreverLinha(`Orcamento: ${resultado.orcamento}`);
+    escreverLinha(`Excecoes: ${resultado.excecoes}`);
+    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO)).replaceAll("\\", "/")}`);
 
     process.exit(resultado.status === "ok" ? 0 : 1);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
     main().catch((erro) => {
-        escreverLinha(pc.red(`Erro na validacao de cruft: ${erro.message}`));
+        escreverLinha(pc.red(`Erro na validacao de residuos: ${erro.message}`));
         process.exit(1);
     });
 }
 
 export {
-    executarValidacaoFrontendCruft
+    executarValidacaoFrontendResiduos
 };

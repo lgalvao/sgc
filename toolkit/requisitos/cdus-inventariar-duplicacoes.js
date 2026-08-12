@@ -59,19 +59,19 @@ for (const caminhoArquivo of arquivos) {
 const duplicacoes = [
     ...[...blocos.values()].map(item => ({
         ocorrencias: item.arquivos.length,
-        arquivos: [...new Set(item.arquivos)].sort((a, b) => a.localeCompare(b, "pt-BR")),
+        arquivos: [...new Set(item.arquivos)].toSorted((a, b) => a.localeCompare(b, "pt-BR")),
         tipo: item.tipo,
         amostra: item.amostra
     })),
     ...[...itens.values()].map(item => ({
         ocorrencias: item.arquivos.length,
-        arquivos: [...new Set(item.arquivos)].sort((a, b) => a.localeCompare(b, "pt-BR")),
+        arquivos: [...new Set(item.arquivos)].toSorted((a, b) => a.localeCompare(b, "pt-BR")),
         tipo: item.tipo,
         amostra: item.amostra
     }))
 ]
     .filter(item => item.arquivos.length > 1)
-    .sort((a, b) => b.ocorrencias - a.ocorrencias || a.arquivos[0].localeCompare(b.arquivos[0], "pt-BR"));
+    .toSorted((a, b) => b.ocorrencias - a.ocorrencias || a.arquivos[0].localeCompare(b.arquivos[0], "pt-BR"));
 
 const resultado = {
     base,

@@ -1,5 +1,4 @@
 import {execa} from "execa";
-import {Listr} from "listr2";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {imprimirCabecalho} from "../lib/saida.js";
 
@@ -24,26 +23,24 @@ async function executarAuditoriaDependencias() {
         "Executa o knip nos manifestos da raiz, do frontend e do toolkit."
     );
 
-    const tarefas = new Listr(
-        ESCOPOS_AUDITORIA.map((escopo) => ({
-            title: escopo.titulo,
-            task: async () => {
-                await execa("npm", ["run", "deps:audit"], {
-                    cwd: escopo.diretorio,
-                    stdio: "inherit",
-                    shell: process.platform === "win32"
-                });
-            }
-        })),
-        {
-            concurrent: false,
-            rendererOptions: {
-                collapseSubtasks: false
-            }
-        }
-    );
+    const resultados = [];
+    for (const escopo of ESCOPOS_AUDITORIA) {
+        process.stdout.write(`\n${escopo.titulo}\n`);
+        const resultado = await execa("npm", ["run", "deps:audit"], {
+            cwd: escopo.diretorio,
+            stdio: "inherit",
+            shell: process.platform === "win32",
+            reject: false
+        });
+        resultados.push({escopo: escopo.titulo, codigoSaida: resultado.exitCode});
+    }
 
-    await tarefas.run();
+    const falhas = resultados.filter((resultado) => resultado.codigoSaida !== 0);
+    if (falhas.length > 0) {
+        throw new Error(`${falhas.length} auditoria(s) de dependencias falharam.`);
+    }
+
+    return resultados;
 }
 
 export {

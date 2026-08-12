@@ -32,7 +32,7 @@ function listarViews(diretorioViews) {
     return fs.readdirSync(diretorioViews)
         .filter((nome) => nome.endsWith(".vue"))
         .map((nome) => path.join(diretorioViews, nome))
-        .sort();
+        .toSorted();
 }
 
 function localizarLinha(conteudo, trecho) {

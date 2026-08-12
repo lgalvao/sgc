@@ -1,12 +1,13 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import {Node, Project, SyntaxKind, ts} from "ts-morph";
-import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const VERSAO_SCHEMA = "3.0.0";
-const DIRETORIO_SAIDA_PADRAO = resolverNaRaiz("etc", "qualidade", "frontend-arquitetura", "latest");
-const CAMINHO_SNAPSHOT_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "ultimo-snapshot.json");
-const CAMINHO_RESUMO_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "ultimo-resumo.md");
+const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "frontend-arquitetura", "mais-recente");
+const CAMINHO_FOTOGRAFIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "fotografia.json");
+const CAMINHO_RESUMO_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "resumo.md");
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 const EXTENSOES_RESOLUCAO = [".ts", ".vue", ".js", "/index.ts", "/index.vue", "/index.js"];
 const CATEGORIAS_ACOPLAMENTO = ["store", "composable", "service", "router"];
@@ -688,14 +689,14 @@ function criarResumoMarkdown(snapshot) {
     if (snapshot.familias) {
         const familiasGrandes = Object.entries(snapshot.familias)
             .filter(([, f]) => f.arquivos.length >= LIMITE_FAMILIA_PULVERIZADA)
-            .sort(([, a], [, b]) => b.arquivos.length - a.arquivos.length);
+            .toSorted(([, a], [, b]) => b.arquivos.length - a.arquivos.length);
         if (familiasGrandes.length > 0) {
             linhas.push("");
             linhas.push("## Famílias de composables pulverizadas");
             linhas.push("");
             for (const [nome, familia] of familiasGrandes) {
                 linhas.push(`### ${nome} (${familia.arquivos.length} arquivos, ${familia.totalLinhas} linhas)`);
-                for (const arq of familia.arquivos.sort()) {
+                for (const arq of familia.arquivos.toSorted()) {
                     linhas.push(`- \`${arq}\``);
                 }
                 linhas.push("");
@@ -729,9 +730,9 @@ function criarResumoMarkdown(snapshot) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function gravarSnapshotArquitetura(snapshot, diretorioSaida = DIRETORIO_SAIDA_PADRAO) {
+async function gravarFotografiaArquitetura(snapshot, diretorioSaida = DIRETORIO_SAIDA_PADRAO) {
     await fs.mkdir(diretorioSaida, {recursive: true});
-    await fs.writeFile(path.join(diretorioSaida, path.basename(CAMINHO_SNAPSHOT_PADRAO)), JSON.stringify(snapshot, null, 2));
+    await fs.writeFile(path.join(diretorioSaida, path.basename(CAMINHO_FOTOGRAFIA_PADRAO)), JSON.stringify(snapshot, null, 2));
     await fs.writeFile(path.join(diretorioSaida, path.basename(CAMINHO_RESUMO_PADRAO)), criarResumoMarkdown(snapshot));
 }
 
@@ -981,7 +982,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
 
     const hotspots = analisados
         .filter((arquivo) => arquivo.score > 0)
-        .sort((a, b) => b.score - a.score || b.metricasAst.importacoesArquiteturais - a.metricasAst.importacoesArquiteturais || b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo));
+        .toSorted((a, b) => b.score - a.score || b.metricasAst.importacoesArquiteturais - a.metricasAst.importacoesArquiteturais || b.linhas - a.linhas || a.arquivo.localeCompare(b.arquivo));
 
     const familias = calcularFamilias(analisados);
     metricas.familiasPulverizadas = Object.values(familias).filter(
@@ -1008,5 +1009,5 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ} = {}) {
 export {
     analisarArquiteturaFrontend,
     DIRETORIO_SAIDA_PADRAO,
-    gravarSnapshotArquitetura,
+    gravarFotografiaArquitetura,
 };

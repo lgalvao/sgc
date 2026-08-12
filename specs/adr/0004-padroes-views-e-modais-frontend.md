@@ -48,7 +48,7 @@ Padronizar o frontend em torno de poucos arquetipos e proibir `BModal` cru em vi
 
 - gate CLI: `node toolkit/sgc.js frontend views templates-validar`
 - script do frontend: `npm --prefix frontend run templates:check`
-- `quality:all` do frontend passa a incluir esse gate
+- `qualidade:completa` do frontend passa a incluir esse gate
 
 ## Consequencias
 

@@ -1,16 +1,20 @@
 #!/usr/bin/env node
 
 import fs from "node:fs/promises";
+import {homedir} from "node:os";
 import path from "node:path";
+import {pathToFileURL} from "node:url";
 import {execa} from "execa";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-const CAMINHO_REGRA_PADRAO = resolverNaRaiz("toolkit/qualidade/semgrep/sgc-qualidade.yml");
-const CAMINHO_RESULTADO_JSON = resolverNaRaiz("toolkit/qualidade/semgrep/latest/resultado.json");
-const CAMINHO_RESULTADO_MD = resolverNaRaiz("toolkit/qualidade/semgrep/latest/resumo.md");
+const CAMINHO_REGRA_PADRAO = resolverCaminhoConfigurado("regrasSemgrep");
+const DIRETORIO_SAIDA = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "semgrep", "mais-recente");
+const CAMINHO_RESULTADO_JSON = path.join(DIRETORIO_SAIDA, "resultado.json");
+const CAMINHO_RESULTADO_MD = path.join(DIRETORIO_SAIDA, "resumo.md");
 const DIRETORIOS_PADRAO = [
     "backend/src/main/java/sgc",
     "frontend/src"
@@ -44,11 +48,7 @@ function extrairLista(args, nome) {
 }
 
 function obterComandoSemgrep() {
-    const home = process.env.HOME;
-    if (!home) {
-        throw new Error("Variável HOME não definida; não foi possível localizar a instalação local do Semgrep.");
-    }
-    return path.join(home, ".local", "bin", "semgrep");
+    return path.join(homedir(), ".local", "bin", "semgrep");
 }
 
 function criarResumo(resultadoJson, regra) {
@@ -75,7 +75,7 @@ function criarResumo(resultadoJson, regra) {
 
     linhas.push("| Regra | Achados |");
     linhas.push("|---|---:|");
-    for (const [id, itens] of [...porRegra.entries()].sort((a, b) => b[1].length - a[1].length)) {
+    for (const [id, itens] of [...porRegra.entries()].toSorted((a, b) => b[1].length - a[1].length)) {
         linhas.push(`| \`${id}\` | ${itens.length} |`);
     }
 
@@ -155,10 +155,12 @@ async function main() {
     const diretorios = extrairLista(args, "--dir");
     const alvos = diretorios.length > 0 ? diretorios : DIRETORIOS_PADRAO;
 
-    imprimirCabecalho("AUDITORIA SEMGREP (PILOTO)");
-    escreverLinha(`Regra: ${pc.dim(regra)}`);
-    escreverLinha(`Alvos: ${alvos.map((item) => pc.dim(item)).join(", ")}`);
-    escreverLinha(`Modo auto: ${auto ? "sim" : "não"}`);
+    if (!emitirJson) {
+        imprimirCabecalho("AUDITORIA SEMGREP (PILOTO)");
+        escreverLinha(`Regra: ${pc.dim(regra)}`);
+        escreverLinha(`Alvos: ${alvos.map((item) => pc.dim(item)).join(", ")}`);
+        escreverLinha(`Modo auto: ${auto ? "sim" : "não"}`);
+    }
 
     const execucao = await executarSemgrep({
         regra,
@@ -168,19 +170,23 @@ async function main() {
 
     if (!semGravar) {
         await gravarRelatorios(execucao);
-        escreverLinha(`Relatório JSON: ${pc.dim(CAMINHO_RESULTADO_JSON)}`);
-        escreverLinha(`Resumo Markdown: ${pc.dim(CAMINHO_RESULTADO_MD)}`);
+        if (!emitirJson) {
+            escreverLinha(`Relatório JSON: ${pc.dim(CAMINHO_RESULTADO_JSON)}`);
+            escreverLinha(`Resumo Markdown: ${pc.dim(CAMINHO_RESULTADO_MD)}`);
+        }
     }
 
     const achados = execucao.resultadoJson.results ?? [];
-    escreverLinha(`Achados: ${achados.length}`);
-    if (achados.length > 0) {
-        for (const finding of achados.slice(0, 10)) {
-            const caminho = path.relative(resolverNaRaiz("."), finding.path ?? "");
-            escreverLinha(`- ${finding.check_id} em ${caminho}:${finding.start?.line ?? "?"}`);
+    if (!emitirJson) {
+        escreverLinha(`Achados: ${achados.length}`);
+        if (achados.length > 0) {
+            for (const finding of achados.slice(0, 10)) {
+                const caminho = path.relative(resolverNaRaiz("."), finding.path ?? "");
+                escreverLinha(`- ${finding.check_id} em ${caminho}:${finding.start?.line ?? "?"}`);
+            }
+        } else {
+            escreverLinha(pc.green("Nenhum achado encontrado pelas regras locais."));
         }
-    } else {
-        escreverLinha(pc.green("Nenhum achado encontrado pelas regras locais."));
     }
 
     if (emitirJson) {
@@ -194,7 +200,14 @@ async function main() {
     }
 }
 
-main().catch((erro) => {
-    escreverLinha(pc.red(`Erro ao executar auditoria Semgrep: ${erro instanceof Error ? erro.message : String(erro)}`));
-    process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main().catch((erro) => {
+        process.stderr.write(`Erro ao executar auditoria Semgrep: ${erro instanceof Error ? erro.message : String(erro)}\n`);
+        process.exit(1);
+    });
+}
+
+export {
+    executarSemgrep,
+    main
+};

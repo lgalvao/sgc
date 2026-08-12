@@ -69,8 +69,7 @@ unit-test-report.md
 view-validations-audit.md
 
 # Snapshots e artefatos gerados por auditorias estruturais
-toolkit/qualidade/openapi/
-toolkit/qualidade/openapi/.gitkeep
+toolkit/qualidade/artefatos/
 toolkit/qualidade/semgrep/latest/
 frontend/src/generated/
 
@@ -89,4 +88,3 @@ specs/docs/como_logar_hom.md
 # Arquivos locais e relatórios de homologação (E2E)
 e2e/homologacao/usuarios.local.json
 playwright-report-hom/
-

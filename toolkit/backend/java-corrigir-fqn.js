@@ -132,7 +132,7 @@ function processFile(filePath, dryRun = false) {
     }
 
     const insertPos = getInsertPosition(lines, importLineIndices);
-    const sortedNew = [...newImportsToAdd].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    const sortedNew = [...newImportsToAdd].toSorted((a, b) => a.localeCompare(b, 'pt-BR'));
     const finalOutput = [];
 
     if (insertPos === 0) {

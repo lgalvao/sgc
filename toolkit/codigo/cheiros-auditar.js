@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
-import {DIRETORIO_RAIZ, resolverNaRaiz} from "../lib/caminhos.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-const DIRETORIO_SAIDA = resolverNaRaiz("etc", "qualidade", "codigo-cheiros", "latest");
-const ARQUIVO_JSON = path.join(DIRETORIO_SAIDA, "ultimo-snapshot.json");
-const ARQUIVO_MD = path.join(DIRETORIO_SAIDA, "ultimo-resumo.md");
+const DIRETORIO_SAIDA = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "codigo-cheiros", "mais-recente");
+const ARQUIVO_FOTOGRAFIA = path.join(DIRETORIO_SAIDA, "fotografia.json");
+const ARQUIVO_RESUMO = path.join(DIRETORIO_SAIDA, "resumo.md");
 
 const EXTENSOES_TEXTO = new Set([".ts", ".vue", ".java"]);
 
@@ -160,9 +161,9 @@ function classificarPontuacao(pontuacao) {
     return "critico";
 }
 
-async function lerSnapshotAnterior() {
+async function lerFotografiaAnterior() {
     try {
-        return JSON.parse(await fs.readFile(ARQUIVO_JSON, "utf8"));
+        return JSON.parse(await fs.readFile(ARQUIVO_FOTOGRAFIA, "utf8"));
     } catch {
         return null;
     }
@@ -212,7 +213,7 @@ function gerarMarkdown(snapshot) {
 
     for (const hotspot of snapshot.hotspots) {
         const sinais = Object.entries(hotspot.categorias)
-            .sort((a, b) => b[1] - a[1])
+            .toSorted((a, b) => b[1] - a[1])
             .map(([categoria, valor]) => `${categoria}: ${valor}`)
             .join(", ");
         linhas.push(`| ${hotspot.arquivo} | ${hotspot.pontuacao} | ${sinais} |`);
@@ -268,7 +269,7 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, json = false, semGravar
         }
     }
 
-    const anterior = semGravar ? null : await lerSnapshotAnterior();
+    const anterior = semGravar ? null : await lerFotografiaAnterior();
     const pontuacaoTotal = PADROES.reduce((soma, padrao) => soma + (contagens[padrao.chave] * padrao.peso), 0);
 
     const snapshot = {
@@ -282,14 +283,14 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, json = false, semGravar
         contagens,
         deltas: calcularDelta(contagens, anterior),
         hotspots: arquivosPontuados
-            .sort((a, b) => b.pontuacao - a.pontuacao || a.arquivo.localeCompare(b.arquivo))
+            .toSorted((a, b) => b.pontuacao - a.pontuacao || a.arquivo.localeCompare(b.arquivo))
             .slice(0, 15)
     };
 
     if (!semGravar) {
         await fs.mkdir(DIRETORIO_SAIDA, {recursive: true});
-        await fs.writeFile(ARQUIVO_JSON, JSON.stringify(snapshot, null, 2));
-        await fs.writeFile(ARQUIVO_MD, gerarMarkdown(snapshot));
+        await fs.writeFile(ARQUIVO_FOTOGRAFIA, JSON.stringify(snapshot, null, 2));
+        await fs.writeFile(ARQUIVO_RESUMO, gerarMarkdown(snapshot));
     }
 
     if (json) {
@@ -312,8 +313,8 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, json = false, semGravar
 
     if (!semGravar) {
         escreverLinha("");
-        escreverLinha(`Snapshot salvo em ${ARQUIVO_JSON}`);
-        escreverLinha(`Resumo salvo em ${ARQUIVO_MD}`);
+        escreverLinha(`Fotografia salva em ${ARQUIVO_FOTOGRAFIA}`);
+        escreverLinha(`Resumo salvo em ${ARQUIVO_RESUMO}`);
     }
 }
 
@@ -347,9 +348,9 @@ function parseArgs(argv) {
 }
 
 if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    escreverLinha("Uso: node toolkit/sgc.js codigo smells auditar [--json] [--sem-gravar] [--base <diretorio>]");
+    escreverLinha("Uso: node toolkit/sgc.js codigo cheiros auditar [--json] [--sem-gravar] [--base <diretorio>]");
     escreverLinha("");
-    escreverLinha("Gera um snapshot com contagens e pontuacao de cheiros de codigo.");
+    escreverLinha("Gera uma fotografia com contagens e pontuacao de cheiros de codigo.");
     process.exit(0);
 }
 

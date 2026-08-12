@@ -1,19 +1,19 @@
 import {execa} from "execa";
 import {Listr} from "listr2";
 import {resolverNaRaiz} from "../lib/caminhos.js";
-import {executarDoctor} from "./doctor.js";
+import {executarDiagnostico} from "./diagnostico.js";
 
-async function executarSetup(opcoes = {}) {
+async function executarPreparacao(opcoes = {}) {
     const tarefas = new Listr([
         {
             title: "Validar ambiente do projeto",
             task: async (ctx, task) => {
-                const diagnostico = await executarDoctor({silencioso: true});
+                const diagnostico = await executarDiagnostico({silencioso: true});
                 ctx.diagnostico = diagnostico;
                 task.output = `status ${diagnostico.statusGeral}`;
 
                 if (diagnostico.statusGeral === "falha") {
-                    throw new Error("Ambiente incompleto. Corrija as falhas do doctor antes de continuar.");
+                    throw new Error("Ambiente incompleto. Corrija as falhas do diagnostico antes de continuar.");
                 }
             }
         },
@@ -44,7 +44,7 @@ async function executarSetup(opcoes = {}) {
             enabled: () => Boolean(opcoes.instalarDependencias),
             task: async () => {
                 await execa("npm", ["install"], {
-                    cwd: resolverNaRaiz("etc", "scripts"),
+                    cwd: resolverNaRaiz("toolkit"),
                     stdio: "inherit",
                     shell: process.platform === "win32"
                 });
@@ -61,17 +61,6 @@ async function executarSetup(opcoes = {}) {
                 });
             }
         },
-        {
-            title: "Importar certificados Java locais",
-            enabled: () => Boolean(opcoes.importarCertificados),
-            task: async () => {
-                await execa("node", ["toolkit/sgc.js", "backend", "java", "instalar-certificados"], {
-                    cwd: resolverNaRaiz(),
-                    stdio: "inherit",
-                    shell: process.platform === "win32"
-                });
-            }
-        }
     ], {
         concurrent: false,
         rendererOptions: {
@@ -84,5 +73,5 @@ async function executarSetup(opcoes = {}) {
 }
 
 export {
-    executarSetup
+    executarPreparacao
 };

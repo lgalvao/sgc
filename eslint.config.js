@@ -44,13 +44,5 @@ export default [
             },
         },
     },
-    {
-        files: ["toolkit/qa-dashboard/**/*.js"],
-        languageOptions: {
-            globals: {
-                ...globals.browser,
-            },
-        },
-    },
     eslintConfigPrettier,
 ];

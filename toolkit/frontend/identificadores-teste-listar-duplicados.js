@@ -1,12 +1,18 @@
 /* eslint-disable */
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import {globby} from "globby";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 
-const argBaseIdx = process.argv.indexOf('--base');
-const searchDir = argBaseIdx >= 0 && process.argv[argBaseIdx + 1]
-    ? path.resolve(process.argv[argBaseIdx + 1])
-    : path.join(import.meta.dirname, '../../../frontend/src');
+function obterDiretorioBusca() {
+    const indiceBase = process.argv.indexOf("--base");
+    return indiceBase >= 0 && process.argv[indiceBase + 1]
+        ? path.resolve(process.argv[indiceBase + 1])
+        : path.join(resolverCaminhoConfigurado("frontend"), "src");
+}
+
+const diretorioBusca = obterDiretorioBusca();
 
 const idsCompartilhadosPermitidos = new Set([
     'subprocesso-header__txt-header-unidade',
@@ -15,10 +21,14 @@ const idsCompartilhadosPermitidos = new Set([
 // Suporta: data-testid="valor", :data-testid="'valor'", data-testid='valor'
 const regex = /(^|[\s<])(:?)(data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/gm;
 
-console.log(`Buscando por test-ids em: ${searchDir}\n`);
+console.log(`Buscando por identificadores de teste em: ${diretorioBusca}\n`);
 
 try {
-    const padraoVue = path.join(searchDir, '**/*.vue').replace(/\\/g, '/');
+    if (!fs.existsSync(diretorioBusca)) {
+        throw new Error(`Diretorio frontend nao encontrado: ${path.relative(DIRETORIO_RAIZ, diretorioBusca)}`);
+    }
+
+    const padraoVue = path.join(diretorioBusca, "**/*.vue").replace(/\\/g, "/");
     const files = await globby(padraoVue, {absolute: true});
 
     const findings = [];
@@ -44,7 +54,7 @@ try {
             }
 
             findings.push({
-                file: path.relative(import.meta.dirname, file),
+                file: path.relative(DIRETORIO_RAIZ, file).replaceAll("\\", "/"),
                 attribute: (isDynamic ? ':' : '') + attrName,
                 value: value
             });
@@ -52,7 +62,7 @@ try {
     }
 
     if (findings.length === 0) {
-        console.log('Nenhum test-id encontrado.');
+        console.log("Nenhum identificador de teste encontrado.");
         process.exit(0);
     }
 
@@ -70,11 +80,11 @@ try {
         .sort((a, b) => b[1].length - a[1].length);
 
     if (duplicates.length === 0) {
-        console.log('Nenhum test-id duplicado encontrado.');
+    console.log("Nenhum identificador de teste duplicado encontrado.");
         process.exit(0);
     }
 
-    console.log('Test-ids duplicados encontrados:\n');
+    console.log("Identificadores de teste duplicados encontrados:\n");
     duplicates.forEach(([value, items]) => {
         console.log(`>> "${value}" — ${items.length} ocorrências`);
         items.forEach(it => {
@@ -85,8 +95,8 @@ try {
     });
 
     const totalOccurrences = duplicates.reduce((sum, [, items]) => sum + items.length, 0);
-    console.log(`Total de ids duplicados distintos: ${duplicates.length}`);
-    console.log(`Total de ocorrências duplicadas: ${totalOccurrences}`);
+    console.log(`Total de identificadores duplicados distintos: ${duplicates.length}`);
+    console.log(`Total de ocorrencias duplicadas: ${totalOccurrences}`);
 
     // Falha o processo para uso como portão de qualidade no CI
     process.exit(1);

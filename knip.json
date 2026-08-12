@@ -18,7 +18,7 @@
         "taskkill"
       ]
     },
-    "e2eHom": {
+    "e2e-hom": {
       "entry": [
         "**/*.ts"
       ],
@@ -48,14 +48,10 @@
     },
     "toolkit": {
       "entry": [
-        "**/*.js",
-        "**/*.mjs",
-        "**/*.cjs"
+        "**/*.js"
       ],
       "project": [
-        "**/*.js",
-        "**/*.mjs",
-        "**/*.cjs"
+        "**/*.js"
       ]
     }
   }

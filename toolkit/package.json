@@ -3,10 +3,21 @@
   "private": true,
   "type": "module",
   "description": "Toolkit unificado de scripts do SGC",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "sgc": "./sgc.js"
+  },
+  "exports": {
+    ".": "./sgc.js",
+    "./lib/*": "./lib/*.js"
+  },
   "scripts": {
     "sgc": "node ./sgc.js",
     "deps:audit": "knip",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
     "lint": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures",
     "lint:fix": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures --fix"
   },
@@ -21,7 +32,6 @@
     "listr2": "^10.2.2",
     "openapi-typescript": "^7.13.0",
     "picocolors": "^1.1.1",
-    "serve-handler": "^6.1.7",
     "ts-morph": "^28.0.0",
     "which": "^7.0.0",
     "xml2js": "^0.6.2"
@@ -30,6 +40,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "knip": "^6.23.0",
     "oxlint": "^1.72.0",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.9"
   }
 }

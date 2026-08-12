@@ -61,15 +61,6 @@ const RECURSOS = [
 
     {tipo: "porta", nome: "Backend (10000)", porta: 10000, obrigatorio: false, categoria: CATEGORIAS.INFRA},
     {tipo: "porta", nome: "Frontend (5173)", porta: 5173, portaPadrao: true, categoria: CATEGORIAS.INFRA},
-    {tipo: "porta", nome: "QA Dashboard (4179)", porta: 4179, portaPadrao: true, categoria: CATEGORIAS.INFRA},
-    {
-        tipo: "conectividade",
-        nome: "Internet (google.com)",
-        host: "google.com",
-        obrigatorio: false,
-        categoria: CATEGORIAS.INFRA
-    },
-
     {
         tipo: "diretorio",
         nome: "node_modules raiz",
@@ -117,22 +108,6 @@ async function verificarPorta(porta) {
     });
 }
 
-async function verificarConectividade(host) {
-    return new Promise((resolve) => {
-        const socket = net.createConnection(80, host);
-        socket.setTimeout(2000);
-        socket.on("connect", () => {
-            socket.destroy();
-            resolve(true);
-        });
-        socket.on("error", () => resolve(false));
-        socket.on("timeout", () => {
-            socket.destroy();
-            resolve(false);
-        });
-    });
-}
-
 async function obterVersao(comando) {
     try {
         const {stdout} = await execa(comando, ["--version"]);
@@ -168,10 +143,53 @@ async function verificarComando(recurso) {
                 status = "alerta";
                 detalhe += ` - esperado ${recurso.versaoEsperada}`;
             }
+            if (recurso.versaoMin && !atendeVersaoMinima(versao, recurso.versaoMin)) {
+                status = "falha";
+                detalhe += ` - minimo ${recurso.versaoMin}`;
+            }
         }
     }
 
     return {...recurso, status, detalhe};
+}
+
+function extrairVersaoNumerica(texto) {
+    const encontrada = texto.match(/\d+(?:\.\d+)+/);
+    return encontrada ? encontrada[0].split(".").map(Number) : null;
+}
+
+function atendeVersaoMinima(textoVersao, textoMinimo) {
+    const versao = extrairVersaoNumerica(textoVersao);
+    const minimo = extrairVersaoNumerica(textoMinimo);
+    if (!versao || !minimo) {
+        return false;
+    }
+
+    const tamanho = Math.max(versao.length, minimo.length);
+    for (let indice = 0; indice < tamanho; indice += 1) {
+        const parteVersao = versao[indice] ?? 0;
+        const parteMinima = minimo[indice] ?? 0;
+        if (parteVersao !== parteMinima) {
+            return parteVersao > parteMinima;
+        }
+    }
+    return true;
+}
+
+async function verificarComandosRegistrados(diretorioBase) {
+    const comandos = [
+        ["toolkit/sgc.js", "toolkit"],
+        ["toolkit/package.json", "toolkit"]
+    ];
+    return Promise.all(comandos.map(async ([caminho, nome]) => ({
+        tipo: "arquivo",
+        nome,
+        caminho,
+        obrigatorio: true,
+        categoria: CATEGORIAS.CONFIGURACAO,
+        status: await fs.pathExists(path.resolve(diretorioBase, caminho)) ? "ok" : "falha",
+        detalhe: caminho
+    })));
 }
 
 async function verificarRecurso(recurso, diretorioBase) {
@@ -185,15 +203,6 @@ async function verificarRecurso(recurso, diretorioBase) {
             ...recurso,
             status: determinarStatus(livre, recurso.obrigatorio),
             detalhe: livre ? "livre" : "ocupada"
-        };
-    }
-
-    if (recurso.tipo === "conectividade") {
-        const ok = await verificarConectividade(recurso.host);
-        return {
-            ...recurso,
-            status: determinarStatus(ok, recurso.obrigatorio),
-            detalhe: ok ? "conectado" : "indisponivel"
         };
     }
 
@@ -257,9 +266,12 @@ function imprimirHumano(resultado, consolidado) {
     escreverLinha(`Totais: ${consolidado.totais.ok} ok, ${consolidado.totais.alerta} alertas, ${consolidado.totais.falha} falhas`);
 }
 
-async function executarDoctor(opcoes = {}) {
+async function executarDiagnostico(opcoes = {}) {
     const diretorioBase = opcoes.base ? path.resolve(opcoes.base) : resolverNaRaiz();
-    const verificacoes = await Promise.all(RECURSOS.map((recurso) => verificarRecurso(recurso, diretorioBase)));
+    const verificacoes = [
+        ...(await Promise.all(RECURSOS.map((recurso) => verificarRecurso(recurso, diretorioBase)))),
+        ...(await verificarComandosRegistrados(diretorioBase))
+    ];
     const consolidado = consolidar(verificacoes);
     const saida = {
         diretorioBase,
@@ -283,5 +295,5 @@ async function executarDoctor(opcoes = {}) {
 }
 
 export {
-    executarDoctor
+    executarDiagnostico
 };

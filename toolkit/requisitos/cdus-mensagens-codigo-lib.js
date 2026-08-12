@@ -192,7 +192,7 @@ function sugerirCanonicos(texto, canonicos, limite = 3) {
     return canonicos
         .map(item => ({...item, similaridade: calcularSimilaridade(texto, item.texto)}))
         .filter(item => item.similaridade >= 0.35)
-        .sort((a, b) => b.similaridade - a.similaridade || a.texto.localeCompare(b.texto, "pt-BR"))
+        .toSorted((a, b) => b.similaridade - a.similaridade || a.texto.localeCompare(b.texto, "pt-BR"))
         .slice(0, limite);
 }
 

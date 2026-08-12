@@ -20,17 +20,16 @@
     "test:unit": "vitest --run --reporter=dot --no-color",
     "coverage:unit": "vitest --run --coverage --reporter=dot --no-color",
     "coverage:unit:collect": "vitest --run --coverage --reporter=dot --no-color --coverage.thresholds.lines=0 --coverage.thresholds.functions=0 --coverage.thresholds.statements=0 --coverage.thresholds.branches=0",
-    "diagnostico:cache:audit": "node ../toolkit/auditar-cache-diagnostico.mjs",
-    "cruft:audit": "node ../toolkit/sgc.js frontend cruft auditar",
+    "residuos:audit": "node ../toolkit/sgc.js frontend residuos auditar",
     "arquitetura:audit": "node ../toolkit/sgc.js frontend arquitetura auditar",
     "arquitetura:gate": "node ../toolkit/sgc.js frontend arquitetura validar",
     "modais:check": "node ../toolkit/sgc.js frontend modais validar",
     "templates:check": "node ../toolkit/sgc.js frontend views templates-validar",
-    "cruft:check": "node ../toolkit/sgc.js frontend cruft validar",
-    "quality:test": "npm run test:unit",
-    "quality:lint": "oxlint --ignore-path .oxlintignore . && eslint . --max-warnings 0",
-    "quality:typecheck": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
-    "quality:all": "npm run quality:test && npm run quality:lint && npm run quality:typecheck && npm run cruft:check && npm run arquitetura:gate && npm run templates:check && npm run modais:check"
+    "residuos:check": "node ../toolkit/sgc.js frontend residuos validar",
+    "qualidade:testes": "npm run test:unit",
+    "qualidade:lint": "oxlint --ignore-path .oxlintignore . && eslint . --max-warnings 0",
+    "qualidade:tipos": "vue-tsc --noEmit --skipLibCheck --incremental --strict",
+    "qualidade:completa": "npm run qualidade:testes && npm run qualidade:lint && npm run qualidade:tipos && npm run residuos:check && npm run arquitetura:gate && npm run templates:check && npm run modais:check"
   },
   "dependencies": {
     "@pinia/colada": "^1.3.1",

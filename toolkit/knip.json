@@ -2,24 +2,23 @@
   "entry": [
     "backend/**/*.js",
     "codigo/**/*.js",
-    "e2e/**/*.js",
     "frontend/**/*.js",
+    "integracao/**/*.js",
     "lib/**/*.js",
     "projeto/**/*.js",
-    "qa/**/*.js",
+    "qualidade/**/*.js",
+    "requisitos/**/*.js",
     "test/**/*.js"
   ],
   "project": [
     "backend/**/*.js",
     "codigo/**/*.js",
-    "e2e/**/*.js",
     "frontend/**/*.js",
+    "integracao/**/*.js",
     "lib/**/*.js",
     "projeto/**/*.js",
-    "qa/**/*.js",
+    "qualidade/**/*.js",
+    "requisitos/**/*.js",
     "test/**/*.js"
-  ],
-  "ignoreBinaries": [
-    "playwright"
   ]
 }

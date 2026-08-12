@@ -1,5 +1,0 @@
-{
-  "versaoSchema": "1.0.0",
-  "descricao": "Dívida existente: o frontend não deve calcular habilitação/exibição de botões ou ações. Novas ocorrências sem waiver quebram o gate frontend arquitetura validar.",
-  "waivers": []
-}

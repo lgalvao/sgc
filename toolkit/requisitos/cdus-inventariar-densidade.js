@@ -51,7 +51,7 @@ const resultado = {
     base,
     totalArquivos: documentos.length,
     resumo,
-    documentos: documentos.sort((a, b) => b.palavras - a.palavras || b.profundidadeListas - a.profundidadeListas)
+    documentos: documentos.toSorted((a, b) => b.palavras - a.palavras || b.profundidadeListas - a.profundidadeListas)
 };
 
 if (emitirJson) {

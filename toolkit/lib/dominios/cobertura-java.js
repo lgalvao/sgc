@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
+import path from "node:path";
 import {parseStringPromise} from "xml2js";
-import {resolverNaRaiz} from "../caminhos.js";
+import {DIRETORIO_RAIZ} from "../caminhos.js";
+import {resolverCaminhoConfigurado} from "../configuracao.js";
 
 const PADROES_EXCLUSAO = [
     /MapperImpl$/,
@@ -66,11 +68,15 @@ async function lerRelatorioJacoco(caminhoAbsoluto) {
     }
 }
 
-async function extrairCoberturaJacoco(caminhoRelativo = "backend/build/reports/jacoco/test/jacocoTestReport.xml", opcoes = {}) {
-    const caminhoXml = resolverNaRaiz(caminhoRelativo);
+async function extrairCoberturaJacoco(caminhoRelativo = null, opcoes = {}) {
+    const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
+    const caminhoPadrao = resolverCaminhoConfigurado("coberturaBackend", diretorioBase);
+    const caminhoXml = caminhoRelativo
+        ? (path.isAbsolute(caminhoRelativo) ? caminhoRelativo : path.resolve(diretorioBase, caminhoRelativo))
+        : caminhoPadrao;
     const relatorio = await lerRelatorioJacoco(caminhoXml);
     if (!relatorio) {
-        throw new Error(`Relatório JaCoCo não encontrado em ${caminhoRelativo}`);
+        throw new Error(`Relatorio JaCoCo nao encontrado em ${caminhoXml}`);
     }
 
     const {
@@ -190,7 +196,7 @@ async function extrairCoberturaJacoco(caminhoRelativo = "backend/build/reports/j
     return {
         ...metricasGlobais,
         totais,
-        classes: classes.sort((a, b) => a.linhasPercentual - b.linhasPercentual)
+        classes: classes.toSorted((a, b) => a.linhasPercentual - b.linhasPercentual)
     };
 }
 
