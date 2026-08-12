@@ -1,3 +1,19 @@
+import {escreverLinha} from "./saida.js";
+
+/**
+ * @typedef {object} OpcoesAjudaComando
+ * @property {string} comandoSgc
+ * @property {string} scriptDireto
+ * @property {string} [descricao]
+ * @property {string|null} [argumentos]
+ * @property {string[]} [opcoes]
+ * @property {string[]} [exemplos]
+ */
+
+/**
+ * @param {OpcoesAjudaComando} opcoes
+ * @returns {void}
+ */
 function exibirAjudaComando({
                                 comandoSgc,
                                 scriptDireto,
@@ -28,7 +44,7 @@ function exibirAjudaComando({
         exemplos.forEach(exemplo => linhas.push(`  ${exemplo}`));
     }
 
-    console.log(linhas.join('\n'));
+    escreverLinha(linhas.join('\n'));
 }
 
 export {

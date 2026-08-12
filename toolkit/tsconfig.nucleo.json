@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "checkJs": true,
+    "noImplicitAny": true
+  },
+  "include": [
+    "lib/caminhos.js",
+    "lib/cli-ajuda.js",
+    "lib/configuracao.js",
+    "lib/execucao.js",
+    "lib/saida.js"
+  ]
+}

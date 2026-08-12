@@ -17,7 +17,8 @@
     "sgc": "node ./sgc.js",
     "deps:audit": "knip",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "typecheck": "npm run typecheck:nucleo && tsc --noEmit --project tsconfig.json",
+    "typecheck:nucleo": "tsc --noEmit --project tsconfig.nucleo.json",
     "lint": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures",
     "lint:fix": "oxlint . --node-plugin --vitest-plugin --disable-unicorn-plugin -D correctness -D suspicious --ignore-pattern node_modules --ignore-pattern test/fixtures --fix"
   },
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.10",
+    "@types/node": "^26.2.0",
     "knip": "^6.32.2",
     "oxlint": "^1.78.0",
     "typescript": "^6.0.3",

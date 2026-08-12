@@ -1,8 +1,11 @@
 import {existsSync} from "node:fs";
 import {execaNode} from "execa";
-import pc from "picocolors";
 import {DIRETORIO_RAIZ, resolverNaRaiz} from "./caminhos.js";
 
+/**
+ * @param {string} relativo
+ * @returns {string}
+ */
 function garantirArquivo(relativo) {
     const absoluto = resolverNaRaiz(relativo);
     if (!existsSync(absoluto)) {
@@ -11,20 +14,19 @@ function garantirArquivo(relativo) {
     return absoluto;
 }
 
-async function executarNode(relativo, args = []) {
+/**
+ * @param {string} relativo
+ * @param {string[]} [argumentos]
+ */
+async function executarNode(relativo, argumentos = []) {
     const script = garantirArquivo(relativo);
-    return execaNode(script, args, {
+    return execaNode(script, argumentos, {
         cwd: DIRETORIO_RAIZ,
         stdio: "inherit"
     });
 }
 
-function imprimirSecao(titulo) {
-    process.stdout.write(`${pc.bold(pc.cyan(`\n${titulo}`))}\n`);
-}
-
 export {
     executarNode,
-    garantirArquivo,
-    imprimirSecao
+    garantirArquivo
 };

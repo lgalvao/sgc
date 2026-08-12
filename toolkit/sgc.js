@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {pathToFileURL} from "node:url";
 import {Command} from "commander";
 import pc from "picocolors";
 import {executarNode} from "./lib/execucao.js";
@@ -12,8 +13,8 @@ function criarComandoScript(pai, nome, descricao, relativo) {
         .allowExcessArguments(true)
         .action(async (...valores) => {
             const comando = valores.at(-1);
-            const args = comando.args ?? [];
-            await executarNode(relativo, args);
+            const argumentos = comando.args ?? [];
+            await executarNode(relativo, argumentos);
         });
 }
 
@@ -186,9 +187,29 @@ program.addHelpText(
     `\nExemplos:\n  ${pc.dim("node toolkit/sgc.js backend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js frontend cobertura auditoria")}\n  ${pc.dim("node toolkit/sgc.js qualidade coletar --perfil rapido")}\n  ${pc.dim("node toolkit/sgc.js qualidade resumo")}\n  ${pc.dim("node toolkit/sgc.js projeto diagnostico --json")}\n  ${pc.dim("node toolkit/sgc.js codigo cheiros auditar --json")}`
 );
 
-try {
-    await program.parseAsync(process.argv);
-} catch (error) {
-    logger.error(pc.red(`Erro: ${error.message}`));
-    process.exit(1);
+async function executar(argumentos = process.argv) {
+    await program.parseAsync(argumentos);
 }
+
+async function principal(argumentos = process.argv) {
+    try {
+        await executar(argumentos);
+        return 0;
+    } catch (erro) {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        logger.error(pc.red(`Erro: ${mensagem}`));
+        process.exitCode = 1;
+        return 1;
+    }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    await principal();
+}
+
+export {
+    criarComandoScript,
+    executar,
+    principal,
+    program
+};

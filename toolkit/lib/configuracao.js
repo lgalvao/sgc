@@ -4,6 +4,11 @@ import {DIRETORIO_RAIZ} from "./caminhos.js";
 
 const NOME_ARQUIVO_CONFIGURACAO = "configuracao-toolkit.json";
 
+/** @typedef {Record<string, string>} DiretoriosConfigurados */
+/** @typedef {{diretorios: DiretoriosConfigurados}} ConfiguracaoToolkit */
+/** @typedef {{diretorios?: DiretoriosConfigurados}} ConfiguracaoSobreposta */
+
+/** @type {ConfiguracaoToolkit} */
 const CONFIGURACAO_PADRAO = {
     diretorios: {
         backend: "backend",
@@ -19,17 +24,26 @@ const CONFIGURACAO_PADRAO = {
     }
 };
 
+/**
+ * @param {ConfiguracaoToolkit} configuracaoBase
+ * @param {ConfiguracaoSobreposta} configuracaoSobreposta
+ * @returns {ConfiguracaoToolkit}
+ */
 function combinarConfiguracoes(configuracaoBase, configuracaoSobreposta) {
     return {
         ...configuracaoBase,
         ...configuracaoSobreposta,
         diretorios: {
             ...configuracaoBase.diretorios,
-            ...configuracaoSobreposta.diretorios
+            ...configuracaoSobreposta.diretorios ?? {}
         }
     };
 }
 
+/**
+ * @param {string} [diretorioBase]
+ * @returns {ConfiguracaoToolkit}
+ */
 function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ) {
     const caminho = path.join(diretorioBase, NOME_ARQUIVO_CONFIGURACAO);
     if (!fs.existsSync(caminho)) {
@@ -38,14 +52,20 @@ function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ) {
 
     let configuracaoSobreposta;
     try {
-        configuracaoSobreposta = JSON.parse(fs.readFileSync(caminho, "utf8"));
+        configuracaoSobreposta = /** @type {ConfiguracaoSobreposta} */ (JSON.parse(fs.readFileSync(caminho, "utf8")));
     } catch (erro) {
-        throw new Error(`Nao foi possivel ler ${NOME_ARQUIVO_CONFIGURACAO}: ${erro.message}`, {cause: erro});
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        throw new Error(`Nao foi possivel ler ${NOME_ARQUIVO_CONFIGURACAO}: ${mensagem}`, {cause: erro});
     }
 
     return combinarConfiguracoes(CONFIGURACAO_PADRAO, configuracaoSobreposta);
 }
 
+/**
+ * @param {string} nomeDiretorio
+ * @param {string} [diretorioBase]
+ * @returns {string}
+ */
 function resolverCaminhoConfigurado(nomeDiretorio, diretorioBase = DIRETORIO_RAIZ) {
     const configuracao = carregarConfiguracao(diretorioBase);
     const caminhoRelativo = configuracao.diretorios[nomeDiretorio];

@@ -3,7 +3,8 @@ import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
-import {execaNode} from "execa";
+import {execa, execaNode} from "execa";
+import {pathToFileURL} from "node:url";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
@@ -38,6 +39,21 @@ async function executarScriptTestesPriorizar(args, opcoes = {}) {
 }
 
 describe("CLI raiz do toolkit", () => {
+    test("pode ser importada sem executar a CLI", async () => {
+        const caminhoSgc = pathToFileURL(CAMINHO_SGC).href;
+        const resultado = await execa(process.execPath, [
+            "--input-type=module",
+            "-e",
+            `process.argv.push("--help"); await import(${JSON.stringify(caminhoSgc)}); process.stdout.write("importacao-ok\\n");`
+        ], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false
+        });
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toBe("importacao-ok");
+    });
+
     test("exibe a ajuda principal", async () => {
         const resultado = await executarSgc(["--help"]);
         expect(resultado.exitCode).toBe(0);
