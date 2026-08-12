@@ -6,7 +6,8 @@ import pc from "picocolors";
 import {globby} from "globby";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {escreverLinha, imprimirCabecalho} from "../lib/saida.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 const DIRETORIO_BACKEND = resolverNaRaiz("backend/src/main/java/sgc");
 const CAMINHO_RELATORIO_MD = resolverNaRaiz("backend-contratos-auditoria.md");
@@ -344,44 +345,55 @@ function exibirAjuda() {
     });
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const emitirJson = args.includes("--json");
-    const semGravar = args.includes("--sem-gravar");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const semGravar = argumentos.includes("--sem-gravar");
 
-    if (args.includes("--help") || args.includes("-h")) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
         return;
     }
 
-    imprimirCabecalho("AUDITORIA DE CONTRATOS HTTP (BACKEND)");
-    escreverLinha(`Base analisada: ${pc.dim(DIRETORIO_BACKEND)}`);
+    if (!emitirJson) {
+        imprimirCabecalho("AUDITORIA DE CONTRATOS HTTP (BACKEND)");
+        escreverLinha(`Base analisada: ${pc.dim(DIRETORIO_BACKEND)}`);
+    }
 
     const relatorio = await auditarContratos();
 
     if (!semGravar) {
         await gravarRelatorio(relatorio);
-        escreverLinha(`Relatório Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
+        if (!emitirJson) {
+            escreverLinha(`Relatório Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
+        }
     }
 
-    escreverLinha(`Achados: ${relatorio.resumo.totalAchados}`);
-    escreverLinha(`Controllers afetados: ${relatorio.resumo.controladoresAfetados}`);
-    escreverLinha(`DTOs afetados: ${relatorio.resumo.dtosAfetados}`);
+    if (!emitirJson) {
+        escreverLinha(`Achados: ${relatorio.resumo.totalAchados}`);
+        escreverLinha(`Controllers afetados: ${relatorio.resumo.controladoresAfetados}`);
+        escreverLinha(`DTOs afetados: ${relatorio.resumo.dtosAfetados}`);
 
-    if (relatorio.achados.length > 0) {
-        for (const achado of relatorio.achados.slice(0, 10)) {
-            escreverLinha(`- ${achado.controlador}.${achado.metodo} -> ${achado.tipoRetorno}.${achado.campo} (${achado.tipoModelo})`);
+        if (relatorio.achados.length > 0) {
+            for (const achado of relatorio.achados.slice(0, 10)) {
+                escreverLinha(`- ${achado.controlador}.${achado.metodo} -> ${achado.tipoRetorno}.${achado.campo} (${achado.tipoModelo})`);
+            }
+        } else {
+            escreverLinha(pc.green("Nenhum vazamento direto de model.* foi encontrado nos DTOs publicos auditados."));
         }
-    } else {
-        escreverLinha(pc.green("Nenhum vazamento direto de model.* foi encontrado nos DTOs publicos auditados."));
     }
 
     if (emitirJson) {
-        process.stdout.write(`${JSON.stringify(relatorio, null, 2)}\n`);
+        imprimirJson(relatorio);
     }
 }
 
-main().catch((erro) => {
-    escreverLinha(pc.red(`Erro ao auditar contratos do backend: ${erro instanceof Error ? erro.message : String(erro)}`));
-    process.exit(1);
-});
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        escreverLinha(pc.red(`Erro ao auditar contratos do backend: ${erro instanceof Error ? erro.message : String(erro)}`));
+        process.exitCode = 1;
+    });
+}
+
+export {
+    principal,
+};

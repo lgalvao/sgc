@@ -17,6 +17,11 @@ const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
     "cobertura-ramificacoes.js",
     "cobertura-auditoria.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
+const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
+    "arquitetura-auditar.js",
+    "coesao-auditar.js",
+    "contratos-auditar.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.js");
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.js",
@@ -121,6 +126,25 @@ describe("CLI raiz do toolkit", () => {
 
     test("pode importar comandos de cobertura backend sem ler JaCoCo", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_BACKEND.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("pode importar auditores estruturais do backend sem analisar o projeto", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_AUDITORIA_BACKEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
                 "--input-type=module",

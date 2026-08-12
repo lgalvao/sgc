@@ -6,6 +6,7 @@ import pc from "picocolors";
 import {globby} from "globby";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 const DIRETORIO_BACKEND = resolverNaRaiz("backend/src/main/java/sgc");
@@ -226,39 +227,44 @@ function exibirAjuda() {
     });
 }
 
-async function main() {
-    const args = process.argv.slice(2);
+async function principal(argumentos = process.argv.slice(2)) {
 
-    if (args.includes("--help") || args.includes("-h")) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
         return;
     }
 
-    const emitirJson = args.includes("--json");
-    const semGravar = args.includes("--sem-gravar");
+    const emitirJson = argumentos.includes("--json");
+    const semGravar = argumentos.includes("--sem-gravar");
 
-    imprimirCabecalho("AUDITORIA DE COESÃO DO BACKEND");
-    escreverLinha(`Base analisada: ${pc.dim(DIRETORIO_BACKEND)}`);
+    if (!emitirJson) {
+        imprimirCabecalho("AUDITORIA DE COESÃO DO BACKEND");
+        escreverLinha(`Base analisada: ${pc.dim(DIRETORIO_BACKEND)}`);
+    }
 
     const relatorio = await auditarCoesao();
 
     if (!semGravar) {
         await gravarRelatorios(relatorio);
-        escreverLinha(`Relatório Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
-        escreverLinha(`Relatório JSON: ${pc.dim(CAMINHO_RELATORIO_JSON)}`);
+        if (!emitirJson) {
+            escreverLinha(`Relatório Markdown: ${pc.dim(CAMINHO_RELATORIO_MD)}`);
+            escreverLinha(`Relatório JSON: ${pc.dim(CAMINHO_RELATORIO_JSON)}`);
+        }
     }
 
-    escreverLinha(`Analisados: ${relatorio.resumo.totalAnalisados} — Críticos: ${pc.red(String(relatorio.resumo.criticos))} — Alertas: ${pc.yellow(String(relatorio.resumo.alertas))} — OK: ${pc.green(String(relatorio.resumo.ok))}`);
+    if (!emitirJson) {
+        escreverLinha(`Analisados: ${relatorio.resumo.totalAnalisados} — Críticos: ${pc.red(String(relatorio.resumo.criticos))} — Alertas: ${pc.yellow(String(relatorio.resumo.alertas))} — OK: ${pc.green(String(relatorio.resumo.ok))}`);
 
-    if (relatorio.hotspots.length > 0) {
-        escreverLinha("");
-        escreverLinha(pc.bold("Hotspots:"));
-        for (const item of relatorio.hotspots.slice(0, 10)) {
-            const cor = item.severidade === "critico" ? pc.red : pc.yellow;
-            escreverLinha(`  ${cor("●")} ${item.nomeArquivo} — ${item.motivos.join(", ")}`);
+        if (relatorio.hotspots.length > 0) {
+            escreverLinha("");
+            escreverLinha(pc.bold("Hotspots:"));
+            for (const item of relatorio.hotspots.slice(0, 10)) {
+                const cor = item.severidade === "critico" ? pc.red : pc.yellow;
+                escreverLinha(`  ${cor("●")} ${item.nomeArquivo} — ${item.motivos.join(", ")}`);
+            }
+        } else {
+            escreverLinha(pc.green("Nenhum service com responsabilidades misturadas encontrado."));
         }
-    } else {
-        escreverLinha(pc.green("Nenhum service com responsabilidades misturadas encontrado."));
     }
 
     if (emitirJson) {
@@ -266,7 +272,13 @@ async function main() {
     }
 }
 
-main().catch((erro) => {
-    escreverLinha(pc.red(`Erro ao auditar coesão: ${erro instanceof Error ? erro.message : String(erro)}`));
-    process.exit(1);
-});
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        escreverLinha(pc.red(`Erro ao auditar coesão: ${erro instanceof Error ? erro.message : String(erro)}`));
+        process.exitCode = 1;
+    });
+}
+
+export {
+    principal,
+};
