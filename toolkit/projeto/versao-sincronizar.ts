@@ -1,32 +1,35 @@
-#!/usr/bin/env node
-
-import fs from "node:fs";
+import {existsSync, readFileSync, writeFileSync} from "node:fs";
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {escreverLinha} from "../lib/saida.js";
 
-function sincronizarVersao(novaVersao, diretorioBase = resolverNaRaiz()) {
+interface ResultadoSincronizacao {
+    novaVersao: string;
+    arquivosAtualizados: string[];
+}
+
+function sincronizarVersao(novaVersao: string | undefined, diretorioBase = resolverNaRaiz()): ResultadoSincronizacao {
     if (!novaVersao) {
         throw new Error("Informe a versão que deve ser sincronizada.");
     }
 
-    const arquivosAtualizados = [];
+    const arquivosAtualizados: string[] = [];
 
-    const resolver = caminho => path.resolve(diretorioBase, caminho);
+    const resolver = (caminho: string): string => path.resolve(diretorioBase, caminho);
     const caminhoGradle = resolver("gradle.properties");
-    if (fs.existsSync(caminhoGradle)) {
-        let conteudo = fs.readFileSync(caminhoGradle, "utf-8");
+    if (existsSync(caminhoGradle)) {
+        let conteudo = readFileSync(caminhoGradle, "utf-8");
         conteudo = conteudo.replace(/^version=.*$/m, `version=${novaVersao}`);
-        fs.writeFileSync(caminhoGradle, conteudo, "utf-8");
+        writeFileSync(caminhoGradle, conteudo, "utf-8");
         arquivosAtualizados.push("gradle.properties");
     }
 
     const caminhoFrontend = resolver("frontend/package.json");
-    if (fs.existsSync(caminhoFrontend)) {
-        const pacote = JSON.parse(fs.readFileSync(caminhoFrontend, "utf-8"));
+    if (existsSync(caminhoFrontend)) {
+        const pacote = JSON.parse(readFileSync(caminhoFrontend, "utf-8")) as Record<string, unknown>;
         pacote.version = novaVersao;
-        fs.writeFileSync(caminhoFrontend, `${JSON.stringify(pacote, null, 2)}\n`, "utf-8");
+        writeFileSync(caminhoFrontend, `${JSON.stringify(pacote, null, 2)}\n`, "utf-8");
         arquivosAtualizados.push("frontend/package.json");
     }
 
@@ -36,11 +39,11 @@ function sincronizarVersao(novaVersao, diretorioBase = resolverNaRaiz()) {
     };
 }
 
-function principal(argumentos = process.argv.slice(2)) {
+function principal(argumentos: string[] = process.argv.slice(2)): ResultadoSincronizacao | undefined {
     const novaVersao = argumentos[0];
     if (!novaVersao) {
         process.stderr.write("Uso recomendado: npx tsx toolkit/sgc.js projeto versao-sincronizar <versao>\n");
-        process.stderr.write("Execução direta: npx tsx toolkit/projeto/versao-sincronizar.js <versao>\n");
+        process.stderr.write("Execução direta: npx tsx toolkit/projeto/versao-sincronizar.ts <versao>\n");
         process.exitCode = 1;
         return;
     }
@@ -56,7 +59,7 @@ function principal(argumentos = process.argv.slice(2)) {
 if (ehEntradaPrincipal(import.meta.url)) {
     try {
         principal();
-    } catch (erro) {
+    } catch (erro: unknown) {
         process.stderr.write(`Erro ao sincronizar versão: ${erro instanceof Error ? erro.message : String(erro)}\n`);
         process.exitCode = 1;
     }
