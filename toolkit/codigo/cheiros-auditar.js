@@ -2,12 +2,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
+import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-
-const DIRETORIO_SAIDA = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "codigo-cheiros", "mais-recente");
-const ARQUIVO_FOTOGRAFIA = path.join(DIRETORIO_SAIDA, "fotografia.json");
-const ARQUIVO_RESUMO = path.join(DIRETORIO_SAIDA, "resumo.md");
 
 const EXTENSOES_TEXTO = new Set([".ts", ".vue", ".java"]);
 
@@ -161,9 +160,9 @@ function classificarPontuacao(pontuacao) {
     return "critico";
 }
 
-async function lerFotografiaAnterior() {
+async function lerFotografiaAnterior(caminhoFotografia) {
     try {
-        return JSON.parse(await fs.readFile(ARQUIVO_FOTOGRAFIA, "utf8"));
+        return JSON.parse(await fs.readFile(caminhoFotografia, "utf8"));
     } catch {
         return null;
     }
@@ -229,8 +228,13 @@ function gerarMarkdown(snapshot) {
     return `${linhas.join("\n")}\n`;
 }
 
-async function executarAuditoria({base = DIRETORIO_RAIZ, json = false, semGravar = false} = {}) {
+async function executarAuditoria({base = DIRETORIO_RAIZ, semGravar = false, diretorioSaida} = {}) {
     const baseResolvida = path.resolve(base);
+    const saidaResolvida = path.resolve(
+        diretorioSaida ?? path.join(resolverCaminhoConfigurado("artefatosQualidade", baseResolvida), "codigo-cheiros", "mais-recente")
+    );
+    const caminhoFotografia = path.join(saidaResolvida, "fotografia.json");
+    const caminhoResumo = path.join(saidaResolvida, "resumo.md");
     const arquivos = await listarArquivosTexto(baseResolvida);
     const contagens = criarEstruturaContagens();
     const pontuacaoPorEscopo = {
@@ -269,7 +273,7 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, json = false, semGravar
         }
     }
 
-    const anterior = semGravar ? null : await lerFotografiaAnterior();
+    const anterior = semGravar ? null : await lerFotografiaAnterior(caminhoFotografia);
     const pontuacaoTotal = PADROES.reduce((soma, padrao) => soma + (contagens[padrao.chave] * padrao.peso), 0);
 
     const snapshot = {
@@ -288,75 +292,71 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, json = false, semGravar
     };
 
     if (!semGravar) {
-        await fs.mkdir(DIRETORIO_SAIDA, {recursive: true});
-        await fs.writeFile(ARQUIVO_FOTOGRAFIA, JSON.stringify(snapshot, null, 2));
-        await fs.writeFile(ARQUIVO_RESUMO, gerarMarkdown(snapshot));
+        await fs.mkdir(saidaResolvida, {recursive: true});
+        await fs.writeFile(caminhoFotografia, JSON.stringify(snapshot, null, 2));
+        await fs.writeFile(caminhoResumo, gerarMarkdown(snapshot));
     }
 
-    if (json) {
+    return {snapshot, caminhoFotografia, caminhoResumo};
+}
+
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
+    if (exibirAjuda) {
+        exibirAjudaComando({
+            comandoSgc: "codigo cheiros auditar",
+            scriptDireto: "codigo/cheiros-auditar.js",
+            descricao: "Gera uma fotografia com contagens e pontuacao de cheiros de codigo.",
+            opcoes: [
+                "--json               Emite a fotografia em JSON.",
+                "--sem-gravar         Nao atualiza os artefatos.",
+                "--base <diretorio>   Sobrescreve a base da auditoria.",
+            ],
+        });
+        return;
+    }
+
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const execucao = await executarAuditoria({
+        base,
+        semGravar: argumentos.includes("--sem-gravar"),
+    });
+    const {snapshot} = execucao;
+
+    if (emitirJson) {
         imprimirJson(snapshot);
         return;
     }
 
     imprimirCabecalho("Auditoria de cheiros de codigo", `Base: ${snapshot.base}`);
     escreverLinha(`Pontuacao total: ${snapshot.pontuacao.total} (${snapshot.pontuacao.faixa})`);
-    escreverLinha("");
+    escreverLinha();
     for (const padrao of PADROES) {
         escreverLinha(`- ${padrao.titulo}: ${snapshot.contagens[padrao.chave]} (delta ${formatarDelta(snapshot.deltas[padrao.chave])})`);
     }
 
-    escreverLinha("");
+    escreverLinha();
     escreverLinha("Hotspots:");
     for (const hotspot of snapshot.hotspots.slice(0, 10)) {
         escreverLinha(`- ${hotspot.arquivo}: ${hotspot.pontuacao} ponto(s)`);
     }
 
-    if (!semGravar) {
-        escreverLinha("");
-        escreverLinha(`Fotografia salva em ${ARQUIVO_FOTOGRAFIA}`);
-        escreverLinha(`Resumo salvo em ${ARQUIVO_RESUMO}`);
+    if (!argumentos.includes("--sem-gravar")) {
+        escreverLinha();
+        escreverLinha(`Fotografia salva em ${execucao.caminhoFotografia}`);
+        escreverLinha(`Resumo salvo em ${execucao.caminhoResumo}`);
     }
 }
 
-function parseArgs(argv) {
-    const opcoes = {
-        base: DIRETORIO_RAIZ,
-        json: false,
-        semGravar: false
-    };
-
-    for (let indice = 0; indice < argv.length; indice += 1) {
-        const arg = argv[indice];
-
-        if (arg === "--json") {
-            opcoes.json = true;
-            continue;
-        }
-
-        if (arg === "--sem-gravar") {
-            opcoes.semGravar = true;
-            continue;
-        }
-
-        if (arg === "--base") {
-            opcoes.base = argv[indice + 1] ?? DIRETORIO_RAIZ;
-            indice += 1;
-        }
-    }
-
-    return opcoes;
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        escreverLinha(`Erro ao auditar cheiros de codigo: ${erro instanceof Error ? erro.message : String(erro)}`);
+        process.exitCode = 1;
+    });
 }
 
-if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    escreverLinha("Uso: node toolkit/sgc.js codigo cheiros auditar [--json] [--sem-gravar] [--base <diretorio>]");
-    escreverLinha("");
-    escreverLinha("Gera uma fotografia com contagens e pontuacao de cheiros de codigo.");
-    process.exit(0);
-}
-
-try {
-    await executarAuditoria(parseArgs(process.argv.slice(2)));
-} catch (error) {
-    escreverLinha(`Erro ao auditar cheiros de codigo: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
-}
+export {
+    executarAuditoria,
+    principal,
+};
