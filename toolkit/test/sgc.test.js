@@ -11,6 +11,10 @@ import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.js");
+const CAMINHOS_COMANDOS_TESTES_BACKEND = [
+    "testes-analisar.js",
+    "testes-priorizar.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.js");
 const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
@@ -176,6 +180,25 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toBe("importacao-ok");
+    });
+
+    test("pode importar comandos de analise de testes sem ler relatorios", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_TESTES_BACKEND.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
     });
 
     test("corrige FQNs em uma raiz de backend externa no modo simulacao", async () => {

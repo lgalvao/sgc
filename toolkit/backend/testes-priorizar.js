@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha} from "../lib/saida.js";
 
 const PADROES_P1 = [
     /Service\.java$/,
@@ -34,26 +37,13 @@ const PADROES_ESTRUTURAIS = [
     /Erro.*\.java$/
 ];
 
-function parseArgs(argv) {
+function lerArgumentos(argumentos) {
     const resultado = {
-        input: 'unit-test-report.md',
-        inputExplicito: false,
-        output: 'prioritized-tests.md'
+        entrada: lerOpcao(argumentos, "--input", "unit-test-report.md"),
+        entradaExplicita: argumentos.includes("--input") || argumentos.some((argumento) => argumento.startsWith("--input=")),
+        saida: lerOpcao(argumentos, "--output", "prioritized-tests.md"),
+        ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
     };
-
-    for (let indice = 0; indice < argv.length; indice++) {
-        const arg = argv[indice];
-        if (arg === '--input') {
-            resultado.input = argv[++indice];
-            resultado.inputExplicito = true;
-        } else if (arg === '--output') {
-            resultado.output = argv[++indice];
-        } else if (arg === '--help' || arg === '-h') {
-            imprimirAjuda();
-            process.exit(0);
-        }
-    }
-
     return resultado;
 }
 
@@ -203,19 +193,32 @@ function gerarMarkdown(priorizadas) {
     return `${linhas.join('\n')}\n`;
 }
 
-function main() {
-    const args = parseArgs(process.argv.slice(2));
-    const caminhoEntrada = args.inputExplicito ? args.input : resolverEntradaPadrao(args.input);
+function principal(argumentos = process.argv.slice(2)) {
+    const opcoes = lerArgumentos(argumentos);
+    if (opcoes.ajuda) {
+        imprimirAjuda();
+        return;
+    }
+
+    const caminhoEntrada = opcoes.entradaExplicita ? opcoes.entrada : resolverEntradaPadrao(opcoes.entrada);
     const priorizadas = priorizar(caminhoEntrada);
-    fs.writeFileSync(args.output, gerarMarkdown(priorizadas), 'utf-8');
-    console.log(`Entrada utilizada: ${caminhoEntrada}`);
-    console.log(`Priorizacao concluida. Encontrados ${priorizadas.P1.length} P1, ${priorizadas.P2.length} P2, ${priorizadas.P3.length} P3.`);
-    console.log(`Plano gerado em: ${args.output}`);
+    fs.mkdirSync(path.dirname(opcoes.saida), {recursive: true});
+    fs.writeFileSync(opcoes.saida, gerarMarkdown(priorizadas), 'utf-8');
+    escreverLinha(`Entrada utilizada: ${caminhoEntrada}`);
+    escreverLinha(`Priorizacao concluida. Encontrados ${priorizadas.P1.length} P1, ${priorizadas.P2.length} P2, ${priorizadas.P3.length} P3.`);
+    escreverLinha(`Plano gerado em: ${opcoes.saida}`);
 }
 
-try {
-    main();
-} catch (error) {
-    console.error(`Erro ao processar priorizacao: ${error.message}`);
-    process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    try {
+        principal();
+    } catch (erro) {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(`Erro ao processar priorizacao: ${mensagem}`);
+        process.exitCode = 1;
+    }
 }
+
+export {
+    principal,
+};

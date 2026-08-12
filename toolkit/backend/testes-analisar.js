@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha} from "../lib/saida.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {
     CATEGORIAS_PRIORITARIAS,
@@ -18,30 +21,14 @@ import {
     SUFIXOS_TESTE
 } from "./lib/testes-analisar-regras.js";
 
-function parseArgs(argv) {
+function lerArgumentos(argumentos) {
     const resultado = {
-        dir: 'backend',
-        output: 'unit-test-report.md',
-        outputJson: null,
-        jacocoXml: null
+        diretorio: lerOpcao(argumentos, "--dir", "backend"),
+        saida: lerOpcao(argumentos, "--output", "unit-test-report.md"),
+        saidaJson: lerOpcao(argumentos, "--output-json", null),
+        arquivoJacoco: lerOpcao(argumentos, "--jacoco-xml", null),
+        ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
     };
-
-    for (let indice = 0; indice < argv.length; indice++) {
-        const arg = argv[indice];
-        if (arg === '--dir') {
-            resultado.dir = argv[++indice];
-        } else if (arg === '--output') {
-            resultado.output = argv[++indice];
-        } else if (arg === '--output-json') {
-            resultado.outputJson = argv[++indice];
-        } else if (arg === '--jacoco-xml') {
-            resultado.jacocoXml = argv[++indice];
-        } else if (arg === '--help' || arg === '-h') {
-            imprimirAjuda();
-            process.exit(0);
-        }
-    }
-
     return resultado;
 }
 
@@ -497,6 +484,7 @@ function gerarMarkdown(dados) {
 }
 
 function gravarArquivo(caminho, conteudo) {
+    fs.mkdirSync(path.dirname(caminho), {recursive: true});
     fs.writeFileSync(caminho, conteudo, 'utf-8');
 }
 
@@ -546,19 +534,31 @@ function imprimirResumoConsole(dados) {
     }
 }
 
-async function main() {
-    const args = parseArgs(process.argv.slice(2));
-    const outputJson = args.outputJson ?? resolverSaidaJsonPadrao(args.output);
-    const dados = await analisarTestes(args.dir, args.jacocoXml);
-    gravarArquivo(args.output, gerarMarkdown(dados));
-    gravarArquivo(outputJson, JSON.stringify(dados, null, 2));
+async function principal(argumentos = process.argv.slice(2)) {
+    const opcoes = lerArgumentos(argumentos);
+    if (opcoes.ajuda) {
+        imprimirAjuda();
+        return;
+    }
+
+    const caminhoSaidaJson = opcoes.saidaJson ?? resolverSaidaJsonPadrao(opcoes.saida);
+    const dados = await analisarTestes(opcoes.diretorio, opcoes.arquivoJacoco);
+    gravarArquivo(opcoes.saida, gerarMarkdown(dados));
+    gravarArquivo(caminhoSaidaJson, JSON.stringify(dados, null, 2));
 
     imprimirResumoConsole(dados);
-    console.log(`Relatorio Markdown gerado em: ${args.output}`);
-    console.log(`Relatorio JSON gerado em: ${outputJson}`);
+    escreverLinha(`Relatorio Markdown gerado em: ${opcoes.saida}`);
+    escreverLinha(`Relatorio JSON gerado em: ${caminhoSaidaJson}`);
 }
 
-main().catch(error => {
-    console.error(`Erro ao analisar testes: ${error.message}`);
-    process.exit(1);
-});
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(`Erro ao analisar testes: ${mensagem}`);
+        process.exitCode = 1;
+    });
+}
+
+export {
+    principal,
+};
