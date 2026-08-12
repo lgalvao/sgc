@@ -1,46 +1,25 @@
 import pc from "picocolors";
 
-/**
- * @param {string} [texto]
- * @returns {void}
- */
-function escrever(texto = "") {
+function escrever(texto = ""): void {
     process.stdout.write(texto);
 }
 
-/**
- * @param {string} [texto]
- * @returns {void}
- */
-function escreverLinha(texto = "") {
+function escreverLinha(texto = ""): void {
     escrever(`${texto}\n`);
 }
 
-/**
- * @param {unknown} dados
- * @returns {void}
- */
-function imprimirJson(dados) {
+function imprimirJson(dados: unknown): void {
     escreverLinha(JSON.stringify(dados, null, 2));
 }
 
-/**
- * @param {string} titulo
- * @param {string} [descricao]
- * @returns {void}
- */
-function imprimirCabecalho(titulo, descricao) {
+function imprimirCabecalho(titulo: string, descricao?: string): void {
     escreverLinha(pc.bold(pc.cyan(titulo)));
     if (descricao) {
         escreverLinha(descricao);
     }
 }
 
-/**
- * @param {string} status
- * @returns {string}
- */
-function formatarStatus(status) {
+function formatarStatus(status: string): string {
     if (status === "ok") {
         return pc.green("ok");
     }

@@ -3,7 +3,7 @@ import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
-import {execa, execaNode} from "execa";
+import {execa} from "execa";
 import {pathToFileURL} from "node:url";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
