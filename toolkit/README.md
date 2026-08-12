@@ -51,7 +51,6 @@ graph TD
 
 ```bash
 node toolkit/sgc.js backend cobertura auditoria
-node toolkit/sgc.js backend cobertura cruzada
 node toolkit/sgc.js backend testes analisar
 node toolkit/sgc.js backend testes priorizar
 node toolkit/sgc.js backend java corrigir-fqn
@@ -160,9 +159,8 @@ Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json`
 informado. Assim, a auditoria de outro projeto não lê nem grava silenciosamente no diretório de artefatos do SGC.
 
 Os comandos `backend cobertura auditoria` e `backend cobertura ramificacoes` aceitam `--base` e `--arquivo` para
-reutilizar relatórios JaCoCo de outro projeto Spring/Gradle. O comando `backend cobertura cruzada` permanece isolado por
-enquanto: ele duplica a leitura do XML, não possui saída JSON nem testes próprios e será avaliado como possível sobra
-local antes de receber mais compatibilidade.
+reutilizar relatórios JaCoCo de outro projeto Spring/Gradle. A antiga auditoria cruzada manual foi removida da CLI por
+duplicar a leitura do XML sem contrato JSON ou testes próprios; o histórico Git preserva sua implementação.
 
 ## Dependências e execução
 

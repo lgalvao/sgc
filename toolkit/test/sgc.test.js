@@ -1409,12 +1409,6 @@ describe("CLI raiz do toolkit", () => {
         expect(await fs.pathExists(DIRETORIO_SCRIPTS_FRONTEND_LEGADO)).toBe(false);
     });
 
-    test("exibe ajuda do comando de cobertura cruzada do backend", async () => {
-        const resultado = await executarSgc(["backend", "cobertura", "cruzada", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Auditoria de cobertura cruzada e independente (Backend).");
-    });
-
     test("projeto diagnostico identifica corretamente a ausencia de arquivos essenciais e falha com codigo 1", async () => {
         const diretorioVazio = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-vazio-"));
 

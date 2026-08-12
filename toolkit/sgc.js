@@ -29,7 +29,6 @@ const backend = program.command("backend").description("Ferramentas do backend."
 const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
 criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "toolkit/backend/cobertura-auditoria.js");
 criarComandoScript(backendCobertura, "ramificacoes", "Lista classes com lacunas de ramificacoes no backend.", "toolkit/backend/cobertura-ramificacoes.js");
-criarComandoScript(backendCobertura, "cruzada", "Auditoria de cobertura cruzada e independente (Backend).", "toolkit/backend/cobertura-cruzada.js");
 
 const backendArquitetura = backend.command("arquitetura").description("Auditorias de arquitetura do backend.");
 criarComandoScript(backendArquitetura, "auditar", "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.", "toolkit/backend/arquitetura-auditar.js");
