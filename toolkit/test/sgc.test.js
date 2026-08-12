@@ -38,6 +38,11 @@ const CAMINHOS_COMANDOS_CONSISTENCIA = [
     "nomes-consistencia-auditar.js",
     "idioma-consistencia-auditar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "codigo", nome));
+const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
+    "arquitetura-auditar.js",
+    "residuos-auditar.js",
+    "residuos-validar.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "frontend", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -174,6 +179,25 @@ describe("CLI raiz do toolkit", () => {
 
     test("pode importar auditores de consistencia sem gerar artefatos", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CONSISTENCIA.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("pode importar auditores estruturais do frontend sem auditar o projeto", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
             return execa(process.execPath, [
                 "--input-type=module",

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {
     analisarResiduosFrontend,
@@ -12,14 +11,8 @@ import {
 } from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-
-function lerOpcao(argumentos, nome) {
-    const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return null;
-    }
-    return argumentos[indice + 1] ?? null;
-}
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 
 function criarViolacao(tipo, mensagem, detalhes = {}) {
     return {
@@ -144,13 +137,12 @@ async function executarValidacaoFrontendResiduos(opcoes = {}) {
     };
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const jsonResumidoMode = args.includes("--json-resumido");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const emitirJsonResumido = argumentos.includes("--json-resumido");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend residuos validar",
             scriptDireto: "frontend/residuos-validar.js",
@@ -170,27 +162,29 @@ async function main() {
                 "node toolkit/sgc.js frontend residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
             ]
         });
-        process.exit(0);
+        return;
     }
 
-    const orcamento = path.resolve(lerOpcao(args, "--orcamento") ?? CAMINHO_ORCAMENTO_PADRAO);
-    const excecoes = path.resolve(lerOpcao(args, "--excecoes") ?? CAMINHO_EXCECOES_PADRAO);
+    const orcamento = path.resolve(lerOpcao(argumentos, "--orcamento", CAMINHO_ORCAMENTO_PADRAO));
+    const excecoes = path.resolve(lerOpcao(argumentos, "--excecoes", CAMINHO_EXCECOES_PADRAO));
     const resultado = await executarValidacaoFrontendResiduos({
-        base: lerOpcao(args, "--base"),
+        base: lerOpcao(argumentos, "--base", undefined),
         orcamento,
         excecoes,
-        saida: path.resolve(lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO),
-        semGravar: args.includes("--sem-gravar"),
+        saida: path.resolve(lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO)),
+        semGravar: argumentos.includes("--sem-gravar"),
     });
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(resultado);
-        process.exit(resultado.status === "ok" ? 0 : 1);
+        if (resultado.status !== "ok") process.exitCode = 1;
+        return;
     }
 
-    if (jsonResumidoMode) {
+    if (emitirJsonResumido) {
         imprimirJson(resumirResultado(resultado));
-        process.exit(resultado.status === "ok" ? 0 : 1);
+        if (resultado.status !== "ok") process.exitCode = 1;
+        return;
     }
 
     imprimirCabecalho("VALIDACAO DE RESIDUOS DO FRONTEND");
@@ -220,18 +214,20 @@ async function main() {
     escreverLinha("");
     escreverLinha(`Orcamento: ${resultado.orcamento}`);
     escreverLinha(`Excecoes: ${resultado.excecoes}`);
-    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO)).replaceAll("\\", "/")}`);
+    escreverLinha(`Fotografia mais recente: ${path.relative(process.cwd(), path.resolve(lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO))).replaceAll("\\", "/")}`);
 
-    process.exit(resultado.status === "ok" ? 0 : 1);
+    if (resultado.status !== "ok") process.exitCode = 1;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        escreverLinha(pc.red(`Erro na validacao de residuos: ${erro.message}`));
-        process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro na validacao de residuos: ${mensagem}`));
+        process.exitCode = 1;
     });
 }
 
 export {
-    executarValidacaoFrontendResiduos
+    executarValidacaoFrontendResiduos,
+    principal,
 };

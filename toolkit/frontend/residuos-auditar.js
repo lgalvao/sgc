@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {
     analisarResiduosFrontend,
@@ -10,14 +9,8 @@ import {
 } from "./residuos-lib.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-
-function lerOpcao(argumentos, nome) {
-    const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return null;
-    }
-    return argumentos[indice + 1] ?? null;
-}
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 
 async function executarAuditoriaFrontendResiduos(opcoes = {}) {
     const fotografia = await analisarResiduosFrontend({
@@ -32,12 +25,11 @@ async function executarAuditoriaFrontendResiduos(opcoes = {}) {
     return fotografia;
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend residuos auditar",
             scriptDireto: "frontend/residuos-auditar.js",
@@ -55,17 +47,17 @@ async function main() {
                 "node toolkit/sgc.js frontend residuos auditar --sem-gravar --base /tmp/sgc"
             ]
         });
-        process.exit(0);
+        return;
     }
 
     const fotografia = await executarAuditoriaFrontendResiduos({
-        base: lerOpcao(args, "--base"),
-        orcamento: lerOpcao(args, "--orcamento") ?? CAMINHO_ORCAMENTO_PADRAO,
-        saida: lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO,
-        semGravar: args.includes("--sem-gravar"),
+        base: lerOpcao(argumentos, "--base", undefined),
+        orcamento: lerOpcao(argumentos, "--orcamento", CAMINHO_ORCAMENTO_PADRAO),
+        saida: lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO),
+        semGravar: argumentos.includes("--sem-gravar"),
     });
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(fotografia);
         return;
     }
@@ -90,20 +82,22 @@ async function main() {
         escreverLinha(`   Linhas: ${hotspot.linhas} | Score: ${hotspot.score}`);
     });
 
-    if (!args.includes("--sem-gravar")) {
-        const diretorio = lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO;
+    if (!argumentos.includes("--sem-gravar")) {
+        const diretorio = lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO);
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
     }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        escreverLinha(pc.red(`Erro na auditoria de residuos: ${erro.message}`));
-        process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro na auditoria de residuos: ${mensagem}`));
+        process.exitCode = 1;
     });
 }
 
 export {
-    executarAuditoriaFrontendResiduos
+    executarAuditoriaFrontendResiduos,
+    principal,
 };

@@ -1,18 +1,11 @@
 #!/usr/bin/env node
 import path from "node:path";
-import {pathToFileURL} from "node:url";
 import pc from "picocolors";
 import {analisarArquiteturaFrontend, DIRETORIO_SAIDA_PADRAO, gravarFotografiaArquitetura} from "./arquitetura-lib.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-
-function lerOpcao(argumentos, nome) {
-    const indice = argumentos.indexOf(nome);
-    if (indice === -1) {
-        return null;
-    }
-    return argumentos[indice + 1] ?? null;
-}
 
 async function executarAuditoriaArquiteturaFrontend(opcoes = {}) {
     const snapshot = await analisarArquiteturaFrontend({base: opcoes.base});
@@ -24,12 +17,11 @@ async function executarAuditoriaArquiteturaFrontend(opcoes = {}) {
     return snapshot;
 }
 
-async function main() {
-    const args = process.argv.slice(2);
-    const jsonMode = args.includes("--json");
-    const helpMode = args.includes("--help") || args.includes("-h");
+async function principal(argumentos = process.argv.slice(2)) {
+    const emitirJson = argumentos.includes("--json");
+    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
-    if (helpMode) {
+    if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend arquitetura auditar",
             scriptDireto: "frontend/arquitetura-auditar.js",
@@ -46,16 +38,16 @@ async function main() {
                 "node toolkit/sgc.js frontend arquitetura auditar --sem-gravar --base /tmp/sgc"
             ]
         });
-        process.exit(0);
+        return;
     }
 
     const snapshot = await executarAuditoriaArquiteturaFrontend({
-        base: lerOpcao(args, "--base"),
-        saida: lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO,
-        semGravar: args.includes("--sem-gravar"),
+        base: lerOpcao(argumentos, "--base", undefined),
+        saida: lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO),
+        semGravar: argumentos.includes("--sem-gravar"),
     });
 
-    if (jsonMode) {
+    if (emitirJson) {
         imprimirJson(snapshot);
         return;
     }
@@ -87,20 +79,22 @@ async function main() {
         escreverLinha(`   Fan-out: ${hotspot.metricasAst.categoriasAcoplamento} categorias / ${hotspot.metricasAst.importacoesArquiteturais} imports`);
     });
 
-    if (!args.includes("--sem-gravar")) {
-        const diretorio = lerOpcao(args, "--saida") ?? DIRETORIO_SAIDA_PADRAO;
+    if (!argumentos.includes("--sem-gravar")) {
+        const diretorio = lerOpcao(argumentos, "--saida", DIRETORIO_SAIDA_PADRAO);
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
     }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-    main().catch((erro) => {
-        escreverLinha(pc.red(`Erro na auditoria arquitetural: ${erro.message}`));
-        process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(pc.red(`Erro na auditoria arquitetural: ${mensagem}`));
+        process.exitCode = 1;
     });
 }
 
 export {
-    executarAuditoriaArquiteturaFrontend
+    executarAuditoriaArquiteturaFrontend,
+    principal,
 };
