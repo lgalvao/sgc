@@ -28,6 +28,7 @@ const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.js");
 const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "java-corrigir-fqn.js");
+const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.js");
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.js",
     "contratos-exportar-openapi.js",
@@ -199,6 +200,21 @@ describe("CLI raiz do toolkit", () => {
             expect(resultado.exitCode).toBe(0);
             expect(resultado.stdout).toBe("importacao-ok");
         }
+    });
+
+    test("pode importar o auditor Semgrep sem executar a ferramenta externa", async () => {
+        const urlModulo = pathToFileURL(CAMINHO_SEMGREP_AUDITAR).href;
+        const resultado = await execa(process.execPath, [
+            "--input-type=module",
+            "-e",
+            `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+        ], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false
+        });
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toBe("importacao-ok");
     });
 
     test("corrige FQNs em uma raiz de backend externa no modo simulacao", async () => {
