@@ -1,15 +1,20 @@
-import fs from "node:fs";
+import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "./caminhos.js";
 
+type DiretoriosConfigurados = Record<string, string>;
+
+interface ConfiguracaoToolkit {
+    diretorios: DiretoriosConfigurados;
+}
+
+interface ConfiguracaoSobreposta {
+    diretorios?: DiretoriosConfigurados;
+}
+
 const NOME_ARQUIVO_CONFIGURACAO = "configuracao-toolkit.json";
 
-/** @typedef {Record<string, string>} DiretoriosConfigurados */
-/** @typedef {{diretorios: DiretoriosConfigurados}} ConfiguracaoToolkit */
-/** @typedef {{diretorios?: DiretoriosConfigurados}} ConfiguracaoSobreposta */
-
-/** @type {ConfiguracaoToolkit} */
-const CONFIGURACAO_PADRAO = {
+const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
     diretorios: {
         backend: "backend",
         frontend: "frontend",
@@ -26,12 +31,10 @@ const CONFIGURACAO_PADRAO = {
     }
 };
 
-/**
- * @param {ConfiguracaoToolkit} configuracaoBase
- * @param {ConfiguracaoSobreposta} configuracaoSobreposta
- * @returns {ConfiguracaoToolkit}
- */
-function combinarConfiguracoes(configuracaoBase, configuracaoSobreposta) {
+function combinarConfiguracoes(
+    configuracaoBase: ConfiguracaoToolkit,
+    configuracaoSobreposta: ConfiguracaoSobreposta
+): ConfiguracaoToolkit {
     return {
         ...configuracaoBase,
         ...configuracaoSobreposta,
@@ -42,20 +45,16 @@ function combinarConfiguracoes(configuracaoBase, configuracaoSobreposta) {
     };
 }
 
-/**
- * @param {string} [diretorioBase]
- * @returns {ConfiguracaoToolkit}
- */
-function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ) {
+function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ): ConfiguracaoToolkit {
     const caminho = path.join(diretorioBase, NOME_ARQUIVO_CONFIGURACAO);
-    if (!fs.existsSync(caminho)) {
+    if (!existsSync(caminho)) {
         return CONFIGURACAO_PADRAO;
     }
 
-    let configuracaoSobreposta;
+    let configuracaoSobreposta: ConfiguracaoSobreposta;
     try {
-        configuracaoSobreposta = /** @type {ConfiguracaoSobreposta} */ (JSON.parse(fs.readFileSync(caminho, "utf8")));
-    } catch (erro) {
+        configuracaoSobreposta = JSON.parse(readFileSync(caminho, "utf8")) as ConfiguracaoSobreposta;
+    } catch (erro: unknown) {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
         throw new Error(`Nao foi possivel ler ${NOME_ARQUIVO_CONFIGURACAO}: ${mensagem}`, {cause: erro});
     }
@@ -63,12 +62,7 @@ function carregarConfiguracao(diretorioBase = DIRETORIO_RAIZ) {
     return combinarConfiguracoes(CONFIGURACAO_PADRAO, configuracaoSobreposta);
 }
 
-/**
- * @param {string} nomeDiretorio
- * @param {string} [diretorioBase]
- * @returns {string}
- */
-function resolverCaminhoConfigurado(nomeDiretorio, diretorioBase = DIRETORIO_RAIZ) {
+function resolverCaminhoConfigurado(nomeDiretorio: string, diretorioBase = DIRETORIO_RAIZ): string {
     const configuracao = carregarConfiguracao(diretorioBase);
     const caminhoRelativo = configuracao.diretorios[nomeDiretorio];
     if (!caminhoRelativo) {
