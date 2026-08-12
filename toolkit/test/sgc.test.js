@@ -23,6 +23,7 @@ const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
     "contratos-auditar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.js");
+const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "java-corrigir-fqn.js");
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.js",
     "contratos-exportar-openapi.js",
@@ -160,6 +161,47 @@ describe("CLI raiz do toolkit", () => {
             expect(resultado.exitCode).toBe(0);
             expect(resultado.stdout).toBe("importacao-ok");
         }
+    });
+
+    test("pode importar o corretor de FQN sem alterar arquivos", async () => {
+        const urlModulo = pathToFileURL(CAMINHO_CORRIGIR_FQN).href;
+        const resultado = await execa(process.execPath, [
+            "--input-type=module",
+            "-e",
+            `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+        ], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false
+        });
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toBe("importacao-ok");
+    });
+
+    test("corrige FQNs em uma raiz de backend externa no modo simulacao", async () => {
+        const diretorioBackend = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-"));
+        const caminhoJava = path.join(diretorioBackend, "src", "main", "java", "exemplo", "Exemplo.java");
+        const conteudoOriginal = [
+            "package exemplo;",
+            "",
+            "public class Exemplo {",
+            "    com.externo.Alvo alvo;",
+            "}"
+        ].join("\n");
+        await fs.outputFile(caminhoJava, conteudoOriginal);
+
+        const resultado = await executarSgc([
+            "backend",
+            "java",
+            "corrigir-fqn",
+            "--base",
+            diretorioBackend,
+            "--dry-run"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("[simulacao] Atualizado");
+        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoOriginal);
     });
 
     test("pode importar auditoria de assuntos sem ler o backend", async () => {

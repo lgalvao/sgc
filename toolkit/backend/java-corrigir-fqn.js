@@ -1,241 +1,251 @@
 #!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {escreverLinha} from "../lib/saida.js";
 
-const TARGET_DIRS = ['src/test/java', 'src/main/java'];
-const PACKAGE_PREFIX = 'package ';
-const IMPORT_PREFIX = 'import ';
-const STATIC_PREFIX = 'static ';
-const MATCH_PTRN = /("[^"]*")|(\b([a-z]\w*(?:\.[a-z]\w*)+)\.([A-Z]\w*)\b)/g;
+const DIRETORIOS_ALVO = ["src/test/java", "src/main/java"];
+const PREFIXO_PACOTE = "package ";
+const PREFIXO_IMPORT = "import ";
+const PREFIXO_ESTATICO = "static ";
+const PADRAO_FQN = /("[^"]*")|(\b([a-z]\w*(?:\.[a-z]\w*)+)\.([A-Z]\w*)\b)/g;
 
-function shouldIgnoreFqn(packagePart, classPart) {
-    if (classPart === 'Assertions') {
+function deveIgnorarFqn(partePacote, parteClasse) {
+    if (parteClasse === "Assertions") {
         return true;
     }
-    return packagePart === 'java.lang';
+    return partePacote === "java.lang";
 }
 
-function parseImports(lines) {
-    let currentPackage = null;
-    const existingImports = new Map();
-    const importLineIndices = [];
+function analisarImports(linhas) {
+    let pacoteAtual = null;
+    const importsExistentes = new Map();
+    const indicesLinhasImport = [];
 
-    lines.forEach((line, index) => {
-        const stripped = line.trim();
-        if (stripped.startsWith(PACKAGE_PREFIX)) {
-            currentPackage = stripped.split('//')[0].replace(PACKAGE_PREFIX, '').replace(';', '').trim();
+    linhas.forEach((linha, indice) => {
+        const linhaLimpa = linha.trim();
+        if (linhaLimpa.startsWith(PREFIXO_PACOTE)) {
+            pacoteAtual = linhaLimpa.split("//")[0].replace(PREFIXO_PACOTE, "").replace(";", "").trim();
             return;
         }
 
-        if (!stripped.startsWith(IMPORT_PREFIX)) {
+        if (!linhaLimpa.startsWith(PREFIXO_IMPORT)) {
             return;
         }
 
-        importLineIndices.push(index);
-        let clean = stripped.split('//')[0].replace(IMPORT_PREFIX, '').replace(';', '').trim();
-        if (clean.startsWith(STATIC_PREFIX)) {
-            clean = clean.replace(STATIC_PREFIX, '').trim();
+        indicesLinhasImport.push(indice);
+        let importLimpo = linhaLimpa.split("//")[0].replace(PREFIXO_IMPORT, "").replace(";", "").trim();
+        if (importLimpo.startsWith(PREFIXO_ESTATICO)) {
+            importLimpo = importLimpo.replace(PREFIXO_ESTATICO, "").trim();
         }
 
-        const simpleName = clean.split('.').pop();
-        if (simpleName !== '*') {
-            existingImports.set(simpleName, clean);
+        const nomeSimples = importLimpo.split(".").pop();
+        if (nomeSimples !== "*") {
+            importsExistentes.set(nomeSimples, importLimpo);
         }
     });
 
-    return {currentPackage, existingImports, importLineIndices};
+    return {pacoteAtual, importsExistentes, indicesLinhasImport};
 }
 
-function getInsertPosition(lines, importLineIndices) {
-    if (importLineIndices.length > 0) {
-        return importLineIndices[importLineIndices.length - 1] + 1;
+function obterPosicaoInsercao(linhas, indicesLinhasImport) {
+    if (indicesLinhasImport.length > 0) {
+        return indicesLinhasImport[indicesLinhasImport.length - 1] + 1;
     }
 
-    for (let index = 0; index < lines.length; index++) {
-        if (lines[index].trim().startsWith(PACKAGE_PREFIX)) {
-            return index + 1;
+    for (let indice = 0; indice < linhas.length; indice++) {
+        if (linhas[indice].trim().startsWith(PREFIXO_PACOTE)) {
+            return indice + 1;
         }
     }
 
     return 0;
 }
 
-function checkCollision(simpleName, fqn, newImportsToAdd) {
-    return [...newImportsToAdd].some(item => item.split('.').pop() === simpleName && item !== fqn);
+function existeColisao(nomeSimples, fqn, importsNovos) {
+    return [...importsNovos].some((item) => item.split(".").pop() === nomeSimples && item !== fqn);
 }
 
-
-function determineReplacement(match, currentPackage, existingImports, newImportsToAdd) {
-    if (match[1]) {
-        return {replacement: match[1], changed: false};
+function determinarSubstituicao(correspondencia, pacoteAtual, importsExistentes, importsNovos) {
+    if (correspondencia[1]) {
+        return {substituicao: correspondencia[1], alterado: false};
     }
 
-    const fullMatch = match[2];
-    const pkg = match[3];
-    const cls = match[4];
-    const fqn = `${pkg}.${cls}`;
+    const correspondenciaCompleta = correspondencia[2];
+    const pacote = correspondencia[3];
+    const classe = correspondencia[4];
+    const fqn = `${pacote}.${classe}`;
 
-    let shouldReplace = false;
+    let deveSubstituir = false;
 
-    if (shouldIgnoreFqn(pkg, cls)) {
-        shouldReplace = true;
-    } else if (currentPackage && pkg === currentPackage) {
-        shouldReplace = true;
-    } else if (existingImports.has(cls)) {
-        shouldReplace = existingImports.get(cls) === fqn;
-    } else if (!checkCollision(cls, fqn, newImportsToAdd)) {
-        newImportsToAdd.add(fqn);
-        shouldReplace = true;
+    if (deveIgnorarFqn(pacote, classe)) {
+        deveSubstituir = true;
+    } else if (pacoteAtual && pacote === pacoteAtual) {
+        deveSubstituir = true;
+    } else if (importsExistentes.has(classe)) {
+        deveSubstituir = importsExistentes.get(classe) === fqn;
+    } else if (!existeColisao(classe, fqn, importsNovos)) {
+        importsNovos.add(fqn);
+        deveSubstituir = true;
     }
 
     return {
-        replacement: shouldReplace ? cls : fullMatch,
-        changed: shouldReplace
+        substituicao: deveSubstituir ? classe : correspondenciaCompleta,
+        alterado: deveSubstituir
     };
 }
 
-function scanLines(lines, currentPackage, existingImports) {
-    const newImportsToAdd = new Set();
-    const modifiedLines = [];
-    let hasModifications = false;
+function analisarLinhas(linhas, pacoteAtual, importsExistentes) {
+    const importsNovos = new Set();
+    const linhasModificadas = [];
+    let temAlteracoes = false;
 
-    lines.forEach(line => {
-        const stripped = line.trim();
-        if (stripped.startsWith(PACKAGE_PREFIX) || stripped.startsWith(IMPORT_PREFIX) || stripped.startsWith('//') || stripped.startsWith('*')) {
-            modifiedLines.push(line);
+    linhas.forEach((linha) => {
+        const linhaLimpa = linha.trim();
+        if (linhaLimpa.startsWith(PREFIXO_PACOTE) || linhaLimpa.startsWith(PREFIXO_IMPORT) || linhaLimpa.startsWith("//") || linhaLimpa.startsWith("*")) {
+            linhasModificadas.push(linha);
             return;
         }
 
-        const newLine = line.replace(MATCH_PTRN, (...args) => {
-            const {replacement, changed} = determineReplacement(args, currentPackage, existingImports, newImportsToAdd);
-            if (changed) {
-                hasModifications = true;
+        const novaLinha = linha.replace(PADRAO_FQN, (...argumentos) => {
+            const {substituicao, alterado} = determinarSubstituicao(argumentos, pacoteAtual, importsExistentes, importsNovos);
+            if (alterado) {
+                temAlteracoes = true;
             }
-            return replacement;
+            return substituicao;
         });
-        modifiedLines.push(newLine);
+        linhasModificadas.push(novaLinha);
     });
 
-    return {modifiedLines, newImportsToAdd, hasModifications};
+    return {linhasModificadas, importsNovos, temAlteracoes};
 }
 
-function processFile(filePath, dryRun = false) {
-    const lines = fs.readFileSync(filePath, 'utf-8').split(/\r?\n/).map((line, index, all) => (
-        index < all.length - 1 ? `${line}\n` : line
+function processarArquivo(caminhoArquivo, apenasSimulacao = false) {
+    const linhas = fs.readFileSync(caminhoArquivo, "utf-8").split(/\r?\n/).map((linha, indice, todas) => (
+        indice < todas.length - 1 ? `${linha}\n` : linha
     ));
-    const {currentPackage, existingImports, importLineIndices} = parseImports(lines);
-    const {modifiedLines, newImportsToAdd, hasModifications} = scanLines(lines, currentPackage, existingImports);
+    const {pacoteAtual, importsExistentes, indicesLinhasImport} = analisarImports(linhas);
+    const {linhasModificadas, importsNovos, temAlteracoes} = analisarLinhas(linhas, pacoteAtual, importsExistentes);
 
-    if (!hasModifications && newImportsToAdd.size === 0) {
+    if (!temAlteracoes && importsNovos.size === 0) {
         return false;
     }
 
-    const insertPos = getInsertPosition(lines, importLineIndices);
-    const sortedNew = [...newImportsToAdd].toSorted((a, b) => a.localeCompare(b, 'pt-BR'));
-    const finalOutput = [];
+    const posicaoInsercao = obterPosicaoInsercao(linhas, indicesLinhasImport);
+    const importsOrdenados = [...importsNovos].toSorted((a, b) => a.localeCompare(b, "pt-BR"));
+    const saidaFinal = [];
 
-    if (insertPos === 0) {
-        sortedNew.forEach(item => finalOutput.push(`${IMPORT_PREFIX}${item};\n`));
+    if (posicaoInsercao === 0) {
+        importsOrdenados.forEach((item) => saidaFinal.push(`${PREFIXO_IMPORT}${item};\n`));
     }
 
-    modifiedLines.forEach((line, index) => {
-        finalOutput.push(line);
-        if (index === insertPos - 1) {
-            sortedNew.forEach(item => finalOutput.push(`${IMPORT_PREFIX}${item};\n`));
+    linhasModificadas.forEach((linha, indice) => {
+        saidaFinal.push(linha);
+        if (indice === posicaoInsercao - 1) {
+            importsOrdenados.forEach((item) => saidaFinal.push(`${PREFIXO_IMPORT}${item};\n`));
         }
     });
 
-    if (!dryRun) {
-        fs.writeFileSync(filePath, finalOutput.join(''), 'utf-8');
+    if (!apenasSimulacao) {
+        fs.writeFileSync(caminhoArquivo, saidaFinal.join(""), "utf-8");
     }
 
-    console.log(`${dryRun ? '[dry-run] ' : ''}Atualizado: ${filePath} (${sortedNew.length} novo(s) import(s))`);
+    escreverLinha(`${apenasSimulacao ? "[simulacao] " : ""}Atualizado: ${caminhoArquivo} (${importsOrdenados.length} novo(s) import(s))`);
     return true;
 }
 
-function findBackendRoot() {
-    let current = path.dirname(import.meta.filename);
-    while (current !== path.parse(current).root) {
-        if (fs.existsSync(path.join(current, 'src'))) {
-            return current;
-        }
-        current = path.dirname(current);
-    }
-    return process.cwd();
+function encontrarRaizBackend(diretorioBase = DIRETORIO_RAIZ) {
+    const candidatos = [path.resolve(diretorioBase), path.resolve(diretorioBase, "backend")];
+    return candidatos.find((candidato) => fs.existsSync(path.join(candidato, "src"))) ?? path.resolve(diretorioBase);
 }
 
-function parseArgs(argv) {
+function lerArgumentos(argumentos) {
     return {
-        help: argv.includes('--help') || argv.includes('-h'),
-        dryRun: argv.includes('--dry-run')
+        ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
+        apenasSimulacao: argumentos.includes("--dry-run"),
+        diretorioBase: lerOpcao(argumentos, "--base", DIRETORIO_RAIZ),
     };
 }
 
-function main() {
-    const {dryRun, help} = parseArgs(process.argv.slice(2));
-    if (help) {
-        exibirAjudaComando({
-            comandoSgc: "backend java corrigir-fqn",
-            scriptDireto: "backend/java-corrigir-fqn.js",
-            descricao: 'Substitui nomes totalmente qualificados por imports em arquivos Java.',
-            opcoes: [
-                '--dry-run     Apenas mostra os arquivos que seriam alterados',
-                '--help, -h    Exibe esta ajuda'
-            ],
-            exemplos: [
-                'node toolkit/sgc.js backend java corrigir-fqn --dry-run',
-                'node toolkit/sgc.js backend java corrigir-fqn'
-            ]
-        });
-        process.exit(0);
+function exibirAjuda() {
+    exibirAjudaComando({
+        comandoSgc: "backend java corrigir-fqn",
+        scriptDireto: "backend/java-corrigir-fqn.js",
+        descricao: "Substitui nomes totalmente qualificados por imports em arquivos Java.",
+        opcoes: [
+            "--dry-run           Apenas mostra os arquivos que seriam alterados.",
+            "--base <diretorio>  Usa uma raiz de backend alternativa.",
+            "--help, -h          Exibe esta ajuda.",
+        ],
+        exemplos: [
+            "node toolkit/sgc.js backend java corrigir-fqn --dry-run",
+            "node toolkit/sgc.js backend java corrigir-fqn --base /tmp/backend",
+        ],
+    });
+}
+
+function principal(argumentos = process.argv.slice(2)) {
+    const opcoes = lerArgumentos(argumentos);
+    if (opcoes.ajuda) {
+        exibirAjuda();
+        return;
     }
 
-    const backendRoot = findBackendRoot();
-    let totalFilesAnalyzed = 0;
-    let totalFilesUpdated = 0;
+    const raizBackend = encontrarRaizBackend(opcoes.diretorioBase);
+    let totalArquivosAnalisados = 0;
+    let totalArquivosAtualizados = 0;
 
-    console.log('Procurando FQNs no projeto...');
-    console.log(`Raiz do backend resolvida: ${backendRoot}`);
+    escreverLinha("Procurando FQNs no projeto...");
+    escreverLinha(`Raiz do backend resolvida: ${raizBackend}`);
 
-    TARGET_DIRS.forEach(relativeDir => {
-        const targetDir = path.join(backendRoot, relativeDir);
-        if (!fs.existsSync(targetDir)) {
-            console.log(`Diretorio nao encontrado: ${targetDir}`);
+    DIRETORIOS_ALVO.forEach((diretorioRelativo) => {
+        const diretorioAlvo = path.join(raizBackend, diretorioRelativo);
+        if (!fs.existsSync(diretorioAlvo)) {
+            escreverLinha(`Diretorio nao encontrado: ${diretorioAlvo}`);
             return;
         }
 
-        console.log(`Processando diretorio: ${targetDir}`);
-        const stack = [targetDir];
-        while (stack.length > 0) {
-            const currentDir = stack.pop();
-            const entries = fs.readdirSync(currentDir, {withFileTypes: true});
-            entries.forEach(entry => {
-                const fullPath = path.join(currentDir, entry.name);
-                if (entry.isDirectory()) {
-                    stack.push(fullPath);
+        escreverLinha(`Processando diretorio: ${diretorioAlvo}`);
+        const pilha = [diretorioAlvo];
+        while (pilha.length > 0) {
+            const diretorioAtual = pilha.pop();
+            const entradas = fs.readdirSync(diretorioAtual, {withFileTypes: true});
+            entradas.forEach((entrada) => {
+                const caminhoCompleto = path.join(diretorioAtual, entrada.name);
+                if (entrada.isDirectory()) {
+                    pilha.push(caminhoCompleto);
                     return;
                 }
 
-                if (!entry.name.endsWith('.java')) {
+                if (!entrada.name.endsWith(".java")) {
                     return;
                 }
 
-                totalFilesAnalyzed++;
-                if (processFile(fullPath, dryRun)) {
-                    totalFilesUpdated++;
+                totalArquivosAnalisados++;
+                if (processarArquivo(caminhoCompleto, opcoes.apenasSimulacao)) {
+                    totalArquivosAtualizados++;
                 }
             });
         }
     });
 
-    console.log(`Total de arquivos analisados: ${totalFilesAnalyzed}`);
-    console.log(`Total de arquivos atualizados: ${totalFilesUpdated}`);
+    escreverLinha(`Total de arquivos analisados: ${totalArquivosAnalisados}`);
+    escreverLinha(`Total de arquivos atualizados: ${totalArquivosAtualizados}`);
 }
 
-try {
-    main();
-} catch (error) {
-    console.error(`Erro ao ajustar FQNs: ${error.message}`);
-    process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    try {
+        principal();
+    } catch (erro) {
+        const mensagem = erro instanceof Error ? erro.message : String(erro);
+        escreverLinha(`Erro ao ajustar FQNs: ${mensagem}`);
+        process.exitCode = 1;
+    }
 }
+
+export {
+    principal,
+};
