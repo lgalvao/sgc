@@ -1,6 +1,6 @@
 import {createConsola} from "consola";
 
-function obterNivel() {
+function obterNivel(): number {
     if (process.env.VITEST) {
         return 1;
     }

@@ -10,6 +10,7 @@
     "lib/cli-opcoes.ts",
     "lib/configuracao.ts",
     "lib/execucao.ts",
-    "lib/saida.ts"
+    "lib/saida.ts",
+    "lib/logger.ts"
   ]
 }
