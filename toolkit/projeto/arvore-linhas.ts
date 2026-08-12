@@ -1,12 +1,32 @@
 import {execSync} from "node:child_process";
-import fs from "node:fs";
+import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import logger from "../lib/logger.js";
 import {escrever, escreverLinha} from "../lib/saida.js";
 
-function listarArquivosGit(diretorioBase = process.cwd()) {
+interface NoArvore {
+    nome: string;
+    linhas: number;
+    filhos: Record<string, NoArvore>;
+    ehDiretorio: boolean;
+}
+
+interface OpcoesArvore {
+    ajuda?: boolean;
+    diretorioBase?: string;
+    profundidadeMaxima?: number;
+    minimoLinhas?: number;
+    excluirTestes?: boolean;
+}
+
+interface ConectoresArvore {
+    conector: string;
+    prefixoFilho: string;
+}
+
+function listarArquivosGit(diretorioBase = process.cwd()): string[] {
     const saida = execSync("git ls-files", {
         cwd: diretorioBase,
         encoding: "utf-8",
@@ -15,15 +35,15 @@ function listarArquivosGit(diretorioBase = process.cwd()) {
     return saida.trim().split(/\r?\n/).filter(Boolean);
 }
 
-function contarLinhas(caminhoArquivo, diretorioBase) {
+function contarLinhas(caminhoArquivo: string, diretorioBase: string): number {
     const caminhoAbsoluto = path.resolve(diretorioBase, caminhoArquivo);
-    if (!fs.existsSync(caminhoAbsoluto)) return 0;
-    const conteudo = fs.readFileSync(caminhoAbsoluto, "utf-8");
+    if (!existsSync(caminhoAbsoluto)) return 0;
+    const conteudo = readFileSync(caminhoAbsoluto, "utf-8");
     return conteudo.split(/\r?\n/).length;
 }
 
-function construirArvore(listaArquivos, diretorioBase = process.cwd()) {
-    const raiz = {nome: ".", linhas: 0, filhos: {}, ehDiretorio: true};
+function construirArvore(listaArquivos: string[], diretorioBase = process.cwd()): NoArvore {
+    const raiz: NoArvore = {nome: ".", linhas: 0, filhos: {}, ehDiretorio: true};
 
     listaArquivos.forEach(caminhoArquivo => {
         const caminhoNormalizado = caminhoArquivo.replaceAll("\\", "/");
@@ -54,7 +74,7 @@ function construirArvore(listaArquivos, diretorioBase = process.cwd()) {
     return raiz;
 }
 
-function calcularTotais(no) {
+function calcularTotais(no: NoArvore): number {
     if (!no.ehDiretorio) {
         return no.linhas;
     }
@@ -67,7 +87,7 @@ function calcularTotais(no) {
     return soma;
 }
 
-function obterConectoresArvore(ehRaiz, ehUltimo) {
+function obterConectoresArvore(ehRaiz: boolean, ehUltimo: boolean): ConectoresArvore {
     if (ehRaiz) {
         return {conector: "", prefixoFilho: ""};
     }
@@ -77,7 +97,7 @@ function obterConectoresArvore(ehRaiz, ehUltimo) {
     };
 }
 
-function imprimirNo(no, prefixo, conector) {
+function imprimirNo(no: NoArvore, prefixo: string, conector: string): void {
     const resetar = "\x1b[0m";
     const azul = "\x1b[34m";
     const verde = "\x1b[32m";
@@ -89,7 +109,14 @@ function imprimirNo(no, prefixo, conector) {
     escreverLinha(linha);
 }
 
-function imprimirArvore(no, opcoes, prefixo = "", ehUltimo = true, ehRaiz = true, profundidadeAtual = 0) {
+function imprimirArvore(
+    no: NoArvore,
+    opcoes: OpcoesArvore,
+    prefixo = "",
+    ehUltimo = true,
+    ehRaiz = true,
+    profundidadeAtual = 0
+): void {
     const {profundidadeMaxima, minimoLinhas} = opcoes;
 
     if (minimoLinhas !== undefined && no.linhas < minimoLinhas) return;
@@ -121,13 +148,13 @@ function imprimirArvore(no, opcoes, prefixo = "", ehUltimo = true, ehRaiz = true
     });
 }
 
-function lerOpcoes(argumentos = process.argv.slice(2)) {
-    const opcoes = {diretorioBase: lerOpcao(argumentos, "--base", process.cwd())};
+function lerOpcoes(argumentos: string[] = process.argv.slice(2)): OpcoesArvore {
+    const opcoes: OpcoesArvore = {diretorioBase: lerOpcao(argumentos, "--base", process.cwd()) ?? process.cwd()};
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escrever(`
 Uso recomendado: npx tsx toolkit/sgc.js projeto arvore-linhas [opções]
-Execução direta: npx tsx toolkit/projeto/arvore-linhas.js [opções]
+Execução direta: npx tsx toolkit/projeto/arvore-linhas.ts [opções]
 
 Opções:
   --depth <n>          Limita a profundidade da árvore exibida (ex: --depth 2)
@@ -156,40 +183,39 @@ Opções:
     return opcoes;
 }
 
-// Padrões para identificar arquivos/diretórios de teste
-const PADROES_TESTE = [
+const PADROES_TESTE: RegExp[] = [
     /\.spec\.(js|ts|vue)$/,
     /\.test\.(js|ts|vue)$/,
     /__tests__\//,
     /e2e\//,
     /frontend\/src\/__tests__\//,
-    /backend\/src\/test\//,
+    /backend\/src\/test\//
 ];
 
-function ehArquivoTeste(caminhoArquivo) {
-    // Normaliza para barras para correspondência de padrão
+function ehArquivoTeste(caminhoArquivo: string): boolean {
     const caminhoNormalizado = caminhoArquivo.replaceAll("\\", "/");
     return PADROES_TESTE.some(padrao => padrao.test(caminhoNormalizado));
 }
 
-function principal(argumentos = process.argv.slice(2)) {
+function principal(argumentos: string[] = process.argv.slice(2)): void {
     const opcoes = lerOpcoes(argumentos);
     if (opcoes.ajuda) {
         return;
     }
 
     logger.info("Gerando árvore de contagem de linhas...");
-    let listaArquivos = listarArquivosGit(opcoes.diretorioBase);
+    const diretorioBase = opcoes.diretorioBase ?? process.cwd();
+    let listaArquivos = listarArquivosGit(diretorioBase);
 
     if (opcoes.excluirTestes) {
         const quantidadeOriginal = listaArquivos.length;
         listaArquivos = listaArquivos.filter(caminhoArquivo => !ehArquivoTeste(caminhoArquivo));
         logger.info(`Excluídos ${quantidadeOriginal - listaArquivos.length} arquivos de teste.`);
     }
-    const arvore = construirArvore(listaArquivos, opcoes.diretorioBase);
+    const arvore = construirArvore(listaArquivos, diretorioBase);
     calcularTotais(arvore);
 
-    escreverLinha(`\x1b[1mProjeto: ${path.basename(path.resolve(opcoes.diretorioBase))}\x1b[0m`);
+    escreverLinha(`\x1b[1mProjeto: ${path.basename(path.resolve(diretorioBase))}\x1b[0m`);
     escreverLinha(`\x1b[1mTotal de Linhas: \x1b[33m${arvore.linhas.toLocaleString()}\x1b[0m`);
     escreverLinha();
 

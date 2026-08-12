@@ -5,8 +5,8 @@ import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {execa, execaNode} from "execa";
 import {pathToFileURL} from "node:url";
-import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.js";
-import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
+import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.ts";
+import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
@@ -38,9 +38,9 @@ const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-fixar-baseline.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "integracao", nome));
 const CAMINHOS_COMANDOS_PROJETO = [
-    "arvore-linhas.js",
+    "arvore-linhas.ts",
     "diagnostico.js",
-    "versao-sincronizar.js"
+    "versao-sincronizar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
     "coleta.js",

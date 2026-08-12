@@ -25,7 +25,7 @@ script diretamente:
 
 ```bash
 npx tsx toolkit/sgc.js --help
-npx tsx toolkit/projeto/arvore-linhas.js --help
+npx tsx toolkit/projeto/arvore-linhas.ts --help
 ```
 
 ## Visão arquitetural
