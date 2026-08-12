@@ -167,7 +167,7 @@ frontend e para os caminhos OpenAPI.
 
 ### 3.2 Evidência de validação atual
 
-No estado publicado, sob Node `26.7.0`:
+Nas validações desta rodada, executadas diretamente sob Node `26.5.1` (Node 26 disponível no ambiente):
 
 - `npm --prefix toolkit run test`: 81 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
