@@ -247,9 +247,7 @@ function carregarMensagensCanonicas(base) {
 }
 
 export {
-    calcularSimilaridade,
     carregarMensagensCanonicas,
-    extrairAssuntosBackend,
     normalizarTextoComparacao,
     sugerirCanonicos
 };

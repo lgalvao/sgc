@@ -7,8 +7,6 @@ const VERSAO_SCHEMA = "1.0.0";
 const CAMINHO_ORCAMENTO_PADRAO = resolverCaminhoConfigurado("orcamentoResiduosFrontend");
 const CAMINHO_EXCECOES_PADRAO = resolverCaminhoConfigurado("excecoesResiduosFrontend");
 const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "frontend-residuos", "mais-recente");
-const CAMINHO_FOTOGRAFIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "fotografia.json");
-const CAMINHO_RESUMO_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "resumo.md");
 
 const EXTENSOES_SUPORTADAS = new Set([".ts", ".vue"]);
 
@@ -428,14 +426,8 @@ async function gravarFotografiaAuditoria(fotografia, diretorioSaida = DIRETORIO_
 export {
     CAMINHO_ORCAMENTO_PADRAO,
     CAMINHO_EXCECOES_PADRAO,
-    CAMINHO_RESUMO_PADRAO,
-    CAMINHO_FOTOGRAFIA_PADRAO,
     DIRETORIO_SAIDA_PADRAO,
-    VERSAO_SCHEMA,
     analisarResiduosFrontend,
-    carregarOrcamento,
     carregarExcecoes,
-    ehArquivoTesteOuHistoria,
-    gerarMarkdownAuditoria,
     gravarFotografiaAuditoria,
 };

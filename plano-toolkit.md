@@ -128,9 +128,9 @@ frontend e para os caminhos OpenAPI.
 - Execução de fonte padronizada em `tsx`; scripts npm, documentação, `release-it` e ADR relevante já não usam `node`
   puro para comandos fonte.
 - Build TypeScript criado e mantido como verificação opcional em `toolkit/dist/`.
-- A configuração raiz do Knip passou a incluir TypeScript, mas a auditoria crítica mostrou que o contrato ainda não está
-  correto: `toolkit/knip.json` lista apenas JavaScript e declara praticamente todos os arquivos como entrypoints. O Knip
-  passa, porém ainda não prova ausência de módulos ou exports mortos.
+- A configuração do Knip agora lista os entrypoints CLI reais do toolkit, inclui JavaScript e TypeScript como projetos e
+  permite que o grafo encontre exports órfãos; a execução passou sem achados depois da remoção de oito exports internos
+  não consumidos.
 - O núcleo compartilhado foi convertido para TypeScript:
   - `lib/caminhos.ts`;
   - `lib/cli-ajuda.ts`;
@@ -145,13 +145,15 @@ frontend e para os caminhos OpenAPI.
   - `projeto/versao-sincronizar.ts`.
 - `garantirArquivo` já encontra `.ts` na fonte e `.js` no build, permitindo migração incremental sem duplicar módulos.
 - Exports de `toolkit/package.json` já distinguem módulos migrados e módulos ainda JavaScript.
+- O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; a implementação não foi
+  alterada porque a suspeita de duplicação não se confirmou.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos e resíduos possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração. Isso ainda
   não equivale a portabilidade: há defaults globais resolvidos no import e caminhos `backend/src`/`frontend/src` fixos.
 - O gerador de tipos OpenAPI foi removido. O toolkit mantém somente exportação, comparação e fixação de fotografias de
   contrato; o Springdoc permanece no backend porque o ciclo E2E usa Swagger/OpenAPI para aguardar a aplicação.
-- O histórico recente relevante está publicado na `main`, culminando, antes desta auditoria, em `a8defbe30 Documenta
-  plano de modernizacao do toolkit`.
+- O histórico recente relevante está publicado na `main`, culminando, antes desta rodada, em `a969a664d Cobre escrita do
+  corretor de FQN`.
 
 ### 3.2 Evidência de validação atual
 
@@ -162,6 +164,7 @@ No estado publicado, sob Node `26.7.0`:
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
 - `npm --prefix toolkit run deps:audit`: aprovado;
+- `npx knip --reporter compact` dentro de `toolkit/`: aprovado sem exports não consumidos;
 - `git diff --check`: aprovado;
 - importação dos comandos sem execução acidental: coberta pelos testes;
 - execução fonte pelo script npm e smoke do artefato compilado: aprovados nas rodadas de migração;
@@ -194,10 +197,10 @@ dos arquivos de implementação rastreados são TypeScript.
 | Bloqueador | Binário npm quebrado | `bin.sgc` aponta para `sgc.js`; `npm exec --workspace toolkit sgc -- --help` falha sob Node puro. O toolkit não é instalável como CLI no estado atual. |
 | Bloqueador | Pacote não pode ser empacotado | `npm pack --workspace toolkit --dry-run` falha porque `toolkit/package.json` não possui `version`. `private: true`, nome específico e ausência de `files` também mostram que a distribuição externa ainda não foi desenhada. |
 | Alta | Raiz acoplada à posição física | `lib/caminhos.ts` deriva a raiz como pai de `toolkit/`. Ao instalar o pacote em `node_modules`, a raiz calculada deixa de ser o projeto consumidor. |
-| Alta | Knip produz falso conforto | `toolkit/knip.json` cobre apenas `.js` e declara todos os módulos como `entry`; assim módulos órfãos podem continuar passando. |
+| Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
 | Alta | Base externa é parcialmente ignorada | Defaults de arquitetura, resíduos e OpenAPI são calculados durante o import usando a raiz do SGC. Um `--base` posterior não recompõe todos os caminhos. |
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
-| Alta | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.js` já adiciona uma única linha por entrada, mas só há teste de `--dry-run`. O modo de escrita e a idempotência precisam de teste antes da conversão. |
+| Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.js` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Média | Configuração sem validação | `configuracao-toolkit.json` é convertido por cast e aceita chaves/tipos desconhecidos até falhar no uso. Não há versão de schema nem diagnóstico agregado. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
 | Média | Testes não representam pacote externo | Os 76 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
@@ -214,9 +217,9 @@ dos arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 76 testes verdes são gates úteis, mas atualmente insuficientes para afirmar ausência de código morto,
-  segurança dos comandos mutáveis ou portabilidade. A suspeita de duplicação no corretor FQN não foi reproduzida na
-  inspeção do código atual; o risco confirmado é a falta de cobertura do modo de escrita.
+- Knip aprovado e 76 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+  do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
+  útil de exports não consumidos; não substitui testes de pacote externo.
 
 ## 4. Classificação para reuso externo
 
@@ -291,44 +294,42 @@ do perfil.
 
 ### Prioridade alta
 
-1. **Segurança de mutação**: testar o modo de escrita e a idempotência de `java-corrigir-fqn`; inventariar os demais
-   comandos que escrevem antes de continuar conversões mecânicas.
+1. **Efeitos colaterais**: inventariar os demais comandos que escrevem, removem ou promovem arquivos e classificar seus
+   contratos antes de continuar conversões mecânicas.
 2. **Entry point e pacote**: `sgc.js` ainda é JavaScript, tem `shebang` para Node puro e é o alvo do `bin`; o caminho
    documentado usa `tsx`. Migrar o entrypoint e corrigir `bin`, `exports`, scripts, referências e smoke tests de instalação.
 3. **Raiz do consumidor**: separar diretório de instalação do toolkit, diretório de trabalho e raiz do projeto auditado.
    `process.cwd()`, `--base` e configuração explícita devem ter precedência documentada.
 4. **Modelo de distribuição**: decidir cedo se o reuso será por pacote compilado, pacote-fonte com runtime `tsx` ou cópia
    vendorizada. A escolha define `version`, `private`, nome, `files`, `bin`, `exports`, assets e dependências de runtime.
-5. **Auditoria de código morto**: corrigir a configuração do Knip para declarar apenas entrypoints reais e incluir JS/TS;
-   hoje o gate não consegue revelar módulos órfãos.
-6. **TypeScript sem rigor uniforme**: `tsconfig.nucleo.json` cobre o núcleo, mas o `tsconfig.json` geral mantém
+5. **TypeScript sem rigor uniforme**: `tsconfig.nucleo.json` cobre o núcleo, mas o `tsconfig.json` geral mantém
    `checkJs: false` e não impõe `strict` aos próximos comandos TS. Criar uma configuração estrita por etapas, sem tentar
    tipar os 62 módulos JavaScript de uma vez.
-7. **Dependência de runtime**: `tsx` ainda está em `devDependencies` do toolkit, embora seja necessário para executar a
+6. **Dependência de runtime**: `tsx` ainda está em `devDependencies` do toolkit, embora seja necessário para executar a
    fonte. Definir o modelo de instalação externo e mover a dependência ou fornecer um launcher de pacote coerente.
-8. **Contrato `.js`/`.ts` temporário**: o fallback do despachador é útil durante a transição, mas aumenta a superfície e
+7. **Contrato `.js`/`.ts` temporário**: o fallback do despachador é útil durante a transição, mas aumenta a superfície e
    pode esconder caminhos inválidos. Medir os consumidores e removê-lo ao fim da conversão.
-9. **Hard-coding de perfil**: várias regras continuam presas ao layout e ao vocabulário SGC. Antes de declarar o toolkit
+8. **Hard-coding de perfil**: várias regras continuam presas ao layout e ao vocabulário SGC. Antes de declarar o toolkit
    reutilizável, separar engine, política e adaptador.
 
 ### Prioridade média
 
-10. **Testes concentrados**: dois arquivos de teste grandes em JavaScript dificultam localizar contratos e impedem que os
+9. **Testes concentrados**: dois arquivos de teste grandes em JavaScript dificultam localizar contratos e impedem que os
    tipos dos testes ajudem na migração. Dividir por domínio e converter para TypeScript depois de estabilizar os comandos.
-11. **Schema de resultados**: fotografias, auditorias, cobertura, diagnósticos e relatórios usam objetos sem schema
+10. **Schema de resultados**: fotografias, auditorias, cobertura, diagnósticos e relatórios usam objetos sem schema
    versionado. Formalizar tipos e versões de saída antes de extrair o pacote externo.
-12. **Opções inconsistentes**: há mistura de `--input`, `--output`, `--dir`, `--arquivo`, `--saida` e defaults locais.
+11. **Opções inconsistentes**: há mistura de `--input`, `--output`, `--dir`, `--arquivo`, `--saida` e defaults locais.
    Definir opções canônicas em português, aliases de transição e mensagens uniformes sem quebrar automações existentes.
-13. **Documentação derivada**: ainda há referências de `sgc.js`, execução direta e exemplos que precisam ser regenerados ou
+12. **Documentação derivada**: ainda há referências de `sgc.js`, execução direta e exemplos que precisam ser regenerados ou
    centralizados. O inventário de comandos não deve divergir do roteador.
-14. **Orquestração pesada**: `qualidade/coleta-execucao.js` mistura subprocessos, Gradle, npm, Playwright, parsing de
+13. **Orquestração pesada**: `qualidade/coleta-execucao.js` mistura subprocessos, Gradle, npm, Playwright, parsing de
     relatórios e schema da fotografia. Separar executor, adaptadores de ferramenta e agregador.
 
 ### Prioridade baixa
 
-15. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
+14. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
     saídas locais sejam confundidas com recursos do pacote.
-16. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
+15. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
     comparação antes/depois e sem sacrificar a legibilidade do relatório.
 
 ## 6. Próximos passos ordenados
@@ -338,21 +339,23 @@ reuso externo e preservação de contratos.
 
 ### Fase 0 — estabilizar os contratos existentes
 
-1. Criar teste que execute o modo de escrita de `backend/java-corrigir-fqn.js` sobre fixture temporária, confirme o
-   conteúdo esperado sem linhas duplicadas e repita a execução para verificar idempotência; não alterar a implementação
-   sem uma falha reproduzível.
+1. **[concluído nesta rodada]** Criar teste que execute o modo de escrita de `backend/java-corrigir-fqn.js` sobre fixture
+   temporária, confirme o conteúdo esperado sem linhas duplicadas e repita a execução para verificar idempotência; não
+   houve alteração da implementação porque não existia falha reproduzível.
 2. Inventariar todos os comandos que escrevem, removem ou promovem arquivos e classificá-los como:
    - auditoria read-only;
    - geração explícita de artefato;
    - manutenção mutável;
    - orquestração externa.
 3. Não converter um comando mutável antes de haver teste de efeito, prévia e idempotência quando aplicável.
-4. Corrigir `toolkit/knip.json`: incluir `js` e `ts`, declarar somente entrypoints reais e permitir que o grafo encontre
-   módulos/exports não usados.
+4. **[concluído nesta rodada]** Corrigir `toolkit/knip.json`: incluir `js` e `ts`, declarar somente entrypoints reais e
+   permitir que o grafo encontre módulos/exports não usados; oito exports internos órfãos foram removidos.
 5. Adicionar testes focados para configuração inválida, precedência de `--base`, defaults calculados após parsing e
    importação sem capturar a raiz do SGC.
 6. Registrar uma baseline de cobertura do próprio toolkit, inicialmente informativa; definir thresholds apenas depois de
    identificar quais contratos críticos ainda não têm teste.
+
+Situação: itens 1 e 4 concluídos; itens 2, 3, 5 e 6 continuam pendentes.
 
 Critério de aceite: comandos mutáveis conhecidos têm testes de efeito, Knip consegue revelar código órfão real e a
 configuração externa possui testes de precedência e erro.
