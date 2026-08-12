@@ -11,11 +11,8 @@ const DIRETORIO_RAIZ = path.resolve(DIRETORIO_TOOLKIT, "..");
 
 /**
  * Resolve segmentos relativos à raiz do repositório.
- *
- * @param {...string} segmentos
- * @returns {string}
  */
-function resolverNaRaiz(...segmentos) {
+function resolverNaRaiz(...segmentos: string[]): string {
     if (segmentos.length > 0 && path.isAbsolute(segmentos[0])) {
         return path.join(...segmentos);
     }

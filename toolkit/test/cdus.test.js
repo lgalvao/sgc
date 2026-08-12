@@ -8,6 +8,7 @@ import {pathToFileURL} from "node:url";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.js");
+const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHOS_COMANDOS_CDU = [
     "cdus-inventariar.js",
     "cdus-auditar.js",
@@ -22,7 +23,7 @@ const CAMINHOS_COMANDOS_CDU = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "requisitos", nome));
 
 async function executarSgc(args, opcoes = {}) {
-    return execaNode(CAMINHO_SGC, args, {
+    return execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes

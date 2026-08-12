@@ -75,7 +75,7 @@ const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "e
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
 async function executarSgc(args, opcoes = {}) {
-    return execaNode(CAMINHO_SGC, args, {
+    return execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes
