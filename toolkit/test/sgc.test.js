@@ -28,6 +28,11 @@ const CAMINHOS_COMANDOS_QUALIDADE = [
     "coleta-execucao.js",
     "resumo.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", nome));
+const CAMINHOS_COMANDOS_CONSISTENCIA = [
+    "nomes-simbolos-coletar.js",
+    "nomes-consistencia-auditar.js",
+    "idioma-consistencia-auditar.js"
+].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "codigo", nome));
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
@@ -126,6 +131,56 @@ describe("CLI raiz do toolkit", () => {
             expect(resultado.exitCode).toBe(0);
             expect(resultado.stdout).toBe("importacao-ok");
         }
+    });
+
+    test("pode importar auditores de consistencia sem gerar artefatos", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_CONSISTENCIA.map(async caminho => {
+            const urlModulo = pathToFileURL(caminho).href;
+            return execa(process.execPath, [
+                "--input-type=module",
+                "-e",
+                `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
+            ], {
+                cwd: DIRETORIO_RAIZ,
+                reject: false
+            });
+        }));
+
+        for (const resultado of resultados) {
+            expect(resultado.exitCode).toBe(0);
+            expect(resultado.stdout).toBe("importacao-ok");
+        }
+    });
+
+    test("resolve artefatos de nomenclatura relativos a uma base externa", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-base-"));
+        await fs.outputFile(
+            path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
+            "export function carregarExemplo(codigo: string) { return codigo; }\n"
+        );
+
+        const resultado = await executarSgc([
+            "codigo",
+            "nomes",
+            "coletar-simbolos",
+            "--json",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const inventario = JSON.parse(resultado.stdout);
+        expect(inventario.base).toBe(diretorioBase);
+        expect(inventario.totais.arquivos).toBe(1);
+        expect(await fs.pathExists(path.join(
+            diretorioBase,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "nomenclatura",
+            "mais-recente",
+            "simbolos.json"
+        ))).toBe(true);
     });
 
     test("exibe a ajuda principal", async () => {

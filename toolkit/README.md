@@ -156,6 +156,9 @@ Na camada de qualidade, `coleta.js` e `resumo.js` têm fronteira reutilizável e
 Já `coleta-execucao.js` permanece específico do SGC por coordenar Gradle, npm, Playwright e os auditores locais; ele não
 deve ser promovido a abstração horizontal antes de existir um contrato de adaptadores para outro projeto.
 
+Os comandos `codigo nomes` também resolvem `simbolos.json`, `consistencia.json` e `idioma.json` relativos ao `--base`
+informado. Assim, a auditoria de outro projeto não lê nem grava silenciosamente no diretório de artefatos do SGC.
+
 ## Dependências e execução
 
 `toolkit/package.json` define dependências próprias, separadas do restante do repositório.

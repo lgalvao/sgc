@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 import fs from "node:fs/promises";
 import path from "node:path";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-
-const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "nomenclatura", "mais-recente");
-const ARQUIVO_JSON_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos.json");
+import {obterCaminhoSimbolos} from "./nomes-caminhos.js";
 
 const EXTENSOES_SUPORTADAS = new Set([".java", ".ts", ".tsx", ".js", ".jsx", ".vue"]);
 const DIRETORIOS_IGNORADOS = new Set([
@@ -407,9 +405,10 @@ async function executarColeta({
                                   base = DIRETORIO_RAIZ,
                                   json = false,
                                   semGravar = false,
-                                  arquivoSaida = ARQUIVO_JSON_PADRAO
+                                  arquivoSaida = null
                               } = {}) {
     const baseResolvida = path.resolve(base);
+    const caminhoSaida = arquivoSaida ?? obterCaminhoSimbolos(baseResolvida);
     const arquivos = await listarArquivos(baseResolvida);
     const resultadoArquivos = [];
     const mapaPacotes = new Map();
@@ -486,7 +485,7 @@ async function executarColeta({
     };
 
     if (!semGravar) {
-        const destinoJson = path.isAbsolute(arquivoSaida) ? arquivoSaida : path.resolve(baseResolvida, arquivoSaida);
+        const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         const destinoMarkdown = path.join(path.dirname(destinoJson), "simbolos-resumo.md");
         await fs.mkdir(path.dirname(destinoJson), {recursive: true});
         await fs.writeFile(destinoJson, JSON.stringify(inventario, null, 2));
@@ -504,7 +503,7 @@ async function executarColeta({
     escreverLinha(`Tipos catalogados: ${inventario.totais.tipos}`);
     escreverLinha(`Membros catalogados: ${inventario.totais.membros}`);
     if (!semGravar) {
-        const destinoJson = path.isAbsolute(arquivoSaida) ? arquivoSaida : path.resolve(baseResolvida, arquivoSaida);
+        const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         escreverLinha("");
         escreverLinha(`Inventario salvo em ${destinoJson}`);
         escreverLinha(`Resumo salvo em ${path.join(path.dirname(destinoJson), "simbolos-resumo.md")}`);
@@ -513,12 +512,12 @@ async function executarColeta({
     return inventario;
 }
 
-function parseArgs(argv) {
+function lerOpcoes(argv) {
     const opcoes = {
         base: DIRETORIO_RAIZ,
         json: false,
         semGravar: false,
-        arquivoSaida: ARQUIVO_JSON_PADRAO
+        arquivoSaida: null
     };
 
     for (let indice = 0; indice < argv.length; indice += 1) {
@@ -537,7 +536,7 @@ function parseArgs(argv) {
             continue;
         }
         if (argumento === "--saida") {
-            opcoes.arquivoSaida = argv[indice + 1] ?? ARQUIVO_JSON_PADRAO;
+            opcoes.arquivoSaida = argv[indice + 1] ?? null;
             indice += 1;
         }
     }
@@ -545,18 +544,25 @@ function parseArgs(argv) {
     return opcoes;
 }
 
-if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    escreverLinha("Uso: node toolkit/sgc.js codigo nomes coletar-simbolos [--json] [--sem-gravar] [--base <diretorio>] [--saida <arquivo.json>]");
-    escreverLinha("");
-    escreverLinha("Gera inventario completo de pacotes, arquivos, tipos e membros.");
-    process.exit(0);
+async function principal(argumentos = process.argv.slice(2)) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
+        escreverLinha("Uso: node toolkit/sgc.js codigo nomes coletar-simbolos [--json] [--sem-gravar] [--base <diretorio>] [--saida <arquivo.json>]");
+        escreverLinha("");
+        escreverLinha("Gera inventario completo de pacotes, arquivos, tipos e membros.");
+        return;
+    }
+
+    await executarColeta(lerOpcoes(argumentos));
 }
 
-try {
-    await executarColeta(parseArgs(process.argv.slice(2)));
-} catch (erro) {
-    escreverLinha(`Erro ao coletar simbolos: ${erro instanceof Error ? erro.message : String(erro)}`);
-    process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        escreverLinha(`Erro ao coletar simbolos: ${erro instanceof Error ? erro.message : String(erro)}`);
+        process.exitCode = 1;
+    });
 }
 
-export {executarColeta};
+export {
+    executarColeta,
+    principal
+};

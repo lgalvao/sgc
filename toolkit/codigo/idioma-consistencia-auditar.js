@@ -7,14 +7,11 @@
  */
 import fs from "node:fs/promises";
 import path from "node:path";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {executarColeta} from "./nomes-simbolos-coletar.js";
-
-const DIRETORIO_SAIDA_PADRAO = path.join(resolverCaminhoConfigurado("artefatosQualidade"), "nomenclatura", "mais-recente");
-const ARQUIVO_SIMBOLOS_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "simbolos.json");
-const ARQUIVO_JSON_AUDITORIA_PADRAO = path.join(DIRETORIO_SAIDA_PADRAO, "idioma.json");
+import {obterCaminhoIdioma, obterCaminhoSimbolos} from "./nomes-caminhos.js";
 
 // Prefixos/sufixos ingleses conhecidos em APIs públicas de composables/views/services
 const PREFIXOS_INGLES = [
@@ -209,11 +206,13 @@ async function executarAuditoriaIdioma({
                                            base = DIRETORIO_RAIZ,
                                            json = false,
                                            semGravar = false,
-                                           inventario = ARQUIVO_SIMBOLOS_PADRAO,
-                                           saidaJson = ARQUIVO_JSON_AUDITORIA_PADRAO
+                                           inventario = null,
+                                           saidaJson = null
                                        } = {}) {
     const baseResolvida = path.resolve(base);
-    const dadosInventario = await carregarInventario(inventario, baseResolvida);
+    const caminhoInventario = inventario ?? obterCaminhoSimbolos(baseResolvida);
+    const caminhoSaida = saidaJson ?? obterCaminhoIdioma(baseResolvida);
+    const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida);
     const {membrosIngles, camposComId, parametrosComId, topArquivos, porPrefixo} = analisarInventario(dadosInventario);
 
     const scoreTotal = membrosIngles.length + camposComId.length + parametrosComId.length;
@@ -221,7 +220,7 @@ async function executarAuditoriaIdioma({
     const auditoria = {
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
-        inventarioFonte: inventario,
+        inventarioFonte: caminhoInventario,
         indicadores: {
             arquivos: dadosInventario.totais.arquivos,
             membrosIngles: membrosIngles.length,
@@ -237,7 +236,7 @@ async function executarAuditoriaIdioma({
     };
 
     if (!semGravar) {
-        const destinoJson = path.isAbsolute(saidaJson) ? saidaJson : path.resolve(baseResolvida, saidaJson);
+        const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         const destinoMarkdown = path.join(path.dirname(destinoJson), "idioma-resumo.md");
         await fs.mkdir(path.dirname(destinoJson), {recursive: true});
         await fs.writeFile(destinoJson, JSON.stringify(auditoria, null, 2));
@@ -265,7 +264,7 @@ async function executarAuditoriaIdioma({
     }
 
     if (!semGravar) {
-        const destinoJson = path.isAbsolute(saidaJson) ? saidaJson : path.resolve(baseResolvida, saidaJson);
+        const destinoJson = path.isAbsolute(caminhoSaida) ? caminhoSaida : path.resolve(baseResolvida, caminhoSaida);
         escreverLinha("");
         escreverLinha(`Auditoria salva em ${destinoJson}`);
         escreverLinha(`Resumo salvo em ${path.join(path.dirname(destinoJson), "idioma-resumo.md")}`);
@@ -274,13 +273,13 @@ async function executarAuditoriaIdioma({
     return auditoria;
 }
 
-function parseArgs(argv) {
+function lerOpcoes(argv) {
     const opcoes = {
         base: DIRETORIO_RAIZ,
         json: false,
         semGravar: false,
-        inventario: ARQUIVO_SIMBOLOS_PADRAO,
-        saidaJson: ARQUIVO_JSON_AUDITORIA_PADRAO
+        inventario: null,
+        saidaJson: null
     };
 
     for (let indice = 0; indice < argv.length; indice += 1) {
@@ -293,10 +292,10 @@ function parseArgs(argv) {
             opcoes.base = argv[indice + 1] ?? DIRETORIO_RAIZ;
             indice += 1;
         } else if (argumento === "--inventario") {
-            opcoes.inventario = argv[indice + 1] ?? ARQUIVO_SIMBOLOS_PADRAO;
+            opcoes.inventario = argv[indice + 1] ?? null;
             indice += 1;
         } else if (argumento === "--saida") {
-            opcoes.saidaJson = argv[indice + 1] ?? ARQUIVO_JSON_AUDITORIA_PADRAO;
+            opcoes.saidaJson = argv[indice + 1] ?? null;
             indice += 1;
         }
     }
@@ -304,18 +303,25 @@ function parseArgs(argv) {
     return opcoes;
 }
 
-if (process.argv.includes("--help") || process.argv.includes("-h")) {
-    escreverLinha("Uso: node toolkit/sgc.js codigo nomes auditar-idioma [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
-    escreverLinha("");
-    escreverLinha("Detecta membros com nomes em inglês e campos com 'id' que deveriam usar 'codigo'.");
-    process.exit(0);
+async function principal(argumentos = process.argv.slice(2)) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
+        escreverLinha("Uso: node toolkit/sgc.js codigo nomes auditar-idioma [--json] [--sem-gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("");
+        escreverLinha("Detecta membros com nomes em inglês e campos com 'id' que deveriam usar 'codigo'.");
+        return;
+    }
+
+    await executarAuditoriaIdioma(lerOpcoes(argumentos));
 }
 
-try {
-    await executarAuditoriaIdioma(parseArgs(process.argv.slice(2)));
-} catch (erro) {
-    escreverLinha(`Erro ao auditar idioma: ${erro instanceof Error ? erro.message : String(erro)}`);
-    process.exit(1);
+if (ehEntradaPrincipal(import.meta.url)) {
+    principal().catch((erro) => {
+        escreverLinha(`Erro ao auditar idioma: ${erro instanceof Error ? erro.message : String(erro)}`);
+        process.exitCode = 1;
+    });
 }
 
-export {executarAuditoriaIdioma};
+export {
+    executarAuditoriaIdioma,
+    principal
+};
