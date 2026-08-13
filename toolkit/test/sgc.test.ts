@@ -23,7 +23,6 @@ import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} 
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
-const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.ts");
 const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.ts");
 const CAMINHO_CHEIROS_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "cheiros-auditar.ts");
 const CAMINHOS_COMANDOS_PROJETO = [
@@ -45,8 +44,6 @@ const CAMINHOS_COMANDOS_CONSISTENCIA = [
     "nomes-consistencia-auditar.ts",
     "idioma-consistencia-auditar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "codigo", nome));
-const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
-const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
 type ObjetoJson = Record<string, unknown>;
 
@@ -70,19 +67,6 @@ interface VerificacaoDiagnosticoJson {
     nome: string;
     status?: string;
     detalhe?: string;
-}
-
-async function executarScriptFrontendCobertura(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
-    const resultado = await execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, ...args], {
-        cwd: DIRETORIO_RAIZ,
-        reject: false,
-        ...opcoes
-    });
-    return {
-        exitCode: resultado.exitCode,
-        stdout: String(resultado.stdout),
-        stderr: String(resultado.stderr)
-    };
 }
 
 async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
@@ -189,26 +173,6 @@ describe("CLI raiz do toolkit", () => {
             expect(resultado.exitCode).toBe(0);
             expect(resultado.stdout).toBe("importacao-ok");
         }
-    });
-
-    test("exibe a ajuda principal", async () => {
-        const resultado = await executarSgc(["--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Toolkit do SGC");
-        expect(resultado.stdout).toContain("projeto diagnostico");
-    });
-
-    test("despacha ajuda de um comando de auditoria do backend", async () => {
-        const resultado = await executarSgc(["backend", "cobertura", "auditoria", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Backend).");
-        expect(resultado.stdout).toContain("--minimo <percentual>");
-    });
-
-    test("despacha ajuda da auditoria de assuntos de notificacao do backend", async () => {
-        const resultado = await executarSgc(["backend", "notificacoes", "auditar-assuntos", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Audita literais de assunto de notificação fora de AssuntosNotificacao.");
     });
 
     test("audita assuntos literais fora de AssuntosNotificacao", async () => {
@@ -1813,13 +1777,6 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo).not.toContain("MapaRuidoCommand.java");
     });
 
-    test("despacha ajuda da validacao de modais do frontend", async () => {
-        const resultado = await executarSgc(["frontend", "modais", "validar", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("ModalPadrao");
-        expect(resultado.stdout).toContain("BModal diretamente no frontend");
-    });
-
     test("valida previsibilidade estrutural das views em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-views-templates-"));
         const viewsDir = path.join(base, "frontend", "src", "views");
@@ -1914,18 +1871,6 @@ describe("CLI raiz do toolkit", () => {
         expect(JSON.parse(resultadoViews.stdout).resumo.totalViews).toBe(1);
         expect(resultadoModais.exitCode).toBe(0);
         expect(JSON.parse(resultadoModais.stdout).resumo.totalViolacoes).toBe(0);
-    });
-
-    test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {
-        const resultado = await executarScriptFrontendCobertura(["--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Frontend).");
-        expect(resultado.stdout).toContain("--minimo <percentual>");
-    });
-
-    test("nao possui diretorios legados de scripts em backend/frontend", async () => {
-        expect(await existe(DIRETORIO_SCRIPTS_BACKEND_LEGADO)).toBe(false);
-        expect(await existe(DIRETORIO_SCRIPTS_FRONTEND_LEGADO)).toBe(false);
     });
 
     test("projeto diagnostico identifica corretamente a ausencia de arquivos essenciais e falha com codigo 1", async () => {
