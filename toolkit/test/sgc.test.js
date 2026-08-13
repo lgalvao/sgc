@@ -3101,7 +3101,7 @@ describe("CLI raiz do toolkit", () => {
             "<template><input data-testid=\"input-nome\" /></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar", "--dir", diretorioBase]);
+        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar", "--diretorio", diretorioBase]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("ComponenteA.vue");
@@ -3141,7 +3141,7 @@ describe("CLI raiz do toolkit", () => {
             "<template><div data-testid=\"btn-acao\">Ação Y</div></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--dir", diretorioBase]);
+        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--diretorio", diretorioBase]);
 
         // O script deve falhar com exitCode 1 quando encontra duplicados
         expect(resultado.exitCode).toBe(1);
@@ -3159,7 +3159,7 @@ describe("CLI raiz do toolkit", () => {
             "<template><button data-testid=\"btn-unico\">Ação Única</button></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--dir", diretorioBase]);
+        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--diretorio", diretorioBase]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Nenhum identificador de teste duplicado encontrado.");

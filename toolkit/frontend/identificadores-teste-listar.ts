@@ -47,11 +47,11 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             opcoes: [
                 "--json               Emite os identificadores em JSON.",
                 "--base <diretorio>   Raiz do projeto para resolver frontendCodigo.",
-                "--dir <diretorio>    Sobrescreve o diretório configurado de código.",
+                "--diretorio <diretorio> Sobrescreve o diretório configurado de código.",
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts frontend identificadores-teste listar",
-                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar --dir /tmp/frontend",
+                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar --diretorio /tmp/frontend",
             ],
         });
         return;

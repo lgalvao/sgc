@@ -260,6 +260,8 @@ frontend e para os caminhos OpenAPI.
   e `backendTestes` e as classificações SGC de DTOs, models e outros.
 - `backend/testes-analisar.ts` e `backend/testes-priorizar.ts` agora expõem opções em português (`--diretorio`,
   `--entrada`, `--saida`, `--saida-json`, `--arquivo-jacoco`), sem alterar as chaves estruturadas do relatório.
+- Cobertura, Semgrep e identificadores de teste frontend também adotaram `--saida`/`--diretorio`; a CLI não mantém
+  `--output`/`--dir` como aliases sem consumidor identificado.
 - `backend/contratos-auditar.ts` foi convertido para TypeScript com tipos para imports, retornos de controllers, campos
   expostos, índice Java, modelos e achados; a política SGC de detectar `model.*` em DTOs permanece e agora tem fixture
   externo cobrindo JSON, `backendCodigo` configurado e gravação explícita com `--gravar`.
@@ -439,7 +441,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
-| Média | Opções e efeitos divergentes | O priorizador e o analisador de testes já usam opções em português; ainda há comandos legados com `--output`, `--dir` e defaults locais, além de geradores com contratos de gravação distintos. |
+| Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
@@ -467,7 +469,7 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 | Classe atual | Comandos ou famílias | Efeito observado e controle existente |
 |---|---|---|
 | Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. As famílias que oferecem persistência usam `--gravar`. Dependências externas podem fazer leitura adicional. |
-| Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json`, `--output` ainda legado ou defaults. São geradores explícitos, não auditores read-only. |
+| Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN e versão simulam por padrão e exigem `--gravar`; baseline copia diretamente para o destino por ser uma ação de promoção nomeada. |
 | Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |

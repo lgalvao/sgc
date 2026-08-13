@@ -260,7 +260,7 @@ interrompe a validação.
 A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pacote. Em outro projeto, informe
 `diretorios.regrasSemgrep` para usar uma política local; o toolkit resolve o override relativo à raiz auditada.
 
-Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--dir`
+Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--diretorio`
 quando a intenção for apontar diretamente para outro diretório de código.
 
 O toolkit executa a árvore-fonte com `tsx`; toda a implementação está em TypeScript estrito. Os testes permanecem em

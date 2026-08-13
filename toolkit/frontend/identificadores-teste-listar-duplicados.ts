@@ -83,11 +83,11 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             opcoes: [
                 "--json               Emite os duplicados em JSON.",
                 "--base <diretorio>   Raiz do projeto para resolver frontendCodigo.",
-                "--dir <diretorio>    Sobrescreve o diretório configurado de código.",
+                "--diretorio <diretorio> Sobrescreve o diretório configurado de código.",
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados",
-                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados --dir /tmp/frontend",
+                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados --diretorio /tmp/frontend",
             ],
         });
         return;

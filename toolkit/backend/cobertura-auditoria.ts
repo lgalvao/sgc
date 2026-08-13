@@ -106,7 +106,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             descricao: "Auditoria unificada de cobertura e risco (Backend).",
             opcoes: [
                 "--json              Saída em formato JSON para integração com outras ferramentas.",
-                "--output <arquivo>  Caminho do arquivo Markdown a ser gerado.",
+                "--saida <arquivo>    Caminho do arquivo Markdown a ser gerado.",
                 "--arquivo <xml>     Usa um relatório JaCoCo específico.",
                 "--base <diretorio>   Resolve o relatório relativo a outra base.",
                 "--gravar             Persiste o relatório Markdown.",
@@ -118,7 +118,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()) ?? resolverNaRaiz());
     const arquivo = lerOpcao(argumentos, "--arquivo", "") ?? "";
-    const caminhoSaida = lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT) ?? CAMINHO_PADRAO_OUTPUT;
+    const caminhoSaida = lerOpcao(argumentos, "--saida", CAMINHO_PADRAO_OUTPUT) ?? CAMINHO_PADRAO_OUTPUT;
     const gravar = argumentos.includes("--gravar");
     const metaMinima = Number(lerOpcao(argumentos, "--min", "0") ?? "0");
 

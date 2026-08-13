@@ -19,7 +19,7 @@ interface ResultadoColetaIdentificadores {
 }
 
 function obterDiretorioBusca(argumentos: string[] = [], diretorioBase: string = DIRETORIO_RAIZ): string {
-    const diretorioInformado = lerOpcao(argumentos, "--dir", undefined);
+    const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
     return diretorioInformado
         ? path.resolve(diretorioBase, diretorioInformado)
         : resolverCaminhoConfigurado("frontendCodigo", diretorioBase);

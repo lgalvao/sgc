@@ -195,7 +195,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             descricao: "Executa um piloto de Semgrep OSS com a política configurada para monitorar deriva estrutural no projeto.",
             opcoes: [
                 "--regra <arquivo>     Sobrescreve o arquivo de regras YAML.",
-                "--dir <caminho>       Adiciona diretório-alvo; pode ser repetido.",
+                "--diretorio <caminho> Adiciona diretório-alvo; pode ser repetido.",
                 "--base <diretorio>    Usa outra raiz para execução e artefatos.",
                 "--auto                Acumula as regras locais com `--config auto` do Semgrep CE.",
                 "--json                Emite resumo estruturado em JSON.",
@@ -203,7 +203,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts codigo semgrep auditar",
-                "npx tsx toolkit/sgc.ts codigo semgrep auditar --dir backend/src/main/java/exemplo",
+                "npx tsx toolkit/sgc.ts codigo semgrep auditar --diretorio backend/src/main/java/exemplo",
                 "npx tsx toolkit/sgc.ts codigo semgrep auditar --auto --json"
             ]
         });
@@ -216,7 +216,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const regra = lerOpcao(argumentos, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase))
         ?? resolverCaminhoConfigurado("regrasSemgrep", diretorioBase);
-    const diretorios = extrairLista(argumentos, "--dir");
+    const diretorios = extrairLista(argumentos, "--diretorio");
     const alvos = diretorios.length > 0 ? diretorios : resolverDiretoriosPadrao(diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "semgrep", "mais-recente");
 
