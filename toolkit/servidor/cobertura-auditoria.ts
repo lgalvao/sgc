@@ -7,6 +7,7 @@ import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/
 import {extrairCoberturaJacoco, type ClasseCobertura, type ResultadoCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {PADROES_EXCLUSAO_COBERTURA_SGC} from "./cobertura-padroes.js";
 
 const CAMINHO_PADRAO_SAIDA = "servidor-cobertura-auditoria.md";
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
@@ -131,7 +132,8 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         const coleta = await extrairCoberturaJacoco(arquivo || undefined, {
             diretorioBase,
             incluirSemLacunas: true,
-            aplicarExclusoes: true
+            aplicarExclusoes: true,
+            padroesExclusao: PADROES_EXCLUSAO_COBERTURA_SGC
         });
 
         const pontosCriticos = coleta.classes

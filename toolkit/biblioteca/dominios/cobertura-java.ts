@@ -83,7 +83,7 @@ export interface OpcoesCoberturaJacoco {
     diretorioBase?: string;
     incluirSemLacunas?: boolean;
     aplicarExclusoes?: boolean;
-    padroesExclusao?: RegExp[];
+    padroesExclusao?: readonly RegExp[];
     filtro?: string | null;
 }
 
@@ -92,27 +92,7 @@ export interface ResultadoCoberturaJacoco extends MetricasGlobais {
     classes: ClasseCobertura[];
 }
 
-const PADROES_EXCLUSAO: RegExp[] = [
-    /MapperImpl$/,
-    /\.Sgc$/,
-    /(?:^|\.).*Config(?:\..*)?$/,
-    /(?:^|\.).*Configuration(?:\..*)?$/,
-    /Properties$/,
-    /Dto$/,
-    /Request$/,
-    /Response$/,
-    /(?:^|\.)Erro.+$/,
-    /Exception$/,
-    /Repo$/,
-    /\.model\.(Perfil|Usuario|Unidade.+|Administrador|Vinculacao.+|Atribuicao.+|Parametro|Movimentacao|Analise|Alerta.+|Conhecimento|Mapa|Atividade|Competencia.+|Notificacao|Processo)$/,
-    /Builder$/,
-    /BuilderImpl$/,
-    /(?:^|\.).*Status.+$/,
-    /(?:^|\.).*Tipo.+$/,
-    /(?:^|\.).*Situacao.+$/
-];
-
-function deveExcluirClasse(nomeClasse: string, padroesExclusao: RegExp[] = PADROES_EXCLUSAO): boolean {
+function deveExcluirClasse(nomeClasse: string, padroesExclusao: readonly RegExp[] = []): boolean {
     return padroesExclusao.some((pattern) => pattern.test(nomeClasse));
 }
 
@@ -173,7 +153,7 @@ async function extrairCoberturaJacoco(
     const {
         incluirSemLacunas = true,
         aplicarExclusoes = false,
-        padroesExclusao = PADROES_EXCLUSAO,
+        padroesExclusao = [],
         filtro = null
     } = opcoes;
 

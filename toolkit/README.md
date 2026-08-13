@@ -111,6 +111,9 @@ SGC que impede cálculos locais de ações baseados em estado de domínio. Ele n
 `pontosCriticos` e `pontuacaoImpacto`; os campos de cobertura dentro de `totais` continuam seguindo os formatos JaCoCo e
 V8 lidos na fronteira.
 
+O domínio JaCoCo não presume exclusões do SGC. Os comandos de cobertura do servidor passam explicitamente os padrões do
+perfil SGC; consumidores externos podem usar `aplicarExclusoes` com seus próprios `padroesExclusao`.
+
 Os três comandos de ramificações também emitem `versaoSchema: "1.0.0"` e `geradoEm`; seus campos de JaCoCo/V8 permanecem
 nos nomes da fonte externa.
 

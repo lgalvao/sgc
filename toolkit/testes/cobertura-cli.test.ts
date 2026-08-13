@@ -9,6 +9,7 @@ import {
     existe
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
+import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
 
 describe("Auditorias de cobertura da CLI", () => {
     test("mantem auditorias de cobertura read-only e grava sob demanda", async () => {
@@ -28,6 +29,9 @@ describe("Auditorias de cobertura da CLI", () => {
             "    <sourcefile name=\"Exemplo.java\">",
             "      <line nr=\"1\" mi=\"0\" ci=\"1\" mb=\"0\" cb=\"0\"/>",
             "      <line nr=\"2\" mi=\"1\" ci=\"0\" mb=\"1\" cb=\"0\"/>",
+            "    </sourcefile>",
+            "    <sourcefile name=\"Dto.java\">",
+            "      <line nr=\"3\" mi=\"0\" ci=\"1\" mb=\"0\" cb=\"0\"/>",
             "    </sourcefile>",
             "  </package>",
             "</report>",
@@ -82,6 +86,7 @@ describe("Auditorias de cobertura da CLI", () => {
             versaoSchema: "1.0.0",
             status: "ok",
         });
+        expect(servidorJson.totais.totais.totalArquivos).toBe(1);
         expect(servidorJson.geradoEm).toBeTypeOf("string");
         expect(servidorJson.pontosCriticos).toBeInstanceOf(Array);
         expect(servidorJson.hotspots).toBeUndefined();
@@ -126,6 +131,34 @@ describe("Auditorias de cobertura da CLI", () => {
         expect(clienteGravacao.exitCode).toBe(0);
         expect(await existe(path.join(base, "servidor-cobertura-auditoria.md"))).toBe(true);
         expect(await existe(path.join(base, "cliente-cobertura-auditoria.md"))).toBe(true);
+    });
+
+    test("não injeta exclusões do SGC no domínio JaCoCo", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-politica-generica-"));
+        const caminhoJacoco = path.join(base, "relatorios", "jacoco.xml");
+        await escreverArquivo(caminhoJacoco, [
+            "<report>",
+            "  <package name=\"exemplo\">",
+            "    <sourcefile name=\"Dto.java\">",
+            "      <line nr=\"1\" ci=\"1\" mi=\"0\" mb=\"0\" cb=\"0\"/>",
+            "    </sourcefile>",
+            "  </package>",
+            "</report>",
+            ""
+        ].join("\n"));
+
+        const semPolitica = await extrairCoberturaJacoco(caminhoJacoco, {
+            diretorioBase: base,
+            aplicarExclusoes: true
+        });
+        const comPolitica = await extrairCoberturaJacoco(caminhoJacoco, {
+            diretorioBase: base,
+            aplicarExclusoes: true,
+            padroesExclusao: [/Dto$/]
+        });
+
+        expect(semPolitica.totais.totalArquivos).toBe(1);
+        expect(comPolitica.totais.totalArquivos).toBe(0);
     });
 
     test("analisa cobertura do cliente a partir de base e relatorio V8 externos", async () => {

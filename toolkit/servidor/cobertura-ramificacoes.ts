@@ -7,6 +7,7 @@ import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
 import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
+import {PADROES_EXCLUSAO_COBERTURA_SGC} from "./cobertura-padroes.js";
 
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 
@@ -65,6 +66,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         diretorioBase,
         incluirSemLacunas: true,
         aplicarExclusoes: true,
+        padroesExclusao: PADROES_EXCLUSAO_COBERTURA_SGC,
         filtro
     });
 

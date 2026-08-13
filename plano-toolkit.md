@@ -208,6 +208,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   removido e a mensagem de `hotspot` foi padronizada como ponto crítico;
 - cobertura Java, web e casos de uso estão publicadas como APIs programáticas horizontais; a fachada CDU recebe apenas
   `{base, secoes}` e delega para motores isolados da borda CLI;
+- o domínio JaCoCo não aplica mais padrões de exclusão do SGC por default; os comandos de cobertura do servidor recebem
+  explicitamente a política em `servidor/cobertura-padroes.ts`;
 - os agregadores CDU ficaram reduzidos a bordas de comando; parser, descoberta do corpus, inventário e auditoria não
   importam mais `process.argv`, execução de processo ou saída textual;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e outras políticas SGC ainda aparecem dentro de módulos adaptáveis;
