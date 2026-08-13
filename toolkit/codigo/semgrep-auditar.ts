@@ -8,7 +8,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 interface PosicaoSemgrep {
@@ -197,7 +197,8 @@ async function gravarRelatorios(
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    if (argumentos.includes("--help") || argumentos.includes("-h")) {
+    const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
+    if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "codigo semgrep auditar",
             scriptDireto: "codigo/semgrep-auditar.ts",
@@ -219,13 +220,13 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         return;
     }
 
-    const emitirJson = argumentos.includes("--json");
-    const gravar = argumentos.includes("--gravar");
-    const auto = argumentos.includes("--auto");
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const regra = lerOpcao(argumentos, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase))
+    const emitirJson = argumentosValidados.includes("--json");
+    const gravar = argumentosValidados.includes("--gravar");
+    const auto = argumentosValidados.includes("--auto");
+    const diretorioBase = path.resolve(lerOpcao(argumentosValidados, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
+    const regra = lerOpcao(argumentosValidados, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase))
         ?? resolverCaminhoConfigurado("regrasSemgrep", diretorioBase);
-    const diretorios = extrairLista(argumentos, "--diretorio");
+    const diretorios = extrairLista(argumentosValidados, "--diretorio");
     const alvos = diretorios.length > 0 ? diretorios : resolverDiretoriosPadrao(diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "semgrep", "mais-recente");
 

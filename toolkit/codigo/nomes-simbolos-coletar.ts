@@ -1,7 +1,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {obterCaminhoSimbolos} from "./nomes-caminhos.js";
@@ -622,14 +622,15 @@ function lerOpcoes(argv: string[]): OpcoesColeta {
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    if (argumentos.includes("--help") || argumentos.includes("-h")) {
+    const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
+    if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
         escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes coletar-simbolos [--json] [--gravar] [--base <diretorio>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Gera inventario completo de pacotes, arquivos, tipos e membros.");
         return;
     }
 
-    await executarColeta(lerOpcoes(argumentos));
+    await executarColeta(lerOpcoes(argumentosValidados));
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {

@@ -5,7 +5,7 @@ import {lerOpcao} from "../lib/cli-opcoes.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirJson} from "../lib/saida.js";
 import {extrairCoberturaJacoco, type ClasseCobertura} from "../lib/dominios/cobertura-java.js";
 import {
@@ -648,7 +648,7 @@ function imprimirResumoConsole(dados: RelatorioTestes): void {
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const opcoes = lerArgumentos(argumentos);
+    const opcoes = lerArgumentos(validarArgumentosEntradaDireta(import.meta.url, argumentos));
     if (opcoes.ajuda) {
         imprimirAjuda();
         return;

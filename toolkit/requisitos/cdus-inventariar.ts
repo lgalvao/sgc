@@ -1,7 +1,7 @@
 // Inventário dos casos de uso CDU.
 
 import path from "node:path";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {
     analisarArquivo,
@@ -220,7 +220,8 @@ async function inventariarFormatos(base: string, arquivosInformados?: string[]):
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base, secoes} = obterOpcoesCdu(argumentos);
+    const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
+    const {emitirJson, base, secoes} = obterOpcoesCdu(argumentosValidados);
     const resultado = await inventariarCdus(base, secoes);
 
     if (emitirJson) {

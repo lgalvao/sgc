@@ -16,6 +16,7 @@ const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(
 );
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
+const CAMINHO_INVENTARIO_SIMBOLOS = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "nomes-simbolos-coletar.ts");
 
 async function executarAjudaFrontendCobertura(): Promise<{exitCode?: number; stdout: string}> {
     const resultado = await execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, "--help"], {
@@ -72,6 +73,26 @@ describe("Superfície da CLI", () => {
         const resultado = await executarSgc(["qualidade", "coletar", "--opcao-inexistente"]);
         expect(resultado.exitCode).not.toBe(0);
         expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("unknown option");
+    });
+
+    test("aplica o mesmo contrato ao entrypoint direto catalogado", async () => {
+        const resultado = await execa(CAMINHO_TSX, [CAMINHO_INVENTARIO_SIMBOLOS, "--opcao-inexistente"], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false,
+        });
+
+        expect(resultado.exitCode).not.toBe(0);
+        expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Opção desconhecida");
+    });
+
+    test("normaliza atribuição de opção no entrypoint direto", async () => {
+        const resultado = await execa(CAMINHO_TSX, [CAMINHO_INVENTARIO_SIMBOLOS, "--help", "--base=/tmp/projeto"], {
+            cwd: DIRETORIO_RAIZ,
+            reject: false,
+        });
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Gera inventario completo");
     });
 
     test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {

@@ -148,7 +148,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - `backend testes analisar` e `backend testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
   já aparecem no mesmo catálogo de opções da CLI principal;
 - o roteador valida opções, valores e posicionais dos comandos catalogados, inclusive a forma `--opcao=valor`; os scripts
-  executados diretamente ainda têm parsers locais heterogêneos e precisam convergir gradualmente;
+  executados diretamente começaram a reutilizar esse contrato por meio de um preflight comum, mas a migração ainda é
+  parcial;
 - `efeito` no catálogo mistura intenção funcional e efeitos reais no sistema;
 - muitos módulos interpretam argumentos manualmente e controlam `process.exitCode` dentro da implementação;
 - resultados próprios ainda misturam português, inglês, `camelCase` e `snake_case`, especialmente na análise de testes;

@@ -1,7 +1,7 @@
 // Auditoria estrutural dos casos de uso CDU.
 
 import path from "node:path";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu, validarLinksMarkdown} from "./cdus-lib.js";
 import {auditarMensagensCodigo} from "./cdus-auditar-mensagens-codigo.js";
@@ -256,7 +256,8 @@ async function auditarEstrutura(base: string, arquivosInformados?: string[]): Pr
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base, secoes} = obterOpcoesCdu(argumentos);
+    const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
+    const {emitirJson, base, secoes} = obterOpcoesCdu(argumentosValidados);
     const resultado = await auditarCdus(base, secoes);
 
     if (emitirJson) {

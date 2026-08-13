@@ -3,7 +3,7 @@ import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import logger from "../lib/logger.js";
 import {escrever, escreverLinha} from "../lib/saida.js";
 
@@ -191,7 +191,8 @@ function ehArquivoTeste(caminhoArquivo: string): boolean {
 }
 
 function principal(argumentos: string[] = process.argv.slice(2)): void {
-    const opcoes = lerOpcoes(argumentos);
+    const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
+    const opcoes = lerOpcoes(argumentosValidados);
     if (opcoes.ajuda) {
         return;
     }

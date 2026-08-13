@@ -1,8 +1,11 @@
 import {existsSync} from "node:fs";
 import path from "node:path";
 import {pathToFileURL} from "node:url";
+import {fileURLToPath} from "node:url";
 import {execa} from "execa";
 import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "./caminhos.js";
+import {obterDefinicaoComandoArquivo} from "./catalogo-comandos.js";
+import {validarArgumentos} from "./cli-opcoes.js";
 
 const NOME_EXECUTAVEL_TSX = process.platform === "win32" ? "tsx.cmd" : "tsx";
 
@@ -30,6 +33,12 @@ function garantirArquivo(relativo: string): string {
     throw new Error(`Script TypeScript nao encontrado: ${relativo}`);
 }
 
+function validarArgumentosEntradaDireta(urlModulo: string, argumentos: readonly string[] = process.argv.slice(2)): string[] {
+    const arquivo = path.relative(DIRETORIO_TOOLKIT, fileURLToPath(urlModulo)).replaceAll(path.sep, "/");
+    const definicao = obterDefinicaoComandoArquivo(arquivo);
+    return definicao ? validarArgumentos(argumentos, definicao.argumentos) : [...argumentos];
+}
+
 async function executarNode(relativo: string, argumentos: string[] = []) {
     const script = garantirArquivo(relativo);
     return execa(resolverCaminhoTsx(), [script, ...argumentos], {
@@ -41,5 +50,6 @@ async function executarNode(relativo: string, argumentos: string[] = []) {
 export {
     ehEntradaPrincipal,
     executarNode,
-    resolverCaminhoTsx
+    resolverCaminhoTsx,
+    validarArgumentosEntradaDireta
 };

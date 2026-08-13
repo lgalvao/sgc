@@ -5,7 +5,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {NOME_ARQUIVO_CONFIGURACAO, resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha} from "../lib/saida.js";
 
 const DIRETORIOS_ALVO = ["src/test/java", "src/main/java"];
@@ -246,7 +246,7 @@ function exibirAjuda(): void {
 }
 
 function principal(argumentos: string[] = process.argv.slice(2)): void {
-    const opcoes = lerArgumentos(argumentos);
+    const opcoes = lerArgumentos(validarArgumentosEntradaDireta(import.meta.url, argumentos));
     if (opcoes.ajuda) {
         exibirAjuda();
         return;

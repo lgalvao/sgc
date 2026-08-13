@@ -330,7 +330,12 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
 
 const CATALOGO_COMANDOS_COMPLETO = [...CATALOGO_COMANDOS, ...CATALOGO_COMANDOS_ESPECIAIS] as const;
 
+function obterDefinicaoComandoArquivo(arquivo: string): (typeof CATALOGO_COMANDOS)[number] | undefined {
+    return CATALOGO_COMANDOS.find(definicao => definicao.arquivo === arquivo);
+}
+
 export {
     CATALOGO_COMANDOS,
-    CATALOGO_COMANDOS_COMPLETO
+    CATALOGO_COMANDOS_COMPLETO,
+    obterDefinicaoComandoArquivo
 };

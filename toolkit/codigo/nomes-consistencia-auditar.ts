@@ -1,7 +1,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {executarColeta, type InventarioSimbolos} from "./nomes-simbolos-coletar.js";
@@ -412,14 +412,15 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaNomes {
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    if (argumentos.includes("--help") || argumentos.includes("-h")) {
+    const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
+    if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
         escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes auditar-consistencia [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Audita consistencia de nomenclatura com base no inventario de simbolos.");
         return;
     }
 
-    await executarAuditoriaNomes(lerOpcoes(argumentos));
+    await executarAuditoriaNomes(lerOpcoes(argumentosValidados));
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
