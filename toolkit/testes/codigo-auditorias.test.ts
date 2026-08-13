@@ -18,11 +18,11 @@ import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-a
 describe("Auditores de código", () => {
     test("audita cheiros de codigo em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cheiros-"));
-        const frontendDir = path.join(base, "frontend", "src");
-        const backendDir = path.join(base, "backend", "src", "main", "java", "sgc", "exemplo", "dto");
+        const diretorioCliente = path.join(base, "frontend", "src");
+        const diretorioServidor = path.join(base, "backend", "src", "main", "java", "sgc", "exemplo", "dto");
 
         await escreverArquivo(
-            path.join(frontendDir, "Exemplo.ts"),
+            path.join(diretorioCliente, "Exemplo.ts"),
             [
                 "export function exemplo(valor: any) {",
                 "  if (valor === null) return valor || [];",
@@ -32,7 +32,7 @@ describe("Auditores de código", () => {
         );
 
         await escreverArquivo(
-            path.join(backendDir, "ExemploDto.java"),
+            path.join(diretorioServidor, "ExemploDto.java"),
             [
                 "package sgc.exemplo.dto;",
                 "import org.jspecify.annotations.Nullable;",
@@ -55,12 +55,12 @@ describe("Auditores de código", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.versao).toBe(2);
-        expect(conteudo.contagens.backendDtoNulavel).toBe(1);
-        expect(conteudo.contagens.backendVerificacoesNulas).toBe(1);
-        expect(conteudo.contagens.frontendAnyProducao).toBe(2);
-        expect(conteudo.contagens.frontendVerificacoesNulas).toBe(1);
-        expect(conteudo.contagens.frontendFallbackOu).toBe(1);
+        expect(conteudo.versao).toBe(3);
+        expect(conteudo.contagens.servidorDtoNulavel).toBe(1);
+        expect(conteudo.contagens.servidorVerificacoesNulas).toBe(1);
+        expect(conteudo.contagens.clienteAnyProducao).toBe(2);
+        expect(conteudo.contagens.clienteVerificacoesNulas).toBe(1);
+        expect(conteudo.contagens.clienteFallbackOu).toBe(1);
         expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "codigo-cheiros"))).toBe(false);
 
         const diretorioSaida = path.join(base, "artefatos", "cheiros");
@@ -68,7 +68,7 @@ describe("Auditores de código", () => {
         expect(await existe(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
         expect(await existe(path.join(diretorioSaida, "resumo.md"))).toBe(true);
         const fotografia = JSON.parse(await readFile(path.join(diretorioSaida, "fotografia.json"), "utf8"));
-        expect(fotografia.versao).toBe(2);
+        expect(fotografia.versao).toBe(3);
         expect(fotografia.pontosCriticos).toBeInstanceOf(Array);
         expect(fotografia.hotspots).toBeUndefined();
     });
@@ -107,8 +107,8 @@ describe("Auditores de código", () => {
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java",
-                frontendCodigo: "aplicacao/src"
+                codigoServidor: "servidor/java",
+                codigoCliente: "aplicacao/src"
             }
         });
 
@@ -132,8 +132,8 @@ describe("Auditores de código", () => {
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java",
-                frontendCodigo: "aplicacao/src"
+                codigoServidor: "servidor/java",
+                codigoCliente: "aplicacao/src"
             }
         });
         await escreverArquivo(
@@ -147,9 +147,9 @@ describe("Auditores de código", () => {
 
         const resultado = await executarAuditoriaCheiros({base});
 
-        expect(resultado.fotografia.contagens.backendDtoNulavel).toBe(1);
-        expect(resultado.fotografia.contagens.frontendAnyProducao).toBe(1);
-        expect(resultado.fotografia.contagens.frontendFallbackOu).toBe(1);
+        expect(resultado.fotografia.contagens.servidorDtoNulavel).toBe(1);
+        expect(resultado.fotografia.contagens.clienteAnyProducao).toBe(1);
+        expect(resultado.fotografia.contagens.clienteFallbackOu).toBe(1);
     });
 
     test("rejeita fotografia anterior de cheiros invalida", async () => {

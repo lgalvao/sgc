@@ -5,7 +5,7 @@ import {execa} from "execa";
 import {DIRETORIO_RAIZ} from "./apoio.js";
 
 const DIRETORIO_TOOLKIT = path.join(DIRETORIO_RAIZ, "toolkit");
-const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
+const CAMINHOS_COMANDOS_ESTRUTURA_CLIENTE = [
     "arquitetura-auditar.ts",
     "arquitetura-validar.ts",
     "modais-validar.ts",
@@ -15,7 +15,7 @@ const CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND = [
     "identificadores-teste-listar-duplicados.ts",
     "views-templates-validar.ts"
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "cliente", nome));
-const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
+const CAMINHOS_COMANDOS_COBERTURA_CLIENTE = [
     "cobertura-auditoria.ts",
     "cobertura-ramificacoes.ts",
     "cobertura-ramificacoes-erros.ts"
@@ -37,9 +37,9 @@ async function importarSemExecutar(caminho: string): Promise<{exitCode?: number;
     };
 }
 
-describe("Importação segura dos comandos frontend", () => {
-    test("pode importar auditores estruturais do frontend sem auditar o projeto", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_ESTRUTURA_FRONTEND.map(importarSemExecutar));
+describe("Importação segura dos comandos do cliente", () => {
+    test("pode importar auditores estruturais do cliente sem auditar o projeto", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_ESTRUTURA_CLIENTE.map(importarSemExecutar));
 
         for (const resultado of resultados) {
             expect(resultado.exitCode).toBe(0);
@@ -47,8 +47,8 @@ describe("Importação segura dos comandos frontend", () => {
         }
     });
 
-    test("pode importar comandos de cobertura frontend sem ler o relatorio V8", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_FRONTEND.map(importarSemExecutar));
+    test("pode importar comandos de cobertura do cliente sem ler o relatorio V8", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_CLIENTE.map(importarSemExecutar));
 
         for (const resultado of resultados) {
             expect(resultado.exitCode).toBe(0);

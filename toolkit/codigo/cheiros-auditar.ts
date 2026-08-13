@@ -9,23 +9,23 @@ import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {VERSAO_FOTOGRAFIA_CHEIROS} from "./cheiros-contrato.js";
 
-type EscopoCheiro = "backend" | "frontend" | "frontendTestes";
+type EscopoCheiro = "servidor" | "cliente" | "clienteTestes";
 type FaixaPontuacao = "bom" | "atencao" | "critico";
 type ChavePadrao =
-    | "backendDtoNulavel"
-    | "backendVerificacoesNulas"
-    | "backendObjetosNulos"
-    | "frontendAnyProducao"
-    | "frontendAnyTestes"
-    | "frontendCapturaAny"
-    | "frontendVerificacoesNulas"
-    | "frontendFallbackOu";
+    | "servidorDtoNulavel"
+    | "servidorVerificacoesNulas"
+    | "servidorObjetosNulos"
+    | "clienteAnyProducao"
+    | "clienteAnyTestes"
+    | "clienteCapturaAny"
+    | "clienteVerificacoesNulas"
+    | "clienteFallbackOu";
 
 interface ContextoFiltroArquivo {
     caminhoRelativo: string;
     conteudo: string;
-    diretorioBackendCodigo: string;
-    diretorioFrontendCodigo: string;
+    diretorioCodigoServidor: string;
+    diretorioCodigoCliente: string;
 }
 
 interface PadraoCheiro {
@@ -77,40 +77,40 @@ const EXTENSOES_TEXTO = new Set([".ts", ".vue", ".java"]);
 
 const PADROES: PadraoCheiro[] = [
     {
-        chave: "backendDtoNulavel",
-        titulo: "Backend DTOs com @Nullable",
+        chave: "servidorDtoNulavel",
+        titulo: "Servidor DTOs com @Nullable",
         peso: 5,
-        escopo: "backend",
-        filtroArquivo: ({caminhoRelativo, diretorioBackendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioBackendCodigo)
+        escopo: "servidor",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoServidor}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoServidor)
             && /(Dto|Request|Response|Command)\.java$/.test(caminhoRelativo),
         regexes: [/@Nullable\b/g]
     },
     {
-        chave: "backendVerificacoesNulas",
-        titulo: "Backend checks explicitos de null",
+        chave: "servidorVerificacoesNulas",
+        titulo: "Servidor checks explicitos de null",
         peso: 2,
-        escopo: "backend",
-        filtroArquivo: ({caminhoRelativo, diretorioBackendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioBackendCodigo),
+        escopo: "servidor",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoServidor}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoServidor),
         regexes: [/(?:===|!==|==|!=)\s*null/g, /null\s*(?:===|!==|==|!=)/g]
     },
     {
-        chave: "backendObjetosNulos",
-        titulo: "Backend Objects.isNull/nonNull",
+        chave: "servidorObjetosNulos",
+        titulo: "Servidor Objects.isNull/nonNull",
         peso: 2,
-        escopo: "backend",
-        filtroArquivo: ({caminhoRelativo, diretorioBackendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioBackendCodigo),
+        escopo: "servidor",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoServidor}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoServidor),
         regexes: [/\bObjects\.(?:isNull|nonNull)\s*\(/g, /\bObjects::(?:isNull|nonNull)\b/g]
     },
     {
-        chave: "frontendAnyProducao",
-        titulo: "Frontend producao com any explicito",
+        chave: "clienteAnyProducao",
+        titulo: "Cliente producao com any explicito",
         peso: 4,
-        escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
+        escopo: "cliente",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoCliente}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoCliente)
             && !ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [
             /\bas any\b/g,
@@ -123,12 +123,12 @@ const PADROES: PadraoCheiro[] = [
         ]
     },
     {
-        chave: "frontendAnyTestes",
-        titulo: "Frontend testes com any explicito",
+        chave: "clienteAnyTestes",
+        titulo: "Cliente testes com any explicito",
         peso: 1,
-        escopo: "frontendTestes",
-        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
+        escopo: "clienteTestes",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoCliente}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoCliente)
             && ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [
             /\bas any\b/g,
@@ -139,31 +139,31 @@ const PADROES: PadraoCheiro[] = [
         ]
     },
     {
-        chave: "frontendCapturaAny",
-        titulo: "Frontend catch tipado como any",
+        chave: "clienteCapturaAny",
+        titulo: "Cliente catch tipado como any",
         peso: 3,
-        escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo),
+        escopo: "cliente",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoCliente}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoCliente),
         regexes: [/catch\s*\(\s*[^):]+:\s*any\s*\)/g]
     },
     {
-        chave: "frontendVerificacoesNulas",
-        titulo: "Frontend checks explicitos de null",
+        chave: "clienteVerificacoesNulas",
+        titulo: "Cliente checks explicitos de null",
         peso: 2,
-        escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
+        escopo: "cliente",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoCliente}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoCliente)
             && !ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [/(?:===|!==|==|!=)\s*null/g, /null\s*(?:===|!==|==|!=)/g]
     },
     {
-        chave: "frontendFallbackOu",
-        titulo: "Frontend fallbacks defensivos com ||",
+        chave: "clienteFallbackOu",
+        titulo: "Cliente fallbacks defensivos com ||",
         peso: 1,
-        escopo: "frontend",
-        filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
-            ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
+        escopo: "cliente",
+        filtroArquivo: ({caminhoRelativo, diretorioCodigoCliente}) =>
+            ehArquivoDentroDiretorio(caminhoRelativo, diretorioCodigoCliente)
             && !ehArquivoTesteOuStory(caminhoRelativo),
         regexes: [/\|\|\s*(?:\[]|\{}|["'`]{2}|false|true|0)(?![\w$])/g]
     }
@@ -327,16 +327,16 @@ async function executarAuditoria({
     const caminhoFotografia = path.join(saidaResolvida, "fotografia.json");
     const caminhoResumo = path.join(saidaResolvida, "resumo.md");
     const arquivos = await listarArquivosTexto(baseResolvida);
-    const diretorioBackendCodigo = normalizarSeparadores(path.relative(
+    const diretorioCodigoServidor = normalizarSeparadores(path.relative(
         baseResolvida,
-        resolverCaminhoConfigurado("backendCodigo", baseResolvida)
+        resolverCaminhoConfigurado("codigoServidor", baseResolvida)
     ));
-    const diretorioFrontendCodigo = normalizarSeparadores(path.relative(
+    const diretorioCodigoCliente = normalizarSeparadores(path.relative(
         baseResolvida,
-        resolverCaminhoConfigurado("frontendCodigo", baseResolvida)
+        resolverCaminhoConfigurado("codigoCliente", baseResolvida)
     ));
     const contagens = criarEstruturaContagens();
-    const pontuacaoPorEscopo: PontuacaoPorEscopo = {backend: 0, frontend: 0, frontendTestes: 0};
+    const pontuacaoPorEscopo: PontuacaoPorEscopo = {servidor: 0, cliente: 0, clienteTestes: 0};
     const arquivosPontuados: ResumoArquivoCheiros[] = [];
 
     for (const arquivo of arquivos) {
@@ -345,7 +345,7 @@ async function executarAuditoria({
         const resumoArquivo: ResumoArquivoCheiros = {arquivo: caminhoRelativo, pontuacao: 0, categorias: {}};
 
         for (const padrao of PADROES) {
-            if (!padrao.filtroArquivo({caminhoRelativo, conteudo, diretorioBackendCodigo, diretorioFrontendCodigo})) {
+            if (!padrao.filtroArquivo({caminhoRelativo, conteudo, diretorioCodigoServidor, diretorioCodigoCliente})) {
                 continue;
             }
             const total = padrao.regexes.reduce((acumulado, regex) => acumulado + contarOcorrencias(conteudo, regex), 0);

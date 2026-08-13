@@ -97,8 +97,8 @@ function inferirCategoria(nomeClasse: string, caminhoRelativo: string): Categori
     return "outros";
 }
 
-function lerConteudoFonte(backendSrc: string, caminhoRelativo: string): string {
-    return fs.readFileSync(path.join(backendSrc, caminhoRelativo), "utf-8");
+function lerConteudoFonte(codigoServidor: string, caminhoRelativo: string): string {
+    return fs.readFileSync(path.join(codigoServidor, caminhoRelativo), "utf-8");
 }
 
 function classificarPerfilDto(conteudoFonte: string): PerfilFonte {

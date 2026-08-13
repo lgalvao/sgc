@@ -44,11 +44,11 @@ const EXCECOES_RESIDUOS_PADRAO: ResultadoExcecoesResiduos = {
 };
 
 function resolverCaminhoOrcamentoResiduos(base: string = DIRETORIO_RAIZ): string | undefined {
-    return tentarResolverCaminhoConfigurado("orcamentoResiduosFrontend", base);
+    return tentarResolverCaminhoConfigurado("orcamentoResiduosCliente", base);
 }
 
 function resolverCaminhoExcecoesResiduos(base: string = DIRETORIO_RAIZ): string | undefined {
-    return tentarResolverCaminhoConfigurado("excecoesResiduosFrontend", base);
+    return tentarResolverCaminhoConfigurado("excecoesResiduosCliente", base);
 }
 
 async function lerJsonConfigurado<T>(caminhoArquivo: string | undefined, fallback: T): Promise<T> {

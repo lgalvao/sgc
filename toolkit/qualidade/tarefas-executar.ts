@@ -36,21 +36,21 @@ const PERFIS_QUALIDADE_SGC: CatalogoPerfisQualidade = {
             }
         ]
     },
-    backend: {
-        descricao: "Executa as verificacoes de qualidade do backend.",
+    servidor: {
+        descricao: "Executa as verificacoes de qualidade do servidor.",
         tarefas: [
             {
-                titulo: "Gradle backendQualityCheck",
+                titulo: "Gradle verificacao de qualidade do servidor (backendQualityCheck)",
                 comando: "./gradlew",
                 argumentos: ["backendQualityCheck"]
             }
         ]
     },
-    frontend: {
-        descricao: "Executa as verificacoes de qualidade do frontend.",
+    cliente: {
+        descricao: "Executa as verificacoes de qualidade do cliente.",
         tarefas: [
             {
-                titulo: "Gradle frontendQualityCheck",
+                titulo: "Gradle verificacao de qualidade do cliente (frontendQualityCheck)",
                 comando: "./gradlew",
                 argumentos: ["frontendQualityCheck"]
             }

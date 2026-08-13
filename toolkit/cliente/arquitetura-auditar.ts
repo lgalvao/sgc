@@ -1,22 +1,22 @@
 import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
-import {analisarArquiteturaFrontend, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura, type FotografiaArquitetura} from "./arquitetura-lib.js";
+import {analisarArquiteturaCliente, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura, type FotografiaArquitetura} from "./arquitetura-lib.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 
-interface OpcoesAuditoriaArquiteturaFrontend {
+interface OpcoesAuditoriaArquiteturaCliente {
     base?: string;
     saida?: string;
     gravar?: boolean;
 }
 
-async function executarAuditoriaArquiteturaFrontend(
-    opcoes: OpcoesAuditoriaArquiteturaFrontend = {}
+async function executarAuditoriaArquiteturaCliente(
+    opcoes: OpcoesAuditoriaArquiteturaCliente = {}
 ): Promise<FotografiaArquitetura> {
-    const fotografia = await analisarArquiteturaFrontend({base: opcoes.base});
+    const fotografia = await analisarArquiteturaCliente({base: opcoes.base});
 
     if (opcoes.gravar) {
         const diretorioSaida = opcoes.saida ? path.resolve(fotografia.base, opcoes.saida) : undefined;
@@ -33,9 +33,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend arquitetura auditar",
+            comandoSgc: "cliente arquitetura auditar",
             scriptDireto: "cliente/arquitetura-auditar.ts",
-            descricao: "Audita vazamentos arquiteturais do frontend, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
+            descricao: "Audita vazamentos arquiteturais do cliente, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
                 "--gravar             Atualiza fotografia e resumo em disco.",
@@ -43,9 +43,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend arquitetura auditar",
-                "npx tsx toolkit/sgc.ts frontend arquitetura auditar --json",
-                "npx tsx toolkit/sgc.ts frontend arquitetura auditar --gravar --base /tmp/sgc"
+                "npx tsx toolkit/sgc.ts cliente arquitetura auditar",
+                "npx tsx toolkit/sgc.ts cliente arquitetura auditar --json",
+                "npx tsx toolkit/sgc.ts cliente arquitetura auditar --gravar --base /tmp/sgc"
             ]
         });
         return;
@@ -55,7 +55,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const saidaPadrao = resolverDiretorioSaidaArquitetura(baseResolvida);
     const saida = lerOpcao(argumentos, "--saida", saidaPadrao);
-    const fotografia = await executarAuditoriaArquiteturaFrontend({
+    const fotografia = await executarAuditoriaArquiteturaCliente({
         base: baseResolvida,
         saida,
         gravar: argumentos.includes("--gravar"),
@@ -66,7 +66,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         return;
     }
 
-    imprimirCabecalho("AUDITORIA ARQUITETURAL DO FRONTEND");
+    imprimirCabecalho("AUDITORIA ARQUITETURAL DO CLIENTE");
     escreverLinha(`Pontuacao total: ${pc.bold(String(fotografia.resumo.pontuacaoTotal))} (${fotografia.resumo.faixa})`);
     escreverLinha(`Arquivos de producao: ${fotografia.resumo.arquivosProducao}`);
     escreverLinha(`Views com vazamento de cache: ${fotografia.resumo.metricas.viewsComVazamentoCache}`);
@@ -109,6 +109,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    executarAuditoriaArquiteturaFrontend,
+    executarAuditoriaArquiteturaCliente,
     principal,
 };

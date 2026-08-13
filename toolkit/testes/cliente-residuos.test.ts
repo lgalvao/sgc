@@ -10,7 +10,7 @@ import {
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
-describe("Resíduos do frontend", () => {
+describe("Resíduos do cliente", () => {
     test("trata politicas de residuos como overrides opcionais e explicita arquivos invalidos", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-politicas-opcionais-"));
         const caminhoOrcamento = path.join(base, "politicas", "orcamento.json");
@@ -18,8 +18,8 @@ describe("Resíduos do frontend", () => {
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                orcamentoResiduosFrontend: "politicas/orcamento.json",
-                excecoesResiduosFrontend: "politicas/excecoes.json"
+                orcamentoResiduosCliente: "politicas/orcamento.json",
+                excecoesResiduosCliente: "politicas/excecoes.json"
             }
         });
         await escreverJson(caminhoOrcamento, {
@@ -30,21 +30,21 @@ describe("Resíduos do frontend", () => {
         await escreverJson(caminhoExcecoes, {versaoSchema: "1.0.0", excecoes: []});
 
         const resultado = await executarSgc([
-            "frontend", "residuos", "validar", "--json", "--base", base
+            "cliente", "residuos", "validar", "--json", "--base", base
         ]);
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.orcamento).toBe(path.relative(base, caminhoOrcamento));
         expect(conteudo.excecoes).toBe(path.relative(base, caminhoExcecoes));
         const gravacao = await executarSgc([
-            "frontend", "residuos", "validar", "--json", "--gravar", "--base", base
+            "cliente", "residuos", "validar", "--json", "--gravar", "--base", base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "cliente-residuos", "mais-recente", "fotografia.json"))).toBe(true);
 
         await escreverArquivo(caminhoOrcamento, "{");
         const falha = await executarSgc([
-            "frontend", "residuos", "validar", "--json", "--base", base
+            "cliente", "residuos", "validar", "--json", "--base", base
         ]);
         expect(falha.exitCode).toBe(1);
         expect(`${falha.stdout}\n${falha.stderr}`).toContain("Nao foi possivel ler a politica de residuos");
@@ -55,7 +55,7 @@ describe("Resíduos do frontend", () => {
             metricas: {maximosProducao: {}}
         });
         const versaoInvalida = await executarSgc([
-            "frontend", "residuos", "validar", "--json", "--base", base
+            "cliente", "residuos", "validar", "--json", "--base", base
         ]);
         expect(versaoInvalida.exitCode).toBe(1);
         expect(`${versaoInvalida.stdout}\n${versaoInvalida.stderr}`).toContain("versaoSchema 1.0.0");
@@ -70,15 +70,15 @@ describe("Resíduos do frontend", () => {
             excecoes: [{arquivo: "", maxLinhas: -1}]
         });
         const excecaoInvalida = await executarSgc([
-            "frontend", "residuos", "validar", "--json", "--base", base
+            "cliente", "residuos", "validar", "--json", "--base", base
         ]);
         expect(excecaoInvalida.exitCode).toBe(1);
         expect(`${excecaoInvalida.stdout}\n${excecaoInvalida.stderr}`).toContain("excecoes com arquivo ou maxLinhas invalidos");
     });
 
-    test("audita residuos do frontend em um recorte controlado", async () => {
+    test("audita residuos do cliente em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-auditar-"));
-        const frontendDir = path.join(base, "frontend", "src");
+        const diretorioCliente = path.join(base, "frontend", "src");
         const orcamento = path.join(base, "orcamento.json");
 
         await escreverJson(orcamento, {
@@ -107,7 +107,7 @@ describe("Resíduos do frontend", () => {
         });
 
         await escreverArquivo(
-            path.join(frontendDir, "services", "exemploService.ts"),
+            path.join(diretorioCliente, "services", "exemploService.ts"),
             [
                 "export function exemploService(valor: any) {",
                 "  if (valor === null) {",
@@ -118,7 +118,7 @@ describe("Resíduos do frontend", () => {
             ].join("\n")
         );
         await escreverArquivo(
-            path.join(frontendDir, "components", "ExemploCard.vue"),
+            path.join(diretorioCliente, "components", "ExemploCard.vue"),
             [
                 "<script setup lang=\"ts\">",
                 "const salvar = () => localStorage.setItem('chave', 'valor');",
@@ -128,7 +128,7 @@ describe("Resíduos do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "residuos",
             "auditar",
             "--json",
@@ -152,7 +152,7 @@ describe("Resíduos do frontend", () => {
         expect(conteudo.contagens.producao.arquivosAcimaMeta.service).toBe(1);
 
         const gravacao = await executarSgc([
-            "frontend",
+            "cliente",
             "residuos",
             "auditar",
             "--json",
@@ -176,7 +176,7 @@ describe("Resíduos do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "residuos",
             "auditar",
             "--json",
@@ -193,17 +193,17 @@ describe("Resíduos do frontend", () => {
             "toolkit",
             "qualidade",
             "artefatos",
-            "frontend-residuos",
+            "cliente-residuos",
             "mais-recente",
             "fotografia.json"
         ))).toBe(true);
     });
 
-    test("classifica residuos usando frontendCodigo configurado", async () => {
+    test("classifica residuos usando codigoCliente configurado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-codigo-configurado-"));
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontendCodigo: "cliente/codigo"},
+            diretorios: {codigoCliente: "cliente/codigo"},
         });
         await escreverArquivo(
             path.join(base, "cliente", "codigo", "services", "exemploService.ts"),
@@ -211,7 +211,7 @@ describe("Resíduos do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "residuos",
             "auditar",
             "--json",
@@ -226,9 +226,9 @@ describe("Resíduos do frontend", () => {
         expect(fotografia.arquivos[0].camada).toBe("service");
     });
 
-    test("valida residuos do frontend com excecao de tamanho", async () => {
+    test("valida residuos do cliente com excecao de tamanho", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-validar-"));
-        const frontendDir = path.join(base, "frontend", "src");
+        const diretorioCliente = path.join(base, "frontend", "src");
         const orcamento = path.join(base, "orcamento.json");
         const excecoes = path.join(base, "excecoes.json");
 
@@ -268,7 +268,7 @@ describe("Resíduos do frontend", () => {
             ]
         });
         await escreverArquivo(
-            path.join(frontendDir, "services", "exemploService.ts"),
+            path.join(diretorioCliente, "services", "exemploService.ts"),
             [
                 "export function exemploService() {",
                 "  return 1;",
@@ -280,7 +280,7 @@ describe("Resíduos do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "residuos",
             "validar",
             "--json",
@@ -296,9 +296,9 @@ describe("Resíduos do frontend", () => {
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.status).toBe("ok");
         expect(conteudo.violacoes).toEqual([]);
-        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos"))).toBe(false);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "cliente-residuos"))).toBe(false);
         const gravacao = await executarSgc([
-            "frontend",
+            "cliente",
             "residuos",
             "validar",
             "--json",
@@ -311,6 +311,6 @@ describe("Resíduos do frontend", () => {
             "excecoes.json"
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "cliente-residuos", "mais-recente", "fotografia.json"))).toBe(true);
     });
 });

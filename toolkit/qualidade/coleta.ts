@@ -3,7 +3,7 @@ import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/
 import logger from "../biblioteca/logger.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 
-const PERFIS_VALIDOS = new Set<string>(["rapido", "completo", "backend", "frontend"]);
+const PERFIS_VALIDOS = new Set<string>(["rapido", "completo", "servidor", "cliente"]);
 
 function normalizarArgumentosColeta(argumentos: string[] = []): string[] {
     const resultado = [];
@@ -14,11 +14,11 @@ function normalizarArgumentosColeta(argumentos: string[] = []): string[] {
         if (atual === "--perfil") {
             const perfil = argumentos[indice + 1];
             if (!perfil) {
-                throw new Error("Informe um valor para --perfil (rapido, completo, backend ou frontend).");
+                throw new Error("Informe um valor para --perfil (rapido, completo, servidor ou cliente).");
             }
 
             if (!PERFIS_VALIDOS.has(perfil)) {
-                throw new Error(`Perfil invalido: ${perfil}. Use rapido, completo, backend ou frontend.`);
+                throw new Error(`Perfil invalido: ${perfil}. Use rapido, completo, servidor ou cliente.`);
             }
 
             resultado.push("--perfil", perfil);
@@ -29,7 +29,7 @@ function normalizarArgumentosColeta(argumentos: string[] = []): string[] {
         if (atual.startsWith("--perfil=")) {
             const perfil = atual.split("=", 2)[1];
             if (!PERFIS_VALIDOS.has(perfil)) {
-                throw new Error(`Perfil invalido: ${perfil}. Use rapido, completo, backend ou frontend.`);
+                throw new Error(`Perfil invalido: ${perfil}. Use rapido, completo, servidor ou cliente.`);
             }
         }
 
@@ -62,12 +62,12 @@ async function executarColetaQualidade(argumentosInformados: string[] = process.
             scriptDireto: "qualidade/coleta.ts",
             descricao: "Coleta uma fotografia consolidada de qualidade do projeto.",
             opcoes: [
-                "--perfil <perfil>   Perfil de execucao: rapido, completo, backend ou frontend.",
+                "--perfil <perfil>   Perfil de execucao: rapido, completo, servidor ou cliente.",
                 "--base <diretorio>  Sobrescreve o diretorio base do projeto auditado."
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido",
-                "npx tsx toolkit/qualidade/coleta.ts --perfil frontend"
+                "npx tsx toolkit/qualidade/coleta.ts --perfil cliente"
             ]
         });
         return;

@@ -117,7 +117,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         }
     } catch (erro) {
         escreverErro(`Erro ao exportar OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
-        escreverErro("Dica: execute o backend com perfil `e2e` ou informe `--url` para uma instância já ativa.\n");
+        escreverErro("Dica: execute o servidor com perfil `e2e` ou informe `--url` para uma instância já ativa.\n");
         process.exitCode = 1;
     }
 }

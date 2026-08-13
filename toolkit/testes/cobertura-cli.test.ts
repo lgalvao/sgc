@@ -42,8 +42,8 @@ describe("Auditorias de cobertura da CLI", () => {
             }
         });
 
-        const backendLeitura = await executarSgc([
-            "backend",
+        const servidorLeitura = await executarSgc([
+            "servidor",
             "cobertura",
             "auditoria",
             "--json",
@@ -52,8 +52,8 @@ describe("Auditorias de cobertura da CLI", () => {
             "--arquivo",
             caminhoJacoco
         ]);
-        const frontendLeitura = await executarSgc([
-            "frontend",
+        const clienteLeitura = await executarSgc([
+            "cliente",
             "cobertura",
             "auditoria",
             "--json",
@@ -62,8 +62,8 @@ describe("Auditorias de cobertura da CLI", () => {
             "--arquivo",
             caminhoV8
         ]);
-        const backendRamificacoes = await executarSgc([
-            "backend",
+        const servidorRamificacoes = await executarSgc([
+            "servidor",
             "cobertura",
             "ramificacoes",
             "--json",
@@ -73,34 +73,34 @@ describe("Auditorias de cobertura da CLI", () => {
             caminhoJacoco
         ]);
 
-        expect(backendLeitura.exitCode).toBe(0);
-        expect(frontendLeitura.exitCode).toBe(0);
-        expect(backendRamificacoes.exitCode).toBe(0);
-        const backendJson = JSON.parse(backendLeitura.stdout);
-        const frontendJson = JSON.parse(frontendLeitura.stdout);
-        expect(backendJson).toMatchObject({
+        expect(servidorLeitura.exitCode).toBe(0);
+        expect(clienteLeitura.exitCode).toBe(0);
+        expect(servidorRamificacoes.exitCode).toBe(0);
+        const servidorJson = JSON.parse(servidorLeitura.stdout);
+        const clienteJson = JSON.parse(clienteLeitura.stdout);
+        expect(servidorJson).toMatchObject({
             versaoSchema: "1.0.0",
             status: "ok",
         });
-        expect(backendJson.geradoEm).toBeTypeOf("string");
-        expect(backendJson.pontosCriticos).toBeInstanceOf(Array);
-        expect(backendJson.hotspots).toBeUndefined();
-        expect(frontendJson).toMatchObject({
+        expect(servidorJson.geradoEm).toBeTypeOf("string");
+        expect(servidorJson.pontosCriticos).toBeInstanceOf(Array);
+        expect(servidorJson.hotspots).toBeUndefined();
+        expect(clienteJson).toMatchObject({
             versaoSchema: "1.0.0",
             status: "ok",
         });
-        expect(frontendJson.geradoEm).toBeTypeOf("string");
-        expect(frontendJson.pontosCriticos).toBeInstanceOf(Array);
-        expect(frontendJson.hotspots).toBeUndefined();
-        const backendRamificacoesJson = JSON.parse(backendRamificacoes.stdout);
-        expect(backendRamificacoesJson).toMatchObject({versaoSchema: "1.0.0", status: "ok"});
-        expect(backendRamificacoesJson.geradoEm).toBeTypeOf("string");
-        expect(backendRamificacoesJson.timestamp).toBeUndefined();
-        expect(await existe(path.join(base, "backend-cobertura-auditoria.md"))).toBe(false);
-        expect(await existe(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(false);
+        expect(clienteJson.geradoEm).toBeTypeOf("string");
+        expect(clienteJson.pontosCriticos).toBeInstanceOf(Array);
+        expect(clienteJson.hotspots).toBeUndefined();
+        const servidorRamificacoesJson = JSON.parse(servidorRamificacoes.stdout);
+        expect(servidorRamificacoesJson).toMatchObject({versaoSchema: "1.0.0", status: "ok"});
+        expect(servidorRamificacoesJson.geradoEm).toBeTypeOf("string");
+        expect(servidorRamificacoesJson.timestamp).toBeUndefined();
+        expect(await existe(path.join(base, "servidor-cobertura-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(base, "cliente-cobertura-auditoria.md"))).toBe(false);
 
-        const backendGravacao = await executarSgc([
-            "backend",
+        const servidorGravacao = await executarSgc([
+            "servidor",
             "cobertura",
             "auditoria",
             "--json",
@@ -110,8 +110,8 @@ describe("Auditorias de cobertura da CLI", () => {
             "--arquivo",
             caminhoJacoco
         ]);
-        const frontendGravacao = await executarSgc([
-            "frontend",
+        const clienteGravacao = await executarSgc([
+            "cliente",
             "cobertura",
             "auditoria",
             "--json",
@@ -122,14 +122,14 @@ describe("Auditorias de cobertura da CLI", () => {
             caminhoV8
         ]);
 
-        expect(backendGravacao.exitCode).toBe(0);
-        expect(frontendGravacao.exitCode).toBe(0);
-        expect(await existe(path.join(base, "backend-cobertura-auditoria.md"))).toBe(true);
-        expect(await existe(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(true);
+        expect(servidorGravacao.exitCode).toBe(0);
+        expect(clienteGravacao.exitCode).toBe(0);
+        expect(await existe(path.join(base, "servidor-cobertura-auditoria.md"))).toBe(true);
+        expect(await existe(path.join(base, "cliente-cobertura-auditoria.md"))).toBe(true);
     });
 
-    test("analisa cobertura frontend a partir de base e relatorio V8 externos", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-frontend-"));
+    test("analisa cobertura do cliente a partir de base e relatorio V8 externos", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-cliente-"));
         const caminhoArquivo = path.join(diretorioBase, "frontend", "src", "exemplo.ts");
         const caminhoRelatorio = path.join(diretorioBase, "coverage", "coverage-final.json");
 
@@ -144,7 +144,7 @@ describe("Auditorias de cobertura da CLI", () => {
         });
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "cobertura",
             "ramificacoes",
             "--json",
@@ -166,15 +166,15 @@ describe("Auditorias de cobertura da CLI", () => {
         });
     });
 
-    test("preserva caminhos de cobertura frontend em layout configurado", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-frontend-configurado-"));
+    test("preserva caminhos de cobertura do cliente em layout configurado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-cliente-configurado-"));
         const caminhoRelativo = path.join("cliente", "codigo", "exemplo.ts");
         const caminhoArquivo = path.join(diretorioBase, caminhoRelativo);
         const caminhoRelatorio = path.join(diretorioBase, "coverage", "coverage-final.json");
 
         await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontendCodigo: "cliente/codigo"},
+            diretorios: {codigoCliente: "cliente/codigo"},
         });
         await escreverArquivo(caminhoArquivo, "export function exemplo() { return true; }\n");
         await escreverJson(caminhoRelatorio, {
@@ -187,7 +187,7 @@ describe("Auditorias de cobertura da CLI", () => {
         });
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "cobertura",
             "ramificacoes",
             "--json",
@@ -216,7 +216,7 @@ describe("Auditorias de cobertura da CLI", () => {
         });
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "cobertura",
             "ramificacoes-erros",
             "--json",

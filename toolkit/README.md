@@ -18,8 +18,8 @@ do fluxo normal.
 A ajuda da CLI é a fonte canônica para comandos, opções e descrições:
 
 ```bash
-npx tsx toolkit/sgc.ts backend --help
-npx tsx toolkit/sgc.ts frontend --help
+npx tsx toolkit/sgc.ts servidor --help
+npx tsx toolkit/sgc.ts cliente --help
 npx tsx toolkit/sgc.ts requisitos --help
 npx tsx toolkit/sgc.ts qualidade --help
 npx tsx toolkit/sgc.ts projeto --help
@@ -54,30 +54,30 @@ O desenho desejado separa:
 
 ## Comandos representativos
 
-### Backend e frontend
+### Servidor e cliente
 
 ```bash
-npx tsx toolkit/sgc.ts backend cobertura auditoria --json
-npx tsx toolkit/sgc.ts backend testes analisar --json
-npx tsx toolkit/sgc.ts backend testes analisar --gravar --saida analise-testes.md
-npx tsx toolkit/sgc.ts backend testes priorizar --entrada analise-testes.json --gravar
-npx tsx toolkit/sgc.ts backend java corrigir-fqn
-npx tsx toolkit/sgc.ts frontend cobertura auditoria --json
-npx tsx toolkit/sgc.ts frontend residuos validar
-npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados
+npx tsx toolkit/sgc.ts servidor cobertura auditoria --json
+npx tsx toolkit/sgc.ts servidor testes analisar --json
+npx tsx toolkit/sgc.ts servidor testes analisar --gravar --saida analise-testes.md
+npx tsx toolkit/sgc.ts servidor testes priorizar --entrada analise-testes.json --gravar
+npx tsx toolkit/sgc.ts servidor java corrigir-fqn
+npx tsx toolkit/sgc.ts cliente cobertura auditoria --json
+npx tsx toolkit/sgc.ts cliente residuos validar
+npx tsx toolkit/sgc.ts cliente identificadores-teste listar-duplicados
 ```
 
-`backend java corrigir-fqn` simula por padrão; use `--gravar` para modificar fontes.
+`servidor java corrigir-fqn` simula por padrão; use `--gravar` para modificar fontes.
 
-`backend testes analisar` e `backend testes priorizar` também são somente leitura por padrão. Use `--json` para alimentar
+`servidor testes analisar` e `servidor testes priorizar` também são somente leitura por padrão. Use `--json` para alimentar
 agentes e scripts pelo stdout; use `--gravar` para persistir relatórios.
 
-Os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` carregam `versao: 2` e
+Os relatórios próprios persistidos de `servidor arquitetura auditar` e `servidor coesao auditar` carregam `versao: 2` e
 usam `pontosCriticos`. O JSON persistido pelo Semgrep continua sendo o formato externo da ferramenta e, por isso, não
 recebe um envelope do toolkit.
 
-O JSON persistido por `backend testes analisar` usa `versao: 1`, campos em português/camelCase e categorias com os grupos
-`comTeste` e `semTeste`. `backend testes priorizar --json` emite outro contrato versionado, com `versao: 1` e a chave
+O JSON persistido por `servidor testes analisar` usa `versao: 2`, campos em português/camelCase e categorias com os grupos
+`comTeste` e `semTeste`. `servidor testes priorizar --json` emite outro contrato versionado, com `versao: 1` e a chave
 `prioridades`; ao receber um relatório JSON incompatível, o comando falha antes de produzir uma priorização.
 
 ### Código e integração
@@ -97,21 +97,21 @@ estruturais configuráveis.
 com formato ou versão incompatível é rejeitado, enquanto a ausência do arquivo ainda permite uma coleta somente em
 memória quando o comando não usa `--gravar`.
 
-`codigo cheiros auditar` produz uma fotografia `versao: 2`; ela é reutilizada para calcular deltas na execução seguinte.
+`codigo cheiros auditar` produz uma fotografia `versao: 3`; ela é reutilizada para calcular deltas na execução seguinte.
 As chaves próprias da fotografia usam camelCase em português, e uma fotografia anterior incompatível é rejeitada em vez
 de ser tratada como se não existisse.
 
-`frontend arquitetura auditar` produz uma fotografia `versaoSchema: "4.0.0"`; seus resultados próprios usam
+`cliente arquitetura auditar` produz uma fotografia `versaoSchema: "4.0.0"`; seus resultados próprios usam
 `pontosCriticos`, `pontuacao` e `pontuacaoTotal`. O formato anterior não é carregado nem traduzido.
 
-`backend cobertura auditoria` e `frontend cobertura auditoria` emitem resultados `versaoSchema: "1.0.0"` com
+`servidor cobertura auditoria` e `cliente cobertura auditoria` emitem resultados `versaoSchema: "1.0.0"` com
 `pontosCriticos` e `pontuacaoImpacto`; os campos de cobertura dentro de `totais` continuam seguindo os formatos JaCoCo e
 V8 lidos na fronteira.
 
 Os três comandos de ramificações também emitem `versaoSchema: "1.0.0"` e `geradoEm`; seus campos de JaCoCo/V8 permanecem
 nos nomes da fonte externa.
 
-`qualidade resumo` lê fotografias `versaoSchema: "2.0.0"` produzidas pelo coletor, projeta apenas verificações e pontos
+`qualidade resumo` lê fotografias `versaoSchema: "3.0.0"` produzidas pelo coletor, projeta apenas verificações e pontos
 críticos atuais e rejeita fotografias incompatíveis. O coletor e os adaptadores usam `pontosCriticos` e `pontuacao` nos
 contratos próprios; campos antigos não são aceitos.
 
@@ -177,21 +177,21 @@ A acessibilidade Playwright/Axe do SGC não pertence ao toolkit. Ela é executad
 
 ## Configuração por projeto
 
-Crie `configuracao-toolkit.json` na raiz auditada. O schema atual exige `versao: 1` e rejeita chaves desconhecidas ou
+Crie `configuracao-toolkit.json` na raiz auditada. O schema atual exige `versao: 2` e rejeita chaves desconhecidas ou
 caminhos vazios.
 
 ```json
 {
-  "versao": 1,
+  "versao": 2,
   "diretorios": {
-    "backend": "servidor",
-    "frontend": "cliente",
-    "backendCodigo": "servidor/src/main/java",
-    "backendTestes": "servidor/src/test/java",
-    "frontendCodigo": "cliente/src",
+    "servidor": "servidor",
+    "cliente": "cliente",
+    "codigoServidor": "servidor/src/main/java",
+    "testesServidor": "servidor/src/test/java",
+    "codigoCliente": "cliente/src",
     "testesIntegracao": "e2e",
-    "coberturaBackend": "servidor/build/reports/jacoco/test/jacocoTestReport.xml",
-    "coberturaFrontend": "cliente/coverage/coverage-final.json",
+    "coberturaServidor": "servidor/build/reports/jacoco/test/jacocoTestReport.xml",
+    "coberturaCliente": "cliente/coverage/coverage-final.json",
     "artefatosQualidade": ".qualidade"
   },
   "requisitos": {
@@ -204,9 +204,9 @@ caminhos vazios.
 
 Diretórios reconhecidos:
 
-- `backend`, `frontend`, `backendCodigo`, `backendTestes`, `frontendCodigo` e `testesIntegracao`;
-- `artefatosQualidade`, `coberturaBackend`, `coberturaFrontend` e `contratosOpenapi`;
-- `regrasSemgrep`, `orcamentoResiduosFrontend` e `excecoesResiduosFrontend`.
+- `servidor`, `cliente`, `codigoServidor`, `testesServidor`, `codigoCliente` e `testesIntegracao`;
+- `artefatosQualidade`, `coberturaServidor`, `coberturaCliente` e `contratosOpenapi`;
+- `regrasSemgrep`, `orcamentoResiduosCliente` e `excecoesResiduosCliente`.
 
 O corpus CDU usa `specs/cdu/cdu-*.md` por padrão. Para outro layout, configure
 `requisitos.cdus.padraoArquivos` com um glob relativo à raiz auditada. O parser, as auditorias estruturais, a densidade e
@@ -218,7 +218,7 @@ o caminho e o adaptador de cada arquivo; uma lista vazia desativa essa comparaç
 
 ```json
 {
-  "versao": 1,
+  "versao": 2,
   "requisitos": {
     "cdus": {
       "fontesMensagensCodigo": [
@@ -242,7 +242,7 @@ Execuções de dependências e qualidade também podem ser substituídas:
 
 ```json
 {
-  "versao": 1,
+  "versao": 2,
   "execucoes": {
     "dependencias": [
       {
@@ -292,10 +292,10 @@ As APIs programáticas públicas atuais são deliberadamente pequenas:
 
 ```ts
 import {extrairCoberturaJacoco} from "sgc-scripts/cobertura-java";
-import {extrairCoberturaFrontend} from "sgc-scripts/cobertura-web";
+import {extrairCoberturaCliente} from "sgc-scripts/cobertura-web";
 
-const backend = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorioBase});
-const frontend = await extrairCoberturaFrontend("cliente/coverage/coverage-final.json", {diretorioBase});
+const coberturaServidor = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorioBase});
+const coberturaCliente = await extrairCoberturaCliente("cliente/coverage/coverage-final.json", {diretorioBase});
 ```
 
 Módulos internos não fazem parte da API pública. Novos subpaths devem ser publicados quando representarem uma fronteira

@@ -77,17 +77,17 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend identificadores-teste listar-duplicados",
+            comandoSgc: "cliente identificadores-teste listar-duplicados",
             scriptDireto: "cliente/identificadores-teste-listar-duplicados.ts",
             descricao: "Lista identificadores de teste duplicados nos templates Vue.",
             opcoes: [
                 "--json               Emite os duplicados em JSON.",
-                "--base <diretorio>   Raiz do projeto para resolver frontendCodigo.",
+                "--base <diretorio>   Raiz do projeto para resolver codigoCliente.",
                 "--diretorio <diretorio> Sobrescreve o diretório configurado de código.",
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados",
-                "npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados --diretorio /tmp/frontend",
+                "npx tsx toolkit/sgc.ts cliente identificadores-teste listar-duplicados",
+                "npx tsx toolkit/sgc.ts cliente identificadores-teste listar-duplicados --diretorio /tmp/cliente",
             ],
         });
         return;

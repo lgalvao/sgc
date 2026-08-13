@@ -50,8 +50,8 @@ type DefinicaoComandoCatalogada = DefinicaoComando | DefinicaoComandoArquivo;
 
 const CATALOGO_COMANDOS = [
     {
-        caminho: ["backend", "cobertura", "auditoria"],
-        descricao: "Auditoria unificada de cobertura e risco (Backend).",
+        caminho: ["servidor", "cobertura", "auditoria"],
+        descricao: "Auditoria unificada de cobertura e risco (Servidor).",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
@@ -59,8 +59,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/cobertura-auditoria.ts"
     },
     {
-        caminho: ["backend", "cobertura", "ramificacoes"],
-        descricao: "Lista classes com lacunas de ramificacoes no backend.",
+        caminho: ["servidor", "cobertura", "ramificacoes"],
+        descricao: "Lista classes com lacunas de ramificacoes no servidor.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
@@ -68,7 +68,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/cobertura-ramificacoes.ts"
     },
     {
-        caminho: ["backend", "arquitetura", "auditar"],
+        caminho: ["servidor", "arquitetura", "auditar"],
         descricao: "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.",
         escopo: "adaptavel",
         finalidade: "auditar",
@@ -77,7 +77,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/arquitetura-auditar.ts"
     },
     {
-        caminho: ["backend", "coesao", "auditar"],
+        caminho: ["servidor", "coesao", "auditar"],
         descricao: "Audita Services com responsabilidades misturadas (consulta, mutacao, workflow, notificacao).",
         escopo: "perfil-sgc",
         finalidade: "auditar",
@@ -86,7 +86,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/coesao-auditar.ts"
     },
     {
-        caminho: ["backend", "contratos", "auditar"],
+        caminho: ["servidor", "contratos", "auditar"],
         descricao: "Audita vazamentos de model.* em DTOs expostos por controllers.",
         escopo: "adaptavel",
         finalidade: "auditar",
@@ -95,7 +95,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/contratos-auditar.ts"
     },
     {
-        caminho: ["backend", "testes", "analisar"],
+        caminho: ["servidor", "testes", "analisar"],
         descricao: "Detecta classes sem testes e gera Markdown/JSON.",
         escopo: "adaptavel",
         finalidade: "inventariar",
@@ -104,8 +104,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/testes-analisar.ts"
     },
     {
-        caminho: ["backend", "testes", "priorizar"],
-        descricao: "Prioriza backlog de testes do backend.",
+        caminho: ["servidor", "testes", "priorizar"],
+        descricao: "Prioriza backlog de testes do servidor.",
         escopo: "adaptavel",
         finalidade: "gerar",
         efeitos: criarEfeitosComando("opcional"),
@@ -113,7 +113,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/testes-priorizar.ts"
     },
     {
-        caminho: ["backend", "java", "corrigir-fqn"],
+        caminho: ["servidor", "java", "corrigir-fqn"],
         descricao: "Substitui FQNs por imports em arquivos Java.",
         escopo: "adaptavel",
         finalidade: "transformar",
@@ -122,7 +122,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/java-corrigir-fqn.ts"
     },
     {
-        caminho: ["backend", "notificacoes", "auditar-assuntos"],
+        caminho: ["servidor", "notificacoes", "auditar-assuntos"],
         descricao: "Audita literais de assunto de notificacao fora de AssuntosNotificacao.",
         escopo: "perfil-sgc",
         finalidade: "auditar",
@@ -131,8 +131,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "servidor/notificacoes-assuntos-auditar.ts"
     },
     {
-        caminho: ["frontend", "cobertura", "auditoria"],
-        descricao: "Auditoria unificada de cobertura e risco (Frontend).",
+        caminho: ["cliente", "cobertura", "auditoria"],
+        descricao: "Auditoria unificada de cobertura e risco (Cliente).",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
@@ -140,8 +140,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/cobertura-auditoria.ts"
     },
     {
-        caminho: ["frontend", "cobertura", "ramificacoes"],
-        descricao: "Lista arquivos com lacunas de ramificacoes no frontend.",
+        caminho: ["cliente", "cobertura", "ramificacoes"],
+        descricao: "Lista arquivos com lacunas de ramificacoes no cliente.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
@@ -149,8 +149,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/cobertura-ramificacoes.ts"
     },
     {
-        caminho: ["frontend", "cobertura", "ramificacoes-erros"],
-        descricao: "Cruza lacunas de ramificacoes com sinais de tratamento de erro suspeito no frontend.",
+        caminho: ["cliente", "cobertura", "ramificacoes-erros"],
+        descricao: "Cruza lacunas de ramificacoes com sinais de tratamento de erro suspeito no cliente.",
         escopo: "perfil-sgc",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
@@ -158,8 +158,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/cobertura-ramificacoes-erros.ts"
     },
     {
-        caminho: ["frontend", "residuos", "auditar"],
-        descricao: "Audita residuos estruturais do frontend.",
+        caminho: ["cliente", "residuos", "auditar"],
+        descricao: "Audita residuos estruturais do cliente.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
@@ -167,8 +167,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/residuos-auditar.ts"
     },
     {
-        caminho: ["frontend", "residuos", "validar"],
-        descricao: "Valida orcamentos e excecoes dos residuos do frontend.",
+        caminho: ["cliente", "residuos", "validar"],
+        descricao: "Valida orcamentos e excecoes dos residuos do cliente.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
@@ -176,8 +176,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/residuos-validar.ts"
     },
     {
-        caminho: ["frontend", "arquitetura", "auditar"],
-        descricao: "Audita vazamentos arquiteturais e estrategia de cache exposta no frontend.",
+        caminho: ["cliente", "arquitetura", "auditar"],
+        descricao: "Audita vazamentos arquiteturais e estrategia de cache exposta no cliente.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
@@ -185,8 +185,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/arquitetura-auditar.ts"
     },
     {
-        caminho: ["frontend", "arquitetura", "validar"],
-        descricao: "Valida regras arquiteturais do frontend (gate duro).",
+        caminho: ["cliente", "arquitetura", "validar"],
+        descricao: "Valida regras arquiteturais do cliente (gate duro).",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
@@ -194,7 +194,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/arquitetura-validar.ts"
     },
     {
-        caminho: ["frontend", "views", "templates-validar"],
+        caminho: ["cliente", "views", "templates-validar"],
         descricao: "Valida previsibilidade estrutural de templates das views.",
         escopo: "perfil-sgc",
         finalidade: "auditar",
@@ -203,7 +203,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/views-templates-validar.ts"
     },
     {
-        caminho: ["frontend", "modais", "validar"],
+        caminho: ["cliente", "modais", "validar"],
         descricao: "Valida o uso padronizado de ModalPadrao e proibe BModal cru fora do componente-base.",
         escopo: "perfil-sgc",
         finalidade: "auditar",
@@ -212,8 +212,8 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/modais-validar.ts"
     },
     {
-        caminho: ["frontend", "identificadores-teste", "listar"],
-        descricao: "Lista identificadores de teste do frontend.",
+        caminho: ["cliente", "identificadores-teste", "listar"],
+        descricao: "Lista identificadores de teste do cliente.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
@@ -221,7 +221,7 @@ const CATALOGO_COMANDOS = [
         arquivo: "cliente/identificadores-teste-listar.ts"
     },
     {
-        caminho: ["frontend", "identificadores-teste", "listar-duplicados"],
+        caminho: ["cliente", "identificadores-teste", "listar-duplicados"],
         descricao: "Lista identificadores de teste duplicados.",
         escopo: "adaptavel",
         finalidade: "auditar",
@@ -240,7 +240,7 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["codigo", "semgrep", "auditar"],
-        descricao: "Executa regras locais de Semgrep para backend, frontend e integração.",
+        descricao: "Executa regras locais de Semgrep para servidor, cliente e integração.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional", {subprocessos: true}),
@@ -330,7 +330,7 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["projeto", "versao-sincronizar"],
-        descricao: "Sincroniza a versao entre gradle.properties e frontend/package.json.",
+        descricao: "Sincroniza a versao entre gradle.properties e o package.json do cliente configurado (frontend/package.json por padrão).",
         escopo: "adaptavel",
         finalidade: "transformar",
         efeitos: criarEfeitosComando("opcional"),

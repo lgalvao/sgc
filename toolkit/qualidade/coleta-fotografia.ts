@@ -4,7 +4,7 @@ import {NOME_ARQUIVO_FOTOGRAFIA} from "../biblioteca/qualidade.js";
 import {extrairPontosCriticosQualidade} from "./coleta-leitores.js";
 import type {ExecucaoQualidade} from "./coleta-execucao.js";
 
-const VERSAO_SCHEMA_FOTOGRAFIA = "2.0.0" as const;
+const VERSAO_SCHEMA_FOTOGRAFIA = "3.0.0" as const;
 
 type MetadadosControleVersao = Readonly<Record<string, string>>;
 

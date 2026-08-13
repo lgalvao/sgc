@@ -1,4 +1,4 @@
-// Auditoria de coesão dos services do backend.
+// Auditoria de coesão dos services do servidor.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -181,7 +181,7 @@ async function auditarCoesao(diretorioCodigo: string, diretorioBase: string): Pr
 
 function gerarMarkdown(relatorio: RelatorioCoesao): string {
     const linhas: string[] = [];
-    linhas.push("# Auditoria de coesão do backend", "");
+    linhas.push("# Auditoria de coesão do servidor", "");
     linhas.push(`Gerado em: ${relatorio.geradoEm}`, "");
     linhas.push(`> ${relatorio.criterio}`, "");
     linhas.push("## Resumo", "");
@@ -256,9 +256,9 @@ async function gravarRelatorios(relatorio: RelatorioCoesao, diretorioSaida: stri
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "backend coesao auditar",
+        comandoSgc: "servidor coesao auditar",
         scriptDireto: "servidor/coesao-auditar.ts",
-        descricao: "Audita Services do backend detectando mistura de responsabilidades (consulta, mutação, workflow, notificação, permissão).",
+        descricao: "Audita Services do servidor detectando mistura de responsabilidades (consulta, mutação, workflow, notificação, permissão).",
         opcoes: [
             "--json              Emite o relatório em JSON.",
             "--gravar            Grava os relatórios em disco.",
@@ -266,9 +266,9 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend coesao auditar",
-            "npx tsx toolkit/sgc.ts backend coesao auditar --json",
-            "npx tsx toolkit/sgc.ts backend coesao auditar --gravar"
+            "npx tsx toolkit/sgc.ts servidor coesao auditar",
+            "npx tsx toolkit/sgc.ts servidor coesao auditar --json",
+            "npx tsx toolkit/sgc.ts servidor coesao auditar --gravar"
         ]
     });
 }
@@ -284,11 +284,11 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const emitirJson = argumentos.includes("--json");
     const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
-    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "mais-recente");
+    const diretorioCodigo = resolverCaminhoConfigurado("codigoServidor", diretorioBase);
+    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "servidor", "mais-recente");
 
     if (!emitirJson) {
-        imprimirCabecalho("AUDITORIA DE COESÃO DO BACKEND");
+        imprimirCabecalho("AUDITORIA DE COESÃO DO SERVIDOR");
         escreverLinha(`Base analisada: ${pc.dim(diretorioCodigo)}`);
     }
 

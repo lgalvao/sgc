@@ -29,7 +29,7 @@ describe("Comandos de projeto do toolkit", () => {
     test("exibe ajuda do comando de sincronizacao de versao do projeto", async () => {
         const resultado = await executarSgc(["projeto", "versao-sincronizar", "--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Atualiza gradle.properties e o package.json do frontend configurado");
+        expect(resultado.stdout).toContain("Atualiza gradle.properties e o package.json do cliente configurado");
     });
 
     test("simula e aplica sincronizacao de versao em um diretorio informado", async () => {
@@ -84,11 +84,11 @@ describe("Comandos de projeto do toolkit", () => {
         expect(await lerArquivo(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
     });
 
-    test("sincroniza versao no frontend configurado", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-frontend-configurado-"));
+    test("sincroniza versao no cliente configurado", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-cliente-configurado-"));
         await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontend: "cliente"}
+            diretorios: {cliente: "cliente"}
         });
         await escreverArquivo(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
         await escreverJson(path.join(diretorioBase, "cliente", "package.json"), {name: "cliente", version: "1.0.0"});
@@ -177,8 +177,8 @@ describe("Comandos de projeto do toolkit", () => {
         await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backend: "servidor",
-                frontend: "cliente",
+                servidor: "servidor",
+                cliente: "cliente",
                 testesIntegracao: "testes-e2e"
             }
         });
@@ -204,7 +204,7 @@ describe("Comandos de projeto do toolkit", () => {
     });
 
     test("audita cobertura JaCoCo a partir de arquivo e base externos", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-backend-"));
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-servidor-"));
         const caminhoXml = path.join(diretorioBase, "jacoco.xml");
         await escreverArquivo(caminhoXml, [
             "<report name=\"exemplo\">",
@@ -224,7 +224,7 @@ describe("Comandos de projeto do toolkit", () => {
         ].join("\n"));
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "cobertura",
             "ramificacoes",
             "--json",
@@ -246,7 +246,7 @@ describe("Comandos de projeto do toolkit", () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-scripts-"));
         await criarDiretorio(path.join(diretorioBase, "backend", "build"));
         await criarDiretorio(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente"));
-        await escreverArquivo(path.join(diretorioBase, "backend-cobertura-auditoria.md"), "# teste");
+        await escreverArquivo(path.join(diretorioBase, "servidor-cobertura-auditoria.md"), "# teste");
         await escreverArquivo(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "resumo.md"), "ok");
 
         const previa = await executarSgc(["projeto", "artefatos", "limpar", "--json", "--base", diretorioBase]);
@@ -261,7 +261,7 @@ describe("Comandos de projeto do toolkit", () => {
         const jsonExecucao = JSON.parse(execucao.stdout);
         expect(jsonExecucao.modo).toBe("executar");
         expect(await existe(path.join(diretorioBase, "backend", "build"))).toBe(false);
-        expect(await existe(path.join(diretorioBase, "backend-cobertura-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(diretorioBase, "servidor-cobertura-auditoria.md"))).toBe(false);
     });
 
     test("aceita política de padrões de limpeza de projeto externo", async () => {
@@ -289,8 +289,8 @@ describe("Comandos de projeto do toolkit", () => {
         await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backend: "servidor",
-                frontend: "cliente",
+                servidor: "servidor",
+                cliente: "cliente",
                 artefatosQualidade: "artefatos"
             }
         });

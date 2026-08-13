@@ -94,7 +94,7 @@ interface PontoCriticoResiduo {
 }
 
 interface ResumoResiduos {
-    arquivosFrontend: number;
+    arquivosCliente: number;
     arquivosProducao: number;
     arquivosTeste: number;
     pontuacaoTotal: number;
@@ -122,7 +122,7 @@ interface OpcoesAnaliseResiduos {
 }
 
 function resolverDiretorioSaidaResiduos(base: string = DIRETORIO_RAIZ): string {
-    return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "frontend-residuos", "mais-recente");
+    return path.join(resolverCaminhoConfigurado("artefatosQualidade", base), "cliente-residuos", "mais-recente");
 }
 
 function normalizarCaminho(caminhoArquivo: string): string {
@@ -130,7 +130,7 @@ function normalizarCaminho(caminhoArquivo: string): string {
 }
 
 function resolverPrefixoCodigo(base: string): string {
-    const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", base);
+    const diretorioCodigo = resolverCaminhoConfigurado("codigoCliente", base);
     const relativo = normalizarCaminho(path.relative(base, diretorioCodigo));
     return relativo ? `${relativo}/` : "";
 }
@@ -145,12 +145,12 @@ function ehArquivoTesteOuHistoria(caminhoRelativo: string): boolean {
         || caminhoRelativo.endsWith(".stories.ts");
 }
 
-function ehArquivoFrontend(caminhoRelativo: string, prefixoCodigo: string): boolean {
+function ehArquivoCliente(caminhoRelativo: string, prefixoCodigo: string): boolean {
     return prefixoCodigo === "" || caminhoRelativo.startsWith(prefixoCodigo);
 }
 
-function ehArquivoProducaoFrontend(caminhoRelativo: string, prefixoCodigo: string): boolean {
-    return ehArquivoFrontend(caminhoRelativo, prefixoCodigo) && !ehArquivoTesteOuHistoria(caminhoRelativo);
+function ehArquivoProducaoCliente(caminhoRelativo: string, prefixoCodigo: string): boolean {
+    return ehArquivoCliente(caminhoRelativo, prefixoCodigo) && !ehArquivoTesteOuHistoria(caminhoRelativo);
 }
 
 function classificarCamada(caminhoRelativo: string, prefixoCodigo: string): Camada {
@@ -185,8 +185,8 @@ function criarContagensZeradas(): ContagensTotais {
     };
 }
 
-async function listarArquivosFrontend(base: string): Promise<string[]> {
-    const diretorioFrontend = resolverCaminhoConfigurado("frontendCodigo", base);
+async function listarArquivosCliente(base: string): Promise<string[]> {
+    const diretorioCliente = resolverCaminhoConfigurado("codigoCliente", base);
     const arquivos: string[] = [];
 
     async function percorrer(diretorioAtual: string): Promise<void> {
@@ -212,7 +212,7 @@ async function listarArquivosFrontend(base: string): Promise<string[]> {
         }
     }
 
-    await percorrer(diretorioFrontend);
+    await percorrer(diretorioCliente);
     return arquivos;
 }
 
@@ -275,11 +275,11 @@ function calcularPontuacaoArquivo(arquivo: ArquivoResiduo, limitesCamada: Limite
         + (arquivo.contagens.exportacoesSuspeitas * PESOS_PONTUACAO.exportacoesSuspeitas);
 }
 
-async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento}: OpcoesAnaliseResiduos = {}): Promise<FotografiaResiduos> {
+async function analisarResiduosCliente({base = DIRETORIO_RAIZ, caminhoOrcamento}: OpcoesAnaliseResiduos = {}): Promise<FotografiaResiduos> {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const prefixoCodigo = resolverPrefixoCodigo(baseResolvida);
     const orcamento = await carregarOrcamento(caminhoOrcamento ?? resolverCaminhoOrcamentoResiduos(baseResolvida));
-    const arquivos = await listarArquivosFrontend(baseResolvida);
+    const arquivos = await listarArquivosCliente(baseResolvida);
     const arquivosAnalisados: ArquivoResiduo[] = [];
     const mapaExportacoes = new Map<string, ExportacaoIndexada>();
     const conteudos = new Map<string, string>();
@@ -289,7 +289,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
         const caminhoRelativo = normalizarCaminho(path.relative(baseResolvida, arquivo));
         conteudos.set(caminhoRelativo, conteudo);
 
-        const ehProducao = ehArquivoProducaoFrontend(caminhoRelativo, prefixoCodigo);
+        const ehProducao = ehArquivoProducaoCliente(caminhoRelativo, prefixoCodigo);
         const camada = classificarCamada(caminhoRelativo, prefixoCodigo);
         const limitesCamada = orcamento.camadas?.[camada] ?? orcamento.camadas?.outro ?? {
             meta: Number.POSITIVE_INFINITY,
@@ -345,7 +345,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
             if (arquivo === exportacao.arquivo || !regexUso.test(conteudo)) {
                 continue;
             }
-            if (ehArquivoProducaoFrontend(arquivo, prefixoCodigo)) {
+            if (ehArquivoProducaoCliente(arquivo, prefixoCodigo)) {
                 exportacao.consumidoresProducao += 1;
             } else if (ehArquivoTesteOuHistoria(arquivo)) {
                 exportacao.consumidoresTeste += 1;
@@ -428,7 +428,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
         base: baseResolvida,
         orcamento,
         resumo: {
-            arquivosFrontend: arquivosAnalisados.length,
+            arquivosCliente: arquivosAnalisados.length,
             arquivosProducao: arquivosProducao.length,
             arquivosTeste: arquivosAnalisados.length - arquivosProducao.length,
             pontuacaoTotal: Number(pontuacaoTotal.toFixed(1)),
@@ -451,7 +451,7 @@ async function analisarResiduosFrontend({base = DIRETORIO_RAIZ, caminhoOrcamento
 
 function gerarMarkdownAuditoria(fotografia: FotografiaResiduos): string {
     const linhas: string[] = [];
-    linhas.push("# Auditoria de residuos do frontend");
+    linhas.push("# Auditoria de residuos do cliente");
     linhas.push("");
     linhas.push(`Gerado em: ${fotografia.geradoEm}`);
     linhas.push(`Pontuacao total: ${fotografia.resumo.pontuacaoTotal} (${fotografia.resumo.faixa})`);
@@ -504,7 +504,7 @@ async function gravarFotografiaAuditoria(
 }
 
 export {
-    analisarResiduosFrontend,
+    analisarResiduosCliente,
     gravarFotografiaAuditoria,
     resolverDiretorioSaidaResiduos,
     type FotografiaResiduos,

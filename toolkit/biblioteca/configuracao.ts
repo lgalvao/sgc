@@ -3,19 +3,19 @@ import path from "node:path";
 import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "./caminhos.js";
 
 type NomeDiretorioConfigurado =
-    | "backend"
-    | "frontend"
-    | "backendCodigo"
-    | "backendTestes"
-    | "frontendCodigo"
+    | "servidor"
+    | "cliente"
+    | "codigoServidor"
+    | "testesServidor"
+    | "codigoCliente"
     | "testesIntegracao"
     | "artefatosQualidade"
-    | "coberturaBackend"
-    | "coberturaFrontend"
+    | "coberturaServidor"
+    | "coberturaCliente"
     | "regrasSemgrep"
     | "contratosOpenapi"
-    | "orcamentoResiduosFrontend"
-    | "excecoesResiduosFrontend";
+    | "orcamentoResiduosCliente"
+    | "excecoesResiduosCliente";
 
 type DiretoriosConfigurados = Partial<Record<NomeDiretorioConfigurado, string>>;
 
@@ -80,36 +80,36 @@ interface RequisitosSobrepostos {
 }
 
 interface ConfiguracaoToolkit {
-    versao: 1;
+    versao: 2;
     diretorios: DiretoriosConfigurados;
     requisitos: RequisitosConfigurados;
     execucoes?: ExecucoesConfiguradas;
 }
 
 interface ConfiguracaoSobreposta {
-    versao: 1;
+    versao: 2;
     diretorios?: DiretoriosConfigurados;
     requisitos?: RequisitosSobrepostos;
     execucoes?: ExecucoesConfiguradas;
 }
 
 const NOME_ARQUIVO_CONFIGURACAO = "configuracao-toolkit.json";
-const VERSAO_CONFIGURACAO = 1 as const;
-const DIRETORIOS_OPCIONAIS = new Set<NomeDiretorioConfigurado>(["orcamentoResiduosFrontend", "excecoesResiduosFrontend"]);
+const VERSAO_CONFIGURACAO = 2 as const;
+const DIRETORIOS_OPCIONAIS = new Set<NomeDiretorioConfigurado>(["orcamentoResiduosCliente", "excecoesResiduosCliente"]);
 const DIRETORIOS_FORNECIDOS_PELO_TOOLKIT = new Set<NomeDiretorioConfigurado>(["regrasSemgrep"]);
 
 const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
     versao: VERSAO_CONFIGURACAO,
     diretorios: {
-        backend: "backend",
-        frontend: "frontend",
-        backendCodigo: "backend/src/main/java/sgc",
-        backendTestes: "backend/src/test/java",
-        frontendCodigo: "frontend/src",
+        servidor: "backend",
+        cliente: "frontend",
+        codigoServidor: "backend/src/main/java/sgc",
+        testesServidor: "backend/src/test/java",
+        codigoCliente: "frontend/src",
         testesIntegracao: "e2e",
         artefatosQualidade: "toolkit/qualidade/artefatos",
-        coberturaBackend: "backend/build/reports/jacoco/test/jacocoTestReport.xml",
-        coberturaFrontend: "frontend/coverage/coverage-final.json",
+        coberturaServidor: "backend/build/reports/jacoco/test/jacocoTestReport.xml",
+        coberturaCliente: "frontend/coverage/coverage-final.json",
         regrasSemgrep: "toolkit/qualidade/politicas/semgrep/sgc-qualidade.yml",
         contratosOpenapi: "toolkit/qualidade/artefatos/openapi"
     },

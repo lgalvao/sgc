@@ -72,7 +72,7 @@ function auditarArquivo(caminhoArquivo: string, diretorioBase: string, diretorio
 
 async function executarValidacaoModais(opcoes: OpcoesValidacaoModais = {}): Promise<ResultadoValidacaoModais> {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", diretorioBase);
+    const diretorioCodigo = resolverCaminhoConfigurado("codigoCliente", diretorioBase);
     const diretorioComponentes = path.join(diretorioCodigo, "components");
     const arquivosVue = listarArquivosVue(diretorioComponentes);
     const violacoes = arquivosVue.flatMap((arquivo) => auditarArquivo(arquivo, diretorioBase, diretorioCodigo));
@@ -105,16 +105,16 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend modais validar",
+            comandoSgc: "cliente modais validar",
             scriptDireto: "cliente/modais-validar.ts",
-            descricao: "Valida que apenas ModalPadrao abre BModal diretamente no frontend.",
+            descricao: "Valida que apenas ModalPadrao abre BModal diretamente no cliente.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend modais validar",
-                "npx tsx toolkit/sgc.ts frontend modais validar --json",
+                "npx tsx toolkit/sgc.ts cliente modais validar",
+                "npx tsx toolkit/sgc.ts cliente modais validar --json",
             ],
         });
         return;

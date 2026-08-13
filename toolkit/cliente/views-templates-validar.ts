@@ -109,7 +109,7 @@ function resumir(violacoes: ViolacaoView[], totalViews: number): ResultadoValida
 
 async function executarValidacaoTemplatesViews(opcoes: OpcoesValidacaoViews = {}): Promise<ResultadoValidacaoViews> {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const diretorioViews = path.join(resolverCaminhoConfigurado("frontendCodigo", diretorioBase), "views");
+    const diretorioViews = path.join(resolverCaminhoConfigurado("codigoCliente", diretorioBase), "views");
     const views = listarViews(diretorioViews);
     const violacoes = views.flatMap((arquivo) => auditarView(arquivo, diretorioBase));
     return {
@@ -138,16 +138,16 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend views templates-validar",
+            comandoSgc: "cliente views templates-validar",
             scriptDireto: "cliente/views-templates-validar.ts",
-            descricao: "Valida previsibilidade estrutural das views do frontend (shell, header e proibicao de BModal cru).",
+            descricao: "Valida previsibilidade estrutural das views do cliente (shell, header e proibicao de BModal cru).",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend views templates-validar",
-                "npx tsx toolkit/sgc.ts frontend views templates-validar --json",
+                "npx tsx toolkit/sgc.ts cliente views templates-validar",
+                "npx tsx toolkit/sgc.ts cliente views templates-validar --json",
             ],
         });
         return;

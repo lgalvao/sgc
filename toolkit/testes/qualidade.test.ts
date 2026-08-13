@@ -31,7 +31,7 @@ describe("Qualidade do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
 
         const json = JSON.parse(resultado.stdout);
-        expect(json.versaoSchema).toBe("2.0.0");
+        expect(json.versaoSchema).toBe("3.0.0");
         expect(json.resumo.statusGeral).toBe("verde");
         expect(json.pontosCriticos).toHaveLength(2);
     });
@@ -41,7 +41,7 @@ describe("Qualidade do toolkit", () => {
         const caminhoFotografia = path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "fotografia.json");
         await criarDiretorio(path.dirname(caminhoFotografia));
         await escreverJson(caminhoFotografia, {
-            versaoSchema: "2.0.0",
+            versaoSchema: "3.0.0",
             resumo: {
                 statusGeral: "verde",
                 totais: {verificacoes: 1}
@@ -54,7 +54,7 @@ describe("Qualidade do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         const json = JSON.parse(resultado.stdout);
-        expect(json.versaoSchema).toBe("2.0.0");
+        expect(json.versaoSchema).toBe("3.0.0");
         expect(json.resumo.statusGeral).toBe("verde");
         expect(json.caminho).toBe("toolkit/qualidade/artefatos/mais-recente/fotografia.json");
     });
@@ -83,7 +83,7 @@ describe("Qualidade do toolkit", () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-estrutura-invalida-"));
         const caminhoFotografia = path.join(diretorioBase, "fotografia.json");
         await escreverJson(caminhoFotografia, {
-            versaoSchema: "2.0.0",
+            versaoSchema: "3.0.0",
             resumo: {},
             verificacoes: "invalido",
             pontosCriticos: []
@@ -183,15 +183,15 @@ describe("Qualidade do toolkit", () => {
                     diretorioArtefatos,
                     diretorioExecucoes: path.join(diretorioArtefatos, "execucoes"),
                     diretorioMaisRecente: path.join(diretorioArtefatos, "mais-recente"),
-                    diretorioBackend: path.join(base, "servidor"),
-                    diretorioFrontend: path.join(base, "cliente"),
-                    diretorioFrontendCodigo: path.join(base, "cliente", "src")
+                    diretorioServidor: path.join(base, "servidor"),
+                    diretorioCliente: path.join(base, "cliente"),
+                    diretorioCodigoCliente: path.join(base, "cliente", "src")
                 };
             }
         });
 
         expect(baseRecebida).toBe(diretorioBase);
-        expect(fotografia.versaoSchema).toBe("2.0.0");
+        expect(fotografia.versaoSchema).toBe("3.0.0");
         expect(fotografia.metadados.controleVersao).toEqual({origem: "externa"});
         expect(fotografia.verificacoes).toHaveLength(1);
         expect(await existe(caminhoFotografiaPersonalizado)).toBe(true);
@@ -270,12 +270,12 @@ describe("Qualidade do toolkit", () => {
     });
 
     test("caracteriza perfis e adaptadores SGC por composição", async () => {
-        expect(PERFIS_SGC.backend).toEqual([
-            "testesBackendUnitarios",
-            "testesBackendIntegracao",
-            "coberturaBackend"
+        expect(PERFIS_SGC.servidor).toEqual([
+            "testesServidorUnitarios",
+            "testesServidorIntegracao",
+            "coberturaServidor"
         ]);
-        expect(PERFIS_SGC.frontend).toContain("identificadoresTesteFrontend");
+        expect(PERFIS_SGC.cliente).toContain("identificadoresTesteCliente");
 
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-adaptadores-"));
         const contexto: ContextoColeta = {
@@ -283,9 +283,9 @@ describe("Qualidade do toolkit", () => {
             diretorioArtefatos: path.join(diretorioBase, "artefatos"),
             diretorioExecucoes: path.join(diretorioBase, "artefatos", "execucoes"),
             diretorioMaisRecente: path.join(diretorioBase, "artefatos", "mais-recente"),
-            diretorioBackend: path.join(diretorioBase, "backend"),
-            diretorioFrontend: path.join(diretorioBase, "frontend"),
-            diretorioFrontendCodigo: path.join(diretorioBase, "frontend", "src")
+            diretorioServidor: path.join(diretorioBase, "backend"),
+            diretorioCliente: path.join(diretorioBase, "frontend"),
+            diretorioCodigoCliente: path.join(diretorioBase, "frontend", "src")
         };
         await escreverArquivo(
             path.join(diretorioBase, "backend", "build", "reports", "jacoco", "test", "jacocoTestReport.xml"),
@@ -345,21 +345,21 @@ describe("Qualidade do toolkit", () => {
         });
 
         const resultados = await Promise.all([
-            adaptadores.testesBackendUnitarios(contexto),
-            adaptadores.testesBackendIntegracao(contexto),
-            adaptadores.coberturaBackend(contexto),
-            adaptadores.coberturaFrontend(contexto),
-            adaptadores.lintFrontend(contexto),
-            adaptadores.tiposFrontend(contexto),
-            adaptadores.residuosFrontend(contexto),
-            adaptadores.arquiteturaFrontend(contexto),
-            adaptadores.identificadoresTesteFrontend(contexto),
+            adaptadores.testesServidorUnitarios(contexto),
+            adaptadores.testesServidorIntegracao(contexto),
+            adaptadores.coberturaServidor(contexto),
+            adaptadores.coberturaCliente(contexto),
+            adaptadores.lintCliente(contexto),
+            adaptadores.tiposCliente(contexto),
+            adaptadores.residuosCliente(contexto),
+            adaptadores.arquiteturaCliente(contexto),
+            adaptadores.identificadoresTesteCliente(contexto),
             adaptadores.testesIntegracaoPlaywright(contexto)
         ]);
 
         expect(resultados.every(resultado => resultado.status === "sucesso")).toBe(true);
-        expect(resultados.find(resultado => resultado.codigo === "backend-cobertura")?.sumario).toContain("ramificações");
-        expect(resultados.find(resultado => resultado.codigo === "frontend-cobertura")?.sumario).toContain("linhas");
+        expect(resultados.find(resultado => resultado.codigo === "servidor-cobertura")?.sumario).toContain("ramificações");
+        expect(resultados.find(resultado => resultado.codigo === "cliente-cobertura")?.sumario).toContain("linhas");
         expect(resultados.find(resultado => resultado.codigo === "e2e-playwright")?.sumario).toContain("0 testes E2E");
     });
 }, 30000);

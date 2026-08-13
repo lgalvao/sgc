@@ -19,15 +19,15 @@ describe("Configuracao do toolkit", () => {
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java"
+                codigoServidor: "servidor/java"
             }
         });
 
         const configuracao = carregarConfiguracao(base);
 
         expect(configuracao.versao).toBe(VERSAO_CONFIGURACAO);
-        expect(configuracao.diretorios.backendCodigo).toBe("servidor/java");
-        expect(configuracao.diretorios.frontend).toBe("frontend");
+        expect(configuracao.diretorios.codigoServidor).toBe("servidor/java");
+        expect(configuracao.diretorios.cliente).toBe("frontend");
         expect(configuracao.requisitos.cdus.padraoArquivos).toBe("specs/cdu/cdu-*.md");
         expect(configuracao.requisitos.cdus.fontesMensagensCodigo).toHaveLength(7);
         expect(configuracao.requisitos.cdus.vocabulario.perfisCanonicos).toEqual(["ADMIN", "GESTOR", "CHEFE", "SERVIDOR"]);
@@ -36,10 +36,10 @@ describe("Configuracao do toolkit", () => {
 
     test("rejeita configuracao com versao, chave ou caminho invalido", () => {
         expect(() => validarConfiguracao({diretorios: {}})).toThrow("deve informar a versão");
-        expect(() => validarConfiguracao({versao: 2})).toThrow("versão 2");
-        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigoo: "servidor/java"}})).toThrow("backendCodigoo");
-        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: 42}})).toThrow("backendCodigo");
-        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {backendCodigo: "   "}})).toThrow("não vazio");
+        expect(() => validarConfiguracao({versao: 1})).toThrow("versão 1");
+        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {codigoServidoro: "servidor/java"}})).toThrow("codigoServidoro");
+        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {codigoServidor: 42}})).toThrow("codigoServidor");
+        expect(() => validarConfiguracao({versao: VERSAO_CONFIGURACAO, diretorios: {codigoServidor: "   "}})).toThrow("não vazio");
         expect(() => validarConfiguracao({
             versao: VERSAO_CONFIGURACAO,
             requisitos: {cdus: {padraoArquivos: "   "}}

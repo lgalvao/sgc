@@ -6,7 +6,7 @@ import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
-import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../biblioteca/dominios/cobertura-web.js";
+import {extrairCoberturaCliente, type ArquivoCobertura, type ResultadoCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
 
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 
@@ -24,7 +24,7 @@ interface ResultadoRamificacoesErros {
     status: "ok";
     versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
     geradoEm: string;
-    totais: ResultadoCoberturaFrontend["ramificacoes"];
+    totais: ResultadoCoberturaCliente["ramificacoes"];
     arquivos: ArquivoRamificacoesErros[];
 }
 
@@ -68,9 +68,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend cobertura ramificacoes-erros",
+            comandoSgc: "cliente cobertura ramificacoes-erros",
             scriptDireto: "cliente/cobertura-ramificacoes-erros.ts",
-            descricao: "Cruza lacunas de ramificacoes do frontend com sinais de tratamento de erro suspeito.",
+            descricao: "Cruza lacunas de ramificacoes do cliente com sinais de tratamento de erro suspeito.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
                 "--limite <n>    Limita a quantidade de arquivos inspecionados. Padrão: 15.",
@@ -84,7 +84,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
     const limite = lerNumero(argumentos, "--limite", 15, {minimo: 0}) ?? 15;
-    const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
+    const coleta = await extrairCoberturaCliente(caminhoRelatorio, {diretorioBase});
     const candidatos = coleta.arquivos
         .map((arquivo) => ({
             ...arquivo,
@@ -122,7 +122,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         return;
     }
 
-    imprimirCabecalho("RAMIFICAÇÕES DE ERRO SUSPEITAS NO FRONTEND");
+    imprimirCabecalho("RAMIFICAÇÕES DE ERRO SUSPEITAS NO CLIENTE");
     escreverLinha(`Cobertura global de ramificações: ${pc.bold(`${coleta.ramificacoes.percentual}%`)} (${coleta.ramificacoes.cobertos}/${coleta.ramificacoes.total})`);
     escreverLinha("");
 

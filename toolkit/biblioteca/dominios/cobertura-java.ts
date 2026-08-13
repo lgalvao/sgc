@@ -161,7 +161,7 @@ async function extrairCoberturaJacoco(
     opcoes: OpcoesCoberturaJacoco = {}
 ): Promise<ResultadoCoberturaJacoco> {
     const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
-    const caminhoPadrao = resolverCaminhoConfigurado("coberturaBackend", diretorioBase);
+    const caminhoPadrao = resolverCaminhoConfigurado("coberturaServidor", diretorioBase);
     const caminhoXml = caminhoRelativo
         ? (path.isAbsolute(caminhoRelativo) ? caminhoRelativo : path.resolve(diretorioBase, caminhoRelativo))
         : caminhoPadrao;

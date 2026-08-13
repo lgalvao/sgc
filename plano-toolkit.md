@@ -2,7 +2,7 @@
 
 ## Objetivos
 
-O trabalho abrange exclusivamente `toolkit/`. Backend, frontend, E2E e especificações do SGC são considerados apenas
+O trabalho abrange exclusivamente `toolkit/`. Servidor, cliente, E2E e especificações do SGC são considerados apenas
 como consumidores, fixtures e fontes de políticas do toolkit.
 
 Os objetivos são:
@@ -152,7 +152,7 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   textual, placeholders e heurísticas de contexto ainda não são políticas configuráveis;
 - a comparação com mensagens do código usa fontes configuráveis por caminho e tipo de adaptador; o default SGC mantém sete
   fontes e as heurísticas de prefixos e grupos ainda estão dentro do adaptador;
-- `backend testes analisar` e `backend testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
+- `servidor testes analisar` e `servidor testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
   já aparecem no mesmo catálogo de opções da CLI principal;
 - o roteador e os entrypoints diretos publicados validam opções, valores e posicionais pelo mesmo preflight, inclusive a
   forma `--opcao=valor`; os scripts internos não publicados continuam fora desse contrato deliberado;
@@ -166,19 +166,19 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   arquivo ausente pode ser coletado sob demanda, mas arquivo existente incompatível falha explicitamente;
 - a auditoria de idioma foi promovida para `versao: 2` e usa `pontuacaoTotal` no resultado próprio, eliminando o último
   `scoreTotal` desse contrato;
-- a fotografia persistida de `codigo cheiros auditar` agora usa `versao: 2`, `pontosCriticos` e chaves próprias em
+- a fotografia persistida de `codigo cheiros auditar` agora usa `versao: 3`, `pontosCriticos` e chaves próprias em
   camelCase; o arquivo anterior é validado antes de calcular deltas e versões antigas são rejeitadas;
-- os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` agora carregam
+- os relatórios próprios persistidos de `servidor arquitetura auditar` e `servidor coesao auditar` agora carregam
   `versao: 2` e usam `pontosCriticos`; o JSON persistido pelo Semgrep permanece externo e não recebe envelope do
   toolkit;
-- a política de orçamento e exceções de `frontend resíduos` foi extraída para um módulo próprio, com validação estrita
+- a política de orçamento e exceções de `cliente resíduos` foi extraída para um módulo próprio, com validação estrita
   de versão e estrutura, sem misturar carregamento de configuração ao motor de análise;
 - identificadores próprios que ainda estavam em inglês (`snapshot`, `STOPWORDS` e `Status`) foram padronizados em
   português; vocabulário externo de bibliotecas, formatos e código auditado continua preservado na fronteira correta;
-- o contrato da fotografia consolidada de qualidade foi promovido para `versaoSchema: "2.0.0"`: `pontosCriticos` e
+- o contrato da fotografia consolidada de qualidade foi promovido para `versaoSchema: "3.0.0"`: `pontosCriticos` e
   `pontuacao` substituem `hotspots` e `score` nos resultados próprios, sem aliases de compatibilidade;
 - `qualidade resumo` valida a estrutura completa da fotografia e rejeita versões ou campos obrigatórios incompatíveis;
-- a fotografia própria de `frontend arquitetura auditar` foi promovida para `versaoSchema: "4.0.0"`, com
+- a fotografia própria de `cliente arquitetura auditar` foi promovida para `versaoSchema: "4.0.0"`, com
   `pontosCriticos`, `pontuacao` e `pontuacaoTotal`; o adaptador de qualidade agora consome diretamente esse contrato;
 - os dois auditores de cobertura agora compartilham resultados próprios `versaoSchema: "1.0.0"`, com `pontosCriticos` e
   `pontuacaoImpacto`; os vocabulários externos de JaCoCo e V8 permanecem somente na fronteira de leitura;
@@ -194,7 +194,7 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 
 Prioridade imediata, porque corrige comportamento surpreendente antes de ampliar a superfície reutilizável.
 
-- preservar o modo somente leitura de `backend testes analisar` e `backend testes priorizar`, com resumo humano ou JSON no
+- preservar o modo somente leitura de `servidor testes analisar` e `servidor testes priorizar`, com resumo humano ou JSON no
   stdout e persistência explícita por `--gravar`;
 - manter o esquema de argumentos no catálogo e rejeitar opções desconhecidas, valores ausentes e argumentos excedentes nos
   comandos encaminhados pelo roteador;
@@ -243,7 +243,7 @@ Critério de saída: é possível apontar, por arquivo e contrato, o que é moto
 
 ### 4. Normalizar resultados e fronteiras programáticas
 
-- manter a análise de testes com relatório JSON `versao: 1` e a priorização com contrato JSON próprio `versao: 1`; o
+- manter a análise de testes com relatório JSON `versao: 2` e a priorização com contrato JSON próprio `versao: 1`; o
   priorizador deve rejeitar versões ausentes ou incompatíveis antes de interpretar categorias;
 - converter campos próprios para português em `camelCase`, mantendo nomes externos apenas nos adaptadores de leitura;
 - exportar tipo, versão e validação para formatos persistidos, consumidos por outro comando/CI ou deliberadamente expostos
@@ -312,7 +312,7 @@ git diff --check
 ```
 
 Acrescentar testes focados conforme o risco: fixture externa para reuso, smoke da CLI para roteamento, teste de efeito
-para mutação e execução frontend/E2E quando o contrato correspondente for alterado.
+para mutação e execução cliente/E2E quando o contrato correspondente for alterado.
 
 ### Definição de conclusão
 

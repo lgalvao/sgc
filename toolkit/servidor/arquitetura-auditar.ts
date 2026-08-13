@@ -1,4 +1,4 @@
-// Auditoria de arquitetura dos componentes Java do backend.
+// Auditoria de arquitetura dos componentes Java do servidor.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -164,7 +164,7 @@ async function auditarArquitetura(diretorioCodigo: string, diretorioBase: string
 
 function gerarMarkdown(relatorio: RelatorioArquitetura): string {
     const linhas: string[] = [];
-    linhas.push("# Auditoria de arquitetura do backend", "");
+    linhas.push("# Auditoria de arquitetura do servidor", "");
     linhas.push(`Gerado em: ${relatorio.geradoEm}`, "");
     linhas.push("## Resumo", "");
     linhas.push(`- Analisados: ${relatorio.resumo.totalAnalisados}`);
@@ -224,9 +224,9 @@ async function gravarRelatorios(relatorio: RelatorioArquitetura, diretorioSaida:
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "backend arquitetura auditar",
+        comandoSgc: "servidor arquitetura auditar",
         scriptDireto: "servidor/arquitetura-auditar.ts",
-        descricao: "Audita Services, Facades e Controllers do backend detectando god objects por linhas, métodos e dependências.",
+        descricao: "Audita Services, Facades e Controllers do servidor detectando god objects por linhas, métodos e dependências.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
             "--gravar            Grava os relatórios em disco.",
@@ -234,9 +234,9 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend arquitetura auditar",
-            "npx tsx toolkit/sgc.ts backend arquitetura auditar --json",
-            "npx tsx toolkit/sgc.ts backend arquitetura auditar --gravar"
+            "npx tsx toolkit/sgc.ts servidor arquitetura auditar",
+            "npx tsx toolkit/sgc.ts servidor arquitetura auditar --json",
+            "npx tsx toolkit/sgc.ts servidor arquitetura auditar --gravar"
         ]
     });
 }
@@ -252,11 +252,11 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const emitirJson = argumentos.includes("--json");
     const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
-    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "mais-recente");
+    const diretorioCodigo = resolverCaminhoConfigurado("codigoServidor", diretorioBase);
+    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "servidor", "mais-recente");
 
     if (!emitirJson) {
-        imprimirCabecalho("AUDITORIA DE ARQUITETURA DO BACKEND");
+        imprimirCabecalho("AUDITORIA DE ARQUITETURA DO SERVIDOR");
         escreverLinha(`Base analisada: ${pc.dim(diretorioCodigo)}`);
     }
 

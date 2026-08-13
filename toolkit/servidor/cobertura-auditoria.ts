@@ -8,7 +8,7 @@ import {extrairCoberturaJacoco, type ClasseCobertura, type ResultadoCoberturaJac
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 
-const CAMINHO_PADRAO_SAIDA = "backend-cobertura-auditoria.md";
+const CAMINHO_PADRAO_SAIDA = "servidor-cobertura-auditoria.md";
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 
 interface PontoCriticoRelatorio {
@@ -56,7 +56,7 @@ function obterPrioridade(pontuacao: number): string {
 
 async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminho: string): Promise<string> {
     const {totais, pontosCriticos} = dados;
-    let markdown = "# Auditoria de Cobertura Backend\n\n";
+    let markdown = "# Auditoria de Cobertura Servidor\n\n";
 
     markdown += `## Resumo Geral\n`;
     markdown += `- **Cobertura Global (Instruções):** ${totais.instrucoes.percentual}%\n`;
@@ -102,9 +102,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "backend cobertura auditoria",
+            comandoSgc: "servidor cobertura auditoria",
             scriptDireto: "servidor/cobertura-auditoria.ts",
-            descricao: "Auditoria unificada de cobertura e risco (Backend).",
+            descricao: "Auditoria unificada de cobertura e risco (Servidor).",
             opcoes: [
                 "--json              Saída em formato JSON para integração com outras ferramentas.",
                 "--saida <arquivo>    Caminho do arquivo Markdown a ser gerado.",
@@ -124,7 +124,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const metaMinima = lerNumero(argumentos, "--minimo", 0, {inteiro: false, minimo: 0, maximo: 100}) ?? 0;
 
     if (!emitirJson) {
-        imprimirCabecalho("AUDITORIA DE COBERTURA BACKEND");
+        imprimirCabecalho("AUDITORIA DE COBERTURA SERVIDOR");
     }
 
     try {

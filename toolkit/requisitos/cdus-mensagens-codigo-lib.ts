@@ -76,7 +76,7 @@ function extrairConstantesJava(texto: string, caminhoRelativo: string): Mensagem
     return resultados;
 }
 
-function extrairAssuntosBackend(texto: string, caminhoRelativo: string): MensagemExtraida[] {
+function extrairAssuntosServidor(texto: string, caminhoRelativo: string): MensagemExtraida[] {
     const resultados: MensagemExtraida[] = [];
 
     for (const match of texto.matchAll(/return\s+"([^"]+)";/g)) {
@@ -226,21 +226,21 @@ function adicionarConstantesTypescript(itens: MensagemCanonica[], texto: string,
     const constantes = extrairConstantesTypescript(texto, fonte.caminho);
     for (const item of constantes) {
         if (item.chave.startsWith("SUCESSO_")) {
-            itens.push({...item, categoria: "toast", grupo: "sucesso_frontend"});
-            itens.push({...item, categoria: "mensagem", grupo: "sucesso_frontend"});
+            itens.push({...item, categoria: "toast", grupo: "sucesso_cliente"});
+            itens.push({...item, categoria: "mensagem", grupo: "sucesso_cliente"});
             continue;
         }
         if (fonte.tipo === "notificacoesTypescript") {
-            itens.push({...item, categoria: "descricao", grupo: "notificacao_frontend"});
+            itens.push({...item, categoria: "descricao", grupo: "notificacao_cliente"});
             continue;
         }
         if (item.chave.startsWith("PROCESSO_")) {
-            itens.push({...item, categoria: "descricao", grupo: "movimentacao_frontend"});
+            itens.push({...item, categoria: "descricao", grupo: "movimentacao_cliente"});
         }
         const ehUiExcluida = PREFIXOS_UI_EXCLUIDOS.some(prefixo => item.chave.startsWith(prefixo));
         if (!ehUiExcluida && CHAVES_MENSAGEM_EXPLICITAS.has(item.chave)) {
-            itens.push({...item, categoria: "toast", grupo: "resultado_frontend"});
-            itens.push({...item, categoria: "mensagem", grupo: "resultado_frontend"});
+            itens.push({...item, categoria: "toast", grupo: "resultado_cliente"});
+            itens.push({...item, categoria: "mensagem", grupo: "resultado_cliente"});
         }
     }
 }
@@ -256,17 +256,17 @@ function carregarMensagensCanonicas(
         if (fonte.tipo === "mensagensJava") {
             for (const item of extrairConstantesJava(texto, fonte.caminho)) {
                 if (item.chave.startsWith("HIST_")) {
-                    itens.push({...item, categoria: "descricao", grupo: "historico_backend"});
+                    itens.push({...item, categoria: "descricao", grupo: "historico_servidor"});
                 }
                 if (item.chave.startsWith("ALERTA_")) {
-                    itens.push({...item, categoria: "descricao", grupo: "alerta_backend"});
+                    itens.push({...item, categoria: "descricao", grupo: "alerta_servidor"});
                 }
             }
             continue;
         }
         if (fonte.tipo === "assuntosJava") {
-            for (const item of extrairAssuntosBackend(texto, fonte.caminho)) {
-                itens.push({...item, categoria: "assunto", grupo: "assunto_backend"});
+            for (const item of extrairAssuntosServidor(texto, fonte.caminho)) {
+                itens.push({...item, categoria: "assunto", grupo: "assunto_servidor"});
             }
             continue;
         }

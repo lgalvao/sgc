@@ -1,4 +1,4 @@
-// Auditoria de contratos HTTP expostos pelo backend.
+// Auditoria de contratos HTTP expostos pelo servidor.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -364,7 +364,7 @@ async function auditarContratos(diretorioCodigo: string, diretorioBase: string):
 
 function gerarMarkdown(relatorio: RelatorioContratos): string {
     const linhas: string[] = [];
-    linhas.push("# Auditoria de contratos HTTP do backend", "");
+    linhas.push("# Auditoria de contratos HTTP do servidor", "");
     linhas.push(`Gerado em: ${relatorio.geradoEm}`, "");
     linhas.push(`- Achados: ${relatorio.resumo.totalAchados}`);
     linhas.push(`- Controllers afetados: ${relatorio.resumo.controladoresAfetados}`);
@@ -394,7 +394,7 @@ async function gravarRelatorio(relatorio: RelatorioContratos, diretorioSaida: st
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "backend contratos auditar",
+        comandoSgc: "servidor contratos auditar",
         scriptDireto: "servidor/contratos-auditar.ts",
         descricao: "Audita DTOs e responses expostos por controllers para detectar vazamento de tipos model.* no contrato HTTP.",
         opcoes: [
@@ -404,9 +404,9 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend contratos auditar",
-            "npx tsx toolkit/sgc.ts backend contratos auditar --json",
-            "npx tsx toolkit/sgc.ts backend contratos auditar --gravar"
+            "npx tsx toolkit/sgc.ts servidor contratos auditar",
+            "npx tsx toolkit/sgc.ts servidor contratos auditar --json",
+            "npx tsx toolkit/sgc.ts servidor contratos auditar --gravar"
         ]
     });
 }
@@ -416,8 +416,8 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const emitirJson = argumentos.includes("--json");
     const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
-    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "mais-recente");
+    const diretorioCodigo = resolverCaminhoConfigurado("codigoServidor", diretorioBase);
+    const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "servidor", "mais-recente");
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
@@ -425,7 +425,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     if (!emitirJson) {
-        imprimirCabecalho("AUDITORIA DE CONTRATOS HTTP (BACKEND)");
+        imprimirCabecalho("AUDITORIA DE CONTRATOS HTTP (SERVIDOR)");
         escreverLinha(`Base analisada: ${pc.dim(diretorioCodigo)}`);
     }
 
@@ -459,7 +459,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
-        escreverLinha(pc.red(`Erro ao auditar contratos do backend: ${erro instanceof Error ? erro.message : String(erro)}`));
+        escreverLinha(pc.red(`Erro ao auditar contratos do servidor: ${erro instanceof Error ? erro.message : String(erro)}`));
         process.exitCode = 1;
     });
 }

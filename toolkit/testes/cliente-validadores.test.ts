@@ -13,7 +13,7 @@ interface ViolacaoJson {
     regra: string;
 }
 
-describe("Validadores estruturais do frontend", () => {
+describe("Validadores estruturais do cliente", () => {
     test("valida previsibilidade estrutural das views em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-views-templates-"));
         const viewsDir = path.join(base, "frontend", "src", "views");
@@ -41,7 +41,7 @@ describe("Validadores estruturais do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "views",
             "templates-validar",
             "--json",
@@ -69,7 +69,7 @@ describe("Validadores estruturais do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "modais",
             "validar",
             "--json",
@@ -84,11 +84,11 @@ describe("Validadores estruturais do frontend", () => {
         expect(conteudo.violacoes[0].regra).toBe("componente-com-bmodal-cru");
     });
 
-    test("resolve frontendCodigo configurado nos validadores estruturais", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-frontend-validadores-configurados-"));
+    test("resolve codigoCliente configurado nos validadores estruturais", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cliente-validadores-configurados-"));
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontendCodigo: "cliente/src"},
+            diretorios: {codigoCliente: "cliente/src"},
         });
         await escreverArquivo(
             path.join(base, "cliente", "src", "views", "PainelView.vue"),
@@ -100,8 +100,8 @@ describe("Validadores estruturais do frontend", () => {
         );
 
         const [resultadoViews, resultadoModais] = await Promise.all([
-            executarSgc(["frontend", "views", "templates-validar", "--json", "--base", base]),
-            executarSgc(["frontend", "modais", "validar", "--json", "--base", base]),
+            executarSgc(["cliente", "views", "templates-validar", "--json", "--base", base]),
+            executarSgc(["cliente", "modais", "validar", "--json", "--base", base]),
         ]);
 
         expect(resultadoViews.exitCode).toBe(0);

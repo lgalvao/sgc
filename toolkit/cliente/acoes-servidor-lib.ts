@@ -11,7 +11,7 @@ const NOMES_UI_LOCAL = /(Modal|Popover|Tooltip|Detalhes|Preview|Filtro|Filtros|B
 const SINAIS_DOMINIO = /(perfilSelecionado|Perfil\.|situacao[A-Z\w]*|situacao\.|tipoProcesso|TipoProcesso|CONSENSO_|DIAGNOSTICO_|AUTOAVALIACAO_|CADASTRO_|HOMOLOGA|ADMIN|GESTOR|CHEFE|SERVIDOR)/;
 const SINAIS_COLECAO = /\.(some|every|filter|find)\s*\(/;
 const SINAIS_COMPOSICAO = /(&&|\|\||\?|===|!==|==|!=| if\s*\()/;
-const SINAL_FLAG_BACKEND = /(?:permissoes|permissao|query\.data|props|subprocesso|contexto|acaoPrincipalMapa|acoesServidor)[\w.?()[\]'"]*\.(pode|habilitar|mostrar|exibir)[A-Z]\w*/;
+const SINAL_FLAG_SERVIDOR = /(?:permissoes|permissao|query\.data|props|subprocesso|contexto|acaoPrincipalMapa|acoesServidor)[\w.?()[\]'"]*\.(pode|habilitar|mostrar|exibir)[A-Z]\w*/;
 const CAMINHOS_IGNORADOS = [
     "**/*.spec.ts",
     "**/*.test.ts",
@@ -20,7 +20,7 @@ const CAMINHOS_IGNORADOS = [
     "**/fixtures/**",
 ];
 
-type RegraViolacao = "frontend-sem-regra-local-acoes";
+type RegraViolacao = "cliente-sem-regra-local-acoes";
 
 interface OcorrenciaAcao {
     identificador: string;
@@ -78,9 +78,9 @@ function contarLinha(conteudo: string, indice: number): number {
     return conteudo.slice(0, indice).split("\n").length;
 }
 
-async function listarArquivosFrontend(diretorioFrontend: string): Promise<string[]> {
+async function listarArquivosCliente(diretorioCliente: string): Promise<string[]> {
     return globby(["src/**/*.{ts,vue}"], {
-        cwd: diretorioFrontend,
+        cwd: diretorioCliente,
         absolute: true,
         gitignore: true,
         ignore: CAMINHOS_IGNORADOS,
@@ -148,7 +148,7 @@ function normalizarExpressaoComputed(expressao: string): string {
     return simplificarExpressao(matchComputed.groups.corpo.replaceAll(/}\s*$/g, ""));
 }
 
-function ehPassagemDiretaBackend(expressao: string): boolean {
+function ehPassagemDiretaServidor(expressao: string): boolean {
     const corpo = normalizarExpressaoComputed(expressao)
         .replace(/^Boolean\s*\((.*)\)$/u, "$1")
         .replace(/^!!/u, "")
@@ -162,7 +162,7 @@ function ehPassagemDiretaBackend(expressao: string): boolean {
         .replace(/\?\./gu, ".")
         .trim();
 
-    return SINAL_FLAG_BACKEND.test(corpoSemOperadoresSeguros)
+    return SINAL_FLAG_SERVIDOR.test(corpoSemOperadoresSeguros)
         && !SINAIS_DOMINIO.test(corpoSemOperadoresSeguros)
         && !SINAIS_COLECAO.test(corpoSemOperadoresSeguros)
         && !/[&|?:]/u.test(corpoSemOperadoresSeguros);
@@ -171,27 +171,27 @@ function ehPassagemDiretaBackend(expressao: string): boolean {
 function classificarViolacao(expressao: string): ClassificacaoViolacao | null {
     const corpo = normalizarExpressaoComputed(expressao);
 
-    if (ehPassagemDiretaBackend(corpo)) {
+    if (ehPassagemDiretaServidor(corpo)) {
         return null;
     }
 
     if (SINAIS_DOMINIO.test(corpo)) {
         return {
-            regra: "frontend-sem-regra-local-acoes",
+            regra: "cliente-sem-regra-local-acoes",
             motivo: "calculo de acao baseado em perfil, situacao ou enum de dominio",
         };
     }
 
-    if (SINAL_FLAG_BACKEND.test(corpo) && SINAIS_COMPOSICAO.test(corpo)) {
+    if (SINAL_FLAG_SERVIDOR.test(corpo) && SINAIS_COMPOSICAO.test(corpo)) {
         return {
-            regra: "frontend-sem-regra-local-acoes",
-            motivo: "composicao local de flags de permissao retornadas pelo backend",
+            regra: "cliente-sem-regra-local-acoes",
+            motivo: "composicao local de flags de permissao retornadas pelo servidor",
         };
     }
 
     if (SINAIS_COLECAO.test(corpo) && /(permissoes|situacao|perfil)/i.test(corpo)) {
         return {
-            regra: "frontend-sem-regra-local-acoes",
+            regra: "cliente-sem-regra-local-acoes",
             motivo: "calculo de acao derivado de colecao com estado de dominio",
         };
     }
@@ -275,9 +275,9 @@ function auditarConteudo({conteudo, arquivoRelativo}: {conteudo: string; arquivo
     return violacoes;
 }
 
-async function auditarAcoesBackendFrontend(opcoes: OpcoesAuditoriaAcoes = {}): Promise<ResultadoAuditoriaAcoes> {
+async function auditarAcoesServidorCliente(opcoes: OpcoesAuditoriaAcoes = {}): Promise<ResultadoAuditoriaAcoes> {
     const diretorioBase = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const diretorioFrontend = resolverCaminhoConfigurado("frontend", diretorioBase);
+    const diretorioCliente = resolverCaminhoConfigurado("cliente", diretorioBase);
     const caminhoExcecoes = opcoes.excecoes ?? path.join(
         diretorioBase,
         "toolkit",
@@ -286,7 +286,7 @@ async function auditarAcoesBackendFrontend(opcoes: OpcoesAuditoriaAcoes = {}): P
         "acoes-servidor-excecoes.json",
     );
     const excecoes = lerExcecoes(caminhoExcecoes);
-    const arquivos = await listarArquivosFrontend(diretorioFrontend);
+    const arquivos = await listarArquivosCliente(diretorioCliente);
     const violacoes: ViolacaoAcao[] = [];
 
     for (const caminhoArquivo of arquivos) {
@@ -302,7 +302,7 @@ async function auditarAcoesBackendFrontend(opcoes: OpcoesAuditoriaAcoes = {}): P
     }));
 
     return {
-        regra: "frontend-sem-regra-local-acoes",
+        regra: "cliente-sem-regra-local-acoes",
         caminhoExcecoes: normalizarCaminho(path.relative(diretorioBase, caminhoExcecoes)),
         total: enriquecidas.length,
         dispensadas: enriquecidas.filter((violacao) => violacao.dispensada).length,
@@ -312,5 +312,5 @@ async function auditarAcoesBackendFrontend(opcoes: OpcoesAuditoriaAcoes = {}): P
 }
 
 export {
-    auditarAcoesBackendFrontend,
+    auditarAcoesServidorCliente,
 };

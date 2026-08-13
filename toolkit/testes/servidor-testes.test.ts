@@ -20,7 +20,7 @@ type ObjetoJson = Record<string, unknown>;
 
 interface RelatorioAnaliseTestesJson {
     versao: number;
-    diretorioBackend: string;
+    diretorioServidor: string;
     estatisticas: Record<string, number>;
     categorias: Record<string, {comTeste: ObjetoJson[]; semTeste: ObjetoJson[]}>;
 }
@@ -40,13 +40,13 @@ async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {
     };
 }
 
-describe("Análise e priorização dos testes backend", () => {
-    test("analisa testes do backend com resumo no console e sidecar JSON", async () => {
+describe("Análise e priorização dos testes do servidor", () => {
+    test("analisa testes do servidor com resumo no console e sidecar JSON", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-"));
         const markdown = path.join(diretorioSaida, "relatorio.md");
         const json = path.join(diretorioSaida, "relatorio.json");
 
-        const resultado = await executarSgc(["backend", "testes", "analisar", "--gravar", "--saida", markdown, "--saida-json", json]);
+        const resultado = await executarSgc(["servidor", "testes", "analisar", "--gravar", "--saida", markdown, "--saida-json", json]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Resumo:");
@@ -57,7 +57,7 @@ describe("Análise e priorização dos testes backend", () => {
         expect(await existe(json)).toBe(true);
 
         const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudoJson.versao).toBe(1);
+        expect(conteudoJson.versao).toBe(2);
         expect(conteudoJson.estatisticas.totalClasses).toBeGreaterThan(0);
         expect(typeof conteudoJson.estatisticas.classesComCoberturaIndireta).toBe("number");
         expect(typeof conteudoJson.estatisticas.classesSemEvidenciaNoEscopo).toBe("number");
@@ -80,7 +80,7 @@ describe("Análise e priorização dos testes backend", () => {
         await escreverArquivo(path.join(testes, "ExemploServiceTest.java"), "package com.exemplo; class ExemploServiceTest {}");
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "testes",
             "analisar",
             "--base",
@@ -100,7 +100,7 @@ describe("Análise e priorização dos testes backend", () => {
         expect(await existe(json)).toBe(false);
     }, 60000);
 
-    test("analisa fontes e testes backend pelos diretorios configurados", async () => {
+    test("analisa fontes e testes do servidor pelos diretorios configurados", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-configurado-"));
         const fonte = path.join(base, "servidor", "java", "com", "exemplo");
         const testes = path.join(base, "servidor", "testes", "com", "exemplo");
@@ -110,8 +110,8 @@ describe("Análise e priorização dos testes backend", () => {
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java",
-                backendTestes: "servidor/testes"
+                codigoServidor: "servidor/java",
+                testesServidor: "servidor/testes"
             }
         });
         await escreverArquivo(
@@ -124,7 +124,7 @@ describe("Análise e priorização dos testes backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "testes",
             "analisar",
             "--gravar",
@@ -138,11 +138,11 @@ describe("Análise e priorização dos testes backend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudo.diretorioBackend).toBe(path.join(base, "servidor", "java"));
+        expect(conteudo.diretorioServidor).toBe(path.join(base, "servidor", "java"));
         expect(conteudo.estatisticas.classesComTesteDedicado).toBe(1);
     });
 
-    test("resolve diretorio backend relativo a base explicita", async () => {
+    test("resolve diretorio do servidor relativo a base explicita", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-diretorio-relativo-"));
         const fonte = path.join(base, "servidor", "src", "main", "java", "com", "exemplo");
         const testes = path.join(base, "servidor", "src", "test", "java", "com", "exemplo");
@@ -159,7 +159,7 @@ describe("Análise e priorização dos testes backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "testes",
             "analisar",
             "--gravar",
@@ -175,14 +175,14 @@ describe("Análise e priorização dos testes backend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = await lerJson<RelatorioAnaliseTestesJson>(json);
-        expect(conteudo.diretorioBackend).toBe(path.join(base, "servidor", "src", "main", "java"));
+        expect(conteudo.diretorioServidor).toBe(path.join(base, "servidor", "src", "main", "java"));
         expect(conteudo.estatisticas.classesComTesteDedicado).toBe(1);
     });
 
     test("ignora dtos estruturais e contratuais do backlog real", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-dto-"));
-        const backendDir = path.join(base, "backend-fake");
-        const dtoDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo", "dto");
+        const diretorioServidor = path.join(base, "backend-fake");
+        const dtoDir = path.join(diretorioServidor, "src", "main", "java", "sgc", "exemplo", "dto");
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
 
@@ -200,12 +200,12 @@ describe("Análise e priorização dos testes backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "testes",
             "analisar",
             "--gravar",
             "--diretorio",
-            backendDir,
+            diretorioServidor,
             "--saida",
             markdown,
             "--saida-json",
@@ -229,8 +229,8 @@ describe("Análise e priorização dos testes backend", () => {
 
     test("ignora modelos estruturais e contratuais do backlog real", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-model-"));
-        const backendDir = path.join(base, "backend-fake");
-        const modelDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo", "model");
+        const diretorioServidor = path.join(base, "backend-fake");
+        const modelDir = path.join(diretorioServidor, "src", "main", "java", "sgc", "exemplo", "model");
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
 
@@ -248,12 +248,12 @@ describe("Análise e priorização dos testes backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "testes",
             "analisar",
             "--gravar",
             "--diretorio",
-            backendDir,
+            diretorioServidor,
             "--saida",
             markdown,
             "--saida-json",
@@ -276,8 +276,8 @@ describe("Análise e priorização dos testes backend", () => {
 
     test("ignora outros estruturais e contratuais do backlog real e reclassifica comandos como dtos", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-outros-"));
-        const backendDir = path.join(base, "backend-fake");
-        const otherDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo");
+        const diretorioServidor = path.join(base, "backend-fake");
+        const otherDir = path.join(diretorioServidor, "src", "main", "java", "sgc", "exemplo");
         const dtoDir = path.join(otherDir, "dto");
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
@@ -300,12 +300,12 @@ describe("Análise e priorização dos testes backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "testes",
             "analisar",
             "--gravar",
             "--diretorio",
-            backendDir,
+            diretorioServidor,
             "--saida",
             markdown,
             "--saida-json",
@@ -332,9 +332,9 @@ describe("Análise e priorização dos testes backend", () => {
 
     test("classifica separadamente teste dedicado, cobertura indireta, sem evidencia e fora do escopo", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analise-jacoco-"));
-        const backendDir = path.join(base, "backend-fake");
-        const srcDir = path.join(backendDir, "src", "main", "java", "sgc", "exemplo");
-        const testDir = path.join(backendDir, "src", "test", "java", "sgc", "exemplo");
+        const diretorioServidor = path.join(base, "backend-fake");
+        const srcDir = path.join(diretorioServidor, "src", "main", "java", "sgc", "exemplo");
+        const testDir = path.join(diretorioServidor, "src", "test", "java", "sgc", "exemplo");
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
         const jacoco = path.join(base, "jacoco.xml");
@@ -372,12 +372,12 @@ describe("Análise e priorização dos testes backend", () => {
 </report>`.trim());
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "testes",
             "analisar",
             "--gravar",
             "--diretorio",
-            backendDir,
+            diretorioServidor,
             "--saida",
             markdown,
             "--saida-json",
@@ -413,7 +413,7 @@ describe("Análise e priorização dos testes backend", () => {
 
         await escreverArquivo(markdown, "# Relatorio simplificado\n");
         await escreverJson(json, {
-            versao: 1,
+            versao: 2,
             categorias: {
                 servicos: {
                     semTeste: [
@@ -444,7 +444,7 @@ describe("Análise e priorização dos testes backend", () => {
         const entrada = path.join(diretorioSaida, "analise-testes.json");
 
         await escreverJson(entrada, {
-            versao: 1,
+            versao: 2,
             categorias: {
                 servicos: {
                     semTeste: [{caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java"}]
@@ -486,7 +486,7 @@ describe("Análise e priorização dos testes backend", () => {
         const entrada = path.join(diretorioSaida, "analise-testes.json");
 
         await escreverJson(entrada, {
-            versao: 1,
+            versao: 2,
             categorias: {
                 servicos: {
                     semTeste: [{caminhoRelativo: "sgc/mapa/service/MapaCriticoService.java"}]
@@ -507,7 +507,7 @@ describe("Análise e priorização dos testes backend", () => {
         const saida = path.join(diretorioSaida, "priorizacao-testes.md");
 
         await escreverJson(json, {
-            versao: 1,
+            versao: 2,
             categorias: {
                 servicos: {
                     semTeste: [

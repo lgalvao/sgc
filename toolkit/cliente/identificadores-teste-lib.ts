@@ -22,7 +22,7 @@ function obterDiretorioBusca(argumentos: string[] = [], diretorioBase: string = 
     const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
     return diretorioInformado
         ? path.resolve(diretorioBase, diretorioInformado)
-        : resolverCaminhoConfigurado("frontendCodigo", diretorioBase);
+        : resolverCaminhoConfigurado("codigoCliente", diretorioBase);
 }
 
 function normalizarCaminhoArquivo(caminhoArquivo: string, diretorioBase: string, diretorioBusca: string): string {
@@ -38,7 +38,7 @@ async function coletarIdentificadores(
     diretorioBase: string = DIRETORIO_RAIZ
 ): Promise<ResultadoColetaIdentificadores> {
     if (!fs.existsSync(diretorioBusca)) {
-        throw new Error(`Diretorio frontend nao encontrado: ${path.relative(diretorioBase, diretorioBusca)}`);
+        throw new Error(`Diretorio cliente nao encontrado: ${path.relative(diretorioBase, diretorioBusca)}`);
     }
 
     const padraoVue = path.join(diretorioBusca, "**/*.vue").replace(/\\/g, "/");

@@ -3,7 +3,7 @@ import path from "node:path";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
-import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../biblioteca/dominios/cobertura-web.js";
+import {extrairCoberturaCliente, type ArquivoCobertura, type ResultadoCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 
@@ -20,7 +20,7 @@ interface ResultadoRamificacoes {
     status: "ok";
     versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
     geradoEm: string;
-    totais: ResultadoCoberturaFrontend["ramificacoes"];
+    totais: ResultadoCoberturaCliente["ramificacoes"];
     arquivos: ArquivoRamificacoes[];
 }
 
@@ -35,9 +35,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend cobertura ramificacoes",
+            comandoSgc: "cliente cobertura ramificacoes",
             scriptDireto: "cliente/cobertura-ramificacoes.ts",
-            descricao: "Lista lacunas de cobertura de ramificacoes no frontend por arquivo.",
+            descricao: "Lista lacunas de cobertura de ramificacoes no cliente por arquivo.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",
                 "--limite <n>    Limita a quantidade de arquivos exibidos. Padrão: 20.",
@@ -51,7 +51,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
     const limite = lerNumero(argumentos, "--limite", 20, {minimo: 0}) ?? 20;
-    const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
+    const coleta = await extrairCoberturaCliente(caminhoRelatorio, {diretorioBase});
     const arquivos: ArquivoRamificacoes[] = coleta.arquivos
         .map((arquivo) => ({
             arquivo: arquivo.arquivo,
@@ -76,7 +76,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         return;
     }
 
-    imprimirCabecalho("COBERTURA DE RAMIFICAÇÕES FRONTEND");
+    imprimirCabecalho("COBERTURA DE RAMIFICAÇÕES CLIENTE");
     escreverLinha(`Cobertura global de ramificações: ${pc.bold(`${coleta.ramificacoes.percentual}%`)} (${coleta.ramificacoes.cobertos}/${coleta.ramificacoes.total})`);
     escreverLinha("");
 
@@ -95,7 +95,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverLinha(pc.red(`Erro ao analisar ramificações do frontend: ${mensagem}`));
+        escreverLinha(pc.red(`Erro ao analisar ramificações do cliente: ${mensagem}`));
         process.exitCode = 1;
     });
 }

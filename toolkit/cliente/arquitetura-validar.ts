@@ -9,7 +9,7 @@ import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
-import {auditarAcoesBackendFrontend} from "./acoes-backend-lib.js";
+import {auditarAcoesServidorCliente} from "./acoes-servidor-lib.js";
 
 interface ViolacaoAcaoArquitetura {
     regra: string;
@@ -20,14 +20,14 @@ interface ViolacaoAcaoArquitetura {
     trecho: string;
 }
 
-interface ResultadoAcoesBackend {
+interface ResultadoAcoesServidor {
     dispensadas?: number;
     violacoes?: ViolacaoAcaoArquitetura[];
 }
 
 interface ResultadoValidacaoArquitetura extends ICruiseResult {
     exitCode: number;
-    acoesBackend: ResultadoAcoesBackend;
+    acoesServidor: ResultadoAcoesServidor;
 }
 
 function carregarRegras(caminhoConfiguracao: string): IConfiguration {
@@ -81,7 +81,7 @@ function imprimirViolacoes(violacoes: IViolation[], diretorioBase: string): void
     });
 }
 
-function imprimirViolacoesAcoesBackend(resultado: ResultadoAcoesBackend): void {
+function imprimirViolacoesAcoesServidor(resultado: ResultadoAcoesServidor): void {
     const violacoes = resultado.violacoes ?? [];
     if (violacoes.length === 0) {
         const detalheExcecoes = (resultado.dispensadas ?? 0) > 0 ? ` (${resultado.dispensadas} dispensadas por excecao)` : "";
@@ -97,24 +97,24 @@ function imprimirViolacoesAcoesBackend(resultado: ResultadoAcoesBackend): void {
     });
 }
 
-interface OpcoesValidacaoArquiteturaFrontend {
+interface OpcoesValidacaoArquiteturaCliente {
     base?: string;
 }
 
-async function executarValidacaoArquiteturaFrontend(
-    opcoes: OpcoesValidacaoArquiteturaFrontend = {}
+async function executarValidacaoArquiteturaCliente(
+    opcoes: OpcoesValidacaoArquiteturaCliente = {}
 ): Promise<ResultadoValidacaoArquitetura> {
     const diretorioBase = realpathSync(path.resolve(opcoes.base ?? DIRETORIO_RAIZ));
-    const diretorioFrontend = realpathSync(resolverCaminhoConfigurado("frontend", diretorioBase));
+    const diretorioCliente = realpathSync(resolverCaminhoConfigurado("cliente", diretorioBase));
     const caminhoSrc = "src";
-    const caminhoConfiguracao = path.join(diretorioFrontend, ".dependency-cruiser.cjs");
+    const caminhoConfiguracao = path.join(diretorioCliente, ".dependency-cruiser.cjs");
     const regrasBase = carregarRegras(caminhoConfiguracao);
     const regras = {
         ...regrasBase,
         options: {
             ...regrasBase.options,
             tsConfig: {
-                fileName: path.join(diretorioFrontend, "tsconfig.json"),
+                fileName: path.join(diretorioCliente, "tsconfig.json"),
             },
         },
     };
@@ -124,22 +124,22 @@ async function executarValidacaoArquiteturaFrontend(
             ruleSet: regras,
             outputType: "json",
             // A API em runtime aceita cwd, embora a declaração atual não o exponha.
-            baseDir: diretorioFrontend,
-            cwd: diretorioFrontend,
+            baseDir: diretorioCliente,
+            cwd: diretorioCliente,
         } as unknown as Parameters<typeof cruise>[1];
     const resultadoCruise: IReporterOutput = await cruise([caminhoSrc], opcoesCruise);
 
     const saida = typeof resultadoCruise.output === "string"
         ? JSON.parse(resultadoCruise.output) as ICruiseResult
         : resultadoCruise.output;
-    const acoesBackend = await auditarAcoesBackendFrontend({
+    const acoesServidor = await auditarAcoesServidorCliente({
         base: diretorioBase,
     });
 
     return {
         ...saida,
         exitCode: resultadoCruise.exitCode,
-        acoesBackend,
+        acoesServidor,
         summary: {
             ...saida.summary,
             violations: extrairViolacoes(saida),
@@ -154,23 +154,23 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend arquitetura validar",
+            comandoSgc: "cliente arquitetura validar",
             scriptDireto: "cliente/arquitetura-validar.ts",
-            descricao: "Valida regras arquiteturais duras do frontend usando resolucao real de modulos.",
+            descricao: "Valida regras arquiteturais duras do cliente usando resolucao real de modulos.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend arquitetura validar",
-                "npx tsx toolkit/sgc.ts frontend arquitetura validar --json",
-                "npx tsx toolkit/sgc.ts frontend arquitetura validar --base C:/sgc",
+                "npx tsx toolkit/sgc.ts cliente arquitetura validar",
+                "npx tsx toolkit/sgc.ts cliente arquitetura validar --json",
+                "npx tsx toolkit/sgc.ts cliente arquitetura validar --base C:/sgc",
             ],
         });
         return;
     }
 
-    const resultado = await executarValidacaoArquiteturaFrontend({
+    const resultado = await executarValidacaoArquiteturaCliente({
         base: lerOpcao(argumentos, "--base", undefined),
     });
 
@@ -179,10 +179,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     } else {
         const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
         imprimirViolacoes(resultado.summary.violations ?? [], diretorioBase);
-        imprimirViolacoesAcoesBackend(resultado.acoesBackend);
+        imprimirViolacoesAcoesServidor(resultado.acoesServidor);
     }
 
-    if ((resultado.summary.violations ?? []).length > 0 || resultado.exitCode !== 0 || (resultado.acoesBackend?.violacoes ?? []).length > 0) {
+    if ((resultado.summary.violations ?? []).length > 0 || resultado.exitCode !== 0 || (resultado.acoesServidor?.violacoes ?? []).length > 0) {
         process.exitCode = 1;
     }
 }
@@ -196,6 +196,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    executarValidacaoArquiteturaFrontend,
+    executarValidacaoArquiteturaCliente,
     principal,
 };

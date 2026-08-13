@@ -193,14 +193,14 @@ test("pacote fonte expõe cobertura parametrizável para consumidor TypeScript",
         caminhoConsumidor,
         [
             'import {extrairCoberturaJacoco} from "sgc-scripts/cobertura-java";',
-            'import {extrairCoberturaFrontend} from "sgc-scripts/cobertura-web";',
+            'import {extrairCoberturaCliente} from "sgc-scripts/cobertura-web";',
             "",
             "const diretorioBase = process.argv[2];",
             "const jacoco = await extrairCoberturaJacoco(\"relatorios/jacoco.xml\", {diretorioBase});",
-            "const frontend = await extrairCoberturaFrontend(\"cliente/coverage/coverage-final.json\", {diretorioBase});",
+            "const coberturaCliente = await extrairCoberturaCliente(\"cliente/coverage/coverage-final.json\", {diretorioBase});",
             "console.log(JSON.stringify({",
             "    jacoco: {linhas: jacoco.linhas.percentual, arquivos: jacoco.totais.totalArquivos},",
-            "    frontend: {linhas: frontend.linhas.percentual, arquivos: frontend.arquivos.length}",
+            "    cliente: {linhas: coberturaCliente.linhas.percentual, arquivos: coberturaCliente.arquivos.length}",
             "}));",
             ""
         ].join("\n")
@@ -218,6 +218,6 @@ test("pacote fonte expõe cobertura parametrizável para consumidor TypeScript",
 
     expect(JSON.parse(String(resultado.stdout))).toEqual({
         jacoco: {linhas: 66.67, arquivos: 1},
-        frontend: {linhas: 50, arquivos: 1}
+        cliente: {linhas: 50, arquivos: 1}
     });
 }, 60000);

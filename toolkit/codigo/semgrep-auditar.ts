@@ -78,8 +78,8 @@ function extrairLista(argumentos: string[], nome: string): string[] {
 function resolverDiretoriosPadrao(diretorioBase: string = DIRETORIO_RAIZ): string[] {
     const baseResolvida = path.resolve(diretorioBase);
     return [
-        path.relative(baseResolvida, resolverCaminhoConfigurado("backendCodigo", baseResolvida)),
-        path.relative(baseResolvida, resolverCaminhoConfigurado("frontendCodigo", baseResolvida))
+        path.relative(baseResolvida, resolverCaminhoConfigurado("codigoServidor", baseResolvida)),
+        path.relative(baseResolvida, resolverCaminhoConfigurado("codigoCliente", baseResolvida))
     ];
 }
 

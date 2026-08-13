@@ -9,7 +9,7 @@ import {
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
-describe("Auditoria de notificações backend", () => {
+describe("Auditoria de notificações do servidor", () => {
     test("audita assuntos literais fora de AssuntosNotificacao", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-assuntos-auditar-"));
         const dir = path.join(base, "backend", "src", "main", "java", "sgc");
@@ -39,7 +39,7 @@ describe("Auditoria de notificações backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "notificacoes",
             "auditar-assuntos",
             "--json",
@@ -54,12 +54,12 @@ describe("Auditoria de notificações backend", () => {
         expect(corpo.relatorio[0].achados.some((item: {regra: string}) => item.regra === "literal_sgc")).toBe(true);
     });
 
-    test("audita assuntos no diretorio backend configurado", async () => {
+    test("audita assuntos no diretorio do servidor configurado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-assuntos-configurado-"));
         const dir = path.join(base, "servidor", "java");
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {backendCodigo: "servidor/java"}
+            diretorios: {codigoServidor: "servidor/java"}
         });
         await escreverArquivo(
             path.join(dir, "diagnostico", "ServicoInvalido.java"),
@@ -67,7 +67,7 @@ describe("Auditoria de notificações backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "notificacoes",
             "auditar-assuntos",
             "--json",

@@ -5,15 +5,15 @@ import {execa} from "execa";
 import {DIRETORIO_RAIZ} from "./apoio.js";
 
 const DIRETORIO_TOOLKIT = path.join(DIRETORIO_RAIZ, "toolkit");
-const CAMINHOS_COMANDOS_TESTES_BACKEND = [
+const CAMINHOS_COMANDOS_TESTES_SERVIDOR = [
     "testes-analisar.ts",
     "testes-priorizar.ts"
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "servidor", nome));
-const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
+const CAMINHOS_COMANDOS_COBERTURA_SERVIDOR = [
     "cobertura-ramificacoes.ts",
     "cobertura-auditoria.ts"
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "servidor", nome));
-const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
+const CAMINHOS_COMANDOS_AUDITORIA_SERVIDOR = [
     "arquitetura-auditar.ts",
     "coesao-auditar.ts",
     "contratos-auditar.ts"
@@ -38,9 +38,9 @@ async function importarSemExecutar(caminho: string): Promise<{exitCode?: number;
     };
 }
 
-describe("Importação segura dos comandos backend", () => {
-    test("pode importar comandos de cobertura backend sem ler JaCoCo", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_BACKEND.map(importarSemExecutar));
+describe("Importação segura dos comandos do servidor", () => {
+    test("pode importar comandos de cobertura do servidor sem ler JaCoCo", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_SERVIDOR.map(importarSemExecutar));
 
         for (const resultado of resultados) {
             expect(resultado.exitCode).toBe(0);
@@ -48,8 +48,8 @@ describe("Importação segura dos comandos backend", () => {
         }
     });
 
-    test("pode importar auditores estruturais do backend sem analisar o projeto", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_AUDITORIA_BACKEND.map(importarSemExecutar));
+    test("pode importar auditores estruturais do servidor sem analisar o projeto", async () => {
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_AUDITORIA_SERVIDOR.map(importarSemExecutar));
 
         for (const resultado of resultados) {
             expect(resultado.exitCode).toBe(0);
@@ -65,7 +65,7 @@ describe("Importação segura dos comandos backend", () => {
     });
 
     test("pode importar comandos de analise de testes sem ler relatorios", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_TESTES_BACKEND.map(importarSemExecutar));
+        const resultados = await Promise.all(CAMINHOS_COMANDOS_TESTES_SERVIDOR.map(importarSemExecutar));
 
         for (const resultado of resultados) {
             expect(resultado.exitCode).toBe(0);
@@ -73,7 +73,7 @@ describe("Importação segura dos comandos backend", () => {
         }
     });
 
-    test("pode importar auditoria de assuntos sem ler o backend", async () => {
+    test("pode importar auditoria de assuntos sem ler o servidor", async () => {
         const resultado = await importarSemExecutar(CAMINHO_AUDITORIA_ASSUNTOS);
 
         expect(resultado.exitCode).toBe(0);

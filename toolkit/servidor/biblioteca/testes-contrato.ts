@@ -1,4 +1,4 @@
-const VERSAO_RELATORIO_TESTES = 1 as const;
+const VERSAO_RELATORIO_TESTES = 2 as const;
 const VERSAO_PRIORIZACAO_TESTES = 1 as const;
 
 export {

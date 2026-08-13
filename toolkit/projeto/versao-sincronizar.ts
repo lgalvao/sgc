@@ -43,16 +43,16 @@ function sincronizarVersao(
         }
     }
 
-    const caminhoFrontend = path.join(resolverCaminhoConfigurado("frontend", diretorioBase), "package.json");
-    const nomeFrontend = caminhoRelativo(caminhoFrontend);
-    if (existsSync(caminhoFrontend)) {
-        const pacote = JSON.parse(readFileSync(caminhoFrontend, "utf-8")) as Record<string, unknown>;
+    const caminhoCliente = path.join(resolverCaminhoConfigurado("cliente", diretorioBase), "package.json");
+    const nomeCliente = caminhoRelativo(caminhoCliente);
+    if (existsSync(caminhoCliente)) {
+        const pacote = JSON.parse(readFileSync(caminhoCliente, "utf-8")) as Record<string, unknown>;
         if (pacote.version !== novaVersao) {
-            arquivosPendentes.push(nomeFrontend);
+            arquivosPendentes.push(nomeCliente);
             if (gravar) {
                 pacote.version = novaVersao;
-                writeFileSync(caminhoFrontend, `${JSON.stringify(pacote, null, 2)}\n`, "utf-8");
-                arquivosAtualizados.push(nomeFrontend);
+                writeFileSync(caminhoCliente, `${JSON.stringify(pacote, null, 2)}\n`, "utf-8");
+                arquivosAtualizados.push(nomeCliente);
             }
         }
     }
@@ -70,7 +70,7 @@ function principal(argumentosInformados: string[] = process.argv.slice(2)): Resu
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escreverLinha("Uso recomendado: npx tsx toolkit/sgc.ts projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]");
         escreverLinha("");
-        escreverLinha("Atualiza gradle.properties e o package.json do frontend configurado; por padrão, apenas simula a alteração.");
+        escreverLinha("Atualiza gradle.properties e o package.json do cliente configurado; por padrão, apenas simula a alteração.");
         escreverLinha("--gravar             Persiste a versão nos arquivos encontrados.");
         escreverLinha("--base <diretorio>   Resolve os arquivos a partir de outra raiz.");
         return;

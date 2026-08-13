@@ -8,9 +8,9 @@ interface ContextoColeta {
     diretorioArtefatos: string;
     diretorioExecucoes: string;
     diretorioMaisRecente: string;
-    diretorioBackend: string;
-    diretorioFrontend: string;
-    diretorioFrontendCodigo: string;
+    diretorioServidor: string;
+    diretorioCliente: string;
+    diretorioCodigoCliente: string;
 }
 
 function criarContextoColeta(base: string = DIRETORIO_RAIZ): ContextoColeta {
@@ -22,9 +22,9 @@ function criarContextoColeta(base: string = DIRETORIO_RAIZ): ContextoColeta {
         diretorioArtefatos,
         diretorioExecucoes: path.join(diretorioArtefatos, "execucoes"),
         diretorioMaisRecente: path.join(diretorioArtefatos, "mais-recente"),
-        diretorioBackend: resolverCaminhoConfigurado("backend", baseResolvida),
-        diretorioFrontend: resolverCaminhoConfigurado("frontend", baseResolvida),
-        diretorioFrontendCodigo: resolverCaminhoConfigurado("frontendCodigo", baseResolvida),
+        diretorioServidor: resolverCaminhoConfigurado("servidor", baseResolvida),
+        diretorioCliente: resolverCaminhoConfigurado("cliente", baseResolvida),
+        diretorioCodigoCliente: resolverCaminhoConfigurado("codigoCliente", baseResolvida),
     };
 }
 

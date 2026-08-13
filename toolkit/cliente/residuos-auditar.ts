@@ -2,7 +2,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {
-    analisarResiduosFrontend,
+    analisarResiduosCliente,
     gravarFotografiaAuditoria,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
@@ -13,16 +13,16 @@ import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 
-interface OpcoesAuditoriaFrontendResiduos {
+interface OpcoesAuditoriaClienteResiduos {
     base?: string;
     orcamento?: string;
     saida?: string;
     gravar?: boolean;
 }
 
-async function executarAuditoriaFrontendResiduos(opcoes: OpcoesAuditoriaFrontendResiduos = {}): Promise<FotografiaResiduos> {
+async function executarAuditoriaClienteResiduos(opcoes: OpcoesAuditoriaClienteResiduos = {}): Promise<FotografiaResiduos> {
     const base = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
-    const fotografia = await analisarResiduosFrontend({
+    const fotografia = await analisarResiduosCliente({
         base,
         caminhoOrcamento: opcoes.orcamento ? path.resolve(base, opcoes.orcamento) : undefined,
     });
@@ -42,9 +42,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend residuos auditar",
+            comandoSgc: "cliente residuos auditar",
             scriptDireto: "cliente/residuos-auditar.ts",
-            descricao: "Audita sinais de residuos estruturais e defensividade acidental no frontend.",
+            descricao: "Audita sinais de residuos estruturais e defensividade acidental no cliente.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
                 "--gravar             Atualiza fotografia e resumo em disco.",
@@ -53,9 +53,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend residuos auditar",
-                "npx tsx toolkit/sgc.ts frontend residuos auditar --json",
-                "npx tsx toolkit/sgc.ts frontend residuos auditar --gravar --base /tmp/sgc"
+                "npx tsx toolkit/sgc.ts cliente residuos auditar",
+                "npx tsx toolkit/sgc.ts cliente residuos auditar --json",
+                "npx tsx toolkit/sgc.ts cliente residuos auditar --gravar --base /tmp/sgc"
             ]
         });
         return;
@@ -64,7 +64,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const base = lerOpcao(argumentos, "--base", undefined);
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const saida = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida));
-    const fotografia = await executarAuditoriaFrontendResiduos({
+    const fotografia = await executarAuditoriaClienteResiduos({
         base: baseResolvida,
         orcamento: lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida)),
         saida,
@@ -76,7 +76,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         return;
     }
 
-    imprimirCabecalho("AUDITORIA DE RESIDUOS DO FRONTEND");
+    imprimirCabecalho("AUDITORIA DE RESIDUOS DO CLIENTE");
     escreverLinha(`Pontuacao total: ${pc.bold(String(fotografia.resumo.pontuacaoTotal))} (${fotografia.resumo.faixa})`);
     escreverLinha(`Arquivos de producao: ${fotografia.resumo.arquivosProducao}`);
     escreverLinha(`Arquivos de teste/story: ${fotografia.resumo.arquivosTeste}`);
@@ -112,6 +112,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    executarAuditoriaFrontendResiduos,
+    executarAuditoriaClienteResiduos,
     principal,
 };

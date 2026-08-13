@@ -1,5 +1,5 @@
 {
   "versaoSchema": "1.0.0",
-  "descricao": "Divida existente: o frontend nao deve calcular habilitacao/exibicao de botoes ou acoes. Novas ocorrencias sem excecao quebram o gate frontend arquitetura validar.",
+  "descricao": "Divida existente: o cliente nao deve calcular habilitacao/exibicao de botoes ou acoes. Novas ocorrencias sem excecao quebram o gate cliente arquitetura validar.",
   "excecoes": []
 }

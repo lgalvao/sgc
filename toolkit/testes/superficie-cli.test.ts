@@ -8,19 +8,19 @@ import {
     existe
 } from "./apoio.js";
 
-const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(
+const CAMINHO_CLIENTE_COBERTURA_AUDITORIA = path.join(
     DIRETORIO_RAIZ,
     "toolkit",
     "cliente",
     "cobertura-auditoria.ts"
 );
-const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
-const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
+const DIRETORIO_SCRIPTS_SERVIDOR_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
+const DIRETORIO_SCRIPTS_CLIENTE_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 const CAMINHO_INVENTARIO_SIMBOLOS = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "nomes-simbolos-coletar.ts");
 const CAMINHO_COLETA_QUALIDADE = path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", "coleta.ts");
 
-async function executarAjudaFrontendCobertura(): Promise<{exitCode?: number; stdout: string}> {
-    const resultado = await execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, "--help"], {
+async function executarAjudaClienteCobertura(): Promise<{exitCode?: number; stdout: string}> {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_CLIENTE_COBERTURA_AUDITORIA, "--help"], {
         cwd: DIRETORIO_RAIZ,
         reject: false
     });
@@ -38,34 +38,34 @@ describe("Superfície da CLI", () => {
         expect(resultado.stdout).toContain("projeto ambiente");
     });
 
-    test("despacha ajuda de um comando de auditoria do backend", async () => {
-        const resultado = await executarSgc(["backend", "cobertura", "auditoria", "--help"]);
+    test("despacha ajuda de um comando de auditoria do servidor", async () => {
+        const resultado = await executarSgc(["servidor", "cobertura", "auditoria", "--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Backend).");
+        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Servidor).");
         expect(resultado.stdout).toContain("--minimo <percentual>");
     });
 
-    test("despacha ajuda da auditoria de assuntos de notificacao do backend", async () => {
-        const resultado = await executarSgc(["backend", "notificacoes", "auditar-assuntos", "--help"]);
+    test("despacha ajuda da auditoria de assuntos de notificacao do servidor", async () => {
+        const resultado = await executarSgc(["servidor", "notificacoes", "auditar-assuntos", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Audita literais de assunto de notificação fora de AssuntosNotificacao.");
     });
 
-    test("despacha ajuda da validacao de modais do frontend", async () => {
-        const resultado = await executarSgc(["frontend", "modais", "validar", "--help"]);
+    test("despacha ajuda da validacao de modais do cliente", async () => {
+        const resultado = await executarSgc(["cliente", "modais", "validar", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("ModalPadrao");
-        expect(resultado.stdout).toContain("BModal diretamente no frontend");
+        expect(resultado.stdout).toContain("BModal diretamente no cliente");
     });
 
     test("falha antes de executar o script quando recebe uma opção desconhecida", async () => {
-        const resultado = await executarSgc(["backend", "arquitetura", "auditar", "--opcao-inexistente"]);
+        const resultado = await executarSgc(["servidor", "arquitetura", "auditar", "--opcao-inexistente"]);
         expect(resultado.exitCode).toBe(1);
         expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Opção desconhecida");
     });
 
     test("rejeita posicionais extras em comando sem argumentos posicionais", async () => {
-        const resultado = await executarSgc(["frontend", "modais", "validar", "extra"]);
+        const resultado = await executarSgc(["cliente", "modais", "validar", "extra"]);
         expect(resultado.exitCode).toBe(1);
         expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Quantidade de argumentos posicionais inválida");
     });
@@ -106,15 +106,15 @@ describe("Superfície da CLI", () => {
         expect(`${resultado.stdout}\n${resultado.stderr}`).toContain("Opção desconhecida");
     });
 
-    test("exibe ajuda padronizada no script frontend cobertura auditoria", async () => {
-        const resultado = await executarAjudaFrontendCobertura();
+    test("exibe ajuda padronizada no script cliente cobertura auditoria", async () => {
+        const resultado = await executarAjudaClienteCobertura();
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Frontend).");
+        expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Cliente).");
         expect(resultado.stdout).toContain("--minimo <percentual>");
     });
 
-    test("nao possui diretorios legados de scripts em backend/frontend", async () => {
-        expect(await existe(DIRETORIO_SCRIPTS_BACKEND_LEGADO)).toBe(false);
-        expect(await existe(DIRETORIO_SCRIPTS_FRONTEND_LEGADO)).toBe(false);
+    test("nao possui diretorios legados de scripts do servidor e do cliente", async () => {
+        expect(await existe(DIRETORIO_SCRIPTS_SERVIDOR_LEGADO)).toBe(false);
+        expect(await existe(DIRETORIO_SCRIPTS_CLIENTE_LEGADO)).toBe(false);
     });
 });

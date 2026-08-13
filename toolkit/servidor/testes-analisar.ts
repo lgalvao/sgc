@@ -1,4 +1,4 @@
-// Analisador de cobertura de testes do backend.
+// Analisador de cobertura de testes do servidor.
 import fs from "node:fs";
 import path from "node:path";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
@@ -86,7 +86,7 @@ interface EstatisticasRelatorio {
 interface RelatorioTestes {
     versao: typeof VERSAO_RELATORIO_TESTES;
     geradoEm: string;
-    diretorioBackend: string;
+    diretorioServidor: string;
     estatisticas: EstatisticasRelatorio;
     categorias: CategoriasRelatorio;
 }
@@ -113,15 +113,15 @@ interface OpcoesAnaliseTestes {
 function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
-    const raizBackendInformada = diretorioInformado ? path.resolve(base, diretorioInformado) : null;
+    const raizServidorInformada = diretorioInformado ? path.resolve(base, diretorioInformado) : null;
     const resultado = {
         base,
-        diretorio: raizBackendInformada
-            ? path.join(raizBackendInformada, "src", "main", "java")
-            : resolverCaminhoConfigurado("backendCodigo", base),
-        diretorioTestes: raizBackendInformada
-            ? path.join(raizBackendInformada, "src", "test", "java")
-            : resolverCaminhoConfigurado("backendTestes", base),
+        diretorio: raizServidorInformada
+            ? path.join(raizServidorInformada, "src", "main", "java")
+            : resolverCaminhoConfigurado("codigoServidor", base),
+        diretorioTestes: raizServidorInformada
+            ? path.join(raizServidorInformada, "src", "test", "java")
+            : resolverCaminhoConfigurado("testesServidor", base),
         saida: lerOpcao(argumentos, "--saida", "analise-testes.md") ?? "analise-testes.md",
         saidaJson: lerOpcao(argumentos, "--saida-json", undefined) ?? null,
         arquivoJacoco: lerOpcao(argumentos, "--arquivo-jacoco", undefined) ?? null,
@@ -134,12 +134,12 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
 
 function imprimirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "backend testes analisar",
+        comandoSgc: "servidor testes analisar",
         scriptDireto: "servidor/testes-analisar.ts",
         descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
             '--base <diretorio>     Base do projeto para resolver configuracao.',
-            '--diretorio <caminho>   Diretorio de fontes Java; substitui backendCodigo.',
+            '--diretorio <caminho>   Diretorio de fontes Java; substitui codigoServidor.',
             '--saida <arquivo>       Arquivo de saida em Markdown',
             '--saida-json <arquivo>  Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
             '--arquivo-jacoco <arquivo> Relatorio XML do JaCoCo para classificar cobertura indireta',
@@ -148,7 +148,7 @@ function imprimirAjuda(): void {
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend testes analisar --diretorio backend --saida analise-testes.md --saida-json analise-testes.json"
+            "npx tsx toolkit/sgc.ts servidor testes analisar --diretorio backend --saida analise-testes.md --saida-json analise-testes.json"
         ]
     });
 }
@@ -160,7 +160,7 @@ function resolverSaidaJsonPadrao(caminhoMarkdown: string): string {
     return `${caminhoMarkdown}.json`;
 }
 
-function listarFontes(backendSrc: string): ArquivoFonte[] {
+function listarFontes(codigoServidor: string): ArquivoFonte[] {
     const arquivos: ArquivoFonte[] = [];
 
     function visitar(diretorio: string): void {
@@ -176,7 +176,7 @@ function listarFontes(backendSrc: string): ArquivoFonte[] {
                 return;
             }
 
-            const caminhoRelativo = normalizarCaminho(path.relative(backendSrc, caminhoCompleto));
+            const caminhoRelativo = normalizarCaminho(path.relative(codigoServidor, caminhoCompleto));
             const nomeClasse = path.basename(caminhoRelativo, EXTENSAO_JAVA);
             const pacote = normalizarCaminho(path.dirname(caminhoRelativo));
 
@@ -189,15 +189,15 @@ function listarFontes(backendSrc: string): ArquivoFonte[] {
         });
     }
 
-    visitar(backendSrc);
+    visitar(codigoServidor);
     return arquivos;
 }
 
-function indexarTestes(backendTest: string): IndicesTestes {
+function indexarTestes(testesServidor: string): IndicesTestes {
     const indicePorNome = new Map<string, string[]>();
     const indicePorPacote = new Map<string, string[]>();
 
-    if (!fs.existsSync(backendTest)) {
+    if (!fs.existsSync(testesServidor)) {
         return {indicePorNome, indicePorPacote};
     }
 
@@ -214,7 +214,7 @@ function indexarTestes(backendTest: string): IndicesTestes {
                 return;
             }
 
-            const caminhoRelativo = normalizarCaminho(path.relative(backendTest, caminhoCompleto));
+            const caminhoRelativo = normalizarCaminho(path.relative(testesServidor, caminhoCompleto));
             const pacote = normalizarCaminho(path.dirname(caminhoRelativo));
 
             const testesPorNome = indicePorNome.get(entrada.name) ?? [];
@@ -228,7 +228,7 @@ function indexarTestes(backendTest: string): IndicesTestes {
         });
     }
 
-    visitar(backendTest);
+    visitar(testesServidor);
     return {indicePorNome, indicePorPacote};
 }
 
@@ -299,15 +299,15 @@ async function analisarTestes({
     caminhoJacocoXml = null,
     base = DIRETORIO_RAIZ
 }: OpcoesAnaliseTestes): Promise<RelatorioTestes> {
-    const backendSrc = path.resolve(diretorioFonte);
-    const backendTest = path.resolve(diretorioTestes);
+    const codigoServidor = path.resolve(diretorioFonte);
+    const testesServidor = path.resolve(diretorioTestes);
 
-    if (!fs.existsSync(backendSrc)) {
-        throw new Error(`Diretorio de origem nao encontrado: ${backendSrc}`);
+    if (!fs.existsSync(codigoServidor)) {
+        throw new Error(`Diretorio de origem nao encontrado: ${codigoServidor}`);
     }
 
-    const arquivosFonte = listarFontes(backendSrc);
-    const {indicePorNome, indicePorPacote} = indexarTestes(backendTest);
+    const arquivosFonte = listarFontes(codigoServidor);
+    const {indicePorNome, indicePorPacote} = indexarTestes(testesServidor);
     const coberturaPorClasse = await carregarCoberturaPorClasse(caminhoJacocoXml, base);
 
     const relatorio: CategoriasRelatorio = {
@@ -338,7 +338,7 @@ async function analisarTestes({
     let totalOutrosEstruturaisContratuais = 0;
 
     arquivosFonte.forEach(arquivo => {
-        const conteudoFonte = lerConteudoFonte(backendSrc, arquivo.caminhoRelativo);
+        const conteudoFonte = lerConteudoFonte(codigoServidor, arquivo.caminhoRelativo);
         const perfilDto = arquivo.categoria === 'dtos' ? classificarPerfilDto(conteudoFonte) : null;
         const perfilModelo = arquivo.categoria === 'modelos'
             ? classificarPerfilModelo({
@@ -455,7 +455,7 @@ async function analisarTestes({
     return {
         versao: VERSAO_RELATORIO_TESTES,
         geradoEm: new Date().toISOString(),
-        diretorioBackend: backendSrc,
+        diretorioServidor: codigoServidor,
         estatisticas: {
             totalClasses: totalClasses,
             classesComTesteDedicado: totalComTeste,
@@ -487,7 +487,7 @@ function gerarMarkdown(dados: RelatorioTestes): string {
     const estatisticas = dados.estatisticas;
     const dataFormatada = new Date(dados.geradoEm).toLocaleString('pt-BR');
     const linhas = [
-        '# Relatorio de Cobertura de Testes Unitarios (Backend)\n',
+        '# Relatorio de Cobertura de Testes Unitarios (Servidor)\n',
         `**Data:** ${dataFormatada}`,
         `**Total de Classes:** ${estatisticas.totalClasses}`,
         `**Com Teste Dedicado:** ${estatisticas.classesComTesteDedicado}`,

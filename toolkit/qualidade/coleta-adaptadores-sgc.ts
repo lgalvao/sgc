@@ -1,7 +1,7 @@
 import path from "node:path";
 import process from "node:process";
 import {extrairCoberturaJacoco} from "../biblioteca/dominios/cobertura-java.js";
-import {extrairCoberturaFrontend} from "../biblioteca/dominios/cobertura-web.js";
+import {extrairCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
 import type {
     CatalogoAdaptadores,
     ContextoColeta,
@@ -39,18 +39,18 @@ interface ResultadoPlaywright extends Record<string, unknown> {
     };
 }
 
-type PerfilQualidadeSgc = "rapido" | "completo" | "backend" | "frontend";
+type PerfilQualidadeSgc = "rapido" | "completo" | "servidor" | "cliente";
 type NomeAdaptadorSgc =
-    | "testesBackendUnitarios"
-    | "testesBackendIntegracao"
-    | "coberturaBackend"
-    | "coberturaFrontend"
-    | "lintFrontend"
-    | "tiposFrontend"
-    | "residuosFrontend"
-    | "arquiteturaFrontend"
+    | "testesServidorUnitarios"
+    | "testesServidorIntegracao"
+    | "coberturaServidor"
+    | "coberturaCliente"
+    | "lintCliente"
+    | "tiposCliente"
+    | "residuosCliente"
+    | "arquiteturaCliente"
     | "testesIntegracaoPlaywright"
-    | "identificadoresTesteFrontend";
+    | "identificadoresTesteCliente";
 
 interface DependenciasAdaptadoresSgc {
     criarExecucao: (
@@ -73,10 +73,10 @@ interface DependenciasAdaptadoresSgc {
 }
 
 const PERFIS_SGC = {
-    rapido: ["testesBackendUnitarios", "coberturaBackend", "coberturaFrontend", "lintFrontend", "tiposFrontend", "residuosFrontend", "arquiteturaFrontend", "identificadoresTesteFrontend"],
-    completo: ["testesBackendUnitarios", "testesBackendIntegracao", "coberturaBackend", "coberturaFrontend", "lintFrontend", "tiposFrontend", "residuosFrontend", "arquiteturaFrontend", "testesIntegracaoPlaywright", "identificadoresTesteFrontend"],
-    backend: ["testesBackendUnitarios", "testesBackendIntegracao", "coberturaBackend"],
-    frontend: ["coberturaFrontend", "lintFrontend", "tiposFrontend", "residuosFrontend", "arquiteturaFrontend", "identificadoresTesteFrontend"]
+    rapido: ["testesServidorUnitarios", "coberturaServidor", "coberturaCliente", "lintCliente", "tiposCliente", "residuosCliente", "arquiteturaCliente", "identificadoresTesteCliente"],
+    completo: ["testesServidorUnitarios", "testesServidorIntegracao", "coberturaServidor", "coberturaCliente", "lintCliente", "tiposCliente", "residuosCliente", "arquiteturaCliente", "testesIntegracaoPlaywright", "identificadoresTesteCliente"],
+    servidor: ["testesServidorUnitarios", "testesServidorIntegracao", "coberturaServidor"],
+    cliente: ["coberturaCliente", "lintCliente", "tiposCliente", "residuosCliente", "arquiteturaCliente", "identificadoresTesteCliente"]
 } as const satisfies Record<PerfilQualidadeSgc, readonly NomeAdaptadorSgc[]>;
 
 function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): CatalogoAdaptadores {
@@ -91,36 +91,36 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
     } = dependencias;
 
     return {
-        async testesBackendUnitarios(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("backend-unitario", "Backend unitario", "teste", "./gradlew :backend:unitTest", "backend");
+        async testesServidorUnitarios(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("servidor-unitario", "Teste unitario do servidor", "teste", "./gradlew :backend:unitTest", "backend");
             const saida = await executarComando({
                 comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew",
                 args: [":backend:unitTest"],
                 cwd: contexto.base
             });
-            const relatorio = await consolidarJUnit(path.join(contexto.diretorioBackend, "build", "test-results", "unitTest"), contexto.base);
+            const relatorio = await consolidarJUnit(path.join(contexto.diretorioServidor, "build", "test-results", "unitTest"), contexto.base);
             execucao.status = saida.codigoSaida === 0 && relatorio.falhas === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = relatorio;
             execucao.sumario = `${relatorio.sucessos}/${relatorio.testes} testes aprovados.`;
             return execucao;
         },
-        async testesBackendIntegracao(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("backend-integracao", "Backend integracao", "teste", "./gradlew :backend:integrationTest", "backend");
+        async testesServidorIntegracao(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("servidor-integracao", "Teste de integracao do servidor", "teste", "./gradlew :backend:integrationTest", "backend");
             const saida = await executarComando({
                 comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew",
                 args: [":backend:integrationTest"],
                 cwd: contexto.base
             });
-            const relatorio = await consolidarJUnit(path.join(contexto.diretorioBackend, "build", "test-results", "integrationTest"), contexto.base);
+            const relatorio = await consolidarJUnit(path.join(contexto.diretorioServidor, "build", "test-results", "integrationTest"), contexto.base);
             execucao.status = saida.codigoSaida === 0 && relatorio.falhas === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = relatorio;
             execucao.sumario = `${relatorio.sucessos}/${relatorio.testes} testes aprovados.`;
             return execucao;
         },
-        async coberturaBackend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("backend-cobertura", "Backend cobertura", "cobertura", "./gradlew :backend:jacocoTestReport", "backend");
+        async coberturaServidor(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("servidor-cobertura", "Cobertura do servidor", "cobertura", "./gradlew :backend:jacocoTestReport", "backend");
             const saida = await executarComando({
                 comando: process.platform === "win32" ? "gradlew.bat" : "./gradlew",
                 args: [":backend:jacocoTestReport"],
@@ -133,47 +133,47 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             execucao.sumario = `Cobertura: ${cobertura.linhas.percentual}% linhas, ${cobertura.ramificacoes.percentual}% ramificações.`;
             return execucao;
         },
-        async coberturaFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("frontend-cobertura", "Frontend cobertura", "cobertura", "npm --prefix frontend run coverage:unit:collect", "frontend");
+        async coberturaCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("cliente-cobertura", "Cobertura do cliente", "cobertura", "npm --prefix frontend run coverage:unit:collect", "frontend");
             const saida = await executarComando({
                 comando: "npm",
                 args: ["run", "coverage:unit:collect"],
-                cwd: contexto.diretorioFrontend
+                cwd: contexto.diretorioCliente
             });
-            const cobertura = await extrairCoberturaFrontend(null, {diretorioBase: contexto.base});
+            const cobertura = await extrairCoberturaCliente(null, {diretorioBase: contexto.base});
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = cobertura;
             execucao.sumario = `Cobertura: ${cobertura.linhas.percentual}% linhas.`;
             return execucao;
         },
-        async lintFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("frontend-lint", "Frontend lint", "qualidade", "npx eslint .", "frontend");
+        async lintCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("cliente-lint", "Lint do cliente", "qualidade", "npx eslint .", "frontend");
             const saida = await executarComando({
                 comando: "npx",
                 args: ["eslint", ".", "--max-warnings", "0"],
-                cwd: contexto.diretorioFrontend
+                cwd: contexto.diretorioCliente
             });
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.sumario = saida.codigoSaida === 0 ? "Lint sem problemas." : "Problemas de lint encontrados.";
             return execucao;
         },
-        async tiposFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("frontend-typecheck", "Frontend typecheck", "qualidade", "npm --prefix frontend run typecheck", "frontend");
+        async tiposCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("cliente-typecheck", "Verificacao de tipos do cliente", "qualidade", "npm --prefix frontend run typecheck", "frontend");
             const saida = await executarComando({
                 comando: "npm",
                 args: ["run", "typecheck"],
-                cwd: contexto.diretorioFrontend
+                cwd: contexto.diretorioCliente
             });
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.sumario = saida.codigoSaida === 0 ? "Typecheck sem erros." : "Erros de tipagem encontrados.";
             return execucao;
         },
-        async residuosFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("frontend-residuos", "Residuos do frontend", "qualidade", "npx tsx toolkit/sgc.ts frontend residuos validar --json-resumido --gravar", ".");
-            const saida = await executarComandoSgc(contexto, ["frontend", "residuos", "validar", "--json-resumido", "--gravar"]);
+        async residuosCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("cliente-residuos", "Residuos do cliente", "qualidade", "npx tsx toolkit/sgc.ts cliente residuos validar --json-resumido --gravar", ".");
+            const saida = await executarComandoSgc(contexto, ["cliente", "residuos", "validar", "--json-resumido", "--gravar"]);
             const resultado = parseJsonSeguro<ResultadoResiduos>(saida.saida, {});
             execucao.status = saida.codigoSaida === 0 && resultado.status === "ok" ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
@@ -189,9 +189,9 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
                 : "Validacao de residuos executada.";
             return execucao;
         },
-        async arquiteturaFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("frontend-arquitetura", "Frontend arquitetura", "qualidade", "npx tsx toolkit/sgc.ts frontend arquitetura auditar --json --gravar", ".");
-            const saida = await executarComandoSgc(contexto, ["frontend", "arquitetura", "auditar", "--json", "--gravar"]);
+        async arquiteturaCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("cliente-arquitetura", "Arquitetura do cliente", "qualidade", "npx tsx toolkit/sgc.ts cliente arquitetura auditar --json --gravar", ".");
+            const saida = await executarComandoSgc(contexto, ["cliente", "arquitetura", "auditar", "--json", "--gravar"]);
             const resultado = parseJsonSeguro<ResultadoArquitetura>(saida.saida, {});
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
@@ -215,10 +215,10 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
                 : "Auditoria arquitetural executada.";
             return execucao;
         },
-        async identificadoresTesteFrontend(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
-            const execucao = criarExecucao("frontend-identificadores-teste", "Identificadores de teste do frontend", "qualidade", "npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados", ".");
+        async identificadoresTesteCliente(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
+            const execucao = criarExecucao("cliente-identificadores-teste", "Identificadores de teste do cliente", "qualidade", "npx tsx toolkit/sgc.ts cliente identificadores-teste listar-duplicados", ".");
             const saida = await executarComandoSgc(contexto, [
-                "frontend",
+                "cliente",
                 "identificadores-teste",
                 "listar-duplicados",
                 "--base",

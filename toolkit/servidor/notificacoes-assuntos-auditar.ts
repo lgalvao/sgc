@@ -84,11 +84,11 @@ function extrairAchados(conteudo: string): AchadoAssunto[] {
 }
 
 async function auditarAssuntos(base: string): Promise<RelatorioAssuntos> {
-    const diretorioBackend = resolverCaminhoConfigurado("backendCodigo", base);
-    const arquivos = await globby(path.join(diretorioBackend, "**/*.java").replaceAll("\\", "/"), {absolute: true});
+    const diretorioServidor = resolverCaminhoConfigurado("codigoServidor", base);
+    const arquivos = await globby(path.join(diretorioServidor, "**/*.java").replaceAll("\\", "/"), {absolute: true});
     const ignorados = new Set([
-        normalizarCaminho(path.join(diretorioBackend, "alerta", "AssuntosNotificacao.java")),
-        normalizarCaminho(path.join(diretorioBackend, "e2e", "E2eController.java"))
+        normalizarCaminho(path.join(diretorioServidor, "alerta", "AssuntosNotificacao.java")),
+        normalizarCaminho(path.join(diretorioServidor, "e2e", "E2eController.java"))
     ]);
 
     const relatorio: RelatorioArquivoAssuntos[] = [];
@@ -121,7 +121,7 @@ async function auditarAssuntos(base: string): Promise<RelatorioAssuntos> {
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "backend notificacoes auditar-assuntos",
+        comandoSgc: "servidor notificacoes auditar-assuntos",
         scriptDireto: "servidor/notificacoes-assuntos-auditar.ts",
         descricao: "Audita literais de assunto de notificação fora de AssuntosNotificacao.",
         opcoes: [
@@ -130,8 +130,8 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos",
-            "npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos --json"
+            "npx tsx toolkit/sgc.ts servidor notificacoes auditar-assuntos",
+            "npx tsx toolkit/sgc.ts servidor notificacoes auditar-assuntos --json"
         ]
     });
 }
@@ -151,7 +151,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         imprimirJson(resultado);
     } else {
         imprimirCabecalho("AUDITORIA DE ASSUNTOS DE NOTIFICACAO");
-        escreverLinha(`Base analisada: ${pc.dim(resolverCaminhoConfigurado("backendCodigo", base))}`);
+        escreverLinha(`Base analisada: ${pc.dim(resolverCaminhoConfigurado("codigoServidor", base))}`);
         escreverLinha(`Arquivos analisados: ${resultado.resumo.arquivosAnalisados}`);
         escreverLinha(`Arquivos com violação: ${resultado.resumo.arquivosComViolacao}`);
         escreverLinha(`Violações: ${resultado.resumo.violacoes}`);

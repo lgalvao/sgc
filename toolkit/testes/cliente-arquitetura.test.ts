@@ -17,18 +17,18 @@ interface PontoArquiteturalJson {
     hubCentral?: boolean;
 }
 
-describe("Auditoria arquitetural do frontend", () => {
-    test("audita vazamentos arquiteturais do frontend em um recorte controlado", async () => {
+describe("Auditoria arquitetural do cliente", () => {
+    test("audita vazamentos arquiteturais do cliente em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-auditar-"));
-        const frontendDir = path.join(base, "frontend", "src");
+        const diretorioCliente = path.join(base, "frontend", "src");
 
-        await escreverArquivo(path.join(frontendDir, "stores", "unidade.ts"), "export const useUnidadeStore = () => ({ invalidar: () => undefined, obterUnidade: () => undefined, recarregarUnidade: () => undefined, dadosEdicaoValidos: () => true, sincronizarUnidade: () => undefined, marcarUnidadeParaAtualizacao: () => undefined, limparContextoAtual: () => undefined, resetar: () => undefined, contextoAtual: null, erroAtual: null, carregando: false });");
-        await escreverArquivo(path.join(frontendDir, "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
-        await escreverArquivo(path.join(frontendDir, "composables", "useUnidadeTela.ts"), "export function useUnidadeTela() { return { carregar: () => undefined }; }");
-        await escreverArquivo(path.join(frontendDir, "router", "unidade.routes.ts"), "export const rotasUnidade = [];");
+        await escreverArquivo(path.join(diretorioCliente, "stores", "unidade.ts"), "export const useUnidadeStore = () => ({ invalidar: () => undefined, obterUnidade: () => undefined, recarregarUnidade: () => undefined, dadosEdicaoValidos: () => true, sincronizarUnidade: () => undefined, marcarUnidadeParaAtualizacao: () => undefined, limparContextoAtual: () => undefined, resetar: () => undefined, contextoAtual: null, erroAtual: null, carregando: false });");
+        await escreverArquivo(path.join(diretorioCliente, "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(path.join(diretorioCliente, "composables", "useUnidadeTela.ts"), "export function useUnidadeTela() { return { carregar: () => undefined }; }");
+        await escreverArquivo(path.join(diretorioCliente, "router", "unidade.routes.ts"), "export const rotasUnidade = [];");
 
         await escreverArquivo(
-            path.join(frontendDir, "views", "UnidadeView.vue"),
+            path.join(diretorioCliente, "views", "UnidadeView.vue"),
             [
                 "<script setup lang=\"ts\">",
                 "import {buscarUnidade} from '@/services/unidadeService';",
@@ -50,7 +50,7 @@ describe("Auditoria arquitetural do frontend", () => {
             ].join("\n")
         );
         await escreverArquivo(
-            path.join(frontendDir, "composables", "useCadastroUnidade.ts"),
+            path.join(diretorioCliente, "composables", "useCadastroUnidade.ts"),
             [
                 "interface DependenciasCadastroUnidade {",
                 "  alpha: string;",
@@ -77,7 +77,7 @@ describe("Auditoria arquitetural do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "arquitetura",
             "auditar",
             "--json",
@@ -109,7 +109,7 @@ describe("Auditoria arquitetural do frontend", () => {
 
         const diretorioSaida = path.join("artefatos", "arquitetura");
         const gravacao = await executarSgc([
-            "frontend", "arquitetura", "auditar", "--json", "--gravar", "--saida", diretorioSaida, "--base", base
+            "cliente", "arquitetura", "auditar", "--json", "--gravar", "--saida", diretorioSaida, "--base", base
         ]);
         expect(gravacao.exitCode).toBe(0);
         expect(await existe(path.join(base, diretorioSaida, "fotografia.json"))).toBe(true);
@@ -124,7 +124,7 @@ describe("Auditoria arquitetural do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "arquitetura",
             "auditar",
             "--json",
@@ -147,24 +147,24 @@ describe("Auditoria arquitetural do frontend", () => {
         ))).toBe(true);
     });
 
-    test("analisa arquitetura usando frontendCodigo configurado", async () => {
+    test("analisa arquitetura usando codigoCliente configurado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-codigo-configurado-"));
-        const frontendDir = path.join(base, "cliente", "codigo");
+        const diretorioCliente = path.join(base, "cliente", "codigo");
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontendCodigo: "cliente/codigo"},
+            diretorios: {codigoCliente: "cliente/codigo"},
         });
         await escreverArquivo(
-            path.join(frontendDir, "services", "exemploService.ts"),
+            path.join(diretorioCliente, "services", "exemploService.ts"),
             "export async function buscarExemplo() { return null; }"
         );
         await escreverArquivo(
-            path.join(frontendDir, "views", "ExemploView.vue"),
+            path.join(diretorioCliente, "views", "ExemploView.vue"),
             "<script setup lang=\"ts\">import {buscarExemplo} from '@/services/exemploService'; void buscarExemplo();</script>"
         );
 
         const resultado = await executarSgc([
-            "frontend",
+            "cliente",
             "arquitetura",
             "auditar",
             "--json",
@@ -196,7 +196,7 @@ describe("Auditoria arquitetural do frontend", () => {
                 mensagemProcessoUnidade: () => string;
             };`
         );
-        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--base", base]);
+        const resultado = await executarSgc(["cliente", "arquitetura", "auditar", "--json", "--base", base]);
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.resumo.metricas.arquivosComBolsaDependenciasLarga).toBe(0);
@@ -204,10 +204,10 @@ describe("Auditoria arquitetural do frontend", () => {
 
     test("hub central nao dispara superficieAmpla", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-hub-central-"));
-        const frontendDir = path.join(base, "frontend", "src");
+        const diretorioCliente = path.join(base, "frontend", "src");
 
         await escreverArquivo(
-            path.join(frontendDir, "stores", "perfil.ts"),
+            path.join(diretorioCliente, "stores", "perfil.ts"),
             [
                 "import {defineStore} from 'pinia';",
                 "export const usePerfilStore = defineStore('perfil', () => {",
@@ -230,7 +230,7 @@ describe("Auditoria arquitetural do frontend", () => {
             ].join("\n")
         );
 
-        const resultado = await executarSgc(["frontend", "arquitetura", "auditar", "--json", "--base", base]);
+        const resultado = await executarSgc(["cliente", "arquitetura", "auditar", "--json", "--base", base]);
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
@@ -240,16 +240,16 @@ describe("Auditoria arquitetural do frontend", () => {
 
     test("composable fachada de store não é penalizado por chamadasStore >= 8", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-facade-"));
-        const frontendDir = path.join(base, "frontend", "src");
+        const diretorioCliente = path.join(base, "frontend", "src");
 
         await escreverArquivo(
-            path.join(frontendDir, "stores", "perfil.ts"),
+            path.join(diretorioCliente, "stores", "perfil.ts"),
             "import {defineStore} from 'pinia'; export const usePerfilStore = defineStore('perfil', () => ({ a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12 }));"
         );
 
         // Composable que só delega para uma única store (fachada) — acessa a store 12 vezes
         await escreverArquivo(
-            path.join(frontendDir, "composables", "usePerfil.ts"),
+            path.join(diretorioCliente, "composables", "usePerfil.ts"),
             [
                 "import {computed} from 'vue';",
                 "import {usePerfilStore} from '@/stores/perfil';",
@@ -274,7 +274,7 @@ describe("Auditoria arquitetural do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend", "arquitetura", "auditar", "--json", "--base", base,
+            "cliente", "arquitetura", "auditar", "--json", "--base", base,
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -286,16 +286,16 @@ describe("Auditoria arquitetural do frontend", () => {
 
     test("módulo em stores/ sem defineStore não é penalizado como store Pinia", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-nao-store-"));
-        const frontendDir = path.join(base, "frontend", "src");
+        const diretorioCliente = path.join(base, "frontend", "src");
 
         await escreverArquivo(
-            path.join(frontendDir, "services", "autenticacaoService.ts"),
+            path.join(diretorioCliente, "services", "autenticacaoService.ts"),
             "export async function login() { return null; } export async function logout() { return null; } export async function renovar() { return null; }"
         );
 
         // Módulo de funções puras em stores/ que NÃO usa defineStore (orquestração de autenticação)
         await escreverArquivo(
-            path.join(frontendDir, "stores", "autenticacao.ts"),
+            path.join(diretorioCliente, "stores", "autenticacao.ts"),
             [
                 "import * as autenticacaoService from '@/services/autenticacaoService';",
                 "export async function entrar() { return autenticacaoService.login(); }",
@@ -305,7 +305,7 @@ describe("Auditoria arquitetural do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend", "arquitetura", "auditar", "--json", "--base", base,
+            "cliente", "arquitetura", "auditar", "--json", "--base", base,
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -317,17 +317,17 @@ describe("Auditoria arquitetural do frontend", () => {
 
     test("composable que chama serviço diretamente não recebe sinal serviceDireto", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-composable-servico-"));
-        const frontendDir = path.join(base, "frontend", "src");
+        const diretorioCliente = path.join(base, "frontend", "src");
 
         await escreverArquivo(
-            path.join(frontendDir, "services", "itemService.ts"),
+            path.join(diretorioCliente, "services", "itemService.ts"),
             "export async function buscarItens() { return []; }"
         );
 
         // Composable com superfície exportada ampla E chamada de serviço direta
         // → deve aparecer em pontos criticos pelo superficieAmpla, mas NAO pelo serviceDireto
         await escreverArquivo(
-            path.join(frontendDir, "composables", "useItens.ts"),
+            path.join(diretorioCliente, "composables", "useItens.ts"),
             [
                 "import * as itemService from '@/services/itemService';",
                 "export function useItens() {",
@@ -340,7 +340,7 @@ describe("Auditoria arquitetural do frontend", () => {
         );
 
         const resultado = await executarSgc([
-            "frontend", "arquitetura", "auditar", "--json", "--base", base,
+            "cliente", "arquitetura", "auditar", "--json", "--base", base,
         ]);
 
         expect(resultado.exitCode).toBe(0);

@@ -28,11 +28,11 @@ export interface ArquivoCobertura {
     linhasPercentual: number;
 }
 
-export interface OpcoesCoberturaFrontend {
+export interface OpcoesCoberturaCliente {
     diretorioBase?: string;
 }
 
-export interface ResultadoCoberturaFrontend {
+export interface ResultadoCoberturaCliente {
     instrucoes: ResumoCobertura;
     ramificacoes: ResumoCobertura;
     funcoes: ResumoCobertura;
@@ -94,12 +94,12 @@ function deveIgnorarArquivo(caminhoRelativo: string): boolean {
         || caminhoRelativo.includes(".test.ts");
 }
 
-async function extrairCoberturaFrontend(
+async function extrairCoberturaCliente(
     caminhoRelativo: string | null = null,
-    opcoes: OpcoesCoberturaFrontend = {}
-): Promise<ResultadoCoberturaFrontend> {
+    opcoes: OpcoesCoberturaCliente = {}
+): Promise<ResultadoCoberturaCliente> {
     const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
-    const caminhoPadrao = resolverCaminhoConfigurado("coberturaFrontend", diretorioBase);
+    const caminhoPadrao = resolverCaminhoConfigurado("coberturaCliente", diretorioBase);
     const caminhoJson = caminhoRelativo
         ? (path.isAbsolute(caminhoRelativo) ? caminhoRelativo : path.resolve(diretorioBase, caminhoRelativo))
         : caminhoPadrao;
@@ -159,5 +159,5 @@ async function extrairCoberturaFrontend(
 }
 
 export {
-    extrairCoberturaFrontend
+    extrairCoberturaCliente
 };

@@ -43,9 +43,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "backend cobertura ramificacoes",
+            comandoSgc: "servidor cobertura ramificacoes",
             scriptDireto: "servidor/cobertura-ramificacoes.ts",
-            descricao: "Lista classes backend com ramificacoes perdidas no relatorio JaCoCo.",
+            descricao: "Lista classes do servidor com ramificacoes perdidas no relatorio JaCoCo.",
             opcoes: [
                 "--json            Saída estruturada em JSON.",
                 "--limite <n>      Limita a quantidade de classes exibidas. Padrão: 20.",
@@ -87,7 +87,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         return;
     }
 
-    imprimirCabecalho("COBERTURA DE RAMIFICAÇÕES BACKEND");
+    imprimirCabecalho("COBERTURA DE RAMIFICAÇÕES SERVIDOR");
     escreverLinha(`Cobertura global de ramificações: ${pc.bold(`${coleta.ramificacoes.percentual}%`)} (${coleta.ramificacoes.cobertos}/${coleta.ramificacoes.cobertos + coleta.ramificacoes.perdidos})`);
     escreverLinha("");
 
@@ -109,7 +109,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverErro(`${pc.red(`Erro ao analisar ramificações do backend: ${mensagem}`)}\n`);
+        escreverErro(`${pc.red(`Erro ao analisar ramificações do servidor: ${mensagem}`)}\n`);
         process.exitCode = 1;
     });
 }

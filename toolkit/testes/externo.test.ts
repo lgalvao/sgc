@@ -67,45 +67,45 @@ describe("reuso do toolkit em projeto externo", () => {
         await escreverArquivo(
             path.join(diretorioBase, "configuracao-toolkit.json"),
             JSON.stringify({
-                versao: 1,
+                versao: 2,
                 diretorios: {
-                    backendCodigo: "servidor/src/main/java",
-                    frontendCodigo: "cliente/src",
+                    codigoServidor: "servidor/src/main/java",
+                    codigoCliente: "cliente/src",
                     artefatosQualidade: "artefatos/qualidade"
                 }
             })
         );
 
-        const auditoriaBackend = await executarSgc(diretorioBase, [
-            "backend",
+        const auditoriaServidor = await executarSgc(diretorioBase, [
+            "servidor",
             "arquitetura",
             "auditar",
             "--json",
             "--base",
             diretorioBase
         ]);
-        expect(auditoriaBackend.exitCode).toBe(0);
-        expect(JSON.parse(auditoriaBackend.stdout)).toMatchObject({
+        expect(auditoriaServidor.exitCode).toBe(0);
+        expect(JSON.parse(auditoriaServidor.stdout)).toMatchObject({
             resumo: {totalAnalisados: 1},
             todos: [{caminhoRelativo: "servidor/src/main/java/exemplo/controle/ExemploController.java"}]
         });
 
-        const auditoriaFrontend = await executarSgc(diretorioBase, [
-            "frontend",
+        const auditoriaCliente = await executarSgc(diretorioBase, [
+            "cliente",
             "arquitetura",
             "auditar",
             "--json",
             "--base",
             diretorioBase
         ]);
-        expect(auditoriaFrontend.exitCode).toBe(0);
-        expect(JSON.parse(auditoriaFrontend.stdout)).toMatchObject({
+        expect(auditoriaCliente.exitCode).toBe(0);
+        expect(JSON.parse(auditoriaCliente.stdout)).toMatchObject({
             base: diretorioBase,
             resumo: {arquivosProducao: 1}
         });
 
         const identificadores = await executarSgc(diretorioBase, [
-            "frontend",
+            "cliente",
             "identificadores-teste",
             "listar",
             "--json",
@@ -119,7 +119,7 @@ describe("reuso do toolkit em projeto externo", () => {
         });
 
         const residuos = await executarSgc(diretorioBase, [
-            "frontend",
+            "cliente",
             "residuos",
             "auditar",
             "--json",
@@ -129,7 +129,7 @@ describe("reuso do toolkit em projeto externo", () => {
         expect(residuos.exitCode).toBe(0);
         expect(JSON.parse(residuos.stdout)).toMatchObject({
             base: diretorioBase,
-            resumo: {arquivosFrontend: 1}
+            resumo: {arquivosCliente: 1}
         });
 
         await expect(access(path.join(diretorioBase, "backend", "src"))).rejects.toThrow("ENOENT");

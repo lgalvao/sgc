@@ -24,13 +24,13 @@ function relativo(base: string, absoluto: string): string {
 }
 
 function obterPadroesArtefatos(base: string): string[] {
-    const diretorioBackend = resolverCaminhoConfigurado("backend", base);
-    const diretorioFrontend = resolverCaminhoConfigurado("frontend", base);
+    const diretorioServidor = resolverCaminhoConfigurado("servidor", base);
+    const diretorioCliente = resolverCaminhoConfigurado("cliente", base);
     const diretorioArtefatos = resolverCaminhoConfigurado("artefatosQualidade", base);
     return [
-        relativo(base, path.join(diretorioBackend, "build")),
-        relativo(base, path.join(diretorioFrontend, "coverage")),
-        relativo(base, path.join(diretorioFrontend, "dist")),
+        relativo(base, path.join(diretorioServidor, "build")),
+        relativo(base, path.join(diretorioCliente, "coverage")),
+        relativo(base, path.join(diretorioCliente, "dist")),
         "coverage",
         "playwright-report",
         "test-results",
@@ -38,8 +38,8 @@ function obterPadroesArtefatos(base: string): string[] {
         "analise-testes.md",
         "analise-testes.json",
         "priorizacao-testes.md",
-        "backend-cobertura-auditoria.md",
-        "frontend-cobertura-auditoria.md"
+        "servidor-cobertura-auditoria.md",
+        "cliente-cobertura-auditoria.md"
     ];
 }
 

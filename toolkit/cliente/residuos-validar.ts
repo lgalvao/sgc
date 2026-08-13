@@ -2,7 +2,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {
-    analisarResiduosFrontend,
+    analisarResiduosCliente,
     gravarFotografiaAuditoria,
     resolverDiretorioSaidaResiduos
 } from "./residuos-lib.js";
@@ -44,7 +44,7 @@ interface ResumoValidacaoResiduos extends Omit<ResultadoValidacaoResiduos, "foto
     pontosCriticos: FotografiaResiduos["pontosCriticos"];
 }
 
-interface OpcoesValidacaoFrontendResiduos {
+interface OpcoesValidacaoClienteResiduos {
     base?: string;
     orcamento?: string;
     excecoes?: string;
@@ -77,8 +77,8 @@ function resumirResultado(resultado: ResultadoValidacaoResiduos): ResumoValidaca
     };
 }
 
-async function executarValidacaoFrontendResiduos(
-    opcoes: OpcoesValidacaoFrontendResiduos = {}
+async function executarValidacaoClienteResiduos(
+    opcoes: OpcoesValidacaoClienteResiduos = {}
 ): Promise<ResultadoValidacaoResiduos> {
     const base = path.resolve(opcoes.base ?? DIRETORIO_RAIZ);
     const resolverCaminho = (caminho: string): string => path.resolve(base, caminho);
@@ -87,7 +87,7 @@ async function executarValidacaoFrontendResiduos(
     const caminhoOrcamento = caminhoOrcamentoConfigurado ? resolverCaminho(caminhoOrcamentoConfigurado) : undefined;
     const caminhoExcecoes = caminhoExcecoesConfigurado ? resolverCaminho(caminhoExcecoesConfigurado) : undefined;
     const caminhoSaida = opcoes.saida ? resolverCaminho(opcoes.saida) : resolverDiretorioSaidaResiduos(base);
-    const fotografia = await analisarResiduosFrontend({
+    const fotografia = await analisarResiduosCliente({
         base,
         caminhoOrcamento,
     });
@@ -193,9 +193,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: "frontend residuos validar",
+            comandoSgc: "cliente residuos validar",
             scriptDireto: "cliente/residuos-validar.ts",
-            descricao: "Valida orcamentos e excecoes dos residuos do frontend para impedir regressao estrutural.",
+            descricao: "Valida orcamentos e excecoes dos residuos do cliente para impedir regressao estrutural.",
             opcoes: [
                 "--json               Emite o resultado em JSON.",
                 "--json-resumido      Emite somente status, resumo, violacoes e pontos criticos.",
@@ -206,9 +206,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend residuos validar",
-                "npx tsx toolkit/sgc.ts frontend residuos validar --json",
-                "npx tsx toolkit/sgc.ts frontend residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
+                "npx tsx toolkit/sgc.ts cliente residuos validar",
+                "npx tsx toolkit/sgc.ts cliente residuos validar --json",
+                "npx tsx toolkit/sgc.ts cliente residuos validar --base /tmp/sgc --orcamento /tmp/orcamento.json --excecoes /tmp/excecoes.json"
             ]
         });
         return;
@@ -219,7 +219,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const orcamentoInformado = lerOpcao(argumentos, "--orcamento", resolverCaminhoOrcamentoResiduos(baseResolvida));
     const excecoesInformadas = lerOpcao(argumentos, "--excecoes", resolverCaminhoExcecoesResiduos(baseResolvida));
     const saida = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida));
-    const resultado = await executarValidacaoFrontendResiduos({
+    const resultado = await executarValidacaoClienteResiduos({
         base: baseResolvida,
         orcamento: orcamentoInformado,
         excecoes: excecoesInformadas,
@@ -239,7 +239,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
         return;
     }
 
-    imprimirCabecalho("VALIDACAO DE RESIDUOS DO FRONTEND");
+    imprimirCabecalho("VALIDACAO DE RESIDUOS DO CLIENTE");
     escreverLinha(`Status: ${resultado.status === "ok" ? pc.green("ok") : pc.red("falha")}`);
     escreverLinha(`Pontuacao total: ${resultado.resumo.pontuacaoTotal} (${resultado.resumo.faixa})`);
     escreverLinha(`Violacoes: ${resultado.resumo.violacoes}`);
@@ -280,6 +280,6 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    executarValidacaoFrontendResiduos,
+    executarValidacaoClienteResiduos,
     principal,
 };

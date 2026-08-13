@@ -4,21 +4,21 @@ import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {lerNumero, lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
-import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../biblioteca/dominios/cobertura-web.js";
+import {extrairCoberturaCliente, type ArquivoCobertura, type ResultadoCoberturaCliente} from "../biblioteca/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../biblioteca/saida.js";
 import {exibirAjudaComando} from "../biblioteca/cli-ajuda.js";
 
-const CAMINHO_PADRAO_SAIDA = "frontend-cobertura-auditoria.md";
+const CAMINHO_PADRAO_SAIDA = "cliente-cobertura-auditoria.md";
 const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 
-interface ResumoMetricasFrontend {
-    linhas: ResultadoCoberturaFrontend["linhas"];
-    instrucoes: ResultadoCoberturaFrontend["instrucoes"];
-    ramificacoes: ResultadoCoberturaFrontend["ramificacoes"];
-    funcoes: ResultadoCoberturaFrontend["funcoes"];
+interface ResumoMetricasCliente {
+    linhas: ResultadoCoberturaCliente["linhas"];
+    instrucoes: ResultadoCoberturaCliente["instrucoes"];
+    ramificacoes: ResultadoCoberturaCliente["ramificacoes"];
+    funcoes: ResultadoCoberturaCliente["funcoes"];
 }
 
-interface PontoCriticoRelatorioFrontend {
+interface PontoCriticoRelatorioCliente {
     arquivo: string;
     pontuacaoImpacto: number;
     coberturaLinhas: number;
@@ -26,16 +26,16 @@ interface PontoCriticoRelatorioFrontend {
     instrucoesCobertas: number;
 }
 
-interface ResultadoAuditoriaFrontend {
+interface ResultadoAuditoriaCliente {
     status: "ok";
     versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
     geradoEm: string;
-    totais: ResumoMetricasFrontend;
-    pontosCriticos: PontoCriticoRelatorioFrontend[];
+    totais: ResumoMetricasCliente;
+    pontosCriticos: PontoCriticoRelatorioCliente[];
 }
 
 function calcularPontuacaoImpacto(arquivo: ArquivoCobertura): number {
-    // No frontend, focamos em instruções e ramificações.
+    // No cliente, focamos em instruções e ramificações.
     // Arquivos com muitas instruções descobertas e muitas ramificações são prioridade.
     const pesoInstrucoes = 1.0;
     const pesoRamificacoes = 1.5;
@@ -52,9 +52,9 @@ function obterPrioridade(pontuacao: number): string {
     return pc.cyan("P3 (Médio)");
 }
 
-async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho: string): Promise<string> {
+async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCliente, caminho: string): Promise<string> {
     const {totais, pontosCriticos} = dados;
-    let markdown = "# Auditoria de Cobertura Frontend\n\n";
+    let markdown = "# Auditoria de Cobertura Cliente\n\n";
 
     markdown += "## Resumo Geral\n";
     markdown += `- **Cobertura de Linhas:** ${totais.linhas.percentual}%\n`;
@@ -86,9 +86,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (exibirAjuda) {
         exibirAjudaComando({
-            comandoSgc: 'frontend cobertura auditoria',
+            comandoSgc: 'cliente cobertura auditoria',
             scriptDireto: 'cliente/cobertura-auditoria.ts',
-            descricao: 'Auditoria unificada de cobertura e risco (Frontend).',
+            descricao: 'Auditoria unificada de cobertura e risco (Cliente).',
             opcoes: [
                 '--json     Saída em formato JSON para integração com outras ferramentas.',
                 '--saida <arquivo>   Caminho do arquivo Markdown a ser gerado.',
@@ -108,11 +108,11 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const metaMinima = lerNumero(argumentos, "--minimo", 0, {inteiro: false, minimo: 0, maximo: 100}) ?? 0;
 
     if (!emitirJson) {
-        imprimirCabecalho("AUDITORIA DE COBERTURA FRONTEND");
+        imprimirCabecalho("AUDITORIA DE COBERTURA CLIENTE");
     }
 
     try {
-        const coleta = await extrairCoberturaFrontend(arquivo, {diretorioBase});
+        const coleta = await extrairCoberturaCliente(arquivo, {diretorioBase});
 
         const pontosCriticos = coleta.arquivos
             .map(a => ({
@@ -123,7 +123,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             .toSorted((a, b) => b.pontuacaoImpacto - a.pontuacaoImpacto)
             .slice(0, 20);
 
-        const resultado: ResultadoAuditoriaFrontend = {
+        const resultado: ResultadoAuditoriaCliente = {
             status: "ok",
             geradoEm: new Date().toISOString(),
             totais: {

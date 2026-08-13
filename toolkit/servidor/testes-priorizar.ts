@@ -1,4 +1,4 @@
-// Priorizador de testes do backend.
+// Priorizador de testes do servidor.
 import fs from "node:fs";
 import path from "node:path";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
@@ -80,7 +80,7 @@ function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
 
 function imprimirAjuda() {
     exibirAjudaComando({
-        comandoSgc: "backend testes priorizar",
+        comandoSgc: "servidor testes priorizar",
         scriptDireto: "servidor/testes-priorizar.ts",
         descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
         opcoes: [
@@ -91,7 +91,7 @@ function imprimirAjuda() {
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend testes priorizar --entrada analise-testes.json --saida priorizacao-testes.md"
+            "npx tsx toolkit/sgc.ts servidor testes priorizar --entrada analise-testes.json --saida priorizacao-testes.md"
         ]
     });
 }

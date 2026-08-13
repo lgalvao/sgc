@@ -11,13 +11,13 @@ import {
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
-describe("Gates arquiteturais do frontend", () => {
+describe("Gates arquiteturais do cliente", () => {
     test("gate arquitetural falha quando view importa service diretamente", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-gate-falha-"));
-        const frontendDir = path.join(base, "frontend");
+        const diretorioCliente = path.join(base, "frontend");
 
-        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(diretorioCliente, "package.json"), {name: "cliente-fixture", private: true});
+        await escreverJson(path.join(diretorioCliente, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -26,9 +26,9 @@ describe("Gates arquiteturais do frontend", () => {
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await escreverArquivo(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(path.join(diretorioCliente, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
         await escreverArquivo(
-            path.join(frontendDir, "src", "views", "UnidadeView.vue"),
+            path.join(diretorioCliente, "src", "views", "UnidadeView.vue"),
             [
                 "<script setup lang=\"ts\">",
                 "import {buscarUnidade} from '../services/unidadeService';",
@@ -36,19 +36,19 @@ describe("Gates arquiteturais do frontend", () => {
                 "</script>",
             ].join("\n")
         );
-        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(diretorioCliente, ".dependency-cruiser.cjs"));
 
-        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        const resultado = await executarSgc(["cliente", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).not.toBe(0);
         expect(resultado.stdout).toContain("view-sem-service-direto");
     });
 
     test("gate arquitetural passa quando view usa composable", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-gate-ok-"));
-        const frontendDir = path.join(base, "frontend");
+        const diretorioCliente = path.join(base, "frontend");
 
-        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(diretorioCliente, "package.json"), {name: "cliente-fixture", private: true});
+        await escreverJson(path.join(diretorioCliente, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -57,9 +57,9 @@ describe("Gates arquiteturais do frontend", () => {
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await escreverArquivo(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(path.join(diretorioCliente, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
         await escreverArquivo(
-            path.join(frontendDir, "src", "composables", "useUnidadeTela.ts"),
+            path.join(diretorioCliente, "src", "composables", "useUnidadeTela.ts"),
             [
                 "import {buscarUnidade} from '../services/unidadeService';",
                 "export function useUnidadeTela() {",
@@ -68,7 +68,7 @@ describe("Gates arquiteturais do frontend", () => {
             ].join("\n")
         );
         await escreverArquivo(
-            path.join(frontendDir, "src", "views", "UnidadeView.vue"),
+            path.join(diretorioCliente, "src", "views", "UnidadeView.vue"),
             [
                 "<script setup lang=\"ts\">",
                 "import {useUnidadeTela} from '../composables/useUnidadeTela';",
@@ -77,52 +77,52 @@ describe("Gates arquiteturais do frontend", () => {
                 "</script>",
             ].join("\n")
         );
-        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(diretorioCliente, ".dependency-cruiser.cjs"));
 
-        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        const resultado = await executarSgc(["cliente", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Nenhuma violacao arquitetural encontrada");
     });
 
-    test("resolve diretorio frontend configurado no gate arquitetural", async () => {
+    test("resolve diretorio cliente configurado no gate arquitetural", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-diretorio-configurado-"));
-        const frontendDir = path.join(base, "cliente");
+        const diretorioCliente = path.join(base, "cliente");
 
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontend: "cliente"},
+            diretorios: {cliente: "cliente"},
         });
-        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(diretorioCliente, "package.json"), {name: "cliente-fixture", private: true});
+        await escreverJson(path.join(diretorioCliente, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {"@/*": ["./src/*"]},
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await escreverArquivo(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(path.join(diretorioCliente, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
         await escreverArquivo(
-            path.join(frontendDir, "src", "composables", "useUnidadeTela.ts"),
+            path.join(diretorioCliente, "src", "composables", "useUnidadeTela.ts"),
             "import {buscarUnidade} from '../services/unidadeService'; export function useUnidadeTela() { return {carregar: () => buscarUnidade()}; }"
         );
         await escreverArquivo(
-            path.join(frontendDir, "src", "views", "UnidadeView.vue"),
+            path.join(diretorioCliente, "src", "views", "UnidadeView.vue"),
             "<script setup lang=\"ts\">import {useUnidadeTela} from '../composables/useUnidadeTela'; const tela = useUnidadeTela(); void tela.carregar();</script>"
         );
-        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(diretorioCliente, ".dependency-cruiser.cjs"));
 
-        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        const resultado = await executarSgc(["cliente", "arquitetura", "validar", "--base", base]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Nenhuma violacao arquitetural encontrada");
     });
 
-    test("gate arquitetural falha quando frontend calcula habilitacao de acao por perfil ou situacao", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-backend-falha-"));
-        const frontendDir = path.join(base, "frontend");
+    test("gate arquitetural falha quando cliente calcula habilitacao de acao por perfil ou situacao", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-servidor-falha-"));
+        const diretorioCliente = path.join(base, "frontend");
 
-        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(diretorioCliente, "package.json"), {name: "cliente-fixture", private: true});
+        await escreverJson(path.join(diretorioCliente, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -132,7 +132,7 @@ describe("Gates arquiteturais do frontend", () => {
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
         await escreverArquivo(
-            path.join(frontendDir, "src", "views", "ConsensoView.vue"),
+            path.join(diretorioCliente, "src", "views", "ConsensoView.vue"),
             [
                 "<script setup lang=\"ts\">",
                 "import {computed} from 'vue';",
@@ -143,20 +143,20 @@ describe("Gates arquiteturais do frontend", () => {
                 "</script>",
             ].join("\n")
         );
-        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(diretorioCliente, ".dependency-cruiser.cjs"));
 
-        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        const resultado = await executarSgc(["cliente", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).not.toBe(0);
-        expect(resultado.stdout).toContain("frontend-sem-regra-local-acoes");
+        expect(resultado.stdout).toContain("cliente-sem-regra-local-acoes");
         expect(resultado.stdout).toContain("habilitarAprovarConsenso");
     });
 
-    test("gate arquitetural permite flag de acao vinda diretamente do backend", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-backend-ok-"));
-        const frontendDir = path.join(base, "frontend");
+    test("gate arquitetural permite flag de acao vinda diretamente do servidor", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-servidor-ok-"));
+        const diretorioCliente = path.join(base, "frontend");
 
-        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(diretorioCliente, "package.json"), {name: "cliente-fixture", private: true});
+        await escreverJson(path.join(diretorioCliente, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -166,7 +166,7 @@ describe("Gates arquiteturais do frontend", () => {
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
         await escreverArquivo(
-            path.join(frontendDir, "src", "views", "ConsensoView.vue"),
+            path.join(diretorioCliente, "src", "views", "ConsensoView.vue"),
             [
                 "<script setup lang=\"ts\">",
                 "import {computed} from 'vue';",
@@ -175,9 +175,9 @@ describe("Gates arquiteturais do frontend", () => {
                 "</script>",
             ].join("\n")
         );
-        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(diretorioCliente, ".dependency-cruiser.cjs"));
 
-        const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
+        const resultado = await executarSgc(["cliente", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Nenhum calculo local novo de habilitacao/exibicao de acoes encontrado");
     });

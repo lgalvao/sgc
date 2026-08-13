@@ -10,19 +10,19 @@ import {
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
-describe("Auditorias backend", () => {
-    test("auditores backend usam caminhos configurados e gravam somente com acao explicita", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-codigo-backend-"));
-        const codigoBackend = path.join(base, "servidor", "java");
+describe("Auditorias do servidor", () => {
+    test("auditores do servidor usam caminhos configurados e gravam somente com acao explicita", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-codigo-servidor-"));
+        const codigoServidor = path.join(base, "servidor", "java");
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java",
+                codigoServidor: "servidor/java",
                 artefatosQualidade: "artefatos"
             }
         });
         await escreverArquivo(
-            path.join(codigoBackend, "exemplo", "ExemploService.java"),
+            path.join(codigoServidor, "exemplo", "ExemploService.java"),
             [
                 "package exemplo;",
                 "public class ExemploService {",
@@ -35,7 +35,7 @@ describe("Auditorias backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "coesao",
             "auditar",
             "--json",
@@ -50,10 +50,10 @@ describe("Auditorias backend", () => {
         expect(conteudo.hotspots).toBeUndefined();
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
-        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(false);
+        expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "coesao-auditoria.json"))).toBe(false);
 
         const gravacao = await executarSgc([
-            "backend",
+            "servidor",
             "coesao",
             "auditar",
             "--json",
@@ -62,21 +62,21 @@ describe("Auditorias backend", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(true);
+        expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "coesao-auditoria.json"))).toBe(true);
     });
 
     test("audita service acima do limiar arquitetural sem gravar por padrao", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-backend-"));
-        const codigoBackend = path.join(base, "servidor", "java");
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-servidor-"));
+        const codigoServidor = path.join(base, "servidor", "java");
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java",
+                codigoServidor: "servidor/java",
                 artefatosQualidade: "artefatos"
             }
         });
         await escreverArquivo(
-            path.join(codigoBackend, "exemplo", "ExemploService.java"),
+            path.join(codigoServidor, "exemplo", "ExemploService.java"),
             [
                 "package exemplo;",
                 "public class ExemploService {",
@@ -87,7 +87,7 @@ describe("Auditorias backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "arquitetura",
             "auditar",
             "--json",
@@ -110,10 +110,10 @@ describe("Auditorias backend", () => {
             severidade: "alerta"
         });
         expect(conteudo.todos[0].motivos).toContain("15 métodos públicos (>=15)");
-        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "arquitetura-auditoria.md"))).toBe(false);
 
         const gravacao = await executarSgc([
-            "backend",
+            "servidor",
             "arquitetura",
             "auditar",
             "--json",
@@ -122,21 +122,21 @@ describe("Auditorias backend", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(true);
+        expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "arquitetura-auditoria.md"))).toBe(true);
     });
 
     test("audita vazamento de modelo em DTO de controlador sem gravar por padrao", async () => {
-        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-contratos-backend-"));
-        const codigoBackend = path.join(base, "servidor", "java");
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-contratos-servidor-"));
+        const codigoServidor = path.join(base, "servidor", "java");
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java",
+                codigoServidor: "servidor/java",
                 artefatosQualidade: "artefatos"
             }
         });
         await escreverArquivo(
-            path.join(codigoBackend, "exemplo", "web", "UsuarioController.java"),
+            path.join(codigoServidor, "exemplo", "web", "UsuarioController.java"),
             [
                 "package exemplo.web;",
                 "import exemplo.web.dto.UsuarioResponse;",
@@ -146,7 +146,7 @@ describe("Auditorias backend", () => {
             ].join("\n")
         );
         await escreverArquivo(
-            path.join(codigoBackend, "exemplo", "web", "dto", "UsuarioResponse.java"),
+            path.join(codigoServidor, "exemplo", "web", "dto", "UsuarioResponse.java"),
             [
                 "package exemplo.web.dto;",
                 "import exemplo.model.Usuario;",
@@ -154,7 +154,7 @@ describe("Auditorias backend", () => {
             ].join("\n")
         );
         await escreverArquivo(
-            path.join(codigoBackend, "exemplo", "model", "Usuario.java"),
+            path.join(codigoServidor, "exemplo", "model", "Usuario.java"),
             [
                 "package exemplo.model;",
                 "public class Usuario {}"
@@ -162,7 +162,7 @@ describe("Auditorias backend", () => {
         );
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "contratos",
             "auditar",
             "--json",
@@ -180,10 +180,10 @@ describe("Auditorias backend", () => {
             campo: "usuario",
             tipoModelo: "exemplo.model.Usuario"
         });
-        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "contratos-auditoria.md"))).toBe(false);
 
         const gravacao = await executarSgc([
-            "backend",
+            "servidor",
             "contratos",
             "auditar",
             "--json",
@@ -192,6 +192,6 @@ describe("Auditorias backend", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(true);
+        expect(await existe(path.join(base, "artefatos", "servidor", "mais-recente", "contratos-auditoria.md"))).toBe(true);
     });
 });

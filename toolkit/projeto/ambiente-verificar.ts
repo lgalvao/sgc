@@ -116,8 +116,8 @@ function ehPerfilSgc(diretorioBase: string): boolean {
 }
 
 function obterRecursosAmbientePadrao(diretorioBase: string): Recurso[] {
-    const diretorioFrontend = caminhoDiretorioConfigurado(diretorioBase, "frontend");
-    const diretorioBackend = caminhoDiretorioConfigurado(diretorioBase, "backend");
+    const diretorioCliente = caminhoDiretorioConfigurado(diretorioBase, "cliente");
+    const diretorioServidor = caminhoDiretorioConfigurado(diretorioBase, "servidor");
     const diretorioTestesIntegracao = caminhoDiretorioConfigurado(diretorioBase, "testesIntegracao");
     const perfilSgc = ehPerfilSgc(diretorioBase);
     const recursos: Recurso[] = [
@@ -126,8 +126,8 @@ function obterRecursosAmbientePadrao(diretorioBase: string): Recurso[] {
         {tipo: "arquivo", nome: "package.json raiz", caminho: "package.json", obrigatorio: true, categoria: CATEGORIAS.CONFIGURACAO},
         {
             tipo: "arquivo",
-            nome: caminhoDentroDiretorio(diretorioFrontend, "package.json"),
-            caminho: caminhoDentroDiretorio(diretorioFrontend, "package.json"),
+            nome: caminhoDentroDiretorio(diretorioCliente, "package.json"),
+            caminho: caminhoDentroDiretorio(diretorioCliente, "package.json"),
             obrigatorio: true,
             categoria: CATEGORIAS.CONFIGURACAO
         },
@@ -147,21 +147,21 @@ function obterRecursosAmbientePadrao(diretorioBase: string): Recurso[] {
         },
         {
             tipo: "arquivo",
-            nome: caminhoDentroDiretorio(diretorioBackend, "build.gradle.kts"),
-            caminho: caminhoDentroDiretorio(diretorioBackend, "build.gradle.kts"),
+            nome: caminhoDentroDiretorio(diretorioServidor, "build.gradle.kts"),
+            caminho: caminhoDentroDiretorio(diretorioServidor, "build.gradle.kts"),
             obrigatorio: true,
             categoria: CATEGORIAS.CONFIGURACAO
         },
         ...(perfilSgc ? [
             {tipo: "arquivo" as const, nome: ".env.e2e", caminho: ".env.e2e", obrigatorio: false, categoria: CATEGORIAS.CONFIGURACAO},
-            {tipo: "porta" as const, nome: "Backend (10000)", porta: 10000, obrigatorio: false, categoria: CATEGORIAS.INFRA},
-            {tipo: "porta" as const, nome: "Frontend (5173)", porta: 5173, portaPadrao: true, categoria: CATEGORIAS.INFRA}
+            {tipo: "porta" as const, nome: "Servidor (10000)", porta: 10000, obrigatorio: false, categoria: CATEGORIAS.INFRA},
+            {tipo: "porta" as const, nome: "Cliente (5173)", porta: 5173, portaPadrao: true, categoria: CATEGORIAS.INFRA}
         ] : []),
         {tipo: "diretorio", nome: "node_modules raiz", caminho: "node_modules", obrigatorio: false, categoria: CATEGORIAS.DEPENDENCIAS},
         {
             tipo: "diretorio",
-            nome: caminhoDentroDiretorio(diretorioFrontend, "node_modules"),
-            caminho: caminhoDentroDiretorio(diretorioFrontend, "node_modules"),
+            nome: caminhoDentroDiretorio(diretorioCliente, "node_modules"),
+            caminho: caminhoDentroDiretorio(diretorioCliente, "node_modules"),
             obrigatorio: false,
             categoria: CATEGORIAS.DEPENDENCIAS
         },

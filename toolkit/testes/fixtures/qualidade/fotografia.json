@@ -1,5 +1,5 @@
 {
-  "versaoSchema": "2.0.0",
+  "versaoSchema": "3.0.0",
   "resumo": {
     "statusGeral": "verde",
     "totais": {
@@ -12,17 +12,17 @@
   },
   "verificacoes": [
     {
-      "codigo": "backend-cobertura",
+      "codigo": "servidor-cobertura",
       "status": "sucesso",
-      "sumario": "Cobertura backend consistente."
+      "sumario": "Cobertura do servidor consistente."
     },
     {
-      "codigo": "frontend-cobertura",
+      "codigo": "cliente-cobertura",
       "status": "sucesso",
-      "sumario": "Cobertura frontend acima do limiar."
+      "sumario": "Cobertura do cliente acima do limiar."
     },
     {
-      "codigo": "frontend-lint",
+      "codigo": "cliente-lint",
       "status": "sucesso",
       "sumario": "Lint sem erros."
     }

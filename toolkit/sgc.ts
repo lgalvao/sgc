@@ -68,33 +68,33 @@ function registrarComandosCatalogados(programa: Command): void {
 const program = new Command();
 program
     .name("sgc")
-    .description("Toolkit do SGC para backend, frontend, qualidade e automacoes de projeto.")
+    .description("Toolkit do SGC para servidor, cliente, qualidade e automacoes de projeto.")
     .showHelpAfterError()
     .showSuggestionAfterError();
 
-const backend = program.command("backend").description("Ferramentas do backend.");
-criarGrupoComando(backend, "cobertura", "Cobertura e diagnosticos do backend.");
-criarGrupoComando(backend, "arquitetura", "Auditorias de arquitetura do backend.");
-criarGrupoComando(backend, "coesao", "Auditorias de coesao do backend.");
-criarGrupoComando(backend, "contratos", "Auditorias de contratos HTTP e DTOs publicos do backend.");
-criarGrupoComando(backend, "testes", "Ferramentas de testes do backend.");
-criarGrupoComando(backend, "java", "Utilitarios Java do backend.");
-criarGrupoComando(backend, "notificacoes", "Auditorias de notificacoes e assuntos do backend.");
+const servidor = program.command("servidor").description("Ferramentas do servidor.");
+criarGrupoComando(servidor, "cobertura", "Cobertura e diagnosticos do servidor.");
+criarGrupoComando(servidor, "arquitetura", "Auditorias de arquitetura do servidor.");
+criarGrupoComando(servidor, "coesao", "Auditorias de coesao do servidor.");
+criarGrupoComando(servidor, "contratos", "Auditorias de contratos HTTP e DTOs publicos do servidor.");
+criarGrupoComando(servidor, "testes", "Ferramentas de testes do servidor.");
+criarGrupoComando(servidor, "java", "Utilitarios Java do servidor.");
+criarGrupoComando(servidor, "notificacoes", "Auditorias de notificacoes e assuntos do servidor.");
 
-const frontend = program.command("frontend").description("Ferramentas do frontend.");
-criarGrupoComando(frontend, "cobertura", "Cobertura e diagnosticos do frontend.");
-criarGrupoComando(frontend, "residuos", "Auditorias de residuos estruturais e orcamentos do frontend.");
-criarGrupoComando(frontend, "arquitetura", "Auditorias de arquitetura e vazamento de contratos no frontend.");
-criarGrupoComando(frontend, "views", "Auditorias especificas de views.");
-criarGrupoComando(frontend, "modais", "Auditorias especificas de modais.");
-criarGrupoComando(frontend, "identificadores-teste", "Ferramentas para identificadores de teste.");
+const cliente = program.command("cliente").description("Ferramentas do cliente.");
+criarGrupoComando(cliente, "cobertura", "Cobertura e diagnosticos do cliente.");
+criarGrupoComando(cliente, "residuos", "Auditorias de residuos estruturais e orcamentos do cliente.");
+criarGrupoComando(cliente, "arquitetura", "Auditorias de arquitetura e vazamento de contratos no cliente.");
+criarGrupoComando(cliente, "views", "Auditorias especificas de views.");
+criarGrupoComando(cliente, "modais", "Auditorias especificas de modais.");
+criarGrupoComando(cliente, "identificadores-teste", "Ferramentas para identificadores de teste.");
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 criarGrupoComando(codigo, "cheiros", "Auditorias de cheiros de codigo.");
 criarGrupoComando(codigo, "semgrep", "Auditorias estruturais com Semgrep OSS.");
 criarGrupoComando(codigo, "nomes", "Inventario e auditoria de nomenclatura do projeto.");
 
-const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira backend/frontend.");
+const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira servidor/cliente.");
 criarGrupoComando(integracao, "contratos", "Auditorias e artefatos de contrato HTTP.");
 
 const requisitos = program.command("requisitos").description("Ferramentas de inventario e auditoria de requisitos.");
@@ -107,7 +107,7 @@ const tarefasQualidade = qualidade
 qualidade
     .command("coletar")
     .description(obterDescricaoComando(["qualidade", "coletar"]))
-    .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, backend, frontend).", "rapido")
+    .option("--perfil <perfil>", "Perfil de execucao (rapido, completo, servidor, cliente).", "rapido")
     .option("--base <diretorio>", "Sobrescreve o diretorio base do projeto auditado.")
     .action(async (opcoes) => {
         const {executarColetaQualidade} = await import("./qualidade/coleta.js");
@@ -190,7 +190,7 @@ registrarComandosCatalogados(program);
 
 program.addHelpText(
     "after",
-    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.ts backend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts frontend cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.ts projeto ambiente verificar --json")}\n  ${pc.dim("npx tsx toolkit/sgc.ts codigo cheiros auditar --json")}`
+    `\nExemplos:\n  ${pc.dim("npx tsx toolkit/sgc.ts servidor cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts cliente cobertura auditoria")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido")}\n  ${pc.dim("npx tsx toolkit/sgc.ts qualidade resumo")}\n  ${pc.dim("npx tsx toolkit/sgc.ts projeto ambiente verificar --json")}\n  ${pc.dim("npx tsx toolkit/sgc.ts codigo cheiros auditar --json")}`
 );
 
 async function executar(argumentos = process.argv) {

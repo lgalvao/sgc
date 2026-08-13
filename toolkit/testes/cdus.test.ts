@@ -230,7 +230,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         await escreverArquivo(
             path.join(base, "configuracao-toolkit.json"),
             JSON.stringify({
-                versao: 1,
+                versao: 2,
                 requisitos: {
                     cdus: {
                         padraoArquivos: "documentacao/casos-de-uso/cdu-*.md"
@@ -454,7 +454,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         await escreverArquivo(
             path.join(base, "configuracao-toolkit.json"),
             JSON.stringify({
-                versao: 1,
+                versao: 2,
                 requisitos: {
                     cdus: {
                         padraoArquivos: "documentacao/casos/cdu-*.md",
@@ -783,7 +783,7 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         await escreverArquivo(
             path.join(base, "configuracao-toolkit.json"),
             JSON.stringify({
-                versao: 1,
+                versao: 2,
                 requisitos: {
                     cdus: {
                         fontesMensagensCodigo: [

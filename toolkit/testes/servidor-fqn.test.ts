@@ -10,10 +10,10 @@ import {
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
-describe("Correção de FQN backend", () => {
-    test("corrige FQNs em uma raiz de backend externa no modo simulacao", async () => {
-        const diretorioBackend = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-"));
-        const caminhoJava = path.join(diretorioBackend, "src", "main", "java", "exemplo", "Exemplo.java");
+describe("Correção de FQN do servidor", () => {
+    test("corrige FQNs em uma raiz de servidor externa no modo simulacao", async () => {
+        const diretorioServidor = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-"));
+        const caminhoJava = path.join(diretorioServidor, "src", "main", "java", "exemplo", "Exemplo.java");
         const conteudoOriginal = [
             "package exemplo;",
             "",
@@ -24,11 +24,11 @@ describe("Correção de FQN backend", () => {
         await escreverArquivo(caminhoJava, conteudoOriginal);
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "java",
             "corrigir-fqn",
             "--base",
-            diretorioBackend
+            diretorioServidor
         ]);
 
         expect(resultado.exitCode).toBe(0);
@@ -37,8 +37,8 @@ describe("Correção de FQN backend", () => {
     });
 
     test("corrige FQNs no modo de escrita sem duplicar linhas e permanece idempotente", async () => {
-        const diretorioBackend = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-escrita-"));
-        const caminhoJava = path.join(diretorioBackend, "src", "main", "java", "exemplo", "Exemplo.java");
+        const diretorioServidor = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-escrita-"));
+        const caminhoJava = path.join(diretorioServidor, "src", "main", "java", "exemplo", "Exemplo.java");
         const conteudoOriginal = [
             "package exemplo;",
             "",
@@ -57,11 +57,11 @@ describe("Correção de FQN backend", () => {
         await escreverArquivo(caminhoJava, conteudoOriginal);
 
         const primeiraExecucao = await executarSgc([
-            "backend",
+            "servidor",
             "java",
             "corrigir-fqn",
             "--base",
-            diretorioBackend
+            diretorioServidor
         ]);
 
         expect(primeiraExecucao.exitCode).toBe(0);
@@ -69,11 +69,11 @@ describe("Correção de FQN backend", () => {
         expect(await lerArquivo(caminhoJava, "utf8")).toBe(conteudoOriginal);
 
         const segundaExecucao = await executarSgc([
-            "backend",
+            "servidor",
             "java",
             "corrigir-fqn",
             "--base",
-            diretorioBackend,
+            diretorioServidor,
             "--gravar"
         ]);
 
@@ -82,11 +82,11 @@ describe("Correção de FQN backend", () => {
         expect(await lerArquivo(caminhoJava, "utf8")).toBe(conteudoEsperado);
 
         const terceiraExecucao = await executarSgc([
-            "backend",
+            "servidor",
             "java",
             "corrigir-fqn",
             "--base",
-            diretorioBackend,
+            diretorioServidor,
             "--gravar"
         ]);
 
@@ -100,8 +100,8 @@ describe("Correção de FQN backend", () => {
         await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
-                backendCodigo: "servidor/java",
-                backendTestes: "servidor/testes"
+                codigoServidor: "servidor/java",
+                testesServidor: "servidor/testes"
             }
         });
 
@@ -118,7 +118,7 @@ describe("Correção de FQN backend", () => {
         await escreverArquivo(caminhoTeste, conteudoJava.replace("Exemplo", "ExemploTest"));
 
         const resultado = await executarSgc([
-            "backend",
+            "servidor",
             "java",
             "corrigir-fqn",
             "--base",

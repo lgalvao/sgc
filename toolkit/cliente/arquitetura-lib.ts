@@ -177,7 +177,7 @@ function normalizarCaminho(caminhoArquivo: string): string {
 }
 
 function resolverPrefixoCodigo(base: string): string {
-    const diretorioCodigo = resolverCaminhoConfigurado("frontendCodigo", base);
+    const diretorioCodigo = resolverCaminhoConfigurado("codigoCliente", base);
     const relativo = normalizarCaminho(path.relative(base, diretorioCodigo));
     return relativo ? `${relativo}/` : "";
 }
@@ -196,7 +196,7 @@ function ehArquivoTesteOuStory(caminhoRelativo: string): boolean {
         || caminhoRelativo.endsWith(".stories.ts");
 }
 
-function ehArquivoProducaoFrontend(caminhoRelativo: string, prefixoCodigo: string): boolean {
+function ehArquivoProducaoCliente(caminhoRelativo: string, prefixoCodigo: string): boolean {
     return (prefixoCodigo === "" || caminhoRelativo.startsWith(prefixoCodigo))
         && !ehArquivoTesteOuStory(caminhoRelativo);
 }
@@ -217,8 +217,8 @@ function contarOcorrencias(conteudo: string, regex: RegExp): number {
     return conteudo.match(regex)?.length ?? 0;
 }
 
-async function listarArquivosFrontend(base: string): Promise<string[]> {
-    const diretorioFrontend = resolverCaminhoConfigurado("frontendCodigo", base);
+async function listarArquivosCliente(base: string): Promise<string[]> {
+    const diretorioCliente = resolverCaminhoConfigurado("codigoCliente", base);
     const arquivos: string[] = [];
 
     async function percorrer(diretorioAtual: string): Promise<void> {
@@ -244,7 +244,7 @@ async function listarArquivosFrontend(base: string): Promise<string[]> {
         }
     }
 
-    await percorrer(diretorioFrontend);
+    await percorrer(diretorioCliente);
     return arquivos;
 }
 
@@ -273,7 +273,7 @@ function resolverImportacao(caminhoRelativo: string, especificador: string, pref
     const caminhoBase = path.posix.normalize(path.posix.join(baseDiretorio, especificador));
     for (const extensao of EXTENSOES_RESOLUCAO) {
         const candidato = normalizarCaminho(`${caminhoBase}${extensao}`);
-        if (ehArquivoProducaoFrontend(candidato, prefixoCodigo) || candidato.startsWith(prefixoCodigo)) {
+        if (ehArquivoProducaoCliente(candidato, prefixoCodigo) || candidato.startsWith(prefixoCodigo)) {
             return candidato;
         }
     }
@@ -824,7 +824,7 @@ function calcularFaixa(pontuacao: number): FaixaPontuacao {
 
 function criarResumoMarkdown(fotografia: FotografiaArquitetura): string {
     const linhas: string[] = [
-        "# Auditoria Arquitetural do Frontend",
+        "# Auditoria Arquitetural do Cliente",
         "",
         `- Pontuacao total: **${fotografia.resumo.pontuacaoTotal}** (${fotografia.resumo.faixa})`,
         `- Arquivos de producao: **${fotografia.resumo.arquivosProducao}**`,
@@ -1029,11 +1029,11 @@ function lerExcecoesAuditoria(
     return sinaisExcetos;
 }
 
-async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnaliseArquitetura = {}): Promise<FotografiaArquitetura> {
+async function analisarArquiteturaCliente({base = DIRETORIO_RAIZ}: OpcoesAnaliseArquitetura = {}): Promise<FotografiaArquitetura> {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const prefixoCodigo = resolverPrefixoCodigo(baseResolvida);
     const hubsCentrais = criarHubsCentrais(prefixoCodigo);
-    const arquivos = await listarArquivosFrontend(baseResolvida);
+    const arquivos = await listarArquivosCliente(baseResolvida);
     const analisados: ArquivoAnalisado[] = [];
     const metricas = criarMetricasResumo();
     const project = criarProjetoAnalise();
@@ -1041,7 +1041,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
 
     for (const arquivo of arquivos) {
         const caminhoRelativo = normalizarCaminho(path.relative(baseResolvida, arquivo));
-        if (!ehArquivoProducaoFrontend(caminhoRelativo, prefixoCodigo)) {
+        if (!ehArquivoProducaoCliente(caminhoRelativo, prefixoCodigo)) {
             continue;
         }
 
@@ -1198,7 +1198,7 @@ async function analisarArquiteturaFrontend({base = DIRETORIO_RAIZ}: OpcoesAnalis
 }
 
 export {
-    analisarArquiteturaFrontend,
+    analisarArquiteturaCliente,
     gravarFotografiaArquitetura,
     resolverDiretorioSaidaArquitetura,
     type FotografiaArquitetura,

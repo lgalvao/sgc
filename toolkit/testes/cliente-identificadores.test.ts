@@ -9,8 +9,8 @@ import {
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 
-describe("Identificadores de teste do frontend", () => {
-    test("lista com sucesso identificadores de teste do frontend em recorte controlado", async () => {
+describe("Identificadores de teste do cliente", () => {
+    test("lista com sucesso identificadores de teste do cliente em recorte controlado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-listar-"));
 
         // Criar arquivos .vue de teste com identificadores
@@ -23,7 +23,7 @@ describe("Identificadores de teste do frontend", () => {
             "<template><input data-testid=\"input-nome\" /></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar", "--diretorio", diretorioBase]);
+        const resultado = await executarSgc(["cliente", "identificadores-teste", "listar", "--diretorio", diretorioBase]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("ComponenteA.vue");
@@ -32,18 +32,18 @@ describe("Identificadores de teste do frontend", () => {
         expect(resultado.stdout).toContain("input-nome");
     });
 
-    test("resolve frontendCodigo configurado para identificadores de teste", async () => {
+    test("resolve codigoCliente configurado para identificadores de teste", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-configurado-"));
         await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
-            diretorios: {frontendCodigo: "aplicacao/src"},
+            diretorios: {codigoCliente: "aplicacao/src"},
         });
         await escreverArquivo(
             path.join(base, "aplicacao", "src", "components", "Componente.vue"),
             "<template><button data-testid=\"btn-configurado\">Salvar</button></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar", "--base", base]);
+        const resultado = await executarSgc(["cliente", "identificadores-teste", "listar", "--base", base]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("aplicacao/src/components/Componente.vue");
@@ -63,7 +63,7 @@ describe("Identificadores de teste do frontend", () => {
             "<template><div data-testid=\"btn-acao\">Ação Y</div></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--diretorio", diretorioBase]);
+        const resultado = await executarSgc(["cliente", "identificadores-teste", "listar-duplicados", "--diretorio", diretorioBase]);
 
         // O script deve falhar com exitCode 1 quando encontra duplicados
         expect(resultado.exitCode).toBe(1);
@@ -81,7 +81,7 @@ describe("Identificadores de teste do frontend", () => {
             "<template><button data-testid=\"btn-unico\">Ação Única</button></template>"
         );
 
-        const resultado = await executarSgc(["frontend", "identificadores-teste", "listar-duplicados", "--diretorio", diretorioBase]);
+        const resultado = await executarSgc(["cliente", "identificadores-teste", "listar-duplicados", "--diretorio", diretorioBase]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Nenhum identificador de teste duplicado encontrado.");

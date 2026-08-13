@@ -203,20 +203,20 @@ function processarArquivo(caminhoArquivo: string, gravar = false): boolean {
     return true;
 }
 
-function encontrarRaizBackend(diretorioBase: string = DIRETORIO_RAIZ): string {
+function encontrarRaizServidor(diretorioBase: string = DIRETORIO_RAIZ): string {
     const candidatos = [path.resolve(diretorioBase), path.resolve(diretorioBase, "backend")];
     return candidatos.find((candidato) => fs.existsSync(path.join(candidato, "src"))) ?? path.resolve(diretorioBase);
 }
 
-function obterDiretoriosAlvo(diretorioBase: string, raizBackend: string): string[] {
+function obterDiretoriosAlvo(diretorioBase: string, raizServidor: string): string[] {
     if (fs.existsSync(path.join(diretorioBase, NOME_ARQUIVO_CONFIGURACAO))) {
         return [
-            resolverCaminhoConfigurado("backendTestes", diretorioBase),
-            resolverCaminhoConfigurado("backendCodigo", diretorioBase)
+            resolverCaminhoConfigurado("testesServidor", diretorioBase),
+            resolverCaminhoConfigurado("codigoServidor", diretorioBase)
         ];
     }
 
-    return DIRETORIOS_ALVO.map(diretorioRelativo => path.join(raizBackend, diretorioRelativo));
+    return DIRETORIOS_ALVO.map(diretorioRelativo => path.join(raizServidor, diretorioRelativo));
 }
 
 function lerArgumentos(argumentos: string[]): OpcoesCorretorFqn {
@@ -229,18 +229,18 @@ function lerArgumentos(argumentos: string[]): OpcoesCorretorFqn {
 
 function exibirAjuda(): void {
     exibirAjudaComando({
-        comandoSgc: "backend java corrigir-fqn",
+        comandoSgc: "servidor java corrigir-fqn",
         scriptDireto: "servidor/java-corrigir-fqn.ts",
         descricao: "Substitui nomes totalmente qualificados por imports em arquivos Java.",
         opcoes: [
             "--gravar            Persiste as substituições nos arquivos Java.",
-            "--base <diretorio>  Usa uma raiz de backend alternativa.",
+            "--base <diretorio>  Usa uma raiz de servidor alternativa.",
             "--help, -h          Exibe esta ajuda.",
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend java corrigir-fqn",
-            "npx tsx toolkit/sgc.ts backend java corrigir-fqn --gravar",
-            "npx tsx toolkit/sgc.ts backend java corrigir-fqn --base /tmp/backend",
+            "npx tsx toolkit/sgc.ts servidor java corrigir-fqn",
+            "npx tsx toolkit/sgc.ts servidor java corrigir-fqn --gravar",
+            "npx tsx toolkit/sgc.ts servidor java corrigir-fqn --base /tmp/backend",
         ],
     });
 }
@@ -252,13 +252,13 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
         return;
     }
 
-    const raizBackend = encontrarRaizBackend(opcoes.diretorioBase);
-    const diretoriosAlvo = obterDiretoriosAlvo(opcoes.diretorioBase, raizBackend);
+    const raizServidor = encontrarRaizServidor(opcoes.diretorioBase);
+    const diretoriosAlvo = obterDiretoriosAlvo(opcoes.diretorioBase, raizServidor);
     let totalArquivosAnalisados = 0;
     let totalArquivosAtualizados = 0;
 
     escreverLinha("Procurando FQNs no projeto...");
-    escreverLinha(`Raiz do backend resolvida: ${raizBackend}`);
+    escreverLinha(`Raiz do servidor resolvida: ${raizServidor}`);
 
     diretoriosAlvo.forEach((diretorioAlvo) => {
         if (!fs.existsSync(diretorioAlvo)) {
