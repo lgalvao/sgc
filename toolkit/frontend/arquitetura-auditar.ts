@@ -1,13 +1,21 @@
 #!/usr/bin/env node
 import path from "node:path";
 import pc from "picocolors";
-import {analisarArquiteturaFrontend, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura} from "./arquitetura-lib.js";
+import {analisarArquiteturaFrontend, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura, type FotografiaArquitetura} from "./arquitetura-lib.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-async function executarAuditoriaArquiteturaFrontend(opcoes = {}) {
+interface OpcoesAuditoriaArquiteturaFrontend {
+    base?: string;
+    saida?: string;
+    semGravar?: boolean;
+}
+
+async function executarAuditoriaArquiteturaFrontend(
+    opcoes: OpcoesAuditoriaArquiteturaFrontend = {}
+): Promise<FotografiaArquitetura> {
     const snapshot = await analisarArquiteturaFrontend({base: opcoes.base});
 
     if (!opcoes.semGravar) {
@@ -17,14 +25,14 @@ async function executarAuditoriaArquiteturaFrontend(opcoes = {}) {
     return snapshot;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "frontend arquitetura auditar",
-            scriptDireto: "frontend/arquitetura-auditar.js",
+            scriptDireto: "frontend/arquitetura-auditar.ts",
             descricao: "Audita vazamentos arquiteturais do frontend, incluindo estrategia de cache exposta nas views, hubs centrais sobrecarregados e server state caseiro.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
@@ -82,7 +90,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     });
 
     if (!argumentos.includes("--sem-gravar")) {
-        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaArquitetura(snapshot.base));
+        const diretorio = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaArquitetura(snapshot.base)) ?? resolverDiretorioSaidaArquitetura(snapshot.base);
         escreverLinha("");
         escreverLinha(`${pc.green("✓")} Fotografia salva em ${path.relative(process.cwd(), diretorio).replaceAll("\\", "/")}`);
     }

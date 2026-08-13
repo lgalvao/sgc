@@ -247,6 +247,8 @@ frontend e para os caminhos OpenAPI.
   de violações, resumos e opções agora são explícitos, mantendo as exceções e os componentes SGC aprovados.
 - `frontend/arquitetura-validar.ts` foi convertido para TypeScript com contratos do dependency-cruiser e da auditoria
   de ações; a opção runtime `cwd`, ausente na declaração da dependência, ficou confinada a um cast na borda.
+- `frontend/arquitetura-auditar.ts` foi convertido para TypeScript; a fotografia, opções de persistência e resumo de
+  hotspots agora usam o contrato público do núcleo AST, mantendo a análise específica do perfil SGC.
 - `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
   atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
 - `integracao/contratos-exportar-openapi.ts`, `integracao/contratos-diff.ts` e
@@ -296,15 +298,15 @@ elevam a cobertura para 101 cenários.
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 48 arquivos TypeScript de implementação;
-- 24 arquivos JavaScript de implementação ainda pendentes;
+- 49 arquivos TypeScript de implementação;
+- 23 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 101 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 67% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 68% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica

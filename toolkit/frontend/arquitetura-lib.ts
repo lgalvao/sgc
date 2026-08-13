@@ -1201,4 +1201,5 @@ export {
     analisarArquiteturaFrontend,
     gravarFotografiaArquitetura,
     resolverDiretorioSaidaArquitetura,
+    type FotografiaArquitetura,
 };
