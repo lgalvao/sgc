@@ -176,6 +176,9 @@ ou plataformas do build, algo que precisa ser filtrado no próprio build consumi
 `projeto artefatos limpar` mostra uma prévia e só remove com `--confirmar`. `projeto versao-sincronizar` simula e só
 altera arquivos com `--gravar`.
 
+O motor `projeto/versao-sincronizacao-motor.ts` recebe alvos explícitos nos formatos `propriedadesGradle` e
+`manifestoNpm`; o comando do SGC monta `gradle.properties` e o `package.json` do cliente configurado como conveniência.
+
 ## Contrato de efeitos colaterais
 
 - Auditorias e inventários são somente leitura por padrão.

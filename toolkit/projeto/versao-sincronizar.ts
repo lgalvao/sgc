@@ -1,68 +1,16 @@
-import {existsSync, readFileSync, writeFileSync} from "node:fs";
 import path from "node:path";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../biblioteca/execucao.js";
 import {resolverNaRaiz} from "../biblioteca/caminhos.js";
 import {lerOpcao} from "../biblioteca/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 import {escreverErro, escreverLinha} from "../biblioteca/saida.js";
+import {sincronizarVersao, type AlvoVersao, type ResultadoSincronizacao} from "./versao-sincronizacao-motor.js";
 
-interface ResultadoSincronizacao {
-    novaVersao: string;
-    arquivosAtualizados: string[];
-    arquivosPendentes: string[];
-    gravado: boolean;
-}
-
-function sincronizarVersao(
-    novaVersao: string | undefined,
-    diretorioBase = resolverNaRaiz(),
-    gravar = false
-): ResultadoSincronizacao {
-    if (!novaVersao) {
-        throw new Error("Informe a versão que deve ser sincronizada.");
-    }
-
-    const arquivosAtualizados: string[] = [];
-    const arquivosPendentes: string[] = [];
-
-    const resolver = (caminho: string): string => path.resolve(diretorioBase, caminho);
-    const caminhoRelativo = (caminho: string): string => path.relative(diretorioBase, caminho).replaceAll(path.sep, "/");
-    const caminhoGradle = resolver("gradle.properties");
-    const nomeGradle = caminhoRelativo(caminhoGradle);
-    if (existsSync(caminhoGradle)) {
-        const conteudo = readFileSync(caminhoGradle, "utf-8");
-        if (/^version=.*$/m.test(conteudo)) {
-            const conteudoAtualizado = conteudo.replace(/^version=.*$/m, `version=${novaVersao}`);
-            if (conteudoAtualizado !== conteudo) {
-                arquivosPendentes.push(nomeGradle);
-                if (gravar) {
-                    writeFileSync(caminhoGradle, conteudoAtualizado, "utf-8");
-                    arquivosAtualizados.push(nomeGradle);
-                }
-            }
-        }
-    }
-
-    const caminhoCliente = path.join(resolverCaminhoConfigurado("cliente", diretorioBase), "package.json");
-    const nomeCliente = caminhoRelativo(caminhoCliente);
-    if (existsSync(caminhoCliente)) {
-        const pacote = JSON.parse(readFileSync(caminhoCliente, "utf-8")) as Record<string, unknown>;
-        if (pacote.version !== novaVersao) {
-            arquivosPendentes.push(nomeCliente);
-            if (gravar) {
-                pacote.version = novaVersao;
-                writeFileSync(caminhoCliente, `${JSON.stringify(pacote, null, 2)}\n`, "utf-8");
-                arquivosAtualizados.push(nomeCliente);
-            }
-        }
-    }
-
-    return {
-        novaVersao,
-        arquivosAtualizados,
-        arquivosPendentes,
-        gravado: gravar
-    };
+function resolverAlvosVersao(diretorioBase: string): AlvoVersao[] {
+    return [
+        {caminho: "gradle.properties", formato: "propriedadesGradle"},
+        {caminho: path.join(resolverCaminhoConfigurado("cliente", diretorioBase), "package.json"), formato: "manifestoNpm"}
+    ];
 }
 
 function principal(argumentosInformados: string[] = process.argv.slice(2)): ResultadoSincronizacao | undefined {
@@ -86,7 +34,12 @@ function principal(argumentosInformados: string[] = process.argv.slice(2)): Resu
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()) ?? resolverNaRaiz());
     const gravar = argumentos.includes("--gravar");
-    const resultado = sincronizarVersao(novaVersao, diretorioBase, gravar);
+    const resultado = sincronizarVersao({
+        novaVersao,
+        diretorioBase,
+        alvos: resolverAlvosVersao(diretorioBase),
+        gravar
+    });
     for (const arquivo of resultado.arquivosPendentes) {
         escreverLinha(`${gravar ? "[v]" : "[simulação]"} ${arquivo} ${gravar ? "atualizado" : "seria atualizado"} para ${novaVersao}`);
     }
@@ -107,6 +60,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal,
-    sincronizarVersao
+    principal
 };

@@ -214,6 +214,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   resolve os diretórios, a política local e o diretório de artefatos;
 - os motores OpenAPI de exportação, diff e baseline foram separados da borda CLI e exigem URL/base/arquivos explícitos;
   os caminhos configurados e o endpoint em `127.0.0.1:10000` ficaram identificados como conveniências do perfil SGC;
+- o motor de sincronização de versão recebe alvos explícitos e formatos `propriedadesGradle`/`manifestoNpm`; a escolha
+  de `gradle.properties` e do `package.json` do cliente ficou somente no comando do perfil SGC;
 - os agregadores CDU ficaram reduzidos a bordas de comando; parser, descoberta do corpus, inventário e auditoria não
   importam mais `process.argv`, execução de processo ou saída textual;
 - defaults de Gradle, Vue, caminhos configurados e outras políticas SGC ainda aparecem em bordas ou módulos adaptáveis;

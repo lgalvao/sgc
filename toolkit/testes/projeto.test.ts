@@ -5,7 +5,7 @@ import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {executarSgc, escreverArquivo, escreverJson, lerArquivo, lerJson, existe, criarDiretorio} from "./apoio.js";
 import {calcularTotais, construirArvore, ehArquivoTeste, listarArquivosGit, lerOpcoes} from "../projeto/arvore-linhas.js";
-import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
+import {sincronizarVersao} from "../projeto/versao-sincronizacao-motor.js";
 import {executarVerificacaoAmbiente, obterRecursosAmbientePadrao} from "../projeto/ambiente-verificar.js";
 import {limparArtefatos, obterPadroesArtefatos} from "../projeto/artefatos-limpar.js";
 import {executarTarefasQualidade} from "../qualidade/tarefas-executar.js";
@@ -37,7 +37,11 @@ describe("Comandos de projeto do toolkit", () => {
         await escreverArquivo(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\nother=value\n");
         await escreverJson(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
 
-        const simulacao = sincronizarVersao("2.3.4", diretorioBase);
+        const alvos = [
+            {caminho: "gradle.properties", formato: "propriedadesGradle" as const},
+            {caminho: "frontend/package.json", formato: "manifestoNpm" as const}
+        ];
+        const simulacao = sincronizarVersao({novaVersao: "2.3.4", diretorioBase, alvos});
 
         expect(simulacao.gravado).toBe(false);
         expect(simulacao.arquivosAtualizados).toEqual([]);
@@ -45,7 +49,7 @@ describe("Comandos de projeto do toolkit", () => {
         expect(await lerArquivo(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=1.0.0");
         expect((await lerJson<{version: string}>(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("1.0.0");
 
-        const resultado = sincronizarVersao("2.3.4", diretorioBase, true);
+        const resultado = sincronizarVersao({novaVersao: "2.3.4", diretorioBase, alvos, gravar: true});
 
         expect(resultado.gravado).toBe(true);
         expect(resultado.arquivosAtualizados).toEqual(["gradle.properties", "frontend/package.json"]);
@@ -93,7 +97,15 @@ describe("Comandos de projeto do toolkit", () => {
         await escreverArquivo(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
         await escreverJson(path.join(diretorioBase, "cliente", "package.json"), {name: "cliente", version: "1.0.0"});
 
-        const resultado = sincronizarVersao("2.4.0", diretorioBase, true);
+        const resultado = sincronizarVersao({
+            novaVersao: "2.4.0",
+            diretorioBase,
+            alvos: [
+                {caminho: "gradle.properties", formato: "propriedadesGradle"},
+                {caminho: "cliente/package.json", formato: "manifestoNpm"}
+            ],
+            gravar: true
+        });
 
         expect(resultado.arquivosAtualizados).toEqual(["gradle.properties", "cliente/package.json"]);
         expect((await lerJson<{version: string}>(path.join(diretorioBase, "cliente", "package.json"))).version).toBe("2.4.0");
