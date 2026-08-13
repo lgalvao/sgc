@@ -17,7 +17,7 @@ const LIMITE_METODOS_ALERTA = 15;
 const LIMITE_METODOS_CRITICO = 25;
 const LIMITE_DEPENDENCIAS_ALERTA = 8;
 const LIMITE_DEPENDENCIAS_CRITICO = 12;
-const VERSAO_RELATORIO = 2 as const;
+const VERSAO_RELATORIO = 3 as const;
 
 const SUFIXOS_ALVO = ["Service.java", "Facade.java", "Controller.java"];
 
@@ -53,6 +53,7 @@ interface RelatorioArquitetura {
         ok: number;
     };
     pontosCriticos: ResultadoArquitetura[];
+    alertas: ResultadoArquitetura[];
     todos: ResultadoArquitetura[];
 }
 
@@ -157,7 +158,8 @@ async function auditarArquitetura(diretorioCodigo: string, diretorioBase: string
             alertas: alertas.length,
             ok: resultados.filter((r) => r.severidade === "ok").length
         },
-        pontosCriticos: resultados.filter((r) => r.severidade !== "ok"),
+        pontosCriticos: criticos,
+        alertas,
         todos: resultados
     };
 }
@@ -180,16 +182,17 @@ function gerarMarkdown(relatorio: RelatorioArquitetura): string {
     linhas.push(`| Dependências injetadas | ${relatorio.limites.dependencias.alerta} | ${relatorio.limites.dependencias.critico} |`);
     linhas.push("");
 
-    if (relatorio.pontosCriticos.length === 0) {
-        linhas.push("Nenhum ponto critico encontrado.");
+    const achados = [...relatorio.pontosCriticos, ...relatorio.alertas];
+    if (achados.length === 0) {
+        linhas.push("Nenhum achado encontrado.");
         return linhas.join("\n");
     }
 
-    linhas.push("## Pontos criticos", "");
+    linhas.push("## Achados", "");
     linhas.push("| Arquivo | Tipo | Linhas | Métodos | Dependências | Severidade | Motivos |");
     linhas.push("|---------|------|--------|---------|--------------|-----------|---------|");
 
-    for (const item of relatorio.pontosCriticos) {
+    for (const item of achados) {
         const sev = item.severidade === "critico" ? "🔴 crítico" : "🟡 alerta";
         linhas.push(`| \`${item.nomeArquivo}\` | ${item.tipo} | ${item.linhas} | ${item.metodos} | ${item.dependencias} | ${sev} | ${item.motivos.join("; ")} |`);
     }
@@ -201,8 +204,8 @@ function gerarMarkdown(relatorio: RelatorioArquitetura): string {
     linhas.push("- testes ficam difíceis de isolar;");
     linhas.push("- responsabilidades se sobrepõem.", "");
     linhas.push("## Primeiro corte sugerido", "");
-    if (relatorio.pontosCriticos.length > 0) {
-        const top = relatorio.pontosCriticos[0];
+    if (achados.length > 0) {
+        const top = achados[0];
         linhas.push(`Começar por \`${top.nomeArquivo}\` (${top.motivos.join(", ")}).`);
         linhas.push("Identificar os casos de uso reais e separar por responsabilidade concreta (consulta, mutação, workflow, notificação).");
     }
@@ -272,15 +275,16 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (!emitirJson) {
         escreverLinha(`Analisados: ${relatorio.resumo.totalAnalisados} — Críticos: ${pc.red(String(relatorio.resumo.criticos))} — Alertas: ${pc.yellow(String(relatorio.resumo.alertas))} — OK: ${pc.green(String(relatorio.resumo.ok))}`);
 
-        if (relatorio.pontosCriticos.length > 0) {
+        const achados = [...relatorio.pontosCriticos, ...relatorio.alertas];
+        if (achados.length > 0) {
             escreverLinha("");
-            escreverLinha(pc.bold("Pontos criticos:"));
-            for (const item of relatorio.pontosCriticos.slice(0, 10)) {
+            escreverLinha(pc.bold("Achados:"));
+            for (const item of achados.slice(0, 10)) {
                 const cor = item.severidade === "critico" ? pc.red : pc.yellow;
                 escreverLinha(`  ${cor("●")} ${item.nomeArquivo} — ${item.motivos.join(", ")}`);
             }
         } else {
-            escreverLinha(pc.green("Nenhum ponto critico encontrado."));
+            escreverLinha(pc.green("Nenhum achado encontrado."));
         }
     }
 

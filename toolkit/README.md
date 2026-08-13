@@ -131,8 +131,9 @@ explícita. O comando do SGC injeta `servidor/testes-politica-sgc.ts`; isso mant
 `SanitizarHtml` fora do motor genérico. Para outro projeto, informe `--politica` com um JSON contendo as oito listas da
 política (`anotacoesContrato`, nomes/prefixos/sufixos de modelos e outros, e `caminhosOutrosEstruturais`).
 
-Os relatórios próprios persistidos de `servidor arquitetura auditar` e `servidor coesao auditar` carregam `versao: 2` e
-usam `pontosCriticos`. O JSON persistido pelo Semgrep continua sendo o formato externo da ferramenta e, por isso, não
+O relatório próprio persistido de `servidor arquitetura auditar` carrega `versao: 3`: `pontosCriticos` contém apenas itens
+críticos e `alertas` contém itens de severidade de alerta. O relatório de `servidor coesao auditar` carrega `versao: 2` e
+usa `pontosCriticos`. O JSON persistido pelo Semgrep continua sendo o formato externo da ferramenta e, por isso, não
 recebe um envelope do toolkit.
 
 O JSON persistido por `servidor testes analisar` usa `versao: 2`, campos em português/camelCase e categorias com os grupos

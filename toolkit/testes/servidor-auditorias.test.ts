@@ -97,8 +97,11 @@ describe("Auditorias do servidor", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.versao).toBe(2);
+        expect(conteudo.versao).toBe(3);
         expect(conteudo.pontosCriticos).toBeInstanceOf(Array);
+        expect(conteudo.pontosCriticos).toHaveLength(0);
+        expect(conteudo.alertas).toHaveLength(1);
+        expect(conteudo.alertas[0].severidade).toBe("alerta");
         expect(conteudo.hotspots).toBeUndefined();
         expect(conteudo.resumo).toMatchObject({totalAnalisados: 1, criticos: 0, alertas: 1, ok: 0});
         expect(conteudo.todos[0]).toMatchObject({
