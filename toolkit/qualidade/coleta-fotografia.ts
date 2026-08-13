@@ -4,8 +4,10 @@ import {NOME_ARQUIVO_FOTOGRAFIA} from "../lib/qualidade.js";
 import {extrairHotspotsQualidade} from "./coleta-leitores.js";
 import type {ExecucaoQualidade} from "./coleta-execucao.js";
 
+const VERSAO_SCHEMA_FOTOGRAFIA = "1.0.0" as const;
+
 interface FotografiaColeta {
-    versaoSchema: string;
+    versaoSchema: typeof VERSAO_SCHEMA_FOTOGRAFIA;
     metadados: {
         geradoEm: string;
         perfilExecucao: string;
@@ -29,7 +31,7 @@ interface FotografiaColeta {
 }
 
 interface OpcoesFotografia {
-    versaoSchema: string;
+    versaoSchema: typeof VERSAO_SCHEMA_FOTOGRAFIA;
     perfilExecucao: string;
     inicio: number;
     verificacoes: ExecucaoQualidade[];
@@ -97,6 +99,7 @@ async function persistirFotografia(
 }
 
 export {
+    VERSAO_SCHEMA_FOTOGRAFIA,
     criarFotografiaColeta,
     persistirFotografia,
     prepararDiretoriosFotografia,

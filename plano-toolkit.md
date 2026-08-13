@@ -342,7 +342,7 @@ frontend e para os caminhos OpenAPI.
   `qualidade/coleta-adaptadores-sgc.ts` concentra os perfis e adaptadores Gradle/npm/Playwright específicos do SGC,
   `qualidade/coleta-executor.ts` concentra a execução de subprocessos, `qualidade/coleta-leitores.ts` concentra a leitura
   de JSON/JUnit e a validação de hotspots, `qualidade/coleta-fotografia.ts` concentra o contrato, a construção e a
-  persistência da fotografia, `qualidade/coleta-contexto.ts` concentra a fábrica de contexto SGC padrão, e a função de
+  persistência e a versão do schema da fotografia, `qualidade/coleta-contexto.ts` concentra a fábrica de contexto SGC padrão, e a função de
   coleta aceita catálogos externos e uma fábrica de contexto externa por composição, sem mutar os defaults globais. A
   coleta Git padrão foi isolada em `qualidade/coleta-metadados.ts` e também pode ser substituída; preparação e persistência
   de fotografia também são injetáveis na opção de coleta. A montagem do comando Playwright continua sendo uma função pura
@@ -498,6 +498,8 @@ Na rodada seguinte, a coleta Git foi extraída para `coleta-metadados.ts` e pass
 o formato SGC continua preservado por default, enquanto consumidores externos podem fornecer seus próprios metadados.
 Na rodada seguinte, a preparação e a persistência da fotografia passaram a ser substituíveis em `principal`; uma
 regressão externa confirmou gravação em relatório próprio sem criar o diretório padrão `.qualidade`.
+Na rodada seguinte, a versão `1.0.0` do schema da fotografia foi centralizada em `coleta-fotografia.ts` e passou a
+restringir o contrato TypeScript do coletor.
 
 ### 3.3 Tamanho e composição atual
 
@@ -547,6 +549,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Contexto SGC era obrigatório e implícito | `qualidade/coleta-contexto.ts` concentra a fábrica padrão, enquanto `principal` aceita `criarContexto`; consumidores externos podem escolher seus diretórios de artefatos sem alterar os defaults SGC. |
 | Resolvido nesta rodada | Coleta Git era obrigatória e embutida no agregador | `qualidade/coleta-metadados.ts` concentra o default Git, enquanto `principal` aceita `coletarMetadados`; consumidores externos podem fornecer ou omitir sua própria origem de metadados. |
 | Resolvido nesta rodada | Persistência da fotografia era fixa no toolkit | `principal` agora aceita `prepararDiretoriosFotografia` e `persistirFotografia`; o default SGC continua preservando os dois destinos, enquanto um consumidor externo pode escolher outro formato ou armazenamento. |
+| Resolvido nesta rodada | Versão do schema da fotografia estava no agregador | `coleta-fotografia.ts` agora é a única fonte de `VERSAO_SCHEMA_FOTOGRAFIA` (`1.0.0`), usada pelo tipo e pela construção; os demais formatos ainda permanecem em inventário separado. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
@@ -701,8 +704,10 @@ do perfil.
    de projeto, os 3 de configuração, os 2 de integração e os 4 de qualidade já tenham sido extraídos para arquivos
    próprios. Dividir os cenários restantes por domínio continua recomendado para localizar contratos, reduzir o custo de
    execução focada e permitir fixtures mais independentes.
-10. **Schema de resultados**: fotografias, auditorias, cobertura, diagnósticos e relatórios usam objetos sem schema
-   versionado. Formalizar tipos e versões de saída antes de extrair o pacote externo.
+10. **[parcial nesta rodada] Schema de resultados**: a fotografia de qualidade agora tem `VERSAO_SCHEMA_FOTOGRAFIA`
+   centralizada (`1.0.0`) e contrato TypeScript restrito; auditorias, cobertura, diagnósticos e relatórios ainda usam
+   objetos com versionamento incompleto. Formalizar tipos, versões e validação de entrada/saída dos demais formatos antes
+   de declarar o pacote externo estável.
 11. **Opções heterogêneas, mas sem aliases ingleses próprios ativos**: a implementação usa `--entrada`, `--saida`,
    `--diretorio`, `--arquivo`, `--base` e opções de domínio em português; a busca não encontrou `--input`, `--output`,
    `--dir` ou `--directory` como contratos do toolkit. Ainda falta um contrato comum para parsing, mensagens de ajuda,

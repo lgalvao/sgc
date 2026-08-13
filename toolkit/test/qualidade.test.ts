@@ -133,6 +133,7 @@ describe("Qualidade do toolkit", () => {
         });
 
         expect(baseRecebida).toBe(diretorioBase);
+        expect(fotografia.versaoSchema).toBe("1.0.0");
         expect(fotografia.metadados.git).toEqual({origem: "externa"});
         expect(fotografia.verificacoes).toHaveLength(1);
         expect(await fs.pathExists(caminhoFotografiaPersonalizado)).toBe(true);

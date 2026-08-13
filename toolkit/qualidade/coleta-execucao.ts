@@ -9,6 +9,7 @@ import {criarAdaptadoresSgc, PERFIS_SGC} from "./coleta-adaptadores-sgc.js";
 import {criarContextoColeta, type ContextoColeta} from "./coleta-contexto.js";
 import {executarComando, executarComandoSgc} from "./coleta-executor.js";
 import {
+    VERSAO_SCHEMA_FOTOGRAFIA,
     criarFotografiaColeta,
     persistirFotografia,
     prepararDiretoriosFotografia,
@@ -16,8 +17,6 @@ import {
 } from "./coleta-fotografia.js";
 import {consolidarJUnit, parseJsonSeguro} from "./coleta-leitores.js";
 import {coletarMetadadosGit} from "./coleta-metadados.js";
-
-const VERSAO_SCHEMA = "1.0.0" as const;
 
 type CategoriaExecucao = "teste" | "cobertura" | "qualidade";
 type StatusExecucao = "nao_executado" | "sucesso" | "falha";
@@ -210,7 +209,7 @@ async function principal(
     }
 
     const fotografia = criarFotografiaColeta({
-        versaoSchema: VERSAO_SCHEMA,
+        versaoSchema: VERSAO_SCHEMA_FOTOGRAFIA,
         perfilExecucao: perfilInformado,
         inicio,
         verificacoes,
