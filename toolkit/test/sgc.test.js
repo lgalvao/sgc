@@ -30,8 +30,8 @@ const CAMINHOS_COMANDOS_TESTES_BACKEND = [
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.js");
 const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
-    "cobertura-ramificacoes.js",
-    "cobertura-auditoria.js"
+    "cobertura-ramificacoes.ts",
+    "cobertura-auditoria.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
     "arquitetura-auditar.js",

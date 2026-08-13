@@ -230,6 +230,8 @@ frontend e para os caminhos OpenAPI.
   o catálogo de perfis e o executor de comandos podem ser fornecidos por projeto externo ou teste.
 - `projeto/dependencias-auditar.ts` foi convertido para TypeScript; os escopos de auditoria, comandos e argumentos
   agora podem ser definidos por projeto, enquanto raiz, frontend e toolkit continuam no catálogo padrão do SGC.
+- `backend/cobertura-ramificacoes.ts` e `backend/cobertura-auditoria.ts` foram convertidos para TypeScript com
+  resultados, hotspots, métricas e geração de relatório tipados; a leitura JaCoCo continua delegada ao domínio comum.
 - `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
   atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
 - `integracao/contratos-exportar-openapi.ts`, `integracao/contratos-diff.ts` e
@@ -503,7 +505,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 
 1. **[concluído nesta rodada]** Migrar `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts`, mantendo os
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
-2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `requisitos/cdus-mensagens-lib.ts`,
+2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `backend/cobertura-ramificacoes.ts`,
+   `backend/cobertura-auditoria.ts`, `requisitos/cdus-mensagens-lib.ts`,
    `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts`,
    `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts`,
    `frontend/arquitetura-lib.ts`, `projeto/diagnostico.ts`, `projeto/limpar.ts`, `projeto/preparar.ts`,

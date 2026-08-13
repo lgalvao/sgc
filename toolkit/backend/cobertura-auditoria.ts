@@ -5,13 +5,31 @@ import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
-import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
+import {extrairCoberturaJacoco, type ClasseCobertura, type ResultadoCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 const CAMINHO_PADRAO_OUTPUT = "backend-coverage-auditoria.md";
 
-function calcularScoreImpacto(classe) {
+interface HotspotRelatorio {
+    nome: string;
+    complexidade: number;
+    linhasPerdidas: number;
+    linhasPerdidasLista: number[];
+    branchesPerdidos: number;
+    branchesPerdidosLista: string[];
+    scoreImpacto: number;
+    coberturaLinhas: number;
+}
+
+interface ResultadoAuditoriaCobertura {
+    status: "ok";
+    timestamp: string;
+    totais: ResultadoCoberturaJacoco;
+    hotspots: HotspotRelatorio[];
+}
+
+function calcularScoreImpacto(classe: ClasseCobertura): number {
     // Fatores de risco: 
     // Classes complexas com lacunas são os verdadeiros hotspots.
     // Se não há lacunas (100% de cobertura), o score deve ser 0.
@@ -30,13 +48,13 @@ function calcularScoreImpacto(classe) {
     return scoreLacunas * fatorComplexidade;
 }
 
-function obterPrioridade(score) {
+function obterPrioridade(score: number): string {
     if (score > 50) return pc.red("P1 (Crítico)");
     if (score > 20) return pc.yellow("P2 (Alto)");
     return pc.cyan("P3 (Médio)");
 }
 
-async function gerarRelatorioMarkdown(dados, caminho) {
+async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminho: string): Promise<string> {
     const {totais, hotspots} = dados;
     let md = `# Auditoria de Cobertura Backend - SGC\n\n`;
 
@@ -77,14 +95,14 @@ async function gerarRelatorioMarkdown(dados, caminho) {
     return caminho;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "backend cobertura auditoria",
-            scriptDireto: "backend/cobertura-auditoria.js",
+            scriptDireto: "backend/cobertura-auditoria.ts",
             descricao: "Auditoria unificada de cobertura e risco (Backend).",
             opcoes: [
                 "--json              Saída em formato JSON para integração com outras ferramentas.",
@@ -97,10 +115,10 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()));
-    const arquivo = lerOpcao(argumentos, "--arquivo", "");
-    const caminhoSaida = lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT);
-    const metaMinima = Number(lerOpcao(argumentos, "--min", "0"));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()) ?? resolverNaRaiz());
+    const arquivo = lerOpcao(argumentos, "--arquivo", "") ?? "";
+    const caminhoSaida = lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT) ?? CAMINHO_PADRAO_OUTPUT;
+    const metaMinima = Number(lerOpcao(argumentos, "--min", "0") ?? "0");
 
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE COBERTURA BACKEND");
@@ -122,7 +140,7 @@ async function principal(argumentos = process.argv.slice(2)) {
             .toSorted((a, b) => b.scoreImpacto - a.scoreImpacto)
             .slice(0, 20);
 
-        const resultado = {
+        const resultado: ResultadoAuditoriaCobertura = {
             status: "ok",
             timestamp: new Date().toISOString(),
             totais: coleta,
@@ -185,7 +203,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    principal();
+    await principal();
 }
 
 export {

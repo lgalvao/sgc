@@ -1,8 +1,8 @@
 {
   "entry": [
     "backend/arquitetura-auditar.js",
-    "backend/cobertura-auditoria.js",
-    "backend/cobertura-ramificacoes.js",
+    "backend/cobertura-auditoria.ts",
+    "backend/cobertura-ramificacoes.ts",
     "backend/coesao-auditar.js",
     "backend/contratos-auditar.js",
     "backend/java-corrigir-fqn.js",

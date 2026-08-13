@@ -5,17 +5,43 @@ import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
+import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
-async function principal(argumentos = process.argv.slice(2)) {
+interface ClasseRamificacoes {
+    nome: string;
+    branchesPerdidos: number;
+    totalBranches: number;
+    branchesPercentual: number;
+    branchesPerdidosLista: string[];
+}
+
+interface ResultadoRamificacoes {
+    status: "ok";
+    timestamp: string;
+    totais: ResultadoCoberturaJacoco["branches"];
+    classes: ClasseRamificacoes[];
+}
+
+function resumirClasse(classe: ClasseCobertura): ClasseRamificacoes {
+    return {
+        nome: classe.nome,
+        branchesPerdidos: classe.branchesPerdidos,
+        totalBranches: classe.totalBranches,
+        branchesPercentual: classe.branchesPercentual,
+        branchesPerdidosLista: classe.branchesPerdidosLista
+    };
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoSgc: "backend cobertura ramificacoes",
-            scriptDireto: "backend/cobertura-ramificacoes.js",
+            scriptDireto: "backend/cobertura-ramificacoes.ts",
             descricao: "Lista classes backend com ramificacoes perdidas no relatorio JaCoCo.",
             opcoes: [
                 "--json            Saída estruturada em JSON.",
@@ -28,9 +54,9 @@ async function principal(argumentos = process.argv.slice(2)) {
         return;
     }
 
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()));
-    const arquivo = lerOpcao(argumentos, "--arquivo", "");
-    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20"), 10);
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()) ?? resolverNaRaiz());
+    const arquivo = lerOpcao(argumentos, "--arquivo", "") ?? "";
+    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20") ?? "20", 10);
     const filtro = lerOpcao(argumentos, "--filtro", "") || null;
     const coleta = await extrairCoberturaJacoco(arquivo || undefined, {
         diretorioBase,
@@ -43,15 +69,9 @@ async function principal(argumentos = process.argv.slice(2)) {
         .filter((classe) => classe.branchesPerdidos > 0)
         .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
         .slice(0, limite)
-        .map((classe) => ({
-            nome: classe.nome,
-            branchesPerdidos: classe.branchesPerdidos,
-            totalBranches: classe.totalBranches,
-            branchesPercentual: classe.branchesPercentual,
-            branchesPerdidosLista: classe.branchesPerdidosLista
-        }));
+        .map(resumirClasse);
 
-    const resultado = {
+    const resultado: ResultadoRamificacoes = {
         status: "ok",
         timestamp: new Date().toISOString(),
         totais: coleta.branches,
