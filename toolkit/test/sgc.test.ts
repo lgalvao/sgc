@@ -7,7 +7,7 @@ import {execa, execaNode, type Options} from "execa";
 import {pathToFileURL} from "node:url";
 import {DIRETORIO_RAIZ, CAMINHO_SGC, CAMINHO_TSX, executarSgc, type ResultadoExecucao} from "./apoio.js";
 import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
-import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
+import {principal as coletarFotografiaQualidade, type AdaptadorQualidade} from "../qualidade/coleta-execucao.js";
 import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.js";
@@ -1361,49 +1361,44 @@ describe("CLI raiz do toolkit", () => {
 
     test("grava fotografia de qualidade na base externa", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-base-"));
-        const adaptadores = [...PERFIS.backend];
-        const originais = new Map(adaptadores.map((nome) => [nome, ADAPTADORES[nome]]));
-
-        try {
-            for (const nome of adaptadores) {
-                ADAPTADORES[nome] = async (contexto) => ({
-                    codigo: nome,
-                    nome,
-                    categoria: "qualidade",
-                    status: "sucesso",
-                    duracaoMs: 0,
-                    comando: "teste",
-                    diretorio: contexto.base,
-                    sumario: "",
-                    metricas: {},
-                    erros: [],
-                    artefatos: []
-                });
-            }
-
-            const fotografia = await coletarFotografiaQualidade([
-                "--perfil",
-                "backend",
-                "--base",
-                base,
-            ]);
-
-            const caminhoFotografia = path.join(
-                base,
-                "toolkit",
-                "qualidade",
-                "artefatos",
-                "mais-recente",
-                "fotografia.json"
-            );
-            expect(fotografia.resumo.statusGeral).toBe("verde");
-            expect(fotografia.verificacoes).toHaveLength(adaptadores.length);
-            expect(await fs.pathExists(caminhoFotografia)).toBe(true);
-        } finally {
-            for (const [nome, adaptador] of originais) {
-                ADAPTADORES[nome] = adaptador;
-            }
+        const adaptadores = ["testeExterno", "coberturaExterna"];
+        const perfis = {externo: adaptadores};
+        const adaptadoresFalsos: Record<string, AdaptadorQualidade> = {};
+        for (const nome of adaptadores) {
+            adaptadoresFalsos[nome] = async contexto => ({
+                codigo: nome,
+                nome,
+                categoria: "qualidade",
+                status: "sucesso",
+                duracaoMs: 0,
+                comando: "teste",
+                diretorio: contexto.base,
+                sumario: "",
+                metricas: {},
+                erros: [],
+                artefatos: []
+            });
         }
+
+        const fotografia = await coletarFotografiaQualidade([
+            "--perfil",
+            "externo",
+            "--base",
+            base,
+        ], {adaptadores: adaptadoresFalsos, perfis});
+
+        const caminhoFotografia = path.join(
+            base,
+            "toolkit",
+            "qualidade",
+            "artefatos",
+            "mais-recente",
+            "fotografia.json"
+        );
+        expect(fotografia.resumo.statusGeral).toBe("verde");
+        expect(fotografia.metadados.perfilExecucao).toBe("externo");
+        expect(fotografia.verificacoes).toHaveLength(adaptadores.length);
+        expect(await fs.pathExists(caminhoFotografia)).toBe(true);
     });
 
     test("resolve alvos padrao do Semgrep pela configuracao da base", async () => {

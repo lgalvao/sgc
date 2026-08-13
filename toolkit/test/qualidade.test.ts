@@ -5,7 +5,7 @@ import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {DIRETORIO_RAIZ, executarSgc} from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
-import {obterOpcoesPlaywright} from "../qualidade/coleta-execucao.js";
+import {obterOpcoesPlaywright, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
 
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 
@@ -73,5 +73,16 @@ describe("Qualidade do toolkit", () => {
                 "--reporter=json"
             ]
         });
+    });
+
+    test("rejeita adaptador ausente antes de criar artefatos da coleta", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-adaptador-ausente-"));
+
+        await expect(coletarFotografiaQualidade(["--perfil", "externo", "--base", diretorioBase], {
+            perfis: {externo: ["adaptadorAusente"]},
+            adaptadores: {}
+        })).rejects.toThrow("adaptadorAusente");
+
+        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
     });
 }, 30000);

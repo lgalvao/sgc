@@ -340,7 +340,8 @@ frontend e para os caminhos OpenAPI.
   subprocessos, JUnit, métricas heterogêneas e fotografia; hotspots vindos de JSON são filtrados como `unknown`, e os
   perfis Gradle/npm/Playwright continuam declarados como orquestração específica do SGC. A montagem do comando
   Playwright agora é uma função pura e resolve `diretorios.testesIntegracao`, compartilhando a mesma convenção do
-  crawler de acessibilidade.
+  crawler de acessibilidade. A função de coleta aceita catálogos de perfis e adaptadores externos por composição, sem
+  mutar os defaults globais.
 - `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
   agora compartilham a fronteira tipada do runtime.
 - `qualidade/resumo.ts` foi convertido para TypeScript; o carregador de fotografias passou a aceitar um tipo genérico e
@@ -400,10 +401,10 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 120 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 121 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,42% de statements (596/1.312),
-  33,69% de branches (307/911), 52,09% de funções (137/263) e 45,65% de linhas (573/1.255); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,72% de statements (604/1.321),
+  34,02% de branches (313/920), 52,27% de funções (138/264) e 45,92% de linhas (580/1.263); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -472,6 +473,8 @@ os 120 cenários e a baseline de cobertura permanecem verdes. Na rodada seguinte
 TypeScript; o launcher `bin/sgc.cjs` continua como fronteira npm fora do grafo de compilação.
 Na rodada seguinte, o despachador deixou de procurar `.js` em `dist`: inclusive no smoke do `sgc.js` compilado, a
 execução é delegada ao `tsx` sobre a fonte `.ts`; `dist` permanece apenas um artefato de verificação.
+Na rodada seguinte, a coleta de qualidade passou a aceitar perfis e adaptadores externos por composição, preservando os
+catálogos SGC como defaults; a suíte chega a 121 cenários regulares, com 81 no teste principal e 6 em `qualidade.test.ts`.
 
 ### 3.3 Tamanho e composição atual
 
@@ -482,7 +485,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 120 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 121 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -510,13 +513,14 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Auditorias frontend misturavam `cwd` e base auditada | Arquitetura, resíduos e cobertura frontend agora resolvem caminhos relativos contra `--base` e exibem artefatos relativos à mesma raiz. |
 | Resolvido nesta rodada | Configuração TypeScript ainda incluía JavaScript legado | Os `tsconfig` de checagem e build agora incluem somente `.ts`; o único `.cjs` restante é o launcher deliberadamente externo ao compilador. |
 | Resolvido nesta rodada | Despachador mantinha fallback para implementação compilada | `lib/execucao.ts` agora resolve sempre a fonte `.ts` via `DIRETORIO_TOOLKIT` e `tsx`; o build não cria nem exige uma segunda árvore de comandos `.js`. |
+| Resolvido nesta rodada | Coleta de qualidade dependia de catálogos globais mutáveis | `qualidade/coleta-execucao.ts` agora recebe perfis e adaptadores por opção, valida adaptadores ausentes antes de criar artefatos e mantém os catálogos SGC como defaults. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
 | Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
-| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 17 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 80 cenários e a suíte permite execução focada por domínio. |
+| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 17 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 81 cenários e a suíte permite execução focada por domínio. |
 | Resolvido nesta rodada | Nomenclatura e limpeza de relatórios divergentes | O pipeline backend agora usa `analise-testes.md/json` -> `priorizacao-testes.md`; `projeto/limpar` deriva diretórios configurados e remove apenas padrões ainda produzidos, descartando caminhos legados sem referências. |
 | Resolvido nesta rodada | Configuração misturada à validação da CLI | Os 3 cenários de carregamento, validação e execução parametrizada agora estão em `test/configuracao.test.ts`; o teste principal caiu para 83 cenários e a configuração pode ser validada sem importar o roteador. |
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
@@ -544,7 +548,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 120 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 121 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -660,7 +664,7 @@ do perfil.
 
 ### Prioridade média
 
-9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 80 cenários, embora os 17 cenários
+9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 81 cenários, embora os 17 cenários
    de projeto, os 3 de configuração, os 2 de integração e os 4 de qualidade já tenham sido extraídos para arquivos
    próprios. Dividir os cenários restantes por domínio continua recomendado para localizar contratos, reduzir o custo de
    execução focada e permitir fixtures mais independentes.
@@ -799,12 +803,14 @@ Para cada comando convertido:
    - contratos OpenAPI;
    - coleta de qualidade;
    - políticas de nomenclatura, CDU, modais e arquitetura.
-3. Fazer o núcleo receber adaptadores por composição, sem `if (projeto === "sgc")` espalhado.
+3. **[parcial nesta rodada]** Fazer o núcleo receber adaptadores por composição, sem `if (projeto === "sgc")` espalhado. A
+   coleta de qualidade já aceita catálogos externos; os adaptadores de Gradle, npm, Playwright e políticas ainda precisam
+   ser separados do orquestrador SGC.
 4. **[concluído nesta rodada]** Criar `test/externo.test.ts` com um projeto fictício mínimo de Java/Vue, layout
    `servidor/src/main/java` e `cliente/src` configurado por JSON, e executar contra ele as auditorias de arquitetura
    backend/frontend, identificadores de teste e resíduos. O fixture confirma o recorte horizontal dessas famílias sem
    criar os diretórios `backend`, `frontend` ou `toolkit` do SGC; tarefas, políticas e adaptadores completos continuam
-   pendentes.
+   pendentes, embora a coleta de qualidade já tenha uma fronteira de composição testada.
 5. Documentar claramente quais comandos são `núcleo`, `perfil-sgc` ou `opcionais`.
 6. Mover políticas do SGC para um diretório de perfil explícito somente quando o motor correspondente estiver estável;
    não reorganizar todos os arquivos antecipadamente.

@@ -28,6 +28,14 @@ type NomeAdaptador =
     | "identificadoresTesteFrontend";
 type CategoriaExecucao = "teste" | "cobertura" | "qualidade";
 type StatusExecucao = "nao_executado" | "sucesso" | "falha";
+type AdaptadorQualidade = (contexto: ContextoColeta) => Promise<ExecucaoQualidade>;
+type CatalogoAdaptadores = Readonly<Record<string, AdaptadorQualidade>>;
+type CatalogoPerfisColeta = Readonly<Record<string, readonly string[]>>;
+
+interface OpcoesColeta {
+    adaptadores?: CatalogoAdaptadores;
+    perfis?: CatalogoPerfisColeta;
+}
 
 interface ContextoColeta {
     base: string;
@@ -111,7 +119,7 @@ interface FotografiaColeta {
     versaoSchema: string;
     metadados: {
         geradoEm: string;
-        perfilExecucao: PerfilQualidade;
+        perfilExecucao: string;
         duracaoTotalMs: number;
         git: Record<string, string>;
     };
@@ -131,12 +139,12 @@ interface FotografiaColeta {
     }>;
 }
 
-const PERFIS: Record<PerfilQualidade, NomeAdaptador[]> = {
+const PERFIS = {
     rapido: ["testesBackendUnitarios", "coberturaBackend", "coberturaFrontend", "lintFrontend", "tiposFrontend", "residuosFrontend", "arquiteturaFrontend", "identificadoresTesteFrontend"],
     completo: ["testesBackendUnitarios", "testesBackendIntegracao", "coberturaBackend", "coberturaFrontend", "lintFrontend", "tiposFrontend", "residuosFrontend", "arquiteturaFrontend", "testesIntegracaoPlaywright", "identificadoresTesteFrontend"],
     backend: ["testesBackendUnitarios", "testesBackendIntegracao", "coberturaBackend"],
     frontend: ["coberturaFrontend", "lintFrontend", "tiposFrontend", "residuosFrontend", "arquiteturaFrontend", "identificadoresTesteFrontend"]
-};
+} as const satisfies Record<PerfilQualidade, readonly NomeAdaptador[]>;
 
 function criarContextoColeta(base: string = DIRETORIO_RAIZ): ContextoColeta {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
@@ -274,7 +282,7 @@ function extrairHotspotsQualidade(metricas: unknown): HotspotQualidade[] {
     return Array.isArray(hotspots) ? hotspots.filter(ehHotspotQualidade) : [];
 }
 
-const ADAPTADORES: Record<NomeAdaptador, (contexto: ContextoColeta) => Promise<ExecucaoQualidade>> = {
+const ADAPTADORES: CatalogoAdaptadores = {
     async testesBackendUnitarios(contexto: ContextoColeta): Promise<ExecucaoQualidade> {
         const execucao = criarExecucao("backend-unitario", "Backend unitario", "teste", "./gradlew :backend:unitTest", "backend");
         const saida = await executarComando({
@@ -439,7 +447,10 @@ async function coletarGit(base: string): Promise<Record<string, string>> {
     return {branch, commit};
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<FotografiaColeta> {
+async function principal(
+    argumentos: string[] = process.argv.slice(2),
+    opcoes: OpcoesColeta = {}
+): Promise<FotografiaColeta> {
     const indicePerfil = argumentos.indexOf("--perfil");
     const perfilPorOpcao = indicePerfil >= 0 ? argumentos[indicePerfil + 1] : null;
     const perfilPorAtribuicao = argumentos.find(argumento => argumento.startsWith("--perfil="))?.split("=")[1] ?? null;
@@ -448,10 +459,16 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const contexto = criarContextoColeta(base);
     const inicio = Date.now();
     const timestamp = formatarTimestampArquivo();
-    if (!(perfilInformado in PERFIS)) {
+    const perfis: CatalogoPerfisColeta = opcoes.perfis ?? PERFIS;
+    const adaptadores = opcoes.adaptadores ?? ADAPTADORES;
+    const adaptadoresDoPerfil = perfis[perfilInformado];
+    if (!adaptadoresDoPerfil) {
         throw new Error(`Perfil de qualidade invalido: ${perfilInformado}`);
     }
-    const perfil = perfilInformado as PerfilQualidade;
+    const adaptadoresAusentes = adaptadoresDoPerfil.filter(nomeAdaptador => !adaptadores[nomeAdaptador]);
+    if (adaptadoresAusentes.length > 0) {
+        throw new Error(`Adaptador(es) de qualidade ausente(s) para o perfil ${perfilInformado}: ${adaptadoresAusentes.join(", ")}`);
+    }
 
     const diretorioExecucao = path.join(contexto.diretorioExecucoes, timestamp);
 
@@ -459,9 +476,14 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     await fs.mkdir(contexto.diretorioMaisRecente, {recursive: true});
 
     const verificacoes: ExecucaoQualidade[] = [];
-    for (const adaptador of PERFIS[perfil]) {
-        escreverLinha(`Executando ${adaptador}...`);
-        verificacoes.push(await ADAPTADORES[adaptador](contexto));
+    for (const nomeAdaptador of adaptadoresDoPerfil) {
+        const adaptador = adaptadores[nomeAdaptador];
+        if (!adaptador) {
+            throw new Error(`Adaptador de qualidade ausente para o perfil ${perfilInformado}: ${nomeAdaptador}`);
+        }
+
+        escreverLinha(`Executando ${nomeAdaptador}...`);
+        verificacoes.push(await adaptador(contexto));
     }
 
     const hotspotsResiduos = verificacoes
@@ -477,7 +499,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         versaoSchema: VERSAO_SCHEMA,
         metadados: {
             geradoEm: new Date().toISOString(),
-            perfilExecucao: perfil,
+            perfilExecucao: perfilInformado,
             duracaoTotalMs: Date.now() - inicio,
             git: await coletarGit(contexto.base).catch(() => ({}))
         },
@@ -513,5 +535,12 @@ export {
     ADAPTADORES,
     PERFIS,
     obterOpcoesPlaywright,
-    principal
+    principal,
+    type AdaptadorQualidade,
+    type CatalogoAdaptadores,
+    type CatalogoPerfisColeta,
+    type ContextoColeta,
+    type ExecucaoQualidade,
+    type FotografiaColeta,
+    type OpcoesColeta
 };
