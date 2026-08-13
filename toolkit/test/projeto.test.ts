@@ -1,10 +1,9 @@
 import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
-import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
-import {executarSgc} from "./apoio.js";
+import {executarSgc, escreverArquivo, escreverJson, lerArquivo, lerJson, existe, criarDiretorio} from "./apoio.js";
 import {calcularTotais, construirArvore, ehArquivoTeste, listarArquivosGit, lerOpcoes} from "../projeto/arvore-linhas.js";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
 import {executarDiagnostico, obterRecursosPadrao} from "../projeto/diagnostico.js";
@@ -36,29 +35,29 @@ describe("Comandos de projeto do toolkit", () => {
 
     test("simula e aplica sincronizacao de versao em um diretorio informado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-sincronizar-"));
-        await fs.outputFile(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\nother=value\n");
-        await fs.outputJSON(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
+        await escreverArquivo(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\nother=value\n");
+        await escreverJson(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
 
         const simulacao = sincronizarVersao("2.3.4", diretorioBase);
 
         expect(simulacao.gravado).toBe(false);
         expect(simulacao.arquivosAtualizados).toEqual([]);
         expect(simulacao.arquivosPendentes).toEqual(["gradle.properties", "frontend/package.json"]);
-        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=1.0.0");
-        expect((await fs.readJSON(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("1.0.0");
+        expect(await lerArquivo(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=1.0.0");
+        expect((await lerJson<{version: string}>(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("1.0.0");
 
         const resultado = sincronizarVersao("2.3.4", diretorioBase, true);
 
         expect(resultado.gravado).toBe(true);
         expect(resultado.arquivosAtualizados).toEqual(["gradle.properties", "frontend/package.json"]);
-        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
-        expect((await fs.readJSON(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("2.3.4");
+        expect(await lerArquivo(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
+        expect((await lerJson<{version: string}>(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("2.3.4");
     });
 
     test("aplica sincronizacao de versao pela CLI somente com gravar", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-sincronizar-cli-"));
-        await fs.outputFile(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
-        await fs.outputJSON(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
+        await escreverArquivo(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
+        await escreverJson(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
 
         const simulacao = await executarSgc([
             "projeto",
@@ -70,7 +69,7 @@ describe("Comandos de projeto do toolkit", () => {
 
         expect(simulacao.exitCode).toBe(0);
         expect(simulacao.stdout).toContain("[simulação]");
-        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=1.0.0");
+        expect(await lerArquivo(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=1.0.0");
 
         const aplicacao = await executarSgc([
             "projeto",
@@ -83,28 +82,28 @@ describe("Comandos de projeto do toolkit", () => {
 
         expect(aplicacao.exitCode).toBe(0);
         expect(aplicacao.stdout).toContain("[v]");
-        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
+        expect(await lerArquivo(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
     });
 
     test("sincroniza versao no frontend configurado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-frontend-configurado-"));
-        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {frontend: "cliente"}
         });
-        await fs.outputFile(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
-        await fs.outputJSON(path.join(diretorioBase, "cliente", "package.json"), {name: "cliente", version: "1.0.0"});
+        await escreverArquivo(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
+        await escreverJson(path.join(diretorioBase, "cliente", "package.json"), {name: "cliente", version: "1.0.0"});
 
         const resultado = sincronizarVersao("2.4.0", diretorioBase, true);
 
         expect(resultado.arquivosAtualizados).toEqual(["gradle.properties", "cliente/package.json"]);
-        expect((await fs.readJSON(path.join(diretorioBase, "cliente", "package.json"))).version).toBe("2.4.0");
+        expect((await lerJson<{version: string}>(path.join(diretorioBase, "cliente", "package.json"))).version).toBe("2.4.0");
     });
 
     test("calcula arvore de linhas usando o diretorio base informado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-arvore-linhas-"));
-        await fs.outputFile(path.join(diretorioBase, "src", "Principal.java"), "linha 1\nlinha 2\n");
-        await fs.outputFile(path.join(diretorioBase, "README.md"), "linha 1\n");
+        await escreverArquivo(path.join(diretorioBase, "src", "Principal.java"), "linha 1\nlinha 2\n");
+        await escreverArquivo(path.join(diretorioBase, "README.md"), "linha 1\n");
 
         const arvore = construirArvore(["src/Principal.java", "README.md"], diretorioBase);
         calcularTotais(arvore);
@@ -117,7 +116,7 @@ describe("Comandos de projeto do toolkit", () => {
     test("lista arquivos Git a partir do diretorio base informado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-arvore-git-"));
         await execa("git", ["init", "--quiet"], {cwd: diretorioBase});
-        await fs.outputFile(path.join(diretorioBase, "arquivo.txt"), "conteúdo\n");
+        await escreverArquivo(path.join(diretorioBase, "arquivo.txt"), "conteúdo\n");
         await execa("git", ["add", "arquivo.txt"], {cwd: diretorioBase});
 
         expect(listarArquivosGit(diretorioBase)).toEqual(["arquivo.txt"]);
@@ -154,7 +153,7 @@ describe("Comandos de projeto do toolkit", () => {
 
     test("diagnostico aceita recursos registrados por projeto externo", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-configurado-"));
-        await fs.outputFile(path.join(diretorioBase, "package.json"), "{}\n");
+        await escreverArquivo(path.join(diretorioBase, "package.json"), "{}\n");
 
         const resultado = await executarDiagnostico({
             base: diretorioBase,
@@ -176,7 +175,7 @@ describe("Comandos de projeto do toolkit", () => {
 
     test("diagnostico deriva recursos estruturais dos diretorios configurados", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-diagnostico-diretorios-"));
-        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backend: "servidor",
@@ -200,7 +199,7 @@ describe("Comandos de projeto do toolkit", () => {
         });
         expect(diagnostico.verificacoes.some(verificacao => verificacao.nome === "toolkit/package.json")).toBe(false);
 
-        await fs.outputFile(path.join(diretorioBase, "toolkit", "sgc.ts"), "");
+        await escreverArquivo(path.join(diretorioBase, "toolkit", "sgc.ts"), "");
         const caminhosSgc = obterRecursosPadrao(diretorioBase).flatMap(recurso => "caminho" in recurso ? [recurso.caminho] : []);
         expect(caminhosSgc).toContain("toolkit/package.json");
     });
@@ -208,7 +207,7 @@ describe("Comandos de projeto do toolkit", () => {
     test("audita cobertura JaCoCo a partir de arquivo e base externos", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-backend-"));
         const caminhoXml = path.join(diretorioBase, "jacoco.xml");
-        await fs.outputFile(caminhoXml, [
+        await escreverArquivo(caminhoXml, [
             "<report name=\"exemplo\">",
             "  <counter type=\"INSTRUCTION\" missed=\"1\" covered=\"2\"/>",
             "  <counter type=\"BRANCH\" missed=\"1\" covered=\"1\"/>",
@@ -246,30 +245,30 @@ describe("Comandos de projeto do toolkit", () => {
 
     test("simula e executa limpeza em diretório temporário", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-scripts-"));
-        await fs.ensureDir(path.join(diretorioBase, "backend", "build"));
-        await fs.ensureDir(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente"));
-        await fs.outputFile(path.join(diretorioBase, "backend-cobertura-auditoria.md"), "# teste");
-        await fs.outputFile(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "resumo.md"), "ok");
+        await criarDiretorio(path.join(diretorioBase, "backend", "build"));
+        await criarDiretorio(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente"));
+        await escreverArquivo(path.join(diretorioBase, "backend-cobertura-auditoria.md"), "# teste");
+        await escreverArquivo(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "resumo.md"), "ok");
 
         const previa = await executarSgc(["projeto", "limpar", "--json", "--base", diretorioBase]);
         expect(previa.exitCode).toBe(0);
         const jsonPrevia = JSON.parse(previa.stdout);
         expect(jsonPrevia.modo).toBe("simular");
         expect(jsonPrevia.itens).toContain("backend/build");
-        expect(await fs.pathExists(path.join(diretorioBase, "backend", "build"))).toBe(true);
+        expect(await existe(path.join(diretorioBase, "backend", "build"))).toBe(true);
 
         const execucao = await executarSgc(["projeto", "limpar", "--json", "--confirmar", "--base", diretorioBase]);
         expect(execucao.exitCode).toBe(0);
         const jsonExecucao = JSON.parse(execucao.stdout);
         expect(jsonExecucao.modo).toBe("executar");
-        expect(await fs.pathExists(path.join(diretorioBase, "backend", "build"))).toBe(false);
-        expect(await fs.pathExists(path.join(diretorioBase, "backend-cobertura-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(diretorioBase, "backend", "build"))).toBe(false);
+        expect(await existe(path.join(diretorioBase, "backend-cobertura-auditoria.md"))).toBe(false);
     });
 
     test("aceita política de padrões de limpeza de projeto externo", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-limpeza-politica-"));
-        await fs.outputFile(path.join(diretorioBase, "artefatos-projeto", "saida.txt"), "temporario");
-        await fs.outputFile(path.join(diretorioBase, "nao-listado.txt"), "preservar");
+        await escreverArquivo(path.join(diretorioBase, "artefatos-projeto", "saida.txt"), "temporario");
+        await escreverArquivo(path.join(diretorioBase, "nao-listado.txt"), "preservar");
 
         const resultado = await executarLimpeza({
             base: diretorioBase,
@@ -282,13 +281,13 @@ describe("Comandos de projeto do toolkit", () => {
             total: 1,
             itens: ["artefatos-projeto"]
         });
-        expect(await fs.pathExists(path.join(diretorioBase, "artefatos-projeto"))).toBe(true);
-        expect(await fs.pathExists(path.join(diretorioBase, "nao-listado.txt"))).toBe(true);
+        expect(await existe(path.join(diretorioBase, "artefatos-projeto"))).toBe(true);
+        expect(await existe(path.join(diretorioBase, "nao-listado.txt"))).toBe(true);
     });
 
     test("deriva padrões de limpeza dos diretórios configurados e remove nomes legados", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-limpeza-configurada-"));
-        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backend: "servidor",

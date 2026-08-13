@@ -1,13 +1,12 @@
 import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
-import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {pathToFileURL} from "node:url";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
-import {DIRETORIO_RAIZ, executarSgc} from "./apoio.js";
+import {DIRETORIO_RAIZ, executarSgc, escreverJson, lerArquivo, existe} from "./apoio.js";
 
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.ts",
@@ -38,7 +37,7 @@ describe("Integrações de contratos do toolkit", () => {
 
     test("resolve artefatos OpenAPI a partir da base externa", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-openapi-base-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 contratosOpenapi: "artefatos/contratos"
@@ -69,9 +68,9 @@ describe("Integrações de contratos do toolkit", () => {
             saida: caminhos.caminhoAtual,
             paths: 1
         });
-        expect(await fs.pathExists(caminhos.caminhoAtual)).toBe(true);
+        expect(await existe(caminhos.caminhoAtual)).toBe(true);
 
-        await fs.outputJSON(caminhos.caminhoReferencia, {
+        await escreverJson(caminhos.caminhoReferencia, {
             openapi: "3.1.0",
             info: {title: "Projeto externo", version: "0.9.0"},
             paths: {}
@@ -93,7 +92,7 @@ describe("Integrações de contratos do toolkit", () => {
             atual: caminhos.caminhoAtual,
             houveMudancas: true
         });
-        expect(await fs.pathExists(caminhos.caminhoRelatorio)).toBe(false);
+        expect(await existe(caminhos.caminhoRelatorio)).toBe(false);
 
         const diferencaGravada = await executarSgc([
             "integracao",
@@ -112,7 +111,7 @@ describe("Integrações de contratos do toolkit", () => {
             atual: caminhos.caminhoAtual,
             houveMudancas: true
         });
-        expect(await fs.pathExists(caminhos.caminhoRelatorio)).toBe(true);
+        expect(await existe(caminhos.caminhoRelatorio)).toBe(true);
 
         const fixacao = await executarSgc([
             "integracao",
@@ -129,6 +128,6 @@ describe("Integrações de contratos do toolkit", () => {
             origem: caminhos.caminhoAtual,
             destino: caminhos.caminhoReferencia
         });
-        expect(await fs.readFile(caminhos.caminhoReferencia, "utf8")).toBe(await fs.readFile(caminhos.caminhoAtual, "utf8"));
+        expect(await lerArquivo(caminhos.caminhoReferencia, "utf8")).toBe(await lerArquivo(caminhos.caminhoAtual, "utf8"));
     });
 }, 30000);

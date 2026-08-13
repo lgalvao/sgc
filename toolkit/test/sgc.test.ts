@@ -1,11 +1,23 @@
 import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
-import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {execa, execaNode, type Options} from "execa";
 import {pathToFileURL} from "node:url";
-import {DIRETORIO_RAIZ, CAMINHO_SGC, CAMINHO_TSX, executarSgc, type ResultadoExecucao} from "./apoio.js";
+import {
+    DIRETORIO_RAIZ,
+    CAMINHO_SGC,
+    CAMINHO_TSX,
+    executarSgc,
+    escreverArquivo,
+    escreverJson,
+    lerArquivo,
+    lerJson,
+    existe,
+    copiar,
+    alterarPermissoes,
+    type ResultadoExecucao
+} from "./apoio.js";
 import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {principal as coletarFotografiaQualidade, type AdaptadorQualidade} from "../qualidade/coleta-execucao.js";
 import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
@@ -78,6 +90,12 @@ const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", 
 
 type ObjetoJson = Record<string, unknown>;
 
+interface RelatorioAnaliseTestesJson {
+    backend_dir: string;
+    estatisticas: Record<string, number>;
+    categorias: Record<string, {tested: ObjetoJson[]; untested: ObjetoJson[]}>;
+}
+
 interface PontoArquiteturalJson {
     arquivo: string;
     sinaisAtivos: string[];
@@ -145,7 +163,7 @@ describe("CLI raiz do toolkit", () => {
 
             expect(comando.description()).toBe(definicao.descricao);
             const arquivoExiste = "arquivo" in definicao
-                ? await fs.pathExists(path.join(DIRETORIO_RAIZ, "toolkit", definicao.arquivo))
+                ? await existe(path.join(DIRETORIO_RAIZ, "toolkit", definicao.arquivo))
                 : true;
             expect(arquivoExiste).toBe(true);
         }
@@ -192,7 +210,7 @@ describe("CLI raiz do toolkit", () => {
         expect(compilacao.exitCode).toBe(0);
 
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cli-compilada-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "Exemplo.ts"),
             "export function exemplo(valor: unknown) { return valor; }\n"
         );
@@ -331,7 +349,7 @@ describe("CLI raiz do toolkit", () => {
             "    com.externo.Alvo alvo;",
             "}"
         ].join("\n");
-        await fs.outputFile(caminhoJava, conteudoOriginal);
+        await escreverArquivo(caminhoJava, conteudoOriginal);
 
         const resultado = await executarSgc([
             "backend",
@@ -343,7 +361,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("[simulação] Seria atualizado");
-        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoOriginal);
+        expect(await lerArquivo(caminhoJava, "utf8")).toBe(conteudoOriginal);
     });
 
     test("corrige FQNs no modo de escrita sem duplicar linhas e permanece idempotente", async () => {
@@ -364,7 +382,7 @@ describe("CLI raiz do toolkit", () => {
             "    Alvo alvo;",
             "}"
         ].join("\n");
-        await fs.outputFile(caminhoJava, conteudoOriginal);
+        await escreverArquivo(caminhoJava, conteudoOriginal);
 
         const primeiraExecucao = await executarSgc([
             "backend",
@@ -376,7 +394,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(primeiraExecucao.exitCode).toBe(0);
         expect(primeiraExecucao.stdout).toContain("[simulação] Seria atualizado");
-        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoOriginal);
+        expect(await lerArquivo(caminhoJava, "utf8")).toBe(conteudoOriginal);
 
         const segundaExecucao = await executarSgc([
             "backend",
@@ -389,7 +407,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(segundaExecucao.exitCode).toBe(0);
         expect(segundaExecucao.stdout).toContain("Atualizado");
-        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
+        expect(await lerArquivo(caminhoJava, "utf8")).toBe(conteudoEsperado);
 
         const terceiraExecucao = await executarSgc([
             "backend",
@@ -402,12 +420,12 @@ describe("CLI raiz do toolkit", () => {
 
         expect(terceiraExecucao.exitCode).toBe(0);
         expect(terceiraExecucao.stdout).toContain("Total de arquivos atualizados: 0");
-        expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
+        expect(await lerArquivo(caminhoJava, "utf8")).toBe(conteudoEsperado);
     });
 
     test("corrige FQNs nos diretorios Java configurados", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-configurado-"));
-        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
@@ -424,8 +442,8 @@ describe("CLI raiz do toolkit", () => {
         ].join("\n");
         const caminhoFonte = path.join(diretorioBase, "servidor", "java", "exemplo", "Exemplo.java");
         const caminhoTeste = path.join(diretorioBase, "servidor", "testes", "exemplo", "ExemploTest.java");
-        await fs.outputFile(caminhoFonte, conteudoJava);
-        await fs.outputFile(caminhoTeste, conteudoJava.replace("Exemplo", "ExemploTest"));
+        await escreverArquivo(caminhoFonte, conteudoJava);
+        await escreverArquivo(caminhoTeste, conteudoJava.replace("Exemplo", "ExemploTest"));
 
         const resultado = await executarSgc([
             "backend",
@@ -438,8 +456,8 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Total de arquivos atualizados: 2");
-        expect(await fs.readFile(caminhoFonte, "utf8")).toContain("import com.externo.Alvo;");
-        expect(await fs.readFile(caminhoTeste, "utf8")).toContain("import com.externo.Alvo;");
+        expect(await lerArquivo(caminhoFonte, "utf8")).toContain("import com.externo.Alvo;");
+        expect(await lerArquivo(caminhoTeste, "utf8")).toContain("import com.externo.Alvo;");
     });
 
     test("pode importar auditoria de assuntos sem ler o backend", async () => {
@@ -543,7 +561,7 @@ describe("CLI raiz do toolkit", () => {
         const caminhoJacoco = path.join(base, "relatorios", "jacoco.xml");
         const caminhoV8 = path.join(base, "relatorios", "coverage-final.json");
 
-        await fs.outputFile(caminhoJacoco, [
+        await escreverArquivo(caminhoJacoco, [
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<report name=\"exemplo\">",
             "  <counter type=\"INSTRUCTION\" missed=\"1\" covered=\"1\"/>",
@@ -560,7 +578,7 @@ describe("CLI raiz do toolkit", () => {
             "</report>",
             ""
         ].join("\n"));
-        await fs.outputJSON(caminhoV8, {
+        await escreverJson(caminhoV8, {
             [path.join(base, "frontend", "src", "Exemplo.ts")]: {
                 s: {"1": 1, "2": 0},
                 f: {"1": 1},
@@ -592,8 +610,8 @@ describe("CLI raiz do toolkit", () => {
 
         expect(backendLeitura.exitCode).toBe(0);
         expect(frontendLeitura.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "backend-cobertura-auditoria.md"))).toBe(false);
-        expect(await fs.pathExists(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(base, "backend-cobertura-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(false);
 
         const backendGravacao = await executarSgc([
             "backend",
@@ -620,8 +638,8 @@ describe("CLI raiz do toolkit", () => {
 
         expect(backendGravacao.exitCode).toBe(0);
         expect(frontendGravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "backend-cobertura-auditoria.md"))).toBe(true);
-        expect(await fs.pathExists(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(true);
+        expect(await existe(path.join(base, "backend-cobertura-auditoria.md"))).toBe(true);
+        expect(await existe(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(true);
     });
 
     test("pode importar comandos de cobertura frontend sem ler o relatorio V8", async () => {
@@ -669,7 +687,7 @@ describe("CLI raiz do toolkit", () => {
         const entrada = path.join(diretorioBase, "resultados.json");
         const saida = path.join(diretorioBase, "relatorios", "acessibilidade.md");
 
-        await fs.outputJSON(entrada, [{
+        await escreverJson(entrada, [{
             name: "Pagina inicial",
             route: "/",
             violations: [{
@@ -695,8 +713,8 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        expect(await fs.pathExists(saida)).toBe(true);
-        expect(await fs.readFile(saida, "utf8")).toContain("botao-com-nome");
+        expect(await existe(saida)).toBe(true);
+        expect(await lerArquivo(saida, "utf8")).toContain("botao-com-nome");
     });
 
     test("parametriza crawler Playwright e valida resultados de acessibilidade", async () => {
@@ -741,7 +759,7 @@ describe("CLI raiz do toolkit", () => {
     test("deriva caminhos do crawler a partir do diretório de testes de integração configurado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-a11y-crawler-configurado-"));
         const chamadas: ChamadaComando[] = [];
-        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 testesIntegracao: "testes-e2e"
@@ -777,8 +795,8 @@ describe("CLI raiz do toolkit", () => {
         const caminhoArquivo = path.join(diretorioBase, "frontend", "src", "exemplo.ts");
         const caminhoRelatorio = path.join(diretorioBase, "coverage", "coverage-final.json");
 
-        await fs.outputFile(caminhoArquivo, "export function exemplo() { return true; }\n");
-        await fs.outputJSON(caminhoRelatorio, {
+        await escreverArquivo(caminhoArquivo, "export function exemplo() { return true; }\n");
+        await escreverJson(caminhoRelatorio, {
             [caminhoArquivo]: {
                 s: {"1": 0, "2": 1},
                 f: {"1": 0},
@@ -813,12 +831,12 @@ describe("CLI raiz do toolkit", () => {
         const caminhoArquivo = path.join(diretorioBase, caminhoRelativo);
         const caminhoRelatorio = path.join(diretorioBase, "coverage", "coverage-final.json");
 
-        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {frontendCodigo: "cliente/codigo"},
         });
-        await fs.outputFile(caminhoArquivo, "export function exemplo() { return true; }\n");
-        await fs.outputJSON(caminhoRelatorio, {
+        await escreverArquivo(caminhoArquivo, "export function exemplo() { return true; }\n");
+        await escreverJson(caminhoRelatorio, {
             [caminhoRelativo]: {
                 s: {"1": 1},
                 f: {"1": 1},
@@ -846,7 +864,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("mantem coleta de simbolos read-only por padrao e grava sob demanda", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-base-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
             "export function carregarExemplo(codigo: string) { return codigo; }\n"
         );
@@ -873,7 +891,7 @@ describe("CLI raiz do toolkit", () => {
             "mais-recente",
             "simbolos.json"
         );
-        expect(await fs.pathExists(caminhoSimbolos)).toBe(false);
+        expect(await existe(caminhoSimbolos)).toBe(false);
 
         const gravacao = await executarSgc([
             "codigo",
@@ -886,12 +904,12 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(caminhoSimbolos)).toBe(true);
+        expect(await existe(caminhoSimbolos)).toBe(true);
     });
 
     test("mantem auditoria de nomenclatura read-only e propaga gravacao ao inventario", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-nomenclatura-read-only-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
             "export function carregarExemplo(codigo: string) { return codigo; }\n"
         );
@@ -907,7 +925,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(JSON.parse(resultado.stdout).base).toBe(diretorioBase);
-        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+        expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
 
         const gravacao = await executarSgc([
             "codigo",
@@ -920,7 +938,7 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(
+        expect(await existe(path.join(
             diretorioBase,
             "toolkit",
             "qualidade",
@@ -933,7 +951,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("mantem auditoria de idioma read-only e grava sob demanda", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-idioma-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "frontend", "src", "exemplo.ts"),
             "export function getExemplo(id: string) { return id; }\n"
         );
@@ -949,7 +967,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         expect(JSON.parse(resultado.stdout).indicadores.membrosIngles).toBeGreaterThan(0);
-        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+        expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
 
         const gravacao = await executarSgc([
             "codigo",
@@ -962,7 +980,7 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(
+        expect(await existe(path.join(
             diretorioBase,
             "toolkit",
             "qualidade",
@@ -997,7 +1015,7 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-assuntos-auditar-"));
         const dir = path.join(base, "backend", "src", "main", "java", "sgc");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dir, "alerta", "AssuntosNotificacao.java"),
             [
                 "package sgc.alerta;",
@@ -1009,7 +1027,7 @@ describe("CLI raiz do toolkit", () => {
             ].join("\n")
         );
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dir, "diagnostico", "ServicoInvalido.java"),
             [
                 "package sgc.diagnostico;",
@@ -1040,11 +1058,11 @@ describe("CLI raiz do toolkit", () => {
     test("audita assuntos no diretorio backend configurado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-assuntos-configurado-"));
         const dir = path.join(base, "servidor", "java");
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {backendCodigo: "servidor/java"}
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dir, "diagnostico", "ServicoInvalido.java"),
             "class ServicoInvalido { void enviar() { String assunto = \"SGC: Assunto espalhado\"; } }\n"
         );
@@ -1069,7 +1087,7 @@ describe("CLI raiz do toolkit", () => {
         const frontendDir = path.join(base, "frontend", "src");
         const backendDir = path.join(base, "backend", "src", "main", "java", "sgc", "exemplo", "dto");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "Exemplo.ts"),
             [
                 "export function exemplo(valor: any) {",
@@ -1079,7 +1097,7 @@ describe("CLI raiz do toolkit", () => {
             ].join("\n")
         );
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(backendDir, "ExemploDto.java"),
             [
                 "package sgc.exemplo.dto;",
@@ -1108,25 +1126,25 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.contagens.frontend_any_producao).toBe(2);
         expect(conteudo.contagens.frontend_null_checks).toBe(1);
         expect(conteudo.contagens.frontend_fallback_or).toBe(1);
-        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "codigo-cheiros"))).toBe(false);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "codigo-cheiros"))).toBe(false);
 
         const diretorioSaida = path.join(base, "artefatos", "cheiros");
         await executarAuditoriaCheiros({base, gravar: true, diretorioSaida});
-        expect(await fs.pathExists(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
-        expect(await fs.pathExists(path.join(diretorioSaida, "resumo.md"))).toBe(true);
+        expect(await existe(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
+        expect(await existe(path.join(diretorioSaida, "resumo.md"))).toBe(true);
     });
 
     test("auditores backend usam caminhos configurados e gravam somente com acao explicita", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-codigo-backend-"));
         const codigoBackend = path.join(base, "servidor", "java");
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
                 artefatosQualidade: "artefatos"
             }
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(codigoBackend, "exemplo", "ExemploService.java"),
             [
                 "package exemplo;",
@@ -1152,7 +1170,7 @@ describe("CLI raiz do toolkit", () => {
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(false);
+        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(false);
 
         const gravacao = await executarSgc([
             "backend",
@@ -1164,20 +1182,20 @@ describe("CLI raiz do toolkit", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(true);
+        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(true);
     });
 
     test("audita service acima do limiar arquitetural sem gravar por padrao", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-backend-"));
         const codigoBackend = path.join(base, "servidor", "java");
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
                 artefatosQualidade: "artefatos"
             }
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(codigoBackend, "exemplo", "ExemploService.java"),
             [
                 "package exemplo;",
@@ -1209,7 +1227,7 @@ describe("CLI raiz do toolkit", () => {
             severidade: "alerta"
         });
         expect(conteudo.todos[0].motivos).toContain("15 métodos públicos (>=15)");
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(false);
 
         const gravacao = await executarSgc([
             "backend",
@@ -1221,20 +1239,20 @@ describe("CLI raiz do toolkit", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(true);
+        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(true);
     });
 
     test("audita vazamento de modelo em DTO de controlador sem gravar por padrao", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-contratos-backend-"));
         const codigoBackend = path.join(base, "servidor", "java");
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
                 artefatosQualidade: "artefatos"
             }
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(codigoBackend, "exemplo", "web", "UsuarioController.java"),
             [
                 "package exemplo.web;",
@@ -1244,7 +1262,7 @@ describe("CLI raiz do toolkit", () => {
                 "}"
             ].join("\n")
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(codigoBackend, "exemplo", "web", "dto", "UsuarioResponse.java"),
             [
                 "package exemplo.web.dto;",
@@ -1252,7 +1270,7 @@ describe("CLI raiz do toolkit", () => {
                 "public record UsuarioResponse(Usuario usuario) {}"
             ].join("\n")
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(codigoBackend, "exemplo", "model", "Usuario.java"),
             [
                 "package exemplo.model;",
@@ -1279,7 +1297,7 @@ describe("CLI raiz do toolkit", () => {
             campo: "usuario",
             tipoModelo: "exemplo.model.Usuario"
         });
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(false);
+        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(false);
 
         const gravacao = await executarSgc([
             "backend",
@@ -1291,7 +1309,7 @@ describe("CLI raiz do toolkit", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(true);
+        expect(await existe(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(true);
     });
 
     test("resolve politica Semgrep padrao a partir da instalacao do toolkit", async () => {
@@ -1308,8 +1326,8 @@ describe("CLI raiz do toolkit", () => {
         expect(resolverCaminhoConfigurado("regrasSemgrep", base)).toBe(caminhoEsperado);
 
         const caminhoAlternativo = path.join(base, "politicas", "regras.yml");
-        await fs.outputFile(caminhoAlternativo, "rules: []\n");
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverArquivo(caminhoAlternativo, "rules: []\n");
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {regrasSemgrep: "politicas/regras.yml"}
         });
@@ -1317,8 +1335,8 @@ describe("CLI raiz do toolkit", () => {
 
         const diretorioBinario = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-bin-"));
         const caminhoExecutavel = path.join(diretorioBinario, "semgrep");
-        await fs.outputFile(caminhoExecutavel, "#!/bin/sh\nexit 0\n");
-        await fs.chmod(caminhoExecutavel, 0o755);
+        await escreverArquivo(caminhoExecutavel, "#!/bin/sh\nexit 0\n");
+        await alterarPermissoes(caminhoExecutavel, 0o755);
         expect(obterComandoSemgrep(diretorioBinario)).toBe(caminhoExecutavel);
         expect(obterComandoSemgrep(path.join(diretorioBinario, "inexistente"))).toBe("semgrep");
     });
@@ -1327,19 +1345,19 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-politicas-opcionais-"));
         const caminhoOrcamento = path.join(base, "politicas", "orcamento.json");
         const caminhoExcecoes = path.join(base, "politicas", "excecoes.json");
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 orcamentoResiduosFrontend: "politicas/orcamento.json",
                 excecoesResiduosFrontend: "politicas/excecoes.json"
             }
         });
-        await fs.outputJSON(caminhoOrcamento, {
+        await escreverJson(caminhoOrcamento, {
             versaoSchema: "1.0.0",
             camadas: {},
             metricas: {maximosProducao: {}}
         });
-        await fs.outputJSON(caminhoExcecoes, {versaoSchema: "1.0.0", excecoes: []});
+        await escreverJson(caminhoExcecoes, {versaoSchema: "1.0.0", excecoes: []});
 
         const resultado = await executarSgc([
             "frontend", "residuos", "validar", "--json", "--base", base
@@ -1352,9 +1370,9 @@ describe("CLI raiz do toolkit", () => {
             "frontend", "residuos", "validar", "--json", "--gravar", "--base", base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
 
-        await fs.outputFile(caminhoOrcamento, "{");
+        await escreverArquivo(caminhoOrcamento, "{");
         const falha = await executarSgc([
             "frontend", "residuos", "validar", "--json", "--base", base
         ]);
@@ -1401,12 +1419,12 @@ describe("CLI raiz do toolkit", () => {
         expect(fotografia.resumo.statusGeral).toBe("verde");
         expect(fotografia.metadados.perfilExecucao).toBe("externo");
         expect(fotografia.verificacoes).toHaveLength(adaptadores.length);
-        expect(await fs.pathExists(caminhoFotografia)).toBe(true);
+        expect(await existe(caminhoFotografia)).toBe(true);
     });
 
     test("resolve alvos padrao do Semgrep pela configuracao da base", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-base-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
@@ -1431,18 +1449,18 @@ describe("CLI raiz do toolkit", () => {
 
     test("aplica filtros de cheiros aos diretorios de codigo configurados", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cheiros-base-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
                 frontendCodigo: "aplicacao/src"
             }
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "servidor", "java", "ExemploResponse.java"),
             "class ExemploResponse { @Nullable String nome; }\n"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "aplicacao", "src", "Exemplo.ts"),
             "export function exemplo(valor: any) { return valor || []; }\n"
         );
@@ -1459,7 +1477,7 @@ describe("CLI raiz do toolkit", () => {
         const frontendDir = path.join(base, "frontend", "src");
         const orcamento = path.join(base, "orcamento.json");
 
-        await fs.outputJson(orcamento, {
+        await escreverJson(orcamento, {
             versaoSchema: "1.0.0",
             camadas: {
                 service: {meta: 4, limite: 8},
@@ -1484,7 +1502,7 @@ describe("CLI raiz do toolkit", () => {
             }
         });
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "services", "exemploService.ts"),
             [
                 "export function exemploService(valor: any) {",
@@ -1495,7 +1513,7 @@ describe("CLI raiz do toolkit", () => {
                 "}",
             ].join("\n")
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "components", "ExemploCard.vue"),
             [
                 "<script setup lang=\"ts\">",
@@ -1539,12 +1557,12 @@ describe("CLI raiz do toolkit", () => {
             "artefatos/residuos"
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "artefatos", "residuos", "fotografia.json"))).toBe(true);
+        expect(await existe(path.join(base, "artefatos", "residuos", "fotografia.json"))).toBe(true);
     });
 
     test("calcula a saida padrao de residuos a partir da base externa", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-saida-base-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "exemplo.ts"),
             "export function carregarExemplo(codigo: string) { return codigo; }\n"
         );
@@ -1562,7 +1580,7 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         const fotografia = JSON.parse(resultado.stdout);
         expect(fotografia.base).toBe(base);
-        expect(await fs.pathExists(path.join(
+        expect(await existe(path.join(
             base,
             "toolkit",
             "qualidade",
@@ -1575,11 +1593,11 @@ describe("CLI raiz do toolkit", () => {
 
     test("classifica residuos usando frontendCodigo configurado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-residuos-codigo-configurado-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {frontendCodigo: "cliente/codigo"},
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "cliente", "codigo", "services", "exemploService.ts"),
             "export function carregarExemplo(codigo: string) { return codigo; }\n"
         );
@@ -1604,12 +1622,12 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-auditar-"));
         const frontendDir = path.join(base, "frontend", "src");
 
-        await fs.outputFile(path.join(frontendDir, "stores", "unidade.ts"), "export const useUnidadeStore = () => ({ invalidar: () => undefined, obterUnidade: () => undefined, recarregarUnidade: () => undefined, dadosEdicaoValidos: () => true, sincronizarUnidade: () => undefined, marcarUnidadeParaAtualizacao: () => undefined, limparContextoAtual: () => undefined, resetar: () => undefined, contextoAtual: null, erroAtual: null, carregando: false });");
-        await fs.outputFile(path.join(frontendDir, "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
-        await fs.outputFile(path.join(frontendDir, "composables", "useUnidadeTela.ts"), "export function useUnidadeTela() { return { carregar: () => undefined }; }");
-        await fs.outputFile(path.join(frontendDir, "router", "unidade.routes.ts"), "export const rotasUnidade = [];");
+        await escreverArquivo(path.join(frontendDir, "stores", "unidade.ts"), "export const useUnidadeStore = () => ({ invalidar: () => undefined, obterUnidade: () => undefined, recarregarUnidade: () => undefined, dadosEdicaoValidos: () => true, sincronizarUnidade: () => undefined, marcarUnidadeParaAtualizacao: () => undefined, limparContextoAtual: () => undefined, resetar: () => undefined, contextoAtual: null, erroAtual: null, carregando: false });");
+        await escreverArquivo(path.join(frontendDir, "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(path.join(frontendDir, "composables", "useUnidadeTela.ts"), "export function useUnidadeTela() { return { carregar: () => undefined }; }");
+        await escreverArquivo(path.join(frontendDir, "router", "unidade.routes.ts"), "export const rotasUnidade = [];");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "views", "UnidadeView.vue"),
             [
                 "<script setup lang=\"ts\">",
@@ -1631,7 +1649,7 @@ describe("CLI raiz do toolkit", () => {
                 "</script>"
             ].join("\n")
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "composables", "useCadastroUnidade.ts"),
             [
                 "interface DependenciasCadastroUnidade {",
@@ -1683,20 +1701,20 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
         expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
         expect(conteudo.hotspots.some((hotspot: PontoArquiteturalJson) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
-        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-arquitetura"))).toBe(false);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-arquitetura"))).toBe(false);
 
         const diretorioSaida = path.join("artefatos", "arquitetura");
         const gravacao = await executarSgc([
             "frontend", "arquitetura", "auditar", "--json", "--gravar", "--saida", diretorioSaida, "--base", base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, diretorioSaida, "fotografia.json"))).toBe(true);
-        expect(await fs.pathExists(path.join(base, diretorioSaida, "resumo.md"))).toBe(true);
+        expect(await existe(path.join(base, diretorioSaida, "fotografia.json"))).toBe(true);
+        expect(await existe(path.join(base, diretorioSaida, "resumo.md"))).toBe(true);
     });
 
     test("calcula a saida padrao de arquitetura a partir da base externa", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-saida-base-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "exemplo.ts"),
             "export function carregarExemplo(codigo: string) { return codigo; }\n"
         );
@@ -1714,7 +1732,7 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         const fotografia = JSON.parse(resultado.stdout);
         expect(fotografia.base).toBe(base);
-        expect(await fs.pathExists(path.join(
+        expect(await existe(path.join(
             base,
             "toolkit",
             "qualidade",
@@ -1728,15 +1746,15 @@ describe("CLI raiz do toolkit", () => {
     test("analisa arquitetura usando frontendCodigo configurado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-codigo-configurado-"));
         const frontendDir = path.join(base, "cliente", "codigo");
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {frontendCodigo: "cliente/codigo"},
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "services", "exemploService.ts"),
             "export async function buscarExemplo() { return null; }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "views", "ExemploView.vue"),
             "<script setup lang=\"ts\">import {buscarExemplo} from '@/services/exemploService'; void buscarExemplo();</script>"
         );
@@ -1759,7 +1777,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("tipos internos de store nao disparam bolsaDependenciasLarga", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-contexto-store-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "stores", "subprocesso", "tipos.ts"),
             `export type ConfiguracaoContexto<T> = {
                 tipoCodigo: string;
@@ -1784,7 +1802,7 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-hub-central-"));
         const frontendDir = path.join(base, "frontend", "src");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "stores", "perfil.ts"),
             [
                 "import {defineStore} from 'pinia';",
@@ -1820,8 +1838,8 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-gate-falha-"));
         const frontendDir = path.join(base, "frontend");
 
-        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -1830,8 +1848,8 @@ describe("CLI raiz do toolkit", () => {
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await fs.outputFile(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
-        await fs.outputFile(
+        await escreverArquivo(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(
             path.join(frontendDir, "src", "views", "UnidadeView.vue"),
             [
                 "<script setup lang=\"ts\">",
@@ -1840,7 +1858,7 @@ describe("CLI raiz do toolkit", () => {
                 "</script>",
             ].join("\n")
         );
-        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
 
         const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).not.toBe(0);
@@ -1851,8 +1869,8 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-gate-ok-"));
         const frontendDir = path.join(base, "frontend");
 
-        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -1861,8 +1879,8 @@ describe("CLI raiz do toolkit", () => {
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await fs.outputFile(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
-        await fs.outputFile(
+        await escreverArquivo(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(
             path.join(frontendDir, "src", "composables", "useUnidadeTela.ts"),
             [
                 "import {buscarUnidade} from '../services/unidadeService';",
@@ -1871,7 +1889,7 @@ describe("CLI raiz do toolkit", () => {
                 "}",
             ].join("\n")
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "src", "views", "UnidadeView.vue"),
             [
                 "<script setup lang=\"ts\">",
@@ -1881,7 +1899,7 @@ describe("CLI raiz do toolkit", () => {
                 "</script>",
             ].join("\n")
         );
-        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
 
         const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).toBe(0);
@@ -1892,28 +1910,28 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-diretorio-configurado-"));
         const frontendDir = path.join(base, "cliente");
 
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {frontend: "cliente"},
         });
-        await fs.outputJSON(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await fs.outputJSON(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {"@/*": ["./src/*"]},
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await fs.outputFile(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
-        await fs.outputFile(
+        await escreverArquivo(path.join(frontendDir, "src", "services", "unidadeService.ts"), "export async function buscarUnidade() { return null; }");
+        await escreverArquivo(
             path.join(frontendDir, "src", "composables", "useUnidadeTela.ts"),
             "import {buscarUnidade} from '../services/unidadeService'; export function useUnidadeTela() { return {carregar: () => buscarUnidade()}; }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "src", "views", "UnidadeView.vue"),
             "<script setup lang=\"ts\">import {useUnidadeTela} from '../composables/useUnidadeTela'; const tela = useUnidadeTela(); void tela.carregar();</script>"
         );
-        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
 
         const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
 
@@ -1925,8 +1943,8 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-backend-falha-"));
         const frontendDir = path.join(base, "frontend");
 
-        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -1935,7 +1953,7 @@ describe("CLI raiz do toolkit", () => {
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "src", "views", "ConsensoView.vue"),
             [
                 "<script setup lang=\"ts\">",
@@ -1947,7 +1965,7 @@ describe("CLI raiz do toolkit", () => {
                 "</script>",
             ].join("\n")
         );
-        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
 
         const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).not.toBe(0);
@@ -1959,8 +1977,8 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-acoes-backend-ok-"));
         const frontendDir = path.join(base, "frontend");
 
-        await fs.outputJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
-        await fs.outputJson(path.join(frontendDir, "tsconfig.json"), {
+        await escreverJson(path.join(frontendDir, "package.json"), {name: "frontend-fixture", private: true});
+        await escreverJson(path.join(frontendDir, "tsconfig.json"), {
             compilerOptions: {
                 baseUrl: ".",
                 paths: {
@@ -1969,7 +1987,7 @@ describe("CLI raiz do toolkit", () => {
             },
             include: ["src/**/*.ts", "src/**/*.vue"],
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "src", "views", "ConsensoView.vue"),
             [
                 "<script setup lang=\"ts\">",
@@ -1979,7 +1997,7 @@ describe("CLI raiz do toolkit", () => {
                 "</script>",
             ].join("\n")
         );
-        await fs.copy(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
+        await copiar(path.join(DIRETORIO_RAIZ, "frontend", ".dependency-cruiser.cjs"), path.join(frontendDir, ".dependency-cruiser.cjs"));
 
         const resultado = await executarSgc(["frontend", "arquitetura", "validar", "--base", base]);
         expect(resultado.exitCode).toBe(0);
@@ -1990,13 +2008,13 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-facade-"));
         const frontendDir = path.join(base, "frontend", "src");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "stores", "perfil.ts"),
             "import {defineStore} from 'pinia'; export const usePerfilStore = defineStore('perfil', () => ({ a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8, i: 9, j: 10, k: 11, l: 12 }));"
         );
 
         // Composable que só delega para uma única store (fachada) — acessa a store 12 vezes
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "composables", "usePerfil.ts"),
             [
                 "import {computed} from 'vue';",
@@ -2036,13 +2054,13 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-nao-store-"));
         const frontendDir = path.join(base, "frontend", "src");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "services", "autenticacaoService.ts"),
             "export async function login() { return null; } export async function logout() { return null; } export async function renovar() { return null; }"
         );
 
         // Módulo de funções puras em stores/ que NÃO usa defineStore (orquestração de autenticação)
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "stores", "autenticacao.ts"),
             [
                 "import * as autenticacaoService from '@/services/autenticacaoService';",
@@ -2067,14 +2085,14 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-composable-servico-"));
         const frontendDir = path.join(base, "frontend", "src");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "services", "itemService.ts"),
             "export async function buscarItens() { return []; }"
         );
 
         // Composable com superfície exportada ampla E chamada de serviço direta
         // → deve aparecer em hotspots pelo superficieAmpla, mas NÃO pelo serviceDireto
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "composables", "useItens.ts"),
             [
                 "import * as itemService from '@/services/itemService';",
@@ -2106,7 +2124,7 @@ describe("CLI raiz do toolkit", () => {
         const orcamento = path.join(base, "orcamento.json");
         const excecoes = path.join(base, "excecoes.json");
 
-        await fs.outputJson(orcamento, {
+        await escreverJson(orcamento, {
             versaoSchema: "1.0.0",
             camadas: {
                 service: {meta: 3, limite: 6},
@@ -2128,7 +2146,7 @@ describe("CLI raiz do toolkit", () => {
                 }
             }
         });
-        await fs.outputJson(excecoes, {
+        await escreverJson(excecoes, {
             versaoSchema: "1.0.0",
             excecoes: [
                 {
@@ -2141,7 +2159,7 @@ describe("CLI raiz do toolkit", () => {
                 }
             ]
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(frontendDir, "services", "exemploService.ts"),
             [
                 "export function exemploService() {",
@@ -2170,7 +2188,7 @@ describe("CLI raiz do toolkit", () => {
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.status).toBe("ok");
         expect(conteudo.violacoes).toEqual([]);
-        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos"))).toBe(false);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos"))).toBe(false);
         const gravacao = await executarSgc([
             "frontend",
             "residuos",
@@ -2185,7 +2203,7 @@ describe("CLI raiz do toolkit", () => {
             "excecoes.json"
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
+        expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-residuos", "mais-recente", "fotografia.json"))).toBe(true);
     });
 
     test("analisa testes do backend com resumo no console e sidecar JSON", async () => {
@@ -2200,10 +2218,10 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Repositories:");
         expect(resultado.stdout).toContain("Cobertura indireta:");
         expect(resultado.stdout).toContain("DTOs:");
-        expect(await fs.pathExists(markdown)).toBe(true);
-        expect(await fs.pathExists(json)).toBe(true);
+        expect(await existe(markdown)).toBe(true);
+        expect(await existe(json)).toBe(true);
 
-        const conteudoJson = await fs.readJson(json);
+        const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
         expect(conteudoJson.estatisticas.total_classes).toBeGreaterThan(0);
         expect(typeof conteudoJson.estatisticas.classes_com_cobertura_indireta).toBe("number");
         expect(typeof conteudoJson.estatisticas.classes_sem_evidencia_no_escopo).toBe("number");
@@ -2219,18 +2237,18 @@ describe("CLI raiz do toolkit", () => {
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
 
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java",
                 backendTestes: "servidor/testes"
             }
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(fonte, "ExemploService.java"),
             "package com.exemplo; public class ExemploService { public String buscar() { return \"ok\"; } }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(testes, "ExemploServiceTest.java"),
             "package com.exemplo; class ExemploServiceTest {}"
         );
@@ -2248,7 +2266,7 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = await fs.readJson(json);
+        const conteudo = await lerJson<RelatorioAnaliseTestesJson>(json);
         expect(conteudo.backend_dir).toBe(path.join(base, "servidor", "java"));
         expect(conteudo.estatisticas.classes_com_teste_dedicado).toBe(1);
     });
@@ -2260,11 +2278,11 @@ describe("CLI raiz do toolkit", () => {
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(fonte, "ExemploService.java"),
             "package com.exemplo; public class ExemploService { public String buscar() { return \"ok\"; } }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(testes, "ExemploServiceTest.java"),
             "package com.exemplo; class ExemploServiceTest {}"
         );
@@ -2284,7 +2302,7 @@ describe("CLI raiz do toolkit", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = await fs.readJson(json);
+        const conteudo = await lerJson<RelatorioAnaliseTestesJson>(json);
         expect(conteudo.backend_dir).toBe(path.join(base, "servidor", "src", "main", "java"));
         expect(conteudo.estatisticas.classes_com_teste_dedicado).toBe(1);
     });
@@ -2296,15 +2314,15 @@ describe("CLI raiz do toolkit", () => {
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dtoDir, "DtoEstrutural.java"),
             "package sgc.exemplo.dto; public record DtoEstrutural(Long codigo, String nome) {}"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dtoDir, "RequestContratual.java"),
             "package sgc.exemplo.dto; import jakarta.validation.constraints.NotBlank; public record RequestContratual(@NotBlank String nome) {}"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dtoDir, "DtoComportamental.java"),
             "package sgc.exemplo.dto; public class DtoComportamental { public static DtoComportamental of(String valor) { return new DtoComportamental(); } }"
         );
@@ -2324,16 +2342,16 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("DTOs: 0/1 testados no backlog real (2 ignorados)");
 
-        const conteudoJson = await fs.readJson(json);
+        const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
         expect(conteudoJson.estatisticas.dtos_comportamentais).toBe(1);
         expect(conteudoJson.estatisticas.dtos_estruturais).toBe(2);
         expect(conteudoJson.estatisticas.dtos_estruturais_contratuais).toBe(1);
         expect(conteudoJson.estatisticas.classes_ruido_ignorado).toBe(2);
 
         const dtoUntested = conteudoJson.categorias.DTOs.untested;
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoEstrutural").dto_ruido_ignorado).toBe(true);
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "RequestContratual").perfil_dto).toBe("estrutural_contrato");
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoComportamental").dto_ruido_ignorado).toBe(false);
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoEstrutural")!.dto_ruido_ignorado).toBe(true);
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "RequestContratual")!.perfil_dto).toBe("estrutural_contrato");
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoComportamental")!.dto_ruido_ignorado).toBe(false);
     });
 
     test("ignora models estruturais e contratuais do backlog real", async () => {
@@ -2343,15 +2361,15 @@ describe("CLI raiz do toolkit", () => {
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(modelDir, "SituacaoExemplo.java"),
             "package sgc.exemplo.model; public enum SituacaoExemplo { ATIVO }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(modelDir, "AnotacaoExemplo.java"),
             "package sgc.exemplo.model; import java.lang.annotation.*; public @interface AnotacaoExemplo { String value() default \"\"; }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(modelDir, "ProcessoExemplo.java"),
             "package sgc.exemplo.model; import java.util.*; public class ProcessoExemplo { public void sincronizar(Set<Long> codigos) { if (codigos.isEmpty()) return; codigos.stream().filter(Objects::nonNull).toList(); } }"
         );
@@ -2371,15 +2389,15 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Models: 0/1 testados no backlog real (2 ignorados)");
 
-        const conteudoJson = await fs.readJson(json);
+        const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
         expect(conteudoJson.estatisticas.models_comportamentais).toBe(1);
         expect(conteudoJson.estatisticas.models_estruturais).toBe(2);
         expect(conteudoJson.estatisticas.models_estruturais_contratuais).toBe(1);
 
         const modelUntested = conteudoJson.categorias.Models.untested;
-        expect(modelUntested.find((item: ObjetoJson) => item.classe === "SituacaoExemplo").model_ruido_ignorado).toBe(true);
-        expect(modelUntested.find((item: ObjetoJson) => item.classe === "AnotacaoExemplo").perfil_model).toBe("estrutural_contrato");
-        expect(modelUntested.find((item: ObjetoJson) => item.classe === "ProcessoExemplo").model_ruido_ignorado).toBe(false);
+        expect(modelUntested.find((item: ObjetoJson) => item.classe === "SituacaoExemplo")!.model_ruido_ignorado).toBe(true);
+        expect(modelUntested.find((item: ObjetoJson) => item.classe === "AnotacaoExemplo")!.perfil_model).toBe("estrutural_contrato");
+        expect(modelUntested.find((item: ObjetoJson) => item.classe === "ProcessoExemplo")!.model_ruido_ignorado).toBe(false);
     });
 
     test("ignora others estruturais e contratuais do backlog real e reclassifica commands como DTOs", async () => {
@@ -2390,19 +2408,19 @@ describe("CLI raiz do toolkit", () => {
         const markdown = path.join(base, "relatorio.md");
         const json = path.join(base, "relatorio.json");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(otherDir, "Mensagens.java"),
             "package sgc.exemplo; public final class Mensagens { private Mensagens() {} public static final String OI = \"oi\"; }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(otherDir, "AnotacaoSegura.java"),
             "package sgc.exemplo; public @interface AnotacaoSegura {}"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(otherDir, "LimitadorExemplo.java"),
             "package sgc.exemplo; import java.util.*; public class LimitadorExemplo { public void verificar(String valor) { if (valor.isBlank()) return; List.of(valor).stream().toList(); } }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(dtoDir, "WorkflowCommand.java"),
             "package sgc.exemplo.dto; public record WorkflowCommand(String nome) {}"
         );
@@ -2423,18 +2441,18 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Others: 0/1 testados no backlog real (2 ignorados)");
         expect(resultado.stdout).toContain("DTOs: 0/0 testados no backlog real (1 ignorados)");
 
-        const conteudoJson = await fs.readJson(json);
+        const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
         expect(conteudoJson.estatisticas.others_comportamentais).toBe(1);
         expect(conteudoJson.estatisticas.others_estruturais).toBe(2);
         expect(conteudoJson.estatisticas.others_estruturais_contratuais).toBe(1);
 
         const otherUntested = conteudoJson.categorias.Others.untested;
-        expect(otherUntested.find((item: ObjetoJson) => item.classe === "Mensagens").other_ruido_ignorado).toBe(true);
-        expect(otherUntested.find((item: ObjetoJson) => item.classe === "AnotacaoSegura").perfil_other).toBe("estrutural_contrato");
-        expect(otherUntested.find((item: ObjetoJson) => item.classe === "LimitadorExemplo").other_ruido_ignorado).toBe(false);
+        expect(otherUntested.find((item: ObjetoJson) => item.classe === "Mensagens")!.other_ruido_ignorado).toBe(true);
+        expect(otherUntested.find((item: ObjetoJson) => item.classe === "AnotacaoSegura")!.perfil_other).toBe("estrutural_contrato");
+        expect(otherUntested.find((item: ObjetoJson) => item.classe === "LimitadorExemplo")!.other_ruido_ignorado).toBe(false);
 
         const dtoUntested = conteudoJson.categorias.DTOs.untested;
-        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "WorkflowCommand").dto_ruido_ignorado).toBe(true);
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "WorkflowCommand")!.dto_ruido_ignorado).toBe(true);
     });
 
     test("classifica separadamente teste dedicado, cobertura indireta, sem evidencia e fora do escopo", async () => {
@@ -2446,22 +2464,22 @@ describe("CLI raiz do toolkit", () => {
         const json = path.join(base, "relatorio.json");
         const jacoco = path.join(base, "jacoco.xml");
 
-        await fs.outputFile(path.join(srcDir, "ClasseDireta.java"), "package sgc.exemplo; public class ClasseDireta {}");
-        await fs.outputFile(
+        await escreverArquivo(path.join(srcDir, "ClasseDireta.java"), "package sgc.exemplo; public class ClasseDireta {}");
+        await escreverArquivo(
             path.join(srcDir, "ClasseIndireta.java"),
             "package sgc.exemplo; public class ClasseIndireta { public String calcular(boolean ativo) { return ativo ? \"ok\" : \"pendente\"; } }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(srcDir, "ClasseSemEvidencia.java"),
             "package sgc.exemplo; public class ClasseSemEvidencia { public boolean validar(String valor) { return valor != null && !valor.isBlank(); } }"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(srcDir, "ClasseForaEscopo.java"),
             "package sgc.exemplo; public class ClasseForaEscopo { public int contarPositivos(java.util.List<Integer> valores) { return (int) valores.stream().filter(valor -> valor > 0).count(); } }"
         );
-        await fs.outputFile(path.join(testDir, "ClasseDiretaTest.java"), "package sgc.exemplo; class ClasseDiretaTest {}");
+        await escreverArquivo(path.join(testDir, "ClasseDiretaTest.java"), "package sgc.exemplo; class ClasseDiretaTest {}");
         // language=XML
-        await fs.outputFile(jacoco, `
+        await escreverArquivo(jacoco, `
 <report name="fake">
   <package name="sgc/exemplo">
     <sourcefile name="ClasseDireta.java">
@@ -2498,7 +2516,7 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Sem evidencia no escopo: 1");
         expect(resultado.stdout).toContain("Fora do escopo do JaCoCo: 1");
 
-        const conteudoJson = await fs.readJson(json);
+        const conteudoJson = await lerJson<RelatorioAnaliseTestesJson>(json);
         expect(conteudoJson.estatisticas.classes_com_teste_dedicado).toBe(1);
         expect(conteudoJson.estatisticas.classes_com_cobertura_indireta).toBe(1);
         expect(conteudoJson.estatisticas.classes_sem_evidencia_no_escopo).toBe(1);
@@ -2507,9 +2525,9 @@ describe("CLI raiz do toolkit", () => {
         const others = conteudoJson.categorias.Others;
         expect(others.tested).toHaveLength(1);
         expect(others.untested).toHaveLength(3);
-        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseIndireta").coberta_somente_indiretamente).toBe(true);
-        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseSemEvidencia").evidencia_qualidade).toBe("sem_evidencia_no_escopo");
-        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseForaEscopo").fora_escopo_jacoco).toBe(true);
+        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseIndireta")!.coberta_somente_indiretamente).toBe(true);
+        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseSemEvidencia")!.evidencia_qualidade).toBe("sem_evidencia_no_escopo");
+        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseForaEscopo")!.fora_escopo_jacoco).toBe(true);
     });
 
     test("prioriza testes usando sidecar JSON automaticamente quando disponivel", async () => {
@@ -2518,8 +2536,8 @@ describe("CLI raiz do toolkit", () => {
         const json = path.join(diretorioSaida, "analise-testes.json");
         const saida = path.join(diretorioSaida, "priorizacao-testes.md");
 
-        await fs.writeFile(markdown, "# Relatorio simplificado\n");
-        await fs.writeJson(json, {
+        await escreverArquivo(markdown, "# Relatorio simplificado\n");
+        await escreverJson(json, {
             categorias: {
                 Services: {
                     untested: [
@@ -2540,7 +2558,7 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Entrada utilizada: analise-testes.json");
         expect(resultado.stdout).toContain("Encontrados 1 P1, 0 P2, 1 P3");
 
-        const conteudo = await fs.readFile(saida, "utf-8");
+        const conteudo = await lerArquivo(saida, "utf-8");
         expect(conteudo).toContain("sgc/mapa/service/MapaCriticoService.java");
         expect(conteudo).toContain("sgc/mapa/model/CompetenciaRepo.java");
     });
@@ -2550,7 +2568,7 @@ describe("CLI raiz do toolkit", () => {
         const json = path.join(diretorioSaida, "analise-testes.json");
         const saida = path.join(diretorioSaida, "priorizacao-testes.md");
 
-        await fs.writeJson(json, {
+        await escreverJson(json, {
             categorias: {
                 Services: {
                     untested: [
@@ -2586,7 +2604,7 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Encontrados 1 P1, 0 P2, 1 P3");
 
-        const conteudo = await fs.readFile(saida, "utf-8");
+        const conteudo = await lerArquivo(saida, "utf-8");
         expect(conteudo).toContain("sgc/mapa/service/MapaCriticoService.java");
         expect(conteudo).toContain("sem evidência");
         expect(conteudo).toContain("sgc/seguranca/AcaoPermissao.java");
@@ -2606,7 +2624,7 @@ describe("CLI raiz do toolkit", () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-views-templates-"));
         const viewsDir = path.join(base, "frontend", "src", "views");
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(viewsDir, "PainelView.vue"),
             [
                 "<template>",
@@ -2617,7 +2635,7 @@ describe("CLI raiz do toolkit", () => {
             ].join("\n")
         );
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(viewsDir, "LegacyView.vue"),
             [
                 "<template>",
@@ -2647,11 +2665,11 @@ describe("CLI raiz do toolkit", () => {
 
     test("valida padronizacao de modais em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-modais-validar-"));
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "components", "comum", "ModalPadrao.vue"),
             "<template><BModal title=\"Base\" /></template>"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "frontend", "src", "components", "mapa", "ImpactoMapaModal.vue"),
             "<template><BModal title=\"Impacto\" /></template>"
         );
@@ -2674,15 +2692,15 @@ describe("CLI raiz do toolkit", () => {
 
     test("resolve frontendCodigo configurado nos validadores estruturais", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-frontend-validadores-configurados-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {frontendCodigo: "cliente/src"},
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "cliente", "src", "views", "PainelView.vue"),
             "<template><LayoutPadrao><PageHeader title=\"Painel\" /></LayoutPadrao></template>"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "cliente", "src", "components", "comum", "ModalPadrao.vue"),
             "<template><BModal title=\"Base\" /></template>"
         );
@@ -2706,8 +2724,8 @@ describe("CLI raiz do toolkit", () => {
     });
 
     test("nao possui diretorios legados de scripts em backend/frontend", async () => {
-        expect(await fs.pathExists(DIRETORIO_SCRIPTS_BACKEND_LEGADO)).toBe(false);
-        expect(await fs.pathExists(DIRETORIO_SCRIPTS_FRONTEND_LEGADO)).toBe(false);
+        expect(await existe(DIRETORIO_SCRIPTS_BACKEND_LEGADO)).toBe(false);
+        expect(await existe(DIRETORIO_SCRIPTS_FRONTEND_LEGADO)).toBe(false);
     });
 
     test("projeto diagnostico identifica corretamente a ausencia de arquivos essenciais e falha com codigo 1", async () => {
@@ -2734,11 +2752,11 @@ describe("CLI raiz do toolkit", () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-listar-"));
 
         // Criar arquivos .vue de teste com identificadores
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "ComponenteA.vue"),
             "<template><button data-test-codigo=\"btn-salvar\">Salvar</button></template>"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "ComponenteB.vue"),
             "<template><input data-testid=\"input-nome\" /></template>"
         );
@@ -2754,11 +2772,11 @@ describe("CLI raiz do toolkit", () => {
 
     test("resolve frontendCodigo configurado para identificadores de teste", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-configurado-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {frontendCodigo: "aplicacao/src"},
         });
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(base, "aplicacao", "src", "components", "Componente.vue"),
             "<template><button data-testid=\"btn-configurado\">Salvar</button></template>"
         );
@@ -2774,11 +2792,11 @@ describe("CLI raiz do toolkit", () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-duplicados-"));
 
         // Criar dois arquivos com o mesmo test-id
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "ComponenteX.vue"),
             "<template><button data-testid=\"btn-acao\">Ação X</button></template>"
         );
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "ComponenteY.vue"),
             "<template><div data-testid=\"btn-acao\">Ação Y</div></template>"
         );
@@ -2796,7 +2814,7 @@ describe("CLI raiz do toolkit", () => {
     test("passa com sucesso se nao houver identificadores de teste duplicados", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-testids-unicos-"));
 
-        await fs.outputFile(
+        await escreverArquivo(
             path.join(diretorioBase, "ComponenteUnico.vue"),
             "<template><button data-testid=\"btn-unico\">Ação Única</button></template>"
         );

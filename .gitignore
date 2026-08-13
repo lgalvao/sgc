@@ -71,7 +71,6 @@ view-validations-audit.md
 
 # Snapshots e artefatos gerados por auditorias estruturais
 toolkit/qualidade/artefatos/
-toolkit/qualidade/semgrep/latest/
 frontend/src/generated/
 
 # Playwright E2E test results

@@ -1,9 +1,8 @@
 import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
-import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
-import {DIRETORIO_RAIZ, executarSgc} from "./apoio.js";
+import {DIRETORIO_RAIZ, executarSgc, criarDiretorio, escreverJson, existe} from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {
     obterOpcoesPlaywright,
@@ -26,8 +25,8 @@ describe("Qualidade do toolkit", () => {
     test("resume a fotografia mais recente a partir da base externa", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-resumo-base-"));
         const caminhoFotografia = path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "fotografia.json");
-        await fs.ensureDir(path.dirname(caminhoFotografia));
-        await fs.writeJson(caminhoFotografia, {
+        await criarDiretorio(path.dirname(caminhoFotografia));
+        await escreverJson(caminhoFotografia, {
             resumo: {
                 statusGeral: "verde",
                 indiceSaude: 98,
@@ -61,7 +60,7 @@ describe("Qualidade do toolkit", () => {
 
     test("resolve a configuracao Playwright a partir dos testes de integracao da base", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-playwright-configurado-"));
-        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(diretorioBase, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 testesIntegracao: "testes-e2e"
@@ -87,7 +86,7 @@ describe("Qualidade do toolkit", () => {
             adaptadores: {}
         })).rejects.toThrow("adaptadorAusente");
 
-        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+        expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
     });
 
     test("aceita uma fabrica de contexto de artefatos para projeto externo", async () => {
@@ -115,7 +114,7 @@ describe("Qualidade do toolkit", () => {
             coletarMetadados: async () => ({origem: "externa"}),
             prepararDiretoriosFotografia: async () => {},
             persistirFotografia: async fotografiaGerada => {
-                await fs.outputJSON(caminhoFotografiaPersonalizado, fotografiaGerada);
+                await escreverJson(caminhoFotografiaPersonalizado, fotografiaGerada);
                 return caminhoFotografiaPersonalizado;
             },
             criarContexto: base => {
@@ -136,8 +135,8 @@ describe("Qualidade do toolkit", () => {
         expect(fotografia.versaoSchema).toBe("1.0.0");
         expect(fotografia.metadados.controleVersao).toEqual({origem: "externa"});
         expect(fotografia.verificacoes).toHaveLength(1);
-        expect(await fs.pathExists(caminhoFotografiaPersonalizado)).toBe(true);
-        expect(await fs.pathExists(diretorioArtefatos)).toBe(false);
-        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+        expect(await existe(caminhoFotografiaPersonalizado)).toBe(true);
+        expect(await existe(diretorioArtefatos)).toBe(false);
+        expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
     });
 }, 30000);

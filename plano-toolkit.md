@@ -186,8 +186,8 @@ provam utilidade funcional.
   fonte + `tsx`; `npm pack` e a instalação do tarball em consumidor isolado passaram.
 - `lib/caminhos.ts` separa o diretório físico de instalação (`DIRETORIO_TOOLKIT`) da raiz padrão (`process.cwd()`),
   enquanto `--base` continua sendo a forma explícita de auditar outra raiz.
-- `fs-extra` deixou de ser dependência de runtime: o código distribuído usa APIs nativas do Node, e a biblioteca ficou
-  somente em `devDependencies` para os testes, com `@types/fs-extra` acompanhando o consumo TypeScript.
+- `fs-extra` foi removida completamente do toolkit: o código distribuído e os testes usam APIs nativas do Node, com
+  helpers de arquivo centralizados em `test/apoio.ts`; `@types/fs-extra` também deixou de ser necessário.
 - A política Semgrep padrão e o executável Semgrep agora são resolvidos de forma portável: a primeira vem da instalação
   física do pacote e o segundo vem do `PATH`, com override de regra pela configuração do projeto.
 - Dois comandos de projeto já foram convertidos:
@@ -543,6 +543,10 @@ Na rodada seguinte, o contrato interno dos resultados JaCoCo passou a usar `rami
 `BRANCH`, `mb` e `cb` permanecem somente como campos do XML externo. A suíte focada de cobertura passou a 10 cenários
 aprovados nesse recorte. Nesta rodada, o contrato interno V8 passou a usar `instrucoes`, `ramificacoes`, `funcoes` e
 `linhas`, com dois cenários focados e a suíte completa aprovados; as chaves do formato V8 externo não foram traduzidas.
+Nesta rodada, os testes deixaram de depender de `fs-extra`: os helpers nativos de arquivo foram centralizados em
+`test/apoio.ts`, o manifesto e o lockfile foram limpos e a suíte completa permaneceu em 122 cenários. A regra ignorada
+de `qualidade/semgrep/latest` e seus dois artefatos não rastreados também foram removidos; os arquivos foram movidos para
+uma quarentena temporária recuperável, enquanto o único destino produzido continua sendo `qualidade/artefatos/semgrep/mais-recente`.
 
 ### 3.3 Tamanho e composição atual
 
@@ -554,8 +558,8 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
 - 7 arquivos de teste TypeScript concentram 122 cenários regulares, mais 1 smoke de distribuição isolada;
-- `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
-  cópias divergentes nos testes de projeto, integração, qualidade e CLI;
+- `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução, `executarSgc` e helpers nativos
+  de arquivo, evitando cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`/`qualidade/coleta-adaptadores-sgc.ts`/`qualidade/coleta-executor.ts`/
@@ -616,7 +620,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
 | Resolvido nesta rodada | Ajuda de folhas catalogadas era genérica | O roteador desativa a ajuda automática do Commander somente nas folhas que despacham arquivos e encaminha `--help` ao script TypeScript; grupos continuam usando a ajuda do Commander e as opções específicas ficam visíveis. |
 | Resolvido nesta rodada | Opção de meta de cobertura em inglês | `backend cobertura auditoria` e `frontend cobertura auditoria` agora usam `--minimo`; os símbolos internos e os relatórios Markdown da família foram normalizados sem alterar os campos JSON de integração. |
-| Baixa | APIs nativas e dependências se sobrepõem | `fs-extra` já foi removido do runtime e ficou restrito aos testes; a auditoria de dependências restantes deve continuar por uso real, sem remoção antecipada. |
+| Resolvido nesta rodada | APIs nativas e dependências se sobrepõem | `fs-extra` e `@types/fs-extra` foram removidos do manifesto e do lockfile; os testes usam helpers nativos centralizados em `test/apoio.ts`. |
 
 ### 3.5 Interpretação correta do estado
 
@@ -718,15 +722,16 @@ Decisões negativas desta auditoria:
 - `backend cobertura ramificacoes` e `frontend cobertura ramificacoes` não são duplicatas automáticas das auditorias
   unificadas: os primeiros têm contrato de listagem focado e os segundos fazem priorização/risco. A fusão fica recusada
   até existir consumidor substituto testado.
-- `fs-extra` não é dependência de runtime e só aparece nos testes. Sua substituição por `node:fs/promises` é uma
-  simplificação possível, mas não é evidência de obsolescência funcional e fica para uma rodada própria.
+- `fs-extra` foi removida após a confirmação de que seus únicos consumidores eram testes; `node:fs/promises` e helpers
+  locais cobrem escrita/leitura JSON, diretórios, cópia, permissões e existência sem manter uma dependência de conveniência.
 - Campos de entrada externos como `BRANCH`, `mb` e `cb` do JaCoCo, `s`, `f`, `b` e `statementMap` do V8 e o diretório
   `frontend/coverage` produzido pelo Vitest não serão traduzidos artificialmente. Os nomes próprios já corrigidos são
   `mais-recente`, `*-cobertura-*`, `metadados.controleVersao.ramo/revisao` e, nos contratos internos de cobertura,
   `instrucoes`, `ramificacoes`, `funcoes`, `linhas` e seus derivados.
 
-Sobra removida nesta rodada: os shebangs `#!/usr/bin/env node` presentes em 42 fontes TypeScript. Nenhum consumidor
-executava esses arquivos como binários; a fonte é chamada por `tsx` e o binário npm é o launcher CJS.
+Sobras removidas nas rodadas recentes: os shebangs `#!/usr/bin/env node` presentes em 42 fontes TypeScript, a dependência
+`fs-extra` restrita aos testes e a regra/saídas do layout antigo `qualidade/semgrep/latest`. Nenhum desses itens tinha
+consumidor atual; a fonte é chamada por `tsx` e o Semgrep usa `qualidade/artefatos/semgrep/mais-recente`.
 
 ## 4. Classificação para reuso externo
 
@@ -805,9 +810,9 @@ do perfil.
 1. **[resolvido nesta rodada] Inventário de utilidade**: a matriz da seção 3.8 registra a decisão funcional por família
    de comandos, bibliotecas, políticas e assets. O grafo do Knip continua sendo apenas evidência técnica; a decisão
    também considerou catálogo, testes, documentação, configuração e histórico.
-2. **[parcial, com quatro cortes concluídos] Código temporal**: os 42 shebangs `#!/usr/bin/env node` sem consumidor, os
-   nomes próprios `latest`, `*-coverage-*`, `metadados.git.branch/commit` e os símbolos internos JaCoCo/V8 em inglês
-   foram removidos. Ainda falta revisar dependências de teste e regras de ignorar artefatos antigos.
+2. **[resolvido nesta rodada] Código temporal**: os 42 shebangs `#!/usr/bin/env node` sem consumidor, os nomes próprios
+   `latest`, `*-coverage-*`, `metadados.git.branch/commit`, os símbolos internos JaCoCo/V8 em inglês, a dependência
+   `fs-extra` restrita aos testes e a regra/saídas `qualidade/semgrep/latest` foram removidos após confirmação de uso.
 3. **[resolvido na superfície de comandos] Mapa explícito núcleo/perfil**: `lib/catalogo-comandos.ts` agora classifica
    todas as 49 folhas da CLI, inclusive as sete registradas com callbacks em `sgc.ts`, por escopo e efeito. Políticas e
    regras internas ainda precisam migrar gradualmente para adaptadores, sem reorganização antecipada.
@@ -1036,8 +1041,8 @@ SGC está ativo.
 ### Fase F — testes, documentação e distribuição
 
 1. **[concluído nesta rodada]** Converter todos os testes para TypeScript estrito. O teste principal da CLI, os testes
-   CDU, o fixture externo e o smoke de pacote passam em `tsconfig.testes.json`; `@types/fs-extra` formaliza a única
-   dependência de tipos necessária ao teste principal.
+   CDU, o fixture externo e o smoke de pacote passam em `tsconfig.testes.json`; `test/apoio.ts` fornece helpers nativos
+   de arquivo e não há mais dependência de `fs-extra` ou `@types/fs-extra`.
 2. **[parcial nesta rodada]** Dividir testes por domínio: os cenários de projeto, configuração, integração e qualidade
    já estão em `test/projeto.test.ts`, `test/configuracao.test.ts`, `test/integracao.test.ts` e `test/qualidade.test.ts`;
    ainda falta separar runtime, saída, backend, frontend e requisitos que permanecem no `test/sgc.test.ts`.

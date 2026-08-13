@@ -1,8 +1,8 @@
 import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
-import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
+import {escreverJson} from "./apoio.js";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {resolverEscoposAuditoria} from "../projeto/dependencias-auditar.js";
 import {resolverEscoposInstalacao} from "../projeto/preparar.js";
@@ -17,7 +17,7 @@ type ChamadaComando = {
 describe("Configuracao do toolkit", () => {
     test("carrega configuracao versionada e preserva defaults ausentes", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-valida-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             diretorios: {
                 backendCodigo: "servidor/java"
@@ -49,7 +49,7 @@ describe("Configuracao do toolkit", () => {
 
     test("configura execucoes de projeto sem substituir os defaults do SGC", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-execucoes-"));
-        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
             versao: VERSAO_CONFIGURACAO,
             execucoes: {
                 dependencias: [{
