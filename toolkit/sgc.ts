@@ -14,6 +14,7 @@ function criarComandoArquivo(pai: Command, nome: string, descricao: string, rela
     pai
         .command(nome)
         .description(descricao)
+        .helpOption(false)
         .allowUnknownOption(true)
         .allowExcessArguments(true)
         .action(async (...valores: unknown[]) => {

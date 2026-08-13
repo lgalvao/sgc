@@ -346,6 +346,9 @@ frontend e para os caminhos OpenAPI.
 - `frontend/cobertura-ramificacoes.ts`, `frontend/cobertura-ramificacoes-erros.ts` e
   `frontend/cobertura-auditoria.ts` foram convertidos para TypeScript com tipos para métricas V8, hotspots, linhas
   suspeitas e relatórios; os filtros de arquivos e heurísticas de erro do perfil SGC foram preservados.
+- A família de auditorias de cobertura agora usa `--minimo` em backend e frontend, nomes internos em português e
+  ajuda específica encaminhada pelo roteador; os campos JSON `hotspots` e `scoreImpacto` foram preservados como
+  contrato de integração do agregador de qualidade.
 - `frontend/residuos-auditar.ts` e `frontend/residuos-validar.ts` foram convertidos para TypeScript; fotografia,
   violações, avisos, exceções e opções de persistência agora têm contratos explícitos, mantendo os budgets do SGC.
 - `frontend/acessibilidade-crawler.ts` e `frontend/acessibilidade-processar-resultados.ts` foram convertidos para
@@ -452,6 +455,8 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
+| Resolvido nesta rodada | Ajuda de folhas catalogadas era genérica | O roteador desativa a ajuda automática do Commander somente nas folhas que despacham arquivos e encaminha `--help` ao script TypeScript; grupos continuam usando a ajuda do Commander e as opções específicas ficam visíveis. |
+| Resolvido nesta rodada | Opção de meta de cobertura em inglês | `backend cobertura auditoria` e `frontend cobertura auditoria` agora usam `--minimo`; os símbolos internos e os relatórios Markdown da família foram normalizados sem alterar os campos JSON de integração. |
 | Baixa | APIs nativas e dependências se sobrepõem | `fs-extra` já foi removido do runtime e ficou restrito aos testes; a auditoria de dependências restantes deve continuar por uso real, sem remoção antecipada. |
 
 ### 3.5 Interpretação correta do estado
@@ -735,9 +740,9 @@ SGC está ativo.
 
 1. Inventariar todas as opções, defaults, mensagens e códigos de saída.
 2. Definir opções canônicas em português (`--entrada`, `--saida`, `--diretorio`, `--arquivo`, `--base`) e remover as
-   formas antigas que não tenham valor semântico, atualizando todos os usos internos. O primeiro recorte foi aplicado
-   em `projeto arvore-linhas`, com `--profundidade`, `--minimo-linhas` e `--excluir-testes`; as demais famílias ainda
-   precisam ser inventariadas.
+   formas antigas que não tenham valor semântico, atualizando todos os usos internos. Os primeiros recortes foram
+   aplicados em `projeto arvore-linhas`, com `--profundidade`, `--minimo-linhas` e `--excluir-testes`, e nas auditorias
+   de cobertura, com `--minimo`; as demais famílias ainda precisam ser inventariadas.
 3. Definir um envelope comum de resultado: versão do schema, status, resumo, violações, métricas, artefatos e avisos.
 4. Separar stdout estruturado, stdout humano e stderr operacional.
 5. Definir quando um comando retorna falha por violação encontrada versus erro de execução.
@@ -763,8 +768,9 @@ SGC está ativo.
 7. Executar smoke tests sobre um recorte do SGC apenas quando necessário para provar que uma funcionalidade específica
    do perfil continua funcionando após a mudança do toolkit.
 8. **[parcial nesta rodada]** Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos. Os 42
-   despachadores de arquivos já usam `lib/catalogo-comandos.ts` e a ajuda da CLI é o inventário canônico; os comandos
-   com ações e opções próprias ainda têm sua estrutura declarada em `sgc.ts` por exigirem lógica de registro específica.
+   despachadores de arquivos já usam `lib/catalogo-comandos.ts`, a ajuda específica das folhas é encaminhada ao módulo
+   e a ajuda da CLI é o inventário canônico; os comandos com ações e opções próprias ainda têm sua estrutura declarada
+   em `sgc.ts` por exigirem lógica de registro específica.
 9. O modelo de distribuição fonte + `tsx` está fechado; os testes TypeScript não entram no artefato distribuído. A
    implementação não possui arquivos JS, aliases ou fallbacks de transição; somente o launcher CJS mínimo permanece
    como adaptação do campo `bin` do npm.

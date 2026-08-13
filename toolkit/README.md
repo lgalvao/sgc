@@ -142,7 +142,8 @@ auditoria precisar criar o inventário auxiliar, a mesma opção é propagada ex
 Markdown; `exportar-openapi` e `fixar-baseline` continuam sendo ações de geração/promoção explícitas.
 
 `backend cobertura auditoria` e `frontend cobertura auditoria` também só persistem o relatório Markdown com `--gravar`.
-O modo `--json` continua adequado para integração sem criar arquivos.
+O modo `--json` continua adequado para integração sem criar arquivos. Use `--minimo <percentual>` para transformar
+cobertura abaixo da meta em código de saída de falha.
 
 ### Requisitos
 

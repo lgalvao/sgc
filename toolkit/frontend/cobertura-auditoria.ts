@@ -9,7 +9,7 @@ import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCobertura
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
-const CAMINHO_PADRAO_OUTPUT = "frontend-coverage-auditoria.md";
+const CAMINHO_PADRAO_SAIDA = "frontend-coverage-auditoria.md";
 
 interface ResumoMetricasFrontend {
     lines: ResultadoCoberturaFrontend["lines"];
@@ -18,7 +18,7 @@ interface ResumoMetricasFrontend {
     functions: ResultadoCoberturaFrontend["functions"];
 }
 
-interface HotspotRelatorioFrontend {
+interface PontoCriticoRelatorioFrontend {
     arquivo: string;
     scoreImpacto: number;
     coberturaLinhas: number;
@@ -30,10 +30,10 @@ interface ResultadoAuditoriaFrontend {
     status: "ok";
     timestamp: string;
     totais: ResumoMetricasFrontend;
-    hotspots: HotspotRelatorioFrontend[];
+    hotspots: PontoCriticoRelatorioFrontend[];
 }
 
-function calcularScoreImpacto(arquivo: ArquivoCobertura): number {
+function calcularPontuacaoImpacto(arquivo: ArquivoCobertura): number {
     // No frontend, focamos em statements e branches.
     // Arquivos com muitos statements descobertos e muitos branches são prioridade.
     const pesoStatements = 1.0;
@@ -45,36 +45,36 @@ function calcularScoreImpacto(arquivo: ArquivoCobertura): number {
     return (statementsDescobertos * pesoStatements) + (branchesDescobertos * pesoBranches);
 }
 
-function obterPrioridade(score: number): string {
-    if (score > 100) return pc.red("P1 (Crítico)");
-    if (score > 40) return pc.yellow("P2 (Alto)");
+function obterPrioridade(pontuacao: number): string {
+    if (pontuacao > 100) return pc.red("P1 (Crítico)");
+    if (pontuacao > 40) return pc.yellow("P2 (Alto)");
     return pc.cyan("P3 (Médio)");
 }
 
 async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho: string): Promise<string> {
     const {totais, hotspots} = dados;
-    let md = "# Auditoria de Cobertura Frontend\n\n";
+    let markdown = "# Auditoria de Cobertura Frontend\n\n";
 
-    md += "## Resumo Geral\n";
-    md += `- **Cobertura de Linhas:** ${totais.lines.percentual}%\n`;
-    md += `- **Cobertura de Statements:** ${totais.statements.percentual}%\n`;
-    md += `- **Cobertura de Branches:** ${totais.branches.percentual}%\n`;
-    md += `- **Cobertura de Funções:** ${totais.functions.percentual}%\n\n`;
+    markdown += "## Resumo Geral\n";
+    markdown += `- **Cobertura de Linhas:** ${totais.lines.percentual}%\n`;
+    markdown += `- **Cobertura de Statements:** ${totais.statements.percentual}%\n`;
+    markdown += `- **Cobertura de Branches:** ${totais.branches.percentual}%\n`;
+    markdown += `- **Cobertura de Funções:** ${totais.functions.percentual}%\n\n`;
 
-    md += "## Top 10 Hotspots de Qualidade (Maior Risco)\n";
-    md += "Prioridade baseada em volume de código não testado e complexidade condicional.\n\n";
-    md += "| Rank | Arquivo | Score | Statements Descobertos | Cobertura Linhas | Prioridade |\n";
-    md += "|------|---------|-------|-------------------------|------------------|------------|\n";
+    markdown += "## Top 10 Pontos Críticos de Qualidade (Maior Risco)\n";
+    markdown += "Prioridade baseada em volume de código não testado e complexidade condicional.\n\n";
+    markdown += "| Posição | Arquivo | Pontuação | Statements Descobertos | Cobertura Linhas | Prioridade |\n";
+    markdown += "|---------|---------|-----------|-------------------------|------------------|------------|\n";
 
-    hotspots.forEach((h, i) => {
-        const prioridade = h.scoreImpacto > 100 ? "P1" : (h.scoreImpacto > 40 ? "P2" : "P3");
-        md += `| ${i + 1} | \`${h.arquivo}\` | ${h.scoreImpacto.toFixed(1)} | ${h.statementsTotal - h.statementsCobertos} | ${h.coberturaLinhas}% | ${prioridade} |\n`;
+    hotspots.forEach((ponto, indice) => {
+        const prioridade = ponto.scoreImpacto > 100 ? "P1" : (ponto.scoreImpacto > 40 ? "P2" : "P3");
+        markdown += `| ${indice + 1} | \`${ponto.arquivo}\` | ${ponto.scoreImpacto.toFixed(1)} | ${ponto.statementsTotal - ponto.statementsCobertos} | ${ponto.coberturaLinhas}% | ${prioridade} |\n`;
     });
 
-    md += `\n\n_Gerado automaticamente pelo toolkit em ${new Date().toLocaleString("pt-BR")}._\n`;
+    markdown += `\n\n_Gerado automaticamente pelo toolkit em ${new Date().toLocaleString("pt-BR")}._\n`;
 
     await fs.mkdir(path.dirname(caminho), {recursive: true});
-    await fs.writeFile(caminho, md, "utf8");
+    await fs.writeFile(caminho, markdown, "utf8");
     return caminho;
 }
 
@@ -93,7 +93,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 '--arquivo <arquivo> Usa um relatório V8 específico.',
                 '--base <diretorio> Resolve o relatório relativo a outra base.',
                 '--gravar             Persiste o relatório Markdown.',
-                '--min <percentual> Falha se a cobertura de linhas for menor que N.'
+                '--minimo <percentual> Falha se a cobertura de linhas for menor que N.'
             ]
         });
         return;
@@ -101,9 +101,9 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const arquivo = lerOpcao(argumentos, "--arquivo", undefined);
-    const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--saida", CAMINHO_PADRAO_OUTPUT) ?? CAMINHO_PADRAO_OUTPUT);
+    const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--saida", CAMINHO_PADRAO_SAIDA) ?? CAMINHO_PADRAO_SAIDA);
     const gravar = argumentos.includes("--gravar");
-    const metaMinima = Number(lerOpcao(argumentos, "--min", "0") ?? "0");
+    const metaMinima = Number(lerOpcao(argumentos, "--minimo", "0") ?? "0");
 
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE COBERTURA FRONTEND");
@@ -112,13 +112,13 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     try {
         const coleta = await extrairCoberturaFrontend(arquivo, {diretorioBase});
 
-        const hotspots = coleta.arquivos
+        const pontosCriticos = coleta.arquivos
             .map(a => ({
                 ...a,
-                scoreImpacto: calcularScoreImpacto(a)
+                pontuacaoImpacto: calcularPontuacaoImpacto(a)
             }))
-            .filter(a => a.scoreImpacto > 0)
-            .toSorted((a, b) => b.scoreImpacto - a.scoreImpacto)
+            .filter(a => a.pontuacaoImpacto > 0)
+            .toSorted((a, b) => b.pontuacaoImpacto - a.pontuacaoImpacto)
             .slice(0, 20);
 
         const resultado: ResultadoAuditoriaFrontend = {
@@ -130,12 +130,12 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 branches: coleta.branches,
                 functions: coleta.functions
             },
-            hotspots: hotspots.map(h => ({
-                arquivo: h.arquivo,
-                scoreImpacto: h.scoreImpacto,
-                coberturaLinhas: h.linesPercentual,
-                statementsTotal: h.statementsTotal,
-                statementsCobertos: h.statementsCobertos
+            hotspots: pontosCriticos.map(ponto => ({
+                arquivo: ponto.arquivo,
+                scoreImpacto: ponto.pontuacaoImpacto,
+                coberturaLinhas: ponto.linesPercentual,
+                statementsTotal: ponto.statementsTotal,
+                statementsCobertos: ponto.statementsCobertos
             }))
         };
 
@@ -156,10 +156,10 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         escreverLinha("");
 
         escreverLinha(pc.bold(pc.underline("TOP 5 PENDÊNCIAS PRIORITÁRIAS:")));
-        hotspots.slice(0, 5).forEach((h, i) => {
-            escreverLinha(`${i + 1}. ${pc.bold(h.arquivo)}`);
-            escreverLinha(`   Impacto: ${pc.bold(h.scoreImpacto.toFixed(1))} | Prioridade: ${obterPrioridade(h.scoreImpacto)}`);
-            escreverLinha(`   Lacuna: ${h.statementsTotal - h.statementsCobertos} statements sem teste.`);
+        pontosCriticos.slice(0, 5).forEach((ponto, indice) => {
+            escreverLinha(`${indice + 1}. ${pc.bold(ponto.arquivo)}`);
+            escreverLinha(`   Impacto: ${pc.bold(ponto.pontuacaoImpacto.toFixed(1))} | Prioridade: ${obterPrioridade(ponto.pontuacaoImpacto)}`);
+            escreverLinha(`   Lacuna: ${ponto.statementsTotal - ponto.statementsCobertos} statements sem teste.`);
         });
 
         if (gravar) {

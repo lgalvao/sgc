@@ -1061,12 +1061,13 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarSgc(["backend", "cobertura", "auditoria", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Backend).");
+        expect(resultado.stdout).toContain("--minimo <percentual>");
     });
 
     test("despacha ajuda da auditoria de assuntos de notificacao do backend", async () => {
         const resultado = await executarSgc(["backend", "notificacoes", "auditar-assuntos", "--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Audita literais de assunto de notificacao fora de AssuntosNotificacao.");
+        expect(resultado.stdout).toContain("Audita literais de assunto de notificação fora de AssuntosNotificacao.");
     });
 
     test("audita assuntos literais fora de AssuntosNotificacao", async () => {
@@ -2741,7 +2742,7 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarSgc(["frontend", "modais", "validar", "--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("ModalPadrao");
-        expect(resultado.stdout).toContain("componente-base");
+        expect(resultado.stdout).toContain("BModal diretamente no frontend");
     });
 
     test("valida previsibilidade estrutural das views em um recorte controlado", async () => {
@@ -2844,12 +2845,13 @@ describe("CLI raiz do toolkit", () => {
         const resultado = await executarScriptFrontendCobertura(["--help"]);
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Auditoria unificada de cobertura e risco (Frontend).");
+        expect(resultado.stdout).toContain("--minimo <percentual>");
     });
 
     test("exibe ajuda do comando de sincronizacao de versao do projeto", async () => {
         const resultado = await executarSgc(["projeto", "versao-sincronizar", "--help"]);
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Sincroniza a versao entre gradle.properties e frontend/package.json.");
+        expect(resultado.stdout).toContain("Atualiza gradle.properties e frontend/package.json");
     });
 
     test("simula e aplica sincronizacao de versao em um diretorio informado", async () => {
