@@ -274,8 +274,9 @@ A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pac
 Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--diretorio`
 quando a intenção for apontar diretamente para outro diretório de código.
 
-O toolkit executa a árvore-fonte com `tsx`; toda a implementação está em TypeScript estrito. Os testes permanecem em
-JavaScript por enquanto, mas não participam da implementação distribuída nem do gate estrito.
+O toolkit executa a árvore-fonte com `tsx`; toda a implementação está em TypeScript estrito. A maior parte dos testes
+ainda está em JavaScript, mas o fixture de reuso externo já é TypeScript em `test/externo.test.ts`; os testes não
+participam da implementação distribuída nem do gate estrito.
 
 Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis: só executam quando chamados diretamente
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou

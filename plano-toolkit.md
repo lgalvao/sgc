@@ -378,7 +378,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 110 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 111 testes aprovados em 3 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 40,8% de statements (524/1.284),
   28,19% de branches (254/901), 48,2% de funções (121/251) e 41,12% de linhas (505/1.228); ainda sem threshold,
@@ -413,16 +413,18 @@ elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste compor
 esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários;
 a parametrização de execuções externas chega a 105; uma rodada explicita as políticas de resíduos e chega a 106; outra
 uniformiza a família de nomenclatura e chega a 107; uma rodada uniformiza os relatórios de cobertura e chega a 108; uma
-rodada protege a sincronização de versão e chega a 109; esta rodada centraliza o catálogo da CLI e chega a 110.
+rodada protege a sincronização de versão e chega a 109; uma rodada centraliza o catálogo da CLI e chega a 110; esta
+rodada adiciona o fixture externo Java/Vue e chega a 111.
 
 ### 3.3 Tamanho e composição atual
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 72 arquivos TypeScript de implementação;
+- 73 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
-- 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
-- 2 arquivos de teste concentrando 110 cenários, mais 1 smoke de distribuição isolada;
+- 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`) e 1 arquivo
+  TypeScript de teste (`test/externo.test.ts`);
+- 3 arquivos de teste concentrando 111 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -460,7 +462,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 110 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 111 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -565,7 +567,7 @@ do perfil.
 4. **[decidido e validado nesta rodada] Modelo de distribuição**: o reuso será por pacote-fonte com runtime `tsx`;
    `version`, `files`, `bin`, `exports`, assets e dependências de runtime refletem esse modelo. A política de publicação
    continua uma decisão operacional futura.
-5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 72 módulos de
+5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 73 módulos de
    implementação TypeScript com `strict` e `noImplicitOverride`; o gate estrito passou e tornou-se o `typecheck` oficial.
 6. **[resolvido nesta rodada] Dependência de runtime**: `tsx` está em `dependencies`, o launcher de pacote foi criado e
    a instalação isolada confirma que o pacote fonte+tsx não depende do hoisting do workspace.
@@ -710,7 +712,11 @@ Para cada comando convertido:
    - coleta de qualidade;
    - políticas de nomenclatura, CDU, modais e arquitetura.
 3. Fazer o núcleo receber adaptadores por composição, sem `if (projeto === "sgc")` espalhado.
-4. Criar um projeto fixture externo mínimo com backend/frontend fictícios e executar os comandos horizontais contra ele.
+4. **[concluído nesta rodada]** Criar `test/externo.test.ts` com um projeto fictício mínimo de Java/Vue, layout
+   `servidor/src/main/java` e `cliente/src` configurado por JSON, e executar contra ele as auditorias de arquitetura
+   backend/frontend, identificadores de teste e resíduos. O fixture confirma o recorte horizontal dessas famílias sem
+   criar os diretórios `backend`, `frontend` ou `toolkit` do SGC; tarefas, políticas e adaptadores completos continuam
+   pendentes.
 5. Documentar claramente quais comandos são `núcleo`, `perfil-sgc` ou `opcionais`.
 6. Mover políticas do SGC para um diretório de perfil explícito somente quando o motor correspondente estiver estável;
    não reorganizar todos os arquivos antecipadamente.
@@ -743,11 +749,14 @@ SGC está ativo.
 4. **[concluído nesta rodada]** Adicionar smoke test de instalação em diretório externo, incluindo a execução do binário
    do pacote; o modelo fonte + `tsx` é exercitado pelo launcher e não depende de `node_modules` hoisted.
 5. Adicionar matriz de validação para Node `26.7+`, TypeScript 6 e as versões de Vitest/tsx usadas no workspace.
-6. Criar fixtures próprias do toolkit para Java/Spring, Vue e Markdown; não usar a suíte do produto SGC como validação
-   rotineira da modernização do toolkit.
+6. **[parcial nesta rodada]** Criar fixtures próprias do toolkit para Java/Spring, Vue e Markdown; o fixture externo
+   Java/Vue já cobre o layout e os comandos estruturais, mas ainda faltam fixtures independentes para cobertura,
+   contratos, OpenAPI e Markdown. Não usar a suíte do produto SGC como validação rotineira da modernização do toolkit.
 7. Executar smoke tests sobre um recorte do SGC apenas quando necessário para provar que uma funcionalidade específica
    do perfil continua funcionando após a mudança do toolkit.
-8. Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos.
+8. **[parcial nesta rodada]** Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos. Os 42
+   despachadores de arquivos já usam `lib/catalogo-comandos.ts` e a ajuda da CLI é o inventário canônico; os comandos
+   com ações e opções próprias ainda têm sua estrutura declarada em `sgc.ts` por exigirem lógica de registro específica.
 9. O modelo de distribuição fonte + `tsx` está fechado; decidir se os testes também serão convertidos para TypeScript. A
    implementação não possui arquivos JS, aliases ou fallbacks de transição; o launcher CJS e os testes JS são exceções
    deliberadas e documentadas.
