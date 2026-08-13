@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": false,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "noEmit": true,
@@ -10,9 +8,6 @@
     "types": ["node"]
   },
   "include": [
-    "**/*.js",
-    "**/*.mjs",
-    "**/*.cjs",
     "**/*.ts"
   ],
   "exclude": [

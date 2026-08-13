@@ -468,7 +468,8 @@ a suíte chega a 120 cenários regulares. Na rodada seguinte, `qualidade resumo`
 relativo à base auditada, inclusive em consumidores externos. Na rodada seguinte, a família de auditorias frontend passou
 a alinhar entradas, saídas e mensagens de artefatos à base efetiva; a contagem permanece em 120 cenários. Na rodada
 seguinte, o alvo de compilação TypeScript passou de ES2023 para ES2025, coerente com Node 26 e sem compatibilidade legada;
-os 120 cenários e a baseline de cobertura permanecem verdes.
+os 120 cenários e a baseline de cobertura permanecem verdes. Na rodada seguinte, os `tsconfig` passaram a incluir somente
+TypeScript; o launcher `bin/sgc.cjs` continua como fronteira npm fora do grafo de compilação.
 
 ### 3.3 Tamanho e composição atual
 
@@ -505,6 +506,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Relatório Semgrep calculava caminhos contra a raiz errada | Achados devolvidos com caminho relativo ou absoluto agora são normalizados contra a base auditada antes da exibição em stdout e Markdown. |
 | Resolvido nesta rodada | Resumo de qualidade calculava caminho contra o `cwd` | `qualidade resumo` agora informa a fotografia relativa à base efetiva, preservando a mesma referência em JSON e saída humana para bases externas. |
 | Resolvido nesta rodada | Auditorias frontend misturavam `cwd` e base auditada | Arquitetura, resíduos e cobertura frontend agora resolvem caminhos relativos contra `--base` e exibem artefatos relativos à mesma raiz. |
+| Resolvido nesta rodada | Configuração TypeScript ainda incluía JavaScript legado | Os `tsconfig` de checagem e build agora incluem somente `.ts`; o único `.cjs` restante é o launcher deliberadamente externo ao compilador. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
