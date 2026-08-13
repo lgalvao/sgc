@@ -285,8 +285,9 @@ Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
 integrações durante o carregamento.
 `npm run typecheck` executa `tsconfig.estrito.json` com `strict` e `noImplicitOverride` sobre todos os módulos de
-implementação TypeScript. Enquanto a migração dos testes não termina, `npm run typecheck:testes` aplica o mesmo rigor
-aos testes que já estão em TypeScript.
+implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos seis arquivos de teste TypeScript; a
+divisão por domínio ainda pode avançar dentro do teste principal, mas não há mais testes JavaScript ou uma migração
+parcial de linguagem.
 
 Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--base <diretorio>` para analisar outro
 repositório Git, e a sincronização de versão aceita um diretório base nas funções reutilizáveis sem alterar o projeto
@@ -362,6 +363,7 @@ O diretório `test/` contém:
 - `sgc.test.ts`: testes da CLI principal
 - `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
   qualidade e dependências)
+- `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
 - `cdus.test.ts`: testes TypeScript das regras CDU específicas do perfil SGC
 - `externo.test.ts`: fixture TypeScript de reuso em projeto Java/Vue externo
 - `pacote.test.ts`: smoke de empacotamento e instalação em consumidor isolado
