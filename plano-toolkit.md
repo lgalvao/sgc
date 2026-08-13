@@ -596,6 +596,9 @@ isolando hotspots, defaults de saída e diretórios configurados.
 Nesta rodada, três cenários de gates dependency-cruiser do frontend foram extraídos para
 `test/frontend-arquitetura-gates.test.ts`; `test/sgc.test.ts` caiu de 29 para 26 cenários, mantendo a contagem total e
 isolando falha, sucesso via composable e diretório frontend configurado.
+Nesta rodada, mais dois cenários de gates de regras de ações foram movidos para
+`test/frontend-arquitetura-gates.test.ts`; `test/sgc.test.ts` caiu de 26 para 24 cenários, mantendo a contagem total e
+separando a proibição de cálculo local da permissão de flags vindas do backend.
 
 ### 3.3 Tamanho e composição atual
 
@@ -715,7 +718,7 @@ Esta revisão confrontou o plano com a árvore rastreada, o manifesto do pacote,
 Conclusões confirmadas:
 
 - a árvore possui 79 arquivos TypeScript de implementação, 22 arquivos `*.test.ts`, 125 cenários regulares e 2 cenários
-  de pacote; `test/sgc.test.ts` ainda concentra 26 cenários e aproximadamente 900 linhas;
+  de pacote; `test/sgc.test.ts` ainda concentra 24 cenários e aproximadamente 800 linhas;
 - o catálogo declarativo contém 42 comandos que apenas despacham módulos; comandos com opções e ações próprias ainda
   são registrados diretamente em `sgc.ts`, portanto o catálogo não é ainda a fonte única de toda a superfície CLI;
 - a instalação externa comprova o binário, a raiz do consumidor, os assets Semgrep e uma API programática horizontal de
@@ -904,8 +907,8 @@ do perfil.
     seis de superfície em `test/superficie-cli.test.ts`, três de importação de núcleos em `test/importacao-nucleos.test.ts`,
     dois de importação de código em `test/codigo-importacao.test.ts`, nove de análise/priorização backend em
     `test/backend-testes.test.ts`, cinco de resíduos frontend em `test/frontend-residuos.test.ts`, três de auditoria
-    arquitetural frontend em `test/frontend-arquitetura.test.ts` e três de gates em
-    `test/frontend-arquitetura-gates.test.ts`; `test/sgc.test.ts` ainda possui 26 cenários e cerca de 900 linhas.
+    arquitetural frontend em `test/frontend-arquitetura.test.ts` e cinco de gates em
+    `test/frontend-arquitetura-gates.test.ts`; `test/sgc.test.ts` ainda possui 24 cenários e cerca de 800 linhas.
     Separar depois os grupos de projeto e comportamento de domínio; `test/qualidade.test.ts` possui
     10 cenários.
 11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
@@ -953,7 +956,7 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
    para `test/superficie-cli.test.ts`, três de importação de núcleos para `test/importacao-nucleos.test.ts` e dois de
    importação de código para `test/codigo-importacao.test.ts`, nove de análise/priorização backend para
    `test/backend-testes.test.ts`, cinco de resíduos frontend para `test/frontend-residuos.test.ts`, três de auditoria
-   arquitetural frontend para `test/frontend-arquitetura.test.ts` e três de gates para
+   arquitetural frontend para `test/frontend-arquitetura.test.ts` e cinco de gates para
    `test/frontend-arquitetura-gates.test.ts`; seguir com os demais grupos comportamentais coesos, mantendo testes sem
    reorganização puramente estética.
 9. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e
