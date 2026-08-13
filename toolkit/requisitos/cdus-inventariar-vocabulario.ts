@@ -46,6 +46,12 @@ function extrairItensListaAtores(texto: string): string[] {
         .map(linha => linha.replace(/^\s*-\s+/, "").trim());
 }
 
+function extrairTiposProcesso(texto: string, tiposCanonicos: Set<string>): string[] {
+    return [...texto.matchAll(/\b(?:tipo|tipos)\b[^'\n]*'([^'\n]+)'/gi)]
+        .map(correspondencia => correspondencia[1].trim())
+        .filter(tipo => tiposCanonicos.has(tipo));
+}
+
 async function inventariarVocabulario(base: string, arquivosInformados?: string[]): Promise<InventarioVocabulario> {
     const situacoesCanonicas = carregarSituacoesCanonicas(base);
     const vocabularioCanonico = obterVocabularioCanonico(base);
@@ -76,8 +82,8 @@ async function inventariarVocabulario(base: string, arquivosInformados?: string[
             acumularMapa(inventario.situacoes, match.slice(1, -1));
         }
 
-        for (const tipo of texto.match(/'(Mapeamento|Revisão|Diagnóstico)'/g) ?? []) {
-            acumularMapa(inventario.tiposProcesso, tipo.slice(1, -1));
+        for (const tipo of extrairTiposProcesso(texto, vocabularioCanonico.tiposProcesso)) {
+            acumularMapa(inventario.tiposProcesso, tipo);
         }
 
         for (const elementoUi of texto.match(/`[^`\n]+`/g) ?? []) {

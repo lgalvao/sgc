@@ -238,6 +238,10 @@ Os valores controlados do CDU também podem ser substituídos em `requisitos.cdu
 `tiposProcessoCanonicos` e `arquivoSituacoesCanonicas`) e `requisitos.cdus.estilo.perfisEmCrases`. O default preserva os
 perfis, tipos, situações e convenções tipográficas atuais do SGC.
 
+O inventário de vocabulário identifica tipos de processo pelo contexto textual (`tipo`/`tipos`) e pela lista configurada;
+ele não mantém uma lista fixa de tipos do SGC. Assim, um projeto externo pode executar os agregadores CDU com corpus,
+perfis, tipos e situações próprios.
+
 Execuções de dependências e qualidade também podem ser substituídas:
 
 ```json

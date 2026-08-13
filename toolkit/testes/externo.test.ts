@@ -136,4 +136,94 @@ describe("reuso do toolkit em projeto externo", () => {
         await expect(access(path.join(diretorioBase, "frontend", "src"))).rejects.toThrow("ENOENT");
         await expect(access(path.join(diretorioBase, "toolkit"))).rejects.toThrow("ENOENT");
     }, 60000);
+
+    test("executa os agregadores CDU com corpus e vocabulário próprios", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-projeto-cdu-horizontal-"));
+
+        await escreverArquivo(
+            path.join(diretorioBase, "documentacao", "casos", "cdu-01.md"),
+            [
+                "# CDU-01 - Registrar solicitação",
+                "",
+                "## Atores",
+                "",
+                "- OPERADOR",
+                "",
+                "## Pré-condições",
+                "",
+                "- Processo do tipo 'Solicitação' na situação 'Liberado'.",
+                "",
+                "## Fluxo principal",
+                "",
+                "1. O operador acessa o `Painel`."
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(diretorioBase, "documentacao", "situacoes.md"),
+            [
+                "## Situações",
+                "",
+                "- **Liberado**: Solicitação pronta para tratamento."
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(diretorioBase, "configuracao-toolkit.json"),
+            JSON.stringify({
+                versao: 2,
+                requisitos: {
+                    cdus: {
+                        padraoArquivos: "documentacao/casos/cdu-*.md",
+                        fontesMensagensCodigo: [],
+                        vocabulario: {
+                            perfisCanonicos: ["OPERADOR"],
+                            tiposProcessoCanonicos: ["Solicitação"],
+                            arquivoSituacoesCanonicas: "documentacao/situacoes.md"
+                        },
+                        estilo: {perfisEmCrases: ["OPERADOR"]}
+                    }
+                }
+            })
+        );
+
+        const inventario = await executarSgc(diretorioBase, [
+            "requisitos",
+            "cdus",
+            "inventariar",
+            "--secoes",
+            "vocabulario",
+            "--json",
+            "--base",
+            diretorioBase
+        ]);
+        expect(inventario.exitCode).toBe(0);
+        expect(JSON.parse(inventario.stdout)).toMatchObject({
+            secoes: {
+                vocabulario: {
+                    canonicos: {
+                        perfis: ["OPERADOR"],
+                        situacoes: ["Liberado"],
+                        tiposProcesso: ["Solicitação"]
+                    },
+                    perfis: {OPERADOR: 1},
+                    tiposProcesso: {Solicitação: 1}
+                }
+            }
+        });
+
+        const auditoria = await executarSgc(diretorioBase, [
+            "requisitos",
+            "cdus",
+            "auditar",
+            "--secoes",
+            "estrutura,vocabulario",
+            "--json",
+            "--base",
+            diretorioBase
+        ]);
+        expect(auditoria.exitCode).toBe(0);
+        expect(JSON.parse(auditoria.stdout)).toMatchObject({
+            totalArquivos: 1,
+            resumo: {erros: 0, avisos: 0}
+        });
+    }, 60000);
 });
