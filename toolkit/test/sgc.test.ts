@@ -3,7 +3,6 @@ import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {execa, type Options} from "execa";
-import {pathToFileURL} from "node:url";
 import {
     DIRETORIO_RAIZ,
     CAMINHO_TSX,
@@ -23,8 +22,6 @@ import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} 
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
-const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.ts");
-const CAMINHO_CHEIROS_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "cheiros-auditar.ts");
 
 type ObjetoJson = Record<string, unknown>;
 
@@ -64,38 +61,6 @@ async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {
 }
 
 describe("CLI raiz do toolkit", () => {
-    test("pode importar o auditor Semgrep sem executar a ferramenta externa", async () => {
-        const urlModulo = pathToFileURL(CAMINHO_SEMGREP_AUDITAR).href;
-        const resultado = await execa(process.execPath, [
-            "--import=tsx",
-                "--input-type=module",
-            "-e",
-            `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-        ], {
-            cwd: DIRETORIO_RAIZ,
-            reject: false
-        });
-
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toBe("importacao-ok");
-    });
-
-    test("pode importar o auditor de cheiros sem ler o projeto", async () => {
-        const urlModulo = pathToFileURL(CAMINHO_CHEIROS_AUDITAR).href;
-        const resultado = await execa(process.execPath, [
-            "--import=tsx",
-                "--input-type=module",
-            "-e",
-            `process.argv.push("--help"); await import(${JSON.stringify(urlModulo)}); process.stdout.write("importacao-ok\\n");`
-        ], {
-            cwd: DIRETORIO_RAIZ,
-            reject: false
-        });
-
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toBe("importacao-ok");
-    });
-
     test("audita assuntos literais fora de AssuntosNotificacao", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-assuntos-auditar-"));
         const dir = path.join(base, "backend", "src", "main", "java", "sgc");
