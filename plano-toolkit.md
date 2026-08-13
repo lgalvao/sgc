@@ -337,12 +337,12 @@ frontend e para os caminhos OpenAPI.
   configuráveis de recursos e comandos registrados; o catálogo padrão resolve backend, frontend e integração pela
   configuração da base, enquanto recursos exclusivos do SGC só entram quando a base contém `toolkit/sgc.ts`. A
   política mínima local do Node é a major 26 (`26.7.0`).
-- `qualidade/coleta-execucao.ts` foi convertido para TypeScript com contratos de contexto, adaptadores, execução de
-  subprocessos, JUnit, métricas heterogêneas e fotografia; hotspots vindos de JSON são filtrados como `unknown`, e os
-  perfis Gradle/npm/Playwright continuam declarados como orquestração específica do SGC. A montagem do comando
-  Playwright agora é uma função pura e resolve `diretorios.testesIntegracao`, compartilhando a mesma convenção do
-  crawler de acessibilidade. A função de coleta aceita catálogos de perfis e adaptadores externos por composição, sem
-  mutar os defaults globais.
+- `qualidade/coleta-execucao.ts` foi convertido para TypeScript com contratos de contexto, execução de subprocessos,
+  JUnit, métricas heterogêneas e fotografia; hotspots vindos de JSON são filtrados como `unknown`. O novo
+  `qualidade/coleta-adaptadores-sgc.ts` concentra os perfis e adaptadores Gradle/npm/Playwright específicos do SGC,
+  enquanto a função de coleta aceita catálogos externos por composição, sem mutar os defaults globais. A montagem do
+  comando Playwright continua sendo uma função pura e resolve `diretorios.testesIntegracao`, compartilhando a mesma
+  convenção do crawler de acessibilidade.
 - `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
   agora compartilham a fronteira tipada do runtime.
 - `qualidade/resumo.ts` foi convertido para TypeScript; o carregador de fotografias passou a aceitar um tipo genérico e
@@ -404,8 +404,8 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 121 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,72% de statements (604/1.321),
-  34,02% de branches (313/920), 52,27% de funções (138/264) e 45,92% de linhas (580/1.263); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,84% de statements (607/1.324),
+  34,02% de branches (313/920), 52,45% de funções (139/265) e 46,05% de linhas (583/1.266); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -478,12 +478,14 @@ Na rodada seguinte, a coleta de qualidade passou a aceitar perfis e adaptadores 
 catálogos SGC como defaults; a suíte chega a 121 cenários regulares, com 81 no teste principal e 6 em `qualidade.test.ts`.
 Na rodada seguinte, o contrato TypeScript dos diretórios configuráveis passou a refletir os nomes aceitos pelo schema,
 mantendo a rejeição de chaves desconhecidas e eliminando índices textuais permissivos nos resolvers.
+Na rodada seguinte, os perfis e adaptadores Gradle/npm/Playwright foram extraídos para `coleta-adaptadores-sgc.ts`; o
+agregador preserva o comportamento do SGC e passa a ter uma fronteira explícita para a separação futura do executor.
 
 ### 3.3 Tamanho e composição atual
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 73 arquivos TypeScript de implementação;
+- 74 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
@@ -493,7 +495,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
-  `qualidade/coleta-execucao.ts`.
+  `qualidade/coleta-execucao.ts`/`qualidade/coleta-adaptadores-sgc.ts`.
 
 O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de implementação rastreados são TypeScript.
 
@@ -518,6 +520,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Despachador mantinha fallback para implementação compilada | `lib/execucao.ts` agora resolve sempre a fonte `.ts` via `DIRETORIO_TOOLKIT` e `tsx`; o build não cria nem exige uma segunda árvore de comandos `.js`. |
 | Resolvido nesta rodada | Coleta de qualidade dependia de catálogos globais mutáveis | `qualidade/coleta-execucao.ts` agora recebe perfis e adaptadores por opção, valida adaptadores ausentes antes de criar artefatos e mantém os catálogos SGC como defaults. |
 | Resolvido nesta rodada | Contrato TypeScript de diretórios era permissivo | `lib/configuracao.ts` agora restringe chaves aos nomes suportados pelo schema e os resolvers aceitam somente essas chaves; a configuração externa continua rejeitando nomes desconhecidos em runtime. |
+| Resolvido nesta rodada | Coleta misturava motor e adaptadores SGC | `qualidade/coleta-adaptadores-sgc.ts` agora concentra perfis e adaptadores específicos; `coleta-execucao.ts` conserva o executor, o contexto e o agregador como fronteira de composição. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
@@ -657,7 +660,7 @@ do perfil.
 4. **[decidido e validado nesta rodada] Modelo de distribuição**: o reuso será por pacote-fonte com runtime `tsx`;
    `version`, `files`, `bin`, `exports`, assets e dependências de runtime refletem esse modelo. A política de publicação
    continua uma decisão operacional futura.
-5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 73 módulos de
+5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 74 módulos de
    implementação TypeScript com `strict` e `noImplicitOverride`; o gate estrito passou e tornou-se o `typecheck` oficial.
 6. **[resolvido nesta rodada] Dependência de runtime**: `tsx` está em `dependencies`, o launcher de pacote foi criado e
    a instalação isolada confirma que o pacote fonte+tsx não depende do hoisting do workspace.
@@ -680,8 +683,9 @@ do perfil.
    valores padrão e validação; flags de Node, Semgrep e Playwright permanecem somente como encaminhamento externo.
 12. **Documentação derivada**: o catálogo já foi atualizado para `sgc.ts`, mas ainda precisa ser centralizado para não
     derivar ajuda, comandos e exports em fontes duplicadas. O inventário de comandos não deve divergir do roteador.
-13. **Orquestração pesada**: `qualidade/coleta-execucao.ts` mistura subprocessos, Gradle, npm, Playwright, parsing de
-    relatórios e schema da fotografia. Separar executor, adaptadores de ferramenta e agregador.
+13. **[parcial nesta rodada] Orquestração pesada**: `qualidade/coleta-adaptadores-sgc.ts` já separa perfis e adaptadores
+    específicos do SGC, mas `coleta-execucao.ts` ainda mistura executor de subprocessos, parsing de relatórios e schema
+    da fotografia. O próximo recorte deve separar executor, leitores de relatório e agregador genérico.
 
 ### Prioridade baixa
 
