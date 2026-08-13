@@ -425,6 +425,7 @@ O diretório `test/` contém:
 - `backend-fqn.test.ts`: testes de simulação, escrita e idempotência do corretor FQN Java
 - `backend-importacao.test.ts`: testes de importação segura dos comandos e auditores backend
 - `frontend-importacao.test.ts`: testes de importação segura dos comandos e auditores frontend
+- `frontend-acessibilidade.test.ts`: testes do processamento e da execução configurada de acessibilidade
 - `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
   qualidade e dependências)
 - `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
