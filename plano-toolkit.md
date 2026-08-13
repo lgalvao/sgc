@@ -253,6 +253,8 @@ frontend e para os caminhos OpenAPI.
 - `requisitos/cdus-auditar-mensagens-codigo.ts` foi convertido para TypeScript com contratos locais para ocorrências,
   referências, sugestões e resumo, reutilizando os tipos públicos de mensagens canônicas e categorias, preservando a
   comparação por categoria e similaridade.
+- `codigo/nomes-caminhos.ts` foi convertido para TypeScript com caminhos de artefatos de nomenclatura tipados, mantendo
+  a resolução relativa à configuração e à base auditada.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -341,15 +343,15 @@ esta rodada chega a 103 com o teste comportamental do auditor de arquitetura bac
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 66 arquivos TypeScript de implementação;
-- 6 arquivos JavaScript de implementação ainda pendentes;
+- 67 arquivos TypeScript de implementação;
+- 5 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 103 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 92% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 93% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -598,9 +600,10 @@ Lotes sugeridos:
    convertidos; faltam parametrizar completamente raiz Vue, globs e convenções de componentes.
 4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
    gerador de tipos removido.
-5. **Requisitos**: converter o motor de Markdown e depois isolar o perfil CDU do SGC.
-6. **Código transversal**: converter cheiros, Semgrep e inventários de nomes/idioma por último, pois concentram mais
-   políticas locais e maior volume de parsing.
+5. **[concluído nesta rodada]** Requisitos: o motor Markdown, as bibliotecas de mensagens e os dez comandos CDU foram
+   convertidos para TypeScript, preservando as regras específicas do SGC; o isolamento do perfil CDU continua na Fase D.
+6. **[em andamento nesta rodada]** Código transversal: converter os seis comandos JavaScript restantes de cheiros,
+   Semgrep e inventários de nomes/idioma, que concentram mais políticas locais e maior volume de parsing.
 
 O corretor FQN foi incluído depois da cobertura de mutação e idempotência da Fase 0 estar corrigida e publicada.
 

@@ -1,19 +1,19 @@
 import path from "node:path";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
-function obterDiretorioSaidaNomenclatura(diretorioBase) {
+function obterDiretorioSaidaNomenclatura(diretorioBase: string): string {
     return path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "nomenclatura", "mais-recente");
 }
 
-function obterCaminhoSimbolos(diretorioBase) {
+function obterCaminhoSimbolos(diretorioBase: string): string {
     return path.join(obterDiretorioSaidaNomenclatura(diretorioBase), "simbolos.json");
 }
 
-function obterCaminhoConsistencia(diretorioBase) {
+function obterCaminhoConsistencia(diretorioBase: string): string {
     return path.join(obterDiretorioSaidaNomenclatura(diretorioBase), "consistencia.json");
 }
 
-function obterCaminhoIdioma(diretorioBase) {
+function obterCaminhoIdioma(diretorioBase: string): string {
     return path.join(obterDiretorioSaidaNomenclatura(diretorioBase), "idioma.json");
 }
 
