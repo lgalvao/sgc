@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Inventário de vocabulário controlado dos casos de uso CDU.
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
@@ -6,17 +7,33 @@ import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 import {carregarSituacoesCanonicas, PERFIS_CANONICOS, TIPOS_PROCESSO_CANONICOS} from "./cdus-vocabulario-lib.js";
 
-function acumularMapa(mapa, chave) {
+type MapaContagem = Record<string, number>;
+
+interface InventarioVocabulario {
+    base: string;
+    totalArquivos: number;
+    perfis: MapaContagem;
+    situacoes: MapaContagem;
+    tiposProcesso: MapaContagem;
+    elementosUi: MapaContagem;
+    canonicos: {
+        perfis: string[];
+        situacoes: string[];
+        tiposProcesso: string[];
+    };
+}
+
+function acumularMapa(mapa: MapaContagem, chave: string): void {
     mapa[chave] = (mapa[chave] ?? 0) + 1;
 }
 
-function ordenarMapa(mapa) {
+function ordenarMapa(mapa: MapaContagem): MapaContagem {
     return Object.fromEntries(
         Object.entries(mapa).toSorted((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "pt-BR"))
     );
 }
 
-function extrairItensListaAtores(texto) {
+function extrairItensListaAtores(texto: string): string[] {
     const linhas = texto.split(/\r?\n/);
     const indiceAtores = linhas.findIndex(linha => /^##\s+Atores\s*$/.test(linha));
     const indicePre = linhas.findIndex(linha => /^##\s+Pré-condições\s*$/.test(linha));
@@ -30,12 +47,12 @@ function extrairItensListaAtores(texto) {
         .map(linha => linha.replace(/^\s*-\s+/, "").trim());
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
     const situacoesCanonicas = carregarSituacoesCanonicas(base);
 
     const arquivos = await listarArquivosCdu(base);
-    const inventario = {
+    const inventario: InventarioVocabulario = {
         base,
         totalArquivos: arquivos.length,
         perfis: {},

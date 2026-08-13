@@ -48,7 +48,7 @@
     "requisitos/cdus-inventariar-densidade.ts",
     "requisitos/cdus-inventariar-duplicacoes.ts",
     "requisitos/cdus-inventariar-mensagens.js",
-    "requisitos/cdus-inventariar-vocabulario.js",
+    "requisitos/cdus-inventariar-vocabulario.ts",
     "requisitos/cdus-inventariar.ts"
   ],
   "project": [

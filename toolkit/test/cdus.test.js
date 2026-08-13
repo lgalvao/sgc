@@ -13,7 +13,7 @@ const CAMINHOS_COMANDOS_CDU = [
     "cdus-inventariar.ts",
     "cdus-auditar.ts",
     "cdus-auditar-estilo.ts",
-    "cdus-inventariar-vocabulario.js",
+    "cdus-inventariar-vocabulario.ts",
     "cdus-auditar-vocabulario.js",
     "cdus-inventariar-mensagens.js",
     "cdus-auditar-mensagens.js",

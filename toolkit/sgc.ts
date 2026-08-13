@@ -97,7 +97,7 @@ const requisitosCdus = requisitos.command("cdus").description("Inventario e audi
 criarComandoScript(requisitosCdus, "inventariar", "Inventaria formatos e convenções implícitas dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar.ts");
 criarComandoScript(requisitosCdus, "auditar", "Audita a estrutura canônica mínima dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar.ts");
 criarComandoScript(requisitosCdus, "auditar-estilo", "Audita convenções tipográficas de aspas simples, aspas duplas e crases nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-estilo.ts");
-criarComandoScript(requisitosCdus, "inventariar-vocabulario", "Inventaria perfis, situações, tipos de processo e elementos de UI recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-vocabulario.js");
+criarComandoScript(requisitosCdus, "inventariar-vocabulario", "Inventaria perfis, situações, tipos de processo e elementos de UI recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-vocabulario.ts");
 criarComandoScript(requisitosCdus, "auditar-vocabulario", "Audita variações de vocabulário controlado nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-vocabulario.js");
 criarComandoScript(requisitosCdus, "inventariar-mensagens", "Inventaria descrições, assuntos, mensagens e toasts recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-mensagens.js");
 criarComandoScript(requisitosCdus, "auditar-mensagens", "Audita problemas mecânicos em descrições, assuntos, mensagens e toasts dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-mensagens.js");
