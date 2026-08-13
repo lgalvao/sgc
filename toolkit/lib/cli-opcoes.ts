@@ -24,4 +24,43 @@ function lerOpcao(argumentos: string[], nome: string, padrao: string | undefined
     return padrao;
 }
 
-export {lerOpcao};
+interface RegrasNumero {
+    inteiro?: boolean;
+    minimo?: number;
+    maximo?: number;
+}
+
+/**
+ * Lê e valida uma opção numérica da CLI.
+ *
+ * A conversão é estrita: valores parciais como `10abc` e números fora dos
+ * limites declarados falham imediatamente, evitando resultados silenciosos
+ * com `NaN` ou intervalos inválidos.
+ */
+function lerNumero(
+    argumentos: string[],
+    nome: string,
+    padrao: number | undefined,
+    regras: RegrasNumero = {}
+): number | undefined {
+    const valor = lerOpcao(argumentos, nome, padrao === undefined ? undefined : String(padrao));
+    if (valor === undefined) {
+        return undefined;
+    }
+
+    const numero = Number(valor);
+    const inteiro = regras.inteiro ?? true;
+    if (!Number.isFinite(numero) || (inteiro && !Number.isInteger(numero))) {
+        throw new Error(`A opção ${nome} deve receber ${inteiro ? "um número inteiro" : "um número"} válido.`);
+    }
+    if (regras.minimo !== undefined && numero < regras.minimo) {
+        throw new Error(`A opção ${nome} deve ser maior ou igual a ${regras.minimo}.`);
+    }
+    if (regras.maximo !== undefined && numero > regras.maximo) {
+        throw new Error(`A opção ${nome} deve ser menor ou igual a ${regras.maximo}.`);
+    }
+
+    return numero;
+}
+
+export {lerNumero, lerOpcao};

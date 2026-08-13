@@ -1,7 +1,8 @@
 import {execSync} from "node:child_process";
 import {existsSync, readFileSync} from "node:fs";
 import path from "node:path";
-import {lerOpcao} from "../lib/cli-opcoes.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import logger from "../lib/logger.js";
 import {escrever, escreverLinha} from "../lib/saida.js";
@@ -26,7 +27,7 @@ interface ConectoresArvore {
     prefixoFilho: string;
 }
 
-function listarArquivosGit(diretorioBase = process.cwd()): string[] {
+function listarArquivosGit(diretorioBase = DIRETORIO_RAIZ): string[] {
     const saida = execSync("git ls-files", {
         cwd: diretorioBase,
         encoding: "utf-8",
@@ -42,7 +43,7 @@ function contarLinhas(caminhoArquivo: string, diretorioBase: string): number {
     return conteudo.split(/\r?\n/).length;
 }
 
-function construirArvore(listaArquivos: string[], diretorioBase = process.cwd()): NoArvore {
+function construirArvore(listaArquivos: string[], diretorioBase = DIRETORIO_RAIZ): NoArvore {
     const raiz: NoArvore = {nome: ".", linhas: 0, filhos: {}, ehDiretorio: true};
 
     listaArquivos.forEach(caminhoArquivo => {
@@ -149,7 +150,7 @@ function imprimirArvore(
 }
 
 function lerOpcoes(argumentos: string[] = process.argv.slice(2)): OpcoesArvore {
-    const opcoes: OpcoesArvore = {diretorioBase: lerOpcao(argumentos, "--base", process.cwd()) ?? process.cwd()};
+    const opcoes: OpcoesArvore = {diretorioBase: lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ};
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escrever(`
@@ -166,15 +167,8 @@ Opções:
         return {ajuda: true};
     }
 
-    const indiceProfundidade = argumentos.indexOf("--profundidade");
-    if (indiceProfundidade !== -1 && argumentos[indiceProfundidade + 1]) {
-        opcoes.profundidadeMaxima = Number.parseInt(argumentos[indiceProfundidade + 1], 10);
-    }
-
-    const indiceMinimoLinhas = argumentos.indexOf("--minimo-linhas");
-    if (indiceMinimoLinhas !== -1 && argumentos[indiceMinimoLinhas + 1]) {
-        opcoes.minimoLinhas = Number.parseInt(argumentos[indiceMinimoLinhas + 1], 10);
-    }
+    opcoes.profundidadeMaxima = lerNumero(argumentos, "--profundidade", undefined, {minimo: 0});
+    opcoes.minimoLinhas = lerNumero(argumentos, "--minimo-linhas", undefined, {minimo: 0});
 
     if (argumentos.includes("--excluir-testes")) {
         opcoes.excluirTestes = true;
@@ -203,7 +197,7 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
     }
 
     logger.info("Gerando árvore de contagem de linhas...");
-    const diretorioBase = opcoes.diretorioBase ?? process.cwd();
+    const diretorioBase = opcoes.diretorioBase ?? DIRETORIO_RAIZ;
     let listaArquivos = listarArquivosGit(diretorioBase);
 
     if (opcoes.excluirTestes) {

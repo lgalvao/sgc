@@ -61,7 +61,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const base = lerOpcao(argumentos, "--base", undefined);
-    const baseResolvida = path.resolve(base ?? process.cwd());
+    const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
     const saida = lerOpcao(argumentos, "--saida", resolverDiretorioSaidaResiduos(baseResolvida));
     const fotografia = await executarAuditoriaFrontendResiduos({
         base: baseResolvida,

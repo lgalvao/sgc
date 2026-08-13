@@ -1,6 +1,6 @@
 import path from "node:path";
 import pc from "picocolors";
-import {lerOpcao} from "../lib/cli-opcoes.js";
+import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
@@ -55,7 +55,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()) ?? resolverNaRaiz());
     const arquivo = lerOpcao(argumentos, "--arquivo", "") ?? "";
-    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20") ?? "20", 10);
+    const limite = lerNumero(argumentos, "--limite", 20, {minimo: 0}) ?? 20;
     const filtro = lerOpcao(argumentos, "--filtro", "") || null;
     const coleta = await extrairCoberturaJacoco(arquivo || undefined, {
         diretorioBase,

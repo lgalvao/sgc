@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
+import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
@@ -102,7 +102,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const arquivo = lerOpcao(argumentos, "--arquivo", undefined);
     const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--saida", CAMINHO_PADRAO_SAIDA) ?? CAMINHO_PADRAO_SAIDA);
     const gravar = argumentos.includes("--gravar");
-    const metaMinima = Number(lerOpcao(argumentos, "--minimo", "0") ?? "0");
+    const metaMinima = lerNumero(argumentos, "--minimo", 0, {inteiro: false, minimo: 0, maximo: 100}) ?? 0;
 
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA DE COBERTURA FRONTEND");

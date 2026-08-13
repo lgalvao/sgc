@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 
 const PERFIS_CANONICOS = new Set<string>([
     "ADMIN",
@@ -14,7 +15,7 @@ const TIPOS_PROCESSO_CANONICOS = new Set<string>([
     "Diagnóstico"
 ]);
 
-function carregarSituacoesCanonicas(base: string = process.cwd()): Set<string> {
+function carregarSituacoesCanonicas(base: string = DIRETORIO_RAIZ): Set<string> {
     const caminho = path.join(base, "specs", "intro_3_situacoes.md");
     const texto = fs.readFileSync(caminho, "utf8");
     const situacoes = new Set<string>();

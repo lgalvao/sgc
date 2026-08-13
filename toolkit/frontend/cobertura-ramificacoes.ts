@@ -1,7 +1,7 @@
 import pc from "picocolors";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
+import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
@@ -46,7 +46,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
-    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "20") ?? "20", 10);
+    const limite = lerNumero(argumentos, "--limite", 20, {minimo: 0}) ?? 20;
     const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
     const arquivos: ArquivoRamificacoes[] = coleta.arquivos
         .map((arquivo) => ({

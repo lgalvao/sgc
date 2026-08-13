@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {globby} from "globby";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -142,7 +143,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const emitirJson = argumentos.includes("--json");
-    const base = path.resolve(lerOpcao(argumentos, "--base", process.cwd()) ?? process.cwd());
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const resultado = await auditarAssuntos(base);
 
     if (emitirJson) {

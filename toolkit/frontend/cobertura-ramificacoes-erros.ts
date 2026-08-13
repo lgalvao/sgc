@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
-import {lerOpcao} from "../lib/cli-opcoes.js";
+import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
@@ -71,7 +71,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhoRelatorio = lerOpcao(argumentos, "--arquivo", undefined);
-    const limite = Number.parseInt(lerOpcao(argumentos, "--limite", "15") ?? "15", 10);
+    const limite = lerNumero(argumentos, "--limite", 15, {minimo: 0}) ?? 15;
     const coleta = await extrairCoberturaFrontend(caminhoRelatorio, {diretorioBase});
     const candidatos = coleta.arquivos
         .map((arquivo) => ({

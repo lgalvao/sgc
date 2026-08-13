@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {globby} from "globby";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 
 const REGEX_TITULO = /^#\s+CDU-(\d{2})\s+-\s+(.+)$/m;
 const REGEX_SECAO_ATORES = /^##\s+Atores\s*$/m;
@@ -62,11 +63,11 @@ function obterOpcoesCdu(argumentos: string[] = process.argv.slice(2)): OpcoesCdu
     const emitirJson = argumentos.includes("--json");
     const indiceBase = argumentos.indexOf("--base");
     const baseInformada = indiceBase >= 0 ? argumentos[indiceBase + 1] : undefined;
-    const base = baseInformada ? path.resolve(baseInformada) : process.cwd();
+    const base = baseInformada ? path.resolve(baseInformada) : DIRETORIO_RAIZ;
     return {emitirJson, base};
 }
 
-async function listarArquivosCdu(base: string = process.cwd()): Promise<string[]> {
+async function listarArquivosCdu(base: string = DIRETORIO_RAIZ): Promise<string[]> {
     const padrao = normalizarCaminho(path.join(base, "specs", "cdu-*.md"));
     const arquivos = await globby(padrao, {absolute: true});
     return arquivos.toSorted((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
