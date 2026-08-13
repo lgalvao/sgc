@@ -332,7 +332,8 @@ defaults da CLI; `coleta-executor.ts` concentra subprocessos, `coleta-leitores.t
 validação de hotspots, `coleta-fotografia.ts` concentra o contrato e a persistência da fotografia,
 `coleta-contexto.ts` concentra a fábrica de contexto SGC substituível, e `coleta-execucao.ts` concentra agregação e
 orquestração; `coleta-metadados.ts` mantém a coleta Git como default substituível. A função
-`principal(argumentos, {perfis, adaptadores})` aceita catálogos externos por composição, sem mutar os defaults globais;
+`principal(argumentos, {perfis, adaptadores, criarContexto, coletarMetadados, persistirFotografia})` aceita catálogos e
+serviços externos por composição, sem mutar os defaults globais;
 essa é a fronteira experimental de reuso até que os adaptadores de ferramentas sejam separados do agregador. Mesmo no
 perfil SGC, a montagem dos argumentos Playwright usa `diretorios.testesIntegracao`, a mesma convenção do crawler de
 acessibilidade.

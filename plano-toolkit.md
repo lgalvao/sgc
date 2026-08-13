@@ -344,8 +344,9 @@ frontend e para os caminhos OpenAPI.
   de JSON/JUnit e a validação de hotspots, `qualidade/coleta-fotografia.ts` concentra o contrato, a construção e a
   persistência da fotografia, `qualidade/coleta-contexto.ts` concentra a fábrica de contexto SGC padrão, e a função de
   coleta aceita catálogos externos e uma fábrica de contexto externa por composição, sem mutar os defaults globais. A
-  coleta Git padrão foi isolada em `qualidade/coleta-metadados.ts` e também pode ser substituída. A montagem do comando
-  Playwright continua sendo uma função pura e resolve
+  coleta Git padrão foi isolada em `qualidade/coleta-metadados.ts` e também pode ser substituída; preparação e persistência
+  de fotografia também são injetáveis na opção de coleta. A montagem do comando Playwright continua sendo uma função pura
+  e resolve
   `diretorios.testesIntegracao`, compartilhando a mesma convenção do crawler de acessibilidade.
 - `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
   agora compartilham a fronteira tipada do runtime.
@@ -408,8 +409,8 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 122 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,04% de statements (612/1.329),
-  34,37% de branches (318/925), 52,98% de funções (142/268) e 46,26% de linhas (588/1.271); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,13% de statements (614/1.331),
+  34,66% de branches (322/929), 52,98% de funções (142/268) e 46,34% de linhas (590/1.273); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -495,6 +496,8 @@ uma regressão confirmou que uma base externa pode escolher seus diretórios de 
 chega a 122 cenários regulares, com 7 em `qualidade.test.ts`.
 Na rodada seguinte, a coleta Git foi extraída para `coleta-metadados.ts` e passou a ser uma dependência substituível;
 o formato SGC continua preservado por default, enquanto consumidores externos podem fornecer seus próprios metadados.
+Na rodada seguinte, a preparação e a persistência da fotografia passaram a ser substituíveis em `principal`; uma
+regressão externa confirmou gravação em relatório próprio sem criar o diretório padrão `.qualidade`.
 
 ### 3.3 Tamanho e composição atual
 
@@ -543,6 +546,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Agregador montava e gravava a fotografia | `qualidade/coleta-fotografia.ts` agora concentra o contrato, a agregação do resumo, a ordenação dos hotspots e a gravação nos dois destinos; o fluxo preserva a preparação antecipada dos diretórios. |
 | Resolvido nesta rodada | Contexto SGC era obrigatório e implícito | `qualidade/coleta-contexto.ts` concentra a fábrica padrão, enquanto `principal` aceita `criarContexto`; consumidores externos podem escolher seus diretórios de artefatos sem alterar os defaults SGC. |
 | Resolvido nesta rodada | Coleta Git era obrigatória e embutida no agregador | `qualidade/coleta-metadados.ts` concentra o default Git, enquanto `principal` aceita `coletarMetadados`; consumidores externos podem fornecer ou omitir sua própria origem de metadados. |
+| Resolvido nesta rodada | Persistência da fotografia era fixa no toolkit | `principal` agora aceita `prepararDiretoriosFotografia` e `persistirFotografia`; o default SGC continua preservando os dois destinos, enquanto um consumidor externo pode escolher outro formato ou armazenamento. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
@@ -708,8 +712,9 @@ do perfil.
 13. **[parcial nesta rodada] Orquestração pesada**: `qualidade/coleta-adaptadores-sgc.ts`, `coleta-executor.ts`,
     `coleta-leitores.ts`, `coleta-fotografia.ts`, `coleta-contexto.ts` e `coleta-metadados.ts` já separam
     perfis/adaptadores SGC, subprocessos, leitura de relatórios, contrato/persistência da fotografia, fábrica de contexto
-    e metadados; `coleta-execucao.ts` ainda coordena o fluxo. O próximo recorte deve avaliar uma interface de persistência
-    substituível e um contrato de metadados, sem esconder os defaults específicos do SGC.
+    e metadados; `coleta-execucao.ts` ainda coordena o fluxo e define o schema mínimo. O próximo recorte deve avaliar
+    formalização do contrato de fotografia e uma política explícita para compatibilidade de schema, sem esconder os
+    defaults específicos do SGC.
 
 ### Prioridade baixa
 

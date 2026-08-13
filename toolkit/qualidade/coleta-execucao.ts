@@ -30,6 +30,8 @@ interface OpcoesColeta {
     perfis?: CatalogoPerfisColeta;
     criarContexto?: (base: string) => ContextoColeta;
     coletarMetadados?: (base: string) => Promise<Record<string, string>>;
+    prepararDiretoriosFotografia?: typeof prepararDiretoriosFotografia;
+    persistirFotografia?: typeof persistirFotografia;
 }
 
 interface ExecucaoQualidade {
@@ -190,7 +192,8 @@ async function principal(
 
     const diretorioExecucao = path.join(contexto.diretorioExecucoes, timestamp);
 
-    await prepararDiretoriosFotografia({
+    const prepararDiretorios = opcoes.prepararDiretoriosFotografia ?? prepararDiretoriosFotografia;
+    await prepararDiretorios({
         diretorioExecucao,
         diretorioMaisRecente: contexto.diretorioMaisRecente
     });
@@ -213,7 +216,8 @@ async function principal(
         verificacoes,
         git: await (opcoes.coletarMetadados ?? coletarMetadadosGit)(contexto.base).catch(() => ({}))
     });
-    const caminhoFotografia = await persistirFotografia(fotografia, {
+    const persistir = opcoes.persistirFotografia ?? persistirFotografia;
+    const caminhoFotografia = await persistir(fotografia, {
         diretorioExecucao,
         diretorioMaisRecente: contexto.diretorioMaisRecente
     });

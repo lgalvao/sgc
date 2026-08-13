@@ -93,6 +93,7 @@ describe("Qualidade do toolkit", () => {
     test("aceita uma fabrica de contexto de artefatos para projeto externo", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-contexto-externo-"));
         const diretorioArtefatos = path.join(diretorioBase, ".qualidade");
+        const caminhoFotografiaPersonalizado = path.join(diretorioBase, "relatorios", "qualidade.json");
         let baseRecebida = "";
         const adaptador: AdaptadorQualidade = async contexto => ({
             codigo: "checagemExterna",
@@ -112,6 +113,11 @@ describe("Qualidade do toolkit", () => {
             perfis: {externo: ["checagemExterna"]},
             adaptadores: {checagemExterna: adaptador},
             coletarMetadados: async () => ({origem: "externa"}),
+            prepararDiretoriosFotografia: async () => {},
+            persistirFotografia: async fotografiaGerada => {
+                await fs.outputJSON(caminhoFotografiaPersonalizado, fotografiaGerada);
+                return caminhoFotografiaPersonalizado;
+            },
             criarContexto: base => {
                 baseRecebida = base;
                 return {
@@ -129,7 +135,8 @@ describe("Qualidade do toolkit", () => {
         expect(baseRecebida).toBe(diretorioBase);
         expect(fotografia.metadados.git).toEqual({origem: "externa"});
         expect(fotografia.verificacoes).toHaveLength(1);
-        expect(await fs.pathExists(path.join(diretorioArtefatos, "mais-recente", "fotografia.json"))).toBe(true);
+        expect(await fs.pathExists(caminhoFotografiaPersonalizado)).toBe(true);
+        expect(await fs.pathExists(diretorioArtefatos)).toBe(false);
         expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
     });
 }, 30000);
