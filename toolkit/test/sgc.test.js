@@ -26,7 +26,7 @@ const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.pl
 const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
 const CAMINHO_TESTES_PRIORIZAR = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "testes-priorizar.ts");
 const CAMINHOS_COMANDOS_TESTES_BACKEND = [
-    "testes-analisar.js",
+    "testes-analisar.ts",
     "testes-priorizar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");

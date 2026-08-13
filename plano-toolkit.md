@@ -214,6 +214,9 @@ frontend e para os caminhos OpenAPI.
 - `backend/testes-priorizar.ts` foi convertido para TypeScript; a leitura do relatório JSON passou a tratar a entrada
   como `unknown` na borda, filtrando itens inválidos sem alterar a priorização P1/P2/P3, as exclusões do perfil SGC ou
   o formato Markdown gerado.
+- `backend/testes-analisar.ts` foi convertido para TypeScript; índices de testes, categorias, estatísticas, cobertura
+  JaCoCo e relatórios Markdown/JSON agora têm contratos explícitos, mantendo a resolução configurável de `backendCodigo`
+  e `backendTestes` e as classificações SGC de DTOs, models e outros.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -301,13 +304,13 @@ elevam a cobertura para 101 cenários.
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 50 arquivos TypeScript de implementação;
-- 22 arquivos JavaScript de implementação ainda pendentes;
+- 51 arquivos TypeScript de implementação;
+- 21 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 101 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
-- outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
-  `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
+- outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts`,
+  `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
 O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 69% dos
 arquivos de implementação rastreados são TypeScript.
@@ -552,7 +555,7 @@ Lotes sugeridos:
 
 1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação e perfil de qualidade convertidos. O
    catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
-2. **Backend**: cobertura e priorização de testes já convertidas; faltam análise de testes, contratos e FQN. Parametrizar raiz Java, tarefas Gradle e
+2. **Backend**: cobertura, análise e priorização de testes já convertidas; faltam contratos e FQN. Parametrizar raiz Java, tarefas Gradle e
    categorias.
 3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
    convertidos; faltam parametrizar completamente raiz Vue, globs e convenções de componentes.

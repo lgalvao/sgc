@@ -7,7 +7,7 @@
     "backend/contratos-auditar.js",
     "backend/java-corrigir-fqn.js",
     "backend/notificacoes-assuntos-auditar.js",
-    "backend/testes-analisar.js",
+    "backend/testes-analisar.ts",
     "backend/testes-priorizar.ts",
     "codigo/cheiros-auditar.js",
     "codigo/idioma-consistencia-auditar.js",

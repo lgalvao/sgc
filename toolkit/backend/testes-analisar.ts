@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Analisador de cobertura de testes do backend.
 import fs from "node:fs";
 import path from "node:path";
 import {lerOpcao} from "../lib/cli-opcoes.js";
@@ -7,7 +8,7 @@ import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha} from "../lib/saida.js";
-import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
+import {extrairCoberturaJacoco, type ClasseCobertura} from "../lib/dominios/cobertura-java.js";
 import {
     CATEGORIAS_PRIORITARIAS,
     CATEGORIAS_SECUNDARIAS,
@@ -23,9 +24,92 @@ import {
     SUFIXOS_TESTE
 } from "./lib/testes-analisar-regras.js";
 
-function lerArgumentos(argumentos) {
-    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
-    const diretorioInformado = lerOpcao(argumentos, "--dir", null);
+type Categoria = (typeof CATEGORIAS_PRIORITARIAS | typeof CATEGORIAS_SECUNDARIAS)[number];
+type PerfilFonte = "comportamental" | "estrutural_contrato" | "estrutural_puro";
+type EstrategiaCorrespondencia = "mesmo_pacote" | "nome_correspondente_outro_pacote" | "nenhum";
+type ItemRelatorioBase = ReturnType<typeof criarItemRelatorio>;
+type ItemRelatorio = ItemRelatorioBase & {
+    perfil_model: PerfilFonte | null;
+    model_ruido_ignorado: boolean;
+    perfil_other: PerfilFonte | null;
+    other_ruido_ignorado: boolean;
+};
+
+interface ArquivoFonte {
+    caminho_relativo: string;
+    nome_classe: string;
+    pacote: string;
+    categoria: Categoria;
+}
+
+interface IndicesTestes {
+    indicePorNome: Map<string, string[]>;
+    indicePorPacote: Map<string, string[]>;
+}
+
+interface LocalizacaoTestes {
+    caminhos: string[];
+    estrategia: EstrategiaCorrespondencia;
+}
+
+interface GrupoRelatorio {
+    tested: ItemRelatorio[];
+    untested: ItemRelatorio[];
+}
+
+type CategoriasRelatorio = Record<Categoria, GrupoRelatorio>;
+
+interface EstatisticasRelatorio {
+    total_classes: number;
+    classes_com_teste_dedicado: number;
+    classes_com_cobertura_indireta: number;
+    classes_sem_evidencia_no_escopo: number;
+    classes_fora_escopo_jacoco: number;
+    classes_ruido_ignorado: number;
+    classes_sem_teste_dedicado: number;
+    cobertura_arquivos_percentual: number;
+    cobertura_backlog_real_percentual: number;
+    cobertura_observada_percentual: number;
+    correspondencias_ambiguas: number;
+    jacoco_disponivel: boolean;
+    dtos_comportamentais: number;
+    dtos_estruturais: number;
+    dtos_estruturais_contratuais: number;
+    models_comportamentais: number;
+    models_estruturais: number;
+    models_estruturais_contratuais: number;
+    others_comportamentais: number;
+    others_estruturais: number;
+    others_estruturais_contratuais: number;
+}
+
+interface RelatorioTestes {
+    gerado_em: string;
+    backend_dir: string;
+    estatisticas: EstatisticasRelatorio;
+    categorias: CategoriasRelatorio;
+}
+
+interface OpcoesAnalisar {
+    base: string;
+    diretorio: string;
+    diretorioTestes: string;
+    saida: string;
+    saidaJson: string | null;
+    arquivoJacoco: string | null;
+    ajuda: boolean;
+}
+
+interface OpcoesAnaliseTestes {
+    diretorioFonte: string;
+    diretorioTestes: string;
+    caminhoJacocoXml?: string | null;
+    base?: string;
+}
+
+function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
+    const diretorioInformado = lerOpcao(argumentos, "--dir", undefined);
     const raizBackendInformada = diretorioInformado ? path.resolve(diretorioInformado) : null;
     const resultado = {
         base,
@@ -35,18 +119,18 @@ function lerArgumentos(argumentos) {
         diretorioTestes: raizBackendInformada
             ? path.join(raizBackendInformada, "src", "test", "java")
             : resolverCaminhoConfigurado("backendTestes", base),
-        saida: lerOpcao(argumentos, "--output", "unit-test-report.md"),
-        saidaJson: lerOpcao(argumentos, "--output-json", null),
-        arquivoJacoco: lerOpcao(argumentos, "--jacoco-xml", null),
+        saida: lerOpcao(argumentos, "--output", "unit-test-report.md") ?? "unit-test-report.md",
+        saidaJson: lerOpcao(argumentos, "--output-json", undefined) ?? null,
+        arquivoJacoco: lerOpcao(argumentos, "--jacoco-xml", undefined) ?? null,
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
     };
     return resultado;
 }
 
-function imprimirAjuda() {
+function imprimirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend testes analisar",
-        scriptDireto: "backend/testes-analisar.js",
+        scriptDireto: "backend/testes-analisar.ts",
         descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
         opcoes: [
             '--base <diretorio>     Base do projeto para resolver configuracao.',
@@ -62,17 +146,17 @@ function imprimirAjuda() {
     });
 }
 
-function resolverSaidaJsonPadrao(caminhoMarkdown) {
+function resolverSaidaJsonPadrao(caminhoMarkdown: string): string {
     if (caminhoMarkdown.toLowerCase().endsWith('.md')) {
         return caminhoMarkdown.replace(/\.md$/i, '.json');
     }
     return `${caminhoMarkdown}.json`;
 }
 
-function listarFontes(backendSrc) {
-    const arquivos = [];
+function listarFontes(backendSrc: string): ArquivoFonte[] {
+    const arquivos: ArquivoFonte[] = [];
 
-    function visitar(diretorio) {
+    function visitar(diretorio: string): void {
         const entradas = fs.readdirSync(diretorio, {withFileTypes: true});
         entradas.forEach(entrada => {
             const caminhoCompleto = path.join(diretorio, entrada.name);
@@ -102,15 +186,15 @@ function listarFontes(backendSrc) {
     return arquivos;
 }
 
-function indexarTestes(backendTest) {
-    const indicePorNome = new Map();
-    const indicePorPacote = new Map();
+function indexarTestes(backendTest: string): IndicesTestes {
+    const indicePorNome = new Map<string, string[]>();
+    const indicePorPacote = new Map<string, string[]>();
 
     if (!fs.existsSync(backendTest)) {
         return {indicePorNome, indicePorPacote};
     }
 
-    function visitar(diretorio) {
+    function visitar(diretorio: string): void {
         const entradas = fs.readdirSync(diretorio, {withFileTypes: true});
         entradas.forEach(entrada => {
             const caminhoCompleto = path.join(diretorio, entrada.name);
@@ -126,16 +210,14 @@ function indexarTestes(backendTest) {
             const caminhoRelativo = normalizarCaminho(path.relative(backendTest, caminhoCompleto));
             const pacote = normalizarCaminho(path.dirname(caminhoRelativo));
 
-            if (!indicePorNome.has(entrada.name)) {
-                indicePorNome.set(entrada.name, []);
-            }
-            indicePorNome.get(entrada.name).push(caminhoRelativo);
+            const testesPorNome = indicePorNome.get(entrada.name) ?? [];
+            testesPorNome.push(caminhoRelativo);
+            indicePorNome.set(entrada.name, testesPorNome);
 
             const chavePacote = `${pacote}::${entrada.name}`;
-            if (!indicePorPacote.has(chavePacote)) {
-                indicePorPacote.set(chavePacote, []);
-            }
-            indicePorPacote.get(chavePacote).push(caminhoRelativo);
+            const testesPorPacote = indicePorPacote.get(chavePacote) ?? [];
+            testesPorPacote.push(caminhoRelativo);
+            indicePorPacote.set(chavePacote, testesPorPacote);
         });
     }
 
@@ -144,9 +226,14 @@ function indexarTestes(backendTest) {
 }
 
 
-function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
+function localizarTestes(
+    nomeClasse: string,
+    pacote: string,
+    indicePorNome: Map<string, string[]>,
+    indicePorPacote: Map<string, string[]>
+): LocalizacaoTestes {
     const candidatos = SUFIXOS_TESTE.map(sufixo => `${nomeClasse}${sufixo}${EXTENSAO_JAVA}`);
-    const encontradosMesmoPacote = [];
+    const encontradosMesmoPacote: string[] = [];
 
     candidatos.forEach(candidato => {
         const chavePacote = `${pacote}::${candidato}`;
@@ -160,7 +247,7 @@ function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
         };
     }
 
-    const encontradosPorNome = [];
+    const encontradosPorNome: string[] = [];
     candidatos.forEach(candidato => {
         (indicePorNome.get(candidato) || []).forEach(item => encontradosPorNome.push(item));
     });
@@ -178,7 +265,10 @@ function localizarTestes(nomeClasse, pacote, indicePorNome, indicePorPacote) {
     };
 }
 
-async function carregarCoberturaPorClasse(caminhoJacocoXml = null, diretorioBase = DIRETORIO_RAIZ) {
+async function carregarCoberturaPorClasse(
+    caminhoJacocoXml: string | null = null,
+    diretorioBase: string = DIRETORIO_RAIZ
+): Promise<Map<string, ClasseCobertura>> {
     try {
         const coleta = await extrairCoberturaJacoco(caminhoJacocoXml || undefined, {
             diretorioBase,
@@ -186,18 +276,22 @@ async function carregarCoberturaPorClasse(caminhoJacocoXml = null, diretorioBase
             aplicarExclusoes: false
         });
 
-        return new Map(
-            coleta.classes.map(arquivo => [arquivo.nomeClasse, arquivo])
-        );
+        return new Map(coleta.classes.map(arquivo => [arquivo.nomeClasse, arquivo] as const));
     } catch (error) {
-        if (/JaCoCo nao encontrado|JaCoCo não encontrado/i.test(String(error.message || ''))) {
+        const mensagem = error instanceof Error ? error.message : String(error);
+        if (/JaCoCo nao encontrado|JaCoCo não encontrado/i.test(mensagem)) {
             return new Map();
         }
         throw error;
     }
 }
 
-async function analisarTestes({diretorioFonte, diretorioTestes, caminhoJacocoXml = null, base = DIRETORIO_RAIZ}) {
+async function analisarTestes({
+    diretorioFonte,
+    diretorioTestes,
+    caminhoJacocoXml = null,
+    base = DIRETORIO_RAIZ
+}: OpcoesAnaliseTestes): Promise<RelatorioTestes> {
     const backendSrc = path.resolve(diretorioFonte);
     const backendTest = path.resolve(diretorioTestes);
 
@@ -209,7 +303,7 @@ async function analisarTestes({diretorioFonte, diretorioTestes, caminhoJacocoXml
     const {indicePorNome, indicePorPacote} = indexarTestes(backendTest);
     const coberturaPorClasse = await carregarCoberturaPorClasse(caminhoJacocoXml, base);
 
-    const relatorio = {
+    const relatorio: CategoriasRelatorio = {
         Controllers: {tested: [], untested: []},
         Services: {tested: [], untested: []},
         Facades: {tested: [], untested: []},
@@ -242,7 +336,6 @@ async function analisarTestes({diretorioFonte, diretorioTestes, caminhoJacocoXml
         const perfilModel = arquivo.categoria === 'Models'
             ? classificarPerfilModel({
                 nomeClasse: arquivo.nome_classe,
-                caminhoRelativo: arquivo.caminho_relativo,
                 conteudoFonte
             })
             : null;
@@ -269,7 +362,8 @@ async function analisarTestes({diretorioFonte, diretorioTestes, caminhoJacocoXml
         const possuiCoberturaJacoco = coberturaClasse !== null && coberturaClasse.linhasCobertas > 0;
         const possuiCoberturaSomenteIndireta = !possuiTeste && possuiCoberturaJacoco;
         const estaForaEscopoJacoco = !possuiTeste && coberturaPorClasse.size > 0 && !estaNoEscopoJacoco;
-        const item = criarItemRelatorio({
+        const item: ItemRelatorio = {
+            ...criarItemRelatorio({
             arquivo,
             perfilDto,
             dtoEstrutural: dtoEstrutural || modelEstrutural || otherEstrutural,
@@ -281,11 +375,12 @@ async function analisarTestes({diretorioFonte, diretorioTestes, caminhoJacocoXml
             estrategia,
             caminhos,
             coberturaClasse
-        });
-        item.perfil_model = perfilModel;
-        item.model_ruido_ignorado = modelEstrutural;
-        item.perfil_other = perfilOther;
-        item.other_ruido_ignorado = otherEstrutural;
+            }),
+            perfil_model: perfilModel,
+            model_ruido_ignorado: modelEstrutural,
+            perfil_other: perfilOther,
+            other_ruido_ignorado: otherEstrutural
+        };
 
         if (arquivo.categoria === 'DTOs') {
             if (perfilDto === 'comportamental') {
@@ -380,7 +475,7 @@ async function analisarTestes({diretorioFonte, diretorioTestes, caminhoJacocoXml
     };
 }
 
-function gerarMarkdown(dados) {
+function gerarMarkdown(dados: RelatorioTestes): string {
     const estatisticas = dados.estatisticas;
     const dataFormatada = new Date(dados.gerado_em).toLocaleString('pt-BR');
     const linhas = [
@@ -496,12 +591,12 @@ function gerarMarkdown(dados) {
     return `${linhas.join('\n')}\n`;
 }
 
-function gravarArquivo(caminho, conteudo) {
+function gravarArquivo(caminho: string, conteudo: string): void {
     fs.mkdirSync(path.dirname(caminho), {recursive: true});
     fs.writeFileSync(caminho, conteudo, 'utf-8');
 }
 
-function imprimirResumoConsole(dados) {
+function imprimirResumoConsole(dados: RelatorioTestes): void {
     const {estatisticas, categorias} = dados;
     console.log(`Resumo: ${estatisticas.classes_com_teste_dedicado}/${estatisticas.total_classes} classes com teste dedicado (${estatisticas.cobertura_arquivos_percentual.toFixed(2)}%).`);
     console.log(`- Cobertura indireta: ${estatisticas.classes_com_cobertura_indireta}`);
@@ -547,7 +642,7 @@ function imprimirResumoConsole(dados) {
     }
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const opcoes = lerArgumentos(argumentos);
     if (opcoes.ajuda) {
         imprimirAjuda();
