@@ -303,6 +303,12 @@ Execução dos testes do toolkit:
 npm --prefix toolkit run test
 ```
 
+Para medir a cobertura do próprio toolkit sem impor threshold prematuro:
+
+```bash
+npm --prefix toolkit run test:coverage
+```
+
 O smoke de distribuição instala o tarball em um consumidor temporário, sem usar dependências hoisted do monorepo:
 
 ```bash

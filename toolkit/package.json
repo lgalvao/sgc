@@ -43,6 +43,7 @@
     "deps:audit": "knip",
     "build": "tsc --project tsconfig.build.json",
     "test": "vitest run --exclude test/pacote.test.js",
+    "test:coverage": "vitest run --coverage --exclude test/pacote.test.js",
     "test:pacote": "vitest run test/pacote.test.js",
     "typecheck": "npm run typecheck:estrito",
     "typecheck:estrito": "tsc --noEmit --project tsconfig.estrito.json",

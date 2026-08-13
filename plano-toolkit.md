@@ -380,6 +380,9 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 109 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 39,37% de statements (469/1.191),
+  28,31% de branches (248/876), 48,93% de funções (115/235) e 39,75% de linhas (452/1.137); ainda sem threshold,
+  porque os testes permanecem concentrados e a prioridade é transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
 - `npm --prefix toolkit run build`: aprovado;
@@ -443,7 +446,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
 | Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
-| Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
+| Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | `fs-extra` já foi removido do runtime e ficou restrito aos testes; a auditoria de dependências restantes deve continuar por uso real, sem remoção antecipada. |
 
@@ -468,8 +471,9 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 
 | Classe atual | Comandos ou famílias | Efeito observado e controle existente |
 |---|---|---|
-| Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. As famílias que oferecem persistência usam `--gravar`. Dependências externas podem fazer leitura adicional. |
-| Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json` ou defaults. São geradores explícitos, não auditores read-only. |
+| Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. Dependências externas podem fazer leitura adicional. |
+| Auditoria read-only com persistência explícita | `backend cobertura auditoria`, `frontend cobertura auditoria` | Calculam a análise e exibem stdout/JSON por padrão; só criam o relatório Markdown indicado por `--saida` quando recebem `--gravar`. |
+| Geração de relatório indicado | `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN e versão simulam por padrão e exigem `--gravar`; baseline copia diretamente para o destino por ser uma ação de promoção nomeada. |
 | Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
@@ -611,10 +615,10 @@ reuso externo e preservação de contratos.
 5. **[concluído nesta rodada]** Adicionar testes focados para configuração inválida e combinação de defaults. Arquitetura,
    resíduos, OpenAPI, coleta, Semgrep, cheiros, assuntos de notificação e análise de testes backend agora calculam seus
    caminhos após a resolução de `--base`; outros defaults import-time continuam pendentes.
-6. Registrar uma baseline de cobertura do próprio toolkit, inicialmente informativa; definir thresholds apenas depois de
-   identificar quais contratos críticos ainda não têm teste.
+6. **[concluído nesta rodada]** Registrar uma baseline de cobertura do próprio toolkit com `npm run test:coverage`,
+   inicialmente informativa; definir thresholds apenas depois de identificar quais contratos críticos ainda não têm teste.
 
-Situação: itens 1, 2, 4 e 5 concluídos; itens 3 e 6 continuam pendentes.
+Situação: itens 1, 2, 4, 5 e 6 concluídos; item 3 continua pendente.
 
 Critério de aceite: comandos mutáveis conhecidos têm testes de efeito, Knip consegue revelar código órfão real e a
 configuração externa possui testes de precedência e erro.
