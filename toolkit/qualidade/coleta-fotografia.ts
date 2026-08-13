@@ -6,13 +6,15 @@ import type {ExecucaoQualidade} from "./coleta-execucao.js";
 
 const VERSAO_SCHEMA_FOTOGRAFIA = "1.0.0" as const;
 
+type MetadadosControleVersao = Readonly<Record<string, string>>;
+
 interface FotografiaColeta {
     versaoSchema: typeof VERSAO_SCHEMA_FOTOGRAFIA;
     metadados: {
         geradoEm: string;
         perfilExecucao: string;
         duracaoTotalMs: number;
-        git: Record<string, string>;
+        controleVersao: MetadadosControleVersao;
     };
     verificacoes: ExecucaoQualidade[];
     resumo: {
@@ -35,7 +37,7 @@ interface OpcoesFotografia {
     perfilExecucao: string;
     inicio: number;
     verificacoes: ExecucaoQualidade[];
-    git: Record<string, string>;
+    controleVersao: MetadadosControleVersao;
     agora?: Date;
 }
 
@@ -49,7 +51,7 @@ function criarFotografiaColeta({
     perfilExecucao,
     inicio,
     verificacoes,
-    git,
+    controleVersao,
     agora = new Date()
 }: OpcoesFotografia): FotografiaColeta {
     const hotspots = verificacoes
@@ -67,7 +69,7 @@ function criarFotografiaColeta({
             geradoEm: agora.toISOString(),
             perfilExecucao,
             duracaoTotalMs: agora.getTime() - inicio,
-            git
+            controleVersao
         },
         verificacoes,
         resumo: {
@@ -103,5 +105,6 @@ export {
     criarFotografiaColeta,
     persistirFotografia,
     prepararDiretoriosFotografia,
-    type FotografiaColeta
+    type FotografiaColeta,
+    type MetadadosControleVersao
 };

@@ -8,7 +8,7 @@ import {extrairCoberturaJacoco, type ClasseCobertura, type ResultadoCoberturaJac
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
-const CAMINHO_PADRAO_SAIDA = "backend-coverage-auditoria.md";
+const CAMINHO_PADRAO_SAIDA = "backend-cobertura-auditoria.md";
 
 interface PontoCriticoRelatorio {
     nome: string;

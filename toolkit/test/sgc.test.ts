@@ -592,8 +592,8 @@ describe("CLI raiz do toolkit", () => {
 
         expect(backendLeitura.exitCode).toBe(0);
         expect(frontendLeitura.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "backend-coverage-auditoria.md"))).toBe(false);
-        expect(await fs.pathExists(path.join(base, "frontend-coverage-auditoria.md"))).toBe(false);
+        expect(await fs.pathExists(path.join(base, "backend-cobertura-auditoria.md"))).toBe(false);
+        expect(await fs.pathExists(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(false);
 
         const backendGravacao = await executarSgc([
             "backend",
@@ -620,8 +620,8 @@ describe("CLI raiz do toolkit", () => {
 
         expect(backendGravacao.exitCode).toBe(0);
         expect(frontendGravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "backend-coverage-auditoria.md"))).toBe(true);
-        expect(await fs.pathExists(path.join(base, "frontend-coverage-auditoria.md"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, "backend-cobertura-auditoria.md"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(true);
     });
 
     test("pode importar comandos de cobertura frontend sem ler o relatorio V8", async () => {
@@ -1152,7 +1152,7 @@ describe("CLI raiz do toolkit", () => {
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(false);
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(false);
 
         const gravacao = await executarSgc([
             "backend",
@@ -1164,7 +1164,7 @@ describe("CLI raiz do toolkit", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "coesao-auditoria.json"))).toBe(true);
     });
 
     test("audita service acima do limiar arquitetural sem gravar por padrao", async () => {
@@ -1209,7 +1209,7 @@ describe("CLI raiz do toolkit", () => {
             severidade: "alerta"
         });
         expect(conteudo.todos[0].motivos).toContain("15 métodos públicos (>=15)");
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "arquitetura-auditoria.md"))).toBe(false);
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(false);
 
         const gravacao = await executarSgc([
             "backend",
@@ -1221,7 +1221,7 @@ describe("CLI raiz do toolkit", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "arquitetura-auditoria.md"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "arquitetura-auditoria.md"))).toBe(true);
     });
 
     test("audita vazamento de modelo em DTO de controlador sem gravar por padrao", async () => {
@@ -1279,7 +1279,7 @@ describe("CLI raiz do toolkit", () => {
             campo: "usuario",
             tipoModelo: "exemplo.model.Usuario"
         });
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "contratos-auditoria.md"))).toBe(false);
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(false);
 
         const gravacao = await executarSgc([
             "backend",
@@ -1291,7 +1291,7 @@ describe("CLI raiz do toolkit", () => {
             base
         ]);
         expect(gravacao.exitCode).toBe(0);
-        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "contratos-auditoria.md"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "mais-recente", "contratos-auditoria.md"))).toBe(true);
     });
 
     test("resolve politica Semgrep padrao a partir da instalacao do toolkit", async () => {

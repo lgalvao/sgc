@@ -13,7 +13,8 @@ import {
     criarFotografiaColeta,
     persistirFotografia,
     prepararDiretoriosFotografia,
-    type FotografiaColeta
+    type FotografiaColeta,
+    type MetadadosControleVersao
 } from "./coleta-fotografia.js";
 import {consolidarJUnit, parseJsonSeguro} from "./coleta-leitores.js";
 import type {HotspotQualidade, ResultadoJUnit} from "./coleta-leitores.js";
@@ -29,7 +30,7 @@ interface OpcoesColeta {
     adaptadores?: CatalogoAdaptadores;
     perfis?: CatalogoPerfisColeta;
     criarContexto?: (base: string) => ContextoColeta;
-    coletarMetadados?: (base: string) => Promise<Record<string, string>>;
+    coletarMetadados?: (base: string) => Promise<MetadadosControleVersao>;
     prepararDiretoriosFotografia?: typeof prepararDiretoriosFotografia;
     persistirFotografia?: typeof persistirFotografia;
 }
@@ -174,7 +175,7 @@ async function principal(
         perfilExecucao: perfilInformado,
         inicio,
         verificacoes,
-        git: await (opcoes.coletarMetadados ?? coletarMetadadosGit)(contexto.base).catch(() => ({}))
+        controleVersao: await (opcoes.coletarMetadados ?? coletarMetadadosGit)(contexto.base).catch(() => ({}))
     });
     const persistir = opcoes.persistirFotografia ?? persistirFotografia;
     const caminhoFotografia = await persistir(fotografia, {
@@ -205,6 +206,7 @@ export {
     type ContextoColeta,
     type ExecucaoQualidade,
     type FotografiaColeta,
+    type MetadadosControleVersao,
     type HotspotQualidade,
     type OpcoesColeta,
     type OpcoesComando,

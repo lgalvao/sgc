@@ -8,7 +8,7 @@ import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCobertura
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
-const CAMINHO_PADRAO_SAIDA = "frontend-coverage-auditoria.md";
+const CAMINHO_PADRAO_SAIDA = "frontend-cobertura-auditoria.md";
 
 interface ResumoMetricasFrontend {
     lines: ResultadoCoberturaFrontend["lines"];

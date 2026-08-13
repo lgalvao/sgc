@@ -248,7 +248,7 @@ describe("Comandos de projeto do toolkit", () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-scripts-"));
         await fs.ensureDir(path.join(diretorioBase, "backend", "build"));
         await fs.ensureDir(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente"));
-        await fs.outputFile(path.join(diretorioBase, "backend-coverage-auditoria.md"), "# teste");
+        await fs.outputFile(path.join(diretorioBase, "backend-cobertura-auditoria.md"), "# teste");
         await fs.outputFile(path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "resumo.md"), "ok");
 
         const previa = await executarSgc(["projeto", "limpar", "--json", "--base", diretorioBase]);
@@ -263,7 +263,7 @@ describe("Comandos de projeto do toolkit", () => {
         const jsonExecucao = JSON.parse(execucao.stdout);
         expect(jsonExecucao.modo).toBe("executar");
         expect(await fs.pathExists(path.join(diretorioBase, "backend", "build"))).toBe(false);
-        expect(await fs.pathExists(path.join(diretorioBase, "backend-coverage-auditoria.md"))).toBe(false);
+        expect(await fs.pathExists(path.join(diretorioBase, "backend-cobertura-auditoria.md"))).toBe(false);
     });
 
     test("aceita política de padrões de limpeza de projeto externo", async () => {
@@ -303,7 +303,7 @@ describe("Comandos de projeto do toolkit", () => {
         expect(padroes).toContain("artefatos");
         expect(padroes).not.toContain("backend/build");
         expect(padroes).not.toContain("frontend/coverage");
-        expect(padroes).not.toContain("toolkit/qualidade/semgrep/latest");
+        expect(padroes.some(padrao => padrao.includes("latest"))).toBe(false);
         expect(padroes).not.toContain("complexity-ranking.md");
     });
 

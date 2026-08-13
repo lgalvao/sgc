@@ -38,8 +38,8 @@ function obterPadroesLimpezaPadrao(base: string): string[] {
         "analise-testes.md",
         "analise-testes.json",
         "priorizacao-testes.md",
-        "backend-coverage-auditoria.md",
-        "frontend-coverage-auditoria.md"
+        "backend-cobertura-auditoria.md",
+        "frontend-cobertura-auditoria.md"
     ];
 }
 

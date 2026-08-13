@@ -439,8 +439,8 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 122 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,13% de statements (614/1.331),
-  34,66% de branches (322/929), 52,98% de funções (142/268) e 46,34% de linhas (590/1.273); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,33% de statements (620/1.338),
+  34,69% de branches (323/931), 53,33% de funções (144/270) e 46,52% de linhas (595/1.279); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -532,6 +532,10 @@ Na rodada seguinte, a versão `1.0.0` do schema da fotografia foi centralizada e
 restringir o contrato TypeScript do coletor.
 Na rodada seguinte, os tipos de relatório específicos de resíduos, arquitetura e Playwright foram removidos do núcleo e
 passaram a viver em `coleta-adaptadores-sgc.ts`; os contratos JUnit e hotspot ficaram no leitor reutilizável.
+Nesta rodada, os 42 shebangs de Node em fontes TypeScript foram removidos; o catálogo completo passou a classificar as
+49 folhas por escopo e efeito; os destinos próprios `latest`, os nomes `*-coverage-*` e os campos da fotografia
+`metadados.git.branch/commit` foram padronizados para `mais-recente`, `*-cobertura-*` e
+`metadados.controleVersao.ramo/revisao`, respectivamente.
 
 ### 3.3 Tamanho e composição atual
 
@@ -657,11 +661,11 @@ Conclusões confirmadas:
   ser guiados por contrato público, cobertura e um consumidor externo representativo;
 - a cobertura global atual é informativa, não um critério suficiente. Os módulos de maior risco da coleta ainda têm
   cobertura direta baixa: adaptadores SGC, executor e leitores são exercitados principalmente por integração indireta;
-- a padronização em português ainda não está completa: permanecem diretórios `latest`, nomes de relatório com
-  `coverage` e campos Git `branch`/`commit`. A ausência de clientes legados permite corrigir esses contratos diretamente,
-  desde que testes, documentação e consumidores internos mudem no mesmo recorte;
-- `backend arquitetura/contratos/coesao auditar` já são read-only por padrão e possuem regressões que exigem `--gravar`;
-  a pendência dessa família é a nomenclatura do destino `backend/latest`, não o controle de persistência;
+- a padronização em português dos contratos próprios avançou: destinos `latest`, nomes de relatório `*-coverage-*` e
+  campos da fotografia `branch`/`commit` foram removidos. Permanecem símbolos de cobertura derivados de formatos ou
+  ferramentas externas e opções/mensagens heterogêneas que ainda exigem revisão coordenada;
+- `backend arquitetura/contratos/coesao auditar` já são read-only por padrão, possuem regressões que exigem `--gravar`
+  e agora usam o destino `backend/mais-recente`;
 - a URL OpenAPI `http://127.0.0.1:10000/api-docs`, tarefas Gradle e várias convenções Vue/SGC continuam sendo defaults
   legítimos do perfil SGC, mas ainda não estão todos representados como política ou adaptador explícito;
 - nesta auditoria, o shell ativo voltou a Node `26.5.1`, abaixo do mínimo `26.7.0`; o teste de diagnóstico falhou como
@@ -709,13 +713,13 @@ Decisões negativas desta auditoria:
   até existir consumidor substituto testado.
 - `fs-extra` não é dependência de runtime e só aparece nos testes. Sua substituição por `node:fs/promises` é uma
   simplificação possível, mas não é evidência de obsolescência funcional e fica para uma rodada própria.
-- Campos de entrada externos como `BRANCH` do JaCoCo e mapas V8 não serão traduzidos artificialmente. Já nomes próprios
-  do toolkit — diretórios `latest`, arquivos `*-coverage-*` e metadados Git `branch`/`commit` — permanecem pendentes de
-  padronização explícita, com atualização coordenada de testes, limpeza e documentação.
+- Campos de entrada externos como `BRANCH` do JaCoCo, mapas V8 e o diretório `frontend/coverage` produzido pelo Vitest
+  não serão traduzidos artificialmente. Os nomes próprios já corrigidos nesta rodada são `mais-recente`,
+  `*-cobertura-*` e `metadados.controleVersao.ramo/revisao`; símbolos internos de cobertura ainda serão avaliados em
+  uma rodada separada, sem alterar chaves de formatos externos.
 
-Sobra confirmada para remoção imediata: os shebangs `#!/usr/bin/env node` presentes em 42 fontes TypeScript. Nenhum
-consumidor executa esses arquivos como binários; a fonte é chamada por `tsx` e o binário npm é o launcher CJS. Eles serão
-removidos junto com a atualização do mapa de classificação, sem alterar comandos ou resultados.
+Sobra removida nesta rodada: os shebangs `#!/usr/bin/env node` presentes em 42 fontes TypeScript. Nenhum consumidor
+executava esses arquivos como binários; a fonte é chamada por `tsx` e o binário npm é o launcher CJS.
 
 ## 4. Classificação para reuso externo
 
@@ -794,16 +798,15 @@ do perfil.
 1. **[resolvido nesta rodada] Inventário de utilidade**: a matriz da seção 3.8 registra a decisão funcional por família
    de comandos, bibliotecas, políticas e assets. O grafo do Knip continua sendo apenas evidência técnica; a decisão
    também considerou catálogo, testes, documentação, configuração e histórico.
-2. **[parcial, com primeiro corte concluído] Código temporal**: os 42 shebangs `#!/usr/bin/env node` sem consumidor
-   foram removidos como sobra objetiva da migração para TypeScript. A revisão dos nomes `latest`, `coverage`, `branch` e
-   `commit` e das dependências de teste ainda precisa ser executada antes de concluir a limpeza temporal.
+2. **[parcial, com dois cortes concluídos] Código temporal**: os 42 shebangs `#!/usr/bin/env node` sem consumidor e os
+   nomes próprios `latest`, `*-coverage-*` e `metadados.git.branch/commit` foram removidos. Ainda falta revisar
+   dependências de teste, símbolos internos de cobertura e regras de ignorar artefatos antigos.
 3. **[resolvido na superfície de comandos] Mapa explícito núcleo/perfil**: `lib/catalogo-comandos.ts` agora classifica
    todas as 49 folhas da CLI, inclusive as sete registradas com callbacks em `sgc.ts`, por escopo e efeito. Políticas e
    regras internas ainda precisam migrar gradualmente para adaptadores, sem reorganização antecipada.
-4. **Padronização e simplificação incompletas**: substituir `latest`, nomes `*-coverage-*` e símbolos próprios
-   `branch`/`commit` por contratos portugueses. Não criar aliases de compatibilidade; atualizar fixtures, consumidores e
-   documentação no mesmo recorte. Também eliminar opções duplicadas, helpers de uso único e camadas que não expressem
-   uma fronteira real.
+4. **[parcial] Padronização e simplificação**: os destinos `latest`, nomes `*-coverage-*` e campos próprios
+   `branch`/`commit` já usam contratos portugueses, sem aliases de compatibilidade. Ainda falta revisar símbolos internos
+   de cobertura, opções duplicadas, helpers de uso único e camadas que não expressem uma fronteira real.
 5. **Caracterização insuficiente das áreas de risco**: adaptadores SGC, executor e leitores têm cobertura direta baixa.
    Criar testes comportamentais focados antes de remover ou fundir código nessas áreas; cobertura não deve servir para
    justificar a preservação de funcionalidade sem consumidor.
@@ -853,8 +856,9 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
    removidos; não havia roteamento, teste, configuração ou dependência exclusiva associada a eles.
 3. **[concluído nesta rodada] Criar o mapa de perfil**: o catálogo completo classifica todas as folhas por escopo e
    efeito, e o teste de sincronização confere descrição, presença do arquivo quando aplicável e unicidade dos caminhos.
-4. **[em andamento] Padronizar a superfície restante**: corrigir nomes `latest`, `coverage`, `branch` e `commit`, revisar parâmetros,
-   mensagens e códigos de saída e fundir helpers/camadas redundantes encontrados no inventário.
+4. **[parcial nesta rodada] Padronizar a superfície restante**: destinos e campos próprios foram corrigidos; continuam
+   pendentes símbolos internos de cobertura, parâmetros, mensagens, códigos de saída e helpers/camadas redundantes
+   encontrados no inventário.
 5. **Caracterizar áreas que serão alteradas**: acrescentar testes focados somente para funcionalidades preservadas que
    serão simplificadas ou separadas; começar por executor, leitores e adaptadores SGC se a coleta entrar no recorte.
 6. **Externalizar o próximo recorte horizontal real**: escolher uma família com consumidor plausível — inicialmente
