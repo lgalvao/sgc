@@ -72,7 +72,7 @@ interface ResultadoDiagnostico extends ResultadoConsolidado {
 }
 
 const RECURSOS: Recurso[] = [
-    {tipo: "comando", nome: "node", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoMin: "26.0.0"},
+    {tipo: "comando", nome: "node", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoMin: "26.7.0"},
     {tipo: "comando", nome: "npm", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
     {tipo: "comando", nome: "git", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE},
     {tipo: "comando", nome: "java", obrigatorio: true, categoria: CATEGORIAS.AMBIENTE, versaoEsperada: "25"},

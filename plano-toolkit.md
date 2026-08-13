@@ -128,10 +128,8 @@ frontend e para os caminhos OpenAPI.
 
 ### 3.1 O que já foi feito
 
-- A política do projeto declara Node `26.7.0` em `.nvmrc` e `engines` no projeto raiz e no toolkit; a validação desta
-  rodada foi executada diretamente em Node `26.5.1`, que está abaixo do mínimo declarado e emite `EBADENGINE` no smoke de
-  instalação. O alinhamento do runtime local continua uma pendência operacional, não uma justificativa para alterar a
-  política do toolkit.
+- A política do projeto declara Node `26.7.0` em `.nvmrc`, `engines` e no diagnóstico do toolkit; esta rodada foi
+  validada diretamente com o runtime `v26.7.0` instalado no ambiente, sem `EBADENGINE`.
 - Execução de fonte padronizada em `tsx`; scripts npm, documentação, `release-it` e ADR relevante já não usam `node`
   puro para comandos fonte.
 - Build TypeScript criado e mantido como verificação opcional em `toolkit/dist/`.
@@ -337,8 +335,7 @@ frontend e para os caminhos OpenAPI.
 
 ### 3.2 Evidência de validação atual
 
-Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.5.1` (Node 26 disponível no
-ambiente):
+Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
 - `npm --prefix toolkit run test`: 104 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
