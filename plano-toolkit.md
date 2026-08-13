@@ -2,7 +2,18 @@
 
 ## 1. Objetivo
 
-Transformar `toolkit/` em uma ferramenta de auditoria e automação:
+O trabalho tem quatro objetivos originais, nesta ordem lógica:
+
+1. **Auditar e limpar**: identificar código, comandos, políticas, artefatos e dependências criados para situações
+   temporárias ou já ultrapassadas; remover o que não tem consumidor nem finalidade atual comprovável.
+2. **Separar escopos**: distinguir o núcleo horizontal reutilizável das políticas e integrações específicas do SGC,
+   preservando estas últimas quando ainda forem úteis ao projeto.
+3. **Modernizar e padronizar**: simplificar implementação, CLI, efeitos, nomes de arquivos, diretórios, símbolos,
+   parâmetros, mensagens e formatos, integralmente em português brasileiro quando não forem nomes técnicos externos.
+4. **Concluir TypeScript**: manter implementação e testes em TypeScript estrito, com fonte única e execução direta por
+   `tsx`, sem JavaScript paralelo nem dependência de `dist` no fluxo normal.
+
+O resultado esperado é uma ferramenta de auditoria e automação:
 
 - executável diretamente a partir do código-fonte com `tsx`;
 - escrita integralmente em TypeScript, sem manter duas implementações da mesma regra;
@@ -15,6 +26,9 @@ O objetivo não é transformar cada regra específica do SGC em uma abstração 
 núcleo horizontal, perfis/adaptadores de projeto e regras que pertencem exclusivamente ao SGC. Reuso externo é uma
 ampliação do toolkit, não uma substituição do seu consumidor original: as funcionalidades específicas do SGC devem
 continuar disponíveis e cobertas pelo perfil SGC.
+
+Uma abstração ou export público não é progresso por si só. Primeiro deve existir uma funcionalidade atual e útil; depois
+ela é classificada como horizontal, adaptável ou SGC. Código sem finalidade atual deve ser removido, não generalizado.
 
 ### 1.1 Escopo
 
@@ -127,6 +141,21 @@ frontend e para os caminhos OpenAPI.
   a distribuição externa usa fonte + `tsx`, com `version`, `files` e separação da raiz do consumidor validados por smoke.
 - Não atualizar dependências major sem uma matriz mínima de validação. A linha de TypeScript fica em TS6 por decisão
   explícita do projeto.
+
+### 2.7 Critério para código temporário ou obsoleto
+
+Cada comando, biblioteca, política ou artefato suspeito deve ser avaliado por evidência, não apenas por estar referenciado:
+
+- consumidor atual no roteador, scripts npm, configuração, CI ou outro módulo;
+- entrada real ainda produzida e saída real ainda consumida;
+- regra que representa requisito atual do SGC ou capacidade horizontal identificável;
+- sobreposição com outro comando que já resolve o mesmo problema;
+- dependências, opções, artefatos de limpeza e documentação que existem apenas para sustentá-lo;
+- teste que caracteriza valor funcional, não somente a existência da implementação.
+
+As decisões permitidas são: `remover`, `fundir`, `manter-horizontal`, `manter-adaptável` ou `manter-sgc`. “Modernizar
+agora e decidir depois” não é uma decisão válida. Knip, cobertura e referências estáticas ajudam a investigação, mas não
+provam utilidade funcional.
 
 ## 3. Situação atual — 13 de agosto de 2026
 
@@ -631,8 +660,8 @@ Conclusões confirmadas:
 - a padronização em português ainda não está completa: permanecem diretórios `latest`, nomes de relatório com
   `coverage` e campos Git `branch`/`commit`. A ausência de clientes legados permite corrigir esses contratos diretamente,
   desde que testes, documentação e consumidores internos mudem no mesmo recorte;
-- há persistências que precisam ser classificadas com mais precisão. `backend arquitetura/contratos/coesao auditar`
-  criam relatórios em diretório `backend/latest`, enquanto o plano afirma auditoria read-only como estado desejado;
+- `backend arquitetura/contratos/coesao auditar` já são read-only por padrão e possuem regressões que exigem `--gravar`;
+  a pendência dessa família é a nomenclatura do destino `backend/latest`, não o controle de persistência;
 - a URL OpenAPI `http://127.0.0.1:10000/api-docs`, tarefas Gradle e várias convenções Vue/SGC continuam sendo defaults
   legítimos do perfil SGC, mas ainda não estão todos representados como política ou adaptador explícito;
 - nesta auditoria, o shell ativo voltou a Node `26.5.1`, abaixo do mínimo `26.7.0`; o teste de diagnóstico falhou como
@@ -715,75 +744,85 @@ do perfil.
 
 ### Prioridade alta
 
-1. **Superfície pública de reuso não fechada**: o tarball prova a CLI externa, mas `package.json` não exporta a API de
-   qualidade recém-composta. Antes de chamar essa camada de reutilizável, decidir e testar uma superfície mínima de
-   subpaths públicos (`qualidade/coleta`, contratos e tipos necessários), sem expor módulos internos por wildcard.
-2. **Caracterização insuficiente da coleta**: adaptadores SGC, executor e leitores têm cobertura direta baixa. Criar
-   testes comportamentais focados para erro de subprocesso, JUnit ausente/malformado, JSON inválido, ordenação/limite de
-   hotspots e pelo menos um adaptador backend e frontend antes de nova decomposição estrutural.
-3. **Efeitos colaterais de auditorias backend**: `backend arquitetura/contratos/coesao auditar` persistem relatórios em
-   `backend/latest`. Classificar o resultado como geração explícita ou tornar a execução read-only por padrão com
-   `--gravar`; adicionar regressões de ausência de escrita e de destino relativo à base.
-4. **Mapa explícito núcleo/perfil**: classificar cada comando e política como horizontal, adaptável ou SGC. A coleta já
+1. **Inventário de utilidade ainda incompleto**: os 79 módulos estão no grafo técnico, mas ainda não existe uma decisão
+   funcional por comando, biblioteca e asset: manter, remover, fundir, horizontalizar ou preservar no perfil SGC. Knip
+   detecta ausência de referências; não detecta uma funcionalidade inteira ainda conectada, porém obsoleta.
+2. **Código temporal pode ter sido modernizado em vez de questionado**: antes de novas abstrações, confrontar cada
+   família com consumidores atuais, artefatos produzidos, documentação, configuração e histórico recente. Ausência de
+   finalidade atual leva à remoção completa, inclusive testes, opções, políticas e limpeza associada.
+3. **Mapa explícito núcleo/perfil**: classificar cada comando e política como horizontal, adaptável ou SGC. A coleta já
    possui essa fronteira, mas arquitetura Vue, nomenclatura, CDU, OpenAPI e tarefas Gradle ainda misturam defaults do
    perfil com capacidades horizontais em graus diferentes.
-5. **Padronização em português incompleta**: substituir `latest`, nomes `*-coverage-*` e símbolos próprios
+4. **Padronização e simplificação incompletas**: substituir `latest`, nomes `*-coverage-*` e símbolos próprios
    `branch`/`commit` por contratos portugueses. Não criar aliases de compatibilidade; atualizar fixtures, consumidores e
-   documentação no mesmo recorte.
+   documentação no mesmo recorte. Também eliminar opções duplicadas, helpers de uso único e camadas que não expressem
+   uma fronteira real.
+5. **Caracterização insuficiente das áreas de risco**: adaptadores SGC, executor e leitores têm cobertura direta baixa.
+   Criar testes comportamentais focados antes de remover ou fundir código nessas áreas; cobertura não deve servir para
+   justificar a preservação de funcionalidade sem consumidor.
 
 ### Prioridade média
 
-6. **Schema de resultados parcial**: a fotografia de qualidade tem `VERSAO_SCHEMA_FOTOGRAFIA`
+6. **Superfície pública de reuso não fechada**: o tarball prova a CLI externa, mas `package.json` não exporta a API de
+   qualidade recém-composta. Só definir subpaths programáticos depois de a auditoria confirmar quais capacidades são
+   horizontais e atuais; não publicar como API código que ainda pode ser removido.
+7. **Schema de resultados parcial**: a fotografia de qualidade tem `VERSAO_SCHEMA_FOTOGRAFIA`
    centralizada (`1.0.0`) e contrato TypeScript restrito; auditorias, cobertura, diagnósticos e relatórios ainda usam
    objetos com versionamento incompleto. Priorizar formatos realmente consumidos por CI ou por outro comando, com
    validação de entrada; não impor um envelope universal a resultados que não compartilham semântica.
-7. **Opções e códigos de saída heterogêneos**: a implementação usa `--entrada`, `--saida`,
+8. **Opções e códigos de saída heterogêneos**: a implementação usa `--entrada`, `--saida`,
    `--diretorio`, `--arquivo`, `--base` e opções de domínio em português; a busca não encontrou `--input`, `--output`,
    `--dir` ou `--directory` como contratos próprios. Falta documentar quando uma violação gera código não zero, quando
    JSON continua disponível em falha e quais comandos exigem `--gravar` ou `--confirmar`.
-8. **Catálogo ainda parcial**: os 42 despachadores estão em `lib/catalogo-comandos.ts`, mas os comandos de registro
+9. **Catálogo ainda parcial**: os 42 despachadores estão em `lib/catalogo-comandos.ts`, mas os comandos de registro
    especializado continuam em `sgc.ts`. Centralizar metadados comuns — caminho, descrição, classe de efeito e perfil —
    sem tentar representar callbacks complexos como dados artificiais.
-9. **Testes concentrados**: `test/sgc.test.ts` ainda possui 81 cenários e cerca de 2.800 linhas. Separar primeiro runtime
+10. **Testes concentrados**: `test/sgc.test.ts` ainda possui 81 cenários e cerca de 2.800 linhas. Separar primeiro runtime
    e distribuição, backend e frontend; `test/qualidade.test.ts` já possui 7 cenários, não 4 como dizia o plano anterior.
-10. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
+11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
     ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
     conseguir distingui-lo de uma regra horizontal.
 
 ### Prioridade baixa
 
-11. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
+12. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
     saídas locais sejam confundidas com recursos do pacote.
-12. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
+13. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
     comparação antes/depois e sem sacrificar a legibilidade do relatório.
 
 ## 6. Próximos passos ordenados
 
-Cada item abaixo deve ser uma rodada pequena, validada e publicada antes do próximo. A ordem privilegia redução de risco,
-reuso externo e preservação de contratos.
+Cada item abaixo deve ser uma rodada pequena, validada e publicada antes do próximo. A ordem privilegia remoção de
+obsolescência, clareza de escopo, consistência e só então ampliação do reuso externo.
 
 ### 6.1 Fila executável após esta auditoria
 
 As fases históricas abaixo continuam úteis como registro, mas a execução deve seguir esta fila ativa:
 
-1. **Caracterizar a coleta recém-separada**: testar executor, leitores, fotografia e adaptadores SGC nos caminhos de
-   sucesso e falha; registrar a cobertura por módulo e evitar novas extrações sem lacuna comportamental comprovada.
-2. **Fechar a API pública do pacote**: escolher os subpaths programáticos mínimos, exportá-los explicitamente, instalar
-   o tarball e importar essa API em um consumidor TypeScript externo. O smoke atual cobre apenas a CLI.
-3. **Corrigir efeitos e idioma dos auditores backend**: decidir o contrato de persistência de arquitetura, contratos e
-   coesão; padronizar `latest`, `coverage`, `branch` e `commit` sem aliases legados.
-4. **Criar o mapa de perfil**: adicionar ao catálogo metadados de classe de efeito e classificação
+1. **Auditar utilidade por família**: para cada comando, biblioteca, política e artefato, registrar consumidores atuais,
+   entradas, saídas e decisão `manter/remover/fundir/horizontalizar/perfil-sgc`. Começar pelos módulos e políticas com
+   origem temporária suspeita, não pela coleta já modernizada.
+2. **Remover o primeiro lote obsoleto**: apagar integralmente funcionalidades sem finalidade atual comprovada, incluindo
+   roteamento, testes, configuração, documentação, padrões de limpeza e dependências exclusivas. Não deixar aliases ou
+   stubs de compatibilidade.
+3. **Criar o mapa de perfil**: adicionar ao catálogo metadados de classe de efeito e classificação
    horizontal/adaptável/SGC; usar teste para garantir que todos os comandos registrados estejam classificados.
-5. **Externalizar o próximo recorte horizontal real**: escolher uma família com consumidor plausível — inicialmente
+4. **Padronizar a superfície restante**: corrigir nomes `latest`, `coverage`, `branch` e `commit`, revisar parâmetros,
+   mensagens e códigos de saída e fundir helpers/camadas redundantes encontrados no inventário.
+5. **Caracterizar áreas que serão alteradas**: acrescentar testes focados somente para funcionalidades preservadas que
+   serão simplificadas ou separadas; começar por executor, leitores e adaptadores SGC se a coleta entrar no recorte.
+6. **Externalizar o próximo recorte horizontal real**: escolher uma família com consumidor plausível — inicialmente
    cobertura Java/V8 ou OpenAPI — e provar configuração em fixture externo antes de criar novos adaptadores genéricos.
-6. **Dividir `test/sgc.test.ts` por risco**: extrair runtime/distribuição primeiro, depois backend e frontend, mantendo
+7. **Fechar a API pública do pacote**: somente após o mapa de utilidade, exportar os subpaths horizontais confirmados e
+   importar essa API em consumidor TypeScript instalado por tarball. O smoke atual cobre apenas a CLI.
+8. **Dividir `test/sgc.test.ts` por risco**: extrair runtime/distribuição primeiro, depois backend e frontend, mantendo
    testes comportamentais e sem reorganização puramente estética.
-7. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e
+9. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e
    validação de entrada por família, sem envelope universal obrigatório.
 
 Cada item só deve ser considerado concluído quando o perfil SGC e o consumidor externo relevante estiverem cobertos no
-mesmo recorte. Itens 1 e 2 precedem novas generalizações porque hoje representam as maiores lacunas entre a arquitetura
-declarada e a evidência disponível.
+mesmo recorte. O inventário e a remoção precedem novas generalizações: não se deve estabilizar, exportar ou ampliar uma
+funcionalidade antes de decidir se ela ainda merece existir.
 
 ### Fase 0 — estabilizar os contratos existentes
 
