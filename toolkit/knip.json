@@ -35,7 +35,7 @@
     "projeto/diagnostico.ts",
     "projeto/limpar.ts",
     "projeto/preparar.ts",
-    "projeto/qualidade.js",
+    "projeto/qualidade.ts",
     "projeto/versao-sincronizar.ts",
     "qualidade/coleta-execucao.ts",
     "qualidade/coleta.ts",

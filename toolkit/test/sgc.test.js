@@ -10,6 +10,7 @@ import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 import {executarDiagnostico} from "../projeto/diagnostico.ts";
 import {executarLimpeza} from "../projeto/limpar.ts";
 import {resolverEscoposInstalacao} from "../projeto/preparar.ts";
+import {executarPerfilQualidade} from "../projeto/qualidade.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
@@ -50,6 +51,7 @@ const CAMINHOS_COMANDOS_PROJETO = [
     "diagnostico.ts",
     "limpar.ts",
     "preparar.ts",
+    "qualidade.ts",
     "versao-sincronizar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
@@ -2408,6 +2410,38 @@ describe("CLI raiz do toolkit", () => {
                 caminho: path.join(diretorioBase, "servicos/api")
             }
         ]);
+    });
+
+    test("executa catálogo de qualidade externo na base indicada", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-base-"));
+        const chamadas = [];
+        const resultado = await executarPerfilQualidade("verificacao", {
+            base: diretorioBase,
+            perfis: {
+                verificacao: {
+                    descricao: "Verificacao do projeto externo.",
+                    tarefas: [{
+                        titulo: "Comando externo",
+                        comando: "ferramenta",
+                        argumentos: ["verificar", "--json"]
+                    }]
+                }
+            },
+            executarComando: async (comando, argumentos, base) => {
+                chamadas.push({comando, argumentos, base});
+            }
+        });
+
+        expect(resultado).toEqual({
+            diretorioBase,
+            perfil: "verificacao",
+            tarefas: ["Comando externo"]
+        });
+        expect(chamadas).toEqual([{
+            comando: "ferramenta",
+            argumentos: ["verificar", "--json"],
+            base: diretorioBase
+        }]);
     });
 
     test("nao possui diretorios legados de scripts em backend/frontend", async () => {
