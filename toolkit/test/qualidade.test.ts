@@ -39,6 +39,7 @@ describe("Qualidade do toolkit", () => {
         const json = JSON.parse(resultado.stdout);
         expect(json.resumo.statusGeral).toBe("verde");
         expect(json.resumo.indiceSaude).toBe(98);
+        expect(json.caminho).toBe("toolkit/qualidade/artefatos/mais-recente/fotografia.json");
     });
 
     test("exibe ajuda de coleta de fotografia com opcao de perfil", async () => {

@@ -1,4 +1,5 @@
 import path from "node:path";
+import {resolverNaRaiz} from "../lib/caminhos.js";
 import {resolverFotografiaQualidade} from "../lib/qualidade.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
@@ -64,10 +65,11 @@ function imprimirHumano(caminho: string, fotografia: FotografiaResumo, limitePon
 }
 
 async function executarResumoQualidade(opcoes: OpcoesResumo = {}): Promise<ResultadoResumo> {
-    const resolvido = await resolverFotografiaQualidade<FotografiaResumo>(opcoes.arquivo ?? null, opcoes.base);
+    const diretorioBase = path.resolve(opcoes.base ?? resolverNaRaiz());
+    const resolvido = await resolverFotografiaQualidade<FotografiaResumo>(opcoes.arquivo ?? null, diretorioBase);
     const fotografia = resolvido.fotografia;
     const saida: ResultadoResumo = {
-        caminho: path.relative(process.cwd(), resolvido.caminho).replaceAll("\\", "/"),
+        caminho: path.relative(diretorioBase, resolvido.caminho).replaceAll("\\", "/"),
         resumo: fotografia.resumo,
         verificacoes: fotografia.verificacoes ?? [],
         confiabilidade: fotografia.confiabilidade ?? {},

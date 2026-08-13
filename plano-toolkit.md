@@ -340,7 +340,8 @@ frontend e para os caminhos OpenAPI.
 - `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
   agora compartilham a fronteira tipada do runtime.
 - `qualidade/resumo.ts` foi convertido para TypeScript; o carregador de fotografias passou a aceitar um tipo genérico e
-  o comando `qualidade resumo` agora resolve a fotografia mais recente pela opção `--base`.
+  o comando `qualidade resumo` agora resolve a fotografia mais recente pela opção `--base` e relativiza o caminho de
+  saída contra a base auditada, não contra o diretório do processo.
 - `projeto/limpar.ts` foi convertido para TypeScript, substituiu `fs-extra` por APIs nativas do Node e aceita uma
   política de padrões de limpeza injetável; os padrões padrão agora derivam backend, frontend e artefatos de qualidade
   da configuração da base, removendo nomes legados que já não são produzidos.
@@ -459,7 +460,8 @@ passou a derivar backend, frontend e artefatos da configuração e a suíte cheg
 `test/projeto.test.ts` em 17. Na rodada seguinte, `backend testes analisar` passou a resolver `--diretorio` relativo a
 `--base`, com regressão em uma base externa; a suíte chega a 119 cenários regulares e `test/sgc.test.ts` passa a ter 80.
 Na rodada seguinte, o Semgrep passou a normalizar caminhos de achados relativos e absolutos em relação à base auditada;
-a suíte chega a 120 cenários regulares.
+a suíte chega a 120 cenários regulares. Na rodada seguinte, `qualidade resumo` passou a exibir o caminho da fotografia
+relativo à base auditada, inclusive em consumidores externos.
 
 ### 3.3 Tamanho e composição atual
 
@@ -494,6 +496,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Corretor FQN ignorava raízes Java configuradas | `backend/java-corrigir-fqn` agora usa `diretorios.backendCodigo` e `diretorios.backendTestes` quando a base possui configuração; a heurística anterior continua para uma base backend isolada sem configuração. |
 | Resolvido nesta rodada | Análise de testes ignorava a base para diretório explícito | `backend testes analisar --diretorio servidor --base <base>` agora procura `servidor` dentro da base informada; caminhos absolutos continuam inalterados. |
 | Resolvido nesta rodada | Relatório Semgrep calculava caminhos contra a raiz errada | Achados devolvidos com caminho relativo ou absoluto agora são normalizados contra a base auditada antes da exibição em stdout e Markdown. |
+| Resolvido nesta rodada | Resumo de qualidade calculava caminho contra o `cwd` | `qualidade resumo` agora informa a fotografia relativa à base efetiva, preservando a mesma referência em JSON e saída humana para bases externas. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |

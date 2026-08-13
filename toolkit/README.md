@@ -179,6 +179,9 @@ npx tsx toolkit/sgc.ts qualidade resumo
 npx tsx toolkit/sgc.ts qualidade resumo --limite-pontos-criticos 10
 ```
 
+`qualidade resumo --base <diretorio>` informa o caminho da fotografia relativo à base auditada, inclusive quando a
+fotografia é encontrada em `artefatosQualidade/mais-recente`.
+
 ### Projeto
 
 ```bash
