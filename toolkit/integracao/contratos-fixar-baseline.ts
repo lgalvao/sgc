@@ -7,7 +7,7 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
+import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
 interface OpcoesFixarBaselineContrato {
     base?: string;
@@ -23,8 +23,8 @@ interface ResultadoFixacaoBaselineContrato {
 
 async function fixarBaselineContrato({base = DIRETORIO_RAIZ, origem, destino}: OpcoesFixarBaselineContrato = {}): Promise<ResultadoFixacaoBaselineContrato> {
     const caminhos = resolverCaminhosOpenapi(base);
-    const origemResolvida = origem ?? caminhos.caminhoAtual;
-    const destinoResolvido = destino ?? caminhos.caminhoReferencia;
+    const origemResolvida = resolverCaminhoArquivoOpenapi(base, origem ?? caminhos.caminhoAtual);
+    const destinoResolvido = resolverCaminhoArquivoOpenapi(base, destino ?? caminhos.caminhoReferencia);
     await fs.mkdir(path.dirname(destinoResolvido), {recursive: true});
     await fs.copyFile(origemResolvida, destinoResolvido);
     return {base: caminhos.base, origem: origemResolvida, destino: destinoResolvido};

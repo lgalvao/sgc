@@ -98,6 +98,9 @@ As chaves próprias da fotografia usam camelCase em português, e uma fotografia
 de ser tratada como se não existisse.
 
 OpenAPI mantém exportação, comparação e promoção de baseline. O toolkit não gera tipos TypeScript a partir do contrato.
+O documento exportado preserva o vocabulário oficial da especificação; os resultados operacionais do toolkit usam campos
+em português/camelCase (`quantidadeRotas`, `saidaPadrao`, `saidaErro`) e caminhos relativos informados por opção são
+resolvidos a partir de `--base`.
 
 ### Casos de uso CDU
 

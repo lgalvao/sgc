@@ -101,8 +101,9 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - `qualidade coletar` produz uma fotografia consolidada; `qualidade tarefas executar` apenas orquestra tarefas configuradas.
 - A auditoria de dependências combina Knip, versões desatualizadas, vulnerabilidades npm e atualizações Gradle.
 - Acessibilidade Playwright/Axe pertence ao workspace `e2e/`, não ao toolkit.
-- OpenAPI mantém exportação, comparação e baseline; geração de tipos não deve voltar sem finalidade atual e compatibilidade
-  com a cadeia moderna do toolkit.
+- OpenAPI mantém exportação, comparação e baseline; o documento externo permanece intacto, enquanto os resultados
+  operacionais usam campos próprios em português/camelCase e caminhos relativos são resolvidos pela base; geração de tipos
+  não deve voltar sem finalidade atual e compatibilidade com a cadeia moderna do toolkit.
 - Cheiros internos e Semgrep são análises complementares, não duplicadas.
 - Auditorias consolidadas de cobertura e listagens focadas de ramificações têm resultados diferentes e podem coexistir.
 - O corretor FQN é um utilitário ocasional mutável, não um gate permanente.

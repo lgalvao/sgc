@@ -25,7 +25,12 @@ function resolverCaminhosOpenapi(base: string = DIRETORIO_RAIZ): CaminhosOpenapi
     };
 }
 
+function resolverCaminhoArquivoOpenapi(base: string, caminho: string): string {
+    return path.isAbsolute(caminho) ? caminho : path.resolve(base, caminho);
+}
+
 export {
     URL_OPENAPI_PADRAO,
+    resolverCaminhoArquivoOpenapi,
     resolverCaminhosOpenapi,
 };

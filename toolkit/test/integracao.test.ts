@@ -4,7 +4,7 @@ import {mkdtemp} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {pathToFileURL} from "node:url";
-import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
+import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
 import {DIRETORIO_RAIZ, executarSgc, escreverJson, lerArquivo, existe} from "./apoio.js";
 
@@ -66,8 +66,9 @@ describe("Integrações de contratos do toolkit", () => {
         expect(JSON.parse(exportacao.stdout)).toMatchObject({
             base,
             saida: caminhos.caminhoAtual,
-            paths: 1
+            quantidadeRotas: 1
         });
+        expect(JSON.parse(exportacao.stdout).paths).toBeUndefined();
         expect(await existe(caminhos.caminhoAtual)).toBe(true);
 
         await escreverJson(caminhos.caminhoReferencia, {
@@ -92,6 +93,9 @@ describe("Integrações de contratos do toolkit", () => {
             atual: caminhos.caminhoAtual,
             houveMudancas: true
         });
+        expect(JSON.parse(diferenca.stdout).modo).toBe("diferencaTextual");
+        expect(JSON.parse(diferenca.stdout).saidaPadrao).toContain("openapi");
+        expect(JSON.parse(diferenca.stdout).stdout).toBeUndefined();
         expect(await existe(caminhos.caminhoRelatorio)).toBe(false);
 
         const diferencaGravada = await executarSgc([
@@ -129,5 +133,55 @@ describe("Integrações de contratos do toolkit", () => {
             destino: caminhos.caminhoReferencia
         });
         expect(await lerArquivo(caminhos.caminhoReferencia, "utf8")).toBe(await lerArquivo(caminhos.caminhoAtual, "utf8"));
+
+        expect(resolverCaminhoArquivoOpenapi(base, "contrato.json")).toBe(path.join(base, "contrato.json"));
+    });
+
+    test("resolve caminhos informados relativos a base", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-openapi-caminhos-relativos-"));
+        const anterior = {openapi: "3.1.0", info: {title: "Anterior", version: "1.0.0"}, paths: {}};
+        const atual = {openapi: "3.1.0", info: {title: "Atual", version: "1.1.0"}, paths: {"/exemplo": {}}};
+        await escreverJson(path.join(base, "anterior.json"), anterior);
+        await escreverJson(path.join(base, "atual.json"), atual);
+
+        const diferenca = await executarSgc([
+            "integracao",
+            "contratos",
+            "diff",
+            "--json",
+            "--base",
+            base,
+            "--anterior",
+            "anterior.json",
+            "--atual",
+            "atual.json"
+        ]);
+
+        expect(diferenca.exitCode).toBe(0);
+        expect(JSON.parse(diferenca.stdout)).toMatchObject({
+            anterior: path.join(base, "anterior.json"),
+            atual: path.join(base, "atual.json"),
+            houveMudancas: true
+        });
+
+        const fixacao = await executarSgc([
+            "integracao",
+            "contratos",
+            "fixar-baseline",
+            "--json",
+            "--base",
+            base,
+            "--origem",
+            "atual.json",
+            "--destino",
+            "referencia.json"
+        ]);
+
+        expect(fixacao.exitCode).toBe(0);
+        expect(JSON.parse(fixacao.stdout)).toMatchObject({
+            origem: path.join(base, "atual.json"),
+            destino: path.join(base, "referencia.json")
+        });
+        expect(await existe(path.join(base, "referencia.json"))).toBe(true);
     });
 }, 30000);

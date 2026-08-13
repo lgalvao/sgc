@@ -8,7 +8,7 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
+import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
 interface OpcoesDiffContratos {
     base?: string;
@@ -16,17 +16,16 @@ interface OpcoesDiffContratos {
     atual?: string;
 }
 
-type ModoDiffContratos = "identico" | "diff_textual";
+type ModoDiffContratos = "identico" | "diferencaTextual";
 
 interface ResultadoDiffContratos {
     base: string;
     anterior: string;
     atual: string;
-    codigoSaida: 0;
     houveMudancas: boolean;
     modo: ModoDiffContratos;
-    stdout: string;
-    stderr: string;
+    saidaPadrao: string;
+    saidaErro: string;
 }
 
 async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual}: OpcoesDiffContratos = {}): Promise<ResultadoDiffContratos> {
@@ -43,11 +42,10 @@ async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual}: O
             base: caminhos.base,
             anterior: anteriorResolvido,
             atual: atualResolvido,
-            codigoSaida: 0,
             houveMudancas: false,
             modo: "identico",
-            stdout: "Nenhuma diferença detectada entre a referência e a fotografia atual.",
-            stderr: ""
+            saidaPadrao: "Nenhuma diferença detectada entre a referência e a fotografia atual.",
+            saidaErro: ""
         };
     }
 
@@ -65,11 +63,10 @@ async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual}: O
         base: caminhos.base,
         anterior: anteriorResolvido,
         atual: atualResolvido,
-        codigoSaida: 0,
         houveMudancas: true,
-        modo: "diff_textual",
-        stdout: resultado.stdout ?? "",
-        stderr: resultado.stderr ?? ""
+        modo: "diferencaTextual",
+        saidaPadrao: resultado.stdout ?? "",
+        saidaErro: resultado.stderr ?? ""
     };
 }
 
@@ -85,7 +82,7 @@ function criarResumoMarkdown(resultado: ResultadoDiffContratos): string {
         "## Saída",
         "",
         "```text",
-        resultado.stdout || resultado.stderr || "Sem saída.",
+        resultado.saidaPadrao || resultado.saidaErro || "Sem saída.",
         "```",
         ""
     ].join("\n");
@@ -118,8 +115,14 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     const gravar = argumentos.includes("--gravar");
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhos = resolverCaminhosOpenapi(base);
-    const anterior = lerOpcao(argumentos, "--anterior", caminhos.caminhoReferencia) ?? caminhos.caminhoReferencia;
-    const atual = lerOpcao(argumentos, "--atual", caminhos.caminhoAtual) ?? caminhos.caminhoAtual;
+    const anterior = resolverCaminhoArquivoOpenapi(
+        base,
+        lerOpcao(argumentos, "--anterior", caminhos.caminhoReferencia) ?? caminhos.caminhoReferencia
+    );
+    const atual = resolverCaminhoArquivoOpenapi(
+        base,
+        lerOpcao(argumentos, "--atual", caminhos.caminhoAtual) ?? caminhos.caminhoAtual
+    );
 
     if (!emitirJson) {
         imprimirCabecalho("DIFF DE CONTRATO OPENAPI");
@@ -139,10 +142,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     if (emitirJson) {
         imprimirJson(resultado);
-    } else if (resultado.stdout) {
-        escreverLinha(resultado.stdout);
-    } else if (resultado.stderr) {
-        escreverLinha(resultado.stderr);
+    } else if (resultado.saidaPadrao) {
+        escreverLinha(resultado.saidaPadrao);
+    } else if (resultado.saidaErro) {
+        escreverLinha(resultado.saidaErro);
     } else {
         escreverLinha("Nenhuma diferença textual reportada pelo git diff.");
     }

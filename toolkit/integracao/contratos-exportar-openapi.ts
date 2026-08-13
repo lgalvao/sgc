@@ -7,7 +7,7 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
-import {URL_OPENAPI_PADRAO, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
+import {URL_OPENAPI_PADRAO, resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
 interface OpcoesExportarOpenapi {
     base?: string;
@@ -25,7 +25,7 @@ interface ResultadoExportacaoOpenapi {
     saida: string;
     titulo: string | null;
     versao: string | null;
-    paths: number;
+    quantidadeRotas: number;
 }
 
 function ehObjeto(valor: unknown): valor is DocumentoOpenapi {
@@ -38,7 +38,10 @@ function obterTexto(valor: unknown): string | null {
 
 async function exportarOpenapi({base = DIRETORIO_RAIZ, url = URL_OPENAPI_PADRAO, saida}: OpcoesExportarOpenapi = {}): Promise<ResultadoExportacaoOpenapi> {
     const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
-    const saidaResolvida = saida ?? resolverCaminhosOpenapi(baseResolvida).caminhoAtual;
+    const saidaResolvida = resolverCaminhoArquivoOpenapi(
+        baseResolvida,
+        saida ?? resolverCaminhosOpenapi(baseResolvida).caminhoAtual
+    );
     const resposta = await fetch(url, {
         headers: {
             Accept: "application/json"
@@ -55,7 +58,7 @@ async function exportarOpenapi({base = DIRETORIO_RAIZ, url = URL_OPENAPI_PADRAO,
     }
 
     const info = ehObjeto(json.info) ? json.info : {};
-    const paths = ehObjeto(json.paths) ? json.paths : {};
+    const rotas = ehObjeto(json.paths) ? json.paths : {};
     await fs.mkdir(path.dirname(saidaResolvida), {recursive: true});
     await fs.writeFile(saidaResolvida, `${JSON.stringify(json, null, 2)}\n`, "utf-8");
 
@@ -65,7 +68,7 @@ async function exportarOpenapi({base = DIRETORIO_RAIZ, url = URL_OPENAPI_PADRAO,
         saida: saidaResolvida,
         titulo: obterTexto(info.title),
         versao: obterTexto(info.version),
-        paths: Object.keys(paths).length
+        quantidadeRotas: Object.keys(rotas).length
     };
 }
 
@@ -110,7 +113,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             escreverLinha(pc.green(`OpenAPI exportado com sucesso.`));
             escreverLinha(`Titulo: ${resultado.titulo ?? "-"}`);
             escreverLinha(`Versao: ${resultado.versao ?? "-"}`);
-            escreverLinha(`Paths: ${resultado.paths}`);
+            escreverLinha(`Rotas: ${resultado.quantidadeRotas}`);
         }
     } catch (erro) {
         escreverErro(`Erro ao exportar OpenAPI: ${erro instanceof Error ? erro.message : String(erro)}\n`);
