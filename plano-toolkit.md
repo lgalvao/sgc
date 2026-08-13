@@ -246,6 +246,8 @@ frontend e para os caminhos OpenAPI.
   canônico tipados, preservando as fontes SGC de perfis, situações, tipos de processo e elementos de UI.
 - `requisitos/cdus-auditar-vocabulario.ts` foi convertido para TypeScript com regras, linhas, achados e relatórios
   tipados, mantendo as sugestões por similaridade e o vocabulário canônico específico do SGC.
+- `requisitos/cdus-inventariar-mensagens.ts` foi convertido para TypeScript com o contrato do inventário e das quatro
+  categorias de mensagens tipados, preservando o JSON e a saída textual existentes.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -334,15 +336,15 @@ esta rodada chega a 103 com o teste comportamental do auditor de arquitetura bac
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 63 arquivos TypeScript de implementação;
-- 9 arquivos JavaScript de implementação ainda pendentes;
+- 64 arquivos TypeScript de implementação;
+- 8 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 103 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 88% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 89% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica

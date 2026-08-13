@@ -13,11 +13,22 @@ import {
     ordenarMapa
 } from "./cdus-mensagens-lib.js";
 
-async function principal(argumentos = process.argv.slice(2)) {
+type MapaContagem = Record<string, number>;
+
+interface InventarioMensagens {
+    base: string;
+    totalArquivos: number;
+    descricoes: MapaContagem;
+    assuntos: MapaContagem;
+    mensagens: MapaContagem;
+    toasts: MapaContagem;
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
 
     const arquivos = await listarArquivosCdu(base);
-    const inventario = {
+    const inventario: InventarioMensagens = {
         base,
         totalArquivos: arquivos.length,
         descricoes: {},
@@ -55,7 +66,7 @@ async function principal(argumentos = process.argv.slice(2)) {
     escreverLinha(`Inventário de mensagens dos CDUs em ${path.join(base, "specs")}`);
     escreverLinha(`Arquivos analisados: ${inventario.totalArquivos}`);
     escreverLinha();
-    for (const chave of ["descricoes", "assuntos", "mensagens", "toasts"]) {
+    for (const chave of ["descricoes", "assuntos", "mensagens", "toasts"] as const) {
         escreverLinha(`${chave}:`);
         for (const [valor, quantidade] of Object.entries(inventario[chave]).slice(0, 40)) {
             escreverLinha(`- ${quantidade}x ${valor}`);
