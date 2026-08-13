@@ -125,6 +125,9 @@ vindo do pacote e políticas locais podem ser informadas por `--regra` ou pela c
 somente leitura por padrão. Use `--gravar` para persistir o inventário ou os relatórios de nomenclatura; quando uma
 auditoria precisar criar o inventário auxiliar, a mesma opção é propagada explicitamente para essa coleta interna.
 
+`integracao contratos diff` compara os documentos OpenAPI sem gravar por padrão. Use `--gravar` para persistir o resumo
+Markdown; `exportar-openapi` e `fixar-baseline` continuam sendo ações de geração/promoção explícitas.
+
 ### Requisitos
 
 ```bash

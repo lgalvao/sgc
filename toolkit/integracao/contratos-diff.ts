@@ -103,7 +103,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 "--anterior <arquivo> Arquivo OpenAPI usado como baseline.",
                 "--atual <arquivo>    Arquivo OpenAPI atual.",
                 "--json               Emite o resultado em JSON.",
-                "--sem-gravar         Não grava o resumo Markdown."
+                "--gravar             Grava o resumo Markdown."
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts integracao contratos diff",
@@ -115,7 +115,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const emitirJson = argumentos.includes("--json");
-    const semGravar = argumentos.includes("--sem-gravar");
+    const gravar = argumentos.includes("--gravar");
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhos = resolverCaminhosOpenapi(base);
     const anterior = lerOpcao(argumentos, "--anterior", caminhos.caminhoReferencia) ?? caminhos.caminhoReferencia;
@@ -129,7 +129,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const resultado = await executarDiffContratos({base, anterior, atual});
 
-    if (!semGravar) {
+    if (gravar) {
         await fs.mkdir(path.dirname(caminhos.caminhoRelatorio), {recursive: true});
         await fs.writeFile(caminhos.caminhoRelatorio, criarResumoMarkdown(resultado), "utf-8");
         if (!emitirJson) {

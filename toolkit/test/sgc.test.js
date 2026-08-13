@@ -254,6 +254,25 @@ describe("CLI raiz do toolkit", () => {
             atual: caminhos.caminhoAtual,
             houveMudancas: true
         });
+        expect(await fs.pathExists(caminhos.caminhoRelatorio)).toBe(false);
+
+        const diferencaGravada = await executarSgc([
+            "integracao",
+            "contratos",
+            "diff",
+            "--json",
+            "--gravar",
+            "--base",
+            base
+        ]);
+
+        expect(diferencaGravada.exitCode).toBe(0);
+        expect(JSON.parse(diferencaGravada.stdout)).toMatchObject({
+            base,
+            anterior: caminhos.caminhoReferencia,
+            atual: caminhos.caminhoAtual,
+            houveMudancas: true
+        });
         expect(await fs.pathExists(caminhos.caminhoRelatorio)).toBe(true);
 
         const fixacao = await executarSgc([
