@@ -15,12 +15,6 @@ const REGEX_PLACEHOLDER_CANONICO = /:[A-Z0-9_]+:/g;
 const REGEX_UI_CRONICA = /`[^`]+`/g;
 const REGEX_SITUACOES = /'[^'\n]+'/g;
 
-interface OpcoesCdu {
-    emitirJson: boolean;
-    base: string;
-    secoes?: string[];
-}
-
 interface IndicesSecoes {
     ator: number;
     pre: number;
@@ -59,39 +53,6 @@ interface AnaliseCdu {
 
 function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll("\\", "/");
-}
-
-function obterOpcoesCdu(argumentos: string[] = process.argv.slice(2)): OpcoesCdu {
-    let emitirJson = false;
-    let baseInformada: string | undefined;
-    let secoes: string[] | undefined;
-
-    for (let indice = 0; indice < argumentos.length; indice += 1) {
-        const argumento = argumentos[indice];
-        if (argumento === "--json") {
-            emitirJson = true;
-            continue;
-        }
-
-        if (argumento === "--base" || argumento === "--secoes") {
-            const valor = argumentos[indice + 1];
-            if (!valor || valor.startsWith("--")) {
-                throw new Error(`A opção ${argumento} exige um valor.`);
-            }
-            indice += 1;
-            if (argumento === "--base") {
-                baseInformada = valor;
-            } else {
-                secoes = valor.split(",").map(secao => secao.trim()).filter(Boolean);
-            }
-            continue;
-        }
-
-        throw new Error(`Opção ou argumento CDU desconhecido: ${argumento}`);
-    }
-
-    const base = baseInformada ? path.resolve(baseInformada) : DIRETORIO_RAIZ;
-    return {emitirJson, base, secoes};
 }
 
 async function listarArquivosCdu(base: string = DIRETORIO_RAIZ): Promise<string[]> {
@@ -158,13 +119,13 @@ function analisarArquivo(caminhoArquivo: string, texto: string): AnaliseCdu {
 
     const repeticoes: number[] = [];
     const regressoes: string[] = [];
-    for (let i = 1; i < passos.length; i += 1) {
-        if (passos[i] === passos[i - 1]) {
-            repeticoes.push(passos[i]);
+    for (let indice = 1; indice < passos.length; indice += 1) {
+        if (passos[indice] === passos[indice - 1]) {
+            repeticoes.push(passos[indice]);
         }
 
-        if (passos[i] < passos[i - 1]) {
-            regressoes.push(`${passos[i - 1]}->${passos[i]}`);
+        if (passos[indice] < passos[indice - 1]) {
+            regressoes.push(`${passos[indice - 1]}->${passos[indice]}`);
         }
     }
 
@@ -225,6 +186,7 @@ function extrairCabecalhoFluxo(texto: string): string | null {
     return linhas.find(linha => /Fluxo principal/.test(linha)) ?? null;
 }
 
+export type {AnaliseCdu};
 export {
     analisarArquivo,
     extrairCabecalhoFluxo,
@@ -232,7 +194,6 @@ export {
     extrairLinhaAtor,
     listarArquivosCdu,
     lerArquivo,
-    obterOpcoesCdu,
     obterLinhas,
     validarLinksMarkdown
 };

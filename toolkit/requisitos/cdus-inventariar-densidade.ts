@@ -1,9 +1,7 @@
 // Inventário de densidade documental dos casos de uso CDU.
 
 import path from "node:path";
-import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
-import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
-import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
+import {analisarArquivo, lerArquivo, listarArquivosCdu} from "./cdus-documentos-lib.js";
 
 interface DocumentoDensidade {
     arquivo: string;
@@ -76,30 +74,6 @@ async function inventariarDensidade(base: string, arquivosInformados?: string[])
     };
 
     return resultado;
-}
-
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-    const resultado = await inventariarDensidade(base);
-
-    if (emitirJson) {
-        imprimirJson(resultado);
-        return;
-    }
-
-    escreverLinha(`Inventário de densidade dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${resultado.totalArquivos}`);
-    escreverLinha(`Média de palavras: ${resultado.resumo.mediaPalavras.toFixed(1)}`);
-    escreverLinha(`Média de passos: ${resultado.resumo.mediaPassos.toFixed(1)}`);
-    escreverLinha();
-
-    for (const doc of resultado.documentos.slice(0, 15)) {
-        escreverLinha(`${doc.arquivo}: ${doc.palavras} palavras | ${doc.passos} passos | profundidade ${doc.profundidadeListas}`);
-    }
-}
-
-if (ehEntradaPrincipal(import.meta.url)) {
-    await principal();
 }
 
 export {

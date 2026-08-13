@@ -1,8 +1,6 @@
 
 import path from "node:path";
-import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
-import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
-import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu, obterLinhas} from "./cdus-documentos-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 
 type Severidade = "aviso";
@@ -137,34 +135,6 @@ async function auditarMensagens(base: string, arquivosInformados?: string[]): Pr
     };
 
     return {resumo, relatorio};
-}
-
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-    const resultado = await auditarMensagens(base);
-
-    if (emitirJson) {
-        imprimirJson(resultado);
-        return;
-    }
-
-    escreverLinha(`Auditoria de mensagens dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${resultado.resumo.totalArquivos}`);
-    escreverLinha(`Arquivos com aviso: ${resultado.resumo.arquivosComAviso}`);
-    escreverLinha(`Avisos: ${resultado.resumo.avisos}`);
-    escreverLinha();
-
-    for (const item of resultado.relatorio.filter(entrada => entrada.achados.length > 0)) {
-        escreverLinha(item.arquivo);
-        for (const achado of item.achados) {
-            const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
-            escreverLinha(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
-        }
-    }
-}
-
-if (ehEntradaPrincipal(import.meta.url)) {
-    await principal();
 }
 
 export {

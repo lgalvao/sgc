@@ -4,6 +4,10 @@ import {mkdir, mkdtemp, writeFile} from "node:fs/promises";
 import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {pathToFileURL} from "node:url";
+import {auditarCdus} from "../requisitos/cdus-auditoria-motor.js";
+import {auditarMensagensCodigo} from "../requisitos/cdus-auditar-mensagens-codigo.js";
+import {inventariarCdus} from "../requisitos/cdus-inventario-motor.js";
+import {carregarMensagensCanonicas} from "../requisitos/cdus-mensagens-codigo-lib.js";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
@@ -139,6 +143,85 @@ async function criarIntroSituacoes(dirSpecs: string): Promise<void> {
 }
 
 describe("Ferramentas de requisitos dos CDUs", () => {
+    test("executa os motores CDU diretamente, sem carregar a borda da CLI", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-motores-"));
+        await escreverArquivo(
+            path.join(base, "specs", "cdu", "cdu-01.md"),
+            [
+                "# CDU-01 - Exemplo",
+                "",
+                "## Atores",
+                "",
+                "- ADMIN",
+                "",
+                "## Pré-condições",
+                "",
+                "- Sistema disponível para o tipo 'Solicitação' na situação 'Liberado'.",
+                "",
+                "## Fluxo principal",
+                "",
+                "1. O usuário acessa o `Painel`.",
+                "2. O sistema registra a mensagem \"Pedido criado\", a `Descrição`: \"Pedido criado\" e mostra *toast* \"Pedido criado\"."
+            ].join("\n")
+        );
+
+        const inventario = await inventariarCdus(base);
+        expect(inventario.versao).toBe(1);
+        expect(inventario.secoes.formatos?.totalArquivos).toBe(1);
+        expect(inventario.secoes.densidade?.documentos[0].passos).toBe(2);
+        expect(inventario.secoes.mensagens?.mensagens["Pedido criado"]).toBe(1);
+
+        const auditoria = await auditarCdus(base);
+        expect(auditoria.secoes.estrutura?.resumo.erros).toBe(0);
+        expect(auditoria.secoes.estilo).toBeDefined();
+        expect(auditoria.secoes.vocabulario).toBeDefined();
+        expect(auditoria.secoes.mensagens).toBeDefined();
+    });
+
+    test("limita casos Java ao método de assuntos configurado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-assuntos-java-"));
+        await escreverArquivo(
+            path.join(base, "codigo", "assuntos.java"),
+            [
+                "public static String inicio(String tipo) {",
+                "    return switch (tipo) {",
+                "        case NAO_ASSUNTO -> \"mapeamento de competências\";",
+                "        default -> tipo;",
+                "    };",
+                "}",
+                "public static String subprocesso(TipoTransicao tipo, String sigla, boolean paraSuperior) {",
+                "    String base = switch (tipo) {",
+                "        case ASSUNTO_REAL -> \"Assunto de %s\";",
+                "        default -> tipo.getDescMovimentacao();",
+                "    };",
+                "    return incluirSigla ? \"SGC: %s - %s\".formatted(base, sigla) : \"SGC: %s\".formatted(base);",
+                "    }"
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(base, "configuracao-toolkit.json"),
+            JSON.stringify({
+                versao: 2,
+                requisitos: {
+                    cdus: {
+                        fontesMensagensCodigo: [{caminho: "codigo/assuntos.java", tipo: "assuntosJava"}]
+                    }
+                }
+            })
+        );
+        const caminhoCdu = path.join(base, "specs", "cdu", "cdu-01.md");
+        await escreverArquivo(caminhoCdu, "Assunto: SGC: Assunto de unidade\n");
+
+        const resultado = carregarMensagensCanonicas(base);
+        expect(resultado.itens.some(item => item.chave === "NAO_ASSUNTO")).toBe(false);
+        expect(resultado.itens.some(item => item.chave === "ASSUNTO_REAL")).toBe(true);
+        expect(resultado.itens.some(item => item.chave === "ASSUNTO_REAL_SUPERIOR")).toBe(true);
+
+        const auditoria = await auditarMensagensCodigo(base, [caminhoCdu]);
+        expect(auditoria.resumo.totalItens).toBe(1);
+        expect(auditoria.relatorio[0].sugestoes.length).toBeGreaterThan(0);
+    });
+
     test("pode importar todos os comandos sem executar auditorias", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_CDU.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;

@@ -5,6 +5,11 @@
 O trabalho abrange exclusivamente `toolkit/`. Servidor, cliente, E2E e especificações do SGC são considerados apenas
 como consumidores, fixtures e fontes de políticas do toolkit.
 
+Não existe uma base de clientes externos ou um contrato histórico que precise ser preservado. O toolkit é usado pelo
+autor e por agentes; portanto, compatibilidade retroativa de nomes, caminhos, exports, formatos próprios ou opções não é
+um objetivo. A continuidade exigida é funcional: capacidades SGC deliberadamente mantidas devem continuar disponíveis,
+mas podem mudar de implementação e de interface durante a modernização.
+
 Os objetivos são:
 
 1. manter uma CLI moderna, coerente e inteiramente em TypeScript;
@@ -42,10 +47,11 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 
 ### Evidência de utilidade
 
-- Ausência de importação não prova ausência de consumidor: comandos manuais podem ter consumidores humanos legítimos.
+- Ausência de importação não prova ausência de uso: comandos manuais podem ser usados pelo autor ou por agentes sem
+  aparecer como consumidores no código.
 - A decisão de manter uma funcionalidade deve considerar CLI, scripts, CI, documentação, testes, artefatos e uso manual.
 - Código temporário deve ser removido quando o problema original desapareceu e não existe finalidade permanente.
-- Testes que apenas reproduzem uma implementação sem finalidade atual, uso por humanos/agentes ou contrato público não
+- Testes que apenas reproduzem uma implementação sem finalidade atual, uso por humanos/agentes ou contrato deliberado não
   justificam sua preservação.
 - O histórico de mudanças pertence ao Git, não a este plano nem ao README.
 
@@ -81,10 +87,12 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - Defaults do SGC são válidos, mas devem estar identificados como perfil SGC e não confundidos com regras universais.
 - O local físico de instalação do pacote não pode determinar a raiz do projeto consumidor.
 - APIs programáticas públicas devem ser deliberadas e cobertas por instalação isolada; essa validação comprova o contrato,
-  não exige consumidor prévio no código; módulos internos permanecem privados.
+  não exige consumidor prévio no código. Como não há clientes legados, um contrato pode ser criado, alterado ou removido
+  diretamente quando a decisão de arquitetura mudar.
 - A identidade pública do pacote e do binário deve ser neutra antes de o toolkit ser oferecido para reutilização em outro
   projeto; o pacote publicado agora se chama `ferramentas-projeto` e o binário `ferramentas`. O entrypoint fonte `sgc.ts`
-  permanece como integração interna do workspace SGC até uma rodada específica de renomeação de consumidores.
+  pode ser renomeado quando isso melhorar a coerência; os pontos de chamada do SGC devem ser atualizados diretamente na
+  mesma mudança.
 
 ### Contratos de resultados
 
@@ -198,8 +206,10 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   `pontuacaoImpacto`; os vocabulários externos de JaCoCo e V8 permanecem somente na fronteira de leitura;
 - os três comandos de ramificações agora também possuem `versaoSchema: "1.0.0"` e `geradoEm`; o `timestamp` próprio foi
   removido e a mensagem de `hotspot` foi padronizada como ponto crítico;
-- cobertura Java e web estão publicadas como APIs programáticas horizontais; os agregadores CDU ainda não são subpath
-  público porque a implementação mistura borda CLI, formatação e análise e precisa de extração adicional;
+- cobertura Java e web estão publicadas como APIs programáticas horizontais; os motores CDU agora estão isolados da
+  borda CLI, mas o subpath público ainda depende de um contrato deliberado e de smoke no tarball;
+- os agregadores CDU ficaram reduzidos a bordas de comando; parser, descoberta do corpus, inventário e auditoria não
+  importam mais `process.argv`, execução de processo ou saída textual;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e outras políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - a composição SGC da coleta foi separada do motor de fotografia, mas outros módulos ainda concentram análise, política,
   formatação, persistência e CLI, dificultando reuso seletivo.
@@ -235,7 +245,8 @@ permite determinar efeitos sem ler a implementação.
 - ampliar a configuração do corpus com políticas conceituais somente quando houver necessidade real de composição; o
   padrão de glob já está em `requisitos.cdus.padraoArquivos`;
 - manter a extração de tipos dependente da política configurada, sem reintroduzir listas literais do SGC nos motores;
-- extrair parser e análise estrutural para contratos independentes do SGC;
+- manter parser e análise estrutural em contratos independentes do SGC, com testes diretos dos motores e regressão dos
+  comandos do SGC;
 - manter perfis, tipos de processo, arquivo de situações e perfis tipográficos em política explícita; avaliar placeholders e
   demais heurísticas somente quando houver contrato horizontal claro;
 - manter a comparação de mensagens separada da política de prefixos e grupos; a configuração parcial já permite composição
@@ -244,8 +255,10 @@ permite determinar efeitos sem ler a implementação.
   perfil SGC;
 - manter a fixture de segundo projeto com caminho, vocabulário e política de mensagens próprios e preservar o SGC por
   regressão;
-- extrair os motores dos agregadores CDU da borda CLI e só então publicar um subpath com `inventariarCasosDeUso` e
-  `auditarCasosDeUso`; o contrato deve ser testado no tarball e não deve arrastar formatação ou execução de processo.
+- publicar um subpath com `inventariarCasosDeUso` e `auditarCasosDeUso`, importando somente os motores isolados; o
+  contrato deve ser testado no tarball e não deve arrastar formatação ou execução de processo;
+- remover ou remodelar diretamente qualquer export interno que não seja necessário ao novo contrato; não criar aliases de
+  compatibilidade para os nomes anteriores.
 
 Critério de saída: um segundo projeto executa os dois comandos e seleciona as capacidades horizontais sem copiar arquivos,
 editar o toolkit ou receber políticas do SGC acidentalmente.

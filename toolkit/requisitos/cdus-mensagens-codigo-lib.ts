@@ -5,7 +5,7 @@ import {
     type FonteMensagensCodigo,
     type PoliticaMensagensCodigo
 } from "../biblioteca/configuracao.js";
-import {lerArquivo} from "./cdus-lib.js";
+import {lerArquivo} from "./cdus-documentos-lib.js";
 
 const PALAVRAS_VAZIAS_PADRAO = ["a", "ao", "as", "da", "das", "de", "do", "dos", "e", "em", "na", "no", "o", "os", "para"];
 
@@ -74,7 +74,10 @@ function extrairAssuntosJava(
         }
     }
 
-    for (const match of texto.matchAll(/case\s+([A-Z0-9_, ]+)\s*->\s*"([^"]+)"(?:\s*\.\s*formatted\([^)]+\))?;/g)) {
+    const blocoSubprocesso = texto.match(/public static String subprocesso\([\s\S]*?return incluirSigla[\s\S]*?\n {4}}/);
+    const textoSubprocesso = blocoSubprocesso?.[0] ?? "";
+
+    for (const match of textoSubprocesso.matchAll(/case\s+([A-Z0-9_, ]+)\s*->\s*"([^"]+)"(?:\s*\.\s*formatted\([^)]+\))?;/g)) {
         const casos = match[1]
             .split(",")
             .map(item => item.trim())

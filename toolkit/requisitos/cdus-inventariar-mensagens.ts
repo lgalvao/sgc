@@ -1,8 +1,5 @@
 
-import path from "node:path";
-import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
-import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
-import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-documentos-lib.js";
 import {
     acumularMapa,
     extrairAssuntos,
@@ -56,31 +53,6 @@ async function inventariarMensagens(base: string, arquivosInformados?: string[])
     inventario.toasts = ordenarMapa(inventario.toasts);
 
     return inventario;
-}
-
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-    const inventario = await inventariarMensagens(base);
-
-    if (emitirJson) {
-        imprimirJson(inventario);
-        return;
-    }
-
-    escreverLinha(`Inventário de mensagens dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${inventario.totalArquivos}`);
-    escreverLinha();
-    for (const chave of ["descricoes", "assuntos", "mensagens", "toasts"] as const) {
-        escreverLinha(`${chave}:`);
-        for (const [valor, quantidade] of Object.entries(inventario[chave]).slice(0, 40)) {
-            escreverLinha(`- ${quantidade}x ${valor}`);
-        }
-        escreverLinha();
-    }
-}
-
-if (ehEntradaPrincipal(import.meta.url)) {
-    await principal();
 }
 
 export {

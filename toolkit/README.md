@@ -139,7 +139,9 @@ executar apenas partes da análise; `todos` seleciona todas as seções. Os inve
 ocasionais, não gates automáticos.
 
 O formato CDU é uma capacidade horizontal em evolução. O perfil atual do SGC usa `specs/cdu/cdu-*.md` e fornece seu
-vocabulário, situações, mensagens e extratores de código. Esses elementos serão parametrizados para outros projetos.
+vocabulário, situações, mensagens e extratores de código. O parser e os motores de inventário/auditoria são independentes
+da borda da CLI; políticas e fontes de código continuam sendo configuradas pelo projeto. Não há aliases de compatibilidade
+para interfaces anteriores do toolkit.
 
 ### Qualidade e projeto
 

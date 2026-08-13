@@ -1,9 +1,6 @@
 // Inventário de vocabulário controlado dos casos de uso CDU.
 
-import path from "node:path";
-import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
-import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
-import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-documentos-lib.js";
 import {carregarSituacoesCanonicas, obterVocabularioCanonico} from "./cdus-vocabulario-lib.js";
 
 type MapaContagem = Record<string, number>;
@@ -97,33 +94,6 @@ async function inventariarVocabulario(base: string, arquivosInformados?: string[
     inventario.elementosUi = ordenarMapa(inventario.elementosUi);
 
     return inventario;
-}
-
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-    const inventario = await inventariarVocabulario(base);
-
-    if (emitirJson) {
-        imprimirJson(inventario);
-        return;
-    }
-
-    escreverLinha(`Inventário de vocabulário dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${inventario.totalArquivos}`);
-    escreverLinha();
-    escreverLinha("Perfis encontrados:");
-    for (const [valor, quantidade] of Object.entries(inventario.perfis)) {
-        escreverLinha(`- ${quantidade}x ${valor}`);
-    }
-    escreverLinha();
-    escreverLinha("Situações encontradas:");
-    for (const [valor, quantidade] of Object.entries(inventario.situacoes)) {
-        escreverLinha(`- ${quantidade}x '${valor}'`);
-    }
-}
-
-if (ehEntradaPrincipal(import.meta.url)) {
-    await principal();
 }
 
 export {

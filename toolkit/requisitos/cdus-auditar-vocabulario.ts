@@ -1,9 +1,7 @@
 // Auditoria de vocabulário controlado dos casos de uso CDU.
 
 import path from "node:path";
-import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
-import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
-import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-documentos-lib.js";
 import {
     carregarSituacoesCanonicas,
     obterVocabularioCanonico,
@@ -141,34 +139,6 @@ async function auditarVocabulario(base: string, arquivosInformados?: string[]): 
     };
 
     return {resumo, relatorio};
-}
-
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-    const resultado = await auditarVocabulario(base);
-
-    if (emitirJson) {
-        imprimirJson(resultado);
-        return;
-    }
-
-    escreverLinha(`Auditoria de vocabulário dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${resultado.resumo.totalArquivos}`);
-    escreverLinha(`Arquivos com aviso: ${resultado.resumo.arquivosComAviso}`);
-    escreverLinha(`Avisos: ${resultado.resumo.avisos}`);
-    escreverLinha();
-
-    for (const item of resultado.relatorio.filter(entrada => entrada.achados.length > 0)) {
-        escreverLinha(item.arquivo);
-        for (const achado of item.achados) {
-            const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
-            escreverLinha(`- [${achado.severidade}] ${achado.regra}${sufixoLinha}: ${achado.mensagem}`);
-        }
-    }
-}
-
-if (ehEntradaPrincipal(import.meta.url)) {
-    await principal();
 }
 
 export {

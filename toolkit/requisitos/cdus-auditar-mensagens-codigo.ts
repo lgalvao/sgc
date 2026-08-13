@@ -1,9 +1,7 @@
 
 import path from "node:path";
-import {ehEntradaPrincipal} from "../biblioteca/execucao.js";
 import {carregarConfiguracao} from "../biblioteca/configuracao.js";
-import {escreverLinha, imprimirJson} from "../biblioteca/saida.js";
-import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
+import {lerArquivo, listarArquivosCdu} from "./cdus-documentos-lib.js";
 import {extrairAssuntos, extrairDescricoes, extrairMensagens, extrairToasts} from "./cdus-mensagens-lib.js";
 import {
     carregarMensagensCanonicas,
@@ -132,41 +130,6 @@ async function auditarMensagensCodigo(base: string, arquivosInformados?: string[
     };
 
     return {resumo, relatorio};
-}
-
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-    const resultado = await auditarMensagensCodigo(base);
-
-    if (emitirJson) {
-        imprimirJson(resultado);
-        return;
-    }
-
-    escreverLinha(`Auditoria de mensagens dos CDUs contra o código em ${base}`);
-    escreverLinha(`Arquivos analisados: ${resultado.resumo.totalArquivos}`);
-    escreverLinha(`Itens auditados: ${resultado.resumo.totalItens}`);
-    escreverLinha(`Com referência exata: ${resultado.resumo.itensComReferenciaExata}`);
-    escreverLinha(`Sem referência exata: ${resultado.resumo.itensSemReferenciaExata}`);
-    escreverLinha(`Sem referência exata, mas com sugestão: ${resultado.resumo.itensComSugestao}`);
-    escreverLinha();
-
-    for (const item of resultado.relatorio.filter(entrada => entrada.referenciasExatas.length === 0)) {
-        escreverLinha(`${item.tipo}: ${item.valor}`);
-        escreverLinha(`- ocorrências: ${item.quantidade}`);
-        if (item.sugestoes.length === 0) {
-            escreverLinha("- sugestões: nenhuma");
-        } else {
-            for (const sugestao of item.sugestoes) {
-                escreverLinha(`- sugestão: ${sugestao.texto} (${sugestao.grupo}, ${sugestao.origem}, similaridade ${sugestao.similaridade})`);
-            }
-        }
-        escreverLinha();
-    }
-}
-
-if (ehEntradaPrincipal(import.meta.url)) {
-    await principal();
 }
 
 export {
