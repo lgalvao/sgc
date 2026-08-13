@@ -6,19 +6,20 @@ import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
-import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
+import {VERSAO_FOTOGRAFIA_CHEIROS} from "./cheiros-contrato.js";
 
-type EscopoCheiro = "backend" | "frontend" | "frontend_testes";
+type EscopoCheiro = "backend" | "frontend" | "frontendTestes";
 type FaixaPontuacao = "bom" | "atencao" | "critico";
 type ChavePadrao =
-    | "backend_nullable_dto"
-    | "backend_null_checks"
-    | "backend_objects_null"
-    | "frontend_any_producao"
-    | "frontend_any_testes"
-    | "frontend_catch_any"
-    | "frontend_null_checks"
-    | "frontend_fallback_or";
+    | "backendDtoNulavel"
+    | "backendVerificacoesNulas"
+    | "backendObjetosNulos"
+    | "frontendAnyProducao"
+    | "frontendAnyTestes"
+    | "frontendCapturaAny"
+    | "frontendVerificacoesNulas"
+    | "frontendFallbackOu";
 
 interface ContextoFiltroArquivo {
     caminhoRelativo: string;
@@ -47,6 +48,7 @@ type DeltasCheiros = Record<ChavePadrao, number>;
 type PontuacaoPorEscopo = Record<EscopoCheiro, number>;
 
 interface SnapshotCheiros {
+    versao: typeof VERSAO_FOTOGRAFIA_CHEIROS;
     geradoEm: string;
     base: string;
     pontuacao: {
@@ -75,7 +77,7 @@ const EXTENSOES_TEXTO = new Set([".ts", ".vue", ".java"]);
 
 const PADROES: PadraoCheiro[] = [
     {
-        chave: "backend_nullable_dto",
+        chave: "backendDtoNulavel",
         titulo: "Backend DTOs com @Nullable",
         peso: 5,
         escopo: "backend",
@@ -85,7 +87,7 @@ const PADROES: PadraoCheiro[] = [
         regexes: [/@Nullable\b/g]
     },
     {
-        chave: "backend_null_checks",
+        chave: "backendVerificacoesNulas",
         titulo: "Backend checks explicitos de null",
         peso: 2,
         escopo: "backend",
@@ -94,7 +96,7 @@ const PADROES: PadraoCheiro[] = [
         regexes: [/(?:===|!==|==|!=)\s*null/g, /null\s*(?:===|!==|==|!=)/g]
     },
     {
-        chave: "backend_objects_null",
+        chave: "backendObjetosNulos",
         titulo: "Backend Objects.isNull/nonNull",
         peso: 2,
         escopo: "backend",
@@ -103,7 +105,7 @@ const PADROES: PadraoCheiro[] = [
         regexes: [/\bObjects\.(?:isNull|nonNull)\s*\(/g, /\bObjects::(?:isNull|nonNull)\b/g]
     },
     {
-        chave: "frontend_any_producao",
+        chave: "frontendAnyProducao",
         titulo: "Frontend producao com any explicito",
         peso: 4,
         escopo: "frontend",
@@ -121,10 +123,10 @@ const PADROES: PadraoCheiro[] = [
         ]
     },
     {
-        chave: "frontend_any_testes",
+        chave: "frontendAnyTestes",
         titulo: "Frontend testes com any explicito",
         peso: 1,
-        escopo: "frontend_testes",
+        escopo: "frontendTestes",
         filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
             ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
             && ehArquivoTesteOuStory(caminhoRelativo),
@@ -137,7 +139,7 @@ const PADROES: PadraoCheiro[] = [
         ]
     },
     {
-        chave: "frontend_catch_any",
+        chave: "frontendCapturaAny",
         titulo: "Frontend catch tipado como any",
         peso: 3,
         escopo: "frontend",
@@ -146,7 +148,7 @@ const PADROES: PadraoCheiro[] = [
         regexes: [/catch\s*\(\s*[^):]+:\s*any\s*\)/g]
     },
     {
-        chave: "frontend_null_checks",
+        chave: "frontendVerificacoesNulas",
         titulo: "Frontend checks explicitos de null",
         peso: 2,
         escopo: "frontend",
@@ -156,7 +158,7 @@ const PADROES: PadraoCheiro[] = [
         regexes: [/(?:===|!==|==|!=)\s*null/g, /null\s*(?:===|!==|==|!=)/g]
     },
     {
-        chave: "frontend_fallback_or",
+        chave: "frontendFallbackOu",
         titulo: "Frontend fallbacks defensivos com ||",
         peso: 1,
         escopo: "frontend",
@@ -243,19 +245,32 @@ function classificarPontuacao(pontuacao: number): FaixaPontuacao {
 }
 
 interface FotografiaAnterior {
+    versao: typeof VERSAO_FOTOGRAFIA_CHEIROS;
     contagens?: Partial<ContagensCheiros>;
 }
 
 function ehFotografiaAnterior(valor: unknown): valor is FotografiaAnterior {
-    return typeof valor === "object" && valor !== null;
+    if (typeof valor !== "object" || valor === null) {
+        return false;
+    }
+    const registro = valor as Record<string, unknown>;
+    return registro.versao === VERSAO_FOTOGRAFIA_CHEIROS
+        && (registro.contagens === undefined
+            || (typeof registro.contagens === "object" && registro.contagens !== null));
 }
 
 async function lerFotografiaAnterior(caminhoFotografia: string): Promise<FotografiaAnterior | null> {
     try {
         const valor: unknown = JSON.parse(await fs.readFile(caminhoFotografia, "utf8"));
-        return ehFotografiaAnterior(valor) ? valor : null;
-    } catch {
-        return null;
+        if (!ehFotografiaAnterior(valor)) {
+            throw new Error(`Fotografia de cheiros invalida ou com versao incompativel: esperado ${VERSAO_FOTOGRAFIA_CHEIROS}.`);
+        }
+        return valor;
+    } catch (erro) {
+        if (typeof erro === "object" && erro !== null && "code" in erro && erro.code === "ENOENT") {
+            return null;
+        }
+        throw erro;
     }
 }
 
@@ -321,7 +336,7 @@ async function executarAuditoria({
         resolverCaminhoConfigurado("frontendCodigo", baseResolvida)
     ));
     const contagens = criarEstruturaContagens();
-    const pontuacaoPorEscopo: PontuacaoPorEscopo = {backend: 0, frontend: 0, frontend_testes: 0};
+    const pontuacaoPorEscopo: PontuacaoPorEscopo = {backend: 0, frontend: 0, frontendTestes: 0};
     const arquivosPontuados: ResumoArquivoCheiros[] = [];
 
     for (const arquivo of arquivos) {
@@ -350,6 +365,7 @@ async function executarAuditoria({
     const anterior = await lerFotografiaAnterior(caminhoFotografia);
     const pontuacaoTotal = PADROES.reduce((soma, padrao) => soma + (contagens[padrao.chave] * padrao.peso), 0);
     const snapshot: SnapshotCheiros = {
+        versao: VERSAO_FOTOGRAFIA_CHEIROS,
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
         pontuacao: {total: pontuacaoTotal, faixa: classificarPontuacao(pontuacaoTotal), porEscopo: pontuacaoPorEscopo},
@@ -414,7 +430,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro: unknown) => {
-        escreverLinha(`Erro ao auditar cheiros de codigo: ${erro instanceof Error ? erro.message : String(erro)}`);
+        escreverErro(`Erro ao auditar cheiros de codigo: ${erro instanceof Error ? erro.message : String(erro)}`);
         process.exitCode = 1;
     });
 }

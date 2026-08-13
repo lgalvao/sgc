@@ -163,6 +163,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   português; os demais formatos próprios ainda precisam de revisão semelhante;
 - o inventário de símbolos e as auditorias de nomenclatura/idioma agora usam contratos versionados e uma validação única;
   arquivo ausente pode ser coletado sob demanda, mas arquivo existente incompatível falha explicitamente;
+- a fotografia persistida de `codigo cheiros auditar` agora é versionada, usa chaves próprias em camelCase e valida o
+  arquivo anterior antes de calcular deltas;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.

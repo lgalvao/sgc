@@ -1,0 +1,3 @@
+const VERSAO_FOTOGRAFIA_CHEIROS = 1 as const;
+
+export {VERSAO_FOTOGRAFIA_CHEIROS};

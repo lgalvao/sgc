@@ -1,3 +1,4 @@
+import {readFile} from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
@@ -54,17 +55,20 @@ describe("Auditores de código", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        expect(conteudo.contagens.backend_nullable_dto).toBe(1);
-        expect(conteudo.contagens.backend_null_checks).toBe(1);
-        expect(conteudo.contagens.frontend_any_producao).toBe(2);
-        expect(conteudo.contagens.frontend_null_checks).toBe(1);
-        expect(conteudo.contagens.frontend_fallback_or).toBe(1);
+        expect(conteudo.versao).toBe(1);
+        expect(conteudo.contagens.backendDtoNulavel).toBe(1);
+        expect(conteudo.contagens.backendVerificacoesNulas).toBe(1);
+        expect(conteudo.contagens.frontendAnyProducao).toBe(2);
+        expect(conteudo.contagens.frontendVerificacoesNulas).toBe(1);
+        expect(conteudo.contagens.frontendFallbackOu).toBe(1);
         expect(await existe(path.join(base, "toolkit", "qualidade", "artefatos", "codigo-cheiros"))).toBe(false);
 
         const diretorioSaida = path.join(base, "artefatos", "cheiros");
         await executarAuditoriaCheiros({base, gravar: true, diretorioSaida});
         expect(await existe(path.join(diretorioSaida, "fotografia.json"))).toBe(true);
         expect(await existe(path.join(diretorioSaida, "resumo.md"))).toBe(true);
+        const fotografia = JSON.parse(await readFile(path.join(diretorioSaida, "fotografia.json"), "utf8"));
+        expect(fotografia.versao).toBe(1);
     });
 
     test("resolve politica Semgrep padrao a partir da instalacao do toolkit", async () => {
@@ -141,8 +145,16 @@ describe("Auditores de código", () => {
 
         const resultado = await executarAuditoriaCheiros({base});
 
-        expect(resultado.snapshot.contagens.backend_nullable_dto).toBe(1);
-        expect(resultado.snapshot.contagens.frontend_any_producao).toBe(1);
-        expect(resultado.snapshot.contagens.frontend_fallback_or).toBe(1);
+        expect(resultado.snapshot.contagens.backendDtoNulavel).toBe(1);
+        expect(resultado.snapshot.contagens.frontendAnyProducao).toBe(1);
+        expect(resultado.snapshot.contagens.frontendFallbackOu).toBe(1);
+    });
+
+    test("rejeita fotografia anterior de cheiros invalida", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cheiros-fotografia-invalida-"));
+        const diretorioSaida = path.join(base, "artefatos", "cheiros");
+        await escreverJson(path.join(diretorioSaida, "fotografia.json"), {versao: 99, contagens: {}});
+
+        await expect(executarAuditoriaCheiros({base, diretorioSaida})).rejects.toThrow("versao incompativel");
     });
 });
