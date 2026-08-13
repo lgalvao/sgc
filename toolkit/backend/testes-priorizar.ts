@@ -61,9 +61,9 @@ const PADROES_ESTRUTURAIS = [
 
 function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
     const resultado = {
-        entrada: lerOpcao(argumentos, "--input", "unit-test-report.md") ?? "unit-test-report.md",
-        entradaExplicita: argumentos.includes("--input") || argumentos.some((argumento) => argumento.startsWith("--input=")),
-        saida: lerOpcao(argumentos, "--output", "prioritized-tests.md") ?? "prioritized-tests.md",
+        entrada: lerOpcao(argumentos, "--entrada", "unit-test-report.md") ?? "unit-test-report.md",
+        entradaExplicita: argumentos.includes("--entrada") || argumentos.some((argumento) => argumento.startsWith("--entrada=")),
+        saida: lerOpcao(argumentos, "--saida", "prioritized-tests.md") ?? "prioritized-tests.md",
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
     };
     return resultado;
@@ -75,12 +75,12 @@ function imprimirAjuda() {
         scriptDireto: "backend/testes-priorizar.ts",
         descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
         opcoes: [
-            '--input <arquivo>   Arquivo de entrada em JSON ou Markdown',
-            '--output <arquivo>  Arquivo de saida em Markdown',
+            '--entrada <arquivo> Arquivo de entrada em JSON ou Markdown',
+            '--saida <arquivo>   Arquivo de saida em Markdown',
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/sgc.ts backend testes priorizar --input analise-testes.json --output priorizacao-testes.md"
+            "npx tsx toolkit/sgc.ts backend testes priorizar --entrada analise-testes.json --saida priorizacao-testes.md"
         ]
     });
 }

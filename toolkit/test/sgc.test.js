@@ -2556,7 +2556,7 @@ describe("CLI raiz do toolkit", () => {
             }
         });
 
-        const resultado = await executarScriptTestesPriorizar(["--output", saida], {cwd: diretorioSaida});
+        const resultado = await executarScriptTestesPriorizar(["--saida", saida], {cwd: diretorioSaida});
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Entrada utilizada: unit-test-report.json");
@@ -2603,7 +2603,7 @@ describe("CLI raiz do toolkit", () => {
             }
         });
 
-        const resultado = await executarScriptTestesPriorizar(["--input", json, "--output", saida]);
+        const resultado = await executarScriptTestesPriorizar(["--entrada", json, "--saida", saida]);
 
         expect(resultado.exitCode).toBe(0);
         expect(resultado.stdout).toContain("Encontrados 1 P1, 0 P2, 1 P3");
