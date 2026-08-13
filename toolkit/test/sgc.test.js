@@ -64,7 +64,7 @@ const CAMINHOS_COMANDOS_QUALIDADE = [
     "resumo.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", nome));
 const CAMINHOS_COMANDOS_CONSISTENCIA = [
-    "nomes-simbolos-coletar.js",
+    "nomes-simbolos-coletar.ts",
     "nomes-consistencia-auditar.js",
     "idioma-consistencia-auditar.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "codigo", nome));

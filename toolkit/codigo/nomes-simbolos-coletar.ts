@@ -1,10 +1,72 @@
 #!/usr/bin/env node
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {obterCaminhoSimbolos} from "./nomes-caminhos.js";
+
+type Linguagem = "java" | "typescript" | "javascript" | "vue";
+type CategoriaTipo = "class" | "interface" | "enum" | "record" | "type";
+type CategoriaMembro = "funcao" | "funcao-arrow" | "metodo" | "construtor";
+
+interface TipoSimbolo {
+    categoria: CategoriaTipo;
+    nome: string;
+}
+
+interface MembroSimbolo {
+    categoria: CategoriaMembro;
+    nome: string;
+    assinatura: string;
+    parametros: string[];
+    retorno?: string | null;
+}
+
+interface ArquivoSimbolos {
+    caminho: string;
+    linguagem: Linguagem;
+    pacote: string | null;
+    tipos: TipoSimbolo[];
+    membros: MembroSimbolo[];
+}
+
+interface EstatisticasLinguagem {
+    arquivos: number;
+    tipos: number;
+    membros: number;
+}
+
+type EstatisticasPorLinguagem = Record<Linguagem, EstatisticasLinguagem>;
+
+interface PacoteJava {
+    nome: string;
+    totalArquivos: number;
+    arquivos: string[];
+}
+
+interface InventarioSimbolos {
+    geradoEm: string;
+    base: string;
+    totais: {
+        arquivos: number;
+        pacotesJava: number;
+        tipos: number;
+        membros: number;
+    };
+    porLinguagem: EstatisticasPorLinguagem;
+    pacotesJava: PacoteJava[];
+    arquivos: ArquivoSimbolos[];
+}
+
+interface OpcoesColeta {
+    base?: string;
+    json?: boolean;
+    semGravar?: boolean;
+    arquivoSaida?: string | null;
+    silencioso?: boolean;
+}
 
 const EXTENSOES_SUPORTADAS = new Set([".java", ".ts", ".tsx", ".js", ".jsx", ".vue"]);
 const DIRETORIOS_IGNORADOS = new Set([
@@ -39,12 +101,12 @@ const PALAVRAS_CHAVE_METODO = new Set([
     "case"
 ]);
 
-function normalizarSeparadores(caminhoArquivo) {
+function normalizarSeparadores(caminhoArquivo: string): string {
     return caminhoArquivo.split(path.sep).join("/");
 }
 
-function dividirParametros(textoParametros) {
-    const parametros = [];
+function dividirParametros(textoParametros: string): string[] {
+    const parametros: string[] = [];
     let atual = "";
     let nivelGenerico = 0;
     let nivelParenteses = 0;
@@ -59,7 +121,7 @@ function dividirParametros(textoParametros) {
 
         if (caractere === "'" && anterior !== "\\" && !aspasDuplas) {
             aspasSimples = !aspasSimples;
-        } else if (caractere === "\"" && anterior !== "\\" && !aspasSimples) {
+        } else if (caractere === '"' && anterior !== "\\" && !aspasSimples) {
             aspasDuplas = !aspasDuplas;
         }
 
@@ -103,7 +165,7 @@ function dividirParametros(textoParametros) {
     return parametros;
 }
 
-function extrairNomeParametro(parametroBruto) {
+function extrairNomeParametro(parametroBruto: string): string | null {
     const parametro = parametroBruto.trim();
     if (parametro.length === 0) {
         return null;
@@ -139,17 +201,17 @@ function extrairNomeParametro(parametroBruto) {
         .replace(/\[+$/g, "");
 }
 
-function extrairParametros(textoParametros) {
+function extrairParametros(textoParametros: string): string[] {
     if (!textoParametros || textoParametros.trim().length === 0) {
         return [];
     }
 
     return dividirParametros(textoParametros)
         .map(extrairNomeParametro)
-        .filter((valor) => valor !== null);
+        .filter((valor): valor is string => valor !== null);
 }
 
-function detectarLinguagem(caminhoRelativo) {
+function detectarLinguagem(caminhoRelativo: string): Linguagem {
     const extensao = path.extname(caminhoRelativo);
     if (extensao === ".java") {
         return "java";
@@ -163,13 +225,13 @@ function detectarLinguagem(caminhoRelativo) {
     return "javascript";
 }
 
-function extrairTipoAlvo(texto) {
-    const tipos = [];
+function extrairTipoAlvo(texto: string): TipoSimbolo[] {
+    const tipos: TipoSimbolo[] = [];
     const regex = /^\s*(?:export\s+)?(?:default\s+)?(?:abstract\s+)?(class|interface|enum|record|type)\s+([A-Za-z_]\w*)/gm;
     let correspondencia = regex.exec(texto);
     while (correspondencia) {
         tipos.push({
-            categoria: correspondencia[1],
+            categoria: correspondencia[1] as CategoriaTipo,
             nome: correspondencia[2]
         });
         correspondencia = regex.exec(texto);
@@ -177,9 +239,9 @@ function extrairTipoAlvo(texto) {
     return tipos;
 }
 
-function extrairFuncoesTsJs(texto) {
-    const funcoes = [];
-    const assinaturasRegistradas = new Set();
+function extrairFuncoesTsJs(texto: string): MembroSimbolo[] {
+    const funcoes: MembroSimbolo[] = [];
+    const assinaturasRegistradas = new Set<string>();
 
     const regexFunction = /^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s+([A-Za-z_]\w*)\s*(?:<[^>]+>\s*)?\(([^)]*)\)\s*(?::\s*[^({=]+)?\s*\{/gm;
     let correspondencia = regexFunction.exec(texto);
@@ -247,21 +309,21 @@ function extrairFuncoesTsJs(texto) {
     return funcoes;
 }
 
-function extrairDadosJava(texto) {
+function extrairDadosJava(texto: string): {pacote: string | null; tipos: TipoSimbolo[]; membros: MembroSimbolo[]} {
     const pacote = texto.match(/^\s*package\s+([a-zA-Z0-9_.]+)\s*;/m)?.[1] ?? null;
-    const tipos = [];
+    const tipos: TipoSimbolo[] = [];
     const regexTipos = /^\s*(?:public|protected|private)?\s*(?:abstract\s+|final\s+|sealed\s+|non-sealed\s+)*\b(class|interface|enum|record)\s+([A-Za-z_]\w*)/gm;
     let correspondencia = regexTipos.exec(texto);
     while (correspondencia) {
         tipos.push({
-            categoria: correspondencia[1],
+            categoria: correspondencia[1] as CategoriaTipo,
             nome: correspondencia[2]
         });
         correspondencia = regexTipos.exec(texto);
     }
 
-    const membros = [];
-    const assinaturasRegistradas = new Set();
+    const membros: MembroSimbolo[] = [];
+    const assinaturasRegistradas = new Set<string>();
     const regexMetodos = /^\s*(?:@\w+(?:\([^)]*\))?\s*)*(?:(?:public|protected|private)\s+)?(?:(?:static|final|abstract|synchronized|native|strictfp|default)\s+)*(?:<[^>{}]+>\s*)?([A-Za-z_$][\w$<>[\].?]*(?:\s+[A-Za-z_$][\w$<>[\].?]*)*)\s+([a-z_]\w*)\s*\(([^)]*)\)\s*(?:throws [^{;]+)?\s*(?:\{|;)\s*$/gm;
     correspondencia = regexMetodos.exec(texto);
     while (correspondencia) {
@@ -290,7 +352,7 @@ function extrairDadosJava(texto) {
         correspondencia = regexMetodos.exec(texto);
     }
 
-    const nomesTipos = new Set(tipos.map((tipo) => tipo.nome));
+    const nomesTipos = new Set(tipos.map(tipo => tipo.nome));
     const regexConstrutor = /^\s*(?:public|protected|private)?\s*([A-Za-z_]\w*)\s*\(([^)]*)\)\s*(?:throws [^{;]+)?\s*\{/gm;
     correspondencia = regexConstrutor.exec(texto);
     while (correspondencia) {
@@ -313,15 +375,11 @@ function extrairDadosJava(texto) {
         correspondencia = regexConstrutor.exec(texto);
     }
 
-    return {
-        pacote,
-        tipos,
-        membros
-    };
+    return {pacote, tipos, membros};
 }
 
-function extrairConteudoScriptVue(texto) {
-    const scripts = [];
+function extrairConteudoScriptVue(texto: string): string {
+    const scripts: string[] = [];
     const regex = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
     let correspondencia = regex.exec(texto);
     while (correspondencia) {
@@ -331,7 +389,11 @@ function extrairConteudoScriptVue(texto) {
     return scripts.join("\n");
 }
 
-async function listarArquivos(baseResolvida, caminhoAtual = baseResolvida, arquivos = []) {
+async function listarArquivos(
+    baseResolvida: string,
+    caminhoAtual: string = baseResolvida,
+    arquivos: string[] = []
+): Promise<string[]> {
     const entradas = await fs.readdir(caminhoAtual, {withFileTypes: true});
 
     for (const entrada of entradas) {
@@ -353,12 +415,12 @@ async function listarArquivos(baseResolvida, caminhoAtual = baseResolvida, arqui
     return arquivos;
 }
 
-function ordenarPorNome(colecao) {
+function ordenarPorNome(colecao: string[]): string[] {
     return [...colecao].toSorted((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
-function montarResumoMarkdown(inventario) {
-    const linhas = [];
+function montarResumoMarkdown(inventario: InventarioSimbolos): string {
+    const linhas: string[] = [];
     linhas.push("# Inventario de simbolos");
     linhas.push("");
     linhas.push(`Gerado em: ${inventario.geradoEm}`);
@@ -402,18 +464,18 @@ function montarResumoMarkdown(inventario) {
 }
 
 async function executarColeta({
-                                  base = DIRETORIO_RAIZ,
-                                  json = false,
-                                  semGravar = false,
-                                  arquivoSaida = null,
-                                  silencioso = false
-                              } = {}) {
+    base = DIRETORIO_RAIZ,
+    json = false,
+    semGravar = false,
+    arquivoSaida = null,
+    silencioso = false
+}: OpcoesColeta = {}): Promise<InventarioSimbolos> {
     const baseResolvida = path.resolve(base);
     const caminhoSaida = arquivoSaida ?? obterCaminhoSimbolos(baseResolvida);
     const arquivos = await listarArquivos(baseResolvida);
-    const resultadoArquivos = [];
-    const mapaPacotes = new Map();
-    const porLinguagem = {
+    const resultadoArquivos: ArquivoSimbolos[] = [];
+    const mapaPacotes = new Map<string, string[]>();
+    const porLinguagem: EstatisticasPorLinguagem = {
         java: {arquivos: 0, tipos: 0, membros: 0},
         typescript: {arquivos: 0, tipos: 0, membros: 0},
         javascript: {arquivos: 0, tipos: 0, membros: 0},
@@ -433,10 +495,9 @@ async function executarColeta({
             porLinguagem.java.membros += dadosJava.membros.length;
 
             if (dadosJava.pacote) {
-                if (!mapaPacotes.has(dadosJava.pacote)) {
-                    mapaPacotes.set(dadosJava.pacote, []);
-                }
-                mapaPacotes.get(dadosJava.pacote).push(caminhoRelativo);
+                const arquivosPacote = mapaPacotes.get(dadosJava.pacote) ?? [];
+                arquivosPacote.push(caminhoRelativo);
+                mapaPacotes.set(dadosJava.pacote, arquivosPacote);
             }
 
             resultadoArquivos.push({
@@ -465,13 +526,16 @@ async function executarColeta({
         });
     }
 
-    const pacotesJava = ordenarPorNome([...mapaPacotes.keys()]).map((nomePacote) => ({
-        nome: nomePacote,
-        totalArquivos: mapaPacotes.get(nomePacote).length,
-        arquivos: ordenarPorNome(mapaPacotes.get(nomePacote))
-    }));
+    const pacotesJava: PacoteJava[] = ordenarPorNome([...mapaPacotes.keys()]).map(nomePacote => {
+        const arquivosPacote = mapaPacotes.get(nomePacote) ?? [];
+        return {
+            nome: nomePacote,
+            totalArquivos: arquivosPacote.length,
+            arquivos: ordenarPorNome(arquivosPacote)
+        };
+    });
 
-    const inventario = {
+    const inventario: InventarioSimbolos = {
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
         totais: {
@@ -517,12 +581,13 @@ async function executarColeta({
     return inventario;
 }
 
-function lerOpcoes(argv) {
-    const opcoes = {
+function lerOpcoes(argv: string[]): OpcoesColeta {
+    const opcoes: Required<OpcoesColeta> = {
         base: DIRETORIO_RAIZ,
         json: false,
         semGravar: false,
-        arquivoSaida: null
+        arquivoSaida: null,
+        silencioso: false
     };
 
     for (let indice = 0; indice < argv.length; indice += 1) {
@@ -549,7 +614,7 @@ function lerOpcoes(argv) {
     return opcoes;
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escreverLinha("Uso: npx tsx toolkit/sgc.ts codigo nomes coletar-simbolos [--json] [--sem-gravar] [--base <diretorio>] [--saida <arquivo.json>]");
         escreverLinha("");
@@ -561,7 +626,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    principal().catch((erro) => {
+    principal().catch((erro: unknown) => {
         escreverLinha(`Erro ao coletar simbolos: ${erro instanceof Error ? erro.message : String(erro)}`);
         process.exitCode = 1;
     });
