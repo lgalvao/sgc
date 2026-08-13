@@ -24,7 +24,8 @@ import {
     SUFIXOS_TESTE,
     type PoliticaClassificacaoTestes
 } from "./biblioteca/testes-analisar-regras.js";
-import {carregarPoliticaClassificacao, POLITICA_CLASSIFICACAO_TESTES_SGC} from "./testes-politica-sgc.js";
+import {POLITICA_CLASSIFICACAO_TESTES_SGC} from "./testes-politica-sgc.js";
+import {carregarPoliticaClassificacao} from "./testes-politica.js";
 
 type Categoria = (typeof CATEGORIAS_PRIORITARIAS | typeof CATEGORIAS_SECUNDARIAS)[number];
 type PerfilFonte = "comportamental" | "estruturalContrato" | "estruturalPuro";
