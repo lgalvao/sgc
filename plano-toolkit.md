@@ -84,10 +84,29 @@ do SGC.
 - A coleta de qualidade separa o motor de composição dos perfis SGC; a execução de tarefas permanece um comando distinto.
 - Acessibilidade Playwright/Axe pertence a `e2e/`, fora do toolkit.
 
-Ainda falta uma decisão final e limitada sobre a superfície remanescente. Em especial, auditores extensos de arquitetura
-Vue e regras de views, modais, notificações, coesão e erros contêm políticas locais. Eles devem ser classificados como
-perfil SGC, e não parametrizados automaticamente. `cliente arquitetura auditar` só continuará como adaptável se uma
-fixture externa provar que suas regras gerais funcionam sem conhecimento do SGC.
+Uma execução representativa contra o workspace real mostrou que rapidez, contratos e testes não bastam. Os comandos
+avaliados terminaram em poucos segundos, mas revelaram problemas de utilidade que passam a orientar o fechamento:
+
+- `projeto ambiente verificar` conhece `e2e`, portas e arquivos do SGC; no estado atual é perfil SGC, não adaptador;
+- `servidor arquitetura auditar` encontra alvos plausíveis, mas chama alertas e críticos conjuntamente de
+  `pontosCriticos`, tornando o contrato contraditório;
+- `servidor testes analisar` produz um inventário detalhado útil, porém marcou todas as 163 classes testadas como
+  correspondências ambíguas, inclusive testes no pacote esperado; essa classificação precisa ser corrigida;
+- `cliente arquitetura auditar`, `cliente residuos auditar` e `codigo cheiros auditar` classificam o repositório inteiro
+  como crítico por pontuações absolutas proporcionais ao tamanho. Isso não demonstra severidade nem orienta uma ação;
+- resíduos pode destacar arquivos com `violacoes: []`; auditoria descritiva e validação por orçamento estão misturadas;
+- cheiros atribui severidade a `@Nullable`, verificações de nulo e `any` em testes sem contexto, sobrepondo resíduos e
+  produzindo mais volume que diagnóstico;
+- os dois comandos CDU consolidam corretamente o corpus, mas a saída humana mostra apenas totais, enquanto o JSON de
+  auditoria é grande; faltam detalhes humanos limitados e acionáveis;
+- `servidor contratos auditar` foi rápido, específico e teve resultado inequívoco, servindo como referência de comando
+  bem delimitado;
+- exemplos baseados em `npx tsx` acrescentam ruído npm. No workspace, a entrada estável deve ser um script npm; no pacote
+  instalado, deve ser o binário `ferramentas`.
+
+Auditores extensos de arquitetura Vue e regras de views, modais, notificações, coesão e erros contêm políticas locais.
+Eles devem ser classificados como perfil SGC, e não parametrizados automaticamente. `cliente arquitetura auditar` só
+continuará como adaptável se uma fixture externa provar que suas regras e sua escala funcionam sem conhecimento do SGC.
 
 ## Escopo restante obrigatório
 
@@ -103,8 +122,15 @@ Revisar uma única vez todos os comandos públicos e registrar no catálogo e no
 Resolver nessa revisão as dúvidas remanescentes, sem abrir novas famílias de comandos:
 
 - classificar corretamente arquitetura Vue, views, modais, notificações, coesão e ramificações de erro;
-- confirmar se `projeto diagnostico`, o corretor FQN e os inventários ainda têm finalidade ocasional clara;
-- verificar se cheiros/Semgrep e cobertura/ramificações continuam complementares na saída atual;
+- reclassificar `projeto ambiente verificar` como perfil SGC ou tornar todos os pré-requisitos configuráveis;
+- decidir se `codigo cheiros auditar` será removido, fundido a resíduos ou convertido em fotografia de tendência sem
+  severidade absoluta;
+- separar inventário de sinais e gate de orçamento na família de resíduos, eliminando “crítico” sem violação;
+- corrigir a ambiguidade sistemática do analisador de testes e a nomenclatura contraditória da arquitetura do servidor;
+- confirmar se o corretor FQN e os inventários ainda têm finalidade ocasional clara;
+- verificar se Semgrep e cobertura/ramificações continuam complementares na saída atual;
+- definir uma saída humana curta mas acionável para CDU e relatórios volumosos;
+- recomendar scripts npm no workspace e o binário `ferramentas` após instalação, removendo `npx tsx` da documentação;
 - remover módulos e exports órfãos revelados pelas decisões.
 
 Critério de saída: todo comando do catálogo tem finalidade e camada inequívocas; não resta decisão funcional marcada como
@@ -144,6 +170,8 @@ A modernização termina quando todos estes itens forem verdadeiros:
 - [ ] motores classificados como núcleo/adaptador não importam política ou caminho SGC;
 - [ ] políticas para auditar o SGC estão identificadas e continuam funcionando contra seu workspace;
 - [ ] CDU e análise de testes Java funcionam com fixture externa sem editar o toolkit;
+- [ ] uma execução representativa contra o SGC não produz severidade contraditória, ambiguidade sistemática ou destaque
+  sem violação correspondente;
 - [ ] ajuda, parser, catálogo e README concordam sobre a superfície pública;
 - [ ] o tarball instalado isoladamente executa o binário e as APIs públicas suportadas;
 - [ ] testes, typechecks, lint, Knip, build e `git diff --check` passam;
