@@ -318,7 +318,7 @@ Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
 integrações durante o carregamento.
 `npm run typecheck` executa `tsconfig.estrito.json` com `strict` e `noImplicitOverride` sobre todos os módulos de
-implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos vinte e três arquivos de teste TypeScript;
+implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos vinte e quatro arquivos de teste TypeScript;
 a divisão por domínio segue reduzindo o teste principal sem manter testes JavaScript ou uma migração parcial de linguagem.
 
 Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--base <diretorio>` para analisar outro
@@ -435,6 +435,7 @@ O diretório `test/` contém:
 - `superficie-cli.test.ts`: testes de ajuda, roteamento e remoção de diretórios legados
 - `importacao-nucleos.test.ts`: testes de importação segura dos comandos de projeto, qualidade e consistência
 - `codigo-importacao.test.ts`: testes de importação segura dos auditores Semgrep e cheiros
+- `codigo-auditorias.test.ts`: testes de auditoria de cheiros, políticas Semgrep e diretórios de código configurados
 - `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
   qualidade e dependências)
 - `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
