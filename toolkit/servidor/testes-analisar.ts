@@ -15,7 +15,6 @@ import {
     classificarPerfilDto,
     classificarPerfilModelo,
     classificarPerfilOutro,
-    construirNomeClasseCompleto,
     criarItemRelatorio,
     EXTENSAO_JAVA,
     inferirCategoria,
@@ -187,7 +186,8 @@ function listarFontes(codigoServidor: string): ArquivoFonte[] {
 
             const caminhoRelativo = normalizarCaminho(path.relative(codigoServidor, caminhoCompleto));
             const nomeClasse = path.basename(caminhoRelativo, EXTENSAO_JAVA);
-            const pacote = normalizarCaminho(path.dirname(caminhoRelativo));
+            const conteudo = fs.readFileSync(caminhoCompleto, "utf-8");
+            const pacote = extrairPacoteJava(conteudo, path.dirname(caminhoRelativo));
 
             arquivos.push({
                 caminhoRelativo: caminhoRelativo,
@@ -200,6 +200,15 @@ function listarFontes(codigoServidor: string): ArquivoFonte[] {
 
     visitar(codigoServidor);
     return arquivos;
+}
+
+function extrairPacoteJava(conteudo: string, fallback: string): string {
+    const pacoteDeclarado = conteudo.match(/^\s*package\s+([\w.]+)\s*;/m)?.[1];
+    if (pacoteDeclarado) {
+        return pacoteDeclarado;
+    }
+
+    return normalizarCaminho(fallback).replaceAll("/", ".");
 }
 
 function indexarTestes(testesServidor: string): IndicesTestes {
@@ -224,7 +233,8 @@ function indexarTestes(testesServidor: string): IndicesTestes {
             }
 
             const caminhoRelativo = normalizarCaminho(path.relative(testesServidor, caminhoCompleto));
-            const pacote = normalizarCaminho(path.dirname(caminhoRelativo));
+            const conteudo = fs.readFileSync(caminhoCompleto, "utf-8");
+            const pacote = extrairPacoteJava(conteudo, path.dirname(caminhoRelativo));
 
             const testesPorNome = indicePorNome.get(entrada.name) ?? [];
             testesPorNome.push(caminhoRelativo);
@@ -375,7 +385,7 @@ async function analisarTestes({
             indicePorPacote
         );
         const possuiTeste = caminhos.length > 0;
-        const nomeClasseCompleto = construirNomeClasseCompleto(arquivo.caminhoRelativo);
+        const nomeClasseCompleto = `${arquivo.pacote}.${arquivo.nomeClasse}`;
         const coberturaClasse = coberturaPorClasse.get(nomeClasseCompleto) || null;
         const estaNoEscopoJacoco = coberturaPorClasse.size === 0 || coberturaClasse !== null;
         const possuiCoberturaJacoco = coberturaClasse !== null && coberturaClasse.linhasCobertas > 0;

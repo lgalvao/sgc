@@ -228,10 +228,6 @@ function classificarPerfilOutro({nomeClasse, caminhoRelativo, conteudoFonte, pol
     return "estruturalPuro";
 }
 
-function construirNomeClasseCompleto(caminhoRelativo: string): string {
-    return normalizarCaminho(caminhoRelativo).replace(/\.java$/i, "").replaceAll("/", ".");
-}
-
 function criarItemRelatorio({
     arquivo,
     perfilDto,
@@ -286,7 +282,6 @@ export {
     classificarPerfilDto,
     classificarPerfilModelo,
     classificarPerfilOutro,
-    construirNomeClasseCompleto,
     criarItemRelatorio
 };
 

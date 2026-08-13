@@ -194,6 +194,58 @@ describe("Análise e priorização dos testes do servidor", () => {
         expect(conteudo.estatisticas.classesComTesteDedicado).toBe(1);
     });
 
+    test("distingue teste no pacote declarado de correspondencia ambigua por nome", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-correspondencia-pacote-"));
+        const fonte = path.join(base, "backend", "src", "main", "java", "sgc", "exemplo");
+        const testesMesmoPacote = path.join(base, "backend", "src", "test", "java", "sgc", "exemplo");
+        const testesOutroPacote = path.join(base, "backend", "src", "test", "java", "outro");
+        const json = path.join(base, "relatorio.json");
+
+        await escreverJson(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                codigoServidor: "backend/src/main/java/sgc",
+                testesServidor: "backend/src/test/java"
+            }
+        });
+        await escreverArquivo(
+            path.join(fonte, "ExemploService.java"),
+            "package sgc.exemplo; public class ExemploService { public String buscar() { return \"ok\"; } }"
+        );
+        await escreverArquivo(
+            path.join(fonte, "ImportadoService.java"),
+            "package sgc.exemplo; public class ImportadoService { public String buscar() { return \"ok\"; } }"
+        );
+        await escreverArquivo(
+            path.join(testesMesmoPacote, "ExemploServiceTest.java"),
+            "package sgc.exemplo; class ExemploServiceTest {}"
+        );
+        await escreverArquivo(
+            path.join(testesOutroPacote, "ImportadoServiceTest.java"),
+            "package outro; class ImportadoServiceTest {}"
+        );
+
+        const resultado = await executarSgc([
+            "servidor",
+            "testes",
+            "analisar",
+            "--base",
+            base,
+            "--json",
+            "--saida-json",
+            json
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout) as RelatorioAnaliseTestesJson;
+        expect(conteudo.estatisticas.classesComTesteDedicado).toBe(2);
+        expect(conteudo.estatisticas.correspondenciasAmbiguas).toBe(1);
+        expect(conteudo.categorias.servicos.comTeste.find(item => item.classe === "ExemploService")?.estrategiaCorrespondencia)
+            .toBe("mesmoPacote");
+        expect(conteudo.categorias.servicos.comTeste.find(item => item.classe === "ImportadoService")?.estrategiaCorrespondencia)
+            .toBe("nomeCorrespondenteOutroPacote");
+    });
+
     test("resolve diretorio do servidor relativo a base explicita", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-diretorio-relativo-"));
         const fonte = path.join(base, "servidor", "src", "main", "java", "com", "exemplo");
