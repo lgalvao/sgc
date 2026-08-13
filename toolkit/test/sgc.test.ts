@@ -3,26 +3,26 @@ import path from "node:path";
 import {mkdtemp} from "node:fs/promises";
 import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
-import {execa, execaNode} from "execa";
+import {execa, execaNode, type Options} from "execa";
 import {pathToFileURL} from "node:url";
-import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.ts";
-import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
-import {executarDiagnostico} from "../projeto/diagnostico.ts";
-import {executarLimpeza} from "../projeto/limpar.ts";
-import {resolverEscoposInstalacao} from "../projeto/preparar.ts";
-import {executarPerfilQualidade} from "../projeto/qualidade.ts";
-import {executarAuditoriaDependencias, resolverEscoposAuditoria} from "../projeto/dependencias-auditar.ts";
-import {carregarConfiguracao, resolverCaminhoConfigurado, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
-import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
-import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
-import {obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.ts";
-import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.ts";
-import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.ts";
-import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.ts";
-import {CATALOGO_COMANDOS} from "../lib/catalogo-comandos.ts";
-import {program} from "../sgc.ts";
+import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.js";
+import {sincronizarVersao} from "../projeto/versao-sincronizar.js";
+import {executarDiagnostico} from "../projeto/diagnostico.js";
+import {executarLimpeza} from "../projeto/limpar.js";
+import {resolverEscoposInstalacao} from "../projeto/preparar.js";
+import {executarPerfilQualidade} from "../projeto/qualidade.js";
+import {executarAuditoriaDependencias, resolverEscoposAuditoria} from "../projeto/dependencias-auditar.js";
+import {carregarConfiguracao, resolverCaminhoConfigurado, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
+import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
+import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
+import {obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
+import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
+import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.js";
+import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.js";
+import {CATALOGO_COMANDOS} from "../lib/catalogo-comandos.js";
+import {program} from "../sgc.js";
 
-const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
+const DIRETORIO_RAIZ: string = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
 const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHO_SGC_COMPILADO = path.join(DIRETORIO_RAIZ, "toolkit", "dist", "sgc.js");
@@ -92,28 +92,74 @@ const CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND = [
 const DIRETORIO_SCRIPTS_BACKEND_LEGADO = path.join(DIRETORIO_RAIZ, "backend", "etc", "scripts");
 const DIRETORIO_SCRIPTS_FRONTEND_LEGADO = path.join(DIRETORIO_RAIZ, "frontend", "etc", "scripts");
 
-async function executarSgc(args, opcoes = {}) {
-    return execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
-        cwd: DIRETORIO_RAIZ,
-        reject: false,
-        ...opcoes
-    });
+type ObjetoJson = Record<string, unknown>;
+
+interface PontoArquiteturalJson {
+    arquivo: string;
+    sinaisAtivos: string[];
+    hubCentral?: boolean;
 }
 
-async function executarScriptFrontendCobertura(args, opcoes = {}) {
-    return execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, ...args], {
-        cwd: DIRETORIO_RAIZ,
-        reject: false,
-        ...opcoes
-    });
+interface ViolacaoJson {
+    regra: string;
 }
 
-async function executarScriptTestesPriorizar(args, opcoes = {}) {
-    return execa(CAMINHO_TSX, [CAMINHO_TESTES_PRIORIZAR, ...args], {
+interface VerificacaoDiagnosticoJson {
+    nome: string;
+    status?: string;
+    detalhe?: string;
+}
+
+type ChamadaComando = {
+    comando: string;
+    argumentos: readonly string[];
+    base?: string;
+    diretorio?: string;
+};
+
+interface ResultadoExecucao {
+    exitCode?: number;
+    stdout: string;
+    stderr: string;
+}
+
+async function executarSgc(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_SGC, ...args], {
         cwd: DIRETORIO_RAIZ,
         reject: false,
         ...opcoes
     });
+    return {
+        exitCode: resultado.exitCode,
+        stdout: String(resultado.stdout),
+        stderr: String(resultado.stderr)
+    };
+}
+
+async function executarScriptFrontendCobertura(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_FRONTEND_COBERTURA_AUDITORIA, ...args], {
+        cwd: DIRETORIO_RAIZ,
+        reject: false,
+        ...opcoes
+    });
+    return {
+        exitCode: resultado.exitCode,
+        stdout: String(resultado.stdout),
+        stderr: String(resultado.stderr)
+    };
+}
+
+async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {}): Promise<ResultadoExecucao> {
+    const resultado = await execa(CAMINHO_TSX, [CAMINHO_TESTES_PRIORIZAR, ...args], {
+        cwd: DIRETORIO_RAIZ,
+        reject: false,
+        ...opcoes
+    });
+    return {
+        exitCode: resultado.exitCode,
+        stdout: String(resultado.stdout),
+        stderr: String(resultado.stderr)
+    };
 }
 
 describe("CLI raiz do toolkit", () => {
@@ -126,6 +172,9 @@ describe("CLI raiz do toolkit", () => {
             for (const segmento of definicao.caminho) {
                 const proximo = comando.commands.find(item => item.name() === segmento);
                 expect(proximo, `Comando ausente: ${definicao.caminho.join(" ")}`).toBeDefined();
+                if (!proximo) {
+                    throw new Error(`Comando ausente: ${definicao.caminho.join(" ")}`);
+                }
                 comando = proximo;
             }
 
@@ -763,7 +812,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("parametriza crawler Playwright e valida resultados de acessibilidade", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-a11y-crawler-"));
-        const chamadas = [];
+        const chamadas: ChamadaComando[] = [];
         const resultado = await executarCrawler(["--projeto", "chromium", "--lista"], {
             base: diretorioBase,
             especificacao: "testes/a11y.spec.ts",
@@ -1061,7 +1110,7 @@ describe("CLI raiz do toolkit", () => {
         const corpo = JSON.parse(resultado.stdout);
         expect(corpo.resumo.arquivosComViolacao).toBe(1);
         expect(corpo.relatorio[0].arquivo).toBe("backend/src/main/java/sgc/diagnostico/ServicoInvalido.java");
-        expect(corpo.relatorio[0].achados.some(item => item.regra === "literal_sgc")).toBe(true);
+        expect(corpo.relatorio[0].achados.some((item: {regra: string}) => item.regra === "literal_sgc")).toBe(true);
     });
 
     test("audita assuntos no diretorio backend configurado", async () => {
@@ -1385,7 +1434,7 @@ describe("CLI raiz do toolkit", () => {
             caminho: path.join(base, "cliente")
         }]);
 
-        const chamadas = [];
+        const chamadas: ChamadaComando[] = [];
         await executarPerfilQualidade("rapido", {
             base,
             executarComando: async (comando, argumentos, diretorio) => {
@@ -1474,10 +1523,18 @@ describe("CLI raiz do toolkit", () => {
 
         try {
             for (const nome of adaptadores) {
-                ADAPTADORES[nome] = async () => ({
+                ADAPTADORES[nome] = async (contexto) => ({
                     codigo: nome,
+                    nome,
+                    categoria: "qualidade",
                     status: "sucesso",
+                    duracaoMs: 0,
+                    comando: "teste",
+                    diretorio: contexto.base,
+                    sumario: "",
                     metricas: {},
+                    erros: [],
+                    artefatos: []
                 });
             }
 
@@ -1759,7 +1816,7 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.resumo.metricas.arquivosComServerStateCaseiro).toBe(1);
         expect(conteudo.hotspots[0].arquivo).toBe("frontend/src/views/UnidadeView.vue");
         expect(conteudo.hotspots[0].sinaisAtivos).toContain("serverStateCaseiro");
-        expect(conteudo.hotspots.some((hotspot) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
+        expect(conteudo.hotspots.some((hotspot: PontoArquiteturalJson) => hotspot.hubCentral && hotspot.sinaisAtivos.includes("superficieAmpla"))).toBe(false);
         expect(await fs.pathExists(path.join(base, "toolkit", "qualidade", "artefatos", "frontend-arquitetura"))).toBe(false);
 
         const diretorioSaida = path.join(base, "artefatos", "arquitetura");
@@ -1889,7 +1946,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((item) => item.arquivo === "frontend/src/stores/perfil.ts");
+        const hotspot = conteudo.hotspots.find((item: Pick<PontoArquiteturalJson, "arquivo">) => item.arquivo === "frontend/src/stores/perfil.ts");
         expect(hotspot).toBeUndefined();
     });
 
@@ -2104,7 +2161,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((h) => h.arquivo.endsWith("usePerfil.ts"));
+        const hotspot = conteudo.hotspots.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("usePerfil.ts"));
         // Fachada de store: acessar a store muitas vezes é esperado — sem penalidade
         expect(hotspot).toBeUndefined();
     });
@@ -2135,7 +2192,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((h) => h.arquivo.endsWith("autenticacao.ts"));
+        const hotspot = conteudo.hotspots.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("autenticacao.ts"));
         // Orquestração sem defineStore: chamar serviços é esperado — sem score nem sinal serviceDireto
         expect(hotspot).toBeUndefined();
     });
@@ -2170,7 +2227,7 @@ describe("CLI raiz do toolkit", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
-        const hotspot = conteudo.hotspots.find((h) => h.arquivo.endsWith("useItens.ts"));
+        const hotspot = conteudo.hotspots.find((ponto: Pick<PontoArquiteturalJson, "arquivo">) => ponto.arquivo.endsWith("useItens.ts"));
         // Composable aparece por superficieAmpla, mas chamar serviços não é sinalizado
         expect(hotspot).toBeDefined();
         expect(hotspot.sinaisAtivos).toContain("superficieAmpla");
@@ -2372,9 +2429,9 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudoJson.estatisticas.classes_ruido_ignorado).toBe(2);
 
         const dtoUntested = conteudoJson.categorias.DTOs.untested;
-        expect(dtoUntested.find((item) => item.classe === "DtoEstrutural").dto_ruido_ignorado).toBe(true);
-        expect(dtoUntested.find((item) => item.classe === "RequestContratual").perfil_dto).toBe("estrutural_contrato");
-        expect(dtoUntested.find((item) => item.classe === "DtoComportamental").dto_ruido_ignorado).toBe(false);
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoEstrutural").dto_ruido_ignorado).toBe(true);
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "RequestContratual").perfil_dto).toBe("estrutural_contrato");
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "DtoComportamental").dto_ruido_ignorado).toBe(false);
     });
 
     test("ignora models estruturais e contratuais do backlog real", async () => {
@@ -2418,9 +2475,9 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudoJson.estatisticas.models_estruturais_contratuais).toBe(1);
 
         const modelUntested = conteudoJson.categorias.Models.untested;
-        expect(modelUntested.find((item) => item.classe === "SituacaoExemplo").model_ruido_ignorado).toBe(true);
-        expect(modelUntested.find((item) => item.classe === "AnotacaoExemplo").perfil_model).toBe("estrutural_contrato");
-        expect(modelUntested.find((item) => item.classe === "ProcessoExemplo").model_ruido_ignorado).toBe(false);
+        expect(modelUntested.find((item: ObjetoJson) => item.classe === "SituacaoExemplo").model_ruido_ignorado).toBe(true);
+        expect(modelUntested.find((item: ObjetoJson) => item.classe === "AnotacaoExemplo").perfil_model).toBe("estrutural_contrato");
+        expect(modelUntested.find((item: ObjetoJson) => item.classe === "ProcessoExemplo").model_ruido_ignorado).toBe(false);
     });
 
     test("ignora others estruturais e contratuais do backlog real e reclassifica commands como DTOs", async () => {
@@ -2470,12 +2527,12 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudoJson.estatisticas.others_estruturais_contratuais).toBe(1);
 
         const otherUntested = conteudoJson.categorias.Others.untested;
-        expect(otherUntested.find((item) => item.classe === "Mensagens").other_ruido_ignorado).toBe(true);
-        expect(otherUntested.find((item) => item.classe === "AnotacaoSegura").perfil_other).toBe("estrutural_contrato");
-        expect(otherUntested.find((item) => item.classe === "LimitadorExemplo").other_ruido_ignorado).toBe(false);
+        expect(otherUntested.find((item: ObjetoJson) => item.classe === "Mensagens").other_ruido_ignorado).toBe(true);
+        expect(otherUntested.find((item: ObjetoJson) => item.classe === "AnotacaoSegura").perfil_other).toBe("estrutural_contrato");
+        expect(otherUntested.find((item: ObjetoJson) => item.classe === "LimitadorExemplo").other_ruido_ignorado).toBe(false);
 
         const dtoUntested = conteudoJson.categorias.DTOs.untested;
-        expect(dtoUntested.find((item) => item.classe === "WorkflowCommand").dto_ruido_ignorado).toBe(true);
+        expect(dtoUntested.find((item: ObjetoJson) => item.classe === "WorkflowCommand").dto_ruido_ignorado).toBe(true);
     });
 
     test("classifica separadamente teste dedicado, cobertura indireta, sem evidencia e fora do escopo", async () => {
@@ -2548,9 +2605,9 @@ describe("CLI raiz do toolkit", () => {
         const others = conteudoJson.categorias.Others;
         expect(others.tested).toHaveLength(1);
         expect(others.untested).toHaveLength(3);
-        expect(others.untested.find((item) => item.classe === "ClasseIndireta").coberta_somente_indiretamente).toBe(true);
-        expect(others.untested.find((item) => item.classe === "ClasseSemEvidencia").evidencia_qualidade).toBe("sem_evidencia_no_escopo");
-        expect(others.untested.find((item) => item.classe === "ClasseForaEscopo").fora_escopo_jacoco).toBe(true);
+        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseIndireta").coberta_somente_indiretamente).toBe(true);
+        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseSemEvidencia").evidencia_qualidade).toBe("sem_evidencia_no_escopo");
+        expect(others.untested.find((item: ObjetoJson) => item.classe === "ClasseForaEscopo").fora_escopo_jacoco).toBe(true);
     });
 
     test("prioriza testes usando sidecar JSON automaticamente quando disponivel", async () => {
@@ -2725,9 +2782,9 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.exitCode).toBe(1);
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.resumo.totalViews).toBe(2);
-        expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-com-bmodal-cru")).toBe(true);
-        expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-sem-layout-padrao")).toBe(true);
-        expect(conteudo.violacoes.some((violacao) => violacao.regra === "view-sem-cabecalho-padrao")).toBe(true);
+        expect(conteudo.violacoes.some((violacao: ViolacaoJson) => violacao.regra === "view-com-bmodal-cru")).toBe(true);
+        expect(conteudo.violacoes.some((violacao: ViolacaoJson) => violacao.regra === "view-sem-layout-padrao")).toBe(true);
+        expect(conteudo.violacoes.some((violacao: ViolacaoJson) => violacao.regra === "view-sem-cabecalho-padrao")).toBe(true);
     });
 
     test("valida padronizacao de modais em um recorte controlado", async () => {
@@ -2876,7 +2933,7 @@ describe("CLI raiz do toolkit", () => {
         const json = JSON.parse(resultado.stdout);
         expect(["ok", "alerta"]).toContain(json.statusGeral);
         expect(Array.isArray(json.verificacoes)).toBe(true);
-        expect(json.verificacoes.some((item) => item.nome === "node")).toBe(true);
+        expect(json.verificacoes.some((item: Pick<VerificacaoDiagnosticoJson, "nome">) => item.nome === "node")).toBe(true);
     });
 
     test("diagnostico aceita recursos registrados por projeto externo", async () => {
@@ -3006,7 +3063,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("executa catálogo de qualidade externo na base indicada", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-base-"));
-        const chamadas = [];
+        const chamadas: ChamadaComando[] = [];
         const resultado = await executarPerfilQualidade("verificacao", {
             base: diretorioBase,
             perfis: {
@@ -3038,7 +3095,7 @@ describe("CLI raiz do toolkit", () => {
 
     test("audita dependencias em escopos e comandos externos", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-dependencias-base-"));
-        const chamadas = [];
+        const chamadas: ChamadaComando[] = [];
         const resultado = await executarAuditoriaDependencias({
             base: diretorioBase,
             escopos: [
@@ -3101,7 +3158,7 @@ describe("CLI raiz do toolkit", () => {
         expect(dados.totais.falha).toBeGreaterThan(0);
 
         // Verifica se um dos arquivos obrigatórios ausentes foi reportado como falha
-        const falhaGradlew = dados.verificacoes.find((v) => v.nome === "gradlew");
+        const falhaGradlew = dados.verificacoes.find((verificacao: VerificacaoDiagnosticoJson) => verificacao.nome === "gradlew");
         expect(falhaGradlew).toBeDefined();
         expect(falhaGradlew.status).toBe("falha");
         expect(falhaGradlew.detalhe).toContain("gradlew ausente");
