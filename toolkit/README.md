@@ -107,6 +107,9 @@ npx tsx toolkit/sgc.ts codigo cheiros auditar --gravar
 persistir os artefatos. O coletor consolidado de qualidade já informa essa opção quando precisa manter o artefato
 intermediário do perfil SGC.
 
+`backend arquitetura auditar` também é somente leitura por padrão. Use `--gravar` para atualizar os relatórios
+Markdown e JSON no diretório de artefatos configurado.
+
 ### Requisitos
 
 ```bash

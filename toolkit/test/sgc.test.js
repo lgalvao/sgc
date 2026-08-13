@@ -970,7 +970,7 @@ describe("CLI raiz do toolkit", () => {
         expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(true);
     });
 
-    test("audita service acima do limiar arquitetural sem gravar artefato", async () => {
+    test("audita service acima do limiar arquitetural sem gravar por padrao", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-backend-"));
         const codigoBackend = path.join(base, "servidor", "java");
         await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
@@ -996,7 +996,6 @@ describe("CLI raiz do toolkit", () => {
             "arquitetura",
             "auditar",
             "--json",
-            "--sem-gravar",
             "--base",
             base
         ]);
@@ -1014,6 +1013,18 @@ describe("CLI raiz do toolkit", () => {
         });
         expect(conteudo.todos[0].motivos).toContain("15 métodos públicos (>=15)");
         expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "arquitetura-auditoria.md"))).toBe(false);
+
+        const gravacao = await executarSgc([
+            "backend",
+            "arquitetura",
+            "auditar",
+            "--json",
+            "--gravar",
+            "--base",
+            base
+        ]);
+        expect(gravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "arquitetura-auditoria.md"))).toBe(true);
     });
 
     test("audita vazamento de modelo em DTO de controlador sem gravar artefato", async () => {
