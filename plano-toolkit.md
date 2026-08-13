@@ -164,6 +164,8 @@ frontend e para os caminhos OpenAPI.
 - Dois comandos de projeto já foram convertidos:
   - `projeto/arvore-linhas.ts`;
   - `projeto/versao-sincronizar.ts`.
+- `projeto/versao-sincronizar.ts` agora calcula pendências sem gravar por padrão, aceita `--base`, aplica alterações
+  somente com `--gravar` e evita reescrita quando a versão já está sincronizada.
 - `garantirArquivo` resolve entradas `.ts` na fonte e o `.js` correspondente no build, sem aliases de comandos antigos.
 - Exports de `toolkit/package.json` já expõem a árvore TypeScript do toolkit; os testes ainda são JavaScript por decisão
   de escopo, não por dependência de runtime.
@@ -373,7 +375,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 108 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 109 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
@@ -404,7 +406,8 @@ reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, 
 elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste comportamental do auditor de contratos backend;
 esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários;
 a parametrização de execuções externas chega a 105; uma rodada explicita as políticas de resíduos e chega a 106; outra
-uniformiza a família de nomenclatura e chega a 107; esta rodada uniformiza os relatórios de cobertura e chega a 108.
+uniformiza a família de nomenclatura e chega a 107; uma rodada uniformiza os relatórios de cobertura e chega a 108; esta
+rodada protege a sincronização de versão e chega a 109.
 
 ### 3.3 Tamanho e composição atual
 
@@ -413,7 +416,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 72 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
-- 2 arquivos de teste concentrando 108 cenários, mais 1 smoke de distribuição isolada;
+- 2 arquivos de teste concentrando 109 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -451,7 +454,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 108 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 109 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -465,7 +468,7 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 | Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. As famílias que oferecem persistência usam `--gravar`. Dependências externas podem fazer leitura adicional. |
 | Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--output`, `--output-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
-| Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN usa `--dry-run` opt-in; versão não possui prévia; baseline copia diretamente para o destino. |
+| Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN ainda usa `--dry-run` opt-in; versão simula por padrão e exige `--gravar`; baseline copia diretamente para o destino. |
 | Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
 | Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar`, `frontend acessibilidade crawler` | Executam Gradle, npm, Playwright, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. |
 

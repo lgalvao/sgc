@@ -2763,16 +2763,56 @@ describe("CLI raiz do toolkit", () => {
         expect(resultado.stdout).toContain("Sincroniza a versao entre gradle.properties e frontend/package.json.");
     });
 
-    test("sincroniza a versao em um diretorio informado", async () => {
+    test("simula e aplica sincronizacao de versao em um diretorio informado", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-sincronizar-"));
         await fs.outputFile(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\nother=value\n");
         await fs.outputJSON(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
 
-        const resultado = sincronizarVersao("2.3.4", diretorioBase);
+        const simulacao = sincronizarVersao("2.3.4", diretorioBase);
 
+        expect(simulacao.gravado).toBe(false);
+        expect(simulacao.arquivosAtualizados).toEqual([]);
+        expect(simulacao.arquivosPendentes).toEqual(["gradle.properties", "frontend/package.json"]);
+        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=1.0.0");
+        expect((await fs.readJSON(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("1.0.0");
+
+        const resultado = sincronizarVersao("2.3.4", diretorioBase, true);
+
+        expect(resultado.gravado).toBe(true);
         expect(resultado.arquivosAtualizados).toEqual(["gradle.properties", "frontend/package.json"]);
         expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
         expect((await fs.readJSON(path.join(diretorioBase, "frontend", "package.json"))).version).toBe("2.3.4");
+    });
+
+    test("aplica sincronizacao de versao pela CLI somente com gravar", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-versao-sincronizar-cli-"));
+        await fs.outputFile(path.join(diretorioBase, "gradle.properties"), "version=1.0.0\n");
+        await fs.outputJSON(path.join(diretorioBase, "frontend", "package.json"), {name: "exemplo", version: "1.0.0"});
+
+        const simulacao = await executarSgc([
+            "projeto",
+            "versao-sincronizar",
+            "2.3.4",
+            "--base",
+            diretorioBase
+        ]);
+
+        expect(simulacao.exitCode).toBe(0);
+        expect(simulacao.stdout).toContain("[simulação]");
+        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=1.0.0");
+
+        const aplicacao = await executarSgc([
+            "projeto",
+            "versao-sincronizar",
+            "2.3.4",
+            "--base",
+            diretorioBase,
+            "--gravar"
+        ]);
+
+        expect(aplicacao.exitCode).toBe(0);
+        expect(aplicacao.stdout).toContain("[v]");
+        expect(await fs.readFile(path.join(diretorioBase, "gradle.properties"), "utf8")).toContain("version=2.3.4");
     });
 
     test("calcula arvore de linhas usando o diretorio base informado", async () => {

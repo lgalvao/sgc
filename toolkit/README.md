@@ -163,8 +163,11 @@ npx tsx toolkit/sgc.ts projeto limpar --confirmar
 npx tsx toolkit/sgc.ts projeto qualidade rapido
 npx tsx toolkit/sgc.ts projeto preparar --instalar-dependencias
 npx tsx toolkit/sgc.ts projeto arvore-linhas
-npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3
+npx tsx toolkit/sgc.ts projeto versao-sincronizar 1.2.3 --gravar
 ```
+
+`projeto versao-sincronizar` apenas simula por padrão. Use `--base` para outra raiz e `--gravar` para atualizar
+`gradle.properties` e `frontend/package.json`.
 
 ## Casos de uso típicos
 
