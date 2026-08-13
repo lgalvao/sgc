@@ -318,9 +318,8 @@ Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
 integrações durante o carregamento.
 `npm run typecheck` executa `tsconfig.estrito.json` com `strict` e `noImplicitOverride` sobre todos os módulos de
-implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos oito arquivos de teste TypeScript; a
-divisão por domínio ainda pode avançar dentro do teste principal, mas não há mais testes JavaScript ou uma migração
-parcial de linguagem.
+implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos vinte e um arquivos de teste TypeScript;
+a divisão por domínio segue reduzindo o teste principal sem manter testes JavaScript ou uma migração parcial de linguagem.
 
 Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--base <diretorio>` para analisar outro
 repositório Git, e a sincronização de versão aceita um diretório base nas funções reutilizáveis sem alterar o projeto
@@ -426,6 +425,7 @@ O diretório `test/` contém:
 - `backend-testes.test.ts`: testes de análise, classificação e priorização dos testes backend
 - `backend-importacao.test.ts`: testes de importação segura dos comandos e auditores backend
 - `frontend-residuos.test.ts`: testes de políticas, auditoria, gravação e validação de resíduos do frontend
+- `frontend-arquitetura.test.ts`: testes da auditoria de hotspots, defaults e persistência arquitetural do frontend
 - `frontend-importacao.test.ts`: testes de importação segura dos comandos e auditores frontend
 - `frontend-acessibilidade.test.ts`: testes do processamento e da execução configurada de acessibilidade
 - `cobertura-cli.test.ts`: testes de leitura, gravação explícita e caminhos externos de cobertura
