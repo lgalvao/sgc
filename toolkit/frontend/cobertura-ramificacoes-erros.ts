@@ -13,15 +13,15 @@ interface LinhaSuspeita {
     texto: string;
 }
 
-interface ArquivoRamificacoesErros extends Pick<ArquivoCobertura, "arquivo" | "branchesTotal" | "branchesPercentual"> {
-    branchesPerdidos: number;
+interface ArquivoRamificacoesErros extends Pick<ArquivoCobertura, "arquivo" | "ramificacoesTotal" | "ramificacoesPercentual"> {
+    ramificacoesPerdidas: number;
     linhasSuspeitas: LinhaSuspeita[];
 }
 
 interface ResultadoRamificacoesErros {
     status: "ok";
     timestamp: string;
-    totais: ResultadoCoberturaFrontend["branches"];
+    totais: ResultadoCoberturaFrontend["ramificacoes"];
     arquivos: ArquivoRamificacoesErros[];
 }
 
@@ -36,8 +36,8 @@ const PADROES_SUSPEITOS: RegExp[] = [
     /\bPromise\.reject\b/,
 ];
 
-function calcularBranchesPerdidos(arquivo: ArquivoCobertura): number {
-    return Math.max(0, arquivo.branchesTotal - Math.round((arquivo.branchesPercentual / 100) * arquivo.branchesTotal));
+function calcularRamificacoesPerdidas(arquivo: ArquivoCobertura): number {
+    return Math.max(0, arquivo.ramificacoesTotal - Math.round((arquivo.ramificacoesPercentual / 100) * arquivo.ramificacoesTotal));
 }
 
 async function coletarLinhasSuspeitas(caminhoRelativo: string, diretorioBase: string): Promise<LinhaSuspeita[]> {
@@ -76,10 +76,10 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const candidatos = coleta.arquivos
         .map((arquivo) => ({
             ...arquivo,
-            branchesPerdidos: calcularBranchesPerdidos(arquivo),
+            ramificacoesPerdidas: calcularRamificacoesPerdidas(arquivo),
         }))
-        .filter((arquivo) => arquivo.branchesPerdidos > 0)
-        .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
+        .filter((arquivo) => arquivo.ramificacoesPerdidas > 0)
+        .toSorted((a, b) => b.ramificacoesPerdidas - a.ramificacoesPerdidas || a.ramificacoesPercentual - b.ramificacoesPercentual)
         .slice(0, limite);
 
     const arquivos: ArquivoRamificacoesErros[] = [];
@@ -90,9 +90,9 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         }
         arquivos.push({
             arquivo: candidato.arquivo,
-            branchesPerdidos: candidato.branchesPerdidos,
-            branchesTotal: candidato.branchesTotal,
-            branchesPercentual: candidato.branchesPercentual,
+            ramificacoesPerdidas: candidato.ramificacoesPerdidas,
+            ramificacoesTotal: candidato.ramificacoesTotal,
+            ramificacoesPercentual: candidato.ramificacoesPercentual,
             linhasSuspeitas,
         });
     }
@@ -100,7 +100,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const resultado: ResultadoRamificacoesErros = {
         status: "ok",
         timestamp: new Date().toISOString(),
-        totais: coleta.branches,
+        totais: coleta.ramificacoes,
         arquivos,
     };
 
@@ -109,8 +109,8 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         return;
     }
 
-    imprimirCabecalho("BRANCHES DE ERRO SUSPEITOS NO FRONTEND");
-    escreverLinha(`Cobertura global de branches: ${pc.bold(`${coleta.branches.percentual}%`)} (${coleta.branches.cobertos}/${coleta.branches.total})`);
+    imprimirCabecalho("RAMIFICAÇÕES DE ERRO SUSPEITAS NO FRONTEND");
+    escreverLinha(`Cobertura global de ramificações: ${pc.bold(`${coleta.ramificacoes.percentual}%`)} (${coleta.ramificacoes.cobertos}/${coleta.ramificacoes.total})`);
     escreverLinha("");
 
     if (arquivos.length === 0) {
@@ -120,7 +120,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     arquivos.forEach((arquivo, indice) => {
         escreverLinha(`${indice + 1}. ${pc.bold(arquivo.arquivo)}`);
-        escreverLinha(`   Branches perdidos: ${arquivo.branchesPerdidos}/${arquivo.branchesTotal} | Cobertura: ${arquivo.branchesPercentual}%`);
+        escreverLinha(`   Ramificações perdidas: ${arquivo.ramificacoesPerdidas}/${arquivo.ramificacoesTotal} | Cobertura: ${arquivo.ramificacoesPercentual}%`);
         arquivo.linhasSuspeitas.forEach((linha) => {
             escreverLinha(`   L${linha.numero}: ${pc.dim(linha.texto)}`);
         });
@@ -131,7 +131,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverLinha(pc.red(`Erro ao cruzar branches de erro suspeitos: ${mensagem}`));
+        escreverLinha(pc.red(`Erro ao cruzar ramificações de erro suspeitas: ${mensagem}`));
         process.exitCode = 1;
     });
 }

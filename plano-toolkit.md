@@ -240,6 +240,9 @@ provam utilidade funcional.
   imports, aliases `@/`, composables e famílias; os hubs e heurísticas específicos do SGC continuam explícitos.
 - A leitura de cobertura V8 frontend agora normaliza caminhos em relação à base auditada, sem procurar o literal
   `frontend/src`; relatórios de layouts externos mantêm seus caminhos relativos.
+- O contrato interno de cobertura V8 agora usa `instrucoes`, `ramificacoes`, `funcoes` e `linhas`, além de seus derivados
+  em português nos resultados por arquivo e nos auditores; as chaves de entrada `s`, `f`, `b`, `statementMap` e o nome
+  externo `coverage-final.json` permanecem intactos.
 - `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts` foram convertidos para TypeScript com tipos
   explícitos para XML JaCoCo, dados V8, métricas, arquivos e opções; `@types/xml2js` documenta a dependência de
   parsing. Os dois domínios puros de cobertura agora têm entrada tipada e não fazem I/O durante a importação.
@@ -439,8 +442,8 @@ Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente s
 
 - `npm --prefix toolkit run test`: 122 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,33% de statements (620/1.338),
-  34,69% de branches (323/931), 53,33% de funções (144/270) e 46,52% de linhas (595/1.279); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,33% de instruções (620/1.338),
+  34,69% de ramificações (323/931), 53,33% de funções (144/270) e 46,52% de linhas (595/1.279); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -538,7 +541,8 @@ Nesta rodada, os 42 shebangs de Node em fontes TypeScript foram removidos; o cat
 `metadados.controleVersao.ramo/revisao`, respectivamente.
 Na rodada seguinte, o contrato interno dos resultados JaCoCo passou a usar `ramificacoes` e seus derivados em português;
 `BRANCH`, `mb` e `cb` permanecem somente como campos do XML externo. A suíte focada de cobertura passou a 10 cenários
-aprovados nesse recorte; o contrato interno V8 ainda será tratado separadamente.
+aprovados nesse recorte. Nesta rodada, o contrato interno V8 passou a usar `instrucoes`, `ramificacoes`, `funcoes` e
+`linhas`, com dois cenários focados e a suíte completa aprovados; as chaves do formato V8 externo não foram traduzidas.
 
 ### 3.3 Tamanho e composição atual
 
@@ -664,16 +668,16 @@ Conclusões confirmadas:
   ser guiados por contrato público, cobertura e um consumidor externo representativo;
 - a cobertura global atual é informativa, não um critério suficiente. Os módulos de maior risco da coleta ainda têm
   cobertura direta baixa: adaptadores SGC, executor e leitores são exercitados principalmente por integração indireta;
-- a padronização em português dos contratos próprios avançou: destinos `latest`, nomes de relatório `*-coverage-*` e
-  campos da fotografia `branch`/`commit` foram removidos. Permanecem símbolos de cobertura derivados de formatos ou
-  ferramentas externas e opções/mensagens heterogêneas que ainda exigem revisão coordenada;
+- a padronização em português dos contratos próprios avançou: destinos `latest`, nomes de relatório `*-coverage-*`,
+  campos da fotografia `branch`/`commit` e os símbolos internos de cobertura JaCoCo/V8 foram removidos. Permanecem
+  nomes derivados de formatos ou ferramentas externas e opções/mensagens heterogêneas que ainda exigem revisão coordenada;
 - `backend arquitetura/contratos/coesao auditar` já são read-only por padrão, possuem regressões que exigem `--gravar`
   e agora usam o destino `backend/mais-recente`;
 - a URL OpenAPI `http://127.0.0.1:10000/api-docs`, tarefas Gradle e várias convenções Vue/SGC continuam sendo defaults
   legítimos do perfil SGC, mas ainda não estão todos representados como política ou adaptador explícito;
-- nesta auditoria, o shell ativo voltou a Node `26.5.1`, abaixo do mínimo `26.7.0`; o teste de diagnóstico falhou como
-  esperado e passou novamente quando executado sob o runtime declarado. A validação deve conferir `node --version`
-  antes da suíte e não reinterpretar falha de ambiente como regressão funcional;
+- uma execução histórica desta auditoria ocorreu sob Node `26.5.1`, abaixo do mínimo `26.7.0`, e foi corrigida antes da
+  publicação; a validação corrente confirma `v26.7.0` diretamente no `PATH`. A versão deve continuar sendo conferida
+  antes da suíte, sem reinterpretar uma falha de ambiente como regressão funcional;
 - o plano anterior acumulava histórico, backlog e itens resolvidos sob as mesmas prioridades. A partir desta revisão,
   a seção de lacunas lista somente trabalho ativo; o histórico permanece nas fases e na situação atual.
 
@@ -716,10 +720,10 @@ Decisões negativas desta auditoria:
   até existir consumidor substituto testado.
 - `fs-extra` não é dependência de runtime e só aparece nos testes. Sua substituição por `node:fs/promises` é uma
   simplificação possível, mas não é evidência de obsolescência funcional e fica para uma rodada própria.
-- Campos de entrada externos como `BRANCH` do JaCoCo, mapas V8 e o diretório `frontend/coverage` produzido pelo Vitest
-  não serão traduzidos artificialmente. Os nomes próprios já corrigidos são `mais-recente`, `*-cobertura-*`,
-  `metadados.controleVersao.ramo/revisao` e, no contrato interno JaCoCo, `ramificacoes` e seus derivados. O contrato
-  interno V8 ainda será avaliado em uma rodada separada, sem alterar chaves de formatos externos.
+- Campos de entrada externos como `BRANCH`, `mb` e `cb` do JaCoCo, `s`, `f`, `b` e `statementMap` do V8 e o diretório
+  `frontend/coverage` produzido pelo Vitest não serão traduzidos artificialmente. Os nomes próprios já corrigidos são
+  `mais-recente`, `*-cobertura-*`, `metadados.controleVersao.ramo/revisao` e, nos contratos internos de cobertura,
+  `instrucoes`, `ramificacoes`, `funcoes`, `linhas` e seus derivados.
 
 Sobra removida nesta rodada: os shebangs `#!/usr/bin/env node` presentes em 42 fontes TypeScript. Nenhum consumidor
 executava esses arquivos como binários; a fonte é chamada por `tsx` e o binário npm é o launcher CJS.
@@ -801,15 +805,15 @@ do perfil.
 1. **[resolvido nesta rodada] Inventário de utilidade**: a matriz da seção 3.8 registra a decisão funcional por família
    de comandos, bibliotecas, políticas e assets. O grafo do Knip continua sendo apenas evidência técnica; a decisão
    também considerou catálogo, testes, documentação, configuração e histórico.
-2. **[parcial, com três cortes concluídos] Código temporal**: os 42 shebangs `#!/usr/bin/env node` sem consumidor, os
-   nomes próprios `latest`, `*-coverage-*`, `metadados.git.branch/commit` e os símbolos internos JaCoCo em inglês foram
-   removidos. Ainda falta revisar dependências de teste, símbolos internos V8 e regras de ignorar artefatos antigos.
+2. **[parcial, com quatro cortes concluídos] Código temporal**: os 42 shebangs `#!/usr/bin/env node` sem consumidor, os
+   nomes próprios `latest`, `*-coverage-*`, `metadados.git.branch/commit` e os símbolos internos JaCoCo/V8 em inglês
+   foram removidos. Ainda falta revisar dependências de teste e regras de ignorar artefatos antigos.
 3. **[resolvido na superfície de comandos] Mapa explícito núcleo/perfil**: `lib/catalogo-comandos.ts` agora classifica
    todas as 49 folhas da CLI, inclusive as sete registradas com callbacks em `sgc.ts`, por escopo e efeito. Políticas e
    regras internas ainda precisam migrar gradualmente para adaptadores, sem reorganização antecipada.
 4. **[parcial] Padronização e simplificação**: os destinos `latest`, nomes `*-coverage-*`, campos próprios
-   `branch`/`commit` e o contrato interno JaCoCo já usam nomes portugueses, sem aliases de compatibilidade. Ainda falta
-   revisar símbolos internos V8, opções duplicadas, helpers de uso único e camadas que não expressem uma fronteira real.
+   `branch`/`commit` e os contratos internos JaCoCo/V8 já usam nomes portugueses, sem aliases de compatibilidade. Ainda
+   falta revisar opções duplicadas, helpers de uso único e camadas que não expressem uma fronteira real.
 5. **Caracterização insuficiente das áreas de risco**: adaptadores SGC, executor e leitores têm cobertura direta baixa.
    Criar testes comportamentais focados antes de remover ou fundir código nessas áreas; cobertura não deve servir para
    justificar a preservação de funcionalidade sem consumidor.
@@ -859,9 +863,9 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
    removidos; não havia roteamento, teste, configuração ou dependência exclusiva associada a eles.
 3. **[concluído nesta rodada] Criar o mapa de perfil**: o catálogo completo classifica todas as folhas por escopo e
    efeito, e o teste de sincronização confere descrição, presença do arquivo quando aplicável e unicidade dos caminhos.
-4. **[parcial nesta rodada] Padronizar a superfície restante**: destinos, campos próprios e o contrato interno JaCoCo
-   foram corrigidos; continuam pendentes símbolos internos V8, parâmetros, mensagens, códigos de saída e helpers/camadas
-   redundantes encontrados no inventário.
+4. **[parcial nesta rodada] Padronizar a superfície restante**: destinos, campos próprios e os contratos internos JaCoCo/V8
+   foram corrigidos; continuam pendentes parâmetros, mensagens, códigos de saída e helpers/camadas redundantes
+   encontrados no inventário.
 5. **Caracterizar áreas que serão alteradas**: acrescentar testes focados somente para funcionalidades preservadas que
    serão simplificadas ou separadas; começar por executor, leitores e adaptadores SGC se a coleta entrar no recorte.
 6. **Externalizar o próximo recorte horizontal real**: escolher uma família com consumidor plausível — inicialmente

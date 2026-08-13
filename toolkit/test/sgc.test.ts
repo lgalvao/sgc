@@ -803,7 +803,7 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.totais.total).toBe(2);
         expect(conteudo.arquivos[0]).toMatchObject({
             arquivo: "frontend/src/exemplo.ts",
-            branchesPerdidos: 1,
+            ramificacoesPerdidas: 1,
         });
     });
 

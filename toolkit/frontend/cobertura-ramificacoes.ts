@@ -9,20 +9,20 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 interface ArquivoRamificacoes {
     arquivo: string;
-    branchesTotal: number;
-    branchesPercentual: number;
-    branchesPerdidos: number;
+    ramificacoesTotal: number;
+    ramificacoesPercentual: number;
+    ramificacoesPerdidas: number;
 }
 
 interface ResultadoRamificacoes {
     status: "ok";
     timestamp: string;
-    totais: ResultadoCoberturaFrontend["branches"];
+    totais: ResultadoCoberturaFrontend["ramificacoes"];
     arquivos: ArquivoRamificacoes[];
 }
 
-function calcularBranchesPerdidos(arquivo: ArquivoCobertura): number {
-    return Math.max(0, arquivo.branchesTotal - Math.round((arquivo.branchesPercentual / 100) * arquivo.branchesTotal));
+function calcularRamificacoesPerdidas(arquivo: ArquivoCobertura): number {
+    return Math.max(0, arquivo.ramificacoesTotal - Math.round((arquivo.ramificacoesPercentual / 100) * arquivo.ramificacoesTotal));
 }
 
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
@@ -51,18 +51,18 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const arquivos: ArquivoRamificacoes[] = coleta.arquivos
         .map((arquivo) => ({
             arquivo: arquivo.arquivo,
-            branchesTotal: arquivo.branchesTotal,
-            branchesPercentual: arquivo.branchesPercentual,
-            branchesPerdidos: calcularBranchesPerdidos(arquivo)
+            ramificacoesTotal: arquivo.ramificacoesTotal,
+            ramificacoesPercentual: arquivo.ramificacoesPercentual,
+            ramificacoesPerdidas: calcularRamificacoesPerdidas(arquivo)
         }))
-        .filter((arquivo) => arquivo.branchesPerdidos > 0)
-        .toSorted((a, b) => b.branchesPerdidos - a.branchesPerdidos || a.branchesPercentual - b.branchesPercentual)
+        .filter((arquivo) => arquivo.ramificacoesPerdidas > 0)
+        .toSorted((a, b) => b.ramificacoesPerdidas - a.ramificacoesPerdidas || a.ramificacoesPercentual - b.ramificacoesPercentual)
         .slice(0, limite);
 
     const resultado: ResultadoRamificacoes = {
         status: "ok",
         timestamp: new Date().toISOString(),
-        totais: coleta.branches,
+        totais: coleta.ramificacoes,
         arquivos
     };
 
@@ -71,26 +71,26 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         return;
     }
 
-    imprimirCabecalho("COBERTURA DE BRANCHES FRONTEND");
-    escreverLinha(`Cobertura global de branches: ${pc.bold(`${coleta.branches.percentual}%`)} (${coleta.branches.cobertos}/${coleta.branches.total})`);
+    imprimirCabecalho("COBERTURA DE RAMIFICAÇÕES FRONTEND");
+    escreverLinha(`Cobertura global de ramificações: ${pc.bold(`${coleta.ramificacoes.percentual}%`)} (${coleta.ramificacoes.cobertos}/${coleta.ramificacoes.total})`);
     escreverLinha("");
 
     if (arquivos.length === 0) {
-        escreverLinha(pc.green("Nenhuma lacuna de branches encontrada nos arquivos auditados."));
+        escreverLinha(pc.green("Nenhuma lacuna de ramificações encontrada nos arquivos auditados."));
         return;
     }
 
-    escreverLinha(pc.bold(pc.underline(`TOP ${arquivos.length} ARQUIVOS COM LACUNAS DE BRANCHES:`)));
+    escreverLinha(pc.bold(pc.underline(`TOP ${arquivos.length} ARQUIVOS COM LACUNAS DE RAMIFICAÇÕES:`)));
     arquivos.forEach((arquivo, indice) => {
         escreverLinha(`${indice + 1}. ${pc.bold(arquivo.arquivo)}`);
-        escreverLinha(`   Branches perdidos: ${arquivo.branchesPerdidos}/${arquivo.branchesTotal} | Cobertura: ${arquivo.branchesPercentual}%`);
+        escreverLinha(`   Ramificações perdidas: ${arquivo.ramificacoesPerdidas}/${arquivo.ramificacoesTotal} | Cobertura: ${arquivo.ramificacoesPercentual}%`);
     });
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
     principal().catch((erro) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
-        escreverLinha(pc.red(`Erro ao analisar branches do frontend: ${mensagem}`));
+        escreverLinha(pc.red(`Erro ao analisar ramificações do frontend: ${mensagem}`));
         process.exitCode = 1;
     });
 }

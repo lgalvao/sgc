@@ -11,18 +11,18 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 const CAMINHO_PADRAO_SAIDA = "frontend-cobertura-auditoria.md";
 
 interface ResumoMetricasFrontend {
-    lines: ResultadoCoberturaFrontend["lines"];
-    statements: ResultadoCoberturaFrontend["statements"];
-    branches: ResultadoCoberturaFrontend["branches"];
-    functions: ResultadoCoberturaFrontend["functions"];
+    linhas: ResultadoCoberturaFrontend["linhas"];
+    instrucoes: ResultadoCoberturaFrontend["instrucoes"];
+    ramificacoes: ResultadoCoberturaFrontend["ramificacoes"];
+    funcoes: ResultadoCoberturaFrontend["funcoes"];
 }
 
 interface PontoCriticoRelatorioFrontend {
     arquivo: string;
     scoreImpacto: number;
     coberturaLinhas: number;
-    statementsTotal: number;
-    statementsCobertos: number;
+    instrucoesTotal: number;
+    instrucoesCobertas: number;
 }
 
 interface ResultadoAuditoriaFrontend {
@@ -33,15 +33,15 @@ interface ResultadoAuditoriaFrontend {
 }
 
 function calcularPontuacaoImpacto(arquivo: ArquivoCobertura): number {
-    // No frontend, focamos em statements e branches.
-    // Arquivos com muitos statements descobertos e muitos branches são prioridade.
-    const pesoStatements = 1.0;
-    const pesoBranches = 1.5;
+    // No frontend, focamos em instruções e ramificações.
+    // Arquivos com muitas instruções descobertas e muitas ramificações são prioridade.
+    const pesoInstrucoes = 1.0;
+    const pesoRamificacoes = 1.5;
 
-    const statementsDescobertos = arquivo.statementsTotal - arquivo.statementsCobertos;
-    const branchesDescobertos = Math.floor(arquivo.branchesTotal * (1 - arquivo.branchesPercentual / 100));
+    const instrucoesDescobertas = arquivo.instrucoesTotal - arquivo.instrucoesCobertas;
+    const ramificacoesDescobertas = Math.floor(arquivo.ramificacoesTotal * (1 - arquivo.ramificacoesPercentual / 100));
 
-    return (statementsDescobertos * pesoStatements) + (branchesDescobertos * pesoBranches);
+    return (instrucoesDescobertas * pesoInstrucoes) + (ramificacoesDescobertas * pesoRamificacoes);
 }
 
 function obterPrioridade(pontuacao: number): string {
@@ -55,19 +55,19 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho
     let markdown = "# Auditoria de Cobertura Frontend\n\n";
 
     markdown += "## Resumo Geral\n";
-    markdown += `- **Cobertura de Linhas:** ${totais.lines.percentual}%\n`;
-    markdown += `- **Cobertura de Statements:** ${totais.statements.percentual}%\n`;
-    markdown += `- **Cobertura de Branches:** ${totais.branches.percentual}%\n`;
-    markdown += `- **Cobertura de Funções:** ${totais.functions.percentual}%\n\n`;
+    markdown += `- **Cobertura de Linhas:** ${totais.linhas.percentual}%\n`;
+    markdown += `- **Cobertura de Instruções:** ${totais.instrucoes.percentual}%\n`;
+    markdown += `- **Cobertura de Ramificações:** ${totais.ramificacoes.percentual}%\n`;
+    markdown += `- **Cobertura de Funções:** ${totais.funcoes.percentual}%\n\n`;
 
     markdown += "## Top 10 Pontos Críticos de Qualidade (Maior Risco)\n";
     markdown += "Prioridade baseada em volume de código não testado e complexidade condicional.\n\n";
-    markdown += "| Posição | Arquivo | Pontuação | Statements Descobertos | Cobertura Linhas | Prioridade |\n";
+    markdown += "| Posição | Arquivo | Pontuação | Instruções Descobertas | Cobertura Linhas | Prioridade |\n";
     markdown += "|---------|---------|-----------|-------------------------|------------------|------------|\n";
 
     hotspots.forEach((ponto, indice) => {
         const prioridade = ponto.scoreImpacto > 100 ? "P1" : (ponto.scoreImpacto > 40 ? "P2" : "P3");
-        markdown += `| ${indice + 1} | \`${ponto.arquivo}\` | ${ponto.scoreImpacto.toFixed(1)} | ${ponto.statementsTotal - ponto.statementsCobertos} | ${ponto.coberturaLinhas}% | ${prioridade} |\n`;
+        markdown += `| ${indice + 1} | \`${ponto.arquivo}\` | ${ponto.scoreImpacto.toFixed(1)} | ${ponto.instrucoesTotal - ponto.instrucoesCobertas} | ${ponto.coberturaLinhas}% | ${prioridade} |\n`;
     });
 
     markdown += `\n\n_Gerado automaticamente pelo toolkit em ${new Date().toLocaleString("pt-BR")}._\n`;
@@ -124,17 +124,17 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             status: "ok",
             timestamp: new Date().toISOString(),
             totais: {
-                lines: coleta.lines,
-                statements: coleta.statements,
-                branches: coleta.branches,
-                functions: coleta.functions
+                linhas: coleta.linhas,
+                instrucoes: coleta.instrucoes,
+                ramificacoes: coleta.ramificacoes,
+                funcoes: coleta.funcoes
             },
             hotspots: pontosCriticos.map(ponto => ({
                 arquivo: ponto.arquivo,
                 scoreImpacto: ponto.pontuacaoImpacto,
-                coberturaLinhas: ponto.linesPercentual,
-                statementsTotal: ponto.statementsTotal,
-                statementsCobertos: ponto.statementsCobertos
+                coberturaLinhas: ponto.linhasPercentual,
+                instrucoesTotal: ponto.instrucoesTotal,
+                instrucoesCobertas: ponto.instrucoesCobertas
             }))
         };
 
@@ -144,29 +144,30 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
         if (emitirJson) {
             imprimirJson(resultado);
-            if (metaMinima > 0 && coleta.lines.percentual < metaMinima) process.exitCode = 1;
+            if (metaMinima > 0 && coleta.linhas.percentual < metaMinima) process.exitCode = 1;
             return;
         }
 
         escreverLinha(`${pc.bold("Resumo do Projeto:")}`);
-        escreverLinha(`  Linhas:      ${coleta.lines.percentual}%`);
-        escreverLinha(`  Statements:  ${coleta.statements.percentual}%`);
-        escreverLinha(`  Branches:    ${coleta.branches.percentual}%`);
+        escreverLinha(`  Linhas:          ${coleta.linhas.percentual}%`);
+        escreverLinha(`  Instruções:      ${coleta.instrucoes.percentual}%`);
+        escreverLinha(`  Ramificações:    ${coleta.ramificacoes.percentual}%`);
+        escreverLinha(`  Funções:         ${coleta.funcoes.percentual}%`);
         escreverLinha("");
 
         escreverLinha(pc.bold(pc.underline("TOP 5 PENDÊNCIAS PRIORITÁRIAS:")));
         pontosCriticos.slice(0, 5).forEach((ponto, indice) => {
             escreverLinha(`${indice + 1}. ${pc.bold(ponto.arquivo)}`);
             escreverLinha(`   Impacto: ${pc.bold(ponto.pontuacaoImpacto.toFixed(1))} | Prioridade: ${obterPrioridade(ponto.pontuacaoImpacto)}`);
-            escreverLinha(`   Lacuna: ${ponto.statementsTotal - ponto.statementsCobertos} statements sem teste.`);
+            escreverLinha(`   Lacuna: ${ponto.instrucoesTotal - ponto.instrucoesCobertas} instruções sem teste.`);
         });
 
         if (gravar) {
             escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(path.relative(diretorioBase, caminhoSaida).replaceAll("\\", "/"))}`);
         }
 
-        if (metaMinima > 0 && coleta.lines.percentual < metaMinima) {
-            escreverLinha(pc.red(`\nFALHA: Cobertura de linhas (${coleta.lines.percentual}%) abaixo da meta (${metaMinima}%).`));
+        if (metaMinima > 0 && coleta.linhas.percentual < metaMinima) {
+            escreverLinha(pc.red(`\nFALHA: Cobertura de linhas (${coleta.linhas.percentual}%) abaixo da meta (${metaMinima}%).`));
             process.exitCode = 1;
         }
 
