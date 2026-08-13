@@ -13,36 +13,74 @@ const REGEX_PLACEHOLDER_CANONICO = /:[A-Z0-9_]+:/g;
 const REGEX_UI_CRONICA = /`[^`]+`/g;
 const REGEX_SITUACOES = /'[^'\n]+'/g;
 
-function normalizarCaminho(caminho) {
+interface OpcoesCdu {
+    emitirJson: boolean;
+    base: string;
+}
+
+interface IndicesSecoes {
+    ator: number;
+    pre: number;
+    fluxo: number;
+}
+
+interface ContagensCdu {
+    placeholdersCanonicos: number;
+    placeholdersLegados: number;
+    uiEmCrases: number;
+    situacoesEntreAspas: number;
+    palavras: number;
+}
+
+interface AnaliseCdu {
+    caminhoArquivo: string;
+    nomeArquivo: string;
+    texto: string;
+    linhas: string[];
+    tituloNumero: string | null;
+    tituloTexto: string | null;
+    temTituloCanonico: boolean;
+    temAtores: boolean;
+    quantidadeSecoesAtoresCanonicas: number;
+    temPre: boolean;
+    temFluxo: boolean;
+    indices: IndicesSecoes;
+    passos: number[];
+    repeticoes: number[];
+    regressoes: string[];
+    quantidadeAtores: number;
+    quantidadePreCondicoes: number;
+    linksMarkdown: string[];
+    contagens: ContagensCdu;
+}
+
+function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll("\\", "/");
 }
 
-/**
- * @param {string[]} [argumentos]
- * @returns {{emitirJson: boolean, base: string}}
- */
-function obterOpcoesCdu(argumentos = process.argv.slice(2)) {
+function obterOpcoesCdu(argumentos: string[] = process.argv.slice(2)): OpcoesCdu {
     const emitirJson = argumentos.includes("--json");
     const indiceBase = argumentos.indexOf("--base");
-    const base = indiceBase >= 0 ? path.resolve(argumentos[indiceBase + 1]) : process.cwd();
+    const baseInformada = indiceBase >= 0 ? argumentos[indiceBase + 1] : undefined;
+    const base = baseInformada ? path.resolve(baseInformada) : process.cwd();
     return {emitirJson, base};
 }
 
-async function listarArquivosCdu(base = process.cwd()) {
+async function listarArquivosCdu(base: string = process.cwd()): Promise<string[]> {
     const padrao = normalizarCaminho(path.join(base, "specs", "cdu-*.md"));
     const arquivos = await globby(padrao, {absolute: true});
     return arquivos.toSorted((a, b) => a.localeCompare(b, "pt-BR", {numeric: true}));
 }
 
-function lerArquivo(caminho) {
+function lerArquivo(caminho: string): string {
     return fs.readFileSync(caminho, "utf8");
 }
 
-function obterLinhas(texto) {
+function obterLinhas(texto: string): string[] {
     return texto.split(/\r?\n/);
 }
 
-function encontrarIndicesSecoes(linhas) {
+function encontrarIndicesSecoes(linhas: string[]): IndicesSecoes {
     return {
         ator: linhas.findIndex(linha => /^##\s+Atores\s*$/.test(linha)),
         pre: linhas.findIndex(linha => /^##\s+Pré-condições\s*$/.test(linha)),
@@ -50,21 +88,21 @@ function encontrarIndicesSecoes(linhas) {
     };
 }
 
-function contarOcorrencias(linhas, regex) {
+function contarOcorrencias(linhas: string[], regex: RegExp): number {
     return linhas.filter(linha => regex.test(linha)).length;
 }
 
-function extrairPassosNumerados(texto) {
+function extrairPassosNumerados(texto: string): number[] {
     return [...texto.matchAll(REGEX_PASSO)].map(correspondencia => Number(correspondencia[1]));
 }
 
-function localizarLinksInternosCdu(texto) {
+function localizarLinksInternosCdu(texto: string): string[] {
     return [...texto.matchAll(REGEX_LINK_CDU)]
         .map(correspondencia => correspondencia[1])
         .filter(destino => destino.endsWith(".md"));
 }
 
-function resolverDestinoMarkdown(caminhoArquivo, destino) {
+function resolverDestinoMarkdown(caminhoArquivo: string, destino: string): string | null {
     // noinspection HttpUrlsUsage
     if (destino.startsWith("http://") || destino.startsWith("https://") || destino.startsWith("#")) {
         return null;
@@ -73,7 +111,7 @@ function resolverDestinoMarkdown(caminhoArquivo, destino) {
     return path.resolve(path.dirname(caminhoArquivo), destino);
 }
 
-function analisarArquivo(caminhoArquivo, texto) {
+function analisarArquivo(caminhoArquivo: string, texto: string): AnaliseCdu {
     const nomeArquivo = path.basename(caminhoArquivo);
     const linhas = obterLinhas(texto);
     const titulo = texto.match(REGEX_TITULO);
@@ -89,8 +127,8 @@ function analisarArquivo(caminhoArquivo, texto) {
         .slice(indices.pre + 1, indices.fluxo > indices.pre ? indices.fluxo : undefined)
         .filter(linha => /^\s*-\s+/.test(linha));
 
-    const repeticoes = [];
-    const regressoes = [];
+    const repeticoes: number[] = [];
+    const regressoes: string[] = [];
     for (let i = 1; i < passos.length; i += 1) {
         if (passos[i] === passos[i - 1]) {
             repeticoes.push(passos[i]);
@@ -130,8 +168,8 @@ function analisarArquivo(caminhoArquivo, texto) {
     };
 }
 
-function validarLinksMarkdown(analise) {
-    const invalidos = [];
+function validarLinksMarkdown(analise: AnaliseCdu): string[] {
+    const invalidos: string[] = [];
 
     for (const destino of analise.linksMarkdown) {
         const resolvido = resolverDestinoMarkdown(analise.caminhoArquivo, destino);
@@ -143,17 +181,17 @@ function validarLinksMarkdown(analise) {
     return invalidos;
 }
 
-function extrairLinhaAtor(texto) {
+function extrairLinhaAtor(texto: string): string | null {
     const linhas = obterLinhas(texto);
     return linhas.find(linha => /Atores|Ator(?:es)?/.test(linha)) ?? null;
 }
 
-function extrairCabecalhoPre(texto) {
+function extrairCabecalhoPre(texto: string): string | null {
     const linhas = obterLinhas(texto);
     return linhas.find(linha => /Pré-condiç(?:ão|ões)/.test(linha)) ?? null;
 }
 
-function extrairCabecalhoFluxo(texto) {
+function extrairCabecalhoFluxo(texto: string): string | null {
     const linhas = obterLinhas(texto);
     return linhas.find(linha => /Fluxo principal/.test(linha)) ?? null;
 }
