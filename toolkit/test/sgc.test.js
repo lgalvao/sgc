@@ -38,7 +38,7 @@ const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
 const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
     "arquitetura-auditar.js",
     "coesao-auditar.js",
-    "contratos-auditar.js"
+    "contratos-auditar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.js");
 const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "java-corrigir-fqn.js");
@@ -954,6 +954,65 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
         expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(true);
+    });
+
+    test("audita vazamento de modelo em DTO de controlador sem gravar artefato", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-contratos-backend-"));
+        const codigoBackend = path.join(base, "servidor", "java");
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backendCodigo: "servidor/java",
+                artefatosQualidade: "artefatos"
+            }
+        });
+        await fs.outputFile(
+            path.join(codigoBackend, "exemplo", "web", "UsuarioController.java"),
+            [
+                "package exemplo.web;",
+                "import exemplo.web.dto.UsuarioResponse;",
+                "public class UsuarioController {",
+                "    public UsuarioResponse obter() { return null; }",
+                "}"
+            ].join("\n")
+        );
+        await fs.outputFile(
+            path.join(codigoBackend, "exemplo", "web", "dto", "UsuarioResponse.java"),
+            [
+                "package exemplo.web.dto;",
+                "import exemplo.model.Usuario;",
+                "public record UsuarioResponse(Usuario usuario) {}"
+            ].join("\n")
+        );
+        await fs.outputFile(
+            path.join(codigoBackend, "exemplo", "model", "Usuario.java"),
+            [
+                "package exemplo.model;",
+                "public class Usuario {}"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "contratos",
+            "auditar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo.totalAchados).toBe(1);
+        expect(conteudo.achados[0]).toMatchObject({
+            controlador: "UsuarioController.java",
+            metodo: "obter",
+            tipoRetorno: "UsuarioResponse",
+            campo: "usuario",
+            tipoModelo: "exemplo.model.Usuario"
+        });
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "contratos-auditoria.md"))).toBe(false);
     });
 
     test("carrega configuracao versionada e preserva defaults ausentes", async () => {

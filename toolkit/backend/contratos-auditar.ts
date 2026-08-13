@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Auditoria de contratos HTTP expostos pelo backend.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -27,14 +28,64 @@ const TIPOS_ESCALARES = new Set([
     "SseEmitter"
 ]);
 
-function normalizarCaminho(caminho) {
+type CategoriaModelo = "entidade" | "enum" | "modelo";
+
+interface Importacoes {
+    exatos: Map<string, string>;
+    curingas: string[];
+}
+
+interface TipoRetorno {
+    metodo: string;
+    tipo: string;
+}
+
+interface CampoExposto {
+    tipo: string;
+    nome: string;
+}
+
+interface IndiceArquivos {
+    arquivos: string[];
+    porNome: Map<string, string[]>;
+}
+
+interface TipoModelo {
+    fqn: string;
+    arquivo: string;
+    categoria: CategoriaModelo;
+}
+
+interface AchadoContrato {
+    controlador: string;
+    metodo: string;
+    tipoRetorno: string;
+    arquivoDto: string;
+    campo: string;
+    tipoCampo: string;
+    categoria: CategoriaModelo;
+    tipoModelo: string;
+}
+
+interface RelatorioContratos {
+    geradoEm: string;
+    base: string;
+    resumo: {
+        totalAchados: number;
+        controladoresAfetados: number;
+        dtosAfetados: number;
+    };
+    achados: AchadoContrato[];
+}
+
+function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll(path.sep, "/");
 }
 
-function extrairImports(conteudo) {
+function extrairImports(conteudo: string): Importacoes {
     const imports = conteudo.match(/^import\s+[^;]+;/gm) ?? [];
-    const exatos = new Map();
-    const curingas = [];
+    const exatos = new Map<string, string>();
+    const curingas: string[] = [];
 
     for (const item of imports) {
         const nome = item.replace(/^import\s+/, "").replace(/;$/, "").trim();
@@ -52,8 +103,8 @@ function extrairImports(conteudo) {
     return {exatos, curingas};
 }
 
-function extrairTiposRetornoController(conteudo) {
-    const tipos = [];
+function extrairTiposRetornoController(conteudo: string): TipoRetorno[] {
+    const tipos: TipoRetorno[] = [];
     const regexMetodo = /public\s+([A-Za-z0-9_$.<>, ?]+)\s+([a-zA-Z0-9_]+)\s*\(/g;
 
     for (const correspondencia of conteudo.matchAll(regexMetodo)) {
@@ -77,7 +128,7 @@ function extrairTiposRetornoController(conteudo) {
     return tipos;
 }
 
-function resolverTipoRetorno(assinaturaRetorno) {
+function resolverTipoRetorno(assinaturaRetorno: string): string | null {
     if (assinaturaRetorno.includes("ResponseEntity<")) {
         return extrairTipoInternoGenerico(assinaturaRetorno, "ResponseEntity");
     }
@@ -98,7 +149,7 @@ function resolverTipoRetorno(assinaturaRetorno) {
     return simples;
 }
 
-function extrairTipoInternoGenerico(texto, wrapper) {
+function extrairTipoInternoGenerico(texto: string, wrapper: string): string | null {
     const regex = new RegExp(`${wrapper}<([^>]+)>`);
     const bruto = texto.match(regex)?.[1]?.trim();
     if (!bruto) {
@@ -113,8 +164,8 @@ function extrairTipoInternoGenerico(texto, wrapper) {
     return simples;
 }
 
-function extrairCamposExpostos(conteudo, nomeTipo) {
-    const campos = [];
+function extrairCamposExpostos(conteudo: string, nomeTipo: string): CampoExposto[] {
+    const campos: CampoExposto[] = [];
     const trechoRecord = conteudo.match(new RegExp(`record\\s+${nomeTipo}\\s*\\(([\\s\\S]*?)\\)\\s*\\{`))?.[1];
     if (trechoRecord) {
         const itens = trechoRecord.split(",\n");
@@ -150,37 +201,44 @@ function extrairCamposExpostos(conteudo, nomeTipo) {
     return campos;
 }
 
-function extrairTiposSimples(tipoDeclarado) {
+function extrairTiposSimples(tipoDeclarado: string): string[] {
     return [...tipoDeclarado.matchAll(/\b([A-Z][A-Za-z0-9_]+)\b/g)].map((item) => item[1]);
 }
 
-async function indexarArquivosJava(diretorioCodigo) {
+async function indexarArquivosJava(diretorioCodigo: string): Promise<IndiceArquivos> {
     const arquivos = await globby(path.join(diretorioCodigo, "**/*.java").replace(/\\/g, "/"), {absolute: true});
-    const porNome = new Map();
+    const porNome = new Map<string, string[]>();
 
     for (const arquivo of arquivos) {
         const nome = path.basename(arquivo, ".java");
-        if (!porNome.has(nome)) {
-            porNome.set(nome, []);
-        }
-        porNome.get(nome).push(arquivo);
+        const arquivosComNome = porNome.get(nome) ?? [];
+        arquivosComNome.push(arquivo);
+        porNome.set(nome, arquivosComNome);
     }
 
     return {arquivos, porNome};
 }
 
-async function lerCacheado(cacheArquivos, arquivo) {
-    if (!cacheArquivos.has(arquivo)) {
-        cacheArquivos.set(arquivo, await fs.readFile(arquivo, "utf-8"));
+async function lerCacheado(cacheArquivos: Map<string, string>, arquivo: string): Promise<string> {
+    const cache = cacheArquivos.get(arquivo);
+    if (cache !== undefined) {
+        return cache;
     }
-    return cacheArquivos.get(arquivo);
+
+    const conteudo = await fs.readFile(arquivo, "utf-8");
+    cacheArquivos.set(arquivo, conteudo);
+    return conteudo;
 }
 
-async function listarTiposPacoteModelo(pacoteCuringa, cacheArquivos, diretorioBase, diretorioCodigo) {
+async function listarTiposPacoteModelo(
+    pacoteCuringa: string,
+    cacheArquivos: Map<string, string>,
+    diretorioCodigo: string
+): Promise<Map<string, TipoModelo>> {
     const diretorioRaizJava = path.dirname(diretorioCodigo);
     const diretorio = path.join(diretorioRaizJava, ...pacoteCuringa.split("."));
     const candidatos = await globby(path.join(diretorio, "*.java").replace(/\\/g, "/"), {absolute: true});
-    const tipos = new Map();
+    const tipos = new Map<string, TipoModelo>();
 
     for (const arquivo of candidatos) {
         const conteudo = await lerCacheado(cacheArquivos, arquivo);
@@ -195,7 +253,7 @@ async function listarTiposPacoteModelo(pacoteCuringa, cacheArquivos, diretorioBa
     return tipos;
 }
 
-function classificarTipoModelo(conteudo) {
+function classificarTipoModelo(conteudo: string): CategoriaModelo {
     if (conteudo.includes("@Entity")) {
         return "entidade";
     }
@@ -205,8 +263,13 @@ function classificarTipoModelo(conteudo) {
     return "modelo";
 }
 
-async function resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArquivos, diretorioBase, diretorioCodigo) {
-    const tiposModelo = new Map();
+async function resolverTiposModeloDisponiveis(
+    imports: Importacoes,
+    indiceArquivos: IndiceArquivos,
+    cacheArquivos: Map<string, string>,
+    diretorioCodigo: string
+): Promise<Map<string, TipoModelo>> {
+    const tiposModelo = new Map<string, TipoModelo>();
 
     for (const [simples, fqn] of imports.exatos.entries()) {
         if (!fqn.includes(".model.")) {
@@ -226,7 +289,7 @@ async function resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArqu
     }
 
     for (const pacote of imports.curingas.filter((item) => item.includes(".model"))) {
-        const tiposPacote = await listarTiposPacoteModelo(pacote, cacheArquivos, diretorioBase, diretorioCodigo);
+        const tiposPacote = await listarTiposPacoteModelo(pacote, cacheArquivos, diretorioCodigo);
         for (const [simples, meta] of tiposPacote.entries()) {
             if (!tiposModelo.has(simples)) {
                 tiposModelo.set(simples, meta);
@@ -237,11 +300,11 @@ async function resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArqu
     return tiposModelo;
 }
 
-async function auditarContratos(diretorioCodigo, diretorioBase) {
+async function auditarContratos(diretorioCodigo: string, diretorioBase: string): Promise<RelatorioContratos> {
     const indiceArquivos = await indexarArquivosJava(diretorioCodigo);
-    const cacheArquivos = new Map();
+    const cacheArquivos = new Map<string, string>();
     const controladores = indiceArquivos.arquivos.filter((arquivo) => arquivo.endsWith("Controller.java"));
-    const achados = [];
+    const achados: AchadoContrato[] = [];
 
     for (const controlador of controladores) {
         const conteudoControlador = await lerCacheado(cacheArquivos, controlador);
@@ -257,7 +320,7 @@ async function auditarContratos(diretorioCodigo, diretorioBase) {
 
             const conteudoTipo = await lerCacheado(cacheArquivos, arquivoTipo);
             const imports = extrairImports(conteudoTipo);
-            const tiposModelo = await resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArquivos, diretorioBase, diretorioCodigo);
+            const tiposModelo = await resolverTiposModeloDisponiveis(imports, indiceArquivos, cacheArquivos, diretorioCodigo);
             if (tiposModelo.size === 0) {
                 continue;
             }
@@ -300,8 +363,8 @@ async function auditarContratos(diretorioCodigo, diretorioBase) {
     };
 }
 
-function gerarMarkdown(relatorio) {
-    const linhas = [];
+function gerarMarkdown(relatorio: RelatorioContratos): string {
+    const linhas: string[] = [];
     linhas.push("# Auditoria de contratos HTTP do backend", "");
     linhas.push(`Gerado em: ${relatorio.geradoEm}`, "");
     linhas.push(`- Achados: ${relatorio.resumo.totalAchados}`);
@@ -323,17 +386,17 @@ function gerarMarkdown(relatorio) {
     return linhas.join("\n");
 }
 
-async function gravarRelatorio(relatorio, diretorioSaida) {
+async function gravarRelatorio(relatorio: RelatorioContratos, diretorioSaida: string): Promise<string> {
     const caminhoMarkdown = path.join(diretorioSaida, "contratos-auditoria.md");
     await fs.mkdir(diretorioSaida, {recursive: true});
     await fs.writeFile(caminhoMarkdown, gerarMarkdown(relatorio), "utf-8");
     return caminhoMarkdown;
 }
 
-function exibirAjuda() {
+function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend contratos auditar",
-        scriptDireto: "backend/contratos-auditar.js",
+        scriptDireto: "backend/contratos-auditar.ts",
         descricao: "Audita DTOs e responses expostos por controllers para detectar vazamento de tipos model.* no contrato HTTP.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
@@ -348,10 +411,10 @@ function exibirAjuda() {
     });
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
 

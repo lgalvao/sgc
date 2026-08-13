@@ -217,6 +217,9 @@ frontend e para os caminhos OpenAPI.
 - `backend/testes-analisar.ts` foi convertido para TypeScript; índices de testes, categorias, estatísticas, cobertura
   JaCoCo e relatórios Markdown/JSON agora têm contratos explícitos, mantendo a resolução configurável de `backendCodigo`
   e `backendTestes` e as classificações SGC de DTOs, models e outros.
+- `backend/contratos-auditar.ts` foi convertido para TypeScript com tipos para imports, retornos de controllers, campos
+  expostos, índice Java, modelos e achados; a política SGC de detectar `model.*` em DTOs permanece e agora tem fixture
+  externo cobrindo JSON, `backendCodigo` configurado e `--sem-gravar`.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -273,7 +276,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, executadas diretamente sob Node `26.5.1` (Node 26 disponível no ambiente):
 
-- `npm --prefix toolkit run test`: 101 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 102 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -298,21 +301,21 @@ com os validadores estruturais dependentes de `frontendCodigo`; agora chega a 90
 outra chegou a 92 com o núcleo AST de arquitetura dependente de `frontendCodigo`; outra chegou a 93 com a normalização
 de caminhos dos relatórios V8 frontend; esta chega a 96 com o launcher `tsx` do binário npm. Nenhuma dessas mudanças
 reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade, dependências e acessibilidade
-elevam a cobertura para 101 cenários.
+elevam a cobertura para 101 cenários; esta rodada chega a 102 com o teste comportamental do auditor de contratos backend.
 
 ### 3.3 Tamanho e composição atual
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 51 arquivos TypeScript de implementação;
-- 21 arquivos JavaScript de implementação ainda pendentes;
+- 52 arquivos TypeScript de implementação;
+- 20 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 101 cenários;
+- 2 arquivos de teste concentrando 102 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
-- outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts`,
-  `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
+- outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
+  `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 69% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 72% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -555,7 +558,7 @@ Lotes sugeridos:
 
 1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação e perfil de qualidade convertidos. O
    catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
-2. **Backend**: cobertura, análise e priorização de testes já convertidas; faltam contratos e FQN. Parametrizar raiz Java, tarefas Gradle e
+2. **Backend**: cobertura, análise, priorização de testes e contratos já convertidos; falta FQN. Parametrizar raiz Java, tarefas Gradle e
    categorias.
 3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
    convertidos; faltam parametrizar completamente raiz Vue, globs e convenções de componentes.
