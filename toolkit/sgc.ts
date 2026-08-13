@@ -44,7 +44,7 @@ criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera
 criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "toolkit/backend/testes-priorizar.ts");
 
 const backendJava = backend.command("java").description("Utilitarios Java do backend.");
-criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "toolkit/backend/java-corrigir-fqn.js");
+criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "toolkit/backend/java-corrigir-fqn.ts");
 const backendNotificacoes = backend.command("notificacoes").description("Auditorias de notificacoes e assuntos do backend.");
 criarComandoScript(backendNotificacoes, "auditar-assuntos", "Audita literais de assunto de notificacao fora de AssuntosNotificacao.", "toolkit/backend/notificacoes-assuntos-auditar.js");
 

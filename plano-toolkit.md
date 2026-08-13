@@ -220,6 +220,9 @@ frontend e para os caminhos OpenAPI.
 - `backend/contratos-auditar.ts` foi convertido para TypeScript com tipos para imports, retornos de controllers, campos
   expostos, índice Java, modelos e achados; a política SGC de detectar `model.*` em DTOs permanece e agora tem fixture
   externo cobrindo JSON, `backendCodigo` configurado e `--sem-gravar`.
+- `backend/java-corrigir-fqn.ts` foi convertido para TypeScript com contratos para análise de imports, decisões de
+  substituição, preservação de linhas e opções; a mutação continua protegida por `--dry-run`, escrita explícita e
+  idempotência.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -307,15 +310,15 @@ elevam a cobertura para 101 cenários; esta rodada chega a 102 com o teste compo
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 52 arquivos TypeScript de implementação;
-- 20 arquivos JavaScript de implementação ainda pendentes;
+- 53 arquivos TypeScript de implementação;
+- 19 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 102 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 72% dos
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 74% dos
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -328,11 +331,11 @@ arquivos de implementação rastreados são TypeScript.
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
-| Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.js` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
+| Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 101 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Testes não representam pacote externo | Os 102 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
@@ -347,7 +350,7 @@ arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 101 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado e 102 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -488,7 +491,7 @@ reuso externo e preservação de contratos.
 
 ### Fase 0 — estabilizar os contratos existentes
 
-1. **[concluído]** Criar teste que execute o modo de escrita de `backend/java-corrigir-fqn.js` sobre fixture
+1. **[concluído]** Criar teste que execute o modo de escrita de `backend/java-corrigir-fqn.ts` sobre fixture
    temporária, confirme o conteúdo esperado sem linhas duplicadas e repita a execução para verificar idempotência; não
    houve alteração da implementação porque não existia falha reproduzível.
 2. **[concluído nesta rodada]** Inventariar todos os comandos que escrevem, removem ou promovem arquivos e classificá-los como:
@@ -558,7 +561,7 @@ Lotes sugeridos:
 
 1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação e perfil de qualidade convertidos. O
    catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para reuso externo.
-2. **Backend**: cobertura, análise, priorização de testes e contratos já convertidos; falta FQN. Parametrizar raiz Java, tarefas Gradle e
+2. **Backend**: cobertura, análise, priorização de testes, contratos e FQN já convertidos; falta parametrizar raiz Java, tarefas Gradle e
    categorias.
 3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
    convertidos; faltam parametrizar completamente raiz Vue, globs e convenções de componentes.
@@ -568,7 +571,7 @@ Lotes sugeridos:
 6. **Código transversal**: converter cheiros, Semgrep e inventários de nomes/idioma por último, pois concentram mais
    políticas locais e maior volume de parsing.
 
-O corretor FQN só entra nesta fase depois do bloqueador de segurança da Fase 0 estar corrigido e publicado.
+O corretor FQN foi incluído depois da cobertura de mutação e idempotência da Fase 0 estar corrigida e publicada.
 
 Para cada comando convertido:
 

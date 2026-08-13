@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Correção explícita de nomes totalmente qualificados em fontes Java.
 import fs from "node:fs";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
@@ -13,17 +14,50 @@ const PREFIXO_IMPORT = "import ";
 const PREFIXO_ESTATICO = "static ";
 const PADRAO_FQN = /("[^"]*")|(\b([a-z]\w*(?:\.[a-z]\w*)+)\.([A-Z]\w*)\b)/g;
 
-function deveIgnorarFqn(partePacote, parteClasse) {
+interface AnaliseImports {
+    pacoteAtual: string | null;
+    importsExistentes: Map<string, string>;
+    indicesLinhasImport: number[];
+}
+
+interface DecisaoSubstituicao {
+    substituicao: string;
+    alterado: boolean;
+}
+
+interface AnaliseLinhas {
+    linhasModificadas: string[];
+    importsNovos: Set<string>;
+    temAlteracoes: boolean;
+}
+
+interface OpcoesCorretorFqn {
+    ajuda: boolean;
+    apenasSimulacao: boolean;
+    diretorioBase: string;
+}
+
+type CorrespondenciaFqn = [
+    correspondenciaCompleta: string,
+    trechoEntreAspas: string | undefined,
+    fqn: string | undefined,
+    pacote: string | undefined,
+    classe: string | undefined,
+    posicao: number,
+    conteudo: string
+];
+
+function deveIgnorarFqn(partePacote: string, parteClasse: string): boolean {
     if (parteClasse === "Assertions") {
         return true;
     }
     return partePacote === "java.lang";
 }
 
-function analisarImports(linhas) {
-    let pacoteAtual = null;
-    const importsExistentes = new Map();
-    const indicesLinhasImport = [];
+function analisarImports(linhas: string[]): AnaliseImports {
+    let pacoteAtual: string | null = null;
+    const importsExistentes = new Map<string, string>();
+    const indicesLinhasImport: number[] = [];
 
     linhas.forEach((linha, indice) => {
         const linhaLimpa = linha.trim();
@@ -43,7 +77,7 @@ function analisarImports(linhas) {
         }
 
         const nomeSimples = importLimpo.split(".").pop();
-        if (nomeSimples !== "*") {
+        if (nomeSimples && nomeSimples !== "*") {
             importsExistentes.set(nomeSimples, importLimpo);
         }
     });
@@ -51,7 +85,7 @@ function analisarImports(linhas) {
     return {pacoteAtual, importsExistentes, indicesLinhasImport};
 }
 
-function obterPosicaoInsercao(linhas, indicesLinhasImport) {
+function obterPosicaoInsercao(linhas: string[], indicesLinhasImport: number[]): number {
     if (indicesLinhasImport.length > 0) {
         return indicesLinhasImport[indicesLinhasImport.length - 1] + 1;
     }
@@ -65,11 +99,16 @@ function obterPosicaoInsercao(linhas, indicesLinhasImport) {
     return 0;
 }
 
-function existeColisao(nomeSimples, fqn, importsNovos) {
+function existeColisao(nomeSimples: string, fqn: string, importsNovos: Set<string>): boolean {
     return [...importsNovos].some((item) => item.split(".").pop() === nomeSimples && item !== fqn);
 }
 
-function determinarSubstituicao(correspondencia, pacoteAtual, importsExistentes, importsNovos) {
+function determinarSubstituicao(
+    correspondencia: CorrespondenciaFqn,
+    pacoteAtual: string | null,
+    importsExistentes: Map<string, string>,
+    importsNovos: Set<string>
+): DecisaoSubstituicao {
     if (correspondencia[1]) {
         return {substituicao: correspondencia[1], alterado: false};
     }
@@ -77,6 +116,9 @@ function determinarSubstituicao(correspondencia, pacoteAtual, importsExistentes,
     const correspondenciaCompleta = correspondencia[2];
     const pacote = correspondencia[3];
     const classe = correspondencia[4];
+    if (!correspondenciaCompleta || !pacote || !classe) {
+        return {substituicao: correspondencia[0], alterado: false};
+    }
     const fqn = `${pacote}.${classe}`;
 
     let deveSubstituir = false;
@@ -98,9 +140,13 @@ function determinarSubstituicao(correspondencia, pacoteAtual, importsExistentes,
     };
 }
 
-function analisarLinhas(linhas, pacoteAtual, importsExistentes) {
-    const importsNovos = new Set();
-    const linhasModificadas = [];
+function analisarLinhas(
+    linhas: string[],
+    pacoteAtual: string | null,
+    importsExistentes: Map<string, string>
+): AnaliseLinhas {
+    const importsNovos = new Set<string>();
+    const linhasModificadas: string[] = [];
     let temAlteracoes = false;
 
     linhas.forEach((linha) => {
@@ -110,7 +156,7 @@ function analisarLinhas(linhas, pacoteAtual, importsExistentes) {
             return;
         }
 
-        const novaLinha = linha.replace(PADRAO_FQN, (...argumentos) => {
+        const novaLinha = linha.replace(PADRAO_FQN, (...argumentos: CorrespondenciaFqn) => {
             const {substituicao, alterado} = determinarSubstituicao(argumentos, pacoteAtual, importsExistentes, importsNovos);
             if (alterado) {
                 temAlteracoes = true;
@@ -123,8 +169,8 @@ function analisarLinhas(linhas, pacoteAtual, importsExistentes) {
     return {linhasModificadas, importsNovos, temAlteracoes};
 }
 
-function processarArquivo(caminhoArquivo, apenasSimulacao = false) {
-    const linhas = fs.readFileSync(caminhoArquivo, "utf-8").split(/\r?\n/).map((linha, indice, todas) => (
+function processarArquivo(caminhoArquivo: string, apenasSimulacao = false): boolean {
+    const linhas: string[] = fs.readFileSync(caminhoArquivo, "utf-8").split(/\r?\n/).map((linha, indice, todas) => (
         indice < todas.length - 1 ? `${linha}\n` : linha
     ));
     const {pacoteAtual, importsExistentes, indicesLinhasImport} = analisarImports(linhas);
@@ -136,7 +182,7 @@ function processarArquivo(caminhoArquivo, apenasSimulacao = false) {
 
     const posicaoInsercao = obterPosicaoInsercao(linhas, indicesLinhasImport);
     const importsOrdenados = [...importsNovos].toSorted((a, b) => a.localeCompare(b, "pt-BR"));
-    const saidaFinal = [];
+    const saidaFinal: string[] = [];
 
     if (posicaoInsercao === 0) {
         importsOrdenados.forEach((item) => saidaFinal.push(`${PREFIXO_IMPORT}${item};\n`));
@@ -157,23 +203,23 @@ function processarArquivo(caminhoArquivo, apenasSimulacao = false) {
     return true;
 }
 
-function encontrarRaizBackend(diretorioBase = DIRETORIO_RAIZ) {
+function encontrarRaizBackend(diretorioBase: string = DIRETORIO_RAIZ): string {
     const candidatos = [path.resolve(diretorioBase), path.resolve(diretorioBase, "backend")];
     return candidatos.find((candidato) => fs.existsSync(path.join(candidato, "src"))) ?? path.resolve(diretorioBase);
 }
 
-function lerArgumentos(argumentos) {
+function lerArgumentos(argumentos: string[]): OpcoesCorretorFqn {
     return {
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
         apenasSimulacao: argumentos.includes("--dry-run"),
-        diretorioBase: lerOpcao(argumentos, "--base", DIRETORIO_RAIZ),
+        diretorioBase: lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ,
     };
 }
 
-function exibirAjuda() {
+function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend java corrigir-fqn",
-        scriptDireto: "backend/java-corrigir-fqn.js",
+        scriptDireto: "backend/java-corrigir-fqn.ts",
         descricao: "Substitui nomes totalmente qualificados por imports em arquivos Java.",
         opcoes: [
             "--dry-run           Apenas mostra os arquivos que seriam alterados.",
@@ -187,7 +233,7 @@ function exibirAjuda() {
     });
 }
 
-function principal(argumentos = process.argv.slice(2)) {
+function principal(argumentos: string[] = process.argv.slice(2)): void {
     const opcoes = lerArgumentos(argumentos);
     if (opcoes.ajuda) {
         exibirAjuda();
@@ -212,6 +258,9 @@ function principal(argumentos = process.argv.slice(2)) {
         const pilha = [diretorioAlvo];
         while (pilha.length > 0) {
             const diretorioAtual = pilha.pop();
+            if (!diretorioAtual) {
+                continue;
+            }
             const entradas = fs.readdirSync(diretorioAtual, {withFileTypes: true});
             entradas.forEach((entrada) => {
                 const caminhoCompleto = path.join(diretorioAtual, entrada.name);
