@@ -155,18 +155,27 @@ describe("CLI raiz do toolkit", () => {
         });
         expect(compilacao.exitCode).toBe(0);
 
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cli-compilada-"));
+        await fs.outputFile(
+            path.join(base, "frontend", "src", "Exemplo.ts"),
+            "export function exemplo(valor: unknown) { return valor; }\n"
+        );
+
         const resultado = await execaNode(CAMINHO_SGC_COMPILADO, [
-            "frontend",
-            "residuos",
+            "codigo",
+            "cheiros",
             "auditar",
-            "--help"
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base
         ], {
             cwd: DIRETORIO_RAIZ,
             reject: false
         });
 
         expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Audita residuos estruturais do frontend.");
+        expect(JSON.parse(resultado.stdout).base).toBe(base);
     });
 
     test("pode importar comandos de contratos sem executar integrações", async () => {

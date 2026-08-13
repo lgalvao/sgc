@@ -174,15 +174,14 @@ iniciar.
 Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--dir`
 quando a intenção for apontar diretamente para outro diretório de código.
 
-O toolkit executa a árvore-fonte com `tsx` e está em migração incremental para TypeScript. As bibliotecas puras de
-`lib/` já foram convertidas; os próximos recortes devem seguir pelas bibliotecas de domínio e pelos comandos que apenas
-adaptam CLI para domínio. Isso reduz o risco de converter simultaneamente roteamento, contratos de saída e integrações
-externas.
+O toolkit executa a árvore-fonte com `tsx`; toda a implementação está em TypeScript estrito. Os testes permanecem em
+JavaScript por enquanto, mas não participam da implementação distribuída nem do gate estrito.
 
 Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis: só executam quando chamados diretamente
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
 integrações durante o carregamento.
-`npm run typecheck:nucleo` verifica com `checkJs` os módulos compartilhados que formam a base da migração incremental.
+`npm run typecheck` executa `tsconfig.estrito.json` com `strict` e `noImplicitOverride` sobre todos os módulos de
+implementação TypeScript.
 
 Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--base <diretorio>` para analisar outro
 repositório Git, e a sincronização de versão aceita um diretório base nas funções reutilizáveis sem alterar o projeto

@@ -19,11 +19,18 @@ function garantirArquivo(relativo: string): string {
     const caminhoRelativo = relativo.startsWith("toolkit/")
         ? relativo.slice("toolkit/".length)
         : relativo;
-    const absoluto = path.resolve(DIRETORIO_EXECUCAO_TOOLKIT, caminhoRelativo);
-    if (!existsSync(absoluto)) {
+    const caminhoFonte = path.resolve(DIRETORIO_EXECUCAO_TOOLKIT, caminhoRelativo);
+    if (existsSync(caminhoFonte)) {
+        return caminhoFonte;
+    }
+
+    const caminhoCompilado = caminhoFonte.endsWith(".ts")
+        ? `${caminhoFonte.slice(0, -3)}.js`
+        : null;
+    if (!caminhoCompilado || !existsSync(caminhoCompilado)) {
         throw new Error(`Script nao encontrado: ${relativo}`);
     }
-    return absoluto;
+    return caminhoCompilado;
 }
 
 async function executarNode(relativo: string, argumentos: string[] = []) {

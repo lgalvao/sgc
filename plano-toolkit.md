@@ -50,8 +50,9 @@ sistema auditado.
 - `toolkit/dist/` é somente artefato opcional para verificar compilação, distribuição ou smoke test de pacote; não é o
   fluxo de desenvolvimento.
 - Não criar novos arquivos `.js` como cópias, wrappers permanentes ou shims para uma implementação `.ts`.
-- O fallback transitório de `garantirArquivo` que tenta `.ts` quando o despachador pede `.js` deve desaparecer quando o
-  roteador e todos os comandos tiverem sido convertidos para caminhos TypeScript consistentes.
+- O despachador recebe exclusivamente caminhos TypeScript registrados; em fonte executa `.ts` diretamente e, no
+  artefato compilado, resolve o mesmo caminho para o `.js` correspondente dentro de `dist`, sem compatibilidade com
+  registros `.js` antigos.
 - Node padrão do projeto: `26.7.0`, registrado em `.nvmrc` e nos `engines`. TypeScript 6 permanece a linha adotada;
   TS7 fica explicitamente fora do escopo até que o ecossistema usado pelo projeto seja compatível.
 - ESM continua sendo o formato do toolkit.
@@ -152,8 +153,9 @@ frontend e para os caminhos OpenAPI.
 - Dois comandos de projeto já foram convertidos:
   - `projeto/arvore-linhas.ts`;
   - `projeto/versao-sincronizar.ts`.
-- `garantirArquivo` já encontra `.ts` na fonte e `.js` no build, permitindo migração incremental sem duplicar módulos.
-- Exports de `toolkit/package.json` já distinguem módulos migrados e módulos ainda JavaScript.
+- `garantirArquivo` resolve entradas `.ts` na fonte e o `.js` correspondente no build, sem aliases de comandos antigos.
+- Exports de `toolkit/package.json` já expõem a árvore TypeScript do toolkit; os testes ainda são JavaScript por decisão
+  de escopo, não por dependência de runtime.
 - O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; a implementação não foi
   alterada porque a suspeita de duplicação não se confirmou.
 - A auditoria de efeitos corrigiu um vazamento de `--sem-gravar` em `codigo nomes auditar-consistencia`: a geração
@@ -268,8 +270,10 @@ frontend e para os caminhos OpenAPI.
 - `codigo/semgrep-auditar.ts` foi convertido para TypeScript com contratos para achados, posições, resultados,
   execução e relatórios; a entrada JSON externa é normalizada como `unknown`, mantendo regras, alvos configuráveis,
   modo automático e o schema de saída do Semgrep.
-- O despachador agora resolve exclusivamente os caminhos TypeScript registrados; o fallback transitório `.js` → `.ts`
-  foi removido depois da migração integral dos comandos.
+- O despachador agora resolve exclusivamente os caminhos TypeScript registrados; o artefato compilado possui uma
+  resolução explícita para os `.js` correspondentes em `dist`.
+- Foi criado `tsconfig.estrito.json`, cobrindo toda a implementação TypeScript com `strict` e `noImplicitOverride`; o
+  gate passou e tornou-se o `typecheck` oficial.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -502,13 +506,12 @@ do perfil.
    `process.cwd()`, `--base` e configuração explícita devem ter precedência documentada.
 4. **Modelo de distribuição**: decidir cedo se o reuso será por pacote compilado, pacote-fonte com runtime `tsx` ou cópia
    vendorizada. A escolha define `version`, `private`, nome, `files`, `bin`, `exports`, assets e dependências de runtime.
-5. **TypeScript sem rigor uniforme**: `tsconfig.nucleo.json` cobre o núcleo, mas o `tsconfig.json` geral mantém
-   `checkJs: false` e não impõe `strict` aos próximos comandos TS. Criar uma configuração estrita por etapas, sem tentar
-   tipar os 42 módulos JavaScript restantes de uma vez.
+5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 72 módulos de
+   implementação TypeScript com `strict` e `noImplicitOverride`; o gate estrito passou e tornou-se o `typecheck` oficial.
 6. **Dependência de runtime**: `tsx` já foi movido para `dependencies` e o launcher de pacote foi criado; ainda falta
    decidir se o pacote final continuará fonte+tsx ou será compilado para distribuição.
-7. **Contrato `.js`/`.ts` temporário**: o fallback do despachador é útil durante a transição, mas aumenta a superfície e
-   pode esconder caminhos inválidos. Medir os consumidores e removê-lo ao fim da conversão.
+7. **[resolvido nesta rodada] Contrato `.js`/`.ts` temporário**: todos os comandos registrados usam caminhos `.ts` e o
+   fallback do despachador foi removido.
 8. **Hard-coding de perfil**: várias regras continuam presas ao layout e ao vocabulário SGC. Antes de declarar o toolkit
    reutilizável, separar engine, política e adaptador.
 
@@ -595,8 +598,8 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
    cobertura frontend, violações de ações, resíduos, arquitetura AST, execução e resumo de qualidade, diagnóstico,
    fotografias, exceções e contratos OpenAPI; ainda faltam achados de auditoria e diagnósticos dos comandos restantes.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
-5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
-   próximos lotes.
+5. **[parcial nesta rodada]** Criar `tsconfig.estrito.json` com `strict` e `noImplicitOverride`, aplicando-o a toda a
+   implementação TypeScript; ainda falta zerar os diagnósticos desse gate e incorporá-lo ao `typecheck` principal.
 6. Eliminar defaults de caminho calculados durante import; expor funções que resolvam caminhos a partir da base e da
    configuração efetivas.
 
@@ -679,7 +682,8 @@ SGC está ativo.
 7. Executar smoke tests sobre um recorte do SGC apenas quando necessário para provar que uma funcionalidade específica
    do perfil continua funcionando após a mudança do toolkit.
 8. Atualizar `toolkit/README.md` e exemplos a partir de uma fonte única de comandos.
-9. Fechar o modelo de distribuição e retirar arquivos JS, aliases e fallbacks de transição.
+9. Fechar o modelo de distribuição e decidir se os testes também serão convertidos para TypeScript; a implementação já
+   não possui arquivos JS, aliases ou fallbacks de transição.
 
 ## 7. Validação obrigatória por rodada
 
@@ -688,7 +692,7 @@ SGC está ativo.
 ```bash
 node --version
 cd toolkit
-npm run typecheck:nucleo
+npm run typecheck
 npx vitest run test/sgc.test.js test/cdus.test.js --reporter=dot --no-color
 npm run build
 cd ..
