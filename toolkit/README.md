@@ -318,7 +318,7 @@ Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
 integrações durante o carregamento.
 `npm run typecheck` executa `tsconfig.estrito.json` com `strict` e `noImplicitOverride` sobre todos os módulos de
-implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos vinte e seis arquivos de teste TypeScript;
+implementação TypeScript. `npm run typecheck:testes` aplica o mesmo rigor aos vinte e oito arquivos de teste TypeScript;
 a divisão por domínio segue reduzindo o teste principal sem manter testes JavaScript ou uma migração parcial de linguagem.
 
 Os comandos de projeto seguem a mesma fronteira. A árvore de linhas aceita `--base <diretorio>` para analisar outro
@@ -419,12 +419,12 @@ npx tsx toolkit/sgc.ts projeto dependencias auditar
 
 O diretório `test/` contém:
 
-- `sgc.test.ts`: testes da CLI principal
 - `execucao-cli.test.ts`: testes de catálogo, launcher, importação e distribuição da CLI
 - `backend-fqn.test.ts`: testes de simulação, escrita e idempotência do corretor FQN Java
 - `backend-testes.test.ts`: testes de análise, classificação e priorização dos testes backend
 - `backend-auditorias.test.ts`: testes de coesão, arquitetura e contratos do backend
 - `backend-importacao.test.ts`: testes de importação segura dos comandos e auditores backend
+- `backend-notificacoes.test.ts`: testes de auditoria de assuntos de notificação e diretórios backend configurados
 - `frontend-residuos.test.ts`: testes de políticas, auditoria, gravação e validação de resíduos do frontend
 - `frontend-arquitetura.test.ts`: testes da auditoria de hotspots, defaults e persistência arquitetural do frontend
 - `frontend-arquitetura-gates.test.ts`: testes dos gates dependency-cruiser e diretórios frontend configurados
@@ -438,11 +438,13 @@ O diretório `test/` contém:
 - `importacao-nucleos.test.ts`: testes de importação segura dos comandos de projeto, qualidade e consistência
 - `codigo-importacao.test.ts`: testes de importação segura dos auditores Semgrep e cheiros
 - `codigo-auditorias.test.ts`: testes de auditoria de cheiros, políticas Semgrep e diretórios de código configurados
-- `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
+- `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, limpeza, preparação,
   qualidade e dependências)
+- `projeto-diagnostico.test.ts`: testes do diagnóstico de arquivos essenciais em uma base vazia
 - `configuracao.test.ts`: testes da configuração versionada e das execuções parametrizadas do projeto
 - `integracao.test.ts`: testes de importação segura e dos artefatos OpenAPI em uma base externa
 - `qualidade.test.ts`: testes de resumo, coleta e validação de perfis de qualidade
+- `qualidade-externa.test.ts`: teste de fotografia de qualidade com adaptadores de uma base externa
 - `cdus.test.ts`: testes TypeScript das regras CDU específicas do perfil SGC
 - `externo.test.ts`: fixture TypeScript de reuso em projeto Java/Vue externo
 - `pacote.test.ts`: smoke de empacotamento e instalação em consumidor isolado
