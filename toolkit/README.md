@@ -360,6 +360,8 @@ npx tsx toolkit/sgc.ts projeto dependencias auditar
 O diretório `test/` contém:
 
 - `sgc.test.ts`: testes da CLI principal
+- `projeto.test.ts`: testes dos comandos de projeto (versão, árvore de linhas, diagnóstico, limpeza, preparação,
+  qualidade e dependências)
 - `cdus.test.ts`: testes TypeScript das regras CDU específicas do perfil SGC
 - `externo.test.ts`: fixture TypeScript de reuso em projeto Java/Vue externo
 - `pacote.test.ts`: smoke de empacotamento e instalação em consumidor isolado
