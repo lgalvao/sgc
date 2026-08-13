@@ -110,6 +110,8 @@ intermediário do perfil SGC.
 `backend arquitetura auditar` também é somente leitura por padrão. Use `--gravar` para atualizar os relatórios
 Markdown e JSON no diretório de artefatos configurado.
 
+`backend coesao auditar` segue o mesmo contrato e só grava os relatórios quando recebe `--gravar`.
+
 ### Requisitos
 
 ```bash

@@ -931,7 +931,7 @@ describe("CLI raiz do toolkit", () => {
         expect(await fs.pathExists(path.join(diretorioSaida, "resumo.md"))).toBe(true);
     });
 
-    test("auditores backend usam caminhos de codigo definidos pela configuracao do projeto", async () => {
+    test("auditores backend usam caminhos configurados e gravam somente com acao explicita", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-configuracao-codigo-backend-"));
         const codigoBackend = path.join(base, "servidor", "java");
         await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
@@ -967,6 +967,18 @@ describe("CLI raiz do toolkit", () => {
         const conteudo = JSON.parse(resultado.stdout);
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(false);
+
+        const gravacao = await executarSgc([
+            "backend",
+            "coesao",
+            "auditar",
+            "--json",
+            "--gravar",
+            "--base",
+            base
+        ]);
+        expect(gravacao.exitCode).toBe(0);
         expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(true);
     });
 

@@ -258,13 +258,14 @@ function exibirAjuda(): void {
         descricao: "Audita Services do backend detectando mistura de responsabilidades (consulta, mutação, workflow, notificação, permissão).",
         opcoes: [
             "--json              Emite o relatório em JSON.",
-            "--sem-gravar        Não grava os arquivos em disco.",
+            "--gravar            Grava os relatórios em disco.",
+            "--base <diretorio>  Sobrescreve a base da auditoria.",
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
             "npx tsx toolkit/sgc.ts backend coesao auditar",
             "npx tsx toolkit/sgc.ts backend coesao auditar --json",
-            "npx tsx toolkit/sgc.ts backend coesao auditar --sem-gravar"
+            "npx tsx toolkit/sgc.ts backend coesao auditar --gravar"
         ]
     });
 }
@@ -277,7 +278,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     }
 
     const emitirJson = argumentos.includes("--json");
-    const semGravar = argumentos.includes("--sem-gravar");
+    const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
@@ -289,7 +290,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     const relatorio = await auditarCoesao(diretorioCodigo, diretorioBase);
 
-    if (!semGravar) {
+    if (gravar) {
         const caminhosRelatorios = await gravarRelatorios(relatorio, diretorioSaida);
         if (!emitirJson) {
             escreverLinha(`Relatório Markdown: ${pc.dim(caminhosRelatorios.caminhoMarkdown)}`);
