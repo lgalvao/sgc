@@ -5,6 +5,7 @@ import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
+import {NOME_ARQUIVO_CONFIGURACAO, resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha} from "../lib/saida.js";
 
@@ -208,6 +209,17 @@ function encontrarRaizBackend(diretorioBase: string = DIRETORIO_RAIZ): string {
     return candidatos.find((candidato) => fs.existsSync(path.join(candidato, "src"))) ?? path.resolve(diretorioBase);
 }
 
+function obterDiretoriosAlvo(diretorioBase: string, raizBackend: string): string[] {
+    if (fs.existsSync(path.join(diretorioBase, NOME_ARQUIVO_CONFIGURACAO))) {
+        return [
+            resolverCaminhoConfigurado("backendTestes", diretorioBase),
+            resolverCaminhoConfigurado("backendCodigo", diretorioBase)
+        ];
+    }
+
+    return DIRETORIOS_ALVO.map(diretorioRelativo => path.join(raizBackend, diretorioRelativo));
+}
+
 function lerArgumentos(argumentos: string[]): OpcoesCorretorFqn {
     return {
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
@@ -242,14 +254,14 @@ function principal(argumentos: string[] = process.argv.slice(2)): void {
     }
 
     const raizBackend = encontrarRaizBackend(opcoes.diretorioBase);
+    const diretoriosAlvo = obterDiretoriosAlvo(opcoes.diretorioBase, raizBackend);
     let totalArquivosAnalisados = 0;
     let totalArquivosAtualizados = 0;
 
     escreverLinha("Procurando FQNs no projeto...");
     escreverLinha(`Raiz do backend resolvida: ${raizBackend}`);
 
-    DIRETORIOS_ALVO.forEach((diretorioRelativo) => {
-        const diretorioAlvo = path.join(raizBackend, diretorioRelativo);
+    diretoriosAlvo.forEach((diretorioAlvo) => {
         if (!fs.existsSync(diretorioAlvo)) {
             escreverLinha(`Diretorio nao encontrado: ${diretorioAlvo}`);
             return;

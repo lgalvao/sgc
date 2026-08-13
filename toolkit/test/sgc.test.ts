@@ -402,6 +402,43 @@ describe("CLI raiz do toolkit", () => {
         expect(await fs.readFile(caminhoJava, "utf8")).toBe(conteudoEsperado);
     });
 
+    test("corrige FQNs nos diretorios Java configurados", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-corrigir-fqn-configurado-"));
+        await fs.outputJSON(path.join(diretorioBase, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backendCodigo: "servidor/java",
+                backendTestes: "servidor/testes"
+            }
+        });
+
+        const conteudoJava = [
+            "package exemplo;",
+            "",
+            "public class Exemplo {",
+            "    com.externo.Alvo alvo;",
+            "}"
+        ].join("\n");
+        const caminhoFonte = path.join(diretorioBase, "servidor", "java", "exemplo", "Exemplo.java");
+        const caminhoTeste = path.join(diretorioBase, "servidor", "testes", "exemplo", "ExemploTest.java");
+        await fs.outputFile(caminhoFonte, conteudoJava);
+        await fs.outputFile(caminhoTeste, conteudoJava.replace("Exemplo", "ExemploTest"));
+
+        const resultado = await executarSgc([
+            "backend",
+            "java",
+            "corrigir-fqn",
+            "--base",
+            diretorioBase,
+            "--gravar"
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        expect(resultado.stdout).toContain("Total de arquivos atualizados: 2");
+        expect(await fs.readFile(caminhoFonte, "utf8")).toContain("import com.externo.Alvo;");
+        expect(await fs.readFile(caminhoTeste, "utf8")).toContain("import com.externo.Alvo;");
+    });
+
     test("pode importar auditoria de assuntos sem ler o backend", async () => {
         const urlModulo = pathToFileURL(CAMINHO_AUDITORIA_ASSUNTOS).href;
         const resultado = await execa(process.execPath, [

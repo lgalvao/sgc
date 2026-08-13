@@ -85,7 +85,9 @@ npx tsx toolkit/sgc.ts backend java corrigir-fqn --gravar
 npx tsx toolkit/sgc.ts backend notificacoes auditar-assuntos
 ```
 
-`backend java corrigir-fqn` apenas lista as substituições por padrão; use `--gravar` para alterar os arquivos Java.
+`backend java corrigir-fqn` apenas lista as substituições por padrão; use `--gravar` para alterar os arquivos Java. Com
+`configuracao-toolkit.json`, ele usa `diretorios.backendCodigo` e `diretorios.backendTestes`; sem configuração, conserva
+a descoberta tradicional de `src/main/java` e `src/test/java`.
 
 ### Frontend
 

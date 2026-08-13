@@ -170,8 +170,9 @@ frontend e para os caminhos OpenAPI.
 - `garantirArquivo` resolve entradas `.ts` na fonte e o `.js` correspondente no build, sem aliases de comandos antigos.
 - Exports de `toolkit/package.json` já expõem a árvore TypeScript do toolkit; todos os testes agora são TypeScript
   estrito, incluindo a CLI grande e o smoke de pacote.
-- O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; a implementação não foi
-  alterada porque a suspeita de duplicação não se confirmou.
+- O corretor de FQN possui teste de escrita, conteúdo esperado sem duplicação e idempotência; agora resolve
+  `backendCodigo` e `backendTestes` quando a base possui configuração, preservando a descoberta convencional para uma
+  base backend isolada.
 - A auditoria de efeitos corrigiu um vazamento de gravação em `codigo nomes auditar-consistencia`: a geração automática do
   inventário auxiliar agora acompanha `--gravar` e não grava nem polui o JSON final na execução padrão.
 - A configuração externa agora exige schema versão `1`, valida estrutura, nomes de diretório e caminhos não vazios na
@@ -389,7 +390,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 116 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 117 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 45,14% de statements (591/1.309),
   33,29% de branches (304/913), 51,72% de funções (135/261) e 45,36% de linhas (568/1.252); o script exclui
@@ -446,6 +447,8 @@ Na rodada seguinte, a coleta consolidada passou a montar o comando Playwright pe
 na função pura de opções; a suíte chega a 115 cenários regulares e `test/qualidade.test.ts` passa a ter 5 cenários.
 Na rodada seguinte, o diagnóstico passou a separar recursos estruturais configuráveis do perfil SGC, com regressão para
 uma base sem o toolkit instalado; a suíte chega a 116 cenários regulares e `test/projeto.test.ts` passa a ter 16.
+Na rodada seguinte, o corretor FQN passou a usar `backendCodigo` e `backendTestes` quando configurados, cobrindo fonte e
+testes Java externos; a suíte chega a 117 cenários regulares e `test/sgc.test.ts` passa a ter 79.
 
 ### 3.3 Tamanho e composição atual
 
@@ -456,7 +459,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 116 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 117 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
@@ -477,13 +480,14 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros, assuntos de notificação, sincronização de versão, crawler de acessibilidade e diagnóstico agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
 | Resolvido nesta rodada | Auditores gravam por padrão | `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar`, `codigo semgrep auditar`, toda a família `codigo nomes`, `integracao contratos diff` e as duas auditorias unificadas de cobertura agora só persistem com `--gravar`. Geração de relatórios, coleta e mutações continuam classificadas separadamente. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
+| Resolvido nesta rodada | Corretor FQN ignorava raízes Java configuradas | `backend/java-corrigir-fqn` agora usa `diretorios.backendCodigo` e `diretorios.backendTestes` quando a base possui configuração; a heurística anterior continua para uma base backend isolada sem configuração. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
 | Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
-| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 16 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 78 cenários e a suíte permite execução focada por domínio. |
+| Resolvido nesta rodada | Testes de projeto misturados ao teste da CLI | Os 16 cenários de versão, árvore, diagnóstico, limpeza, preparação, qualidade e dependências agora estão em `test/projeto.test.ts`; o teste principal concentra 79 cenários e a suíte permite execução focada por domínio. |
 | Resolvido nesta rodada | Configuração misturada à validação da CLI | Os 3 cenários de carregamento, validação e execução parametrizada agora estão em `test/configuracao.test.ts`; o teste principal caiu para 83 cenários e a configuração pode ser validada sem importar o roteador. |
 | Resolvido nesta rodada | Integração OpenAPI misturada à validação da CLI | Os 2 cenários de importação e artefatos OpenAPI agora estão em `test/integracao.test.ts`; o teste principal caiu para 81 cenários e a persistência de diff continua coberta com `--gravar`. |
 | Resolvido nesta rodada | Qualidade misturada à validação da CLI | Os 4 cenários iniciais de resumo e coleta foram extraídos para `test/qualidade.test.ts`; o teste principal caiu para 77 cenários e o arquivo agora cobre também a montagem configurada do Playwright. |
@@ -510,7 +514,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 116 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 117 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -626,7 +630,7 @@ do perfil.
 
 ### Prioridade média
 
-9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 78 cenários, embora os 16 cenários
+9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 79 cenários, embora os 16 cenários
    de projeto, os 3 de configuração, os 2 de integração e os 4 de qualidade já tenham sido extraídos para arquivos
    próprios. Dividir os cenários restantes por domínio continua recomendado para localizar contratos, reduzir o custo de
    execução focada e permitir fixtures mais independentes.
@@ -730,8 +734,8 @@ Lotes sugeridos:
 1. **[concluído nesta rodada]** Projeto: diagnóstico, limpeza, preparação, perfil de qualidade e auditoria de
    dependências convertidos. O catálogo padrão continua sendo o perfil SGC, com base e execução parametrizáveis para
    reuso externo; `configuracao-toolkit.json` pode substituir separadamente qualidade, dependências e instalação.
-2. **Backend**: cobertura, análise, priorização de testes, contratos e FQN já convertidos; falta parametrizar raiz Java, tarefas Gradle e
-   categorias.
+2. **Backend**: cobertura, análise, priorização de testes, contratos e FQN já convertidos; o FQN já respeita as raízes
+   configuradas, mas ainda falta parametrizar tarefas Gradle e categorias das demais famílias.
 3. **[parcial nesta rodada]** Frontend: cobertura V8, resíduos, acessibilidade e identificadores de teste já
    convertidos; o crawler e a coleta Playwright respeitam `testesIntegracao`, mas faltam parametrizar completamente raiz
    Vue, globs e convenções de componentes.
