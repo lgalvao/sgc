@@ -198,7 +198,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   `pontuacaoImpacto`; os vocabulários externos de JaCoCo e V8 permanecem somente na fronteira de leitura;
 - os três comandos de ramificações agora também possuem `versaoSchema: "1.0.0"` e `geradoEm`; o `timestamp` próprio foi
   removido e a mensagem de `hotspot` foi padronizada como ponto crítico;
-- apenas cobertura Java e web está publicada como API programática horizontal;
+- cobertura Java e web estão publicadas como APIs programáticas horizontais; os agregadores CDU ainda não são subpath
+  público porque a implementação mistura borda CLI, formatação e análise e precisa de extração adicional;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e outras políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - a composição SGC da coleta foi separada do motor de fotografia, mas outros módulos ainda concentram análise, política,
   formatação, persistência e CLI, dificultando reuso seletivo.
@@ -243,8 +244,8 @@ permite determinar efeitos sem ler a implementação.
   perfil SGC;
 - manter a fixture de segundo projeto com caminho, vocabulário e política de mensagens próprios e preservar o SGC por
   regressão;
-- publicar um subpath CDU quando o modelo e as análises agregadas formarem uma fronteira programática estável, validada por
-  fixture isolada e útil para composição por scripts, humanos ou agentes.
+- extrair os motores dos agregadores CDU da borda CLI e só então publicar um subpath com `inventariarCasosDeUso` e
+  `auditarCasosDeUso`; o contrato deve ser testado no tarball e não deve arrastar formatação ou execução de processo.
 
 Critério de saída: um segundo projeto executa os dois comandos e seleciona as capacidades horizontais sem copiar arquivos,
 editar o toolkit ou receber políticas do SGC acidentalmente.
