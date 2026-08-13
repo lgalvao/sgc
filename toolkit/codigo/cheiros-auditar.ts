@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
@@ -8,9 +9,72 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
+type EscopoCheiro = "backend" | "frontend" | "frontend_testes";
+type FaixaPontuacao = "bom" | "atencao" | "critico";
+type ChavePadrao =
+    | "backend_nullable_dto"
+    | "backend_null_checks"
+    | "backend_objects_null"
+    | "frontend_any_producao"
+    | "frontend_any_testes"
+    | "frontend_catch_any"
+    | "frontend_null_checks"
+    | "frontend_fallback_or";
+
+interface ContextoFiltroArquivo {
+    caminhoRelativo: string;
+    conteudo: string;
+    diretorioBackendCodigo: string;
+    diretorioFrontendCodigo: string;
+}
+
+interface PadraoCheiro {
+    chave: ChavePadrao;
+    titulo: string;
+    peso: number;
+    escopo: EscopoCheiro;
+    filtroArquivo: (contexto: ContextoFiltroArquivo) => boolean;
+    regexes: RegExp[];
+}
+
+interface ResumoArquivoCheiros {
+    arquivo: string;
+    pontuacao: number;
+    categorias: Partial<Record<ChavePadrao, number>>;
+}
+
+type ContagensCheiros = Record<ChavePadrao, number>;
+type DeltasCheiros = Record<ChavePadrao, number>;
+type PontuacaoPorEscopo = Record<EscopoCheiro, number>;
+
+interface SnapshotCheiros {
+    geradoEm: string;
+    base: string;
+    pontuacao: {
+        total: number;
+        faixa: FaixaPontuacao;
+        porEscopo: PontuacaoPorEscopo;
+    };
+    contagens: ContagensCheiros;
+    deltas: DeltasCheiros;
+    hotspots: ResumoArquivoCheiros[];
+}
+
+interface ResultadoAuditoriaCheiros {
+    snapshot: SnapshotCheiros;
+    caminhoFotografia: string;
+    caminhoResumo: string;
+}
+
+interface OpcoesAuditoriaCheiros {
+    base?: string;
+    semGravar?: boolean;
+    diretorioSaida?: string;
+}
+
 const EXTENSOES_TEXTO = new Set([".ts", ".vue", ".java"]);
 
-const PADROES = [
+const PADROES: PadraoCheiro[] = [
     {
         chave: "backend_nullable_dto",
         titulo: "Backend DTOs com @Nullable",
@@ -47,7 +111,15 @@ const PADROES = [
         filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
             ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
             && !ehArquivoTesteOuStory(caminhoRelativo),
-        regexes: [/\bas any\b/g, /:\s*any\b/g, /\bArray<any>\b/g, /\bPromise<any>\b/g, /\bref<any>\b/g, /\bRecord<[^>]+,\s*any>\b/g, /\[key:\s*string\]:\s*any\b/g]
+        regexes: [
+            /\bas any\b/g,
+            /:\s*any\b/g,
+            /\bArray<any>\b/g,
+            /\bPromise<any>\b/g,
+            /\bref<any>\b/g,
+            /\bRecord<[^>]+,\s*any>\b/g,
+            /\[key:\s*string\]:\s*any\b/g
+        ]
     },
     {
         chave: "frontend_any_testes",
@@ -57,7 +129,13 @@ const PADROES = [
         filtroArquivo: ({caminhoRelativo, diretorioFrontendCodigo}) =>
             ehArquivoDentroDiretorio(caminhoRelativo, diretorioFrontendCodigo)
             && ehArquivoTesteOuStory(caminhoRelativo),
-        regexes: [/\bas any\b/g, /:\s*any\b/g, /\bArray<any>\b/g, /\bPromise<any>\b/g, /\bref<any>\b/g]
+        regexes: [
+            /\bas any\b/g,
+            /:\s*any\b/g,
+            /\bArray<any>\b/g,
+            /\bPromise<any>\b/g,
+            /\bref<any>\b/g
+        ]
     },
     {
         chave: "frontend_catch_any",
@@ -90,27 +168,28 @@ const PADROES = [
     }
 ];
 
-function ehArquivoTesteOuStory(caminhoRelativo) {
+function ehArquivoTesteOuStory(caminhoRelativo: string): boolean {
     return caminhoRelativo.includes("/__tests__/")
         || caminhoRelativo.endsWith(".spec.ts")
-        || caminhoRelativo.endsWith(".stories.ts") || caminhoRelativo.includes("/test-utils/");
+        || caminhoRelativo.endsWith(".stories.ts")
+        || caminhoRelativo.includes("/test-utils/");
 }
 
-function ehArquivoDentroDiretorio(caminhoRelativo, diretorio) {
+function ehArquivoDentroDiretorio(caminhoRelativo: string, diretorio: string): boolean {
     const diretorioNormalizado = diretorio.replace(/\/$/, "");
     return caminhoRelativo === diretorioNormalizado
         || caminhoRelativo.startsWith(`${diretorioNormalizado}/`);
 }
 
-function criarEstruturaContagens() {
-    return Object.fromEntries(PADROES.map((padrao) => [padrao.chave, 0]));
+function criarEstruturaContagens(): ContagensCheiros {
+    return Object.fromEntries(PADROES.map(padrao => [padrao.chave, 0])) as ContagensCheiros;
 }
 
-function normalizarSeparadores(caminhoArquivo) {
+function normalizarSeparadores(caminhoArquivo: string): string {
     return caminhoArquivo.split(path.sep).join("/");
 }
 
-async function listarArquivosTexto(diretorio, acumulado = []) {
+async function listarArquivosTexto(diretorio: string, acumulado: string[] = []): Promise<string[]> {
     const entradas = await fs.readdir(diretorio, {withFileTypes: true});
 
     for (const entrada of entradas) {
@@ -139,83 +218,74 @@ async function listarArquivosTexto(diretorio, acumulado = []) {
     return acumulado;
 }
 
-function contarOcorrencias(conteudo, regex) {
+function contarOcorrencias(conteudo: string, regex: RegExp): number {
     const correspondencias = conteudo.match(regex);
     return correspondencias ? correspondencias.length : 0;
 }
 
-
-function somarCategoriaPorArquivo(resumoArquivo, categoria, quantidade, peso) {
-    if (!resumoArquivo.categorias[categoria]) {
-        resumoArquivo.categorias[categoria] = 0;
-    }
-
-    resumoArquivo.categorias[categoria] += quantidade;
+function somarCategoriaPorArquivo(
+    resumoArquivo: ResumoArquivoCheiros,
+    categoria: ChavePadrao,
+    quantidade: number,
+    peso: number
+): void {
+    resumoArquivo.categorias[categoria] = (resumoArquivo.categorias[categoria] ?? 0) + quantidade;
     resumoArquivo.pontuacao += quantidade * peso;
 }
 
-function classificarPontuacao(pontuacao) {
+function classificarPontuacao(pontuacao: number): FaixaPontuacao {
     if (pontuacao <= 120) {
         return "bom";
     }
-
     if (pontuacao <= 260) {
         return "atencao";
     }
-
     return "critico";
 }
 
-async function lerFotografiaAnterior(caminhoFotografia) {
+interface FotografiaAnterior {
+    contagens?: Partial<ContagensCheiros>;
+}
+
+function ehFotografiaAnterior(valor: unknown): valor is FotografiaAnterior {
+    return typeof valor === "object" && valor !== null;
+}
+
+async function lerFotografiaAnterior(caminhoFotografia: string): Promise<FotografiaAnterior | null> {
     try {
-        return JSON.parse(await fs.readFile(caminhoFotografia, "utf8"));
+        const valor: unknown = JSON.parse(await fs.readFile(caminhoFotografia, "utf8"));
+        return ehFotografiaAnterior(valor) ? valor : null;
     } catch {
         return null;
     }
 }
 
-function calcularDelta(atual, anterior) {
-    const deltas = {};
-
+function calcularDelta(atual: ContagensCheiros, anterior: FotografiaAnterior | null): DeltasCheiros {
+    const deltas = criarEstruturaContagens();
     for (const padrao of PADROES) {
         const valorAtual = atual[padrao.chave] ?? 0;
         const valorAnterior = anterior?.contagens?.[padrao.chave] ?? 0;
         deltas[padrao.chave] = valorAtual - valorAnterior;
     }
-
     return deltas;
 }
 
-function formatarDelta(valor) {
+function formatarDelta(valor: number): string {
     if (valor === 0) {
         return "0";
     }
-
     return valor > 0 ? `+${valor}` : `${valor}`;
 }
 
-function gerarMarkdown(snapshot) {
-    const linhas = [];
-    linhas.push("# Auditoria de cheiros de codigo");
-    linhas.push("");
-    linhas.push(`Gerado em: ${snapshot.geradoEm}`);
-    linhas.push(`Pontuacao: ${snapshot.pontuacao.total} (${snapshot.pontuacao.faixa})`);
-    linhas.push("");
-    linhas.push("## Contagens");
-    linhas.push("");
-    linhas.push("| Sinal | Total | Delta | Peso |");
-    linhas.push("|---|---:|---:|---:|");
-
+function gerarMarkdown(snapshot: SnapshotCheiros): string {
+    const linhas: string[] = [];
+    linhas.push("# Auditoria de cheiros de codigo", "", `Gerado em: ${snapshot.geradoEm}`, `Pontuacao: ${snapshot.pontuacao.total} (${snapshot.pontuacao.faixa})`, "");
+    linhas.push("## Contagens", "", "| Sinal | Total | Delta | Peso |", "|---|---:|---:|---:|");
     for (const padrao of PADROES) {
         linhas.push(`| ${padrao.titulo} | ${snapshot.contagens[padrao.chave]} | ${formatarDelta(snapshot.deltas[padrao.chave])} | ${padrao.peso} |`);
     }
 
-    linhas.push("");
-    linhas.push("## Hotspots");
-    linhas.push("");
-    linhas.push("| Arquivo | Pontos | Sinais |");
-    linhas.push("|---|---:|---|");
-
+    linhas.push("", "## Hotspots", "", "| Arquivo | Pontos | Sinais |", "|---|---:|---|");
     for (const hotspot of snapshot.hotspots) {
         const sinais = Object.entries(hotspot.categorias)
             .toSorted((a, b) => b[1] - a[1])
@@ -224,17 +294,18 @@ function gerarMarkdown(snapshot) {
         linhas.push(`| ${hotspot.arquivo} | ${hotspot.pontuacao} | ${sinais} |`);
     }
 
-    linhas.push("");
-    linhas.push("## Escopos");
-    linhas.push("");
+    linhas.push("", "## Escopos", "");
     for (const [escopo, valor] of Object.entries(snapshot.pontuacao.porEscopo)) {
         linhas.push(`- ${escopo}: ${valor} ponto(s)`);
     }
-
     return `${linhas.join("\n")}\n`;
 }
 
-async function executarAuditoria({base = DIRETORIO_RAIZ, semGravar = false, diretorioSaida} = {}) {
+async function executarAuditoria({
+    base = DIRETORIO_RAIZ,
+    semGravar = false,
+    diretorioSaida
+}: OpcoesAuditoriaCheiros = {}): Promise<ResultadoAuditoriaCheiros> {
     const baseResolvida = path.resolve(base);
     const saidaResolvida = path.resolve(
         diretorioSaida ?? path.join(resolverCaminhoConfigurado("artefatosQualidade", baseResolvida), "codigo-cheiros", "mais-recente")
@@ -251,37 +322,22 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, semGravar = false, dire
         resolverCaminhoConfigurado("frontendCodigo", baseResolvida)
     ));
     const contagens = criarEstruturaContagens();
-    const pontuacaoPorEscopo = {
-        backend: 0,
-        frontend: 0,
-        frontend_testes: 0
-    };
-    const arquivosPontuados = [];
+    const pontuacaoPorEscopo: PontuacaoPorEscopo = {backend: 0, frontend: 0, frontend_testes: 0};
+    const arquivosPontuados: ResumoArquivoCheiros[] = [];
 
     for (const arquivo of arquivos) {
         const conteudo = await fs.readFile(arquivo, "utf8");
         const caminhoRelativo = normalizarSeparadores(path.relative(baseResolvida, arquivo));
-        const resumoArquivo = {
-            arquivo: caminhoRelativo,
-            pontuacao: 0,
-            categorias: {}
-        };
+        const resumoArquivo: ResumoArquivoCheiros = {arquivo: caminhoRelativo, pontuacao: 0, categorias: {}};
 
         for (const padrao of PADROES) {
-            if (!padrao.filtroArquivo({
-                caminhoRelativo,
-                conteudo,
-                diretorioBackendCodigo,
-                diretorioFrontendCodigo,
-            })) {
+            if (!padrao.filtroArquivo({caminhoRelativo, conteudo, diretorioBackendCodigo, diretorioFrontendCodigo})) {
                 continue;
             }
-
             const total = padrao.regexes.reduce((acumulado, regex) => acumulado + contarOcorrencias(conteudo, regex), 0);
             if (total === 0) {
                 continue;
             }
-
             contagens[padrao.chave] += total;
             pontuacaoPorEscopo[padrao.escopo] += total * padrao.peso;
             somarCategoriaPorArquivo(resumoArquivo, padrao.chave, total, padrao.peso);
@@ -294,15 +350,10 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, semGravar = false, dire
 
     const anterior = semGravar ? null : await lerFotografiaAnterior(caminhoFotografia);
     const pontuacaoTotal = PADROES.reduce((soma, padrao) => soma + (contagens[padrao.chave] * padrao.peso), 0);
-
-    const snapshot = {
+    const snapshot: SnapshotCheiros = {
         geradoEm: new Date().toISOString(),
         base: baseResolvida,
-        pontuacao: {
-            total: pontuacaoTotal,
-            faixa: classificarPontuacao(pontuacaoTotal),
-            porEscopo: pontuacaoPorEscopo
-        },
+        pontuacao: {total: pontuacaoTotal, faixa: classificarPontuacao(pontuacaoTotal), porEscopo: pontuacaoPorEscopo},
         contagens,
         deltas: calcularDelta(contagens, anterior),
         hotspots: arquivosPontuados
@@ -319,30 +370,25 @@ async function executarAuditoria({base = DIRETORIO_RAIZ, semGravar = false, dire
     return {snapshot, caminhoFotografia, caminhoResumo};
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const emitirJson = argumentos.includes("--json");
-    const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
-    if (exibirAjuda) {
+    if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "codigo cheiros auditar",
-            scriptDireto: "codigo/cheiros-auditar.js",
+            scriptDireto: "codigo/cheiros-auditar.ts",
             descricao: "Gera uma fotografia com contagens e pontuacao de cheiros de codigo.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
                 "--sem-gravar         Nao atualiza os artefatos.",
-                "--base <diretorio>   Sobrescreve a base da auditoria.",
-            ],
+                "--base <diretorio>   Sobrescreve a base da auditoria."
+            ]
         });
         return;
     }
 
-    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
-    const execucao = await executarAuditoria({
-        base,
-        semGravar: argumentos.includes("--sem-gravar"),
-    });
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
+    const execucao = await executarAuditoria({base, semGravar: argumentos.includes("--sem-gravar")});
     const {snapshot} = execucao;
-
     if (emitirJson) {
         imprimirJson(snapshot);
         return;
@@ -350,26 +396,24 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     imprimirCabecalho("Auditoria de cheiros de codigo", `Base: ${snapshot.base}`);
     escreverLinha(`Pontuacao total: ${snapshot.pontuacao.total} (${snapshot.pontuacao.faixa})`);
-    escreverLinha();
+    escreverLinha("");
     for (const padrao of PADROES) {
         escreverLinha(`- ${padrao.titulo}: ${snapshot.contagens[padrao.chave]} (delta ${formatarDelta(snapshot.deltas[padrao.chave])})`);
     }
-
-    escreverLinha();
+    escreverLinha("");
     escreverLinha("Hotspots:");
     for (const hotspot of snapshot.hotspots.slice(0, 10)) {
         escreverLinha(`- ${hotspot.arquivo}: ${hotspot.pontuacao} ponto(s)`);
     }
-
     if (!argumentos.includes("--sem-gravar")) {
-        escreverLinha();
+        escreverLinha("");
         escreverLinha(`Fotografia salva em ${execucao.caminhoFotografia}`);
         escreverLinha(`Resumo salvo em ${execucao.caminhoResumo}`);
     }
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    principal().catch((erro) => {
+    principal().catch((erro: unknown) => {
         escreverLinha(`Erro ao auditar cheiros de codigo: ${erro instanceof Error ? erro.message : String(erro)}`);
         process.exitCode = 1;
     });
@@ -377,5 +421,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 
 export {
     executarAuditoria,
-    principal,
+    principal
 };

@@ -78,7 +78,7 @@ criarComandoScript(frontendAcessibilidade, "processar", "Processa os resultados 
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 const codigoCheiros = codigo.command("cheiros").description("Auditorias de cheiros de codigo.");
-criarComandoScript(codigoCheiros, "auditar", "Gera fotografia de sinais de complexidade acidental e codigo defensivo.", "toolkit/codigo/cheiros-auditar.js");
+criarComandoScript(codigoCheiros, "auditar", "Gera fotografia de sinais de complexidade acidental e codigo defensivo.", "toolkit/codigo/cheiros-auditar.ts");
 const codigoSemgrep = codigo.command("semgrep").description("Auditorias estruturais com Semgrep OSS.");
 criarComandoScript(codigoSemgrep, "auditar", "Executa regras locais de Semgrep para backend, frontend e integração.", "toolkit/codigo/semgrep-auditar.js");
 const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
