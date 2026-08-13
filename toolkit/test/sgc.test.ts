@@ -23,7 +23,6 @@ const CAMINHOS_COMANDOS_TESTES_BACKEND = [
     "testes-analisar.ts",
     "testes-priorizar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
-const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 const CAMINHO_FRONTEND_COBERTURA_AUDITORIA = path.join(DIRETORIO_RAIZ, "toolkit", "frontend", "cobertura-auditoria.ts");
 const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
     "cobertura-ramificacoes.ts",
@@ -2485,50 +2484,6 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo).toContain("cobertura indireta");
         expect(conteudo).not.toContain("Mensagens.java");
         expect(conteudo).not.toContain("MapaRuidoCommand.java");
-    });
-
-    test("resume uma fotografia de qualidade a partir de fixture", async () => {
-        const resultado = await executarSgc(["qualidade", "resumo", "--json", "--arquivo", FIXTURE_FOTOGRAFIA]);
-        expect(resultado.exitCode).toBe(0);
-
-        const json = JSON.parse(resultado.stdout);
-        expect(json.resumo.statusGeral).toBe("verde");
-        expect(json.hotspots).toHaveLength(2);
-    });
-
-    test("resume a fotografia mais recente a partir da base externa", async () => {
-        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-resumo-base-"));
-        const caminhoFotografia = path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "fotografia.json");
-        await fs.ensureDir(path.dirname(caminhoFotografia));
-        await fs.writeJson(caminhoFotografia, {
-            resumo: {
-                statusGeral: "verde",
-                indiceSaude: 98,
-                totais: {verificacoes: 1}
-            },
-            verificacoes: [],
-            hotspots: []
-        });
-
-        const resultado = await executarSgc(["qualidade", "resumo", "--json", "--base", diretorioBase]);
-
-        expect(resultado.exitCode).toBe(0);
-        const json = JSON.parse(resultado.stdout);
-        expect(json.resumo.statusGeral).toBe("verde");
-        expect(json.resumo.indiceSaude).toBe(98);
-    });
-
-    test("exibe ajuda de coleta de fotografia com opcao de perfil", async () => {
-        const resultado = await executarSgc(["qualidade", "coletar", "--help"]);
-        expect(resultado.exitCode).toBe(0);
-        expect(resultado.stdout).toContain("Perfil de execucao");
-        expect(resultado.stdout).toContain("rapido");
-    });
-
-    test("falha rapido para perfil invalido de fotografia", async () => {
-        const resultado = await executarSgc(["qualidade", "coletar", "--perfil", "inexistente"]);
-        expect(resultado.exitCode).toBe(1);
-        expect(resultado.stderr).toContain("Perfil invalido");
     });
 
     test("despacha ajuda da validacao de modais do frontend", async () => {
