@@ -4,6 +4,11 @@ import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {analisarArquivo, lerArquivo, listarArquivosCdu, obterOpcoesCdu, validarLinksMarkdown} from "./cdus-lib.js";
+import {auditarMensagensCodigo} from "./cdus-auditar-mensagens-codigo.js";
+import {auditarMensagens} from "./cdus-auditar-mensagens.js";
+import {auditarEstilo} from "./cdus-auditar-estilo.js";
+import {auditarVocabulario} from "./cdus-auditar-vocabulario.js";
+import {possuiFontesMensagensCanonicas} from "./cdus-mensagens-codigo-lib.js";
 
 type AnaliseCdu = ReturnType<typeof analisarArquivo>;
 type SeveridadeAchado = "erro" | "aviso";
@@ -29,6 +34,129 @@ interface RelatorioAuditoriaCdu {
         avisos: number;
     };
     relatorio: RelatorioArquivoCdu[];
+}
+
+type SecaoAuditoria = "estrutura" | "estilo" | "vocabulario" | "mensagens" | "mensagens-codigo";
+
+interface AuditoriaCdus {
+    versao: 1;
+    base: string;
+    totalArquivos: number;
+    secoesIgnoradas: string[];
+    secoes: {
+        estrutura?: Awaited<ReturnType<typeof auditarEstrutura>>;
+        estilo?: Awaited<ReturnType<typeof auditarEstilo>>;
+        vocabulario?: Awaited<ReturnType<typeof auditarVocabulario>>;
+        mensagens?: Awaited<ReturnType<typeof auditarMensagens>>;
+        mensagensCodigo?: Awaited<ReturnType<typeof auditarMensagensCodigo>>;
+    };
+    resumo: {
+        erros: number;
+        avisos: number;
+        itensSemReferenciaExata: number;
+    };
+}
+
+const SECOES_AUDITORIA: readonly SecaoAuditoria[] = [
+    "estrutura",
+    "estilo",
+    "vocabulario",
+    "mensagens",
+    "mensagens-codigo"
+];
+
+function selecionarSecoesAuditoria(argumentos: string[] | undefined): Set<SecaoAuditoria> {
+    if (!argumentos || argumentos.length === 0 || argumentos.includes("todos")) {
+        return new Set(SECOES_AUDITORIA);
+    }
+
+    const desconhecidas = argumentos.filter(secao => !SECOES_AUDITORIA.includes(secao as SecaoAuditoria));
+    if (desconhecidas.length > 0) {
+        throw new Error(`Seção de auditoria CDU desconhecida: ${desconhecidas.join(", ")}.`);
+    }
+
+    return new Set(argumentos as SecaoAuditoria[]);
+}
+
+async function auditarCdus(base: string, secoesInformadas?: string[]): Promise<AuditoriaCdus> {
+    const arquivos = await listarArquivosCdu(base);
+    const secoesSelecionadas = selecionarSecoesAuditoria(secoesInformadas);
+    const secoes: AuditoriaCdus["secoes"] = {};
+    const secoesIgnoradas: string[] = [];
+
+    if (secoesSelecionadas.has("estrutura")) {
+        secoes.estrutura = await auditarEstrutura(base, arquivos);
+    }
+    if (secoesSelecionadas.has("estilo")) {
+        secoes.estilo = await auditarEstilo(base, arquivos);
+    }
+    if (secoesSelecionadas.has("vocabulario")) {
+        secoes.vocabulario = await auditarVocabulario(base, arquivos);
+    }
+    if (secoesSelecionadas.has("mensagens")) {
+        secoes.mensagens = await auditarMensagens(base, arquivos);
+    }
+    if (secoesSelecionadas.has("mensagens-codigo")) {
+        if (!possuiFontesMensagensCanonicas(base)) {
+            const selecaoExplícita = secoesInformadas?.some(secao => secao !== "todos") ?? false;
+            if (selecaoExplícita) {
+                throw new Error("A comparação com mensagens do código exige as fontes canônicas configuradas do projeto.");
+            }
+            secoesIgnoradas.push("mensagens-codigo (fontes canônicas ausentes)");
+        } else {
+            secoes.mensagensCodigo = await auditarMensagensCodigo(base, arquivos);
+        }
+    }
+
+    const erros = secoes.estrutura?.resumo.erros ?? 0;
+    const avisos = (secoes.estrutura?.resumo.avisos ?? 0)
+        + (secoes.estilo?.resumo.avisos ?? 0)
+        + (secoes.vocabulario?.resumo.avisos ?? 0)
+        + (secoes.mensagens?.resumo.avisos ?? 0);
+
+    return {
+        versao: 1,
+        base,
+        totalArquivos: arquivos.length,
+        secoesIgnoradas,
+        secoes,
+        resumo: {
+            erros,
+            avisos,
+            itensSemReferenciaExata: secoes.mensagensCodigo?.resumo.itensSemReferenciaExata ?? 0
+        }
+    };
+}
+
+function imprimirAuditoriaCdus(resultado: AuditoriaCdus): void {
+    escreverLinha(`Auditoria consolidada dos CDUs em ${path.join(resultado.base, "specs")}`);
+    escreverLinha(`Arquivos analisados: ${resultado.totalArquivos}`);
+    escreverLinha(`Erros: ${resultado.resumo.erros} | Avisos: ${resultado.resumo.avisos}`);
+    if (resultado.resumo.itensSemReferenciaExata > 0) {
+        escreverLinha(`Mensagens sem referência exata no código: ${resultado.resumo.itensSemReferenciaExata}`);
+    }
+    for (const secao of resultado.secoesIgnoradas) {
+        escreverLinha(`Seção ignorada: ${secao}`);
+    }
+    escreverLinha();
+
+    if (resultado.secoes.estrutura) {
+        const resumo = resultado.secoes.estrutura.resumo;
+        escreverLinha(`[estrutura] ${resumo.erros} erros e ${resumo.avisos} avisos`);
+    }
+    if (resultado.secoes.estilo) {
+        escreverLinha(`[estilo] ${resultado.secoes.estilo.resumo.avisos} avisos`);
+    }
+    if (resultado.secoes.vocabulario) {
+        escreverLinha(`[vocabulário] ${resultado.secoes.vocabulario.resumo.avisos} avisos`);
+    }
+    if (resultado.secoes.mensagens) {
+        escreverLinha(`[mensagens] ${resultado.secoes.mensagens.resumo.avisos} avisos`);
+    }
+    if (resultado.secoes.mensagensCodigo) {
+        const resumo = resultado.secoes.mensagensCodigo.resumo;
+        escreverLinha(`[mensagens-código] ${resumo.itensSemReferenciaExata} itens sem referência exata`);
+    }
 }
 
 function adicionarAchado(
@@ -104,10 +232,8 @@ function auditarAnalise(analise: AnaliseCdu): AchadoCdu[] {
     return achados;
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-
-    const arquivos = await listarArquivosCdu(base);
+async function auditarEstrutura(base: string, arquivosInformados?: string[]): Promise<RelatorioAuditoriaCdu> {
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const relatorio: RelatorioArquivoCdu[] = arquivos.map(caminhoArquivo => {
         const texto = lerArquivo(caminhoArquivo);
         const analise = analisarArquivo(caminhoArquivo, texto);
@@ -126,23 +252,19 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         avisos: relatorio.flatMap(item => item.achados).filter(achado => achado.severidade === "aviso").length
     };
 
+    return {resumo, relatorio};
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base, secoes} = obterOpcoesCdu(argumentos);
+    const resultado = await auditarCdus(base, secoes);
+
     if (emitirJson) {
-        imprimirJson({resumo, relatorio});
+        imprimirJson(resultado);
         return;
     }
 
-    escreverLinha(`Auditoria read-only dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
-    escreverLinha(`Arquivos com erro: ${resumo.arquivosComErro}`);
-    escreverLinha(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
-    escreverLinha();
-
-    for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
-        escreverLinha(item.arquivo);
-        for (const achado of item.achados) {
-            escreverLinha(`- [${achado.severidade}] ${achado.regra}: ${achado.mensagem}`);
-        }
-    }
+    imprimirAuditoriaCdus(resultado);
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
@@ -150,5 +272,7 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
+    auditarCdus,
+    auditarEstrutura,
     principal
 };

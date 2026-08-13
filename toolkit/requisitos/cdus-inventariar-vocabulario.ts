@@ -46,11 +46,10 @@ function extrairItensListaAtores(texto: string): string[] {
         .map(linha => linha.replace(/^\s*-\s+/, "").trim());
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+async function inventariarVocabulario(base: string, arquivosInformados?: string[]): Promise<InventarioVocabulario> {
     const situacoesCanonicas = carregarSituacoesCanonicas(base);
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
 
-    const arquivos = await listarArquivosCdu(base);
     const inventario: InventarioVocabulario = {
         base,
         totalArquivos: arquivos.length,
@@ -90,6 +89,13 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     inventario.tiposProcesso = ordenarMapa(inventario.tiposProcesso);
     inventario.elementosUi = ordenarMapa(inventario.elementosUi);
 
+    return inventario;
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const inventario = await inventariarVocabulario(base);
+
     if (emitirJson) {
         imprimirJson(inventario);
         return;
@@ -114,5 +120,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal
+    inventariarVocabulario
 };

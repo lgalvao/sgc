@@ -101,10 +101,13 @@ function auditarArquivo(caminhoArquivo: string): ResultadoArquivoEstilo {
     };
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-
-    const arquivos = await listarArquivosCdu(base);
+async function auditarEstilo(base: string, arquivosInformados?: string[]): Promise<{resumo: {
+    base: string;
+    totalArquivos: number;
+    arquivosComAviso: number;
+    avisos: number;
+}; relatorio: ResultadoArquivoEstilo[]}> {
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const relatorio: ResultadoArquivoEstilo[] = arquivos.map(caminhoArquivo => {
         const resultado = auditarArquivo(caminhoArquivo);
         return {
@@ -120,18 +123,25 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         avisos: relatorio.flatMap(item => item.achados).length
     };
 
+    return {resumo, relatorio};
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const resultado = await auditarEstilo(base);
+
     if (emitirJson) {
-        imprimirJson({resumo, relatorio});
+        imprimirJson(resultado);
         return;
     }
 
     escreverLinha(`Auditoria tipográfica read-only dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
-    escreverLinha(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
-    escreverLinha(`Avisos: ${resumo.avisos}`);
+    escreverLinha(`Arquivos analisados: ${resultado.resumo.totalArquivos}`);
+    escreverLinha(`Arquivos com aviso: ${resultado.resumo.arquivosComAviso}`);
+    escreverLinha(`Avisos: ${resultado.resumo.avisos}`);
     escreverLinha();
 
-    for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
+    for (const item of resultado.relatorio.filter(entrada => entrada.achados.length > 0)) {
         escreverLinha(item.arquivo);
         for (const achado of item.achados) {
             const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
@@ -145,5 +155,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal
+    auditarEstilo
 };

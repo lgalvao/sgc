@@ -17,6 +17,7 @@ const REGEX_SITUACOES = /'[^'\n]+'/g;
 interface OpcoesCdu {
     emitirJson: boolean;
     base: string;
+    secoes?: string[];
 }
 
 interface IndicesSecoes {
@@ -60,11 +61,36 @@ function normalizarCaminho(caminho: string): string {
 }
 
 function obterOpcoesCdu(argumentos: string[] = process.argv.slice(2)): OpcoesCdu {
-    const emitirJson = argumentos.includes("--json");
-    const indiceBase = argumentos.indexOf("--base");
-    const baseInformada = indiceBase >= 0 ? argumentos[indiceBase + 1] : undefined;
+    let emitirJson = false;
+    let baseInformada: string | undefined;
+    let secoes: string[] | undefined;
+
+    for (let indice = 0; indice < argumentos.length; indice += 1) {
+        const argumento = argumentos[indice];
+        if (argumento === "--json") {
+            emitirJson = true;
+            continue;
+        }
+
+        if (argumento === "--base" || argumento === "--secoes") {
+            const valor = argumentos[indice + 1];
+            if (!valor || valor.startsWith("--")) {
+                throw new Error(`A opção ${argumento} exige um valor.`);
+            }
+            indice += 1;
+            if (argumento === "--base") {
+                baseInformada = valor;
+            } else {
+                secoes = valor.split(",").map(secao => secao.trim()).filter(Boolean);
+            }
+            continue;
+        }
+
+        throw new Error(`Opção ou argumento CDU desconhecido: ${argumento}`);
+    }
+
     const base = baseInformada ? path.resolve(baseInformada) : DIRETORIO_RAIZ;
-    return {emitirJson, base};
+    return {emitirJson, base, secoes};
 }
 
 async function listarArquivosCdu(base: string = DIRETORIO_RAIZ): Promise<string[]> {

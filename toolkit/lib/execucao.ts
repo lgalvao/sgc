@@ -9,6 +9,7 @@ const NOME_EXECUTAVEL_TSX = process.platform === "win32" ? "tsx.cmd" : "tsx";
 function resolverCaminhoTsx(): string {
     return [
         path.join(DIRETORIO_TOOLKIT, "node_modules", ".bin", NOME_EXECUTAVEL_TSX),
+        path.join(DIRETORIO_TOOLKIT, "..", "node_modules", ".bin", NOME_EXECUTAVEL_TSX),
         path.join(DIRETORIO_RAIZ, "node_modules", ".bin", NOME_EXECUTAVEL_TSX)
     ].find(caminho => existsSync(caminho)) ?? NOME_EXECUTAVEL_TSX;
 }

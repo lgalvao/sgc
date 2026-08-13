@@ -78,18 +78,17 @@ OpenAPI mantém exportação, comparação e promoção de baseline. O toolkit n
 ### Casos de uso CDU
 
 ```bash
-npx tsx toolkit/sgc.ts requisitos cdus auditar --json
-npx tsx toolkit/sgc.ts requisitos cdus auditar-estilo
-npx tsx toolkit/sgc.ts requisitos cdus auditar-vocabulario
-npx tsx toolkit/sgc.ts requisitos cdus auditar-mensagens
-npx tsx toolkit/sgc.ts requisitos cdus auditar-mensagens-codigo
 npx tsx toolkit/sgc.ts requisitos cdus inventariar
-npx tsx toolkit/sgc.ts requisitos cdus inventariar-densidade
-npx tsx toolkit/sgc.ts requisitos cdus inventariar-duplicacoes
+npx tsx toolkit/sgc.ts requisitos cdus inventariar --secoes vocabulario,mensagens
+npx tsx toolkit/sgc.ts requisitos cdus auditar --json
+npx tsx toolkit/sgc.ts requisitos cdus auditar --secoes estrutura,estilo,vocabulario,mensagens
+npx tsx toolkit/sgc.ts requisitos cdus auditar --secoes mensagens-codigo
 ```
 
-A auditoria estrutural verifica título, seções obrigatórias, ordem, atores, pré-condições, passos numerados e links. Os
-inventários descrevem o corpus e são utilitários ocasionais, não gates automáticos.
+`inventariar` consolida formatos, vocabulário, mensagens, densidade e duplicações. `auditar` consolida estrutura, estilo,
+vocabulário, mensagens e, quando as fontes canônicas estão disponíveis, a comparação com o código. Use `--secoes` para
+executar apenas partes da análise; `todos` seleciona todas as seções. Os inventários continuam sendo diagnósticos
+ocasionais, não gates automáticos.
 
 O formato CDU é uma capacidade horizontal em evolução. O perfil atual do SGC usa `specs/cdu/cdu-*.md` e fornece seu
 vocabulário, situações, mensagens e extratores de código. Esses elementos serão parametrizados para outros projetos.
@@ -212,8 +211,9 @@ const backend = await extrairCoberturaJacoco("relatorios/jacoco.xml", {diretorio
 const frontend = await extrairCoberturaFrontend("cliente/coverage/coverage-final.json", {diretorioBase});
 ```
 
-Módulos internos não fazem parte da API pública. Novos subpaths só devem ser publicados depois de comprovados em um
-consumidor externo instalado.
+Módulos internos não fazem parte da API pública. Novos subpaths devem ser publicados quando representarem uma fronteira
+estável e útil para composição por scripts, humanos ou agentes; o smoke usa um projeto temporário instalado para validar o
+contrato, mesmo quando não existe consumidor prévio no código.
 
 ## Desenvolvimento e validação
 

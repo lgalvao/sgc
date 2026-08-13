@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import {lerArquivo} from "./cdus-lib.js";
 
@@ -37,6 +38,20 @@ const CHAVES_MENSAGEM_EXPLICITAS = new Set<string>([
     "PROCESSO_FINALIZADO",
     "PROCESSO_INICIADO"
 ]);
+
+const CAMINHOS_FONTES_MENSAGENS = [
+    "backend/src/main/java/sgc/comum/Mensagens.java",
+    "backend/src/main/java/sgc/alerta/AssuntosNotificacao.java",
+    "frontend/src/constants/notificacoes.ts",
+    "frontend/src/constants/textos-subprocesso.ts",
+    "frontend/src/constants/textos-mapa.ts",
+    "frontend/src/constants/textos-diagnostico.ts",
+    "frontend/src/constants/textos-processo.ts"
+];
+
+function possuiFontesMensagensCanonicas(base: string): boolean {
+    return CAMINHOS_FONTES_MENSAGENS.every(caminho => fs.existsSync(path.join(base, caminho)));
+}
 
 interface MensagemExtraida {
     chave: string;
@@ -271,5 +286,6 @@ function carregarMensagensCanonicas(base: string): ResultadoMensagensCanonicas {
 export {
     carregarMensagensCanonicas,
     normalizarTextoComparacao,
+    possuiFontesMensagensCanonicas,
     sugerirCanonicos
 };

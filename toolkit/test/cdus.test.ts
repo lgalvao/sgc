@@ -10,15 +10,7 @@ const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
 const CAMINHO_TSX = path.join(DIRETORIO_RAIZ, "node_modules", ".bin", process.platform === "win32" ? "tsx.cmd" : "tsx");
 const CAMINHOS_COMANDOS_CDU = [
     "cdus-inventariar.ts",
-    "cdus-auditar.ts",
-    "cdus-auditar-estilo.ts",
-    "cdus-inventariar-vocabulario.ts",
-    "cdus-auditar-vocabulario.ts",
-    "cdus-inventariar-mensagens.ts",
-    "cdus-auditar-mensagens.ts",
-    "cdus-auditar-mensagens-codigo.ts",
-    "cdus-inventariar-densidade.ts",
-    "cdus-inventariar-duplicacoes.ts"
+    "cdus-auditar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "requisitos", nome));
 
 async function escreverArquivo(caminho: string, conteudo: string): Promise<void> {
@@ -38,12 +30,21 @@ interface ItemAuditoriaCdu {
 }
 
 interface ResultadoAuditoriaCdu {
-    resumo: {
-        totalArquivos: number;
-        arquivosComErro?: number;
-        arquivosComAviso?: number;
+    secoes: {
+        estrutura?: {
+            resumo: {
+                totalArquivos: number;
+                arquivosComErro: number;
+                erros: number;
+                avisos: number;
+            };
+            relatorio: ItemAuditoriaCdu[];
+        };
+        estilo?: {resumo: {totalArquivos: number; arquivosComAviso: number; avisos: number}; relatorio: ItemAuditoriaCdu[]};
+        vocabulario?: {resumo: {totalArquivos: number; arquivosComAviso: number; avisos: number}; relatorio: ItemAuditoriaCdu[]};
+        mensagens?: {resumo: {totalArquivos: number; arquivosComAviso: number; avisos: number}; relatorio: ItemAuditoriaCdu[]};
+        mensagensCodigo?: ResultadoMensagensCodigo;
     };
-    relatorio: ItemAuditoriaCdu[];
 }
 
 interface ResultadoInventarioFormatos {
@@ -53,6 +54,16 @@ interface ResultadoInventarioFormatos {
     formatosFluxoPrincipal: Record<string, number>;
     situacoesMaisFrequentes: Record<string, number>;
     elementosUiMaisFrequentes: Record<string, number>;
+}
+
+interface ResultadoInventarioCdus {
+    secoes: {
+        formatos?: ResultadoInventarioFormatos;
+        vocabulario?: ResultadoInventarioVocabulario;
+        mensagens?: ResultadoInventarioMensagens;
+        densidade?: ResultadoDensidade;
+        duplicacoes?: ResultadoDuplicacoes;
+    };
 }
 
 interface ResultadoInventarioMensagens {
@@ -178,13 +189,28 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = lerJson<ResultadoInventarioFormatos>(resultado);
-        expect(conteudo.totalArquivos).toBe(1);
-        expect(conteudo.formatosAtor["## Atores"]).toBe(1);
-        expect(conteudo.formatosPreCondicoes["## Pré-condições"]).toBe(1);
-        expect(conteudo.formatosFluxoPrincipal["## Fluxo principal"]).toBe(1);
-        expect(conteudo.situacoesMaisFrequentes["'Em andamento'"]).toBe(1);
-        expect(conteudo.elementosUiMaisFrequentes["`Painel`"]).toBe(1);
+        const conteudo = lerJson<ResultadoInventarioCdus>(resultado);
+        const formatos = conteudo.secoes.formatos!;
+        expect(Object.keys(conteudo.secoes)).toEqual(["formatos", "vocabulario", "mensagens", "densidade", "duplicacoes"]);
+        expect(formatos.totalArquivos).toBe(1);
+        expect(formatos.formatosAtor["## Atores"]).toBe(1);
+        expect(formatos.formatosPreCondicoes["## Pré-condições"]).toBe(1);
+        expect(formatos.formatosFluxoPrincipal["## Fluxo principal"]).toBe(1);
+        expect(formatos.situacoesMaisFrequentes["'Em andamento'"]).toBe(1);
+        expect(formatos.elementosUiMaisFrequentes["`Painel`"]).toBe(1);
+    });
+
+    test("rejeita seção CDU desconhecida", async () => {
+        const resultado = await executarSgc([
+            "requisitos",
+            "cdus",
+            "inventariar",
+            "--secoes",
+            "nao-existe"
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stderr).toContain("Seção de inventário CDU desconhecida");
     });
 
     test("audita a estrutura canônica mínima dos CDUs", async () => {
@@ -239,10 +265,11 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
-        expect(conteudo.resumo.totalArquivos).toBe(2);
-        expect(conteudo.resumo.arquivosComErro).toBe(1);
+        const estrutura = conteudo.secoes.estrutura!;
+        expect(estrutura.resumo.totalArquivos).toBe(2);
+        expect(estrutura.resumo.arquivosComErro).toBe(1);
 
-        const invalido = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-02.md")!;
+        const invalido = estrutura.relatorio.find(item => item.arquivo === "specs/cdu/cdu-02.md")!;
         expect(invalido.achados.some(achado => achado.regra === "titulo_numero")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "atores_canonicos")).toBe(true);
         expect(invalido.achados.some(achado => achado.regra === "pre_condicoes")).toBe(true);
@@ -276,7 +303,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "auditar-estilo",
+            "auditar",
+            "--secoes",
+            "estilo",
             "--json",
             "--base",
             base
@@ -284,10 +313,11 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
-        expect(conteudo.resumo.totalArquivos).toBe(1);
-        expect(conteudo.resumo.arquivosComAviso).toBe(1);
+        const estilo = conteudo.secoes.estilo!;
+        expect(estilo.resumo.totalArquivos).toBe(1);
+        expect(estilo.resumo.arquivosComAviso).toBe(1);
 
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
+        const arquivo = estilo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "perfil_em_aspas_simples")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "ui_em_aspas_duplas")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "placeholder_legado")).toBe(true);
@@ -321,19 +351,22 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "inventariar-vocabulario",
+            "inventariar",
+            "--secoes",
+            "vocabulario",
             "--json",
             "--base",
             base
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = lerJson<ResultadoInventarioVocabulario>(resultado);
-        expect(conteudo.perfis.ADMIN).toBe(1);
-        expect(conteudo.perfis.GESTOR).toBe(1);
-        expect(conteudo.situacoes["Em andamento"]).toBe(1);
-        expect(conteudo.tiposProcesso["Diagnóstico"]).toBe(1);
-        expect(conteudo.elementosUi.Painel).toBe(1);
+        const conteudo = lerJson<ResultadoInventarioCdus>(resultado);
+        const vocabulario = conteudo.secoes.vocabulario!;
+        expect(vocabulario.perfis.ADMIN).toBe(1);
+        expect(vocabulario.perfis.GESTOR).toBe(1);
+        expect(vocabulario.situacoes["Em andamento"]).toBe(1);
+        expect(vocabulario.tiposProcesso["Diagnóstico"]).toBe(1);
+        expect(vocabulario.elementosUi.Painel).toBe(1);
     });
 
     test("audita vocabulário controlado dos CDUs", async () => {
@@ -363,7 +396,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "auditar-vocabulario",
+            "auditar",
+            "--secoes",
+            "vocabulario",
             "--json",
             "--base",
             base
@@ -371,8 +406,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
-        expect(conteudo.resumo.arquivosComAviso).toBe(1);
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
+        const vocabulario = conteudo.secoes.vocabulario!;
+        expect(vocabulario.resumo.arquivosComAviso).toBe(1);
+        const arquivo = vocabulario.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "perfil_fora_vocabulario")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "tipo_processo_variacao")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "situacao_variacao")).toBe(true);
@@ -414,18 +450,21 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "inventariar-mensagens",
+            "inventariar",
+            "--secoes",
+            "mensagens",
             "--json",
             "--base",
             base
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = lerJson<ResultadoInventarioMensagens>(resultado);
-        expect(conteudo.descricoes["Cadastro aceito"]).toBe(1);
-        expect(conteudo.assuntos["SGC: Cadastro aceito"]).toBe(1);
-        expect(conteudo.mensagens["Aceite registrado"]).toBe(1);
-        expect(conteudo.toasts["Aceite registrado"]).toBe(1);
+        const conteudo = lerJson<ResultadoInventarioCdus>(resultado);
+        const mensagens = conteudo.secoes.mensagens!;
+        expect(mensagens.descricoes["Cadastro aceito"]).toBe(1);
+        expect(mensagens.assuntos["SGC: Cadastro aceito"]).toBe(1);
+        expect(mensagens.mensagens["Aceite registrado"]).toBe(1);
+        expect(mensagens.toasts["Aceite registrado"]).toBe(1);
     });
 
     test("audita problemas mecânicos de mensagens dos CDUs", async () => {
@@ -460,7 +499,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "auditar-mensagens",
+            "auditar",
+            "--secoes",
+            "mensagens",
             "--json",
             "--base",
             base
@@ -468,8 +509,9 @@ describe("Ferramentas de requisitos dos CDUs", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = lerJson<ResultadoAuditoriaCdu>(resultado);
-        expect(conteudo.resumo.arquivosComAviso).toBe(1);
-        const arquivo = conteudo.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
+        const mensagens = conteudo.secoes.mensagens!;
+        expect(mensagens.resumo.arquivosComAviso).toBe(1);
+        const arquivo = mensagens.relatorio.find(item => item.arquivo === "specs/cdu/cdu-01.md")!;
         expect(arquivo.achados.some(achado => achado.regra === "descricao_espacamento")).toBe(true);
         expect(arquivo.achados.some(achado => achado.regra === "assunto_fechamento_suspeito")).toBe(true);
     });
@@ -553,14 +595,17 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "auditar-mensagens-codigo",
+            "auditar",
+            "--secoes",
+            "mensagens-codigo",
             "--json",
             "--base",
             base
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = lerJson<ResultadoMensagensCodigo>(resultado);
+        const agregado = lerJson<ResultadoAuditoriaCdu>(resultado);
+        const conteudo = agregado.secoes.mensagensCodigo!;
         expect(conteudo.resumo.itensComReferenciaExata).toBeGreaterThan(0);
         const descricao = conteudo.relatorio.find(item => item.tipo === "descricoes" && item.valor === "Início do processo")!;
         expect(descricao.referenciasExatas).toHaveLength(0);
@@ -603,14 +648,17 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "inventariar-densidade",
+            "inventariar",
+            "--secoes",
+            "densidade",
             "--json",
             "--base",
             base
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const conteudo = lerJson<ResultadoDensidade>(resultado);
+        const agregado = lerJson<ResultadoInventarioCdus>(resultado);
+        const conteudo = agregado.secoes.densidade!;
         expect(conteudo.totalArquivos).toBe(1);
         expect(conteudo.resumo.mediaPalavras).toBeGreaterThan(0);
         expect(conteudo.documentos[0].passos).toBe(2);
@@ -649,14 +697,17 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         const resultado = await executarSgc([
             "requisitos",
             "cdus",
-            "inventariar-duplicacoes",
+            "inventariar",
+            "--secoes",
+            "duplicacoes",
             "--json",
             "--base",
             base
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        const corpo = lerJson<ResultadoDuplicacoes>(resultado);
+        const agregado = lerJson<ResultadoInventarioCdus>(resultado);
+        const corpo = agregado.secoes.duplicacoes!;
         expect(corpo.duplicacoes.length).toBeGreaterThan(0);
     });
 });

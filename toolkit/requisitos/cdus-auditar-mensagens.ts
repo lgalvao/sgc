@@ -122,10 +122,8 @@ function auditarArquivo(caminhoArquivo: string): AchadoMensagem[] {
     return achados;
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-
-    const arquivos = await listarArquivosCdu(base);
+async function auditarMensagens(base: string, arquivosInformados?: string[]): Promise<{resumo: ResumoMensagens; relatorio: RelatorioArquivoMensagens[]}> {
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const relatorio: RelatorioArquivoMensagens[] = arquivos.map(caminhoArquivo => ({
         arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
         achados: auditarArquivo(caminhoArquivo)
@@ -138,18 +136,25 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         avisos: relatorio.flatMap(item => item.achados).length
     };
 
+    return {resumo, relatorio};
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const resultado = await auditarMensagens(base);
+
     if (emitirJson) {
-        imprimirJson({resumo, relatorio});
+        imprimirJson(resultado);
         return;
     }
 
     escreverLinha(`Auditoria de mensagens dos CDUs em ${path.join(base, "specs")}`);
-    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
-    escreverLinha(`Arquivos com aviso: ${resumo.arquivosComAviso}`);
-    escreverLinha(`Avisos: ${resumo.avisos}`);
+    escreverLinha(`Arquivos analisados: ${resultado.resumo.totalArquivos}`);
+    escreverLinha(`Arquivos com aviso: ${resultado.resumo.arquivosComAviso}`);
+    escreverLinha(`Avisos: ${resultado.resumo.avisos}`);
     escreverLinha();
 
-    for (const item of relatorio.filter(entrada => entrada.achados.length > 0)) {
+    for (const item of resultado.relatorio.filter(entrada => entrada.achados.length > 0)) {
         escreverLinha(item.arquivo);
         for (const achado of item.achados) {
             const sufixoLinha = achado.linha ? ` (linha ${achado.linha})` : "";
@@ -163,5 +168,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal
+    auditarMensagens
 };

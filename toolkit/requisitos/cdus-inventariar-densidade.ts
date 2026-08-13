@@ -42,10 +42,8 @@ function calcularProfundidadeMaxima(linhas: string[]): number {
     return maximo;
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-
-    const arquivos = await listarArquivosCdu(base);
+async function inventariarDensidade(base: string, arquivosInformados?: string[]): Promise<InventarioDensidade> {
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const documentos: DocumentoDensidade[] = arquivos.map(caminhoArquivo => {
         const texto = lerArquivo(caminhoArquivo);
         const analise = analisarArquivo(caminhoArquivo, texto);
@@ -77,6 +75,13 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         documentos: documentos.toSorted((a, b) => b.palavras - a.palavras || b.profundidadeListas - a.profundidadeListas)
     };
 
+    return resultado;
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const resultado = await inventariarDensidade(base);
+
     if (emitirJson) {
         imprimirJson(resultado);
         return;
@@ -84,8 +89,8 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
 
     escreverLinha(`Inventário de densidade dos CDUs em ${path.join(base, "specs")}`);
     escreverLinha(`Arquivos analisados: ${resultado.totalArquivos}`);
-    escreverLinha(`Média de palavras: ${resumo.mediaPalavras.toFixed(1)}`);
-    escreverLinha(`Média de passos: ${resumo.mediaPassos.toFixed(1)}`);
+    escreverLinha(`Média de palavras: ${resultado.resumo.mediaPalavras.toFixed(1)}`);
+    escreverLinha(`Média de passos: ${resultado.resumo.mediaPassos.toFixed(1)}`);
     escreverLinha();
 
     for (const doc of resultado.documentos.slice(0, 15)) {
@@ -98,5 +103,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal
+    inventariarDensidade
 };

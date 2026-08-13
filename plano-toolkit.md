@@ -35,7 +35,8 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - Implementação, testes, símbolos, mensagens, comentários e documentação devem usar TypeScript e português brasileiro.
 - O entrypoint fonte é `toolkit/sgc.ts`, executado diretamente com `tsx`.
 - `dist/` é produto de verificação do build, não o caminho normal de execução.
-- Não manter implementação JavaScript paralela, wrappers de transição ou aliases legados sem consumidor real.
+- Não manter implementação JavaScript paralela, wrappers de transição ou aliases legados sem finalidade atual, uso por
+  humanos/agentes ou contrato público deliberado.
 - Node 26.7 ou superior é o ambiente mínimo; não há necessidade de compatibilidade com clientes antigos.
 
 ### Evidência de utilidade
@@ -43,7 +44,8 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - Ausência de importação não prova ausência de consumidor: comandos manuais podem ter consumidores humanos legítimos.
 - A decisão de manter uma funcionalidade deve considerar CLI, scripts, CI, documentação, testes, artefatos e uso manual.
 - Código temporário deve ser removido quando o problema original desapareceu e não existe finalidade permanente.
-- Testes que apenas reproduzem uma implementação sem consumidor não justificam sua preservação.
+- Testes que apenas reproduzem uma implementação sem finalidade atual, uso por humanos/agentes ou contrato público não
+  justificam sua preservação.
 - O histórico de mudanças pertence ao Git, não a este plano nem ao README.
 
 ### Segurança e efeitos colaterais
@@ -77,9 +79,10 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - Diretórios, globs, tarefas e políticas variáveis pertencem à configuração ou a adaptadores.
 - Defaults do SGC são válidos, mas devem estar identificados como perfil SGC e não confundidos com regras universais.
 - O local físico de instalação do pacote não pode determinar a raiz do projeto consumidor.
-- APIs programáticas públicas devem ser deliberadas e cobertas por instalação isolada; módulos internos permanecem privados.
-- A identidade pública do pacote e do binário deve ser neutra antes do primeiro consumidor externo real; o perfil SGC
-  pode continuar sendo o default sem obrigar outros projetos a adotar os nomes `sgc-scripts` e `sgc`.
+- APIs programáticas públicas devem ser deliberadas e cobertas por instalação isolada; essa validação comprova o contrato,
+  não exige consumidor prévio no código; módulos internos permanecem privados.
+- A identidade pública do pacote e do binário deve ser neutra antes de o toolkit ser oferecido para reutilização em outro
+  projeto; o perfil SGC pode continuar sendo o default sem obrigar outros projetos a adotar os nomes `sgc-scripts` e `sgc`.
 
 ### Contratos de resultados
 
@@ -88,7 +91,8 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - Formatos usados por outro comando, CI ou API pública precisam de tipo exportado, versão e validação ao carregar.
 - Campos históricos em inglês ou `snake_case` próprios do toolkit devem ser migrados diretamente, sem aliases de
   compatibilidade.
-- JSON humano ocasional não precisa receber um envelope universal; versionamento deve acompanhar consumo real.
+- JSON humano ou de agente ocasional não precisa receber um envelope universal; versionamento deve acompanhar a finalidade
+  e a forma de uso do resultado.
 - Códigos de saída precisam distinguir execução inválida, falha de infraestrutura e achados de auditoria quando essa
   diferença for relevante ao consumidor.
 
@@ -97,7 +101,8 @@ quando houver contrato claro e uso horizontal plausível ou comprovado.
 - `qualidade coletar` produz uma fotografia consolidada; `qualidade tarefas executar` apenas orquestra tarefas configuradas.
 - A auditoria de dependências combina Knip, versões desatualizadas, vulnerabilidades npm e atualizações Gradle.
 - Acessibilidade Playwright/Axe pertence ao workspace `e2e/`, não ao toolkit.
-- OpenAPI mantém exportação, comparação e baseline; geração de tipos não deve voltar sem consumidor e compatibilidade atual.
+- OpenAPI mantém exportação, comparação e baseline; geração de tipos não deve voltar sem finalidade atual e compatibilidade
+  com a cadeia moderna do toolkit.
 - Cheiros internos e Semgrep são análises complementares, não duplicadas.
 - Auditorias consolidadas de cobertura e listagens focadas de ramificações têm resultados diferentes e podem coexistir.
 - O corretor FQN é um utilitário ocasional mutável, não um gate permanente.
@@ -130,10 +135,16 @@ motor horizontal.
 
 ### Diagnóstico estrutural atual
 
-A implementação já é integralmente TypeScript e o pacote isolado funciona, mas as fronteiras ainda não estão concluídas:
+A implementação já é integralmente TypeScript, a superfície CDU foi reduzida a dois comandos agregadores e o pacote
+isolado funciona, mas as fronteiras ainda não estão concluídas:
 
-- o catálogo ainda classifica todos os comandos CDU como `perfil-sgc` e fixa o caminho do corpus nas descrições;
+- `requisitos cdus inventariar` e `requisitos cdus auditar` agora são os únicos comandos CDU públicos; as regras menores
+  continuam como módulos internos compostos por eles;
+- os dois agregadores aceitam `--secoes` e produzem JSON versionado, mas o caminho do corpus ainda é fixo em
+  `specs/cdu/cdu-*.md`;
 - a configuração não representa corpus, vocabulário, estilo nem extratores CDU;
+- a comparação com mensagens do código ainda depende de sete caminhos rígidos do SGC e só pode ser selecionada quando as
+  fontes canônicas estão presentes;
 - os comandos `backend testes analisar` e `backend testes priorizar` escrevem relatórios por padrão;
 - comandos encaminhados aceitam opções inexistentes sem erro;
 - `efeito` no catálogo mistura intenção funcional e efeitos reais no sistema;
@@ -163,6 +174,11 @@ permite determinar efeitos sem ler a implementação.
 
 ### 2. Horizontalizar a família CDU
 
+- manter a superfície pública reduzida a `requisitos cdus inventariar` e `requisitos cdus auditar`;
+- manter `inventariar` reunindo formatos, vocabulário, mensagens, densidade e duplicações em seções de um resultado único;
+- manter `auditar` reunindo estrutura, estilo, vocabulário, mensagens mecânicas e comparação com mensagens do código;
+- manter seleção de seções com uma opção explícita, sem transformar cada regra em subcomando público;
+- conservar detalhes e capacidades atuais no JSON agregado, identificados por seção, para não perder informação do SGC;
 - representar o corpus por configuração conceitual, com glob ou arquivos, em vez de embutir `specs/cdu/cdu-*.md`;
 - extrair parser e análise estrutural para contratos independentes do SGC;
 - mover vocabulário, situações, tipos, estilo e placeholders do SGC para uma política explícita;
@@ -170,10 +186,11 @@ permite determinar efeitos sem ler a implementação.
 - reclassificar cada comando CDU individualmente: análise estrutural no núcleo, integração no adaptador e convenções no
   perfil SGC;
 - criar fixture de um segundo projeto com caminho e vocabulário próprios e preservar o SGC por regressão;
-- publicar um subpath CDU somente quando o consumidor isolado demonstrar que o contrato programático é necessário.
+- publicar um subpath CDU quando o modelo e as análises agregadas formarem uma fronteira programática estável, validada por
+  fixture isolada e útil para composição por scripts, humanos ou agentes.
 
-Critério de saída: um segundo projeto executa as capacidades horizontais sem copiar arquivos, editar o toolkit ou receber
-políticas do SGC acidentalmente.
+Critério de saída: um segundo projeto executa os dois comandos e seleciona as capacidades horizontais sem copiar arquivos,
+editar o toolkit ou receber políticas do SGC acidentalmente.
 
 ### 3. Separar adaptadores e perfil SGC
 
@@ -189,10 +206,12 @@ Critério de saída: é possível apontar, por arquivo e contrato, o que é moto
 
 - começar pela análise e priorização de testes, pois uma consome o resultado da outra;
 - converter campos próprios para português em `camelCase`, mantendo nomes externos apenas nos adaptadores de leitura;
-- exportar tipo, versão e validação para formatos realmente persistidos ou consumidos;
+- exportar tipo, versão e validação para formatos persistidos, consumidos por outro comando/CI ou deliberadamente expostos
+  a scripts e agentes;
 - separar análise, formatação e persistência para que a API de domínio não dependa de arquivo ou console;
 - evitar um envelope universal para saídas sem consumidor automático;
-- ampliar exports públicos apenas após teste por tarball em um consumidor TypeScript isolado.
+- ampliar exports públicos apenas após teste por tarball em um projeto TypeScript isolado, mesmo que esse projeto seja uma
+  fixture criada para validar o contrato;
 
 Critério de saída: formatos entre comandos falham cedo quando incompatíveis e APIs públicas não expõem detalhes de CLI,
 filesystem ou workspace.
@@ -203,7 +222,7 @@ filesystem ou workspace.
 - manter opções canônicas em português: `--base`, `--arquivo`, `--diretorio`, `--entrada`, `--saida`, `--gravar` e
   `--confirmar`;
 - gerar ou verificar ajuda, parser e catálogo a partir de um contrato comum por comando;
-- escolher nome neutro para pacote e binário antes do primeiro consumidor externo, mantendo o perfil SGC como conveniência;
+- escolher nome neutro para pacote e binário antes de publicar o reuso horizontal, mantendo o perfil SGC como conveniência;
 - atualizar todos os consumidores do repositório diretamente, sem aliases ou período de compatibilidade.
 
 Critério de saída: nomes, ajuda, validação e catálogo descrevem a mesma interface, e a identidade pública não sugere que o
@@ -217,7 +236,7 @@ Tratar primeiro `frontend/arquitetura-lib.ts`, `backend/testes-analisar.ts`,
 - separar somente fronteiras coesas, como coleta, regras, agregação, formatação e persistência;
 - manter juntas regras que mudam pelo mesmo motivo, mesmo em arquivos extensos;
 - exigir testes diretamente sobre cada contrato extraído;
-- remover helpers, exports e fixtures que se tornarem sem consumidor durante a extração;
+- remover helpers, exports e fixtures que se tornarem sem uso, finalidade ou contrato durante a extração;
 - medir AST, varreduras e subprocessos antes de introduzir cache, paralelismo ou atalhos.
 
 Critério de saída: motores podem ser usados sem carregar CLI ou persistência, e a divisão reduz acoplamento observável em
@@ -231,7 +250,7 @@ vez de apenas diminuir arquivos.
 - uniformizar `mais-recente`, diretórios de execuções e caminhos relativos à base;
 - manter `projeto artefatos limpar` em prévia e exigir `--confirmar` para remoção;
 - repetir a auditoria de utilidade ao fim: remover políticas, fixtures, comandos e saídas que continuarem sem finalidade
-  permanente ou consumidor humano documentável.
+  permanente ou uso documentável por humanos/agentes.
 
 Critério de saída: o pacote instalado é autônomo, não suja a fonte e não conserva código apenas por ter testes.
 

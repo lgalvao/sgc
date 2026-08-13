@@ -107,10 +107,8 @@ function auditarItem(
     };
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-
-    const arquivos = await listarArquivosCdu(base);
+async function auditarMensagensCodigo(base: string, arquivosInformados?: string[]): Promise<{resumo: ResumoRelatorio; relatorio: ItemRelatorio[]}> {
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const {itens: canonicos, indice: indiceCanonicos} = carregarMensagensCanonicas(base);
 
     const itens = [
@@ -130,20 +128,27 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         itensComSugestao: relatorio.filter(item => item.referenciasExatas.length === 0 && item.sugestoes.length > 0).length
     };
 
+    return {resumo, relatorio};
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const resultado = await auditarMensagensCodigo(base);
+
     if (emitirJson) {
-        imprimirJson({resumo, relatorio});
+        imprimirJson(resultado);
         return;
     }
 
     escreverLinha(`Auditoria de mensagens dos CDUs contra o código em ${base}`);
-    escreverLinha(`Arquivos analisados: ${resumo.totalArquivos}`);
-    escreverLinha(`Itens auditados: ${resumo.totalItens}`);
-    escreverLinha(`Com referência exata: ${resumo.itensComReferenciaExata}`);
-    escreverLinha(`Sem referência exata: ${resumo.itensSemReferenciaExata}`);
-    escreverLinha(`Sem referência exata, mas com sugestão: ${resumo.itensComSugestao}`);
+    escreverLinha(`Arquivos analisados: ${resultado.resumo.totalArquivos}`);
+    escreverLinha(`Itens auditados: ${resultado.resumo.totalItens}`);
+    escreverLinha(`Com referência exata: ${resultado.resumo.itensComReferenciaExata}`);
+    escreverLinha(`Sem referência exata: ${resultado.resumo.itensSemReferenciaExata}`);
+    escreverLinha(`Sem referência exata, mas com sugestão: ${resultado.resumo.itensComSugestao}`);
     escreverLinha();
 
-    for (const item of relatorio.filter(entrada => entrada.referenciasExatas.length === 0)) {
+    for (const item of resultado.relatorio.filter(entrada => entrada.referenciasExatas.length === 0)) {
         escreverLinha(`${item.tipo}: ${item.valor}`);
         escreverLinha(`- ocorrências: ${item.quantidade}`);
         if (item.sugestoes.length === 0) {
@@ -162,5 +167,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal
+    auditarMensagensCodigo
 };

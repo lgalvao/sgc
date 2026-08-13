@@ -17,6 +17,9 @@ const TIPOS_PROCESSO_CANONICOS = new Set<string>([
 
 function carregarSituacoesCanonicas(base: string = DIRETORIO_RAIZ): Set<string> {
     const caminho = path.join(base, "specs", "intro_3_situacoes.md");
+    if (!fs.existsSync(caminho)) {
+        return new Set<string>();
+    }
     const texto = fs.readFileSync(caminho, "utf8");
     const situacoes = new Set<string>();
 

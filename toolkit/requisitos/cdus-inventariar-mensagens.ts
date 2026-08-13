@@ -23,10 +23,8 @@ interface InventarioMensagens {
     toasts: MapaContagem;
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-
-    const arquivos = await listarArquivosCdu(base);
+async function inventariarMensagens(base: string, arquivosInformados?: string[]): Promise<InventarioMensagens> {
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const inventario: InventarioMensagens = {
         base,
         totalArquivos: arquivos.length,
@@ -57,6 +55,13 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     inventario.mensagens = ordenarMapa(inventario.mensagens);
     inventario.toasts = ordenarMapa(inventario.toasts);
 
+    return inventario;
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const inventario = await inventariarMensagens(base);
+
     if (emitirJson) {
         imprimirJson(inventario);
         return;
@@ -79,5 +84,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal
+    inventariarMensagens
 };

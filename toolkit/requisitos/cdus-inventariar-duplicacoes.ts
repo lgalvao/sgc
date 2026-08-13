@@ -35,10 +35,8 @@ function normalizarBloco(texto: string): string {
         .replaceAll(/\n{2,}/g, "\n");
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
-    const {emitirJson, base} = obterOpcoesCdu(argumentos);
-
-    const arquivos = await listarArquivosCdu(base);
+async function inventariarDuplicacoes(base: string, arquivosInformados?: string[]): Promise<ResultadoDuplicacoes> {
+    const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const blocos = new Map<string, ItemRegistrado>();
     const itens = new Map<string, ItemRegistrado>();
 
@@ -105,6 +103,13 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         duplicacoes
     };
 
+    return resultado;
+}
+
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+    const {emitirJson, base} = obterOpcoesCdu(argumentos);
+    const resultado = await inventariarDuplicacoes(base);
+
     if (emitirJson) {
         imprimirJson(resultado);
         return;
@@ -127,5 +132,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 }
 
 export {
-    principal
+    inventariarDuplicacoes
 }
