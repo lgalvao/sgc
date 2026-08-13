@@ -2,10 +2,15 @@
 import {pathToFileURL} from "node:url";
 import {Command} from "commander";
 import pc from "picocolors";
+import {CATALOGO_COMANDOS} from "./lib/catalogo-comandos.js";
 import {executarNode} from "./lib/execucao.js";
 import logger from "./lib/logger.js";
 
-function criarComandoScript(pai: Command, nome: string, descricao: string, relativo: string): void {
+function criarGrupoComando(pai: Command, nome: string, descricao: string): Command {
+    return pai.command(nome).description(descricao);
+}
+
+function criarComandoArquivo(pai: Command, nome: string, descricao: string, relativo: string): void {
     pai
         .command(nome)
         .description(descricao)
@@ -18,6 +23,33 @@ function criarComandoScript(pai: Command, nome: string, descricao: string, relat
         });
 }
 
+function obterComandoPai(programa: Command, caminho: readonly string[]): Command {
+    let atual = programa;
+    for (const segmento of caminho) {
+        const proximo = atual.commands.find(comando => comando.name() === segmento);
+        if (!proximo) {
+            throw new Error(`Grupo de comando não encontrado no catálogo: ${[...caminho].join(" ")}`);
+        }
+        atual = proximo;
+    }
+    return atual;
+}
+
+function registrarComandosCatalogados(programa: Command): void {
+    for (const definicao of CATALOGO_COMANDOS) {
+        const nome = definicao.caminho.at(-1);
+        if (!nome) {
+            throw new Error("Comando sem nome no catálogo.");
+        }
+
+        const pai = obterComandoPai(programa, definicao.caminho.slice(0, -1));
+        if (pai.commands.some(comando => comando.name() === nome)) {
+            throw new Error(`Comando duplicado no catálogo: ${definicao.caminho.join(" ")}`);
+        }
+        criarComandoArquivo(pai, nome, definicao.descricao, definicao.arquivo);
+    }
+}
+
 const program = new Command();
 program
     .name("sgc")
@@ -26,84 +58,33 @@ program
     .showSuggestionAfterError();
 
 const backend = program.command("backend").description("Ferramentas do backend.");
-const backendCobertura = backend.command("cobertura").description("Cobertura e diagnosticos do backend.");
-criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Backend).", "toolkit/backend/cobertura-auditoria.ts");
-criarComandoScript(backendCobertura, "ramificacoes", "Lista classes com lacunas de ramificacoes no backend.", "toolkit/backend/cobertura-ramificacoes.ts");
-
-const backendArquitetura = backend.command("arquitetura").description("Auditorias de arquitetura do backend.");
-criarComandoScript(backendArquitetura, "auditar", "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.", "toolkit/backend/arquitetura-auditar.ts");
-
-const backendCoesao = backend.command("coesao").description("Auditorias de coesao do backend.");
-criarComandoScript(backendCoesao, "auditar", "Audita Services com responsabilidades misturadas (consulta, mutacao, workflow, notificacao).", "toolkit/backend/coesao-auditar.ts");
-
-const backendContratos = backend.command("contratos").description("Auditorias de contratos HTTP e DTOs publicos do backend.");
-criarComandoScript(backendContratos, "auditar", "Audita vazamentos de model.* em DTOs expostos por controllers.", "toolkit/backend/contratos-auditar.ts");
-
-const backendTestes = backend.command("testes").description("Ferramentas de testes do backend.");
-criarComandoScript(backendTestes, "analisar", "Detecta classes sem testes e gera Markdown/JSON.", "toolkit/backend/testes-analisar.ts");
-criarComandoScript(backendTestes, "priorizar", "Prioriza backlog de testes do backend.", "toolkit/backend/testes-priorizar.ts");
-
-const backendJava = backend.command("java").description("Utilitarios Java do backend.");
-criarComandoScript(backendJava, "corrigir-fqn", "Substitui FQNs por imports em arquivos Java.", "toolkit/backend/java-corrigir-fqn.ts");
-const backendNotificacoes = backend.command("notificacoes").description("Auditorias de notificacoes e assuntos do backend.");
-criarComandoScript(backendNotificacoes, "auditar-assuntos", "Audita literais de assunto de notificacao fora de AssuntosNotificacao.", "toolkit/backend/notificacoes-assuntos-auditar.ts");
+criarGrupoComando(backend, "cobertura", "Cobertura e diagnosticos do backend.");
+criarGrupoComando(backend, "arquitetura", "Auditorias de arquitetura do backend.");
+criarGrupoComando(backend, "coesao", "Auditorias de coesao do backend.");
+criarGrupoComando(backend, "contratos", "Auditorias de contratos HTTP e DTOs publicos do backend.");
+criarGrupoComando(backend, "testes", "Ferramentas de testes do backend.");
+criarGrupoComando(backend, "java", "Utilitarios Java do backend.");
+criarGrupoComando(backend, "notificacoes", "Auditorias de notificacoes e assuntos do backend.");
 
 const frontend = program.command("frontend").description("Ferramentas do frontend.");
-const frontendCobertura = frontend.command("cobertura").description("Cobertura e diagnosticos do frontend.");
-criarComandoScript(frontendCobertura, "auditoria", "Auditoria unificada de cobertura e risco (Frontend).", "toolkit/frontend/cobertura-auditoria.ts");
-criarComandoScript(frontendCobertura, "ramificacoes", "Lista arquivos com lacunas de ramificacoes no frontend.", "toolkit/frontend/cobertura-ramificacoes.ts");
-criarComandoScript(frontendCobertura, "ramificacoes-erros", "Cruza lacunas de ramificacoes com sinais de tratamento de erro suspeito no frontend.", "toolkit/frontend/cobertura-ramificacoes-erros.ts");
-
-const frontendResiduos = frontend.command("residuos").description("Auditorias de residuos estruturais e orcamentos do frontend.");
-criarComandoScript(frontendResiduos, "auditar", "Audita residuos estruturais do frontend.", "toolkit/frontend/residuos-auditar.ts");
-criarComandoScript(frontendResiduos, "validar", "Valida orcamentos e excecoes dos residuos do frontend.", "toolkit/frontend/residuos-validar.ts");
-
-const frontendArquitetura = frontend.command("arquitetura").description("Auditorias de arquitetura e vazamento de contratos no frontend.");
-criarComandoScript(frontendArquitetura, "auditar", "Audita vazamentos arquiteturais e estrategia de cache exposta no frontend.", "toolkit/frontend/arquitetura-auditar.ts");
-criarComandoScript(frontendArquitetura, "validar", "Valida regras arquiteturais do frontend (gate duro).", "toolkit/frontend/arquitetura-validar.ts");
-
-const frontendViews = frontend.command("views").description("Auditorias especificas de views.");
-criarComandoScript(frontendViews, "templates-validar", "Valida previsibilidade estrutural de templates das views.", "toolkit/frontend/views-templates-validar.ts");
-
-const frontendModais = frontend.command("modais").description("Auditorias especificas de modais.");
-criarComandoScript(frontendModais, "validar", "Valida o uso padronizado de ModalPadrao e proibe BModal cru fora do componente-base.", "toolkit/frontend/modais-validar.ts");
-
-const frontendIdentificadoresTeste = frontend.command("identificadores-teste").description("Ferramentas para identificadores de teste.");
-criarComandoScript(frontendIdentificadoresTeste, "listar", "Lista identificadores de teste do frontend.", "toolkit/frontend/identificadores-teste-listar.ts");
-criarComandoScript(frontendIdentificadoresTeste, "listar-duplicados", "Lista identificadores de teste duplicados.", "toolkit/frontend/identificadores-teste-listar-duplicados.ts");
-
-const frontendAcessibilidade = frontend.command("acessibilidade").description("Auditorias de acessibilidade do frontend.");
-criarComandoScript(frontendAcessibilidade, "crawler", "Executa o crawler Axe-core em todas as rotas principais.", "toolkit/frontend/acessibilidade-crawler.ts");
-criarComandoScript(frontendAcessibilidade, "processar", "Processa os resultados do crawler em um relatorio Markdown.", "toolkit/frontend/acessibilidade-processar-resultados.ts");
+criarGrupoComando(frontend, "cobertura", "Cobertura e diagnosticos do frontend.");
+criarGrupoComando(frontend, "residuos", "Auditorias de residuos estruturais e orcamentos do frontend.");
+criarGrupoComando(frontend, "arquitetura", "Auditorias de arquitetura e vazamento de contratos no frontend.");
+criarGrupoComando(frontend, "views", "Auditorias especificas de views.");
+criarGrupoComando(frontend, "modais", "Auditorias especificas de modais.");
+criarGrupoComando(frontend, "identificadores-teste", "Ferramentas para identificadores de teste.");
+criarGrupoComando(frontend, "acessibilidade", "Auditorias de acessibilidade do frontend.");
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
-const codigoCheiros = codigo.command("cheiros").description("Auditorias de cheiros de codigo.");
-criarComandoScript(codigoCheiros, "auditar", "Gera fotografia de sinais de complexidade acidental e codigo defensivo.", "toolkit/codigo/cheiros-auditar.ts");
-const codigoSemgrep = codigo.command("semgrep").description("Auditorias estruturais com Semgrep OSS.");
-criarComandoScript(codigoSemgrep, "auditar", "Executa regras locais de Semgrep para backend, frontend e integração.", "toolkit/codigo/semgrep-auditar.ts");
-const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
-criarComandoScript(codigoNomes, "coletar-simbolos", "Gera inventario de pacotes, arquivos, tipos e membros.", "toolkit/codigo/nomes-simbolos-coletar.ts");
-criarComandoScript(codigoNomes, "auditar-consistencia", "Audita padroes e divergencias de nomenclatura.", "toolkit/codigo/nomes-consistencia-auditar.ts");
-criarComandoScript(codigoNomes, "auditar-idioma", "Detecta nomes em inglês e campos com 'id' que deveriam usar 'codigo'.", "toolkit/codigo/idioma-consistencia-auditar.ts");
+criarGrupoComando(codigo, "cheiros", "Auditorias de cheiros de codigo.");
+criarGrupoComando(codigo, "semgrep", "Auditorias estruturais com Semgrep OSS.");
+criarGrupoComando(codigo, "nomes", "Inventario e auditoria de nomenclatura do projeto.");
 
 const integracao = program.command("integracao").description("Ferramentas de qualidade na fronteira backend/frontend.");
-const integracaoContratos = integracao.command("contratos").description("Auditorias e artefatos de contrato HTTP.");
-criarComandoScript(integracaoContratos, "exportar-openapi", "Exporta o OpenAPI atual da aplicação para arquivo local.", "toolkit/integracao/contratos-exportar-openapi.ts");
-criarComandoScript(integracaoContratos, "diff", "Compara duas versões do OpenAPI e resume mudanças de contrato.", "toolkit/integracao/contratos-diff.ts");
-criarComandoScript(integracaoContratos, "fixar-baseline", "Promove o OpenAPI mais recente como baseline de comparação.", "toolkit/integracao/contratos-fixar-baseline.ts");
+criarGrupoComando(integracao, "contratos", "Auditorias e artefatos de contrato HTTP.");
 
 const requisitos = program.command("requisitos").description("Ferramentas de inventario e auditoria de requisitos.");
-const requisitosCdus = requisitos.command("cdus").description("Inventario e auditoria read-only dos casos de uso.");
-criarComandoScript(requisitosCdus, "inventariar", "Inventaria formatos e convenções implícitas dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar.ts");
-criarComandoScript(requisitosCdus, "auditar", "Audita a estrutura canônica mínima dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar.ts");
-criarComandoScript(requisitosCdus, "auditar-estilo", "Audita convenções tipográficas de aspas simples, aspas duplas e crases nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-estilo.ts");
-criarComandoScript(requisitosCdus, "inventariar-vocabulario", "Inventaria perfis, situações, tipos de processo e elementos de UI recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-vocabulario.ts");
-criarComandoScript(requisitosCdus, "auditar-vocabulario", "Audita variações de vocabulário controlado nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-vocabulario.ts");
-criarComandoScript(requisitosCdus, "inventariar-mensagens", "Inventaria descrições, assuntos, mensagens e toasts recorrentes nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-mensagens.ts");
-criarComandoScript(requisitosCdus, "auditar-mensagens", "Audita problemas mecânicos em descrições, assuntos, mensagens e toasts dos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-auditar-mensagens.ts");
-criarComandoScript(requisitosCdus, "auditar-mensagens-codigo", "Compara descrições, mensagens e toasts dos `specs/cdu-*.md` com mensagens canônicas extraídas do código.", "toolkit/requisitos/cdus-auditar-mensagens-codigo.ts");
-criarComandoScript(requisitosCdus, "inventariar-densidade", "Inventaria densidade documental dos `specs/cdu-*.md` por palavras, passos e profundidade de listas.", "toolkit/requisitos/cdus-inventariar-densidade.ts");
-criarComandoScript(requisitosCdus, "inventariar-duplicacoes", "Inventaria blocos textuais duplicados nos `specs/cdu-*.md`.", "toolkit/requisitos/cdus-inventariar-duplicacoes.ts");
+criarGrupoComando(requisitos, "cdus", "Inventario e auditoria read-only dos casos de uso.");
 
 const qualidade = program.command("qualidade").description("Ferramentas de coleta e analise da qualidade.");
 qualidade
@@ -193,8 +174,7 @@ projeto
         await executarPreparacao(opcoes);
     });
 
-criarComandoScript(projeto, "arvore-linhas", "Gera arvore agregada de linhas do repositório.", "toolkit/projeto/arvore-linhas.ts");
-criarComandoScript(projeto, "versao-sincronizar", "Sincroniza a versao entre gradle.properties e frontend/package.json.", "toolkit/projeto/versao-sincronizar.ts");
+registrarComandosCatalogados(program);
 
 program.addHelpText(
     "after",
@@ -222,7 +202,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 }
 
 export {
-    criarComandoScript,
+    criarComandoArquivo,
     executar,
     principal,
     program

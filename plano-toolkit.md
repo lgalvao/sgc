@@ -378,10 +378,10 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 109 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 110 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 39,37% de statements (469/1.191),
-  28,31% de branches (248/876), 48,93% de funções (115/235) e 39,75% de linhas (452/1.137); ainda sem threshold,
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 40,8% de statements (524/1.284),
+  28,19% de branches (254/901), 48,2% de funções (121/251) e 41,12% de linhas (505/1.228); ainda sem threshold,
   porque os testes permanecem concentrados e a prioridade é transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
@@ -412,8 +412,8 @@ reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, 
 elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste comportamental do auditor de contratos backend;
 esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários;
 a parametrização de execuções externas chega a 105; uma rodada explicita as políticas de resíduos e chega a 106; outra
-uniformiza a família de nomenclatura e chega a 107; uma rodada uniformiza os relatórios de cobertura e chega a 108; esta
-rodada protege a sincronização de versão e chega a 109.
+uniformiza a família de nomenclatura e chega a 107; uma rodada uniformiza os relatórios de cobertura e chega a 108; uma
+rodada protege a sincronização de versão e chega a 109; esta rodada centraliza o catálogo da CLI e chega a 110.
 
 ### 3.3 Tamanho e composição atual
 
@@ -422,7 +422,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 72 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
-- 2 arquivos de teste concentrando 109 cenários, mais 1 smoke de distribuição isolada;
+- 2 arquivos de teste concentrando 110 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -447,7 +447,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Média | Opções e efeitos divergentes | Os comandos principais já usam opções em português; ainda há defaults de nomes de artefatos e alguns contratos de geração que precisam ser uniformizados, além de mutações sem prévia uniforme. |
 | Resolvido nesta rodada | Testes não representam pacote externo | A suíte interna continua separada do smoke de distribuição, e `npm run test:pacote` empacota, instala em diretório isolado e executa o binário sem dependências hoisted do monorepo. |
 | Resolvido nesta rodada | Cobertura funcional não medida | `npm run test:coverage` agora gera a baseline informativa do próprio toolkit com `@vitest/coverage-v8`; threshold fica para depois da divisão dos testes por domínio e da análise dos contratos críticos. |
-| Média | Roteador monolítico e inventário duplicado | `sgc.ts` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
+| Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
 | Baixa | APIs nativas e dependências se sobrepõem | `fs-extra` já foi removido do runtime e ficou restrito aos testes; a auditoria de dependências restantes deve continuar por uso real, sem remoção antecipada. |
 
 ### 3.5 Interpretação correta do estado
@@ -460,7 +460,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 109 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 110 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 

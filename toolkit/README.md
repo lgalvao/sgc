@@ -53,7 +53,7 @@ graph TD
 | Caminho       | Papel                                                             |
 |---------------|-------------------------------------------------------------------|
 | `sgc.ts`      | roteador principal da CLI                                         |
-| `lib/`        | infraestrutura compartilhada, execução, caminhos, saída e utilidades |
+| `lib/`        | catálogo de comandos, infraestrutura compartilhada, execução, caminhos, saída e utilidades |
 | `backend/`    | comandos de cobertura, testes e higiene Java                      |
 | `frontend/`   | comandos de cobertura, resíduos, validações e acessibilidade     |
 | `codigo/`     | auditorias transversais de cheiros de código                       |
@@ -62,7 +62,18 @@ graph TD
 | `projeto/`    | preparação, diagnóstico, limpeza e qualidade do repositório        |
 | `test/`       | testes do toolkit                                                 |
 
-## Comandos por domínio
+## Exemplos de comandos por domínio
+
+O catálogo canônico de comandos e descrições é a própria ajuda da CLI; consulte-a antes de procurar um comando:
+
+```bash
+npx tsx toolkit/sgc.ts --help
+npx tsx toolkit/sgc.ts backend --help
+npx tsx toolkit/sgc.ts frontend --help
+```
+
+Os exemplos abaixo são intencionalmente representativos. A lista completa não é repetida nesta documentação para evitar
+que o roteador e o README se tornem duas fontes de verdade.
 
 ### Backend
 

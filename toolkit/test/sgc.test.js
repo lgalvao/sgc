@@ -19,6 +19,8 @@ import {obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-a
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.ts";
 import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.ts";
 import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.ts";
+import {CATALOGO_COMANDOS} from "../lib/catalogo-comandos.ts";
+import {program} from "../sgc.ts";
 
 const DIRETORIO_RAIZ = path.resolve(import.meta.dirname, "..", "..");
 const CAMINHO_SGC = path.join(DIRETORIO_RAIZ, "toolkit", "sgc.ts");
@@ -115,6 +117,23 @@ async function executarScriptTestesPriorizar(args, opcoes = {}) {
 }
 
 describe("CLI raiz do toolkit", () => {
+    test("mantem o catalogo de scripts sincronizado com a arvore da CLI", async () => {
+        const caminhos = CATALOGO_COMANDOS.map(definicao => definicao.caminho.join(" "));
+        expect(new Set(caminhos).size).toBe(caminhos.length);
+
+        for (const definicao of CATALOGO_COMANDOS) {
+            let comando = program;
+            for (const segmento of definicao.caminho) {
+                const proximo = comando.commands.find(item => item.name() === segmento);
+                expect(proximo, `Comando ausente: ${definicao.caminho.join(" ")}`).toBeDefined();
+                comando = proximo;
+            }
+
+            expect(comando.description()).toBe(definicao.descricao);
+            expect(await fs.pathExists(path.join(DIRETORIO_RAIZ, "toolkit", definicao.arquivo))).toBe(true);
+        }
+    });
+
     test("pode ser importada sem executar a CLI", async () => {
         const caminhoSgc = pathToFileURL(CAMINHO_SGC).href;
         const resultado = await execa(process.execPath, [
