@@ -1,10 +1,10 @@
 import path from "node:path";
-import fs from "fs-extra";
+import {access, rm} from "node:fs/promises";
 import {globby} from "globby";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-const PADROES_LIMPEZA = [
+const PADROES_LIMPEZA_SGC = [
     "backend/build",
     "frontend/coverage",
     "frontend/dist",
@@ -31,13 +31,36 @@ const PADROES_LIMPEZA = [
     "unit-test-report.md"
 ];
 
-async function resolverItens(base) {
-    const encontrados = new Set();
+interface OpcoesLimpeza {
+    base?: string;
+    confirmar?: boolean;
+    json?: boolean;
+    padroes?: readonly string[];
+}
 
-    for (const padrao of PADROES_LIMPEZA) {
+interface ResultadoLimpeza {
+    diretorioBase: string;
+    modo: "simular" | "executar";
+    total: number;
+    itens: string[];
+}
+
+async function existeCaminho(caminho: string): Promise<boolean> {
+    try {
+        await access(caminho);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function resolverItens(base: string, padroes: readonly string[]): Promise<string[]> {
+    const encontrados = new Set<string>();
+
+    for (const padrao of padroes) {
         if (!padrao.includes("*")) {
             const absoluto = path.resolve(base, padrao);
-            if (await fs.pathExists(absoluto)) {
+            if (await existeCaminho(absoluto)) {
                 encontrados.add(absoluto);
             }
             continue;
@@ -58,11 +81,11 @@ async function resolverItens(base) {
     return [...encontrados].toSorted((a, b) => a.localeCompare(b));
 }
 
-function relativo(base, absoluto) {
+function relativo(base: string, absoluto: string): string {
     return path.relative(base, absoluto).replaceAll("\\", "/");
 }
 
-function imprimirHumano(base, itens, modo) {
+function imprimirHumano(base: string, itens: string[], modo: ResultadoLimpeza["modo"]): void {
     imprimirCabecalho("Limpeza do projeto", modo === "executar"
         ? "Removendo artefatos gerados pelo toolkit e ferramentas de qualidade."
         : "Prévia dos artefatos gerados pelo toolkit e ferramentas de qualidade.");
@@ -81,14 +104,14 @@ function imprimirHumano(base, itens, modo) {
     escreverLinha(`Total: ${itens.length} item(ns).`);
 }
 
-async function executarLimpeza(opcoes = {}) {
+async function executarLimpeza(opcoes: OpcoesLimpeza = {}): Promise<ResultadoLimpeza> {
     const base = opcoes.base ? path.resolve(opcoes.base) : resolverNaRaiz();
-    const itens = await resolverItens(base);
-    const modo = opcoes.confirmar ? "executar" : "simular";
+    const itens = await resolverItens(base, opcoes.padroes ?? PADROES_LIMPEZA_SGC);
+    const modo: ResultadoLimpeza["modo"] = opcoes.confirmar ? "executar" : "simular";
 
     if (opcoes.confirmar) {
         for (const item of itens) {
-            await fs.remove(item);
+            await rm(item, {recursive: true, force: true});
         }
     }
 
@@ -112,5 +135,6 @@ async function executarLimpeza(opcoes = {}) {
 }
 
 export {
-    executarLimpeza
+    executarLimpeza,
+    PADROES_LIMPEZA_SGC
 };

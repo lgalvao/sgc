@@ -33,7 +33,7 @@
     "projeto/arvore-linhas.ts",
     "projeto/dependencias-auditar.js",
     "projeto/diagnostico.ts",
-    "projeto/limpar.js",
+    "projeto/limpar.ts",
     "projeto/preparar.js",
     "projeto/qualidade.js",
     "projeto/versao-sincronizar.ts",

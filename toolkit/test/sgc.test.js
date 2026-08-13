@@ -8,6 +8,7 @@ import {pathToFileURL} from "node:url";
 import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arvore-linhas.ts";
 import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 import {executarDiagnostico} from "../projeto/diagnostico.ts";
+import {executarLimpeza} from "../projeto/limpar.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
@@ -2362,6 +2363,26 @@ describe("CLI raiz do toolkit", () => {
         expect(jsonExecucao.modo).toBe("executar");
         expect(await fs.pathExists(path.join(diretorioBase, "backend", "build"))).toBe(false);
         expect(await fs.pathExists(path.join(diretorioBase, "backend-coverage-auditoria.md"))).toBe(false);
+    });
+
+    test("aceita política de padrões de limpeza de projeto externo", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-limpeza-politica-"));
+        await fs.outputFile(path.join(diretorioBase, "artefatos-projeto", "saida.txt"), "temporario");
+        await fs.outputFile(path.join(diretorioBase, "nao-listado.txt"), "preservar");
+
+        const resultado = await executarLimpeza({
+            base: diretorioBase,
+            padroes: ["artefatos-projeto"]
+        });
+
+        expect(resultado).toMatchObject({
+            diretorioBase,
+            modo: "simular",
+            total: 1,
+            itens: ["artefatos-projeto"]
+        });
+        expect(await fs.pathExists(path.join(diretorioBase, "artefatos-projeto"))).toBe(true);
+        expect(await fs.pathExists(path.join(diretorioBase, "nao-listado.txt"))).toBe(true);
     });
 
     test("nao possui diretorios legados de scripts em backend/frontend", async () => {
