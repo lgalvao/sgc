@@ -17,6 +17,43 @@ type EvidenciaQualidade =
     | "coberturaIndireta"
     | "semEvidenciaNoEscopo";
 
+interface PoliticaClassificacaoTestes {
+    anotacoesContrato: readonly string[];
+    nomesModelosEstruturais: readonly string[];
+    prefixosModelosEstruturais: readonly string[];
+    sufixosModelosEstruturais: readonly string[];
+    nomesOutrosEstruturais: readonly string[];
+    prefixosOutrosEstruturais: readonly string[];
+    sufixosOutrosEstruturais: readonly string[];
+    caminhosOutrosEstruturais: readonly string[];
+}
+
+const POLITICA_CLASSIFICACAO_GENERICA: PoliticaClassificacaoTestes = {
+    anotacoesContrato: [
+        "NotNull",
+        "NotBlank",
+        "NotEmpty",
+        "Size",
+        "Pattern",
+        "Email",
+        "Future",
+        "Past",
+        "Positive",
+        "Negative",
+        "JsonProperty",
+        "JsonView",
+        "JsonFormat",
+        "JsonIgnoreProperties"
+    ],
+    nomesModelosEstruturais: [],
+    prefixosModelosEstruturais: [],
+    sufixosModelosEstruturais: [],
+    nomesOutrosEstruturais: [],
+    prefixosOutrosEstruturais: [],
+    sufixosOutrosEstruturais: [],
+    caminhosOutrosEstruturais: []
+};
+
 interface ArquivoFonte {
     caminhoRelativo: string;
     nomeClasse: string;
@@ -27,6 +64,7 @@ interface ArquivoFonte {
 interface OpcoesClassificacaoFonte {
     nomeClasse: string;
     conteudoFonte: string;
+    politica?: PoliticaClassificacaoTestes;
 }
 
 interface OpcoesClassificacaoOutro extends OpcoesClassificacaoFonte {
@@ -101,14 +139,14 @@ function lerConteudoFonte(codigoServidor: string, caminhoRelativo: string): stri
     return fs.readFileSync(path.join(codigoServidor, caminhoRelativo), "utf-8");
 }
 
-function classificarPerfilDto(conteudoFonte: string): PerfilFonte {
+function classificarPerfilDto(conteudoFonte: string, politica: PoliticaClassificacaoTestes = POLITICA_CLASSIFICACAO_GENERICA): PerfilFonte {
     const conteudoSemComentarios = conteudoFonte
         .replace(/\/\*[\s\S]*?\*\//g, "")
         .replace(/\/\/.*$/gm, "");
 
     const possuiMetodoExplicito = /\b(public|private|protected)\s+(?!record\b|class\b|interface\b|enum\b)(static\s+)?[\w@.<>[\]?]+\s+\w+\s*\(/.test(conteudoSemComentarios);
     const possuiLogica = /\b(for|if|switch|while)\s*\(|->|\.stream\s*\(|\.map\s*\(|\.filter\s*\(|\.collect\s*\(|\breturn\b/.test(conteudoSemComentarios);
-    const possuiValidacaoOuContrato = /@(NotNull|NotBlank|NotEmpty|Size|Pattern|Email|Future|Past|Positive|Negative|SanitizarHtml|JsonProperty|JsonView|JsonFormat|JsonIgnoreProperties)\b/.test(conteudoSemComentarios);
+    const possuiValidacaoOuContrato = politica.anotacoesContrato.some(anotacao => conteudoSemComentarios.includes(`@${anotacao}`));
 
     if (possuiMetodoExplicito || possuiLogica) {
         return "comportamental";
@@ -121,17 +159,15 @@ function classificarPerfilDto(conteudoFonte: string): PerfilFonte {
     return "estruturalPuro";
 }
 
-function classificarPerfilModelo({nomeClasse, conteudoFonte}: OpcoesClassificacaoFonte): PerfilFonte {
+function classificarPerfilModelo({nomeClasse, conteudoFonte, politica = POLITICA_CLASSIFICACAO_GENERICA}: OpcoesClassificacaoFonte): PerfilFonte {
     const conteudoSemComentarios = conteudoFonte
         .replace(/\/\*[\s\S]*?\*\//g, "")
         .replace(/\/\/.*$/gm, "");
 
     if (
-        nomeClasse.endsWith("Views")
-        || nomeClasse.startsWith("Tipo")
-        || nomeClasse.startsWith("Situacao")
-        || nomeClasse === "Perfil"
-        || nomeClasse.endsWith("Id")
+        politica.nomesModelosEstruturais.includes(nomeClasse)
+        || politica.prefixosModelosEstruturais.some(prefixo => nomeClasse.startsWith(prefixo))
+        || politica.sufixosModelosEstruturais.some(sufixo => nomeClasse.endsWith(sufixo))
     ) {
         return "estruturalPuro";
     }
@@ -157,21 +193,17 @@ function classificarPerfilModelo({nomeClasse, conteudoFonte}: OpcoesClassificaca
     return "estruturalPuro";
 }
 
-function classificarPerfilOutro({nomeClasse, caminhoRelativo, conteudoFonte}: OpcoesClassificacaoOutro): PerfilFonte {
+function classificarPerfilOutro({nomeClasse, caminhoRelativo, conteudoFonte, politica = POLITICA_CLASSIFICACAO_GENERICA}: OpcoesClassificacaoOutro): PerfilFonte {
     const caminhoNormalizado = normalizarCaminho(caminhoRelativo);
     const conteudoSemComentarios = conteudoFonte
         .replace(/\/\*[\s\S]*?\*\//g, "")
         .replace(/\/\/.*$/gm, "");
 
     if (
-        nomeClasse === "Sgc"
-        || nomeClasse === "Mensagens"
-        || nomeClasse.endsWith("Properties")
-        || nomeClasse.startsWith("Config")
-        || nomeClasse.startsWith("Erro")
-        || nomeClasse.endsWith("SecurityConfig")
-        || caminhoNormalizado.includes("/config/")
-        || caminhoNormalizado.includes("/erros/")
+        politica.nomesOutrosEstruturais.includes(nomeClasse)
+        || politica.prefixosOutrosEstruturais.some(prefixo => nomeClasse.startsWith(prefixo))
+        || politica.sufixosOutrosEstruturais.some(sufixo => nomeClasse.endsWith(sufixo))
+        || politica.caminhosOutrosEstruturais.some(caminho => caminhoNormalizado.includes(caminho))
     ) {
         return "estruturalPuro";
     }
@@ -257,3 +289,5 @@ export {
     construirNomeClasseCompleto,
     criarItemRelatorio
 };
+
+export type {PoliticaClassificacaoTestes};

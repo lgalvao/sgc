@@ -15,6 +15,8 @@ import {
     type ResultadoExecucao
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
+import {classificarPerfilDto, classificarPerfilModelo, classificarPerfilOutro} from "../servidor/biblioteca/testes-analisar-regras.js";
+import {POLITICA_CLASSIFICACAO_TESTES_SGC} from "../servidor/testes-politica-sgc.js";
 
 type ObjetoJson = Record<string, unknown>;
 
@@ -41,6 +43,19 @@ async function executarScriptTestesPriorizar(args: string[], opcoes: Options = {
 }
 
 describe("Análise e priorização dos testes do servidor", () => {
+    test("separa heurísticas genéricas da política de classificação do SGC", () => {
+        const classeModelo = "public class SituacaoExterna { public void descrever() {} }";
+        const classeOutro = "public class Sgc { public void configurar() {} }";
+        const dto = "public record Exemplo(@SanitizarHtml String nome) {}";
+
+        expect(classificarPerfilModelo({nomeClasse: "SituacaoExterna", conteudoFonte: classeModelo})).toBe("estruturalContrato");
+        expect(classificarPerfilModelo({nomeClasse: "SituacaoExterna", conteudoFonte: classeModelo, politica: POLITICA_CLASSIFICACAO_TESTES_SGC})).toBe("estruturalPuro");
+        expect(classificarPerfilOutro({nomeClasse: "Sgc", caminhoRelativo: "Sgc.java", conteudoFonte: classeOutro})).toBe("estruturalContrato");
+        expect(classificarPerfilOutro({nomeClasse: "Sgc", caminhoRelativo: "Sgc.java", conteudoFonte: classeOutro, politica: POLITICA_CLASSIFICACAO_TESTES_SGC})).toBe("estruturalPuro");
+        expect(classificarPerfilDto(dto)).toBe("estruturalPuro");
+        expect(classificarPerfilDto(dto, POLITICA_CLASSIFICACAO_TESTES_SGC)).toBe("estruturalContrato");
+    });
+
     test("analisa testes do servidor com resumo no console e sidecar JSON", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-"));
         const markdown = path.join(diretorioSaida, "relatorio.md");

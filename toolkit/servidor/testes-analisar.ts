@@ -21,8 +21,10 @@ import {
     inferirCategoria,
     lerConteudoFonte,
     normalizarCaminho,
-    SUFIXOS_TESTE
+    SUFIXOS_TESTE,
+    type PoliticaClassificacaoTestes
 } from "./biblioteca/testes-analisar-regras.js";
+import {POLITICA_CLASSIFICACAO_TESTES_SGC} from "./testes-politica-sgc.js";
 
 type Categoria = (typeof CATEGORIAS_PRIORITARIAS | typeof CATEGORIAS_SECUNDARIAS)[number];
 type PerfilFonte = "comportamental" | "estruturalContrato" | "estruturalPuro";
@@ -108,6 +110,7 @@ interface OpcoesAnaliseTestes {
     diretorioTestes: string;
     caminhoJacocoXml?: string | null;
     base?: string;
+    politica?: PoliticaClassificacaoTestes;
 }
 
 function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
@@ -297,7 +300,8 @@ async function analisarTestes({
     diretorioFonte,
     diretorioTestes,
     caminhoJacocoXml = null,
-    base = DIRETORIO_RAIZ
+    base = DIRETORIO_RAIZ,
+    politica
 }: OpcoesAnaliseTestes): Promise<RelatorioTestes> {
     const codigoServidor = path.resolve(diretorioFonte);
     const testesServidor = path.resolve(diretorioTestes);
@@ -339,18 +343,20 @@ async function analisarTestes({
 
     arquivosFonte.forEach(arquivo => {
         const conteudoFonte = lerConteudoFonte(codigoServidor, arquivo.caminhoRelativo);
-        const perfilDto = arquivo.categoria === 'dtos' ? classificarPerfilDto(conteudoFonte) : null;
+        const perfilDto = arquivo.categoria === 'dtos' ? classificarPerfilDto(conteudoFonte, politica) : null;
         const perfilModelo = arquivo.categoria === 'modelos'
             ? classificarPerfilModelo({
                 nomeClasse: arquivo.nomeClasse,
-                conteudoFonte
+                conteudoFonte,
+                politica
             })
             : null;
         const perfilOutro = arquivo.categoria === 'outros'
             ? classificarPerfilOutro({
                 nomeClasse: arquivo.nomeClasse,
                 caminhoRelativo: arquivo.caminhoRelativo,
-                conteudoFonte
+                conteudoFonte,
+                politica
             })
             : null;
         const dtoEstrutural = perfilDto === 'estruturalPuro' || perfilDto === 'estruturalContrato';
@@ -663,6 +669,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         diretorioTestes: opcoes.diretorioTestes,
         caminhoJacocoXml: opcoes.arquivoJacoco,
         base: opcoes.base,
+        politica: POLITICA_CLASSIFICACAO_TESTES_SGC,
     });
     if (opcoes.emitirJson) {
         imprimirJson(dados);
