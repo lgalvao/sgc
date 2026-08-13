@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Auditoria de vocabulário controlado dos casos de uso CDU.
 
 import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
@@ -11,11 +12,31 @@ import {
     TIPOS_PROCESSO_CANONICOS
 } from "./cdus-vocabulario-lib.js";
 
-function adicionarAchado(achados, severidade, regra, mensagem, linha = null) {
+type RegraVocabulario = "perfil_fora_vocabulario" | "tipo_processo_variacao" | "situacao_variacao";
+
+interface AchadoVocabulario {
+    severidade: "aviso";
+    regra: RegraVocabulario;
+    mensagem: string;
+    linha: number | null;
+}
+
+interface RelatorioArquivoVocabulario {
+    arquivo: string;
+    achados: AchadoVocabulario[];
+}
+
+function adicionarAchado(
+    achados: AchadoVocabulario[],
+    severidade: "aviso",
+    regra: RegraVocabulario,
+    mensagem: string,
+    linha: number | null = null
+): void {
     achados.push({severidade, regra, mensagem, linha});
 }
 
-function auditarPerfis(texto, achados) {
+function auditarPerfis(texto: string, achados: AchadoVocabulario[]): void {
     const linhas = texto.split(/\r?\n/);
     const indiceAtores = linhas.findIndex(linha => /^##\s+Atores\s*$/.test(linha));
     const indicePre = linhas.findIndex(linha => /^##\s+Pré-condições\s*$/.test(linha));
@@ -45,7 +66,11 @@ function auditarPerfis(texto, achados) {
     });
 }
 
-function auditarSituacoesETipos(texto, achados, situacoesCanonicas) {
+function auditarSituacoesETipos(
+    texto: string,
+    achados: AchadoVocabulario[],
+    situacoesCanonicas: Set<string>
+): void {
     const linhas = texto.split(/\r?\n/);
     linhas.forEach((linha, indice) => {
         const linhaNormalizada = linha.toLowerCase();
@@ -88,14 +113,14 @@ function auditarSituacoesETipos(texto, achados, situacoesCanonicas) {
     });
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const {emitirJson, base} = obterOpcoesCdu(argumentos);
     const situacoesCanonicas = carregarSituacoesCanonicas(base);
 
     const arquivos = await listarArquivosCdu(base);
-    const relatorio = arquivos.map(caminhoArquivo => {
+    const relatorio: RelatorioArquivoVocabulario[] = arquivos.map(caminhoArquivo => {
         const texto = lerArquivo(caminhoArquivo);
-        const achados = [];
+        const achados: AchadoVocabulario[] = [];
         auditarPerfis(texto, achados);
         auditarSituacoesETipos(texto, achados, situacoesCanonicas);
         return {

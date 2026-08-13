@@ -43,7 +43,7 @@
     "requisitos/cdus-auditar-estilo.ts",
     "requisitos/cdus-auditar-mensagens-codigo.js",
     "requisitos/cdus-auditar-mensagens.js",
-    "requisitos/cdus-auditar-vocabulario.js",
+    "requisitos/cdus-auditar-vocabulario.ts",
     "requisitos/cdus-auditar.ts",
     "requisitos/cdus-inventariar-densidade.ts",
     "requisitos/cdus-inventariar-duplicacoes.ts",
