@@ -5,6 +5,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {globby} from "globby";
 import {lerOpcao} from "../lib/cli-opcoes.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
@@ -59,7 +60,7 @@ function extrairAchados(conteudo) {
 }
 
 async function auditarAssuntos(base) {
-    const diretorioBackend = path.join(base, "backend", "src", "main", "java", "sgc");
+    const diretorioBackend = resolverCaminhoConfigurado("backendCodigo", base);
     const arquivos = await globby(path.join(diretorioBackend, "**/*.java").replaceAll("\\", "/"), {absolute: true});
     const ignorados = new Set([
         normalizarCaminho(path.join(diretorioBackend, "alerta", "AssuntosNotificacao.java")),
@@ -125,7 +126,7 @@ async function principal(argumentos = process.argv.slice(2)) {
         imprimirJson(resultado);
     } else {
         imprimirCabecalho("AUDITORIA DE ASSUNTOS DE NOTIFICACAO");
-        escreverLinha(`Base analisada: ${pc.dim(path.join(base, "backend/src/main/java/sgc"))}`);
+        escreverLinha(`Base analisada: ${pc.dim(resolverCaminhoConfigurado("backendCodigo", base))}`);
         escreverLinha(`Arquivos analisados: ${resultado.resumo.arquivosAnalisados}`);
         escreverLinha(`Arquivos com violação: ${resultado.resumo.arquivosComViolacao}`);
         escreverLinha(`Violações: ${resultado.resumo.violacoes}`);

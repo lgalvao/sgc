@@ -164,6 +164,8 @@ frontend e para os caminhos OpenAPI.
   assumir os diretórios do SGC.
 - A auditoria de cheiros agora aplica os filtros de backend/frontend aos diretórios `backendCodigo` e `frontendCodigo`
   configurados, mantendo o diagnóstico em projetos com layout diferente.
+- A auditoria de assuntos de notificação agora usa `backendCodigo` configurado, preservando as exceções específicas do
+  perfil SGC sem fixar `backend/src/main/java/sgc` no código.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -177,7 +179,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, executadas diretamente sob Node `26.5.1` (Node 26 disponível no ambiente):
 
-- `npm --prefix toolkit run test`: 85 testes aprovados em 2 arquivos;
+- `npm --prefix toolkit run test`: 86 testes aprovados em 2 arquivos;
 - `npm --prefix toolkit run build`: aprovado;
 - `npm --prefix toolkit run typecheck`: aprovado;
 - `npm --prefix toolkit run lint`: aprovado;
@@ -194,7 +196,8 @@ wrapper. Uma rodada voltou a 76 com escrita e idempotência do corretor FQN; out
 `--sem-gravar` da auditoria de nomenclatura; outra chegou a 79 com validação de configuração; outra chegou a 81 com
 defaults de arquitetura e resíduos dependentes da base externa; outra chegou a 82 com os caminhos OpenAPI dependentes
 da base externa; outra chegou a 83 com o coletor de qualidade dependente da base externa; esta chega a 84 com os alvos
-configuráveis do Semgrep; outra chega a 85 com filtros de cheiros dependentes da configuração. Nenhuma dessas mudanças
+configuráveis do Semgrep; outra chegou a 85 com filtros de cheiros dependentes da configuração; esta chega a 86 com a
+auditoria de assuntos dependente de `backendCodigo`. Nenhuma dessas mudanças
 reintroduz o wrapper obsoleto.
 
 ### 3.3 Tamanho e composição atual
@@ -204,7 +207,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 10 arquivos TypeScript de implementação;
 - 62 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
-- 2 arquivos de teste concentrando 85 cenários;
+- 2 arquivos de teste concentrando 86 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.js`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.js`.
@@ -220,13 +223,13 @@ dos arquivos de implementação rastreados são TypeScript.
 | Bloqueador | Pacote não pode ser empacotado | `npm pack --workspace toolkit --dry-run` falha porque `toolkit/package.json` não possui `version`. `private: true`, nome específico e ausência de `files` também mostram que a distribuição externa ainda não foi desenhada. |
 | Alta | Raiz acoplada à posição física | `lib/caminhos.ts` deriva a raiz como pai de `toolkit/`. Ao instalar o pacote em `node_modules`, a raiz calculada deixa de ser o projeto consumidor. |
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
-| Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep e cheiros agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
+| Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
 | Alta | Auditores gravam por padrão | Arquitetura, resíduos, cobertura, nomenclatura, Semgrep e diff OpenAPI têm escrita automática ou defaults distintos. A diretriz read-only ainda é meta, não realidade. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.js` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido | Efeito colateral oculto de `--sem-gravar` | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Média | Opções e efeitos divergentes | Há `--input`/`--output` e `--entrada`/`--saida`, `--dry-run` e `--sem-gravar`, além de comandos mutáveis sem modo de prévia uniforme. |
-| Média | Testes não representam pacote externo | Os 85 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
+| Média | Testes não representam pacote externo | Os 86 testes rodam dentro do monorepo e encontram dependências hoisted. Não existe instalação em diretório isolado nem teste de raiz do consumidor. |
 | Média | Cobertura funcional não medida | `@vitest/coverage-v8` está instalado, mas não há script, threshold ou relatório de cobertura do próprio toolkit. Quantidade de testes não mede contratos não exercitados. |
 | Média | Roteador monolítico e inventário duplicado | `sgc.js` registra todos os comandos e a documentação repete a lista manualmente; é fácil haver deriva de nomes, extensões e ajuda. |
 | Baixa | APIs nativas e dependências se sobrepõem | Parte do núcleo já substituiu `fs-extra` por Node nativo; a migração deve reavaliar dependências por uso real, sem remoção antecipada. |
@@ -240,7 +243,7 @@ dos arquivos de implementação rastreados são TypeScript.
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado e 85 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado e 86 testes verdes são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -393,8 +396,8 @@ reuso externo e preservação de contratos.
 4. **[concluído]** Corrigir `toolkit/knip.json`: incluir `js` e `ts`, declarar somente entrypoints reais e
    permitir que o grafo encontre módulos/exports não usados; oito exports internos órfãos foram removidos.
 5. **[concluído nesta rodada]** Adicionar testes focados para configuração inválida e combinação de defaults. Arquitetura,
-   resíduos, OpenAPI, coleta, Semgrep e cheiros agora calculam seus defaults após a resolução de `--base`; outros
-   defaults import-time continuam pendentes.
+   resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora calculam seus defaults após a resolução
+   de `--base`; outros defaults import-time continuam pendentes.
 6. Registrar uma baseline de cobertura do próprio toolkit, inicialmente informativa; definir thresholds apenas depois de
    identificar quais contratos críticos ainda não têm teste.
 

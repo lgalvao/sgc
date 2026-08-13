@@ -739,6 +739,33 @@ describe("CLI raiz do toolkit", () => {
         expect(corpo.relatorio[0].achados.some(item => item.regra === "literal_sgc")).toBe(true);
     });
 
+    test("audita assuntos no diretorio backend configurado", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-assuntos-configurado-"));
+        const dir = path.join(base, "servidor", "java");
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {backendCodigo: "servidor/java"}
+        });
+        await fs.outputFile(
+            path.join(dir, "diagnostico", "ServicoInvalido.java"),
+            "class ServicoInvalido { void enviar() { String assunto = \"SGC: Assunto espalhado\"; } }\n"
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "notificacoes",
+            "auditar-assuntos",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        const corpo = JSON.parse(resultado.stdout);
+        expect(corpo.resumo.arquivosComViolacao).toBe(1);
+        expect(corpo.relatorio[0].arquivo).toBe("servidor/java/diagnostico/ServicoInvalido.java");
+    });
+
     test("audita cheiros de codigo em um recorte controlado", async () => {
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cheiros-"));
         const frontendDir = path.join(base, "frontend", "src");
