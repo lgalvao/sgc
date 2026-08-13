@@ -349,7 +349,7 @@ function lerOpcoes(argv: string[]): OpcoesAuditoriaIdioma {
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     const argumentosValidados = validarArgumentosEntradaDireta(import.meta.url, argumentos);
     if (argumentosValidados.includes("--help") || argumentosValidados.includes("-h")) {
-        escreverLinha("Uso: npx tsx toolkit/ferramentas.ts codigo nomes auditar-idioma [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
+        escreverLinha("Uso: ferramentas codigo nomes auditar-idioma [--json] [--gravar] [--base <diretorio>] [--inventario <arquivo.json>] [--saida <arquivo.json>]");
         escreverLinha("");
         escreverLinha("Detecta membros com nomes em inglês e campos com 'id' que deveriam usar 'codigo'.");
         return;

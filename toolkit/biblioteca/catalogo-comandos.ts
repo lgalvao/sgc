@@ -69,7 +69,7 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["servidor", "arquitetura", "auditar"],
-        descricao: "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.",
+        descricao: "Audita concentração de responsabilidades em Services, Facades e Controllers por linhas, métodos e dependências.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma"),
@@ -96,7 +96,7 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["servidor", "testes", "analisar"],
-        descricao: "Detecta classes sem testes e gera Markdown/JSON.",
+        descricao: "Analisa evidências de testes e cobertura das classes do servidor e gera Markdown/JSON.",
         escopo: "adaptavel",
         finalidade: "inventariar",
         efeitos: criarEfeitosComando("opcional"),
@@ -177,8 +177,8 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["cliente", "arquitetura", "auditar"],
-        descricao: "Audita vazamentos arquiteturais e estrategia de cache exposta no cliente.",
-        escopo: "adaptavel",
+        descricao: "Audita vazamentos arquiteturais e estratégia de cache do cliente segundo a política do SGC.",
+        escopo: "perfil-sgc",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
         argumentos: esquema(["--base", "--saida"], ["--json", "--gravar"]),
@@ -231,7 +231,7 @@ const CATALOGO_COMANDOS = [
     },
     {
         caminho: ["codigo", "cheiros", "auditar"],
-        descricao: "Gera fotografia de sinais de complexidade acidental e codigo defensivo.",
+        descricao: "Gera fotografia de tendências de complexidade e código defensivo para comparação entre execuções.",
         escopo: "adaptavel",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("opcional"),
@@ -342,7 +342,7 @@ const CATALOGO_COMANDOS = [
 const CATALOGO_COMANDOS_ESPECIAIS = [
     {
         caminho: ["qualidade", "coletar"],
-        descricao: "Coleta uma fotografia de qualidade do SGC.",
+        descricao: "Coleta uma fotografia de qualidade usando os adaptadores e perfis do SGC.",
         escopo: "perfil-sgc",
         finalidade: "orquestrar",
         efeitos: criarEfeitosComando("intrinseca", {subprocessos: true}),
@@ -375,8 +375,8 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
     },
     {
         caminho: ["projeto", "ambiente", "verificar"],
-        descricao: "Verifica pre-requisitos, comandos e arquivos essenciais do projeto auditado.",
-        escopo: "adaptavel",
+        descricao: "Verifica pré-requisitos, comandos e arquivos essenciais do workspace do SGC.",
+        escopo: "perfil-sgc",
         finalidade: "auditar",
         efeitos: criarEfeitosComando("nenhuma", {subprocessos: true}),
         argumentos: esquema(["--base"], ["--json"])

@@ -257,7 +257,6 @@ async function gravarRelatorios(relatorio: RelatorioCoesao, diretorioSaida: stri
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoToolkit: "servidor coesao auditar",
-        scriptDireto: "servidor/coesao-auditar.ts",
         descricao: "Audita Services do servidor detectando mistura de responsabilidades (consulta, mutação, workflow, notificação, permissão).",
         opcoes: [
             "--json              Emite o relatório em JSON.",
@@ -266,9 +265,9 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/ferramentas.ts servidor coesao auditar",
-            "npx tsx toolkit/ferramentas.ts servidor coesao auditar --json",
-            "npx tsx toolkit/ferramentas.ts servidor coesao auditar --gravar"
+            "ferramentas servidor coesao auditar",
+            "ferramentas servidor coesao auditar --json",
+            "ferramentas servidor coesao auditar --gravar"
         ]
     });
 }

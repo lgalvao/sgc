@@ -155,16 +155,15 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "cliente arquitetura validar",
-            scriptDireto: "cliente/arquitetura-validar.ts",
             descricao: "Valida regras arquiteturais duras do cliente usando resolucao real de modulos.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
-                "npx tsx toolkit/ferramentas.ts cliente arquitetura validar",
-                "npx tsx toolkit/ferramentas.ts cliente arquitetura validar --json",
-                "npx tsx toolkit/ferramentas.ts cliente arquitetura validar --base C:/sgc",
+                "ferramentas cliente arquitetura validar",
+                "ferramentas cliente arquitetura validar --json",
+                "ferramentas cliente arquitetura validar --base C:/sgc",
             ],
         });
         return;

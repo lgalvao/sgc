@@ -106,15 +106,14 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "cliente modais validar",
-            scriptDireto: "cliente/modais-validar.ts",
             descricao: "Valida que apenas ModalPadrao abre BModal diretamente no cliente.",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
-                "npx tsx toolkit/ferramentas.ts cliente modais validar",
-                "npx tsx toolkit/ferramentas.ts cliente modais validar --json",
+                "ferramentas cliente modais validar",
+                "ferramentas cliente modais validar --json",
             ],
         });
         return;

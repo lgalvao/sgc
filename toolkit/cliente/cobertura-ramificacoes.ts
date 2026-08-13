@@ -36,7 +36,6 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "cliente cobertura ramificacoes",
-            scriptDireto: "cliente/cobertura-ramificacoes.ts",
             descricao: "Lista lacunas de cobertura de ramificacoes no cliente por arquivo.",
             opcoes: [
                 "--json          Saída estruturada em JSON.",

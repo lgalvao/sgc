@@ -81,7 +81,6 @@ function lerArgumentos(argumentos: string[]): OpcoesPriorizar {
 function imprimirAjuda() {
     exibirAjudaComando({
         comandoToolkit: "servidor testes priorizar",
-        scriptDireto: "servidor/testes-priorizar.ts",
         descricao: 'Prioriza o backlog de testes a partir do relatorio estruturado ou Markdown.',
         opcoes: [
             '--entrada <arquivo> Arquivo de entrada em JSON ou Markdown',
@@ -91,7 +90,7 @@ function imprimirAjuda() {
             '--help, -h          Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/ferramentas.ts servidor testes priorizar --entrada analise-testes.json --saida priorizacao-testes.md"
+            "ferramentas servidor testes priorizar --entrada analise-testes.json --saida priorizacao-testes.md"
         ]
     });
 }

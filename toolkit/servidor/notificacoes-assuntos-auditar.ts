@@ -122,7 +122,6 @@ async function auditarAssuntos(base: string): Promise<RelatorioAssuntos> {
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoToolkit: "servidor notificacoes auditar-assuntos",
-        scriptDireto: "servidor/notificacoes-assuntos-auditar.ts",
         descricao: "Audita literais de assunto de notificação fora de AssuntosNotificacao.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
@@ -130,8 +129,8 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/ferramentas.ts servidor notificacoes auditar-assuntos",
-            "npx tsx toolkit/ferramentas.ts servidor notificacoes auditar-assuntos --json"
+            "ferramentas servidor notificacoes auditar-assuntos",
+            "ferramentas servidor notificacoes auditar-assuntos --json"
         ]
     });
 }

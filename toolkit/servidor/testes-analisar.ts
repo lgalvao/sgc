@@ -144,8 +144,7 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
 function imprimirAjuda(): void {
     exibirAjudaComando({
         comandoToolkit: "servidor testes analisar",
-        scriptDireto: "servidor/testes-analisar.ts",
-        descricao: 'Analisa classes sem testes correspondentes e gera relatorios em Markdown e JSON com resumo por categoria.',
+        descricao: 'Analisa evidências de testes e cobertura das classes do servidor e gera Markdown e JSON por categoria.',
         opcoes: [
             '--base <diretorio>     Base do projeto para resolver configuracao.',
             '--diretorio <caminho>   Diretorio de fontes Java; substitui codigoServidor.',
@@ -158,7 +157,7 @@ function imprimirAjuda(): void {
             '--help, -h              Exibe esta ajuda'
         ],
         exemplos: [
-            "npx tsx toolkit/ferramentas.ts servidor testes analisar --diretorio backend --saida analise-testes.md --saida-json analise-testes.json"
+            "ferramentas servidor testes analisar --diretorio backend --saida analise-testes.md --saida-json analise-testes.json"
         ]
     });
 }

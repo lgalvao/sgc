@@ -34,7 +34,6 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoToolkit: "integracao contratos diff",
-            scriptDireto: "integracao/contratos-diff.ts",
             descricao: "Compara duas versões do OpenAPI e produz um resumo útil para revisão de mudanças de contrato.",
             opcoes: [
                 "--base <diretorio>   Base do projeto que contém os artefatos padrão.",
@@ -44,9 +43,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--gravar             Grava o resumo Markdown."
             ],
             exemplos: [
-                "npx tsx toolkit/ferramentas.ts integracao contratos diff",
-                "npx tsx toolkit/ferramentas.ts integracao contratos diff --anterior /tmp/old.json --atual /tmp/new.json",
-                "npx tsx toolkit/ferramentas.ts integracao contratos diff --json"
+                "ferramentas integracao contratos diff",
+                "ferramentas integracao contratos diff --anterior /tmp/old.json --atual /tmp/new.json",
+                "ferramentas integracao contratos diff --json"
             ]
         });
         return;

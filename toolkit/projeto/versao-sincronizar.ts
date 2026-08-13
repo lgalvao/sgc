@@ -16,7 +16,7 @@ function resolverAlvosVersao(diretorioBase: string): AlvoVersao[] {
 function principal(argumentosInformados: string[] = process.argv.slice(2)): ResultadoSincronizacao | undefined {
     const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
-        escreverLinha("Uso recomendado: npx tsx toolkit/ferramentas.ts projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]");
+        escreverLinha("Uso recomendado: ferramentas projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]");
         escreverLinha("");
         escreverLinha("Atualiza gradle.properties e o package.json do cliente configurado; por padrão, apenas simula a alteração.");
         escreverLinha("--gravar             Persiste a versão nos arquivos encontrados.");
@@ -26,8 +26,7 @@ function principal(argumentosInformados: string[] = process.argv.slice(2)): Resu
 
     const novaVersao = argumentos[0];
     if (!novaVersao) {
-        escreverErro("Uso recomendado: npx tsx toolkit/ferramentas.ts projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]\n");
-        escreverErro("Execução direta: npx tsx toolkit/projeto/versao-sincronizar.ts <versao>\n");
+        escreverErro("Uso recomendado: ferramentas projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]\n");
         process.exitCode = 1;
         return;
     }

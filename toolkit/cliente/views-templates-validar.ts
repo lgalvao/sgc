@@ -139,15 +139,14 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "cliente views templates-validar",
-            scriptDireto: "cliente/views-templates-validar.ts",
             descricao: "Valida previsibilidade estrutural das views do cliente (shell, header e proibicao de BModal cru).",
             opcoes: [
                 "--json               Emite o resultado bruto em JSON.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
             ],
             exemplos: [
-                "npx tsx toolkit/ferramentas.ts cliente views templates-validar",
-                "npx tsx toolkit/ferramentas.ts cliente views templates-validar --json",
+                "ferramentas cliente views templates-validar",
+                "ferramentas cliente views templates-validar --json",
             ],
         });
         return;

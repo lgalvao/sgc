@@ -45,7 +45,6 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "servidor cobertura ramificacoes",
-            scriptDireto: "servidor/cobertura-ramificacoes.ts",
             descricao: "Lista classes do servidor com ramificacoes perdidas no relatorio JaCoCo.",
             opcoes: [
                 "--json            Saída estruturada em JSON.",

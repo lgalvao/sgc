@@ -43,7 +43,6 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (exibirAjuda) {
         exibirAjudaComando({
             comandoToolkit: "cliente residuos auditar",
-            scriptDireto: "cliente/residuos-auditar.ts",
             descricao: "Audita sinais de residuos estruturais e defensividade acidental no cliente.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
@@ -53,9 +52,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--saida <diretorio>  Sobrescreve o diretorio de saida da fotografia."
             ],
             exemplos: [
-                "npx tsx toolkit/ferramentas.ts cliente residuos auditar",
-                "npx tsx toolkit/ferramentas.ts cliente residuos auditar --json",
-                "npx tsx toolkit/ferramentas.ts cliente residuos auditar --gravar --base /tmp/sgc"
+                "ferramentas cliente residuos auditar",
+                "ferramentas cliente residuos auditar --json",
+                "ferramentas cliente residuos auditar --gravar --base /tmp/sgc"
             ]
         });
         return;

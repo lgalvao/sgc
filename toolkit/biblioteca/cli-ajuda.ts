@@ -2,7 +2,6 @@ import {escreverLinha} from "./saida.js";
 
 interface OpcoesAjudaComando {
     comandoToolkit: string;
-    scriptDireto: string;
     descricao?: string;
     argumentos?: string | null;
     opcoes?: string[];
@@ -11,16 +10,13 @@ interface OpcoesAjudaComando {
 
 function exibirAjudaComando({
     comandoToolkit,
-    scriptDireto,
     descricao,
     argumentos = null,
     opcoes = [],
     exemplos = []
 }: OpcoesAjudaComando): void {
     const linhas: string[] = [];
-    linhas.push(`Uso recomendado: npx tsx toolkit/ferramentas.ts ${comandoToolkit}${argumentos ? ` ${argumentos}` : ''}`);
-
-    linhas.push(`Execucao direta: npx tsx toolkit/${scriptDireto}${argumentos ? ` ${argumentos}` : ''}`);
+    linhas.push(`Uso recomendado: ferramentas ${comandoToolkit}${argumentos ? ` ${argumentos}` : ''}`);
 
     if (descricao) {
         linhas.push('');

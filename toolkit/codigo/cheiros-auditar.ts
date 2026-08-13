@@ -391,8 +391,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoToolkit: "codigo cheiros auditar",
-            scriptDireto: "codigo/cheiros-auditar.ts",
-            descricao: "Gera uma fotografia com contagens e pontuacao de cheiros de codigo.",
+            descricao: "Gera fotografia de tendências de complexidade e código defensivo para comparação entre execuções.",
             opcoes: [
                 "--json               Emite a fotografia em JSON.",
                 "--gravar             Atualiza os artefatos de fotografia e resumo.",

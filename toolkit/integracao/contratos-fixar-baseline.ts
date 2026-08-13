@@ -14,7 +14,6 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoToolkit: "integracao contratos fixar-baseline",
-            scriptDireto: "integracao/contratos-fixar-baseline.ts",
             descricao: "Promove a fotografia OpenAPI mais recente como referência para comparações futuras de contrato.",
             opcoes: [
                 "--base <diretorio>   Base do projeto que contém os artefatos padrão.",
@@ -23,9 +22,9 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
                 "--json               Emite o resultado em JSON."
             ],
             exemplos: [
-                "npx tsx toolkit/ferramentas.ts integracao contratos fixar-baseline",
-                "npx tsx toolkit/ferramentas.ts integracao contratos fixar-baseline --origem /tmp/novo.json",
-                "npx tsx toolkit/ferramentas.ts integracao contratos fixar-baseline --json"
+                "ferramentas integracao contratos fixar-baseline",
+                "ferramentas integracao contratos fixar-baseline --origem /tmp/novo.json",
+                "ferramentas integracao contratos fixar-baseline --json"
             ]
         });
         return;

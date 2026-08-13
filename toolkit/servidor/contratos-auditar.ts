@@ -395,7 +395,6 @@ async function gravarRelatorio(relatorio: RelatorioContratos, diretorioSaida: st
 function exibirAjuda(): void {
     exibirAjudaComando({
         comandoToolkit: "servidor contratos auditar",
-        scriptDireto: "servidor/contratos-auditar.ts",
         descricao: "Audita DTOs e responses expostos por controllers para detectar vazamento de tipos model.* no contrato HTTP.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
@@ -404,9 +403,9 @@ function exibirAjuda(): void {
             "--help, -h          Exibe esta ajuda."
         ],
         exemplos: [
-            "npx tsx toolkit/ferramentas.ts servidor contratos auditar",
-            "npx tsx toolkit/ferramentas.ts servidor contratos auditar --json",
-            "npx tsx toolkit/ferramentas.ts servidor contratos auditar --gravar"
+            "ferramentas servidor contratos auditar",
+            "ferramentas servidor contratos auditar --json",
+            "ferramentas servidor contratos auditar --gravar"
         ]
     });
 }

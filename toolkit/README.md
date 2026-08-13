@@ -9,27 +9,28 @@ Requisitos: Node 26.7 ou superior e dependências do workspace `toolkit` instala
 
 ```bash
 npm --prefix toolkit install
-npx tsx toolkit/ferramentas.ts --help
+npm --prefix toolkit run ferramentas -- --help
 ```
 
 O toolkit executa a fonte TypeScript diretamente com `tsx`. `dist/` é gerado apenas pelo gate de build e não participa
-do fluxo normal.
+do fluxo normal. No monorepo SGC, use `npm run sgc -- <comando>`. Depois de instalar o pacote, use o binário
+`ferramentas <comando>`.
 
 A ajuda da CLI é a fonte canônica para comandos, opções e descrições:
 
 ```bash
-npx tsx toolkit/ferramentas.ts servidor --help
-npx tsx toolkit/ferramentas.ts cliente --help
-npx tsx toolkit/ferramentas.ts requisitos --help
-npx tsx toolkit/ferramentas.ts qualidade --help
-npx tsx toolkit/ferramentas.ts projeto --help
+npm run sgc -- servidor --help
+npm run sgc -- cliente --help
+npm run sgc -- requisitos --help
+npm run sgc -- qualidade --help
+npm run sgc -- projeto --help
 ```
 
 A CLI rejeita opções desconhecidas, valores ausentes e argumentos posicionais excedentes. Opções com valor também podem
 usar a forma `--opcao=valor`; ela é normalizada antes de chegar ao script executado.
 
-Os entrypoints diretos dos comandos catalogados reutilizam o mesmo contrato. Por exemplo, `npx tsx
-toolkit/codigo/cheiros-auditar.ts --opcao-inexistente` falha antes de iniciar a auditoria.
+Os entrypoints diretos dos comandos catalogados reutilizam o mesmo contrato. A execução recomendada continua sendo a
+CLI ou o binário instalado; scripts internos não são uma segunda interface pública.
 
 ## Organização
 
@@ -55,19 +56,69 @@ O desenho desejado separa:
 O SGC não importa nem executa o toolkit como dependência. O termo “perfil SGC” identifica apenas a composição de regras
 e defaults usada quando o toolkit audita ou opera sobre o workspace do SGC.
 
-## Comandos representativos
+## Superfície pública
+
+Todos os comandos abaixo são mantidos. “Ocasional” identifica inventários e utilitários úteis sob demanda, não gates
+permanentes. O catálogo também registra persistência, remoção, subprocessos e rede.
+
+| Comando | Camada | Finalidade | Decisão |
+|---|---|---|---|
+| `servidor cobertura auditoria` | adaptável | Auditar cobertura e risco do servidor | Manter |
+| `servidor cobertura ramificacoes` | adaptável | Auditar lacunas de ramificações do servidor | Manter |
+| `servidor arquitetura auditar` | adaptável | Auditar concentração de responsabilidades em Java | Manter |
+| `servidor coesao auditar` | perfil SGC | Auditar mistura de responsabilidades nos Services do SGC | Manter |
+| `servidor contratos auditar` | adaptável | Auditar vazamento de modelos em DTOs expostos | Manter |
+| `servidor testes analisar` | adaptável | Analisar evidências de testes e cobertura Java | Manter |
+| `servidor testes priorizar` | adaptável | Gerar prioridades para o backlog de testes | Manter |
+| `servidor java corrigir-fqn` | adaptável | Transformar FQNs Java em imports | Manter como utilitário ocasional |
+| `servidor notificacoes auditar-assuntos` | perfil SGC | Auditar assuntos de notificações do SGC | Manter |
+| `cliente cobertura auditoria` | adaptável | Auditar cobertura e risco do cliente | Manter |
+| `cliente cobertura ramificacoes` | adaptável | Auditar lacunas de ramificações do cliente | Manter |
+| `cliente cobertura ramificacoes-erros` | perfil SGC | Cruzar lacunas com tratamento de erros do SGC | Manter |
+| `cliente residuos auditar` | adaptável | Inventariar resíduos estruturais do cliente | Manter |
+| `cliente residuos validar` | adaptável | Validar orçamento e exceções de resíduos | Manter |
+| `cliente arquitetura auditar` | perfil SGC | Auditar arquitetura Vue segundo a política do SGC | Manter |
+| `cliente arquitetura validar` | perfil SGC | Validar o gate arquitetural do SGC | Manter |
+| `cliente views templates-validar` | perfil SGC | Validar previsibilidade dos templates do SGC | Manter |
+| `cliente modais validar` | perfil SGC | Validar o padrão de modais do SGC | Manter |
+| `cliente identificadores-teste listar` | adaptável | Inventariar identificadores de testes | Manter como diagnóstico ocasional |
+| `cliente identificadores-teste listar-duplicados` | adaptável | Auditar identificadores de testes duplicados | Manter como diagnóstico ocasional |
+| `codigo cheiros auditar` | adaptável | Fotografar tendências de complexidade e código defensivo | Manter como tendência |
+| `codigo semgrep auditar` | adaptável | Executar regras Semgrep configuradas | Manter |
+| `codigo nomes coletar-simbolos` | adaptável | Inventariar símbolos do código | Manter como diagnóstico ocasional |
+| `codigo nomes auditar-consistencia` | adaptável | Auditar consistência de nomenclatura | Manter |
+| `codigo nomes auditar-idioma` | perfil SGC | Auditar idioma e uso de `codigo` no SGC | Manter |
+| `integracao contratos exportar-openapi` | adaptável | Exportar o contrato OpenAPI atual | Manter |
+| `integracao contratos diff` | adaptável | Auditar diferenças entre contratos OpenAPI | Manter |
+| `integracao contratos fixar-baseline` | adaptável | Promover um contrato como baseline | Manter |
+| `requisitos cdus inventariar` | adaptável | Inventariar o corpus CDU | Manter como diagnóstico ocasional |
+| `requisitos cdus auditar` | adaptável | Auditar estrutura e referências CDU | Manter |
+| `projeto arvore-linhas` | núcleo | Inventariar linhas do repositório | Manter como diagnóstico ocasional |
+| `projeto versao-sincronizar` | adaptável | Sincronizar versões entre arquivos configurados | Manter |
+| `qualidade coletar` | perfil SGC | Orquestrar a fotografia de qualidade do SGC | Manter |
+| `qualidade tarefas executar` | adaptável | Executar tarefas de qualidade configuradas | Manter |
+| `qualidade resumo` | núcleo | Resumir uma fotografia de qualidade | Manter |
+| `projeto dependencias auditar` | adaptável | Auditar uso, atualização e vulnerabilidades | Manter |
+| `projeto ambiente verificar` | perfil SGC | Verificar pré-requisitos do workspace SGC | Manter |
+| `projeto artefatos limpar` | adaptável | Pré-visualizar e remover artefatos elegíveis | Manter |
+
+Os comandos classificados como perfil SGC operam sobre convenções do SGC; isso não significa que o SGC consuma o
+toolkit. Os comandos adaptáveis são os candidatos ao uso em outros projetos, desde que configuração e política sejam
+fornecidas.
+
+## Exemplos de execução
 
 ### Servidor e cliente
 
 ```bash
-npx tsx toolkit/ferramentas.ts servidor cobertura auditoria --json
-npx tsx toolkit/ferramentas.ts servidor testes analisar --json
-npx tsx toolkit/ferramentas.ts servidor testes analisar --gravar --saida analise-testes.md
-npx tsx toolkit/ferramentas.ts servidor testes priorizar --entrada analise-testes.json --gravar
-npx tsx toolkit/ferramentas.ts servidor java corrigir-fqn
-npx tsx toolkit/ferramentas.ts cliente cobertura auditoria --json
-npx tsx toolkit/ferramentas.ts cliente residuos validar
-npx tsx toolkit/ferramentas.ts cliente identificadores-teste listar-duplicados
+ferramentas servidor cobertura auditoria --json
+ferramentas servidor testes analisar --json
+ferramentas servidor testes analisar --gravar --saida analise-testes.md
+ferramentas servidor testes priorizar --entrada analise-testes.json --gravar
+ferramentas servidor java corrigir-fqn
+ferramentas cliente cobertura auditoria --json
+ferramentas cliente residuos validar
+ferramentas cliente identificadores-teste listar-duplicados
 ```
 
 `servidor java corrigir-fqn` simula por padrão; use `--gravar` para modificar fontes.
@@ -91,10 +142,10 @@ O JSON persistido por `servidor testes analisar` usa `versao: 2`, campos em port
 ### Código e integração
 
 ```bash
-npx tsx toolkit/ferramentas.ts codigo cheiros auditar --json
-npx tsx toolkit/ferramentas.ts codigo semgrep auditar
-npx tsx toolkit/ferramentas.ts codigo nomes auditar-consistencia
-npx tsx toolkit/ferramentas.ts integracao contratos diff
+ferramentas codigo cheiros auditar --json
+ferramentas codigo semgrep auditar
+ferramentas codigo nomes auditar-consistencia
+ferramentas integracao contratos diff
 ```
 
 Cheiros e Semgrep são complementares: o primeiro aplica heurísticas internas, enquanto o segundo executa regras
@@ -142,11 +193,11 @@ e `http://127.0.0.1:10000/api-docs` apenas como conveniências da sua borda.
 ### Casos de uso CDU
 
 ```bash
-npx tsx toolkit/ferramentas.ts requisitos cdus inventariar
-npx tsx toolkit/ferramentas.ts requisitos cdus inventariar --secoes vocabulario,mensagens
-npx tsx toolkit/ferramentas.ts requisitos cdus auditar --json
-npx tsx toolkit/ferramentas.ts requisitos cdus auditar --secoes estrutura,estilo,vocabulario,mensagens
-npx tsx toolkit/ferramentas.ts requisitos cdus auditar --secoes mensagens-codigo
+ferramentas requisitos cdus inventariar
+ferramentas requisitos cdus inventariar --secoes vocabulario,mensagens
+ferramentas requisitos cdus auditar --json
+ferramentas requisitos cdus auditar --secoes estrutura,estilo,vocabulario,mensagens
+ferramentas requisitos cdus auditar --secoes mensagens-codigo
 ```
 
 `inventariar` consolida formatos, vocabulário, mensagens, densidade e duplicações. `auditar` consolida estrutura, estilo,
@@ -162,13 +213,13 @@ para interfaces anteriores do toolkit.
 ### Qualidade e projeto
 
 ```bash
-npx tsx toolkit/ferramentas.ts qualidade coletar --perfil rapido
-npx tsx toolkit/ferramentas.ts qualidade tarefas executar rapido
-npx tsx toolkit/ferramentas.ts qualidade resumo
-npx tsx toolkit/ferramentas.ts projeto ambiente verificar
-npx tsx toolkit/ferramentas.ts projeto dependencias auditar
-npx tsx toolkit/ferramentas.ts projeto artefatos limpar
-npx tsx toolkit/ferramentas.ts projeto versao-sincronizar 1.2.3
+ferramentas qualidade coletar --perfil rapido
+ferramentas qualidade tarefas executar rapido
+ferramentas qualidade resumo
+ferramentas projeto ambiente verificar
+ferramentas projeto dependencias auditar
+ferramentas projeto artefatos limpar
+ferramentas projeto versao-sincronizar 1.2.3
 ```
 
 `qualidade coletar` executa os adaptadores e perfis do SGC e produz uma fotografia consolidada. Seu motor interno de
