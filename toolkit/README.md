@@ -128,6 +128,9 @@ auditoria precisar criar o inventário auxiliar, a mesma opção é propagada ex
 `integracao contratos diff` compara os documentos OpenAPI sem gravar por padrão. Use `--gravar` para persistir o resumo
 Markdown; `exportar-openapi` e `fixar-baseline` continuam sendo ações de geração/promoção explícitas.
 
+`backend cobertura auditoria` e `frontend cobertura auditoria` também só persistem o relatório Markdown com `--gravar`.
+O modo `--json` continua adequado para integração sem criar arquivos.
+
 ### Requisitos
 
 ```bash

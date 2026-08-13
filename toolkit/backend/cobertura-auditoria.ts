@@ -56,7 +56,7 @@ function obterPrioridade(score: number): string {
 
 async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminho: string): Promise<string> {
     const {totais, hotspots} = dados;
-    let md = `# Auditoria de Cobertura Backend - SGC\n\n`;
+    let md = "# Auditoria de Cobertura Backend\n\n";
 
     md += `## Resumo Geral\n`;
     md += `- **Cobertura Global (Instruções):** ${totais.instrucoes.percentual}%\n`;
@@ -88,7 +88,7 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminh
         }
     });
 
-    md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;
+    md += `\n\n_Gerado automaticamente pelo toolkit em ${new Date().toLocaleString("pt-BR")}._\n`;
 
     await fs.mkdir(path.dirname(caminho), {recursive: true});
     await fs.writeFile(caminho, md, "utf8");
@@ -109,6 +109,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 "--output <arquivo>  Caminho do arquivo Markdown a ser gerado.",
                 "--arquivo <xml>     Usa um relatório JaCoCo específico.",
                 "--base <diretorio>   Resolve o relatório relativo a outra base.",
+                "--gravar             Persiste o relatório Markdown.",
                 "--min <percentual>   Falha se a cobertura global for menor que a meta."
             ]
         });
@@ -118,6 +119,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", resolverNaRaiz()) ?? resolverNaRaiz());
     const arquivo = lerOpcao(argumentos, "--arquivo", "") ?? "";
     const caminhoSaida = lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT) ?? CAMINHO_PADRAO_OUTPUT;
+    const gravar = argumentos.includes("--gravar");
     const metaMinima = Number(lerOpcao(argumentos, "--min", "0") ?? "0");
 
     if (!emitirJson) {
@@ -156,8 +158,19 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             }))
         };
 
+        const caminhoRelatorio = path.isAbsolute(caminhoSaida)
+            ? caminhoSaida
+            : path.resolve(diretorioBase, caminhoSaida);
+
+        if (gravar) {
+            await gerarRelatorioMarkdown(resultado, caminhoRelatorio);
+        }
+
         if (emitirJson) {
             imprimirJson(resultado);
+            if (metaMinima > 0 && coleta.instrucoes.percentual < metaMinima) {
+                process.exitCode = 1;
+            }
             return;
         }
 
@@ -180,11 +193,9 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             }
         });
 
-        const caminhoRelatorio = path.isAbsolute(caminhoSaida)
-            ? caminhoSaida
-            : path.resolve(diretorioBase, caminhoSaida);
-        await gerarRelatorioMarkdown(resultado, caminhoRelatorio);
-        escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(caminhoRelatorio)}`);
+        if (gravar) {
+            escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(caminhoRelatorio)}`);
+        }
 
         if (metaMinima > 0 && coleta.instrucoes.percentual < metaMinima) {
             escreverLinha(pc.red(`\nFALHA: Cobertura global (${coleta.instrucoes.percentual}%) abaixo da meta (${metaMinima}%).`));

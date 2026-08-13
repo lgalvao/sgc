@@ -53,7 +53,7 @@ function obterPrioridade(score: number): string {
 
 async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho: string): Promise<string> {
     const {totais, hotspots} = dados;
-    let md = "# Auditoria de Cobertura Frontend - SGC\n\n";
+    let md = "# Auditoria de Cobertura Frontend\n\n";
 
     md += "## Resumo Geral\n";
     md += `- **Cobertura de Linhas:** ${totais.lines.percentual}%\n`;
@@ -71,7 +71,7 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho
         md += `| ${i + 1} | \`${h.arquivo}\` | ${h.scoreImpacto.toFixed(1)} | ${h.statementsTotal - h.statementsCobertos} | ${h.coberturaLinhas}% | ${prioridade} |\n`;
     });
 
-    md += `\n\n_Gerado automaticamente pelo toolkit SGC em ${new Date().toLocaleString('pt-BR')}._\n`;
+    md += `\n\n_Gerado automaticamente pelo toolkit em ${new Date().toLocaleString("pt-BR")}._\n`;
 
     await fs.mkdir(path.dirname(caminho), {recursive: true});
     await fs.writeFile(caminho, md, "utf8");
@@ -92,6 +92,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
                 '--output <arquivo> Caminho do arquivo Markdown a ser gerado.',
                 '--arquivo <arquivo> Usa um relatório V8 específico.',
                 '--base <diretorio> Resolve o relatório relativo a outra base.',
+                '--gravar             Persiste o relatório Markdown.',
                 '--min <percentual> Falha se a cobertura de linhas for menor que N.'
             ]
         });
@@ -101,6 +102,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const arquivo = lerOpcao(argumentos, "--arquivo", undefined);
     const caminhoSaida = path.resolve(diretorioBase, lerOpcao(argumentos, "--output", CAMINHO_PADRAO_OUTPUT) ?? CAMINHO_PADRAO_OUTPUT);
+    const gravar = argumentos.includes("--gravar");
     const metaMinima = Number(lerOpcao(argumentos, "--min", "0") ?? "0");
 
     if (!emitirJson) {
@@ -137,6 +139,10 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             }))
         };
 
+        if (gravar) {
+            await gerarRelatorioMarkdown(resultado, caminhoSaida);
+        }
+
         if (emitirJson) {
             imprimirJson(resultado);
             if (metaMinima > 0 && coleta.lines.percentual < metaMinima) process.exitCode = 1;
@@ -156,8 +162,9 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
             escreverLinha(`   Lacuna: ${h.statementsTotal - h.statementsCobertos} statements sem teste.`);
         });
 
-        await gerarRelatorioMarkdown(resultado, caminhoSaida);
-        escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(path.relative(process.cwd(), caminhoSaida).replaceAll("\\", "/"))}`);
+        if (gravar) {
+            escreverLinha(`\n${pc.green("✓")} Relatório detalhado gerado em: ${pc.dim(path.relative(process.cwd(), caminhoSaida).replaceAll("\\", "/"))}`);
+        }
 
         if (metaMinima > 0 && coleta.lines.percentual < metaMinima) {
             escreverLinha(pc.red(`\nFALHA: Cobertura de linhas (${coleta.lines.percentual}%) abaixo da meta (${metaMinima}%).`));

@@ -244,6 +244,8 @@ frontend e para os caminhos OpenAPI.
   cobre execução sem gravação e persistência explícita junto com a resolução da política empacotada.
 - `integracao/contratos-diff.ts` adotou a mesma fronteira read-only, com `--gravar` como ação positiva; exportação e
   fixação de baseline continuam separadas como ações explicitamente geradoras/promotoras.
+- `backend/cobertura-auditoria.ts` e `frontend/cobertura-auditoria.ts` adotaram a mesma fronteira read-only, com
+  `--gravar` como ação positiva; o modo JSON não cria relatórios e os títulos deixaram de carregar `SGC` fixo.
 - `frontend/arquitetura-lib.ts` foi convertido para TypeScript com tipos para análise AST, imports por camada, sinais,
   métricas, hotspots, famílias, exceções documentadas e fotografia; os hubs e heurísticas arquiteturais continuam
   explícitos no perfil SGC.
@@ -370,7 +372,7 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 107 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 108 testes aprovados em 2 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
   e verificação da política Semgrep empacotada;
@@ -400,8 +402,8 @@ de caminhos dos relatórios V8 frontend; esta chega a 96 com o launcher `tsx` do
 reintroduz o wrapper obsoleto; as rodadas posteriores de limpeza, preparação, qualidade, dependências e acessibilidade
 elevam a cobertura para 101 cenários; uma rodada chega a 102 com o teste comportamental do auditor de contratos backend;
 esta rodada adiciona a resolução portável do Semgrep e o smoke de pacote isolado; a suíte unitária chega a 104 cenários;
-a parametrização de execuções externas chega a 105; uma rodada explicita as políticas de resíduos e chega a 106; esta
-rodada uniformiza a família de nomenclatura e chega a 107.
+a parametrização de execuções externas chega a 105; uma rodada explicita as políticas de resíduos e chega a 106; outra
+uniformiza a família de nomenclatura e chega a 107; esta rodada uniformiza os relatórios de cobertura e chega a 108.
 
 ### 3.3 Tamanho e composição atual
 
@@ -410,7 +412,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 - 72 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 3 arquivos JavaScript de teste (`test/sgc.test.js`, `test/cdus.test.js` e `test/pacote.test.js`);
-- 2 arquivos de teste concentrando 107 cenários, mais 1 smoke de distribuição isolada;
+- 2 arquivos de teste concentrando 108 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
@@ -427,7 +429,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Semgrep acoplado ao ambiente local | A política padrão vinha da raiz do consumidor e o executável era fixado em `~/.local/bin/semgrep`; ambos agora usam a instalação do toolkit e o `PATH`, com testes de override e consumidor isolado. |
 | Resolvido | Configuração permissiva do Knip | A configuração anterior tratava praticamente todos os arquivos como entrypoints. A nova lista os comandos reais, inclui JS/TS e, nesta rodada, encontrou e removeu oito exports internos não consumidos. |
 | Resolvido parcialmente | Base externa é parcialmente ignorada | Arquitetura, resíduos, OpenAPI, coleta, Semgrep, cheiros e assuntos de notificação agora respeitam a base/configuração; outros comandos ainda precisam da mesma correção. |
-| Alta | Auditores gravam por padrão | Cobertura ainda tem escrita automática ou defaults distintos. `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar`, `codigo semgrep auditar`, toda a família `codigo nomes` e `integracao contratos diff` já exigem `--gravar`; a diretriz read-only ainda precisa ser aplicada às demais famílias. |
+| Resolvido nesta rodada | Auditores gravam por padrão | `codigo cheiros auditar`, `frontend arquitetura auditar`, `backend arquitetura auditar`, `backend coesao auditar`, `backend contratos auditar`, `frontend residuos auditar/validar`, `codigo semgrep auditar`, toda a família `codigo nomes`, `integracao contratos diff` e as duas auditorias unificadas de cobertura agora só persistem com `--gravar`. Geração de relatórios, coleta e mutações continuam classificadas separadamente. |
 | Resolvido | Cobertura insuficiente de mutação | O corretor `backend/java-corrigir-fqn.ts` agora tem fixture de escrita, verificação de conteúdo sem duplicação e segunda execução idempotente. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
@@ -448,7 +450,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 107 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 108 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -459,7 +461,7 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 
 | Classe atual | Comandos ou famílias | Efeito observado e controle existente |
 |---|---|---|
-| Auditoria read-only | `requisitos cdus *`, `backend cobertura ramificacoes`, `frontend cobertura ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. As famílias que oferecem persistência usam `--gravar`. Dependências externas podem fazer leitura adicional. |
+| Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. As famílias que oferecem persistência usam `--gravar`. Dependências externas podem fazer leitura adicional. |
 | Geração de relatório indicado | `backend cobertura auditoria`, `frontend cobertura auditoria`, `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--output`, `--output-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN usa `--dry-run` opt-in; versão não possui prévia; baseline copia diretamente para o destino. |

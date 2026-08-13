@@ -568,6 +568,92 @@ describe("CLI raiz do toolkit", () => {
         }
     });
 
+    test("mantem auditorias de cobertura read-only e grava sob demanda", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cobertura-auditoria-"));
+        const caminhoJacoco = path.join(base, "relatorios", "jacoco.xml");
+        const caminhoV8 = path.join(base, "relatorios", "coverage-final.json");
+
+        await fs.outputFile(caminhoJacoco, [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<report name=\"exemplo\">",
+            "  <counter type=\"INSTRUCTION\" missed=\"1\" covered=\"1\"/>",
+            "  <counter type=\"LINE\" missed=\"1\" covered=\"1\"/>",
+            "  <counter type=\"BRANCH\" missed=\"1\" covered=\"0\"/>",
+            "  <counter type=\"COMPLEXITY\" missed=\"1\" covered=\"1\"/>",
+            "  <counter type=\"METHOD\" missed=\"1\" covered=\"1\"/>",
+            "  <package name=\"exemplo\">",
+            "    <sourcefile name=\"Exemplo.java\">",
+            "      <line nr=\"1\" mi=\"0\" ci=\"1\" mb=\"0\" cb=\"0\"/>",
+            "      <line nr=\"2\" mi=\"1\" ci=\"0\" mb=\"1\" cb=\"0\"/>",
+            "    </sourcefile>",
+            "  </package>",
+            "</report>",
+            ""
+        ].join("\n"));
+        await fs.outputJSON(caminhoV8, {
+            [path.join(base, "frontend", "src", "Exemplo.ts")]: {
+                s: {"1": 1, "2": 0},
+                f: {"1": 1},
+                b: {"1": [1, 0]},
+                statementMap: {"1": {}, "2": {}}
+            }
+        });
+
+        const backendLeitura = await executarSgc([
+            "backend",
+            "cobertura",
+            "auditoria",
+            "--json",
+            "--base",
+            base,
+            "--arquivo",
+            caminhoJacoco
+        ]);
+        const frontendLeitura = await executarSgc([
+            "frontend",
+            "cobertura",
+            "auditoria",
+            "--json",
+            "--base",
+            base,
+            "--arquivo",
+            caminhoV8
+        ]);
+
+        expect(backendLeitura.exitCode).toBe(0);
+        expect(frontendLeitura.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(base, "backend-coverage-auditoria.md"))).toBe(false);
+        expect(await fs.pathExists(path.join(base, "frontend-coverage-auditoria.md"))).toBe(false);
+
+        const backendGravacao = await executarSgc([
+            "backend",
+            "cobertura",
+            "auditoria",
+            "--json",
+            "--gravar",
+            "--base",
+            base,
+            "--arquivo",
+            caminhoJacoco
+        ]);
+        const frontendGravacao = await executarSgc([
+            "frontend",
+            "cobertura",
+            "auditoria",
+            "--json",
+            "--gravar",
+            "--base",
+            base,
+            "--arquivo",
+            caminhoV8
+        ]);
+
+        expect(backendGravacao.exitCode).toBe(0);
+        expect(frontendGravacao.exitCode).toBe(0);
+        expect(await fs.pathExists(path.join(base, "backend-coverage-auditoria.md"))).toBe(true);
+        expect(await fs.pathExists(path.join(base, "frontend-coverage-auditoria.md"))).toBe(true);
+    });
+
     test("pode importar comandos de cobertura frontend sem ler o relatorio V8", async () => {
         const resultados = await Promise.all(CAMINHOS_COMANDOS_COBERTURA_FRONTEND.map(async caminho => {
             const urlModulo = pathToFileURL(caminho).href;
