@@ -217,7 +217,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
 - o motor de sincronização de versão recebe alvos explícitos e formatos `propriedadesGradle`/`manifestoNpm`; a escolha
   de `gradle.properties` e do `package.json` do cliente ficou somente no comando do perfil SGC;
 - as heurísticas de classificação do analisador de testes Java aceitam uma política explícita; o comando injeta a política
-  SGC em `servidor/testes-politica-sgc.ts`, deixando `Sgc`, `Situacao`, `Mensagens` e `SanitizarHtml` fora do motor;
+  SGC em `servidor/testes-politica-sgc.ts`, deixando `Sgc`, `Situacao`, `Mensagens` e `SanitizarHtml` fora do motor; a
+  opção `--politica` carrega e valida a política JSON de outro projeto;
 - os agregadores CDU ficaram reduzidos a bordas de comando; parser, descoberta do corpus, inventário e auditoria não
   importam mais `process.argv`, execução de processo ou saída textual;
 - defaults de Gradle, Vue, caminhos configurados e outras políticas SGC ainda aparecem em bordas ou módulos adaptáveis;
@@ -277,8 +278,8 @@ editar o toolkit ou receber políticas do SGC acidentalmente.
 
 - consolidar a separação já feita para URL OpenAPI e regras Semgrep nos testes, na documentação e na composição dos comandos;
 - inventariar e tornar explícitos tarefas Gradle, convenções Vue e caminhos ainda embutidos;
-- expor a política de classificação de testes Java por configuração ou opção validada, permitindo que a CLI use uma política
-  de outro projeto sem editar o toolkit;
+- adicionar uma fixture completa de segundo projeto que use `--politica`, `--base`, fontes/testes configurados e os
+  relatórios do analisador Java sem nenhum default do SGC;
 - mover defaults locais para módulos coesos de perfil, sem condicionais `projeto === "sgc"` espalhadas;
 - fazer motores receberem políticas, coletores e executores por composição;
 - manter a configuração orientada a conceitos do domínio, evitando espelhar cada detalhe interno como uma opção;

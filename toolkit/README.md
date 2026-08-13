@@ -74,8 +74,8 @@ agentes e scripts pelo stdout; use `--gravar` para persistir relatórios.
 
 As heurísticas de classificação Java ficam em `servidor/biblioteca/testes-analisar-regras.ts` e aceitam uma política
 explícita. O comando do SGC injeta `servidor/testes-politica-sgc.ts`; isso mantém exceções como `Situacao`, `Mensagens` e
-`SanitizarHtml` fora do motor genérico. A exposição dessa política por configuração/CLI ainda é uma etapa pendente para
-usar o comando diretamente em outros projetos.
+`SanitizarHtml` fora do motor genérico. Para outro projeto, informe `--politica` com um JSON contendo as oito listas da
+política (`anotacoesContrato`, nomes/prefixos/sufixos de modelos e outros, e `caminhosOutrosEstruturais`).
 
 Os relatórios próprios persistidos de `servidor arquitetura auditar` e `servidor coesao auditar` carregam `versao: 2` e
 usam `pontosCriticos`. O JSON persistido pelo Semgrep continua sendo o formato externo da ferramenta e, por isso, não

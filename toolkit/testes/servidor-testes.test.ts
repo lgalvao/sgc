@@ -56,6 +56,43 @@ describe("Análise e priorização dos testes do servidor", () => {
         expect(classificarPerfilDto(dto, POLITICA_CLASSIFICACAO_TESTES_SGC)).toBe("estruturalContrato");
     });
 
+    test("aceita política de classificação externa pela CLI", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-politica-externa-"));
+        const diretorioServidor = path.join(base, "backend-fake");
+        const caminhoPolitica = path.join(base, "politica-testes.json");
+        await escreverJson(caminhoPolitica, {
+            anotacoesContrato: ["ValidacaoExterna"],
+            nomesModelosEstruturais: [],
+            prefixosModelosEstruturais: ["Estado"],
+            sufixosModelosEstruturais: [],
+            nomesOutrosEstruturais: [],
+            prefixosOutrosEstruturais: [],
+            sufixosOutrosEstruturais: [],
+            caminhosOutrosEstruturais: []
+        });
+        await escreverArquivo(
+            path.join(diretorioServidor, "src", "main", "java", "com", "exemplo", "model", "EstadoExterno.java"),
+            "package com.exemplo.model; public class EstadoExterno { public void descrever() {} }"
+        );
+
+        const resultado = await executarSgc([
+            "servidor",
+            "testes",
+            "analisar",
+            "--json",
+            "--diretorio",
+            diretorioServidor,
+            "--politica",
+            caminhoPolitica
+        ], {cwd: base});
+
+        expect(resultado.exitCode).toBe(0);
+        const relatorio = JSON.parse(resultado.stdout) as RelatorioAnaliseTestesJson;
+        expect(relatorio.estatisticas.modelosEstruturais).toBe(1);
+        expect(relatorio.estatisticas.classesRuidoIgnorado).toBe(1);
+        expect(relatorio.categorias.modelos.semTeste[0].ruidoModeloIgnorado).toBe(true);
+    });
+
     test("analisa testes do servidor com resumo no console e sidecar JSON", async () => {
         const diretorioSaida = await mkdtemp(path.join(os.tmpdir(), "sgc-testes-analisar-"));
         const markdown = path.join(diretorioSaida, "relatorio.md");

@@ -100,7 +100,7 @@ const CATALOGO_COMANDOS = [
         escopo: "adaptavel",
         finalidade: "inventariar",
         efeitos: criarEfeitosComando("opcional"),
-        argumentos: esquema(["--base", "--diretorio", "--saida", "--saida-json", "--arquivo-jacoco"], ["--json", "--gravar"]),
+        argumentos: esquema(["--base", "--diretorio", "--saida", "--saida-json", "--arquivo-jacoco", "--politica"], ["--json", "--gravar"]),
         arquivo: "servidor/testes-analisar.ts"
     },
     {

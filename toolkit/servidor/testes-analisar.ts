@@ -24,7 +24,7 @@ import {
     SUFIXOS_TESTE,
     type PoliticaClassificacaoTestes
 } from "./biblioteca/testes-analisar-regras.js";
-import {POLITICA_CLASSIFICACAO_TESTES_SGC} from "./testes-politica-sgc.js";
+import {carregarPoliticaClassificacao, POLITICA_CLASSIFICACAO_TESTES_SGC} from "./testes-politica-sgc.js";
 
 type Categoria = (typeof CATEGORIAS_PRIORITARIAS | typeof CATEGORIAS_SECUNDARIAS)[number];
 type PerfilFonte = "comportamental" | "estruturalContrato" | "estruturalPuro";
@@ -100,6 +100,7 @@ interface OpcoesAnalisar {
     saida: string;
     saidaJson: string | null;
     arquivoJacoco: string | null;
+    politica: PoliticaClassificacaoTestes;
     ajuda: boolean;
     gravar: boolean;
     emitirJson: boolean;
@@ -116,6 +117,7 @@ interface OpcoesAnaliseTestes {
 function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioInformado = lerOpcao(argumentos, "--diretorio", undefined);
+    const caminhoPolitica = lerOpcao(argumentos, "--politica", undefined);
     const raizServidorInformada = diretorioInformado ? path.resolve(base, diretorioInformado) : null;
     const resultado = {
         base,
@@ -128,6 +130,9 @@ function lerArgumentos(argumentos: string[]): OpcoesAnalisar {
         saida: lerOpcao(argumentos, "--saida", "analise-testes.md") ?? "analise-testes.md",
         saidaJson: lerOpcao(argumentos, "--saida-json", undefined) ?? null,
         arquivoJacoco: lerOpcao(argumentos, "--arquivo-jacoco", undefined) ?? null,
+        politica: caminhoPolitica
+            ? carregarPoliticaClassificacao(path.resolve(base, caminhoPolitica))
+            : POLITICA_CLASSIFICACAO_TESTES_SGC,
         ajuda: argumentos.includes("--help") || argumentos.includes("-h"),
         gravar: argumentos.includes("--gravar"),
         emitirJson: argumentos.includes("--json"),
@@ -146,6 +151,7 @@ function imprimirAjuda(): void {
             '--saida <arquivo>       Arquivo de saida em Markdown',
             '--saida-json <arquivo>  Arquivo de saida estruturado em JSON (padrao: sidecar do Markdown)',
             '--arquivo-jacoco <arquivo> Relatorio XML do JaCoCo para classificar cobertura indireta',
+            '--politica <arquivo>    Arquivo JSON com a politica de classificacao Java',
             '--gravar                Persiste os relatorios em Markdown e JSON',
             '--json                  Emite o relatorio estruturado no stdout',
             '--help, -h              Exibe esta ajuda'
@@ -669,7 +675,7 @@ async function principal(argumentos: string[] = process.argv.slice(2)): Promise<
         diretorioTestes: opcoes.diretorioTestes,
         caminhoJacocoXml: opcoes.arquivoJacoco,
         base: opcoes.base,
-        politica: POLITICA_CLASSIFICACAO_TESTES_SGC,
+        politica: opcoes.politica,
     });
     if (opcoes.emitirJson) {
         imprimirJson(dados);
