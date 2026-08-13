@@ -12,8 +12,50 @@ import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
-function extrairLista(argumentos, nome) {
-    const valores = [];
+interface PosicaoSemgrep {
+    line?: number;
+}
+
+interface ExtraSemgrep {
+    message?: string;
+}
+
+interface AchadoSemgrep {
+    check_id?: string;
+    path?: string;
+    start?: PosicaoSemgrep;
+    extra?: ExtraSemgrep;
+    [chave: string]: unknown;
+}
+
+interface ResultadoSemgrep {
+    results: AchadoSemgrep[];
+    [chave: string]: unknown;
+}
+
+interface OpcoesSemgrep {
+    regra: string;
+    diretorios?: string[];
+    auto?: boolean;
+    diretorioBase?: string;
+}
+
+interface ExecucaoSemgrep {
+    comando: string;
+    regra: string;
+    diretorios: string[];
+    auto: boolean;
+    codigoSaida: number;
+    resultadoJson: ResultadoSemgrep;
+}
+
+interface CaminhosRelatorios {
+    caminhoResultadoJson: string;
+    caminhoResultadoMd: string;
+}
+
+function extrairLista(argumentos: string[], nome: string): string[] {
+    const valores: string[] = [];
     const prefixoAtribuicao = `${nome}=`;
     for (let indice = 0; indice < argumentos.length; indice += 1) {
         if (argumentos[indice] === nome) {
@@ -34,61 +76,74 @@ function extrairLista(argumentos, nome) {
     return valores;
 }
 
-function resolverDiretoriosPadrao(diretorioBase = DIRETORIO_RAIZ) {
+function resolverDiretoriosPadrao(diretorioBase: string = DIRETORIO_RAIZ): string[] {
     const baseResolvida = path.resolve(diretorioBase);
     return [
         path.relative(baseResolvida, resolverCaminhoConfigurado("backendCodigo", baseResolvida)),
-        path.relative(baseResolvida, resolverCaminhoConfigurado("frontendCodigo", baseResolvida)),
+        path.relative(baseResolvida, resolverCaminhoConfigurado("frontendCodigo", baseResolvida))
     ];
 }
 
-function obterComandoSemgrep() {
+function obterComandoSemgrep(): string {
     return path.join(homedir(), ".local", "bin", "semgrep");
 }
 
-function criarResumo(resultadoJson, regra, diretorioBase) {
-    const achados = resultadoJson.results ?? [];
-    const porRegra = new Map();
+function ehRegistro(valor: unknown): valor is Record<string, unknown> {
+    return typeof valor === "object" && valor !== null;
+}
+
+function ehAchadoSemgrep(valor: unknown): valor is AchadoSemgrep {
+    return ehRegistro(valor);
+}
+
+function normalizarResultadoSemgrep(valor: unknown): ResultadoSemgrep {
+    if (!ehRegistro(valor)) {
+        return {results: []};
+    }
+
+    const resultados = Array.isArray(valor.results) ? valor.results.filter(ehAchadoSemgrep) : [];
+    return {...valor, results: resultados};
+}
+
+function criarResumo(resultadoJson: ResultadoSemgrep, regra: string, diretorioBase: string): string {
+    const achados = resultadoJson.results;
+    const porRegra = new Map<string, AchadoSemgrep[]>();
 
     for (const achado of achados) {
         const codigoRegra = achado.check_id ?? "sem-id";
-        if (!porRegra.has(codigoRegra)) {
-            porRegra.set(codigoRegra, []);
-        }
-        porRegra.get(codigoRegra).push(achado);
+        const itens = porRegra.get(codigoRegra) ?? [];
+        itens.push(achado);
+        porRegra.set(codigoRegra, itens);
     }
 
-    const linhas = [];
-    linhas.push("# Auditoria Semgrep do SGC", "");
-    linhas.push(`Regra: \`${regra}\``, "");
-    linhas.push(`Total de achados: ${achados.length}`, "");
+    const linhas: string[] = [];
+    linhas.push("# Auditoria Semgrep do SGC", "", `Regra: \`${regra}\``, "", `Total de achados: ${achados.length}`, "");
 
     if (achados.length === 0) {
         linhas.push("Nenhum achado encontrado.");
         return linhas.join("\n");
     }
 
-    linhas.push("| Regra | Achados |");
-    linhas.push("|---|---:|");
-    for (const [id, itens] of [...porRegra.entries()].toSorted((a, b) => b[1].length - a[1].length)) {
-        linhas.push(`| \`${id}\` | ${itens.length} |`);
+    linhas.push("| Regra | Achados |", "|---|---:|");
+    for (const [codigoRegra, itens] of [...porRegra.entries()].toSorted((a, b) => b[1].length - a[1].length)) {
+        linhas.push(`| \`${codigoRegra}\` | ${itens.length} |`);
     }
 
     linhas.push("", "## Primeiros achados", "");
     for (const achado of achados.slice(0, 20)) {
         const caminho = path.relative(diretorioBase, achado.path ?? "");
-        linhas.push(`- \`${achado.check_id}\` em \`${caminho}:${achado.start?.line ?? "?"}\` - ${achado.extra?.message ?? ""}`);
+        linhas.push(`- \`${achado.check_id ?? "sem-id"}\` em \`${caminho}:${achado.start?.line ?? "?"}\` - ${achado.extra?.message ?? ""}`);
     }
 
     return linhas.join("\n");
 }
 
 async function executarSemgrep({
-                                   regra,
-                                   diretorios,
-                                   auto = false,
-                                   diretorioBase = DIRETORIO_RAIZ,
-                               }) {
+    regra,
+    diretorios,
+    auto = false,
+    diretorioBase = DIRETORIO_RAIZ
+}: OpcoesSemgrep): Promise<ExecucaoSemgrep> {
     const baseResolvida = path.resolve(diretorioBase);
     const alvos = diretorios ?? resolverDiretoriosPadrao(baseResolvida);
     const comando = obterComandoSemgrep();
@@ -106,18 +161,22 @@ async function executarSemgrep({
         reject: false
     });
 
-    const resultadoJson = JSON.parse(resultado.stdout || "{}");
+    const valor: unknown = JSON.parse(resultado.stdout || "{}");
     return {
         comando,
         regra,
         diretorios: alvos,
         auto,
         codigoSaida: resultado.exitCode ?? 0,
-        resultadoJson
+        resultadoJson: normalizarResultadoSemgrep(valor)
     };
 }
 
-async function gravarRelatorios(execucao, diretorioSaida, diretorioBase) {
+async function gravarRelatorios(
+    execucao: ExecucaoSemgrep,
+    diretorioSaida: string,
+    diretorioBase: string
+): Promise<CaminhosRelatorios> {
     const caminhoResultadoJson = path.join(diretorioSaida, "resultado.json");
     const caminhoResultadoMd = path.join(diretorioSaida, "resumo.md");
     await fs.mkdir(diretorioSaida, {recursive: true});
@@ -126,11 +185,11 @@ async function gravarRelatorios(execucao, diretorioSaida, diretorioBase) {
     return {caminhoResultadoJson, caminhoResultadoMd};
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "codigo semgrep auditar",
-            scriptDireto: "codigo/semgrep-auditar.js",
+            scriptDireto: "codigo/semgrep-auditar.ts",
             descricao: "Executa um piloto de Semgrep OSS com regras locais do SGC para monitorar deriva estrutural em backend, frontend e integração.",
             opcoes: [
                 "--regra <arquivo>     Sobrescreve o arquivo de regras YAML.",
@@ -152,8 +211,9 @@ async function principal(argumentos = process.argv.slice(2)) {
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
     const auto = argumentos.includes("--auto");
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
-    const regra = lerOpcao(argumentos, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
+    const regra = lerOpcao(argumentos, "--regra", resolverCaminhoConfigurado("regrasSemgrep", diretorioBase))
+        ?? resolverCaminhoConfigurado("regrasSemgrep", diretorioBase);
     const diretorios = extrairLista(argumentos, "--dir");
     const alvos = diretorios.length > 0 ? diretorios : resolverDiretoriosPadrao(diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "semgrep", "mais-recente");
@@ -161,16 +221,11 @@ async function principal(argumentos = process.argv.slice(2)) {
     if (!emitirJson) {
         imprimirCabecalho("AUDITORIA SEMGREP (PILOTO)");
         escreverLinha(`Regra: ${pc.dim(regra)}`);
-        escreverLinha(`Alvos: ${alvos.map((item) => pc.dim(item)).join(", ")}`);
+        escreverLinha(`Alvos: ${alvos.map(item => pc.dim(item)).join(", ")}`);
         escreverLinha(`Modo auto: ${auto ? "sim" : "não"}`);
     }
 
-    const execucao = await executarSemgrep({
-        regra,
-        diretorios: alvos,
-        auto,
-        diretorioBase,
-    });
+    const execucao = await executarSemgrep({regra, diretorios: alvos, auto, diretorioBase});
 
     if (!semGravar) {
         const caminhosRelatorios = await gravarRelatorios(execucao, diretorioSaida, diretorioBase);
@@ -180,13 +235,13 @@ async function principal(argumentos = process.argv.slice(2)) {
         }
     }
 
-    const achados = execucao.resultadoJson.results ?? [];
+    const achados = execucao.resultadoJson.results;
     if (!emitirJson) {
         escreverLinha(`Achados: ${achados.length}`);
         if (achados.length > 0) {
             for (const achado of achados.slice(0, 10)) {
                 const caminho = path.relative(diretorioBase, achado.path ?? "");
-                escreverLinha(`- ${achado.check_id} em ${caminho}:${achado.start?.line ?? "?"}`);
+                escreverLinha(`- ${achado.check_id ?? "sem-id"} em ${caminho}:${achado.start?.line ?? "?"}`);
             }
         } else {
             escreverLinha(pc.green("Nenhum achado encontrado pelas regras locais."));
@@ -205,7 +260,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    principal().catch((erro) => {
+    principal().catch((erro: unknown) => {
         process.stderr.write(`Erro ao executar auditoria Semgrep: ${erro instanceof Error ? erro.message : String(erro)}\n`);
         process.exitCode = 1;
     });
@@ -214,5 +269,5 @@ if (ehEntradaPrincipal(import.meta.url)) {
 export {
     executarSemgrep,
     principal,
-    resolverDiretoriosPadrao,
+    resolverDiretoriosPadrao
 };

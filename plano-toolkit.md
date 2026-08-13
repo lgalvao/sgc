@@ -265,6 +265,9 @@ frontend e para os caminhos OpenAPI.
 - `codigo/cheiros-auditar.ts` foi convertido para TypeScript com tipos para padrões, filtros, contagens, pontuação,
   deltas, hotspots, fotografia e opções; os pesos e filtros parametrizados por `backendCodigo`/`frontendCodigo` foram
   preservados.
+- `codigo/semgrep-auditar.ts` foi convertido para TypeScript com contratos para achados, posições, resultados,
+  execução e relatórios; a entrada JSON externa é normalizada como `unknown`, mantendo regras, alvos configuráveis,
+  modo automático e o schema de saída do Semgrep.
 - `projeto/diagnostico.ts` foi convertido para TypeScript, deixou de depender de `fs-extra` e aceita catálogos
   configuráveis de recursos e comandos registrados; o catálogo padrão continua sendo o perfil SGC e o mínimo local do
   Node foi alinhado à major 26 (`26.0.0`).
@@ -353,15 +356,15 @@ esta rodada chega a 103 com o teste comportamental do auditor de arquitetura bac
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 71 arquivos TypeScript de implementação;
-- 1 arquivo JavaScript de implementação ainda pendente;
+- 72 arquivos TypeScript de implementação;
+- 0 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 103 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 99% dos
+O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de implementação rastreados são TypeScript.
 arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
@@ -612,8 +615,9 @@ Lotes sugeridos:
    gerador de tipos removido.
 5. **[concluído nesta rodada]** Requisitos: o motor Markdown, as bibliotecas de mensagens e os dez comandos CDU foram
    convertidos para TypeScript, preservando as regras específicas do SGC; o isolamento do perfil CDU continua na Fase D.
-6. **[em andamento nesta rodada]** Código transversal: converter os seis comandos JavaScript restantes de cheiros,
-   Semgrep e inventários de nomes/idioma, que concentram mais políticas locais e maior volume de parsing.
+6. **[concluído nesta rodada]** Código transversal: cheiros, Semgrep e inventários de nomes/idioma foram convertidos
+   para TypeScript, preservando as políticas locais e os contratos do SGC; a parametrização horizontal continua na
+   Fase D.
 
 O corretor FQN foi incluído depois da cobertura de mutação e idempotência da Fase 0 estar corrigida e publicada.
 

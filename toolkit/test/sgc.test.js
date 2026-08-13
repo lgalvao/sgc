@@ -15,7 +15,7 @@ import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.ts"
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
-import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
+import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.ts";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.ts";
 import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.ts";
 import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.ts";
@@ -42,7 +42,7 @@ const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHO_AUDITORIA_ASSUNTOS = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "notificacoes-assuntos-auditar.ts");
 const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "java-corrigir-fqn.ts");
-const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.js");
+const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.ts");
 const CAMINHO_CHEIROS_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "cheiros-auditar.ts");
 const CAMINHOS_COMANDOS_CONTRATOS = [
     "contratos-diff.ts",

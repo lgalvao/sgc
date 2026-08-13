@@ -80,7 +80,7 @@ const codigo = program.command("codigo").description("Ferramentas de manutencao 
 const codigoCheiros = codigo.command("cheiros").description("Auditorias de cheiros de codigo.");
 criarComandoScript(codigoCheiros, "auditar", "Gera fotografia de sinais de complexidade acidental e codigo defensivo.", "toolkit/codigo/cheiros-auditar.ts");
 const codigoSemgrep = codigo.command("semgrep").description("Auditorias estruturais com Semgrep OSS.");
-criarComandoScript(codigoSemgrep, "auditar", "Executa regras locais de Semgrep para backend, frontend e integração.", "toolkit/codigo/semgrep-auditar.js");
+criarComandoScript(codigoSemgrep, "auditar", "Executa regras locais de Semgrep para backend, frontend e integração.", "toolkit/codigo/semgrep-auditar.ts");
 const codigoNomes = codigo.command("nomes").description("Inventario e auditoria de nomenclatura do projeto.");
 criarComandoScript(codigoNomes, "coletar-simbolos", "Gera inventario de pacotes, arquivos, tipos e membros.", "toolkit/codigo/nomes-simbolos-coletar.ts");
 criarComandoScript(codigoNomes, "auditar-consistencia", "Audita padroes e divergencias de nomenclatura.", "toolkit/codigo/nomes-consistencia-auditar.ts");
