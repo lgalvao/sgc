@@ -84,8 +84,8 @@ async function executarCrawler(
 ): Promise<ResultadoCrawler | undefined> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
-            comandoSgc: "frontend acessibilidade crawler",
-            scriptDireto: "frontend/acessibilidade-crawler.ts",
+            comandoSgc: "e2e acessibilidade crawler",
+            scriptDireto: "e2e/acessibilidade-crawler.ts",
             descricao: "Executa o crawler de acessibilidade usando o executor do Playwright.",
             opcoes: [
                 "--projeto <nome>   Projeto Playwright a ser executado.",
@@ -95,8 +95,8 @@ async function executarCrawler(
                 "--configuracao <arquivo> Configuracao Playwright alternativa."
             ],
             exemplos: [
-                "npx tsx toolkit/sgc.ts frontend acessibilidade crawler",
-                "npx tsx toolkit/sgc.ts frontend acessibilidade crawler --projeto chromium"
+                "npx tsx toolkit/sgc.ts e2e acessibilidade crawler",
+                "npx tsx toolkit/sgc.ts e2e acessibilidade crawler --projeto chromium"
             ]
         });
         return;

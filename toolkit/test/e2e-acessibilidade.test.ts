@@ -9,8 +9,8 @@ import {
     existe
 } from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
-import {executarCrawler, normalizarArgumentosPlaywright} from "../frontend/acessibilidade-crawler.js";
-import {normalizarResultados} from "../frontend/acessibilidade-processar-resultados.js";
+import {executarCrawler, normalizarArgumentosPlaywright} from "../e2e/acessibilidade-crawler.js";
+import {normalizarResultados} from "../e2e/acessibilidade-processar-resultados.js";
 
 type ChamadaComando = {
     comando: string;
@@ -18,7 +18,7 @@ type ChamadaComando = {
     base?: string;
 };
 
-describe("Acessibilidade frontend", () => {
+describe("Acessibilidade E2E", () => {
     test("processa resultados de acessibilidade em uma base externa", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-acessibilidade-processar-"));
         const entrada = path.join(diretorioBase, "resultados.json");
@@ -38,7 +38,7 @@ describe("Acessibilidade frontend", () => {
         }]);
 
         const resultado = await executarSgc([
-            "frontend",
+            "e2e",
             "acessibilidade",
             "processar",
             "--base",

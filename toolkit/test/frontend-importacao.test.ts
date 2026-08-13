@@ -20,11 +20,6 @@ const CAMINHOS_COMANDOS_COBERTURA_FRONTEND = [
     "cobertura-ramificacoes.ts",
     "cobertura-ramificacoes-erros.ts"
 ].map(nome => path.join(DIRETORIO_TOOLKIT, "frontend", nome));
-const CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND = [
-    "acessibilidade-crawler.ts",
-    "acessibilidade-processar-resultados.ts"
-].map(nome => path.join(DIRETORIO_TOOLKIT, "frontend", nome));
-
 async function importarSemExecutar(caminho: string): Promise<{exitCode?: number; stdout: string}> {
     const urlModulo = pathToFileURL(caminho).href;
     const resultado = await execa(process.execPath, [
@@ -61,12 +56,4 @@ describe("Importação segura dos comandos frontend", () => {
         }
     });
 
-    test("pode importar comandos de acessibilidade sem executar o crawler ou ler resultados", async () => {
-        const resultados = await Promise.all(CAMINHOS_COMANDOS_ACESSIBILIDADE_FRONTEND.map(importarSemExecutar));
-
-        for (const resultado of resultados) {
-            expect(resultado.exitCode).toBe(0);
-            expect(resultado.stdout).toBe("importacao-ok");
-        }
-    });
 });

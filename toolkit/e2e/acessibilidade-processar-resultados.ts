@@ -140,8 +140,8 @@ async function processarResultadosAcessibilidade({entrada, saida}: OpcoesProcess
 async function principal(argumentos: string[] = process.argv.slice(2)): Promise<ResultadoProcessamentoAcessibilidade | undefined> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
-            comandoSgc: "frontend acessibilidade processar",
-            scriptDireto: "frontend/acessibilidade-processar-resultados.ts",
+            comandoSgc: "e2e acessibilidade processar",
+            scriptDireto: "e2e/acessibilidade-processar-resultados.ts",
             descricao: "Consolida os resultados JSON do Axe em um relatorio Markdown.",
             opcoes: [
                 "--entrada <arquivo> Arquivo JSON produzido pelo crawler.",

@@ -55,7 +55,8 @@ graph TD
 | `sgc.ts`      | roteador principal da CLI                                         |
 | `lib/`        | catálogo de comandos, infraestrutura compartilhada, execução, caminhos, saída e utilidades |
 | `backend/`    | comandos de cobertura, testes e higiene Java                      |
-| `frontend/`   | comandos de cobertura, resíduos, validações e acessibilidade     |
+| `frontend/`   | comandos de cobertura, resíduos e validações                      |
+| `e2e/`        | comandos Playwright/Axe de auditoria dos testes de integração     |
 | `codigo/`     | auditorias transversais de cheiros de código                       |
 | `integracao/` | contratos OpenAPI e fronteira backend/frontend                    |
 | `qualidade/`  | coleta e resumo de qualidade                                       |
@@ -103,8 +104,8 @@ npx tsx toolkit/sgc.ts frontend residuos auditar
 npx tsx toolkit/sgc.ts frontend residuos validar
 npx tsx toolkit/sgc.ts frontend identificadores-teste listar
 npx tsx toolkit/sgc.ts frontend identificadores-teste listar-duplicados
-npx tsx toolkit/sgc.ts frontend acessibilidade crawler
-npx tsx toolkit/sgc.ts frontend acessibilidade processar
+npx tsx toolkit/sgc.ts e2e acessibilidade crawler
+npx tsx toolkit/sgc.ts e2e acessibilidade processar
 ```
 
 ### Código transversal
@@ -293,7 +294,7 @@ defaults SGC para dependências e instalação. Opções explícitas da API ou d
 quando nenhuma delas existe, os defaults SGC preservam o comportamento atual. Os comandos são configuração confiável
 do projeto e não formam uma camada de segurança ou de sandbox.
 
-O comando `frontend acessibilidade crawler` deriva a especificação `a11y/crawler.spec.ts` e a configuração
+O comando `e2e acessibilidade crawler` deriva a especificação `a11y/crawler.spec.ts` e a configuração
 `playwright.config.ts` do diretório definido por `diretorios.testesIntegracao`. Projetos com outra estrutura podem usar
 `--especificacao` e `--configuracao` explicitamente.
 
@@ -431,7 +432,8 @@ O diretório `test/` contém:
 - `frontend-validadores.test.ts`: testes dos validadores estruturais de views, modais e diretórios configurados
 - `frontend-identificadores.test.ts`: testes de listagem e detecção de identificadores de teste duplicados
 - `frontend-importacao.test.ts`: testes de importação segura dos comandos e auditores frontend
-- `frontend-acessibilidade.test.ts`: testes do processamento e da execução configurada de acessibilidade
+- `e2e-acessibilidade.test.ts`: testes do processamento e da execução configurada de acessibilidade
+- `e2e-importacao.test.ts`: testes de importação segura dos comandos de acessibilidade E2E
 - `cobertura-cli.test.ts`: testes de leitura, gravação explícita e caminhos externos de cobertura
 - `opcoes-cli.test.ts`: testes da leitura, conversão estrita e limites das opções numéricas
 - `consistencia.test.ts`: testes das auditorias de símbolos, nomenclatura e idioma

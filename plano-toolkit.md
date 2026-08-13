@@ -418,7 +418,7 @@ provam utilidade funcional.
   contrato de integração do agregador de qualidade.
 - `frontend/residuos-auditar.ts` e `frontend/residuos-validar.ts` foram convertidos para TypeScript; fotografia,
   violações, avisos, exceções e opções de persistência agora têm contratos explícitos, mantendo os budgets do SGC.
-- `frontend/acessibilidade-crawler.ts` e `frontend/acessibilidade-processar-resultados.ts` foram convertidos para
+- `e2e/acessibilidade-crawler.ts` e `e2e/acessibilidade-processar-resultados.ts` foram convertidos para
   TypeScript; o processador valida o JSON externo antes de gerar Markdown e o crawler aceita base, spec, configuração e
   executor Playwright parametrizados, mantendo os defaults SGC.
 - `frontend/identificadores-teste-listar.ts` e `frontend/identificadores-teste-listar-duplicados.ts` foram convertidos
@@ -448,7 +448,7 @@ provam utilidade funcional.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 129 testes aprovados em 28 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 129 testes aprovados em 29 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 60,10% de instruções (809/1.346),
   48,68% de ramificações (463/951), 66,78% de funções (181/271) e 60,21% de linhas (775/1.287); o script exclui
@@ -573,7 +573,7 @@ Nesta rodada, três cenários de importação segura dos comandos frontend foram
 `test/frontend-importacao.test.ts`; `test/sgc.test.ts` caiu de 69 para 66 cenários, mantendo a contagem total e
 separando validadores estruturais, cobertura e acessibilidade dos cenários que executam essas auditorias.
 Nesta rodada, três cenários comportamentais de acessibilidade foram extraídos para
-`test/frontend-acessibilidade.test.ts`; `test/sgc.test.ts` caiu de 66 para 63 cenários, mantendo a contagem total e
+`test/e2e-acessibilidade.test.ts`; `test/sgc.test.ts` caiu de 66 para 63 cenários, mantendo a contagem total e
 separando processamento de resultados, composição do crawler e defaults configurados.
 Nesta rodada, três cenários de cobertura da CLI foram extraídos para `test/cobertura-cli.test.ts`; `test/sgc.test.ts`
 caiu de 63 para 60 cenários, mantendo a contagem total e separando o contrato read-only/gravação dos relatórios V8.
@@ -627,7 +627,7 @@ Por fim, o cenário de diagnóstico de projeto foi extraído para `test/projeto-
 Nesta rodada, `lib/cli-opcoes.ts` passou a fornecer `lerNumero`, com validação estrita compartilhada por cobertura,
 ramificações e árvore de linhas; quatro regressões cobrem defaults, atribuição, frações, valores parciais e intervalos.
 Os defaults diretos de `process.cwd()` restantes também foram alinhados à resolução comum. A suíte passou a 129 cenários
-regulares em 28 arquivos, e a baseline de cobertura ficou em 60,10% de instruções, 48,68% de ramificações, 66,78% de
+regulares em 29 arquivos, e a baseline de cobertura ficou em 60,10% de instruções, 48,68% de ramificações, 66,78% de
 funções e 60,21% de linhas.
 
 ### 3.3 Tamanho e composição atual
@@ -636,16 +636,16 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 
 - 79 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
-- 0 arquivos JavaScript de teste e 29 arquivos TypeScript de teste (`test/execucao-cli.test.ts`, `test/backend-fqn.test.ts`,
+- 0 arquivos JavaScript de teste e 30 arquivos TypeScript de teste (`test/execucao-cli.test.ts`, `test/backend-fqn.test.ts`,
   `test/backend-testes.test.ts`, `test/backend-auditorias.test.ts`, `test/backend-importacao.test.ts`,
   `test/backend-notificacoes.test.ts`, `test/frontend-residuos.test.ts`, `test/frontend-arquitetura.test.ts`,
   `test/frontend-arquitetura-gates.test.ts`, `test/frontend-validadores.test.ts`, `test/frontend-identificadores.test.ts`,
-  `test/frontend-importacao.test.ts`, `test/frontend-acessibilidade.test.ts`, `test/cobertura-cli.test.ts`,
+  `test/frontend-importacao.test.ts`, `test/e2e-acessibilidade.test.ts`, `test/e2e-importacao.test.ts`, `test/cobertura-cli.test.ts`,
   `test/consistencia.test.ts`, `test/opcoes-cli.test.ts`, `test/superficie-cli.test.ts`, `test/importacao-nucleos.test.ts`,
   `test/codigo-importacao.test.ts`, `test/codigo-auditorias.test.ts`, `test/projeto.test.ts`,
   `test/projeto-diagnostico.test.ts`, `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`,
   `test/qualidade-externa.test.ts`, `test/cdus.test.ts`, `test/externo.test.ts` e `test/pacote.test.ts`);
-- 28 arquivos de teste TypeScript concentram 129 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
+- 29 arquivos de teste TypeScript concentram 129 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
   isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução, `executarSgc` e helpers nativos
   de arquivo, evitando cópias divergentes nos testes de projeto, integração, qualidade e CLI;
@@ -703,7 +703,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Apoio de execução duplicado entre testes | `test/apoio.ts` passou a ser a fonte única da raiz do toolkit, do `tsx` e do contrato `ResultadoExecucao`; os quatro testes que executam a CLI não mantêm cópias locais desse mecanismo. |
 | Resolvido nesta rodada | Apoio de testes contaminava a cobertura | `test:coverage` agora exclui `test/**`; a baseline permanece focada na implementação e não conta `test/apoio.ts` como código produtivo. |
 | Resolvido nesta rodada | Sincronização de versão fixava o frontend do SGC | `projeto/versao-sincronizar` agora resolve `diretorios.frontend` pela configuração da base; o fallback continua sendo `frontend` e o teste externo cobre `cliente/package.json`. |
-| Resolvido nesta rodada | Crawler fixava a raiz de integração do SGC | `frontend/acessibilidade-crawler` agora deriva os defaults de `diretorios.testesIntegracao`; opções explícitas continuam substituindo a convenção e o teste externo cobre a base configurada. |
+| Resolvido nesta rodada | Crawler fixava a raiz de integração do SGC | `e2e/acessibilidade-crawler` agora deriva os defaults de `diretorios.testesIntegracao`; opções explícitas continuam substituindo a convenção e o teste externo cobre a base configurada. |
 | Resolvido nesta rodada | Coleta Playwright divergia do crawler | `qualidade/coleta-execucao` agora centraliza a montagem de descrição e argumentos Playwright em função pura que resolve `diretorios.testesIntegracao`; o contrato tem teste de base externa. |
 | Resolvido nesta rodada | Diagnóstico exigia artefatos do próprio toolkit em qualquer base | `projeto/diagnostico` agora monta recursos estruturais com `backend`, `frontend` e `testesIntegracao` configurados; recursos de `toolkit`, portas e `.env.e2e` continuam no perfil SGC e não contaminam bases externas. |
 | Resolvido nesta rodada | Resumo de análise bypassava a saída comum | `backend/testes-analisar.ts` agora usa `escreverLinha` em todas as linhas humanas; stdout continua igual e não há mistura com o JSON gravado. |
@@ -739,11 +739,11 @@ o comportamento atual; não transforma automaticamente todo comando que gera rel
 |---|---|---|
 | Auditoria read-only | `requisitos cdus *`, `backend cobertura auditoria/ramificacoes`, `frontend cobertura auditoria/ramificacoes`, `frontend arquitetura validar`, `frontend modais validar`, `frontend views templates-validar`, `frontend identificadores-teste *`, `codigo nomes coletar-simbolos/auditar-consistencia/auditar-idioma`, `projeto diagnostico` | Leem código/relatórios e escrevem somente stdout/JSON por padrão; não criam artefatos próprios. Dependências externas podem fazer leitura adicional. |
 | Auditoria read-only com persistência explícita | `backend cobertura auditoria`, `frontend cobertura auditoria` | Calculam a análise e exibem stdout/JSON por padrão; só criam o relatório Markdown indicado por `--saida` quando recebem `--gravar`. |
-| Geração de relatório indicado | `backend testes analisar/priorizar`, `frontend acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json` ou defaults. São geradores explícitos, não auditores read-only. |
+| Geração de relatório indicado | `backend testes analisar/priorizar`, `e2e acessibilidade processar` | Criam arquivos Markdown/JSON definidos por `--saida`, `--saida-json` ou defaults. São geradores explícitos, não auditores read-only. |
 | Artefato de contrato | `integracao contratos exportar-openapi`, `integracao contratos diff` | Exportação grava OpenAPI; diff apenas grava resumo Markdown com `--gravar`; `fixar-baseline` promove uma referência somente quando chamado. |
 | Mutação de fonte ou baseline | `backend java corrigir-fqn`, `projeto versao-sincronizar`, `integracao contratos fixar-baseline` | Alteram código/configuração ou promovem arquivo. FQN e versão simulam por padrão e exigem `--gravar`; baseline copia diretamente para o destino por ser uma ação de promoção nomeada. |
 | Limpeza confirmada | `projeto limpar` | Lista em prévia por padrão e remove somente com `--confirmar`; é o modelo de confirmação explícita a preservar. |
-| Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar`, `frontend acessibilidade crawler` | Executam Gradle, npm, Playwright, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. |
+| Orquestração externa | `qualidade coletar`, `projeto qualidade`, `projeto dependencias auditar`, `projeto preparar`, `e2e acessibilidade crawler` | Executam Gradle, npm, Playwright, Semgrep ou Git e podem criar artefatos fora da biblioteca do toolkit. Precisam de perfil/ação explícita e limites de raiz. |
 
 Achado corrigido nesta rodada: quando `codigo nomes auditar-consistencia` precisa gerar um inventário auxiliar ausente,
 ele só chama a coleta com gravação habilitada se a auditoria recebeu `--gravar`. A propagação de `gravar` e a opção
@@ -799,7 +799,7 @@ regra que deve continuar no toolkit, mas não deve ser apresentada como regra ho
 | Frontend cobertura e identificadores: `cobertura-auditoria`, `cobertura-ramificacoes`, `cobertura-ramificacoes-erros`, `identificadores-teste-*` | Recebem base/arquivo/diretório e têm fixture externa; os relatórios de ramificação e de risco não são equivalentes | Manter e parametrizar | `adaptável` |
 | Frontend arquitetura/resíduos: `arquitetura-lib`, `arquitetura-auditar`, `arquitetura-validar`, `residuos-lib`, `residuos-auditar`, `residuos-validar` | Coleta, fotografias, budgets e gate usam esses módulos; fixture Java/Vue externa já cobre parte do motor | Manter; políticas SGC devem ficar explícitas | `adaptável` |
 | Frontend específico: `acoes-backend-lib`, `views-templates-validar`, `modais-validar` | Detecta `ModalPadrao`, `LayoutPadrao`, ações e exceções concretas do SGC; é usado por gates do frontend | Manter no perfil SGC até existir política externa equivalente | `perfil-sgc` |
-| Acessibilidade: `acessibilidade-crawler`, `acessibilidade-processar-resultados` | Executa Playwright/Axe e processa resultados; diretório de integração é configurável | Manter e separar tarefa/configuração do motor | `adaptável` |
+| Acessibilidade E2E: `acessibilidade-crawler`, `acessibilidade-processar-resultados` | Executa Playwright/Axe e processa resultados; diretório de integração é configurável | Manter em `e2e/` e separar tarefa/configuração do motor | `adaptável` |
 | Código transversal: `cheiros-auditar`, `nomes-simbolos-coletar`, `nomes-consistencia-auditar`, `semgrep-auditar`, `nomes-caminhos` | Comandos catalogados e usados por qualidade; Semgrep e inventários têm política/saída configuráveis | Manter; núcleo de análise com políticas do perfil | `adaptável` |
 | Idioma e identificadores SGC: `idioma-consistencia-auditar` | A regra de português e `codigo` é uma convenção deliberada deste repositório, não uma verdade universal | Manter no perfil SGC | `perfil-sgc` |
 | Contratos: `contratos-openapi-caminhos`, `contratos-exportar-openapi`, `contratos-diff`, `contratos-fixar-baseline` | Exportação, comparação e baseline continuam documentados e testados; somente o gerador de tipos foi removido | Manter e parametrizar URL/artefatos | `adaptável` |
@@ -941,7 +941,8 @@ do perfil.
 10. **[concluído nesta rodada] Divisão do teste monolítico**: os quatro cenários de execução/distribuição estão em
     `test/execucao-cli.test.ts`, os três cenários de mutação FQN em `test/backend-fqn.test.ts`, cinco cenários de
     importação backend em `test/backend-importacao.test.ts`, três de importação frontend em
-    `test/frontend-importacao.test.ts`, três de acessibilidade em `test/frontend-acessibilidade.test.ts` e três de
+    `test/frontend-importacao.test.ts`, três de acessibilidade em `test/e2e-acessibilidade.test.ts` e um de importação em
+    `test/e2e-importacao.test.ts`, além de três de
     cobertura em `test/cobertura-cli.test.ts`, além de três de consistência em `test/consistencia.test.ts`;
     seis de superfície em `test/superficie-cli.test.ts`, três de importação de núcleos em `test/importacao-nucleos.test.ts`,
     dois de importação de código em `test/codigo-importacao.test.ts`, nove de análise/priorização backend em
@@ -996,7 +997,8 @@ As fases históricas abaixo continuam úteis como registro, mas a execução dev
 8. **[concluído nesta rodada] Dividir testes por risco e domínio**: os quatro cenários de runtime/distribuição foram
    extraídos para `test/execucao-cli.test.ts`, os três cenários de mutação FQN para `test/backend-fqn.test.ts`, cinco
    cenários de importação backend para `test/backend-importacao.test.ts`, três de importação frontend para
-   `test/frontend-importacao.test.ts`, três de acessibilidade para `test/frontend-acessibilidade.test.ts` e três de
+   `test/frontend-importacao.test.ts`, três de acessibilidade para `test/e2e-acessibilidade.test.ts` e um de importação em
+   `test/e2e-importacao.test.ts`, além de três de
    cobertura para `test/cobertura-cli.test.ts`, três de consistência para `test/consistencia.test.ts`, seis de superfície
    para `test/superficie-cli.test.ts`, três de importação de núcleos para `test/importacao-nucleos.test.ts` e dois de
    importação de código para `test/codigo-importacao.test.ts`, nove de análise/priorização backend para

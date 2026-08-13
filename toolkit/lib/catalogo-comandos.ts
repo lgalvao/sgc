@@ -154,18 +154,18 @@ const CATALOGO_COMANDOS = [
         arquivo: "frontend/identificadores-teste-listar-duplicados.ts"
     },
     {
-        caminho: ["frontend", "acessibilidade", "crawler"],
+        caminho: ["e2e", "acessibilidade", "crawler"],
         descricao: "Executa o crawler Axe-core em todas as rotas principais.",
         escopo: "adaptavel",
         efeito: "orquestracao",
-        arquivo: "frontend/acessibilidade-crawler.ts"
+        arquivo: "e2e/acessibilidade-crawler.ts"
     },
     {
-        caminho: ["frontend", "acessibilidade", "processar"],
+        caminho: ["e2e", "acessibilidade", "processar"],
         descricao: "Processa os resultados do crawler em um relatorio Markdown.",
         escopo: "adaptavel",
         efeito: "geracao",
-        arquivo: "frontend/acessibilidade-processar-resultados.ts"
+        arquivo: "e2e/acessibilidade-processar-resultados.ts"
     },
     {
         caminho: ["codigo", "cheiros", "auditar"],

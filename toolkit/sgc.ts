@@ -81,7 +81,9 @@ criarGrupoComando(frontend, "arquitetura", "Auditorias de arquitetura e vazament
 criarGrupoComando(frontend, "views", "Auditorias especificas de views.");
 criarGrupoComando(frontend, "modais", "Auditorias especificas de modais.");
 criarGrupoComando(frontend, "identificadores-teste", "Ferramentas para identificadores de teste.");
-criarGrupoComando(frontend, "acessibilidade", "Auditorias de acessibilidade do frontend.");
+
+const e2e = program.command("e2e").description("Ferramentas de testes de integracao e acessibilidade.");
+criarGrupoComando(e2e, "acessibilidade", "Auditorias de acessibilidade executadas no E2E.");
 
 const codigo = program.command("codigo").description("Ferramentas de manutencao e higiene do código.");
 criarGrupoComando(codigo, "cheiros", "Auditorias de cheiros de codigo.");

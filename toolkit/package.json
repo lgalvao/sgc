@@ -14,6 +14,7 @@
     "*.ts",
     "backend/**/*.ts",
     "codigo/**/*.ts",
+    "e2e/**/*.ts",
     "frontend/**/*.ts",
     "integracao/**/*.ts",
     "lib/**/*.ts",
