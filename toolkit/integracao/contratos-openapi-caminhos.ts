@@ -2,8 +2,6 @@ import path from "node:path";
 import {DIRETORIO_RAIZ} from "../biblioteca/caminhos.js";
 import {resolverCaminhoConfigurado} from "../biblioteca/configuracao.js";
 
-const URL_OPENAPI_PADRAO = "http://127.0.0.1:10000/api-docs";
-
 interface CaminhosOpenapi {
     base: string;
     diretorioOpenapi: string;
@@ -30,7 +28,6 @@ function resolverCaminhoArquivoOpenapi(base: string, caminho: string): string {
 }
 
 export {
-    URL_OPENAPI_PADRAO,
     resolverCaminhoArquivoOpenapi,
     resolverCaminhosOpenapi,
 };

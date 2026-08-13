@@ -12,7 +12,8 @@ import {
     alterarPermissoes
 } from "./apoio.js";
 import {resolverCaminhoConfigurado, VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
-import {normalizarCaminhoAchado, obterComandoSemgrep, resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
+import {executarSemgrep, normalizarCaminhoAchado, obterComandoSemgrep} from "../codigo/semgrep-motor.js";
+import {resolverDiretoriosPadrao} from "../codigo/semgrep-auditar.js";
 import {executarAuditoria as executarAuditoriaCheiros} from "../codigo/cheiros-auditar.js";
 
 describe("Auditores de código", () => {
@@ -125,6 +126,39 @@ describe("Auditores de código", () => {
 
         expect(normalizarCaminhoAchado(caminhoRelativo, base)).toBe(caminhoRelativo);
         expect(normalizarCaminhoAchado(caminhoAbsoluto, base)).toBe(caminhoRelativo);
+    });
+
+    test("executa o motor Semgrep com regra, alvo e comando explícitos", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-semgrep-motor-"));
+        const diretorioBinario = path.join(base, "bin");
+        const caminhoExecutavel = path.join(diretorioBinario, "semgrep");
+        await escreverArquivo(
+            caminhoExecutavel,
+            [
+                "#!/bin/sh",
+                "printf '%s' '{\"results\":[{\"check_id\":\"regra.exemplo\",\"path\":\"codigo/Exemplo.java\",\"start\":{\"line\":7}}]}'"
+            ].join("\n")
+        );
+        await alterarPermissoes(caminhoExecutavel, 0o755);
+
+        const resultado = await executarSemgrep({
+            regra: "politicas/regras.yml",
+            diretorios: ["codigo"],
+            diretorioBase: base,
+            comando: caminhoExecutavel
+        });
+
+        expect(resultado).toMatchObject({
+            comando: caminhoExecutavel,
+            regra: "politicas/regras.yml",
+            diretorios: ["codigo"],
+            codigoSaida: 0
+        });
+        expect(resultado.resultadoJson.results).toHaveLength(1);
+    });
+
+    test("exige alvo explícito no motor Semgrep", async () => {
+        await expect(executarSemgrep({regra: "regras.yml", diretorios: []})).rejects.toThrow("pelo menos um diretório-alvo");
     });
 
     test("aplica filtros de cheiros aos diretorios de codigo configurados", async () => {

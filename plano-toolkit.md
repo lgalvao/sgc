@@ -210,9 +210,13 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   `{base, secoes}` e delega para motores isolados da borda CLI;
 - o domínio JaCoCo não aplica mais padrões de exclusão do SGC por default; os comandos de cobertura do servidor recebem
   explicitamente a política em `servidor/cobertura-padroes.ts`;
+- o motor Semgrep foi separado da borda CLI: recebe regra, alvos e comando explicitamente; somente o comando do SGC
+  resolve os diretórios, a política local e o diretório de artefatos;
+- o motor OpenAPI foi separado da borda CLI e exige URL, base e saída explícitas; o endpoint em `127.0.0.1:10000` ficou
+  identificado como conveniência do perfil SGC;
 - os agregadores CDU ficaram reduzidos a bordas de comando; parser, descoberta do corpus, inventário e auditoria não
   importam mais `process.argv`, execução de processo ou saída textual;
-- defaults de Gradle, Vue, OpenAPI, Semgrep e outras políticas SGC ainda aparecem dentro de módulos adaptáveis;
+- defaults de Gradle, Vue, caminhos configurados e outras políticas SGC ainda aparecem em bordas ou módulos adaptáveis;
 - a composição SGC da coleta foi separada do motor de fotografia, mas outros módulos ainda concentram análise, política,
   formatação, persistência e CLI, dificultando reuso seletivo.
 
@@ -267,7 +271,8 @@ editar o toolkit ou receber políticas do SGC acidentalmente.
 
 ### 3. Separar adaptadores e perfil SGC
 
-- inventariar e tornar explícitos URL OpenAPI, tarefas Gradle, regras Semgrep, convenções Vue e caminhos ainda embutidos;
+- consolidar a separação já feita para URL OpenAPI e regras Semgrep nos testes, na documentação e na composição dos comandos;
+- inventariar e tornar explícitos tarefas Gradle, convenções Vue e caminhos ainda embutidos;
 - mover defaults locais para módulos coesos de perfil, sem condicionais `projeto === "sgc"` espalhadas;
 - fazer motores receberem políticas, coletores e executores por composição;
 - manter a configuração orientada a conceitos do domínio, evitando espelhar cada detalhe interno como uma opção;

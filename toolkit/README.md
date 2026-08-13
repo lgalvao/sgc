@@ -92,6 +92,9 @@ npx tsx toolkit/ferramentas.ts integracao contratos diff
 Cheiros e Semgrep são complementares: o primeiro aplica heurísticas internas, enquanto o segundo executa regras
 estruturais configuráveis.
 
+O motor `codigo/semgrep-motor.ts` recebe regra, alvos e comando explicitamente e não resolve caminhos do SGC. A borda
+`codigo/semgrep-auditar.ts` compõe esses valores a partir da configuração e da política Semgrep do perfil SGC.
+
 `codigo nomes coletar-simbolos` produz um inventário `versao: 1`. As auditorias `codigo nomes auditar-consistencia` e
 `codigo nomes auditar-idioma` reutilizam esse inventário e emitem resultados versionados (`auditar-idioma` em `versao: 2`); um inventário existente
 com formato ou versão incompatível é rejeitado, enquanto a ausência do arquivo ainda permite uma coleta somente em
@@ -124,7 +127,8 @@ contratos próprios; campos antigos não são aceitos.
 OpenAPI mantém exportação, comparação e promoção de baseline. O toolkit não gera tipos TypeScript a partir do contrato.
 O documento exportado preserva o vocabulário oficial da especificação; os resultados operacionais do toolkit usam campos
 em português/camelCase (`quantidadeRotas`, `saidaPadrao`, `saidaErro`) e caminhos relativos informados por opção são
-resolvidos a partir de `--base`.
+resolvidos a partir de `--base`. O motor `integracao/contratos-openapi-motor.ts` exige URL, base e saída explícitas; o
+comando do SGC mantém `http://127.0.0.1:10000/api-docs` apenas como conveniência da sua borda.
 
 ### Casos de uso CDU
 
@@ -318,7 +322,8 @@ Execuções de dependências e qualidade também podem ser substituídas:
 Opções explícitas da API ou CLI têm precedência sobre o arquivo. Categorias não configuradas usam os defaults do perfil
 SGC. A configuração é considerada confiável e não funciona como sandbox.
 
-A política Semgrep padrão vem do pacote; um override em `diretorios.regrasSemgrep` é resolvido contra a raiz auditada.
+O comando Semgrep do SGC usa a política que acompanha o pacote; um override em `diretorios.regrasSemgrep` é resolvido
+contra a raiz auditada. O motor não conhece essa política e recebe o arquivo de regras explicitamente.
 Orçamentos e exceções de resíduos são opcionais; quando configurados, os arquivos precisam existir, usar
 `versaoSchema: "1.0.0"` e respeitar a estrutura da política. O carregamento e a validação dessas políticas ficam
 separados do motor de análise.

@@ -5,6 +5,7 @@ import {describe, expect, test} from "vitest";
 import {execa} from "execa";
 import {pathToFileURL} from "node:url";
 import {resolverCaminhoArquivoOpenapi, resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.js";
+import {exportarOpenapi} from "../integracao/contratos-openapi-motor.js";
 import {VERSAO_CONFIGURACAO} from "../biblioteca/configuracao.js";
 import {DIRETORIO_RAIZ, executarSgc, escreverJson, lerArquivo, existe} from "./apoio.js";
 
@@ -135,6 +136,29 @@ describe("Integrações de contratos do toolkit", () => {
         expect(await lerArquivo(caminhos.caminhoReferencia, "utf8")).toBe(await lerArquivo(caminhos.caminhoAtual, "utf8"));
 
         expect(resolverCaminhoArquivoOpenapi(base, "contrato.json")).toBe(path.join(base, "contrato.json"));
+    });
+
+    test("exporta OpenAPI pelo motor com URL e saída explícitas", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-openapi-motor-"));
+        const documento = {
+            openapi: "3.1.0",
+            info: {title: "Motor externo", version: "2.0.0"},
+            paths: {"/saude": {get: {responses: {200: {description: "OK"}}}}}
+        };
+        const resultado = await exportarOpenapi({
+            base,
+            url: `data:application/json,${encodeURIComponent(JSON.stringify(documento))}`,
+            saida: "artefatos/openapi.json"
+        });
+
+        expect(resultado).toMatchObject({
+            base,
+            saida: path.join(base, "artefatos", "openapi.json"),
+            titulo: "Motor externo",
+            versao: "2.0.0",
+            quantidadeRotas: 1
+        });
+        expect(await existe(resultado.saida)).toBe(true);
     });
 
     test("resolve caminhos informados relativos a base", async () => {
