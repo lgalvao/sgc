@@ -11,7 +11,26 @@ import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
-async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual} = {}) {
+interface OpcoesDiffContratos {
+    base?: string;
+    anterior?: string;
+    atual?: string;
+}
+
+type ModoDiffContratos = "identico" | "diff_textual";
+
+interface ResultadoDiffContratos {
+    base: string;
+    anterior: string;
+    atual: string;
+    codigoSaida: 0;
+    houveMudancas: boolean;
+    modo: ModoDiffContratos;
+    stdout: string;
+    stderr: string;
+}
+
+async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual}: OpcoesDiffContratos = {}): Promise<ResultadoDiffContratos> {
     const caminhos = resolverCaminhosOpenapi(base);
     const anteriorResolvido = anterior ?? caminhos.caminhoReferencia;
     const atualResolvido = atual ?? caminhos.caminhoAtual;
@@ -38,8 +57,9 @@ async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual} = 
         cwd: caminhos.base
     });
 
-    if (resultado.exitCode > 1) {
-        throw new Error(resultado.stderr || `git diff terminou com codigo ${resultado.exitCode}.`);
+    const codigoSaida = resultado.exitCode ?? 0;
+    if (codigoSaida > 1) {
+        throw new Error(resultado.stderr || `git diff terminou com codigo ${codigoSaida}.`);
     }
 
     return {
@@ -54,7 +74,7 @@ async function executarDiffContratos({base = DIRETORIO_RAIZ, anterior, atual} = 
     };
 }
 
-function criarResumoMarkdown(resultado) {
+function criarResumoMarkdown(resultado: ResultadoDiffContratos): string {
     return [
         "# Diff de contrato OpenAPI",
         "",
@@ -72,11 +92,11 @@ function criarResumoMarkdown(resultado) {
     ].join("\n");
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "integracao contratos diff",
-            scriptDireto: "integracao/contratos-diff.js",
+            scriptDireto: "integracao/contratos-diff.ts",
             descricao: "Compara duas versões do OpenAPI e produz um resumo útil para revisão de mudanças de contrato.",
             opcoes: [
                 "--base <diretorio>   Base do projeto que contém os artefatos padrão.",
@@ -96,10 +116,10 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
-    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhos = resolverCaminhosOpenapi(base);
-    const anterior = lerOpcao(argumentos, "--anterior", caminhos.caminhoReferencia);
-    const atual = lerOpcao(argumentos, "--atual", caminhos.caminhoAtual);
+    const anterior = lerOpcao(argumentos, "--anterior", caminhos.caminhoReferencia) ?? caminhos.caminhoReferencia;
+    const atual = lerOpcao(argumentos, "--atual", caminhos.caminhoAtual) ?? caminhos.caminhoAtual;
 
     if (!emitirJson) {
         imprimirCabecalho("DIFF DE CONTRATO OPENAPI");

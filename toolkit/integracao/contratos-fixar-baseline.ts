@@ -10,7 +10,19 @@ import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
-async function fixarBaselineContrato({base = DIRETORIO_RAIZ, origem, destino} = {}) {
+interface OpcoesFixarBaselineContrato {
+    base?: string;
+    origem?: string;
+    destino?: string;
+}
+
+interface ResultadoFixacaoBaselineContrato {
+    base: string;
+    origem: string;
+    destino: string;
+}
+
+async function fixarBaselineContrato({base = DIRETORIO_RAIZ, origem, destino}: OpcoesFixarBaselineContrato = {}): Promise<ResultadoFixacaoBaselineContrato> {
     const caminhos = resolverCaminhosOpenapi(base);
     const origemResolvida = origem ?? caminhos.caminhoAtual;
     const destinoResolvido = destino ?? caminhos.caminhoReferencia;
@@ -19,11 +31,11 @@ async function fixarBaselineContrato({base = DIRETORIO_RAIZ, origem, destino} = 
     return {base: caminhos.base, origem: origemResolvida, destino: destinoResolvido};
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "integracao contratos fixar-baseline",
-            scriptDireto: "integracao/contratos-fixar-baseline.js",
+            scriptDireto: "integracao/contratos-fixar-baseline.ts",
             descricao: "Promove a fotografia OpenAPI mais recente como referência para comparações futuras de contrato.",
             opcoes: [
                 "--base <diretorio>   Base do projeto que contém os artefatos padrão.",
@@ -41,10 +53,10 @@ async function principal(argumentos = process.argv.slice(2)) {
     }
 
     const emitirJson = argumentos.includes("--json");
-    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const caminhos = resolverCaminhosOpenapi(base);
-    const origem = lerOpcao(argumentos, "--origem", caminhos.caminhoAtual);
-    const destino = lerOpcao(argumentos, "--destino", caminhos.caminhoReferencia);
+    const origem = lerOpcao(argumentos, "--origem", caminhos.caminhoAtual) ?? caminhos.caminhoAtual;
+    const destino = lerOpcao(argumentos, "--destino", caminhos.caminhoReferencia) ?? caminhos.caminhoReferencia;
 
     if (!emitirJson) {
         imprimirCabecalho("FIXAR BASELINE DO OPENAPI");

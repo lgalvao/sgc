@@ -223,14 +223,17 @@ frontend e para os caminhos OpenAPI.
   o comando `qualidade resumo` agora resolve a fotografia mais recente pela opção `--base`.
 - `integracao/contratos-openapi-caminhos.ts` foi convertido para TypeScript com o contrato explícito dos caminhos
   atual, de referência e de relatório; ele permanece independente do gerador de tipos removido.
+- `integracao/contratos-exportar-openapi.ts`, `integracao/contratos-diff.ts` e
+  `integracao/contratos-fixar-baseline.ts` foram convertidos para TypeScript; opções, resultados de contrato e a
+  validação da resposta JSON agora têm tipos explícitos, preservando os três fluxos de integração do perfil SGC.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
   globais ou caminhos `backend/src`/`frontend/src` fixos. Isso ainda não equivale a portabilidade.
 - O gerador de tipos OpenAPI foi removido. O toolkit mantém somente exportação, comparação e fixação de fotografias de
   contrato; o Springdoc permanece no backend porque o ciclo E2E usa Swagger/OpenAPI para aguardar a aplicação.
-- O histórico recente relevante está publicado na `main`, culminando, antes desta rodada, em `39036604d Parametriza
-  artefatos OpenAPI pela base`.
+- O histórico recente relevante está publicado na `main`; esta rodada amplia a migração TypeScript do módulo de
+  contratos OpenAPI.
 
 ### 3.2 Evidência de validação atual
 
@@ -266,16 +269,16 @@ reintroduz o wrapper obsoleto.
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 10 arquivos TypeScript de implementação;
-- 58 arquivos JavaScript de implementação ainda pendentes;
+- 30 arquivos TypeScript de implementação;
+- 42 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 96 cenários;
-- maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;
+- maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.js`, `backend/testes-analisar.js`,
   `frontend/residuos-lib.ts`, `backend/contratos-auditar.js` e `qualidade/coleta-execucao.ts`.
 
-O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda está no início: aproximadamente 14%
-dos arquivos de implementação rastreados são TypeScript.
+O núcleo TypeScript está adiantado, mas a migração do toolkit como um todo ainda não terminou: aproximadamente 42% dos
+arquivos de implementação rastreados são TypeScript.
 
 ### 3.4 Achados da auditoria crítica
 
@@ -412,7 +415,7 @@ do perfil.
    vendorizada. A escolha define `version`, `private`, nome, `files`, `bin`, `exports`, assets e dependências de runtime.
 5. **TypeScript sem rigor uniforme**: `tsconfig.nucleo.json` cobre o núcleo, mas o `tsconfig.json` geral mantém
    `checkJs: false` e não impõe `strict` aos próximos comandos TS. Criar uma configuração estrita por etapas, sem tentar
-   tipar os 62 módulos JavaScript de uma vez.
+   tipar os 42 módulos JavaScript restantes de uma vez.
 6. **Dependência de runtime**: `tsx` já foi movido para `dependencies` e o launcher de pacote foi criado; ainda falta
    decidir se o pacote final continuará fonte+tsx ou será compilado para distribuição.
 7. **Contrato `.js`/`.ts` temporário**: o fallback do despachador é útil durante a transição, mas aumenta a superfície e
@@ -492,11 +495,13 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
 2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`, `requisitos/cdus-mensagens-lib.ts`,
    `frontend/identificadores-teste-lib.ts`, `requisitos/cdus-lib.ts`, `requisitos/cdus-vocabulario-lib.ts`,
-   `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts` e
-   `frontend/arquitetura-lib.ts`; ainda faltam fotografia de qualidade, bibliotecas de diagnóstico e comandos maiores.
+   `requisitos/cdus-mensagens-codigo-lib.ts`, `frontend/acoes-backend-lib.ts`, `frontend/residuos-lib.ts`,
+   `frontend/arquitetura-lib.ts`, `projeto/diagnostico.ts`, `qualidade/coleta-execucao.ts`, `qualidade/coleta.ts`,
+   `qualidade/resumo.ts` e os três comandos de contratos OpenAPI; ainda faltam achados de auditoria e comandos
+   transversais maiores.
 3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
-   violações de ações, resíduos, arquitetura AST, execução de qualidade, fotografias e exceções; ainda faltam achados
-   de auditoria e diagnósticos de comandos restantes.
+   violações de ações, resíduos, arquitetura AST, execução e resumo de qualidade, diagnóstico, fotografias, exceções e
+   contratos OpenAPI; ainda faltam achados de auditoria e diagnósticos dos comandos restantes.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
    próximos lotes.
@@ -510,13 +515,14 @@ mesmos fixtures e resultados JSON.
 
 Lotes sugeridos:
 
-1. **Projeto**: diagnóstico, limpeza, preparação e perfil de qualidade; separar o que é genérico do perfil SGC sem
-   alterar o backend/frontend auditado.
+1. **Projeto**: diagnóstico já convertido; faltam limpeza, preparação e perfil de qualidade. Separar o que é genérico
+   do perfil SGC sem alterar o backend/frontend auditado.
 2. **Backend**: cobertura, análise/priorização de testes, contratos e FQN; parametrizar raiz Java, tarefas Gradle e
    categorias.
 3. **Frontend**: cobertura V8, resíduos, acessibilidade e identificadores de teste; parametrizar raiz Vue, globs e
    convenções de componentes.
-4. **Integração**: exportação, diff e baseline OpenAPI; manter o módulo independente do gerador de tipos removido.
+4. **[concluído nesta rodada]** Integração: exportação, diff e baseline OpenAPI; o módulo permanece independente do
+   gerador de tipos removido.
 5. **Requisitos**: converter o motor de Markdown e depois isolar o perfil CDU do SGC.
 6. **Código transversal**: converter cheiros, Semgrep e inventários de nomes/idioma por último, pois concentram mais
    políticas locais e maior volume de parsing.

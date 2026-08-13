@@ -39,9 +39,9 @@ const CAMINHO_CORRIGIR_FQN = path.join(DIRETORIO_RAIZ, "toolkit", "backend", "ja
 const CAMINHO_SEMGREP_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "semgrep-auditar.js");
 const CAMINHO_CHEIROS_AUDITAR = path.join(DIRETORIO_RAIZ, "toolkit", "codigo", "cheiros-auditar.js");
 const CAMINHOS_COMANDOS_CONTRATOS = [
-    "contratos-diff.js",
-    "contratos-exportar-openapi.js",
-    "contratos-fixar-baseline.js"
+    "contratos-diff.ts",
+    "contratos-exportar-openapi.ts",
+    "contratos-fixar-baseline.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "integracao", nome));
 const CAMINHOS_COMANDOS_PROJETO = [
     "arvore-linhas.ts",
