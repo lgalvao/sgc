@@ -369,5 +369,9 @@ async function executarDiagnostico(opcoes: OpcoesDiagnostico = {}): Promise<Resu
 }
 
 export {
-    executarDiagnostico
+    executarDiagnostico,
+    type OpcoesDiagnostico,
+    type Recurso,
+    type RecursoArquivo,
+    type ResultadoDiagnostico
 };

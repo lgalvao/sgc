@@ -9,6 +9,7 @@ import {calcularTotais, construirArvore, listarArquivosGit} from "../projeto/arv
 import {sincronizarVersao} from "../projeto/versao-sincronizar.ts";
 import {executarDiagnostico} from "../projeto/diagnostico.ts";
 import {executarLimpeza} from "../projeto/limpar.ts";
+import {resolverEscoposInstalacao} from "../projeto/preparar.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
@@ -47,6 +48,8 @@ const CAMINHOS_COMANDOS_CONTRATOS = [
 const CAMINHOS_COMANDOS_PROJETO = [
     "arvore-linhas.ts",
     "diagnostico.ts",
+    "limpar.ts",
+    "preparar.ts",
     "versao-sincronizar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
@@ -2383,6 +2386,28 @@ describe("CLI raiz do toolkit", () => {
         });
         expect(await fs.pathExists(path.join(diretorioBase, "artefatos-projeto"))).toBe(true);
         expect(await fs.pathExists(path.join(diretorioBase, "nao-listado.txt"))).toBe(true);
+    });
+
+    test("resolve escopos de instalação a partir da base e da política do projeto", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-preparacao-base-"));
+
+        const escopos = resolverEscoposInstalacao(diretorioBase, [
+            {titulo: "Instalar dependencias do cliente", segmento: "cliente"},
+            {titulo: "Instalar dependencias do servidor", segmento: "servicos/api"}
+        ]);
+
+        expect(escopos).toEqual([
+            {
+                titulo: "Instalar dependencias do cliente",
+                segmento: "cliente",
+                caminho: path.join(diretorioBase, "cliente")
+            },
+            {
+                titulo: "Instalar dependencias do servidor",
+                segmento: "servicos/api",
+                caminho: path.join(diretorioBase, "servicos/api")
+            }
+        ]);
     });
 
     test("nao possui diretorios legados de scripts em backend/frontend", async () => {

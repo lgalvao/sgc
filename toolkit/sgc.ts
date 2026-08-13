@@ -183,6 +183,7 @@ projeto
 projeto
     .command("preparar")
     .description("Prepara o ambiente do projeto com etapas opcionais.")
+    .option("--base <diretorio>", "Sobrescreve o diretório base para preparação.")
     .option("--instalar-dependencias", "Executa npm install na raiz, no frontend e no toolkit.")
     .option("--instalar-playwright", "Instala o Chromium do Playwright.")
     .action(async (opcoes) => {

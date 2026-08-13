@@ -34,7 +34,7 @@
     "projeto/dependencias-auditar.js",
     "projeto/diagnostico.ts",
     "projeto/limpar.ts",
-    "projeto/preparar.js",
+    "projeto/preparar.ts",
     "projeto/qualidade.js",
     "projeto/versao-sincronizar.ts",
     "qualidade/coleta-execucao.ts",
