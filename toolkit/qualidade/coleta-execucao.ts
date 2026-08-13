@@ -2,15 +2,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import {execa} from "execa";
-import {DIRETORIO_RAIZ, DIRETORIO_TOOLKIT} from "../lib/caminhos.js";
-import {ehEntradaPrincipal, resolverCaminhoTsx} from "../lib/execucao.js";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {NOME_ARQUIVO_FOTOGRAFIA, obterDiretorioArtefatos} from "../lib/qualidade.js";
 import {escreverErro, escreverLinha} from "../lib/saida.js";
 import {criarAdaptadoresSgc, PERFIS_SGC} from "./coleta-adaptadores-sgc.js";
+import {executarComando, executarComandoSgc} from "./coleta-executor.js";
 
-const CAMINHO_SGC = path.join(DIRETORIO_TOOLKIT, "sgc.ts");
 const VERSAO_SCHEMA = "1.0.0" as const;
 
 type CategoriaExecucao = "teste" | "cobertura" | "qualidade";
@@ -188,38 +188,6 @@ function criarExecucao(
     };
 }
 
-async function executarComando({comando, args, cwd, env}: OpcoesComando): Promise<ResultadoComando> {
-    const inicio = Date.now();
-    try {
-        const resultado = await execa(comando, args, {
-            cwd,
-            env: {...process.env, ...env},
-            shell: process.platform === "win32",
-            reject: false
-        });
-        return {
-            codigoSaida: resultado.exitCode ?? -1,
-            saida: resultado.stdout,
-            erro: resultado.stderr,
-            duracaoMs: Date.now() - inicio
-        };
-    } catch (erro: unknown) {
-        return {
-            codigoSaida: -1,
-            saida: "",
-            erro: erro instanceof Error ? erro.message : String(erro),
-            duracaoMs: Date.now() - inicio
-        };
-    }
-}
-
-async function executarComandoSgc(contexto: ContextoColeta, argumentos: string[], incluirBase: boolean = true): Promise<ResultadoComando> {
-    return executarComando({
-        comando: resolverCaminhoTsx(),
-        args: [CAMINHO_SGC, ...argumentos, ...(incluirBase ? ["--base", contexto.base] : [])],
-        cwd: contexto.base,
-    });
-}
 
 function registrarResultadoExecucao(execucao: ExecucaoQualidade, resultado: ResultadoComando): void {
     execucao.duracaoMs = resultado.duracaoMs;

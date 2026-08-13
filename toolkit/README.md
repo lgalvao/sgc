@@ -328,7 +328,8 @@ atual por padrão.
 
 Na camada de qualidade, `coleta.ts` e `resumo.ts` têm fronteira reutilizável e não executam trabalho durante o `import`.
 `coleta-adaptadores-sgc.ts` mantém os adaptadores Gradle, npm, Playwright e os auditores locais específicos do SGC como
-defaults da CLI; `coleta-execucao.ts` concentra contexto, execução, agregação e fotografia. A função
+defaults da CLI; `coleta-executor.ts` concentra subprocessos e `coleta-execucao.ts` concentra contexto, agregação e
+fotografia. A função
 `principal(argumentos, {perfis, adaptadores})` aceita catálogos externos por composição, sem mutar os defaults globais;
 essa é a fronteira experimental de reuso até que os adaptadores de ferramentas sejam separados do agregador. Mesmo no
 perfil SGC, a montagem dos argumentos Playwright usa `diretorios.testesIntegracao`, a mesma convenção do crawler de
