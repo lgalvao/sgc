@@ -416,6 +416,13 @@ npm --prefix toolkit run deps:audit
 npx tsx toolkit/sgc.ts projeto dependencias auditar
 ```
 
+`projeto dependencias auditar` reúne quatro verificações: uso e declaração com Knip, pacotes npm desatualizados,
+vulnerabilidades npm e atualizações de dependências Gradle. O npm cobre todos os workspaces; o Gradle usa o wrapper
+local e desativa somente a execução paralela exigida pela tarefa `dependencyUpdates`. Achados de `outdated` e `audit`
+ficam classificados como `achados` — não são confundidos com falha de execução —, mas ainda produzem código de saída
+não zero para uso em CI. Um projeto pode substituir os escopos em `execucoes.dependencias`; nesses escopos,
+`codigoNaoZeroIndicaAchados: true` declara que código não zero representa resultado encontrado, não erro de infraestrutura.
+
 ## Organização dos testes
 
 O diretório `test/` contém:

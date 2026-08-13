@@ -137,7 +137,10 @@ projeto
     .option("--base <diretorio>", "Sobrescreve o diretório base para auditoria.")
     .action(async (opcoes) => {
         const {executarAuditoriaDependencias} = await import("./projeto/dependencias-auditar.js");
-        await executarAuditoriaDependencias(opcoes);
+        const resultado = await executarAuditoriaDependencias(opcoes);
+        if (resultado.statusGeral !== "ok") {
+            process.exitCode = 1;
+        }
     });
 
 projeto

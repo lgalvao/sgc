@@ -10,7 +10,7 @@ spotbugs = "4.10.2"
 spotbugsPlugin = "6.4.8"
 pitest = "1.19.0"
 openRewrite = "7.18.0"
-gradleVersions = "0.54.0"
+gradleVersions = "0.61.0"
 
 # Security & Core Overrides
 jackson = "3.2.0"
@@ -101,4 +101,4 @@ spotbugs = { id = "com.github.spotbugs", version.ref = "spotbugsPlugin" }
 pitest = { id = "info.solidsoft.pitest", version.ref = "pitest" }
 open-rewrite = { id = "org.openrewrite.rewrite", version.ref = "openRewrite" }
 node = { id = "com.github.node-gradle.node", version = "7.1.0" }
-gradle-versions = { id = "com.github.ben-manes.versions", version.ref = "gradleVersions" }
+gradle-versions = { id = "io.github.ben-manes.versions", version.ref = "gradleVersions" }

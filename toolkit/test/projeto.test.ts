@@ -387,9 +387,10 @@ describe("Comandos de projeto do toolkit", () => {
 
         expect(resultado).toEqual({
             diretorioBase,
+            statusGeral: "ok",
             resultados: [
-                {escopo: "Auditar cliente", codigoSaida: 0},
-                {escopo: "Auditar servidor", codigoSaida: 0}
+                {escopo: "Auditar cliente", codigoSaida: 0, status: "ok"},
+                {escopo: "Auditar servidor", codigoSaida: 0, status: "ok"}
             ]
         });
         expect(chamadas).toEqual([
@@ -403,6 +404,35 @@ describe("Comandos de projeto do toolkit", () => {
                 argumentos: ["dependencias", "--json"],
                 diretorio: path.join(diretorioBase, "servidor")
             }
+        ]);
+    });
+
+    test("distingue achados esperados de falhas de execução", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-dependencias-status-"));
+        const resultado = await executarAuditoriaDependencias({
+            base: diretorioBase,
+            escopos: [
+                {
+                    titulo: "Dependencias desatualizadas",
+                    segmento: "",
+                    comando: "npm",
+                    argumentos: ["outdated"],
+                    codigoNaoZeroIndicaAchados: true
+                },
+                {
+                    titulo: "Ferramenta indisponivel",
+                    segmento: "",
+                    comando: "ferramenta",
+                    argumentos: []
+                }
+            ],
+            executarComando: async (comando) => comando === "npm" ? {exitCode: 1} : {exitCode: undefined}
+        });
+
+        expect(resultado.statusGeral).toBe("falha");
+        expect(resultado.resultados).toEqual([
+            {escopo: "Dependencias desatualizadas", codigoSaida: 1, status: "achados"},
+            {escopo: "Ferramenta indisponivel", codigoSaida: 1, status: "falha"}
         ]);
     });
 }, 30000);

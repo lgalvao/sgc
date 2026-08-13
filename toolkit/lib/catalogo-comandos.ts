@@ -324,7 +324,7 @@ const CATALOGO_COMANDOS_ESPECIAIS = [
     },
     {
         caminho: ["projeto", "dependencias", "auditar"],
-        descricao: "Executa o knip na raiz, no frontend e no toolkit.",
+        descricao: "Audita uso, atualizacao e vulnerabilidades de dependencias npm e Gradle.",
         escopo: "adaptavel",
         efeito: "orquestracao"
     },

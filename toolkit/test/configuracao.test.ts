@@ -45,6 +45,10 @@ describe("Configuracao do toolkit", () => {
             versao: VERSAO_CONFIGURACAO,
             execucoes: {dependencias: [{titulo: "auditoria", segmento: ".", comando: "npm", argumentos: [42]}]}
         })).toThrow("execucoes.dependencias[0].argumentos");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            execucoes: {dependencias: [{titulo: "auditoria", segmento: ".", comando: "npm", argumentos: [], codigoNaoZeroIndicaAchados: "sim"}]}
+        })).toThrow("codigoNaoZeroIndicaAchados deve ser booleano");
     });
 
     test("configura execucoes de projeto sem substituir os defaults do SGC", async () => {
@@ -56,7 +60,8 @@ describe("Configuracao do toolkit", () => {
                     titulo: "Auditar cliente",
                     segmento: "cliente",
                     comando: "npm",
-                    argumentos: ["run", "auditar-dependencias"]
+                    argumentos: ["run", "auditar-dependencias"],
+                    codigoNaoZeroIndicaAchados: true
                 }],
                 qualidade: {
                     rapido: {
@@ -71,7 +76,8 @@ describe("Configuracao do toolkit", () => {
         expect(resolverEscoposAuditoria(base)).toMatchObject([{
             titulo: "Auditar cliente",
             segmento: "cliente",
-            diretorio: path.join(base, "cliente")
+            diretorio: path.join(base, "cliente"),
+            codigoNaoZeroIndicaAchados: true
         }]);
         expect(resolverEscoposInstalacao(base)).toEqual([{
             titulo: "Instalar cliente",

@@ -27,6 +27,7 @@ interface TarefaConfigurada {
 
 interface EscopoComandoConfigurado extends TarefaConfigurada {
     segmento: string;
+    codigoNaoZeroIndicaAchados?: boolean;
 }
 
 interface PerfilQualidadeConfigurado {
@@ -97,11 +98,22 @@ function validarArgumentos(valor: unknown, caminho: string): string[] {
     return [...valor];
 }
 
-function validarTarefa(valor: unknown, caminho: string, permitirSegmento = false): TarefaConfigurada {
+function validarTarefa(
+    valor: unknown,
+    caminho: string,
+    permitirSegmento = false,
+    chavesAdicionais: readonly string[] = []
+): TarefaConfigurada {
     if (!ehObjeto(valor)) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser um objeto.`);
     }
-    const chavesPermitidas = new Set(["titulo", "comando", "argumentos", ...(permitirSegmento ? ["segmento"] : [])]);
+    const chavesPermitidas = new Set([
+        "titulo",
+        "comando",
+        "argumentos",
+        ...(permitirSegmento ? ["segmento"] : []),
+        ...chavesAdicionais
+    ]);
     const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
     if (chavesDesconhecidas.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
@@ -118,13 +130,18 @@ function validarEscoposComando(valor: unknown, caminho: string): EscopoComandoCo
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista.`);
     }
     return valor.map((item, indice) => {
-        const tarefa = validarTarefa(item, `${caminho}[${indice}]`, true);
+        const tarefa = validarTarefa(item, `${caminho}[${indice}]`, true, ["codigoNaoZeroIndicaAchados"]);
         if (!ehObjeto(item)) {
             throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}] deve ser um objeto.`);
+        }
+        const codigoNaoZeroIndicaAchados = item.codigoNaoZeroIndicaAchados;
+        if (codigoNaoZeroIndicaAchados !== undefined && typeof codigoNaoZeroIndicaAchados !== "boolean") {
+            throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho}[${indice}].codigoNaoZeroIndicaAchados deve ser booleano.`);
         }
         return {
             ...tarefa,
             segmento: validarTexto(item.segmento, `${caminho}[${indice}].segmento`),
+            ...(codigoNaoZeroIndicaAchados === undefined ? {} : {codigoNaoZeroIndicaAchados})
         };
     });
 }

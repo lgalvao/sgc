@@ -13,7 +13,10 @@ interface EscopoAuditoria extends DefinicaoEscopoAuditoria {
 interface ResultadoEscopoAuditoria {
     escopo: string;
     codigoSaida: number;
+    status: StatusAuditoriaDependencias;
 }
+
+type StatusAuditoriaDependencias = "ok" | "achados" | "falha";
 
 interface OpcoesAuditoriaDependencias {
     base?: string;
@@ -29,27 +32,42 @@ type ExecutarComando = (
 
 interface ResultadoAuditoriaDependencias {
     diretorioBase: string;
+    statusGeral: StatusAuditoriaDependencias;
     resultados: ResultadoEscopoAuditoria[];
 }
 
 const ESCOPOS_AUDITORIA_SGC: readonly DefinicaoEscopoAuditoria[] = [
     {
-        titulo: "Auditar dependencias da raiz",
+        titulo: "Auditar uso e declaracao de dependencias com Knip",
         segmento: "",
         comando: "npm",
-        argumentos: ["run", "deps:audit"]
+        argumentos: ["run", "deps:audit"],
+        codigoNaoZeroIndicaAchados: true
     },
     {
-        titulo: "Auditar dependencias do frontend",
-        segmento: "frontend",
+        titulo: "Verificar dependencias npm desatualizadas",
+        segmento: "",
         comando: "npm",
-        argumentos: ["run", "deps:audit"]
+        argumentos: ["outdated", "--workspaces", "--include-workspace-root", "--json"],
+        codigoNaoZeroIndicaAchados: true
     },
     {
-        titulo: "Auditar dependencias do toolkit",
-        segmento: "toolkit",
+        titulo: "Verificar vulnerabilidades npm",
+        segmento: "",
         comando: "npm",
-        argumentos: ["run", "deps:audit"]
+        argumentos: ["audit", "--workspaces", "--include-workspace-root", "--json"],
+        codigoNaoZeroIndicaAchados: true
+    },
+    {
+        titulo: "Verificar atualizacoes de dependencias Gradle",
+        segmento: "",
+        comando: "./gradlew",
+        argumentos: [
+            "dependencyUpdates",
+            "--no-parallel",
+            "-Drevision=release",
+            "--console=plain"
+        ]
     }
 ];
 
@@ -90,15 +108,30 @@ async function executarAuditoriaDependencias(
         escreverLinha();
         escreverLinha(escopo.titulo);
         const resultado = await executarComando(escopo.comando, escopo.argumentos, escopo.diretorio);
-        resultados.push({escopo: escopo.titulo, codigoSaida: resultado.exitCode ?? 0});
+        const codigoSaida = resultado.exitCode;
+        const status: StatusAuditoriaDependencias = codigoSaida === undefined
+            ? "falha"
+            : codigoSaida === 0
+                ? "ok"
+                : escopo.codigoNaoZeroIndicaAchados
+                    ? "achados"
+                    : "falha";
+        resultados.push({escopo: escopo.titulo, codigoSaida: codigoSaida ?? 1, status});
     }
 
-    const falhas = resultados.filter((resultado) => resultado.codigoSaida !== 0);
-    if (falhas.length > 0) {
-        throw new Error(`${falhas.length} auditoria(s) de dependencias falharam.`);
+    const statusGeral: StatusAuditoriaDependencias = resultados.some(resultado => resultado.status === "falha")
+        ? "falha"
+        : resultados.some(resultado => resultado.status === "achados")
+            ? "achados"
+            : "ok";
+    const achados = resultados.filter(resultado => resultado.status === "achados").length;
+    const falhas = resultados.filter(resultado => resultado.status === "falha").length;
+    if (achados > 0 || falhas > 0) {
+        escreverLinha();
+        escreverLinha(`Resumo: ${achados} escopo(s) com achados; ${falhas} escopo(s) com falha de execucao.`);
     }
 
-    return {diretorioBase, resultados};
+    return {diretorioBase, statusGeral, resultados};
 }
 
 export {
@@ -110,5 +143,6 @@ export {
     type ExecutarComando,
     type OpcoesAuditoriaDependencias,
     type ResultadoAuditoriaDependencias,
-    type ResultadoEscopoAuditoria
+    type ResultadoEscopoAuditoria,
+    type StatusAuditoriaDependencias
 };

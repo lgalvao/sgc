@@ -404,8 +404,12 @@ provam utilidade funcional.
   o catálogo de perfis e o executor de comandos podem ser fornecidos por projeto externo ou teste. O catálogo também
   pode ser declarado em `execucoes.qualidade`.
 - `projeto/dependencias-auditar.ts` foi convertido para TypeScript; os escopos de auditoria, comandos e argumentos
-  agora podem ser definidos por projeto, enquanto raiz, frontend e toolkit continuam no catálogo padrão do SGC quando
-  não há configuração.
+  agora podem ser definidos por projeto. O catálogo padrão foi ampliado para Knip, `npm outdated`, `npm audit` em todos
+  os workspaces e `dependencyUpdates` do Gradle; códigos não zero esperados são classificados como achados, enquanto
+  falhas de execução continuam distinguíveis.
+- O plugin Gradle de atualizações foi promovido do ID legado `com.github.ben-manes.versions` 0.54.0 para
+  `io.github.ben-manes.versions` 0.61.0, a série compatível com configuration cache; o toolkit mantém somente
+  `--no-parallel` na chamada porque o projeto ainda declara execução paralela global.
 - `projeto/preparar.ts` foi convertido para TypeScript; os escopos de instalação podem ser definidos em
   `execucoes.instalacao`, preservando raiz, frontend e toolkit como defaults do SGC.
 - `backend/cobertura-ramificacoes.ts` e `backend/cobertura-auditoria.ts` foram convertidos para TypeScript com
@@ -448,10 +452,10 @@ provam utilidade funcional.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 129 testes aprovados em 29 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 130 testes aprovados em 29 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
-- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 60,10% de instruções (809/1.346),
-  48,68% de ramificações (463/951), 66,78% de funções (181/271) e 60,21% de linhas (775/1.287); o script exclui
+- `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 60,44% de instruções (822/1.360),
+  49,48% de ramificações (481/972), 67,15% de funções (184/274) e 60,50% de linhas (786/1.299); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 2 testes aprovados, com `npm pack`, instalação isolada, auditoria no consumidor,
@@ -626,9 +630,9 @@ Por fim, o cenário de diagnóstico de projeto foi extraído para `test/projeto-
 `test/sgc.test.ts` ficou vazio e foi removido, concluindo a divisão por domínio sem alterar os 125 cenários totais.
 Nesta rodada, `lib/cli-opcoes.ts` passou a fornecer `lerNumero`, com validação estrita compartilhada por cobertura,
 ramificações e árvore de linhas; quatro regressões cobrem defaults, atribuição, frações, valores parciais e intervalos.
-Os defaults diretos de `process.cwd()` restantes também foram alinhados à resolução comum. A suíte passou a 129 cenários
-regulares em 29 arquivos, e a baseline de cobertura ficou em 60,10% de instruções, 48,68% de ramificações, 66,78% de
-funções e 60,21% de linhas.
+Os defaults diretos de `process.cwd()` restantes também foram alinhados à resolução comum. A suíte passou a 130 cenários
+regulares em 29 arquivos, e a baseline de cobertura ficou em 60,44% de instruções, 49,48% de ramificações, 67,15% de
+funções e 60,50% de linhas.
 
 ### 3.3 Tamanho e composição atual
 
@@ -645,7 +649,7 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
   `test/codigo-importacao.test.ts`, `test/codigo-auditorias.test.ts`, `test/projeto.test.ts`,
   `test/projeto-diagnostico.test.ts`, `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`,
   `test/qualidade-externa.test.ts`, `test/cdus.test.ts`, `test/externo.test.ts` e `test/pacote.test.ts`);
-- 29 arquivos de teste TypeScript concentram 129 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
+- 29 arquivos de teste TypeScript concentram 130 cenários regulares; `test/pacote.test.ts` contém 2 cenários de distribuição
   isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução, `executarSgc` e helpers nativos
   de arquivo, evitando cópias divergentes nos testes de projeto, integração, qualidade e CLI;
@@ -707,7 +711,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Coleta Playwright divergia do crawler | `qualidade/coleta-execucao` agora centraliza a montagem de descrição e argumentos Playwright em função pura que resolve `diretorios.testesIntegracao`; o contrato tem teste de base externa. |
 | Resolvido nesta rodada | Diagnóstico exigia artefatos do próprio toolkit em qualquer base | `projeto/diagnostico` agora monta recursos estruturais com `backend`, `frontend` e `testesIntegracao` configurados; recursos de `toolkit`, portas e `.env.e2e` continuam no perfil SGC e não contaminam bases externas. |
 | Resolvido nesta rodada | Resumo de análise bypassava a saída comum | `backend/testes-analisar.ts` agora usa `escreverLinha` em todas as linhas humanas; stdout continua igual e não há mistura com o JSON gravado. |
-| Resolvido nesta rodada | Auditoria de dependências bypassava a saída comum | `projeto/dependencias-auditar.ts` agora usa `escreverLinha` para a separação dos escopos; o fluxo mantém títulos, quebras e códigos de falha. |
+| Resolvido nesta rodada | Auditoria de dependências era apenas Knip e confundia achados com falhas | `projeto/dependencias-auditar.ts` agora coordena Knip, `npm outdated`, `npm audit` e `dependencyUpdates` Gradle; o resultado separa `ok`, `achados` e `falha`, preservando código não zero para CI. |
 | Resolvido nesta rodada | Roteador monolítico e inventário duplicado | Os 42 comandos que apenas despacham scripts agora vêm de `lib/catalogo-comandos.ts`, com teste de unicidade, descrição, rota e arquivo existente. A documentação passou a tratar `sgc --help` como catálogo canônico e mantém apenas exemplos; comandos com ações/opções próprias continuam explícitos em `sgc.ts`. |
 | Resolvido nesta rodada | Ajuda de folhas catalogadas era genérica | O roteador desativa a ajuda automática do Commander somente nas folhas que despacham arquivos e encaminha `--help` ao script TypeScript; grupos continuam usando a ajuda do Commander e as opções específicas ficam visíveis. |
 | Resolvido nesta rodada | Opção de meta de cobertura em inglês | `backend cobertura auditoria` e `frontend cobertura auditoria` agora usam `--minimo`; os símbolos internos e os relatórios Markdown da família foram normalizados sem alterar os campos JSON de integração. |
@@ -726,7 +730,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 129 testes unitários verdes e os 2 cenários de pacote aprovados são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 130 testes unitários verdes e os 2 cenários de pacote aprovados são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -754,7 +758,7 @@ interna `silencioso` preservam o contrato de leitura e mantêm o stdout JSON vá
 Esta revisão confrontou o plano com a árvore rastreada, o manifesto do pacote, o catálogo da CLI e os testes atuais.
 Conclusões confirmadas:
 
-- a árvore possui 79 arquivos TypeScript de implementação, 29 arquivos `*.test.ts`, 129 cenários regulares e 2 cenários
+- a árvore possui 79 arquivos TypeScript de implementação, 29 arquivos `*.test.ts`, 130 cenários regulares e 2 cenários
   de pacote; o antigo `test/sgc.test.ts` foi removido depois que seus últimos cenários foram distribuídos por domínio;
 - o catálogo declarativo contém 42 comandos que apenas despacham módulos; comandos com opções e ações próprias ainda
   são registrados diretamente em `sgc.ts`, portanto o catálogo não é ainda a fonte única de toda a superfície CLI;
@@ -804,7 +808,7 @@ regra que deve continuar no toolkit, mas não deve ser apresentada como regra ho
 | Idioma e identificadores SGC: `idioma-consistencia-auditar` | A regra de português e `codigo` é uma convenção deliberada deste repositório, não uma verdade universal | Manter no perfil SGC | `perfil-sgc` |
 | Contratos: `contratos-openapi-caminhos`, `contratos-exportar-openapi`, `contratos-diff`, `contratos-fixar-baseline` | Exportação, comparação e baseline continuam documentados e testados; somente o gerador de tipos foi removido | Manter e parametrizar URL/artefatos | `adaptável` |
 | Requisitos/CDUs: `requisitos/cdus-*` | Dez comandos são usados no catálogo e cobrem `specs/cdu-*.md`; mensagens canônicas apontam arquivos concretos do SGC | Manter no perfil SGC; promover apenas primitivas comprovadamente independentes | `perfil-sgc` |
-| Projeto: `arvore-linhas`, `limpar`, `diagnostico`, `dependencias-auditar`, `preparar`, `qualidade`, `versao-sincronizar` | Comandos têm uso em scripts/testes; base, execuções e diretórios já são configuráveis em graus diferentes | Manter; separar orquestração e defaults SGC | `adaptável` |
+| Projeto: `arvore-linhas`, `limpar`, `diagnostico`, `dependencias-auditar`, `preparar`, `qualidade`, `versao-sincronizar` | Comandos têm uso em scripts/testes e execução manual; base, execuções e diretórios já são configuráveis em graus diferentes | Manter; separar orquestração e defaults SGC; auditoria de dependências cobre saúde npm/Gradle | `adaptável` |
 | Coleta: `qualidade/coleta`, `coleta-execucao`, `coleta-executor`, `coleta-leitores`, `coleta-fotografia`, `coleta-contexto`, `coleta-metadados`, `coleta-adaptadores-sgc`, `resumo` | Coleta é usada pela CLI e por testes de composição; motor e adaptadores já estão separados | Manter; núcleo no motor, perfil nos adaptadores | `núcleo` + `perfil-sgc` |
 | Políticas: `qualidade/politicas/semgrep/sgc-qualidade.yml`, `qualidade/frontend-arquitetura/acoes-backend-excecoes.json` | São assets empacotados e consumidos como defaults SGC; não são regras horizontais | Manter no perfil SGC | `perfil-sgc` |
 | Fixtures e saídas ignoradas: `test/fixtures/qualidade/fotografia.json` e diretórios gerados em `qualidade/artefatos`/`semgrep` | Fixture é contrato de teste; saídas são geradas e não pertencem ao pacote | Manter fixture; remover saídas somente pela limpeza, não versioná-las | `núcleo` de teste / transiente |
@@ -954,7 +958,7 @@ do perfil.
     três auditorias backend em `test/backend-auditorias.test.ts`, dois de notificações em
     `test/backend-notificacoes.test.ts`, um de qualidade externa em `test/qualidade-externa.test.ts`, um de diagnóstico
     em `test/projeto-diagnostico.test.ts` e quatro de opções em `test/opcoes-cli.test.ts`. O arquivo `test/sgc.test.ts`
-    foi removido por ficar vazio; os 129 cenários regulares permanecem distribuídos por domínio e `test/qualidade.test.ts`
+foi removido por ficar vazio; os 130 cenários regulares permanecem distribuídos por domínio e `test/qualidade.test.ts`
     possui 10 cenários.
 11. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
     ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
