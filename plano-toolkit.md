@@ -611,6 +611,36 @@ Achado corrigido nesta rodada: quando `codigo nomes auditar-consistencia` precis
 ele só chama a coleta com gravação habilitada se a auditoria recebeu `--gravar`. A propagação de `gravar` e a opção
 interna `silencioso` preservam o contrato de leitura e mantêm o stdout JSON válido.
 
+### 3.7 Auditoria crítica do estado atual
+
+Esta revisão confrontou o plano com a árvore rastreada, o manifesto do pacote, o catálogo da CLI e os testes atuais.
+Conclusões confirmadas:
+
+- a árvore possui 79 arquivos TypeScript de implementação, 8 arquivos `*.test.ts`, 122 cenários regulares e 1 smoke
+  de pacote; `test/sgc.test.ts` ainda concentra 81 cenários e aproximadamente 2.800 linhas;
+- o catálogo declarativo contém 42 comandos que apenas despacham módulos; comandos com opções e ações próprias ainda
+  são registrados diretamente em `sgc.ts`, portanto o catálogo não é ainda a fonte única de toda a superfície CLI;
+- a instalação externa comprova o binário, a raiz do consumidor e os assets Semgrep, mas não comprova uma API
+  programática horizontal: `package.json` exporta a raiz e `lib/*`, porém não exporta os módulos componíveis de
+  `qualidade/*`;
+- a coleta de qualidade está de fato separada em orquestração, contexto, executor, leitores, fotografia, metadados e
+  adaptadores SGC. Não faz sentido continuar fatiando arquivos apenas para reduzir tamanho; os próximos recortes devem
+  ser guiados por contrato público, cobertura e um consumidor externo representativo;
+- a cobertura global atual é informativa, não um critério suficiente. Os módulos de maior risco da coleta ainda têm
+  cobertura direta baixa: adaptadores SGC, executor e leitores são exercitados principalmente por integração indireta;
+- a padronização em português ainda não está completa: permanecem diretórios `latest`, nomes de relatório com
+  `coverage` e campos Git `branch`/`commit`. A ausência de clientes legados permite corrigir esses contratos diretamente,
+  desde que testes, documentação e consumidores internos mudem no mesmo recorte;
+- há persistências que precisam ser classificadas com mais precisão. `backend arquitetura/contratos/coesao auditar`
+  criam relatórios em diretório `backend/latest`, enquanto o plano afirma auditoria read-only como estado desejado;
+- a URL OpenAPI `http://127.0.0.1:10000/api-docs`, tarefas Gradle e várias convenções Vue/SGC continuam sendo defaults
+  legítimos do perfil SGC, mas ainda não estão todos representados como política ou adaptador explícito;
+- nesta auditoria, o shell ativo voltou a Node `26.5.1`, abaixo do mínimo `26.7.0`; o teste de diagnóstico falhou como
+  esperado e passou novamente quando executado sob o runtime declarado. A validação deve conferir `node --version`
+  antes da suíte e não reinterpretar falha de ambiente como regressão funcional;
+- o plano anterior acumulava histórico, backlog e itens resolvidos sob as mesmas prioridades. A partir desta revisão,
+  a seção de lacunas lista somente trabalho ativo; o histórico permanece nas fases e na situação atual.
+
 ## 4. Classificação para reuso externo
 
 ### 4.1 Horizontal com pouca adaptação
@@ -619,7 +649,8 @@ Estes componentes podem formar o pacote reutilizável:
 
 - resolução de raiz, configuração, parsing de opções e saída;
 - execução de comandos, logging e detecção de entrada principal;
-- fotografia/resumo de qualidade quando o schema for formalizado;
+- fotografia/resumo de qualidade, cujo schema `1.0.0` já está centralizado, depois de fechar export público e validação
+  de entrada;
 - contagem de linhas e operações sobre um diretório Git;
 - leitura de JaCoCo e de cobertura V8, desde que caminhos e schema de entrada sejam parâmetros;
 - comparação de fotografias JSON e geração de relatórios determinísticos;
@@ -684,58 +715,75 @@ do perfil.
 
 ### Prioridade alta
 
-1. **Efeitos colaterais**: inverter gradualmente defaults de auditorias geradoras para read-only e exigir ação explícita
-   para persistir artefatos, usando o inventário da seção 3.6 e atualizando o único consumidor interno na mesma rodada.
-2. **[resolvido nesta rodada] Entry point e pacote**: o roteador é `sgc.ts`, o launcher executa `tsx`, e workspace,
-   tarball e instalação isolada passaram nos smoke tests.
-3. **[resolvido nesta rodada] Raiz do consumidor**: o diretório físico do toolkit, o `process.cwd()` e `--base` estão
-   separados e documentados; o teste do pacote prova a precedência da raiz do consumidor.
-4. **[decidido e validado nesta rodada] Modelo de distribuição**: o reuso será por pacote-fonte com runtime `tsx`;
-   `version`, `files`, `bin`, `exports`, assets e dependências de runtime refletem esse modelo. A política de publicação
-   continua uma decisão operacional futura.
-5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 79 módulos de
-   implementação TypeScript com `strict` e `noImplicitOverride`; o gate estrito passou e tornou-se o `typecheck` oficial.
-6. **[resolvido nesta rodada] Dependência de runtime**: `tsx` está em `dependencies`, o launcher de pacote foi criado e
-   a instalação isolada confirma que o pacote fonte+tsx não depende do hoisting do workspace.
-7. **[resolvido nesta rodada] Contrato `.js`/`.ts` temporário**: todos os comandos registrados usam caminhos `.ts` e o
-   fallback do despachador foi removido.
-8. **Hard-coding de perfil**: várias regras continuam presas ao layout e ao vocabulário SGC. Antes de declarar o toolkit
-   reutilizável, separar engine, política e adaptador.
+1. **Superfície pública de reuso não fechada**: o tarball prova a CLI externa, mas `package.json` não exporta a API de
+   qualidade recém-composta. Antes de chamar essa camada de reutilizável, decidir e testar uma superfície mínima de
+   subpaths públicos (`qualidade/coleta`, contratos e tipos necessários), sem expor módulos internos por wildcard.
+2. **Caracterização insuficiente da coleta**: adaptadores SGC, executor e leitores têm cobertura direta baixa. Criar
+   testes comportamentais focados para erro de subprocesso, JUnit ausente/malformado, JSON inválido, ordenação/limite de
+   hotspots e pelo menos um adaptador backend e frontend antes de nova decomposição estrutural.
+3. **Efeitos colaterais de auditorias backend**: `backend arquitetura/contratos/coesao auditar` persistem relatórios em
+   `backend/latest`. Classificar o resultado como geração explícita ou tornar a execução read-only por padrão com
+   `--gravar`; adicionar regressões de ausência de escrita e de destino relativo à base.
+4. **Mapa explícito núcleo/perfil**: classificar cada comando e política como horizontal, adaptável ou SGC. A coleta já
+   possui essa fronteira, mas arquitetura Vue, nomenclatura, CDU, OpenAPI e tarefas Gradle ainda misturam defaults do
+   perfil com capacidades horizontais em graus diferentes.
+5. **Padronização em português incompleta**: substituir `latest`, nomes `*-coverage-*` e símbolos próprios
+   `branch`/`commit` por contratos portugueses. Não criar aliases de compatibilidade; atualizar fixtures, consumidores e
+   documentação no mesmo recorte.
 
 ### Prioridade média
 
-9. **Testes ainda parcialmente concentrados**: `test/sgc.test.ts` ainda concentra 81 cenários, embora os 17 cenários
-   de projeto, os 3 de configuração, os 2 de integração e os 4 de qualidade já tenham sido extraídos para arquivos
-   próprios. Dividir os cenários restantes por domínio continua recomendado para localizar contratos, reduzir o custo de
-   execução focada e permitir fixtures mais independentes.
-10. **[parcial nesta rodada] Schema de resultados**: a fotografia de qualidade agora tem `VERSAO_SCHEMA_FOTOGRAFIA`
+6. **Schema de resultados parcial**: a fotografia de qualidade tem `VERSAO_SCHEMA_FOTOGRAFIA`
    centralizada (`1.0.0`) e contrato TypeScript restrito; auditorias, cobertura, diagnósticos e relatórios ainda usam
-   objetos com versionamento incompleto. Formalizar tipos, versões e validação de entrada/saída dos demais formatos antes
-   de declarar o pacote externo estável.
-11. **Opções heterogêneas, mas sem aliases ingleses próprios ativos**: a implementação usa `--entrada`, `--saida`,
+   objetos com versionamento incompleto. Priorizar formatos realmente consumidos por CI ou por outro comando, com
+   validação de entrada; não impor um envelope universal a resultados que não compartilham semântica.
+7. **Opções e códigos de saída heterogêneos**: a implementação usa `--entrada`, `--saida`,
    `--diretorio`, `--arquivo`, `--base` e opções de domínio em português; a busca não encontrou `--input`, `--output`,
-   `--dir` ou `--directory` como contratos do toolkit. Ainda falta um contrato comum para parsing, mensagens de ajuda,
-   valores padrão e validação; flags de Node, Semgrep e Playwright permanecem somente como encaminhamento externo.
-12. **Documentação derivada**: o catálogo já foi atualizado para `sgc.ts`, mas ainda precisa ser centralizado para não
-    derivar ajuda, comandos e exports em fontes duplicadas. O inventário de comandos não deve divergir do roteador.
-13. **[parcial nesta rodada] Orquestração pesada**: `qualidade/coleta-adaptadores-sgc.ts`, `coleta-executor.ts`,
-    `coleta-leitores.ts`, `coleta-fotografia.ts`, `coleta-contexto.ts` e `coleta-metadados.ts` já separam
-    perfis/adaptadores SGC e seus formatos, subprocessos, leitura de relatórios, contrato/persistência da fotografia,
-    fábrica de contexto e metadados; `coleta-execucao.ts` ainda coordena o fluxo e define o schema mínimo. O próximo recorte deve avaliar
-    formalização do contrato de fotografia e uma política explícita para compatibilidade de schema, sem esconder os
-    defaults específicos do SGC.
+   `--dir` ou `--directory` como contratos próprios. Falta documentar quando uma violação gera código não zero, quando
+   JSON continua disponível em falha e quais comandos exigem `--gravar` ou `--confirmar`.
+8. **Catálogo ainda parcial**: os 42 despachadores estão em `lib/catalogo-comandos.ts`, mas os comandos de registro
+   especializado continuam em `sgc.ts`. Centralizar metadados comuns — caminho, descrição, classe de efeito e perfil —
+   sem tentar representar callbacks complexos como dados artificiais.
+9. **Testes concentrados**: `test/sgc.test.ts` ainda possui 81 cenários e cerca de 2.800 linhas. Separar primeiro runtime
+   e distribuição, backend e frontend; `test/qualidade.test.ts` já possui 7 cenários, não 4 como dizia o plano anterior.
+10. **Defaults de perfil ainda implícitos**: URL OpenAPI, tarefas Gradle, convenções Vue e caminhos de políticas devem
+    ser associados explicitamente ao perfil SGC ou à configuração. Um default SGC é válido; o problema é o núcleo não
+    conseguir distingui-lo de uma regra horizontal.
 
 ### Prioridade baixa
 
-14. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
+11. **Artefatos e limpeza**: revisar políticas, arquivos ignorados e nomes de `mais-recente`/`execucoes` para evitar que
     saídas locais sejam confundidas com recursos do pacote.
-15. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
+12. **Performance**: medir antes de otimizar. A coleta e os auditores só devem ser otimizados por gargalo observado, com
     comparação antes/depois e sem sacrificar a legibilidade do relatório.
 
 ## 6. Próximos passos ordenados
 
 Cada item abaixo deve ser uma rodada pequena, validada e publicada antes do próximo. A ordem privilegia redução de risco,
 reuso externo e preservação de contratos.
+
+### 6.1 Fila executável após esta auditoria
+
+As fases históricas abaixo continuam úteis como registro, mas a execução deve seguir esta fila ativa:
+
+1. **Caracterizar a coleta recém-separada**: testar executor, leitores, fotografia e adaptadores SGC nos caminhos de
+   sucesso e falha; registrar a cobertura por módulo e evitar novas extrações sem lacuna comportamental comprovada.
+2. **Fechar a API pública do pacote**: escolher os subpaths programáticos mínimos, exportá-los explicitamente, instalar
+   o tarball e importar essa API em um consumidor TypeScript externo. O smoke atual cobre apenas a CLI.
+3. **Corrigir efeitos e idioma dos auditores backend**: decidir o contrato de persistência de arquitetura, contratos e
+   coesão; padronizar `latest`, `coverage`, `branch` e `commit` sem aliases legados.
+4. **Criar o mapa de perfil**: adicionar ao catálogo metadados de classe de efeito e classificação
+   horizontal/adaptável/SGC; usar teste para garantir que todos os comandos registrados estejam classificados.
+5. **Externalizar o próximo recorte horizontal real**: escolher uma família com consumidor plausível — inicialmente
+   cobertura Java/V8 ou OpenAPI — e provar configuração em fixture externo antes de criar novos adaptadores genéricos.
+6. **Dividir `test/sgc.test.ts` por risco**: extrair runtime/distribuição primeiro, depois backend e frontend, mantendo
+   testes comportamentais e sem reorganização puramente estética.
+7. **Formalizar resultados consumidos**: começar pelos JSON usados por coleta, resumo ou CI; acrescentar versão e
+   validação de entrada por família, sem envelope universal obrigatório.
+
+Cada item só deve ser considerado concluído quando o perfil SGC e o consumidor externo relevante estiverem cobertos no
+mesmo recorte. Itens 1 e 2 precedem novas generalizações porque hoje representam as maiores lacunas entre a arquitetura
+declarada e a evidência disponível.
 
 ### Fase 0 — estabilizar os contratos existentes
 
@@ -797,7 +845,9 @@ launcher compilado, quando exercitado no smoke opcional, continuar despachando a
 3. **[concluído nesta rodada]** Introduzir tipos para JaCoCo, V8, regras da análise de testes backend, mensagens CDU,
    cobertura frontend, violações de ações, resíduos, arquitetura AST, execução e resumo de qualidade, diagnóstico,
    fotografias, exceções e contratos OpenAPI; os contratos de entrada JSON não confiáveis são tratados como `unknown`.
-4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
+4. **[concluído]** Substituir entradas não confiáveis por `unknown` e validar apenas o que o consumidor exige; a busca
+   atual não encontra `any` de implementação, apenas padrões textuais usados pelos próprios auditores para detectar
+   `any` no código analisado.
 5. **[concluído nesta rodada]** Criar `tsconfig.estrito.json` com `strict` e `noImplicitOverride`, aplicá-lo a toda a
    implementação TypeScript, zerar os diagnósticos e incorporá-lo ao `typecheck` principal.
 6. **[parcial nesta rodada]** Eliminar defaults de caminho calculados durante import; `lib/execucao.ts` agora resolve
@@ -849,15 +899,16 @@ Para cada comando convertido:
    - contratos OpenAPI;
    - coleta de qualidade;
    - políticas de nomenclatura, CDU, modais e arquitetura.
-3. **[parcial nesta rodada]** Fazer o núcleo receber adaptadores por composição, sem `if (projeto === "sgc")` espalhado. A
-   coleta de qualidade já aceita catálogos externos; os adaptadores de Gradle, npm, Playwright e políticas ainda precisam
-   ser separados do orquestrador SGC.
+3. **[parcial]** Fazer o núcleo receber adaptadores por composição, sem `if (projeto === "sgc")` espalhado. A coleta de
+   qualidade já separa e injeta perfis, adaptadores, contexto, metadados e persistência; a pendência está nas demais
+   famílias horizontais, não em continuar decompondo `coleta-execucao.ts`.
 4. **[concluído nesta rodada]** Criar `test/externo.test.ts` com um projeto fictício mínimo de Java/Vue, layout
    `servidor/src/main/java` e `cliente/src` configurado por JSON, e executar contra ele as auditorias de arquitetura
    backend/frontend, identificadores de teste e resíduos. O fixture confirma o recorte horizontal dessas famílias sem
    criar os diretórios `backend`, `frontend` ou `toolkit` do SGC; tarefas, políticas e adaptadores completos continuam
    pendentes, embora a coleta de qualidade já tenha uma fronteira de composição testada.
-5. Documentar claramente quais comandos são `núcleo`, `perfil-sgc` ou `opcionais`.
+5. Documentar claramente quais comandos são `núcleo`, `perfil-sgc` ou `opcionais`, preferencialmente como metadado do
+   catálogo para que ajuda, documentação e testes possam verificar a classificação.
 6. Mover políticas do SGC para um diretório de perfil explícito somente quando o motor correspondente estiver estável;
    não reorganizar todos os arquivos antecipadamente.
 7. Criar testes de caracterização para cada funcionalidade específica antes de separar seu motor horizontal; preservar
@@ -877,7 +928,8 @@ SGC está ativo.
    primeiros recortes foram aplicados em `projeto arvore-linhas`, com `--profundidade`, `--minimo-linhas` e
    `--excluir-testes`, nas auditorias de cobertura, com `--minimo`, e na substituição documentada de `--dir` por
    `--diretorio`; permanece a oportunidade de compartilhar parsing e validação sem esconder semântica específica.
-3. Definir um envelope comum de resultado: versão do schema, status, resumo, violações, métricas, artefatos e avisos.
+3. Definir contratos por família de resultado. Compartilhar versão, estado, artefatos e avisos somente onde a semântica
+   for realmente comum; evitar um envelope universal cheio de campos opcionais.
 4. Separar stdout estruturado, stdout humano e stderr operacional.
 5. Definir quando um comando retorna falha por violação encontrada versus erro de execução.
 6. Adicionar `--json`/`--gravar` de forma consistente, sem inventar opções para comandos que não precisam delas.
@@ -897,7 +949,9 @@ SGC está ativo.
    implementação.
 4. **[concluído nesta rodada]** Adicionar smoke test de instalação em diretório externo, incluindo a execução do binário
    do pacote; o modelo fonte + `tsx` é exercitado pelo launcher e não depende de `node_modules` hoisted.
-5. Adicionar matriz de validação para Node `26.7+`, TypeScript 6 e as versões de Vitest/tsx usadas no workspace.
+5. Registrar uma matriz mínima de validação para Node `26.7+`, TypeScript 6 e as versões de Vitest/tsx usadas no
+   workspace. Como o projeto adota bleeding edge e não mantém compatibilidade antiga, a matriz deve verificar a versão
+   corrente declarada, não criar suporte retroativo.
 6. **[parcial nesta rodada]** Criar fixtures próprias do toolkit para Java/Spring, Vue e Markdown; o fixture externo
    Java/Vue já cobre o layout e os comandos estruturais, mas ainda faltam fixtures independentes para cobertura,
    contratos, OpenAPI e Markdown. Não usar a suíte do produto SGC como validação rotineira da modernização do toolkit.
@@ -917,28 +971,33 @@ SGC está ativo.
 
 ```bash
 node --version
-cd toolkit
-npm run typecheck
-npx vitest run test/sgc.test.ts test/projeto.test.ts test/configuracao.test.ts test/integracao.test.ts test/qualidade.test.ts test/cdus.test.ts test/externo.test.ts --reporter=dot --no-color
-npm run build
-cd ..
+npm --prefix toolkit run typecheck
+npm --prefix toolkit run typecheck:testes
+npm --prefix toolkit run lint
+npm --prefix toolkit exec -- vitest run test/<dominio>.test.ts --reporter=dot --no-color
 git diff --check
 ```
 
-O comando focado deve apontar para os testes do módulo alterado assim que a suíte for dividida. Enquanto
-`test/sgc.test.ts` continuar monolítico, a rodada acima é o mínimo seguro.
+O comando focado deve apontar para os testes do módulo alterado. Enquanto o contrato correspondente permanecer em
+`test/sgc.test.ts`, incluí-lo junto ao arquivo de domínio; não executar sempre todos os arquivos sob o rótulo de rodada
+focada.
 
 ### Rodada completa do toolkit
 
 ```bash
-cd toolkit
-npm run test
-npm run typecheck
-npm run lint
-npm run deps:audit
-npm run build
-cd ..
+npm --prefix toolkit run test
+npm --prefix toolkit run test:coverage
+npm --prefix toolkit run test:pacote
+npm --prefix toolkit run typecheck
+npm --prefix toolkit run typecheck:testes
+npm --prefix toolkit run lint
+npm --prefix toolkit run deps:audit
+npm --prefix toolkit run build
+git diff --check
 ```
+
+`test:coverage` continua informativo, mas deve ser executado na rodada completa para detectar queda acidental. O smoke de
+pacote é obrigatório quando mudarem manifesto, exports, assets, launcher, resolução de raiz ou superfície pública.
 
 ### Verificações de integração de execução
 
