@@ -47,17 +47,36 @@ interface FonteMensagensCodigo {
     tipo: TipoFonteMensagensCodigo;
 }
 
+interface VocabularioCduConfigurado {
+    perfisCanonicos: string[];
+    tiposProcessoCanonicos: string[];
+    arquivoSituacoesCanonicas: string;
+}
+
+interface EstiloCduConfigurado {
+    perfisEmCrases: string[];
+}
+
 interface ConfiguracaoCdu {
     padraoArquivos: string;
     fontesMensagensCodigo: FonteMensagensCodigo[];
+    vocabulario: VocabularioCduConfigurado;
+    estilo: EstiloCduConfigurado;
 }
 
 interface RequisitosConfigurados {
     cdus: ConfiguracaoCdu;
 }
 
+interface ConfiguracaoCduSobreposta {
+    padraoArquivos?: string;
+    fontesMensagensCodigo?: FonteMensagensCodigo[];
+    vocabulario?: Partial<VocabularioCduConfigurado>;
+    estilo?: Partial<EstiloCduConfigurado>;
+}
+
 interface RequisitosSobrepostos {
-    cdus?: Partial<ConfiguracaoCdu>;
+    cdus?: ConfiguracaoCduSobreposta;
 }
 
 interface ConfiguracaoToolkit {
@@ -105,7 +124,15 @@ const CONFIGURACAO_PADRAO: ConfiguracaoToolkit = {
                 {caminho: "frontend/src/constants/textos-mapa.ts", tipo: "textosTypescript"},
                 {caminho: "frontend/src/constants/textos-diagnostico.ts", tipo: "textosTypescript"},
                 {caminho: "frontend/src/constants/textos-processo.ts", tipo: "textosTypescript"}
-            ]
+            ],
+            vocabulario: {
+                perfisCanonicos: ["ADMIN", "GESTOR", "CHEFE", "SERVIDOR"],
+                tiposProcessoCanonicos: ["Mapeamento", "Revisão", "Diagnóstico"],
+                arquivoSituacoesCanonicas: "specs/intro_3_situacoes.md"
+            },
+            estilo: {
+                perfisEmCrases: ["ADMIN", "GESTOR", "CHEFE", "SERVIDOR", "TODOS"]
+            }
         }
     }
 };
@@ -221,6 +248,49 @@ function validarExecucoes(valor: unknown): ExecucoesConfiguradas {
     return resultado;
 }
 
+function validarListaTextos(valor: unknown, caminho: string): string[] {
+    if (!Array.isArray(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.${caminho} deve ser uma lista de textos.`);
+    }
+    return valor.map((item, indice) => validarTexto(item, `${caminho}[${indice}]`));
+}
+
+function validarVocabularioCdu(valor: unknown): Partial<VocabularioCduConfigurado> {
+    if (!ehObjeto(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.vocabulario deve ser um objeto JSON.`);
+    }
+
+    const chavesPermitidas = new Set(["perfisCanonicos", "tiposProcessoCanonicos", "arquivoSituacoesCanonicas"]);
+    const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
+    if (chavesDesconhecidas.length > 0) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.vocabulario possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+    }
+
+    return {
+        ...(valor.perfisCanonicos === undefined ? {} : {perfisCanonicos: validarListaTextos(valor.perfisCanonicos, "requisitos.cdus.vocabulario.perfisCanonicos")}),
+        ...(valor.tiposProcessoCanonicos === undefined ? {} : {tiposProcessoCanonicos: validarListaTextos(valor.tiposProcessoCanonicos, "requisitos.cdus.vocabulario.tiposProcessoCanonicos")}),
+        ...(valor.arquivoSituacoesCanonicas === undefined
+            ? {}
+            : {arquivoSituacoesCanonicas: validarTexto(valor.arquivoSituacoesCanonicas, "requisitos.cdus.vocabulario.arquivoSituacoesCanonicas")})
+    };
+}
+
+function validarEstiloCdu(valor: unknown): Partial<EstiloCduConfigurado> {
+    if (!ehObjeto(valor)) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.estilo deve ser um objeto JSON.`);
+    }
+
+    const chavesPermitidas = new Set(["perfisEmCrases"]);
+    const chavesDesconhecidas = Object.keys(valor).filter(chave => !chavesPermitidas.has(chave));
+    if (chavesDesconhecidas.length > 0) {
+        throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus.estilo possui chave(s) desconhecida(s): ${chavesDesconhecidas.join(", ")}.`);
+    }
+
+    return valor.perfisEmCrases === undefined
+        ? {}
+        : {perfisEmCrases: validarListaTextos(valor.perfisEmCrases, "requisitos.cdus.estilo.perfisEmCrases")};
+}
+
 function validarRequisitos(valor: unknown): RequisitosSobrepostos {
     if (!ehObjeto(valor)) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos deve ser um objeto JSON.`);
@@ -239,7 +309,7 @@ function validarRequisitos(valor: unknown): RequisitosSobrepostos {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus deve ser um objeto JSON.`);
     }
 
-    const chavesPermitidasCdus = new Set(["padraoArquivos", "fontesMensagensCodigo"]);
+    const chavesPermitidasCdus = new Set(["padraoArquivos", "fontesMensagensCodigo", "vocabulario", "estilo"]);
     const chavesDesconhecidasCdus = Object.keys(valor.cdus).filter(chave => !chavesPermitidasCdus.has(chave));
     if (chavesDesconhecidasCdus.length > 0) {
         throw new Error(`${NOME_ARQUIVO_CONFIGURACAO}.requisitos.cdus possui chave(s) desconhecida(s): ${chavesDesconhecidasCdus.join(", ")}.`);
@@ -277,7 +347,9 @@ function validarRequisitos(valor: unknown): RequisitosSobrepostos {
             ...(valor.cdus.padraoArquivos === undefined
                 ? {}
                 : {padraoArquivos: validarTexto(valor.cdus.padraoArquivos, "requisitos.cdus.padraoArquivos")}),
-            ...(fontesValidadas === undefined ? {} : {fontesMensagensCodigo: fontesValidadas})
+            ...(fontesValidadas === undefined ? {} : {fontesMensagensCodigo: fontesValidadas}),
+            ...(valor.cdus.vocabulario === undefined ? {} : {vocabulario: validarVocabularioCdu(valor.cdus.vocabulario)}),
+            ...(valor.cdus.estilo === undefined ? {} : {estilo: validarEstiloCdu(valor.cdus.estilo)})
         }
     };
 }
@@ -355,12 +427,21 @@ function combinarConfiguracoes(
         },
     };
     const requisitosSobrepostos = configuracaoSobreposta.requisitos ?? {};
+    const cdusSobrepostos = requisitosSobrepostos.cdus ?? {};
     const requisitos = {
         ...configuracaoBase.requisitos,
         ...requisitosSobrepostos,
         cdus: {
             ...configuracaoBase.requisitos.cdus,
-            ...requisitosSobrepostos.cdus
+            ...cdusSobrepostos,
+            vocabulario: {
+                ...configuracaoBase.requisitos.cdus.vocabulario,
+                ...cdusSobrepostos.vocabulario
+            },
+            estilo: {
+                ...configuracaoBase.requisitos.cdus.estilo,
+                ...cdusSobrepostos.estilo
+            }
         }
     };
     return {

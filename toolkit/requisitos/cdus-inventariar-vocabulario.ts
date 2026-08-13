@@ -4,7 +4,7 @@ import path from "node:path";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
-import {carregarSituacoesCanonicas, PERFIS_CANONICOS, TIPOS_PROCESSO_CANONICOS} from "./cdus-vocabulario-lib.js";
+import {carregarSituacoesCanonicas, obterVocabularioCanonico} from "./cdus-vocabulario-lib.js";
 
 type MapaContagem = Record<string, number>;
 
@@ -48,6 +48,7 @@ function extrairItensListaAtores(texto: string): string[] {
 
 async function inventariarVocabulario(base: string, arquivosInformados?: string[]): Promise<InventarioVocabulario> {
     const situacoesCanonicas = carregarSituacoesCanonicas(base);
+    const vocabularioCanonico = obterVocabularioCanonico(base);
     const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
 
     const inventario: InventarioVocabulario = {
@@ -58,9 +59,9 @@ async function inventariarVocabulario(base: string, arquivosInformados?: string[
         tiposProcesso: {},
         elementosUi: {},
         canonicos: {
-            perfis: [...PERFIS_CANONICOS],
+            perfis: [...vocabularioCanonico.perfis],
             situacoes: [...situacoesCanonicas],
-            tiposProcesso: [...TIPOS_PROCESSO_CANONICOS]
+            tiposProcesso: [...vocabularioCanonico.tiposProcesso]
         }
     };
 

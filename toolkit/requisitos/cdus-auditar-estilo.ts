@@ -1,6 +1,7 @@
 // Auditoria tipográfica dos casos de uso CDU.
 
 import path from "node:path";
+import {carregarConfiguracao} from "../lib/configuracao.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus-lib.js";
@@ -8,7 +9,6 @@ import {lerArquivo, listarArquivosCdu, obterLinhas, obterOpcoesCdu} from "./cdus
 const REGEX_ASPAS_SIMPLES = /'([^'\n]+)'/g;
 const REGEX_TITULO_UI_EM_ASPAS = /(?:título|titulo|subtítulo|subtitulo)\s*:?\s*"([^"\n]+)"/gi;
 const REGEX_PLACEHOLDER_LEGADO = /\[[A-Z0-9_]+\]/g;
-const PERFIS = new Set<string>(["ADMIN", "GESTOR", "CHEFE", "SERVIDOR", "TODOS"]);
 
 type RegraEstilo = "perfil_em_aspas_simples" | "ui_em_aspas_duplas" | "placeholder_legado";
 
@@ -34,11 +34,11 @@ function adicionarAchado(
     achados.push({severidade, regra, mensagem, linha});
 }
 
-function encontrarAspasSimplesSuspeitas(linhas: string[], achados: AchadoEstilo[]): void {
+function encontrarAspasSimplesSuspeitas(linhas: string[], achados: AchadoEstilo[], perfis: Set<string>): void {
     linhas.forEach((linha, indice) => {
         for (const correspondencia of linha.matchAll(REGEX_ASPAS_SIMPLES)) {
             const valor = correspondencia[1].trim();
-            if (PERFIS.has(valor)) {
+            if (perfis.has(valor)) {
                 adicionarAchado(
                     achados,
                     "aviso",
@@ -86,12 +86,12 @@ function encontrarPlaceholdersLegados(linhas: string[], achados: AchadoEstilo[])
     });
 }
 
-function auditarArquivo(caminhoArquivo: string): ResultadoArquivoEstilo {
+function auditarArquivo(caminhoArquivo: string, perfis: Set<string>): ResultadoArquivoEstilo {
     const texto = lerArquivo(caminhoArquivo);
     const linhas = obterLinhas(texto);
     const achados: AchadoEstilo[] = [];
 
-    encontrarAspasSimplesSuspeitas(linhas, achados);
+    encontrarAspasSimplesSuspeitas(linhas, achados, perfis);
     encontrarUiEmAspasDuplas(linhas, achados);
     encontrarPlaceholdersLegados(linhas, achados);
 
@@ -107,9 +107,10 @@ async function auditarEstilo(base: string, arquivosInformados?: string[]): Promi
     arquivosComAviso: number;
     avisos: number;
 }; relatorio: ResultadoArquivoEstilo[]}> {
+    const perfis = new Set(carregarConfiguracao(base).requisitos.cdus.estilo.perfisEmCrases);
     const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const relatorio: ResultadoArquivoEstilo[] = arquivos.map(caminhoArquivo => {
-        const resultado = auditarArquivo(caminhoArquivo);
+        const resultado = auditarArquivo(caminhoArquivo, perfis);
         return {
             arquivo: path.relative(base, resultado.arquivo).replaceAll("\\", "/"),
             achados: resultado.achados

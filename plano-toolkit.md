@@ -147,7 +147,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   continuam como módulos internos compostos por eles;
 - os dois agregadores aceitam `--secoes` e produzem JSON versionado; o caminho do corpus já é configurável por
   `requisitos.cdus.padraoArquivos`, com default `specs/cdu/cdu-*.md`;
-- a configuração ainda não representa vocabulário, estilo nem extratores CDU;
+- a configuração já representa corpus, fontes de mensagens, vocabulário, situações, tipos e perfis tipográficos; estilo
+  textual, placeholders e heurísticas de contexto ainda não são políticas configuráveis;
 - a comparação com mensagens do código usa fontes configuráveis por caminho e tipo de adaptador; o default SGC mantém sete
   fontes e as heurísticas de prefixos e grupos ainda estão dentro do adaptador;
 - `backend testes analisar` e `backend testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
@@ -194,7 +195,8 @@ permite determinar efeitos sem ler a implementação.
 - ampliar a configuração do corpus com políticas conceituais somente quando houver necessidade real de composição; o
   padrão de glob já está em `requisitos.cdus.padraoArquivos`;
 - extrair parser e análise estrutural para contratos independentes do SGC;
-- mover vocabulário, situações, tipos, estilo e placeholders do SGC para uma política explícita;
+- manter perfis, tipos de processo, arquivo de situações e perfis tipográficos em política explícita; avaliar placeholders e
+  demais heurísticas somente quando houver contrato horizontal claro;
 - separar a comparação de mensagens das heurísticas de prefixos e grupos e permitir composição por stack;
 - reclassificar cada comando CDU individualmente: análise estrutural no núcleo, integração no adaptador e convenções no
   perfil SGC;

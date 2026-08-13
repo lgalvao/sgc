@@ -1,22 +1,24 @@
 import fs from "node:fs";
 import path from "node:path";
+import {carregarConfiguracao} from "../lib/configuracao.js";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 
-const PERFIS_CANONICOS = new Set<string>([
-    "ADMIN",
-    "GESTOR",
-    "CHEFE",
-    "SERVIDOR"
-]);
+interface VocabularioCanonico {
+    perfis: Set<string>;
+    tiposProcesso: Set<string>;
+}
 
-const TIPOS_PROCESSO_CANONICOS = new Set<string>([
-    "Mapeamento",
-    "Revisão",
-    "Diagnóstico"
-]);
+function obterVocabularioCanonico(base: string = DIRETORIO_RAIZ): VocabularioCanonico {
+    const configuracao = carregarConfiguracao(base).requisitos.cdus.vocabulario;
+    return {
+        perfis: new Set(configuracao.perfisCanonicos),
+        tiposProcesso: new Set(configuracao.tiposProcessoCanonicos)
+    };
+}
 
 function carregarSituacoesCanonicas(base: string = DIRETORIO_RAIZ): Set<string> {
-    const caminho = path.join(base, "specs", "intro_3_situacoes.md");
+    const arquivo = carregarConfiguracao(base).requisitos.cdus.vocabulario.arquivoSituacoesCanonicas;
+    const caminho = path.resolve(base, arquivo);
     if (!fs.existsSync(caminho)) {
         return new Set<string>();
     }
@@ -75,8 +77,7 @@ function sugerirCanonico(valor: string, canonicos: Iterable<string>): string | n
 }
 
 export {
-    PERFIS_CANONICOS,
-    TIPOS_PROCESSO_CANONICOS,
     carregarSituacoesCanonicas,
+    obterVocabularioCanonico,
     sugerirCanonico
 };

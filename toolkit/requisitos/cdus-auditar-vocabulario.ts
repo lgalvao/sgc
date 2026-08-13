@@ -6,9 +6,8 @@ import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {lerArquivo, listarArquivosCdu, obterOpcoesCdu} from "./cdus-lib.js";
 import {
     carregarSituacoesCanonicas,
-    PERFIS_CANONICOS,
-    sugerirCanonico,
-    TIPOS_PROCESSO_CANONICOS
+    obterVocabularioCanonico,
+    sugerirCanonico
 } from "./cdus-vocabulario-lib.js";
 
 type RegraVocabulario = "perfil_fora_vocabulario" | "tipo_processo_variacao" | "situacao_variacao";
@@ -35,7 +34,7 @@ function adicionarAchado(
     achados.push({severidade, regra, mensagem, linha});
 }
 
-function auditarPerfis(texto: string, achados: AchadoVocabulario[]): void {
+function auditarPerfis(texto: string, achados: AchadoVocabulario[], perfisCanonicos: Set<string>): void {
     const linhas = texto.split(/\r?\n/);
     const indiceAtores = linhas.findIndex(linha => /^##\s+Atores\s*$/.test(linha));
     const indicePre = linhas.findIndex(linha => /^##\s+Pré-condições\s*$/.test(linha));
@@ -49,11 +48,11 @@ function auditarPerfis(texto: string, achados: AchadoVocabulario[]): void {
         }
 
         const valor = linha.replace(/^\s*-\s+/, "").trim();
-        if (PERFIS_CANONICOS.has(valor)) {
+        if (perfisCanonicos.has(valor)) {
             return;
         }
 
-        const sugestao = sugerirCanonico(valor, PERFIS_CANONICOS);
+        const sugestao = sugerirCanonico(valor, perfisCanonicos);
         const complemento = sugestao ? ` Sugestão: \`${sugestao}\`.` : "";
         adicionarAchado(
             achados,
@@ -68,7 +67,8 @@ function auditarPerfis(texto: string, achados: AchadoVocabulario[]): void {
 function auditarSituacoesETipos(
     texto: string,
     achados: AchadoVocabulario[],
-    situacoesCanonicas: Set<string>
+    situacoesCanonicas: Set<string>,
+    tiposProcessoCanonicos: Set<string>
 ): void {
     const linhas = texto.split(/\r?\n/);
     linhas.forEach((linha, indice) => {
@@ -78,7 +78,7 @@ function auditarSituacoesETipos(
 
         for (const match of linha.matchAll(/'([^'\n]+)'/g)) {
             const valor = match[1].trim();
-            const ehTipo = TIPOS_PROCESSO_CANONICOS.has(valor);
+            const ehTipo = tiposProcessoCanonicos.has(valor);
             const ehSituacao = situacoesCanonicas.has(valor);
             if (ehTipo || ehSituacao) {
                 continue;
@@ -88,17 +88,17 @@ function auditarSituacoesETipos(
                 ? sugerirCanonico(valor, situacoesCanonicas)
                 : null;
             const sugestaoTipo = contextoTipo
-                ? sugerirCanonico(valor, TIPOS_PROCESSO_CANONICOS)
+                ? sugerirCanonico(valor, tiposProcessoCanonicos)
                 : null;
             const sugestao = sugestaoSituacao ?? sugestaoTipo;
             if (!sugestao) {
                 continue;
             }
 
-            const regra = TIPOS_PROCESSO_CANONICOS.has(sugestao)
+            const regra = tiposProcessoCanonicos.has(sugestao)
                 ? "tipo_processo_variacao"
                 : "situacao_variacao";
-            const categoria = TIPOS_PROCESSO_CANONICOS.has(sugestao)
+            const categoria = tiposProcessoCanonicos.has(sugestao)
                 ? "tipo de processo"
                 : "situação";
             adicionarAchado(
@@ -119,13 +119,14 @@ async function auditarVocabulario(base: string, arquivosInformados?: string[]): 
     avisos: number;
 }; relatorio: RelatorioArquivoVocabulario[]}> {
     const situacoesCanonicas = carregarSituacoesCanonicas(base);
+    const {perfis: perfisCanonicos, tiposProcesso: tiposProcessoCanonicos} = obterVocabularioCanonico(base);
 
     const arquivos = arquivosInformados ?? await listarArquivosCdu(base);
     const relatorio: RelatorioArquivoVocabulario[] = arquivos.map(caminhoArquivo => {
         const texto = lerArquivo(caminhoArquivo);
         const achados: AchadoVocabulario[] = [];
-        auditarPerfis(texto, achados);
-        auditarSituacoesETipos(texto, achados, situacoesCanonicas);
+        auditarPerfis(texto, achados, perfisCanonicos);
+        auditarSituacoesETipos(texto, achados, situacoesCanonicas, tiposProcessoCanonicos);
         return {
             arquivo: path.relative(base, caminhoArquivo).replaceAll("\\", "/"),
             achados

@@ -30,6 +30,8 @@ describe("Configuracao do toolkit", () => {
         expect(configuracao.diretorios.frontend).toBe("frontend");
         expect(configuracao.requisitos.cdus.padraoArquivos).toBe("specs/cdu/cdu-*.md");
         expect(configuracao.requisitos.cdus.fontesMensagensCodigo).toHaveLength(7);
+        expect(configuracao.requisitos.cdus.vocabulario.perfisCanonicos).toEqual(["ADMIN", "GESTOR", "CHEFE", "SERVIDOR"]);
+        expect(configuracao.requisitos.cdus.vocabulario.arquivoSituacoesCanonicas).toBe("specs/intro_3_situacoes.md");
     });
 
     test("rejeita configuracao com versao, chave ou caminho invalido", () => {
@@ -50,6 +52,14 @@ describe("Configuracao do toolkit", () => {
             versao: VERSAO_CONFIGURACAO,
             requisitos: {cdus: {fontesMensagensCodigo: [{caminho: "mensagens.java", tipo: "kotlin"}]}}
         })).toThrow("tipo de fonte conhecido");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            requisitos: {cdus: {vocabulario: {perfisCanonicos: ["ADMIN", ""]}}}
+        })).toThrow("perfisCanonicos[1]");
+        expect(() => validarConfiguracao({
+            versao: VERSAO_CONFIGURACAO,
+            requisitos: {cdus: {estilo: {perfisEmCrases: "ADMIN"}}}
+        })).toThrow("perfisEmCrases deve ser uma lista");
         expect(() => validarConfiguracao({
             versao: VERSAO_CONFIGURACAO,
             execucoes: {qualidade: {rapido: {descricao: "", tarefas: []}}}

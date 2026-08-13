@@ -78,6 +78,11 @@ interface ResultadoInventarioVocabulario {
     situacoes: Record<string, number>;
     tiposProcesso: Record<string, number>;
     elementosUi: Record<string, number>;
+    canonicos: {
+        perfis: string[];
+        situacoes: string[];
+        tiposProcesso: string[];
+    };
 }
 
 interface ItemMensagemCodigo {
@@ -417,6 +422,86 @@ describe("Ferramentas de requisitos dos CDUs", () => {
         expect(vocabulario.situacoes["Em andamento"]).toBe(1);
         expect(vocabulario.tiposProcesso["Diagnóstico"]).toBe(1);
         expect(vocabulario.elementosUi.Painel).toBe(1);
+    });
+
+    test("usa política de vocabulário e estilo CDU configurada pelo projeto", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-cdus-politica-configurada-"));
+        const diretorioCorpus = path.join(base, "documentacao", "casos");
+
+        await escreverArquivo(
+            path.join(diretorioCorpus, "cdu-01.md"),
+            [
+                "# CDU-01 - Exemplo externo",
+                "",
+                "## Atores",
+                "",
+                "- OPERADOR",
+                "",
+                "## Pré-condições",
+                "",
+                "- Usuário com perfil 'OPERADOR'.",
+                "- Solicitação na situação 'Aberta'.",
+                "",
+                "## Fluxo principal",
+                "",
+                "1. O usuário abre o `Painel`."
+            ].join("\n")
+        );
+        await escreverArquivo(
+            path.join(base, "documentacao", "situacoes.md"),
+            "- **Aberta**: Solicitação disponível.\n"
+        );
+        await escreverArquivo(
+            path.join(base, "configuracao-toolkit.json"),
+            JSON.stringify({
+                versao: 1,
+                requisitos: {
+                    cdus: {
+                        padraoArquivos: "documentacao/casos/cdu-*.md",
+                        vocabulario: {
+                            perfisCanonicos: ["OPERADOR"],
+                            tiposProcessoCanonicos: ["Solicitação"],
+                            arquivoSituacoesCanonicas: "documentacao/situacoes.md"
+                        },
+                        estilo: {
+                            perfisEmCrases: ["OPERADOR"]
+                        }
+                    }
+                }
+            })
+        );
+
+        const inventario = await executarSgc([
+            "requisitos",
+            "cdus",
+            "inventariar",
+            "--secoes",
+            "vocabulario",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(inventario.exitCode).toBe(0);
+        const vocabulario = lerJson<ResultadoInventarioCdus>(inventario).secoes.vocabulario!;
+        expect(vocabulario.canonicos.perfis).toEqual(["OPERADOR"]);
+        expect(vocabulario.canonicos.situacoes).toEqual(["Aberta"]);
+        expect(vocabulario.canonicos.tiposProcesso).toEqual(["Solicitação"]);
+
+        const estilo = await executarSgc([
+            "requisitos",
+            "cdus",
+            "auditar",
+            "--secoes",
+            "estilo",
+            "--json",
+            "--base",
+            base
+        ]);
+
+        expect(estilo.exitCode).toBe(0);
+        const resultadoEstilo = lerJson<ResultadoAuditoriaCdu>(estilo).secoes.estilo!;
+        expect(resultadoEstilo.relatorio[0].achados.some(achado => achado.regra === "perfil_em_aspas_simples")).toBe(true);
     });
 
     test("audita vocabulário controlado dos CDUs", async () => {

@@ -200,6 +200,10 @@ Os tipos aceitos são `mensagensJava`, `assuntosJava`, `notificacoesTypescript` 
 adaptador de leitura; prefixos, grupos e convenções de mensagens continuam sendo políticas que precisam ser extraídas do
 perfil quando houver necessidade de generalização adicional.
 
+Os valores controlados do CDU também podem ser substituídos em `requisitos.cdus.vocabulario` (`perfisCanonicos`,
+`tiposProcessoCanonicos` e `arquivoSituacoesCanonicas`) e `requisitos.cdus.estilo.perfisEmCrases`. O default preserva os
+perfis, tipos, situações e convenções tipográficas atuais do SGC.
+
 Execuções de dependências e qualidade também podem ser substituídas:
 
 ```json
