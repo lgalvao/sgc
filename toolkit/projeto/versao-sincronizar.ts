@@ -1,6 +1,6 @@
 import {existsSync, readFileSync, writeFileSync} from "node:fs";
 import path from "node:path";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
@@ -65,7 +65,8 @@ function sincronizarVersao(
     };
 }
 
-function principal(argumentos: string[] = process.argv.slice(2)): ResultadoSincronizacao | undefined {
+function principal(argumentosInformados: string[] = process.argv.slice(2)): ResultadoSincronizacao | undefined {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         escreverLinha("Uso recomendado: npx tsx toolkit/sgc.ts projeto versao-sincronizar <versao> [--base <diretorio>] [--gravar]");
         escreverLinha("");

@@ -4,7 +4,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {analisarArquiteturaFrontend, gravarFotografiaArquitetura, resolverDiretorioSaidaArquitetura, type FotografiaArquitetura} from "./arquitetura-lib.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 interface OpcoesAuditoriaArquiteturaFrontend {
@@ -26,7 +26,8 @@ async function executarAuditoriaArquiteturaFrontend(
     return snapshot;
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 

@@ -3,7 +3,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {resolverNaRaiz} from "../lib/caminhos.js";
 import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {extrairCoberturaJacoco, type ClasseCobertura, type ResultadoCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -93,7 +93,8 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminh
     return caminho;
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 

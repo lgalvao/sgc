@@ -8,7 +8,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 const TIPOS_ESCALARES = new Set([
@@ -411,7 +411,8 @@ function exibirAjuda(): void {
     });
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     const emitirJson = argumentos.includes("--json");
     const gravar = argumentos.includes("--gravar");
     const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);

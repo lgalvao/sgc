@@ -5,7 +5,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 type EscopoCheiro = "backend" | "frontend" | "frontend_testes";
@@ -369,7 +369,8 @@ async function executarAuditoria({
     return {snapshot, caminhoFotografia, caminhoResumo};
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     const emitirJson = argumentos.includes("--json");
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({

@@ -3,7 +3,7 @@ import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
 import {coletarIdentificadores, obterDiretorioBusca, type ResultadoColetaIdentificadores} from "./identificadores-teste-lib.js";
 
@@ -34,7 +34,8 @@ function imprimirIdentificadores(resultado: ResultadoColetaIdentificadores): voi
     escreverLinha(`Total encontrado: ${resultado.identificadores.length}`);
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 

@@ -2,7 +2,7 @@ import path from "node:path";
 import pc from "picocolors";
 import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverNaRaiz} from "../lib/caminhos.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {extrairCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import type {ClasseCobertura, ResultadoCoberturaJacoco} from "../lib/dominios/cobertura-java.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
@@ -33,7 +33,8 @@ function resumirClasse(classe: ClasseCobertura): ClasseRamificacoes {
     };
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 

@@ -147,9 +147,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   fontes canônicas estão presentes;
 - `backend testes analisar` e `backend testes priorizar` são somente leitura por padrão, persistem apenas com `--gravar` e
   já aparecem no mesmo catálogo de opções da CLI principal;
-- o roteador valida opções, valores e posicionais dos comandos catalogados, inclusive a forma `--opcao=valor`; os scripts
-  executados diretamente começaram a reutilizar esse contrato por meio de um preflight comum, mas a migração ainda é
-  parcial;
+- o roteador e os entrypoints diretos dos comandos catalogados validam opções, valores e posicionais pelo mesmo preflight,
+  inclusive a forma `--opcao=valor`; os scripts internos não publicados continuam fora desse contrato deliberado;
 - `efeito` no catálogo mistura intenção funcional e efeitos reais no sistema;
 - muitos módulos interpretam argumentos manualmente e controlam `process.exitCode` dentro da implementação;
 - resultados próprios ainda misturam português, inglês, `camelCase` e `snake_case`, especialmente na análise de testes;
@@ -167,8 +166,8 @@ Prioridade imediata, porque corrige comportamento surpreendente antes de ampliar
   stdout e persistência explícita por `--gravar`;
 - manter o esquema de argumentos no catálogo e rejeitar opções desconhecidas, valores ausentes e argumentos excedentes nos
   comandos encaminhados pelo roteador;
-- aplicar o mesmo contrato aos scripts executados diretamente, evitando que a entrada direta aceite opções que a CLI
-  principal rejeita;
+- aplicar o mesmo contrato aos entrypoints especiais documentados, especialmente coleta de qualidade, evitando que uma
+  entrada direta permaneça com gramática diferente da CLI principal;
 - substituir o campo genérico `efeito` por metadados separados de finalidade e efeitos observáveis;
 - retirar `process.exitCode` das funções de domínio e concentrar a tradução de resultados em códigos de saída na borda;
 - definir códigos compartilhados para invocação inválida, falha operacional e achados, sem aplicar código não zero a

@@ -28,6 +28,9 @@ npx tsx toolkit/sgc.ts projeto --help
 A CLI rejeita opções desconhecidas, valores ausentes e argumentos posicionais excedentes. Opções com valor também podem
 usar a forma `--opcao=valor`; ela é normalizada antes de chegar ao script executado.
 
+Os entrypoints diretos dos comandos catalogados reutilizam o mesmo contrato. Por exemplo, `npx tsx
+toolkit/codigo/cheiros-auditar.ts --opcao-inexistente` falha antes de iniciar a auditoria.
+
 ## Organização
 
 | Caminho | Responsabilidade |

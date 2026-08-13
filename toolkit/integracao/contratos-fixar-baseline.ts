@@ -5,7 +5,7 @@ import pc from "picocolors";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverErro, escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {resolverCaminhosOpenapi} from "./contratos-openapi-caminhos.js";
 
@@ -30,7 +30,8 @@ async function fixarBaselineContrato({base = DIRETORIO_RAIZ, origem, destino}: O
     return {base: caminhos.base, origem: origemResolvida, destino: destinoResolvido};
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "integracao contratos fixar-baseline",

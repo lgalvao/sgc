@@ -2,7 +2,7 @@ import pc from "picocolors";
 import path from "node:path";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerNumero, lerOpcao} from "../lib/cli-opcoes.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {extrairCoberturaFrontend, type ArquivoCobertura, type ResultadoCoberturaFrontend} from "../lib/dominios/cobertura-web.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
@@ -25,7 +25,8 @@ function calcularRamificacoesPerdidas(arquivo: ArquivoCobertura): number {
     return Math.max(0, arquivo.ramificacoesTotal - Math.round((arquivo.ramificacoesPercentual / 100) * arquivo.ramificacoesTotal));
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     const emitirJson = argumentos.includes("--json");
     const exibirAjuda = argumentos.includes("--help") || argumentos.includes("-h");
 

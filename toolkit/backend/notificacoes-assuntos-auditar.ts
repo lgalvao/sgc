@@ -8,7 +8,7 @@ import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
 import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
-import {ehEntradaPrincipal} from "../lib/execucao.js";
+import {ehEntradaPrincipal, validarArgumentosEntradaDireta} from "../lib/execucao.js";
 import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 
 type RegraAssunto = "literal_sgc" | "assunto_literal" | "titulo_literal" | "builder_assunto_literal";
@@ -136,7 +136,8 @@ function exibirAjuda(): void {
     });
 }
 
-async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
+async function principal(argumentosInformados: string[] = process.argv.slice(2)): Promise<void> {
+    const argumentos = validarArgumentosEntradaDireta(import.meta.url, argumentosInformados);
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
         return;
