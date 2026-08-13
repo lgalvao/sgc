@@ -274,9 +274,9 @@ A regra Semgrep padrão é a política do perfil SGC fornecida pelo próprio pac
 Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--diretorio`
 quando a intenção for apontar diretamente para outro diretório de código.
 
-O toolkit executa a árvore-fonte com `tsx`; toda a implementação está em TypeScript estrito. A maior parte dos testes
-ainda está em JavaScript, mas o fixture de reuso externo já é TypeScript em `test/externo.test.ts`; os testes não
-participam da implementação distribuída nem do gate estrito.
+O toolkit executa a árvore-fonte com `tsx`; toda a implementação está em TypeScript estrito. O grande teste da CLI
+ainda está em JavaScript, enquanto os testes CDU, externo e de pacote estão em TypeScript estrito; os testes não
+participam da implementação distribuída.
 
 Os comandos de requisitos/CDUs e de contratos OpenAPI são módulos importáveis: só executam quando chamados diretamente
 pela CLI. Isso permite reutilizar suas funções `principal(argumentos)` em outras automações sem iniciar auditorias ou
@@ -359,7 +359,7 @@ O diretório `test/` contém:
 - `sgc.test.js`: testes da CLI principal
 - `cdus.test.ts`: testes TypeScript das regras CDU específicas do perfil SGC
 - `externo.test.ts`: fixture TypeScript de reuso em projeto Java/Vue externo
-- `pacote.test.js`: smoke de empacotamento e instalação em consumidor isolado
+- `pacote.test.ts`: smoke de empacotamento e instalação em consumidor isolado
 - `fixtures/`: dados auxiliares para simular cenários de execução
 
 Esses testes garantem que a CLI continue roteando comandos, produzindo saídas e respeitando contratos básicos de

@@ -424,8 +424,8 @@ Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e ar
 
 - 73 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
-- 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/pacote.test.js`) e 2 arquivos TypeScript de teste
-  (`test/cdus.test.ts` e `test/externo.test.ts`);
+- 1 arquivo JavaScript de teste (`test/sgc.test.js`) e 3 arquivos TypeScript de teste (`test/cdus.test.ts`,
+  `test/externo.test.ts` e `test/pacote.test.ts`);
 - 3 arquivos de teste concentrando 111 cenários, mais 1 smoke de distribuição isolada;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
@@ -745,9 +745,9 @@ SGC está ativo.
 
 ### Fase F — testes, documentação e distribuição
 
-1. **[parcial nesta rodada]** Converter `test/sgc.test.js` e `test/cdus.test.js` para TypeScript após a estabilização
-   das interfaces. `test/cdus.test.ts` já está convertido e passa em `tsconfig.testes.json`; o grande teste da CLI e o
-   smoke de pacote ainda permanecem em JavaScript.
+1. **[parcial nesta rodada]** Converter o restante dos testes para TypeScript após a estabilização das interfaces. Os
+   testes CDU e de pacote já estão convertidos e passam em `tsconfig.testes.json`; somente o grande teste da CLI ainda
+   permanece em JavaScript.
 2. Dividir testes por domínio: runtime, configuração, saída, projeto, backend, frontend, integração e requisitos.
 3. Manter testes comportamentais sobre a API pública; não testar métodos privados por reflexão ou acoplamento à
    implementação.
@@ -764,7 +764,7 @@ SGC está ativo.
    com ações e opções próprias ainda têm sua estrutura declarada em `sgc.ts` por exigirem lógica de registro específica.
 9. O modelo de distribuição fonte + `tsx` está fechado; continuar a conversão dos testes para TypeScript sem colocar
    testes no artefato distribuído. A implementação não possui arquivos JS, aliases ou fallbacks de transição; o launcher
-   CJS e os dois testes JS restantes são exceções deliberadas e documentadas.
+   CJS e o teste JS restante são exceções deliberadas e documentadas.
 
 ## 7. Validação obrigatória por rodada
 

@@ -1,19 +1,32 @@
 import os from "node:os";
 import path from "node:path";
-import {mkdtemp} from "node:fs/promises";
-import fs from "fs-extra";
+import {access, chmod, mkdir, mkdtemp, readFile, realpath, writeFile} from "node:fs/promises";
 import {execa} from "execa";
 import {expect, test} from "vitest";
 
 const DIRETORIO_REPOSITORIO = path.resolve(import.meta.dirname, "..", "..");
 const NOME_EXECUTAVEL = process.platform === "win32" ? "sgc.cmd" : "sgc";
 
+async function escreverArquivo(caminho: string, conteudo: string): Promise<void> {
+    await mkdir(path.dirname(caminho), {recursive: true});
+    await writeFile(caminho, conteudo, "utf8");
+}
+
+async function existe(caminho: string): Promise<boolean> {
+    try {
+        await access(caminho);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 test("pacote fonte executa em um projeto consumidor isolado", async () => {
     const diretorioTemporario = await mkdtemp(path.join(os.tmpdir(), "sgc-pacote-"));
     const diretorioPacote = path.join(diretorioTemporario, "pacote");
     const diretorioConsumidor = path.join(diretorioTemporario, "consumidor");
-    await fs.ensureDir(diretorioPacote);
-    await fs.ensureDir(diretorioConsumidor);
+    await mkdir(diretorioPacote, {recursive: true});
+    await mkdir(diretorioConsumidor, {recursive: true});
 
     const empacotamento = await execa("npm", [
         "pack",
@@ -25,7 +38,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
     ], {
         cwd: DIRETORIO_REPOSITORIO
     });
-    const nomePacote = empacotamento.stdout.trim().split(/\r?\n/).at(-1);
+    const nomePacote = empacotamento.stdout.trim().split(/\r?\n/).at(-1) ?? "";
     expect(nomePacote).toMatch(/^sgc-scripts-\d+\.\d+\.\d+\.tgz$/);
     const caminhoPacote = path.join(diretorioPacote, nomePacote);
 
@@ -43,7 +56,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         timeout: 60000
     });
 
-    await fs.outputFile(
+    await escreverArquivo(
         path.join(diretorioConsumidor, "frontend", "src", "Exemplo.ts"),
         "export function exemplo(valor: unknown) { return valor; }\n"
     );
@@ -57,16 +70,16 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         cwd: diretorioConsumidor
     });
 
-    expect(await fs.pathExists(path.join(diretorioConsumidor, "node_modules", "sgc-scripts", "sgc.ts"))).toBe(true);
-    expect(JSON.parse(resultado.stdout)).toMatchObject({
-        base: await fs.realpath(diretorioConsumidor),
+    expect(await existe(path.join(diretorioConsumidor, "node_modules", "sgc-scripts", "sgc.ts"))).toBe(true);
+    expect(JSON.parse(String(resultado.stdout))).toMatchObject({
+        base: await realpath(diretorioConsumidor),
         pontuacao: {faixa: "bom"}
     });
 
     const diretorioBinario = path.join(diretorioTemporario, "bin");
     const caminhoSemgrep = path.join(diretorioBinario, "semgrep");
-    await fs.ensureDir(diretorioBinario);
-    await fs.outputFile(caminhoSemgrep, [
+    await mkdir(diretorioBinario, {recursive: true});
+    await escreverArquivo(caminhoSemgrep, [
         "#!/bin/sh",
         "case \"$*\" in",
         "  *sgc-scripts/qualidade/politicas/semgrep/sgc-qualidade.yml*) printf '{\"results\":[]}';;",
@@ -74,7 +87,7 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
         "esac",
         ""
     ].join("\n"));
-    await fs.chmod(caminhoSemgrep, 0o755);
+    await chmod(caminhoSemgrep, 0o755);
     const auditoriaSemgrep = await execa(executavel, [
         "codigo",
         "semgrep",
@@ -86,11 +99,11 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
             PATH: `${diretorioBinario}${path.delimiter}${process.env.PATH ?? ""}`
         }
     });
-    expect(JSON.parse(auditoriaSemgrep.stdout)).toMatchObject({
+    expect(JSON.parse(String(auditoriaSemgrep.stdout))).toMatchObject({
         totalAchados: 0,
         codigoSaida: 0
     });
-    expect(await fs.pathExists(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep"))).toBe(false);
+    expect(await existe(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep"))).toBe(false);
 
     const gravacaoSemgrep = await execa(executavel, [
         "codigo",
@@ -104,8 +117,8 @@ test("pacote fonte executa em um projeto consumidor isolado", async () => {
             PATH: `${diretorioBinario}${path.delimiter}${process.env.PATH ?? ""}`
         }
     });
-    expect(JSON.parse(gravacaoSemgrep.stdout)).toMatchObject({totalAchados: 0, codigoSaida: 0});
+    expect(JSON.parse(String(gravacaoSemgrep.stdout))).toMatchObject({totalAchados: 0, codigoSaida: 0});
     const caminhoResumoSemgrep = path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep", "mais-recente", "resumo.md");
-    expect(await fs.pathExists(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep", "mais-recente", "resultado.json"))).toBe(true);
-    expect(await fs.readFile(caminhoResumoSemgrep, "utf8")).toContain("# Auditoria Semgrep\n");
+    expect(await existe(path.join(diretorioConsumidor, "toolkit", "qualidade", "artefatos", "semgrep", "mais-recente", "resultado.json"))).toBe(true);
+    expect(await readFile(caminhoResumoSemgrep, "utf8")).toContain("# Auditoria Semgrep\n");
 }, 60000);
