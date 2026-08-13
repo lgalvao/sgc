@@ -65,6 +65,22 @@ describe("Auditorias de cobertura da CLI", () => {
 
         expect(backendLeitura.exitCode).toBe(0);
         expect(frontendLeitura.exitCode).toBe(0);
+        const backendJson = JSON.parse(backendLeitura.stdout);
+        const frontendJson = JSON.parse(frontendLeitura.stdout);
+        expect(backendJson).toMatchObject({
+            versaoSchema: "1.0.0",
+            status: "ok",
+        });
+        expect(backendJson.geradoEm).toBeTypeOf("string");
+        expect(backendJson.pontosCriticos).toBeInstanceOf(Array);
+        expect(backendJson.hotspots).toBeUndefined();
+        expect(frontendJson).toMatchObject({
+            versaoSchema: "1.0.0",
+            status: "ok",
+        });
+        expect(frontendJson.geradoEm).toBeTypeOf("string");
+        expect(frontendJson.pontosCriticos).toBeInstanceOf(Array);
+        expect(frontendJson.hotspots).toBeUndefined();
         expect(await existe(path.join(base, "backend-cobertura-auditoria.md"))).toBe(false);
         expect(await existe(path.join(base, "frontend-cobertura-auditoria.md"))).toBe(false);
 

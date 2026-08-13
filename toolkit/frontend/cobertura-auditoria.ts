@@ -9,6 +9,7 @@ import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 const CAMINHO_PADRAO_SAIDA = "frontend-cobertura-auditoria.md";
+const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 
 interface ResumoMetricasFrontend {
     linhas: ResultadoCoberturaFrontend["linhas"];
@@ -19,7 +20,7 @@ interface ResumoMetricasFrontend {
 
 interface PontoCriticoRelatorioFrontend {
     arquivo: string;
-    scoreImpacto: number;
+    pontuacaoImpacto: number;
     coberturaLinhas: number;
     instrucoesTotal: number;
     instrucoesCobertas: number;
@@ -27,9 +28,10 @@ interface PontoCriticoRelatorioFrontend {
 
 interface ResultadoAuditoriaFrontend {
     status: "ok";
-    timestamp: string;
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
     totais: ResumoMetricasFrontend;
-    hotspots: PontoCriticoRelatorioFrontend[];
+    pontosCriticos: PontoCriticoRelatorioFrontend[];
 }
 
 function calcularPontuacaoImpacto(arquivo: ArquivoCobertura): number {
@@ -51,7 +53,7 @@ function obterPrioridade(pontuacao: number): string {
 }
 
 async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho: string): Promise<string> {
-    const {totais, hotspots} = dados;
+    const {totais, pontosCriticos} = dados;
     let markdown = "# Auditoria de Cobertura Frontend\n\n";
 
     markdown += "## Resumo Geral\n";
@@ -65,9 +67,9 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaFrontend, caminho
     markdown += "| Posição | Arquivo | Pontuação | Instruções Descobertas | Cobertura Linhas | Prioridade |\n";
     markdown += "|---------|---------|-----------|-------------------------|------------------|------------|\n";
 
-    hotspots.forEach((ponto, indice) => {
-        const prioridade = ponto.scoreImpacto > 100 ? "P1" : (ponto.scoreImpacto > 40 ? "P2" : "P3");
-        markdown += `| ${indice + 1} | \`${ponto.arquivo}\` | ${ponto.scoreImpacto.toFixed(1)} | ${ponto.instrucoesTotal - ponto.instrucoesCobertas} | ${ponto.coberturaLinhas}% | ${prioridade} |\n`;
+    pontosCriticos.forEach((ponto, indice) => {
+        const prioridade = ponto.pontuacaoImpacto > 100 ? "P1" : (ponto.pontuacaoImpacto > 40 ? "P2" : "P3");
+        markdown += `| ${indice + 1} | \`${ponto.arquivo}\` | ${ponto.pontuacaoImpacto.toFixed(1)} | ${ponto.instrucoesTotal - ponto.instrucoesCobertas} | ${ponto.coberturaLinhas}% | ${prioridade} |\n`;
     });
 
     markdown += `\n\n_Gerado automaticamente pelo toolkit em ${new Date().toLocaleString("pt-BR")}._\n`;
@@ -123,16 +125,17 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
         const resultado: ResultadoAuditoriaFrontend = {
             status: "ok",
-            timestamp: new Date().toISOString(),
+            geradoEm: new Date().toISOString(),
             totais: {
                 linhas: coleta.linhas,
                 instrucoes: coleta.instrucoes,
                 ramificacoes: coleta.ramificacoes,
                 funcoes: coleta.funcoes
             },
-            hotspots: pontosCriticos.map(ponto => ({
+            versaoSchema: VERSAO_SCHEMA_RESULTADO,
+            pontosCriticos: pontosCriticos.map(ponto => ({
                 arquivo: ponto.arquivo,
-                scoreImpacto: ponto.pontuacaoImpacto,
+                pontuacaoImpacto: ponto.pontuacaoImpacto,
                 coberturaLinhas: ponto.linhasPercentual,
                 instrucoesTotal: ponto.instrucoesTotal,
                 instrucoesCobertas: ponto.instrucoesCobertas

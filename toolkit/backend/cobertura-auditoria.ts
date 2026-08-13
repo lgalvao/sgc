@@ -9,6 +9,7 @@ import {escreverLinha, imprimirCabecalho, imprimirJson} from "../lib/saida.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
 const CAMINHO_PADRAO_SAIDA = "backend-cobertura-auditoria.md";
+const VERSAO_SCHEMA_RESULTADO = "1.0.0" as const;
 
 interface PontoCriticoRelatorio {
     nome: string;
@@ -17,15 +18,16 @@ interface PontoCriticoRelatorio {
     linhasPerdidasLista: number[];
     ramificacoesPerdidas: number;
     ramificacoesPerdidasLista: string[];
-    scoreImpacto: number;
+    pontuacaoImpacto: number;
     coberturaLinhas: number;
 }
 
 interface ResultadoAuditoriaCobertura {
     status: "ok";
-    timestamp: string;
+    versaoSchema: typeof VERSAO_SCHEMA_RESULTADO;
+    geradoEm: string;
     totais: ResultadoCoberturaJacoco;
-    hotspots: PontoCriticoRelatorio[];
+    pontosCriticos: PontoCriticoRelatorio[];
 }
 
 function calcularPontuacaoImpacto(classe: ClasseCobertura): number {
@@ -53,7 +55,7 @@ function obterPrioridade(pontuacao: number): string {
 }
 
 async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminho: string): Promise<string> {
-    const {totais, hotspots} = dados;
+    const {totais, pontosCriticos} = dados;
     let markdown = "# Auditoria de Cobertura Backend\n\n";
 
     markdown += `## Resumo Geral\n`;
@@ -67,15 +69,15 @@ async function gerarRelatorioMarkdown(dados: ResultadoAuditoriaCobertura, caminh
     markdown += `| Posição | Classe | Pontuação | Complexidade | Linhas S/ Cobertura | Ramificações S/ Cobertura | Prioridade |\n`;
     markdown += `|---------|--------|-----------|--------------|---------------------|-----------------------|------------|\n`;
 
-    hotspots.slice(0, 10).forEach((ponto, indice) => {
-        const prioridade = ponto.scoreImpacto > 50 ? "P1" : (ponto.scoreImpacto > 20 ? "P2" : "P3");
-        markdown += `| ${indice + 1} | \`${ponto.nome}\` | ${ponto.scoreImpacto.toFixed(1)} | ${ponto.complexidade} | ${ponto.linhasPerdidas} | ${ponto.ramificacoesPerdidas} | ${prioridade} |\n`;
+    pontosCriticos.slice(0, 10).forEach((ponto, indice) => {
+        const prioridade = ponto.pontuacaoImpacto > 50 ? "P1" : (ponto.pontuacaoImpacto > 20 ? "P2" : "P3");
+        markdown += `| ${indice + 1} | \`${ponto.nome}\` | ${ponto.pontuacaoImpacto.toFixed(1)} | ${ponto.complexidade} | ${ponto.linhasPerdidas} | ${ponto.ramificacoesPerdidas} | ${prioridade} |\n`;
     });
 
     markdown += `\n## Detalhamento das Lacunas dos Principais Pontos Críticos\n\n`;
-    hotspots.slice(0, 10).forEach((ponto) => {
+    pontosCriticos.slice(0, 10).forEach((ponto) => {
         if (ponto.linhasPerdidas > 0 || ponto.ramificacoesPerdidas > 0) {
-            markdown += `### \`${ponto.nome}\` (Risco: ${ponto.scoreImpacto.toFixed(1)})\n`;
+            markdown += `### \`${ponto.nome}\` (Risco: ${ponto.pontuacaoImpacto.toFixed(1)})\n`;
             if (ponto.linhasPerdidas > 0) {
                 markdown += `- **Linhas 100% descobertas:** ${ponto.linhasPerdidasLista.join(", ")}\n`;
             }
@@ -143,16 +145,17 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
         const resultado: ResultadoAuditoriaCobertura = {
             status: "ok",
-            timestamp: new Date().toISOString(),
+            geradoEm: new Date().toISOString(),
             totais: coleta,
-            hotspots: pontosCriticos.map(ponto => ({
+            versaoSchema: VERSAO_SCHEMA_RESULTADO,
+            pontosCriticos: pontosCriticos.map(ponto => ({
                 nome: ponto.nome,
                 complexidade: ponto.complexidade,
                 linhasPerdidas: ponto.linhasPerdidas,
                 linhasPerdidasLista: ponto.linhasPerdidasLista,
                 ramificacoesPerdidas: ponto.ramificacoesPerdidas,
                 ramificacoesPerdidasLista: ponto.ramificacoesPerdidasLista,
-                scoreImpacto: ponto.pontuacaoImpacto,
+                pontuacaoImpacto: ponto.pontuacaoImpacto,
                 coberturaLinhas: ponto.linhasPercentual
             }))
         };
