@@ -79,6 +79,31 @@ describe("Qualidade do toolkit", () => {
         expect(resultado.stderr).toContain("versao ausente ou incompativel");
     });
 
+    test("rejeita fotografia de qualidade com estrutura invalida", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-estrutura-invalida-"));
+        const caminhoFotografia = path.join(diretorioBase, "fotografia.json");
+        await escreverJson(caminhoFotografia, {
+            versaoSchema: "1.0.0",
+            resumo: {},
+            verificacoes: "invalido",
+            hotspots: []
+        });
+
+        const resultado = await executarSgc([
+            "qualidade",
+            "resumo",
+            "--json",
+            "--base",
+            diretorioBase,
+            "--arquivo",
+            caminhoFotografia
+        ]);
+
+        expect(resultado.exitCode).toBe(1);
+        expect(resultado.stdout).toBe("");
+        expect(resultado.stderr).toContain("estrutura invalida");
+    });
+
     test("exibe ajuda de coleta de fotografia com opcao de perfil", async () => {
         const resultado = await executarSgc(["qualidade", "coletar", "--help"]);
         expect(resultado.exitCode).toBe(0);
