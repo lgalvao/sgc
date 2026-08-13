@@ -217,6 +217,8 @@ frontend e para os caminhos OpenAPI.
 - `qualidade/coleta-execucao.ts` foi convertido para TypeScript com contratos de contexto, adaptadores, execução de
   subprocessos, JUnit, métricas heterogêneas e fotografia; hotspots vindos de JSON são filtrados como `unknown`, e os
   perfis Gradle/npm/Playwright continuam declarados como orquestração específica do SGC.
+- `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
+  agora compartilham a fronteira tipada do runtime.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -261,7 +263,7 @@ reintroduz o wrapper obsoleto.
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
 - 10 arquivos TypeScript de implementação;
-- 61 arquivos JavaScript de implementação ainda pendentes;
+- 60 arquivos JavaScript de implementação ainda pendentes;
 - 2 arquivos JavaScript de teste (`test/sgc.test.js` e `test/cdus.test.js`);
 - 2 arquivos de teste concentrando 95 cenários;
 - maior módulo atual: `frontend/arquitetura-lib.js`, com aproximadamente 1.000 linhas;

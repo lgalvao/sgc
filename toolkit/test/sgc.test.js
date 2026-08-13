@@ -49,7 +49,7 @@ const CAMINHOS_COMANDOS_PROJETO = [
     "versao-sincronizar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "projeto", nome));
 const CAMINHOS_COMANDOS_QUALIDADE = [
-    "coleta.js",
+    "coleta.ts",
     "coleta-execucao.ts",
     "resumo.js"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "qualidade", nome));

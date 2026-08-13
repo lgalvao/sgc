@@ -4,9 +4,9 @@ import {ehEntradaPrincipal} from "../lib/execucao.js";
 import logger from "../lib/logger.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 
-const PERFIS_VALIDOS = new Set(["rapido", "completo", "backend", "frontend"]);
+const PERFIS_VALIDOS = new Set<string>(["rapido", "completo", "backend", "frontend"]);
 
-function normalizarArgumentosColeta(argumentos = []) {
+function normalizarArgumentosColeta(argumentos: string[] = []): string[] {
     const resultado = [];
 
     for (let indice = 0; indice < argumentos.length; indice += 1) {
@@ -55,11 +55,11 @@ function normalizarArgumentosColeta(argumentos = []) {
     return resultado;
 }
 
-async function executarColetaQualidade(argumentos = []) {
+async function executarColetaQualidade(argumentos: string[] = []): Promise<void> {
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjudaComando({
             comandoSgc: "qualidade coletar",
-            scriptDireto: "qualidade/coleta.js",
+            scriptDireto: "qualidade/coleta.ts",
             descricao: "Coleta uma fotografia consolidada de qualidade do projeto.",
             opcoes: [
                 "--perfil <perfil>   Perfil de execucao: rapido, completo, backend ou frontend.",
@@ -67,7 +67,7 @@ async function executarColetaQualidade(argumentos = []) {
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.ts qualidade coletar --perfil rapido",
-                "npx tsx toolkit/qualidade/coleta.js --perfil frontend"
+                "npx tsx toolkit/qualidade/coleta.ts --perfil frontend"
             ]
         });
         return;
@@ -78,7 +78,7 @@ async function executarColetaQualidade(argumentos = []) {
 }
 
 if (ehEntradaPrincipal(import.meta.url)) {
-    executarColetaQualidade().catch((erro) => {
+    executarColetaQualidade().catch((erro: unknown) => {
         const mensagem = erro instanceof Error ? erro.message : String(erro);
         logger.error(`Erro ao coletar fotografia de qualidade: ${mensagem}`);
         process.exitCode = 1;
