@@ -28,7 +28,7 @@ interface ResultadoValidacaoResiduos {
     status: "ok" | "falha";
     geradoEm: string;
     resumo: {
-        scoreTotal: number;
+        pontuacaoTotal: number;
         faixa: FotografiaResiduos["resumo"]["faixa"];
         violacoes: number;
         avisos: number;
@@ -41,7 +41,7 @@ interface ResultadoValidacaoResiduos {
 }
 
 interface ResumoValidacaoResiduos extends Omit<ResultadoValidacaoResiduos, "fotografia"> {
-    hotspots: FotografiaResiduos["hotspots"];
+    pontosCriticos: FotografiaResiduos["pontosCriticos"];
 }
 
 interface OpcoesValidacaoFrontendResiduos {
@@ -73,7 +73,7 @@ function resumirResultado(resultado: ResultadoValidacaoResiduos): ResumoValidaca
         excecoes: resultado.excecoes,
         violacoes: resultado.violacoes,
         avisos: resultado.avisos,
-        hotspots: resultado.fotografia.hotspots,
+        pontosCriticos: resultado.fotografia.pontosCriticos,
     };
 }
 
@@ -170,7 +170,7 @@ async function executarValidacaoFrontendResiduos(
         status: violacoes.length === 0 ? "ok" : "falha",
         geradoEm: new Date().toISOString(),
         resumo: {
-            scoreTotal: fotografia.resumo.scoreTotal,
+            pontuacaoTotal: fotografia.resumo.pontuacaoTotal,
             faixa: fotografia.resumo.faixa,
             violacoes: violacoes.length,
             avisos: avisos.length,
@@ -198,7 +198,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
             descricao: "Valida orcamentos e excecoes dos residuos do frontend para impedir regressao estrutural.",
             opcoes: [
                 "--json               Emite o resultado em JSON.",
-                "--json-resumido      Emite somente status, resumo, violacoes e hotspots.",
+                "--json-resumido      Emite somente status, resumo, violacoes e pontos criticos.",
                 "--gravar             Atualiza a fotografia mais recente.",
                 "--base <diretorio>   Sobrescreve o diretorio base da validacao.",
                 "--orcamento <arquivo> Usa um arquivo de orcamento alternativo.",
@@ -241,7 +241,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
 
     imprimirCabecalho("VALIDACAO DE RESIDUOS DO FRONTEND");
     escreverLinha(`Status: ${resultado.status === "ok" ? pc.green("ok") : pc.red("falha")}`);
-    escreverLinha(`Score total: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa})`);
+    escreverLinha(`Pontuacao total: ${resultado.resumo.pontuacaoTotal} (${resultado.resumo.faixa})`);
     escreverLinha(`Violacoes: ${resultado.resumo.violacoes}`);
     escreverLinha(`Avisos: ${resultado.resumo.avisos}`);
     escreverLinha("");

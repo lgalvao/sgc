@@ -77,7 +77,7 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     }
 
     imprimirCabecalho("AUDITORIA DE RESIDUOS DO FRONTEND");
-    escreverLinha(`Score total: ${pc.bold(String(fotografia.resumo.scoreTotal))} (${fotografia.resumo.faixa})`);
+    escreverLinha(`Pontuacao total: ${pc.bold(String(fotografia.resumo.pontuacaoTotal))} (${fotografia.resumo.faixa})`);
     escreverLinha(`Arquivos de producao: ${fotografia.resumo.arquivosProducao}`);
     escreverLinha(`Arquivos de teste/story: ${fotografia.resumo.arquivosTeste}`);
     escreverLinha("");
@@ -90,10 +90,10 @@ async function principal(argumentosInformados: string[] = process.argv.slice(2))
     escreverLinha(`- storage direto: ${fotografia.contagens.producao.storageDireto}`);
     escreverLinha(`- exportacoes suspeitas: ${fotografia.contagens.producao.exportacoesSuspeitas}`);
     escreverLinha("");
-    escreverLinha(pc.bold("Top 5 hotspots:"));
-    fotografia.hotspots.slice(0, 5).forEach((hotspot, indice) => {
-        escreverLinha(`${indice + 1}. ${hotspot.arquivo} [${hotspot.camada}]`);
-        escreverLinha(`   Linhas: ${hotspot.linhas} | Score: ${hotspot.score}`);
+    escreverLinha(pc.bold("5 principais pontos criticos:"));
+    fotografia.pontosCriticos.slice(0, 5).forEach((pontoCritico, indice) => {
+        escreverLinha(`${indice + 1}. ${pontoCritico.arquivo} [${pontoCritico.camada}]`);
+        escreverLinha(`   Linhas: ${pontoCritico.linhas} | Pontuacao: ${pontoCritico.pontuacao}`);
     });
 
     if (argumentos.includes("--gravar")) {

@@ -17,7 +17,7 @@ interface FotografiaResumo {
         totais?: {verificacoes?: number};
     };
     verificacoes: VerificacaoQualidade[];
-    hotspots: Array<{nome: string; risco: number}>;
+    pontosCriticos: Array<{nome: string; risco: number}>;
 }
 
 interface OpcoesResumo {
@@ -32,7 +32,7 @@ interface ResultadoResumo {
     caminho: string;
     resumo: FotografiaResumo["resumo"];
     verificacoes: VerificacaoQualidade[];
-    hotspots: NonNullable<FotografiaResumo["hotspots"]>;
+    pontosCriticos: NonNullable<FotografiaResumo["pontosCriticos"]>;
 }
 
 function formatarVerificacao(verificacao: VerificacaoQualidade): string {
@@ -51,7 +51,7 @@ function validarFotografia(valor: unknown, caminho: string): asserts valor is Fo
     const resumo = valor.resumo;
     const totais = ehRegistro(resumo) ? resumo.totais : undefined;
     const verificacoes = valor.verificacoes;
-    const hotspots = valor.hotspots;
+    const pontosCriticos = valor.pontosCriticos;
     const resumoValido = ehRegistro(resumo)
         && typeof resumo.statusGeral === "string"
         && (totais === undefined
@@ -63,13 +63,13 @@ function validarFotografia(valor: unknown, caminho: string): asserts valor is Fo
             && typeof item.codigo === "string"
             && typeof item.status === "string"
             && (item.sumario === undefined || typeof item.sumario === "string"));
-    const hotspotsValidos = Array.isArray(hotspots)
-        && hotspots.every((item) => ehRegistro(item)
+    const pontosCriticosValidos = Array.isArray(pontosCriticos)
+        && pontosCriticos.every((item) => ehRegistro(item)
             && typeof item.nome === "string"
             && typeof item.risco === "number"
             && Number.isFinite(item.risco));
 
-    if (!resumoValido || !verificacoesValidas || !hotspotsValidos) {
+    if (!resumoValido || !verificacoesValidas || !pontosCriticosValidos) {
         throw new Error(`Fotografia de qualidade possui estrutura invalida em ${caminho}.`);
     }
 }
@@ -85,14 +85,14 @@ function imprimirHumano(caminho: string, fotografia: FotografiaResumo, limitePon
         escreverLinha(`- ${formatarVerificacao(verificacao)}`);
     }
     escreverLinha("");
-    escreverLinha("Hotspots:");
-    const pontosCriticos = (fotografia.hotspots ?? []).slice(0, limitePontosCriticos);
-    if (pontosCriticos.length === 0) {
+    escreverLinha("Pontos criticos:");
+    const pontosCriticosLimitados = (fotografia.pontosCriticos ?? []).slice(0, limitePontosCriticos);
+    if (pontosCriticosLimitados.length === 0) {
         escreverLinha("- Nenhum ponto critico calculado.");
         return;
     }
 
-    for (const pontoCritico of pontosCriticos) {
+    for (const pontoCritico of pontosCriticosLimitados) {
         escreverLinha(`- ${pontoCritico.nome}: risco ${pontoCritico.risco}`);
     }
 }
@@ -107,7 +107,7 @@ async function executarResumoQualidade(opcoes: OpcoesResumo = {}): Promise<Resul
         caminho: path.relative(diretorioBase, resolvido.caminho).replaceAll("\\", "/"),
         resumo: fotografia.resumo,
         verificacoes: fotografia.verificacoes,
-        hotspots: fotografia.hotspots
+        pontosCriticos: fotografia.pontosCriticos
     };
 
     if (opcoes.json) {

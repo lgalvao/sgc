@@ -172,8 +172,11 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   de versão e estrutura, sem misturar carregamento de configuração ao motor de análise;
 - identificadores próprios que ainda estavam em inglês (`snapshot`, `STOPWORDS` e `Status`) foram padronizados em
   português; vocabulário externo de bibliotecas, formatos e código auditado continua preservado na fronteira correta;
-- `qualidade resumo` agora valida `versaoSchema: "1.0.0"` e deixou de carregar campos históricos (`indiceSaude` e
-  `confiabilidade`) que não são produzidos pela fotografia atual;
+- o contrato da fotografia consolidada de qualidade foi promovido para `versaoSchema: "2.0.0"`: `pontosCriticos` e
+  `pontuacao` substituem `hotspots` e `score` nos resultados próprios, sem aliases de compatibilidade;
+- `qualidade resumo` valida a estrutura completa da fotografia e rejeita versões ou campos obrigatórios incompatíveis;
+- o adaptador de qualidade normaliza o formato ainda antigo do auditor arquitetural na fronteira, sem reintroduzir seus
+  nomes ingleses no contrato consolidado;
 - apenas cobertura Java e web está publicada como API programática horizontal;
 - defaults de Gradle, Vue, OpenAPI, Semgrep e políticas SGC ainda aparecem dentro de módulos adaptáveis;
 - os maiores módulos concentram análise, política, formatação, persistência e CLI, dificultando reuso seletivo.

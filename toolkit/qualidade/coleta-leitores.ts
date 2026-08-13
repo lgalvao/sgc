@@ -10,9 +10,9 @@ interface ResultadoJUnit extends Record<string, unknown> {
     arquivosXml: string[];
 }
 
-interface HotspotQualidade {
+interface PontoCriticoQualidade {
     arquivo: string;
-    score: number;
+    pontuacao: number;
 }
 
 function parseJsonSeguro<T>(conteudo: string, fallback: T): T {
@@ -40,26 +40,26 @@ async function consolidarJUnit(diretorioRelatorio: string, base: string): Promis
     return totais;
 }
 
-function ehHotspotQualidade(valor: unknown): valor is HotspotQualidade {
+function ehPontoCriticoQualidade(valor: unknown): valor is PontoCriticoQualidade {
     if (!valor || typeof valor !== "object") {
         return false;
     }
-    const hotspot = valor as Record<string, unknown>;
-    return typeof hotspot.arquivo === "string" && typeof hotspot.score === "number";
+    const pontoCritico = valor as Record<string, unknown>;
+    return typeof pontoCritico.arquivo === "string" && typeof pontoCritico.pontuacao === "number";
 }
 
-function extrairHotspotsQualidade(metricas: unknown): HotspotQualidade[] {
+function extrairPontosCriticosQualidade(metricas: unknown): PontoCriticoQualidade[] {
     if (!metricas || typeof metricas !== "object") {
         return [];
     }
-    const hotspots = (metricas as Record<string, unknown>).hotspots;
-    return Array.isArray(hotspots) ? hotspots.filter(ehHotspotQualidade) : [];
+    const pontosCriticos = (metricas as Record<string, unknown>).pontosCriticos;
+    return Array.isArray(pontosCriticos) ? pontosCriticos.filter(ehPontoCriticoQualidade) : [];
 }
 
 export {
     consolidarJUnit,
-    extrairHotspotsQualidade,
+    extrairPontosCriticosQualidade,
     parseJsonSeguro,
-    type HotspotQualidade,
+    type PontoCriticoQualidade,
     type ResultadoJUnit
 };

@@ -11,17 +11,17 @@ import type {
     ResultadoComando,
     ResultadoJUnit
 } from "./coleta-execucao.js";
-import type {HotspotQualidade} from "./coleta-leitores.js";
+import type {PontoCriticoQualidade} from "./coleta-leitores.js";
 
 interface ResultadoResiduos {
     status?: string;
     resumo?: {
-        scoreTotal?: number;
+        pontuacaoTotal?: number;
         faixa?: string;
     };
     violacoes?: unknown[];
     avisos?: unknown[];
-    hotspots?: HotspotQualidade[];
+    pontosCriticos?: PontoCriticoQualidade[];
 }
 
 interface ResultadoArquitetura {
@@ -30,7 +30,7 @@ interface ResultadoArquitetura {
         faixa?: string;
         metricas?: Record<string, unknown>;
     };
-    hotspots?: unknown[];
+    hotspots?: Array<{arquivo?: unknown; score?: unknown}>;
 }
 
 interface ResultadoPlaywright extends Record<string, unknown> {
@@ -178,14 +178,14 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             execucao.status = saida.codigoSaida === 0 && resultado.status === "ok" ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = {
-                scoreTotal: resultado.resumo?.scoreTotal ?? null,
+                pontuacaoTotal: resultado.resumo?.pontuacaoTotal ?? null,
                 faixa: resultado.resumo?.faixa ?? null,
                 violacoes: resultado.violacoes ?? [],
                 avisos: resultado.avisos ?? [],
-                hotspots: resultado.hotspots ?? []
+                pontosCriticos: resultado.pontosCriticos ?? []
             };
             execucao.sumario = resultado.resumo
-                ? `Pontuacao de residuos: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa}).`
+                ? `Pontuacao de residuos: ${resultado.resumo.pontuacaoTotal} (${resultado.resumo.faixa}).`
                 : "Validacao de residuos executada.";
             return execucao;
         },
@@ -196,7 +196,7 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
             execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
             registrarResultadoExecucao(execucao, saida);
             execucao.metricas = {
-                scoreTotal: resultado.resumo?.scoreTotal ?? null,
+                pontuacaoTotal: resultado.resumo?.scoreTotal ?? null,
                 faixa: resultado.resumo?.faixa ?? null,
                 viewsComVazamentoCache: resultado.resumo?.metricas?.viewsComVazamentoCache ?? null,
                 viewsComServiceDireto: resultado.resumo?.metricas?.viewsComServiceDireto ?? null,
@@ -208,10 +208,14 @@ function criarAdaptadoresSgc(dependencias: DependenciasAdaptadoresSgc): Catalogo
                 arquivosComSuperficieAmpla: resultado.resumo?.metricas?.arquivosComSuperficieAmpla ?? null,
                 arquivosComMisturaCamadas: resultado.resumo?.metricas?.arquivosComMisturaCamadas ?? null,
                 hubsCentraisComSinais: resultado.resumo?.metricas?.hubsCentraisComSinais ?? null,
-                hotspots: resultado.hotspots ?? [],
+                pontosCriticos: (resultado.hotspots ?? []).flatMap((ponto) =>
+                    typeof ponto.arquivo === "string" && typeof ponto.score === "number"
+                        ? [{arquivo: ponto.arquivo, pontuacao: ponto.score}]
+                        : []
+                ),
             };
             execucao.sumario = resultado.resumo
-                ? `Score arquitetural: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa}).`
+                ? `Pontuacao arquitetural: ${resultado.resumo.scoreTotal} (${resultado.resumo.faixa}).`
                 : "Auditoria arquitetural executada.";
             return execucao;
         },

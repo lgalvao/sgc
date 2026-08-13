@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
 import {tentarResolverCaminhoConfigurado} from "../lib/configuracao.js";
 
-const VERSAO_SCHEMA = "1.0.0" as const;
+const VERSAO_SCHEMA_POLITICAS = "1.0.0" as const;
 
 interface LimitesCamada {
     meta: number;
@@ -14,7 +14,7 @@ interface MetricasOrcamento {
 }
 
 interface OrcamentoResiduos {
-    versaoSchema: typeof VERSAO_SCHEMA;
+    versaoSchema: typeof VERSAO_SCHEMA_POLITICAS;
     camadas: Record<string, LimitesCamada>;
     metricas: MetricasOrcamento;
 }
@@ -26,12 +26,12 @@ interface ExcecaoResiduo {
 }
 
 interface ResultadoExcecoesResiduos {
-    versaoSchema: typeof VERSAO_SCHEMA;
+    versaoSchema: typeof VERSAO_SCHEMA_POLITICAS;
     excecoes: ExcecaoResiduo[];
 }
 
 const ORCAMENTO_RESIDUOS_PADRAO: OrcamentoResiduos = {
-    versaoSchema: VERSAO_SCHEMA,
+    versaoSchema: VERSAO_SCHEMA_POLITICAS,
     camadas: {},
     metricas: {
         maximosProducao: {},
@@ -39,7 +39,7 @@ const ORCAMENTO_RESIDUOS_PADRAO: OrcamentoResiduos = {
 };
 
 const EXCECOES_RESIDUOS_PADRAO: ResultadoExcecoesResiduos = {
-    versaoSchema: VERSAO_SCHEMA,
+    versaoSchema: VERSAO_SCHEMA_POLITICAS,
     excecoes: [],
 };
 
@@ -85,8 +85,8 @@ function ehLimitesCamada(valor: unknown): valor is LimitesCamada {
 
 function validarOrcamento(valor: unknown, caminhoArquivo?: string): asserts valor is OrcamentoResiduos {
     const origem = caminhoArquivo ?? "padrao-do-toolkit";
-    if (!ehRegistro(valor) || valor.versaoSchema !== VERSAO_SCHEMA) {
-        throw new Error(`Politica de residuos invalida em ${origem}: esperado versaoSchema ${VERSAO_SCHEMA}.`);
+    if (!ehRegistro(valor) || valor.versaoSchema !== VERSAO_SCHEMA_POLITICAS) {
+        throw new Error(`Politica de residuos invalida em ${origem}: esperado versaoSchema ${VERSAO_SCHEMA_POLITICAS}.`);
     }
 
     if (!ehRegistro(valor.camadas) || !ehRegistro(valor.metricas)) {
@@ -141,8 +141,8 @@ function ehExcecaoResiduo(valor: unknown): valor is ExcecaoResiduo {
 async function carregarExcecoes(caminhoExcecoes?: string): Promise<ResultadoExcecoesResiduos> {
     const conteudo: unknown = await lerJsonConfigurado(caminhoExcecoes, EXCECOES_RESIDUOS_PADRAO);
     const origem = caminhoExcecoes ?? "padrao-do-toolkit";
-    if (!ehRegistro(conteudo) || conteudo.versaoSchema !== VERSAO_SCHEMA || !Array.isArray(conteudo.excecoes)) {
-        throw new Error(`Politica de residuos invalida em ${origem}: esperado versaoSchema ${VERSAO_SCHEMA} e uma lista de excecoes.`);
+    if (!ehRegistro(conteudo) || conteudo.versaoSchema !== VERSAO_SCHEMA_POLITICAS || !Array.isArray(conteudo.excecoes)) {
+        throw new Error(`Politica de residuos invalida em ${origem}: esperado versaoSchema ${VERSAO_SCHEMA_POLITICAS} e uma lista de excecoes.`);
     }
 
     const excecoesInvalidas = conteudo.excecoes.filter((excecao) => !ehExcecaoResiduo(excecao));
@@ -152,13 +152,13 @@ async function carregarExcecoes(caminhoExcecoes?: string): Promise<ResultadoExce
 
     const excecoes = conteudo.excecoes.filter(ehExcecaoResiduo);
     return {
-        versaoSchema: VERSAO_SCHEMA,
+        versaoSchema: VERSAO_SCHEMA_POLITICAS,
         excecoes,
     };
 }
 
 export {
-    VERSAO_SCHEMA,
+    VERSAO_SCHEMA_POLITICAS,
     carregarExcecoes,
     carregarOrcamento,
     resolverCaminhoExcecoesResiduos,

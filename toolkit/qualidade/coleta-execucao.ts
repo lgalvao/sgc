@@ -17,7 +17,7 @@ import {
     type MetadadosControleVersao
 } from "./coleta-fotografia.js";
 import {consolidarJUnit, parseJsonSeguro} from "./coleta-leitores.js";
-import type {HotspotQualidade, ResultadoJUnit} from "./coleta-leitores.js";
+import type {PontoCriticoQualidade, ResultadoJUnit} from "./coleta-leitores.js";
 import {coletarMetadadosGit} from "./coleta-metadados.js";
 
 type CategoriaExecucao = "teste" | "cobertura" | "qualidade";
@@ -207,7 +207,7 @@ export {
     type ExecucaoQualidade,
     type FotografiaColeta,
     type MetadadosControleVersao,
-    type HotspotQualidade,
+    type PontoCriticoQualidade,
     type OpcoesColeta,
     type OpcoesComando,
     type OpcoesPlaywright,

@@ -1,5 +1,5 @@
 {
-  "versaoSchema": "1.0.0",
+  "versaoSchema": "2.0.0",
   "resumo": {
     "statusGeral": "verde",
     "totais": {
@@ -27,7 +27,7 @@
       "sumario": "Lint sem erros."
     }
   ],
-  "hotspots": [
+  "pontosCriticos": [
     {
       "nome": "sgc.processo.ProcessoService",
       "risco": 88

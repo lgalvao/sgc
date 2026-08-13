@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import {NOME_ARQUIVO_FOTOGRAFIA} from "../lib/qualidade.js";
-import {extrairHotspotsQualidade} from "./coleta-leitores.js";
+import {extrairPontosCriticosQualidade} from "./coleta-leitores.js";
 import type {ExecucaoQualidade} from "./coleta-execucao.js";
 
-const VERSAO_SCHEMA_FOTOGRAFIA = "1.0.0" as const;
+const VERSAO_SCHEMA_FOTOGRAFIA = "2.0.0" as const;
 
 type MetadadosControleVersao = Readonly<Record<string, string>>;
 
@@ -25,7 +25,7 @@ interface FotografiaColeta {
             falha: number;
         };
     };
-    hotspots: Array<{
+    pontosCriticos: Array<{
         nome: string;
         risco: number;
         origem: string;
@@ -54,10 +54,10 @@ function criarFotografiaColeta({
     controleVersao,
     agora = new Date()
 }: OpcoesFotografia): FotografiaColeta {
-    const hotspots = verificacoes
-        .flatMap((item) => extrairHotspotsQualidade(item.metricas).map((hotspot) => ({
-            nome: hotspot.arquivo,
-            risco: hotspot.score,
+    const pontosCriticos = verificacoes
+        .flatMap((item) => extrairPontosCriticosQualidade(item.metricas).map((pontoCritico) => ({
+            nome: pontoCritico.arquivo,
+            risco: pontoCritico.pontuacao,
             origem: item.codigo
         })))
         .toSorted((a, b) => b.risco - a.risco)
@@ -80,7 +80,7 @@ function criarFotografiaColeta({
                 falha: verificacoes.filter(v => v.status === "falha").length
             }
         },
-        hotspots
+        pontosCriticos
     };
 }
 

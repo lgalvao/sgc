@@ -21,7 +21,7 @@ import {
 } from "../qualidade/coleta-execucao.js";
 import {criarAdaptadoresSgc, PERFIS_SGC} from "../qualidade/coleta-adaptadores-sgc.js";
 import {executarComando} from "../qualidade/coleta-executor.js";
-import {consolidarJUnit, extrairHotspotsQualidade, parseJsonSeguro} from "../qualidade/coleta-leitores.js";
+import {consolidarJUnit, extrairPontosCriticosQualidade, parseJsonSeguro} from "../qualidade/coleta-leitores.js";
 
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 
@@ -31,9 +31,9 @@ describe("Qualidade do toolkit", () => {
         expect(resultado.exitCode).toBe(0);
 
         const json = JSON.parse(resultado.stdout);
-        expect(json.versaoSchema).toBe("1.0.0");
+        expect(json.versaoSchema).toBe("2.0.0");
         expect(json.resumo.statusGeral).toBe("verde");
-        expect(json.hotspots).toHaveLength(2);
+        expect(json.pontosCriticos).toHaveLength(2);
     });
 
     test("resume a fotografia mais recente a partir da base externa", async () => {
@@ -41,20 +41,20 @@ describe("Qualidade do toolkit", () => {
         const caminhoFotografia = path.join(diretorioBase, "toolkit", "qualidade", "artefatos", "mais-recente", "fotografia.json");
         await criarDiretorio(path.dirname(caminhoFotografia));
         await escreverJson(caminhoFotografia, {
-            versaoSchema: "1.0.0",
+            versaoSchema: "2.0.0",
             resumo: {
                 statusGeral: "verde",
                 totais: {verificacoes: 1}
             },
             verificacoes: [],
-            hotspots: []
+            pontosCriticos: []
         });
 
         const resultado = await executarSgc(["qualidade", "resumo", "--json", "--base", diretorioBase]);
 
         expect(resultado.exitCode).toBe(0);
         const json = JSON.parse(resultado.stdout);
-        expect(json.versaoSchema).toBe("1.0.0");
+        expect(json.versaoSchema).toBe("2.0.0");
         expect(json.resumo.statusGeral).toBe("verde");
         expect(json.caminho).toBe("toolkit/qualidade/artefatos/mais-recente/fotografia.json");
     });
@@ -62,7 +62,7 @@ describe("Qualidade do toolkit", () => {
     test("rejeita fotografia de qualidade com versao incompativel", async () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-versao-invalida-"));
         const caminhoFotografia = path.join(diretorioBase, "fotografia.json");
-        await escreverJson(caminhoFotografia, {versaoSchema: "99.0.0", resumo: {}, verificacoes: [], hotspots: []});
+        await escreverJson(caminhoFotografia, {versaoSchema: "99.0.0", resumo: {}, verificacoes: [], pontosCriticos: []});
 
         const resultado = await executarSgc([
             "qualidade",
@@ -83,10 +83,10 @@ describe("Qualidade do toolkit", () => {
         const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-estrutura-invalida-"));
         const caminhoFotografia = path.join(diretorioBase, "fotografia.json");
         await escreverJson(caminhoFotografia, {
-            versaoSchema: "1.0.0",
+            versaoSchema: "2.0.0",
             resumo: {},
             verificacoes: "invalido",
-            hotspots: []
+            pontosCriticos: []
         });
 
         const resultado = await executarSgc([
@@ -191,7 +191,7 @@ describe("Qualidade do toolkit", () => {
         });
 
         expect(baseRecebida).toBe(diretorioBase);
-        expect(fotografia.versaoSchema).toBe("1.0.0");
+        expect(fotografia.versaoSchema).toBe("2.0.0");
         expect(fotografia.metadados.controleVersao).toEqual({origem: "externa"});
         expect(fotografia.verificacoes).toHaveLength(1);
         expect(await existe(caminhoFotografiaPersonalizado)).toBe(true);
@@ -199,17 +199,17 @@ describe("Qualidade do toolkit", () => {
         expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
     });
 
-    test("caracteriza leitura segura de JSON, hotspots e relatorios JUnit", async () => {
+    test("caracteriza leitura segura de JSON, pontos criticos e relatorios JUnit", async () => {
         expect(parseJsonSeguro<{status: string}>("{\"status\":\"ok\"}", {status: "falha"})).toEqual({status: "ok"});
         expect(parseJsonSeguro("invalido", {status: "falha"})).toEqual({status: "falha"});
-        expect(extrairHotspotsQualidade({
-            hotspots: [
-                {arquivo: "src/valido.ts", score: 12},
-                {arquivo: "src/sem-score.ts"},
+        expect(extrairPontosCriticosQualidade({
+            pontosCriticos: [
+                {arquivo: "src/valido.ts", pontuacao: 12},
+                {arquivo: "src/sem-pontuacao.ts"},
                 "invalido"
             ]
-        })).toEqual([{arquivo: "src/valido.ts", score: 12}]);
-        expect(extrairHotspotsQualidade({hotspots: "invalido"})).toEqual([]);
+        })).toEqual([{arquivo: "src/valido.ts", pontuacao: 12}]);
+        expect(extrairPontosCriticosQualidade({pontosCriticos: "invalido"})).toEqual([]);
 
         const base = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-leitores-"));
         const diretorioRelatorio = path.join(base, "backend", "build", "test-results");
@@ -317,7 +317,7 @@ describe("Qualidade do toolkit", () => {
         const executarComandoSgcFake = async (_contexto: ContextoColeta, argumentos: string[]): Promise<ResultadoComando> => ({
             codigoSaida: 0,
             saida: JSON.stringify(argumentos.includes("residuos")
-                ? {status: "ok", resumo: {scoreTotal: 90, faixa: "A"}, violacoes: [], avisos: [], hotspots: []}
+                ? {status: "ok", resumo: {pontuacaoTotal: 90, faixa: "A"}, violacoes: [], avisos: [], pontosCriticos: []}
                 : {resumo: {scoreTotal: 95, faixa: "A", metricas: {}}, hotspots: []}),
             erro: "",
             duracaoMs: 3

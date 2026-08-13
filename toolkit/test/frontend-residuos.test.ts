@@ -140,6 +140,10 @@ describe("Resíduos do frontend", () => {
 
         expect(resultado.exitCode).toBe(0);
         const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.versaoSchema).toBe("2.0.0");
+        expect(conteudo.resumo.pontuacaoTotal).toBeTypeOf("number");
+        expect(conteudo.pontosCriticos).toBeInstanceOf(Array);
+        expect(conteudo.hotspots).toBeUndefined();
         expect(conteudo.contagens.producao.anyExplicito).toBe(1);
         expect(conteudo.contagens.producao.checksNull).toBe(1);
         expect(conteudo.contagens.producao.fallbacksDefensivos).toBe(1);
