@@ -3,20 +3,20 @@ import path from "node:path";
 import {DIRETORIO_RAIZ} from "../caminhos.js";
 import {resolverCaminhoConfigurado} from "../configuracao.js";
 
-interface DadosCoberturaV8 {
+export interface DadosCoberturaV8 {
     s?: Record<string, number>;
     f?: Record<string, number>;
     b?: Record<string, number[]>;
     statementMap?: Record<string, unknown>;
 }
 
-interface ResumoCobertura {
+export interface ResumoCobertura {
     cobertos: number;
     total: number;
     percentual: number;
 }
 
-interface ArquivoCobertura {
+export interface ArquivoCobertura {
     arquivo: string;
     statementsPercentual: number;
     statementsCobertos: number;
@@ -28,11 +28,11 @@ interface ArquivoCobertura {
     linesPercentual: number;
 }
 
-interface OpcoesCoberturaFrontend {
+export interface OpcoesCoberturaFrontend {
     diretorioBase?: string;
 }
 
-interface ResultadoCoberturaFrontend {
+export interface ResultadoCoberturaFrontend {
     statements: ResumoCobertura;
     branches: ResumoCobertura;
     functions: ResumoCobertura;

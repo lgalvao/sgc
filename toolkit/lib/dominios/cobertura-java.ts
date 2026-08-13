@@ -34,13 +34,13 @@ interface RelatorioJacocoXml {
     };
 }
 
-interface ResumoContador {
+export interface ResumoContador {
     cobertos: number;
     perdidos: number;
     percentual: number;
 }
 
-interface MetricasGlobais {
+export interface MetricasGlobais {
     linhas: ResumoContador;
     branches: ResumoContador;
     instrucoes: ResumoContador;
@@ -48,7 +48,7 @@ interface MetricasGlobais {
     complexidade: ResumoContador;
 }
 
-interface TotaisCobertura {
+export interface TotaisCobertura {
     totalArquivos: number;
     totalLinhas: number;
     linhasCobertas: number;
@@ -58,7 +58,7 @@ interface TotaisCobertura {
     coberturaGlobalBranches: number;
 }
 
-interface ClasseCobertura {
+export interface ClasseCobertura {
     nomePacote: string;
     nomeArquivo: string;
     nomeClasse: string;
@@ -79,7 +79,7 @@ interface ClasseCobertura {
     contadoresGlobais: MetricasGlobais;
 }
 
-interface OpcoesCoberturaJacoco {
+export interface OpcoesCoberturaJacoco {
     diretorioBase?: string;
     incluirSemLacunas?: boolean;
     aplicarExclusoes?: boolean;
@@ -87,7 +87,7 @@ interface OpcoesCoberturaJacoco {
     filtro?: string | null;
 }
 
-interface ResultadoCoberturaJacoco extends MetricasGlobais {
+export interface ResultadoCoberturaJacoco extends MetricasGlobais {
     totais: TotaisCobertura;
     classes: ClasseCobertura[];
 }

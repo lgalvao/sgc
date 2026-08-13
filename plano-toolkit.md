@@ -189,6 +189,8 @@ frontend e para os caminhos OpenAPI.
 - `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts` foram convertidos para TypeScript com tipos
   explícitos para XML JaCoCo, dados V8, métricas, arquivos e opções; `@types/xml2js` documenta a dependência de
   parsing. Os dois domínios puros de cobertura agora têm entrada tipada e não fazem I/O durante a importação.
+- `backend/lib/testes-analisar-regras.ts` foi convertido para TypeScript com tipos internos para categorias, perfis,
+  correspondências, evidências e itens de relatório; as regras SGC e as chaves JSON permaneceram inalteradas.
 - A configuração já aceita alguns caminhos diferentes do layout do SGC; auditores de cobertura, arquitetura, coesão,
   contratos, resíduos e coleta possuem parametrização parcial por `--base`, `--arquivo`, `--saida` ou configuração.
   Arquitetura, resíduos, OpenAPI e coleta já resolvem seus defaults após a base; outros comandos ainda têm defaults
@@ -456,8 +458,10 @@ roteador fonte/compilado possuir testes de smoke equivalentes.
 
 1. **[concluído nesta rodada]** Migrar `lib/dominios/cobertura-java.ts` e `lib/dominios/cobertura-web.ts`, mantendo os
    contratos de métricas, os caminhos relativos à base auditada e os fixtures existentes.
-2. Migrar `backend/lib/testes-analisar-regras.js` e bibliotecas puras de frontend/requisitos.
-3. Introduzir tipos para JaCoCo, V8, fotografia de qualidade, achados de auditoria e diagnóstico.
+2. **[parcial nesta rodada]** Migrar `backend/lib/testes-analisar-regras.ts`; ainda faltam as bibliotecas puras de
+   frontend e requisitos.
+3. **[parcial nesta rodada]** Introduzir tipos para JaCoCo, V8 e regras da análise de testes backend; ainda faltam
+   fotografia de qualidade, achados de auditoria e diagnósticos.
 4. Substituir `any` implícito por `unknown` na entrada JSON e validar apenas o que o consumidor realmente exige.
 5. Criar `tsconfig.toolkit-estrito.json` ou equivalente com `strict`, aplicando-o aos módulos já convertidos e aos
    próximos lotes.
