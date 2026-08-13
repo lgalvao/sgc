@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 import pc from "picocolors";
+import path from "node:path";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
@@ -60,17 +63,19 @@ async function principal(argumentos = process.argv.slice(2)) {
             descricao: "Lista identificadores de teste duplicados nos templates Vue.",
             opcoes: [
                 "--json               Emite os duplicados em JSON.",
-                "--base <diretorio>   Sobrescreve o diretorio de busca.",
+                "--base <diretorio>   Raiz do projeto para resolver frontendCodigo.",
+                "--dir <diretorio>    Sobrescreve o diretório configurado de código.",
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.js frontend identificadores-teste listar-duplicados",
-                "npx tsx toolkit/sgc.js frontend identificadores-teste listar-duplicados --base /tmp/frontend",
+                "npx tsx toolkit/sgc.js frontend identificadores-teste listar-duplicados --dir /tmp/frontend",
             ],
         });
         return;
     }
 
-    const resultado = criarResultado(await coletarIdentificadores(obterDiretorioBusca(argumentos)));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const resultado = criarResultado(await coletarIdentificadores(obterDiretorioBusca(argumentos, diretorioBase), diretorioBase));
     if (emitirJson) {
         imprimirJson(resultado);
     } else {

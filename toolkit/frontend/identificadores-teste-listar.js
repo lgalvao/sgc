@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 import pc from "picocolors";
+import path from "node:path";
+import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {lerOpcao} from "../lib/cli-opcoes.js";
 import {exibirAjudaComando} from "../lib/cli-ajuda.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {escreverLinha, imprimirJson} from "../lib/saida.js";
@@ -32,17 +35,19 @@ async function principal(argumentos = process.argv.slice(2)) {
             descricao: "Lista identificadores de teste declarados em templates Vue.",
             opcoes: [
                 "--json               Emite os identificadores em JSON.",
-                "--base <diretorio>   Sobrescreve o diretorio de busca.",
+                "--base <diretorio>   Raiz do projeto para resolver frontendCodigo.",
+                "--dir <diretorio>    Sobrescreve o diretório configurado de código.",
             ],
             exemplos: [
                 "npx tsx toolkit/sgc.js frontend identificadores-teste listar",
-                "npx tsx toolkit/sgc.js frontend identificadores-teste listar --json --base /tmp/frontend",
+                "npx tsx toolkit/sgc.js frontend identificadores-teste listar --dir /tmp/frontend",
             ],
         });
         return;
     }
 
-    const resultado = await coletarIdentificadores(obterDiretorioBusca(argumentos));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const resultado = await coletarIdentificadores(obterDiretorioBusca(argumentos, diretorioBase), diretorioBase);
     if (emitirJson) {
         imprimirJson(resultado);
         return;

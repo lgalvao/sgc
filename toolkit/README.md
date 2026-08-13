@@ -171,6 +171,9 @@ O arquivo exige a versão `1` e aceita uma seção `diretorios` com nomes conhec
 Chaves desconhecidas, versões não suportadas e caminhos vazios falham na borda de configuração, antes de um auditor
 iniciar.
 
+Nos comandos de inspeção de frontend, `--base` representa a raiz do projeto e resolve `frontendCodigo`; use `--dir`
+quando a intenção for apontar diretamente para outro diretório de código.
+
 O toolkit executa a árvore-fonte com `tsx` e está em migração incremental para TypeScript. As bibliotecas puras de
 `lib/` já foram convertidas; os próximos recortes devem seguir pelas bibliotecas de domínio e pelos comandos que apenas
 adaptam CLI para domínio. Isso reduz o risco de converter simultaneamente roteamento, contratos de saída e integrações

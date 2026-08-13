@@ -258,7 +258,7 @@ const ADAPTADORES = {
             "identificadores-teste",
             "listar-duplicados",
             "--base",
-            contexto.diretorioFrontendCodigo,
+            contexto.base,
         ], false);
         execucao.status = saida.codigoSaida === 0 ? "sucesso" : "falha";
         registrarResultadoExecucao(execucao, saida);

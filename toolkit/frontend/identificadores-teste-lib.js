@@ -7,24 +7,24 @@ import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 
 const PADRAO_IDENTIFICADOR = /(^|[\s<])(:?)(data-test-codigo|test-codigo|data-test-id|test-id|data-testid)=("([^"]*)"|'([^']*)')/gm;
 
-function obterDiretorioBusca(argumentos = []) {
-    const baseInformada = lerOpcao(argumentos, "--base", null);
-    return baseInformada
-        ? path.resolve(baseInformada)
-        : path.join(resolverCaminhoConfigurado("frontend"), "src");
+function obterDiretorioBusca(argumentos = [], diretorioBase = DIRETORIO_RAIZ) {
+    const diretorioInformado = lerOpcao(argumentos, "--dir", null);
+    return diretorioInformado
+        ? path.resolve(diretorioBase, diretorioInformado)
+        : resolverCaminhoConfigurado("frontendCodigo", diretorioBase);
 }
 
-function normalizarCaminhoArquivo(caminhoArquivo, diretorioBusca) {
-    const relativoRaiz = path.relative(DIRETORIO_RAIZ, caminhoArquivo).replaceAll("\\", "/");
+function normalizarCaminhoArquivo(caminhoArquivo, diretorioBase, diretorioBusca) {
+    const relativoRaiz = path.relative(diretorioBase, caminhoArquivo).replaceAll("\\", "/");
     if (!relativoRaiz.startsWith("../") && relativoRaiz !== "..") {
         return relativoRaiz;
     }
     return path.relative(diretorioBusca, caminhoArquivo).replaceAll("\\", "/");
 }
 
-async function coletarIdentificadores(diretorioBusca) {
+async function coletarIdentificadores(diretorioBusca, diretorioBase = DIRETORIO_RAIZ) {
     if (!fs.existsSync(diretorioBusca)) {
-        throw new Error(`Diretorio frontend nao encontrado: ${path.relative(DIRETORIO_RAIZ, diretorioBusca)}`);
+        throw new Error(`Diretorio frontend nao encontrado: ${path.relative(diretorioBase, diretorioBusca)}`);
     }
 
     const padraoVue = path.join(diretorioBusca, "**/*.vue").replace(/\\/g, "/");
@@ -47,7 +47,7 @@ async function coletarIdentificadores(diretorioBusca) {
             }
 
             identificadores.push({
-                arquivo: normalizarCaminhoArquivo(caminhoArquivo, diretorioBusca),
+                arquivo: normalizarCaminhoArquivo(caminhoArquivo, diretorioBase, diretorioBusca),
                 atributo: `${dinamico ? ":" : ""}${correspondencia[3]}`,
                 valor,
             });
