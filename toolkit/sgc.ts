@@ -31,7 +31,7 @@ criarComandoScript(backendCobertura, "auditoria", "Auditoria unificada de cobert
 criarComandoScript(backendCobertura, "ramificacoes", "Lista classes com lacunas de ramificacoes no backend.", "toolkit/backend/cobertura-ramificacoes.js");
 
 const backendArquitetura = backend.command("arquitetura").description("Auditorias de arquitetura do backend.");
-criarComandoScript(backendArquitetura, "auditar", "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.", "toolkit/backend/arquitetura-auditar.js");
+criarComandoScript(backendArquitetura, "auditar", "Audita god objects (Services, Facades, Controllers) por linhas, metodos e dependencias.", "toolkit/backend/arquitetura-auditar.ts");
 
 const backendCoesao = backend.command("coesao").description("Auditorias de coesao do backend.");
 criarComandoScript(backendCoesao, "auditar", "Audita Services com responsabilidades misturadas (consulta, mutacao, workflow, notificacao).", "toolkit/backend/coesao-auditar.ts");

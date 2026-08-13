@@ -36,7 +36,7 @@ const CAMINHOS_COMANDOS_COBERTURA_BACKEND = [
     "cobertura-auditoria.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
 const CAMINHOS_COMANDOS_AUDITORIA_BACKEND = [
-    "arquitetura-auditar.js",
+    "arquitetura-auditar.ts",
     "coesao-auditar.ts",
     "contratos-auditar.ts"
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "backend", nome));
@@ -954,6 +954,52 @@ describe("CLI raiz do toolkit", () => {
         expect(conteudo.resumo.totalAnalisados).toBe(1);
         expect(conteudo.todos[0].caminhoRelativo).toBe("servidor/java/exemplo/ExemploService.java");
         expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "coesao-auditoria.json"))).toBe(true);
+    });
+
+    test("audita service acima do limiar arquitetural sem gravar artefato", async () => {
+        const base = await mkdtemp(path.join(os.tmpdir(), "sgc-arquitetura-backend-"));
+        const codigoBackend = path.join(base, "servidor", "java");
+        await fs.outputJSON(path.join(base, "configuracao-toolkit.json"), {
+            versao: VERSAO_CONFIGURACAO,
+            diretorios: {
+                backendCodigo: "servidor/java",
+                artefatosQualidade: "artefatos"
+            }
+        });
+        await fs.outputFile(
+            path.join(codigoBackend, "exemplo", "ExemploService.java"),
+            [
+                "package exemplo;",
+                "public class ExemploService {",
+                ...Array.from({length: 8}, (_, indice) => `    private final Dependencia${indice} dependencia${indice};`),
+                ...Array.from({length: 15}, (_, indice) => `    public void buscar${indice}() {}`),
+                "}"
+            ].join("\n")
+        );
+
+        const resultado = await executarSgc([
+            "backend",
+            "arquitetura",
+            "auditar",
+            "--json",
+            "--sem-gravar",
+            "--base",
+            base
+        ]);
+
+        expect(resultado.exitCode).toBe(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.resumo).toMatchObject({totalAnalisados: 1, criticos: 0, alertas: 1, ok: 0});
+        expect(conteudo.todos[0]).toMatchObject({
+            nomeArquivo: "ExemploService.java",
+            caminhoRelativo: "servidor/java/exemplo/ExemploService.java",
+            tipo: "service",
+            metodos: 15,
+            dependencias: 8,
+            severidade: "alerta"
+        });
+        expect(conteudo.todos[0].motivos).toContain("15 métodos públicos (>=15)");
+        expect(await fs.pathExists(path.join(base, "artefatos", "backend", "latest", "arquitetura-auditoria.md"))).toBe(false);
     });
 
     test("audita vazamento de modelo em DTO de controlador sem gravar artefato", async () => {

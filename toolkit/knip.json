@@ -1,6 +1,6 @@
 {
   "entry": [
-    "backend/arquitetura-auditar.js",
+    "backend/arquitetura-auditar.ts",
     "backend/cobertura-auditoria.ts",
     "backend/cobertura-ramificacoes.ts",
     "backend/coesao-auditar.ts",

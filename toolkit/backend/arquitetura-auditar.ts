@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// Auditoria de arquitetura dos componentes Java do backend.
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -20,23 +21,57 @@ const LIMITE_DEPENDENCIAS_CRITICO = 12;
 
 const SUFIXOS_ALVO = ["Service.java", "Facade.java", "Controller.java"];
 
-function normalizarCaminho(caminho) {
+type TipoAlvo = "controller" | "facade" | "service" | "outro";
+type Severidade = "critico" | "alerta" | "ok";
+
+interface LimitesArquitetura {
+    linhas: {alerta: number; critico: number};
+    metodos: {alerta: number; critico: number};
+    dependencias: {alerta: number; critico: number};
+}
+
+interface ResultadoArquitetura {
+    nomeArquivo: string;
+    caminhoRelativo: string;
+    pacote: string;
+    tipo: TipoAlvo;
+    linhas: number;
+    metodos: number;
+    dependencias: number;
+    severidade: Severidade;
+    motivos: string[];
+}
+
+interface RelatorioArquitetura {
+    geradoEm: string;
+    limites: LimitesArquitetura;
+    resumo: {
+        totalAnalisados: number;
+        criticos: number;
+        alertas: number;
+        ok: number;
+    };
+    hotspots: ResultadoArquitetura[];
+    todos: ResultadoArquitetura[];
+}
+
+function normalizarCaminho(caminho: string): string {
     return caminho.replaceAll(path.sep, "/");
 }
 
-function contarLinhas(conteudo) {
+function contarLinhas(conteudo: string): number {
     return conteudo.split(/\r?\n/).filter((linha) => {
         const limpa = linha.trim();
         return limpa.length > 0 && !limpa.startsWith("//") && !limpa.startsWith("*");
     }).length;
 }
 
-function contarMetodosPublicos(conteudo) {
+function contarMetodosPublicos(conteudo: string): number {
     const regex = /^\s+public\s+(?:static\s+)?(?!class|interface|enum|record\b)(?:@\w+(?:\([^)]*\))?\s+)*[\w<>[\],\s]+\s+[a-z]\w*\s*\(/gm;
     return (conteudo.match(regex) ?? []).length;
 }
 
-function contarDependencias(conteudo) {
+function contarDependencias(conteudo: string): number {
     // @RequiredArgsConstructor style: private final Type field;
     const camposFinais = (conteudo.match(/^\s+private\s+final\s+\w[\w.<>[\]]+\s+\w+\s*;/gm) ?? []).length;
     // @Autowired style
@@ -44,18 +79,18 @@ function contarDependencias(conteudo) {
     return camposFinais + autowired;
 }
 
-function extrairPacote(conteudo) {
+function extrairPacote(conteudo: string): string {
     return conteudo.match(/^package\s+([\w.]+)\s*;/m)?.[1] ?? "";
 }
 
-function classificarTipo(nomeArquivo) {
+function classificarTipo(nomeArquivo: string): TipoAlvo {
     if (nomeArquivo.endsWith("Controller.java")) return "controller";
     if (nomeArquivo.endsWith("Facade.java")) return "facade";
     if (nomeArquivo.endsWith("Service.java")) return "service";
     return "outro";
 }
 
-function calcularSeveridade(linhas, metodos, dependencias) {
+function calcularSeveridade(linhas: number, metodos: number, dependencias: number): Severidade {
     let pontos = 0;
     if (linhas >= LIMITE_LINHAS_CRITICO) pontos += 2;
     else if (linhas >= LIMITE_LINHAS_ALERTA) pontos += 1;
@@ -68,8 +103,8 @@ function calcularSeveridade(linhas, metodos, dependencias) {
     return "ok";
 }
 
-function motivosSeveridade(linhas, metodos, dependencias) {
-    const motivos = [];
+function motivosSeveridade(linhas: number, metodos: number, dependencias: number): string[] {
+    const motivos: string[] = [];
     if (linhas >= LIMITE_LINHAS_CRITICO) motivos.push(`${linhas} linhas (>=${LIMITE_LINHAS_CRITICO})`);
     else if (linhas >= LIMITE_LINHAS_ALERTA) motivos.push(`${linhas} linhas (>=${LIMITE_LINHAS_ALERTA})`);
     if (metodos >= LIMITE_METODOS_CRITICO) motivos.push(`${metodos} métodos públicos (>=${LIMITE_METODOS_CRITICO})`);
@@ -79,11 +114,11 @@ function motivosSeveridade(linhas, metodos, dependencias) {
     return motivos;
 }
 
-async function auditarArquitetura(diretorioCodigo, diretorioBase) {
+async function auditarArquitetura(diretorioCodigo: string, diretorioBase: string): Promise<RelatorioArquitetura> {
     const arquivos = await globby(path.join(diretorioCodigo, "**/*.java").replace(/\\/g, "/"), {absolute: true});
     const alvos = arquivos.filter((f) => SUFIXOS_ALVO.some((s) => f.endsWith(s)));
 
-    const resultados = await Promise.all(alvos.map(async (arquivo) => {
+    const resultados: ResultadoArquitetura[] = await Promise.all(alvos.map(async (arquivo): Promise<ResultadoArquitetura> => {
         const conteudo = await fs.readFile(arquivo, "utf-8");
         const nomeArquivo = path.basename(arquivo);
         const linhas = contarLinhas(conteudo);
@@ -125,8 +160,8 @@ async function auditarArquitetura(diretorioCodigo, diretorioBase) {
     };
 }
 
-function gerarMarkdown(relatorio) {
-    const linhas = [];
+function gerarMarkdown(relatorio: RelatorioArquitetura): string {
+    const linhas: string[] = [];
     linhas.push("# Auditoria de arquitetura do backend", "");
     linhas.push(`Gerado em: ${relatorio.geradoEm}`, "");
     linhas.push("## Resumo", "");
@@ -173,7 +208,10 @@ function gerarMarkdown(relatorio) {
     return linhas.join("\n");
 }
 
-async function gravarRelatorios(relatorio, diretorioSaida) {
+async function gravarRelatorios(relatorio: RelatorioArquitetura, diretorioSaida: string): Promise<{
+    caminhoMarkdown: string;
+    caminhoJson: string;
+}> {
     const caminhoMarkdown = path.join(diretorioSaida, "arquitetura-auditoria.md");
     const caminhoJson = path.join(diretorioSaida, "arquitetura-auditoria.json");
     await fs.mkdir(diretorioSaida, {recursive: true});
@@ -182,10 +220,10 @@ async function gravarRelatorios(relatorio, diretorioSaida) {
     return {caminhoMarkdown, caminhoJson};
 }
 
-function exibirAjuda() {
+function exibirAjuda(): void {
     exibirAjudaComando({
         comandoSgc: "backend arquitetura auditar",
-        scriptDireto: "toolkit/backend/arquitetura-auditar.js",
+        scriptDireto: "backend/arquitetura-auditar.ts",
         descricao: "Audita Services, Facades e Controllers do backend detectando god objects por linhas, métodos e dependências.",
         opcoes: [
             "--json              Emite o relatório em JSON.",
@@ -200,7 +238,7 @@ function exibirAjuda() {
     });
 }
 
-async function principal(argumentos = process.argv.slice(2)) {
+async function principal(argumentos: string[] = process.argv.slice(2)): Promise<void> {
 
     if (argumentos.includes("--help") || argumentos.includes("-h")) {
         exibirAjuda();
@@ -209,7 +247,7 @@ async function principal(argumentos = process.argv.slice(2)) {
 
     const emitirJson = argumentos.includes("--json");
     const semGravar = argumentos.includes("--sem-gravar");
-    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ));
+    const diretorioBase = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
     const diretorioCodigo = resolverCaminhoConfigurado("backendCodigo", diretorioBase);
     const diretorioSaida = path.join(resolverCaminhoConfigurado("artefatosQualidade", diretorioBase), "backend", "latest");
 
