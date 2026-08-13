@@ -11,6 +11,7 @@ import {executarDiagnostico} from "../projeto/diagnostico.ts";
 import {executarLimpeza} from "../projeto/limpar.ts";
 import {resolverEscoposInstalacao} from "../projeto/preparar.ts";
 import {executarPerfilQualidade} from "../projeto/qualidade.ts";
+import {executarAuditoriaDependencias} from "../projeto/dependencias-auditar.ts";
 import {carregarConfiguracao, validarConfiguracao, VERSAO_CONFIGURACAO} from "../lib/configuracao.ts";
 import {resolverCaminhosOpenapi} from "../integracao/contratos-openapi-caminhos.ts";
 import {ADAPTADORES, PERFIS, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.ts";
@@ -48,6 +49,7 @@ const CAMINHOS_COMANDOS_CONTRATOS = [
 ].map(nome => path.join(DIRETORIO_RAIZ, "toolkit", "integracao", nome));
 const CAMINHOS_COMANDOS_PROJETO = [
     "arvore-linhas.ts",
+    "dependencias-auditar.ts",
     "diagnostico.ts",
     "limpar.ts",
     "preparar.ts",
@@ -2442,6 +2444,52 @@ describe("CLI raiz do toolkit", () => {
             argumentos: ["verificar", "--json"],
             base: diretorioBase
         }]);
+    });
+
+    test("audita dependencias em escopos e comandos externos", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-dependencias-base-"));
+        const chamadas = [];
+        const resultado = await executarAuditoriaDependencias({
+            base: diretorioBase,
+            escopos: [
+                {
+                    titulo: "Auditar cliente",
+                    segmento: "cliente",
+                    comando: "ferramenta",
+                    argumentos: ["dependencias"]
+                },
+                {
+                    titulo: "Auditar servidor",
+                    segmento: "servidor",
+                    comando: "ferramenta",
+                    argumentos: ["dependencias", "--json"]
+                }
+            ],
+            executarComando: async (comando, argumentos, diretorio) => {
+                chamadas.push({comando, argumentos, diretorio});
+                return {exitCode: 0};
+            }
+        });
+
+        expect(resultado).toEqual({
+            diretorioBase,
+            resultados: [
+                {escopo: "Auditar cliente", codigoSaida: 0},
+                {escopo: "Auditar servidor", codigoSaida: 0}
+            ]
+        });
+        expect(chamadas).toEqual([
+            {
+                comando: "ferramenta",
+                argumentos: ["dependencias"],
+                diretorio: path.join(diretorioBase, "cliente")
+            },
+            {
+                comando: "ferramenta",
+                argumentos: ["dependencias", "--json"],
+                diretorio: path.join(diretorioBase, "servidor")
+            }
+        ]);
     });
 
     test("nao possui diretorios legados de scripts em backend/frontend", async () => {

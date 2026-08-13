@@ -143,9 +143,10 @@ projeto
     .description("Ferramentas para auditar uso e declaracao de dependencias.")
     .command("auditar")
     .description("Executa o knip na raiz, no frontend e no toolkit.")
-    .action(async () => {
+    .option("--base <diretorio>", "Sobrescreve o diretório base para auditoria.")
+    .action(async (opcoes) => {
         const {executarAuditoriaDependencias} = await import("./projeto/dependencias-auditar.js");
-        await executarAuditoriaDependencias();
+        await executarAuditoriaDependencias(opcoes);
     });
 
 projeto

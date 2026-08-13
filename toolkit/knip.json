@@ -31,7 +31,7 @@
     "integracao/contratos-exportar-openapi.ts",
     "integracao/contratos-fixar-baseline.ts",
     "projeto/arvore-linhas.ts",
-    "projeto/dependencias-auditar.js",
+    "projeto/dependencias-auditar.ts",
     "projeto/diagnostico.ts",
     "projeto/limpar.ts",
     "projeto/preparar.ts",
