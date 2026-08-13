@@ -5,7 +5,11 @@ import fs from "fs-extra";
 import {describe, expect, test} from "vitest";
 import {DIRETORIO_RAIZ, executarSgc} from "./apoio.js";
 import {VERSAO_CONFIGURACAO} from "../lib/configuracao.js";
-import {obterOpcoesPlaywright, principal as coletarFotografiaQualidade} from "../qualidade/coleta-execucao.js";
+import {
+    obterOpcoesPlaywright,
+    principal as coletarFotografiaQualidade,
+    type AdaptadorQualidade
+} from "../qualidade/coleta-execucao.js";
 
 const FIXTURE_FOTOGRAFIA = path.join(DIRETORIO_RAIZ, "toolkit", "test", "fixtures", "qualidade", "fotografia.json");
 
@@ -83,6 +87,47 @@ describe("Qualidade do toolkit", () => {
             adaptadores: {}
         })).rejects.toThrow("adaptadorAusente");
 
+        expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
+    });
+
+    test("aceita uma fabrica de contexto de artefatos para projeto externo", async () => {
+        const diretorioBase = await mkdtemp(path.join(os.tmpdir(), "sgc-qualidade-contexto-externo-"));
+        const diretorioArtefatos = path.join(diretorioBase, ".qualidade");
+        let baseRecebida = "";
+        const adaptador: AdaptadorQualidade = async contexto => ({
+            codigo: "checagemExterna",
+            nome: "Checagem externa",
+            categoria: "qualidade",
+            status: "sucesso",
+            duracaoMs: 0,
+            comando: "checagem",
+            diretorio: contexto.base,
+            sumario: "",
+            metricas: {},
+            erros: [],
+            artefatos: []
+        });
+
+        const fotografia = await coletarFotografiaQualidade(["--perfil", "externo", "--base", diretorioBase], {
+            perfis: {externo: ["checagemExterna"]},
+            adaptadores: {checagemExterna: adaptador},
+            criarContexto: base => {
+                baseRecebida = base;
+                return {
+                    base,
+                    diretorioArtefatos,
+                    diretorioExecucoes: path.join(diretorioArtefatos, "execucoes"),
+                    diretorioMaisRecente: path.join(diretorioArtefatos, "mais-recente"),
+                    diretorioBackend: path.join(base, "servidor"),
+                    diretorioFrontend: path.join(base, "cliente"),
+                    diretorioFrontendCodigo: path.join(base, "cliente", "src")
+                };
+            }
+        });
+
+        expect(baseRecebida).toBe(diretorioBase);
+        expect(fotografia.verificacoes).toHaveLength(1);
+        expect(await fs.pathExists(path.join(diretorioArtefatos, "mais-recente", "fotografia.json"))).toBe(true);
         expect(await fs.pathExists(path.join(diretorioBase, "toolkit"))).toBe(false);
     });
 }, 30000);

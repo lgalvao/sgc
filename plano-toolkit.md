@@ -342,8 +342,9 @@ frontend e para os caminhos OpenAPI.
   `qualidade/coleta-adaptadores-sgc.ts` concentra os perfis e adaptadores Gradle/npm/Playwright específicos do SGC,
   `qualidade/coleta-executor.ts` concentra a execução de subprocessos, `qualidade/coleta-leitores.ts` concentra a leitura
   de JSON/JUnit e a validação de hotspots, `qualidade/coleta-fotografia.ts` concentra o contrato, a construção e a
-  persistência da fotografia, e a função de coleta aceita catálogos externos por composição, sem mutar os defaults
-  globais. A montagem do comando Playwright continua sendo uma função pura e resolve
+  persistência da fotografia, `qualidade/coleta-contexto.ts` concentra a fábrica de contexto SGC padrão, e a função de
+  coleta aceita catálogos externos e uma fábrica de contexto externa por composição, sem mutar os defaults globais. A
+  montagem do comando Playwright continua sendo uma função pura e resolve
   `diretorios.testesIntegracao`, compartilhando a mesma convenção do crawler de acessibilidade.
 - `qualidade/coleta.ts` foi convertido para TypeScript; a validação de perfis/opções e o wrapper que delega ao coletor
   agora compartilham a fronteira tipada do runtime.
@@ -404,10 +405,10 @@ frontend e para os caminhos OpenAPI.
 
 Nas validações desta rodada, em 13 de agosto de 2026, executadas diretamente sob Node `26.7.0`:
 
-- `npm --prefix toolkit run test`: 121 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
+- `npm --prefix toolkit run test`: 122 testes aprovados em 7 arquivos; o smoke de pacote é separado para não tornar a
   suíte unitária dependente de rede ou instalação;
 - `npm --prefix toolkit run test:coverage`: aprovado com baseline informativa de 46,04% de statements (612/1.329),
-  34,09% de branches (314/921), 52,98% de funções (142/268) e 46,26% de linhas (588/1.271); o script exclui
+  34,23% de branches (316/923), 52,98% de funções (142/268) e 46,26% de linhas (588/1.271); o script exclui
   `test/**` para não contar o apoio de testes como implementação e ainda não aplica threshold, porque a prioridade é
   transformar os contratos críticos em cenários explícitos;
 - `npm --prefix toolkit run test:pacote`: 1 teste aprovado, com `npm pack`, instalação isolada, auditoria no consumidor
@@ -488,23 +489,26 @@ Na rodada seguinte, os leitores de JSON/JUnit e hotspots foram extraídos para `
 concentrar contexto e composição da fotografia.
 Na rodada seguinte, o contrato, a construção e a persistência da fotografia foram extraídos para `coleta-fotografia.ts`;
 o agregador deixou de conhecer a gravação duplicada do artefato e a montagem do resumo consolidado.
+Na rodada seguinte, a fábrica SGC de contexto foi extraída para `coleta-contexto.ts` e passou a ser substituível na API;
+uma regressão confirmou que uma base externa pode escolher seus diretórios de artefatos sem criar `toolkit/`, e a suíte
+chega a 122 cenários regulares, com 7 em `qualidade.test.ts`.
 
 ### 3.3 Tamanho e composição atual
 
 Inventário dos arquivos rastreados do toolkit, excluindo `dist`, cobertura e artefatos ignorados:
 
-- 77 arquivos TypeScript de implementação;
+- 78 arquivos TypeScript de implementação;
 - 0 arquivos JavaScript de implementação; o único CJS é o launcher mínimo do binário;
 - 0 arquivos JavaScript de teste e 8 arquivos TypeScript de teste (`test/sgc.test.ts`, `test/projeto.test.ts`,
   `test/configuracao.test.ts`, `test/integracao.test.ts`, `test/qualidade.test.ts`, `test/cdus.test.ts`,
   `test/externo.test.ts` e `test/pacote.test.ts`);
-- 7 arquivos de teste TypeScript concentram 121 cenários regulares, mais 1 smoke de distribuição isolada;
+- 7 arquivos de teste TypeScript concentram 122 cenários regulares, mais 1 smoke de distribuição isolada;
 - `test/apoio.ts` centraliza a raiz do toolkit, o launcher `tsx`, o contrato de execução e `executarSgc`, evitando
   cópias divergentes nos testes de projeto, integração, qualidade e CLI;
 - maior módulo atual: `frontend/arquitetura-lib.ts`, com aproximadamente 1.200 linhas;
 - outros hotspots: `codigo/nomes-simbolos-coletar.ts`, `frontend/residuos-lib.ts` e
   `qualidade/coleta-execucao.ts`/`qualidade/coleta-adaptadores-sgc.ts`/`qualidade/coleta-executor.ts`/
-  `qualidade/coleta-leitores.ts`/`qualidade/coleta-fotografia.ts`.
+  `qualidade/coleta-leitores.ts`/`qualidade/coleta-fotografia.ts`/`qualidade/coleta-contexto.ts`.
 
 O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de implementação rastreados são TypeScript.
 
@@ -533,6 +537,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 | Resolvido nesta rodada | Agregador conhecia detalhes de subprocessos | `qualidade/coleta-executor.ts` agora encapsula `execa`, `tsx`, ambiente, diretório de execução e despacho interno do toolkit; a fotografia continua sob responsabilidade do agregador. |
 | Resolvido nesta rodada | Agregador conhecia detalhes de leitura de relatórios | `qualidade/coleta-leitores.ts` agora concentra o parsing seguro de JSON, a consolidação JUnit e a validação de hotspots; o agregador apenas compõe os resultados. |
 | Resolvido nesta rodada | Agregador montava e gravava a fotografia | `qualidade/coleta-fotografia.ts` agora concentra o contrato, a agregação do resumo, a ordenação dos hotspots e a gravação nos dois destinos; o fluxo preserva a preparação antecipada dos diretórios. |
+| Resolvido nesta rodada | Contexto SGC era obrigatório e implícito | `qualidade/coleta-contexto.ts` concentra a fábrica padrão, enquanto `principal` aceita `criarContexto`; consumidores externos podem escolher seus diretórios de artefatos sem alterar os defaults SGC. |
 | Resolvido | Efeito colateral oculto de gravação | `codigo nomes auditar-consistencia` gerava o inventário auxiliar com gravação habilitada e contaminava `--json`; a opção `--gravar` agora é propagada e a coleta interna é silenciosa. |
 | Resolvido | Configuração sem validação | `configuracao-toolkit.json` agora exige a versão `1` e valida estrutura, chaves conhecidas e caminhos textuais antes da combinação com defaults. |
 | Resolvido nesta rodada | Políticas de resíduos apontando para legado ausente | Os defaults de orçamento e exceções frontend foram removidos; overrides continuam aceitos, a ausência usa política neutra explícita e arquivo configurado ausente ou inválido falha visivelmente. |
@@ -567,7 +572,7 @@ O núcleo TypeScript de implementação foi concluído: 100% dos arquivos de imp
 - Parametrização parcial não significa generalização concluída.
 - Build aprovado prova que a árvore pode ser emitida; não prova que o pacote emitido contém assets, configuração e
   resolução de raiz adequados para distribuição.
-- Knip aprovado, 121 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
+- Knip aprovado, 122 testes unitários verdes e o smoke de pacote aprovado são gates úteis, mas ainda insuficientes para afirmar ausência de código morto fora
   do grafo declarado, segurança de todos os comandos mutáveis ou portabilidade. O grafo do Knip agora é uma evidência
   útil de exports não consumidos; não substitui testes de pacote externo.
 
@@ -672,7 +677,7 @@ do perfil.
 4. **[decidido e validado nesta rodada] Modelo de distribuição**: o reuso será por pacote-fonte com runtime `tsx`;
    `version`, `files`, `bin`, `exports`, assets e dependências de runtime refletem esse modelo. A política de publicação
    continua uma decisão operacional futura.
-5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 77 módulos de
+5. **[resolvido nesta rodada] TypeScript sem rigor uniforme**: `tsconfig.estrito.json` cobre os 78 módulos de
    implementação TypeScript com `strict` e `noImplicitOverride`; o gate estrito passou e tornou-se o `typecheck` oficial.
 6. **[resolvido nesta rodada] Dependência de runtime**: `tsx` está em `dependencies`, o launcher de pacote foi criado e
    a instalação isolada confirma que o pacote fonte+tsx não depende do hoisting do workspace.
@@ -696,10 +701,10 @@ do perfil.
 12. **Documentação derivada**: o catálogo já foi atualizado para `sgc.ts`, mas ainda precisa ser centralizado para não
     derivar ajuda, comandos e exports em fontes duplicadas. O inventário de comandos não deve divergir do roteador.
 13. **[parcial nesta rodada] Orquestração pesada**: `qualidade/coleta-adaptadores-sgc.ts`, `coleta-executor.ts`,
-    `coleta-leitores.ts` e `coleta-fotografia.ts` já separam perfis/adaptadores SGC, subprocessos, leitura de relatórios e
-    contrato/persistência da fotografia; `coleta-execucao.ts` ainda resolve o contexto SGC, coleta o Git e coordena o
-    fluxo. O próximo recorte deve avaliar uma fábrica de contexto e uma interface de persistência substituível, sem
-    esconder os defaults específicos do SGC.
+    `coleta-leitores.ts`, `coleta-fotografia.ts` e `coleta-contexto.ts` já separam perfis/adaptadores SGC, subprocessos,
+    leitura de relatórios, contrato/persistência da fotografia e fábrica de contexto; `coleta-execucao.ts` ainda coleta
+    o Git e coordena o fluxo. O próximo recorte deve avaliar uma interface de persistência substituível e uma política de
+    metadados, sem esconder os defaults específicos do SGC.
 
 ### Prioridade baixa
 

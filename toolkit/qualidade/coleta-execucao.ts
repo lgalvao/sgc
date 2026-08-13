@@ -2,12 +2,12 @@ import path from "node:path";
 import process from "node:process";
 import {execa} from "execa";
 import {DIRETORIO_RAIZ} from "../lib/caminhos.js";
+import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
 import {ehEntradaPrincipal} from "../lib/execucao.js";
 import {lerOpcao} from "../lib/cli-opcoes.js";
-import {resolverCaminhoConfigurado} from "../lib/configuracao.js";
-import {obterDiretorioArtefatos} from "../lib/qualidade.js";
 import {escreverErro, escreverLinha} from "../lib/saida.js";
 import {criarAdaptadoresSgc, PERFIS_SGC} from "./coleta-adaptadores-sgc.js";
+import {criarContextoColeta, type ContextoColeta} from "./coleta-contexto.js";
 import {executarComando, executarComandoSgc} from "./coleta-executor.js";
 import {
     criarFotografiaColeta,
@@ -28,16 +28,7 @@ type CatalogoPerfisColeta = Readonly<Record<string, readonly string[]>>;
 interface OpcoesColeta {
     adaptadores?: CatalogoAdaptadores;
     perfis?: CatalogoPerfisColeta;
-}
-
-interface ContextoColeta {
-    base: string;
-    diretorioArtefatos: string;
-    diretorioExecucoes: string;
-    diretorioMaisRecente: string;
-    diretorioBackend: string;
-    diretorioFrontend: string;
-    diretorioFrontendCodigo: string;
+    criarContexto?: (base: string) => ContextoColeta;
 }
 
 interface ExecucaoQualidade {
@@ -115,21 +106,6 @@ interface HotspotQualidade {
 
 const PERFIS = PERFIS_SGC;
 
-function criarContextoColeta(base: string = DIRETORIO_RAIZ): ContextoColeta {
-    const baseResolvida = path.resolve(base ?? DIRETORIO_RAIZ);
-    const diretorioArtefatos = obterDiretorioArtefatos(baseResolvida);
-
-    return {
-        base: baseResolvida,
-        diretorioArtefatos,
-        diretorioExecucoes: path.join(diretorioArtefatos, "execucoes"),
-        diretorioMaisRecente: path.join(diretorioArtefatos, "mais-recente"),
-        diretorioBackend: resolverCaminhoConfigurado("backend", baseResolvida),
-        diretorioFrontend: resolverCaminhoConfigurado("frontend", baseResolvida),
-        diretorioFrontendCodigo: resolverCaminhoConfigurado("frontendCodigo", baseResolvida),
-    };
-}
-
 function caminhoRelativo(caminhoAbsoluto: string, base: string): string {
     return path.relative(base, caminhoAbsoluto).replace(/\\/g, "/");
 }
@@ -203,7 +179,7 @@ async function principal(
     const perfilPorAtribuicao = argumentos.find(argumento => argumento.startsWith("--perfil="))?.split("=")[1] ?? null;
     const perfilInformado = perfilPorOpcao || perfilPorAtribuicao || "rapido";
     const base = path.resolve(lerOpcao(argumentos, "--base", DIRETORIO_RAIZ) ?? DIRETORIO_RAIZ);
-    const contexto = criarContextoColeta(base);
+    const contexto = (opcoes.criarContexto ?? criarContextoColeta)(base);
     const inicio = Date.now();
     const timestamp = formatarTimestampArquivo();
     const perfis: CatalogoPerfisColeta = opcoes.perfis ?? PERFIS;
