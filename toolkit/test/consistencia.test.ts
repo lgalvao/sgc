@@ -127,8 +127,11 @@ describe("Auditorias de consistência e nomenclatura", () => {
         ]);
 
         expect(resultado.exitCode).toBe(0);
-        expect(JSON.parse(resultado.stdout).versao).toBe(1);
-        expect(JSON.parse(resultado.stdout).indicadores.membrosIngles).toBeGreaterThan(0);
+        const conteudo = JSON.parse(resultado.stdout);
+        expect(conteudo.versao).toBe(2);
+        expect(conteudo.indicadores.membrosIngles).toBeGreaterThan(0);
+        expect(conteudo.indicadores.pontuacaoTotal).toBeTypeOf("number");
+        expect(conteudo.indicadores.scoreTotal).toBeUndefined();
         expect(await existe(path.join(diretorioBase, "toolkit"))).toBe(false);
 
         const gravacao = await executarSgc([
@@ -159,7 +162,7 @@ describe("Auditorias de consistência e nomenclatura", () => {
             "nomenclatura",
             "mais-recente",
             "idioma.json"
-        ))).versao).toBe(1);
+        ))).versao).toBe(2);
     });
 
     test("rejeita inventario de simbolos invalido em vez de substitui-lo silenciosamente", async () => {

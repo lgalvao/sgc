@@ -164,6 +164,8 @@ isolado funciona, mas as fronteiras ainda não estão concluídas:
   português; os demais formatos próprios ainda precisam de revisão semelhante;
 - o inventário de símbolos e as auditorias de nomenclatura/idioma agora usam contratos versionados e uma validação única;
   arquivo ausente pode ser coletado sob demanda, mas arquivo existente incompatível falha explicitamente;
+- a auditoria de idioma foi promovida para `versao: 2` e usa `pontuacaoTotal` no resultado próprio, eliminando o último
+  `scoreTotal` desse contrato;
 - a fotografia persistida de `codigo cheiros auditar` agora usa `versao: 2`, `pontosCriticos` e chaves próprias em
   camelCase; o arquivo anterior é validado antes de calcular deltas e versões antigas são rejeitadas;
 - os relatórios próprios persistidos de `backend arquitetura auditar` e `backend coesao auditar` agora carregam

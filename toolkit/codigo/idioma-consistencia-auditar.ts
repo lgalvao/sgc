@@ -70,7 +70,7 @@ interface AuditoriaIdioma {
         membrosIngles: number;
         camposComId: number;
         parametrosComId: number;
-        scoreTotal: number;
+        pontuacaoTotal: number;
     };
     porPrefixo: Record<string, number>;
     topArquivos: ArquivoIdioma[];
@@ -206,7 +206,7 @@ function montarResumo(auditoria: AuditoriaIdioma): string {
     linhas.push(`- Membros com nome inglês: ${auditoria.indicadores.membrosIngles}`);
     linhas.push(`- Campos com \`id\`/\`*Id\`: ${auditoria.indicadores.camposComId}`);
     linhas.push(`- Parâmetros com \`id\`/\`*Id\`: ${auditoria.indicadores.parametrosComId}`);
-    linhas.push(`- **Score total (menor = melhor):** ${auditoria.indicadores.scoreTotal}`);
+    linhas.push(`- **Pontuacao total (menor = melhor):** ${auditoria.indicadores.pontuacaoTotal}`);
     linhas.push("");
     linhas.push("## Distribuição por prefixo inglês");
     linhas.push("");
@@ -258,7 +258,7 @@ async function executarAuditoriaIdioma({
     const dadosInventario = await carregarInventario(caminhoInventario, baseResolvida, gravar);
     const {membrosIngles, camposComId, parametrosComId, topArquivos, porPrefixo} = analisarInventario(dadosInventario);
 
-    const scoreTotal = membrosIngles.length + camposComId.length + parametrosComId.length;
+    const pontuacaoTotal = membrosIngles.length + camposComId.length + parametrosComId.length;
     const auditoria: AuditoriaIdioma = {
         versao: VERSAO_AUDITORIA_IDIOMA,
         geradoEm: new Date().toISOString(),
@@ -269,7 +269,7 @@ async function executarAuditoriaIdioma({
             membrosIngles: membrosIngles.length,
             camposComId: camposComId.length,
             parametrosComId: parametrosComId.length,
-            scoreTotal
+            pontuacaoTotal
         },
         porPrefixo,
         topArquivos,
@@ -296,7 +296,7 @@ async function executarAuditoriaIdioma({
     escreverLinha(`Membros com nome inglês: ${auditoria.indicadores.membrosIngles}`);
     escreverLinha("Campos com id/*Id: " + auditoria.indicadores.camposComId);
     escreverLinha("Parâmetros com id/*Id: " + auditoria.indicadores.parametrosComId);
-    escreverLinha(`Score total (menor = melhor): ${auditoria.indicadores.scoreTotal}`);
+    escreverLinha(`Pontuacao total (menor = melhor): ${auditoria.indicadores.pontuacaoTotal}`);
 
     if (auditoria.topArquivos.length > 0) {
         escreverLinha("");
